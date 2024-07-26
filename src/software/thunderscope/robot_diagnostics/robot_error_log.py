@@ -1,7 +1,6 @@
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import Qt, QTimer
 from proto.import_all_protos import *
-from typing import Dict, List
 from software.py_constants import *
 from software.thunderscope.robot_diagnostics.error_log_widgets import (
     RobotLogMessageWidget,
@@ -46,17 +45,17 @@ class RobotErrorLog(QScrollArea):
         # when a robot has a battery warning, its map entry is set to True
         # which prevents spamming the same battery warning
         # set back to False if battery is back above warning level
-        self.low_battery_log_disabled: Dict[int, bool] = {}
+        self.low_battery_log_disabled: dict[int, bool] = {}
 
         # when the robot has an error code, its added to tne list keyed to the robot id
         # which prevents spamming the same error code log
         # list set back to empty if no error code
-        self.error_code_log_disabled: Dict[int, List[ErrorCode]] = {}
+        self.error_code_log_disabled: dict[int, list[ErrorCode]] = {}
 
         self.layout = QVBoxLayout()
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.error_log_messages: List[RobotLogMessageWidget] = []
+        self.error_log_messages: list[RobotLogMessageWidget] = []
 
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller

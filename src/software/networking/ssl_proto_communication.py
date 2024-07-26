@@ -60,7 +60,7 @@ class SslSocket(object):
 
     def receive(
         self, proto_type: type[protobuf_message.Message]
-    ) -> List[protobuf_message.Message]:
+    ) -> list[protobuf_message.Message]:
         """
         Receives proto(s) on the socket and returns them, given the proto type to expect. This function is blocking
 

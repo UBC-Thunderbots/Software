@@ -8,7 +8,7 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.gl.graphics.gl_shape import GLShape
 import software.thunderscope.gl.helpers.triangulate as triangulate
 
-from typing import Optional, List, Tuple
+from typing import Optional
 
 import math
 import numpy as np
@@ -42,7 +42,7 @@ class GLRobotOutline(GLShape):
     @staticmethod
     def get_robot_outline(
         z_coordinate: float = 0, num_points: int = 10
-    ) -> List[Tuple[float, float, float]]:
+    ) -> list[tuple[float, float, float]]:
         """Returns a list of points that represent the outline of a robot.
         The points will be on a plane parallel to the x-y plane.
 

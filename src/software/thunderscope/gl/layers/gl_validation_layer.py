@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import List
 
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.opengl import *
@@ -135,7 +134,7 @@ class GLValidationLayer(GLLayer):
 
         self.__update_validation_graphics(self.get_validations())
 
-    def get_validations(self) -> List[ValidationProto]:
+    def get_validations(self) -> list[ValidationProto]:
         """Get a list of the cached validations
 
         :returns: A list of the cached validation protos
@@ -150,7 +149,7 @@ class GLValidationLayer(GLLayer):
             ]
         )
 
-    def __update_validation_graphics(self, validations: List[ValidationProto]) -> None:
+    def __update_validation_graphics(self, validations: list[ValidationProto]) -> None:
         """Update the GLGraphicsItems that display the validations
         
         :param validations: The list of validation protos

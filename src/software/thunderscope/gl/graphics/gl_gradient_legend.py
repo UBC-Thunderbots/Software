@@ -1,7 +1,7 @@
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from pyqtgraph.Qt import QtCore, QtGui
 
-from typing import Optional, Dict, Tuple
+from typing import Optional
 
 from software.thunderscope.gl.graphics.gl_painter import GLPainter
 from software.thunderscope.constants import Colors
@@ -18,10 +18,10 @@ class GLGradientLegend(GLPainter):
     def __init__(
         self,
         parent_item: Optional[GLGraphicsItem] = None,
-        size: Tuple[int, int] = (10, 100),
-        offset: Tuple[int, int] = (0, 0),
+        size: tuple[int, int] = (10, 100),
+        offset: tuple[int, int] = (0, 0),
         gradient: QtGui.QLinearGradient = QtGui.QLinearGradient(),
-        labels: Dict[str, float] = {"1.0": 1, "0.0": 0},
+        labels: dict[str, float] = {"1.0": 1, "0.0": 0},
         title: Optional[str] = None,
     ) -> None:
         """Initialize the GLGradientLegend
@@ -119,7 +119,7 @@ class GLGradientLegend(GLPainter):
             painter.setFont(self.title_font)
             painter.drawText(QtCore.QPoint(x_left, round(y_top - label_height)), self.title)
 
-    def set_labels(self, labels: Dict[str, float]) -> None:
+    def set_labels(self, labels: dict[str, float]) -> None:
         """ Update the labels appearing next to the color bar
 
         :param labels: The labels to appear next to the color bar at specified stops

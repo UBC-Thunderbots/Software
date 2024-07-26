@@ -1,5 +1,5 @@
 import math
-from typing import List, Tuple, Optional, Dict
+from typing import Optional
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtGui import *
@@ -19,8 +19,8 @@ class RobotOperation:
     def __init__(
         self,
         id: int,
-        prev_pos: Optional[Tuple[int, int]],
-        pos: Optional[Tuple[int, int]],
+        prev_pos: Optional[tuple[int, int]],
+        pos: Optional[tuple[int, int]],
         next_id: int,
     ):
         self.type = type
@@ -79,14 +79,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.should_init_curr_robot_ids = True
 
         # the local state of robots (if simulator is paused)
-        # map of robot id to a Tuple with the robot coordinates and orientation
+        # map of robot id to a tuple with the robot coordinates and orientation
         # or None if the robot has been removed already
         # (easier to keep track of robots rather than removing the entry entirely)
-        self.local_robot_positions: Dict[int, Tuple[QVector3D, float]] = {}
+        self.local_robot_positions: dict[int, tuple[QVector3D, float]] = {}
 
         # the state of robots before running the simulator
         # the robot state if only manual moves are considered
-        self.pre_sim_robot_positions: Dict[int, Tuple[QVector3D, float]] = {}
+        self.pre_sim_robot_positions: dict[int, tuple[QVector3D, float]] = {}
 
         # stacks for undo and redo operations
         self.undo_operations = []
@@ -461,8 +461,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
         return world_state
 
     def __identify_robot(
-        self, multi_plane_points: List[QVector3D]
-    ) -> Tuple[Optional[int], Optional[int]]:
+        self, multi_plane_points: list[QVector3D]
+    ) -> tuple[Optional[int], Optional[int]]:
         """Identify which robot was clicked on the team
 
         :param multi_plane_points: points on the x-y plane and planes above it corresponding to the mouse click
@@ -625,7 +625,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
     def __invert_robot_if_defending_negative_half(
         self, point: QVector3D, orientation: float
-    ) -> Tuple[QVector3D, float]:
+    ) -> tuple[QVector3D, float]:
         """If we are defending the negative half of the field, we invert the position and orientation
         of a robot  to match up with the visualization.
 

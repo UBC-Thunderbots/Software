@@ -1,6 +1,5 @@
 import pyqtgraph as pg
 from google.protobuf import text_format
-from typing import List
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
@@ -25,7 +24,7 @@ class RobotViewComponent(QWidget):
     def __init__(
         self,
         robot_id: int,
-        available_control_modes: List[IndividualRobotMode],
+        available_control_modes: list[IndividualRobotMode],
         control_mode_signal: Type[QtCore.pyqtSignal],
     ):
         """
@@ -93,7 +92,7 @@ class RobotView(QScrollArea):
 
     control_mode_signal = QtCore.pyqtSignal(int, int)
 
-    def __init__(self, available_control_modes: List[IndividualRobotMode]) -> None:
+    def __init__(self, available_control_modes: list[IndividualRobotMode]) -> None:
 
         """
         Initialize the robot view component for each robot.

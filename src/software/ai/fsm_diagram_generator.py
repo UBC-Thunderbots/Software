@@ -53,14 +53,11 @@ def generate_diagram(fsm):
         # Extract src_state from transition, which is before '+' sign
         src_state = transition.split("+")[0]
 
-        def remove_suffix(str, suffix):
-            return str[: -len(suffix)] if str.endswith(suffix) else str
-
         # Remove suffixes from states, guard, action
-        src_state = remove_suffix(src_state, "_S")
-        dest_state = remove_suffix(dest_state, "_S")
-        guard = " && ".join([remove_suffix(g, "_G") for g in guard.split("&&")])
-        action = remove_suffix(action, "_A")
+        src_state = src_state.removesuffix("_S")
+        dest_state = dest_state.removesuffix("_S")
+        guard = " && ".join([g.removesuffix("_G") for g in guard.split("&&")])
+        action = action.removesuffix("_A")
 
         # Terminate state is marked with X in transition table.
         # Give terminate state custom styling with the

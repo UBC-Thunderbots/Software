@@ -28,12 +28,11 @@ SOFTWARE.
 import math
 import sys
 from collections import namedtuple
-from typing import List, Tuple
 
 Point = namedtuple("Point", ["x", "y", "index"])
 
 
-def earclip(polygon: List[Tuple[float, float]]) -> List[Tuple[int, int, int]]:
+def earclip(polygon: list[tuple[float, float]]) -> list[tuple[int, int, int]]:
     """Triangulates a polygon using a simple earclipping algorithm.
 
     Implementation reference:

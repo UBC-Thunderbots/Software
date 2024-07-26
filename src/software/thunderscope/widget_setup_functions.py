@@ -1,6 +1,6 @@
 import os
 
-from typing import List, Any
+from typing import Any
 
 from software.py_constants import *
 from proto.import_all_protos import *
@@ -302,7 +302,7 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
 
 
 def setup_robot_view(
-    proto_unix_io: ProtoUnixIO, available_control_modes: List[IndividualRobotMode]
+    proto_unix_io: ProtoUnixIO, available_control_modes: list[IndividualRobotMode]
 ) -> RobotView:
     """Setup the robot view widget
     :param proto_unix_io: The proto unix io object for the full system

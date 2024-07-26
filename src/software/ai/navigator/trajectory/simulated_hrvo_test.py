@@ -3,7 +3,6 @@ from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
     pytest_main,
 )
-from typing import List, Union
 from software.simulated_tests.avoid_collisions import *
 import software.python_bindings as tbots
 from proto.ssl_gc_common_pb2 import Team
@@ -28,9 +27,7 @@ class HRVORobotEntersRegionAndStops:
     def __init__(
         self,
         robot_id: int,
-        region: Union[
-            tbots.Vector, tbots.Polygon, tbots.Rectangle, tbots.Circle, tbots.Segment
-        ] = None,
+        region: tbots.Vector | tbots.Polygon | tbots.Rectangle | tbots.Circle | tbots.Segment = None,
         num_ticks: int = 1,
     ):
         """
@@ -168,11 +165,11 @@ def create_robot_circle_pos_params(radius: float, num_robots: int, start: bool):
 
 
 def hrvo_setup(
-    friendly_robots_positions: List[tbots.Point],
-    friendly_robots_destinations: List[tbots.Point],
-    friendly_robots_final_orientations: List[tbots.Angle],
-    enemy_robots_positions: List[tbots.Point],
-    enemy_robots_destinations: List[tbots.Point],
+    friendly_robots_positions: list[tbots.Point],
+    friendly_robots_destinations: list[tbots.Point],
+    friendly_robots_final_orientations: list[tbots.Angle],
+    enemy_robots_positions: list[tbots.Point],
+    enemy_robots_destinations: list[tbots.Point],
     simulated_test_runner: SimulatedTestRunner,
 ):
     """
@@ -469,11 +466,11 @@ def hrvo_setup(
 )
 def test_robot_movement(
     simulated_test_runner: SimulatedTestRunner,
-    friendly_robot_positions: List[tbots.Point],
-    friendly_robot_destinations: List[tbots.Point],
-    friendly_robots_final_orientations: List[tbots.Angle],
-    enemy_robots_positions: List[tbots.Point],
-    enemy_robots_destinations: List[tbots.Point],
+    friendly_robot_positions: list[tbots.Point],
+    friendly_robot_destinations: list[tbots.Point],
+    friendly_robots_final_orientations: list[tbots.Angle],
+    enemy_robots_positions: list[tbots.Point],
+    enemy_robots_destinations: list[tbots.Point],
     timeout_s: int,
     run_till_end: bool,
 ):
@@ -506,7 +503,7 @@ def test_robot_movement(
     )
 
 
-def get_reached_destination_validation(robot_destinations: List[tbots.Point]):
+def get_reached_destination_validation(robot_destinations: list[tbots.Point]):
     """
     Constructs validation that each robot from the list of robot destinations
     reaches its destination within a certain threshold

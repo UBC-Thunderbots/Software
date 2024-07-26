@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TypeVar, List, Iterable, Union, Callable
+from typing import TypeVar, Iterable, Callable
 
 T = TypeVar("T")
 
@@ -12,7 +12,7 @@ class ChangeAction:
 class Change:
     """Represents a change in a list"""
 
-    def __init__(self, changed_list: List, changed_slice: slice, action: ChangeAction):
+    def __init__(self, changed_list: list, changed_slice: slice, action: ChangeAction):
         """Initialize the Change
 
         :param changed_list: The list that changed
@@ -25,7 +25,7 @@ class Change:
         self._action = action
 
     @property
-    def elements(self) -> List:
+    def elements(self) -> list:
         """The elements in the list affected by the change
 
         :returns: A list of elements affected by the change
@@ -44,7 +44,7 @@ class Change:
 
 
 class ObservableList(list):
-    """List that notifies observers when elements are added or removed"""
+    """list that notifies observers when elements are added or removed"""
 
     def __init__(
         self, observer: Callable[[Change], None] = None, iterable: Iterable[T] = ()
@@ -127,12 +127,12 @@ class ObservableList(list):
     def __imul__(self, multiplier):
         raise NotImplementedError()
 
-    def __delitem__(self, index_or_slice: Union[int, slice]) -> None:
+    def __delitem__(self, index_or_slice: int | slice) -> None:
         """See list.__delitem__"""
         self.__notify_elements_removed_index_or_slice(index_or_slice)
         super().__delitem__(index_or_slice)
 
-    def __setitem__(self, index_or_slice: Union[int, slice], value: T) -> None:
+    def __setitem__(self, index_or_slice: int | slice, value: T) -> None:
         """See list.__setitem__"""
         notify_added = self.__notify_elements_removed_index_or_slice(index_or_slice)
         super().__setitem__(index_or_slice, value)
@@ -159,7 +159,7 @@ class ObservableList(list):
             observer(change)
 
     def __notify_elements_removed_index_or_slice(
-        self, index_or_slice: Union[int, slice]
+        self, index_or_slice: int | slice
     ) -> Callable[[], None]:
         """Notify observers about elements removed at an index or slice
 

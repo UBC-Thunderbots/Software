@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Sequence, Any, Dict
+from typing import Callable, Optional, Sequence, Any
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.constants import TabNames
 
@@ -73,13 +73,17 @@ class TScopeQTTab(TScopeTab):
     """
     Data that describes a tab with Qt Widgets in Thunderscope
     """
+    # List of widget data for this tab
+    widgets: Sequence[TScopeWidget]  
 
-    widgets: Sequence[TScopeWidget]  # list of widget data for this tab
-    widgets_map: Dict[str, TScopeWidget]  # Mapping of widget names to widget objects
-    dock_map: Dict[str, DockArea]  # Mapping of widget names to dock areas
-    refresh_functions: Dict[
-        str, Callable[[], None]
-    ]  # Mapping of widget names to refresh functions
+    # Mapping of widget names to widget objects
+    widgets_map: dict[str, TScopeWidget]  
+
+    # Mapping of widget names to dock areas
+    dock_map: dict[str, DockArea]  
+
+    # Mapping of widget names to refresh functions
+    refresh_functions: dict[str, Callable[[], None]]  
 
     def __init__(
         self,

@@ -8,7 +8,6 @@ from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import MULTI_PLANE_POINTS
 
 import numpy as np
-from typing import List
 
 
 class MouseInSceneEvent:
@@ -21,7 +20,7 @@ class MouseInSceneEvent:
         self,
         mouse_event: QtGui.QMouseEvent,
         point_in_scene: QtGui.QVector3D,
-        multi_plane_points: List[QtGui.QVector3D],
+        multi_plane_points: list[QtGui.QVector3D],
     ):
         """Initialize the MouseInSceneEvent
 
@@ -153,7 +152,7 @@ class ExtendedGLViewWidget(GLViewWidget):
 
     def get_multi_plane_points_in_scene(
         self, mouse_pos: QtCore.QPoint
-    ) -> List[QtGui.QVector3D]:
+    ) -> list[QtGui.QVector3D]:
         """
         Determines the coordinates of the points on the x-y planes and a few planes above it
         in the 3D scene that the mouse is pointing at

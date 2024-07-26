@@ -3,13 +3,12 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
-from typing import List
 from proto.import_all_protos import *
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
-from typing import Type, List
+from typing import Type
 from collections import deque
 
 
@@ -77,7 +76,7 @@ class RobotInfo(QWidget):
     def __init__(
         self,
         robot_id: int,
-        available_control_modes: List[IndividualRobotMode],
+        available_control_modes: list[IndividualRobotMode],
         control_mode_signal: Type[QtCore.pyqtSignal],
     ) -> None:
         """
@@ -199,7 +198,7 @@ class RobotInfo(QWidget):
         return button
 
     def create_control_mode_menu(
-        self, available_control_modes: List[IndividualRobotMode]
+        self, available_control_modes: list[IndividualRobotMode]
     ) -> QComboBox:
         """
         Creates the drop down menu to select the input for each robot

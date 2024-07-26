@@ -19,8 +19,6 @@ from software.thunderscope.constants import (
     CustomGLOptions,
 )
 
-from typing import Dict, Tuple
-
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
@@ -453,7 +451,7 @@ class GLWorldLayer(GLLayer):
 
     def __update_robot_graphics(
         self,
-        robots: Dict[int, Tuple[float, float, float]],
+        robots: dict[int, tuple[float, float, float]],
         color: QtGui.QColor,
         robot_graphics: ObservableList,
         robot_id_graphics: ObservableList,

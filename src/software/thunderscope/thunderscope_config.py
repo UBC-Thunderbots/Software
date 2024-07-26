@@ -2,7 +2,7 @@ from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.widget_setup_functions import *
 from software.thunderscope.constants import TabNames, ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from typing import Sequence, Dict
+from typing import Sequence
 from software.thunderscope.thunderscope_types import (
     TScopeTab,
     TScopeWidget,
@@ -19,15 +19,15 @@ class TScopeConfig:
     """
     Data that described a whole Thunderscope view
     """
+    # Mapping of protos needed for this view
+    proto_unix_io_map: dict[ProtoUnixIOTypes, ProtoUnixIO]
 
-    proto_unix_io_map: Dict[
-        ProtoUnixIOTypes, ProtoUnixIO
-    ]  # mapping of protos needed for this view
-    tabs: Sequence[TScopeTab]  # list of tabs for this view
+    # List of tabs for this view
+    tabs: Sequence[TScopeTab] 
 
     def __init__(
         self,
-        proto_unix_io_map: Dict[ProtoUnixIOTypes, ProtoUnixIO],
+        proto_unix_io_map: dict[ProtoUnixIOTypes, ProtoUnixIO],
         tabs: Sequence[TScopeTab],
     ) -> None:
         self.proto_unix_io_map = proto_unix_io_map
@@ -126,7 +126,7 @@ def configure_base_fullsystem(
     replay: bool = False,
     replay_log: os.PathLike = None,
     visualization_buffer_size: int = 5,
-    extra_widgets: List[TScopeWidget] = [],
+    extra_widgets: list[TScopeWidget] = [],
     refresh_func_counter: FrameTimeCounter = None,
     buffer_func_counter: FrameTimeCounter = None,
 ) -> list:
@@ -245,7 +245,7 @@ def configure_base_fullsystem(
 def configure_base_diagnostics(
     diagnostics_proto_unix_io: ProtoUnixIO,
     current_proto_unix_io: ProtoUnixIO,
-    extra_widgets: List[TScopeWidget] = [],
+    extra_widgets: list[TScopeWidget] = [],
 ) -> list:
     """
     Returns a list of widget data for a Diagnostics tab

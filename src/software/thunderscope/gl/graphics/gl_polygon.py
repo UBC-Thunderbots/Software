@@ -3,7 +3,7 @@ from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors, LINE_WIDTH
-from typing import Optional, List, Tuple
+from typing import Optional
 
 import software.thunderscope.gl.helpers.triangulate as triangulate
 from software.thunderscope.gl.graphics.gl_shape import GLShape
@@ -17,7 +17,7 @@ class GLPolygon(GLShape):
     def __init__(
         self,
         parent_item: Optional[GLGraphicsItem] = None,
-        points: List[Tuple[float, float]] = [],
+        points: list[tuple[float, float]] = [],
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
@@ -41,7 +41,7 @@ class GLPolygon(GLShape):
 
         self.set_points(points)
 
-    def set_points(self, points: List[Tuple[float, float]]) -> None:
+    def set_points(self, points: list[tuple[float, float]]) -> None:
         """Update the point data representing the polygon to display.
         A polygon is an ordered sequence of points, where consecutive points
         in the sequence are connected an edge, and an edge connects the first
