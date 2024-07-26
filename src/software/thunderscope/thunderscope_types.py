@@ -73,17 +73,18 @@ class TScopeQTTab(TScopeTab):
     """
     Data that describes a tab with Qt Widgets in Thunderscope
     """
+
     # List of widget data for this tab
-    widgets: Sequence[TScopeWidget]  
+    widgets: Sequence[TScopeWidget]
 
     # Mapping of widget names to widget objects
-    widgets_map: dict[str, TScopeWidget]  
+    widgets_map: dict[str, TScopeWidget]
 
     # Mapping of widget names to dock areas
-    dock_map: dict[str, DockArea]  
+    dock_map: dict[str, DockArea]
 
     # Mapping of widget names to refresh functions
-    refresh_functions: dict[str, Callable[[], None]]  
+    refresh_functions: dict[str, Callable[[], None]]
 
     def __init__(
         self,

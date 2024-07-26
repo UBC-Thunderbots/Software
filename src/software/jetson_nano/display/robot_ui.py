@@ -20,6 +20,7 @@ BUTTON_PIN = constants.BUTTON_PIN
 PIN_1 = constants.PIN_1
 PIN_2 = constants.PIN_2
 
+
 # These keys indicate how to handle return values
 class ScreenActions:
     NONE = 0
@@ -42,16 +43,16 @@ redis_keys = [
 
 class RobotUi:
     """
-    RobotUI is our user interface for our robots that allows us to quickly get robot 
+    RobotUI is our user interface for our robots that allows us to quickly get robot
     diagnostics and change settings of the robot.
 
     RobotUI uses LcdDisplay to show information, RotaryEncoder to toggle and change different settings,
-    and Screen classes to organize the layout of the user interface. 
+    and Screen classes to organize the layout of the user interface.
 
-    RobotUI can synchronize the user interface with a redis server by calling the `poll_redis` 
+    RobotUI can synchronize the user interface with a redis server by calling the `poll_redis`
     function which will continuously update the values with what is in redis every 3 seconds.
 
-    Ensure that the 'spidev' kernel module is loaded while using RobotUI. This can be loaded by 
+    Ensure that the 'spidev' kernel module is loaded while using RobotUI. This can be loaded by
     the following command: 'sudo modprobe spidev'
     """
 
@@ -83,7 +84,7 @@ class RobotUi:
         time.sleep(2)
 
         def on_click():
-            """ Execute on click callback of curr screen """
+            """Execute on click callback of curr screen"""
             action = self.screens[self.curr_screen].on_click()
 
             if screen_actions.CHANGE_SCREEN == action["screen action"]:
@@ -101,11 +102,11 @@ class RobotUi:
                 )
 
         def on_clockwise_rotate():
-            """ Execute the clockwise rotate callback of curr screen """
+            """Execute the clockwise rotate callback of curr screen"""
             self.screens[self.curr_screen].on_clockwise_rotate()
 
         def on_counterclockwise_rotate():
-            """ Execute the counterclockwise rotate callback of curr screen """
+            """Execute the counterclockwise rotate callback of curr screen"""
             self.screens[self.curr_screen].on_counterclockwise_rotate()
 
         self.rotary_encoder = RotaryEncoder(
@@ -121,7 +122,7 @@ class RobotUi:
         self.screens[self.curr_screen].update_screen()
 
     def poll_redis(self, timeout=0.1):
-        """ Update redis dict every timeout seconds """
+        """Update redis dict every timeout seconds"""
         while not self.shutdown:
             for key in redis_keys:
                 self.redis_dict[key] = float(self.redis_client.get(key).decode("UTF-8"))
@@ -133,7 +134,7 @@ class RobotUi:
             time.sleep(timeout)
 
     def stop(self):
-        """ Cleanup the GPIO pins """
+        """Cleanup the GPIO pins"""
         self.shutdown = True
         self.rotary_encoder.stop()
 

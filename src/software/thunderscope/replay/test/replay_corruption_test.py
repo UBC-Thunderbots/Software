@@ -12,6 +12,7 @@ Steps to test:
         entries
     4. we check to see if there are uncaught exception. If there are, we know fore sure proto player wouldn't work!
 """
+
 import pytest
 
 import time
@@ -111,8 +112,8 @@ def make_part_replay_chunks(
     :list_of_protos: the list of proto that we are referencing when creating the log entries
     :save_path: where we are saving the replay file
     :duration: how long do we want to create these replay chunks
-    :start_time: when is the replay chunk being started? 
-    :gen_log_entry_func: the function that is used to generate invalid log entries 
+    :start_time: when is the replay chunk being started?
+    :gen_log_entry_func: the function that is used to generate invalid log entries
     :frequency: what percent of the time should we call gen_log_entry_func
     """
     os.makedirs(save_path, exist_ok=True)
@@ -136,9 +137,9 @@ def make_part_replay_chunks(
 
 def make_replay_chunk(size_of_replay_chunk=1000):
     """
-    Creating a replay chunks that is like the following: 
+    Creating a replay chunks that is like the following:
     1. from 0 to 0.1 seconds, it all of the entries are valid
-    2. from 0.1 to 0.2 seconds, 10% of the proto cannot be decoded 
+    2. from 0.1 to 0.2 seconds, 10% of the proto cannot be decoded
     3. from 0.2 to 0.3 seconds, 10% of the proto are missing delimiter
 
     :size_of_replay_chunks: the size of the replay chunks we want to make
@@ -170,14 +171,14 @@ def make_replay_chunk(size_of_replay_chunk=1000):
 
 def cleanup():
     """
-    cleaning up this test by deleting the replay files 
+    cleaning up this test by deleting the replay files
     """
     shutil.rmtree(TMP_REPLAY_SAVE_PATH)
 
 
 def create_test_player() -> ProtoPlayer:
     """
-    Creating a protoplayer and setting a seed so that the generated 
+    Creating a protoplayer and setting a seed so that the generated
     replay file stays the same over time!
     """
 
@@ -190,7 +191,7 @@ def create_test_player() -> ProtoPlayer:
 
 def test_for_file_corruption():
     """
-    testing whether or not the proto player could play corrupted zipfile! 
+    testing whether or not the proto player could play corrupted zipfile!
     """
     player = create_test_player()
 

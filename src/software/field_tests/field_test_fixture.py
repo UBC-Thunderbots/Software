@@ -382,7 +382,8 @@ def field_test_runner():
         rc_friendly.setup_for_fullsystem()
 
         gamecontroller.setup_proto_unix_io(
-            blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
         )
         # Inject the proto unix ios into thunderscope and start the test
         tscope = Thunderscope(

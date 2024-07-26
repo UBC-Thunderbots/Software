@@ -23,9 +23,9 @@ class GLPolygon(GLShape):
         line_width: float = LINE_WIDTH,
     ) -> None:
         """Initialize the GLPolygon
-        
+
         :param parent_item: The parent item of the graphic
-        :param points: A list of 2-tuples representing the polygon points 
+        :param points: A list of 2-tuples representing the polygon points
                        on the cartesian plane. Must be non-empty
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill

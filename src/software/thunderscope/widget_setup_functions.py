@@ -203,9 +203,9 @@ def setup_parameter_widget(
 ) -> ProtoConfigurationWidget:
     """Setup the parameter widget
 
-        :param proto_unix_io: The proto unix io object
-        :param friendly_colour_yellow:
-        :returns: The proto configuration widget
+    :param proto_unix_io: The proto unix io object
+    :param friendly_colour_yellow:
+    :returns: The proto configuration widget
 
     """
 

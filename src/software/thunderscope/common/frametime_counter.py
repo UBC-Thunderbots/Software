@@ -42,7 +42,7 @@ class FrameTimeCounter:
 
     def get_average_frametime(self):
         """
-        Averaget the entire list 
+        Averaget the entire list
 
         :return: the average of the entire list, and -1 if the list is empty
         """

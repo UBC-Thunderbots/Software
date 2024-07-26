@@ -17,7 +17,7 @@ class FloatSlider(QSlider):
         :param decimals: number of decimal places that value of slider should have
         """
         super(FloatSlider, self).__init__(*args, **kwargs)
-        self.decimals = 10 ** decimals
+        self.decimals = 10**decimals
 
         # slider now emits a float value signal every time its value changes
         self.valueChanged.connect(self.emitFloatValueChanged)
@@ -93,8 +93,8 @@ class ColorQLabel(QLabel):
     def set_float_val(self, val: float) -> None:
         """
         Sets the current value of the label to the given float value
-        :param val:  the value to 
-        :return: 
+        :param val:  the value to
+        :return:
         """
         self.setText(f"{self.label_text}{val:02d}")
         self.__update_background_color(val)
@@ -128,7 +128,7 @@ class ColorProgressBar(QProgressBar):
         """
         super(ColorProgressBar, self).__init__()
 
-        self.decimals = 10 ** decimals
+        self.decimals = 10**decimals
 
         super(ColorProgressBar, self).setRange(
             int(min_val * self.decimals), int(max_val * self.decimals)
@@ -277,7 +277,7 @@ def create_radio(text: list, radio_group):
 
     :param text: - list of text for all buttons
     :param radio_group: QButtonGroup to add these buttons to
-    :return group_box, buttons: 
+    :return group_box, buttons:
                 QGroupBox object - add this to the widget
                 list of QRadioButton object - use this to perform tasks on the buttons
     """
@@ -491,7 +491,9 @@ def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
     convert_degree = -16
 
     painter.drawChord(
-        rect, start_angle_degree * convert_degree, span_angle_degree * convert_degree,
+        rect,
+        start_angle_degree * convert_degree,
+        span_angle_degree * convert_degree,
     )
 
 
@@ -505,7 +507,10 @@ def display_tooltip(event, tooltip_text):
     """
     if str(event.type()) == "Type.Enter":
         QToolTip.showText(
-            QPoint(int(event.globalPosition().x()), int(event.globalPosition().y()),),
+            QPoint(
+                int(event.globalPosition().x()),
+                int(event.globalPosition().y()),
+            ),
             tooltip_text,
             msecShowTime=20 * MILLISECONDS_PER_SECOND,
         )

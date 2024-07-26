@@ -19,11 +19,12 @@ class TScopeConfig:
     """
     Data that described a whole Thunderscope view
     """
+
     # Mapping of protos needed for this view
     proto_unix_io_map: dict[ProtoUnixIOTypes, ProtoUnixIO]
 
     # List of tabs for this view
-    tabs: Sequence[TScopeTab] 
+    tabs: Sequence[TScopeTab]
 
     def __init__(
         self,
@@ -626,9 +627,11 @@ def configure_ai_or_diagnostics(
         proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS] = (
             proto_unix_io_map[ProtoUnixIOTypes.BLUE]
             if load_blue
-            else proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
-            if load_yellow
-            else ProtoUnixIO()
+            else (
+                proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+                if load_yellow
+                else ProtoUnixIO()
+            )
         )
         if not load_blue and not load_yellow:
             proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[

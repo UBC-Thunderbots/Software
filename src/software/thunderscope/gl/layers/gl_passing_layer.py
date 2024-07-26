@@ -28,7 +28,7 @@ class GLPassingLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-                            
+
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -68,9 +68,11 @@ class GLPassingLayer(GLLayer):
         self.pass_graphics.resize(
             1,
             lambda: GLPolygon(
-                outline_color=Colors.COMMITTED_PASS_VISUALIZATION_COLOR
-                if pass_vis.pass_committed
-                else Colors.UNCOMMITTED_PASS_VISUALIZATION_COLOR
+                outline_color=(
+                    Colors.COMMITTED_PASS_VISUALIZATION_COLOR
+                    if pass_vis.pass_committed
+                    else Colors.UNCOMMITTED_PASS_VISUALIZATION_COLOR
+                )
             ),
         )
 

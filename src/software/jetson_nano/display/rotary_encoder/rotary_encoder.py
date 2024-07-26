@@ -72,7 +72,7 @@ class RotaryEncoder:
         self.transitions_per_rotation = len(STATES) - 1
 
     def setup(self):
-        """ Initialize GPIO pins and rotary encoder state """
+        """Initialize GPIO pins and rotary encoder state"""
 
         # Set the GPIO mode if it has not been set
         if not Gpio.getmode():
@@ -92,7 +92,7 @@ class RotaryEncoder:
         self.count = 0
 
     def rot_state(self):
-        """ Update the current state and count state transitions """
+        """Update the current state and count state transitions"""
         pin_1_state = Gpio.input(self.PIN_1)
         pin_2_state = Gpio.input(self.PIN_2)
         next_state = (pin_1_state, pin_2_state)
@@ -108,10 +108,10 @@ class RotaryEncoder:
             self.dir = COUNTERCLOCKWISE
 
     def start(self):
-        """ Start listening to GPIO pins to trigger callback functions """
+        """Start listening to GPIO pins to trigger callback functions"""
 
         def on_rotation(channel):
-            """ Update rotation state and call user defined callback functions after complete rotation """
+            """Update rotation state and call user defined callback functions after complete rotation"""
             self.rot_state()
 
             if self.count // self.transitions_per_rotation != 0:
@@ -125,7 +125,7 @@ class RotaryEncoder:
                 self.count = 0
 
         def button_pressed(channel):
-            """ Call the user defined callback when button is pressed """
+            """Call the user defined callback when button is pressed"""
             if not Gpio.input(self.BUTTON_PIN):
                 self.on_click()
 
@@ -144,7 +144,7 @@ class RotaryEncoder:
         )
 
     def stop(self):
-        """ clean up the GPIO pins that we were using for this class """
+        """clean up the GPIO pins that we were using for this class"""
         Gpio.cleanup()
 
 

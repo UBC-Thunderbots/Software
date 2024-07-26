@@ -12,7 +12,6 @@ from software.simulated_tests.validation import (
 
 
 class RobotSpeedThreshold(Validation):
-
     """Checks if the friendly robots' speed is at or above some threshold."""
 
     def __init__(self, speed_threshold):

@@ -158,7 +158,7 @@ class GLGamecontrollerToolbar(GLToolbar):
     ) -> None:
         """
         The handler called when a play is selected. Sends the right gc command
-        based on the play we want. 
+        based on the play we want.
         Updates the UI to indicate the play that was selected
         Toggles the normal start button so we can start the play
         """
@@ -176,14 +176,15 @@ class GLGamecontrollerToolbar(GLToolbar):
             command_type = Command.Type.PENALTY
 
         self.__send_gc_command(
-            command_type, (SslTeam.BLUE if is_blue else SslTeam.YELLOW),
+            command_type,
+            (SslTeam.BLUE if is_blue else SslTeam.YELLOW),
         )
 
         if not self.normal_start_enabled:
             self.__toggle_normal_start_button()
 
     def __toggle_normal_start_button(self) -> None:
-        """ 
+        """
         Toggles the enabled / disabled state of the Normal Start button
         """
         self.normal_start_enabled = not self.normal_start_enabled

@@ -25,7 +25,7 @@ class GLRobotOutline(GLShape):
         line_width: float = LINE_WIDTH,
     ) -> None:
         """Initialize the GLRobotOutline
-        
+
         :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
         :param line_width: The line width of the graphic
@@ -70,7 +70,7 @@ class GLRobotOutline(GLShape):
 
     def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
-        
+
         :param degrees: The orientation of the graphic in degrees
 
         """

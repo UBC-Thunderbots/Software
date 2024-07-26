@@ -12,7 +12,6 @@ logger = createLogger(__name__)
 
 
 class TbotsTestRunner:
-
     """An abstract class that represents a test runner"""
 
     def __init__(
@@ -25,11 +24,11 @@ class TbotsTestRunner:
         is_yellow_friendly=False,
     ):
         """Initialize the TestRunner.
-        
+
         :param test_name: The name of the test to run
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
-        :param gamecontroller: The gamecontroller context managed instance 
+        :param gamecontroller: The gamecontroller context managed instance
 
         """
 
@@ -100,7 +99,9 @@ class TbotsTestRunner:
         )
 
     def set_tactics(
-        self, tactics: AssignedTacticPlayControlParams, is_friendly: bool,
+        self,
+        tactics: AssignedTacticPlayControlParams,
+        is_friendly: bool,
     ):
         """Overrides current AI tactic for the given team
 

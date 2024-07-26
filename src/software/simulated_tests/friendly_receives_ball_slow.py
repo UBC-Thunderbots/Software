@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class FriendlyReceivesBallSlow(Validation):
-
     """
     Checks if a receiver receives the ball below a certain speed
     """

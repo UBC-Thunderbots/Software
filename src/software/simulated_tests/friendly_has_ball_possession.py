@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class FriendlyHasBallPossession(Validation):
-
     """Checks if any friendly robot has possession of the ball."""
 
     def __init__(self, tolerance=0.01):

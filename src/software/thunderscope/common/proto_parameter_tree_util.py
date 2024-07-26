@@ -60,7 +60,10 @@ def __create_double_parameter_writable(key, value, descriptor):
         "type": "float",
         "value": value,
         "default": value,
-        "limits": (min_max["min_double_value"], min_max["max_double_value"],),
+        "limits": (
+            min_max["min_double_value"],
+            min_max["max_double_value"],
+        ),
         "step": 0.01,
     }
 

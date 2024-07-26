@@ -42,7 +42,7 @@ COLOUR_MODEL = "RGB"
 
 class LcdDisplay:
     def __init__(self):
-        """ Create a lcd_display object """
+        """Create a lcd_display object"""
         # Create the display for 1.8" ST7735R:
         self.disp = st7735.ST7735R(
             SPI,
@@ -67,13 +67,13 @@ class LcdDisplay:
         self.clear_screen()
 
     def clear_screen(self):
-        """ Clear this LCD display, make it black """
+        """Clear this LCD display, make it black"""
         # Draw a black filled box to clear the image.
         self.draw.rectangle((0, 0, self.width, self.height), outline=0, fill=(0, 0, 0))
         self.disp.image(self.image)
 
     def draw_image(self, path_to_image):
-        """ Draw image on this LCD display """
+        """Draw image on this LCD display"""
         self.clear_screen()
 
         image = Image.open(path_to_image)
@@ -99,9 +99,9 @@ class LcdDisplay:
         self.disp.image(image)
 
     def prepare(self):
-        """ Create a blank rectangle for drawing """
+        """Create a blank rectangle for drawing"""
         self.draw.rectangle((0, 20, self.width, self.height), outline=0, fill=0)
 
     def show(self):
-        """ Display the image """
+        """Display the image"""
         self.disp.image(self.image)

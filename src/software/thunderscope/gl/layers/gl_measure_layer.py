@@ -20,7 +20,7 @@ class GLMeasureLayer(GLLayer):
 
     def __init__(self, name: str) -> None:
         """Initialize the GLMeasureLayer
-        
+
         :param name: The displayed name of the layer
 
         """
@@ -40,7 +40,7 @@ class GLMeasureLayer(GLLayer):
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was pressed and picked a point in the 3D scene
-        
+
         :param event: The event
 
         """
@@ -127,9 +127,9 @@ class GLMeasureLayer(GLLayer):
 
     def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was moved within the 3D scene
-        
+
         :param event: The event
-        
+
         """
         self.mouse_point_in_scene = event.point_in_scene
 

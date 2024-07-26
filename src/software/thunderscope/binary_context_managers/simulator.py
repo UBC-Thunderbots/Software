@@ -12,8 +12,7 @@ from software.thunderscope.binary_context_managers.util import *
 
 
 class Simulator(object):
-
-    """ Simulator Context Manager """
+    """Simulator Context Manager"""
 
     def __init__(
         self,
@@ -37,7 +36,7 @@ class Simulator(object):
         self.enable_realism = enable_realism
 
     def __enter__(self) -> "self":
-        """Enter the simulator context manager. 
+        """Enter the simulator context manager.
 
         If the debug mode is enabled then the binary is _not_ run and the
         command to debug under gdb is printed.
@@ -112,7 +111,6 @@ gdb --args bazel-bin/{simulator_command}
         yellow_full_system_proto_unix_io: ProtoUnixIO,
         autoref_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
-
         """Setup the proto unix io for the simulator
 
         :param simulator_proto_unix_io: The proto unix io of the simulator.

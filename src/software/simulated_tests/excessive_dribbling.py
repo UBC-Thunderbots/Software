@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class ExcessivelyDribbling(Validation):
-
     """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
 
     def __init__(self):

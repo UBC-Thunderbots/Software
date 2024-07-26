@@ -1,6 +1,7 @@
 """
 A file of constants that are used throughout the robot UI
 """
+
 # REDIS
 REDIS_PORT_NUMBER = 6379
 

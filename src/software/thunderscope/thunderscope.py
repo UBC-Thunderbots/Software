@@ -17,8 +17,7 @@ from software.thunderscope.thunderscope_config import TScopeConfig
 
 
 class Thunderscope(object):
-
-    """ Thunderscope is our main visualizer that can visualize our field,
+    """Thunderscope is our main visualizer that can visualize our field,
     obstacles, paths, performance metrics, logs, plots. Thunderscope also
     provides tools to interact with the robots.
 

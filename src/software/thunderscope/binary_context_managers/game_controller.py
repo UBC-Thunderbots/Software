@@ -77,7 +77,7 @@ class Gamecontroller(object):
         return self.referee_port
 
     def __enter__(self) -> "self":
-        """Enter the gamecontroller context manager. 
+        """Enter the gamecontroller context manager.
 
         :return: gamecontroller context managed instance
 
@@ -124,13 +124,16 @@ class Gamecontroller(object):
             self.send_gc_command(
                 gc_command=manual_command.manual_command.type,
                 team=manual_command.manual_command.for_team,
-                final_ball_placement_point=tbots_cpp.Point(
-                    manual_command.final_ball_placement_point.x,
-                    manual_command.final_ball_placement_point.y,
-                )
-                # HasField checks if the field was manually set by us
-                # as opposed to if a value exists (since a default value always exists)
-                if manual_command.HasField("final_ball_placement_point") else None,
+                final_ball_placement_point=(
+                    tbots_cpp.Point(
+                        manual_command.final_ball_placement_point.x,
+                        manual_command.final_ball_placement_point.y,
+                    )
+                    # HasField checks if the field was manually set by us
+                    # as opposed to if a value exists (since a default value always exists)
+                    if manual_command.HasField("final_ball_placement_point")
+                    else None
+                ),
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
@@ -193,7 +196,10 @@ class Gamecontroller(object):
                 autoref_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
+            Gamecontroller.REFEREE_IP,
+            self.referee_port,
+            __send_referee_command,
+            True,
         )
 
         blue_full_system_proto_unix_io.register_observer(

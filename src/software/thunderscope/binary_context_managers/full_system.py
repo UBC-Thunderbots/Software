@@ -12,8 +12,7 @@ from software.thunderscope.binary_context_managers.util import is_cmd_running
 
 
 class FullSystem(object):
-
-    """ Full System Binary Context Manager """
+    """Full System Binary Context Manager"""
 
     def __init__(
         self,
@@ -45,7 +44,7 @@ class FullSystem(object):
         self.thread = threading.Thread(target=self.__restart__, daemon=True)
 
     def __enter__(self) -> "self":
-        """Enter the full_system context manager. 
+        """Enter the full_system context manager.
 
         If the debug mode is enabled then the binary is _not_ run and the
         command to debug under gdb is printed. The  context manager will then

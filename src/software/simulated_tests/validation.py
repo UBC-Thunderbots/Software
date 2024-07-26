@@ -6,7 +6,6 @@ from proto.validation_pb2 import *
 
 
 class Validation(object):
-
     """A validation function"""
 
     def get_validation_status(self, world) -> ValidationStatus:
@@ -26,7 +25,7 @@ def create_validation_types(validation_class):
     """Given a Validation implementation that returns ValidationStatus.PASSING
     when true and ValidationStatus.FAILING when false, create the 4 validation
     types with different visualization/passing/failing properties (described below)
-     
+
                               ┌───────────────────────┐      ┌─────────────────┐
                               │                       │──────► EventuallyTrue  │
                               │                       │      └─────────────────┘

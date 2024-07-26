@@ -22,7 +22,6 @@ class ThreadedUnixSender(Generic[T]):
     def __init__(
         self, unix_path: str, proto_type: type[T], max_buffer_size: int = 3
     ) -> None:
-
         """Send protobufs over unix sockets
 
         :param unix_path: The unix path to send the protobuf to
@@ -46,8 +45,7 @@ class ThreadedUnixSender(Generic[T]):
         self.send_failures = 0
 
     def force_stop(self) -> None:
-        """Stop handling requests
-        """
+        """Stop handling requests"""
         self.stop = True
         self.socket.close()
 

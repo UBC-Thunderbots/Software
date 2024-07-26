@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class RobotEntersRegion(Validation):
-
     """Checks if a Robot enters any of the provided regions."""
 
     def __init__(self, regions=None):
@@ -55,7 +54,6 @@ class RobotEntersRegion(Validation):
 
 
 class NumberOfRobotsEntersRegion(Validation):
-
     """Checks if a certain number of Robots enters a specific region."""
 
     def __init__(self, region, req_robot_cnt):

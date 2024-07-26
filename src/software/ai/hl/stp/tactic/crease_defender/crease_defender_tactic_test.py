@@ -211,7 +211,10 @@ def test_crease_autochip(
 
     # Always Validation
     always_validation_sequence_set = [
-        [BallIsAlwaysOnGround(threshold=0.05), NeverExcessivelyDribbles(),]
+        [
+            BallIsAlwaysOnGround(threshold=0.05),
+            NeverExcessivelyDribbles(),
+        ]
     ]
     # Eventually Validation
     eventually_validation_sequence_set = [[]]
@@ -299,7 +302,10 @@ def test_crease_get_ball(
 
     # Always Validation
     always_validation_sequence_set = [
-        [BallIsAlwaysOnGround(threshold=0.05), NeverExcessivelyDribbles(),]
+        [
+            BallIsAlwaysOnGround(threshold=0.05),
+            NeverExcessivelyDribbles(),
+        ]
     ]
     # Eventually Validation
     eventually_validation_sequence_set = [[]]

@@ -93,7 +93,6 @@ class RobotView(QScrollArea):
     control_mode_signal = QtCore.pyqtSignal(int, int)
 
     def __init__(self, available_control_modes: list[IndividualRobotMode]) -> None:
-
         """
         Initialize the robot view component for each robot.
 

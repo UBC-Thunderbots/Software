@@ -76,7 +76,11 @@ class GLValidationLayer(GLLayer):
 
     PASSED_VALIDATION_PERSISTANCE_TIMEOUT_S = 1.0
 
-    def __init__(self, name: str, buffer_size: int = 10,) -> None:
+    def __init__(
+        self,
+        name: str,
+        buffer_size: int = 10,
+    ) -> None:
         """Initialize the GLValidationLayer
 
         :param name: The displayed name of the layer
@@ -151,7 +155,7 @@ class GLValidationLayer(GLLayer):
 
     def __update_validation_graphics(self, validations: list[ValidationProto]) -> None:
         """Update the GLGraphicsItems that display the validations
-        
+
         :param validations: The list of validation protos
 
         """
@@ -178,16 +182,20 @@ class GLValidationLayer(GLLayer):
 
         # Ensure we have the same number of graphics as validations
         self.polygon_graphics.resize(
-            len(polygons), lambda: GLPolygon(),
+            len(polygons),
+            lambda: GLPolygon(),
         )
         self.segment_graphics.resize(
-            len(segments), lambda: GLPolygon(),
+            len(segments),
+            lambda: GLPolygon(),
         )
         self.circle_graphics.resize(
-            len(circles), lambda: GLCircle(),
+            len(circles),
+            lambda: GLCircle(),
         )
         self.stadium_graphics.resize(
-            len(stadiums), lambda: GLStadium(),
+            len(stadiums),
+            lambda: GLStadium(),
         )
 
         for polygon_graphic, (polygon, validation_status) in zip(
@@ -247,7 +255,7 @@ class GLValidationLayer(GLLayer):
         self, validation_status: ValidationStatus
     ) -> QtGui.QColor:
         """Get the color representing the given validation status
-        
+
         :param validation_status: the validation status
         :returns: the color representing the validation status
 

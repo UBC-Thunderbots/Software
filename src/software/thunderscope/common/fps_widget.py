@@ -7,7 +7,7 @@ from software.py_constants import MILLISECONDS_PER_SECOND
 
 class FrameTimeWidget(QWidget):
     """
-    Display the fps and frametime of thunderscope. 
+    Display the fps and frametime of thunderscope.
     This is measured in two different places, the buffer callback in GLWidget, and
     the refresh function in tab.
 
@@ -21,7 +21,7 @@ class FrameTimeWidget(QWidget):
         update_delta_sec=0.5,
     ):
         """
-        Initialize FrameTimeWidget 
+        Initialize FrameTimeWidget
 
         :buffer_counter: a frametime counter at the GLWidget Widget
         :refresh_counter: a frametime counter at the refresh function

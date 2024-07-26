@@ -36,8 +36,8 @@ def get_current_ball_angle(ball):
 
 def get_ball_speed(ball):
     ball_speed = math.sqrt(
-        ball.current_state.global_velocity.x_component_meters ** 2
-        + ball.current_state.global_velocity.y_component_meters ** 2
+        ball.current_state.global_velocity.x_component_meters**2
+        + ball.current_state.global_velocity.y_component_meters**2
     )
 
     return ball_speed

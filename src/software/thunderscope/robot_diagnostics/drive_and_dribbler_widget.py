@@ -31,8 +31,7 @@ class DriveAndDribblerWidget(QWidget):
         self.setLayout(layout)
 
     def refresh(self) -> None:
-        """Refresh the widget and send the a MotorControl message with the current values
-        """
+        """Refresh the widget and send the a MotorControl message with the current values"""
         motor_control = MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
 
@@ -235,8 +234,7 @@ class DriveAndDribblerWidget(QWidget):
         self.dribbler_speed_rpm_slider.valueChanged.disconnect()
 
     def reset_direct_sliders(self) -> None:
-        """Reset direct sliders back to 0
-        """
+        """Reset direct sliders back to 0"""
         self.x_velocity_slider.setValue(0)
         self.y_velocity_slider.setValue(0)
         self.angular_velocity_slider.setValue(0)

@@ -27,7 +27,13 @@ class HRVORobotEntersRegionAndStops:
     def __init__(
         self,
         robot_id: int,
-        region: tbots.Vector | tbots.Polygon | tbots.Rectangle | tbots.Circle | tbots.Segment = None,
+        region: (
+            tbots.Vector
+            | tbots.Polygon
+            | tbots.Rectangle
+            | tbots.Circle
+            | tbots.Segment
+        ) = None,
         num_ticks: int = 1,
     ):
         """
@@ -205,9 +211,11 @@ def hrvo_setup(
         blue_params = get_move_update_control_params(
             index,
             destination,
-            friendly_robots_final_orientations[index]
-            if friendly_robots_final_orientations
-            else desired_orientation,
+            (
+                friendly_robots_final_orientations[index]
+                if friendly_robots_final_orientations
+                else desired_orientation
+            ),
             0,
             params=blue_params,
         )
@@ -241,7 +249,15 @@ def hrvo_setup(
     + "enemy_robots_positions,enemy_robots_destinations,timeout_s,run_till_end",
     [
         # robot moving straight with no obstacles
-        ([tbots.Point(-2.5, 0)], [tbots.Point(2.8, 0)], [], [], [], 10, False,),
+        (
+            [tbots.Point(-2.5, 0)],
+            [tbots.Point(2.8, 0)],
+            [],
+            [],
+            [],
+            10,
+            False,
+        ),
         # robot moving straight with no obstacles while turning from 0 to 180 degrees
         (
             [tbots.Point(-2.5, 0)],
@@ -328,7 +344,11 @@ def hrvo_setup(
             [tbots.Point(0, 0)],
             [tbots.Point(2.7, 0)],
             [],
-            [tbots.Point(1, 0), tbots.Point(1, 0.3), tbots.Point(1, -0.3),],
+            [
+                tbots.Point(1, 0),
+                tbots.Point(1, 0.3),
+                tbots.Point(1, -0.3),
+            ],
             [],
             10,
             False,

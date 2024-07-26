@@ -9,7 +9,7 @@ OUTPUT_FILE_PATH = "docs/fsm-diagrams.md"
 
 def generate_diagram(fsm):
     """
-    Generates a Mermaid text definition for a state diagram 
+    Generates a Mermaid text definition for a state diagram
     representing the FSM.
 
     Details on Mermaid UML syntax:

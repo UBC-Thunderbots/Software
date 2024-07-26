@@ -15,8 +15,7 @@ from google.protobuf.message import Message
 
 
 class RobotCommunication(object):
-
-    """ Communicate with the robots """
+    """Communicate with the robots"""
 
     def __init__(
         self,
@@ -265,12 +264,14 @@ class RobotCommunication(object):
             primitive_set = PrimitiveSet(
                 time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                 stay_away_from_ball=False,
-                robot_primitives=robot_primitives
-                if not self.should_send_stop
-                else {
-                    robot_id: Primitive(stop=StopPrimitive())
-                    for robot_id in robot_primitives.keys()
-                },
+                robot_primitives=(
+                    robot_primitives
+                    if not self.should_send_stop
+                    else {
+                        robot_id: Primitive(stop=StopPrimitive())
+                        for robot_id in robot_primitives.keys()
+                    }
+                ),
                 sequence_number=self.sequence_number,
             )
 

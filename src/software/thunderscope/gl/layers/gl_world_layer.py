@@ -105,10 +105,12 @@ class GLWorldLayer(GLLayer):
             parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR
         )
         self.halfway_line_graphic = GLPolygon(
-            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
+            parent_item=self,
+            outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
         )
         self.goal_to_goal_line_graphic = GLPolygon(
-            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
+            parent_item=self,
+            outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
         )
         self.field_center_circle_graphic = GLCircle(
             parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
@@ -221,9 +223,9 @@ class GLWorldLayer(GLLayer):
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was pressed and picked a point in the 3D scene
-        
+
         :param event: The event
-        
+
         """
         if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             return
@@ -246,9 +248,9 @@ class GLWorldLayer(GLLayer):
 
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was dragged within the 3D scene
-        
+
         :param event: The event
-        
+
         """
         if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             return
@@ -272,9 +274,9 @@ class GLWorldLayer(GLLayer):
 
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was released after picking a point in the 3D scene
-        
+
         :param event: The event
-        
+
         """
         if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             return
@@ -380,7 +382,7 @@ class GLWorldLayer(GLLayer):
 
     def __update_field_graphics(self, field: Field) -> None:
         """Update the GLGraphicsItems that display the field lines and markings
-        
+
         :param field: The field proto
 
         """
@@ -420,7 +422,7 @@ class GLWorldLayer(GLLayer):
 
     def __update_goal_graphics(self, field: Field) -> None:
         """Update the GLGraphicsItems that display the goals
-        
+
         :param field: The field proto
 
         """
@@ -439,7 +441,7 @@ class GLWorldLayer(GLLayer):
 
     def __update_ball_graphics(self, ball_state: BallState) -> None:
         """Update the GLGraphicsItems that display the ball
-        
+
         :param ball_state: The ball state proto
 
         """
@@ -457,7 +459,7 @@ class GLWorldLayer(GLLayer):
         robot_id_graphics: ObservableList,
     ) -> None:
         """Update the GLGraphicsItems that display the robots
-        
+
         :param robots: a mapping of robot ids to a tuple containing x-coord, y-coord, and orientation
         :param color: The color of the robots
         :param robot_graphics: The ObservableList containing the robot graphics for this team
@@ -475,7 +477,9 @@ class GLWorldLayer(GLLayer):
         )
 
         for robot_graphic, robot_id_graphic, robot_id in zip(
-            robot_graphics, robot_id_graphics, robots.keys(),
+            robot_graphics,
+            robot_id_graphics,
+            robots.keys(),
         ):
             # update the robot graphic with the robot state
             pos_x, pos_y, orientation = robots[robot_id]
@@ -663,7 +667,8 @@ class GLWorldLayer(GLLayer):
 
         # Ensure we have the same number of graphics as robots/balls
         self.speed_line_graphics.resize(
-            len(objects), lambda: GLPolygon(outline_color=Colors.SPEED_VECTOR_COLOR),
+            len(objects),
+            lambda: GLPolygon(outline_color=Colors.SPEED_VECTOR_COLOR),
         )
 
         for speed_line_graphic, object in zip(self.speed_line_graphics, objects):
@@ -685,7 +690,7 @@ class GLWorldLayer(GLLayer):
         the negative half of the field.
 
         If we are defending the positive half, we invert the coordinate frame
-        and render the inverted proto. 
+        and render the inverted proto.
 
         We can use the referee msg to determine if we are defending the positive
         or negative half of the field.

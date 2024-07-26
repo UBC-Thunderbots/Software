@@ -11,9 +11,9 @@ class GLPainter(GLGraphicsItem):
 
     def __init__(self, parent_item: Optional[GLGraphicsItem] = None) -> None:
         """Initialize the GLPainter
-        
+
         :param parent_item: The parent item of the graphic
-        
+
         """
         super().__init__(parentItem=parent_item)
         self.draw_functions = []
@@ -22,7 +22,7 @@ class GLPainter(GLGraphicsItem):
         self, draw_function: Callable[[QtGui.QPainter, QtCore.QRect], None]
     ):
         """Register a draw function with this GLPainter.
-        
+
         The draw function must accept a QPainter that it will use to perform
         drawing operations and a QRect that indicates the viewport dimensions.
         The draw function should not call end() on the QPainter.

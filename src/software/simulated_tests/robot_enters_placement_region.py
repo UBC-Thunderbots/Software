@@ -10,7 +10,6 @@ from software.simulated_tests.validation import (
 
 
 class RobotEntersPlacementRegion(Validation):
-
     """Checks if a Robot enters the ball placement stadium region."""
 
     def __init__(self, placement_point):

@@ -12,7 +12,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class ProtoPlotter(QWidget):
-
     """Plot the protobuf data in a pyqtgraph plot
 
     In-order to make the plotter as flexible as possible, we need dependency
@@ -120,7 +119,9 @@ class ProtoPlotter(QWidget):
                         # Ensure hue has sufficient contrast
                         self.color_hue = (self.color_hue + randint(100, 260)) % 360
                         self.plots[name] = self.win.plot(
-                            pen=QtGui.QColor.fromHsl(self.color_hue, 255, round(255 * 0.8)),
+                            pen=QtGui.QColor.fromHsl(
+                                self.color_hue, 255, round(255 * 0.8)
+                            ),
                             name=name,
                             disableAutoRange=True,
                             brush=None,

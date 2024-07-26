@@ -11,7 +11,6 @@ from software.simulated_tests.validation import (
 
 
 class BallSpeedThreshold(Validation):
-
     """Checks if the ball speed is at or above some threshold."""
 
     def __init__(self, speed_threshold):

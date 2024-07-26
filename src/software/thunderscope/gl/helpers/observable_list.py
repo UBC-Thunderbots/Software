@@ -16,9 +16,9 @@ class Change:
         """Initialize the Change
 
         :param changed_list: The list that changed
-        :param changed_slice: The slice of the observable_list that changed 
+        :param changed_slice: The slice of the observable_list that changed
         :param type: The action that caused the change
-        
+
         """
         self._changed_list = changed_list
         self._changed_slice = changed_slice
@@ -36,9 +36,9 @@ class Change:
     @property
     def action(self) -> ChangeAction:
         """The action that caused the change
-        
+
         :returns: The action that caused the change
-        
+
         """
         return self._action
 
@@ -50,11 +50,11 @@ class ObservableList(list):
         self, observer: Callable[[Change], None] = None, iterable: Iterable[T] = ()
     ) -> None:
         """Initialize the ObservableList
-        
+
         :param observer: Observer method to register
         :param iterable: iterable from which elements are to be copied to
                          the initialized ObservableList
-        
+
         """
         super().__init__()
         self.observers = []
@@ -66,14 +66,14 @@ class ObservableList(list):
         ObservableList provides a change notification
 
         :param observer: Observer method that takes a Change as its first argument
-        
+
         """
         if observer:
             self.observers.append(observer)
 
     def resize(self, length: int, element_generator: Callable[[], T]) -> None:
         """Resize the list to a desired target length by either creating new elements
-        using the provided `element_generator` and adding them to the list, or by 
+        using the provided `element_generator` and adding them to the list, or by
         popping elements from the end of the list.
 
         :param length: The target length to resize the list to
@@ -179,7 +179,7 @@ class ObservableList(list):
 
     def __slice_at_index(self, index: int, length: int = 1) -> slice:
         """Create a slice starting at an index and with a given length
-        
+
         :param index: the index to start the slice at
 
         """

@@ -37,16 +37,16 @@ def earclip(polygon: list[tuple[float, float]]) -> list[tuple[int, int, int]]:
 
     Implementation reference:
     https://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
-    
+
     Example usage:
     >>> polygon = [(0, 1), (-1, 0), (0, -1), (1, 0)]
     >>> triangles = tripy.earclip(polygon)
     >>> triangles
     [(3, 0, 1), (3, 1, 2)]
-    
+
     :param polygon: an array of 2-tuples of the cartesian points of the polygon
     :returns: an array of 3-tuples where each item in the tuple is a index into
-              the polygon array (for a polygon with n points, (n - 2) triangles 
+              the polygon array (for a polygon with n points, (n - 2) triangles
               will be returned)
     """
     ear_vertex = []

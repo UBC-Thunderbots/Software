@@ -109,7 +109,7 @@ class ExtendedGLViewWidget(GLViewWidget):
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was moved
-        
+
         :param event: The event
 
         """
@@ -134,7 +134,7 @@ class ExtendedGLViewWidget(GLViewWidget):
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was released
-        
+
         :param event: The event
 
         """

@@ -24,7 +24,7 @@ import time
 class TigersAutoref(TimeProvider):
     """
     A wrapper over the TigersAutoref binary. It coordinates communication between the Simulator, TigersAutoref and
-    Gamecontroller. 
+    Gamecontroller.
 
     In CI mode, the flow of data corresponds to:
 
@@ -107,9 +107,9 @@ class TigersAutoref(TimeProvider):
         game_event_proto_map = Config()
 
         for game_event in GameEvent.Type.DESCRIPTOR.values_by_name:
-            game_event_proto_map.game_event_behavior[
-                game_event
-            ] = Config.Behavior.BEHAVIOR_ACCEPT
+            game_event_proto_map.game_event_behavior[game_event] = (
+                Config.Behavior.BEHAVIOR_ACCEPT
+            )
 
         return self.gamecontroller.update_game_engine_config(game_event_proto_map)
 

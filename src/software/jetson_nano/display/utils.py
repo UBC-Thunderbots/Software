@@ -2,7 +2,7 @@ import subprocess
 
 
 def get_ip_address():
-    """ Returns the IP address of the roboot """
+    """Returns the IP address of the roboot"""
     try:
         cmd = "hostname -I | cut -d' ' -f1"
         IP = subprocess.check_output(cmd, shell=True).decode("utf-8")
@@ -12,7 +12,7 @@ def get_ip_address():
 
 
 def get_signal_strength():
-    """ Returns the signal strength of the robot """
+    """Returns the signal strength of the robot"""
     try:
         cmd = "iwconfig | grep 'Signal level='"
         signal_strength = (

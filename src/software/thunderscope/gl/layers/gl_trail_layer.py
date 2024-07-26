@@ -72,11 +72,15 @@ class GLTrailLayer(GLLayer):
         """
 
         self.trail_graphics_head.resize(
-            len(team.team_robots), lambda: GLPolygon(outline_color=color,),
+            len(team.team_robots),
+            lambda: GLPolygon(
+                outline_color=color,
+            ),
         )
 
         for trail_graphics_head, trail_queue in zip(
-            self.trail_graphics_head, queues_dict,
+            self.trail_graphics_head,
+            queues_dict,
         ):
             trail_graphics_head.set_points(
                 [[point.x_meters, point.y_meters] for point in queues_dict[trail_queue]]

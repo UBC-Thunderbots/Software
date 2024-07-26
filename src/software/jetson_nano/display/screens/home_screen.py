@@ -47,10 +47,10 @@ class HomeScreen(Screen):
         self.current_draw = redis_dict["/current_draw"]
 
         def draw_screen():
-            """ Home Screen Layout """
+            """Home Screen Layout"""
 
             def setup_robot_id(x, y):
-                """ Draw the robot id setting on the screen """
+                """Draw the robot id setting on the screen"""
                 robot_id_str = "Robot ID"
                 self.lcd_display.draw.text(
                     (x, y), robot_id_str, font=self.font, fill=constants.WHITE
@@ -75,7 +75,7 @@ class HomeScreen(Screen):
                 return channel_id_x
 
             def setup_channel_id(x, y):
-                """ Draw the channel id setting on the screen """
+                """Draw the channel id setting on the screen"""
                 channel_id_str = "Channel ID"
                 self.lcd_display.draw.text(
                     (x, y), channel_id_str, font=self.font, fill=constants.WHITE
@@ -90,7 +90,7 @@ class HomeScreen(Screen):
                 )
 
             def setup_battery_voltage(x, y):
-                """ Draw the battery voltage diagnostic on the screen """
+                """Draw the battery voltage diagnostic on the screen"""
                 battery_str = "Battery Voltage: "
                 x = cursor_size
 
@@ -109,7 +109,7 @@ class HomeScreen(Screen):
                 return y + self.font_size
 
             def setup_capacitor_voltage(x, y):
-                """ Draw the capacitor voltage diagnostic on the screen """
+                """Draw the capacitor voltage diagnostic on the screen"""
                 cap_str = "Capacitor Voltage: "
                 x = cursor_size
                 self.lcd_display.draw.text(
@@ -126,7 +126,7 @@ class HomeScreen(Screen):
                 return y + self.font_size
 
             def setup_current_draw(x, y):
-                """ Draw the current draw on screen """
+                """Draw the current draw on screen"""
                 current_draw_str = "Current Draw %: "
                 x = cursor_size
                 self.lcd_display.draw.text(
@@ -181,7 +181,7 @@ class HomeScreen(Screen):
         super().__init__(lcd_display, screen_actions, actions, draw_screen)
 
     def update_values(self, redis_dict):
-        """ Sync values with those from redis """
+        """Sync values with those from redis"""
         if not self.edit_mode:
             for i in range(self.len):
                 if self.actions[i]["redis key"] == None:

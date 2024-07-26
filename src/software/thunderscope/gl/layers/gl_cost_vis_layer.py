@@ -24,7 +24,7 @@ class GLCostVisOverlayLayer(GLLayer):
 
     def __init__(self, cost_vis_layer: GLCostVisLayer) -> None:
         """Initialize the GLCostVisOverlayLayer
-        
+
         :param cost_vis_layer: The GLCostVisLayer this overlay layer is related to
 
         """
@@ -62,11 +62,11 @@ class GLCostVisOverlayLayer(GLLayer):
 
 class GLCostVisLayer(GLLayer):
     """GLLayer that visualizes pass cost data as a heatmap.
-    
+
     This layer enables us to sample different pass cost functions
     in the field and visualize them.
 
-    WARNING: This layer may slow down AI significantly if the number of points 
+    WARNING: This layer may slow down AI significantly if the number of points
     sampled is too high.
 
     WARNING: The checkbox for generate_sample_passes should only be checked
@@ -82,7 +82,7 @@ class GLCostVisLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-                            
+
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BENEATH_BACKGROUND_DEPTH)

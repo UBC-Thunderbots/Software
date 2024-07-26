@@ -78,7 +78,8 @@ class GLObstacleLayer(GLLayer):
         ):
             circle_obstacle_graphic.set_radius(circle_obstacle.radius)
             circle_obstacle_graphic.set_position(
-                circle_obstacle.origin.x_meters, circle_obstacle.origin.y_meters,
+                circle_obstacle.origin.x_meters,
+                circle_obstacle.origin.y_meters,
             )
 
         for stadium_obstacle_graphic, stadium_obstacle in zip(

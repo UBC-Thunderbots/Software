@@ -11,7 +11,7 @@ import software.thunderscope.gl.helpers.triangulate as triangulate
 
 
 class GLShape(GLLinePlotItem):
-    """Base class for a graphic that displays a shape on the 
+    """Base class for a graphic that displays a shape on the
     cartesian plane (i.e. x-y plane)
     """
 
@@ -23,7 +23,7 @@ class GLShape(GLLinePlotItem):
         line_width: float = LINE_WIDTH,
     ) -> None:
         """Base constructor for the GLShape
-        
+
         :param parent_item: The parent item of the graphic
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill
@@ -44,10 +44,10 @@ class GLShape(GLLinePlotItem):
 
     def set_position(self, x: float, y: float) -> None:
         """Set the position of the graphic in the scene
-        
+
         :param x: The x coordinate to position the graphic at
         :param y: The y coordinate to position the graphic at
-        
+
         """
         if self.x == x and self.y == y:
             return
@@ -58,7 +58,7 @@ class GLShape(GLLinePlotItem):
 
     def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
-        
+
         :param degrees: The orientation of the graphic in degrees
 
         """
@@ -71,17 +71,17 @@ class GLShape(GLLinePlotItem):
 
     def set_outline_color(self, outline_color: QtGui.QColor) -> None:
         """Set the color of the shape's outline
-        
-        :param outline_color: The color of the shape's outline 
-        
+
+        :param outline_color: The color of the shape's outline
+
         """
         self.setData(color=outline_color)
 
     def set_fill_color(self, fill_color: Optional[QtGui.QColor]) -> None:
         """Set the color used to fill the shape
-        
-        :param fill_color: The color used to fill the shape, or None if no fill 
-        
+
+        :param fill_color: The color used to fill the shape, or None if no fill
+
         """
         if fill_color:
             if not self.fill_graphic:

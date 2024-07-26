@@ -188,13 +188,15 @@ def test_goalie_blocks_shot(
         ),  # ball is just inside the dead zone in the Y direction
         (
             tbots_cpp.Point(0, 0),
-            False
+            False,
             # ball is just outside the dead zone in the X direction
         ),
     ],
 )
 def test_goalie_clears_from_dead_zone(
-    ball_position, should_clear, simulated_test_runner,
+    ball_position,
+    should_clear,
+    simulated_test_runner,
 ):
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(

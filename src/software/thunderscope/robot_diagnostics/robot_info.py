@@ -55,11 +55,11 @@ class BreakbeamLabel(QLabel):
         """
         common_widgets.display_tooltip(
             event,
-            "No Signal Yet"
-            if self.breakbeam_status is None
-            else "In Beam"
-            if self.breakbeam_status
-            else "Not In Beam",
+            (
+                "No Signal Yet"
+                if self.breakbeam_status is None
+                else "In Beam" if self.breakbeam_status else "Not In Beam"
+            ),
         )
 
         return super().event(event)
@@ -249,7 +249,15 @@ class RobotInfo(QWidget):
         painter.setBrush(pg.mkBrush("black"))
 
         common_widgets.draw_robot(
-            painter, QtCore.QRectF(0, 0, int(radius * 2), int(radius * 2),), -45, 270,
+            painter,
+            QtCore.QRectF(
+                0,
+                0,
+                int(radius * 2),
+                int(radius * 2),
+            ),
+            -45,
+            270,
         )
 
         # Draw the vision pattern

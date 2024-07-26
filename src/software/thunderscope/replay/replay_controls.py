@@ -10,7 +10,7 @@ from software.py_constants import *
 
 class ReplayControls(QWidget):
     def __init__(self, player: ProtoPlayer) -> None:
-        """Setup the replay controls. 
+        """Setup the replay controls.
 
         :param player: The player to control.
 
@@ -102,8 +102,7 @@ class ReplayControls(QWidget):
         self.setLayout(self.controls_layout)
 
     def __on_play_pause_clicked(self) -> None:
-        """When the play/pause button is clicked, toggle play/pause and set the text
-        """
+        """When the play/pause button is clicked, toggle play/pause and set the text"""
         self.player.toggle_play_pause()
 
     def __on_replay_slider_released(self) -> None:
@@ -141,9 +140,7 @@ class ReplayControls(QWidget):
         self.replay_label.setText(f"{current_time} / {total_time}")
 
     def refresh(self) -> None:
-        """Refresh the slider to match the current time.
-
-        """
+        """Refresh the slider to match the current time."""
         if not self.slider_pressed:
             self.replay_slider.setValue(
                 self.player.current_packet_time * MILLISECONDS_PER_SECOND
@@ -157,9 +154,7 @@ class ReplayControls(QWidget):
         )
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
-        """When a key is pressed, pause the player.
-        
-        """
+        """When a key is pressed, pause the player."""
         if event.key() == QtCore.Qt.Key.Key_P:
             self.__on_play_pause_clicked()
 
@@ -188,8 +183,7 @@ class ReplayControls(QWidget):
             self.player.play()
 
     def __on_save_clip_clicked(self) -> None:
-        """When the button is clicked, save clip if current time is after the clip start time
-        """
+        """When the button is clicked, save clip if current time is after the clip start time"""
         if self.clipping and self.player.current_packet_time > self.clip_start:
             self.player.pause()
             end_time = self.player.current_packet_time

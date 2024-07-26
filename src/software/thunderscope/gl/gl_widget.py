@@ -25,7 +25,7 @@ from proto.world_pb2 import SimulationState
 
 
 class GLWidget(QWidget):
-    """Widget that handles GLLayers to produce a 3D visualization of the field/world 
+    """Widget that handles GLLayers to produce a 3D visualization of the field/world
     and our AI. GLWidget can also provide replay controls.
     """
 
@@ -122,9 +122,9 @@ class GLWidget(QWidget):
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
-        
+
         :param event: The event
-        
+
         """
         key_pressed = event.key()
 
@@ -144,9 +144,9 @@ class GLWidget(QWidget):
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
-        
+
         :param event: The event
-        
+
         """
         # Propagate keypress event to all layers
         for layer in self.layers:
@@ -154,9 +154,9 @@ class GLWidget(QWidget):
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Propagate mouse_in_scene_pressed event to all layers
-        
+
         :param event: The event
-        
+
         """
         if self.measure_mode_enabled:
             # Only GLMeasureLayer should receive event to avoid layer
@@ -168,9 +168,9 @@ class GLWidget(QWidget):
 
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Propagate mouse_in_scene_dragged event to all layers
-        
+
         :param event: The event
-        
+
         """
         if self.measure_mode_enabled:
             # Only GLMeasureLayer should receive event to avoid layer
@@ -182,9 +182,9 @@ class GLWidget(QWidget):
 
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Propagate mouse_in_scene_released event to all layers
-        
+
         :param event: The event
-        
+
         """
         if self.measure_mode_enabled:
             # Only GLMeasureLayer should receive event to avoid layer
@@ -196,9 +196,9 @@ class GLWidget(QWidget):
 
     def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
         """Propagate mouse_in_scene_moved event to all layers
-        
+
         :param event: The event
-        
+
         """
         if self.measure_mode_enabled:
             # Only GLMeasureLayer should receive event to avoid layer
@@ -210,8 +210,8 @@ class GLWidget(QWidget):
 
     def add_layer(self, layer: GLLayer, visible: bool = True) -> None:
         """Add a layer to this GLWidget
-        
-        :param layer: The GLLayer 
+
+        :param layer: The GLLayer
         :param visible: Whether the layer is visible on startup
 
         """
@@ -241,7 +241,7 @@ class GLWidget(QWidget):
 
     def remove_layer(self, layer: GLLayer) -> None:
         """Remove a layer from this GLWidget
-        
+
         :param layer: The GLLayer to remove
 
         """

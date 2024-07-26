@@ -146,7 +146,8 @@ class GLDebugShapesLayer(GLLayer):
         ):
             circle_shape_graphic.set_radius(circle_shape.radius)
             circle_shape_graphic.set_position(
-                circle_shape.origin.x_meters, circle_shape.origin.y_meters,
+                circle_shape.origin.x_meters,
+                circle_shape.origin.y_meters,
             )
             circle_shape_text_graphic.setData(
                 text=name,

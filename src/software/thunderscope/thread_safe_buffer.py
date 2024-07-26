@@ -24,7 +24,6 @@ class ThreadSafeBuffer(object):
     def __init__(
         self, buffer_size: int, protobuf_type: Type[Message], log_overrun: bool = False
     ) -> None:
-
         """A buffer to hold data to be consumed.
 
         :param buffer size: The size of the buffer.

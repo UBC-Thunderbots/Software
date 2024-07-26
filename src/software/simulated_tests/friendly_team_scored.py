@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class FriendlyTeamScored(Validation):
-
     """Checks if a ball enters the enemy goal."""
 
     def __init__(self):

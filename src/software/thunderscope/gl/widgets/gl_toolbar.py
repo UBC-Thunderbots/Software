@@ -36,7 +36,7 @@ class GLToolbar(QWidget):
     def get_button_style(self, is_enabled: bool = True) -> str:
         """
         Returns the stylesheet for a QPushButton based on if it's enabled or not
-        
+
         :param is_enabled: True if button is enabled, False if not
         :return: the corresponding stylesheet indicating the button state
         """

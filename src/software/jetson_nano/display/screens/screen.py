@@ -36,7 +36,7 @@ class Screen:
         self.big_font = ImageFont.truetype("DejaVuSans.ttf", self.big_font_size)
 
     def draw_header(self):
-        """ Draw the display header """
+        """Draw the display header"""
         self.lcd_display.draw.rectangle(
             (0, 0, self.lcd_display.width, self.font_size + 6),
             outline=constants.BLACK,
@@ -59,7 +59,7 @@ class Screen:
         self.lcd_display.show()
 
     def update_screen(self):
-        """ Draw the updated screen """
+        """Draw the updated screen"""
         if self.draw_screen != None:
             self.draw_screen()
         else:
@@ -68,7 +68,7 @@ class Screen:
         self.draw_header()
 
     def on_click(self):
-        """ Execute the current action """
+        """Execute the current action"""
         action = self.actions[self.curr_action]
 
         # For editing settings
@@ -92,7 +92,7 @@ class Screen:
         return action
 
     def on_clockwise_rotate(self):
-        """ Update current action and update screen """
+        """Update current action and update screen"""
         if not self.edit_mode:
             self.curr_action = (self.curr_action + 1) % self.len
         else:
@@ -101,7 +101,7 @@ class Screen:
         self.update_screen()
 
     def on_counterclockwise_rotate(self):
-        """ Update current action and update screen """
+        """Update current action and update screen"""
         if not self.edit_mode:
             self.curr_action = (self.curr_action - 1) % self.len
         else:
@@ -110,15 +110,15 @@ class Screen:
         self.update_screen()
 
     def inc_val(self):
-        """ Increment self.param by self.delta"""
+        """Increment self.param by self.delta"""
         self.action["value"] += self.action["delta"]
 
     def dec_val(self):
-        """ Decrement self.param by self.delta """
+        """Decrement self.param by self.delta"""
         self.action["value"] -= self.action["delta"]
 
     def draw_actions(self):
-        """ Draws our list of actions """
+        """Draws our list of actions"""
         self.lcd_display.prepare()
 
         cursor = constants.CURSOR
@@ -171,7 +171,7 @@ class Screen:
             y += self.font_size
 
     def update_values(self, redis_dict):
-        """ Sync values with those from redis """
+        """Sync values with those from redis"""
         if not self.edit_mode:
             for i in range(self.len):
                 if self.actions[i]["redis key"] == None:

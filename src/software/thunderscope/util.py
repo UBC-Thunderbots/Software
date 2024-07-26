@@ -20,7 +20,7 @@ def exit_poller(
     poll_duration_s: float = 0.5,
 ) -> NoReturn:
     """
-    Calls the on_exit callback once the elapsed exit_duration has passed from the start of this function call, 
+    Calls the on_exit callback once the elapsed exit_duration has passed from the start of this function call,
     polling every poll_duration using system time
 
     :param time_provider:   used to compare all timestamps
@@ -46,8 +46,8 @@ def async_sim_ticker(
     """
     Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
 
-    :param tick_rate_ms:            the interval between consequent ticks (ms) 
-    :param blue_proto_unix_io:      ProtoUnixIO for the Blue FullSystem 
+    :param tick_rate_ms:            the interval between consequent ticks (ms)
+    :param blue_proto_unix_io:      ProtoUnixIO for the Blue FullSystem
     :param yellow_proto_unix_io:    ProtoUnixIO for the Yellow FullSystem
     :param sim_proto_unix_io:       ProtoUnixIO for the Simulation
     :param tscope:                  Thunderscope instance that is tied to the simulation ticking

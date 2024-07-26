@@ -49,7 +49,7 @@ class GLTacticLayer(GLLayer):
 
     def __update_tactic_name_graphics(self, team: Team, play_info_dict) -> None:
         """Update the GLGraphicsItems that display tactic data
-        
+
         :param team: The team proto
         :param play_info_dict: The dictionary containing play/tactic info
 
@@ -65,7 +65,8 @@ class GLTacticLayer(GLLayer):
         )
 
         for tactic_fsm_info_graphic, robot in zip(
-            self.tactic_fsm_info_graphics, team.team_robots,
+            self.tactic_fsm_info_graphics,
+            team.team_robots,
         ):
             tactic_fsm_info_graphic.setData(
                 text=textwrap.dedent(

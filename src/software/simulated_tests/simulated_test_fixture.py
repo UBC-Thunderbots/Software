@@ -37,7 +37,6 @@ PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
 class SimulatedTestRunner(TbotsTestRunner):
-
     """Run a simulated test"""
 
     def __init__(
@@ -50,13 +49,13 @@ class SimulatedTestRunner(TbotsTestRunner):
         gamecontroller,
     ):
         """Initialize the SimulatorTestRunner
-        
+
         :param test_name: The name of the test to run
         :param thunderscope: The thunderscope to use, None if not used
         :param simulator_proto_unix_io: The simulator proto unix io to use
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
-        :param gamecontroller: The gamecontroller context managed instance 
+        :param gamecontroller: The gamecontroller context managed instance
 
         """
         super(SimulatedTestRunner, self).__init__(
@@ -139,7 +138,7 @@ class SimulatedTestRunner(TbotsTestRunner):
             processing_start_time = time.time()
 
             # Check for new CI commands at this time step
-            for (delay, cmd, team) in ci_cmd_with_delay:
+            for delay, cmd, team in ci_cmd_with_delay:
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
@@ -309,7 +308,6 @@ class SimulatedTestRunner(TbotsTestRunner):
 
 
 class InvariantTestRunner(SimulatedTestRunner):
-
     """
     Runs a simulated test only once with a given parameter
 
@@ -351,7 +349,6 @@ class InvariantTestRunner(SimulatedTestRunner):
 
 
 class AggregateTestRunner(SimulatedTestRunner):
-
     """
     Runs a simulated test multiple times with different given parameters
 
@@ -556,7 +553,8 @@ def simulated_test_runner():
                 ProtoUnixIO(),
             )
             gamecontroller.setup_proto_unix_io(
-                blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
+                blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io,
             )
 
             # If we want to run thunderscope, inject the proto unix ios

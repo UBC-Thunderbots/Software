@@ -23,7 +23,7 @@ class ProtoUnixIO:
         ProtoUnixReceiver ┌───────────────────┐           ┌──┬──┬──┬──┬──┐
                 ──────────>                   ├──────────>│  │  │  │  │  │
                           │                   │           └──┴──┴──┴──┴──┘
-                          │    ProtoUnixIO    │           ThreadSafeBuffer 
+                          │    ProtoUnixIO    │           ThreadSafeBuffer
         ProtoUnixSender   │                   │
                 <─────────┤                   <──────────── send_proto
                           └───────────────────┘
@@ -104,7 +104,7 @@ class ProtoUnixIO:
         """Register a buffer to observe all incoming protobufs
 
         :param buffer: buffer to push protos onto
-        
+
         """
         self.all_proto_observers.append(buffer)
 
@@ -141,7 +141,7 @@ class ProtoUnixIO:
     ) -> None:
         """Creates a unix sender and registers an observer
         of the proto_class to send the data over the unix_path socket.
-        
+
         :param runtime_dir: The runtime_dir where all protos will be sent to
         :param unix_path: The unix socket path within the runtime_dir to open
         :param proto_class: The protobuf type to send
@@ -162,7 +162,7 @@ class ProtoUnixIO:
     ) -> None:
         """Creates a unix listener of that protobuf type and provides
         incoming data to registered observers.
-        
+
         :param runtime_dir: The runtime_dir where all protos will be sent to
         :param unix_path: The unix path within the runtime_dir to send data over
         :param proto_class: The prototype to send
@@ -170,9 +170,11 @@ class ProtoUnixIO:
 
         """
         listener = ThreadedUnixListener(
-            runtime_dir + f"/{proto_class.DESCRIPTOR.full_name}"
-            if from_log_visualize and not unix_path
-            else runtime_dir + unix_path,
+            (
+                runtime_dir + f"/{proto_class.DESCRIPTOR.full_name}"
+                if from_log_visualize and not unix_path
+                else runtime_dir + unix_path
+            ),
             proto_class=proto_class,
         )
         key = proto_class.DESCRIPTOR.full_name

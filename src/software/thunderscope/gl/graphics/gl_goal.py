@@ -19,7 +19,7 @@ class GLGoal(GLMeshItem):
         color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
     ) -> None:
         """Initialize the GLGoal
-        
+
         :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
 
@@ -44,7 +44,7 @@ class GLGoal(GLMeshItem):
 
     def set_dimensions(self, x_length: float, y_length: float) -> None:
         """Set the dimensions of the goal
-        
+
         :param x_length: The length of the goal in the x direction
         :param y_length: The length of the goal in the y direction
 
@@ -69,10 +69,10 @@ class GLGoal(GLMeshItem):
 
     def set_position(self, x: float, y: float) -> None:
         """Set the position of the graphic in the scene
-        
+
         :param x: The x coordinate to position the graphic at
         :param y: The y coordinate to position the graphic at
-        
+
         """
         if self.x == x and self.y == y:
             return
@@ -83,7 +83,7 @@ class GLGoal(GLMeshItem):
 
     def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
-        
+
         :param degrees: The orientation of the graphic in degrees
 
         """
@@ -101,7 +101,7 @@ class GLGoal(GLMeshItem):
 
         :param x_length: The length of the goal in the x direction
         :param y_length: The length of the goal in the y direction
-        :returns: the computed MeshData instance 
+        :returns: the computed MeshData instance
 
         """
         # Construct vertices that make up the mesh.
@@ -130,4 +130,7 @@ class GLGoal(GLMeshItem):
             [7, 3, 1],
         ]
 
-        return MeshData(vertexes=np.array(vertices), faces=np.array(faces),)
+        return MeshData(
+            vertexes=np.array(vertices),
+            faces=np.array(faces),
+        )

@@ -41,8 +41,7 @@ class PlayInfoWidget(QWidget):
         self.setLayout(self.vertical_layout)
 
     def refresh(self) -> None:
-        """Update the play info widget with new play information
-        """
+        """Update the play info widget with new play information"""
         playinfo = self.playinfo_buffer.get(block=False, return_cached=False)
 
         # Updating QTableWidget could be expensive, so we only update if there is new data

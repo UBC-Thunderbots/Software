@@ -22,7 +22,7 @@ class GLHeatmap(GLMeshItem):
         color_map: pg.ColorMap = None,
     ) -> None:
         """Initialize the GLHeatmap
-        
+
         :param parent_item: The parent item of the graphic
         :param color_map: ColorMap to map scalar data values to the color space.
                           If no ColorMap is provided, the default is a grayscale ColorMap.
@@ -43,7 +43,7 @@ class GLHeatmap(GLMeshItem):
 
     def set_dimensions(self, x_length: float = 0, y_length: float = 0) -> None:
         """Set the dimensions of the heatmap
-        
+
         :param x_length: The length of the heatmap in the x direction
         :param y_length: The length of the heatmap in the y direction
 

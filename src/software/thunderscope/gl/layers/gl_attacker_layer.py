@@ -69,9 +69,11 @@ class GLAttackerLayer(GLLayer):
             self.pass_graphics.resize(
                 1,
                 lambda: GLPolygon(
-                    outline_color=Colors.COMMITTED_PASS_VISUALIZATION_COLOR
-                    if attacker_vis_proto.pass_committed
-                    else Colors.UNCOMMITTED_PASS_VISUALIZATION_COLOR
+                    outline_color=(
+                        Colors.COMMITTED_PASS_VISUALIZATION_COLOR
+                        if attacker_vis_proto.pass_committed
+                        else Colors.UNCOMMITTED_PASS_VISUALIZATION_COLOR
+                    )
                 ),
             )
             self.pass_graphics[0].set_points(
@@ -90,7 +92,8 @@ class GLAttackerLayer(GLLayer):
         if attacker_vis_proto.HasField("shot"):
             shot_proto = attacker_vis_proto.shot
             self.shot_graphics.resize(
-                1, lambda: GLPolygon(outline_color=Colors.SHOT_VISUALIZATION_COLOR),
+                1,
+                lambda: GLPolygon(outline_color=Colors.SHOT_VISUALIZATION_COLOR),
             )
             self.shot_open_angle_graphics.resize(
                 1,
@@ -101,8 +104,14 @@ class GLAttackerLayer(GLLayer):
 
             self.shot_graphics[0].set_points(
                 [
-                    [shot_proto.shot_origin.x_meters, shot_proto.shot_origin.y_meters,],
-                    [shot_proto.shot_target.x_meters, shot_proto.shot_target.y_meters,],
+                    [
+                        shot_proto.shot_origin.x_meters,
+                        shot_proto.shot_origin.y_meters,
+                    ],
+                    [
+                        shot_proto.shot_target.x_meters,
+                        shot_proto.shot_target.y_meters,
+                    ],
                 ]
             )
             self.shot_open_angle_graphics[0].setData(
@@ -120,7 +129,10 @@ class GLAttackerLayer(GLLayer):
                 1,
                 lambda: GLCircle(outline_color=Colors.CHIP_TARGET_VISUALIZATION_COLOR),
             )
-            self.chip_target_graphics[0].set_radius(self.CHIP_TARGET_RADIUS_METERS,)
+            self.chip_target_graphics[0].set_radius(
+                self.CHIP_TARGET_RADIUS_METERS,
+            )
             self.chip_target_graphics[0].set_position(
-                chip_target_proto.x_meters, chip_target_proto.y_meters,
+                chip_target_proto.x_meters,
+                chip_target_proto.y_meters,
             )

@@ -130,7 +130,8 @@ class GLFieldToolbar(GLToolbar):
         self.simulation_speeds = SIMULATION_SPEEDS
         for speed in self.simulation_speeds:
             self.sim_speed_menu.addAction(
-                str(speed), lambda new_speed=speed: self.speed_callback(new_speed),
+                str(speed),
+                lambda new_speed=speed: self.speed_callback(new_speed),
             )
 
         # if sandbox mode, set up the sandbox control buttons
