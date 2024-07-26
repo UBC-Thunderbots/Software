@@ -1,4 +1,4 @@
-#!/opt/tbotspython/bin/python3.8
+#!/opt/tbotspython/bin/python3
 
 import os
 import sys
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     if args.interactive or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
         filtered_targets = process.extract(
-            args.search_query, list(targets.keys()), limit=NUM_FILTERED_MATCHES_TO_SHOW
+            args.search_query, list(target_dict.keys()), limit=NUM_FILTERED_MATCHES_TO_SHOW
         )
         targets = [
             target_dict[filtered_target_name[0]]

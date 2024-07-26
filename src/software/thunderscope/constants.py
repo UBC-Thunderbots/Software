@@ -253,7 +253,7 @@ def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> 
     }
 
 
-def rgb_to_bw(r: int, g: int, b: int) -> tuple:
+def rgb_to_bw(r: int, g: int, b: int) -> tuple[int, int, int]:
     """
     Converts the given RGB color values into the corresponding black and white RGB values
     :param r: red value
@@ -261,7 +261,7 @@ def rgb_to_bw(r: int, g: int, b: int) -> tuple:
     :param b: blue value
     :return: RGB tuple of the given color in black and white
     """
-    rgb_val = 0.3 * r + 0.59 * g + 0.11 * b
+    rgb_val = int(0.3 * r + 0.59 * g + 0.11 * b)
     return rgb_val, rgb_val, rgb_val
 
 

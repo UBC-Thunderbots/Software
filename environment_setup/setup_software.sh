@@ -62,14 +62,14 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    python3.8       # Python 3
-    python3.8-dev # Python 3 headers
-    python3.8-venv # Virtual Environment
-    python3-pip   # Required for bazel to install python dependencies for build targets
+    python3.10       # Python 3
+    python3.10-dev   # Python 3 headers
+    python3.10-venv  # Virtual Environment
+    python3-pip      # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
-                    # properly manage this as a bazel dependency, so we have
-                    # to manually install it ourselves
-    python3-yaml 	# Load dynamic parameter configuration files
+                     # properly manage this as a bazel dependency, so we have
+                     # to manually install it ourselves
+    python3-yaml 	 # Load dynamic parameter configuration files
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libffi-dev # needed to use _ctypes in Python3
@@ -114,7 +114,7 @@ print_status_msg "Setting Up Virtual Python Environment"
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
+if ! sudo /usr/bin/python3.10 -m venv /opt/tbotspython ; then
     print_status_msg "Error: Setting up virtual environment failed"
     exit 1
 fi
@@ -160,8 +160,11 @@ print_status_msg "Finished setting up AutoRef"
 # Install Bazel
 print_status_msg "Installing Bazel"
 
+# Uninstall Bazel first
+sudo rm -rf $HOME/.bazel
+
 # Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
-sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
+sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
 sudo chmod +x /tmp/bazel-installer.sh
 sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
 echo "source ${HOME}/.bazel/bin/bazel-complete.bash" >> ~/.bashrc
@@ -185,7 +188,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # installs PlatformIO to global environment
-if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.1.13; then
+if ! sudo /usr/bin/python3.10 -m pip install --prefix /usr/local platformio==6.1.13; then
     print_status_msg "Error: Installing PlatformIO failed"
     exit 1
 fi

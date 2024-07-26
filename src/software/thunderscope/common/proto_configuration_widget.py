@@ -89,7 +89,7 @@ class ProtoConfigurationWidget(QWidget):
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(func)
-        self.timer.start(time_in_seconds * MILLISECONDS_PER_SECOND)
+        self.timer.start(round(time_in_seconds * MILLISECONDS_PER_SECOND))
 
     def create_widget(self):
         """

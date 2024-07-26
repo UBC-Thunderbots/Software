@@ -117,7 +117,7 @@ class GLGradientLegend(GLPainter):
         # Draw legend title
         if self.title:
             painter.setFont(self.title_font)
-            painter.drawText(QtCore.QPoint(x_left, y_top - label_height), self.title)
+            painter.drawText(QtCore.QPoint(x_left, round(y_top - label_height)), self.title)
 
     def set_labels(self, labels: Dict[str, float]) -> None:
         """ Update the labels appearing next to the color bar
