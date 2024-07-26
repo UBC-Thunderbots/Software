@@ -114,6 +114,11 @@ print_status_msg "Setting Up Virtual Python Environment"
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
+if ! curl -sS https://bootstrap.pypa.io/get-pip.py | sudo python3.10 ; then
+    print_status_msg "Error: Installing pip failed"
+    exit 1
+fi
+
 if ! sudo /usr/bin/python3.10 -m venv /opt/tbotspython ; then
     print_status_msg "Error: Setting up virtual environment failed"
     exit 1
