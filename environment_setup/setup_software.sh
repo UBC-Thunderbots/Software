@@ -203,6 +203,13 @@ if ! sudo /usr/bin/python3.10 -m pip install --prefix /usr/local platformio==6.1
     exit 1
 fi
 
+which platformio
+echo $PATH
+if ! platformio ; then
+    echo "no platformio"
+    exit 1
+fi
+
 print_status_msg "Done PlatformIO Setup"
 
 print_status_msg "Done Software Setup, please reboot for changes to take place"
