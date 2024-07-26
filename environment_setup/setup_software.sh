@@ -124,6 +124,11 @@ if ! sudo /usr/bin/python3.10 -m venv /opt/tbotspython ; then
     exit 1
 fi
 
+if ! curl -sS https://bootstrap.pypa.io/get-pip.py | sudo /opt/tbotspython/bin/python3.10 ; then
+    print_status_msg "Error: Installing pip in venv failed"
+    exit 1
+fi
+
 if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     print_status_msg "Error: Upgrading pip version in venv failed"
     exit 1
