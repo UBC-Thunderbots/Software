@@ -7,7 +7,7 @@
 # The version of the clang executable to use
 export CLANG_VERSION=10.0
 # The version of black to use
-export BLACK_VERSION=19-10b0
+export BLACK_VERSION=24.4.2
 
 # The directory this script is in
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
