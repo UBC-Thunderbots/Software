@@ -62,14 +62,15 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    python3.10       # Python 3
-    python3.10-dev   # Python 3 headers
-    python3.10-venv  # Virtual Environment
-    python3-pip      # Required for bazel to install python dependencies for build targets
-    python3-protobuf # This is required for the "NanoPb" library, which does not
-                     # properly manage this as a bazel dependency, so we have
-                     # to manually install it ourselves
-    python3-yaml 	 # Load dynamic parameter configuration files
+    python3.10        # Python 3
+    python3.10-dev    # Python 3 headers
+    python3.10-venv   # Virtual Environment
+    python3-pip       # Required for bazel to install python dependencies for build targets
+    python3-protobuf  # This is required for the "NanoPb" library, which does not
+                      # properly manage this as a bazel dependency, so we have
+                      # to manually install it ourselves
+    python3-yaml 	  # Load dynamic parameter configuration files
+    python-is-python3 # Symlinks /usr/bin/python to python3
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libffi-dev # needed to use _ctypes in Python3
