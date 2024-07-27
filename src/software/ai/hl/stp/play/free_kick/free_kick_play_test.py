@@ -7,7 +7,6 @@ from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_team_scored import *
 from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
-from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
@@ -156,7 +155,6 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos, must_s
     ],
 )
 def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bots):
-
     blue_bots = [
         tbots_cpp.Point(-4.5, 0),
         tbots_cpp.Point(-3, 1.5),
