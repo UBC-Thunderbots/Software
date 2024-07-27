@@ -70,7 +70,6 @@ host_software_packages=(
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
     python3-yaml 	  # Load dynamic parameter configuration files
-    python-is-python3 # Symlinks /usr/bin/python to python3
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libffi-dev # needed to use _ctypes in Python3
