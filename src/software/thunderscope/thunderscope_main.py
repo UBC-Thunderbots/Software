@@ -223,7 +223,7 @@ if __name__ == "__main__":
 
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
     if not args.run_blue and not args.run_yellow and args.launch_gc:
-        parser.error("--launch_gc has to be ran with --run_blue argument")
+        parser.error("--launch_gc has to be run with --run_blue or --run_yellow argument")
 
     # Sanity check that an interface was provided
     if args.run_blue or args.run_yellow:
@@ -328,7 +328,9 @@ if __name__ == "__main__":
             estop_mode=estop_mode,
             estop_path=estop_path,
             enable_radio=args.enable_radio,
-            referee_port=Gamecontroller.get_referee_port_static(gamecontroller),
+            referee_port=gamecontroller.get_referee_port()
+            if gamecontroller
+            else SSL_REFEREE_PORT,
         ) as robot_communication:
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
                 tscope.keyboard_estop_shortcut.activated.connect(

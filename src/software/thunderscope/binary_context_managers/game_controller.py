@@ -26,14 +26,14 @@ class Gamecontroller(object):
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs: bool = False, use_conventional_port=False) -> None:
+    def __init__(self, suppress_logs: bool = False, use_conventional_port=False) -> None:
         """Run Gamecontroller
 
-        :param supress_logs: Whether to suppress the logs
+        :param suppress_logs: Whether to suppress the logs
         :param use_conventional_port: whether or not to use the conventional port!
         """
 
-        self.supress_logs = supress_logs
+        self.suppress_logs = suppress_logs
 
         # We default to using a non-conventional port to avoid emitting
         # on the same port as what other teams may be listening on.
@@ -50,19 +50,6 @@ class Gamecontroller(object):
         self.command_override_buffer = ThreadSafeBuffer(
             buffer_size=2, protobuf_type=ManualGCCommand
         )
-
-    @staticmethod
-    def get_referee_port_static(gamecontroller: Gamecontroller):
-        """
-        return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
-
-        :param gamecontroller: the gamecontroller we are using
-        :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
-        """
-        if gamecontroller is not None:
-            return gamecontroller.get_referee_port()
-
-        return SSL_REFEREE_PORT
 
     def get_referee_port(self) -> int:
         """
@@ -85,7 +72,7 @@ class Gamecontroller(object):
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
-        if self.supress_logs:
+        if self.suppress_logs:
             with open(os.devnull, "w") as fp:
                 self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
 
