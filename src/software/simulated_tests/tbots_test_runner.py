@@ -1,10 +1,6 @@
-import pytest
-
 from proto.import_all_protos import *
 from software.logger.logger import createLogger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.time_provider import TimeProvider
-from software.thunderscope.thunderscope import Thunderscope
 from proto.ssl_gc_common_pb2 import Team
 
 

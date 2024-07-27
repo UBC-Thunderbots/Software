@@ -1,4 +1,3 @@
-import numpy as np
 from software.py_constants import *
 import software.python_bindings as tbots
 from proto.import_all_protos import *
@@ -152,7 +151,7 @@ class RobotsDoNotCollide(Validation):
         if self.fouled_robots:
             return f"Robots that fouled: {str(self.fouled_robots)}"
 
-        return f"Check that no robots are colliding with each other"
+        return "Check that no robots are colliding with each other"
 
 
 (

@@ -5,8 +5,6 @@ from software.thunderscope.constants import IndividualRobotMode, EstopMode
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.import_all_protos import *
-from pyqtgraph.Qt import QtCore
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 from typing import Type
 import threading
 import time
@@ -143,9 +141,9 @@ class RobotCommunication(object):
             print(
                 "Keyboard Estop changed to "
                 + (
-                    f"\x1b[32mPLAY \x1b[0m"
+                    "\x1b[32mPLAY \x1b[0m"
                     if self.estop_is_playing
-                    else f"\x1b[31;20mSTOP \x1b[0m"
+                    else "\x1b[31;20mSTOP \x1b[0m"
                 )
             )
 

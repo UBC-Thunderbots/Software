@@ -95,7 +95,6 @@ class RobotErrorLog(QScrollArea):
 
         # empty out the buffer to get statuses for all current robots at once
         while robot_status is not None:
-
             # add log widgets for error code and low battery warnings
             self.__refresh_robot_status_error_code(robot_status)
             self.__refresh_robot_status_battery_voltage(robot_status)
@@ -148,7 +147,6 @@ class RobotErrorLog(QScrollArea):
                 robot_log.log_level == LogLevel.FATAL
                 or robot_log.log_level == LogLevel.CONTRACT
             ):
-
                 if (
                     robot_log.robot_id not in self.robot_last_fatal_time_s
                     or time.time() - self.robot_last_fatal_time_s[robot_log.robot_id]

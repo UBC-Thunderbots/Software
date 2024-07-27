@@ -6,9 +6,6 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 
 from typing import Optional
 
-import numpy as np
-import software.thunderscope.gl.helpers.triangulate as triangulate
-
 
 class GLShape(GLLinePlotItem):
     """Base class for a graphic that displays a shape on the

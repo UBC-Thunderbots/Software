@@ -1,11 +1,9 @@
 import pytest
 from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
     pytest_main,
 )
 from software.simulated_tests.avoid_collisions import *
 import software.python_bindings as tbots
-from proto.ssl_gc_common_pb2 import Team
 from software.py_constants import *
 from proto.message_translation.tbots_protobuf import create_world_state
 import math

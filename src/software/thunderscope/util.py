@@ -2,7 +2,6 @@ from typing import Callable, NoReturn
 
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
-import software.python_bindings as tbots_cpp
 from software.py_constants import SECONDS_PER_MILLISECOND
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

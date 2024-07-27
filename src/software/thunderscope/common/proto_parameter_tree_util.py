@@ -165,7 +165,6 @@ def config_proto_to_field_list(
     field_list = []
 
     for descriptor in message.DESCRIPTOR.fields:
-
         key = descriptor.name
         value = getattr(message, descriptor.name)
 

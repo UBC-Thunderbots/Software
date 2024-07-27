@@ -58,7 +58,6 @@ class Simulator(object):
             simulator_command += " --enable_realism"
 
         if self.debug_simulator:
-
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
             if not is_cmd_running(

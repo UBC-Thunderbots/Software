@@ -1,11 +1,9 @@
-import pyqtgraph as pg
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from proto.import_all_protos import *
 from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
@@ -222,7 +220,6 @@ class ChickerWidget(QWidget):
             button.setCheckable(False)
 
     def refresh(self) -> None:
-
         # gets slider values and sets label to that value
         geneva_value = self.geneva_slider.value()
         self.geneva_label.setText(Slot.Name(geneva_value))

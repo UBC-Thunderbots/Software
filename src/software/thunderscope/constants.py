@@ -1,4 +1,4 @@
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtGui
 from OpenGL.GL import *
 from proto.import_all_protos import *
 from enum import Enum, IntEnum

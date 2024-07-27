@@ -3,11 +3,9 @@ import time
 from collections import deque
 
 import pyqtgraph as pg
-from proto.visualization_pb2 import NamedValue
 from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.Qt import QtGui
 
-from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
@@ -106,7 +104,6 @@ class ProtoPlotter(QWidget):
         # its just consuming data from the buffer and appending it to a deque.
         for proto_class, buffer in self.buffers.items():
             for _ in range(buffer.queue.qsize()):
-
                 data = self.configuration[proto_class](buffer.get(block=False))
 
                 # If named_value is new, create a plot and for the new value and

@@ -1,13 +1,9 @@
-import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import MULTI_PLANE_POINTS
-
-import numpy as np
 
 
 class MouseInSceneEvent:
@@ -114,7 +110,6 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         """
         if self.point_picked or self.detect_mouse_movement_in_scene:
-
             point_in_scene_event = MouseInSceneEvent(
                 event,
                 self.get_point_in_scene(event.position()),

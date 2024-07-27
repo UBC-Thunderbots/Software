@@ -94,7 +94,6 @@ sudo bazel-bin/{self.full_system}
                     time.sleep(1)
 
         elif self.debug_full_system:
-
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
             if not is_cmd_running(

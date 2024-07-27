@@ -3,7 +3,6 @@ from pyqtgraph.opengl import *
 import time
 import queue
 
-import numpy as np
 
 from proto.visualization_pb2 import PassVisualization
 
@@ -46,7 +45,7 @@ class GLPassingLayer(GLLayer):
 
         try:
             pass_vis = self.pass_visualization_buffer.queue.get_nowait()
-        except queue.Empty as empty:
+        except queue.Empty:
             pass_vis = None
 
         if not pass_vis:

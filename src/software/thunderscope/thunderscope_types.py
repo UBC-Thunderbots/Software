@@ -2,7 +2,6 @@ from typing import Callable, Optional, Sequence, Any
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.constants import TabNames
 
-from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.dockarea import *
 

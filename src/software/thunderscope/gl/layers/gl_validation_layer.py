@@ -4,7 +4,6 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.opengl import *
 
 import time
-import numpy as np
 
 from proto.import_all_protos import *
 

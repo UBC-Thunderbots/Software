@@ -1,7 +1,4 @@
-import pyqtgraph as pg
-import software.thunderscope.constants as constants
 from google.protobuf.json_format import MessageToDict
-from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
@@ -10,7 +7,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class RefereeInfoWidget(QWidget):
-
     NUM_ROWS = 13
     NUM_COLS = 3
 

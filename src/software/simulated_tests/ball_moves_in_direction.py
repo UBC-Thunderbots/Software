@@ -82,7 +82,6 @@ class BallMovesForwardInRegions(BallMovesForward):
         self.regions = regions
 
     def get_validation_status(self, world) -> ValidationStatus:
-
         for region in self.regions:
             if tbots.contains(
                 region, tbots.createPoint(world.ball.current_state.global_position)

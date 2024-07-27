@@ -156,9 +156,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
             if self.move_in_progress:
                 # if a move is already in progress, update the undo move added previously with the new move position
-                self.undo_operations[len(self.undo_operations) - 1].prev_pos = (
-                    point_on_current_plane
-                )
+                self.undo_operations[
+                    len(self.undo_operations) - 1
+                ].prev_pos = point_on_current_plane
             else:
                 # add an undo operation to restore the robot to the position before moving
                 self.__add_undo_operation(

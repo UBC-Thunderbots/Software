@@ -5,7 +5,7 @@ from proto.import_all_protos import *
 from datetime import datetime
 import textwrap
 import software.thunderscope.robot_diagnostics.robot_error_log_icons.error_log_constants as error_constants
-from proto.robot_log_msg_pb2 import RobotLog, LogLevel
+from proto.robot_log_msg_pb2 import RobotLog
 from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.constants import LOG_LEVEL_STR_MAP
 
@@ -185,10 +185,10 @@ class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
         self.setStyleSheet(
             self.base_stylesheet
             + textwrap.dedent(
-                f"""
-                RobotLogMessageWidget:hover {{
+                """
+                RobotLogMessageWidget:hover {
                     background-color: rgba(0, 0, 0, 0.15);
-                }}
+                }
                 """
             )
         )

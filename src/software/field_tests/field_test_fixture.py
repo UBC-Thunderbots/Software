@@ -11,9 +11,7 @@ from software.simulated_tests import validation
 from software.thunderscope.constants import EstopMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.logger.logger import createLogger
 
@@ -79,7 +77,7 @@ class FieldTestRunner(TbotsTestRunner):
             if len(self.friendly_robot_ids_field) == 0:
                 raise Exception("no friendly robots found on field")
 
-        except queue.Empty as empty:
+        except queue.Empty:
             raise Exception(
                 f"No Worlds were received with in {WORLD_BUFFER_TIMEOUT} seconds. Please make sure atleast 1 robot and 1 ball is present on the field."
             )
@@ -135,7 +133,7 @@ class FieldTestRunner(TbotsTestRunner):
                             block=True, timeout=WORLD_BUFFER_TIMEOUT
                         )
                         break
-                    except queue.Empty as empty:
+                    except queue.Empty:
                         # If we timeout, that means full_system missed the last
                         # wrapper and robot status, lets resend it.
                         logger.warning(

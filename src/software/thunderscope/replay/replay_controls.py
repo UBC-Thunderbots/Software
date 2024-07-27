@@ -1,5 +1,4 @@
 import time
-import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
 from functools import partial

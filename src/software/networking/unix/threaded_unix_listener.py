@@ -49,7 +49,7 @@ class ThreadedUnixListener:
         """
         try:
             self.proto_buffer.put_nowait(proto)
-        except queue.Full as queue_full:
+        except queue.Full:
             logger.warning("buffer overrun for {}".format(self.unix_path))
 
     def serve_till_stopped(self):

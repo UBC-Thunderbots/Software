@@ -6,8 +6,6 @@
 
 # The version of the clang executable to use
 export CLANG_VERSION=10.0
-# The version of black to use
-export BLACK_VERSION=24.4.2
 
 # The directory this script is in
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -58,21 +56,15 @@ function run_bazel_formatting () {
     fi
 }
 
-# Format the imports and remove unused imports/variables
-# NOTE: It's important that this runs _before_ black formatting
-function run_python_import_formatting(){
-    /opt/tbotspython/bin/autoflake -r --in-place --remove-unused-variables $CURR_DIR/../src/software
-}
+# Function to run ruff python linting and formatting
+function run_ruff() {
+    printf "Running ruff to lint and format Python files...\n\n"
 
-
-# Function to run black python formatting
-function run_black_formatting () {
-    printf "Running black to format Python files...\n\n"
-
-    $CURR_DIR/black_$BLACK_VERSION $BAZEL_ROOT_DIR
+    /opt/tbotspython/bin/python3 -m ruff check $BAZEL_ROOT_DIR --fix-only
+    /opt/tbotspython/bin/python3 -m ruff format $BAZEL_ROOT_DIR
 
     if [[ "$?" != 0 ]]; then
-        printf "\n***Failed to format Python files!***\n\n"
+        printf "\n***Failed to lint/format Python files!***\n\n"
         exit 1
     fi
 }
@@ -128,8 +120,7 @@ function run_eof_new_line(){
 run_code_spell
 run_clang_format
 run_bazel_formatting
-run_python_import_formatting
-run_black_formatting
+run_ruff
 run_eof_new_line
 run_git_diff_check
 

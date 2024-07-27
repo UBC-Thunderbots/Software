@@ -28,7 +28,9 @@ def get_estop_config(
         path = (
             ESTOP_PATH_1
             if os.path.exists(ESTOP_PATH_1)
-            else ESTOP_PATH_2 if os.path.exists(ESTOP_PATH_2) else None
+            else ESTOP_PATH_2
+            if os.path.exists(ESTOP_PATH_2)
+            else None
         )
         if not path:
             raise Exception(

@@ -122,7 +122,7 @@ class ProtoConfigurationWidget(QWidget):
         """
         if not os.path.isfile(path_to_file):
             logging.info(
-                f"No previously saved ThunderbotsConfig found. Creating a new default one."
+                "No previously saved ThunderbotsConfig found. Creating a new default one."
             )
             self.proto_to_configure = ThunderbotsConfig()
             self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
@@ -326,7 +326,6 @@ class ProtoConfigurationWidget(QWidget):
             current_attr = "self.proto_to_configure"
 
         for descriptor in message.DESCRIPTOR.fields:
-
             key = descriptor.name
             value = getattr(message, descriptor.name)
 

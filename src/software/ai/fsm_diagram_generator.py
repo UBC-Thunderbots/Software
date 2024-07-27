@@ -35,7 +35,6 @@ def generate_diagram(fsm):
 
     transitions = transition_table.split(",")
     for transition in transitions:
-
         # Transitions have the following format:
         # src_state + event [guard] / action = dest_state
 
@@ -94,7 +93,6 @@ def generate_diagram(fsm):
 
 
 if __name__ == "__main__":
-
     root_dir = Path(os.path.abspath(__file__)).parents[3]
 
     fsm_diagrams = {}
@@ -104,7 +102,6 @@ if __name__ == "__main__":
     for root, dirs, files in os.walk(ai_dir):
         dirs.sort()
         for file in sorted(files):
-
             if not file.endswith("fsm.h"):
                 continue
 
@@ -116,7 +113,6 @@ if __name__ == "__main__":
             diagram = generate_diagram(fsm)
 
             if diagram:
-
                 # Regex match to extract FSM struct name
                 fsm_name = re.findall(r"struct\s+(\w+)\s(?:\s:\s.)?{?", fsm)[0]
 
@@ -128,11 +124,9 @@ if __name__ == "__main__":
 
     output_file_path = os.path.join(root_dir, OUTPUT_FILE_PATH)
     with open(output_file_path, "w") as output_file:
-
         print("# Play and Tactic FSM Diagrams\n", file=output_file)
 
         for fsm_name, diagram in fsm_diagrams.items():
-
             file_path = fsm_file_paths[fsm_name]
 
             # Format diagram in Markdown syntax and write to output file

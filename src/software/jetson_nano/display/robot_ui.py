@@ -1,8 +1,5 @@
-import time, redis
-import digitalio
-import board
-from PIL import Image, ImageDraw, ImageOps
-import adafruit_rgb_display.st7735 as st7735
+import time
+import redis
 
 from software.jetson_nano.display.lcd_user_interface.lcd_user_interface import (
     LcdDisplay,
@@ -140,7 +137,6 @@ class RobotUi:
 
 
 if __name__ == "__main__":
-
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--path_to_boot_screen",

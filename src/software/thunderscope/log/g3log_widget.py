@@ -1,4 +1,3 @@
-import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
 import queue
 from software.py_constants import *
@@ -67,7 +66,7 @@ class g3logWidget(QWidget):
         # Need to make sure the message is new before logging it
         try:
             log = self.log_buffer.queue.get_nowait()
-        except queue.Empty as empty:
+        except queue.Empty:
             return
 
         # Checks whether this type of log is enabled from checkboxes

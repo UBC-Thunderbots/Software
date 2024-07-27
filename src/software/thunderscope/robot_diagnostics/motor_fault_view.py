@@ -1,6 +1,5 @@
 from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt.QtCore import Qt, QPoint, QByteArray, QBuffer, QIODeviceBase, QEvent
-from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt.QtCore import Qt, QByteArray, QBuffer, QIODeviceBase, QEvent
 from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_loader import (
     get_no_fault_icon,
     get_stopped_icon,
@@ -123,7 +122,7 @@ class MotorFaultView(QWidget):
                     + "</ul>"
                 )
             else:
-                self.motor_fault_tooltip += f"<ul><li>No Motor Faults :)</li></ul>"
+                self.motor_fault_tooltip += "<ul><li>No Motor Faults :)</li></ul>"
 
     def update_ui(self) -> None:
         """

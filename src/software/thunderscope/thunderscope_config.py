@@ -12,7 +12,7 @@ from software.thunderscope.thunderscope_types import (
 import pyqtgraph
 import signal
 import os
-from qt_material import apply_stylesheet, list_themes
+from qt_material import apply_stylesheet
 
 
 class TScopeConfig:

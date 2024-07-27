@@ -2,7 +2,6 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
 import software.python_bindings as tbots_cpp
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO

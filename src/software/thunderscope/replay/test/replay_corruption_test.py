@@ -1,19 +1,17 @@
 """
-TO GIVE CONTEXT FOR THE THIS TEST: 
+TO GIVE CONTEXT FOR THE THIS TEST:
 
-The idea of this test is to check how robust proto player is against corrupted file entries. 
-We are going to test how robust proto player is by intentionally creating corrupted replay files 
-and seeing whether or not proto player could play the replay files. 
+The idea of this test is to check how robust proto player is against corrupted file entries.
+We are going to test how robust proto player is by intentionally creating corrupted replay files
+and seeing whether or not proto player could play the replay files.
 
-Steps to test: 
-    1. we create a directory to store the replay files 
-    2. we create invalid entries of two type: the data is actually corrupted, and we are missing a delimiter. We 
+Steps to test:
+    1. we create a directory to store the replay files
+    2. we create invalid entries of two type: the data is actually corrupted, and we are missing a delimiter. We
         mixed those replay entries with valid replay entries to check if proto player could actually player those
         entries
     4. we check to see if there are uncaught exception. If there are, we know fore sure proto player wouldn't work!
 """
-
-import pytest
 
 import time
 from typing import Callable

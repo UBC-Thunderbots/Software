@@ -3,7 +3,6 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.opengl import *
 
 import math
-import numpy as np
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
@@ -26,7 +25,6 @@ from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.graphics.gl_goal import GLGoal
 
-from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
@@ -638,7 +636,6 @@ class GLWorldLayer(GLLayer):
         # When the user is kicking the ball, show the kick velocity vector
         # as a speed line
         if self.ball_velocity_vector:
-
             ball_state = self.cached_world.ball.current_state
             velocity = self.ball_velocity_vector * SPEED_SEGMENT_SCALE
 

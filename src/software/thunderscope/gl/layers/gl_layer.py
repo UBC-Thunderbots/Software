@@ -1,5 +1,4 @@
 from pyqtgraph.Qt import QtGui
-import pyqtgraph as pg
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 

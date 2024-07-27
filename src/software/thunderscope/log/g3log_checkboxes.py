@@ -1,5 +1,4 @@
-from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget, QGridLayout, QCheckBox
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from pyqtgraph.Qt.QtWidgets import QWidget, QGridLayout, QCheckBox
 
 
 class g3logCheckboxes(QWidget):

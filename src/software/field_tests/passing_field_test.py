@@ -7,7 +7,6 @@ from software.field_tests.field_test_fixture import *
 from software.simulated_tests.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
-from software import py_constants
 
 
 def test_passing(field_test_runner):

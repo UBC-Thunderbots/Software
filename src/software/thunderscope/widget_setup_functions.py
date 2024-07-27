@@ -11,7 +11,6 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_style import *
-from google.protobuf.message import Message
 
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget

@@ -3,10 +3,8 @@ import time
 import threading
 import base64
 import os
-import logging
 import gzip
 import glob
-import proto
 from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.py_constants import *
@@ -14,7 +12,7 @@ from software.py_constants import *
 from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
-from google.protobuf.message import DecodeError, Message
+from google.protobuf.message import Message
 from typing import Callable, Type
 
 
@@ -454,7 +452,6 @@ class ProtoPlayer:
             return timestamp
 
         with self.replay_controls_mutex:
-
             # Load the chunk that would have the entry
             self.current_chunk = ProtoPlayer.load_replay_chunk(
                 self.sorted_chunks[self.current_chunk_index], self.version
@@ -497,7 +494,6 @@ class ProtoPlayer:
         mid = 0
 
         while low <= high:
-
             mid = (high + low) // 2
 
             # If x is greater, ignore left half
@@ -559,7 +555,6 @@ class ProtoPlayer:
         self.start_playback_time = time.time()
 
         while True:
-
             # Only play if we are playing
             if not self.is_playing:
                 time.sleep(ProtoPlayer.PLAY_PAUSE_POLL_INTERVAL_SECONDS)
@@ -574,9 +569,7 @@ class ProtoPlayer:
             while self.is_playing and self.current_entry_index < len(
                 self.current_chunk
             ):
-
                 with self.replay_controls_mutex:
-
                     try:
                         # Unpack the current entry in the chunk
                         (
@@ -606,7 +599,6 @@ class ProtoPlayer:
 
             # Load the next chunk
             with self.replay_controls_mutex:
-
                 if self.is_playing:
                     self.current_chunk_index += 1
 

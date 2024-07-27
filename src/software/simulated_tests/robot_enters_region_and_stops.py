@@ -1,6 +1,5 @@
 import math
 from software.py_constants import *
-import software.python_bindings as tbots
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -88,9 +87,9 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
         Either the robot has not entered the region yet, or it has but is not stationary
         """
         if not self.is_stationary:
-            return f"Check that robot in correct region is stationary"
+            return "Check that robot in correct region is stationary"
 
-        return f"Check for stationary robot in region " + ",".join(
+        return "Check for stationary robot in region " + ",".join(
             repr(region) for region in self.regions
         )
 

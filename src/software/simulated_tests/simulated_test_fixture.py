@@ -6,20 +6,14 @@ import sys
 import os
 
 import pytest
-import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
-from pyqtgraph.Qt import QtCore, QtGui
-
-from software.networking.unix.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
-from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
@@ -165,7 +159,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                     )
 
                     break
-                except queue.Empty as empty:
+                except queue.Empty:
                     # If we timeout, that means full_system missed the last
                     # wrapper and robot status, lets resend it.
                     logger.warning("Fullsystem missed last wrapper, resending ...")
@@ -276,7 +270,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         # thunderscope on this thread. The excepthook is setup to catch
         # any test failures and propagate them to the main thread
         if self.thunderscope:
-
             run_sim_thread = threading.Thread(
                 target=self.runner,
                 daemon=True,
@@ -385,7 +378,6 @@ class AggregateTestRunner(SimulatedTestRunner):
         # Catches Assertion Error thrown by failing test and increments counter
         # Calculates overall results and prints them
         for x in range(len(params)):
-
             setup(params[x])
 
             try:
@@ -543,7 +535,6 @@ def simulated_test_runner():
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs)
         ) as gamecontroller:
-
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
             simulator.setup_proto_unix_io(

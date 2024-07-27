@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 import pyqtgraph as pg
 
@@ -8,7 +7,7 @@ import time
 import queue
 import numpy as np
 
-from proto.world_pb2 import World, SimulationState
+from proto.world_pb2 import World
 from proto.visualization_pb2 import CostVisualization
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -16,7 +15,7 @@ from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_heatmap import GLHeatmap
 from software.thunderscope.gl.graphics.gl_gradient_legend import GLGradientLegend
 
-from software.thunderscope.constants import Colors, DepthValues
+from software.thunderscope.constants import DepthValues
 
 
 class GLCostVisOverlayLayer(GLLayer):
@@ -108,7 +107,7 @@ class GLCostVisLayer(GLLayer):
 
         try:
             cost_vis = self.cost_visualization_buffer.queue.get_nowait()
-        except queue.Empty as empty:
+        except queue.Empty:
             cost_vis = None
 
         if not cost_vis:

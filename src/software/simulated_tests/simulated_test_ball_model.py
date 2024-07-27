@@ -10,10 +10,7 @@ from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from proto.geometry_pb2 import Point, Angle
 from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
     pytest_main,
 )
 
@@ -115,7 +112,6 @@ def test_simulator_move_ball(
 
 
 def test_ball_robot_collision(simulated_test_runner):
-
     ball_initial_position = tbots_cpp.Field.createSSLDivisionBField().centerPoint()
     ball_initial_velocity = tbots_cpp.Vector(2.5, 0)
     robot_position = tbots_cpp.Point(2.5, 0)

@@ -1,6 +1,4 @@
-import pyqtgraph as pg
-from google.protobuf import text_format
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from proto.import_all_protos import *

@@ -4,13 +4,10 @@ import logging
 import os
 import sys
 import threading
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
-import software.python_bindings as tbots_cpp
 from software.py_constants import *
-import proto.message_translation.tbots_protobuf as tbots_protobuf
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
@@ -18,8 +15,6 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import (
     CI_DURATION_S,
-    ProtoUnixIOTypes,
-    SIM_TICK_RATE_MS,
 )
 from software.thunderscope.util import *
 
@@ -37,7 +32,6 @@ NUM_ROBOTS = DIV_B_NUM_ROBOTS
 ###########################################################################
 
 if __name__ == "__main__":
-
     logging.getLogger().setLevel(logging.INFO)
 
     # Setup parser
@@ -241,7 +235,6 @@ if __name__ == "__main__":
     ###########################################################################
     # TODO (#2581) remove this
     if args.visualize_cpp_test:
-
         runtime_dir = "/tmp/tbots/gtest_logs"
 
         try:
@@ -337,7 +330,6 @@ if __name__ == "__main__":
             enable_radio=args.enable_radio,
             referee_port=Gamecontroller.get_referee_port_static(gamecontroller),
         ) as robot_communication:
-
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
                 tscope.keyboard_estop_shortcut.activated.connect(
                     robot_communication.toggle_keyboard_estop
@@ -350,7 +342,8 @@ if __name__ == "__main__":
 
                         if robot_view_widget:
                             robot_view_widget.control_mode_signal.connect(
-                                lambda mode, robot_id: robot_communication.toggle_robot_connection(
+                                lambda mode,
+                                robot_id: robot_communication.toggle_robot_connection(
                                     mode, robot_id
                                 )
                             )
@@ -369,7 +362,6 @@ if __name__ == "__main__":
                     should_restart_on_crash=True,
                     run_sudo=args.sudo,
                 ) as full_system:
-
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
                     tscope.show()
@@ -465,7 +457,6 @@ if __name__ == "__main__":
             if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref:
-
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()

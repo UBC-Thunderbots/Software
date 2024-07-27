@@ -58,7 +58,9 @@ class BreakbeamLabel(QLabel):
             (
                 "No Signal Yet"
                 if self.breakbeam_status is None
-                else "In Beam" if self.breakbeam_status else "Not In Beam"
+                else "In Beam"
+                if self.breakbeam_status
+                else "Not In Beam"
             ),
         )
 
@@ -66,7 +68,6 @@ class BreakbeamLabel(QLabel):
 
 
 class RobotInfo(QWidget):
-
     # Offsets the minimum of the battery bar from the minimum ideal voltage
     # Allows battery % to go below the minimum ideal level
     BATTERY_MIN_OFFSET = 3

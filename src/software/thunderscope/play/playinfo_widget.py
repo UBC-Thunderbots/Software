@@ -1,10 +1,5 @@
-import pyqtgraph as pg
-import pyqtgraph.console as pg_console
 from proto.play_info_msg_pb2 import PlayInfo
-from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
-import software.thunderscope.constants as constants
 from google.protobuf.json_format import MessageToDict
-from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.common.common_widgets import set_table_data
@@ -13,7 +8,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class PlayInfoWidget(QWidget):
-
     NUM_ROWS = 6
     NUM_COLS = 4
 

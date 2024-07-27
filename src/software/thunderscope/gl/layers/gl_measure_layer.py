@@ -57,7 +57,6 @@ class GLMeasureLayer(GLLayer):
         # If we have at least one previous measurement point, then adding a new point
         # will create a line between the last point and the new point
         if len(self.measurement_points_cache) > 1:
-
             first_point = self.measurement_points_cache[-2]
             second_point = self.measurement_points_cache[-1]
 
@@ -93,7 +92,6 @@ class GLMeasureLayer(GLLayer):
         # If two points are already in the cache, adding a new point will form an angle
         # between the three points
         if len(self.measurement_points_cache) == 3:
-
             # Calculate the angle
             a = self.measurement_points_cache[0]
             b = self.measurement_points_cache[1]

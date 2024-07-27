@@ -1,6 +1,3 @@
-import pytest
-
-
 import software.python_bindings as tbots_cpp
 from proto.validation_pb2 import *
 
@@ -83,9 +80,8 @@ def create_validation_types(validation_class):
     # We simply pass the validation_geometry from the validation object through.
     common = {
         "__init__": constructor,
-        "get_validation_geometry": lambda self, world: self.validation.get_validation_geometry(
-            world
-        ),
+        "get_validation_geometry": lambda self,
+        world: self.validation.get_validation_geometry(world),
     }
 
     eventually_true = type(
@@ -96,9 +92,8 @@ def create_validation_types(validation_class):
             "__repr__": lambda self: "EventuallyTrueValidation: "
             + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
-            "get_validation_status": lambda self, world: self.validation.get_validation_status(
-                world
-            ),
+            "get_validation_status": lambda self,
+            world: self.validation.get_validation_status(world),
         },
     )
 
@@ -121,9 +116,8 @@ def create_validation_types(validation_class):
             **common,
             "__repr__": lambda self: "AlwaysTrueValidation: " + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.ALWAYS,
-            "get_validation_status": lambda self, world: self.validation.get_validation_status(
-                world
-            ),
+            "get_validation_status": lambda self,
+            world: self.validation.get_validation_status(world),
         },
     )
 
@@ -194,7 +188,6 @@ def run_validation_sequence_sets(
         # (using the `list` constructor) since we will be modifying the original list
         # within the loop
         for validation in list(validation_sequence):
-
             # Add to validation_proto_set and get status
             status = create_validation_proto_helper(
                 eventually_validation_proto_set, validation

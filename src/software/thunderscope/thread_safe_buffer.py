@@ -5,7 +5,6 @@ from google.protobuf.message import Message
 
 
 class ThreadSafeBuffer(object):
-
     MIN_DROPPED_BEFORE_LOG = 20
 
     """Multiple producer, multiple consumer buffer.
@@ -88,7 +87,7 @@ class ThreadSafeBuffer(object):
         else:
             try:
                 self.cached_msg = self.queue.get_nowait()
-            except queue.Empty as empty:
+            except queue.Empty:
                 if not return_cached:
                     return None
 
@@ -109,5 +108,5 @@ class ThreadSafeBuffer(object):
 
         try:
             self.queue.put_nowait(proto)
-        except queue.Full as full:
+        except queue.Full:
             self.protos_dropped += 1

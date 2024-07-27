@@ -5,8 +5,6 @@ import logging
 import os
 import socket
 import time
-import google.protobuf.internal.encoder as encoder
-import google.protobuf.internal.decoder as decoder
 from subprocess import Popen
 from typing import Any
 
