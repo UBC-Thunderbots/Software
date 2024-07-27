@@ -9,9 +9,6 @@
 # Our clang-format executable is a binary
 formatting_scripts/clang-format-*    binary
 
-# Our black executable is a binary
-formatting_scripts/black*    binary
-
 # Treat images as binaries
 *.svg           binary
 *.png           binary
