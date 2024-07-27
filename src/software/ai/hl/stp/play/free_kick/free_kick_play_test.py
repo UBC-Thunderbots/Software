@@ -6,6 +6,8 @@ import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_team_scored import *
+from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
+from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
@@ -57,14 +59,15 @@ def free_kick_play_setup(
 
 # We want to test friendly half, enemy half, and at the border of the field
 @pytest.mark.parametrize(
-    "ball_initial_pos",
+    "ball_initial_pos,must_score",
     [
-        tbots_cpp.Point(1.5, -2.75),
-        tbots_cpp.Point(-1.5, -2.75),
-        tbots_cpp.Point(1.5, -3),
+        (tbots_cpp.Point(1.5, -2.75), False),
+        (tbots_cpp.Point(-1.5, -2.75), False),
+        (tbots_cpp.Point(1.5, -3), False),
+        (tbots_cpp.Point(1.5, -0.5), True),
     ],
 )
-def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
+def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos, must_score):
     # TODO- #2753 Validation
     # params just have to be a list of length 1 to ensure the test runs at least once
     simulated_test_runner.run_test(
@@ -102,7 +105,17 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
             }
         ],
         inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[
+            [
+                RobotEventuallyEntersRegion(
+                    regions=[tbots_cpp.Circle(ball_initial_pos, 0.3)]
+                ),
+                BallEventuallyExitsRegion(
+                    regions=[tbots_cpp.Circle(ball_initial_pos, 0.5)]
+                ),
+            ]
+            + ([FriendlyTeamScored()] if must_score else []),
+        ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=10,
@@ -143,6 +156,7 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
     ],
 )
 def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bots):
+
     blue_bots = [
         tbots_cpp.Point(-4.5, 0),
         tbots_cpp.Point(-3, 1.5),
