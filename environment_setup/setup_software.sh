@@ -197,16 +197,9 @@ sudo service udev restart
 # allow user access to serial ports
 sudo usermod -a -G dialout $USER
 
-# installs PlatformIO to global environment
+# install PlatformIO to global environment
 if ! sudo /usr/bin/python3.10 -m pip install platformio==6.1.13; then
     print_status_msg "Error: Installing PlatformIO failed"
-    exit 1
-fi
-
-which platformio
-echo $PATH
-if ! platformio ; then
-    echo "no platformio"
     exit 1
 fi
 
