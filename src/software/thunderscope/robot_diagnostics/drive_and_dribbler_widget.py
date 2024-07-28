@@ -12,7 +12,6 @@ class DriveAndDribblerWidget(QWidget):
         """Initialize the widget to control the robot's motors
 
         :param proto_unix_io: the proto_unix_io object
-
         """
         self.input_a = time.time()
         self.constants = tbots_cpp.create2021RobotConstants()
@@ -47,11 +46,9 @@ class DriveAndDribblerWidget(QWidget):
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def value_change(self, value: float) -> str:
-        """
-        Converts the given float value to a string label
+        """Converts the given float value to a string label
 
         :param value: float value to be converted
-
         """
         value = float(value)
         value_str = "%.2f" % value
@@ -61,9 +58,7 @@ class DriveAndDribblerWidget(QWidget):
         """Create a widget to control the direct velocity of the robot's motors
 
         :param title: the name of the slider
-
         """
-
         group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
@@ -130,9 +125,7 @@ class DriveAndDribblerWidget(QWidget):
         """Create a widget to control the dribbler RPM
 
         :param title: the name of the slider
-
         """
-
         group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
@@ -169,10 +162,10 @@ class DriveAndDribblerWidget(QWidget):
         return group_box
 
     def toggle_all(self, enable: bool) -> None:
-        """
-        Disables or enables all sliders and buttons depending on boolean parameter
+        """Disables or enables all sliders and buttons depending on boolean parameter
 
         Updates listener functions and stylesheets accordingly
+
         :param enable: boolean parameter, True is enable and False is disable
         """
         if enable:
@@ -224,9 +217,7 @@ class DriveAndDribblerWidget(QWidget):
                 self.enabled = False
 
     def disconnect_sliders(self) -> None:
-        """
-        Disconnect listener for changing values for all sliders
-        """
+        """Disconnect listener for changing values for all sliders"""
         self.x_velocity_slider.valueChanged.disconnect()
         self.y_velocity_slider.valueChanged.disconnect()
         self.angular_velocity_slider.valueChanged.disconnect()
@@ -239,14 +230,10 @@ class DriveAndDribblerWidget(QWidget):
         self.angular_velocity_slider.setValue(0)
 
     def reset_dribbler_slider(self) -> None:
-        """
-        Reset the dribbler slider back to 0
-        """
+        """Reset the dribbler slider back to 0"""
         self.dribbler_speed_rpm_slider.setValue(0)
 
     def reset_all_sliders(self) -> None:
-        """
-        Reset all sliders back to 0
-        """
+        """Reset all sliders back to 0"""
         self.reset_direct_sliders()
         self.reset_dribbler_slider()

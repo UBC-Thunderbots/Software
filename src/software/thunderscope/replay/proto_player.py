@@ -40,7 +40,6 @@ class ProtoPlayer:
     speed. If the seek function is called with a specific time, the player will
     update the 3 variables (shown above) to point to the chunk and entry (in the
     chunk) that contains the data at that time and continue playing from there.
-
     """
 
     PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
@@ -50,7 +49,6 @@ class ProtoPlayer:
 
         :param log_folder_path: The path to the log file.
         :param proto_unix_io: The proto_unix_io to send the protos to.
-
         """
         self.log_folder_path = log_folder_path
         self.proto_unix_io = proto_unix_io
@@ -96,8 +94,7 @@ class ProtoPlayer:
 
     @staticmethod
     def sort_and_get_replay_files(log_folder_path):
-        """
-        Sorting the replay files
+        """Sorting the replay files
 
         :param log_folder_path: the path to the folder that we are going to be sorting!
         :return: the sorted replay files
@@ -121,8 +118,7 @@ class ProtoPlayer:
 
     @staticmethod
     def is_log_entry_corrupt(log_entry: bytes, version: int) -> bool:
-        """
-        Check to see if we have can unpack the log entry
+        """Check to see if we have can unpack the log entry
 
         :param log_entry: the log entry we are checking
         :param version: the version of the replay file
@@ -135,17 +131,14 @@ class ProtoPlayer:
             return True
 
     def is_proto_player_playing(self) -> bool:
-        """
-        return whether or not the proto player is being played.
+        """Return whether or not the proto player is being played.
 
         :return: True if the proto player is playing, False otherwise.
         """
-
         return self.is_playing
 
     def find_actual_endtime(self) -> float:
-        """
-        Finding the last end time.
+        """Finding the last end time.
         Note that the end time may not necessarily be the last message in the last chunks since there may be
         file corruptions. We also assume a chronological order in the chunks data!
 
@@ -176,7 +169,6 @@ class ProtoPlayer:
         :param replay_chunk_path: The path to the replay chunk.
         :param version: The format version of the replay file
         :return: The replay chunk. List of log entries
-
         """
         cached_data = []
 
@@ -215,7 +207,6 @@ class ProtoPlayer:
 
         :param replay_chunk_path: The path to the replay chunk.
         :return: The format version of the replay file
-
         """
         # Default to version 1
         file_version = 1
@@ -246,9 +237,7 @@ class ProtoPlayer:
         :param log_entry: The log entry.
         :param version: The format version of the replay file
         :return: The timestamp, proto_class, deserialized protobuf
-
         """
-
         # Unpack metadata
         timestamp, protobuf_type, data = log_entry.split(
             bytes(REPLAY_METADATA_DELIMITER, encoding="utf-8")
@@ -284,7 +273,6 @@ class ProtoPlayer:
         :param filename: The file to save to
         :param start_time: the start time for the clip
         :param end_time: the end time for the clip
-
         """
         if not filename:
             print("No filename selected")
@@ -354,7 +342,6 @@ class ProtoPlayer:
 
     def play(self) -> None:
         """Plays back the log file."""
-
         # Protection from spamming the play button
         if self.is_playing:
             return
@@ -365,14 +352,12 @@ class ProtoPlayer:
 
     def pause(self) -> None:
         """Pauses the player."""
-
         with self.replay_controls_mutex:
             self.is_playing = False
             self.seek_offset_time = self.current_packet_time
 
     def toggle_play_pause(self) -> None:
         """Toggles the play/pause state."""
-
         with self.replay_controls_mutex:
             if not self.is_playing:
                 self.play()
@@ -383,7 +368,6 @@ class ProtoPlayer:
         """Sets the playback speed.
 
         :param speed: The speed to set the playback to.
-
         """
         with self.replay_controls_mutex:
             self.pause()
@@ -429,7 +413,6 @@ class ProtoPlayer:
         with realtime playback timing calculations in the worker thread.
 
         :param seek_time: The time to seek to.
-
         """
 
         # Let's binary search through the chunks to find the chunk that starts
@@ -487,7 +470,6 @@ class ProtoPlayer:
         :param arr: The array to search.
         :param x: The element to search for.
         :param key: The key to use for sorting.
-
         """
         low = 0
         high = len(arr) - 1
@@ -511,8 +493,7 @@ class ProtoPlayer:
         return min(abs(low), abs(high))
 
     def __play_protobufs_wrapper(self) -> None:
-        """
-        this function essentially executes __play_protobufs. However, the intention of this function
+        """This function essentially executes __play_protobufs. However, the intention of this function
         is for testing purposes. __play_protobufs is launched in a different thread, it would be useful to know
         if there are uncaught exceptions. This is then used to test the robustness of the __play_protobufs
         function when dealing with corrupted replay files.
@@ -521,7 +502,6 @@ class ProtoPlayer:
 
         :return: None
         """
-
         try:
             self.__play_protobufs()
         except Exception as e:
@@ -533,8 +513,7 @@ class ProtoPlayer:
             self.is_playing = False
 
     def get_error_bit_flag(self) -> ProtoPlayerFlags:
-        """
-        the error bit flags is defined as the following:
+        """The error bit flags is defined as the following:
             1 if there is an uncaught exception in the code
             0 if success
 
@@ -549,7 +528,6 @@ class ProtoPlayer:
             - Play/Pause through self.is_playing
             - Seek to a specific time through self.current_chunk and self.current_entry_index
             - Set playback speed through self.playback_speed
-
         """
         self.time_elapsed = 0.0
         self.start_playback_time = time.time()

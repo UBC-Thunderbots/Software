@@ -22,7 +22,6 @@ class GLMeasureLayer(GLLayer):
         """Initialize the GLMeasureLayer
 
         :param name: The displayed name of the layer
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -42,7 +41,6 @@ class GLMeasureLayer(GLLayer):
         """Detect that the mouse was pressed and picked a point in the 3D scene
 
         :param event: The event
-
         """
         self.measurement_points_cache.append(event.point_in_scene)
 
@@ -127,7 +125,6 @@ class GLMeasureLayer(GLLayer):
         """Detect that the mouse was moved within the 3D scene
 
         :param event: The event
-
         """
         self.mouse_point_in_scene = event.point_in_scene
 
@@ -140,7 +137,6 @@ class GLMeasureLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         # Display coordinates of point at mouse cursor
 
         if not self.cursor_coords_graphic:

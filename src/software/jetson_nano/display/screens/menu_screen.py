@@ -2,12 +2,11 @@ from software.jetson_nano.display.screens.screen import Screen
 
 
 class MenuScreen(Screen):
-    """
-    This screen is used to navigate between different configuration settings.
-    """
+    """This screen is used to navigate between different configuration settings."""
 
     def __init__(self, lcd_display, screen_actions):
-        """
+        """Constructor
+
         @param lcd_display, an instance of the LcdDisplay class
         @param screen_actions, an instance of ScreenActions class
         """

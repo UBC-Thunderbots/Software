@@ -29,8 +29,7 @@ def setup_pass_and_robots(
     receive_pass,
     simulated_test_runner,
 ):
-    """
-    Sets up a test involving 1 robot passing the ball
+    """Sets up a test involving 1 robot passing the ball
     With any number of friendly and enemy robots on the field
     Can specify if the first friendly robot should receive the pass or not
     :param ball_initial_position: the initial position of the ball

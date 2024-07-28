@@ -19,7 +19,6 @@ class RefereeInfoWidget(QWidget):
 
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         QWidget.__init__(self)
 
@@ -111,8 +110,7 @@ class RefereeInfoWidget(QWidget):
         self.referee_table.resizeRowsToContents()
 
     def parse_yellow_card_times(self, team_info: TeamInfo) -> str:
-        """
-        Parses yellow card times from a TeamInfo Protobuf dict as a string output.
+        """Parses yellow card times from a TeamInfo Protobuf dict as a string output.
 
         :param team_info: TeamInfo protobuf dict to parse
         """

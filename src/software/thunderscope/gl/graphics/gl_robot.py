@@ -23,7 +23,6 @@ class GLRobot(GLMeshItem):
 
         :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
-
         """
         super().__init__(
             parentItem=parent_item,
@@ -40,7 +39,6 @@ class GLRobot(GLMeshItem):
 
         :param x: The x coordinate to position the graphic at
         :param y: The y coordinate to position the graphic at
-
         """
         if self.x == x and self.y == y:
             return
@@ -53,7 +51,6 @@ class GLRobot(GLMeshItem):
         """Set the orientation of the graphic in the scene
 
         :param degrees: The orientation of the graphic in degrees
-
         """
         # We need to add 45 degrees to our desired orientation in order
         # to get the flat side of the robot (i.e. its front) to face
@@ -68,13 +65,11 @@ class GLRobot(GLMeshItem):
         self.orientation = degrees
 
     def __get_mesh_data(self) -> MeshData:
-        """
-        Return a MeshData instance with vertices and faces computed
+        """Return a MeshData instance with vertices and faces computed
         for the surface of a cylinder with a flat side wall.
         This represents the geometry of a robot.
 
         :returns: the computed MeshData instance
-
         """
         top_face_points = GLRobotOutline.get_robot_outline(
             z_coordinate=ROBOT_MAX_HEIGHT_METERS

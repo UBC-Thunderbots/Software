@@ -11,13 +11,11 @@ from software.thunderscope.replay.proto_player import ProtoPlayer
 
 
 def read_one_chunk(replay_file_name: str) -> int:
-    """
-    read one chunk of the replay file:
+    """Read one chunk of the replay file:
 
     :param replay_file_name: the name of the replay file that is going to be read
     :return: the number of lines that have been read
     """
-
     version = ProtoPlayer.get_replay_chunk_format_version(replay_file_name)
 
     line_num = 0

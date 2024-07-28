@@ -28,7 +28,6 @@ class Thunderscope:
     The setup_* functions return docks. See configure_full_system_layout for an
     example. The returned docks can be arranged differently based on the
     use case (robot diagnostics, simulation, robocup, demo, etc..)
-
     """
 
     def __init__(
@@ -43,9 +42,7 @@ class Thunderscope:
         :param layout_path: The path to the layout to load
         :param refresh_interval_ms:
             The interval in milliseconds to refresh all the widgets.
-
         """
-
         self.refresh_interval_ms = refresh_interval_ms
         self.widgets = {}
         self.refresh_timers = []
@@ -132,7 +129,6 @@ class Thunderscope:
     def save_layout(self) -> None:
         """Open a file dialog to save the layout and any other
         registered state to a file
-
         """
         # Create a folder at SAVED_LAYOUT_PATH if it doesn't exist
         try:
@@ -172,9 +168,7 @@ class Thunderscope:
 
         :param filename: The filename to load the layout from. If None, then
                          open a file dialog.
-
         """
-
         if filename is None:
             filename, _ = QFileDialog.getOpenFileName(
                 self.window,
@@ -207,7 +201,6 @@ class Thunderscope:
         passed into thunderscope.
 
         :param refresh_func: The function to call at refresh_interval_ms
-
         """
         refresh_timer = QtCore.QTimer()
         refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
@@ -218,7 +211,6 @@ class Thunderscope:
 
     def show(self) -> None:
         """Show the main window"""
-
         self.window.showMaximized()
         pyqtgraph.exec()
 
@@ -228,5 +220,4 @@ class Thunderscope:
 
     def close(self) -> None:
         """Close the main window"""
-
         QtCore.QTimer.singleShot(0, self.window.close)

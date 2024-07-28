@@ -10,9 +10,7 @@ SIM_TICK_RATE_MS = 16
 
 
 class ProtoUnixIOTypes(Enum):
-    """
-    Different keys for Proto Unix IOs used by Thunderscope
-    """
+    """Different keys for Proto Unix IOs used by Thunderscope"""
 
     SIM = 1
     BLUE = 2
@@ -22,9 +20,7 @@ class ProtoUnixIOTypes(Enum):
 
 
 class TabNames(str, Enum):
-    """
-    Different keys for tabs used in various Thunderscope views
-    """
+    """Different keys for tabs used in various Thunderscope views"""
 
     BLUE = "BLUE"
     YELLOW = "YELLOW"
@@ -36,9 +32,7 @@ class TabNames(str, Enum):
 
 
 class ParamTypes(Enum):
-    """
-    Different types of parameters used by setup methods for Thunderscope widgets
-    """
+    """Different types of parameters used by setup methods for Thunderscope widgets"""
 
     BOOL = 1
     PROTO_UNIX_IO = 2
@@ -48,9 +42,7 @@ class ParamTypes(Enum):
 
 
 class IndividualRobotMode(IntEnum):
-    """
-    Enum for the mode of input for an individual robot
-    """
+    """Enum for the mode of input for an individual robot"""
 
     NONE = 0
     MANUAL = 1
@@ -58,9 +50,7 @@ class IndividualRobotMode(IntEnum):
 
 
 class CameraView(Enum):
-    """
-    Enum for preset camera views in the 3D visualizer
-    """
+    """Enum for preset camera views in the 3D visualizer"""
 
     ORTHOGRAPHIC = 1
     LANDSCAPE_HIGH_ANGLE = 2
@@ -69,8 +59,7 @@ class CameraView(Enum):
 
 
 class EstopMode(IntEnum):
-    """
-    Enum for the various estop modes we can run thunderscope in
+    """Enum for the various estop modes we can run thunderscope in
 
     DISABLE_ESTOP: No physical / keyboard estop is needed, but we cannot send anything over the network
     KEYBOARD_ESTOP: The spacebar can be used as an estop toggle instead of a physical estop
@@ -210,8 +199,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 
 
 def is_field_message_empty(field: Field) -> bool:
-    """
-    Checks if a field message is empty
+    """Checks if a field message is empty
     All values in a field message are required so the message will never be None
     So we have to check if the field itself has 0 length
     :param field: the field to check
@@ -221,8 +209,7 @@ def is_field_message_empty(field: Field) -> bool:
 
 
 def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> dict:
-    """
-    There is no pattern to this so we just have to create
+    """There is no pattern to this so we just have to create
     mapping from robot id to the four corners of the vision pattern
 
     robot-id: top-right, top-left, bottom-left, bottom-right
@@ -254,8 +241,7 @@ def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> 
 
 
 def rgb_to_bw(r: int, g: int, b: int) -> tuple[int, int, int]:
-    """
-    Converts the given RGB color values into the corresponding black and white RGB values
+    """Converts the given RGB color values into the corresponding black and white RGB values
     :param r: red value
     :param g: green value
     :param b: blue value
@@ -342,8 +328,7 @@ class ProtoConfigurationConstant:
 
 
 class CustomGLOptions:
-    """
-    Custom OpenGL Rendering modes that could be used in addition to
+    """Custom OpenGL Rendering modes that could be used in addition to
     the ones provided by PyQtGraph in GLGraphicsItem.py GLOptions.
     """
 
@@ -360,9 +345,7 @@ class CustomGLOptions:
 
 
 class ProtoPlayerFlags(Enum):
-    """
-    Flags set by the ProtoPlayer to indicate the state of the player
-    """
+    """Flags set by the ProtoPlayer to indicate the state of the player"""
 
     NO_ERROR_FLAG = 0
     UNCAUGHT_EXCEPTION_FLAG = 1 << 0

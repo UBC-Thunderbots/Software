@@ -2,9 +2,7 @@ from pyqtgraph.dockarea.Dock import Dock, DockLabel
 
 
 def updateDockStylePatched(self):
-    """
-    Overrides the style of the dock.
-    """
+    """Overrides the style of the dock."""
     border = "#4f5b62"
     border_width = "2px"
     border_radius = "5px"
@@ -57,9 +55,7 @@ def updateDockStylePatched(self):
 
 
 def updateDockLabelStylePatched(self):
-    """
-    Overrides the style of the label.
-    """
+    """Overrides the style of the label."""
     r = "2px"
     if self.dim:
         fg = "#a0a0a0"

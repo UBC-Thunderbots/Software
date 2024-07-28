@@ -27,7 +27,6 @@ class GLPassingLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -42,7 +41,6 @@ class GLPassingLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         try:
             pass_vis = self.pass_visualization_buffer.queue.get_nowait()
         except queue.Empty:

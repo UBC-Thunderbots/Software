@@ -52,7 +52,8 @@ class RotaryEncoder:
         on_counterclockwise_rotate,
         on_click,
     ):
-        """
+        """Constructor
+
         @param PIN_1, the Jetson Nano board pin number used for channel 1 input of rotary encoder; pin requires pull up resistor
         @param PIN_2, the Jetson Nano board pin number used for channel 2 input of rotary encoder; pin requires pull up resistor
         @param BUTTON_PIN, the Jetson Nano board pin number used for push button input of rotary encoder; pin requires pull up resistor
@@ -73,7 +74,6 @@ class RotaryEncoder:
 
     def setup(self):
         """Initialize GPIO pins and rotary encoder state"""
-
         # Set the GPIO mode if it has not been set
         if not Gpio.getmode():
             Gpio.setmode(Gpio.BOARD)
@@ -144,7 +144,7 @@ class RotaryEncoder:
         )
 
     def stop(self):
-        """clean up the GPIO pins that we were using for this class"""
+        """Clean up the GPIO pins that we were using for this class"""
         Gpio.cleanup()
 
 

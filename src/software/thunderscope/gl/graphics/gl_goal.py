@@ -22,7 +22,6 @@ class GLGoal(GLMeshItem):
 
         :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
-
         """
         super().__init__(parentItem=parent_item, color=color)
 
@@ -47,7 +46,6 @@ class GLGoal(GLMeshItem):
 
         :param x_length: The length of the goal in the x direction
         :param y_length: The length of the goal in the y direction
-
         """
         if self.x_length == x_length and self.y_length == y_length:
             return
@@ -72,7 +70,6 @@ class GLGoal(GLMeshItem):
 
         :param x: The x coordinate to position the graphic at
         :param y: The y coordinate to position the graphic at
-
         """
         if self.x == x and self.y == y:
             return
@@ -85,7 +82,6 @@ class GLGoal(GLMeshItem):
         """Set the orientation of the graphic in the scene
 
         :param degrees: The orientation of the graphic in degrees
-
         """
         if self.orientation == degrees:
             return
@@ -95,14 +91,12 @@ class GLGoal(GLMeshItem):
         self.orientation = degrees
 
     def __get_mesh_data(self, x_length: float, y_length: float) -> MeshData:
-        """
-        Return a MeshData instance with vertices and faces computed
+        """Return a MeshData instance with vertices and faces computed
         for a mesh representing the goal
 
         :param x_length: The length of the goal in the x direction
         :param y_length: The length of the goal in the y direction
         :returns: the computed MeshData instance
-
         """
         # Construct vertices that make up the mesh.
         vertices = [

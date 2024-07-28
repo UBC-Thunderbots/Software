@@ -18,8 +18,8 @@ class ProtoPlotter(QWidget):
     inject a way to extract data from the incoming protobufs. This is so that
     the user can control the way the data is plotted.
 
-    Examples:
-
+    Examples
+    --------
     NamedValueProto: we can plot the value directly
     RobotStatus: the data comes in over multiple packets, with each one having
     a different robot id. We need to append the robot id to the name so that
@@ -65,7 +65,6 @@ class ProtoPlotter(QWidget):
         :param configuration: A dictionary of protobuf types to data extractor
         :param plot_rate_hz: How many times per second to update the plot
         :param buffer_size: The size of the buffer to use for plotting.
-
         """
         QWidget.__init__(self)
 
@@ -98,7 +97,6 @@ class ProtoPlotter(QWidget):
 
     def refresh(self) -> None:
         """Refreshes ProtoPlotter and updates data in the respective plots."""
-
         # Dump the entire buffer into a deque. This operation is fast because
         # its just consuming data from the buffer and appending it to a deque.
         for proto_class, buffer in self.buffers.items():

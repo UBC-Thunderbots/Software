@@ -36,9 +36,7 @@ class ExcessivelyDribbling(Validation):
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) Shows the max allowed dribbling circle
-        """
+        """(override) Shows the max allowed dribbling circle"""
         return create_validation_geometry(
             [tbots_cpp.Circle(self.continous_dribbling_start_point, 1.0)]
             if self.continous_dribbling_start_point is not None

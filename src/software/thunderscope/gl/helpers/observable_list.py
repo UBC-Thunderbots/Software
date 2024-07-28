@@ -18,7 +18,6 @@ class Change:
         :param changed_list: The list that changed
         :param changed_slice: The slice of the observable_list that changed
         :param type: The action that caused the change
-
         """
         self._changed_list = changed_list
         self._changed_slice = changed_slice
@@ -29,7 +28,6 @@ class Change:
         """The elements in the list affected by the change
 
         :returns: A list of elements affected by the change
-
         """
         return self._changed_list[self._changed_slice]
 
@@ -38,13 +36,12 @@ class Change:
         """The action that caused the change
 
         :returns: The action that caused the change
-
         """
         return self._action
 
 
 class ObservableList(list):
-    """list that notifies observers when elements are added or removed"""
+    """List that notifies observers when elements are added or removed"""
 
     def __init__(
         self, observer: Callable[[Change], None] = None, iterable: Iterable[T] = ()
@@ -54,7 +51,6 @@ class ObservableList(list):
         :param observer: Observer method to register
         :param iterable: iterable from which elements are to be copied to
                          the initialized ObservableList
-
         """
         super().__init__()
         self.observers = []
@@ -66,7 +62,6 @@ class ObservableList(list):
         ObservableList provides a change notification
 
         :param observer: Observer method that takes a Change as its first argument
-
         """
         if observer:
             self.observers.append(observer)
@@ -78,7 +73,6 @@ class ObservableList(list):
 
         :param length: The target length to resize the list to
         :param element_generator: Callable that returns an element to add to the list
-
         """
         if len(self) > length:
             del self[length : len(self)]
@@ -142,7 +136,6 @@ class ObservableList(list):
         """Notify observers about elements added to the ObservableList
 
         :param added_slice: the slice of the ObservableList with the added elements
-
         """
         change = Change(self, added_slice, ChangeAction.ADD)
         for observer in self.observers:
@@ -152,7 +145,6 @@ class ObservableList(list):
         """Notify observers about elements removed from the ObservableList
 
         :param added_slice: the slice of the ObservableList with the elements to be removed
-
         """
         change = Change(self, removed_slice, ChangeAction.REMOVE)
         for observer in self.observers:
@@ -164,7 +156,6 @@ class ObservableList(list):
         """Notify observers about elements removed at an index or slice
 
         :return: a function that notifies about an add at the same place
-
         """
         if isinstance(index_or_slice, int):
             length = len(self)
@@ -181,7 +172,6 @@ class ObservableList(list):
         """Create a slice starting at an index and with a given length
 
         :param index: the index to start the slice at
-
         """
         length_ = len(self)
         if -length <= index < 0:

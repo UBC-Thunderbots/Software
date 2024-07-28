@@ -11,8 +11,7 @@ from software.thunderscope.constants import LOG_LEVEL_STR_MAP
 
 
 class RobotLogMessageWidget(QFrame):
-    """
-    A single error message from a robot.
+    """A single error message from a robot.
 
     Displays an icon corresponding to the type of error, the robot id, the message
     and the timestamp of the error
@@ -21,8 +20,7 @@ class RobotLogMessageWidget(QFrame):
     def __init__(
         self, robot_id: int, message: str, icon: QtGui.QPixmap, timestamp=None
     ):
-        """
-        Creates an error message with the given info
+        """Creates an error message with the given info
 
         :param robot_id: the id of the robot that threw the error
         :param message: the message of the error
@@ -108,35 +106,29 @@ class RobotLogMessageWidget(QFrame):
         self.setStyleSheet(self.base_stylesheet)
 
     def close(self) -> None:
-        """
-        Sets the widget to closed
-        """
+        """Sets the widget to closed"""
         self.log_open = not self.log_open
 
     def update_time(self) -> None:
-        """
-        Updates the time since label for the error log message
-        """
+        """Updates the time since label for the error log message"""
         # get the time difference from the timestamp to now
         time_diff = datetime.now() - self.timestamp
         self.time_since_label.setText(f"{int(time_diff.total_seconds())} seconds ago")
 
     def mouseReleaseEvent(self, event) -> None:
-        """
-        Mouse Release Event handler for child classes to override
+        """Mouse Release Event handler for child classes to override
+
         :param event: the mouse release event
         """
         super().mouseReleaseEvent(event)
 
 
 class LowBatteryLogMessageWidget(RobotLogMessageWidget):
-    """
-    A robot error log message when a robot has low battery
-    """
+    """A robot error log message when a robot has low battery"""
 
     def __init__(self, robot_id):
-        """
-        Creates a low battery error message for the given robot
+        """Creates a low battery error message for the given robot
+
         :param robot_id: the id of the robot whose battery is low
         """
         super(LowBatteryLogMessageWidget, self).__init__(
@@ -145,13 +137,10 @@ class LowBatteryLogMessageWidget(RobotLogMessageWidget):
 
 
 class ErrorCodeLogMessageWidget(RobotLogMessageWidget):
-    """
-    A robot error log message when it has an error code
-    """
+    """A robot error log message when it has an error code"""
 
     def __init__(self, robot_id: int, error_code: str):
-        """
-        Creates an error message that the given robot has the given error code
+        """Creates an error message that the given robot has the given error code
 
         :param robot_id: the id of the robot with the error code
         :param error_code: the specific error code
@@ -164,16 +153,15 @@ class ErrorCodeLogMessageWidget(RobotLogMessageWidget):
 
 
 class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
-    """
-    A clickable error message from the robot
+    """A clickable error message from the robot
     Displays the error info, and opens up a dialog with more info when clicked
     """
 
     def __init__(
         self, robot_id: int, message: str, icon: QtGui.QPixmap, timestamp=None
     ):
-        """
-        Creates a error message with hover indication. Dialog is set by child classes
+        """Creates a error message with hover indication. Dialog is set by child classes
+
         :param robot_id: the id of the robot that threw the error
         :param message: the message of the error
         :param icon: the icon to display for the error
@@ -195,16 +183,16 @@ class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
         self.dialog = None
 
     def enterEvent(self, event) -> None:
-        """
-        Sets the cursor to indicate that this widget is clickable upon mouse enter
+        """Sets the cursor to indicate that this widget is clickable upon mouse enter
+
         :param event: the mouse enter event
         """
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def mouseReleaseEvent(self, event) -> None:
-        """
-        If the error has a robot status to display, creates and opens a dialog to
+        """If the error has a robot status to display, creates and opens a dialog to
         display it on mouse click
+
         :param event: the mouse release event
         """
         super().mouseReleaseEvent(event)
@@ -213,13 +201,11 @@ class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
 
 
 class RobotCrashLogMessageWidget(RobotLogMessageWithDialogWidget):
-    """
-    A robot error log message when a robot has crashed. On click, opens a dialog with last robot status
-    """
+    """A robot error log message when a robot has crashed. On click, opens a dialog with last robot status"""
 
     def __init__(self, crash_message: RobotCrash):
-        """
-        Creates an error message for a crashed robot. Creates a dialog to display the whole crash message
+        """Creates an error message for a crashed robot. Creates a dialog to display the whole crash message
+
         :param crash_message: the crash message containing robot id and other info
         """
         super(RobotCrashLogMessageWidget, self).__init__(
@@ -237,14 +223,13 @@ class RobotCrashLogMessageWidget(RobotLogMessageWithDialogWidget):
 
 
 class FatalLogMessageWidget(RobotLogMessageWithDialogWidget):
-    """
-    A robot error log message when it has a fatal log message. On click,
+    """A robot error log message when it has a fatal log message. On click,
     opens a dialog with the stack dump + extra info
     """
 
     def __init__(self, robot_log: RobotLog):
-        """
-        Creates an error message for a robot with a fatal log message. Creates a dialog to display the whole log
+        """Creates an error message for a robot with a fatal log message. Creates a dialog to display the whole log
+
         :param robot_log: the fatal log message
         """
         super(FatalLogMessageWidget, self).__init__(
@@ -258,15 +243,14 @@ class FatalLogMessageWidget(RobotLogMessageWithDialogWidget):
 
 
 class RobotFatalLogDialog(QDialog):
-    """
-    Dialog to show information about a fatal robot log message
+    """Dialog to show information about a fatal robot log message
 
     Displays the message info along with the robot ID and the file / line number that caused it
     """
 
     def __init__(self, fatal_log: RobotLog, parent=None):
-        """
-        Creates a dialog box to display a robot fatal log clearly
+        """Creates a dialog box to display a robot fatal log clearly
+
         :param fatal_log: the fatal log to display
         :param parent: the parent widget of the dialog
         """
@@ -305,12 +289,11 @@ class RobotCrashDialog(QDialog):
     """Dialog to show information about a robot before it crashed,
 
     Displays the message and RobotStatus.
-
     """
 
     def __init__(self, message, robot_status, parent=None):
-        """
-        Creates a dialog box detailing info about a robot crash + the last status of the robot before crashing
+        """Creates a dialog box detailing info about a robot crash + the last status of the robot before crashing
+
         :param message: the crash message of the robot
         :param robot_status: the last robot status of the crashed robot
         :param parent: the parent widget of the dialog

@@ -45,6 +45,7 @@ class FieldTestRunner(TbotsTestRunner):
         is_yellow_friendly=False,
     ):
         """Initialize the FieldTestRunner
+
         :param test_name: The name of the test to run
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
@@ -176,9 +177,7 @@ class FieldTestRunner(TbotsTestRunner):
             the window from the main thread.
 
             :param args: The args passed in from the hook
-
             """
-
             stop_test(delay=PAUSE_AFTER_FAIL_DELAY_S)
             self.last_exception = args.exc_value
             raise self.last_exception
@@ -200,6 +199,7 @@ class FieldTestRunner(TbotsTestRunner):
 
 def load_command_line_arguments():
     """Load from command line arguments using argpase
+
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
     """
@@ -329,8 +329,8 @@ def load_command_line_arguments():
 
 @pytest.fixture
 def field_test_runner():
-    """
-    Runs a field test
+    """Runs a field test
+
     :return: yields the runner to the test fixture
     """
     simulator_proto_unix_io = ProtoUnixIO()

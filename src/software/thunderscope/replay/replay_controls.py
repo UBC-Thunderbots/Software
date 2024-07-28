@@ -12,7 +12,6 @@ class ReplayControls(QWidget):
         """Setup the replay controls.
 
         :param player: The player to control.
-
         """
         QGroupBox.__init__(self)
 
@@ -105,29 +104,20 @@ class ReplayControls(QWidget):
         self.player.toggle_play_pause()
 
     def __on_replay_slider_released(self) -> None:
-        """When the slider is released, seek to the sliders location and
-        start playing.
-
-        """
+        """When the slider is released, seek to the sliders location and start playing."""
         self.player.seek(self.replay_slider.value() / MILLISECONDS_PER_SECOND)
         if self.was_playing:
             self.player.play()
         self.slider_pressed = False
 
     def __on_replay_slider_pressed(self) -> None:
-        """When the slider is pressed, pause the player so the slider
-        doesn't move away.
-
-        """
+        """When the slider is pressed, pause the player so the slider doesn't move away."""
         self.was_playing = self.player.is_playing
         self.player.pause()
         self.slider_pressed = True
 
     def __on_replay_slider_value_changed(self, value: int) -> None:
-        """When the slider value is changed, update the label to show the
-        current time.
-
-        """
+        """When the slider value is changed, update the label to show the current time."""
         current_time = time.strftime(
             "%H:%M:%S",
             time.gmtime(self.replay_slider.value() / MILLISECONDS_PER_SECOND),
@@ -161,7 +151,6 @@ class ReplayControls(QWidget):
         """Seeks time relative to current time
 
         :param relative_time The time relative to the current time to seek to
-
         """
         self.was_playing = self.player.is_playing
         self.player.pause()
@@ -173,7 +162,6 @@ class ReplayControls(QWidget):
         """Seeks to an absolute time
 
         :param absolute_time The absolute time to seek to
-
         """
         self.was_playing = self.player.is_playing
         self.player.pause()

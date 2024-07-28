@@ -25,9 +25,7 @@ class TbotsTestRunner:
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
-
         """
-
         self.test_name = test_name
         self.thunderscope = thunderscope
         self.blue_full_system_proto_unix_io = blue_full_system_proto_unix_io
@@ -75,11 +73,11 @@ class TbotsTestRunner:
         is_friendly: bool,
         final_ball_placement_point=None,
     ):
-        """sends a gamecontroller command that is to be broadcasted to the given team
+        """Sends a gamecontroller command that is to be broadcasted to the given team
 
-        param gc_command: the gamecontroller command
-        param is_blue: whether the command should be sent to the blue team
-        final_ball_placement_point: where to place the ball in ball placement
+        :param gc_command: the gamecontroller command
+        :param is_blue: whether the command should be sent to the blue team
+        :param final_ball_placement_point: where to place the ball in ball placement
         """
         team = Team.BLUE
         # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
@@ -101,11 +99,8 @@ class TbotsTestRunner:
     ):
         """Overrides current AI tactic for the given team
 
-        param tactic: the tactic params proto to use
-        param is_friendly: whether the play should be applied to the "friendly" team
-
-        Raises:
-            NotImplementedError
+        :param tactic: the tactic params proto to use
+        :param is_friendly: whether the play should be applied to the "friendly" team
         """
         fs_proto_unix_io = self.blue_full_system_proto_unix_io
         # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
@@ -119,11 +114,8 @@ class TbotsTestRunner:
     def set_play(self, play: Play, is_friendly: bool):
         """Overrides current AI play for the given team
 
-        param play: the play proto to use
-        param is_blue: whether the play should be applied to the blue team
-
-        Raises:
-            NotImplementedError
+        :param play: the play proto to use
+        :param is_blue: whether the play should be applied to the blue team
         """
         fs_proto_unix_io = self.blue_full_system_proto_unix_io
         # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
@@ -149,11 +141,8 @@ class TbotsTestRunner:
     ):
         """Begins validating a test based on incoming world protos
 
-        param always_validation_sequence_set: validation set that must always be true
-        param eventually_validation_sequence_set: validation set that must eventually be true
-        param test_timeout_s: how long the test will run
-
-        Raises:
-            NotImplementedError
+        :param always_validation_sequence_set: validation set that must always be true
+        :param eventually_validation_sequence_set: validation set that must eventually be true
+        :param test_timeout_s: how long the test will run
         """
         raise NotImplementedError("abstract method run_test called from base class")

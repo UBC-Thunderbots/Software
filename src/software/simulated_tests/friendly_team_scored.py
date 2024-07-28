@@ -21,7 +21,6 @@ class FriendlyTeamScored(Validation):
         :returns: FAILING until a ball enters the enemy goal
                   PASSING when a ball enters
         """
-
         if tbots_cpp.contains(
             self.region, tbots_cpp.createPoint(world.ball.current_state.global_position)
         ):

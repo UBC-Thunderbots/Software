@@ -15,7 +15,8 @@ class RobotSpeedThreshold(Validation):
     """Checks if the friendly robots' speed is at or above some threshold."""
 
     def __init__(self, speed_threshold):
-        """
+        """Constructor
+
         :param speed_threshold: The speed threshold
         """
         self.speed_threshold = speed_threshold
@@ -27,7 +28,6 @@ class RobotSpeedThreshold(Validation):
         :returns: FAILING if the friendly robots' speed is below some threshold
                   PASSING if the friendly robots' speed is at or above some threshold
         """
-
         for robot in world.friendly_team.team_robots:
             if (
                 tbots_cpp.createVector(robot.current_state.global_velocity).length()
@@ -37,7 +37,7 @@ class RobotSpeedThreshold(Validation):
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """override"""
+        """(override) shows regions to enter"""
         segments = []
         for robot in world.friendly_team.team_robots:
             robot_x, robot_y = get_current_robot_position(robot)

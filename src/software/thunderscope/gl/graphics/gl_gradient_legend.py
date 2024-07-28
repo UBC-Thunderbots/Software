@@ -12,7 +12,6 @@ class GLGradientLegend(GLPainter):
     the value at specific points along the gradient.
 
     The graphic is a 2D static overlay painted over top the viewport.
-
     """
 
     def __init__(
@@ -38,7 +37,6 @@ class GLGradientLegend(GLPainter):
         :param labels: The labels to appear next to the color bar at specified stops
                        Accepts a dict of {"label": stop} pairs where stop is in [0, 1]
         :param title: The optional title to display above the legend
-
         """
         super().__init__(parent_item=parent_item)
 
@@ -61,7 +59,6 @@ class GLGradientLegend(GLPainter):
 
         :param painter: The QPainter to perform drawing operations with
         :param viewport_rect: The QRect indicating the viewport dimensions
-
         """
         # Determine max width of all labels
         label_width = 0

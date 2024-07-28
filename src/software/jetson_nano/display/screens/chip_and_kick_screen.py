@@ -2,12 +2,11 @@ from software.jetson_nano.display.screens.screen import Screen
 
 
 class ChipAndKickScreen(Screen):
-    """
-    This screen is used to edit the chip and kick speed settings
-    """
+    """This screen is used to edit the chip and kick speed settings"""
 
     def __init__(self, lcd_display, redis_dict, screen_actions):
-        """
+        """Constructor
+
         @param lcd_display, an instance of the LcdDisplay class
         @param redis_dict, a dict of values from redis client to init variables on this screen
         @param screen_actions, an instance of ScreenActions class

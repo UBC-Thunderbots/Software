@@ -25,8 +25,7 @@ class RobotViewComponent(QWidget):
         available_control_modes: list[IndividualRobotMode],
         control_mode_signal: Type[QtCore.pyqtSignal],
     ):
-        """
-        Sets up a Robot Info Widget and a Robot Status Widget for each robot
+        """Sets up a Robot Info Widget and a Robot Status Widget for each robot
 
         Sets the Robot Status widget to None so that it can be added later on button click
 
@@ -54,8 +53,7 @@ class RobotViewComponent(QWidget):
         self.setLayout(self.layout)
 
     def robot_status_expand(self) -> None:
-        """
-        Handles the info button click event from the Robot Info widget
+        """Handles the info button click event from the Robot Info widget
         If robot status widget is not defined, initialises one and adds it to this layout
         If robot status widget is defined, toggles its visibility
         """
@@ -68,8 +66,7 @@ class RobotViewComponent(QWidget):
     def update(
         self, robot_status: RobotStatus, round_trip_time: RobotStatistic
     ) -> None:
-        """
-        Updates the Robot View Components with the new robot status message
+        """Updates the Robot View Components with the new robot status message
         Updates the robot info widget and, if initialized, the robot status widget as well
 
         :param robot_status: the new message data to update the widget with
@@ -81,8 +78,7 @@ class RobotViewComponent(QWidget):
 
 
 class RobotView(QScrollArea):
-    """
-    Widget that displays a collection of robot view components for all
+    """Widget that displays a collection of robot view components for all
     robots currently being used
 
     Contains signal to communicate with robot diagnostics when control mode changes
@@ -91,13 +87,11 @@ class RobotView(QScrollArea):
     control_mode_signal = QtCore.pyqtSignal(int, int)
 
     def __init__(self, available_control_modes: list[IndividualRobotMode]) -> None:
-        """
-        Initialize the robot view component for each robot.
+        """Initialize the robot view component for each robot.
 
         :param available_control_modes: the currently available input modes for the robots
                                         according to what mode thunderscope is run in
         """
-
         super().__init__()
 
         self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
@@ -124,10 +118,9 @@ class RobotView(QScrollArea):
         self.setWidgetResizable(True)
 
     def refresh(self) -> None:
-        """
-        Refresh the view
+        """Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
-        Until the buffer is empty
+        until the buffer is empty
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
         round_trip_time = self.round_trip_time_buffer.get(

@@ -25,7 +25,6 @@ class GLTacticLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
@@ -38,7 +37,6 @@ class GLTacticLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         self.cached_world = self.world_buffer.get(block=False)
         play_info = self.play_info_buffer.get(block=False)
         play_info_dict = MessageToDict(play_info)
@@ -52,7 +50,6 @@ class GLTacticLayer(GLLayer):
 
         :param team: The team proto
         :param play_info_dict: The dictionary containing play/tactic info
-
         """
         tactic_assignments = play_info_dict["robotTacticAssignment"]
 

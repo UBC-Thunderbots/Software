@@ -34,7 +34,6 @@ class Gamecontroller:
         :param suppress_logs: Whether to suppress the logs
         :param use_conventional_port: whether or not to use the conventional port!
         """
-
         self.suppress_logs = suppress_logs
 
         # We default to using a non-conventional port to avoid emitting
@@ -54,20 +53,17 @@ class Gamecontroller:
         )
 
     def get_referee_port(self) -> int:
-        """
-        Sometimes, the port that we are using changes depending on context.
+        """Sometimes, the port that we are using changes depending on context.
         We want a getter function that returns the port we are using.
 
         :return: the port that the game controller is currently using!
         """
-
         return self.referee_port
 
     def __enter__(self) -> Gamecontroller:
         """Enter the gamecontroller context manager.
 
         :return: gamecontroller context managed instance
-
         """
         command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
 
@@ -94,7 +90,6 @@ class Gamecontroller:
         :param type: The type of exception that was raised
         :param value: The exception that was raised
         :param traceback: The traceback of the exception
-
         """
         self.gamecontroller_proc.terminate()
         self.gamecontroller_proc.wait()
@@ -102,9 +97,7 @@ class Gamecontroller:
         self.ci_socket.close()
 
     def refresh(self):
-        """
-        Gets any manual gamecontroller commands from the buffer and executes them
-        """
+        """Gets any manual gamecontroller commands from the buffer and executes them"""
         manual_command = self.command_override_buffer.get(return_cached=False)
 
         while manual_command is not None:
@@ -125,8 +118,7 @@ class Gamecontroller:
             manual_command = self.command_override_buffer.get(return_cached=False)
 
     def is_valid_port(self, port):
-        """
-        determine whether or not a given port is valid
+        """Determine whether or not a given port is valid
 
         :param port: the port we are checking
         :return: True if a port is valid False otherwise
@@ -147,7 +139,6 @@ class Gamecontroller:
         :param start_port: The port to start looking from
         :param max_port: The maximum port to look up to
         :return: The next free port
-
         """
         while start_port <= max_port:
             if self.is_valid_port(start_port):
@@ -167,7 +158,6 @@ class Gamecontroller:
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
         :param autoref_proto_unix_io: The proto unix io for the autoref
-
         """
 
         def __send_referee_command(data: Referee) -> None:
@@ -213,7 +203,6 @@ class Gamecontroller:
         :param team: The team to send the command to
         :param final_ball_placement_point: ball placement point for BallPlacement messages
         :return: The response CiOutput containing 1 or more refree msgs
-
         """
         ci_input = CiInput(timestamp=int(time.time_ns()))
         api_input = Input()
@@ -255,8 +244,7 @@ class Gamecontroller:
         return ci_output_list
 
     def send_ci_input(self, ci_input: proto.ssl_gc_ci_pb2.CiInput) -> list[CiOutput]:
-        """
-        Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
+        """Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
 
         :param CiInput proto to send to the Gamecontroller
 
@@ -277,8 +265,7 @@ class Gamecontroller:
         return ci_output_list
 
     def reset_team(self, name: str, team: str) -> UpdateTeamState:
-        """
-        Returns an UpdateTeamState proto for the gamecontroller to reset team info.
+        """Returns an UpdateTeamState proto for the gamecontroller to reset team info.
 
         :param name name of the new team
         :param team yellow or blue team to update
@@ -296,8 +283,7 @@ class Gamecontroller:
         return update_team_state
 
     def reset_game(self, division: proto.ssl_gc_common_pb2.Division) -> UpdateConfig:
-        """
-        Returns an UpdateConfig proto for the Gamecontroller to reset game info.
+        """Returns an UpdateConfig proto for the Gamecontroller to reset game info.
 
         :param division the Division proto corresponding to the game division to set up the Gamecontroller for
 
@@ -314,8 +300,7 @@ class Gamecontroller:
     def reset_team_info(
         self, division: proto.ssl_gc_common_pb2.Division
     ) -> list[CiOutput]:
-        """
-        Sends a message to the Gamecontroller to reset Team information.
+        """Sends a message to the Gamecontroller to reset Team information.
 
         :param division: the Division proto corresponding to the game division to set up the Gamecontroller for
 
@@ -347,8 +332,7 @@ class Gamecontroller:
     def update_game_engine_config(
         self, config: proto.ssl_gc_engine_config_pb2
     ) -> list[CiOutput]:
-        """
-        Sends a game engine config update.
+        """Sends a game engine config update.
 
         :param config: the new SSL game engine config
 

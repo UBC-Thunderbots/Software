@@ -39,8 +39,7 @@ redis_keys = [
 
 
 class RobotUi:
-    """
-    RobotUI is our user interface for our robots that allows us to quickly get robot
+    """RobotUI is our user interface for our robots that allows us to quickly get robot
     diagnostics and change settings of the robot.
 
     RobotUI uses LcdDisplay to show information, RotaryEncoder to toggle and change different settings,

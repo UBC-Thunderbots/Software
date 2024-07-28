@@ -64,8 +64,8 @@ class SimulatedTestRunner(TbotsTestRunner):
     def set_worldState(self, worldstate: WorldState):
         """Sets the simulation worldstate
 
-        Args:
-            worldstate (WorldState): proto containing the desired worldstate
+        :param worldstate: proto containing the desired worldstate
+
         """
         self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
@@ -77,7 +77,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param args: The args passed in from the hook
 
         """
-
         self.__stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
         self.last_exception = args.exc_value
         raise self.last_exception
@@ -122,7 +121,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
-
         time_elapsed_s = 0
 
         eventually_validation_failure_msg = "Test Timed Out"
@@ -242,8 +240,8 @@ class SimulatedTestRunner(TbotsTestRunner):
         run_till_end=True,
         **kwargs,
     ):
-        """
-        Helper function to run a test, with thunderscope if enabled
+        """Helper function to run a test, with thunderscope if enabled
+
         :param always_validation_sequence_set: validation that should always be true
         :param eventually_validation_sequence_set: validation that should eventually be true
         :param test_timeout_s: how long the test should run before timing out
@@ -253,7 +251,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
-
         test_timeout_duration = (
             test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
         )
@@ -301,8 +298,7 @@ class SimulatedTestRunner(TbotsTestRunner):
 
 
 class InvariantTestRunner(SimulatedTestRunner):
-    """
-    Runs a simulated test only once with a given parameter
+    """Runs a simulated test only once with a given parameter
 
     Test passes or fails based on the outcome of this test
     """
@@ -329,7 +325,6 @@ class InvariantTestRunner(SimulatedTestRunner):
                                 that should eventually be true, before the test ends
 
         """
-
         threading.excepthook = self.excepthook
 
         setup(params[0])
@@ -342,8 +337,7 @@ class InvariantTestRunner(SimulatedTestRunner):
 
 
 class AggregateTestRunner(SimulatedTestRunner):
-    """
-    Runs a simulated test multiple times with different given parameters
+    """Runs a simulated test multiple times with different given parameters
 
     Result of the test is determined by comparing the number of
     passing iterations to a predetermined acceptable threshold
@@ -369,7 +363,6 @@ class AggregateTestRunner(SimulatedTestRunner):
         :param ag_eventually_validation_sequence_set: Validation functions for aggregate testing
                                 that should eventually be true, before the test end
         """
-
         threading.excepthook = self.excepthook
 
         failed_tests = 0

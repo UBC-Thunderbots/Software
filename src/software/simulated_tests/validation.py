@@ -68,7 +68,6 @@ def create_validation_types(validation_class):
         :param world: The world msg to validate on
 
         """
-
         return {
             ValidationStatus.FAILING: ValidationStatus.PASSING,
             ValidationStatus.PASSING: ValidationStatus.FAILING,
@@ -151,7 +150,6 @@ def run_validation_sequence_sets(
     :returns: Eventually ValidationProtoSet, Always ValidationProtoSet
 
     """
-
     # Proto that stores validation geometry and validation status of
     # all validations passed in
     always_validation_proto_set = ValidationProtoSet()
@@ -234,7 +232,6 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     :returns: ValidationGeometry
 
     """
-
     validation_geometry = ValidationGeometry()
 
     CREATE_PROTO_DISPATCH = {

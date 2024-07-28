@@ -26,9 +26,7 @@ class ChickerWidget(QWidget):
         will not work until the capacitors charge up and the cooldown is over.
 
         :param proto_unix_io: proto_unix_io object to send messages to the robot
-
         """
-
         super(ChickerWidget, self).__init__()
 
         vbox_layout = QVBoxLayout()
@@ -111,8 +109,7 @@ class ChickerWidget(QWidget):
         self.power_value = 1
 
     def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
-        """
-        If buttons are enabled, sends a Kick command and disables buttons
+        """If buttons are enabled, sends a Kick command and disables buttons
 
         Attaches a callback to re-enable buttons after 3 seconds
 
@@ -128,15 +125,11 @@ class ChickerWidget(QWidget):
             QTimer.singleShot(CHICKER_TIMEOUT, self.enable_kick_chip_buttons)
 
     def disable_kick_chip_buttons(self) -> None:
-        """
-        Disables the buttons
-        """
+        """Disables the buttons"""
         self.kick_chip_buttons_enable = False
 
     def enable_kick_chip_buttons(self) -> None:
-        """
-        If buttons should be enabled, enables them
-        """
+        """If buttons should be enabled, enables them"""
         if self.no_auto_selected:
             self.kick_chip_buttons_enable = True
 
@@ -145,8 +138,7 @@ class ChickerWidget(QWidget):
             self.clear_proto_buffer()
 
     def set_should_enable_buttons(self, enable: bool) -> None:
-        """
-        Changes if buttons are clickable or not based on boolean parameter
+        """Changes if buttons are clickable or not based on boolean parameter
 
         :param enable: boolean to indicate whether buttons should be made clickable or not
         """
@@ -162,9 +154,7 @@ class ChickerWidget(QWidget):
 
         :param command: enum int value to indicate what primitive to send
         :returns: None
-
         """
-
         # gets slider values
         geneva_value = self.geneva_slider.value()
 
@@ -194,8 +184,7 @@ class ChickerWidget(QWidget):
             self.clear_proto_buffer()
 
     def clear_proto_buffer(self) -> None:
-        """
-        Sends an empty proto to the proto unix io buffer
+        """Sends an empty proto to the proto unix io buffer
         This is due to a bug in robot_communication where if a new PowerControl message is not sent,
         The previous, cached message is resent to the robot repeatedly which we don't want for kick/chip
         So sending an empty message overwrites the cache and prevents spamming commands
@@ -210,7 +199,6 @@ class ChickerWidget(QWidget):
         :param button: button to change the state of
         :param enable: bool: if True: enable this button, if False: disable
         :returns: None
-
         """
         if enable:
             button.setStyleSheet("background-color: White")

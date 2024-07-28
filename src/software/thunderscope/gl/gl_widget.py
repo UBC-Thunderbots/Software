@@ -115,16 +115,13 @@ class GLWidget(QWidget):
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
 
     def get_sim_control_toolbar(self):
-        """
-        Returns the simulation control toolbar
-        """
+        """Returns the simulation control toolbar"""
         return self.simulation_control_toolbar
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
 
         :param event: The event
-
         """
         key_pressed = event.key()
 
@@ -146,7 +143,6 @@ class GLWidget(QWidget):
         """Detect when a key has been released
 
         :param event: The event
-
         """
         # Propagate keypress event to all layers
         for layer in self.layers:
@@ -156,7 +152,6 @@ class GLWidget(QWidget):
         """Propagate mouse_in_scene_pressed event to all layers
 
         :param event: The event
-
         """
         if self.measure_mode_enabled:
             # Only GLMeasureLayer should receive event to avoid layer
@@ -170,7 +165,6 @@ class GLWidget(QWidget):
         """Propagate mouse_in_scene_dragged event to all layers
 
         :param event: The event
-
         """
         if self.measure_mode_enabled:
             # Only GLMeasureLayer should receive event to avoid layer
@@ -184,7 +178,6 @@ class GLWidget(QWidget):
         """Propagate mouse_in_scene_released event to all layers
 
         :param event: The event
-
         """
         if self.measure_mode_enabled:
             # Only GLMeasureLayer should receive event to avoid layer
@@ -198,7 +191,6 @@ class GLWidget(QWidget):
         """Propagate mouse_in_scene_moved event to all layers
 
         :param event: The event
-
         """
         if self.measure_mode_enabled:
             # Only GLMeasureLayer should receive event to avoid layer
@@ -213,7 +205,6 @@ class GLWidget(QWidget):
 
         :param layer: The GLLayer
         :param visible: Whether the layer is visible on startup
-
         """
         self.layers.append(layer)
 
@@ -243,7 +234,6 @@ class GLWidget(QWidget):
         """Remove a layer from this GLWidget
 
         :param layer: The GLLayer to remove
-
         """
         self.layers.remove(layer)
 
@@ -258,7 +248,6 @@ class GLWidget(QWidget):
 
     def refresh(self) -> None:
         """Trigger an update on all the layers"""
-
         if self.player:
             self.replay_controls.refresh()
 
@@ -284,7 +273,6 @@ class GLWidget(QWidget):
         """Set the camera position to a preset camera view
 
         :param camera_view: the preset camera view
-
         """
         self.gl_view_widget.reset()
         if camera_view == CameraView.ORTHOGRAPHIC:
@@ -310,7 +298,6 @@ class GLWidget(QWidget):
 
     def toggle_measure_mode(self) -> None:
         """Toggles measure mode in the 3D visualizer"""
-
         self.measure_mode_enabled = not self.measure_mode_enabled
 
         # Enable/disable detect_mouse_movement_in_scene in ExtendedGLViewWidget
@@ -328,13 +315,11 @@ class GLWidget(QWidget):
             self.remove_layer(self.measure_layer)
 
     def __add_toolbar_toggle(self, toolbar: QWidget, name: str) -> None:
-        """
-        Adds a button to the toolbar menu to toggle the given toolbar
+        """Adds a button to the toolbar menu to toggle the given toolbar
 
         :param toolbar: the toolbar to add the toggle button for
         :param name: the display name of the toolbar
         """
-
         # Add a menu item for the Gamecontroller toolbar
         (toolbar_checkbox, toolbar_action) = self.__setup_menu_checkbox(
             name, self.toolbars_menu
@@ -349,8 +334,7 @@ class GLWidget(QWidget):
     def __setup_menu_checkbox(
         self, name: str, parent: QWidget, checked: bool = True
     ) -> tuple[QCheckBox, QWidgetAction]:
-        """
-        Sets up a clickable menu checkbox with the given name
+        """Sets up a clickable menu checkbox with the given name
         attached to the given parent
 
         :param name: the name displayed on the checkbox
@@ -369,7 +353,6 @@ class GLWidget(QWidget):
 
     def __calc_orthographic_distance(self) -> float:
         """Calculates the distance of the camera above the field so that the field occupies the entire viewport"""
-
         field = DEFAULT_EMPTY_FIELD_WORLD.field
         buffer_size = 0.5
         distance = np.tan(np.deg2rad(90 - ORTHOGRAPHIC_FOV_DEGREES / 2))

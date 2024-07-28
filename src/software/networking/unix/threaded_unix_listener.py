@@ -14,11 +14,8 @@ class ThreadedUnixListener:
 
         :param unix_path: The unix path to receive the new protobuf to plot
         :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
-
         :param max_buffer_size: The size of the buffer
-
         """
-
         # cleanup the old path if it exists
         try:
             os.remove(unix_path)
@@ -45,7 +42,6 @@ class ThreadedUnixListener:
 
         :param proto: The protobuf to buffer
         :raises: Warning
-
         """
         try:
             self.proto_buffer.put_nowait(proto)

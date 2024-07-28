@@ -13,7 +13,6 @@ class GLPainter(GLGraphicsItem):
         """Initialize the GLPainter
 
         :param parent_item: The parent item of the graphic
-
         """
         super().__init__(parentItem=parent_item)
         self.draw_functions = []
@@ -28,13 +27,11 @@ class GLPainter(GLGraphicsItem):
         The draw function should not call end() on the QPainter.
 
         :param draw_function: The draw function to register
-
         """
         self.draw_functions.append(draw_function)
 
     def paint(self):
         """Called by the GLViewWidget to draw this graphic"""
-
         self.setupGLState()
 
         painter = QtGui.QPainter(self.view())

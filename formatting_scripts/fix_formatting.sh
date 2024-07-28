@@ -60,7 +60,7 @@ function run_bazel_formatting () {
 function run_ruff() {
     printf "Running ruff to lint and format Python files...\n\n"
 
-    /opt/tbotspython/bin/python3 -m ruff check $BAZEL_ROOT_DIR --fix-only
+    /opt/tbotspython/bin/python3 -m ruff check $BAZEL_ROOT_DIR --fix-only --extend-select D
     /opt/tbotspython/bin/python3 -m ruff format $BAZEL_ROOT_DIR
 
     if [[ "$?" != 0 ]]; then

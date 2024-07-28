@@ -30,7 +30,6 @@ class GLPolygon(GLShape):
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill
         :param line_width: The line width of the polygon's outline
-
         """
         super().__init__(
             parent_item=parent_item,
@@ -49,7 +48,6 @@ class GLPolygon(GLShape):
 
         :param points: A list of 2-tuples representing the polygon points
                        on the cartesian plane. Must be non-empty
-
         """
         self.points = points
         self._update_shape_data()

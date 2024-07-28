@@ -33,7 +33,6 @@ class FullSystem:
         :param should_restart_on_crash: whether or not to restart the program after it has been crashed
         :param run_sudo: true if we should run full system under sudo
         :param running_in_realtime: True if we are running fullsystem in realtime, else False
-
         """
         self.full_system_runtime_dir = full_system_runtime_dir
         self.debug_full_system = debug_full_system
@@ -134,7 +133,7 @@ gdb --args bazel-bin/{self.full_system}
         return self
 
     def __restart__(self) -> None:
-        "Restarts full system."
+        """Restarts full system."""
         while self.should_restart_on_crash:
             if not is_cmd_running(
                 [
@@ -153,7 +152,6 @@ gdb --args bazel-bin/{self.full_system}
         :param type: The type of exception that was raised
         :param value: The exception that was raised
         :param traceback: The traceback of the exception
-
         """
         self.should_restart_on_crash = False
 
@@ -174,9 +172,7 @@ gdb --args bazel-bin/{self.full_system}
         """Helper to run full system and attach the appropriate unix senders/listeners
 
         :param proto_unix_io: The unix io to setup for this full_system instance
-
         """
-
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for proto_class in [

@@ -34,9 +34,7 @@ class RobotEntersRegion(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) shows regions to enter
-        """
+        """(override) shows regions to enter"""
         return create_validation_geometry(self.regions)
 
     def __repr__(self):
@@ -87,9 +85,7 @@ class NumberOfRobotsEntersRegion(Validation):
             return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) shows region to enter
-        """
+        """(override) shows region to enter"""
         return create_validation_geometry([self.region])
 
     def __repr__(self):

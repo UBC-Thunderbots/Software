@@ -12,7 +12,8 @@ class BallMovesFromRest(Validation):
     """Checks if ball has moved threshold meters from initial position"""
 
     def __init__(self, position, threshold=0.05):
-        """
+        """Constructor
+
         :param position: initial position of the ball
         :param threshold: distance for which ball is considered to have moved
         """
@@ -39,9 +40,7 @@ class BallMovesFromRest(Validation):
         return validation_status
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) Shows the last ball position line
-        """
+        """(override) Shows the last ball position line"""
         return create_validation_geometry(
             [tbots_cpp.Circle(self.initial_ball_position, self.threshold)]
         )

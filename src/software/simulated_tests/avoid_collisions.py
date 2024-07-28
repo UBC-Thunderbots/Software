@@ -9,22 +9,19 @@ from software.simulated_tests.validation import (
 
 
 class RobotsDoNotCollide(Validation):
-    """
-    Checks if any 2 robots have collided
-    """
+    """Checks if any 2 robots have collided"""
 
     ROBOT_COLLISION_BUFFER_M = 0.005
 
     def __init__(self):
-        """
-        Initialised the list of robots that have fouled to empty
+        """Initialise the list of robots that have fouled to empty
         2 robots can collide with only 1 of them fouling
         """
         self.fouled_robots = []
 
     def get_validation_status(self, world: World) -> ValidationStatus:
-        """
-        Checks if any 2 robots in the world have collided
+        """Checks if any 2 robots in the world have collided
+
         :param world: the World message to validate
         :return: FAILING if any 2 robots have collided
                  PASSING if no robots have collided
@@ -40,16 +37,15 @@ class RobotsDoNotCollide(Validation):
         return ValidationStatus.PASSING
 
     def check_robot_collision(self, robot1: Robot, robot2: Robot):
-        """
-        Helper function to check if 2 robots have collided
+        """Helper function to check if 2 robots have collided
         Also determines which robots have committed a foul
+
         :param robot1: first robot
         :param robot2: second robot
         :return: True if a collision occurs
                  False if no collision
                  Adds robots which fouled to self.fouled_robots
         """
-
         # robot positions
         robot1_pos = tbots.createVector(
             Vector(
@@ -99,11 +95,12 @@ class RobotsDoNotCollide(Validation):
     def check_fouled_robots(
         self, robot1_id: int, robot1_vel: Vector, robot2_id: int, robot2_vel: Vector
     ):
-        """
-        Determines which of the 2 robots have fouled based on their speed
+        """Determines which of the 2 robots have fouled based on their speed
         and adds them to the fouled robots list
+
         The logic on which robot(s) get a foul is from the official SSL rules
         https://robocup-ssl.github.io/ssl-rules/sslrules.html#_crashing
+
         :param robot1_id: the id of the first robot
         :param robot1_vel: the velocity of the first robot
         :param robot2_id: the id of the second robot
@@ -121,8 +118,8 @@ class RobotsDoNotCollide(Validation):
                 self.fouled_robots.extend([robot2_id])
 
     def get_validation_geometry(self, world: World) -> ValidationGeometry:
-        """
-        Returns a list of circles indicating the boundary of each robot in the world
+        """Returns a list of circles indicating the boundary of each robot in the world
+
         :param world: the world message to create geometry for
         :return: ValidationGeometry with a list of circles around each robot
         """
@@ -141,10 +138,10 @@ class RobotsDoNotCollide(Validation):
         )
 
     def __repr__(self):
-        """
-        String representation of the validation
+        """String representation of the validation
 
         If any robots have fouled, returns a string with all their ids
+
         :return: string with robot ids that have fouled,
                  or default message if none have fouled
         """

@@ -9,14 +9,12 @@ from software.simulated_tests.validation import (
 
 
 class FriendlyReceivesBallSlow(Validation):
-    """
-    Checks if a receiver receives the ball below a certain speed
-    """
+    """Checks if a receiver receives the ball below a certain speed"""
 
     def __init__(self, robot_id, max_receive_speed):
-        """
-        Constructs the validation to check the given robot ID for receiving the ball
+        """Constructs the validation to check the given robot ID for receiving the ball
         at the given speed
+
         :param robot_id: the robot id to check
         :param max_receive_speed: the max speed the ball should be received at
         """
@@ -42,9 +40,7 @@ class FriendlyReceivesBallSlow(Validation):
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) highlights the dribbler area of the robots
-        """
+        """(override) highlights the dribbler area of the robots"""
         return create_validation_geometry(
             [
                 tbots.Robot(robot).dribblerArea()

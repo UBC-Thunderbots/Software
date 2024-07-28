@@ -67,8 +67,7 @@ def create_world_state(
 
 
 def create_default_world_state(num_robots: int) -> WorldState:
-    """
-    Create a WorldState proto with num_robots yellow and blue robots evenly spaced in two parallel lines on the field.
+    """Create a WorldState proto with num_robots yellow and blue robots evenly spaced in two parallel lines on the field.
 
     :param num_robots: Number of robots for the yellow and blue teams
     """

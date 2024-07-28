@@ -51,7 +51,6 @@ class GLWorldLayer(GLLayer):
         :param friendly_colour_yellow: Is the friendly_colour_yellow?
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.FOREGROUND_DEPTH)
@@ -143,7 +142,6 @@ class GLWorldLayer(GLLayer):
         """Detect when a key has been pressed
 
         :param event: The event
-
         """
         self.key_pressed[event.key()] = True
 
@@ -186,9 +184,9 @@ class GLWorldLayer(GLLayer):
         self.set_simulation_speed(new_simulation_speed)
 
     def toggle_play_state(self) -> bool:
-        """
-        Pauses the simulated gameplay and toggles the play state
+        """Pauses the simulated gameplay and toggles the play state
         Calls all callback functions with the new play state
+
         :return: the current play state
         """
         simulator_state = SimulationState(
@@ -201,8 +199,8 @@ class GLWorldLayer(GLLayer):
         return self.is_playing
 
     def set_simulation_speed(self, speed: float) -> None:
-        """
-        Sets the speed of the simulator
+        """Sets the speed of the simulator
+
         :param speed: the new speed to set
         """
         self.simulation_speed = speed
@@ -215,7 +213,6 @@ class GLWorldLayer(GLLayer):
         """Detect when a key has been released
 
         :param event: The event
-
         """
         self.key_pressed[event.key()] = False
 
@@ -223,7 +220,6 @@ class GLWorldLayer(GLLayer):
         """Detect that the mouse was pressed and picked a point in the 3D scene
 
         :param event: The event
-
         """
         if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             return
@@ -248,7 +244,6 @@ class GLWorldLayer(GLLayer):
         """Detect that the mouse was dragged within the 3D scene
 
         :param event: The event
-
         """
         if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             return
@@ -274,7 +269,6 @@ class GLWorldLayer(GLLayer):
         """Detect that the mouse was released after picking a point in the 3D scene
 
         :param event: The event
-
         """
         if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             return
@@ -307,7 +301,6 @@ class GLWorldLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         self.cached_world = self.world_buffer.get(block=False, return_cached=True)
 
         # if not receiving worlds, just render an empty field
@@ -351,9 +344,7 @@ class GLWorldLayer(GLLayer):
             self.simulation_speed = simulation_state.simulation_speed
 
     def _update_robots_graphics(self) -> None:
-        """
-        Updates the GLGraphicsItems that display all robots (friendly and enemy team)
-        """
+        """Updates the GLGraphicsItems that display all robots (friendly and enemy team)"""
         friendly_colour = (
             Colors.YELLOW_ROBOT_COLOR
             if self.friendly_colour_yellow
@@ -382,7 +373,6 @@ class GLWorldLayer(GLLayer):
         """Update the GLGraphicsItems that display the field lines and markings
 
         :param field: The field proto
-
         """
         self.field_lines_graphic.set_dimensions(
             field.field_x_length, field.field_y_length
@@ -422,7 +412,6 @@ class GLWorldLayer(GLLayer):
         """Update the GLGraphicsItems that display the goals
 
         :param field: The field proto
-
         """
         if not field.goal_x_length or not field.goal_y_length:
             return
@@ -441,7 +430,6 @@ class GLWorldLayer(GLLayer):
         """Update the GLGraphicsItems that display the ball
 
         :param ball_state: The ball state proto
-
         """
         self.ball_graphic.set_position(
             ball_state.global_position.x_meters,
@@ -462,7 +450,6 @@ class GLWorldLayer(GLLayer):
         :param color: The color of the robots
         :param robot_graphics: The ObservableList containing the robot graphics for this team
         :param robot_id_graphics: The ObservableList containing the robot ID graphics for this team
-
         """
         # Ensure we have the same number of graphics as robots
         robot_graphics.resize(len(robots), lambda: GLRobot())
@@ -506,7 +493,6 @@ class GLWorldLayer(GLLayer):
 
     def __update_robot_status_graphics(self) -> None:
         """Update the robot status graphics"""
-
         # Get the robot status messages
         robot_statuses = {}
         while True:
@@ -548,7 +534,6 @@ class GLWorldLayer(GLLayer):
 
     def __update_auto_chip_or_kick_graphics(self) -> None:
         """Update the auto kick and auto chip graphics"""
-
         # See which robots have auto kick or auto chip enabled
         auto_kick_robots = []
         auto_chip_robots = []
@@ -586,8 +571,8 @@ class GLWorldLayer(GLLayer):
         )
 
         def update_polygon(polygon_graphic: GLPolygon, robot: tbots_cpp.Robot) -> None:
-            """
-            Update the polygon graphic with the robot's dribbler area
+            """Update the polygon graphic with the robot's dribbler area
+
             :param polygon_graphic: The polygon graphic to update
             :param robot: The robot to get the dribbler area from
             """
@@ -632,7 +617,6 @@ class GLWorldLayer(GLLayer):
 
     def __update_speed_line_graphics(self) -> None:
         """Update the speed lines visualizing the robot and ball speeds"""
-
         # When the user is kicking the ball, show the kick velocity vector
         # as a speed line
         if self.ball_velocity_vector:
@@ -693,7 +677,6 @@ class GLWorldLayer(GLLayer):
         or negative half of the field.
 
         :return: True if we should invert the coordinate frame, False otherwise
-
         """
         referee = self.referee_buffer.get(block=False)
 
@@ -711,7 +694,6 @@ class GLWorldLayer(GLLayer):
 
         :param point: The point location in the 3D scene [x, y]
         :return: The inverted point location [x, y] (if needed to be inverted)
-
         """
         if self._should_invert_coordinate_frame():
             return QtGui.QVector3D(-point[0], -point[1], point[2])

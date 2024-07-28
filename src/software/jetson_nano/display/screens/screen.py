@@ -5,14 +5,14 @@ from software.jetson_nano.display.utils import get_ip_address, get_signal_streng
 
 
 class Screen:
-    """
-    All new screens will inherit from this class. This class will handles editing variables and maintaining
+    """All new screens will inherit from this class. This class will handles editing variables and maintaining
     the current action the cursor is hovering. It also accepts the list of actions so that it can display
     them on the screen.
     """
 
     def __init__(self, lcd_display, screen_actions, actions, draw_screen=None):
-        """
+        """Constructor
+
         @param lcd_display, an instance of the LcdDisplay class
         @param screen_actions, an instance of ScreenActions class
         @param draw_screen, a callback function to re-render screen on lcd display

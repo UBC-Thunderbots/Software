@@ -32,9 +32,7 @@ class BallMovesForward(Validation):
         return validation_status
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) Shows the last ball position line
-        """
+        """(override) Shows the last ball position line"""
         return create_validation_geometry(
             [
                 tbots_cpp.Rectangle(

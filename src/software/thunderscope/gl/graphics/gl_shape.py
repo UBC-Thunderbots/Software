@@ -25,7 +25,6 @@ class GLShape(GLLinePlotItem):
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill
         :param line_width: The line width of the polygon's outline
-
         """
         super().__init__(parentItem=parent_item, width=line_width)
 
@@ -44,7 +43,6 @@ class GLShape(GLLinePlotItem):
 
         :param x: The x coordinate to position the graphic at
         :param y: The y coordinate to position the graphic at
-
         """
         if self.x == x and self.y == y:
             return
@@ -57,7 +55,6 @@ class GLShape(GLLinePlotItem):
         """Set the orientation of the graphic in the scene
 
         :param degrees: The orientation of the graphic in degrees
-
         """
         if self.orientation == degrees:
             return
@@ -70,7 +67,6 @@ class GLShape(GLLinePlotItem):
         """Set the color of the shape's outline
 
         :param outline_color: The color of the shape's outline
-
         """
         self.setData(color=outline_color)
 
@@ -78,7 +74,6 @@ class GLShape(GLLinePlotItem):
         """Set the color used to fill the shape
 
         :param fill_color: The color used to fill the shape, or None if no fill
-
         """
         if fill_color:
             if not self.fill_graphic:

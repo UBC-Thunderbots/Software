@@ -7,9 +7,7 @@ from pyqtgraph.dockarea import *
 
 
 class WidgetStretchData:
-    """
-    Data that describes how a widget should be sized
-    """
+    """Data that describes how a widget should be sized"""
 
     x: Optional[int]  # stretch in x direction
     y: Optional[int]  # stretch in y direction
@@ -20,9 +18,7 @@ class WidgetStretchData:
 
 
 class TScopeWidget:
-    """
-    Data that describes a widget in Thunderscope
-    """
+    """Data that describes a widget in Thunderscope"""
 
     name: str  # name of widget (must be unique)
     widget: Any  # the widget object
@@ -52,9 +48,7 @@ class TScopeWidget:
 
 
 class TScopeTab:
-    """
-    Data that describes a tab in Thunderscope
-    """
+    """Data that describes a tab in Thunderscope"""
 
     name: str  # name of tab
     key: TabNames  # key to identify this tab
@@ -69,9 +63,7 @@ class TScopeTab:
 
 
 class TScopeQTTab(TScopeTab):
-    """
-    Data that describes a tab with Qt Widgets in Thunderscope
-    """
+    """Data that describes a tab with Qt Widgets in Thunderscope"""
 
     # List of widget data for this tab
     widgets: Sequence[TScopeWidget]
@@ -92,12 +84,12 @@ class TScopeQTTab(TScopeTab):
         widgets: Sequence[TScopeWidget],
         refresh_func_counter: FrameTimeCounter = None,
     ) -> None:
-        """
-        name: the name of this tab
-        key: the key to identify this tab
-        widgets: a list of widgets that is going to be displayed in the tab
-        refresh_func_counter: a counter that tracks the runtime of the refresh function
-        :Return: None
+        """Constructor
+
+        :param name: the name of this tab
+        :param key: the key to identify this tab
+        :param widgets: a list of widgets that is going to be displayed in the tab
+        :param refresh_func_counter: a counter that tracks the runtime of the refresh function
         """
         super().__init__(name, key)
         self.widgets = widgets
@@ -121,13 +113,12 @@ class TScopeQTTab(TScopeTab):
             self.refresh_func_counter = FrameTimeCounter()
 
     def add_one_widget(self, data: TScopeWidget) -> None:
-        """
-        Gets the widget name and object from the given data
+        """Gets the widget name and object from the given data
         Add widget to a dock and adds dock to this tab's dock area
         And to this tab's map of widgets and docks
+
         :param data: the data describing the widget of type TScopeWidget
         """
-
         widget_name = data.name
         new_widget = data.widget
 
@@ -152,9 +143,7 @@ class TScopeQTTab(TScopeTab):
             self.refresh_functions[widget_name] = new_widget.refresh
 
     def refresh(self) -> None:
-        """
-        Refreshes all the widgets belonging to this tab, and not refresh widget that are not visible.
-        """
+        """Refreshes all the widgets belonging to this tab, and not refresh widget that are not visible."""
         if not self.dock_area.isVisible():
             return
 
@@ -170,9 +159,9 @@ class TScopeQTTab(TScopeTab):
             refresh_func()
 
     def find_widget(self, widget_name: str) -> Optional[TScopeWidget]:
-        """
-        Finds and returns the widget object corresponding to the given name, if exists
+        """Finds and returns the widget object corresponding to the given name, if exists
         If not, returns None
+
         :param widget_name: the name of the widget
         """
         if widget_name in self.widgets_map:

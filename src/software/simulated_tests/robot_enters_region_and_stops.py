@@ -15,8 +15,7 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
     ROBOT_MAX_STATIONARY_SPEED_M_PER_S = 0.01
 
     def __init__(self, regions=None, num_ticks=1):
-        """
-        Constructs the base validation with the given regions
+        """Constructs the base validation with the given regions
         Sets boolean indicating validation stage to default
 
         :param regions: the regions the robot has to enter
@@ -30,8 +29,7 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
         self.passing_robot_id = None
 
     def get_validation_status(self, world) -> ValidationStatus:
-        """
-        Checks if a robot is in the provided region
+        """Checks if a robot is in the provided region
         Then checks if that robot is stationary within a threshold for the provided number of ticks
 
         Sets booleans about the state of the validation for logging
@@ -76,14 +74,11 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
             return robot_in_region_validation
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) shows region to enter
-        """
+        """(override) shows region to enter"""
         return create_validation_geometry(self.regions)
 
     def __repr__(self):
-        """
-        Returns a string representing the stage of validation that failed
+        """Returns a string representing the stage of validation that failed
         Either the robot has not entered the region yet, or it has but is not stationary
         """
         if not self.is_stationary:

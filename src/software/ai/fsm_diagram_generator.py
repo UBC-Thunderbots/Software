@@ -8,9 +8,7 @@ OUTPUT_FILE_PATH = "docs/fsm-diagrams.md"
 
 
 def generate_diagram(fsm):
-    """
-    Generates a Mermaid text definition for a state diagram
-    representing the FSM.
+    """Generates a Mermaid text definition for a state diagram representing the FSM.
 
     Details on Mermaid UML syntax:
     https://mermaid.js.org/syntax/stateDiagram.html
@@ -18,7 +16,6 @@ def generate_diagram(fsm):
     :param fsm: the FSM code containing its transition table
     :returns: the mermaid.js text definition for FSM diagram
     """
-
     # Regex match to extract transition table from the FSM
     transition_table_match = re.search(r"make_transition_table\(([\s\S]*?)\);", fsm)
     if not transition_table_match:

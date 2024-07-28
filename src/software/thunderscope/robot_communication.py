@@ -38,9 +38,7 @@ class RobotCommunication:
         :param estop_baudrate: The baudrate of the estop
         :param enable_radio: Whether to use radio to send primitives to robots
         :param referee_port: the referee port that we are using. If this is None, the default port is used
-
         """
-
         self.referee_port = referee_port
         self.receive_ssl_referee_proto = None
         self.receive_ssl_wrapper = None
@@ -104,8 +102,8 @@ class RobotCommunication:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
     def setup_for_fullsystem(self) -> None:
-        """
-        Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
+        """Sets up a listener for SSL vision and referee data, and connects
+        all robots to fullsystem as default
         """
         self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
@@ -133,8 +131,7 @@ class RobotCommunication:
             self.receive_ssl_referee_proto.close()
 
     def toggle_keyboard_estop(self) -> None:
-        """
-        If keyboard estop is being used, toggles the estop state
+        """If keyboard estop is being used, toggles the estop state
         And sends a message to the console
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
@@ -150,8 +147,7 @@ class RobotCommunication:
             )
 
     def toggle_robot_connection(self, mode: IndividualRobotMode, robot_id: int):
-        """
-        Changes the input mode for a robot between None, Manual, or AI
+        """Changes the input mode for a robot between None, Manual, or AI
         If changing from anything to None, add robot to disconnected map
         So we can send multiple stop primitives to make sure it stops
 
@@ -170,8 +166,7 @@ class RobotCommunication:
             self.robots_connected_to_fullsystem.add(robot_id)
 
     def __send_estop_state(self) -> None:
-        """
-        Constant loop which sends the current estop status proto if estop is not disabled
+        """Constant loop which sends the current estop status proto if estop is not disabled
         Uses the keyboard estop value for keyboard estop mode
         If we're in physical estop mode, uses the physical estop value
         If estop has just changed from playing to stop, set flag to send stop primitive once to connected robots
@@ -196,8 +191,8 @@ class RobotCommunication:
                 time.sleep(0.1)
 
     def __should_send_packet(self) -> bool:
-        """
-        Returns True if the proto sending threads should send a proto
+        """Returns True if the proto sending threads should send a proto
+
         :return: boolean
         """
         return (
@@ -222,7 +217,6 @@ class RobotCommunication:
 
         send_override_primitive_set can be used to send a primitive set, which
         is useful to dip in and out of robot diagnostics.
-
         """
         while self.running:
             # total primitives for all robots
@@ -286,8 +280,8 @@ class RobotCommunication:
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
-        """
-        Forwards to proto unix IO iff running is true
+        """Forwards to proto unix IO iff running is true
+
         :param data: the data to be passed through
         :param type: the proto type
         """
@@ -297,7 +291,6 @@ class RobotCommunication:
     def __enter__(self) -> RobotCommunication:
         """Enter RobotCommunication context manager. Setup multicast listeners
         for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
-
         """
         # Create the multicast listeners
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
@@ -337,8 +330,8 @@ class RobotCommunication:
         return self
 
     def __receive_robot_status(self, robot_status: Message) -> None:
-        """
-        Forwards the given robot status to the full system along with the round-trip time
+        """Forwards the given robot status to the full system along with the round-trip time
+
         :param robot_status: RobotStatus to forward to fullsystem
         """
         round_trip_time_seconds = time.time() - (
@@ -354,7 +347,6 @@ class RobotCommunication:
         """Exit RobotCommunication context manager
 
         Ends all currently running loops and joins all currently active threads
-
         """
         self.running = False
 

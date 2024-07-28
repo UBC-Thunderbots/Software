@@ -9,12 +9,11 @@ BATTERY_VOLTAGE_BASE = 60
 
 
 class HomeScreen(Screen):
-    """
-    This is the dashboard screen which shows basic robot diagnostics
-    """
+    """This is the dashboard screen which shows basic robot diagnostics"""
 
     def __init__(self, lcd_display, redis_dict, screen_actions):
-        """
+        """Constructor
+
         @param lcd_display, an instance of the LcdDisplay class
         @param redis_dict, a dict of values from redis client to init variables on this screen
         @param screen_actions, an instance of ScreenActions class

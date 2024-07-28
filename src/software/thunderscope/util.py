@@ -18,8 +18,7 @@ def exit_poller(
     on_exit: Callable[[], None],
     poll_duration_s: float = 0.5,
 ) -> NoReturn:
-    """
-    Calls the on_exit callback once the elapsed exit_duration has passed from the start of this function call,
+    """Calls the on_exit callback once the elapsed exit_duration has passed from the start of this function call,
     polling every poll_duration using system time
 
     :param time_provider:   used to compare all timestamps
@@ -42,8 +41,7 @@ def async_sim_ticker(
     tscope: Thunderscope,
     buffer_timeout_s: int = 1,
 ) -> None:
-    """
-    Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
+    """Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
 
     :param tick_rate_ms:            the interval between consequent ticks (ms)
     :param blue_proto_unix_io:      ProtoUnixIO for the Blue FullSystem
@@ -94,8 +92,7 @@ def async_sim_ticker(
 def realtime_sim_ticker(
     tick_rate_ms: int, sim_proto_unix_io: ProtoUnixIO, tscope: Thunderscope
 ) -> None:
-    """
-    Tick simulation in real-time. Requires Thunderscope to be open.
+    """Tick simulation in real-time. Requires Thunderscope to be open.
 
     :param tick_rate_ms:        the interval between consequent ticks (ms) and delay between sending Vision messages
     :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
@@ -119,8 +116,7 @@ def realtime_sim_ticker(
 
 
 def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int) -> None:
-    """
-    Ensure that simulator has synchronized with the default world state.
+    """Ensure that simulator has synchronized with the default world state.
 
     :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
     :param num_robots:          Number of robots to initialize the simulator with

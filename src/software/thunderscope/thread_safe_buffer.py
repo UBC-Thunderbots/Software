@@ -28,7 +28,6 @@ class ThreadSafeBuffer:
         :param buffer size: The size of the buffer.
         :param protobuf_type: To buffer
         :param log_overrun: False
-
         """
         self.logger = createLogger(protobuf_type.DESCRIPTOR.name + " Buffer")
         self.queue = queue.Queue(buffer_size)
@@ -63,9 +62,7 @@ class ThreadSafeBuffer:
 
         :return: protobuf (cached if block is False and there is no data
                  in the buffer)
-
         """
-
         if (
             self.log_overrun
             and self.protos_dropped > self.last_logged_protos_dropped
@@ -100,7 +97,6 @@ class ThreadSafeBuffer:
         :param proto: The proto to place in the buffer
         :param block: Should block until there is space in the buffer
         :param timeout: If block is True, then wait for this many seconds
-
         """
         if block:
             self.queue.put(proto, block, timeout)

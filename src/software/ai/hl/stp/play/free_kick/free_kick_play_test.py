@@ -14,15 +14,14 @@ from proto.ssl_gc_common_pb2 import Team
 def free_kick_play_setup(
     blue_bots, yellow_bots, ball_initial_pos, play_name, simulated_test_runner
 ):
-    """
-    Sets up the free kick play test
+    """Sets up the free kick play test
+
     :param blue_bots: positions of blue robots
     :param yellow_bots: positions of yellow robots
     :param ball_initial_pos: initial position of the ball
     :param play_name: current play being used for blue robots
     :param simulated_test_runner: the current test runner
     """
-
     # Game Controller Setup
     simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN

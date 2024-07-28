@@ -16,9 +16,7 @@ from qt_material import apply_stylesheet
 
 
 class TScopeConfig:
-    """
-    Data that described a whole Thunderscope view
-    """
+    """Data that describes a whole Thunderscope view"""
 
     # Mapping of protos needed for this view
     proto_unix_io_map: dict[ProtoUnixIOTypes, ProtoUnixIO]
@@ -36,8 +34,7 @@ class TScopeConfig:
 
 
 def initialize_application() -> None:
-    """
-    Initializes a QApplication
+    """Initializes a QApplication
 
     MUST be done before any QWidgets are initialized, so this is called
     at the start of every config initialize method
@@ -58,8 +55,8 @@ def initialize_application() -> None:
 def configure_robot_view_fullsystem(
     fullsystem_proto_unix_io: ProtoUnixIO,
 ) -> TScopeWidget:
-    """
-    Returns Widget Data for the Robot View Widget for FullSystem
+    """Returns Widget Data for the Robot View Widget for FullSystem
+
     :param fullsystem_proto_unix_io: the proto unix io to configure the widget with
     :return: the widget data
     """
@@ -83,8 +80,8 @@ def configure_robot_view_fullsystem(
 def configure_robot_view_diagnostics(
     diagnostics_proto_unix_io: ProtoUnixIO,
 ) -> TScopeWidget:
-    """
-    Returns Widget Data for the Robot View Widget for Diagnostics
+    """Returns Widget Data for the Robot View Widget for Diagnostics
+
     :return: the widget data
     """
     return TScopeWidget(
@@ -105,8 +102,8 @@ def configure_robot_view_diagnostics(
 
 
 def configure_estop(proto_unix_io):
-    """
-    Returns Widget Data for the Estop widget
+    """Returns Widget Data for the Estop widget
+
     :param proto_unix_io: the proto unix io to configure the widget with
     :return:
     """
@@ -131,8 +128,7 @@ def configure_base_fullsystem(
     refresh_func_counter: FrameTimeCounter = None,
     buffer_func_counter: FrameTimeCounter = None,
 ) -> list:
-    """
-    Returns a list of widget data for a FullSystem tab
+    """Returns a list of widget data for a FullSystem tab
     along with any extra widgets passed in
 
     :param full_system_proto_unix_io: the proto unix io to configure widgets with
@@ -148,7 +144,6 @@ def configure_base_fullsystem(
     :param buffer_func_counter: a counter that is used to count the bufferswap frametime callback
     :return: list of widget data for FullSystem
     """
-
     if refresh_func_counter == None:
         refresh_func_counter = FrameTimeCounter()
 
@@ -248,8 +243,7 @@ def configure_base_diagnostics(
     current_proto_unix_io: ProtoUnixIO,
     extra_widgets: list[TScopeWidget] = [],
 ) -> list:
-    """
-    Returns a list of widget data for a Diagnostics tab
+    """Returns a list of widget data for a Diagnostics tab
     along with any extra widgets passed in
 
     :param diagnostics_proto_unix_io: the proto unix io for diagnostics
@@ -296,8 +290,7 @@ def configure_base_diagnostics(
 def configure_two_ai_gamecontroller_view(
     visualization_buffer_size: int = 5,
 ) -> TScopeConfig:
-    """
-    Constructs the Thunderscope Config for a view with 2 FullSystem tabs (Blue and Yellow)
+    """Constructs the Thunderscope Config for a view with 2 FullSystem tabs (Blue and Yellow)
     And 1 Gamecontroller tab
 
     :param visualization_buffer_size: The size of the visualization buffer.
@@ -365,8 +358,7 @@ def configure_simulated_test_view(
     yellow_full_system_proto_unix_io: ProtoUnixIO,
     visualization_buffer_size: int = 5,
 ) -> TScopeConfig:
-    """
-    Constructs the Thunderscope Config for simulated tests
+    """Constructs the Thunderscope Config for simulated tests
     A view with 2 FullSystem tabs (Blue and Yellow)
     And 1 Gamecontroller tab
 
@@ -424,8 +416,7 @@ def configure_field_test_view(
     visualization_buffer_size: int = 5,
     yellow_is_friendly: bool = False,
 ) -> TScopeConfig:
-    """
-    Constructs the Thunderscope Config for field tests
+    """Constructs the Thunderscope Config for field tests
     A view with 2 FullSystem tabs (Blue and Yellow)
     And 1 Gamecontroller tab
 
@@ -486,8 +477,7 @@ def configure_replay_view(
     yellow_replay_log: os.PathLike,
     visualization_buffer_size: int = 5,
 ) -> TScopeConfig:
-    """
-    Constructs the Thunderscope Config for a replay view
+    """Constructs the Thunderscope Config for a replay view
     Can have 1 or 2 FullSystem tabs but no GameController tab
     GLWidget will now have Player controls
 
@@ -550,8 +540,7 @@ def configure_ai_or_diagnostics(
     load_diagnostics: bool,
     visualization_buffer_size: int = 5,
 ) -> TScopeConfig:
-    """
-    Constructs a view with one of:
+    """Constructs a view with one of:
         - 1 Fullsystem (Blue or Yellow)
         - 1 Fullsystem (Blue or Yellow) and Diagnostics
         - Diagnostics
@@ -565,8 +554,7 @@ def configure_ai_or_diagnostics(
     """
 
     def get_extra_widgets(proto_unix_io):
-        """
-        Gets the extra widgets for the fullsystem tab
+        """Gets the extra widgets for the fullsystem tab
         :param proto_unix_io: the proto unix io to configure widgets with
         :return: list of widget data for the extra widgets
         """

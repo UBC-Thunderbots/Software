@@ -34,8 +34,7 @@ class HRVORobotEntersRegionAndStops:
         ) = None,
         num_ticks: int = 1,
     ):
-        """
-        Constructs the base validation with the given region
+        """Constructs the base validation with the given region
         Sets boolean indicating validation stage to default
 
         :param robot_id: the id of the robot being validated
@@ -50,8 +49,7 @@ class HRVORobotEntersRegionAndStops:
         self.is_stationary = True
 
     def get_validation_status(self, world: tbots.World) -> ValidationStatus:
-        """
-        Checks if a specific robot id is in the provided region
+        """Checks if a specific robot id is in the provided region
         Then checks if that robot is stationary within a threshold for the provided number of ticks
 
         Sets booleans about the state of the validation for logging
@@ -84,14 +82,11 @@ class HRVORobotEntersRegionAndStops:
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world: tbots.World) -> ValidationGeometry:
-        """
-        (override) shows region to enter
-        """
+        """(override) shows region to enter"""
         return create_validation_geometry([self.region])
 
     def __repr__(self):
-        """
-        Returns a string representing the stage of validation that failed
+        """Returns a string representing the stage of validation that failed
         Either the robot has not entered the region yet, or it has but is not stationary
         """
         if not self.is_stationary:
@@ -115,8 +110,7 @@ class HRVORobotEntersRegionAndStops:
 def create_zig_zag_path_test_params(
     front_wall_x: int, robot_y_delta: float, num_walls: int, wall_height: float
 ):
-    """
-    Gets the test params to cause movement in a zig zag pattern
+    """Gets the test params to cause movement in a zig zag pattern
     due to multiple walls of enemy robots
 
     :param front_wall_x: the x position of the first wall
@@ -148,8 +142,7 @@ def create_zig_zag_path_test_params(
 
 
 def create_robot_circle_pos_params(radius: float, num_robots: int, start: bool):
-    """
-    Gets the test params to position robots in a circle and have them move
+    """Gets the test params to position robots in a circle and have them move
     along each diameter
 
     :param radius: the radius of the circle
@@ -176,8 +169,7 @@ def hrvo_setup(
     enemy_robots_destinations: list[tbots.Point],
     simulated_test_runner: SimulatedTestRunner,
 ):
-    """
-    Setup for the hrvo tests
+    """Setup for the hrvo tests
 
     :param friendly_robots_positions: starting positions of friendly robots
     :param friendly_robots_destinations: destinations of friendly robots
@@ -522,8 +514,7 @@ def test_robot_movement(
 
 
 def get_reached_destination_validation(robot_destinations: list[tbots.Point]):
-    """
-    Constructs validation that each robot from the list of robot destinations
+    """Constructs validation that each robot from the list of robot destinations
     reaches its destination within a certain threshold
     and stays stationary there for 15 ticks
 
@@ -553,8 +544,7 @@ def get_move_update_control_params(
     final_speed: float,
     params: AssignedTacticPlayControlParams = None,
 ):
-    """
-    Constructs the control params for a Move Tactic for a single robot
+    """Constructs the control params for a Move Tactic for a single robot
     with the given data
     And adds it to an existing or new AssignedTacticPlayControlParams message
 
@@ -567,7 +557,6 @@ def get_move_update_control_params(
                    else, create a new message and add
     :return: an AssignedTacticPlayControlParams message with this robot's params added
     """
-
     params = params if params else AssignedTacticPlayControlParams()
     params.assigned_tactics[robot_id].move.CopyFrom(
         MoveTactic(

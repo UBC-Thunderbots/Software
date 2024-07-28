@@ -28,9 +28,7 @@ class GLValidationOverlayLayer(GLLayer):
         """Initialize the GLValidationOverlayLayer
 
         :param validation_layer: The GLValidationLayer this overlay layer is related to
-
         """
-
         super().__init__("GLValidationOverlayLayer")
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
 
@@ -39,7 +37,6 @@ class GLValidationOverlayLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         if not self.overlay_graphic:
             self.overlay_graphic = GLPainter(parent_item=self)
             self.overlay_graphic.add_draw_function(self.draw_overlay)
@@ -51,7 +48,6 @@ class GLValidationOverlayLayer(GLLayer):
 
         :param painter: The QPainter to perform drawing operations with
         :param viewport_rect: The QRect indicating the viewport dimensions
-
         """
         info_msgs = []
 
@@ -87,7 +83,6 @@ class GLValidationLayer(GLLayer):
                             Set lower for more realtime plots. Default is arbitrary
         :param test_name_pos_x: The x position of the test name
         :param test_name_pos_y: The y position of the test name
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -107,7 +102,6 @@ class GLValidationLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         # Consume the validation set buffer
         for _ in range(self.validation_set_buffer.queue.qsize()):
             self.validation_set = self.validation_set_buffer.get()
@@ -141,7 +135,6 @@ class GLValidationLayer(GLLayer):
         """Get a list of the cached validations
 
         :returns: A list of the cached validation protos
-
         """
         return (
             list(self.cached_always_validation_set.validations)
@@ -156,7 +149,6 @@ class GLValidationLayer(GLLayer):
         """Update the GLGraphicsItems that display the validations
 
         :param validations: The list of validation protos
-
         """
         polygons = [
             (polygon, validation.status)
@@ -257,7 +249,6 @@ class GLValidationLayer(GLLayer):
 
         :param validation_status: the validation status
         :returns: the color representing the validation status
-
         """
         return (
             Colors.VALIDATION_PASSED_COLOR

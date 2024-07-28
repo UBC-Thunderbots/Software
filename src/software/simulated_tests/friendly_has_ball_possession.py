@@ -12,8 +12,7 @@ class FriendlyHasBallPossession(Validation):
     """Checks if any friendly robot has possession of the ball."""
 
     def __init__(self, tolerance=0.01):
-        """
-        Constructs the validation object
+        """Constructs the validation object
 
         :param tolerance: The tolerance for when we check if the robot has the ball
         """
@@ -33,9 +32,7 @@ class FriendlyHasBallPossession(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) highlights the dribbler area of the robots
-        """
+        """(override) highlights the dribbler area of the robots"""
         return create_validation_geometry(
             [
                 tbots_cpp.Robot(robot).dribblerArea()

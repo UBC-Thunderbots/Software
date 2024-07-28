@@ -25,7 +25,6 @@ class GLCostVisOverlayLayer(GLLayer):
         """Initialize the GLCostVisOverlayLayer
 
         :param cost_vis_layer: The GLCostVisLayer this overlay layer is related to
-
         """
         super().__init__("GLCostVisOverlayLayer")
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
@@ -35,7 +34,6 @@ class GLCostVisOverlayLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         if not self.legend_graphic:
             self.legend_graphic = GLGradientLegend(
                 parent_item=self,
@@ -81,7 +79,6 @@ class GLCostVisLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BENEATH_BACKGROUND_DEPTH)

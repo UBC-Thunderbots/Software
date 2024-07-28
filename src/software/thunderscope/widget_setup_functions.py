@@ -75,7 +75,6 @@ def setup_gl_widget(
     :param replay_log: The file path of the replay log
     :param bufferswap_counter: a counter used to keep track of the fps. This is used for the fps widget
     :returns: The GLWidget
-
     """
     # Create ProtoPlayer if replay is enabled
     player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
@@ -205,7 +204,6 @@ def setup_parameter_widget(
     :param proto_unix_io: The proto unix io object
     :param friendly_colour_yellow:
     :returns: The proto configuration widget
-
     """
 
     def on_change_callback(
@@ -223,7 +221,6 @@ def setup_log_widget(proto_unix_io: ProtoUnixIO) -> g3logWidget:
 
     :param proto_unix_io: The proto unix io object
     :returns: The log widget
-
     """
     # Create widget
     logs = g3logWidget()
@@ -239,7 +236,6 @@ def setup_performance_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
 
     :param proto_unix_io: The proto unix io object
     :returns: The performance plot widget
-
     """
 
     def extract_namedvalue_data(named_value_data):
@@ -263,9 +259,7 @@ def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
 
     :param proto_unix_io: The proto unix io object
     :returns: The play info widget
-
     """
-
     play_info = PlayInfoWidget()
     proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
     return play_info
@@ -280,7 +274,6 @@ def setup_fps_widget(
     :param refresh_func_counter: a counter at the refresh function
     :returns: a FPS Widget
     """
-
     return FrameTimeWidget(bufferswap_counter, refresh_func_counter)
 
 
@@ -289,9 +282,7 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
 
     :param proto_unix_io: The proto unix io object
     :returns: The referee info widget
-
     """
-
     referee_info = RefereeInfoWidget()
     proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
 
@@ -307,6 +298,7 @@ def setup_robot_view(
     proto_unix_io: ProtoUnixIO, available_control_modes: list[IndividualRobotMode]
 ) -> RobotView:
     """Setup the robot view widget
+
     :param proto_unix_io: The proto unix io object for the full system
     :param available_control_modes: the currently available input modes for the robots
                                     according to what mode thunderscope is run in
@@ -320,8 +312,8 @@ def setup_robot_view(
 
 
 def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorLog:
-    """
-    Setup the robot error log widget and connect its buffer to the proto unix io
+    """Setup the robot error log widget and connect its buffer to the proto unix io
+
     :param proto_unix_io: The proto unix io object for the full system
     :return: the robot error log widget
     """
@@ -356,12 +348,10 @@ def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
 
 
 def setup_diagnostics_input_widget() -> FullSystemConnectWidget:
-    """
-    Sets up the diagnostics input widget
+    """Sets up the diagnostics input widget
 
     :returns: the diagnostics input widget
     """
-
     diagnostics_input_widget = FullSystemConnectWidget()
 
     return diagnostics_input_widget
@@ -374,7 +364,6 @@ def setup_drive_and_dribbler_widget(
 
     :param proto_unix_io: The proto unix io object
     :returns: The drive and dribbler widget
-
     """
     drive_and_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
 

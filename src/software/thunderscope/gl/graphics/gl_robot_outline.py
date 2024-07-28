@@ -29,7 +29,6 @@ class GLRobotOutline(GLShape):
         :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
         :param line_width: The line width of the graphic
-
         """
         super().__init__(
             parent_item=parent_item,
@@ -49,7 +48,6 @@ class GLRobotOutline(GLShape):
         :param z_coordinate: The z coordinate of the plane to generate points on
         :param num_points: The number of points to generate
         :returns: A list of 3-tuple points representing the outline of a robot
-
         """
         # We compute points along 3/4 the circumference of a circle.
         # This is so that when we connect the points, there will be a chord
@@ -72,7 +70,6 @@ class GLRobotOutline(GLShape):
         """Set the orientation of the graphic in the scene
 
         :param degrees: The orientation of the graphic in degrees
-
         """
         # We need to add 45 degrees to our desired orientation in order
         # to get the flat side of the robot (i.e. its front) to face

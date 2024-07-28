@@ -1,5 +1,4 @@
-"""
-The code in this file is adapted from
+"""The code in this file is adapted from
 https://github.com/linuxlewis/tripy/tree/master
 
 MIT License

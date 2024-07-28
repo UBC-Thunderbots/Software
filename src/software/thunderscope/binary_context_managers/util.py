@@ -5,8 +5,7 @@ from software.py_constants import *
 
 
 def is_cmd_running(command: list[str]) -> bool:
-    """Check if there is any running process that was launched
-    with the given command.
+    """Check if there is any running process that was launched with the given command.
 
     :param command: Command that was used to launch the process. List of strings.
     :return: whether there is a running process that was launched with the given command

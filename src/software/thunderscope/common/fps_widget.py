@@ -6,8 +6,7 @@ from software.py_constants import MILLISECONDS_PER_SECOND
 
 
 class FrameTimeWidget(QWidget):
-    """
-    Display the FPS and frametime of Thunderscope.
+    """Display the FPS and frametime of Thunderscope.
     This is measured in two different places: the buffer callback in GLWidget and
     the refresh function in tab.
     """
@@ -18,8 +17,7 @@ class FrameTimeWidget(QWidget):
         refresh_counter: FrameTimeCounter,
         update_delta_sec: float = 0.5,
     ):
-        """
-        Initialize FrameTimeWidget
+        """Initialize FrameTimeWidget
 
         :param buffer_counter: a frametime counter for the GLWidget widget
         :param refresh_counter: a frametime counter for the refresh function
@@ -57,8 +55,7 @@ class FrameTimeWidget(QWidget):
         self.update_delta = update_delta_sec  # updating every 0.5 seconds
 
     def update_table(self, table: QTableWidget, row: int, col: int, text: str) -> None:
-        """
-        Updates a cell in the given table.
+        """Updates a cell in the given table.
 
         :param table: the table to update
         :param row: the row of the cell in the table
@@ -70,9 +67,7 @@ class FrameTimeWidget(QWidget):
         table.setItem(row, col, text)
 
     def refresh(self) -> None:
-        """
-        Update the FPS based on the FrameTimeCounters
-        """
+        """Update the FPS based on the FrameTimeCounters"""
         # updating every self.update_delta time, which is likely 0.5 seconds
         if time.time() - self.last_update_time < self.update_delta:
             return
