@@ -223,7 +223,9 @@ if __name__ == "__main__":
 
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
     if not args.run_blue and not args.run_yellow and args.launch_gc:
-        parser.error("--launch_gc has to be run with --run_blue or --run_yellow argument")
+        parser.error(
+            "--launch_gc has to be run with --run_blue or --run_yellow argument"
+        )
 
     # Sanity check that an interface was provided
     if args.run_blue or args.run_yellow:
@@ -318,7 +320,9 @@ if __name__ == "__main__":
         )
 
         with (
-            Gamecontroller(supress_logs=(not args.verbose), use_conventional_port=False)
+            Gamecontroller(
+                suppress_logs=(not args.verbose), use_conventional_port=False
+            )
             if args.launch_gc
             else contextlib.nullcontext()
         ) as gamecontroller, RobotCommunication(
@@ -444,7 +448,7 @@ if __name__ == "__main__":
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
         ) as yellow_fs, Gamecontroller(
-            supress_logs=(not args.verbose)
+            suppress_logs=(not args.verbose)
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -452,7 +456,7 @@ if __name__ == "__main__":
             TigersAutoref(
                 ci_mode=True,
                 gc=gamecontroller,
-                supress_logs=(not args.verbose),
+                suppress_logs=(not args.verbose),
                 tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
                 show_gui=args.show_autoref_gui,
             )

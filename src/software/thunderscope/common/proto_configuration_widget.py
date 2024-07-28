@@ -78,7 +78,7 @@ class ProtoConfigurationWidget(QWidget):
 
         self.run_onetime_async(3, self.send_proto_to_fullsystem)
 
-    def run_onetime_async(self, time_in_seconds: float, func: Callable):
+    def run_onetime_async(self, time_in_seconds: float, func: Callable) -> None:
         """
         starting a timer that runs a given function after a given
         amount of seconds one time asynchronously.
@@ -91,7 +91,7 @@ class ProtoConfigurationWidget(QWidget):
         self.timer.timeout.connect(func)
         self.timer.start(round(time_in_seconds * MILLISECONDS_PER_SECOND))
 
-    def create_widget(self):
+    def create_widget(self) -> tuple[QHBoxLayout, QHBoxLayout]:
         """
         Creating widgets that are used to load, save parameters
 
@@ -114,9 +114,9 @@ class ProtoConfigurationWidget(QWidget):
 
         return save_hbox_top, save_hbox_bottom
 
-    def update_proto_from_file(self, path_to_file: str):
+    def update_proto_from_file(self, path_to_file: os.PathLike) -> None:
         """
-        load the protobuf from path_to_file to the variable self.proto_to_configure
+        Load the protobuf from path_to_file to the variable self.proto_to_configure
 
         :param path_to_file: the path to the ThunderbotsConfig proto
         """
@@ -142,7 +142,7 @@ class ProtoConfigurationWidget(QWidget):
                 self.is_yellow
             )
 
-    def send_proto_to_fullsystem(self):
+    def send_proto_to_fullsystem(self) -> None:
         """
         Sending the default configuration protobufs to unix_full_system at startup.
         Also updates the widget at the same time.
@@ -151,7 +151,7 @@ class ProtoConfigurationWidget(QWidget):
         self.on_change_callback(None, None, self.proto_to_configure)
         self.update_widget()
 
-    def save_proto_callback(self):
+    def save_proto_callback(self) -> None:
         """
         This is a callback for a button that save the current protobuf to disk!
         """
@@ -171,7 +171,7 @@ class ProtoConfigurationWidget(QWidget):
         except Exception:
             logging.warning("cannot save configuration to {}".format(save_to_path))
 
-    def save_current_config_to_file(self, path_to_file):
+    def save_current_config_to_file(self, path_to_file: os.PathLike) -> None:
         """
         This save the self.proto_to_configure to path_to_file
 
@@ -185,9 +185,9 @@ class ProtoConfigurationWidget(QWidget):
         with open(path_to_file, "wb") as f:
             f.write(self.proto_to_configure.SerializeToString())
 
-    def load_proto_with_file_explorer(self):
+    def load_proto_with_file_explorer(self) -> None:
         """
-        loading the current protobuf through file explorer
+        Load the current protobuf through file explorer
         """
         try:
             path_to_file, should_open = QFileDialog.getOpenFileName(
@@ -212,7 +212,7 @@ class ProtoConfigurationWidget(QWidget):
                 )
             )
 
-    def update_widget(self):
+    def update_widget(self) -> None:
         """
         The following function updates the current parameters tree based on the
         current protobuf that is being configured (i.e. self.proto_to_configure) widget.
@@ -229,7 +229,7 @@ class ProtoConfigurationWidget(QWidget):
         self.param_group.sigTreeStateChanged.connect(self.__handle_parameter_changed)
         self.param_tree.setAlternatingRowColors(False)
 
-    def reset_button_callback(self):
+    def reset_button_callback(self) -> None:
         """
         resetting the protobufs when the reset button has been clicked!
         """
@@ -246,7 +246,7 @@ class ProtoConfigurationWidget(QWidget):
 
         self.on_change_callback(None, None, self.proto_to_configure)
 
-    def __handle_search_query_changed(self, search_term):
+    def __handle_search_query_changed(self, search_term) -> None:
         """Given a new search term, reconfigure the parameter tree with parameters
         that match the term.
 
@@ -265,7 +265,7 @@ class ProtoConfigurationWidget(QWidget):
         self.param_tree.setParameters(self.param_group, showTop=False)
         self.param_group.sigTreeStateChanged.connect(self.__handle_parameter_changed)
 
-    def __handle_parameter_changed(self, param, changes):
+    def __handle_parameter_changed(self, param, changes) -> None:
         """Handles the parameter change by triggering the provided callback
 
         :param param: The paramaeter that changed
@@ -314,12 +314,12 @@ class ProtoConfigurationWidget(QWidget):
 
         return field_list
 
-    def build_proto(self, message, current_attr=None):
+    def build_proto(self, message, current_attr=None) -> None:
         """
         Builds the given message to a field
+
         :param message: the message to build
         :param current_attr: the string to execute to access the current level of fields
-        :return:
         """
 
         if not current_attr:

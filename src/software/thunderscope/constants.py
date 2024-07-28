@@ -265,7 +265,7 @@ def rgb_to_bw(r: int, g: int, b: int) -> tuple[int, int, int]:
     return rgb_val, rgb_val, rgb_val
 
 
-class Colors(object):
+class Colors:
     DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128)
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 200)
     FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 100)

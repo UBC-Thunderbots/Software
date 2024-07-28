@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -12,7 +14,7 @@ import os
 from google.protobuf.message import Message
 
 
-class RobotCommunication(object):
+class RobotCommunication:
     """Communicate with the robots"""
 
     def __init__(
@@ -292,7 +294,7 @@ class RobotCommunication(object):
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> RobotCommunication:
         """Enter RobotCommunication context manager. Setup multicast listeners
         for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
 

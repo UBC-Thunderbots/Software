@@ -11,7 +11,7 @@ class FloatSlider(QSlider):
 
     floatValueChanged = pyqtSignal(float)
 
-    def __init__(self, decimals=1, *args, **kwargs):
+    def __init__(self, decimals: int = 1, *args, **kwargs):
         """
         Creates a FloatSlider with the given number of decimal places
         :param decimals: number of decimal places that value of slider should have
@@ -22,13 +22,13 @@ class FloatSlider(QSlider):
         # slider now emits a float value signal every time its value changes
         self.valueChanged.connect(self.emitFloatValueChanged)
 
-    def emitFloatValueChanged(self):
+    def emitFloatValueChanged(self) -> None:
         """
         Emits a signal with the slider's float value
         """
         self.floatValueChanged.emit(self.value())
 
-    def value(self):
+    def value(self) -> float:
         """
         Gets the actual value of the slider and converts it to the float value
         of corresponding decimal places
@@ -36,21 +36,21 @@ class FloatSlider(QSlider):
         """
         return float(super(FloatSlider, self).value()) / self.decimals
 
-    def setMinimum(self, min_val):
+    def setMinimum(self, min_val: float) -> None:
         """
         Sets a minimum float value for this slider
         :param min_val: value to set as the minimum
         """
         return super(FloatSlider, self).setMinimum(min_val * self.decimals)
 
-    def setMaximum(self, max_val):
+    def setMaximum(self, max_val: float) -> None:
         """
         Sets a maximum float value for this slider
         :param max_val: value to set as the maximum
         """
         return super(FloatSlider, self).setMaximum(max_val * self.decimals)
 
-    def setValue(self, value):
+    def setValue(self, value: float) -> None:
         """
         Sets a float value as the value for this slider
         :param value: value to set as the slider's value

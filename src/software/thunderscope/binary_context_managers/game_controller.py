@@ -19,14 +19,16 @@ from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class Gamecontroller(object):
+class Gamecontroller:
     """Gamecontroller Context Manager"""
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, suppress_logs: bool = False, use_conventional_port=False) -> None:
+    def __init__(
+        self, suppress_logs: bool = False, use_conventional_port: bool = False
+    ) -> None:
         """Run Gamecontroller
 
         :param suppress_logs: Whether to suppress the logs
@@ -61,7 +63,7 @@ class Gamecontroller(object):
 
         return self.referee_port
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> Gamecontroller:
         """Enter the gamecontroller context manager.
 
         :return: gamecontroller context managed instance

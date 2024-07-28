@@ -1,6 +1,8 @@
 from random import randint
 import time
 from collections import deque
+from typing import Type, Callable
+from google.protobuf.message import Message
 
 import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
@@ -48,12 +50,12 @@ class ProtoPlotter(QWidget):
 
     def __init__(
         self,
-        min_y,
-        max_y,
-        window_secs,
-        configuration,
-        plot_rate_hz=60,
-        buffer_size=1000,
+        min_y: float,
+        max_y: float,
+        window_secs: float,
+        configuration: dict[Type[Message], Callable[dict[str, float], Message]],
+        plot_rate_hz: float = 60,
+        buffer_size: int = 1000,
     ):
         """Initializes NamedValuePlotter.
 
@@ -91,14 +93,11 @@ class ProtoPlotter(QWidget):
         self.update_interval = 1.0 / plot_rate_hz
         self.buffer_size = buffer_size
 
-    def isVisible(self):
+    def isVisible(self) -> bool:
         return self.win.isVisible()
 
-    def refresh(self):
-        """Refreshes ProtoPlotter and updates data in the respective
-        plots.
-
-        """
+    def refresh(self) -> None:
+        """Refreshes ProtoPlotter and updates data in the respective plots."""
 
         # Dump the entire buffer into a deque. This operation is fast because
         # its just consuming data from the buffer and appending it to a deque.

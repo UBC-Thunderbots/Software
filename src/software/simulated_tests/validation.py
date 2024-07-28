@@ -2,7 +2,7 @@ import software.python_bindings as tbots_cpp
 from proto.validation_pb2 import *
 
 
-class Validation(object):
+class Validation:
     """A validation function"""
 
     def get_validation_status(self, world) -> ValidationStatus:

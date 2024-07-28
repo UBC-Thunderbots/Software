@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import logging
 import time
@@ -11,7 +13,7 @@ from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import is_cmd_running
 
 
-class FullSystem(object):
+class FullSystem:
     """Full System Binary Context Manager"""
 
     def __init__(
@@ -43,7 +45,7 @@ class FullSystem(object):
 
         self.thread = threading.Thread(target=self.__restart__, daemon=True)
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> FullSystem:
         """Enter the full_system context manager.
 
         If the debug mode is enabled then the binary is _not_ run and the

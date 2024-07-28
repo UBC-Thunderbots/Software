@@ -271,8 +271,11 @@ def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
     return play_info
 
 
-def setup_fps_widget(bufferswap_counter, refresh_func_counter):
-    """setup fps widget
+def setup_fps_widget(
+    bufferswap_counter: FrameTimeCounter, refresh_func_counter: FrameTimeCounter
+) -> FrameTimeWidget:
+    """Setup fps widget
+
     :param bufferswap_counter: a counter at the bufferswap
     :param refresh_func_counter: a counter at the refresh function
     :returns: a FPS Widget

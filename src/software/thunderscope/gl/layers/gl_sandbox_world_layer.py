@@ -7,6 +7,7 @@ from pyqtgraph.opengl import *
 from software.py_constants import *
 from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class RobotOperation:
@@ -47,7 +48,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
     def __init__(
         self,
         name: str,
-        simulator_io,
+        simulator_io: ProtoUnixIO,
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
     ):

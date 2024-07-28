@@ -365,7 +365,7 @@ def field_test_runner():
         should_restart_on_crash=False,
     ) as friendly_fs, Gamecontroller(
         # we would be using conventional port if and only if we are playing in robocup.
-        supress_logs=(not args.show_gamecontroller_logs),
+        suppress_logs=(not args.show_gamecontroller_logs),
         use_conventional_port=False,
     ) as gamecontroller, RobotCommunication(
         current_proto_unix_io=friendly_proto_unix_io,

@@ -4,7 +4,7 @@ from typing import Type, Optional
 from google.protobuf.message import Message
 
 
-class ThreadSafeBuffer(object):
+class ThreadSafeBuffer:
     MIN_DROPPED_BEFORE_LOG = 20
 
     """Multiple producer, multiple consumer buffer.

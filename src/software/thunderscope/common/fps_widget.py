@@ -7,24 +7,23 @@ from software.py_constants import MILLISECONDS_PER_SECOND
 
 class FrameTimeWidget(QWidget):
     """
-    Display the fps and frametime of thunderscope.
-    This is measured in two different places, the buffer callback in GLWidget, and
+    Display the FPS and frametime of Thunderscope.
+    This is measured in two different places: the buffer callback in GLWidget and
     the refresh function in tab.
-
-    Also, this widget update every 0.5 seconds
     """
 
     def __init__(
         self,
         buffer_counter: FrameTimeCounter,
         refresh_counter: FrameTimeCounter,
-        update_delta_sec=0.5,
+        update_delta_sec: float = 0.5,
     ):
         """
         Initialize FrameTimeWidget
 
-        :buffer_counter: a frametime counter at the GLWidget Widget
-        :refresh_counter: a frametime counter at the refresh function
+        :param buffer_counter: a frametime counter for the GLWidget widget
+        :param refresh_counter: a frametime counter for the refresh function
+        :param update_delta_sec: how often this widget updates (in seconds)
         """
         super().__init__()
         self.buffer_counter = buffer_counter
@@ -57,21 +56,22 @@ class FrameTimeWidget(QWidget):
         self.last_update_time = time.time()
         self.update_delta = update_delta_sec  # updating every 0.5 seconds
 
-    def update_table(self, table, row, col, text):
+    def update_table(self, table: QTableWidget, row: int, col: int, text: str) -> None:
         """
-        table: this table that I am going to be updating
-        row: the row in which data is going to be updated
-        col: the column in which the data is going to be updated
-        text: the text in which the data is going to be updated
-        Updating what is on the table. This purpose of this section is to reduce Redundancy
+        Updates a cell in the given table.
+
+        :param table: the table to update
+        :param row: the row of the cell in the table
+        :param col: the column of the cell in the table
+        :param text: the text to update the cell with
         """
         text = QTableWidgetItem(text)
         text.setTextAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignHCenter)
         table.setItem(row, col, text)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """
-        Updating the fps based on the frametime_counter
+        Update the FPS based on the FrameTimeCounters
         """
         # updating every self.update_delta time, which is likely 0.5 seconds
         if time.time() - self.last_update_time < self.update_delta:

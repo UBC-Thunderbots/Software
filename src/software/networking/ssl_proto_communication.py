@@ -12,7 +12,7 @@ class SslSocketProtoParseException(Exception):
     """
 
 
-class SslSocket(object):
+class SslSocket:
     """
     The SSL Socket class is responsible for communication with SSL protos from SSL binaries. The encoding that SSL uses
     is slightly different from our encoding when we send protobufs between different processes (and robots).

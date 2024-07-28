@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import logging
 import time
@@ -11,7 +13,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.thunderscope.binary_context_managers.util import *
 
 
-class Simulator(object):
+class Simulator:
     """Simulator Context Manager"""
 
     def __init__(
@@ -35,7 +37,7 @@ class Simulator(object):
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> Simulator:
         """Enter the simulator context manager.
 
         If the debug mode is enabled then the binary is _not_ run and the

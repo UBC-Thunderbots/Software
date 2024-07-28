@@ -11,7 +11,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class g3logWidget(QWidget):
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size: int = 10):
         """The g3log widget is a console widget that displays g3log messages
 
         :param buffer_size: The buffer size, set higher for smoother plots.
@@ -61,7 +61,7 @@ class g3logWidget(QWidget):
             LogLevel.CONTRACT: "CONTRACT",
         }
 
-    def refresh(self):
+    def refresh(self) -> None:
         """Update the log widget with another log message"""
         # Need to make sure the message is new before logging it
         try:

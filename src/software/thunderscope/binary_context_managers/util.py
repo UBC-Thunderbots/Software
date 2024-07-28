@@ -4,12 +4,12 @@ from proto.import_all_protos import *
 from software.py_constants import *
 
 
-def is_cmd_running(command):
+def is_cmd_running(command: list[str]) -> bool:
     """Check if there is any running process that was launched
     with the given command.
 
     :param command: Command that was used to launch the process. List of strings.
-
+    :return: whether there is a running process that was launched with the given command
     """
     for proc in util.process_iter():
         try:

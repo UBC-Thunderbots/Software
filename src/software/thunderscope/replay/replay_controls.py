@@ -87,7 +87,7 @@ class ReplayControls(QWidget):
         ) = common_widgets.create_slider(
             text="",
             min_val=0,
-            max_val=self.player.end_time * MILLISECONDS_PER_SECOND,
+            max_val=int(self.player.end_time * MILLISECONDS_PER_SECOND),
             tick_spacing=1,
         )
 
@@ -142,7 +142,7 @@ class ReplayControls(QWidget):
         """Refresh the slider to match the current time."""
         if not self.slider_pressed:
             self.replay_slider.setValue(
-                self.player.current_packet_time * MILLISECONDS_PER_SECOND
+                int(self.player.current_packet_time * MILLISECONDS_PER_SECOND)
             )
 
         self.play_pause.setText("⏸" if self.player.is_playing else "▶")

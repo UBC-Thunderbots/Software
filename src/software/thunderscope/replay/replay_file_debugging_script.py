@@ -10,7 +10,7 @@ from software.py_constants import *
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
 
-def read_one_chunk(replay_file_name: str):
+def read_one_chunk(replay_file_name: str) -> int:
     """
     read one chunk of the replay file:
 

@@ -46,7 +46,7 @@ class TigersAutoref(TimeProvider):
         tick_rate_ms: int,
         ci_mode: bool = False,
         buffer_size: int = 5,
-        supress_logs: bool = True,
+        suppress_logs: bool = True,
         show_gui: bool = False,
     ) -> None:
         """
@@ -57,7 +57,7 @@ class TigersAutoref(TimeProvider):
         :param ci_mode:         true to run the autoref binary in CI mode (use system time or use the time from the
                                 CiInput messages)
         :param buffer_size:     buffer size for the SSL wrapper and referee packets
-        :supress_logs:          true silences logs from the Autoref binary, otherwise shows them (its very verbose)
+        :suppress_logs:          true silences logs from the Autoref binary, otherwise shows them (its very verbose)
         :show_gui:              true shows the Tigers' autoref GUI, false runs it in headless mode
         """
         self.tigers_autoref_proc = None
@@ -68,14 +68,14 @@ class TigersAutoref(TimeProvider):
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.gamecontroller = gc
-        self.supress_logs = supress_logs
+        self.suppress_logs = suppress_logs
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
 
         self.current_timestamp = int(time.time_ns())
         self.timestamp_mutex = threading.Lock()
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> TigersAutoref:
         if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
             logging.warning(
                 "Could not find autoref binary, did you run ./setup_software.sh"
@@ -237,7 +237,7 @@ class TigersAutoref(TimeProvider):
         if self.ci_mode:
             autoref_cmd += " --ci"
 
-        if self.supress_logs:
+        if self.suppress_logs:
             with open(os.devnull, "w") as fp:
                 self.tigers_autoref_proc = Popen(
                     autoref_cmd.split(" "), stdout=fp, stderr=fp

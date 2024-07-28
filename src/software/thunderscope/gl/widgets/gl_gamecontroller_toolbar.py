@@ -107,14 +107,14 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.__toggle_normal_start_button()
 
         self.layout().addWidget(QLabel("<b>Gamecontroller</b>"))
-        self.__add_seperator(self.layout())
+        self.__add_separator(self.layout())
         self.layout().addWidget(self.stop_button)
         self.layout().addWidget(self.halt_button)
         self.layout().addWidget(self.force_start_button)
-        self.__add_seperator(self.layout())
+        self.__add_separator(self.layout())
         self.layout().addWidget(self.plays_menu_button)
         self.layout().addWidget(self.normal_start_button)
-        self.__add_seperator(self.layout())
+        self.__add_separator(self.layout())
         self.layout().addWidget(self.gc_browser_button)
         self.layout().addStretch()
 
@@ -124,7 +124,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         """
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
 
-    def __add_seperator(self, layout: QBoxLayout) -> None:
+    def __add_separator(self, layout: QBoxLayout) -> None:
         """
         Adds a separator line with enough spacing to the given layout
 
