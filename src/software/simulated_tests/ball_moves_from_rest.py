@@ -24,8 +24,8 @@ class BallMovesFromRest(Validation):
         """Checks if ball has moved threshold meters from initial position. Default is 0.05m.
 
         :param world: The world msg to validate
-        :returns: FAILING if ball doesn't move according to RoboCup rules
-                  PASSING if ball moves according to RoboCup rules
+        :return: FAILING if ball doesn't move according to RoboCup rules
+                 PASSING if ball moves according to RoboCup rules
         """
         validation_status = ValidationStatus.FAILING
         current_ball_position = tbots_cpp.createPoint(

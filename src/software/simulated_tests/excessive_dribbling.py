@@ -18,8 +18,8 @@ class ExcessivelyDribbling(Validation):
         """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m.
 
         :param world: The world msg to validate
-        :returns: FAILING when the robot is excessively dribbling
-                  PASSING when the robot is not excessively dribbling
+        :return: FAILING when the robot is excessively dribbling
+                 PASSING when the robot is not excessively dribbling
         """
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:

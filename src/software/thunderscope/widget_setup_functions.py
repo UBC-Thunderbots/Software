@@ -74,7 +74,7 @@ def setup_gl_widget(
     :param replay: Whether replay mode is currently enabled
     :param replay_log: The file path of the replay log
     :param bufferswap_counter: a counter used to keep track of the fps. This is used for the fps widget
-    :returns: The GLWidget
+    :return: The GLWidget
     """
     # Create ProtoPlayer if replay is enabled
     player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
@@ -203,7 +203,7 @@ def setup_parameter_widget(
 
     :param proto_unix_io: The proto unix io object
     :param friendly_colour_yellow:
-    :returns: The proto configuration widget
+    :return: The proto configuration widget
     """
 
     def on_change_callback(
@@ -220,7 +220,7 @@ def setup_log_widget(proto_unix_io: ProtoUnixIO) -> g3logWidget:
     """Setup the wiget that receives logs from full system
 
     :param proto_unix_io: The proto unix io object
-    :returns: The log widget
+    :return: The log widget
     """
     # Create widget
     logs = g3logWidget()
@@ -235,7 +235,7 @@ def setup_performance_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
     """Setup the performance plot
 
     :param proto_unix_io: The proto unix io object
-    :returns: The performance plot widget
+    :return: The performance plot widget
     """
 
     def extract_namedvalue_data(named_value_data):
@@ -258,7 +258,7 @@ def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
     """Setup the play info widget
 
     :param proto_unix_io: The proto unix io object
-    :returns: The play info widget
+    :return: The play info widget
     """
     play_info = PlayInfoWidget()
     proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
@@ -272,7 +272,7 @@ def setup_fps_widget(
 
     :param bufferswap_counter: a counter at the bufferswap
     :param refresh_func_counter: a counter at the refresh function
-    :returns: a FPS Widget
+    :return: a FPS Widget
     """
     return FrameTimeWidget(bufferswap_counter, refresh_func_counter)
 
@@ -281,7 +281,7 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     """Setup the referee info widget
 
     :param proto_unix_io: The proto unix io object
-    :returns: The referee info widget
+    :return: The referee info widget
     """
     referee_info = RefereeInfoWidget()
     proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
@@ -303,7 +303,7 @@ def setup_robot_view(
     :param available_control_modes: the currently available input modes for the robots
                                     according to what mode thunderscope is run in
 
-    :returns: the robot view widget
+    :return: the robot view widget
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
@@ -328,7 +328,7 @@ def setup_estop_view(proto_unix_io) -> EstopView:
     """Setup the estop view widget
 
     :param proto_unix_io: The proto unix io object for the full system
-    :returns: the estop widget
+    :return: the estop widget
     """
     estop_view = EstopView()
 
@@ -340,8 +340,7 @@ def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
     """Setup the chicker widget for robot diagnostics
 
     :param proto_unix_io: The proto unix io object
-    :returns: The chicker widget
-
+    :return: The chicker widget
     """
     chicker_widget = ChickerWidget(proto_unix_io)
     return chicker_widget
@@ -350,7 +349,7 @@ def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
 def setup_diagnostics_input_widget() -> FullSystemConnectWidget:
     """Sets up the diagnostics input widget
 
-    :returns: the diagnostics input widget
+    :return: the diagnostics input widget
     """
     diagnostics_input_widget = FullSystemConnectWidget()
 
@@ -363,7 +362,7 @@ def setup_drive_and_dribbler_widget(
     """Setup the drive and dribbler widget
 
     :param proto_unix_io: The proto unix io object
-    :returns: The drive and dribbler widget
+    :return: The drive and dribbler widget
     """
     drive_and_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
 

@@ -181,7 +181,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         :param mouse_pos: the coordinates of the mouse relative to the ExtendedGLViewWidget
         :param z_height: the z axis height of the plane that the mouse event should point to
                             default is 0 (x-y plane)
-        :returns: the point in the 3D scene that represents where the mouse is pointing to
+        :return: the point in the 3D scene that represents where the mouse is pointing to
         """
         # Get viewport
         viewport_width = self.width()

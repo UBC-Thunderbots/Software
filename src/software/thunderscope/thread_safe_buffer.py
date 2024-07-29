@@ -17,7 +17,6 @@ class ThreadSafeBuffer:
          put() │      │      │      │      │      │       │  get()
                └──────┴──────┴──────┴──────┴──────┴───────┘
                                            ThreadSafeBuffer
-
     """
 
     def __init__(

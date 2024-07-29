@@ -232,7 +232,6 @@ def create_buttons(text: list):
     :return group_box, buttons:
             QGroupBox object - add this to the widget
             list of QPushButton objects - use this to perform tasks on the buttons
-
     """
     group_box = QGroupBox()
     num_buttons = len(text)

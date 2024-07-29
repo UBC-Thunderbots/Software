@@ -19,8 +19,8 @@ class RobotEntersRegion(Validation):
         """Checks if _any_ robot enters the provided regions
 
         :param world: The world msg to validate
-        :returns: FAILING until a robot enters any of the regions
-                  PASSING when a robot enters
+        :return: FAILING until a robot enters any of the regions
+                 PASSING when a robot enters
         """
         for region in self.regions:
             for robot in world.friendly_team.team_robots:
@@ -64,8 +64,8 @@ class NumberOfRobotsEntersRegion(Validation):
         """Checks if a specific number of robots enter the provided region
 
         :param world: The world msg to validate
-        :returns: FAILING until req_robot_cnt robots enter the region
-                  PASSING when req_robot_cnt robots enters
+        :return: FAILING until req_robot_cnt robots enter the region
+                 PASSING when req_robot_cnt robots enters
         """
         # Update the map with latest robot status
         for robot in world.friendly_team.team_robots:

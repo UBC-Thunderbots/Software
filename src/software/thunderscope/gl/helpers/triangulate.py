@@ -44,9 +44,9 @@ def earclip(polygon: list[tuple[float, float]]) -> list[tuple[int, int, int]]:
     [(3, 0, 1), (3, 1, 2)]
 
     :param polygon: an array of 2-tuples of the cartesian points of the polygon
-    :returns: an array of 3-tuples where each item in the tuple is a index into
-              the polygon array (for a polygon with n points, (n - 2) triangles
-              will be returned)
+    :return: an array of 3-tuples where each item in the tuple is a index into
+             the polygon array (for a polygon with n points, (n - 2) triangles
+             will be returned)
     """
     ear_vertex = []
     triangles = []

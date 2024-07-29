@@ -24,8 +24,8 @@ class BallSpeedThreshold(Validation):
         """Checks if the ball speed is at or above some threshold
 
         :param world: The world msg to validate
-        :returns: FAILING if the ball speed is below some threshold
-                  PASSING if the ball speed is at or above some threshold
+        :return: FAILING if the ball speed is below some threshold
+                 PASSING if the ball speed is at or above some threshold
         """
         if (
             tbots_cpp.createVector(world.ball.current_state.global_velocity).length()

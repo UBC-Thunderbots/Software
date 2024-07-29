@@ -456,9 +456,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """Identify which robot was clicked on the team
 
         :param multi_plane_points: points on the x-y plane and planes above it corresponding to the mouse click
-        :returns: The robot if one is present at the mouse position,
-                    along with the index of the plane it was identified on,
-                    else None, None
+        :return: The robot if one is present at the mouse position,
+                 along with the index of the plane it was identified on,
+                 else None, None
         """
         # first, check if there's any enemy robots being clicked on
         # return None immediately if so (since we can't edit enemy robot state)

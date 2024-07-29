@@ -25,8 +25,8 @@ class RobotSpeedThreshold(Validation):
         """Checks if the friendly robots' speed is at or above some threshold
 
         :param world: The world msg to validate
-        :returns: FAILING if the friendly robots' speed is below some threshold
-                  PASSING if the friendly robots' speed is at or above some threshold
+        :return: FAILING if the friendly robots' speed is below some threshold
+                 PASSING if the friendly robots' speed is at or above some threshold
         """
         for robot in world.friendly_team.team_robots:
             if (

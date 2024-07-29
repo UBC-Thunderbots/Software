@@ -96,7 +96,7 @@ class GLGoal(GLMeshItem):
 
         :param x_length: The length of the goal in the x direction
         :param y_length: The length of the goal in the y direction
-        :returns: the computed MeshData instance
+        :return: the computed MeshData instance
         """
         # Construct vertices that make up the mesh.
         vertices = [

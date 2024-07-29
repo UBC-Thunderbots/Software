@@ -27,7 +27,7 @@ class Change:
     def elements(self) -> list:
         """The elements in the list affected by the change
 
-        :returns: A list of elements affected by the change
+        :return: A list of elements affected by the change
         """
         return self._changed_list[self._changed_slice]
 
@@ -35,7 +35,7 @@ class Change:
     def action(self) -> ChangeAction:
         """The action that caused the change
 
-        :returns: The action that caused the change
+        :return: The action that caused the change
         """
         return self._action
 

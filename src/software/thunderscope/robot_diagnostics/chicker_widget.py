@@ -153,7 +153,6 @@ class ChickerWidget(QWidget):
         """Sends a [auto]kick or [auto]chip primitive
 
         :param command: enum int value to indicate what primitive to send
-        :returns: None
         """
         # gets slider values
         geneva_value = self.geneva_slider.value()
@@ -198,7 +197,6 @@ class ChickerWidget(QWidget):
 
         :param button: button to change the state of
         :param enable: bool: if True: enable this button, if False: disable
-        :returns: None
         """
         if enable:
             button.setStyleSheet("background-color: White")

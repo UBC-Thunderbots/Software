@@ -47,7 +47,7 @@ class GLRobotOutline(GLShape):
 
         :param z_coordinate: The z coordinate of the plane to generate points on
         :param num_points: The number of points to generate
-        :returns: A list of 3-tuple points representing the outline of a robot
+        :return: A list of 3-tuple points representing the outline of a robot
         """
         # We compute points along 3/4 the circumference of a circle.
         # This is so that when we connect the points, there will be a chord

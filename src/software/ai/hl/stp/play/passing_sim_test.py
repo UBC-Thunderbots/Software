@@ -40,7 +40,7 @@ def setup_pass_and_robots(
     :param enemy_robot_positions: the positions of the enemy robots
     :param receive_pass: whether a friendly robot should try to receive the pass
     :param simulated_test_runner: the test runner
-    :return the best pass we generate
+    :return: the best pass we generate
     """
     blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
 

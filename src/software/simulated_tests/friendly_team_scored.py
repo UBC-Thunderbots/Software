@@ -18,8 +18,8 @@ class FriendlyTeamScored(Validation):
         """Checks if the ball enters the provided regions
 
         :param world: The world msg to validate
-        :returns: FAILING until a ball enters the enemy goal
-                  PASSING when a ball enters
+        :return: FAILING until a ball enters the enemy goal
+                 PASSING when a ball enters
         """
         if tbots_cpp.contains(
             self.region, tbots_cpp.createPoint(world.ball.current_state.global_position)
@@ -32,8 +32,7 @@ class FriendlyTeamScored(Validation):
         """Returns the underlying geometry this validation is checking
 
         :param world: The world msg to create v alidation geometry from
-        :returns: ValidationGeometry containing geometry to visualize
-
+        :return: ValidationGeometry containing geometry to visualize
         """
         return create_validation_geometry([self.region])
 

@@ -134,7 +134,7 @@ class GLValidationLayer(GLLayer):
     def get_validations(self) -> list[ValidationProto]:
         """Get a list of the cached validations
 
-        :returns: A list of the cached validation protos
+        :return: A list of the cached validation protos
         """
         return (
             list(self.cached_always_validation_set.validations)
@@ -248,7 +248,7 @@ class GLValidationLayer(GLLayer):
         """Get the color representing the given validation status
 
         :param validation_status: the validation status
-        :returns: the color representing the validation status
+        :return: the color representing the validation status
         """
         return (
             Colors.VALIDATION_PASSED_COLOR

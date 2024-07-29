@@ -25,10 +25,10 @@ class FriendlyReceivesBallSlow(Validation):
         """Checks if the specified robot receives the ball too fast
 
         :param world: The world msg to validate
-        :returns: FAILING if the ball is near the robot's dribbler at a speed higher
-                    than the max receive speed
-                  PASSING if the ball is not near the dribbler, or if it is near
-                    the dribbler at a speed slower than the max
+        :return: FAILING if the ball is near the robot's dribbler at a speed higher
+                         than the max receive speed
+                 PASSING if the ball is not near the dribbler, or if it is near
+                         the dribbler at a speed slower than the max
         """
         ball_position = tbots.createPoint(world.ball.current_state.global_position)
         ball_velocity = tbots.createVector(world.ball.current_state.global_velocity)

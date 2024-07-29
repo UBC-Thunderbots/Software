@@ -69,7 +69,7 @@ class GLRobot(GLMeshItem):
         for the surface of a cylinder with a flat side wall.
         This represents the geometry of a robot.
 
-        :returns: the computed MeshData instance
+        :return: the computed MeshData instance
         """
         top_face_points = GLRobotOutline.get_robot_outline(
             z_coordinate=ROBOT_MAX_HEIGHT_METERS

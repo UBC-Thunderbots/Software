@@ -50,7 +50,7 @@ def create_validation_types(validation_class):
           always true. AlwaysFalse is the flipped AlwaysTrue
 
     :param eventually_true: A validation function that is eventually_true
-    :returns: EventuallyTrueValidation, EventuallyFalseValidation,
+    :return: EventuallyTrueValidation, EventuallyFalseValidation,
               AlwaysTrueValidation, AlwaysFalseValidation
     """
 
@@ -58,7 +58,6 @@ def create_validation_types(validation_class):
         """The 4 validation outputs will be composed of the input validation
 
         :param args/kwargs: Pass through to the validation_class
-
         """
         self.validation = validation_class(*args, **kwargs)
 
@@ -66,7 +65,6 @@ def create_validation_types(validation_class):
         """Flip the validation status
 
         :param world: The world msg to validate on
-
         """
         return {
             ValidationStatus.FAILING: ValidationStatus.PASSING,
@@ -147,8 +145,7 @@ def run_validation_sequence_sets(
     :param always_validation_sequence_set:
             A collection of sequences of always validations to validate.
 
-    :returns: Eventually ValidationProtoSet, Always ValidationProtoSet
-
+    :return: Eventually ValidationProtoSet, Always ValidationProtoSet
     """
     # Proto that stores validation geometry and validation status of
     # all validations passed in
@@ -163,7 +160,6 @@ def run_validation_sequence_sets(
 
         :param validation_proto_set: The validation proto set to add to
         :param validation: The validation to put into the proto
-
         """
         # Stores the validation result
         validation_proto = ValidationProto()
@@ -214,7 +210,6 @@ def check_validation(validation_proto_set):
 
     :param validation_proto_set: Validation proto set
     :raises: AssertionError
-
     """
     for validation_proto in validation_proto_set.validations:
         if validation_proto.status == ValidationStatus.FAILING:
@@ -229,8 +224,7 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     proto containing the protobuf representations.
 
     :param geometry: A list of geom
-    :returns: ValidationGeometry
-
+    :return: ValidationGeometry
     """
     validation_geometry = ValidationGeometry()
 

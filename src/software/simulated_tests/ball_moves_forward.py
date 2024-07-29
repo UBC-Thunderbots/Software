@@ -18,8 +18,8 @@ class BallMovesForward(Validation):
         """Checks if ball is moving forward, i.e. in the +x direction
 
         :param world: The world msg to validate
-        :returns: FAILING if ball doesn't move forward
-                  PASSING if ball moves forward
+        :return: FAILING if ball doesn't move forward
+                 PASSING if ball moves forward
         """
         validation_status = ValidationStatus.FAILING
         current_ball_position = tbots_cpp.createPoint(

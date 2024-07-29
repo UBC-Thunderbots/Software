@@ -26,8 +26,8 @@ class BallMovesForward(Validation):
         """Checks if ball is moving forward
 
         :param world: The world msg to validate
-        :returns: FAILING if ball doesn't move in the direction
-                  PASSING if ball moves in the direction
+        :return: FAILING if ball doesn't move in the direction
+                 PASSING if ball moves in the direction
         """
         current_ball_position = world.ball.current_state.global_position.x_meters
 

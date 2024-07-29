@@ -13,10 +13,8 @@ class RobotViewComponent(QWidget):
     """Class to show a snapshot of the robot's current state,
     along with an expandable view of the full robot state
 
-    Displays the vision pattern, capacitor/battery voltages,
-    and other information about the robot state. Displays the whole RobotStatus
-    message when expanded
-
+    Displays the vision pattern, capacitor/battery voltages, and other information
+    about the robot state. Displays the whole RobotStatus message when expanded
     """
 
     def __init__(

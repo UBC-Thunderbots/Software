@@ -394,7 +394,6 @@ def load_command_line_arguments():
 
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
-
     """
     parser = argparse.ArgumentParser(description="Run simulated pytests")
     parser.add_argument(
@@ -477,7 +476,6 @@ def pytest_main(file):
     """Runs the pytest file
 
     :param file: The test file to run
-
     """
     args = load_command_line_arguments()
     # Run the test, -s disables all capturing at -vv increases verbosity

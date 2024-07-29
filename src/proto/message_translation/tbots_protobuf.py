@@ -22,7 +22,6 @@ def create_world_state(
     :param ball_location: Location of the ball
     :param ball_velocity: Velocity of the ball
     :param blue_robot_orientations: A list of blue robots orientations
-
     """
     world_state = WorldState()
 

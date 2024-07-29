@@ -28,8 +28,8 @@ class RobotEntersPlacementRegion(Validation):
         """Checks if robots enter the ball placement region
 
         :param world: The world msg to validate
-        :returns: PASSING when robots enter and stay for over two seconds
-                  FAILING otherwise
+        :return: PASSING when robots enter and stay for over two seconds
+                 FAILING otherwise
         """
         segment = tbots_cpp.Segment(
             self.placement_point,

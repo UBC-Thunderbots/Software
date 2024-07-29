@@ -22,8 +22,8 @@ class FriendlyHasBallPossession(Validation):
         """Checks if any friendly robot has possession of the ball
 
         :param world: The world msg to validate
-        :returns: FAILING when no friendly robot has possession of the ball
-                  PASSING when any friendly robot has possession of the ball
+        :return: FAILING when no friendly robot has possession of the ball
+                 PASSING when any friendly robot has possession of the ball
         """
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:

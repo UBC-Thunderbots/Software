@@ -14,7 +14,7 @@ def generate_diagram(fsm):
     https://mermaid.js.org/syntax/stateDiagram.html
 
     :param fsm: the FSM code containing its transition table
-    :returns: the mermaid.js text definition for FSM diagram
+    :return: the mermaid.js text definition for FSM diagram
     """
     # Regex match to extract transition table from the FSM
     transition_table_match = re.search(r"make_transition_table\(([\s\S]*?)\);", fsm)
