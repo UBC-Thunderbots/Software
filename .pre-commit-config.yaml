@@ -5,7 +5,7 @@ repos:
         name: compile pip requirements
         language: system
         entry: |
-            cd ./src
+            cd src
             /usr/bin/bazel run //extlibs:nanopb_requirements.update
             /usr/bin/bazel run //software/thunderscope:requirements.update
             /usr/bin/bazel run //software/jetson_nano/ansible:requirements.update
