@@ -82,14 +82,15 @@ class TScopeQTTab(TScopeTab):
         name: str,
         key: TabNames,
         widgets: Sequence[TScopeWidget],
-        refresh_func_counter: FrameTimeCounter = None,
+        refresh_counter: Optional[FrameTimeCounter] = None,
     ) -> None:
         """Constructor
 
         :param name: the name of this tab
         :param key: the key to identify this tab
         :param widgets: a list of widgets that is going to be displayed in the tab
-        :param refresh_func_counter: a counter that tracks the runtime of the refresh function
+        :param refresh_counter: a FrameTimeCounter to track the time between calls
+                                to the refresh function
         """
         super().__init__(name, key)
         self.widgets = widgets
@@ -107,10 +108,9 @@ class TScopeQTTab(TScopeTab):
         for widget in self.widgets:
             self.add_one_widget(widget)
 
-        # initialized a frametime counter if none was passed in
-        self.refresh_func_counter = refresh_func_counter
-        if refresh_func_counter == None:
-            self.refresh_func_counter = FrameTimeCounter()
+        self.refresh_counter = (
+            refresh_counter if refresh_counter else FrameTimeCounter()
+        )
 
     def add_one_widget(self, data: TScopeWidget) -> None:
         """Gets the widget name and object from the given data
@@ -147,7 +147,7 @@ class TScopeQTTab(TScopeTab):
         if not self.dock_area.isVisible():
             return
 
-        self.refresh_func_counter.add_one_datapoint()
+        self.refresh_counter.add_one_datapoint()
 
         for widget_name in self.refresh_functions:
             # only refresh widget inside the dock that are visible

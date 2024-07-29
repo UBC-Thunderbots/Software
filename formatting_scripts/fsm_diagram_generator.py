@@ -32,7 +32,7 @@ def generate_diagram(fsm):
 
     # Get the transitions in the transition table
     # Split by commas NOT in between parentheses (commas in parentheses separate actions)
-    transitions = re.split(r',(?![^()]*\))', transition_table)
+    transitions = re.split(r",(?![^()]*\))", transition_table)
 
     for transition in transitions:
         # Transitions have the following format:
@@ -50,7 +50,7 @@ def generate_diagram(fsm):
         # Extract src_state from transition, which is before '+' sign
         src_state, _, _ = transition.partition("+")
 
-        # There may be multiple guards, so get a list of the guards and the 
+        # There may be multiple guards, so get a list of the guards and the
         # operators separating them
         guard_list = re.split(r"(&&|\|\|)", guard)
 
@@ -66,7 +66,7 @@ def generate_diagram(fsm):
         guard_list = [g.removesuffix("_G") for g in guard_list]
         action_list = [a.removesuffix("_A") for a in action_list]
 
-        # Convert guard and action lists into strings 
+        # Convert guard and action lists into strings
         guard = " ".join(guard_list)
         action = ", ".join(action_list)
 
@@ -105,7 +105,7 @@ def generate_diagram(fsm):
 
 
 if __name__ == "__main__":
-    root_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     ai_dir = os.path.join(root_dir, "src/software/ai")
 
     fsm_diagrams = {}

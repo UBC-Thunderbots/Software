@@ -5,7 +5,7 @@ from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.py_constants import MILLISECONDS_PER_SECOND
 
 
-class FrameTimeWidget(QWidget):
+class FPSWidget(QWidget):
     """Display the FPS and frametime of Thunderscope.
     This is measured in two different places: the buffer callback in GLWidget and
     the refresh function in tab.
@@ -13,18 +13,19 @@ class FrameTimeWidget(QWidget):
 
     def __init__(
         self,
-        buffer_counter: FrameTimeCounter,
+        frame_swap_counter: FrameTimeCounter,
         refresh_counter: FrameTimeCounter,
         update_delta_sec: float = 0.5,
     ):
-        """Initialize FrameTimeWidget
+        """Initialize FPSWidget
 
-        :param buffer_counter: a frametime counter for the GLWidget widget
-        :param refresh_counter: a frametime counter for the refresh function
+        :param frame_swap_counter: a FrameTimeCounter for the GLWidget to track
+                                   the time between frame swaps
+        :param refresh_counter: a FrameTimeCounter for the refresh function
         :param update_delta_sec: how often this widget updates (in seconds)
         """
         super().__init__()
-        self.buffer_counter = buffer_counter
+        self.frame_swap_counter = frame_swap_counter
         self.refresh_counter = refresh_counter
 
         self.vertical_layout = QVBoxLayout()
@@ -73,13 +74,13 @@ class FrameTimeWidget(QWidget):
             return
 
         buffer_frametime = (
-            self.buffer_counter.get_last_frametime() * MILLISECONDS_PER_SECOND
+            self.frame_swap_counter.get_last_frametime() * MILLISECONDS_PER_SECOND
         )
         buffer_frametime_average_last_30 = (
-            self.buffer_counter.get_average_last_30() * MILLISECONDS_PER_SECOND
+            self.frame_swap_counter.get_average_last_30() * MILLISECONDS_PER_SECOND
         )
         buffer_frametime_average_all = (
-            self.buffer_counter.get_average_frametime() * MILLISECONDS_PER_SECOND
+            self.frame_swap_counter.get_average_frametime() * MILLISECONDS_PER_SECOND
         )
         buffer_fps = 1 / (buffer_frametime / MILLISECONDS_PER_SECOND)
         buffer_average_last_30_fps = 1 / (

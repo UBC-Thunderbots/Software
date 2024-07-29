@@ -1,10 +1,10 @@
 import os
 
-from typing import Any
+from typing import Any, Optional
 
 from software.py_constants import *
 from proto.import_all_protos import *
-from software.thunderscope.common.fps_widget import FrameTimeWidget
+from software.thunderscope.common.fps_widget import FPSWidget
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.common.proto_plotter import ProtoPlotter
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -62,7 +62,7 @@ def setup_gl_widget(
     sandbox_mode: bool = False,
     replay: bool = False,
     replay_log: os.PathLike = None,
-    bufferswap_counter: FrameTimeCounter = None,
+    frame_swap_counter: Optional[FrameTimeCounter] = None,
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -73,19 +73,18 @@ def setup_gl_widget(
     :param sandbox_mode: if sandbox mode should be enabled
     :param replay: Whether replay mode is currently enabled
     :param replay_log: The file path of the replay log
-    :param bufferswap_counter: a counter used to keep track of the fps. This is used for the fps widget
+    :param frame_swap_counter: FrameTimeCounter to keep track of the time between
+                               frame swaps in the GLWidget
     :return: The GLWidget
     """
     # Create ProtoPlayer if replay is enabled
     player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
 
-    if bufferswap_counter == None:
-        bufferswap_counter = FrameTimeCounter()
     # Create widget
     gl_widget = GLWidget(
         proto_unix_io=full_system_proto_unix_io,
         friendly_color_yellow=friendly_colour_yellow,
-        bufferswap_counter=bufferswap_counter,
+        frame_swap_counter=frame_swap_counter,
         player=player,
         sandbox_mode=sandbox_mode,
     )
@@ -202,8 +201,9 @@ def setup_parameter_widget(
     """Setup the parameter widget
 
     :param proto_unix_io: The proto unix io object
-    :param friendly_colour_yellow:
-    :return: The proto configuration widget
+    :param friendly_colour_yellow: Whether the parameter widget is editing the
+                                   yellow (true) or blue (false) team's configuration
+    :return: The proto configuration (parameter) widget
     """
 
     def on_change_callback(
@@ -266,15 +266,16 @@ def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
 
 
 def setup_fps_widget(
-    bufferswap_counter: FrameTimeCounter, refresh_func_counter: FrameTimeCounter
-) -> FrameTimeWidget:
+    frame_swap_counter: FrameTimeCounter, refresh_counter: FrameTimeCounter
+) -> FPSWidget:
     """Setup fps widget
 
-    :param bufferswap_counter: a counter at the bufferswap
-    :param refresh_func_counter: a counter at the refresh function
-    :return: a FPS Widget
+    :param frame_swap_counter: a FrameTimeCounter for the GLWidget to track
+                               the time between frame swaps
+    :param refresh_counter: a FrameTimeCounter for the refresh function
+    :return: the FPS Widget
     """
-    return FrameTimeWidget(bufferswap_counter, refresh_func_counter)
+    return FPSWidget(frame_swap_counter, refresh_counter)
 
 
 def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
@@ -300,10 +301,10 @@ def setup_robot_view(
     """Setup the robot view widget
 
     :param proto_unix_io: The proto unix io object for the full system
-    :param available_control_modes: the currently available input modes for the robots
+    :param available_control_modes: The currently available input modes for the robots
                                     according to what mode thunderscope is run in
 
-    :return: the robot view widget
+    :return: The robot view widget
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
@@ -315,7 +316,7 @@ def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorL
     """Setup the robot error log widget and connect its buffer to the proto unix io
 
     :param proto_unix_io: The proto unix io object for the full system
-    :return: the robot error log widget
+    :return: The robot error log widget
     """
     robot_error_log = RobotErrorLog()
     proto_unix_io.register_observer(RobotStatus, robot_error_log.robot_status_buffer)
@@ -328,7 +329,7 @@ def setup_estop_view(proto_unix_io) -> EstopView:
     """Setup the estop view widget
 
     :param proto_unix_io: The proto unix io object for the full system
-    :return: the estop widget
+    :return: The estop widget
     """
     estop_view = EstopView()
 
@@ -349,7 +350,7 @@ def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
 def setup_diagnostics_input_widget() -> FullSystemConnectWidget:
     """Sets up the diagnostics input widget
 
-    :return: the diagnostics input widget
+    :return: The diagnostics input widget
     """
     diagnostics_input_widget = FullSystemConnectWidget()
 

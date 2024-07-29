@@ -6,6 +6,7 @@ from pyqtgraph.opengl import *
 
 import functools
 import numpy as np
+from typing import Optional
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from software.thunderscope.constants import *
@@ -33,23 +34,31 @@ class GLWidget(QWidget):
         self,
         proto_unix_io: ProtoUnixIO,
         friendly_color_yellow: bool,
-        bufferswap_counter: FrameTimeCounter = None,
-        player: ProtoPlayer = None,
+        frame_swap_counter: Optional[FrameTimeCounter] = None,
+        player: Optional[ProtoPlayer] = None,
         sandbox_mode: bool = False,
     ) -> None:
         """Initialize the GLWidget
 
+        :param proto_unix_io: The ProtoUnixIO to send protos to
+        :param friendly_color_yellow: Whether the friendly team is yellow (true) or blue (false)
+        :param frame_swap_counter: A FrameTimeCounter to track the time between frame swaps
         :param player: The replay player to optionally display media controls for
-        :param sandbox_mode: if sandbox mode should be enabled
-        :param bufferswap_counter: a counter that is used to display fps in thunderscope
+        :param sandbox_mode: Whether sandbox mode should be enabled
         """
         super().__init__()
 
-        self.gl_view_widget = ExtendedGLViewWidget(
-            bufferswap_counter=bufferswap_counter
-        )
+        self.gl_view_widget = ExtendedGLViewWidget()
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.gl_view_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+
+        # Adding a callback for the purpose of tracking frametime/FPS
+        self.frame_swap_counter = (
+            frame_swap_counter if frame_swap_counter else FrameTimeCounter()
+        )
+        self.gl_view_widget.frameSwapped.connect(
+            lambda: self.frame_swap_counter.add_one_datapoint()
+        )
 
         self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
 

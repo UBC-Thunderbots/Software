@@ -7,12 +7,13 @@ class FrameTimeCounter:
     """FrameTimeCounter is basically just a list that stores the time difference
     between each consecutive function call.
 
-    From that, it calculates the frametime of each function call.
+    From that, it calculates the frametime of each function call, i.e. the time
+    between each function call.
     """
 
     def __init__(self) -> None:
         """Initialize FrameTimeCounter"""
-        # stores the timeframe of every data cycle
+        # Stores the frametime of every data cycle
         self.datapoints = collections.deque(maxlen=100)
         self.previous_timestamp = time.time()
 

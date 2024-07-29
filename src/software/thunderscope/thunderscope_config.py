@@ -125,8 +125,8 @@ def configure_base_fullsystem(
     replay_log: os.PathLike = None,
     visualization_buffer_size: int = 5,
     extra_widgets: list[TScopeWidget] = [],
-    refresh_func_counter: FrameTimeCounter = None,
-    buffer_func_counter: FrameTimeCounter = None,
+    frame_swap_counter: FrameTimeCounter = None,
+    refresh_counter: FrameTimeCounter = None,
 ) -> list:
     """Returns a list of widget data for a FullSystem tab
     along with any extra widgets passed in
@@ -140,16 +140,11 @@ def configure_base_fullsystem(
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
     :param extra_widgets: a list of additional widget data to append
-    :param refresh_func_counter: a counter that is used to keep track of the refresh func frametime
-    :param buffer_func_counter: a counter that is used to count the bufferswap frametime callback
+    :param frame_swap_counter: a FrameTimeCounter for the GLWidget to track
+                               the time between frame swaps
+    :param refresh_counter: a FrameTimeCounter for the refresh function
     :return: list of widget data for FullSystem
     """
-    if refresh_func_counter == None:
-        refresh_func_counter = FrameTimeCounter()
-
-    if buffer_func_counter == None:
-        buffer_func_counter = FrameTimeCounter()
-
     return [
         TScopeWidget(
             name="Field",
@@ -162,7 +157,7 @@ def configure_base_fullsystem(
                     "sim_proto_unix_io": sim_proto_unix_io,
                     "friendly_colour_yellow": friendly_colour_yellow,
                     "visualization_buffer_size": visualization_buffer_size,
-                    "bufferswap_counter": buffer_func_counter,
+                    "frame_swap_counter": frame_swap_counter,
                 }
             ),
         ),
@@ -220,8 +215,8 @@ def configure_base_fullsystem(
             name="FPS Widget",
             widget=setup_fps_widget(
                 **{
-                    "bufferswap_counter": buffer_func_counter,
-                    "refresh_func_counter": refresh_func_counter,
+                    "frame_swap_counter": frame_swap_counter,
+                    "refresh_counter": refresh_counter,
                 }
             ),
             anchor="Performance",
@@ -308,10 +303,10 @@ def configure_two_ai_gamecontroller_view(
 
     # setup frametime counter
     blue_refresh_func_frametime_counter = FrameTimeCounter()
-    blue_buffer_func_frametime_counter = FrameTimeCounter()
+    blue_frame_swap_frametime_counter = FrameTimeCounter()
 
     yellow_refresh_func_frametime_counter = FrameTimeCounter()
-    yellow_buffer_func_frametime_counter = FrameTimeCounter()
+    yellow_frame_swap_frametime_counter = FrameTimeCounter()
 
     return TScopeConfig(
         proto_unix_io_map=proto_unix_io_map,
@@ -326,10 +321,10 @@ def configure_two_ai_gamecontroller_view(
                     visualization_buffer_size=visualization_buffer_size,
                     sandbox_mode=True,
                     extra_widgets=[],
-                    refresh_func_counter=blue_refresh_func_frametime_counter,
-                    buffer_func_counter=blue_buffer_func_frametime_counter,
+                    frame_swap_counter=blue_frame_swap_frametime_counter,
+                    refresh_counter=blue_refresh_func_frametime_counter,
                 ),
-                refresh_func_counter=blue_refresh_func_frametime_counter,
+                refresh_counter=blue_refresh_func_frametime_counter,
             ),
             TScopeQTTab(
                 name="Yellow FullSystem",
@@ -343,10 +338,10 @@ def configure_two_ai_gamecontroller_view(
                     visualization_buffer_size=visualization_buffer_size,
                     sandbox_mode=True,
                     extra_widgets=[],
-                    buffer_func_counter=yellow_buffer_func_frametime_counter,
-                    refresh_func_counter=yellow_refresh_func_frametime_counter,
+                    frame_swap_counter=yellow_frame_swap_frametime_counter,
+                    refresh_counter=yellow_refresh_func_frametime_counter,
                 ),
-                refresh_func_counter=yellow_refresh_func_frametime_counter,
+                refresh_counter=yellow_refresh_func_frametime_counter,
             ),
         ],
     )
