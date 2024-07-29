@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # This script is used for running formatting checks in CI
-#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 # The version of the clang executable to use
 export CLANG_VERSION=10.0

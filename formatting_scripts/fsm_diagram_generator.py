@@ -30,30 +30,45 @@ def generate_diagram(fsm):
 
     diagram = ""
 
-    transitions = transition_table.split(",")
+    # Get the transitions in the transition table
+    # Split by commas NOT in between parentheses (commas in parentheses separate actions)
+    transitions = re.split(r',(?![^()]*\))', transition_table)
+
     for transition in transitions:
         # Transitions have the following format:
         # src_state + event [guard] / action = dest_state
 
         # Extract dest_state from transition, which is after '=' sign
-        transition, *rest = transition.split("=")
-        dest_state = rest[0] if rest else ""
+        transition, _, dest_state = transition.partition("=")
 
         # Extract action from transition, which is after '/' sign
-        transition, *rest = transition.split("/")
-        action = rest[0] if rest else ""
+        transition, _, action = transition.partition("/")
 
         # Extract guard contained between square brackets
         guard = next(iter(re.findall(r"\[(.*?)\]", transition)), "")
 
         # Extract src_state from transition, which is before '+' sign
-        src_state = transition.split("+")[0]
+        src_state, _, _ = transition.partition("+")
 
-        # Remove suffixes from states, guard, action
+        # There may be multiple guards, so get a list of the guards and the 
+        # operators separating them
+        guard_list = re.split(r"(&&|\|\|)", guard)
+
+        # There may be multiple actions, so get a list of all of them
+        if action.startswith("(") and action.endswith(")"):
+            action_list = action.strip("()").split(",")
+        else:
+            action_list = [action]
+
+        # Remove suffixes from states, guards, actions
         src_state = src_state.removesuffix("_S")
         dest_state = dest_state.removesuffix("_S")
-        guard = " && ".join([g.removesuffix("_G") for g in guard.split("&&")])
-        action = action.removesuffix("_A")
+        guard_list = [g.removesuffix("_G") for g in guard_list]
+        action_list = [a.removesuffix("_A") for a in action_list]
+
+        # Convert guard and action lists into strings 
+        guard = " ".join(guard_list)
+        action = ", ".join(action_list)
 
         # Terminate state is marked with X in transition table.
         # Give terminate state custom styling with the
@@ -90,12 +105,12 @@ def generate_diagram(fsm):
 
 
 if __name__ == "__main__":
-    root_dir = Path(os.path.abspath(__file__)).parents[3]
+    root_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+    ai_dir = os.path.join(root_dir, "src/software/ai")
 
     fsm_diagrams = {}
     fsm_file_paths = {}
 
-    ai_dir = os.path.join(root_dir, "src/software/ai")
     for root, dirs, files in os.walk(ai_dir):
         dirs.sort()
         for file in sorted(files):

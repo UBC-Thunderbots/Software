@@ -4,12 +4,7 @@ repos:
     -   id: compile_pip_requirements
         name: compile pip requirements
         language: system
-        entry: |
-            cd src
-            /usr/bin/bazel run //extlibs:nanopb_requirements.update
-            /usr/bin/bazel run //software/thunderscope:requirements.update
-            /usr/bin/bazel run //software/jetson_nano/ansible:requirements.update
-            /usr/bin/bazel run //software/simulated_tests:requirements.update
+        entry: formatting_scripts/compile_pip_requirements.sh
 
     -   id: fix_formatting
         name: fix common trivial code errors
@@ -19,4 +14,4 @@ repos:
     -   id: generate_fsm_diagrams
         name: generate new FSM diagrams
         language: python
-        entry: ./src/software/ai/fsm_diagram_generator.py
+        entry: formatting_scripts/fsm_diagram_generator.py
