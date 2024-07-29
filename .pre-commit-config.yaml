@@ -1,6 +1,15 @@
 repos:
 -   repo: local
     hooks:
+    -   id: compile_pip_requirements
+        name: compile pip requirements
+        language: system
+        entry: >
+            bazel run //extlibs:nanopb_requirements.update;
+            bazel run //software/thunderscope:requirements.update;
+            bazel run //software/jetson_nano/ansible:requirements.update;
+            bazel run //software/simulated_tests:requirements.update;
+
     -   id: fix_formatting
         name: fix common trivial code errors
         language: system
