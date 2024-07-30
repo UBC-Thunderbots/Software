@@ -37,14 +37,14 @@ class FloatSlider(QSlider):
 
         :param min_val: value to set as the minimum
         """
-        return super(FloatSlider, self).setMinimum(min_val * self.decimals)
+        return super(FloatSlider, self).setMinimum(int(min_val * self.decimals))
 
     def setMaximum(self, max_val: float) -> None:
         """Sets a maximum float value for this slider
 
         :param max_val: value to set as the maximum
         """
-        return super(FloatSlider, self).setMaximum(max_val * self.decimals)
+        return super(FloatSlider, self).setMaximum(int(max_val * self.decimals))
 
     def setValue(self, value: float) -> None:
         """Sets a float value as the value for this slider
@@ -484,7 +484,7 @@ def display_tooltip(event, tooltip_text):
                 int(event.globalPosition().y()),
             ),
             tooltip_text,
-            msecShowTime=20 * MILLISECONDS_PER_SECOND,
+            msecShowTime=int(20 * MILLISECONDS_PER_SECOND),
         )
     elif str(event.type()) == "Type.Leave":
         QToolTip.hideText()

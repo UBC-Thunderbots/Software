@@ -172,7 +172,9 @@ class RobotInfo(QWidget):
         # breakbeam indicator above robot
         self.breakbeam_label = BreakbeamLabel()
         self.breakbeam_label.setFixedWidth(self.color_vision_pattern.width())
-        self.breakbeam_label.setFixedHeight(self.color_vision_pattern.width() * 0.25)
+        self.breakbeam_label.setFixedHeight(
+            int(self.color_vision_pattern.width() * 0.25)
+        )
 
         self.robot_model_layout.addWidget(self.breakbeam_label)
         self.robot_model_layout.addWidget(self.robot_model)

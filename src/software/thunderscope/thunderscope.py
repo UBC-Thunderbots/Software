@@ -22,12 +22,8 @@ class Thunderscope:
     provides tools to interact with the robots.
 
     Thunderscope uses pyqtgraph, which is highly configurable during runtime.
-    Users can move docks (purple bar) around, double click to pop them out into
+    Users can move docks (blue bars) around, double click to pop them out into
     another window, etc. https://pyqtgraph.readthedocs.io/en/latest/
-
-    The setup_* functions return docks. See configure_full_system_layout for an
-    example. The returned docks can be arranged differently based on the
-    use case (robot diagnostics, simulation, robocup, demo, etc..)
     """
 
     def __init__(
