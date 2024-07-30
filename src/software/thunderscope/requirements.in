@@ -1,2 +1,3 @@
 numpy==1.25.0
 pyqtgraph==0.13.3
+pyqtdarktheme==2.1.0

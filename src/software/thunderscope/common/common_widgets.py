@@ -348,17 +348,6 @@ def create_float_slider(text, decimals, min_val, max_val, tick_spacing):
     return create_slider_abs(slider, text, min_val, max_val, tick_spacing)
 
 
-def create_push_button(title):
-    """Create a push button
-
-    :param title: the name of the button
-    """
-    push_button = QPushButton(title)
-    push_button.setFixedWidth(150)
-
-    return push_button
-
-
 def set_table_data(
     data, table, header_size_hint_width_expansion, item_size_hint_width_expansion
 ):
