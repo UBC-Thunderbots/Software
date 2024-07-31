@@ -164,7 +164,7 @@ if ! /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autor
     
     # Download autoref binary from our Google Drive mirror
     /opt/tbotspython/bin/python3 -m gdown 1oFaIWYSJFjax8488NKoIlxNfCFRcN_Yo -O /tmp/autoReferee.tar.gz
-    tar -xzf /tmp/autoReferee.tar.gz -C /opt/tbotspython/autoReferee
+    tar -xzf /tmp/autoReferee.tar.gz -C /opt/tbotspython/
 else
     cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
 fi
