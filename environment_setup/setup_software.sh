@@ -154,8 +154,15 @@ print_status_msg "Compiling TIGERS AutoRef"
 sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/refs/heads/autoref-ci.zip -O /tmp/autoref-ci.zip
 unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
 touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
-/tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/
-cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
+
+if ! /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/; then
+    print_status_msg "Building TIGERS AutoRef failed. Downloading mirror"
+    
+    wget https://github.com/UBC-Thunderbots/AutoReferee/releases/download/autoref-ci/autoReferee.tar.gz -O /tmp/autoReferee.tar.gz
+    tar -xzf /tmp/autoReferee.tar.gz -C /opt/tbotspython/
+else
+    cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
+fi
 
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
