@@ -41,7 +41,7 @@ pyqtdarktheme==2.1.0 \
     --hash=sha256:5f8274ddfa3a5481ed9743cdb0f9debfeb7ff695b3a0d202a8104361d17dadb8 \
     --hash=sha256:8739d99502230fbaca42551ea033c9ae31c81c4ebfec2f1ffde38f32a18bea7a
     # via -r software/thunderscope/requirements.in
-pyqtgraph==0.13.3 \
-    --hash=sha256:58108d8411c7054e0841d8b791ee85e101fc296b9b359c0e01dde38a98ff2ace \
-    --hash=sha256:fdcc04ac4b32a7bedf1bf3cf74cbb93ab3ba5687791712bbfa8d0712377d2f2b
+pyqtgraph==0.13.7 \
+    --hash=sha256:64f84f1935c6996d0e09b1ee66fe478a7771e3ca6f3aaa05f00f6e068321d9e3 \
+    --hash=sha256:7754edbefb6c367fa0dfb176e2d0610da3ada20aa7a5318516c74af5fb72bf7a
     # via -r software/thunderscope/requirements.in
