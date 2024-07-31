@@ -98,9 +98,6 @@ fi
 
 if [[ $(lsb_release -rs) == "22.04" ]]; then
     host_software_packages+=(qtbase5-dev)
-
-    wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/85-brltty.rules
-    sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -135,6 +132,13 @@ fi
 
 if [[ $(lsb_release -rs) == "22.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
+
+    # The BRLTTY service provides access to a console screen for blind people via a braille screen.
+    # One of the udev rules conflicts with the device id used by our E-stops, so we offer alternate 
+    # udev rules to prevent this conflict.
+    # Download the udev rules hosted in our Google Drive
+    /opt/tbotspython/bin/python3 -m gdown 1ic6FEgIm9Zc0WkY_AN68zRC003V7CUBv -O /tmp/85-brltty.rules
+    sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
 
 print_status_msg "Done Setting Up Virtual Python Environment"
@@ -154,8 +158,16 @@ print_status_msg "Compiling TIGERS AutoRef"
 sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/refs/heads/autoref-ci.zip -O /tmp/autoref-ci.zip
 unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
 touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
-/tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/
-cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
+
+if ! /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/; then
+    print_status_msg "Building TIGERS AutoRef failed. Downloading mirror"
+    
+    # Download autoref binary from our Google Drive mirror
+    /opt/tbotspython/bin/python3 -m gdown 1oFaIWYSJFjax8488NKoIlxNfCFRcN_Yo -O /tmp/autoReferee.tar.gz
+    tar -xzf /tmp/autoReferee.tar.gz -C /opt/tbotspython/autoReferee
+else
+    cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
+fi
 
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
