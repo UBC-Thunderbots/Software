@@ -23,10 +23,7 @@
 
 #include <btBulletDynamicsCommon.h>
 
-#include <QtCore/QObject>
-
 #include "extlibs/er_force_sim/src/protobuf/command.pb.h"
-#include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 #include "shared/constants.h"
 #include "simfield.h"
 
@@ -45,17 +42,11 @@ namespace camun
     }  // namespace simulator
 }  // namespace camun
 
-class camun::simulator::SimBall : public QObject
+class camun::simulator::SimBall
 {
-    Q_OBJECT
    public:
-    SimBall(RNG *rng, btDiscreteDynamicsWorld *world);
+    SimBall(std::shared_ptr<btDiscreteDynamicsWorld> world);
     ~SimBall();
-    SimBall(const SimBall &) = delete;
-    SimBall &operator=(const SimBall &) = delete;
-
-   signals:
-    void sendSSLSimError(const SSLSimError &error, ErrorSource s);
 
    public:
     /**
@@ -76,7 +67,7 @@ class camun::simulator::SimBall : public QObject
     void restoreState(const world::SimBall &ball);
     btRigidBody *body() const
     {
-        return m_body;
+        return m_body.get();
     }
     bool isInvalid() const;
 
@@ -88,10 +79,10 @@ class camun::simulator::SimBall : public QObject
 
    private:
     RNG *m_rng;
-    btDiscreteDynamicsWorld *m_world;
-    btCollisionShape *m_sphere;
-    btRigidBody *m_body;
-    btMotionState *m_motionState;
+    std::shared_ptr<btDiscreteDynamicsWorld> m_world;
+    std::unique_ptr<btCollisionShape> m_sphere;
+    std::unique_ptr<btRigidBody> m_body;
+    std::unique_ptr<btMotionState> m_motionState;
     sslsim::TeleportBall m_move;
     double rolling_speed;
     bool set_transition_speed;

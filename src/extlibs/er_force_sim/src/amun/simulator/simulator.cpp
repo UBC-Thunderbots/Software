@@ -20,135 +20,54 @@
 
 #include "simulator.h"
 
-#include <QtCore/QPair>
-#include <QtCore/QTimer>
-#include <QtCore/QVector>
-#include <QtCore/QtDebug>
 #include <algorithm>
 #include <functional>
 
-#include "erroraggregator.h"
 #include "extlibs/er_force_sim/src/core/coordinates.h"
-#include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/protobuf/geometry.h"
-#include "simball.h"
-#include "simfield.h"
-#include "simrobot.h"
 
 
 using namespace camun::simulator;
 
-/* Friction and restitution between robots, ball and field: (empirical
- * measurments) Ball vs. Robot: Restitution: about 0.60 Friction: trial and
- * error in simulator 0.18 (similar results as in reality)
- *
- * Ball vs. Floor:
- * Restitution: sqrt(h'/h) = sqrt(0.314) = 0.56
- * Friction: \mu_k = -a / g (while slipping) = 0.35
- *
- * Robot vs. Floor:
- * Restitution and Friction should be as low as possible
- *
- * Calculations:
- * Variables: r: restitution, f: friction
- * Indices: b: ball; f: floor; r: robot
- *
- * r_b * r_f = 0.56
- * r_b * r_r = 0.60
- * r_f * r_r = small
- * => r_b = 1; r_f = 0.56; r_r = 0.60
- *
- * f_b * f_f = 0.35
- * f_b * f_r = 0.22
- * f_f * f_r = very small
- * => f_b = 1; f_f = 0.35; f_r = 0.22
- */
-
-struct camun::simulator::SimulatorData
-{
-    RNG rng;
-    btDefaultCollisionConfiguration *collision;
-    btCollisionDispatcher *dispatcher;
-    btBroadphaseInterface *overlappingPairCache;
-    btSequentialImpulseConstraintSolver *solver;
-    btDiscreteDynamicsWorld *dynamicsWorld;
-    world::Geometry geometry;
-    QVector<SSLProto::SSL_GeometryCameraCalibration> reportedCameraSetup;
-    QVector<btVector3> cameraPositions;
-    SimField *field;
-    SimBall *ball;
-    Simulator::RobotMap robotsBlue;
-    Simulator::RobotMap robotsYellow;
-    QMap<uint32_t, robot::Specs> specsBlue;
-    QMap<uint32_t, robot::Specs> specsYellow;
-    bool flip;
-    float stddevBall;
-    float stddevBallArea;
-    float stddevRobot;
-    float stddevRobotPhi;
-    float ballDetectionsAtDribbler;  // per robot per second
-    bool enableInvisibleBall;
-    float ballVisibilityThreshold;
-    float cameraOverlap;
-    float cameraPositionError;
-    float objectPositionOffset;
-    float robotCommandPacketLoss;
-    float robotReplyPacketLoss;
-    float missingBallDetections;
-    bool dribblePerfect;
-};
-
-static void simulatorTickCallback(btDynamicsWorld *world, btScalar timeStep)
-{
-    Simulator *sim = reinterpret_cast<Simulator *>(world->getWorldUserInfo());
-    sim->handleSimulatorTick(timeStep);
-}
-
-/*!
- * \class Simulator
- * \ingroup simulator
- * \brief %Simulator interface
- */
-
 Simulator::Simulator(const amun::SimulatorSetup &setup)
-    : m_time(0),
-      m_lastSentStatusTime(0),
+    : m_data(std::make_unique<SimulatorData>()),
       m_enabled(false),
       m_charge(true),
+      m_time(0),
       m_visionDelay(35 * 1000 * 1000),
-      m_visionProcessingTime(5 * 1000 * 1000),
-      m_aggregator(new ErrorAggregator(this))
+      m_visionProcessingTime(5 * 1000 * 1000)
 {
-    // setup bullet
-    m_data                       = new SimulatorData;
-    m_data->collision            = new btDefaultCollisionConfiguration();
-    m_data->dispatcher           = new btCollisionDispatcher(m_data->collision);
-    m_data->overlappingPairCache = new btDbvtBroadphase();
-    m_data->solver               = new btSequentialImpulseConstraintSolver;
-    m_data->dynamicsWorld =
-        new btDiscreteDynamicsWorld(m_data->dispatcher, m_data->overlappingPairCache,
-                                    m_data->solver, m_data->collision);
+    m_data->collision  = std::make_unique<btDefaultCollisionConfiguration>();
+    m_data->dispatcher = std::make_unique<btCollisionDispatcher>(m_data->collision.get());
+    m_data->overlappingPairCache = std::make_unique<btDbvtBroadphase>();
+    m_data->solver        = std::make_unique<btSequentialImpulseConstraintSolver>();
+    m_data->dynamicsWorld = std::make_shared<btDiscreteDynamicsWorld>(
+        m_data->dispatcher.get(), m_data->overlappingPairCache.get(),
+        m_data->solver.get(), m_data->collision.get());
     m_data->dynamicsWorld->setGravity(btVector3(0.0f, 0.0f, -9.81f * SIMULATOR_SCALE));
-    m_data->dynamicsWorld->setInternalTickCallback(simulatorTickCallback, this, true);
+    m_data->dynamicsWorld->setInternalTickCallback(
+        [](btDynamicsWorld *world, btScalar timeStep)
+        {
+            Simulator *sim = reinterpret_cast<Simulator *>(world->getWorldUserInfo());
+            sim->handleSimulatorTick(timeStep);
+        },
+        this, true);
 
     m_data->geometry.CopyFrom(setup.geometry());
     for (const auto &camera : setup.camera_setup())
     {
-        m_data->reportedCameraSetup.append(camera);
+        m_data->reportedCameraSetup.push_back(camera);
         ErForceVector visionPosition(camera.derived_camera_world_tx(),
                                      camera.derived_camera_world_ty());
         btVector3 truePosition;
         coordinates::fromVision(visionPosition, truePosition);
         truePosition.setZ(camera.derived_camera_world_tz() / 1000.0f);
-        m_data->cameraPositions.append(truePosition);
+        m_data->cameraPositions.push_back(truePosition);
     }
 
-    // add field and ball
-    m_data->field = new SimField(m_data->dynamicsWorld, m_data->geometry);
-    m_data->ball  = new SimBall(&m_data->rng, m_data->dynamicsWorld);
-    connect(m_data->ball, &SimBall::sendSSLSimError, m_aggregator,
-            &ErrorAggregator::aggregate);
-    m_data->flip                     = false;
+    m_data->field = std::make_unique<SimField>(m_data->dynamicsWorld, m_data->geometry);
+    m_data->ball  = std::make_shared<SimBall>(m_data->dynamicsWorld);
+    m_data->flip  = false;
     m_data->stddevBall               = 0.0f;
     m_data->stddevBallArea           = 0.0f;
     m_data->stddevRobot              = 0.0f;
@@ -165,32 +84,6 @@ Simulator::Simulator(const amun::SimulatorSetup &setup)
     m_data->dribblePerfect           = false;
 
     // no robots after initialisation
-}
-
-// does delete all Simrobots in the RobotMap, does not clear map
-// (just like qDeleteAll would)
-static void deleteAll(const Simulator::RobotMap &map)
-{
-    for (const auto &e : map)
-    {
-        delete e.first;
-    }
-}
-
-Simulator::~Simulator()
-{
-    resetVisionPackets();
-
-    deleteAll(m_data->robotsBlue);
-    deleteAll(m_data->robotsYellow);
-    delete m_data->ball;
-    delete m_data->field;
-    delete m_data->dynamicsWorld;
-    delete m_data->solver;
-    delete m_data->overlappingPairCache;
-    delete m_data->dispatcher;
-    delete m_data->collision;
-    delete m_data;
 }
 
 std::vector<robot::RadioResponse> Simulator::acceptBlueRobotControlCommand(
@@ -214,62 +107,43 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
     for (const SSLSimulationProto::RobotCommand &command : control.robot_commands())
     {
         // pass radio command to robot that matches the id
-        const auto id          = command.id();
-        SimulatorData *data    = m_data;
-        auto time              = m_time;
-        auto charge            = m_charge;
-        auto fabricateResponse = [data, &responses, time, charge, &id, &command](
-                                     const Simulator::RobotMap &map, const bool *isBlue) {
-            if (!map.contains(id))
-                return;
-            robot::RadioResponse response = map[id].first->setCommand(
-                command, data->ball, charge, data->robotCommandPacketLoss,
-                data->robotReplyPacketLoss);
-            response.set_time(time);
-
-            if (isBlue != nullptr)
+        auto fabricateResponse = [&](Simulator::RobotMap &map, bool isBlue)
+        {
+            if (!map.contains(command.id()))
             {
-                response.set_is_blue(*isBlue);
+                return;
             }
+
+            robot::RadioResponse response =
+                map.at(command.id())
+                    ->setCommand(command, *m_data->ball, m_charge,
+                                 m_data->robotCommandPacketLoss,
+                                 m_data->robotReplyPacketLoss);
+            response.set_time(m_time);
+            response.set_is_blue(isBlue);
+
             // only collect valid responses
             if (response.IsInitialized())
             {
-                if (data->robotReplyPacketLoss == 0 ||
-                    data->rng.uniformFloat(0, 1) > data->robotReplyPacketLoss)
+                if (m_data->robotReplyPacketLoss == 0 ||
+                    m_data->rng.uniformFloat(0, 1) > m_data->robotReplyPacketLoss)
                 {
                     responses.emplace_back(response);
                 }
             }
         };
+
         if (isBlue)
         {
-            fabricateResponse(m_data->robotsBlue, &isBlue);
+            fabricateResponse(m_data->robotsBlue, isBlue);
         }
         else
         {
-            fabricateResponse(m_data->robotsYellow, &isBlue);
+            fabricateResponse(m_data->robotsYellow, isBlue);
         }
     }
+
     return responses;
-}
-
-void Simulator::sendSSLSimErrorInternal(ErrorSource source)
-{
-    QList<SSLSimError> errors = m_aggregator->getAggregates(source);
-    if (errors.size() == 0)
-        return;
-    emit sendSSLSimError(errors, source);
-}
-
-static void createRobot(Simulator::RobotMap &list, float x, float y, uint32_t id,
-                        const ErrorAggregator *agg, SimulatorData *data,
-                        const QMap<uint32_t, robot::Specs> &teamSpecs)
-{
-    SimRobot *robot = new SimRobot(&data->rng, teamSpecs[id], data->dynamicsWorld,
-                                   btVector3(x, y, 0), 0.f);
-    robot->setDribbleMode(data->dribblePerfect);
-    robot->connect(robot, &SimRobot::sendSSLSimError, agg, &ErrorAggregator::aggregate);
-    list[id] = {robot, teamSpecs[id].generation()};
 }
 
 void Simulator::resetFlipped(Simulator::RobotMap &robots, float side)
@@ -278,22 +152,13 @@ void Simulator::resetFlipped(Simulator::RobotMap &robots, float side)
     const float x = m_data->geometry.field_width() / 2 - 0.2;
     float y       = m_data->geometry.field_height() / 2 - 0.2;
 
-    for (RobotMap::iterator it = robots.begin(); it != robots.end(); ++it)
+    for (auto &[robotId, robot] : robots)
     {
-        SimRobot *robot = it.value().first;
         if (robot->isFlipped())
         {
-            SimRobot *new_robot =
-                new SimRobot(&m_data->rng, robot->specs(), m_data->dynamicsWorld,
-                             btVector3(x, side * y, 0), 0.0f);
-            delete robot;
-            connect(new_robot, &SimRobot::sendSSLSimError, m_aggregator,
-                    &ErrorAggregator::aggregate);  // TODO? use createRobot instead of
-                                                   // this. However, doing so naively
-                                                   // will break the iteration, so I
-                                                   // left it for now.
-            new_robot->setDribbleMode(m_data->dribblePerfect);
-            it.value().first = new_robot;
+            robot = std::make_unique<SimRobot>(robot->specs(), m_data->dynamicsWorld,
+                                               btVector3(x, side * y, 0), 0.0f);
+            robot->setDribbleMode(m_data->dribblePerfect);
         }
         y -= 0.3;
     }
@@ -314,15 +179,14 @@ void Simulator::handleSimulatorTick(double time_s)
     resetFlipped(m_data->robotsYellow, -1.0f);
     if (m_data->ball->isInvalid())
     {
-        delete m_data->ball;
-        m_data->ball = new SimBall(&m_data->rng, m_data->dynamicsWorld);
-        connect(m_data->ball, &SimBall::sendSSLSimError, m_aggregator,
-                &ErrorAggregator::aggregate);
+        m_data->ball = std::make_shared<SimBall>(m_data->dynamicsWorld);
     }
 
     // find out if ball and any robot collide
-    auto robot_ball_collision = [this](QPair<SimRobot *, unsigned int> elem) {
-        return elem.first->touchesBall(this->m_data->ball);
+    auto robot_ball_collision = [&](const auto &kv_pair)
+    { 
+        auto& [robotId, robot] = kv_pair;
+        return robot->touchesBall(*m_data->ball); 
     };
 
     bool ball_collision = std::any_of(m_data->robotsBlue.begin(),
@@ -332,13 +196,13 @@ void Simulator::handleSimulatorTick(double time_s)
 
     // apply commands and forces to ball and robots
     m_data->ball->begin(ball_collision);
-    for (const auto &pair : m_data->robotsBlue)
+    for (auto &[robotId, robot] : m_data->robotsBlue)
     {
-        pair.first->begin(m_data->ball, time_s);
+        robot->begin(*m_data->ball, time_s);
     }
-    for (const auto &pair : m_data->robotsYellow)
+    for (auto &[robotId, robot] : m_data->robotsYellow)
     {
-        pair.first->begin(m_data->ball, time_s);
+        robot->begin(*m_data->ball, time_s);
     }
 
     // add gravity to all ACTIVE objects
@@ -347,7 +211,8 @@ void Simulator::handleSimulatorTick(double time_s)
 }
 
 static bool checkCameraID(const int cameraId, const btVector3 &p,
-                          const QVector<btVector3> &cameraPositions, const float overlap)
+                          const std::vector<btVector3> &cameraPositions,
+                          const float overlap)
 {
     float minDistance = std::numeric_limits<float>::max();
     float ownDistance = 0;
@@ -366,13 +231,13 @@ static bool checkCameraID(const int cameraId, const btVector3 &p,
     return ownDistance <= minDistance + 2 * overlap;
 }
 
-void Simulator::initializeDetection(SSLProto::SSL_DetectionFrame *detection,
-                                    std::size_t cameraId)
+void Simulator::initializeDetection(SSLProto::SSL_DetectionFrame& detection,
+                                    size_t cameraId)
 {
-    detection->set_frame_number(m_lastFrameNumber[cameraId]++);
-    detection->set_camera_id(cameraId);
-    detection->set_t_capture((m_time + m_visionDelay - m_visionProcessingTime) * 1E-9);
-    detection->set_t_sent((m_time + m_visionDelay) * 1E-9);
+    detection.set_frame_number(m_lastFrameNumber[cameraId]++);
+    detection.set_camera_id(cameraId);
+    detection.set_t_capture((m_time + m_visionDelay - m_visionProcessingTime) * 1E-9);
+    detection.set_t_sent((m_time + m_visionDelay) * 1E-9);
 }
 
 static btVector3 positionOffsetForCamera(float offsetStrength, btVector3 cameraPos)
@@ -398,7 +263,7 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
     std::vector<SSLProto::SSL_DetectionFrame> detections(numCameras);
     for (std::size_t i = 0; i < numCameras; i++)
     {
-        initializeDetection(&detections[i], i);
+        initializeDetection(detections[i], i);
     }
 
     bool missingBall = m_data->missingBallDetections > 0 &&
@@ -437,10 +302,8 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
     {
         auto &team = teamIsBlue ? m_data->robotsBlue : m_data->robotsYellow;
 
-        for (const auto &it : team)
+        for (auto &[robotId, robot] : team)
         {
-            SimRobot *robot = it.first;
-
             if (m_time - robot->getLastSendTime() >= m_minRobotDetectionTime)
             {
                 const float timeDiff     = (m_time - robot->getLastSendTime()) * 1E-9;
@@ -459,14 +322,14 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
                     if (teamIsBlue)
                     {
                         robot->update(detections[cameraId].add_robots_blue(),
-                                      m_data->stddevRobot, m_data->stddevRobotPhi, m_time,
-                                      positionOffset);
+                                     m_data->stddevRobot, m_data->stddevRobotPhi, m_time,
+                                     positionOffset);
                     }
                     else
                     {
                         robot->update(detections[cameraId].add_robots_yellow(),
-                                      m_data->stddevRobot, m_data->stddevRobotPhi, m_time,
-                                      positionOffset);
+                                     m_data->stddevRobot, m_data->stddevRobotPhi, m_time,
+                                     positionOffset);
                     }
 
                     // once in a while, add a ball mis-detection at a corner of the
@@ -563,10 +426,8 @@ world::SimulatorState Simulator::getSimulatorState()
     {
         auto &team = teamIsBlue ? m_data->robotsBlue : m_data->robotsYellow;
 
-        for (const auto &it : team)
+        for (auto &[robotId, robot] : team)
         {
-            SimRobot *robot = it.first;
-
             // convert coordinates from ER Force
             btVector3 robotPos = robot->position() / SIMULATOR_SCALE;
             btVector3 newRobotPos;
@@ -576,7 +437,7 @@ world::SimulatorState Simulator::getSimulatorState()
             auto *robotProto =
                 teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
 
-            robot->update(robotProto, m_data->ball);
+            robot->update(robotProto, *m_data->ball);
 
             // Convert mm to m
             robotProto->set_p_x(newRobotPos.x() / 1000);
@@ -592,33 +453,12 @@ world::SimulatorState Simulator::getSimulatorState()
     return simState;
 }
 
-void Simulator::resetVisionPackets()
-{
-    qDeleteAll(m_visionTimers);
-    m_visionTimers.clear();
-    m_visionPackets.clear();
-}
-
-void Simulator::handleRadioCommands(const SSLSimRobotControl &commands, bool isBlue,
-                                    qint64 processingStart)
-{
-    m_radioCommands.enqueue(std::make_tuple(commands, processingStart, isBlue));
-}
-
-void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team &team,
-                        QMap<uint32_t, robot::Specs> &teamSpecs)
+void Simulator::setTeam(Simulator::RobotMap &robotMap, float side,
+                        const robot::Team &team,
+                        std::map<uint32_t, robot::Specs> &teamSpecs)
 {
     // remove old team
-    deleteAll(list);
-    list.clear();
-
-    // changing a team is also triggering a tracking reset
-    // thus the old robots will disappear immediatelly
-    // however if the delayed vision packets arrive the old robots will be tracked
-    // again thus after removing a robot from a team it can take 1 simulated
-    // second for the robot to disappear to prevent this remove outdated vision
-    // packets
-    resetVisionPackets();
+    robotMap.clear();
 
     // align robots on a line
     const float x = m_data->geometry.field_width() / 2 - 0.2;
@@ -630,14 +470,17 @@ void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team
         const auto id             = specs.id();
 
         // (color, robot id) must be unique
-        if (list.contains(id))
+        if (robotMap.contains(id))
         {
             std::cerr << "Error: Two ids for the same color, aborting!" << std::endl;
             continue;
         }
         teamSpecs[id].CopyFrom(specs);
 
-        createRobot(list, x, side * y, id, m_aggregator, m_data, teamSpecs);
+        robotMap[id] = std::make_unique<SimRobot>(teamSpecs[id], m_data->dynamicsWorld,
+                                       btVector3(x, side * y, 0), 0.f);
+        robotMap[id]->setDribbleMode(m_data->dribblePerfect);
+
         y -= 0.3;
     }
 }
@@ -656,12 +499,13 @@ void Simulator::moveBall(const sslsim::TeleportBall &ball)
     // remove the dribbling constraint
     if (!ball.has_by_force() || !ball.by_force())
     {
-        for (const auto &robotList : {m_data->robotsBlue, m_data->robotsYellow})
+        for (auto &[robotId, robot] : m_data->robotsBlue)
         {
-            for (const auto &it : robotList)
-            {
-                it.first->stopDribbling();
-            }
+            robot->stopDribbling();
+        }
+        for (auto &[robotId, robot] : m_data->robotsYellow)
+        {
+            robot->stopDribbling();
         }
     }
 
@@ -692,9 +536,9 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
 
     bool is_blue = robot.id().team() == gameController::Team::BLUE;
 
-    RobotMap &list = is_blue ? m_data->robotsBlue : m_data->robotsYellow;
-    bool isPresent = list.contains(robot.id().id());
-    QMap<uint32_t, robot::Specs> &teamSpecs =
+    RobotMap &robotMap = is_blue ? m_data->robotsBlue : m_data->robotsYellow;
+    bool isPresent     = robotMap.contains(robot.id().id());
+    std::map<uint32_t, robot::Specs> &teamSpecs =
         is_blue ? m_data->specsBlue : m_data->specsYellow;
 
     if (robot.has_present())
@@ -704,39 +548,31 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
             // add the requested robot
             if (!teamSpecs.contains(robot.id().id()))
             {
-                SSLSimError error{new sslsim::SimulatorError};
-                error->set_code("CREATE_UNSPEC_ROBOT");
-                std::string message =
-                    "trying to create robot " + std::to_string(robot.id().id());
-                message += ", but no spec for this robot was found";
-                error->set_message(std::move(message));
-                m_aggregator->aggregate(error, ErrorSource::CONFIG);
+                std::cerr << "Trying to create robot " << std::to_string(robot.id().id())
+                          << ", but no spec for this robot was found" << std::endl;
             }
             else if (!robot.has_x() || !robot.has_y())
             {
-                SSLSimError error{new sslsim::SimulatorError};
-                error->set_code("CREATE_NOPOS_ROBOT");
-                std::string message =
-                    "trying to create robot " + std::to_string(robot.id().id());
-                message += " without giving a position";
-                error->set_message(std::move(message));
-                m_aggregator->aggregate(error, ErrorSource::CONFIG);
+                std::cerr << "Trying to create robot " << std::to_string(robot.id().id())
+                          << ", without giving a position" << std::endl;
             }
             else
             {
                 ErForceVector targetPos;
                 coordinates::fromVision(robot, targetPos);
                 // TODO: check if the given position is fine
-                createRobot(list, targetPos.x, targetPos.y, robot.id().id(), m_aggregator,
-                            m_data, teamSpecs);
+
+                robotMap[robot.id().id()] = std::make_unique<SimRobot>(
+                                       teamSpecs[robot.id().id()], m_data->dynamicsWorld,
+                                       btVector3(targetPos.x, targetPos.y, 0), 0.f);
+                robotMap[robot.id().id()]->setDribbleMode(m_data->dribblePerfect);
             }
         }
         else if (!robot.present() && isPresent)
         {
             // remove the robot
-            auto val = list.take(robot.id().id());
-            val.first->stopDribbling();
-            delete val.first;
+            robotMap.at(robot.id().id())->stopDribbling();
+            robotMap.erase(robot.id().id());
             return;
         }
         else if (!robot.present() && !isPresent)
@@ -752,8 +588,8 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
             return;
     }
 
-    if (!list.contains(robot.id().id()))
-        return;  // Recheck the list in case the has_present paragraph did change it.
+    if (!robotMap.contains(robot.id().id()))
+        return;  // Recheck the robotMap in case the has_present paragraph did change it.
 
     sslsim::TeleportRobot r = robot;
 
@@ -765,17 +601,11 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
         FLIP(r, v_y);
     }
 
-    SimRobot *sim_robot = list[robot.id().id()].first;
     if (!r.has_by_force() || !r.by_force())
     {
-        sim_robot->stopDribbling();
+        robotMap[robot.id().id()]->stopDribbling();
     }
-    sim_robot->move(r);
-}
-
-void Simulator::setFlipped(bool flipped)
-{
-    m_data->flip = flipped;
+    robotMap[robot.id().id()]->move(r);
 }
 
 void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command)
@@ -860,13 +690,12 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
 
             if (realism.has_vision_delay())
             {
-                m_visionDelay = std::max((qint64)0, (qint64)realism.vision_delay());
+                m_visionDelay = std::max(0l, realism.vision_delay());
             }
 
             if (realism.has_vision_processing_time())
             {
-                m_visionProcessingTime =
-                    std::max((qint64)0, (qint64)realism.vision_processing_time());
+                m_visionProcessingTime = std::max(0l, realism.vision_processing_time());
             }
 
             if (realism.has_simulate_dribbling())
@@ -909,12 +738,13 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
             {
                 m_data->ball->restoreState(sim.set_simulator_state().ball());
             }
-            const auto restoreRobots = [](RobotMap &map, auto robots) {
+            const auto restoreRobots = [](RobotMap &map, auto robots)
+            {
                 for (const auto &robot : robots)
                 {
                     if (map.contains(robot.id()))
                     {
-                        map[robot.id()].first->restoreState(robot);
+                        map[robot.id()]->restoreState(robot);
                     }
                 }
             };
@@ -948,73 +778,13 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
 
     if (teamOrPerfectDribbleChanged)
     {
-        for (const auto &robotList : {m_data->robotsBlue, m_data->robotsYellow})
+        for (auto &[robotId, robot] : m_data->robotsBlue)
         {
-            for (const auto &it : robotList)
-            {
-                SimRobot *robot = it.first;
-                robot->setDribbleMode(m_data->dribblePerfect);
-            }
+            robot->setDribbleMode(m_data->dribblePerfect);
+        }
+        for (auto &[robotId, robot] : m_data->robotsYellow)
+        {
+            robot->setDribbleMode(m_data->dribblePerfect);
         }
     }
-}
-
-void Simulator::seedPRGN(uint32_t seed)
-{
-    m_data->rng.seed(seed);
-}
-
-static bool overlapCheck(const btVector3 &p0, const float &r0, const btVector3 &p1,
-                         const float &r1)
-{
-    const float distance = (p1 - p0).length();
-    return distance <= r0 + r1;
-}
-
-// uses the real world scale
-void Simulator::teleportRobotToFreePosition(SimRobot *robot)
-{
-    btVector3 robotPos = robot->position() / SIMULATOR_SCALE;
-    btVector3 direction =
-        (robotPos - m_data->ball->position() / SIMULATOR_SCALE).normalize();
-    float distance =
-        2.0f * (static_cast<float>(BALL_MAX_RADIUS_METERS) + robot->specs().radius());
-    bool valid = true;
-    do
-    {
-        valid    = true;
-        robotPos = robotPos + 2 * direction * distance;
-
-        for (const auto &robotList : {m_data->robotsBlue, m_data->robotsYellow})
-        {
-            for (const auto &it : robotList)
-            {
-                SimRobot *robot2 = it.first;
-                if (robot == robot2)
-                {
-                    continue;
-                }
-
-                btVector3 tmp = robot2->position() / SIMULATOR_SCALE;
-                if (overlapCheck(robotPos, robot->specs().radius(), tmp,
-                                 robot2->specs().radius()))
-                {
-                    valid = false;
-                    break;
-                }
-            }
-            if (!valid)
-            {
-                break;
-            }
-        }
-    } while (!valid);
-
-    sslsim::TeleportRobot robotCommand;
-    robotCommand.mutable_id()->set_id(robot->specs().id());
-    coordinates::toVision(robotPos, robotCommand);
-
-    robotCommand.set_v_x(0);
-    robotCommand.set_v_y(0);
-    robot->move(robotCommand);
 }

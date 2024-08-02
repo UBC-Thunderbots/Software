@@ -20,7 +20,6 @@
 
 #include "simball.h"
 
-#include <QtCore/QDebug>
 #include <cmath>
 
 #include "extlibs/er_force_sim/src/core/coordinates.h"
@@ -31,19 +30,19 @@
 
 using namespace camun::simulator;
 
-SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world)
-    : m_rng(rng),
+SimBall::SimBall(std::shared_ptr<btDiscreteDynamicsWorld> world)
+    : m_rng(new RNG()),
       m_world(world),
       current_ball_state(STATIONARY),
       set_transition_speed(true),
       rolling_speed(-1.0f)
 {
     // see http://robocup.mi.fu-berlin.de/buch/rolling.pdf for correct modelling
-    m_sphere =
-        new btSphereShape(static_cast<float>(BALL_MAX_RADIUS_METERS) * SIMULATOR_SCALE);
+    m_sphere = std::make_unique<btSphereShape>(
+        static_cast<float>(BALL_MAX_RADIUS_METERS) * SIMULATOR_SCALE);
 
-    btVector3 localInertia(0, 0, 0);
     // FIXME measure inertia coefficient
+    btVector3 localInertia(0, 0, 0);
     m_sphere->calculateLocalInertia(BALL_MASS_KG, localInertia);
 
     btTransform startWorldTransform;
@@ -51,30 +50,28 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world)
     startWorldTransform.setOrigin(
         btVector3(0.0f, 0.0f, static_cast<float>(BALL_MAX_RADIUS_METERS)) *
         SIMULATOR_SCALE);
-    m_motionState = new btDefaultMotionState(startWorldTransform);
+    m_motionState = std::make_unique<btDefaultMotionState>(startWorldTransform);
 
-    btRigidBody::btRigidBodyConstructionInfo rbInfo(BALL_MASS_KG, m_motionState, m_sphere,
-                                                    localInertia);
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(BALL_MASS_KG, m_motionState.get(),
+                                                    m_sphere.get(), localInertia);
 
     // parameters seem to be ignored...
-    m_body = new btRigidBody(rbInfo);
-    // see simulator.cpp
-    // TODO (#2512): Check these values with real life
+    m_body = std::make_unique<btRigidBody>(rbInfo);
+
+    // See simulator.cpp
     m_body->setRestitution(BALL_RESTITUTION);
     m_body->setFriction(BALL_SLIDING_FRICTION_NEWTONS);
 
     // \mu_r = -a / g = 0.0357 (while rolling)
     // rollingFriction in bullet is too unstable to be useful
     // use custom implementation in begin()
-    m_world->addRigidBody(m_body);
+
+    m_world->addRigidBody(m_body.get());
 }
 
 SimBall::~SimBall()
 {
-    m_world->removeRigidBody(m_body);
-    delete m_body;
-    delete m_sphere;
-    delete m_motionState;
+    m_world->removeRigidBody(m_body.get());
 }
 
 void SimBall::begin(bool robot_collision)
@@ -145,13 +142,8 @@ void SimBall::begin(bool robot_collision)
     }
 
     bool moveCommand           = false;
-    auto sendPartialCoordError = [this](const char *msg) {
-        SSLSimError error{new sslsim::SimulatorError};
-        error->set_code("PARTIAL_COORD");
-        std::string message = "Partial coordinates are not implemented yet";
-        error->set_message(message + msg);
-        emit this->sendSSLSimError(error, ErrorSource::CONFIG);
-    };
+    auto sendPartialCoordError = [this](const char *msg)
+    { std::cerr << "Partial coordinates are not implemented yet" << msg << std::endl; };
     if (m_move.has_x())
     {
         if (!m_move.has_y())
@@ -177,10 +169,7 @@ void SimBall::begin(bool robot_collision)
         if (m_move.by_force() && (m_move.vx() != 0 || m_move.vy() != 0 ||
                                   (m_move.has_vz() && m_move.vz() != 0)))
         {
-            SSLSimError error{new sslsim::SimulatorError};
-            error->set_code("VELOCITY_FORCE");
-            error->set_message("Velocities != 0 and by_force are incompatible");
-            emit sendSSLSimError(error, ErrorSource::CONFIG);
+            std::cerr << "Velocities != 0 and by_force are incompatible" << std::endl;
             return;
         }
         moveCommand = true;
@@ -365,7 +354,7 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
     {
         // if the visibility is lower than the threshold the ball disappears
         visibility = positionOfVisiblePixels(pos, transform.getOrigin(),
-                                             simulatorCameraPosition, m_world);
+                                             simulatorCameraPosition, m_world.get());
         if (visibility < visibilityThreshold)
         {
             return false;
@@ -401,14 +390,8 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
                         static_cast<float>(m_rng->normal(stddevArea)) / PIXEL_PER_AREA));
     ball->set_area(area * PIXEL_PER_AREA);
 
-    // if (height > 0.1f) {
-    //     qDebug() << "simball" << p.x() << p.y() << height << "ttt" << ball_x <<
-    //     ball_y;
-    // }
-
     // add noise to coordinates
-    // to convert from bullet coordinate system to ssl-vision rotate by 90 degree
-    // ccw
+    // to convert from bullet coordinate system to ssl-vision rotate by 90 degree ccw
     const ErForceVector noise = m_rng->normalVector(stddev);
     coordinates::toVision(ErForceVector(modX, modY) + noise, *ball);
 
@@ -479,8 +462,4 @@ void SimBall::kick(const btVector3 &power)
 {
     m_body->activate();
     m_body->applyCentralForce(power);
-    // btTransform transform;
-    // m_motionState->getWorldTransform(transform);
-    // const btVector3 p = transform.getOrigin() / SIMULATOR_SCALE;
-    // qDebug() << "kick at" << p.x() << p.y();
 }

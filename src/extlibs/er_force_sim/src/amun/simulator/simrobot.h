@@ -23,11 +23,8 @@
 
 #include <btBulletDynamicsCommon.h>
 
-#include <QtCore/QList>
-
 #include "extlibs/er_force_sim/src/protobuf/command.pb.h"
 #include "extlibs/er_force_sim/src/protobuf/robot.pb.h"
-#include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
 
 class RNG;
@@ -46,35 +43,29 @@ namespace camun
     }  // namespace simulator
 }  // namespace camun
 
-class camun::simulator::SimRobot : public QObject
+class camun::simulator::SimRobot
 {
-    Q_OBJECT
    public:
-    SimRobot(RNG *rng, const robot::Specs &specs, btDiscreteDynamicsWorld *world,
+    SimRobot(const robot::Specs &specs, std::shared_ptr<btDiscreteDynamicsWorld> world,
              const btVector3 &pos, float dir);
     ~SimRobot();
-    SimRobot(const SimRobot &) = delete;
-    SimRobot &operator=(const SimRobot &) = delete;
-
-   signals:
-    void sendSSLSimError(const SSLSimError &error, ErrorSource s);
 
    public:
-    void begin(SimBall *ball, double time);
-    bool canKickBall(SimBall *ball) const;
-    void tryKick(SimBall *ball, float power, double time);
+    void begin(SimBall &ball, double time);
+    bool canKickBall(const SimBall &ball) const;
+    void tryKick(const SimBall &ball, float power, double time);
     robot::RadioResponse setCommand(const SSLSimulationProto::RobotCommand &command,
-                                    SimBall *ball, bool charge, float rxLoss,
+                                    const SimBall &ball, bool charge, float rxLoss,
                                     float txLoss);
     void update(SSLProto::SSL_DetectionRobot *robot, float stddev_p, float stddev_phi,
-                qint64 time, btVector3 positionOffset);
-    void update(world::SimRobot *robot, SimBall *ball) const;
+                int64_t time, btVector3 positionOffset);
+    void update(world::SimRobot *robot, const SimBall &ball) const;
     void restoreState(const world::SimRobot &robot);
     void move(const sslsim::TeleportRobot &robot);
     bool isFlipped();
     btVector3 position() const;
     btVector3 dribblerCorner(bool left) const;
-    qint64 getLastSendTime() const
+    int64_t getLastSendTime() const
     {
         return m_lastSendTime;
     }
@@ -92,27 +83,27 @@ class camun::simulator::SimRobot : public QObject
      * @param ball the ball in play
      * @return true if the ball is in contact with the robot, false otherwise
      */
-    bool touchesBall(SimBall *ball) const;
+    bool touchesBall(const SimBall &ball) const;
 
 
    private:
-    btVector3 relativeBallSpeed(SimBall *ball) const;
+    btVector3 relativeBallSpeed(const SimBall &ball) const;
     float bound(float acceleration, float oldSpeed, float speedupLimit,
                 float brakeLimit) const;
     void calculateDribblerMove(const btVector3 pos, const btQuaternion rot,
                                const btVector3 linVel, float omega);
-    void dribble(SimBall *ball, float speed);
+    void dribble(const SimBall &ball, float speed);
 
     RNG *m_rng;
     robot::Specs m_specs;
-    btDiscreteDynamicsWorld *m_world;
-    btRigidBody *m_body;
-    btRigidBody *m_dribblerBody;
-    btHingeConstraint *m_dribblerConstraint;
-    QList<btCollisionShape *> m_shapes;
-    btMotionState *m_motionState;
-    btVector3 m_dribblerCenter;
+    std::shared_ptr<btDiscreteDynamicsWorld> m_world;
+    std::unique_ptr<btRigidBody> m_body;
+    std::unique_ptr<btRigidBody> m_dribblerBody;
+    std::unique_ptr<btHingeConstraint> m_dribblerConstraint;
+    std::vector<std::unique_ptr<btCollisionShape>> m_shapes;
+    std::unique_ptr<btMotionState> m_motionState;
     std::unique_ptr<btHingeConstraint> m_holdBallConstraint;
+    btVector3 m_dribblerCenter;
 
     struct Wheel
     {
@@ -135,7 +126,7 @@ class camun::simulator::SimRobot : public QObject
 
     bool m_perfectDribbler = false;
 
-    qint64 m_lastSendTime = 0;
+    int64_t m_lastSendTime = 0;
 };
 
 #endif  // SIMROBOT_H
