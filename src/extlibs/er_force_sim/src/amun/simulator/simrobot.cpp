@@ -24,10 +24,7 @@
 #include <cmath>
 
 #include "extlibs/er_force_sim/src/core/coordinates.h"
-#include "extlibs/er_force_sim/src/core/rng.h"
-#include "proto/ssl_vision_detection.pb.h"
-#include "robot_mesh.h"
-#include "simball.h"
+#include "robotmesh.h"
 #include "simulator.h"
 
 using namespace camun::simulator;
@@ -37,17 +34,16 @@ const float MAX_SPEED = 1000;
 SimRobot::SimRobot(const robot::Specs &specs,
                    std::shared_ptr<btDiscreteDynamicsWorld> world, const btVector3 &pos,
                    float dir)
-    : m_rng(new RNG()),
-      m_specs(specs),
+    : m_specs(specs),
       m_world(world),
       m_charge(false),
       m_isCharged(false),
       m_inStandby(false),
       m_shootTime(0.0),
       m_commandTime(0.0),
-      error_sum_v_s(0),
-      error_sum_v_f(0),
-      error_sum_omega(0)
+      m_error_sum_v_s(0),
+      m_error_sum_v_f(0),
+      m_error_sum_omega(0)
 {
     std::unique_ptr<btCompoundShape> wholeShape = std::make_unique<btCompoundShape>();
     btTransform robotShapeTransform;
@@ -239,8 +235,7 @@ void SimRobot::begin(SimBall &ball, double time)
         stopDribbling();
     }
 
-    auto sendPartialCoordError = [this](const std::string &msg)
-    {
+    auto sendPartialCoordError = [this](const std::string &msg) {
         std::cerr << "Partial coordinates are not implemented yet" << msg << std::endl;
         if (!m_move.has_by_force() || !m_move.by_force())
         {
@@ -433,8 +428,7 @@ void SimRobot::begin(SimBall &ball, double time)
             power = std::clamp(m_sslCommand.kick_speed(), 0.05f, maxShootSpeed);
         }
 
-        const auto getSpeedCompensation = [&]() -> float
-        {
+        const auto getSpeedCompensation = [&]() -> float {
             if (m_sslCommand.kick_angle() == 0)
             {
                 return 0.0f;
@@ -480,13 +474,13 @@ void SimRobot::begin(SimBall &ball, double time)
     const float error_v_f   = v_d_local.y() - v_f;
     const float error_omega = std::clamp(output_omega, -MAX_SPEED, MAX_SPEED) - omega;
 
-    error_sum_v_s += error_v_s;
-    error_sum_v_f += error_v_f;
-    error_sum_omega += error_omega;
+    m_error_sum_v_s += error_v_s;
+    m_error_sum_v_f += error_v_f;
+    m_error_sum_omega += error_omega;
 
-    const float error_sum_limit = 20.0f;
-    error_sum_v_s = std::clamp(error_sum_v_s, -error_sum_limit, error_sum_limit);
-    error_sum_v_f = std::clamp(error_sum_v_f, -error_sum_limit, error_sum_limit);
+    const float m_error_sum_limit = 20.0f;
+    m_error_sum_v_s = std::clamp(m_error_sum_v_s, -m_error_sum_limit, m_error_sum_limit);
+    m_error_sum_v_f = std::clamp(m_error_sum_v_f, -m_error_sum_limit, m_error_sum_limit);
 
     // (1-(1-linear_damping)^timestep)/timestep - compensates damping
     const float V = 1.200f;             // keep current speed
@@ -496,8 +490,8 @@ void SimRobot::begin(SimBall &ball, double time)
     // as a certain part of the acceleration is required to compensate damping,
     // the robot will run into a speed limit! bound acceleration the speed limit
     // is acceleration * accelScale / V
-    float a_f = V * v_f + K * error_v_f + K_I * error_sum_v_f;
-    float a_s = V * v_s + K * error_v_s + K_I * error_sum_v_s;
+    float a_f = V * v_f + K * error_v_f + K_I * m_error_sum_v_f;
+    float a_s = V * v_s + K * error_v_s + K_I * m_error_sum_v_s;
 
     const float accelScale =
         2.f;  // let robot accelerate / brake faster than the accelerator does
@@ -516,7 +510,7 @@ void SimRobot::begin(SimBall &ball, double time)
         1.f / time * 0.5f;  // correct half the error during each subtimestep
     const float K_I_phi = /*0*0.2/1000; //*/ 0.f;
 
-    const float a_phi = V_phi * omega + K_phi * error_omega + K_I_phi * error_sum_omega;
+    const float a_phi = V_phi * omega + K_phi * error_omega + K_I_phi * m_error_sum_omega;
     const float a_phi_bound =
         bound(a_phi, omega, accelScale * m_specs.strategy().a_speedup_phi_max(),
               accelScale * m_specs.strategy().a_brake_phi_max());
@@ -631,26 +625,26 @@ robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand
     return response;
 }
 
-void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
+void SimRobot::update(SSLProto::SSL_DetectionRobot& robot, float stddev_p,
                       float stddev_phi, int64_t time, btVector3 positionOffset)
 {
     // setup vision packet
-    robot->set_robot_id(m_specs.id());
-    robot->set_confidence(1.0);
-    robot->set_pixel_x(0);
-    robot->set_pixel_y(0);
+    robot.set_robot_id(m_specs.id());
+    robot.set_confidence(1.0);
+    robot.set_pixel_x(0);
+    robot.set_pixel_y(0);
 
     // add noise
     btTransform transform;
     m_motionState->getWorldTransform(transform);
     const btVector3 p = transform.getOrigin() / SIMULATOR_SCALE + positionOffset;
-    const ErForceVector p_noise = m_rng->normalVector(stddev_p);
-    robot->set_x((p.y() + p_noise.x) * 1000.0f);
-    robot->set_y(-(p.x() + p_noise.y) * 1000.0f);
+    const ErForceVector p_noise = m_rng.normalVector(stddev_p);
+    robot.set_x((p.y() + p_noise.x) * 1000.0f);
+    robot.set_y(-(p.x() + p_noise.y) * 1000.0f);
 
     const btQuaternion q = transform.getRotation();
     const btVector3 dir  = btMatrix3x3(q).getColumn(0);
-    robot->set_orientation(atan2(dir.y(), dir.x()) + m_rng->normal(stddev_phi));
+    robot.set_orientation(atan2(dir.y(), dir.x()) + m_rng.normal(stddev_phi));
 
     m_lastSendTime = time;
 }
@@ -697,18 +691,18 @@ bool SimRobot::touchesBall(const SimBall &ball) const
     return false;
 }
 
-void SimRobot::update(world::SimRobot *robot, const SimBall &ball) const
+void SimRobot::update(world::SimRobot& robot, const SimBall &ball) const
 {
     btTransform transform;
     m_motionState->getWorldTransform(transform);
     const btVector3 position = transform.getOrigin() / SIMULATOR_SCALE;
-    robot->set_p_x(position.x());
-    robot->set_p_y(position.y());
-    robot->set_p_z(position.z());
-    robot->set_id(m_specs.id());
+    robot.set_p_x(position.x());
+    robot.set_p_y(position.y());
+    robot.set_p_z(position.z());
+    robot.set_id(m_specs.id());
 
     const btQuaternion q = transform.getRotation();
-    auto *rotation       = robot->mutable_rotation();
+    auto *rotation       = robot.mutable_rotation();
     rotation->set_real(q.getX());
     rotation->set_i(q.getY());
     rotation->set_j(q.getZ());
@@ -719,17 +713,17 @@ void SimRobot::update(world::SimRobot *robot, const SimBall &ball) const
     float y = 0;
     float z = 0;
     q.getEulerZYX(z, y, x);
-    robot->set_angle(z);
+    robot.set_angle(z);
 
     const btVector3 velocity = m_body->getLinearVelocity() / SIMULATOR_SCALE;
-    robot->set_v_x(velocity.x());
-    robot->set_v_y(velocity.y());
-    robot->set_v_z(velocity.z());
+    robot.set_v_x(velocity.x());
+    robot.set_v_y(velocity.y());
+    robot.set_v_z(velocity.z());
 
     const btVector3 angular = m_body->getAngularVelocity();
-    robot->set_r_x(angular.x());
-    robot->set_r_y(angular.y());
-    robot->set_r_z(angular.z());
+    robot.set_r_x(angular.x());
+    robot.set_r_y(angular.y());
+    robot.set_r_z(angular.z());
 
     bool ballTouchesRobot = false;
     int numManifolds      = m_world->getDispatcher()->getNumManifolds();
@@ -747,7 +741,7 @@ void SimRobot::update(world::SimRobot *robot, const SimBall &ball) const
             ballTouchesRobot = true;
         }
     }
-    robot->set_touches_ball(ballTouchesRobot);
+    robot.set_touches_ball(ballTouchesRobot);
 }
 
 void SimRobot::restoreState(const world::SimRobot &robot)

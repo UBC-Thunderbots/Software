@@ -23,19 +23,16 @@
 #include <cmath>
 
 #include "extlibs/er_force_sim/src/core/coordinates.h"
-#include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/core/vector.h"
-#include "proto/ssl_vision_detection.pb.h"
 #include "simulator.h"
 
 using namespace camun::simulator;
 
 SimBall::SimBall(std::shared_ptr<btDiscreteDynamicsWorld> world)
-    : m_rng(new RNG()),
-      m_world(world),
-      current_ball_state(STATIONARY),
-      set_transition_speed(true),
-      rolling_speed(-1.0f)
+    : m_world(world),
+      m_rolling_speed(-1.0f),
+      m_set_transition_speed(true),
+      m_current_ball_state(STATIONARY)
 {
     // see http://robocup.mi.fu-berlin.de/buch/rolling.pdf for correct modelling
     m_sphere = std::make_unique<btSphereShape>(
@@ -83,45 +80,45 @@ void SimBall::begin(bool robot_collision)
     {  // ball is on the ground
         bool is_stationary =
             velocity.length() < STATIONARY_BALL_SPEED_METERS_PER_SECOND * SIMULATOR_SCALE;
-        bool should_roll = velocity.length() < rolling_speed * SIMULATOR_SCALE;
+        bool should_roll = velocity.length() < m_rolling_speed * SIMULATOR_SCALE;
 
         if (robot_collision)
         {
-            current_ball_state = ROBOT_COLLISION;
+            m_current_ball_state = ROBOT_COLLISION;
         }
         else if (is_stationary)
         {
-            current_ball_state = STATIONARY;
+            m_current_ball_state = STATIONARY;
         }
-        else if ((current_ball_state == SLIDING && should_roll) ||
-                 current_ball_state == ROLLING)
+        else if ((m_current_ball_state == SLIDING && should_roll) ||
+                 m_current_ball_state == ROLLING)
         {
-            current_ball_state = ROLLING;
+            m_current_ball_state = ROLLING;
         }
         else
         {
-            current_ball_state = SLIDING;
+            m_current_ball_state = SLIDING;
         }
 
-        switch (current_ball_state)
+        switch (m_current_ball_state)
         {
             case STATIONARY:
                 m_body->setLinearVelocity(btVector3(0, 0, 0));
                 m_body->setFriction(BALL_SLIDING_FRICTION_NEWTONS);
-                set_transition_speed = true;
+                m_set_transition_speed = true;
                 break;
             case ROBOT_COLLISION:
                 m_body->setFriction(BALL_SLIDING_FRICTION_NEWTONS);
-                set_transition_speed = true;
+                m_set_transition_speed = true;
                 break;
             case SLIDING:
                 m_body->setFriction(BALL_SLIDING_FRICTION_NEWTONS);
-                if (set_transition_speed)
+                if (m_set_transition_speed)
                 {
-                    rolling_speed =
+                    m_rolling_speed =
                         FRICTION_TRANSITION_FACTOR * velocity.length() / SIMULATOR_SCALE;
                 }
-                set_transition_speed = false;
+                m_set_transition_speed = false;
                 break;
             case ROLLING:
 
@@ -136,14 +133,15 @@ void SimBall::begin(bool robot_collision)
                                             SUB_TIMESTEP);
 
                 m_body->setFriction(0.0f);
-                set_transition_speed = false;
+                m_set_transition_speed = false;
                 break;
         }
     }
 
     bool moveCommand           = false;
-    auto sendPartialCoordError = [this](const char *msg)
-    { std::cerr << "Partial coordinates are not implemented yet" << msg << std::endl; };
+    auto sendPartialCoordError = [this](const char *msg) {
+        std::cerr << "Partial coordinates are not implemented yet" << msg << std::endl;
+    };
     if (m_move.has_x())
     {
         if (!m_move.has_y())
@@ -221,9 +219,9 @@ void SimBall::begin(bool robot_collision)
                 m_body->setLinearVelocity(linVel * SIMULATOR_SCALE);
 
                 // override ballState
-                current_ball_state   = SLIDING;
-                rolling_speed        = linVel.length() * FRICTION_TRANSITION_FACTOR;
-                set_transition_speed = false;
+                m_current_ball_state   = SLIDING;
+                m_rolling_speed        = linVel.length() * FRICTION_TRANSITION_FACTOR;
+                m_set_transition_speed = false;
 
                 m_body->setAngularVelocity(btVector3(0, 0, 0));
             }
@@ -317,7 +315,7 @@ static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulatorBal
     return static_cast<float>(cameraHitCounter) / static_cast<float>(maxHits);
 }
 
-bool SimBall::update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
+bool SimBall::update(SSLProto::SSL_DetectionBall& ball, float stddev, float stddevArea,
                      const btVector3 &cameraPosition, bool enableInvisibleBall,
                      float visibilityThreshold, btVector3 positionOffset)
 {
@@ -329,15 +327,15 @@ bool SimBall::update(SSLProto::SSL_DetectionBall *ball, float stddev, float stdd
                         enableInvisibleBall, visibilityThreshold, positionOffset);
 }
 
-bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, float stddev,
+bool SimBall::addDetection(SSLProto::SSL_DetectionBall& ball, btVector3 pos, float stddev,
                            float stddevArea, const btVector3 &cameraPosition,
                            bool enableInvisibleBall, float visibilityThreshold,
                            btVector3 positionOffset)
 {
     // setup ssl-vision ball detection
-    ball->set_confidence(1.0f);
-    ball->set_pixel_x(0.0f);
-    ball->set_pixel_y(0.0f);
+    ball.set_confidence(1.0f);
+    ball.set_pixel_x(0.0f);
+    ball.set_pixel_y(0.0f);
 
     btTransform transform;
     m_motionState->getWorldTransform(transform);
@@ -387,15 +385,15 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
     float area =
         visibility *
         std::max(0.0f, (basePixelArea +
-                        static_cast<float>(m_rng->normal(stddevArea)) / PIXEL_PER_AREA));
-    ball->set_area(area * PIXEL_PER_AREA);
+                        static_cast<float>(m_rng.normal(stddevArea)) / PIXEL_PER_AREA));
+    ball.set_area(area * PIXEL_PER_AREA);
 
     // add noise to coordinates
     // to convert from bullet coordinate system to ssl-vision rotate by 90 degree ccw
-    const ErForceVector noise = m_rng->normalVector(stddev);
-    coordinates::toVision(ErForceVector(modX, modY) + noise, *ball);
+    const ErForceVector noise = m_rng.normalVector(stddev);
+    coordinates::toVision(ErForceVector(modX, modY) + noise, ball);
 
-    ball->set_z(modZ * 1000);  // modZ is in kilometres, need to convert to metres
+    ball.set_z(modZ * 1000);  // modZ is in kilometres, need to convert to metres
 
     return true;
 }
@@ -416,21 +414,21 @@ btVector3 SimBall::speed() const
     return m_body->getLinearVelocity();
 }
 
-void SimBall::writeBallState(world::SimBall *ball) const
+void SimBall::writeBallState(world::SimBall &ball) const
 {
     const btVector3 ballPosition =
         m_body->getWorldTransform().getOrigin() / SIMULATOR_SCALE;
-    ball->set_p_x(ballPosition.getX());
-    ball->set_p_y(ballPosition.getY());
-    ball->set_p_z(ballPosition.getZ());
+    ball.set_p_x(ballPosition.getX());
+    ball.set_p_y(ballPosition.getY());
+    ball.set_p_z(ballPosition.getZ());
     const btVector3 ballSpeed = speed() / SIMULATOR_SCALE;
-    ball->set_v_x(ballSpeed.getX());
-    ball->set_v_y(ballSpeed.getY());
-    ball->set_v_z(ballSpeed.getZ());
+    ball.set_v_x(ballSpeed.getX());
+    ball.set_v_y(ballSpeed.getY());
+    ball.set_v_z(ballSpeed.getZ());
     const btVector3 angularVelocity = m_body->getAngularVelocity();
-    ball->set_angular_x(angularVelocity.x());
-    ball->set_angular_y(angularVelocity.y());
-    ball->set_angular_z(angularVelocity.z());
+    ball.set_angular_x(angularVelocity.x());
+    ball.set_angular_y(angularVelocity.y());
+    ball.set_angular_z(angularVelocity.z());
 }
 
 void SimBall::restoreState(const world::SimBall &ball)

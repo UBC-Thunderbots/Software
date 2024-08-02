@@ -124,7 +124,7 @@ class camun::simulator::Simulator
                  std::map<uint32_t, robot::Specs> &specs);
     void moveBall(const sslsim::TeleportBall &ball);
     void moveRobot(const sslsim::TeleportRobot &robot);
-    void initializeDetection(SSLProto::SSL_DetectionFrame& detection, size_t cameraId);
+    void initializeDetection(SSLProto::SSL_DetectionFrame &detection, size_t cameraId);
 
    private:
     std::unique_ptr<SimulatorData> m_data;
@@ -170,6 +170,7 @@ class camun::simulator::Simulator
  * f_f * f_r = very small
  * => f_b = 1; f_f = 0.35; f_r = 0.22
  */
+
 struct camun::simulator::SimulatorData
 {
     RNG rng;

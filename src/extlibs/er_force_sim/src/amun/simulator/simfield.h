@@ -30,7 +30,7 @@ namespace camun
     namespace simulator
     {
         class SimField;
-    }
+    }  // namespace simulator
 }  // namespace camun
 
 class camun::simulator::SimField

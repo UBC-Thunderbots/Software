@@ -23,23 +23,19 @@
 
 #include <btBulletDynamicsCommon.h>
 
+#include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/protobuf/command.pb.h"
 #include "extlibs/er_force_sim/src/protobuf/robot.pb.h"
+#include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
-
-class RNG;
-namespace SSLProto
-{
-    class SSL_DetectionRobot;
-}
+#include "proto/ssl_vision_detection.pb.h"
+#include "simball.h"
 
 namespace camun
 {
     namespace simulator
     {
-        class SimBall;
         class SimRobot;
-        enum class ErrorSource;
     }  // namespace simulator
 }  // namespace camun
 
@@ -57,9 +53,9 @@ class camun::simulator::SimRobot
     robot::RadioResponse setCommand(const SSLSimulationProto::RobotCommand &command,
                                     const SimBall &ball, bool charge, float rxLoss,
                                     float txLoss);
-    void update(SSLProto::SSL_DetectionRobot *robot, float stddev_p, float stddev_phi,
+    void update(SSLProto::SSL_DetectionRobot& robot, float stddev_p, float stddev_phi,
                 int64_t time, btVector3 positionOffset);
-    void update(world::SimRobot *robot, const SimBall &ball) const;
+    void update(world::SimRobot& robot, const SimBall &ball) const;
     void restoreState(const world::SimRobot &robot);
     void move(const sslsim::TeleportRobot &robot);
     bool isFlipped();
@@ -94,7 +90,7 @@ class camun::simulator::SimRobot
                                const btVector3 linVel, float omega);
     void dribble(const SimBall &ball, float speed);
 
-    RNG *m_rng;
+    RNG m_rng;
     robot::Specs m_specs;
     std::shared_ptr<btDiscreteDynamicsWorld> m_world;
     std::unique_ptr<btRigidBody> m_body;
@@ -120,9 +116,9 @@ class camun::simulator::SimRobot
     double m_shootTime;
     double m_commandTime;
 
-    float error_sum_v_s;
-    float error_sum_v_f;
-    float error_sum_omega;
+    float m_error_sum_v_s;
+    float m_error_sum_v_f;
+    float m_error_sum_omega;
 
     bool m_perfectDribbler = false;
 
