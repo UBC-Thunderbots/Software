@@ -88,7 +88,7 @@ class ColorQLabel(QLabel):
     def set_float_val(self, val: float) -> None:
         """Sets the current value of the label to the given float value
 
-        :param val:  the value to
+        :param val: the new float value
         """
         self.setText(f"{self.label_text}{val:02d}")
         self.__update_background_color(val)
