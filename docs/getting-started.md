@@ -443,7 +443,7 @@ If you do rebase or merge and get conflicts, you'll need to resolve them manuall
 
 We use [clang-format](https://electronjs.org/docs/development/clang-format) to automatically format our code. Using an automatic tool helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what it does.
 
-To format the code, from the `Software` directory run `./formatting_scripts/fix_formatting.sh`.
+To format the code, from the `Software` directory run `./scripts/lint_and_format.sh`.
 
 We recommend running the formatting script and then committing all your changes, so that your commits can more easily pass CI.
 

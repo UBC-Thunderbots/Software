@@ -7,7 +7,7 @@
 * text=auto
 
 # Our clang-format executable is a binary
-formatting_scripts/clang-format-*    binary
+scripts/clang-format-*    binary
 
 # Treat images as binaries
 *.svg           binary
