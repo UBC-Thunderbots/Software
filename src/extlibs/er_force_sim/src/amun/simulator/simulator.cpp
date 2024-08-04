@@ -26,7 +26,6 @@
 #include "extlibs/er_force_sim/src/core/coordinates.h"
 #include "extlibs/er_force_sim/src/protobuf/geometry.h"
 
-
 using namespace camun::simulator;
 
 Simulator::Simulator(const amun::SimulatorSetup &setup)
@@ -46,7 +45,8 @@ Simulator::Simulator(const amun::SimulatorSetup &setup)
         m_data->solver.get(), m_data->collision.get());
     m_data->dynamicsWorld->setGravity(btVector3(0.0f, 0.0f, -9.81f * SIMULATOR_SCALE));
     m_data->dynamicsWorld->setInternalTickCallback(
-        [](btDynamicsWorld *world, btScalar timeStep) {
+        [](btDynamicsWorld *world, btScalar timeStep)
+        {
             Simulator *sim = reinterpret_cast<Simulator *>(world->getWorldUserInfo());
             sim->handleSimulatorTick(timeStep);
         },
@@ -103,41 +103,31 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
     // collect responses from robots
     std::vector<robot::RadioResponse> responses;
 
+    Simulator::RobotMap &robotMap = isBlue ? m_data->robotsBlue : m_data->robotsYellow;
+
     for (const SSLSimulationProto::RobotCommand &command : control.robot_commands())
     {
-        // pass radio command to robot that matches the id
-        auto fabricateResponse = [&](Simulator::RobotMap &map, bool isBlue) {
-            if (!map.contains(command.id()))
-            {
-                return;
-            }
-
-            robot::RadioResponse response =
-                map.at(command.id())
-                    ->setCommand(command, *m_data->ball, m_charge,
-                                 m_data->robotCommandPacketLoss,
-                                 m_data->robotReplyPacketLoss);
-            response.set_time(m_time);
-            response.set_is_blue(isBlue);
-
-            // only collect valid responses
-            if (response.IsInitialized())
-            {
-                if (m_data->robotReplyPacketLoss == 0 ||
-                    m_data->rng.uniformFloat(0, 1) > m_data->robotReplyPacketLoss)
-                {
-                    responses.emplace_back(response);
-                }
-            }
-        };
-
-        if (isBlue)
+        if (!robotMap.contains(command.id()))
         {
-            fabricateResponse(m_data->robotsBlue, isBlue);
+            return responses;
         }
-        else
+
+        // pass radio command to robot that matches the id
+        robot::RadioResponse response = robotMap.at(command.id())
+                                            ->setCommand(command, *m_data->ball, m_charge,
+                                                         m_data->robotCommandPacketLoss,
+                                                         m_data->robotReplyPacketLoss);
+        response.set_time(m_time);
+        response.set_is_blue(isBlue);
+
+        // only collect valid responses
+        if (response.IsInitialized())
         {
-            fabricateResponse(m_data->robotsYellow, isBlue);
+            if (m_data->robotReplyPacketLoss == 0 ||
+                m_data->rng.uniformFloat(0, 1) > m_data->robotReplyPacketLoss)
+            {
+                responses.emplace_back(response);
+            }
         }
     }
 
@@ -181,11 +171,11 @@ void Simulator::handleSimulatorTick(double time_s)
     }
 
     // find out if ball and any robot collide
-    auto robot_ball_collision = [&](const auto &kv_pair) {
+    auto robot_ball_collision = [&](const auto &kv_pair)
+    {
         auto &[robotId, robot] = kv_pair;
         return robot->touchesBall(*m_data->ball);
     };
-
     bool ball_collision = std::any_of(m_data->robotsBlue.begin(),
                                       m_data->robotsBlue.end(), robot_ball_collision) ||
                           std::any_of(m_data->robotsYellow.begin(),
@@ -295,10 +285,10 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
     }
 
     // get robot positions
-    for (bool teamIsBlue : {true, false})
+    for (auto &[teamIsBlue, team] :
+         {std::make_tuple(true, std::ref(m_data->robotsBlue)),
+          std::make_tuple(false, std::ref(m_data->robotsYellow))})
     {
-        auto &team = teamIsBlue ? m_data->robotsBlue : m_data->robotsYellow;
-
         for (auto &[robotId, robot] : team)
         {
             if (m_time - robot->getLastSendTime() >= m_minRobotDetectionTime)
@@ -530,12 +520,11 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
     if (!robot.id().has_id())
         return;
 
-    bool is_blue = robot.id().team() == gameController::Team::BLUE;
-
-    RobotMap &robotMap = is_blue ? m_data->robotsBlue : m_data->robotsYellow;
+    bool isBlue        = robot.id().team() == gameController::Team::BLUE;
+    RobotMap &robotMap = isBlue ? m_data->robotsBlue : m_data->robotsYellow;
     bool isPresent     = robotMap.contains(robot.id().id());
     std::map<uint32_t, robot::Specs> &teamSpecs =
-        is_blue ? m_data->specsBlue : m_data->specsYellow;
+        isBlue ? m_data->specsBlue : m_data->specsYellow;
 
     if (robot.has_present())
     {
@@ -611,6 +600,7 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
     if (command->has_simulator())
     {
         const amun::CommandSimulator &sim = command->simulator();
+
         if (sim.has_enable())
         {
             m_enabled = sim.enable();
@@ -619,6 +609,7 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
         if (sim.has_realism_config())
         {
             auto realism = sim.realism_config();
+
             if (realism.has_stddev_ball_p())
             {
                 m_data->stddevBall = realism.stddev_ball_p();
@@ -734,7 +725,8 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
             {
                 m_data->ball->restoreState(sim.set_simulator_state().ball());
             }
-            const auto restoreRobots = [](RobotMap &map, auto robots) {
+            const auto restoreRobots = [](RobotMap &map, auto robots)
+            {
                 for (const auto &robot : robots)
                 {
                     if (map.contains(robot.id()))
@@ -751,10 +743,9 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
 
     if (command->has_transceiver())
     {
-        const amun::CommandTransceiver &t = command->transceiver();
-        if (t.has_charge())
+        if (command->transceiver().has_charge())
         {
-            m_charge = t.charge();
+            m_charge = command->transceiver().charge();
         }
     }
 

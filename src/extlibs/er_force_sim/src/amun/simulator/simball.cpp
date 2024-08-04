@@ -55,7 +55,7 @@ SimBall::SimBall(std::shared_ptr<btDiscreteDynamicsWorld> world)
     // parameters seem to be ignored...
     m_body = std::make_unique<btRigidBody>(rbInfo);
 
-    // See simulator.cpp
+    // See simulator.h
     m_body->setRestitution(BALL_RESTITUTION);
     m_body->setFriction(BALL_SLIDING_FRICTION_NEWTONS);
 

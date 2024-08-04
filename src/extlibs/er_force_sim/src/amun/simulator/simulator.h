@@ -119,6 +119,7 @@ class camun::simulator::Simulator
      */
     std::vector<robot::RadioResponse> acceptRobotControlCommand(
         const SSLSimulationProto::RobotControl &control, bool isBlue);
+    
     void resetFlipped(RobotMap &robots, float side);
     void setTeam(RobotMap &list, float side, const robot::Team &team,
                  std::map<uint32_t, robot::Specs> &specs);

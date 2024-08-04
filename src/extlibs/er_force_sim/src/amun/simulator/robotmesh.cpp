@@ -72,7 +72,7 @@ camun::simulator::createRobotMesh(float radius, float height, float angle,
     //           ' - , _│, │'                        
     //                  │  └─angle                                             
     //                  └────angleDiff
-    //                       outerAngle = angle + angleDiff    
+    //                       outerAngle = angle + angleDiff + angleDiff   
     //    
     const float frontPlateLength = std::sin(angle / 2.0) * radius;
     const float frontPlatePos    = radius * std::cos(angle / 2.0);
@@ -88,15 +88,15 @@ camun::simulator::createRobotMesh(float radius, float height, float angle,
     // Parts of robot (top view)
     //    
     //             , - ~ - ,    Right pillar                    
-    //         , '        .| ' ,                       
-    //       ,           . ├────┐                 
-    //      ,           .  |.   |                 
-    //     ,           . . |    |                 
-    //     , Main hull +   |  Front plate and dribbler hole
-    //     ,           ` ` |    |                 
-    //      ,           `  |'   |                 
-    //       ,           ` ├────┘                 
-    //         ,          `|  .'                 
+    //         , '         | ' ,                       
+    //       ,             ├────┐                 
+    //      ,              |    |                 
+    //     ,               |    |                 
+    //     , Main hull     |  Front plate and dribbler hole
+    //     ,               |    |                 
+    //      ,              |    |                 
+    //       ,             ├────┘                 
+    //         ,           |  .'                 
     //           ' - , _  , '   Left pillar                     
     //    
 
