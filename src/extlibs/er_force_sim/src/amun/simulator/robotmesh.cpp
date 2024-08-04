@@ -1,3 +1,23 @@
+/***************************************************************************
+ *   Copyright 2015 Michael Eischer, Philipp Nordhus                       *
+ *   Robotics Erlangen e.V.                                                *
+ *   http://www.robotics-erlangen.de/                                      *
+ *   info@robotics-erlangen.de                                             *
+ *                                                                         *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation, either version 3 of the License, or     *
+ *   any later version.                                                    *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
+ ***************************************************************************/
+
 #include "robotmesh.h"
 
 #include <cmath>
@@ -34,6 +54,26 @@ camun::simulator::createRobotMesh(float radius, float height, float angle,
     static constexpr unsigned int NUM_SEGMENTS_HULL   = 20;
     static constexpr unsigned int NUM_SEGMENTS_PILLAR = 5;
 
+    // Diagram of robot (top view)
+    //    
+    //                 ┌────────┬────frontPlatePos                                                                 
+    //                 ┌───┬─────────holePlatePos                                                                 
+    //                     ┌────┬────holeDepth                                                                 
+    //             , - ~ - ,                        
+    //         , '        .  ' ,                     
+    //       ,           .     .| ─┐                 
+    //      ,           .   .   |  │                 
+    //     ,           .\.      |  │                 
+    //     ,           + )─┐    |  ├─frontPlateLength
+    //     ,           `/` │    |  │                 
+    //      ,           │  │'   |  │                 
+    //       ,          │` │   .|  │                 
+    //         ,        │ `│  , ' ─┘                 
+    //           ' - , _│, │'                        
+    //                  │  └─angle                                             
+    //                  └────angleDiff
+    //                       outerAngle = angle + angleDiff    
+    //    
     const float frontPlateLength = std::sin(angle / 2.0) * radius;
     const float frontPlatePos    = radius * std::cos(angle / 2.0);
     const float holePlatePos     = frontPlatePos - holeDepth;
@@ -45,10 +85,25 @@ camun::simulator::createRobotMesh(float radius, float height, float angle,
 
     std::vector<std::vector<std::tuple<float, float, float>>> meshParts;
 
+    // Parts of robot (top view)
+    //    
+    //             , - ~ - ,    Right pillar                    
+    //         , '        .| ' ,                       
+    //       ,           . ├────┐                 
+    //      ,           .  |.   |                 
+    //     ,           . . |    |                 
+    //     , Main hull +   |  Front plate and dribbler hole
+    //     ,           ` ` |    |                 
+    //      ,           `  |'   |                 
+    //       ,           ` ├────┘                 
+    //         ,          `|  .'                 
+    //           ' - , _  , '   Left pillar                     
+    //    
+
     // Main hull
     meshParts.push_back(generateRobotShellPoints(NUM_SEGMENTS_HULL, outerAngleStart,
                                                  outerAngleStop, radius, height));
-
+     
     // Left pillar
     auto leftPillar = generateRobotShellPoints(
         NUM_SEGMENTS_PILLAR, outerAngleStop, outerAngleStop + angleDiff, radius, height);

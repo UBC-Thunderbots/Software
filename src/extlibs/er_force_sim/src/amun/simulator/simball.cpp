@@ -121,7 +121,6 @@ void SimBall::begin(bool robot_collision)
                 m_set_transition_speed = false;
                 break;
             case ROLLING:
-
                 // just apply rolling friction, normal friction is somehow handled by
                 // bullet
                 const btScalar rollingDeceleration =
@@ -138,42 +137,27 @@ void SimBall::begin(bool robot_collision)
         }
     }
 
-    bool moveCommand           = false;
-    auto sendPartialCoordError = [this](const char *msg) {
-        std::cerr << "Partial coordinates are not implemented yet" << msg << std::endl;
-    };
-    if (m_move.has_x())
+    if (m_move.has_x() != m_move.has_y())
     {
-        if (!m_move.has_y())
-        {
-            sendPartialCoordError(": position ball");
-            return;
-        }
-        moveCommand = true;
-    }
-    else if (m_move.has_y() || m_move.has_z())
-    {
-        sendPartialCoordError(": position ball (not x)");
+        std::cerr << "Partial coordinates are not implemented yet: ball position"
+                  << std::endl;
         return;
     }
 
-    if (m_move.has_vx())
+    if (m_move.has_vx() != m_move.has_vy())
     {
-        if (!m_move.has_vy())
-        {
-            sendPartialCoordError(": velocity ball");
-            return;
-        }
-        if (m_move.by_force() && (m_move.vx() != 0 || m_move.vy() != 0 ||
-                                  (m_move.has_vz() && m_move.vz() != 0)))
-        {
-            std::cerr << "Velocities != 0 and by_force are incompatible" << std::endl;
-            return;
-        }
-        moveCommand = true;
+        std::cerr << "Partial coordinates are not implemented yet: ball velocity"
+                  << std::endl;
+        return;
     }
 
-    if (moveCommand)
+    if (m_move.by_force() && (m_move.vx() != 0 || m_move.vy() != 0 || m_move.vz() != 0))
+    {
+        std::cerr << "Velocities != 0 and by_force are incompatible" << std::endl;
+        return;
+    }
+
+    if (m_move.has_x() || m_move.has_vx())
     {
         if (m_move.by_force())
         {
@@ -315,7 +299,7 @@ static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulatorBal
     return static_cast<float>(cameraHitCounter) / static_cast<float>(maxHits);
 }
 
-bool SimBall::update(SSLProto::SSL_DetectionBall& ball, float stddev, float stddevArea,
+bool SimBall::update(SSLProto::SSL_DetectionBall &ball, float stddev, float stddevArea,
                      const btVector3 &cameraPosition, bool enableInvisibleBall,
                      float visibilityThreshold, btVector3 positionOffset)
 {
@@ -327,7 +311,7 @@ bool SimBall::update(SSLProto::SSL_DetectionBall& ball, float stddev, float stdd
                         enableInvisibleBall, visibilityThreshold, positionOffset);
 }
 
-bool SimBall::addDetection(SSLProto::SSL_DetectionBall& ball, btVector3 pos, float stddev,
+bool SimBall::addDetection(SSLProto::SSL_DetectionBall &ball, btVector3 pos, float stddev,
                            float stddevArea, const btVector3 &cameraPosition,
                            bool enableInvisibleBall, float visibilityThreshold,
                            btVector3 positionOffset)
