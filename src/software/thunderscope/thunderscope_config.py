@@ -12,7 +12,7 @@ from software.thunderscope.thunderscope_types import (
 import pyqtgraph
 import signal
 import os
-from qt_material import apply_stylesheet
+import qdarktheme
 
 
 class TScopeConfig:
@@ -45,11 +45,7 @@ def initialize_application() -> None:
     app = pyqtgraph.mkQApp("Thunderscope")
 
     # Setup stylesheet
-    extra = {
-        # Make thunderscope more dense
-        "density_scale": "-2",
-    }
-    apply_stylesheet(app, theme="dark_blue.xml", extra=extra)
+    qdarktheme.setup_theme()
 
 
 def configure_robot_view_fullsystem(

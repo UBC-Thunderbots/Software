@@ -1,10 +1,11 @@
+import qdarktheme
 from pyqtgraph.dockarea.Dock import Dock, DockLabel
 
 
 def updateDockStylePatched(self):
     """Overrides the style of the dock."""
-    border = "#4f5b62"
-    border_width = "2px"
+    border = "#3f4042"
+    border_width = "1px"
     border_radius = "5px"
 
     if self.labelHidden:
@@ -56,15 +57,13 @@ def updateDockStylePatched(self):
 
 def updateDockLabelStylePatched(self):
     """Overrides the style of the label."""
-    r = "2px"
+    r = "5px"
     if self.dim:
-        fg = "#a0a0a0"
-        bg = "#2b303a"
-        border = "#2b303a"
+        fg = "#aaa"
+        bg = "#2f5082"
     else:
         fg = "#fff"
-        bg = "#448aff"
-        border = "#448aff"
+        bg = "#4272b8"
 
     if self.orientation == "vertical":
         self.vStyle = """DockLabel {
@@ -75,18 +74,14 @@ def updateDockLabelStylePatched(self):
             border-bottom-right-radius: 0px;
             border-bottom-left-radius: %s;
             border-width: 0px;
-            border-right: 2px solid %s;
             padding-top: 3px;
             padding-bottom: 3px;
-            font-size: 13px;
-            text-transform: uppercase;
-            font-weight: bold;
+            font-size: 15px;
         }""" % (
             bg,
             fg,
             r,
             r,
-            border,
         )
         self.setStyleSheet(self.vStyle)
     else:
@@ -98,18 +93,14 @@ def updateDockLabelStylePatched(self):
             border-bottom-right-radius: 0px;
             border-bottom-left-radius: 0px;
             border-width: 0px;
-            border-bottom: 2px solid %s;
             padding-left: 13px;
             padding-right: 13px;
-            font-size: 13px;
-            text-transform: uppercase;
-            font-weight: bold;
+            font-size: 15px;
         }""" % (
             bg,
             fg,
             r,
             r,
-            border,
         )
         self.setStyleSheet(self.hStyle)
 
