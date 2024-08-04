@@ -1,4 +1,3 @@
-import qdarktheme
 from pyqtgraph.dockarea.Dock import Dock, DockLabel
 
 
