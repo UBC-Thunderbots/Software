@@ -6,8 +6,6 @@ from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
 
-SIM_TICK_RATE_MS = 16
-
 
 class ProtoUnixIOTypes(Enum):
     """Different keys for Proto Unix IOs used by Thunderscope"""
@@ -17,28 +15,6 @@ class ProtoUnixIOTypes(Enum):
     YELLOW = 3
     DIAGNOSTICS = 4
     CURRENT = 5
-
-
-class TabNames(str, Enum):
-    """Different keys for tabs used in various Thunderscope views"""
-
-    BLUE = "BLUE"
-    YELLOW = "YELLOW"
-    DIAGNOSTICS = "DIAGNOSTICS"
-    GAMECONTROLLER = "GAMECONTROLLER"
-
-    def __str__(self) -> str:
-        return str.__str__(self)
-
-
-class ParamTypes(Enum):
-    """Different types of parameters used by setup methods for Thunderscope widgets"""
-
-    BOOL = 1
-    PROTO_UNIX_IO = 2
-    STRING = 3
-    INT = 4
-    LIST = 5
 
 
 class IndividualRobotMode(IntEnum):
@@ -208,7 +184,9 @@ def is_field_message_empty(field: Field) -> bool:
     return field.field_x_length == 0
 
 
-def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> dict:
+def create_vision_pattern_lookup(
+    color1: QtGui.QColor, color2: QtGui.QColor
+) -> dict[int, tuple[QtGui.QColor, QtGui.QColor, QtGui.QColor, QtGui.QColor]]:
     """There is no pattern to this so we just have to create
     mapping from robot id to the four corners of the vision pattern
 
@@ -221,22 +199,22 @@ def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> 
     :return: the vision pattern lookup made up of the given colors
     """
     return {
-        0: [color1, color1, color2, color1],
-        1: [color1, color2, color2, color1],
-        2: [color2, color2, color2, color1],
-        3: [color2, color1, color2, color1],
-        4: [color1, color1, color1, color2],
-        5: [color1, color2, color1, color2],
-        6: [color2, color2, color1, color2],
-        7: [color2, color1, color1, color2],
-        8: [color2, color2, color2, color2],
-        9: [color1, color1, color1, color1],
-        10: [color1, color1, color2, color2],
-        11: [color2, color2, color1, color1],
-        12: [color1, color2, color2, color2],
-        13: [color1, color2, color1, color1],
-        14: [color2, color1, color2, color2],
-        15: [color2, color1, color1, color1],
+        0: (color1, color1, color2, color1),
+        1: (color1, color2, color2, color1),
+        2: (color2, color2, color2, color1),
+        3: (color2, color1, color2, color1),
+        4: (color1, color1, color1, color2),
+        5: (color1, color2, color1, color2),
+        6: (color2, color2, color1, color2),
+        7: (color2, color1, color1, color2),
+        8: (color2, color2, color2, color2),
+        9: (color1, color1, color1, color1),
+        10: (color1, color1, color2, color2),
+        11: (color2, color2, color1, color1),
+        12: (color1, color2, color2, color2),
+        13: (color1, color2, color1, color1),
+        14: (color2, color1, color2, color2),
+        15: (color2, color1, color1, color1),
     }
 
 

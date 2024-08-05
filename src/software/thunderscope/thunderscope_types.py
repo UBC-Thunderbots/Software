@@ -1,103 +1,85 @@
 from typing import Callable, Optional, Sequence, Any
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
-from software.thunderscope.constants import TabNames
 
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.dockarea import *
 
+from dataclasses import dataclass
+from enum import Enum
 
+
+class WidgetPosition(Enum):
+    """Enum that describes how a widget should be placed relative its anchor"""
+
+    BOTTOM = "bottom"
+    TOP = "top"
+    LEFT = "left"
+    RIGHT = "right"
+    ABOVE = "above"
+    BELOW = "below"
+
+
+@dataclass
 class WidgetStretchData:
     """Data that describes how a widget should be sized"""
 
-    x: Optional[int]  # stretch in x direction
-    y: Optional[int]  # stretch in y direction
+    x: Optional[int] = None
+    """Stretch in x direction"""
 
-    def __init__(self, x: int = None, y: int = None) -> None:
-        self.x = x
-        self.y = y
+    y: Optional[int] = None
+    """Stretch in y direction"""
 
 
+@dataclass
 class TScopeWidget:
     """Data that describes a widget in Thunderscope"""
 
-    name: str  # name of widget (must be unique)
-    widget: Any  # the widget object
-    anchor: Optional[str]  # name of widget to position this relative to
-    position: Optional[str]  # position relative to anchor to position this to
-    stretch: Optional[WidgetStretchData]  # how widget should be sized
-    has_refresh_func: Optional[bool]  # if this widget has a refresh function or not
-    in_window: Optional[bool]  # if this widget should be added in window or not
+    name: str
+    """Name of widget (must be unique)"""
 
-    def __init__(
-        self,
-        name: str,
-        widget: Any,
-        anchor: Optional[str] = None,
-        position: Optional[str] = None,
-        in_window: Optional[bool] = False,
-        stretch: Optional[object] = None,
-        has_refresh_func: Optional[bool] = True,
-    ) -> None:
-        self.name = name
-        self.widget = widget
-        self.anchor = anchor
-        self.position = position
-        self.stretch = stretch
-        self.has_refresh_func = has_refresh_func
-        self.in_window = in_window
+    widget: Any
+    """The widget object"""
+
+    anchor: Optional[str] = None
+    """Name of widget to position this relative to"""
+
+    position: Optional[WidgetPosition] = None
+    """Position relative to anchor to position this to"""
+
+    stretch: Optional[WidgetStretchData] = None
+    """How widget should be sized"""
+
+    has_refresh_func: Optional[bool] = True
+    """If this widget has a refresh function or not"""
+
+    in_window: Optional[bool] = False
+    """If this widget should be added in window or not"""
 
 
 class TScopeTab:
-    """Data that describes a tab in Thunderscope"""
-
-    name: str  # name of tab
-    key: TabNames  # key to identify this tab
-    dock_area: QWidget  # Dock Area for this tab
-
-    def __init__(self, name: str, key: TabNames) -> None:
-        self.name = name
-        self.key = key
-
-    def refresh(self) -> None:
-        pass
-
-
-class TScopeQTTab(TScopeTab):
     """Data that describes a tab with Qt Widgets in Thunderscope"""
-
-    # List of widget data for this tab
-    widgets: Sequence[TScopeWidget]
-
-    # Mapping of widget names to widget objects
-    widgets_map: dict[str, TScopeWidget]
-
-    # Mapping of widget names to dock areas
-    dock_map: dict[str, DockArea]
-
-    # Mapping of widget names to refresh functions
-    refresh_functions: dict[str, Callable[[], None]]
 
     def __init__(
         self,
         name: str,
-        key: TabNames,
         widgets: Sequence[TScopeWidget],
         refresh_counter: Optional[FrameTimeCounter] = None,
     ) -> None:
         """Constructor
 
         :param name: the name of this tab
-        :param key: the key to identify this tab
         :param widgets: a list of widgets that is going to be displayed in the tab
         :param refresh_counter: a FrameTimeCounter to track the time between calls
                                 to the refresh function
         """
-        super().__init__(name, key)
+        self.name = name
         self.widgets = widgets
-        self.refresh_functions = {}
 
-        self.widgets_map = {}
-        self.dock_map = {}
+        # Mapping of widget names to widget objects
+        self.widgets_map: dict[str, TScopeWidget] = {}
+
+        # Mapping of widget names to dock areas
+        self.dock_map: dict[str, DockArea] = {}
 
         # make dock area
         self.dock_area = DockArea()
@@ -119,13 +101,10 @@ class TScopeQTTab(TScopeTab):
 
         :param data: the data describing the widget of type TScopeWidget
         """
-        widget_name = data.name
-        new_widget = data.widget
-
-        self.widgets_map[widget_name] = new_widget
-        new_dock = Dock(widget_name)
-        new_dock.addWidget(new_widget.win if data.in_window else new_widget)
-        self.dock_map[widget_name] = new_dock
+        self.widgets_map[data.name] = data
+        new_dock = Dock(data.name)
+        new_dock.addWidget(data.widget.win if data.in_window else data.widget)
+        self.dock_map[data.name] = new_dock
 
         if data.stretch:
             stretch_data = data.stretch
@@ -135,12 +114,11 @@ class TScopeQTTab(TScopeTab):
                 new_dock.setStretch(x=stretch_data.x)
 
         if data.anchor and data.position:
-            self.dock_area.addDock(new_dock, data.position, self.dock_map[data.anchor])
+            self.dock_area.addDock(
+                new_dock, data.position.value, self.dock_map[data.anchor]
+            )
         else:
             self.dock_area.addDock(new_dock)
-
-        if data.has_refresh_func:
-            self.refresh_functions[widget_name] = new_widget.refresh
 
     def refresh(self) -> None:
         """Refreshes all the widgets belonging to this tab, and not refresh widget that are not visible."""
@@ -149,14 +127,10 @@ class TScopeQTTab(TScopeTab):
 
         self.refresh_counter.add_one_datapoint()
 
-        for widget_name in self.refresh_functions:
+        for widget_data in self.widgets_map.values():
             # only refresh widget inside the dock that are visible
-            widget = self.widgets_map[widget_name]
-            if not widget.isVisible():
-                continue
-
-            refresh_func = self.refresh_functions[widget_name]
-            refresh_func()
+            if widget_data.has_refresh_func and widget_data.widget.isVisible():
+                widget_data.widget.refresh()
 
     def find_widget(self, widget_name: str) -> Optional[TScopeWidget]:
         """Finds and returns the widget object corresponding to the given name, if exists
@@ -164,7 +138,5 @@ class TScopeQTTab(TScopeTab):
 
         :param widget_name: the name of the widget
         """
-        if widget_name in self.widgets_map:
-            return self.widgets_map[widget_name]
-        else:
-            return None
+        widget_data = self.widgets_map.get(widget_name, None)
+        return widget_data.widget if widget_data else None

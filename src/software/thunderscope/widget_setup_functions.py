@@ -39,7 +39,7 @@ from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
-    FullSystemConnectWidget,
+    DiagnosticsInputWidget,
 )
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
@@ -286,7 +286,6 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     """
     referee_info = RefereeInfoWidget()
     proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
-
     return referee_info
 
 
@@ -332,7 +331,6 @@ def setup_estop_view(proto_unix_io) -> EstopView:
     :return: The estop widget
     """
     estop_view = EstopView()
-
     proto_unix_io.register_observer(EstopState, estop_view.estop_state_buffer)
     return estop_view
 
@@ -347,13 +345,12 @@ def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
     return chicker_widget
 
 
-def setup_diagnostics_input_widget() -> FullSystemConnectWidget:
+def setup_diagnostics_input_widget() -> DiagnosticsInputWidget:
     """Sets up the diagnostics input widget
 
     :return: The diagnostics input widget
     """
-    diagnostics_input_widget = FullSystemConnectWidget()
-
+    diagnostics_input_widget = DiagnosticsInputWidget()
     return diagnostics_input_widget
 
 
@@ -366,5 +363,4 @@ def setup_drive_and_dribbler_widget(
     :return: The drive and dribbler widget
     """
     drive_and_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
-
     return drive_and_dribbler_widget

@@ -6,14 +6,15 @@ from enum import IntEnum
 
 
 class ControlMode(IntEnum):
-    """Enum for the 2 modes of control (Manual and XBox)"""
+    """Enum for the 2 modes of control (Manual and Xbox)"""
 
     DIAGNOSTICS = 0
     XBOX = 1
 
 
-class FullSystemConnectWidget(QWidget):
-    """Class to allow the user to switch between Manual, XBox, and Fullsystem control through Thunderscope UI
+class DiagnosticsInputWidget(QWidget):
+    """Class to allow the user to switch between Manual, Xbox, and Fullsystem
+    control through Thunderscope UI
 
     Disables Manual controls in the other two modes
     """
@@ -22,13 +23,15 @@ class FullSystemConnectWidget(QWidget):
     toggle_controls_signal = pyqtSignal(bool)
 
     def __init__(self) -> None:
-        """Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control"""
-        super(FullSystemConnectWidget, self).__init__()
+        """Initialises a new DiagnosticsInputWidget to allow switching between
+        Diagnostics and Xbox control
+        """
+        super().__init__()
 
         vbox_layout = QVBoxLayout()
         self.connect_options_group = QButtonGroup()
 
-        radio_button_names = ["Diagnostics Control", "XBox Control"]
+        radio_button_names = ["Diagnostics Control", "Xbox Control"]
 
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
             radio_button_names, self.connect_options_group
