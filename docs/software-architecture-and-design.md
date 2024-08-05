@@ -11,7 +11,6 @@
     * [Ball](#ball)
     * [Field](#field)
     * [GameState](#gamestate)
-  * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
 * [Protobuf](#protobuf)
   * [Important Protobuf Messages](#important-protobuf-messages)
@@ -61,7 +60,6 @@
     * [3D Visualizer](#3d-visualizer)
       * [Layers](#layers)
   * [Simulator](#simulator)
-    * [Standalone Simulator](#standalone-simulator)
     * [Simulated Tests](#simulated-tests)
       * [Simulated Tests Architecture](#simulated-tests-architecture)
         * [Validation Functions](#validation-functions)
@@ -101,18 +99,10 @@ The Field class represents the state of the physical field being played on, whic
 ### GameState
 These represent the current state of the game as dictated by the Gamecontroller. These provide functions like `isPlaying()`, `isHalted()` which tell the rest of the system what game state we are in, and make decisions accordingly. We need to obey the rules!
 
-## Intents
-An `Intent` represents a simple thing the [AI](#ai) wants (or intends for) a robot to do, but is at a level that requires knowledge of the state of the game and the field (e.g. Referee state, location of the other robots). It does not represent or include _how_ these things are achieved. Some examples are:
-* Moving to a position without colliding with anything on its way and while following all rules
-* Pivoting around a point
-* Kicking the ball at a certain direction or at a target
-
-There are two types of `Intent`s: `DirectPrimitiveIntent`s and `NavigatingIntent`s. `DirectPrimitiveIntent`s directly represent the [Primitives](#primitives) that the AI is trying to send to the robots. `NavigatingIntent`s are intents that require moving while avoiding obstacles, so they contain extra parameters to help with [Navigation](#navigation).
-
 ## Dynamic Parameters
 `Dynamic Parameters` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! Using `Dynamic Parameters` saves us from having to stop the [AI](#ai), change a constant, recompile the code, and restart the [AI](#ai).
 
-Additionally, we can use `Dynamic Parameters` to communicate between [Thunderscope](#thunderscope) and the rest of our system. [Thunderscope](#thunderscope) can change the values of `DynamicParameters` when buttons or menu items are clicked, and these new values will be picked up by the rest of the code. For example, we can define a `Dynamic Parameter` called `run_ai` that is a boolean value. Then when the `Start [AI](#ai)` button is clicked in [Thunderscope](#thunderscope), it sets the value of `run_ai` to `true`. In the "main loop" for the [AI](#ai), it will check if the value of `run_ai` is true before running its logic.
+Additionally, we can use `Dynamic Parameters` to communicate between [Thunderscope](#thunderscope) and the rest of our system. [Thunderscope](#thunderscope) can change the values of `DynamicParameters` when buttons or menu items are clicked, and these new values will be picked up by the rest of the code. For example, we can define a `Dynamic Parameter` called `run_ai` that is a boolean value. Then when the Start AI button is clicked in [Thunderscope](#thunderscope), it sets the value of `run_ai` to `true`. In the "main loop" for the [AI](#ai), it will check if the value of `run_ai` is true before running its logic.
 
 Here's a slightly more relevant example of how we used `Dynamic Parameters` during a game in RoboCup 2019. We had a parameter called `enemy_team_can_pass`, which indicates whether or not we think the enemy team can pass. This parameter was used in several places in our defensive logic, and specifically affected how we would shadow enemy robots when we were defending them. If we assumed the enemy team could pass, we would shadow between the robots and the ball to block any passes, otherwise we would shadow between the enemy robot and our net to block shots. During the start of a game, we had `enemy_team_can_pass` set to `false` but the enemy did start to attempt some passes during the game. However, we didn't want to use one of our timeouts to change the value. Luckily later during the half, the enemy team took a time out. Because `Dynamic Parameters` can be changed quick without stopping [AI](#ai), we were quickly able to change `enemy_team_can_pass` to `true` while the enemy team took their timeout. This made our defence much better against that team and didn't take so much time that we had to burn our own timeout. Altogether this is an example of how we use `Dynamic Parameters` to control our [AI](#ai) and other parts of the code.
 
@@ -122,7 +112,7 @@ It is worth noting that constants are still useful, and should still be used whe
 # Protobuf
 [Protobufs or protocol buffers](https://protobuf.dev/) are used to pass messages between components in our system.
 After building using Bazel, the `.proto` files are generated into `.pb.h` and `.pb.cc` files, which are found in `bazel-out/k8-fastbuild/bin/proto`.
-To include these files in our code, we simply include `proto/<protobuf_filename>.pb.h`
+To include these files in our code, we simply include `proto/<protobuf_filename>.pb.h`.
 
 ## Important Protobuf Messages
 These are [protobuf](https://developers.google.com/protocol-buffers/docs/cpptutorial) messages that we define and that are important for understanding how the [AI](#ai) works.
@@ -142,22 +132,10 @@ The `TbotsProto::RobotStatus` protobuf message contains information about the st
 * The capacitor charge on the robot
 * The temperature of the dribbler motor
 
-Information about the robot status is communicated and stored as `RobotStatus` protobuf messages. [Thunderscope](#thunderscope) displays warnings from incoming `RobotStatus`es so we can take appropriate action. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
+Information about the robot status is communicated and stored as `RobotStatus` protobuf messages. [Thunderscope](#thunderscope) displays warnings from incoming `RobotStatus`es so we can take appropriate action. For example, during a game we may get a "low battery warning" for a certain robot, so we know to substitute it and replace the battery before it dies on the field.
 
 # Design Patterns
 Below are the main design patterns we use in our code, and what they are used for.
-
-## Abstract Classes and Inheritance
-Abstract classes let us define interfaces for various components of our code. Then we can implement different objects that obey the interface, and use them interchangeably, with the guarantee that as long as they follow the same interface we can use them in the same way.
-
-Read https://www.geeksforgeeks.org/inheritance-in-c/ for more information.
-
-Examples of this can be found in many places, including:
-* [Plays](#plays)
-* [Tactics](#tactics)
-* [Intents](#intents)
-* Different implementations of the [Backend](#backend)
-
 
 ## Singleton Pattern
 The Singleton pattern is useful for having a single, global instance of an object that can be accessed from anywhere. Though it's generally considered an anti-pattern (aka _bad_), it is useful in specific scenarios.
@@ -211,19 +189,17 @@ Read https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern for an intr
 We use the pub-sub pattern to facilitate [inter-process communication](#inter-process-communication) in our system. Through a class called [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py), components can subscribe to receive certain [Protobuf](#protobuf) message types sent out by other processes or system components.
 
 ## C++ Templating
-While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
-
-We use templating in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-pattern), and our `Gradient Descent` optimizer.
-
+While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. We use templating throughout around our codebase. `learncpp.com` has a good explanation on [function templates](https://www.learncpp.com/cpp-tutorial/function-templates/) and [class templates](https://www.learncpp.com/cpp-tutorial/class-templates/).
 
 # Coroutines
+
 ## What Are Coroutines?
 Coroutines are a general control structure where the flow control is cooperatively passed between two different routines without returning, by allowing execution to be suspended and resumed. This is very similar to the `yield` statement and generators in `Python`.
 
 Rather than using the `return` keyword to return data, coroutines use the `yield` keyword. The main difference is that when `return` is encountered, the data is returned and the function terminates. If the function is called again, it starts back from the beginning. On the other hand, when `yield` is encountered some data is returned, but the state of the function / coroutine is saved and the function does not terminate. This means that when the function is called again, execution resumes immediately after the `yield` statement that previously returned the data, with all the previous context (variables, etc) as if the function never stopped running. This is the "suspend and resume" functionality of coroutines.
 
 See the following C++ pseudocode for an example. This coroutine function computes and returns the fibonacci sequence.
-```
+```cpp
 int fib(Coroutine::push_type& yield) {
     int f1 = 1;
     int f2 = 0;
@@ -266,6 +242,10 @@ We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs
 
 
 ## How Do We Use Coroutines?
+
+> [!IMPORTANT]  
+> We are currently in the process of moving away from using coroutines and transitioning to using [finite-state machines](#finite-state-machines) for all our STP logic.
+
 We use Coroutines to write our [strategy logic](#strategy). The "pause and resume" functionality of Coroutines makes it much easier to write [Plays](#plays).
 
 Specifically, we use Coroutines as a way to break down our strategy into "stages". Once a "stage" completes we generally don't want to re-evaluate it, and would rather commit to a decision and move on. Coroutines makes it much easier to write "stages" of strategy without requiring complex state machine logic to check what stage we are in, and it's easier for developers to see what the intended order of operations is (eg. "Line up to take the shot" -> "shoot").
@@ -273,15 +253,15 @@ Specifically, we use Coroutines as a way to break down our strategy into "stages
 In the past, we had issues with our gameplay logic "committing" to decisions if we were near certain edge cases. This caused robots to behave oddly, and sometimes get significantly slowed down in "analysis paralysis". Coroutines solve this problem by allowing us to write "stages" that execute top-to-bottom in a function, and once we make a decision we commit to it and move on to the next stage.
 
 Here's a more specific example. In this example we are going to pretend to write a [Tactic](#tactic) that will pass the ball.
-```
+```cpp
 def executeStrategy(IntentCoroutine::push_type& yield, Pass pass) {
     do {
         yield(/* align the robot to make the pass */)
-    }while(current_time < pass.start_time);
+    } while(current_time < pass.start_time);
     
     do {
         yield(/* kick the ball at the pass location */)
-    }while(/* robot has not kicked the ball */)
+    } while(/* robot has not kicked the ball */)
 }
 ```
 We will pretend that this function is getting called 30 times per second to get the most up-to-date gameplay decision.
@@ -308,64 +288,147 @@ A finite state machine (FSM) is a system with a finite number of states with def
 [source](https://www.block-net.de/Programmierung/cpp/fsm/fsm.html)
 
 ## Boost-ext SML Library
-We use the [Boost-Ext SML](https://github.com/boost-ext/sml), short for State Machine Library, to manage our finite state machines. This library defines state machines through a transition table, where a row indicates the transition from one state to another subject to _guards_, _actions_ and _events_. The syntax of a row of the transition table looks like this:
+We use the [Boost-Ext SML](https://github.com/boost-ext/sml), short for State Machine Library, to manage our finite state machines. This library defines state machines through a transition table, where a row indicates the transition from one state to another state using _guards_, _actions_ and _events_. The syntax of a row of the transition table looks like this:
 ```
 src_state + event [guard] / action = dest_state
 ```
-where the src\_state transitions to the dest\_state, while performing the _action_, only if the _event_ is processed and the _guard_ is true. Events are structs of new information that FSMs receive, so _guards_ and _actions_ take events as arguments. _Guards_ must return a boolean and _actions_ must return void. An asterix (\*) at the start of a row indicates that the state is an initial state. The rows of the transition table are processed in order and the first row to match is executed.
+where the `src_state` transitions to the `dest_state`, while performing the `action`, only if the `event` is processed and the `guard` is true. _Events_ are structs of new information that FSMs receive, and _guards_ and _actions_ are functions that take events as arguments. _Guards_ must return a boolean and _actions_ must return void. An asterix (\*) at the start of a row indicates that the state is an initial state. The rows of the transition table are processed in order from top to bottom and the first row to match is executed.
 
-The library also supports hierarchical FSMs. Sub-FSMs are treated as states where an unconditional transition occurs when the sub-FSM is in the terminal state, X.
+The library also supports hierarchical FSMs. Sub-FSMs are treated as states where an unconditional transition occurs when the sub-FSM is in the terminal state, `X`.
+```cpp
+const auto SubFSM_S = boost::sml::state<SubFSM>;
+
+// ...in the transition table...
+SubFSM_S = next_state // Transitions to next_state only when the SubFSM is in the terminal state, X
 ```
-/* omitted rows of transition table */
-SubFSM = next_state, // Transitions to next_state only when the SubFSM is in the terminal state, X
-/* omitted rows of transition table */
-```
-In order to update a subFSM with an event, we need to do the following:
-```
+In order to update a sub-FSM with an event, we need to do the following:
+```cpp
 const auto update_sub_fsm_action =
-    [](auto event, back::process<TypeOfSubFSMEvent> processEvent) {
-        TypeOfSubFSMEvent sub_fsm_event = // initialize the subFSM event
+    [](auto event, boost::sml::back::process<TypeOfSubFSMEvent> processEvent) {
+        TypeOfSubFSMEvent sub_fsm_event = // initialize the sub-FSM event
         processEvent(sub_fsm_event);
     };
+
+// ...in the transition table...
+SubFSM_S + event / update_sub_fsm_action
+// When the parent FSM is updated with an event and it is
+// in the SubFSM_S state, the update_sub_fsm_action will be
+// invoked in the parent FSM. In turn, the update_sub_fsm_action 
+// will update the SubFSM with an event by calling processEvent
 ```
 The convenience of this syntax comes at the cost of hard to read error messages due to the functor and templating system.
 
 ## How Do We Use SML?
-We use SML to manage our [Tactics](#tactic). Each state represents a stage in the tactic where the robot should be doing a particular action or looking for certain conditions to be true. An example of this is the MoveFSM. While the robot is not at the destination and oriented correctly, the FSM is in the move state. Once the robot reaches its destination, it enters the terminal state, _X_, to indicate that it's done. SML also allows us to easily reuse FSMs in other tactics. For example, if a shadowing tactic needs to move to a particular destination with a certain orientation, then it can use the MoveFSM as a sub-FSM state.
+We use SML to implement our [Plays](#plays) and [Tactics](#tactic). Each state represents a stage in the play/tactic where the team/robot should be doing a particular thing or looking for certain conditions to be true. An example of this is the `MoveFSM`. While the robot is not at the destination and oriented correctly, the FSM is in the move state. Once the robot reaches its destination, it enters the terminal state, `X`, to indicate that it's done. SML also allows us to easily reuse FSMs in other tactics. For example, if a shadowing tactic needs to move to a particular destination with a certain orientation, then it can use the MoveFSM as a sub-FSM state.
+
+If you're having trouble understanding the SML syntax, take a look at [`docs/fsm-diagrams.md`](./fsm-diagrams.md). It contains automatically generated diagrams of the FSMs in our codebase, which can help with visualizing the FSM control flow. 
 
 ## SML Best Practices
-Boost-ext SML is a library that supports complex functionality with similarly complex syntax and semantics. If complex syntax is misused, the complicated error messages can make development difficult. Thus, we need to carefully choose a standardized subset of the library's syntax to implement our functionality while maintaining high readability.
-* Only use one _event_ per FSM: In gameplay, we react to changes in the [World](#world), so since there's only one source of new information, we should only need one _event_
-* Only one _guard_ or _action_ per transition: For readability of the transition table, we should only have one _guard_ or _action_ per transition. This can always be achieved by defining a _guard_ or _action_ outside of the transition table that checks multiple conditions or performs multiple actions if that's required.
-* Define _guards_ and _actions_ outside of the transition table: The names of _guards_ and _actions_ should be succinct so that transition tables rows fit on one line and readers can easily understand the FSM from the transition table. In other words, no lambdas/anonymous functions in transition tables.
-* States should be defined as classes in the FSM struct so that users of the FSM can check what state the FSM is in: 
-```
-    // inside the struct
-    class KickState;
-    // inside the operator()()
-    const auto kick_s = state<KickState>;
-    // allows for this syntax
-    fsm.is(boost::sml::state<MyFSM::MyState>)
-```
-* Avoid entry and exit conditions: Everything that can be implemented with entry and exit conditions can easily be implemented as actions, so this rule reduces source of confusion for the reader
+Boost-ext SML is a library that supports complex functionality with similarly complex syntax and semantics. If complex syntax is misused, the complicated error messages can make development difficult. Thus, we have carefully chosen a standardized subset of the library's syntax to implement our functionality while maintaining high readability.
+
+* Define _guards_ and _actions_ outside of the transition table: The names of _guards_ and _actions_ should be succinct so that transition tables rows fit on one line and readers can easily understand the FSM from the transition table. In other words, no inserting lambdas/anonymous functions directly in transition tables.
+
+  To aid with this, we have **macros** in [`software/util/sml_fsm/sml_fsm.h`](../src/software/util/sml_fsm/sml_fsm.h) that generate named lambda wrappers around guard and action methods you define in your FSM struct. There are also macros for generating state and events that will be compatible with the SML library. 
+
+  ```cpp
+  struct KickFSM
+  {
+      // Define states inside the FSM struct
+      class KickState;
+
+      // Define an event for this FSM
+      class Update;
+
+      // Define your guards and actions as member functions 
+      bool isBallInDribbler(Update event);
+      void kickBall(Update event);
+
+      auto operator()()
+      {
+          using namespace boost::sml;
+
+          DEFINE_SML_STATE(KickState)
+          // Equivalent to: 
+          // const auto KickState_S = boost::sml::state<KickState>;
+
+          DEFINE_SML_EVENT(Update)
+          // Equivalent to: 
+          // const auto Update_E = boost::sml::event<Update>;
+      
+          DEFINE_SML_GUARD(isBallInDribbler)
+          // Equivalent to:
+          // const auto isBallInDribbler_G = [this](auto event) { return isBallInDribbler(event); };
+          
+          DEFINE_SML_ACTION(kickBall)
+          // Equivalent to:
+          // const auto kickBall_A = [this](auto event) { kickBall(event); };
+
+          // You can use the macro-generated states, events, guards, and actions 
+          // in the transition table
+          return make_transition_table(
+              *KickState_S + Update_E[isBallInDribbler_G] / kickBall_A,
+          );
+      }
+  };
+
+  // We can instantiate this FSM and update it with an event
+  FSM<KickFSM> fsm(KickFSM());
+  fsm.process_event(KickFSM::Update());
+  ```
+  We also have macros for working with sub-FSMs:
+  ```cpp
+  struct KickFSM
+  {
+      class Update;
+
+      // Define an action that will update the sub-FSM
+      void moveToKickOrigin(Update event, 
+          boost::sml::back::process<MoveFSM::Update> processEvent)
+      {
+          // Make sure to call processEvent to update the sub-FSM!
+          processEvent(MoveFSM::Update());
+      }
+
+      auto operator()()
+      {
+          using namespace boost::sml;
+
+          // Declare the sub-FSM as a state
+          DEFINE_SML_STATE(MoveFSM)
+
+          DEFINE_SML_EVENT(Update)
+
+          // Similar to DEFINE_SML_ACTION -- generates moveToKickOrigin_A
+          DEFINE_SML_SUB_FSM_UPDATE_ACTION(moveToKickOrigin)
+
+          return make_transition_table(
+              *MoveFSM_S + Update_E / moveToKickOrigin_A
+          );
+      }
+  };
+
+  // When instantiating an FSM with sub-FSMs, you need to
+  // pass in instances of all the sub-FSMs structs along with the
+  // parent FSM struct into the FSM constructor
+  FSM<KickFSM> fsm(KickFSM(), MoveFSM());
+  ```
+* Avoid entry and exit conditions: Everything that can be implemented with entry and exit conditions can easily be implemented as actions, so this rule reduces source of confusion for the reader.
 * Avoid self transitions, i.e. `src_state + event [guard] / action = src_state`: self transitions call entry and exit conditions, which complicates the FSM. If we want a state to stay in the same state while performing an action, then we should use an internal transition, i.e. `src_state + event [guard] / action`.
-* Avoid orthogonal regions: Multiple FSMs running in parallel is hard to reason about and isn't necessary for implementing single robot behaviour. Thus, only prefix one state with an asterix (\*)
+* Avoid orthogonal regions: Multiple FSMs running in parallel is hard to reason about and isn't necessary for implementing single robot behaviour. Thus, only prefix one state with an asterix (\*) so that there is only one initial state.
 * Use callbacks in _events_ to return information from the FSM: Since the SML library cannot directly return information, we need to return information through callbacks. For example, if we want to return a double from an FSM, we can pass in `std::function<void(double)> callback` as part of the event and then make the _action_ call that function with the value we want returned.
 * When a variable needs to be shared between multiple states or can be initialized upon construction of the FSM, then define a private member and constructor in the FSM struct, and pass that in when constructing the FSM. Here's a code snippet:
-```
-(drive_forward_fsm.h)
-DriveForwardFSM
-{
-   public:
-    DriveForwardFSM(double max_speed): max_speed(max_speed){}
-   private:
-    double max_speed;
-}
-(drive_forward_tactic.h)
-    FSM<DriveForwardFSM> fsm;
-(drive_forward_tactic.cpp: constructor)
-    fsm(DriveForwardFSM(10.0))
-```
+  ```cpp
+  struct DriveForwardFSM
+  {
+    public:
+      DriveForwardFSM(double max_speed): max_speed(max_speed){}
+      // ...
+    private:
+      double max_speed;
+  }
+  
+  FSM<DriveForwardFSM> fsm(DriveForwardFSM(10.0));
+  ```
 
 # Conventions
 Various conventions we use and follow that you need to know.
@@ -404,7 +467,7 @@ At a high-level, our system is split into several independent processes that [co
 
 - The [**Simulator**](#simulator) provides a physics simulation of the [World](#world), enabling testing of our gameplay when we don't have access to a real field. This process is optional and used only for development and testing purposes; in a real match, our system will receive data from [SSL-Vision](#ssl-vision).
 
-- [**Thunderloop**](/docs/robot-software-architecture.md#thunderloop) is responsible for coordinating communication between our [AI](#ai) computer and the motor and power boards in our robots. It is part our robot software architecture, which is documented [here](/docs/robot-software-architecture.md).
+- [**Thunderloop**](/docs/robot-software-architecture.md#thunderloop) is the software that runs onboard our robots. It is responsible for coordinating communication between our [AI](#ai) computer and the motor and power boards in our robots. It is part our robot software architecture, which is documented [here](/docs/robot-software-architecture.md).
 
 # Fullsystem
 
@@ -444,32 +507,35 @@ The `AI` is the part of the [Fullsystem](#fullsystem) where all of our gameplay 
 The two main components of the `AI` are strategy and navigation.
 
 ## Strategy
-We use a framework called `STP (Skills, Tactics, Plays)` to implement our stratgy. The `STP` framework was originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
+We use a framework called `STP (Skills, Tactics, Plays)` to implement our gameplay strategy. The `STP` framework was originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
 
 `STP` is a way of breaking down roles and responsibilities into a simple hierarchy, making it easier to build up more complex strategies from simpler pieces. This is the core of where our strategy is implemented.
-
-When the [AI](#ai) is given new information and asked to make a decision, our `STP` strategy is what is executed first. It takes in a [World](#world) and returns [Intents](#intents).
 
 ###  STP Diagram
 The STP diagram shows how this works. Functions to assign tactics to robots and build motion constraints are passed into a `Play`'s `get` function, which the `Play` uses to generate tactics with assigned robots and with updated motion constraints.
 
 ![STP Diagram](images/STP.svg)
 
-### Tactics
-The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robots' role" on a team. Examples include:
-1. Being a goalie
-2. Being a passer or pass receiver
-3. Being a defender that shadows enemy robots
-4. Being a defender that tries to steal the ball from enemies
+### Skills
+The `S` in `STP` stands for `Skills`. A `Skill` represents a lower-level behaviour that a robot can execute. Examples include:
 
-They can also represent lower level behaviours, such as
 1. Moving to a position (without colliding with anything)
 2. Shooting the ball at a target
 3. Intercepting a moving ball
 
-The high level behaviours can use the lower level behaviours in a hierarchical way.
+Skills use [Primitives](#primitives) to implement their behaviour, so that our strategy is decoupled from the [Navigator](#navigation).
 
-Tactics use [Intents](#intents) to implement their behaviour, so that it can decouple strategy from the [Navigator](#navigation).
+### Tactics
+The `T` in `STP` stands for `Tactics`. A `Tactic` represents a single robot's role on a team. Examples include:
+1. Being a goalie
+2. Being an attacker
+3. Being a pass receiver
+4. Being a defender that shadows enemy robots
+5. Being a defender that tries to steal the ball from enemies
+
+Tactics can use Skills in a hierarchical way.
+
+Tactics use [Primitives](#primitives) to implement their behaviour, so that it can decouple strategy from the [Navigator](#navigation).
 
 ### Plays
 The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like Plays in real-life soccer. Examples include:
@@ -507,9 +573,11 @@ The `Path Planner` is an interface for the responsibility of path planning a sin
 
 # Thunderscope
 
-[`Thunderscope Main`](/src/software/thunderscope/thunderscope_main.py) serves as the main entry point for our entire system. It starts up the [Thunderscope GUI](#thunderscope-gui) and other processes, such as a [Fullsystem](#fullsystem) for each [AI](#ai) team.
+[`thunderscope_main.py`](/src/software/thunderscope/thunderscope_main.py) serves as the main entry point for our entire system. It starts up the [Thunderscope GUI](#thunderscope-gui) and other processes, such as a [Fullsystem](#fullsystem) for each [AI](#ai) team.
 
 ## Thunderscope GUI
+
+![Thunderscope GUI](images/thunderscope.png)
 
 [Thunderscope](#thunderscope) is our main visualizer of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and it is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
@@ -537,18 +605,15 @@ We organize our graphics into "layers" so that we can toggle the visibility of d
 A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayer`s could also be nested within one another. 
 
 # Simulator
-The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:
+Our simulator is what we use for physics simulation to do testing when we don't have access to real field. The simulator is a standalone application that simulates the following components' functionalities:
 * [SSL-Vision](#ssl-vision) by publishing new vision data
 * the robots by accepting new [Primitives](#primitives)
 
-Using the current state of the simulated world, the `Simulator` simulates the new [Primitives](#primitives) over some time step and publishes new ssl vision data based on the updated simulated world. The `Simulator` is designed to be "perfect", which means that
-* the vision data it publishes exactly reflects the state of the simulated world
-* the simulation perfectly reflects our best understanding of the physics (e.g. friction) with no randomness.
+Using the current state of the simulated world, the simulator simulates the new [Primitives](#primitives) over some time step and publishes new SSL vision data based on the updated simulated world. Since the simulator interfaces with the our software over the network, it is essentially indistinguishible from robots receiving [Primitives](#primitives) and an [SSL-Vision](#ssl-vision) client publishing data over the network.
 
-The `Simulator` uses `Box2D`, which provides 2D physics simulation for free. While this simplifies the simulator greatly, it means that we manually implement the physics for "3D effects", such as dribbling and chipping.
+The simulation can also be configured with "realism" parameters that control the amount of noise added to vision detections, simulate missed vision detections and packet loss, and add artificial vision/processing delay, all with some degree of randomness. 
 
-## Standalone Simulator
-The `Standalone Simulator` is a wrapper around the `Simulator` so that we can run it as a standlone application that publishes and receives data over the network. The `Standalone Simulator` is designed to interface with the [WifiBackend](#backend) over the network, and so it is essentially indistinguishible from robots receiving [Primitives](#primitives) and an [SSL-Vision](#ssl-vision) client publishing data over the network. The `Standalone Simulator` also has a [GUI](#gui) that provides user-friendly features, such as moving the ball around.
+The code for our simulator is adapted from the [ER Force Simulator](https://github.com/robotics-erlangen/framework?tab=readme-ov-file#simulator-cli) built by another team in our league. The simulator uses the real-time [Bullet physics engine](https://github.com/bulletphysics/bullet3), which simulates collision detection and soft/rigid-body dynamics in 3D.
 
 ## Simulated Tests
 
@@ -609,9 +674,9 @@ The data sent between Fullsystem and Thunderscope is serialized using [protobufs
 Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). Protobufs need to be converted to strings in order to log them with <code>g3log</code>. We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
 </details><br>
 
-In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes a variation of the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, clients can register as a subscriber by providing a type of protobuf to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming those protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
+In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes a variation of the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, clients can register as a subscriber by providing a type of protobuf to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
 
 # Estop
-The `Estop` allows us to quickly and manually command physical robots to stop what they are doing. It is a physical push button that is connected to the computer via a USB cable. When Thunderscope is launched, a `ThreadedEstopReader` is initialized (within `RobotCommunication`) that is responsible for communicating and reading values from the `Estop` via UART. While running, it will poll the status of the `Estop` to determine whether it is in the `STOP` or `PLAY` state:
+The `Estop` allows us to quickly and manually command physical robots to stop what they are doing. It is a physical push button that is connected to the computer via a USB cable (we also have a `--keyboard-estop` flag you can use when running Thunderscope that lets you use the spacebar as the `Estop`). When Thunderscope is launched, a `ThreadedEstopReader` is initialized (within `RobotCommunication`) that is responsible for communicating and reading values from the `Estop` via UART. While running, it will poll the status of the `Estop` to determine whether it is in the `STOP` or `PLAY` state:
 - If the `Estop` is in the `STOP` state, it overrides the [Primitives](#primitives) sent to the robots with `Stop` primitives. On the robot, `Thunderloop` is responsible for handling the primitive message and ensuring that the power & motor boards receive the correct inputs for the robot to stop. 
 - If the `Estop` is in the `PLAY` state, primitives are communicated as normal.
