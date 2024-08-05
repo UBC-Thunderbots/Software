@@ -117,7 +117,10 @@ class ReplayControls(QWidget):
         self.slider_pressed = True
 
     def __on_replay_slider_value_changed(self, value: int) -> None:
-        """When the slider value is changed, update the label to show the current time."""
+        """When the slider value is changed, update the label to show the current time.
+
+        :param value: time in seconds
+        """
         current_time = time.strftime(
             "%H:%M:%S",
             time.gmtime(self.replay_slider.value() / MILLISECONDS_PER_SECOND),
@@ -143,7 +146,10 @@ class ReplayControls(QWidget):
         )
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
-        """When a key is pressed, pause the player."""
+        """When a key is pressed, pause the player.
+
+        :param event: an event whenever a key is pressed
+        """
         if event.key() == QtCore.Qt.Key.Key_P:
             self.__on_play_pause_clicked()
 

@@ -18,18 +18,15 @@ import qdarktheme
 class TScopeConfig:
     """Data that describes a whole Thunderscope view"""
 
-    # Mapping of protos needed for this view
-    proto_unix_io_map: dict[ProtoUnixIOTypes, ProtoUnixIO]
-
-    # List of tabs for this view
-    tabs: Sequence[TScopeTab]
-
     def __init__(
         self,
         proto_unix_io_map: dict[ProtoUnixIOTypes, ProtoUnixIO],
         tabs: Sequence[TScopeTab],
     ) -> None:
+        # Mapping of protos needed for this view
         self.proto_unix_io_map = proto_unix_io_map
+
+        # List of tabs for this view
         self.tabs = tabs
 
 
