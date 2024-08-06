@@ -25,8 +25,6 @@ from software.thunderscope.binary_context_managers.game_controller import Gameco
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
 
-NUM_ROBOTS = DIV_B_NUM_ROBOTS
-
 ###########################################################################
 #                         Thunderscope Main                               #
 ###########################################################################
@@ -414,7 +412,7 @@ if __name__ == "__main__":
             """
             sync_simulation(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
-                0 if args.empty else NUM_ROBOTS,
+                0 if args.empty else DIV_B_NUM_ROBOTS,
             )
 
             if args.ci_mode:

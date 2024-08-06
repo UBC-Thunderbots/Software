@@ -3,6 +3,7 @@ from software.thunderscope.widget_setup_functions import *
 from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from typing import Sequence
+from dataclasses import dataclass
 from software.thunderscope.thunderscope_types import (
     TScopeTab,
     TScopeWidget,
@@ -15,19 +16,15 @@ import os
 import qdarktheme
 
 
+@dataclass
 class TScopeConfig:
     """Data that describes a whole Thunderscope view"""
 
-    def __init__(
-        self,
-        proto_unix_io_map: dict[ProtoUnixIOTypes, ProtoUnixIO],
-        tabs: Sequence[TScopeTab],
-    ) -> None:
-        # Mapping of protos needed for this view
-        self.proto_unix_io_map = proto_unix_io_map
+    proto_unix_io_map: dict[ProtoUnixIOTypes, ProtoUnixIO]
+    """Mapping of protos needed for this view"""
 
-        # List of tabs for this view
-        self.tabs = tabs
+    tabs: Sequence[TScopeTab]
+    """List of tabs for this view"""
 
 
 def initialize_application() -> None:

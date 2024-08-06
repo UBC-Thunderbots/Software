@@ -43,7 +43,7 @@ def updateDockStylePatched(self):
 
 
 def updateDockLabelStylePatched(self):
-    """Overrides the style of the label."""
+    """Overrides the style of the dock label."""
     r = "5px"
     if self.dim:
         fg = "#aaa"
