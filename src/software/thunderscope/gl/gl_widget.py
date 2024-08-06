@@ -348,6 +348,7 @@ class GLWidget(QWidget):
 
         :param name: the name displayed on the checkbox
         :param parent: the checkbox's parent
+        :param checked: whether the checkbox is checked or not
         :return: the checkbox and associated action
         """
         # Not using a checkable QAction in order to prevent menu from closing

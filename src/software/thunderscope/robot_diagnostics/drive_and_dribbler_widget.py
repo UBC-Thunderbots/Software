@@ -107,7 +107,7 @@ class DriveAndDribblerWidget(QWidget):
             self.angular_velocity_slider, self.angular_velocity_label, self.value_change
         )
 
-        self.stop_and_reset_direct = common_widgets.create_push_button("Stop and Reset")
+        self.stop_and_reset_direct = QPushButton("Stop and Reset")
         self.stop_and_reset_direct.clicked.connect(self.reset_direct_sliders)
 
         dbox.addLayout(x_layout)
@@ -148,9 +148,7 @@ class DriveAndDribblerWidget(QWidget):
             self.value_change,
         )
 
-        self.stop_and_reset_dribbler = common_widgets.create_push_button(
-            "Stop and Reset"
-        )
+        self.stop_and_reset_dribbler = QPushButton("Stop and Reset")
         self.stop_and_reset_dribbler.clicked.connect(self.reset_dribbler_slider)
 
         dbox.addLayout(dribbler_layout)

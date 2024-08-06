@@ -88,7 +88,7 @@ class ColorQLabel(QLabel):
     def set_float_val(self, val: float) -> None:
         """Sets the current value of the label to the given float value
 
-        :param val:  the value to
+        :param val: the new float value
         """
         self.setText(f"{self.label_text}{val:02d}")
         self.__update_background_color(val)
@@ -346,17 +346,6 @@ def create_float_slider(text, decimals, min_val, max_val, tick_spacing):
     slider = FloatSlider(decimals, Qt.Orientation.Horizontal)
 
     return create_slider_abs(slider, text, min_val, max_val, tick_spacing)
-
-
-def create_push_button(title):
-    """Create a push button
-
-    :param title: the name of the button
-    """
-    push_button = QPushButton(title)
-    push_button.setFixedWidth(150)
-
-    return push_button
 
 
 def set_table_data(
