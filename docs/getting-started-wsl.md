@@ -2,29 +2,28 @@
 
 ## Table of Contents
 
-* [Table Of Contents](#table-of-contents)
+* [Table of Contents](#table-of-contents)
 * [Introduction](#introduction)
-* [WSLg Setup (Windows 11 - Recommended)](#wslg-setup-(windows-11---recommended))
-* [WSL2 Setup (windows 10)](#wsl2-setup-(windows-10))
+* [WSLg Setup (Windows 11/10 - Recommended)](#wslg-setup-windows-1110---recommended)
+* [WSL2 Setup (Windows 10)](#wsl2-setup-windows-10)
     * [X Server Setup](#x-server-setup)
-
+* [Networking Issues](#networking-issues)
+* [USB Issues](#usb-issues)
 
 ## Introduction
 
 Windows has a Windows Subsystem for Linux component that can be used to develop and run code for Linux on Windows. WSL1 was a Windows component that implemented Linux kernel interfaces, and didn't work great with Thunderbots software. WSL2 runs a full-fledged Linux kernel in a VM, and works great with Thunderbots software with the exception that we need to use software rendering instead of GPU-accelerated rendering for our AI. WSLg is WSL2 but with built-in support for running GUI applications (e.g. Thunderscope).
 
 > [!WARNING]  
-> **Support for WSL is experimental. Because we use software rendering, the experience will also be degraded on computers with weak or old CPUs.**
->
-> **Note that this will not work with legacy robots. Due to the lack of USB support in WSL2, we are unable to use the USB dongle used to communicate with them.**
+> **Support for WSL is experimental. Performance will be degraded, features may not work properly, and the developer experience will be worse overall.**
 
-## WSLg Setup (Windows 11 - Recommended)
-1. Installing WSLg is more straight forward than WSL2. For up to date documentation, please follow the [official documentation for setting up WSLg](https://github.com/microsoft/wslg#installing-wslg). 
+## WSLg Setup (Windows 11/10 - Recommended)
+1. Installing WSLg is more straight forward than WSL2 and is the recommended way to run Linux GUI applications in Windows. For up to date documentation, please follow the [official documentation for setting up WSLg](https://github.com/microsoft/wslg#installing-wslg). 
 2. Once you have completed all of the above, complete the [Software Setup](./getting-started.md).
 
 
 ## WSL2 Setup (Windows 10)
-If you are not using Windows 11 and would prefer not to upgrade, you can follow the following steps. Note that this setup is more complex than the [WSLg](#wslg-setup-(windows-11---recommended)) setup as it does not support GUI applications out of the box.
+If you are not using Windows 11 or the latest version of Windows 10 and would prefer not to upgrade, you can follow the following steps. Note that this setup is more complex than the [WSLg](#wslg-setup-(windows-11---recommended)) setup as it does not support GUI applications out of the box.
 1. You'll need to be on build 19041 or later to use WSL2. If you have updated to Windows 10 version 2004 or newer, you will be able to use WSL2. 
 2. When you have ensured that your Windows version supports WSL2, do the following to enable it.
     - Enable WSL by opening an Administrator PowerShell window and running command 
@@ -63,3 +62,26 @@ If you are not using Windows 11 and would prefer not to upgrade, you can follow 
 7. Verify that your system is configured correctly by running `glxgears -info` on the Linux command line. You should see a window pop up with spinning gears and the line `GL_RENDERER   = llvmpipe (LLVM 9.0, 256 bits)` at the top of the output.
 
 Once you have completed all of the above, complete the [Software Setup](./getting-started.md).
+
+## Networking Issues
+
+Networking compatibility with WSL is limited but it can be improved by enabling [mirrored mode](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking). There are still many unresolved issues with mirrored mode enabled (no vision, no robot status, etc.) but robot diagnostics should work and you should be able to control robots on the network.
+
+Create a `.wslconfig` file in your `%UserProfile%` directory (typically your home directory, `cd ~`) and copy the following into the config file:
+
+```
+[wsl2]
+networkingMode = mirrored
+```
+
+This will enable [mirrored mode networking for WSL](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking). This mode “mirrors” the networking interfaces you have on Windows into Linux, which improves networking capabilities and compatibility.
+
+When selecting a network interface to use, choose `eth0` or similar. There probably won’t be a `wlan0` interface since WSL only sees the virtual network interface `eth0`. 
+
+## USB Issues
+
+WSL does not natively support connecting USB devices, which is necessary for some tasks like flashing firmware onto our robots or using a physical e-stop. You will need to install a piece of open-source software called `usbipd-win` to support USB connectivity.
+
+Please follow the [official documentation on installing `usbipd-win`](https://github.com/dorssel/usbipd-win?tab=readme-ov-file#how-to-install).
+
+Note that connected devices are not automatically shared with `usbipd`, so you will have to manually share the device with `usbipd` and attach/detach the device to a `usbipd` client whenever you plug/unplug it (or between reboots). See the [official documentation for details on usage](https://github.com/dorssel/usbipd-win?tab=readme-ov-file#how-to-install).
