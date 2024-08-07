@@ -13,9 +13,10 @@
 
 Windows has a Windows Subsystem for Linux component that can be used to develop and run code for Linux on Windows. WSL1 was a Windows component that implemented Linux kernel interfaces, and didn't work great with Thunderbots software. WSL2 runs a full-fledged Linux kernel in a VM, and works great with Thunderbots software with the exception that we need to use software rendering instead of GPU-accelerated rendering for our AI. WSLg is WSL2 but with built-in support for running GUI applications (e.g. Thunderscope).
 
-**Support for WSL is experimental. Because we use software rendering, the experience will also be degraded on computers with weak or old CPUs.**
-
-**Note that this will not work with legacy robots. Due to the lack of USB support in WSL2, we are unable to use the USB dongle used to communicate with them.**
+> [!WARNING]  
+> **Support for WSL is experimental. Because we use software rendering, the experience will also be degraded on computers with weak or old CPUs.**
+>
+> **Note that this will not work with legacy robots. Due to the lack of USB support in WSL2, we are unable to use the USB dongle used to communicate with them.**
 
 ## WSLg Setup (Windows 11 - Recommended)
 1. Installing WSLg is more straight forward than WSL2. For up to date documentation, please follow the [official documentation for setting up WSLg](https://github.com/microsoft/wslg#installing-wslg). 
