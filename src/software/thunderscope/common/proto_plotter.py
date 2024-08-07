@@ -1,26 +1,25 @@
 from random import randint
 import time
 from collections import deque
+from typing import Type, Callable
+from google.protobuf.message import Message
 
 import pyqtgraph as pg
-from proto.visualization_pb2 import NamedValue
 from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.Qt import QtGui
 
-from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class ProtoPlotter(QWidget):
-
     """Plot the protobuf data in a pyqtgraph plot
 
     In-order to make the plotter as flexible as possible, we need dependency
     inject a way to extract data from the incoming protobufs. This is so that
     the user can control the way the data is plotted.
 
-    Examples:
-
+    Examples
+    --------
     NamedValueProto: we can plot the value directly
     RobotStatus: the data comes in over multiple packets, with each one having
     a different robot id. We need to append the robot id to the name so that
@@ -51,12 +50,12 @@ class ProtoPlotter(QWidget):
 
     def __init__(
         self,
-        min_y,
-        max_y,
-        window_secs,
-        configuration,
-        plot_rate_hz=60,
-        buffer_size=1000,
+        min_y: float,
+        max_y: float,
+        window_secs: float,
+        configuration: dict[Type[Message], Callable[dict[str, float], Message]],
+        plot_rate_hz: float = 60,
+        buffer_size: int = 1000,
     ):
         """Initializes NamedValuePlotter.
 
@@ -66,7 +65,6 @@ class ProtoPlotter(QWidget):
         :param configuration: A dictionary of protobuf types to data extractor
         :param plot_rate_hz: How many times per second to update the plot
         :param buffer_size: The size of the buffer to use for plotting.
-
         """
         QWidget.__init__(self)
 
@@ -94,20 +92,15 @@ class ProtoPlotter(QWidget):
         self.update_interval = 1.0 / plot_rate_hz
         self.buffer_size = buffer_size
 
-    def isVisible(self):
+    def isVisible(self) -> bool:
         return self.win.isVisible()
 
-    def refresh(self):
-        """Refreshes ProtoPlotter and updates data in the respective
-        plots.
-
-        """
-
+    def refresh(self) -> None:
+        """Refreshes ProtoPlotter and updates data in the respective plots."""
         # Dump the entire buffer into a deque. This operation is fast because
         # its just consuming data from the buffer and appending it to a deque.
         for proto_class, buffer in self.buffers.items():
             for _ in range(buffer.queue.qsize()):
-
                 data = self.configuration[proto_class](buffer.get(block=False))
 
                 # If named_value is new, create a plot and for the new value and
@@ -120,7 +113,9 @@ class ProtoPlotter(QWidget):
                         # Ensure hue has sufficient contrast
                         self.color_hue = (self.color_hue + randint(100, 260)) % 360
                         self.plots[name] = self.win.plot(
-                            pen=QtGui.QColor.fromHsl(self.color_hue, 255, 255 * 0.8),
+                            pen=QtGui.QColor.fromHsl(
+                                self.color_hue, 255, round(255 * 0.8)
+                            ),
                             name=name,
                             disableAutoRange=True,
                             brush=None,

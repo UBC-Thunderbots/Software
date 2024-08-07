@@ -218,8 +218,8 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - `[--run_blue | --run_yellow]` indicate which FullSystem to run
         - `[--run_diagnostics]` indicates if diagnostics should be loaded as well
       - If FullSystem is running, the robots receive input from the AI
-      - If Diagnostics is enabled, the robots can also receive input from Manual controls or XBox controls
-      - This mode allows us to test and debug the robots by setting each robot's input to be either AI, Manual Control or XBox Control
+      - If Diagnostics is enabled, the robots can also receive input from Manual controls or Xbox controls
+      - This mode allows us to test and debug the robots by setting each robot's input to be either AI, Manual Control or Xbox Control
       - Control mode for each robot can be set with each one's drop down menu in the Robot View widget
 
     - If we want to run it with real robots:
@@ -265,7 +265,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     - Manual Control
       - When a robot is in Manual control mode, the commands it receives depend on the radio buttons to the top-right
         - Diagnostics Control allows us to use the on-screen sliders and buttons to control the robot
-        - XBox control allows us to use a connected XBox controller to control the robots
+        - Xbox control allows us to use a connected Xbox controller to control the robots
 4. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
     1. For legacy C++ tests (#2581) with the visualizer:
@@ -448,7 +448,7 @@ If you do rebase or merge and get conflicts, you'll need to resolve them manuall
 
 We use [clang-format](https://electronjs.org/docs/development/clang-format) to automatically format our code. Using an automatic tool helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what it does.
 
-To format the code, from the `Software` directory run `./formatting_scripts/fix_formatting.sh`.
+To format the code, from the `Software` directory run `./scripts/lint_and_format.sh`.
 
 We recommend running the formatting script and then committing all your changes, so that your commits can more easily pass CI.
 

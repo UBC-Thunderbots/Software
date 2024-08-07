@@ -783,7 +783,7 @@ message OffensePlayConfig
 
 enum PlayMode
 {
-    NORMAL = 0;
+    NORMAL    = 0;
     OFFENSIVE = 1;
     DEFENSIVE = 2;
 }

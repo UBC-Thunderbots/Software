@@ -2,7 +2,6 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui
 from PyQt6.QtWidgets import *
 
-import numpy as np
 from typing import Dict
 
 
@@ -24,10 +23,10 @@ class BarGraphWidget(QWidget):
     def set_data(
         self, data: Dict[str, float], colours: Dict[str, QtGui.QColor] = {}
     ) -> None:
-        """Sets the data displayed in the bar graph. 
-        
+        """Sets the data displayed in the bar graph.
+
         The data should be a dictionary where each key-value pair is a bar
-        in the graph. The key is the label for the bar, and the value is the 
+        in the graph. The key is the label for the bar, and the value is the
         height of the bar.
 
         :param data: the data to display

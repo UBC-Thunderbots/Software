@@ -2,7 +2,6 @@ import time
 import logging
 import pathlib
 
-import pyqtgraph as pg
 from dataclasses import dataclass
 from proto.q_learning_pb2 import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -26,7 +25,7 @@ class QLearningInfoWidget(QWidget):
 
     @dataclass
     class MdpInfo:
-        """Stores information about Q-learning algorithms for a particular 
+        """Stores information about Q-learning algorithms for a particular
         Markov decision process (MDP)
         """
 
@@ -87,7 +86,6 @@ class QLearningInfoWidget(QWidget):
 
     def refresh(self) -> None:
         """Update the Q-learning info widget with new information"""
-
         linear_q_func_info = self.linear_q_func_info_buffer.get(
             block=False, return_cached=False
         )
@@ -175,9 +173,9 @@ class QLearningInfoWidget(QWidget):
         )
 
     def __display_action_selection_strategy_info(self, mdp_name: str) -> None:
-        """Update the BarGraphWidget with data from the most recent 
+        """Update the BarGraphWidget with data from the most recent
         ActionSelectionStrategyInfo for the given MDP
-        
+
         :param mdp_name: the name identifying the MDP
         """
         # Check if we have an ActionSelectionStrategyInfo for the given MDP
@@ -195,9 +193,9 @@ class QLearningInfoWidget(QWidget):
         for action in action_selection_strategy_info.actions:
             bar_graph_data[action.name] = action.value
             if action.selected:
-                bar_graph_colours[
-                    action.name
-                ] = QLearningInfoWidget.SELECTED_ACTION_BAR_COLOUR
+                bar_graph_colours[action.name] = (
+                    QLearningInfoWidget.SELECTED_ACTION_BAR_COLOUR
+                )
 
         self.action_bar_graph.set_data(bar_graph_data, colours=bar_graph_colours)
 
@@ -206,7 +204,7 @@ class QLearningInfoWidget(QWidget):
         )
 
     def __save_linear_q_function_weights(self) -> None:
-        """Open a file dialog to save the weights of the currently selected 
+        """Open a file dialog to save the weights of the currently selected
         LinearQFunction to a CSV file
         """
         mdp_name = self.mdp_combo_box.currentText()

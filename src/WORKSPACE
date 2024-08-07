@@ -18,12 +18,55 @@ rules_foreign_cc_dependencies()
 
 http_archive(
     name = "rules_python",
-    sha256 = "a30abdfc7126d497a7698c29c46ea9901c6392d6ed315171a6df5ce433aa4502",
-    strip_prefix = "rules_python-0.6.0",
-    url = "https://github.com/bazelbuild/rules_python/archive/0.6.0.tar.gz",
+    sha256 = "3b8b4cdc991bc9def8833d118e4c850f1b7498b3d65d5698eea92c3528b8cf2c",
+    strip_prefix = "rules_python-0.30.0",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.30.0/rules_python-0.30.0.tar.gz",
 )
 
-load("@rules_python//python:pip.bzl", "pip_install")
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+register_toolchains("//:py_toolchain")
+
+load("@rules_python//python:pip.bzl", "pip_parse")
+
+pip_parse(
+    name = "nanopb_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//extlibs:nanopb_requirements_lock.txt",
+)
+
+pip_parse(
+    name = "thunderscope_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/thunderscope:requirements_lock.txt",
+)
+
+pip_parse(
+    name = "ansible_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
+)
+
+pip_parse(
+    name = "simulated_tests_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/simulated_tests:requirements_lock.txt",
+)
+
+load("@nanopb_deps//:requirements.bzl", nanopb_install_deps = "install_deps")
+load("@thunderscope_deps//:requirements.bzl", thunderscope_install_deps = "install_deps")
+load("@ansible_deps//:requirements.bzl", ansible_install_deps = "install_deps")
+load("@simulated_tests_deps//:requirements.bzl", simulated_tests_install_deps = "install_deps")
+
+nanopb_install_deps()
+
+thunderscope_install_deps()
+
+ansible_install_deps()
+
+simulated_tests_install_deps()
 
 all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
 
@@ -281,45 +324,12 @@ new_git_repository(
     shallow_since = "1596403987 -0600",
 )
 
-git_repository(
-    name = "rules_python",
-    commit = "6f37aa9966f53e063c41b7509a386d53a9f156c3",
-    remote = "https://github.com/bazelbuild/rules_python.git",
-    shallow_since = "1617165164 +1100",
-)
-
 new_git_repository(
     name = "trinamic",
     build_file = "@//extlibs:trinamic.BUILD",
     commit = "0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
     remote = "https://github.com/trinamic/TMC-API.git",
     shallow_since = "1631132123 +0200",
-)
-
-register_toolchains("//:py_toolchain")
-
-pip_install(
-    name = "nanopb_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//extlibs:nanopb_requirements.txt",
-)
-
-pip_install(
-    name = "thunderscope_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//software/thunderscope:requirements.txt",
-)
-
-pip_install(
-    name = "ansible_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//software/embedded/ansible:requirements.txt",
-)
-
-pip_install(
-    name = "simulated_tests_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//software/simulated_tests:requirements.txt",
 )
 
 # required to use `py_proto_library` from protobuf

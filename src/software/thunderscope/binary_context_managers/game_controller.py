@@ -5,8 +5,6 @@ import logging
 import os
 import socket
 import time
-import google.protobuf.internal.encoder as encoder
-import google.protobuf.internal.decoder as decoder
 from subprocess import Popen
 from typing import Any
 
@@ -21,21 +19,22 @@ from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class Gamecontroller(object):
+class Gamecontroller:
     """Gamecontroller Context Manager"""
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs: bool = False, use_conventional_port=False) -> None:
+    def __init__(
+        self, suppress_logs: bool = False, use_conventional_port: bool = False
+    ) -> None:
         """Run Gamecontroller
 
-        :param supress_logs: Whether to suppress the logs
+        :param suppress_logs: Whether to suppress the logs
         :param use_conventional_port: whether or not to use the conventional port!
         """
-
-        self.supress_logs = supress_logs
+        self.suppress_logs = suppress_logs
 
         # We default to using a non-conventional port to avoid emitting
         # on the same port as what other teams may be listening on.
@@ -53,41 +52,25 @@ class Gamecontroller(object):
             buffer_size=2, protobuf_type=ManualGCCommand
         )
 
-    @staticmethod
-    def get_referee_port_static(gamecontroller: Gamecontroller):
-        """
-        return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
-
-        :param gamecontroller: the gamecontroller we are using
-        :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
-        """
-        if gamecontroller is not None:
-            return gamecontroller.get_referee_port()
-
-        return SSL_REFEREE_PORT
-
     def get_referee_port(self) -> int:
-        """
-        Sometimes, the port that we are using changes depending on context.
+        """Sometimes, the port that we are using changes depending on context.
         We want a getter function that returns the port we are using.
 
         :return: the port that the game controller is currently using!
         """
-
         return self.referee_port
 
-    def __enter__(self) -> "self":
-        """Enter the gamecontroller context manager. 
+    def __enter__(self) -> Gamecontroller:
+        """Enter the gamecontroller context manager.
 
         :return: gamecontroller context managed instance
-
         """
         command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
 
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
-        if self.supress_logs:
+        if self.suppress_logs:
             with open(os.devnull, "w") as fp:
                 self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
 
@@ -107,7 +90,6 @@ class Gamecontroller(object):
         :param type: The type of exception that was raised
         :param value: The exception that was raised
         :param traceback: The traceback of the exception
-
         """
         self.gamecontroller_proc.terminate()
         self.gamecontroller_proc.wait()
@@ -115,28 +97,28 @@ class Gamecontroller(object):
         self.ci_socket.close()
 
     def refresh(self):
-        """
-        Gets any manual gamecontroller commands from the buffer and executes them
-        """
+        """Gets any manual gamecontroller commands from the buffer and executes them"""
         manual_command = self.command_override_buffer.get(return_cached=False)
 
         while manual_command is not None:
             self.send_gc_command(
                 gc_command=manual_command.manual_command.type,
                 team=manual_command.manual_command.for_team,
-                final_ball_placement_point=tbots_cpp.Point(
-                    manual_command.final_ball_placement_point.x,
-                    manual_command.final_ball_placement_point.y,
-                )
-                # HasField checks if the field was manually set by us
-                # as opposed to if a value exists (since a default value always exists)
-                if manual_command.HasField("final_ball_placement_point") else None,
+                final_ball_placement_point=(
+                    tbots_cpp.Point(
+                        manual_command.final_ball_placement_point.x,
+                        manual_command.final_ball_placement_point.y,
+                    )
+                    # HasField checks if the field was manually set by us
+                    # as opposed to if a value exists (since a default value always exists)
+                    if manual_command.HasField("final_ball_placement_point")
+                    else None
+                ),
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
     def is_valid_port(self, port):
-        """
-        determine whether or not a given port is valid
+        """Determine whether or not a given port is valid
 
         :param port: the port we are checking
         :return: True if a port is valid False otherwise
@@ -157,7 +139,6 @@ class Gamecontroller(object):
         :param start_port: The port to start looking from
         :param max_port: The maximum port to look up to
         :return: The next free port
-
         """
         while start_port <= max_port:
             if self.is_valid_port(start_port):
@@ -177,7 +158,6 @@ class Gamecontroller(object):
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
         :param autoref_proto_unix_io: The proto unix io for the autoref
-
         """
 
         def __send_referee_command(data: Referee) -> None:
@@ -193,7 +173,10 @@ class Gamecontroller(object):
                 autoref_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
+            Gamecontroller.REFEREE_IP,
+            self.referee_port,
+            __send_referee_command,
+            True,
         )
 
         blue_full_system_proto_unix_io.register_observer(
@@ -220,7 +203,6 @@ class Gamecontroller(object):
         :param team: The team to send the command to
         :param final_ball_placement_point: ball placement point for BallPlacement messages
         :return: The response CiOutput containing 1 or more refree msgs
-
         """
         ci_input = CiInput(timestamp=int(time.time_ns()))
         api_input = Input()
@@ -262,8 +244,7 @@ class Gamecontroller(object):
         return ci_output_list
 
     def send_ci_input(self, ci_input: proto.ssl_gc_ci_pb2.CiInput) -> list[CiOutput]:
-        """
-        Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
+        """Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
 
         :param CiInput proto to send to the Gamecontroller
 
@@ -284,8 +265,7 @@ class Gamecontroller(object):
         return ci_output_list
 
     def reset_team(self, name: str, team: str) -> UpdateTeamState:
-        """
-        Returns an UpdateTeamState proto for the gamecontroller to reset team info.
+        """Returns an UpdateTeamState proto for the gamecontroller to reset team info.
 
         :param name name of the new team
         :param team yellow or blue team to update
@@ -303,8 +283,7 @@ class Gamecontroller(object):
         return update_team_state
 
     def reset_game(self, division: proto.ssl_gc_common_pb2.Division) -> UpdateConfig:
-        """
-        Returns an UpdateConfig proto for the Gamecontroller to reset game info.
+        """Returns an UpdateConfig proto for the Gamecontroller to reset game info.
 
         :param division the Division proto corresponding to the game division to set up the Gamecontroller for
 
@@ -321,8 +300,7 @@ class Gamecontroller(object):
     def reset_team_info(
         self, division: proto.ssl_gc_common_pb2.Division
     ) -> list[CiOutput]:
-        """
-        Sends a message to the Gamecontroller to reset Team information.
+        """Sends a message to the Gamecontroller to reset Team information.
 
         :param division: the Division proto corresponding to the game division to set up the Gamecontroller for
 
@@ -354,8 +332,7 @@ class Gamecontroller(object):
     def update_game_engine_config(
         self, config: proto.ssl_gc_engine_config_pb2
     ) -> list[CiOutput]:
-        """
-        Sends a game engine config update.
+        """Sends a game engine config update.
 
         :param config: the new SSL game engine config
 

@@ -19,13 +19,12 @@ class GLSphere(GLMeshItem):
         color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
     ) -> None:
         """Initialize the GLSphere
-        
+
         :param parent_item: The parent item of the graphic
         :param radius: The radius of the sphere
         :param rows: The number of rows in the mesh
         :param cols: The number of columns in the mesh
         :param color: The color of the sphere
-
         """
         super().__init__(parentItem=parent_item, color=color)
 
@@ -41,7 +40,6 @@ class GLSphere(GLMeshItem):
         :param radius: The radius of the sphere
         :param rows: The number of rows in the mesh
         :param cols: The number of columns in the mesh
-        
         """
         if self.radius == radius:
             return
@@ -51,11 +49,10 @@ class GLSphere(GLMeshItem):
 
     def set_position(self, x: float, y: float, z: float) -> None:
         """Set the position of the graphic in the scene
-        
+
         :param x: The x coordinate to position the graphic at
         :param y: The y coordinate to position the graphic at
         :param z: The z coordinate to position the graphic at
-        
         """
         if self.x == x and self.y == y and self.z == z:
             return

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TypeVar, List, Iterable, Union, Callable
+from typing import TypeVar, Iterable, Callable
 
 T = TypeVar("T")
 
@@ -12,33 +12,30 @@ class ChangeAction:
 class Change:
     """Represents a change in a list"""
 
-    def __init__(self, changed_list: List, changed_slice: slice, action: ChangeAction):
+    def __init__(self, changed_list: list, changed_slice: slice, action: ChangeAction):
         """Initialize the Change
 
         :param changed_list: The list that changed
-        :param changed_slice: The slice of the observable_list that changed 
+        :param changed_slice: The slice of the observable_list that changed
         :param type: The action that caused the change
-        
         """
         self._changed_list = changed_list
         self._changed_slice = changed_slice
         self._action = action
 
     @property
-    def elements(self) -> List:
+    def elements(self) -> list:
         """The elements in the list affected by the change
 
-        :returns: A list of elements affected by the change
-
+        :return: A list of elements affected by the change
         """
         return self._changed_list[self._changed_slice]
 
     @property
     def action(self) -> ChangeAction:
         """The action that caused the change
-        
-        :returns: The action that caused the change
-        
+
+        :return: The action that caused the change
         """
         return self._action
 
@@ -50,11 +47,10 @@ class ObservableList(list):
         self, observer: Callable[[Change], None] = None, iterable: Iterable[T] = ()
     ) -> None:
         """Initialize the ObservableList
-        
+
         :param observer: Observer method to register
         :param iterable: iterable from which elements are to be copied to
                          the initialized ObservableList
-        
         """
         super().__init__()
         self.observers = []
@@ -66,19 +62,17 @@ class ObservableList(list):
         ObservableList provides a change notification
 
         :param observer: Observer method that takes a Change as its first argument
-        
         """
         if observer:
             self.observers.append(observer)
 
     def resize(self, length: int, element_generator: Callable[[], T]) -> None:
         """Resize the list to a desired target length by either creating new elements
-        using the provided `element_generator` and adding them to the list, or by 
+        using the provided `element_generator` and adding them to the list, or by
         popping elements from the end of the list.
 
         :param length: The target length to resize the list to
         :param element_generator: Callable that returns an element to add to the list
-
         """
         if len(self) > length:
             del self[length : len(self)]
@@ -127,12 +121,12 @@ class ObservableList(list):
     def __imul__(self, multiplier):
         raise NotImplementedError()
 
-    def __delitem__(self, index_or_slice: Union[int, slice]) -> None:
+    def __delitem__(self, index_or_slice: int | slice) -> None:
         """See list.__delitem__"""
         self.__notify_elements_removed_index_or_slice(index_or_slice)
         super().__delitem__(index_or_slice)
 
-    def __setitem__(self, index_or_slice: Union[int, slice], value: T) -> None:
+    def __setitem__(self, index_or_slice: int | slice, value: T) -> None:
         """See list.__setitem__"""
         notify_added = self.__notify_elements_removed_index_or_slice(index_or_slice)
         super().__setitem__(index_or_slice, value)
@@ -142,7 +136,6 @@ class ObservableList(list):
         """Notify observers about elements added to the ObservableList
 
         :param added_slice: the slice of the ObservableList with the added elements
-
         """
         change = Change(self, added_slice, ChangeAction.ADD)
         for observer in self.observers:
@@ -152,19 +145,17 @@ class ObservableList(list):
         """Notify observers about elements removed from the ObservableList
 
         :param added_slice: the slice of the ObservableList with the elements to be removed
-
         """
         change = Change(self, removed_slice, ChangeAction.REMOVE)
         for observer in self.observers:
             observer(change)
 
     def __notify_elements_removed_index_or_slice(
-        self, index_or_slice: Union[int, slice]
+        self, index_or_slice: int | slice
     ) -> Callable[[], None]:
         """Notify observers about elements removed at an index or slice
 
         :return: a function that notifies about an add at the same place
-
         """
         if isinstance(index_or_slice, int):
             length = len(self)
@@ -179,9 +170,8 @@ class ObservableList(list):
 
     def __slice_at_index(self, index: int, length: int = 1) -> slice:
         """Create a slice starting at an index and with a given length
-        
-        :param index: the index to start the slice at
 
+        :param index: the index to start the slice at
         """
         length_ = len(self)
         if -length <= index < 0:

@@ -21,7 +21,6 @@ class GLTrailLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -37,7 +36,6 @@ class GLTrailLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         self.cached_world = self.world_buffer.get(block=False, return_cached=False)
 
         if self.refresh_count <= 0 and self.cached_world is not None:
@@ -63,20 +61,23 @@ class GLTrailLayer(GLLayer):
     def __update_trail_graphics(
         self, team: Team, queues_dict: dict, color: Colors
     ) -> None:
-        """Updates the onscreen visualizations of the past robot positions correlating to the
-           given team.
+        """Updates the onscreen visualizations of the past robot positions correlating
+        to the given team.
 
         :param team: Team proto containing the current friendly team
         :param queues_dict: dictionary with the stored robot position histories
         :param color: color to render the trails in
         """
-
         self.trail_graphics_head.resize(
-            len(team.team_robots), lambda: GLPolygon(outline_color=color,),
+            len(team.team_robots),
+            lambda: GLPolygon(
+                outline_color=color,
+            ),
         )
 
         for trail_graphics_head, trail_queue in zip(
-            self.trail_graphics_head, queues_dict,
+            self.trail_graphics_head,
+            queues_dict,
         ):
             trail_graphics_head.set_points(
                 [[point.x_meters, point.y_meters] for point in queues_dict[trail_queue]]

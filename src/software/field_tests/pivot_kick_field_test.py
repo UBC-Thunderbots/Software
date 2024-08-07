@@ -1,22 +1,17 @@
 import pytest
 
-import software.python_bindings as tbots_cpp
 import sys
 import math
-from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
 
 from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import createLogger
-from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
-from proto.message_translation.tbots_protobuf import create_world_state
 
 logger = createLogger(__name__)
 
 
 def test_pivot_kick(field_test_runner):
-
     id = 5
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)

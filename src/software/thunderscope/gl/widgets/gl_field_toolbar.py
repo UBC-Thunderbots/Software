@@ -1,5 +1,5 @@
 from typing import Callable
-from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -14,8 +14,7 @@ from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 
 
 class GLFieldToolbar(GLToolbar):
-    """
-    Toolbar for the GL Field Widget
+    """Toolbar for the GL Field Widget
 
     Has buttons for measure mode, changing camera views, showing help info
     And for undoing / redoing robot state changes
@@ -30,8 +29,7 @@ class GLFieldToolbar(GLToolbar):
         toolbars_menu: QMenu,
         sandbox_mode: bool = False,
     ):
-        """
-        Set up the toolbar with these buttons:
+        """Set up the toolbar with these buttons:
 
         - Layers select menu
         - Undo
@@ -130,7 +128,8 @@ class GLFieldToolbar(GLToolbar):
         self.simulation_speeds = SIMULATION_SPEEDS
         for speed in self.simulation_speeds:
             self.sim_speed_menu.addAction(
-                str(speed), lambda new_speed=speed: self.speed_callback(new_speed),
+                str(speed),
+                lambda new_speed=speed: self.speed_callback(new_speed),
             )
 
         # if sandbox mode, set up the sandbox control buttons
@@ -167,9 +166,7 @@ class GLFieldToolbar(GLToolbar):
         self.layout().addWidget(self.camera_view_button)
 
     def refresh(self) -> None:
-        """
-        Refreshes the UI for all the toolbar icons and updates toolbar position
-        """
+        """Refreshes the UI for all the toolbar icons and updates toolbar position"""
         # update the pause button state
         simulation_state = self.simulation_state_buffer.get(
             block=False, return_cached=False
@@ -179,8 +176,8 @@ class GLFieldToolbar(GLToolbar):
             self.update_simulation_speed(simulation_state.simulation_speed)
 
     def toggle_pause_button(self, is_playing: bool) -> None:
-        """
-        Toggles the state of the pause button by updating its text and icon
+        """Toggles the state of the pause button by updating its text and icon
+
         :param is_playing: True if the button is in the Play state, False if its in the Pause state
         """
         self.pause_button.setToolTip("Pause" if is_playing else "Play")
@@ -191,15 +188,15 @@ class GLFieldToolbar(GLToolbar):
         )
 
     def update_simulation_speed(self, speed: float) -> None:
-        """
-        Updates the simulation speed label
+        """Updates the simulation speed label
+
         :param speed: the speed of the simulation
         """
         self.sim_speed_button.setText(f"Speed: {speed:.2f}x")
 
     def toggle_undo_enabled(self, enabled: bool) -> None:
-        """
-        Callback function to enable / disable the undo button based on the given state
+        """Callback function to enable / disable the undo button based on the given state
+
         :param enabled: if the undo button is enabled or not
         """
         self.undo_button.toggle_enabled(enabled)
@@ -207,8 +204,8 @@ class GLFieldToolbar(GLToolbar):
         self.undo_button.repaint()
 
     def toggle_redo_enabled(self, enabled: bool) -> None:
-        """
-        Callback function to enable / disable the redo button based on the given state
+        """Callback function to enable / disable the redo button based on the given state
+
         :param enabled: if the redo button is enabled or not
         """
         self.redo_button.toggle_enabled(enabled)
@@ -216,8 +213,8 @@ class GLFieldToolbar(GLToolbar):
         self.redo_button.repaint()
 
     def set_speed_callback(self, callback: Callable[[float], None]) -> None:
-        """
-        Sets the callback function for updating the simulation speed
+        """Sets the callback function for updating the simulation speed
+
         :param callback: the callback function to update the simulation speed
         """
         self.speed_callback = callback

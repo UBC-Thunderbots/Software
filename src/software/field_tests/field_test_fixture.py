@@ -11,9 +11,7 @@ from software.simulated_tests import validation
 from software.thunderscope.constants import EstopMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.logger.logger import createLogger
 
@@ -47,6 +45,7 @@ class FieldTestRunner(TbotsTestRunner):
         is_yellow_friendly=False,
     ):
         """Initialize the FieldTestRunner
+
         :param test_name: The name of the test to run
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
@@ -79,7 +78,7 @@ class FieldTestRunner(TbotsTestRunner):
             if len(self.friendly_robot_ids_field) == 0:
                 raise Exception("no friendly robots found on field")
 
-        except queue.Empty as empty:
+        except queue.Empty:
             raise Exception(
                 f"No Worlds were received with in {WORLD_BUFFER_TIMEOUT} seconds. Please make sure atleast 1 robot and 1 ball is present on the field."
             )
@@ -135,7 +134,7 @@ class FieldTestRunner(TbotsTestRunner):
                             block=True, timeout=WORLD_BUFFER_TIMEOUT
                         )
                         break
-                    except queue.Empty as empty:
+                    except queue.Empty:
                         # If we timeout, that means full_system missed the last
                         # wrapper and robot status, lets resend it.
                         logger.warning(
@@ -178,9 +177,7 @@ class FieldTestRunner(TbotsTestRunner):
             the window from the main thread.
 
             :param args: The args passed in from the hook
-
             """
-
             stop_test(delay=PAUSE_AFTER_FAIL_DELAY_S)
             self.last_exception = args.exc_value
             raise self.last_exception
@@ -202,6 +199,7 @@ class FieldTestRunner(TbotsTestRunner):
 
 def load_command_line_arguments():
     """Load from command line arguments using argpase
+
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
     """
@@ -331,8 +329,8 @@ def load_command_line_arguments():
 
 @pytest.fixture
 def field_test_runner():
-    """
-    Runs a field test
+    """Runs a field test
+
     :return: yields the runner to the test fixture
     """
     simulator_proto_unix_io = ProtoUnixIO()
@@ -367,7 +365,7 @@ def field_test_runner():
         should_restart_on_crash=False,
     ) as friendly_fs, Gamecontroller(
         # we would be using conventional port if and only if we are playing in robocup.
-        supress_logs=(not args.show_gamecontroller_logs),
+        suppress_logs=(not args.show_gamecontroller_logs),
         use_conventional_port=False,
     ) as gamecontroller, RobotCommunication(
         current_proto_unix_io=friendly_proto_unix_io,
@@ -376,13 +374,16 @@ def field_test_runner():
         estop_mode=estop_mode,
         estop_path=estop_path,
         enable_radio=args.enable_radio,
-        referee_port=Gamecontroller.get_referee_port_static(gamecontroller),
+        referee_port=gamecontroller.get_referee_port()
+        if gamecontroller
+        else SSL_REFEREE_PORT,
     ) as rc_friendly:
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
         rc_friendly.setup_for_fullsystem()
 
         gamecontroller.setup_proto_unix_io(
-            blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
         )
         # Inject the proto unix ios into thunderscope and start the test
         tscope = Thunderscope(

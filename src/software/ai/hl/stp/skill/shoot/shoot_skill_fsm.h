@@ -15,7 +15,7 @@ struct ShootSkillFSM
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Guard that updates the current best shot on goal and checks whether we 
+     * Guard that updates the current best shot on goal and checks whether we
      * should abort the shot because it is unlikely to succeed.
      *
      * @param event the Update event

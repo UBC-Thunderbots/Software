@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class ExcessivelyDribbling(Validation):
-
     """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
 
     def __init__(self):
@@ -19,8 +18,8 @@ class ExcessivelyDribbling(Validation):
         """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m.
 
         :param world: The world msg to validate
-        :returns: FAILING when the robot is excessively dribbling
-                  PASSING when the robot is not excessively dribbling
+        :return: FAILING when the robot is excessively dribbling
+                 PASSING when the robot is not excessively dribbling
         """
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
@@ -37,9 +36,7 @@ class ExcessivelyDribbling(Validation):
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) Shows the max allowed dribbling circle
-        """
+        """(override) Shows the max allowed dribbling circle"""
         return create_validation_geometry(
             [tbots_cpp.Circle(self.continous_dribbling_start_point, 1.0)]
             if self.continous_dribbling_start_point is not None

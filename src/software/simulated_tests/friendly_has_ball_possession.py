@@ -12,9 +12,7 @@ class FriendlyHasBallPossession(Validation):
     """Checks if a single friendly robot has possession of the ball."""
 
     def __init__(self, robot_id: int) -> None:
-        """
-        Initializes the validation to check for if the robot with the given id has possession
-        """
+        """Initializes the validation to check for if the robot with the given id has possession"""
         self.robot_id = robot_id
 
     def get_validation_status(self, world, robot_id=None) -> ValidationStatus:
@@ -36,9 +34,7 @@ class FriendlyHasBallPossession(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) highlights the dribbler area of the specified robot
-        """
+        """(override) highlights the dribbler area of the specified robot"""
         return create_validation_geometry(
             [
                 tbots_cpp.Robot(
@@ -60,12 +56,10 @@ class FriendlyHasBallPossession(Validation):
 
 
 class AnyFriendlyHasBallPossession(FriendlyHasBallPossession):
-
     """Checks if any friendly robot has possession of the ball."""
 
     def __init__(self, tolerance=0.01):
-        """
-        Constructs the validation object
+        """Constructs the validation object
 
         :param tolerance: The tolerance for when we check if the robot has the ball
         """
@@ -75,8 +69,8 @@ class AnyFriendlyHasBallPossession(FriendlyHasBallPossession):
         """Checks if any friendly robot has possession of the ball
 
         :param world: The world msg to validate
-        :returns: FAILING when no friendly robot has possession of the ball
-                  PASSING when any friendly robot has possession of the ball
+        :return: FAILING when no friendly robot has possession of the ball
+                 PASSING when any friendly robot has possession of the ball
         """
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
@@ -85,9 +79,7 @@ class AnyFriendlyHasBallPossession(FriendlyHasBallPossession):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) highlights the dribbler area of the robots
-        """
+        """(override) highlights the dribbler area of the robots"""
         return create_validation_geometry(
             [
                 tbots_cpp.Robot(robot).dribblerArea()

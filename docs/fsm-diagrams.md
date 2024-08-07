@@ -7,36 +7,20 @@
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> HaltState
-HaltState --> StopState : [gameStateStopped]\n<i>setupStopPlay</i>
-HaltState --> OffensePlayState : [gameStatePlaying && !enemyHasPossession]\n<i>setupOffensePlay</i>
-HaltState --> DefensePlayState : [gameStatePlaying && enemyHasPossession]\n<i>setupDefensePlay</i>
-HaltState --> SetPlayState : [gameStateSetupRestart]\n<i>setupSetPlay</i>
-StopState --> HaltState : [gameStateHalted]\n<i>setupHaltPlay</i>
-StopState --> OffensePlayState : [gameStatePlaying && !enemyHasPossession]\n<i>setupOffensePlay</i>
-StopState --> DefensePlayState : [gameStatePlaying && enemyHasPossession]\n<i>setupDefensePlay</i>
-StopState --> SetPlayState : [gameStateSetupRestart]\n<i>setupSetPlay</i>
-OffensePlayState --> OffensePlayState : [gameStateHalted]\n<i>(terminateOffensePlay</i>
-setupHaltPlay_A) --> HaltState
-OffensePlayState --> OffensePlayState : [gameStateStopped]\n<i>(terminateOffensePlay</i>
-setupStopPlay_A) --> StopState
-OffensePlayState --> OffensePlayState : [gameStateSetupRestart]\n<i>(terminateOffensePlay</i>
-setupSetPlay_A) --> SetPlayState
-OffensePlayState --> OffensePlayState : [enemyHasPossession]\n<i>(terminateOffensePlay</i>
-setupDefensePlay_A) --> DefensePlayState
-DefensePlayState --> HaltState : [gameStateHalted]\n<i>setupHaltPlay</i>
-DefensePlayState --> StopState : [gameStateStopped]\n<i>setupStopPlay</i>
-DefensePlayState --> SetPlayState : [gameStateSetupRestart]\n<i>setupSetPlay</i>
-DefensePlayState --> OffensePlayState : [!enemyHasPossession]\n<i>setupOffensePlay</i>
-SetPlayState --> SetPlayState : [gameStateHalted]\n<i>(resetSetPlay</i>
-setupHaltPlay_A) --> HaltState
-SetPlayState --> SetPlayState : [gameStateStopped]\n<i>(resetSetPlay</i>
-setupStopPlay_A) --> StopState
-SetPlayState --> SetPlayState : [gameStatePlaying && !enemyHasPossession]\n<i>(resetSetPlay</i>
-setupOffensePlay_A) --> OffensePlayState
-SetPlayState --> SetPlayState : [gameStatePlaying && enemyHasPossession]\n<i>(resetSetPlay</i>
-setupDefensePlay_A) --> DefensePlayState
-SetPlayState --> SetPlayState : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+[*] --> Halt
+Halt --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
+Halt --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
+Halt --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Stop --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
+Stop --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
+Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
+Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
+Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+SetPlay --> Halt : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
+SetPlay --> Stop : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
+SetPlay --> Playing : [gameStatePlaying]\n<i>resetSetPlay, setupOffensePlay</i>
+SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```

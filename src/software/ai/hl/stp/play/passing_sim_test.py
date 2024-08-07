@@ -3,7 +3,6 @@ import math
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -18,7 +17,6 @@ from software.simulated_tests.ball_enters_region import (
     BallEventuallyExitsRegion,
     BallEventuallyEntersRegion,
 )
-from software import py_constants
 
 
 def setup_pass_and_robots(
@@ -31,8 +29,7 @@ def setup_pass_and_robots(
     receive_pass,
     simulated_test_runner,
 ):
-    """
-    Sets up a test involving 1 robot passing the ball
+    """Sets up a test involving 1 robot passing the ball
     With any number of friendly and enemy robots on the field
     Can specify if the first friendly robot should receive the pass or not
     :param ball_initial_position: the initial position of the ball
@@ -43,7 +40,7 @@ def setup_pass_and_robots(
     :param enemy_robot_positions: the positions of the enemy robots
     :param receive_pass: whether a friendly robot should try to receive the pass
     :param simulated_test_runner: the test runner
-    :return the best pass we generate
+    :return: the best pass we generate
     """
     blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
 

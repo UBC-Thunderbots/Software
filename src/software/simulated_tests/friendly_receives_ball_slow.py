@@ -9,15 +9,12 @@ from software.simulated_tests.validation import (
 
 
 class FriendlyReceivesBallSlow(Validation):
-
-    """
-    Checks if a receiver receives the ball below a certain speed
-    """
+    """Checks if a receiver receives the ball below a certain speed"""
 
     def __init__(self, robot_id, max_receive_speed):
-        """
-        Constructs the validation to check the given robot ID for receiving the ball
+        """Constructs the validation to check the given robot ID for receiving the ball
         at the given speed
+
         :param robot_id: the robot id to check
         :param max_receive_speed: the max speed the ball should be received at
         """
@@ -28,10 +25,10 @@ class FriendlyReceivesBallSlow(Validation):
         """Checks if the specified robot receives the ball too fast
 
         :param world: The world msg to validate
-        :returns: FAILING if the ball is near the robot's dribbler at a speed higher
-                    than the max receive speed
-                  PASSING if the ball is not near the dribbler, or if it is near
-                    the dribbler at a speed slower than the max
+        :return: FAILING if the ball is near the robot's dribbler at a speed higher
+                         than the max receive speed
+                 PASSING if the ball is not near the dribbler, or if it is near
+                         the dribbler at a speed slower than the max
         """
         ball_position = tbots.createPoint(world.ball.current_state.global_position)
         ball_velocity = tbots.createVector(world.ball.current_state.global_velocity)
@@ -43,9 +40,7 @@ class FriendlyReceivesBallSlow(Validation):
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) highlights the dribbler area of the robots
-        """
+        """(override) highlights the dribbler area of the robots"""
         return create_validation_geometry(
             [
                 tbots.Robot(robot).dribblerArea()

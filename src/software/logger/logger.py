@@ -9,7 +9,6 @@ logging.basicConfig(
 def createLogger(name):
     """Create a logger given the name of the logger
 
-    :returns: A Logger
-
+    :return: A Logger
     """
     return logging.getLogger(name)

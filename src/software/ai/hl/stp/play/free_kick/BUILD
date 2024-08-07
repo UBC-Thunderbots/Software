@@ -50,7 +50,7 @@ py_test(
     srcs = ["free_kick_play_test.py"],
     tags = ["exclusive"],
     deps = [
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],

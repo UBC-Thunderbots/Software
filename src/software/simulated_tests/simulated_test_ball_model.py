@@ -10,10 +10,7 @@ from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from proto.geometry_pb2 import Point, Angle
 from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
     pytest_main,
 )
 
@@ -28,14 +25,28 @@ STOPPING_SPEED = 0.01
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity",
     [
-        (tbots_cpp.Point(-3.5, 0), tbots_cpp.Vector(2, 0),),
-        (tbots_cpp.Point(-3.5, 2), tbots_cpp.Vector(3, -2),),
-        (tbots_cpp.Point(-3.5, -2), tbots_cpp.Vector(3, 2),),
-        (tbots_cpp.Point(4.5, 3), tbots_cpp.Vector(-3.5, -2),),
+        (
+            tbots_cpp.Point(-3.5, 0),
+            tbots_cpp.Vector(2, 0),
+        ),
+        (
+            tbots_cpp.Point(-3.5, 2),
+            tbots_cpp.Vector(3, -2),
+        ),
+        (
+            tbots_cpp.Point(-3.5, -2),
+            tbots_cpp.Vector(3, 2),
+        ),
+        (
+            tbots_cpp.Point(4.5, 3),
+            tbots_cpp.Vector(-3.5, -2),
+        ),
     ],
 )
 def test_simulator_move_ball(
-    ball_initial_position, ball_initial_velocity, simulated_test_runner,
+    ball_initial_position,
+    ball_initial_velocity,
+    simulated_test_runner,
 ):
     # Setup Ball
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -78,11 +89,19 @@ def test_simulator_move_ball(
     )
 
     # Always Validation
-    always_validation_sequence_set = [[NeverExcessivelyDribbles(),]]
+    always_validation_sequence_set = [
+        [
+            NeverExcessivelyDribbles(),
+        ]
+    ]
 
     # Eventually Validation
     eventually_validation_sequence_set = [
-        [BallEventuallyStopsInRegion([tbots_cpp.Circle(ball_expected_position, 0.1)]),]
+        [
+            BallEventuallyStopsInRegion(
+                [tbots_cpp.Circle(ball_expected_position, 0.1)]
+            ),
+        ]
     ]
 
     simulated_test_runner.run_test(
@@ -93,7 +112,6 @@ def test_simulator_move_ball(
 
 
 def test_ball_robot_collision(simulated_test_runner):
-
     ball_initial_position = tbots_cpp.Field.createSSLDivisionBField().centerPoint()
     ball_initial_velocity = tbots_cpp.Vector(2.5, 0)
     robot_position = tbots_cpp.Point(2.5, 0)

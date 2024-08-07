@@ -6,20 +6,14 @@ import sys
 import os
 
 import pytest
-import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
-from pyqtgraph.Qt import QtCore, QtGui
-
-from software.networking.unix.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
-from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
@@ -37,7 +31,6 @@ PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
 class SimulatedTestRunner(TbotsTestRunner):
-
     """Run a simulated test"""
 
     def __init__(
@@ -50,13 +43,13 @@ class SimulatedTestRunner(TbotsTestRunner):
         gamecontroller,
     ):
         """Initialize the SimulatorTestRunner
-        
+
         :param test_name: The name of the test to run
         :param thunderscope: The thunderscope to use, None if not used
         :param simulator_proto_unix_io: The simulator proto unix io to use
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
-        :param gamecontroller: The gamecontroller context managed instance 
+        :param gamecontroller: The gamecontroller context managed instance
 
         """
         super(SimulatedTestRunner, self).__init__(
@@ -71,8 +64,8 @@ class SimulatedTestRunner(TbotsTestRunner):
     def set_worldState(self, worldstate: WorldState):
         """Sets the simulation worldstate
 
-        Args:
-            worldstate (WorldState): proto containing the desired worldstate
+        :param worldstate: proto containing the desired worldstate
+
         """
         self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
@@ -84,7 +77,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param args: The args passed in from the hook
 
         """
-
         self.__stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
         self.last_exception = args.exc_value
         raise self.last_exception
@@ -129,7 +121,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
-
         time_elapsed_s = 0
 
         eventually_validation_failure_msg = "Test Timed Out"
@@ -139,7 +130,7 @@ class SimulatedTestRunner(TbotsTestRunner):
             processing_start_time = time.time()
 
             # Check for new CI commands at this time step
-            for (delay, cmd, team) in ci_cmd_with_delay:
+            for delay, cmd, team in ci_cmd_with_delay:
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
@@ -166,7 +157,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                     )
 
                     break
-                except queue.Empty as empty:
+                except queue.Empty:
                     # If we timeout, that means full_system missed the last
                     # wrapper and robot status, lets resend it.
                     logger.warning("Fullsystem missed last wrapper, resending ...")
@@ -249,8 +240,8 @@ class SimulatedTestRunner(TbotsTestRunner):
         run_till_end=True,
         **kwargs,
     ):
-        """
-        Helper function to run a test, with thunderscope if enabled
+        """Helper function to run a test, with thunderscope if enabled
+
         :param always_validation_sequence_set: validation that should always be true
         :param eventually_validation_sequence_set: validation that should eventually be true
         :param test_timeout_s: how long the test should run before timing out
@@ -260,7 +251,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
-
         test_timeout_duration = (
             test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
         )
@@ -277,7 +267,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         # thunderscope on this thread. The excepthook is setup to catch
         # any test failures and propagate them to the main thread
         if self.thunderscope:
-
             run_sim_thread = threading.Thread(
                 target=self.runner,
                 daemon=True,
@@ -309,9 +298,7 @@ class SimulatedTestRunner(TbotsTestRunner):
 
 
 class InvariantTestRunner(SimulatedTestRunner):
-
-    """
-    Runs a simulated test only once with a given parameter
+    """Runs a simulated test only once with a given parameter
 
     Test passes or fails based on the outcome of this test
     """
@@ -338,7 +325,6 @@ class InvariantTestRunner(SimulatedTestRunner):
                                 that should eventually be true, before the test ends
 
         """
-
         threading.excepthook = self.excepthook
 
         setup(params[0])
@@ -351,9 +337,7 @@ class InvariantTestRunner(SimulatedTestRunner):
 
 
 class AggregateTestRunner(SimulatedTestRunner):
-
-    """
-    Runs a simulated test multiple times with different given parameters
+    """Runs a simulated test multiple times with different given parameters
 
     Result of the test is determined by comparing the number of
     passing iterations to a predetermined acceptable threshold
@@ -379,7 +363,6 @@ class AggregateTestRunner(SimulatedTestRunner):
         :param ag_eventually_validation_sequence_set: Validation functions for aggregate testing
                                 that should eventually be true, before the test end
         """
-
         threading.excepthook = self.excepthook
 
         failed_tests = 0
@@ -388,7 +371,6 @@ class AggregateTestRunner(SimulatedTestRunner):
         # Catches Assertion Error thrown by failing test and increments counter
         # Calculates overall results and prints them
         for x in range(len(params)):
-
             setup(params[x])
 
             try:
@@ -412,7 +394,6 @@ def load_command_line_arguments():
 
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
-
     """
     parser = argparse.ArgumentParser(description="Run simulated pytests")
     parser.add_argument(
@@ -495,7 +476,6 @@ def pytest_main(file):
     """Runs the pytest file
 
     :param file: The test file to run
-
     """
     args = load_command_line_arguments()
     # Run the test, -s disables all capturing at -vv increases verbosity
@@ -544,9 +524,8 @@ def simulated_test_runner():
         running_in_realtime=args.enable_thunderscope,
     ) as yellow_fs:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs)
+            suppress_logs=(not args.show_gamecontroller_logs)
         ) as gamecontroller:
-
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
             simulator.setup_proto_unix_io(
@@ -556,7 +535,8 @@ def simulated_test_runner():
                 ProtoUnixIO(),
             )
             gamecontroller.setup_proto_unix_io(
-                blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
+                blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io,
             )
 
             # If we want to run thunderscope, inject the proto unix ios
