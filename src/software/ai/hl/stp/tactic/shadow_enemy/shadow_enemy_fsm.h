@@ -2,8 +2,8 @@
 
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/skill/move/move_skill_fsm.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
@@ -34,6 +34,12 @@ struct ShadowEnemyFSM
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
+    /**
+     * Constructor for ShadowEnemyFSM
+     *
+     * @param strategy the Strategy shared by all of AI
+     */
+    explicit ShadowEnemyFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Calculates the point to block the pass to the robot we are shadowing
@@ -64,7 +70,7 @@ struct ShadowEnemyFSM
     /**
      * Guard that checks if the enemy threat has ball
      *
-     * @param event ShadowEnemyFSM::Update
+     * @param event ShadowEnemyFSM::Update event
      *
      * @return if the ball has been have_possession
      */
@@ -73,26 +79,25 @@ struct ShadowEnemyFSM
     /**
      * Action to block the pass to our shadowee
      *
-     *
-     * @param event ShadowEnemyFSM::Update
+     * @param event ShadowEnemyFSM::Update event
      */
     void blockPass(const Update &event);
 
     /**
      * Action to block the shot from our shadowee
      *
-     *
-     * @param event ShadowEnemyFSM::Update
+     * @param event ShadowEnemyFSM::Update event
+     * @param processEvent processes the MoveSkillFSM::Update event
      */
     void blockShot(const Update &event,
-                   boost::sml::back::process<MoveFSM::Update> processEvent);
+                   boost::sml::back::process<MoveSkillFSM::Update> processEvent);
 
     /**
      * Action to steal and chip the ball
      *
      * Steal the ball if enemy threat is close enough and chip the ball away
      *
-     * @param event ShadowEnemyFSM::Update
+     * @param event ShadowEnemyFSM::Update event
      */
     void stealAndChip(const Update &event);
 
@@ -100,7 +105,7 @@ struct ShadowEnemyFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(MoveFSM)
+        DEFINE_SML_STATE(MoveSkillFSM)
         DEFINE_SML_STATE(BlockPassState)
         DEFINE_SML_STATE(StealAndChipState)
         DEFINE_SML_EVENT(Update)
@@ -108,18 +113,23 @@ struct ShadowEnemyFSM
         DEFINE_SML_GUARD(enemyThreatHasBall)
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(stealAndChip)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockShot, MoveFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockShot, MoveSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
-            MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = StealAndChipState_S,
+            *MoveSkillFSM_S + Update_E[!enemyThreatHasBall_G] / blockPass_A =
+                BlockPassState_S,
+            MoveSkillFSM_S + Update_E / blockShot_A, MoveSkillFSM_S = StealAndChipState_S,
             BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
-            BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,
+            BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A =
+                MoveSkillFSM_S,
             StealAndChipState_S + Update_E[enemyThreatHasBall_G] / stealAndChip_A,
             StealAndChipState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,
             X + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
-            X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S,
+            X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveSkillFSM_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION          = X);
     }
+
+   private:
+    std::shared_ptr<Strategy> strategy;
 };

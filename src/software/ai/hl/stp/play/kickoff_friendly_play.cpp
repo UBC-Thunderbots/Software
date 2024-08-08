@@ -3,8 +3,8 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/skill/chip/chip_skill.h"
+#include "software/ai/hl/stp/skill/move/move_skill.h"
 #include "software/ai/hl/stp/tactic/assigned_skill/specialized_assigned_skill_tactics.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<Strategy> strategy)
@@ -69,11 +69,13 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
               world_ptr->field().friendlyGoalpostNeg().y()),
     };
 
-    // move tactics to use to move to positions defined above
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<PrepareKickoffMoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>()};
+    // move skill tactics to use to move to positions defined above
+    std::vector<std::shared_ptr<AssignedSkillTactic<MoveSkill>>> move_skill_tactics = {
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy)};
 
     // specific tactics
     auto kickoff_chip_tactic = std::make_shared<KickoffChipSkillTactic>(strategy);
@@ -88,15 +90,17 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         PriorityTacticVector result = {{}};
 
         // set the requirement that Robot 1 must be able to kick and chip
-        move_tactics.at(0)->mutableRobotCapabilityRequirements() = {
+        move_skill_tactics.at(0)->mutableRobotCapabilityRequirements() = {
             RobotCapability::Kick, RobotCapability::Chip};
 
         // setup 5 kickoff positions in order of priority
         for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
-                                                    Angle::zero(), 0);
-            result[0].emplace_back(move_tactics.at(i));
+            move_skill_tactics.at(i)->updateControlParams(
+                {.destination       = kickoff_setup_positions.at(i),
+                 .final_orientation = Angle::zero(),
+                 .final_speed       = 0});
+            result[0].emplace_back(move_skill_tactics.at(i));
         }
 
         // yield the Tactics this Play wants to run, in order of priority
@@ -126,9 +130,11 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // 1 will be assigned to the rest of the robots
         for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
-                                                    Angle::zero(), 0);
-            result[0].emplace_back(move_tactics.at(i));
+            move_skill_tactics.at(i)->updateControlParams(
+                {.destination       = kickoff_setup_positions.at(i),
+                 .final_orientation = Angle::zero(),
+                 .final_speed       = 0});
+            result[0].emplace_back(move_skill_tactics.at(i));
         }
 
         // yield the Tactics this Play wants to run, in order of priority

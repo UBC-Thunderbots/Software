@@ -2,13 +2,14 @@
 
 FreeKickPlayFSM::FreeKickPlayFSM(std::shared_ptr<Strategy> strategy)
     : strategy(strategy),
-      align_to_ball_tactic(std::make_shared<MoveTactic>()),
+      align_to_ball_tactic(std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy)),
       shoot_tactic(std::make_shared<AssignedSkillTactic<KickSkill>>(strategy)),
       chip_tactic(std::make_shared<AssignedSkillTactic<ChipSkill>>(strategy)),
       passer_tactic(std::make_shared<AssignedSkillTactic<KickSkill>>(strategy)),
       receiver_tactic(std::make_shared<ReceiverTactic>(strategy)),
       receiver_positioning_tactics(
-          {std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()}),
+          {std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+           std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy)}),
       defense_play(std::make_shared<DefensePlay>(strategy)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0})
@@ -45,10 +46,10 @@ void FreeKickPlayFSM::updateReceiverPositioningTactics(
     if (num_tactics != receiver_positioning_tactics.size())
     {
         receiver_positioning_tactics =
-            std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
-        std::generate(receiver_positioning_tactics.begin(),
-                      receiver_positioning_tactics.end(),
-                      []() { return std::make_shared<MoveTactic>(); });
+            std::vector<std::shared_ptr<AssignedSkillTactic<MoveSkill>>>(num_tactics);
+        std::generate(
+            receiver_positioning_tactics.begin(), receiver_positioning_tactics.end(),
+            [&]() { return std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy); });
     }
 
     std::vector<Point> best_receiving_positions = strategy->getBestReceivingPositions(
@@ -63,9 +64,11 @@ void FreeKickPlayFSM::updateReceiverPositioningTactics(
         Angle receiver_orientation =
             (world->ball().position() - best_receiving_positions[i]).orientation();
         receiver_positioning_tactics[i]->updateControlParams(
-            best_receiving_positions[i], receiver_orientation, 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
+            {.destination             = best_receiving_positions[i],
+             .final_orientation       = receiver_orientation,
+             .final_speed             = 0.0,
+             .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+             .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE});
     }
 }
 
@@ -118,8 +121,10 @@ void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)
     Vector direction_to_face = position_to_face - ball_pos;
 
     align_to_ball_tactic->updateControlParams(
-        ball_pos - direction_to_face.normalize(ROBOT_MAX_RADIUS_METERS * 2),
-        direction_to_face.orientation(), 0);
+        {.destination =
+             ball_pos - direction_to_face.normalize(ROBOT_MAX_RADIUS_METERS * 2),
+         .final_orientation = direction_to_face.orientation(),
+         .final_speed       = 0});
 }
 
 bool FreeKickPlayFSM::shotFound(const Update &event)

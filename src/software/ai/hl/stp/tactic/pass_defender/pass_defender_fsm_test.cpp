@@ -7,6 +7,8 @@
 
 TEST(PassDefenderFSMTest, test_transitions)
 {
+    std::shared_ptr<Strategy> strategy =
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
     std::shared_ptr<World> world    = ::TestUtil::createBlankTestingWorld();
     Robot robot                     = ::TestUtil::createRobotAtPos(Point(-1, 0));
     std::vector<Point> enemy_robots = {
@@ -16,9 +18,7 @@ TEST(PassDefenderFSMTest, test_transitions)
     PassDefenderFSM::ControlParams control_params{
         .position_to_block_from = Point(-2, 0),
         .ball_steal_mode        = TbotsProto::BallStealMode::STEAL};
-    TbotsProto::AiConfig ai_config;
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM(ai_config),
-                             DribbleSkillFSM(ai_config.dribble_tactic_config())};
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(strategy), DribbleSkillFSM()};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
@@ -73,16 +73,15 @@ TEST(PassDefenderFSMTest, test_transitions)
 // This is created to test one single edge case in interceptBall
 TEST(PassDefenderFSMTest, test_intercept_edge_case)
 {
-    // create the world and the robot to test at (0,0)
+    std::shared_ptr<Strategy> strategy =
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(0, 0));
     PassDefenderFSM::ControlParams control_params{
         .position_to_block_from = Point(-2, 0),
         .ball_steal_mode        = TbotsProto::BallStealMode::STEAL};
-    TbotsProto::AiConfig ai_config;
 
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM(ai_config),
-                             DribbleSkillFSM(ai_config.dribble_tactic_config())};
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(strategy), DribbleSkillFSM()};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));

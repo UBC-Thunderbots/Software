@@ -1,9 +1,10 @@
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/hl/stp/skill/move/move_skill.h"
 
 #include <gtest/gtest.h>
 
 #include <utility>
 
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -13,14 +14,14 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class MoveTacticTest : public SimulatedErForceSimPlayTestFixture
+class MoveSkillTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
 };
 
-TEST_F(MoveTacticTest, test_move_across_field)
+TEST_F(MoveSkillTest, test_move_across_field)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(2.5, -1.1);
@@ -32,8 +33,10 @@ TEST_F(MoveTacticTest, test_move_across_field)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>();
-    tactic->updateControlParams(destination, Angle::zero(), 0);
+    auto tactic = std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy);
+    tactic->updateControlParams({.destination       = destination,
+                                 .final_orientation = Angle::zero(),
+                                 .final_speed       = 0});
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -59,7 +62,7 @@ TEST_F(MoveTacticTest, test_move_across_field)
             Duration::fromSeconds(10));
 }
 
-TEST_F(MoveTacticTest, test_autochip_move)
+TEST_F(MoveSkillTest, test_autochip_move)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(0, 1.5);
@@ -71,12 +74,17 @@ TEST_F(MoveTacticTest, test_autochip_move)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy);
     tactic->updateControlParams(
-        destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOCHIP, 2.0},
-        TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED,
-        TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
+        {.destination             = destination,
+         .final_orientation       = Angle::zero(),
+         .final_speed             = 0,
+         .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+         .ball_collision_type     = TbotsProto::BallCollisionType::ALLOW,
+         .auto_chip_or_kick       = {AutoChipOrKickMode::AUTOCHIP, 2.0},
+         .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED,
+         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
+         .target_spin_rev_per_s   = 0.0});
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -103,7 +111,7 @@ TEST_F(MoveTacticTest, test_autochip_move)
             Duration::fromSeconds(10));
 }
 
-TEST_F(MoveTacticTest, test_autokick_move)
+TEST_F(MoveSkillTest, test_autokick_move)
 {
     Point initial_position = Point(-1, -0.5);
     Point destination      = Point(-1, -1);
@@ -117,12 +125,17 @@ TEST_F(MoveTacticTest, test_autokick_move)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy);
     tactic->updateControlParams(
-        destination, Angle::threeQuarter(), 0, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOKICK, 3.0},
-        TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED,
-        TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
+        {.destination             = destination,
+         .final_orientation       = Angle::threeQuarter(),
+         .final_speed             = 0,
+         .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+         .ball_collision_type     = TbotsProto::BallCollisionType::ALLOW,
+         .auto_chip_or_kick       = {AutoChipOrKickMode::AUTOKICK, 3.0},
+         .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED,
+         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
+         .target_spin_rev_per_s   = 0.0});
     setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -149,7 +162,7 @@ TEST_F(MoveTacticTest, test_autokick_move)
             Duration::fromSeconds(10));
 }
 
-TEST_F(MoveTacticTest, test_spinning_move_clockwise)
+TEST_F(MoveSkillTest, test_spinning_move_clockwise)
 {
     Point initial_position = Point(-4, 2);
     Point destination      = Point(4, 2);
@@ -160,12 +173,17 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
                                   AngularVelocity::quarter())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy);
     tactic->updateControlParams(
-        destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
+        {.destination             = destination,
+         .final_orientation       = Angle::zero(),
+         .final_speed             = 0,
+         .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+         .ball_collision_type     = TbotsProto::BallCollisionType::ALLOW,
+         .auto_chip_or_kick       = {AutoChipOrKickMode::OFF, 0.0},
+         .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
+         .target_spin_rev_per_s   = 0.0});
     setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -196,7 +214,7 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
             Duration::fromSeconds(10));
 }
 
-TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
+TEST_F(MoveSkillTest, test_spinning_move_counter_clockwise)
 {
     Point initial_position = Point(4, 2);
     Point destination      = Point(-4, 2);
@@ -207,12 +225,17 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
                                   AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy);
     tactic->updateControlParams(
-        destination, Angle::half(), 0, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::SAFE, -4.0);
+        {.destination             = destination,
+         .final_orientation       = Angle::half(),
+         .final_speed             = 0,
+         .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+         .ball_collision_type     = TbotsProto::BallCollisionType::ALLOW,
+         .auto_chip_or_kick       = {AutoChipOrKickMode::OFF, 0.0},
+         .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
+         .target_spin_rev_per_s   = -4.0});
     setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

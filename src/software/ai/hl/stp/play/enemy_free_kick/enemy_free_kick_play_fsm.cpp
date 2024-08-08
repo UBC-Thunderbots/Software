@@ -5,7 +5,6 @@
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/util/generic_factory/generic_factory.h"

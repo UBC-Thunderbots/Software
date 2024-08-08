@@ -16,7 +16,6 @@ cc_library(
         "//software/ai/hl/stp/skill/dribble:dribble_skill",
         "//software/ai/hl/stp/skill/kick:kick_skill",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/geom/algorithms",
         "//software/logger",
     ],

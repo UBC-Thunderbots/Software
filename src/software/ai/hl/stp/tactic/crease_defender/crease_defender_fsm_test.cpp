@@ -135,7 +135,7 @@ TEST(CreaseDefenderFSMTest, test_transitions)
         .ball_steal_mode           = TbotsProto::BallStealMode::STEAL};
 
     FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{strategy}, DribbleSkillFSM());
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveSkillFSM>));
 
     // robot far from destination, ball in friendly half
     fsm.process_event(CreaseDefenderFSM::Update(
@@ -181,7 +181,7 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     // Check that the FSM stops dribbling with enemy near ball
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveSkillFSM>));
 
     robot.updateState(
         RobotState(

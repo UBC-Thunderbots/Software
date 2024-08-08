@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/specialized_assigned_skill_tactics.h"
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
@@ -84,6 +84,7 @@ struct PenaltyKickPlayFSM
     }
 
    private:
+    std::shared_ptr<Strategy> strategy;
     std::shared_ptr<PenaltyKickTactic> penalty_kick_tactic;
     std::vector<std::shared_ptr<PenaltySetupTactic>> penalty_setup_tactics;
 };

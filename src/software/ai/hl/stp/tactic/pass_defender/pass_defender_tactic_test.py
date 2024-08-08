@@ -286,12 +286,12 @@ def test_steal_ball(
 
     if should_steal:
         eventually_validation_sequence_set = [
-            [FriendlyEventuallyHasBallPossession(tolerance=0.05)]
+            [AnyFriendlyEventuallyHasBallPossession(tolerance=0.05)]
         ]
 
     else:
         always_validation_sequence_set[0].append(
-            FriendlyNeverHasBallPossession(tolerance=0.05)
+            AnyFriendlyNeverHasBallPossession(tolerance=0.05)
         )
 
     simulated_test_runner.run_test(

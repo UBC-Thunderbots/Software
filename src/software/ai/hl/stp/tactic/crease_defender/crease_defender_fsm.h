@@ -4,7 +4,6 @@
 #include "proto/tactic.pb.h"
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/geom/algorithms/contains.h"
@@ -79,32 +78,33 @@ struct CreaseDefenderFSM : public DefenderFSMBase
      * This is an Action that blocks the threat
      *
      * @param event CreaseDefenderFSM::Update event
+     * @param processEvent processes the MoveSkillFSM::Update event
      */
     void blockThreat(const Update& event,
-                     boost::sml::back::process<MoveFSM::Update> processEvent);
+                     boost::sml::back::process<MoveSkillFSM::Update> processEvent);
 
     auto operator()()
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(MoveFSM)
+        DEFINE_SML_STATE(MoveSkillFSM)
         DEFINE_SML_EVENT(Update)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveSkillFSM)
         DEFINE_SML_STATE(DribbleSkillFSM)
         DEFINE_SML_GUARD(ballNearbyWithoutThreat)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
-                DribbleSkillFSM_S,
-            MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
+            *MoveSkillFSM_S + Update_E[ballNearbyWithoutThreat_G] /
+                                  prepareGetPossession_A = DribbleSkillFSM_S,
+            MoveSkillFSM_S + Update_E / blockThreat_A, MoveSkillFSM_S = X,
             DribbleSkillFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A =
-                MoveFSM_S,
+                MoveSkillFSM_S,
             DribbleSkillFSM_S + Update_E / prepareGetPossession_A,
             X + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
                 DribbleSkillFSM_S,
-            X + Update_E / blockThreat_A = MoveFSM_S);
+            X + Update_E / blockThreat_A = MoveSkillFSM_S);
     }
 
    private:

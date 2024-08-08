@@ -1,9 +1,10 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 #include "shared/constants.h"
+#include "software/ai/hl/stp/skill/move/move_skill.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 StopPlay::StopPlay(std::shared_ptr<Strategy> strategy) : Play(true, strategy) {}
@@ -41,9 +42,10 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
     TbotsProto::MaxAllowedSpeedMode stop_mode =
         TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND;
 
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>()};
+    std::vector<std::shared_ptr<AssignedSkillTactic<MoveSkill>>> move_skill_tactics = {
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy)};
 
     goalie_tactic = std::make_shared<GoalieTactic>(strategy, stop_mode);
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -78,18 +80,27 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
             ball_defense_point_center +
             robot_positioning_unit_vector * 4 * ROBOT_MAX_RADIUS_METERS;
 
-        move_tactics.at(0)->updateControlParams(
-            ball_defense_point_center,
-            (world_ptr->ball().position() - ball_defense_point_center).orientation(), 0,
-            stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
-        move_tactics.at(1)->updateControlParams(
-            ball_defense_point_left,
-            (world_ptr->ball().position() - ball_defense_point_left).orientation(), 0,
-            stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
-        move_tactics.at(2)->updateControlParams(
-            ball_defense_point_right,
-            (world_ptr->ball().position() - ball_defense_point_right).orientation(), 0,
-            stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
+        move_skill_tactics.at(0)->updateControlParams(
+            {.destination = ball_defense_point_center,
+             .final_orientation =
+                 (world_ptr->ball().position() - ball_defense_point_center).orientation(),
+             .final_speed             = 0,
+             .max_allowed_speed_mode  = stop_mode,
+             .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE});
+        move_skill_tactics.at(1)->updateControlParams(
+            {.destination = ball_defense_point_left,
+             .final_orientation =
+                 (world_ptr->ball().position() - ball_defense_point_left).orientation(),
+             .final_speed             = 0,
+             .max_allowed_speed_mode  = stop_mode,
+             .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE});
+        move_skill_tactics.at(2)->updateControlParams(
+            {.destination = ball_defense_point_right,
+             .final_orientation =
+                 (world_ptr->ball().position() - ball_defense_point_right).orientation(),
+             .final_speed             = 0,
+             .max_allowed_speed_mode  = stop_mode,
+             .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE});
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
@@ -103,7 +114,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // insert all the tactics to the result
         result[0].emplace_back(std::get<0>(crease_defender_tactics));
         result[0].emplace_back(std::get<1>(crease_defender_tactics));
-        result[0].insert(result[0].end(), move_tactics.begin(), move_tactics.end());
+        result[0].insert(result[0].end(), move_skill_tactics.begin(),
+                         move_skill_tactics.end());
         yield(result);
     } while (true);
 }

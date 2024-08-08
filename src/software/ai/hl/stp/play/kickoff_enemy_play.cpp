@@ -4,7 +4,8 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/hl/stp/skill/move/move_skill.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/util/generic_factory/generic_factory.h"
@@ -20,7 +21,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>()};
+        std::make_shared<ShadowEnemyTactic>(strategy),
+        std::make_shared<ShadowEnemyTactic>(strategy)};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -64,11 +66,13 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Point(-(world_ptr->field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
               -world_ptr->field().defenseAreaYLength() / 2.0),
     };
-    // these move tactics will be used to go to those positions
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>()};
+    // these move skill tactics will be used to go to those positions
+    std::vector<std::shared_ptr<AssignedSkillTactic<MoveSkill>>> move_skill_tactics = {
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+        std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy)};
 
     // created an enemy_team for mutation
     Team enemy_team = world_ptr->enemyTeam();
@@ -126,24 +130,30 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 // Once we are out of enemies to shadow, or are already shadowing 2
                 // enemies, we move the rest of the robots to the defense positions
                 // listed above
-                move_tactics.at(defense_position_index)
-                    ->updateControlParams(defense_positions.at(defense_position_index),
-                                          Angle::zero(), 0);
-                result[0].emplace_back(move_tactics.at(defense_position_index));
+                move_skill_tactics.at(defense_position_index)
+                    ->updateControlParams(
+                        {.destination = defense_positions.at(defense_position_index),
+                         .final_orientation = Angle::zero(),
+                         .final_speed       = 0});
+                result[0].emplace_back(move_skill_tactics.at(defense_position_index));
                 defense_position_index++;
             }
         }
 
         // update robot 3 to be directly between the ball and the friendly net
-        move_tactics.at(defense_position_index)
+        move_skill_tactics.at(defense_position_index)
             ->updateControlParams(
-                calculateBlockCone(world_ptr->field().friendlyGoalpostPos(),
-                                   world_ptr->field().friendlyGoalpostNeg(),
-                                   world_ptr->field().centerPoint(),
-                                   ROBOT_MAX_RADIUS_METERS),
-                Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
-        result[0].emplace_back(move_tactics.at(defense_position_index));
+                {.destination = calculateBlockCone(
+                     world_ptr->field().friendlyGoalpostPos(),
+                     world_ptr->field().friendlyGoalpostNeg(),
+                     world_ptr->field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
+                 .final_orientation = Angle::zero(),
+                 .final_speed       = 0,
+                 .max_allowed_speed_mode =
+                     TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                 .obstacle_avoidance_mode =
+                     TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE});
+        result[0].emplace_back(move_skill_tactics.at(defense_position_index));
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);

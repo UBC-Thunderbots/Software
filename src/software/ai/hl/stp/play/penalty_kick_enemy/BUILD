@@ -13,8 +13,9 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/hl/stp/play",
+        "//software/ai/hl/stp/skill/move:move_skill",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/generic_factory",
         "@sml",

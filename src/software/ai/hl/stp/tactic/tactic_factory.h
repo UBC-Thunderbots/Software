@@ -20,11 +20,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tac
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::GoalieTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
-std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::MoveGoalieToGoalLineTactic &tactic_proto,
-    std::shared_ptr<Strategy> strategy);
-std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveTactic &tactic_proto,
-                                     std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PassDefenderTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PenaltyKickTactic &tactic_proto,
@@ -36,6 +31,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic
 std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::KickSkillTactic &tactic_proto,
+                                     std::shared_ptr<Strategy> strategy);
+std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);

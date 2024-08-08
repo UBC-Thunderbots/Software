@@ -36,8 +36,6 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass)
     Robot enemy(2, Point(0, 2), Vector(0, 0), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-
-
     EnemyThreat enemy_threat{shadowee,     false, Angle::zero(), std::nullopt,
                              std::nullopt, 1,     enemy};
 
@@ -52,7 +50,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass)
 
 
     BallState ball_state(Point(0, 2), Vector(0, 0));
-    auto tactic = std::make_shared<ShadowEnemyTactic>();
+    auto tactic = std::make_shared<ShadowEnemyTactic>(strategy);
     tactic->updateControlParams(enemy_threat, 2);
     setTactic(0, tactic, motion_constraints);
 
@@ -98,7 +96,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ball)
 
 
     BallState ball_state(Point(3, 0), Vector(0, 0));
-    auto tactic = std::make_shared<ShadowEnemyTactic>();
+    auto tactic = std::make_shared<ShadowEnemyTactic>(strategy);
     tactic->updateControlParams(enemy_threat, 1.5);
     setTactic(0, tactic, motion_constraints);
 
@@ -143,7 +141,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
 
 
     BallState ball_state(Point(0, -1.75), Vector(0, 0));
-    auto tactic = std::make_shared<ShadowEnemyTactic>();
+    auto tactic = std::make_shared<ShadowEnemyTactic>(strategy);
     tactic->updateControlParams(enemy_threat, 2);
     setTactic(0, tactic, motion_constraints);
 
@@ -195,7 +193,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
 
 
     BallState ball_state(Point(0, -1.75), Vector(0, 0));
-    auto tactic = std::make_shared<ShadowEnemyTactic>();
+    auto tactic = std::make_shared<ShadowEnemyTactic>(strategy);
     tactic->updateControlParams(std::nullopt, 2);
     setTactic(0, tactic, motion_constraints);
 

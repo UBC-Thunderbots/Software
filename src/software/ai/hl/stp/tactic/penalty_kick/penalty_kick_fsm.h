@@ -2,7 +2,6 @@
 
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 #include "software/ai/hl/stp/skill/kick/kick_skill_fsm.h"
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"

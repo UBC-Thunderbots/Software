@@ -7,9 +7,9 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/skill/chip/chip_skill.h"
 #include "software/ai/hl/stp/skill/kick/kick_skill.h"
+#include "software/ai/hl/stp/skill/move/move_skill.h"
 #include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/logger/logger.h"
 
@@ -264,12 +264,13 @@ struct FreeKickPlayFSM
     std::shared_ptr<Strategy> strategy;
 
     std::optional<Shot> shot;
-    std::shared_ptr<MoveTactic> align_to_ball_tactic;
+    std::shared_ptr<AssignedSkillTactic<MoveSkill>> align_to_ball_tactic;
     std::shared_ptr<AssignedSkillTactic<KickSkill>> shoot_tactic;
     std::shared_ptr<AssignedSkillTactic<ChipSkill>> chip_tactic;
     std::shared_ptr<AssignedSkillTactic<KickSkill>> passer_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
-    std::vector<std::shared_ptr<MoveTactic>> receiver_positioning_tactics;
+    std::vector<std::shared_ptr<AssignedSkillTactic<MoveSkill>>>
+        receiver_positioning_tactics;
     std::shared_ptr<DefensePlay> defense_play;
 
     PassWithRating best_pass_and_score_so_far;

@@ -1,8 +1,9 @@
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
+#include "software/ai/hl/stp/skill/move/move_skill_fsm.h"
 
 #include "software/ai/hl/stp/primitive/move_primitive.h"
+#include "software/ai/hl/stp/tactic/transition_conditions.h"
 
-void MoveFSM::updateMove(const Update &event)
+void MoveSkillFSM::updateMove(const Update &event)
 {
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, event.control_params.destination,
@@ -13,7 +14,7 @@ void MoveFSM::updateMove(const Update &event)
         event.control_params.auto_chip_or_kick));
 }
 
-bool MoveFSM::moveDone(const Update &event)
+bool MoveSkillFSM::moveDone(const Update &event)
 {
     // only finish moving if not dribbling. Sometimes when dribbling we just want to hold
     // the ball somewhere.

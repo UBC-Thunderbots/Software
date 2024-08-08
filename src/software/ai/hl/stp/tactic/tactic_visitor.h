@@ -10,24 +10,21 @@
 class Tactic;
 class CreaseDefenderTactic;
 class GoalieTactic;
-class MoveTactic;
 class AttackerTactic;
 class PassDefenderTactic;
 class PenaltyKickTactic;
-class PenaltySetupTactic;
 class ReceiverTactic;
 class ShadowEnemyTactic;
 class StopTactic;
-class MoveGoalieToGoalLineTactic;
-class PrepareKickoffMoveTactic;
-class BallPlacementMoveTactic;
-class AvoidInterferenceTactic;
 
 template <typename TSkill>
 class AssignedSkillTactic;
 
 class KickoffChipSkillTactic;
-class BallPlacementDribbleTactic;
+class BallPlacementDribbleSkillTactic;
+class PenaltySetupTactic;
+class BallPlacementMoveSkillTactic;
+class AvoidInterferenceTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
@@ -45,17 +42,12 @@ class TacticVisitor
      */
     virtual void visit(const CreaseDefenderTactic &tactic)                    = 0;
     virtual void visit(const GoalieTactic &tactic)                            = 0;
-    virtual void visit(const MoveTactic &tactic)                              = 0;
     virtual void visit(const AttackerTactic &tactic)                          = 0;
     virtual void visit(const PassDefenderTactic &tactic)                      = 0;
     virtual void visit(const PenaltyKickTactic &tactic)                       = 0;
-    virtual void visit(const PenaltySetupTactic &tactic)                      = 0;
     virtual void visit(const ReceiverTactic &tactic)                          = 0;
     virtual void visit(const ShadowEnemyTactic &tactic)                       = 0;
     virtual void visit(const StopTactic &tactic)                              = 0;
-    virtual void visit(const MoveGoalieToGoalLineTactic &tactic)              = 0;
-    virtual void visit(const PrepareKickoffMoveTactic &tactic)                = 0;
-    virtual void visit(const AvoidInterferenceTactic &tactic)                 = 0;
     virtual void visit(const AssignedSkillTactic<ChipSkill> &tactic)          = 0;
     virtual void visit(const AssignedSkillTactic<DribbleSkill> &tactic)       = 0;
     virtual void visit(const AssignedSkillTactic<GetBehindBallSkill> &tactic) = 0;
@@ -63,10 +55,13 @@ class TacticVisitor
     virtual void visit(const AssignedSkillTactic<KickSkill> &tactic)          = 0;
     virtual void visit(const AssignedSkillTactic<KickPassSkill> &tactic)      = 0;
     virtual void visit(const AssignedSkillTactic<ChipPassSkill> &tactic)      = 0;
+    virtual void visit(const AssignedSkillTactic<MoveSkill> &tactic)          = 0;
     virtual void visit(const AssignedSkillTactic<PivotKickSkill> &tactic)     = 0;
     virtual void visit(const AssignedSkillTactic<ShootSkill> &tactic)         = 0;
     virtual void visit(const AssignedSkillTactic<DribbleShootSkill> &tactic)  = 0;
     virtual void visit(const KickoffChipSkillTactic &tactic)                  = 0;
-    virtual void visit(const BallPlacementDribbleTactic &tactic)              = 0;
-    virtual void visit(const BallPlacementMoveTactic &tactic)                 = 0;
+    virtual void visit(const BallPlacementDribbleSkillTactic &tactic)         = 0;
+    virtual void visit(const PenaltySetupTactic &tactic)                      = 0;
+    virtual void visit(const BallPlacementMoveSkillTactic &tactic)            = 0;
+    virtual void visit(const AvoidInterferenceTactic &tactic)                 = 0;
 };

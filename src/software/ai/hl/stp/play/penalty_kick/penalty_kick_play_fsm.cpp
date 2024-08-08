@@ -1,7 +1,8 @@
 #include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h"
 
 PenaltyKickPlayFSM::PenaltyKickPlayFSM(std::shared_ptr<Strategy> strategy)
-    : penalty_kick_tactic(std::make_shared<PenaltyKickTactic>(strategy)),
+    : strategy(strategy),
+      penalty_kick_tactic(std::make_shared<PenaltyKickTactic>(strategy)),
       penalty_setup_tactics(std::vector<std::shared_ptr<PenaltySetupTactic>>())
 {
 }
@@ -36,7 +37,7 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
         penalty_setup_tactics =
             std::vector<std::shared_ptr<PenaltySetupTactic>>(num_tactics);
         std::generate(penalty_setup_tactics.begin(), penalty_setup_tactics.end(),
-                      []() { return std::make_shared<PenaltySetupTactic>(); });
+                      [&]() { return std::make_shared<PenaltySetupTactic>(strategy); });
     }
 
     // Move all non-shooter robots behind the penalty
@@ -46,13 +47,18 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
                           ((double)i - ((double)penalty_setup_tactics.size() - 1) / 2.0) *
                           ROBOT_MAX_RADIUS_METERS;
         penalty_setup_tactics.at(i)->updateControlParams(
-            Point(ball_position_x - 1.25, y_offset),
-            event.common.world_ptr->field().enemyGoalCenter().toVector().orientation(),
-            0);
+            {.destination       = Point(ball_position_x - 1.25, y_offset),
+             .final_orientation = event.common.world_ptr->field()
+                                      .enemyGoalCenter()
+                                      .toVector()
+                                      .orientation(),
+             .final_speed = 0});
     }
 
     // Move shooting robot behind the ball
-    penalty_setup_tactics.back()->updateControlParams(behind_ball, shoot_angle, 0.0);
+    penalty_setup_tactics.back()->updateControlParams({.destination       = behind_ball,
+                                                       .final_orientation = shoot_angle,
+                                                       .final_speed       = 0.0});
 
     tactics_to_run[0].insert(tactics_to_run[0].end(), penalty_setup_tactics.begin(),
                              penalty_setup_tactics.end());

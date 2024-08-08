@@ -2,13 +2,13 @@
 
 BallPlacementPlayFSM::BallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
     : strategy(strategy),
-      align_wall_tactic(std::make_shared<BallPlacementMoveTactic>()),
-      pickoff_wall_tactic(std::make_shared<BallPlacementDribbleTactic>(strategy)),
-      place_ball_tactic(std::make_shared<BallPlacementDribbleTactic>(strategy)),
-      align_placement_tactic(std::make_shared<BallPlacementMoveTactic>()),
-      retreat_tactic(std::make_shared<MoveTactic>()),
-      wait_tactic(std::make_shared<MoveTactic>()),
-      move_tactics(std::vector<std::shared_ptr<BallPlacementMoveTactic>>())
+      align_wall_tactic(std::make_shared<BallPlacementMoveSkillTactic>(strategy)),
+      pickoff_wall_tactic(std::make_shared<BallPlacementDribbleSkillTactic>(strategy)),
+      place_ball_tactic(std::make_shared<BallPlacementDribbleSkillTactic>(strategy)),
+      align_placement_tactic(std::make_shared<BallPlacementMoveSkillTactic>(strategy)),
+      retreat_tactic(std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy)),
+      wait_tactic(std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy)),
+      move_skill_tactics(std::vector<std::shared_ptr<BallPlacementMoveSkillTactic>>())
 {
 }
 
@@ -16,10 +16,10 @@ void BallPlacementPlayFSM::alignWall(const Update &event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
-    // setup move tactics for robots away from ball placing robot
-    setupMoveTactics(event);
-    tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
-                             move_tactics.end());
+    // setup move skill tactics for robots away from ball placing robot
+    setupMoveSkillTactics(event);
+    tactics_to_run[0].insert(tactics_to_run[0].end(), move_skill_tactics.begin(),
+                             move_skill_tactics.end());
 
     // setup wall kickoff tactic for ball placing robot
     Point ball_pos           = event.common.world_ptr->ball().position();
@@ -32,10 +32,15 @@ void BallPlacementPlayFSM::alignWall(const Update &event)
     pickoff_point =
         ball_pos - Vector::createFromAngle(pickoff_final_orientation).normalize(0.4);
     align_wall_tactic->updateControlParams(
-        pickoff_point, pickoff_final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
+        {.destination             = pickoff_point,
+         .final_orientation       = pickoff_final_orientation,
+         .final_speed             = 0.0,
+         .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+         .ball_collision_type     = TbotsProto::BallCollisionType::AVOID,
+         .auto_chip_or_kick       = {AutoChipOrKickMode::OFF, 0},
+         .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+         .target_spin_rev_per_s   = 0.0});
     tactics_to_run[0].emplace_back(align_wall_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -59,10 +64,10 @@ void BallPlacementPlayFSM::pickOffWall(const BallPlacementPlayFSM::Update &event
 {
     PriorityTacticVector tactics_to_run = {{}};
 
-    // setup move tactics for robots away from ball placing robot
-    setupMoveTactics(event);
-    tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
-                             move_tactics.end());
+    // setup move skill tactics for robots away from ball placing robot
+    setupMoveSkillTactics(event);
+    tactics_to_run[0].insert(tactics_to_run[0].end(), move_skill_tactics.begin(),
+                             move_skill_tactics.end());
 
     pickoff_wall_tactic->updateControlParams(
         {.dribble_destination       = pickoff_destination,
@@ -87,10 +92,10 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
     {
         PriorityTacticVector tactics_to_run = {{}};
 
-        // setup move tactics for robots away from ball placing robot
-        setupMoveTactics(event);
-        tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
-                                 move_tactics.end());
+        // setup move skill tactics for robots away from ball placing robot
+        setupMoveSkillTactics(event);
+        tactics_to_run[0].insert(tactics_to_run[0].end(), move_skill_tactics.begin(),
+                                 move_skill_tactics.end());
 
         // find position behind the ball where the ball is aligned directly in front
         // placement point from the placing robot's POV
@@ -102,10 +107,15 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
                       2.5 * alignment_vector * ROBOT_MAX_RADIUS_METERS;
 
         align_placement_tactic->updateControlParams(
-            setup_point, setup_angle, 0.0, TbotsProto::DribblerMode::OFF,
-            TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-            TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
+            {.destination             = setup_point,
+             .final_orientation       = setup_angle,
+             .final_speed             = 0.0,
+             .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+             .ball_collision_type     = TbotsProto::BallCollisionType::AVOID,
+             .auto_chip_or_kick       = {AutoChipOrKickMode::OFF, 0},
+             .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+             .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
+             .target_spin_rev_per_s   = 0.0});
 
         tactics_to_run[0].emplace_back(align_placement_tactic);
 
@@ -125,10 +135,10 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
     PriorityTacticVector tactics_to_run = {{}};
 
-    // setup move tactics for robots away from ball placing robot
-    setupMoveTactics(event);
-    tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
-                             move_tactics.end());
+    // setup move skill tactics for robots away from ball placing robot
+    setupMoveSkillTactics(event);
+    tactics_to_run[0].insert(tactics_to_run[0].end(), move_skill_tactics.begin(),
+                             move_skill_tactics.end());
 
     Point ball_pos = event.common.world_ptr->ball().position();
     std::optional<Robot> robot_placing_ball =
@@ -175,18 +185,23 @@ void BallPlacementPlayFSM::releaseBall(const Update &event)
     {
         PriorityTacticVector tactics_to_run = {{}};
 
-        // setup move tactics for robots away from ball placing robot
-        setupMoveTactics(event);
-        tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
-                                 move_tactics.end());
+        // setup move skill tactics for robots away from ball placing robot
+        setupMoveSkillTactics(event);
+        tactics_to_run[0].insert(tactics_to_run[0].end(), move_skill_tactics.begin(),
+                                 move_skill_tactics.end());
 
 
         wait_tactic->updateControlParams(
-            nearest_robot->position(), nearest_robot->orientation(), 0.0,
-            TbotsProto::DribblerMode::RELEASE_BALL_SLOW,
-            TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
+            {.destination         = nearest_robot->position(),
+             .final_orientation   = nearest_robot->orientation(),
+             .final_speed         = 0.0,
+             .dribbler_mode       = TbotsProto::DribblerMode::RELEASE_BALL_SLOW,
+             .ball_collision_type = TbotsProto::BallCollisionType::ALLOW,
+             .auto_chip_or_kick   = {AutoChipOrKickMode::OFF, 0},
+             .max_allowed_speed_mode =
+                 TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
+             .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+             .target_spin_rev_per_s   = 0.0});
         tactics_to_run[0].emplace_back(wait_tactic);
 
         event.common.set_tactics(tactics_to_run);
@@ -203,10 +218,10 @@ void BallPlacementPlayFSM::retreat(const Update &event)
     {
         PriorityTacticVector tactics_to_run = {{}};
 
-        // setup move tactics for robots away from ball placing robot
-        setupMoveTactics(event);
-        tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
-                                 move_tactics.end());
+        // setup move skill tactics for robots away from ball placing robot
+        setupMoveSkillTactics(event);
+        tactics_to_run[0].insert(tactics_to_run[0].end(), move_skill_tactics.begin(),
+                                 move_skill_tactics.end());
 
         Point ball_pos = world_ptr->ball().position();
 
@@ -235,10 +250,16 @@ void BallPlacementPlayFSM::retreat(const Update &event)
 
         // setup ball placement tactic for ball placing robot
         retreat_tactic->updateControlParams(
-            retreat_position, final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
-            TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
-            TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
+            {.destination         = retreat_position,
+             .final_orientation   = final_orientation,
+             .final_speed         = 0.0,
+             .dribbler_mode       = TbotsProto::DribblerMode::OFF,
+             .ball_collision_type = TbotsProto::BallCollisionType::AVOID,
+             .auto_chip_or_kick   = {AutoChipOrKickMode::OFF, 0},
+             .max_allowed_speed_mode =
+                 TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
+             .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
+             .target_spin_rev_per_s   = 0.0});
         tactics_to_run[0].emplace_back(retreat_tactic);
 
         event.common.set_tactics(tactics_to_run);
@@ -387,20 +408,21 @@ std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffLocation(
     return std::make_pair(facing_angle, backoff_point);
 }
 
-void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
+void BallPlacementPlayFSM::setupMoveSkillTactics(const Update &event)
 {
     // assign all but one of the robots to line up away from the ball placing robot
-    int num_move_tactics = event.common.num_tactics - 1;
+    int num_move_skill_tactics = event.common.num_tactics - 1;
 
-    if (num_move_tactics <= 0)
+    if (num_move_skill_tactics <= 0)
     {
         return;
     }
 
-    move_tactics =
-        std::vector<std::shared_ptr<BallPlacementMoveTactic>>(num_move_tactics);
-    std::generate(move_tactics.begin(), move_tactics.end(),
-                  [this]() { return std::make_shared<BallPlacementMoveTactic>(); });
+    move_skill_tactics = std::vector<std::shared_ptr<BallPlacementMoveSkillTactic>>(
+        num_move_skill_tactics);
+    std::generate(move_skill_tactics.begin(), move_skill_tactics.end(), [this]() {
+        return std::make_shared<BallPlacementMoveSkillTactic>(strategy);
+    });
 
     // non goalie and non ball placing robots line up along a line just outside the
     // friendly defense area to wait for ball placement to finish
@@ -413,15 +435,17 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
                0);  // Path planner can slow down when pathing through objects - buffer
     // zone of radius x 3 should help
 
-    for (unsigned int i = 0; i < move_tactics.size(); i++)
+    for (unsigned int i = 0; i < move_skill_tactics.size(); i++)
     {
         Point waiting_destination =
             waiting_line_start_point +
             waiting_line_vector.normalize(waiting_line_vector.length() * i /
-                                          static_cast<double>(move_tactics.size()));
-        move_tactics.at(i)->updateControlParams(
-            waiting_destination, Angle::zero(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::SAFE);
+                                          static_cast<double>(move_skill_tactics.size()));
+        move_skill_tactics.at(i)->updateControlParams(
+            {.destination             = waiting_destination,
+             .final_orientation       = Angle::zero(),
+             .final_speed             = 0.0,
+             .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+             .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE});
     }
 }

@@ -3,8 +3,8 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/skill/move/move_skill.h"
 #include "software/ai/hl/stp/tactic/assigned_skill/specialized_assigned_skill_tactics.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -174,12 +174,12 @@ struct BallPlacementPlayFSM
                                                          double max_dist);
 
     /**
-     * Helper function that populates the move_tactics field with MoveTactics that
-     * organize the robots away from the ball placing robot
+     * Helper function that populates the move_skill_tactics field with MoveSkillTactics
+     * that organize the robots away from the ball placing robot
      *
      * @param event the BallPlacementPlayFSM Update event
      */
-    void setupMoveTactics(const Update& event);
+    void setupMoveSkillTactics(const Update& event);
 
     auto operator()()
     {
@@ -248,13 +248,13 @@ struct BallPlacementPlayFSM
 
    private:
     std::shared_ptr<Strategy> strategy;
-    std::shared_ptr<BallPlacementMoveTactic> align_wall_tactic;
-    std::shared_ptr<BallPlacementDribbleTactic> pickoff_wall_tactic;
-    std::shared_ptr<BallPlacementDribbleTactic> place_ball_tactic;
-    std::shared_ptr<BallPlacementMoveTactic> align_placement_tactic;
-    std::shared_ptr<MoveTactic> retreat_tactic;
-    std::shared_ptr<MoveTactic> wait_tactic;
-    std::vector<std::shared_ptr<BallPlacementMoveTactic>> move_tactics;
+    std::shared_ptr<BallPlacementMoveSkillTactic> align_wall_tactic;
+    std::shared_ptr<BallPlacementDribbleSkillTactic> pickoff_wall_tactic;
+    std::shared_ptr<BallPlacementDribbleSkillTactic> place_ball_tactic;
+    std::shared_ptr<BallPlacementMoveSkillTactic> align_placement_tactic;
+    std::shared_ptr<AssignedSkillTactic<MoveSkill>> retreat_tactic;
+    std::shared_ptr<AssignedSkillTactic<MoveSkill>> wait_tactic;
+    std::vector<std::shared_ptr<BallPlacementMoveSkillTactic>> move_skill_tactics;
     Point setup_point;
     Point pickoff_point;
     Point pickoff_destination;

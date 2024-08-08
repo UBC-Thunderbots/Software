@@ -24,7 +24,7 @@ TEST(PenaltyKickEnemyPlayFSMTest, test_transitions)
     std::shared_ptr<GoalieTactic> goalie_tactic =
         std::make_shared<GoalieTactic>(strategy);
 
-    FSM<PenaltyKickEnemyPlayFSM> fsm(PenaltyKickEnemyPlayFSM{strategy->getAiConfig()});
+    FSM<PenaltyKickEnemyPlayFSM> fsm(PenaltyKickEnemyPlayFSM{strategy});
 
     EXPECT_TRUE(fsm.is(boost::sml::state<PenaltyKickEnemyPlayFSM::SetupPositionState>));
 

@@ -3,9 +3,9 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/specialized_assigned_skill_tactics.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/stadium.h"
@@ -130,7 +130,7 @@ struct EnemyBallPlacementPlayFSM
     std::shared_ptr<Strategy> strategy;
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
     std::array<std::shared_ptr<AvoidInterferenceTactic>, 6> avoid_interference_tactics;
-    std::array<std::shared_ptr<MoveTactic>, 3> move_tactics;
+    std::array<std::shared_ptr<AssignedSkillTactic<MoveSkill>>, 3> move_skill_tactics;
     std::shared_ptr<GoalieTactic> goalie_tactic;
 
     Point placement_point;

@@ -13,7 +13,12 @@
 class ShadowEnemyTactic : public Tactic
 {
    public:
-    explicit ShadowEnemyTactic();
+    /**
+     * Creates a new ShadowEnemyTactic
+     *
+     * @param strategy the Strategy shared by all of AI
+     */
+    explicit ShadowEnemyTactic(std::shared_ptr<Strategy> strategy);
 
     /**
      * Updates the control parameters for this ShadowEnemyTactic
@@ -33,7 +38,7 @@ class ShadowEnemyTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
+    std::shared_ptr<Strategy> strategy;
     std::map<RobotId, std::unique_ptr<FSM<ShadowEnemyFSM>>> fsm_map;
-
     ShadowEnemyFSM::ControlParams control_params;
 };

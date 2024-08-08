@@ -2,6 +2,8 @@
 
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 
+ShadowEnemyFSM::ShadowEnemyFSM(std::shared_ptr<Strategy> strategy) : strategy(strategy) {}
+
 Point ShadowEnemyFSM::findBlockPassPoint(const Point &ball_position,
                                          const Robot &shadowee,
                                          const double &shadow_distance)
@@ -76,8 +78,8 @@ void ShadowEnemyFSM::blockPass(const Update &event)
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
-void ShadowEnemyFSM::blockShot(const Update &event,
-                               boost::sml::back::process<MoveFSM::Update> processEvent)
+void ShadowEnemyFSM::blockShot(
+    const Update &event, boost::sml::back::process<MoveSkillFSM::Update> processEvent)
 {
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
     auto ball_position = event.common.world_ptr->ball().position();
@@ -99,7 +101,7 @@ void ShadowEnemyFSM::blockShot(const Update &event,
             enemy_threat_opt.value().robot, event.control_params.shadow_distance);
     };
 
-    MoveFSM::ControlParams control_params{
+    MoveSkillFSM::ControlParams control_params{
         .destination             = position_to_block,
         .final_orientation       = face_ball_orientation,
         .final_speed             = 0.0,
@@ -110,7 +112,9 @@ void ShadowEnemyFSM::blockShot(const Update &event,
         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         .target_spin_rev_per_s   = 0.0};
 
-    processEvent(MoveFSM::Update(control_params, event.common));
+    processEvent(MoveSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
+                                    event.common.set_primitive)));
 }
 
 void ShadowEnemyFSM::stealAndChip(const Update &event)

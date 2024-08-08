@@ -43,7 +43,7 @@ bool CreaseDefenderFSM::isAnyEnemyInZone(const Update& event, const Stadium& zon
 }
 
 void CreaseDefenderFSM::blockThreat(
-    const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<MoveSkillFSM::Update> processEvent)
 {
     Point robot_position    = event.common.robot.position();
     Point destination       = event.common.robot.position();
@@ -142,7 +142,7 @@ void CreaseDefenderFSM::blockThreat(
         auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance};
     }
 
-    MoveFSM::ControlParams control_params{
+    MoveSkillFSM::ControlParams control_params{
         .destination             = destination,
         .final_orientation       = face_threat_orientation,
         .final_speed             = 0.0,
@@ -154,7 +154,9 @@ void CreaseDefenderFSM::blockThreat(
         .target_spin_rev_per_s   = 0.0};
 
     // Update the get behind ball fsm
-    processEvent(MoveFSM::Update(control_params, event.common));
+    processEvent(MoveSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
+                                    event.common.set_primitive)));
 }
 
 std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(

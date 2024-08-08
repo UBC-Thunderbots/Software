@@ -15,19 +15,18 @@ message Tactic
 {
     oneof tactic
     {
-        AttackerTactic attacker                             = 1;
-        CreaseDefenderTactic crease_defender                = 3;
-        GoalieTactic goalie                                 = 6;
-        MoveGoalieToGoalLineTactic move_goalie_to_goal_line = 8;
-        MoveTactic move                                     = 9;
-        PenaltyKickTactic penalty_kick                      = 10;
-        ReceiverTactic receiver                             = 12;
-        ShadowEnemyTactic shadow_enemy                      = 13;
-        StopTactic stop                                     = 14;
-        PassDefenderTactic pass_defender                    = 15;
-        KickSkillTactic kick_skill                          = 16;
-        PivotKickSkillTactic pivot_kick_skill               = 17;
-        ShootSkillTactic shoot_skill                        = 18;
+        AttackerTactic attacker               = 1;
+        CreaseDefenderTactic crease_defender  = 3;
+        GoalieTactic goalie                   = 6;
+        PenaltyKickTactic penalty_kick        = 10;
+        ReceiverTactic receiver               = 12;
+        ShadowEnemyTactic shadow_enemy        = 13;
+        StopTactic stop                       = 14;
+        PassDefenderTactic pass_defender      = 15;
+        KickSkillTactic kick_skill            = 16;
+        PivotKickSkillTactic pivot_kick_skill = 17;
+        ShootSkillTactic shoot_skill          = 18;
+        MoveSkillTactic move_skill            = 19;
     }
     reserved 2, 4, 5, 7, 11;
 }
@@ -65,30 +64,6 @@ message GoalieTactic
 {
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 1;
-}
-
-message MoveGoalieToGoalLineTactic {}
-
-message MoveTactic
-{
-    // The point the robot is trying to move to
-    required Point destination = 1;
-    // The orientation the robot should have when it arrives at its destination
-    required Angle final_orientation = 2;
-    // The speed the robot should have when it arrives at its destination
-    required double final_speed = 3;
-    // How to run the dribbler
-    required DribblerMode dribbler_mode = 4;
-    // How to navigate around the ball
-    required BallCollisionType ball_collision_type = 5;
-    // The command to autochip or autokick
-    required AutoChipOrKick auto_chip_or_kick = 6;
-    // The maximum allowed speed mode
-    required MaxAllowedSpeedMode max_allowed_speed_mode = 7;
-    // The target spin while moving in revolutions per second
-    required double target_spin_rev_per_s = 8;
-    // The obstacle avoidance mode to use while moving
-    required ObstacleAvoidanceMode obstacle_avoidance_mode = 9;
 }
 
 message PassDefenderTactic
@@ -155,4 +130,26 @@ message KickSkillTactic
     required Angle kick_direction = 2;
     // How fast the Robot will kick the ball in meters per second
     required double kick_speed_meters_per_second = 3;
+}
+
+message MoveSkillTactic
+{
+    // The point the robot is trying to move to
+    required Point destination = 1;
+    // The orientation the robot should have when it arrives at its destination
+    required Angle final_orientation = 2;
+    // The speed the robot should have when it arrives at its destination
+    required double final_speed = 3;
+    // How to run the dribbler
+    required DribblerMode dribbler_mode = 4;
+    // How to navigate around the ball
+    required BallCollisionType ball_collision_type = 5;
+    // The command to autochip or autokick
+    required AutoChipOrKick auto_chip_or_kick = 6;
+    // The maximum allowed speed mode
+    required MaxAllowedSpeedMode max_allowed_speed_mode = 7;
+    // The target spin while moving in revolutions per second
+    required double target_spin_rev_per_s = 8;
+    // The obstacle avoidance mode to use while moving
+    required ObstacleAvoidanceMode obstacle_avoidance_mode = 9;
 }
