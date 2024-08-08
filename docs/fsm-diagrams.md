@@ -319,6 +319,21 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
+## [StopSkillFSM](/src/software/ai/hl/stp/skill/stop/stop_skill_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StopState
+StopState --> StopState : [!stopDone]\n<i>updateStop</i>
+StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+
+```
+
 ## [CreaseDefenderFSM](/src/software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h)
 
 ```mermaid
@@ -445,21 +460,6 @@ StealAndChipState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPas
 Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> MoveSkillFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
-
-```
-
-## [StopSkillFSM](/src/software/ai/hl/stp/tactic/stop/stop_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> StopState
-StopState --> StopState : [!stopDone]\n<i>updateStop</i>
-StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 
 ```
 

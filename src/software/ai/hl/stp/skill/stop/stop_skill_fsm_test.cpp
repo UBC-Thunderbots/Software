@@ -1,6 +1,7 @@
+#include "software/ai/hl/stp/skill/stop/stop_skill_fsm.h"
+
 #include <gtest/gtest.h>
 
-#include "software/ai/hl/stp/skill/stop/stop_skill_fsm.h"
 #include "software/test_util/test_util.h"
 
 TEST(StopSkillFSMTest, test_transitions)
