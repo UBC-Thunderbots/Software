@@ -1,8 +1,8 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/skill/skill_fsm.h"
 
-struct StopFSM
+struct StopSkillFSM
 {
    public:
     class StopState;
@@ -11,24 +11,19 @@ struct StopFSM
     {
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
-    /**
-     * Constructor for StopFSM struct
-     */
-    explicit StopFSM() {}
+    DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Action to set the StopPrimitive
      *
-     * @param event StopFSM::Update
+     * @param event StopSkillFSM::Update
      */
     void updateStop(const Update& event);
 
     /**
-     * Guard if the stop is done
+     * Guard to check if the stop is done
      *
-     * @param event StopFSM::Update
+     * @param event StopSkillFSM::Update
      *
      * @return if the robot has stopped
      */

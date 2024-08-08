@@ -13,7 +13,8 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/skill/stop:stop_skill",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],
@@ -82,9 +83,10 @@ cc_library(
     ],
     deps = [
         "//software/ai:strategy",
+        "//software/ai/hl/stp/skill/stop:stop_skill",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/ai/navigator/trajectory:trajectory_planner",
         "//software/ai/passing:pass_with_rating",
@@ -220,7 +222,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/logger",
         "//software/util/generic_factory",

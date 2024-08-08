@@ -28,8 +28,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ReceiverTactic &tactic_pr
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
-std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
-                                     std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::KickSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveSkillTactic &tactic_proto,
@@ -37,6 +35,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveSkillTactic &tactic_p
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ShootSkillTactic &tactic_proto,
+                                     std::shared_ptr<Strategy> strategy);
+std::shared_ptr<Tactic> createTactic(const TbotsProto::StopSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 
 /**

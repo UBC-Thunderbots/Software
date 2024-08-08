@@ -14,7 +14,6 @@ cc_library(
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
         "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )
 

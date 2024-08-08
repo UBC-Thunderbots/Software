@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/skill/stop/stop_skill.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/geom/algorithms/contains.h"
 #include "software/util/generic_factory/generic_factory.h"
 
@@ -13,9 +14,9 @@ HaltTestPlay::HaltTestPlay(const TbotsProto::AiConfig &config,
 void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                   const WorldPtr &world_ptr)
 {
-    auto stop_test_tactic_1 = std::make_shared<StopTactic>();
-    auto stop_test_tactic_2 = std::make_shared<StopTactic>();
-    auto stop_test_tactic_3 = std::make_shared<StopTactic>();
+    auto stop_test_tactic_1 = std::make_shared<AssignedSkillTactic<StopSkill>>(strategy);
+    auto stop_test_tactic_2 = std::make_shared<AssignedSkillTactic<StopSkill>>(strategy);
+    auto stop_test_tactic_3 = std::make_shared<AssignedSkillTactic<StopSkill>>(strategy);
 
     do
     {

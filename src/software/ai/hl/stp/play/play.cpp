@@ -5,15 +5,16 @@
 #include <Tracy.hpp>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/skill/stop/stop_skill.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
 Play::Play(bool requires_goalie, std::shared_ptr<Strategy> strategy)
     : strategy(strategy),
       goalie_tactic(std::make_shared<GoalieTactic>(strategy)),
-      stop_tactics(),
+      stop_skill_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
       world_ptr_(std::nullopt),
@@ -21,7 +22,8 @@ Play::Play(bool requires_goalie, std::shared_ptr<Strategy> strategy)
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
-        stop_tactics.push_back(std::make_shared<StopTactic>());
+        stop_skill_tactics.push_back(
+            std::make_shared<AssignedSkillTactic<StopSkill>>(strategy));
     }
 }
 
@@ -189,10 +191,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             else if (i == (priority_tactics.size() - 1))
             {
                 // If assigning the last tactic vector, then assign rest of robots with
-                // StopTactics
+                // stop skill tactics
                 for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
                 {
-                    tactic_vector.push_back(stop_tactics[ii]);
+                    tactic_vector.push_back(stop_skill_tactics[ii]);
                 }
             }
 

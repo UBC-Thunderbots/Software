@@ -1,21 +1,22 @@
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/skill/stop/stop_skill.h"
 
 #include <gtest/gtest.h>
 
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
-class StopTacticTest : public SimulatedErForceSimPlayTestFixture
+class StopSkillTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
 };
 
-TEST_F(StopTacticTest, robot_already_stopped)
+TEST_F(StopSkillTest, robot_already_stopped)
 {
     BallState ball_state(Point(0, 0.5), Vector(0, 0));
 
@@ -23,7 +24,7 @@ TEST_F(StopTacticTest, robot_already_stopped)
         {Point(-3, 2.5), Point()}, {Vector(), Vector()});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<StopTactic>();
+    auto tactic = std::make_shared<AssignedSkillTactic<StopSkill>>(strategy);
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -41,7 +42,7 @@ TEST_F(StopTacticTest, robot_already_stopped)
             Duration::fromSeconds(5));
 }
 
-TEST_F(StopTacticTest, robot_start_moving)
+TEST_F(StopSkillTest, robot_start_moving)
 {
     BallState ball_state(Point(0, 0.5), Vector(0, 0));
 
@@ -49,7 +50,7 @@ TEST_F(StopTacticTest, robot_start_moving)
         {Point(-3, 2.5), Point()}, {Vector(), Vector(4, 4)});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<StopTactic>();
+    auto tactic = std::make_shared<AssignedSkillTactic<StopSkill>>(strategy);
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

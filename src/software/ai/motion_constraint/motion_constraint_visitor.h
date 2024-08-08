@@ -22,7 +22,6 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const GoalieTactic &tactic) override;
     void visit(const CreaseDefenderTactic &tactic) override;
     void visit(const ShadowEnemyTactic &tactic) override;
-    void visit(const StopTactic &tactic) override;
     void visit(const PenaltyKickTactic &tactic) override;
     void visit(const ReceiverTactic &tactic) override;
     void visit(const AttackerTactic &tactic) override;
@@ -38,6 +37,7 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const AssignedSkillTactic<PivotKickSkill> &tactic) override;
     void visit(const AssignedSkillTactic<ShootSkill> &tactic) override;
     void visit(const AssignedSkillTactic<DribbleShootSkill> &tactic) override;
+    void visit(const AssignedSkillTactic<StopSkill> &tactic) override;
     void visit(const KickoffChipSkillTactic &tactic) override;
     void visit(const BallPlacementDribbleSkillTactic &tactic) override;
     void visit(const PenaltySetupTactic &tactic) override;

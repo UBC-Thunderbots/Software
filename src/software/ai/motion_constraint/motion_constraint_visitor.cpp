@@ -18,8 +18,6 @@ void MotionConstraintVisitor::visit(const CreaseDefenderTactic &tactic)
 
 void MotionConstraintVisitor::visit(const ShadowEnemyTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const StopTactic &tactic) {}
-
 void MotionConstraintVisitor::visit(const PenaltyKickTactic &tactic)
 {
     current_motion_constraints.erase(
@@ -59,6 +57,8 @@ void MotionConstraintVisitor::visit(const AssignedSkillTactic<ShootSkill> &tacti
 void MotionConstraintVisitor::visit(const AssignedSkillTactic<DribbleShootSkill> &tactic)
 {
 }
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<StopSkill> &tactic) {}
 
 void MotionConstraintVisitor::visit(const KickoffChipSkillTactic &tactic)
 {

@@ -15,7 +15,6 @@ class PassDefenderTactic;
 class PenaltyKickTactic;
 class ReceiverTactic;
 class ShadowEnemyTactic;
-class StopTactic;
 
 template <typename TSkill>
 class AssignedSkillTactic;
@@ -47,7 +46,6 @@ class TacticVisitor
     virtual void visit(const PenaltyKickTactic &tactic)                       = 0;
     virtual void visit(const ReceiverTactic &tactic)                          = 0;
     virtual void visit(const ShadowEnemyTactic &tactic)                       = 0;
-    virtual void visit(const StopTactic &tactic)                              = 0;
     virtual void visit(const AssignedSkillTactic<ChipSkill> &tactic)          = 0;
     virtual void visit(const AssignedSkillTactic<DribbleSkill> &tactic)       = 0;
     virtual void visit(const AssignedSkillTactic<GetBehindBallSkill> &tactic) = 0;
@@ -59,6 +57,7 @@ class TacticVisitor
     virtual void visit(const AssignedSkillTactic<PivotKickSkill> &tactic)     = 0;
     virtual void visit(const AssignedSkillTactic<ShootSkill> &tactic)         = 0;
     virtual void visit(const AssignedSkillTactic<DribbleShootSkill> &tactic)  = 0;
+    virtual void visit(const AssignedSkillTactic<StopSkill> &tactic)          = 0;
     virtual void visit(const KickoffChipSkillTactic &tactic)                  = 0;
     virtual void visit(const BallPlacementDribbleSkillTactic &tactic)         = 0;
     virtual void visit(const PenaltySetupTactic &tactic)                      = 0;

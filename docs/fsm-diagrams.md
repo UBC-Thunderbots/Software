@@ -448,7 +448,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [StopFSM](/src/software/ai/hl/stp/tactic/stop/stop_fsm.h)
+## [StopSkillFSM](/src/software/ai/hl/stp/tactic/stop/stop_fsm.h)
 
 ```mermaid
 

@@ -5,7 +5,6 @@
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/skill/move/move_skill.h"
 #include "software/ai/hl/stp/tactic/assigned_skill/specialized_assigned_skill_tactics.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/closest_point.h"
 

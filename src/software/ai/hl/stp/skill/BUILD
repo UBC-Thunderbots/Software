@@ -43,5 +43,6 @@ cc_library(
         "//software/ai/hl/stp/skill/move:move_skill",
         "//software/ai/hl/stp/skill/pass:pass_skill",
         "//software/ai/hl/stp/skill/shoot:shoot_skill",
+        "//software/ai/hl/stp/skill/stop:stop_skill",
     ],
 )

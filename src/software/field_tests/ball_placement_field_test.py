@@ -32,10 +32,10 @@ def test_ball_placement(field_test_runner):
         eventually_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
-    # Send a stop tactic after the test finishes
-    stop_tactic = StopTactic()
+    # Send a stop skill tactic after the test finishes
+    stop_skill_tactic = StopSkillTactic()
     params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
+    params.assigned_tactics[id].stop_skill.CopyFrom(stop_skill_tactic)
 
 
 _

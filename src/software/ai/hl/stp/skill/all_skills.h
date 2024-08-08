@@ -9,3 +9,4 @@
 #include "software/ai/hl/stp/skill/pass/pass_skill.hpp"
 #include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill.h"
 #include "software/ai/hl/stp/skill/shoot/shoot_skill.hpp"
+#include "software/ai/hl/stp/skill/stop/stop_skill.h"

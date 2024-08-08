@@ -62,9 +62,6 @@ namespace
             std::make_tuple(std::make_shared<AttackerTactic>(strategy),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(std::make_shared<StopTactic>(),
-                            std::set<TbotsProto::MotionConstraint>(),
-                            std::set<TbotsProto::MotionConstraint>()),
             std::make_tuple(std::make_shared<PassDefenderTactic>(strategy),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>())};

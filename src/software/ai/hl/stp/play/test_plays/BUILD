@@ -35,7 +35,8 @@ cc_library(
     hdrs = ["halt_test_play.h"],
     deps = [
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/skill/stop:stop_skill",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
         "//software/util/generic_factory",
     ],
     alwayslink = True,
