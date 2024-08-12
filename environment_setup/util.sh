@@ -3,11 +3,11 @@ install_autoref () {
     unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
     touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
 
-    java_home = /opt/tbotspython/jdk-17.0.12/
-    mirror = ""
+    java_home=/opt/tbotspython/jdk-17.0.12/
+    mirror=""
     if is_x86 $1; then
-        java_home = /usr/lib/jvm/jdk-17/
-        mirror = "https://github.com/ubc-thunderbots/autoreferee/releases/download/autoref-ci/autoreferee.tar.gz"
+        java_home=/usr/lib/jvm/jdk-17.0.12-oracle-x64/
+        mirror="https://github.com/ubc-thunderbots/autoreferee/releases/download/autoref-ci/autoreferee.tar.gz"
     fi
 
     if ! /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=$java_home; then
@@ -21,10 +21,10 @@ install_autoref () {
 }
 
 install_bazel() {
-    download = https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-linux-arm64
+    download=https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-linux-arm64
 
     if is_x86 $1; then
-        download = https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-linux-x86_64
+        download=https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-linux-x86_64
     fi
 
     wget -nc $download -O /tmp/bazel
@@ -43,8 +43,8 @@ install_gamecontroller () {
 
 install_java () {
     if is_x86 $1; then
-        sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bin.deb -O /tmp/jdk-17.0.5.deb
-        sudo apt install /tmp/./jdk-17.0.5.deb
+        sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.12_linux-x64_bin.deb -O /tmp/jdk-17.0.12.deb
+        sudo apt install /tmp/./jdk-17.0.12.deb
         return
     fi
     sudo wget https://download.oracle.com/java/17/latest/jdk-17_linux-aarch64_bin.tar.gz -O /opt/jdk-17.0.12.tar.gz
@@ -53,9 +53,10 @@ install_java () {
 
 is_x86() {
     if [[ $1 == "x86_64" ]]; then
+        return 0
+    else
         return 1
     fi
-    return 0
 }
 
 print_status_msg () {

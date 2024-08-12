@@ -20,7 +20,7 @@ cd "$CURR_DIR" || exit
 
 source util.sh
 
-arch = $(uname -m)
+arch=$(uname -m)
 
 print_status_msg "Installing Utilities and Dependencies"
 
@@ -138,6 +138,9 @@ if [[ $(lsb_release -rs) == "24.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu24_requirements.txt
 fi
 
+# Install pip
+sudo /usr/bin/python3.12 -m ensurepip
+
 sudo chown -R $USER:$USER /opt/tbotspython
 
 print_status_msg "Done Setting Up Virtual Python Environment"
@@ -182,7 +185,8 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # install PlatformIO to global environment
-if ! sudo /usr/bin/python3.12 -m pip install platformio==6.1.13 --break-system-packages; then
+wget -O /tmp/get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py
+if ! /usr/bin/python3.12 /tmp/./get-platformio.py; then
     print_status_msg "Error: Installing PlatformIO failed"
     exit 1
 fi
