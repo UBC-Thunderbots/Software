@@ -11,18 +11,16 @@
 # unit tests
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-print_status_msg () {
-   echo "================================================================"
-   echo $1
-   echo "================================================================"
-}
-
 # Save the parent dir of this so we can always run commands relative to the
 # location of this script, no matter where it is called from. This
 # helps prevent bugs and odd behaviour if this script is run through a symlink
 # or from a different directory.
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd "$CURR_DIR" || exit
+
+source util.sh
+
+arch = $(uname -m)
 
 print_status_msg "Installing Utilities and Dependencies"
 
@@ -62,9 +60,9 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    python3.10        # Python 3
-    python3.10-dev    # Python 3 headers
-    python3.10-venv   # Virtual Environment
+    python3.12        # Python 3
+    python3.12-dev    # Python 3 headers
+    python3.12-venv   # Virtual Environment
     python3-pip       # Required for bazel to install python dependencies for build targets
     python3-protobuf  # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
@@ -96,11 +94,15 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     ldconfig
 fi
 
-if [[ $(lsb_release -rs) == "22.04" ]]; then
+if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; then
     host_software_packages+=(qtbase5-dev)
 
     wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/85-brltty.rules
     sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
+fi
+
+if [[ $(lsb_release -rs) == "24.04" ]]; then
+    host_software_packages+=(python3-pyqt6)
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -114,12 +116,7 @@ print_status_msg "Setting Up Virtual Python Environment"
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-if ! curl -sS https://bootstrap.pypa.io/get-pip.py | sudo /usr/bin/python3.10 ; then
-    print_status_msg "Error: Installing pip failed"
-    exit 1
-fi
-
-if ! sudo /usr/bin/python3.10 -m venv /opt/tbotspython ; then
+if ! sudo /usr/bin/python3.12 -m venv /opt/tbotspython ; then
     print_status_msg "Error: Setting up virtual environment failed"
     exit 1
 fi
@@ -137,32 +134,24 @@ if [[ $(lsb_release -rs) == "22.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
 fi
 
-print_status_msg "Done Setting Up Virtual Python Environment"
-print_status_msg "Fetching game controller"
+if [[ $(lsb_release -rs) == "24.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install -r ubuntu24_requirements.txt
+fi
 
 sudo chown -R $USER:$USER /opt/tbotspython
-sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
-sudo chmod +x /opt/tbotspython/gamecontroller
+
+print_status_msg "Done Setting Up Virtual Python Environment"
+print_status_msg "Fetching game controller"
+install_gamecontroller $arch
 
 print_status_msg "Setting up TIGERS AutoRef"
 
 print_status_msg "Installing TIGERS dependency: Java 17"
-sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bin.deb -O /tmp/jdk-17.0.5.deb
-sudo apt install /tmp/./jdk-17.0.5.deb
+install_java $arch
 
 print_status_msg "Compiling TIGERS AutoRef"
-sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/refs/heads/autoref-ci.zip -O /tmp/autoref-ci.zip
-unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
-touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
+install_autoref $arch
 
-if ! /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/; then
-    print_status_msg "Building TIGERS AutoRef failed. Downloading mirror"
-    
-    wget https://github.com/UBC-Thunderbots/AutoReferee/releases/download/autoref-ci/autoReferee.tar.gz -O /tmp/autoReferee.tar.gz
-    tar -xzf /tmp/autoReferee.tar.gz -C /opt/tbotspython/
-else
-    cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
-fi
 
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
@@ -172,14 +161,7 @@ print_status_msg "Finished setting up AutoRef"
 # Install Bazel
 print_status_msg "Installing Bazel"
 
-# Uninstall Bazel first
-sudo rm -rf $HOME/.bazel
-
-# Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
-sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
-sudo chmod +x /tmp/bazel-installer.sh
-sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
-echo "source ${HOME}/.bazel/bin/bazel-complete.bash" >> ~/.bashrc
+install_bazel $arch
 
 print_status_msg "Done Installing Bazel"
 print_status_msg "Setting Up PlatformIO"
@@ -200,7 +182,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # install PlatformIO to global environment
-if ! sudo /usr/bin/python3.10 -m pip install platformio==6.1.13; then
+if ! sudo /usr/bin/python3.12 -m pip install platformio==6.1.13 --break-system-packages; then
     print_status_msg "Error: Installing PlatformIO failed"
     exit 1
 fi
