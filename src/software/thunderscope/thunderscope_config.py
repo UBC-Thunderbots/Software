@@ -13,7 +13,6 @@ from software.thunderscope.thunderscope_types import (
 import pyqtgraph
 import signal
 import os
-import qdarktheme
 
 
 @dataclass
