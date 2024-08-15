@@ -19,8 +19,6 @@ class g3logWidget(QWidget):
         """
         QWidget.__init__(self)
 
-        palette = qdarktheme.load_palette()
-
         self.console_widget = pg_console.ConsoleWidget()
         self.console_widget.setStyleSheet(
             """
