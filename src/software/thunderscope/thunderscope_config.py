@@ -13,6 +13,7 @@ from software.thunderscope.thunderscope_types import (
 import pyqtgraph
 import signal
 import os
+from qt_material import apply_stylesheet, list_themes
 
 
 @dataclass
@@ -36,6 +37,13 @@ def initialize_application() -> None:
 
     # Setup MainApp and initialize DockArea
     app = pyqtgraph.mkQApp("Thunderscope")
+
+    # Setup stylesheet
+    extra = {
+        # Make thunderscope more dense
+        "density_scale": "-2",
+    }
+    apply_stylesheet(app, theme="dark_blue.xml", extra=extra)
 
 
 def configure_robot_view_fullsystem(

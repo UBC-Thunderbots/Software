@@ -10,7 +10,7 @@ install_autoref () {
         mirror="https://github.com/ubc-thunderbots/autoreferee/releases/download/autoref-ci/autoreferee.tar.gz"
     fi
 
-    ln -s /opt/tbotspython/bin/jdk $java_home
+    ln -s $java_home /opt/tbotspython/bin/jdk
 
     if ! /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=$java_home; then
         print_status_msg "Building TIGERS AutoRef failed. Downloading mirror"
