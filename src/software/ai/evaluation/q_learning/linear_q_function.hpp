@@ -11,13 +11,13 @@
  * Implementation of a Q-function with linear function approximation.
  *
  * We approximate the Q-function using a linear combination of state features and
- * their weights. This provides a reasonable estimate of Q(S, A) even if we have not
- * applied action A in state S previously.
+ * their weights. This provides a reasonable estimate of Q(s, a) even if we have not
+ * applied action `a` in state `s` previously.
  *
  * See https://gibberblot.github.io/rl-notes/single-agent/function-approximation.html
  * for more details.
  *
- * @tparam TState the type representing the state of the MDP
+ * @tparam TState the type representing the state of the Markov decision process (MDP)
  * @tparam TAction the type representing the set of actions the agent can execute
  */
 template <typename TState, typename TAction>
@@ -163,7 +163,7 @@ void LinearQFunction<TState, TAction>::saveWeightsToCsv(const std::string& csv_f
     const static Eigen::IOFormat CSV_FORMAT(Eigen::StreamPrecision, Eigen::DontAlignCols,
                                             ",", "\n");
 
-    LOG(CSV_OVERWRITE, csv_file) << getWeights().transpose().format(CSV_FORMAT);
+    LOG(CSV_OVERWRITE, csv_file) << weights_.transpose().format(CSV_FORMAT);
 }
 
 template <typename TState, typename TAction>

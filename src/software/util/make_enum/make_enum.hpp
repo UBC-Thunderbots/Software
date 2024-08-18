@@ -64,9 +64,6 @@
     }                                                                                      \
     inline std::ostream& operator<<(std::ostream& os, name value)                          \
     {                                                                                      \
-        /* This index lookup relies on the assumption that the enum does not manually */   \
-        /* specify any values. If it did, the underlying integer of the given value */     \
-        /* may be out of range of the vector of strings */                                 \
         os << reflective_enum::nameOf<name>(value);                                        \
         return os;                                                                         \
     }

@@ -11,7 +11,7 @@
  *
  * See https://en.wikipedia.org/wiki/Multi-armed_bandit
  *
- * @tparam TState the type representing the state of the MDP
+ * @tparam TState the type representing the state of the Markov decision process (MDP)
  * @tparam TAction the type representing the set of actions the agent can execute
  */
 template <typename TState, typename TAction>

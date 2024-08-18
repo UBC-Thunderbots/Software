@@ -7,10 +7,16 @@
 #include "software/ai/evaluation/q_learning/q_function.hpp"
 
 /**
- * Policy for a Markov decision process (MDP) that tells the agent the action
- * to take in each state.
+ * QPolicy is a policy that uses a Q-function to select its actions.
  *
- * @tparam TState the type representing the state of the MDP
+ * A policy is the RL agent's strategy. It is a function that takes a state `s` and 
+ * outputs an action `a`; i.e. it defines how the agent should behave in any given state.
+ *
+ * The goal of RL is to find an optimal policy which maximizes the expected return,
+ * i.e. the cumulative, discounted reward over any and all successive time steps, 
+ * starting from some given initial time step.
+ *
+ * @tparam TState the type representing the state of the Markov decision process (MDP)
  * @tparam TAction the type representing the set of actions the agent can execute
  */
 template <typename TState, typename TAction>
