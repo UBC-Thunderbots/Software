@@ -107,7 +107,8 @@ void PassSkillFSM::findPass(
     {
         robots_to_ignore.push_back(*friendly_goalie_id);
     }
-    best_pass_so_far_ = event.common.strategy->getBestPass(robots_to_ignore);
+    best_pass_so_far_ =
+        event.common.strategy->getBestPass(*event.common.world_ptr, robots_to_ignore);
 
     // Update minimum pass score threshold. Wait for a good pass by starting out only
     // looking for "perfect" passes (with a high score close to 1) and decreasing this

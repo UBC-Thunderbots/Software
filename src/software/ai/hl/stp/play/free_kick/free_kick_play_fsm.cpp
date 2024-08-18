@@ -53,7 +53,7 @@ void FreeKickPlayFSM::updateReceiverPositioningTactics(
     }
 
     std::vector<Point> best_receiving_positions = strategy->getBestReceivingPositions(
-        num_tactics, existing_receiver_positions, pass_origin_override);
+        *world, num_tactics, existing_receiver_positions, pass_origin_override);
 
     // Note that getBestReceivingPositions may return fewer positions than requested
     // if there are not enough robots, so we will need to check the size of the vector.
@@ -236,7 +236,8 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
     {
         robots_to_ignore.push_back(robot_with_ball_opt.value().id());
     }
-    best_pass_and_score_so_far = strategy->getBestPass(robots_to_ignore);
+    best_pass_and_score_so_far =
+        strategy->getBestPass(*event.common.world_ptr, robots_to_ignore);
 
     event.common.set_tactics(tactics_to_run);
 }

@@ -52,8 +52,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 
     WorldPtr world_ptr = std::make_shared<const World>(world);
 
-    strategy->updateWorld(world_ptr);
-
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
 

@@ -96,8 +96,8 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
 
         // Generate receiving positions for the remaining support tactics
         std::vector<Point> receiving_positions = strategy->getBestReceivingPositions(
-            num_positions_to_generate, existing_receiving_positions,
-            pass_origin_override);
+            *play_update.world_ptr, num_positions_to_generate,
+            existing_receiving_positions, pass_origin_override);
 
         for (const Point& receiving_position : receiving_positions)
         {

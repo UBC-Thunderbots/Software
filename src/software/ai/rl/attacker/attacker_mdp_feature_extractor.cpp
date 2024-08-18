@@ -26,7 +26,7 @@ double AttackerMdpFeatureExtractor::ballXPositionFeature(const AttackerMdpState&
 
 double AttackerMdpFeatureExtractor::bestPassRatingFeature(const AttackerMdpState& state)
 {
-    return state.strategy->getBestPass().rating;
+    return state.strategy->getBestPass(*state.world_ptr).rating;
 }
 
 double AttackerMdpFeatureExtractor::bestShotOpenAngleFeature(
@@ -38,7 +38,8 @@ double AttackerMdpFeatureExtractor::bestShotOpenAngleFeature(
 
     if (attacker)
     {
-        std::optional<Shot> best_shot = state.strategy->getBestShot(*attacker);
+        std::optional<Shot> best_shot =
+            state.strategy->getBestShot(*state.world_ptr, *attacker);
         if (best_shot)
         {
             return best_shot->getOpenAngle().toDegrees() * SHOT_OPEN_ANGLE_FACTOR;

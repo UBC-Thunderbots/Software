@@ -4,11 +4,13 @@ bool ShootSkillFSM::shouldAbortShot(const Update& event)
 {
     if (event.control_params.sample_for_best_shot)
     {
-        best_shot_ = event.common.strategy->getBestSampledShot(event.common.robot);
+        best_shot_ = event.common.strategy->getBestSampledShot(*event.common.world_ptr,
+                                                               event.common.robot);
     }
     else
     {
-        best_shot_ = event.common.strategy->getBestShot(event.common.robot);
+        best_shot_ = event.common.strategy->getBestShot(*event.common.world_ptr,
+                                                        event.common.robot);
     }
 
     event.common.set_skill_state({.shot = best_shot_});

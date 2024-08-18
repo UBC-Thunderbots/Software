@@ -12,7 +12,10 @@ class FriendlyHasBallPossession(Validation):
     """Checks if a single friendly robot has possession of the ball."""
 
     def __init__(self, robot_id: int) -> None:
-        """Initializes the validation to check for if the robot with the given id has possession"""
+        """Initializes the validation to check for if the robot with the given ID has possession
+
+        :param robot_id: the ID of the robot to check
+        """
         self.robot_id = robot_id
 
     def get_validation_status(self, world, robot_id=None) -> ValidationStatus:
