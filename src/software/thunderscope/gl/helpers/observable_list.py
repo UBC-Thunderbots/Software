@@ -17,7 +17,7 @@ class Change:
 
         :param changed_list: The list that changed
         :param changed_slice: The slice of the observable_list that changed
-        :param type: The action that caused the change
+        :param action: The action that caused the change
         """
         self._changed_list = changed_list
         self._changed_slice = changed_slice
@@ -172,6 +172,7 @@ class ObservableList(list):
         """Create a slice starting at an index and with a given length
 
         :param index: the index to start the slice at
+        :param length: the number of items in the slice
         """
         length_ = len(self)
         if -length <= index < 0:
