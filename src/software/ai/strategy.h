@@ -26,7 +26,7 @@ class Strategy
      * Gets the best pass on the field.
      *
      * @see PassGenerator::getBestPass
-     * 
+     *
      * @param world The state of the world
      * @param robots_to_ignore A list of robot ids to ignore when generating passes
      *
@@ -39,7 +39,7 @@ class Strategy
      * Gets the best receiving positions for the friendly robots to go to.
      *
      * @see ReceiverPositionGenerator::getBestReceivingPositions
-     * 
+     *
      * @param world The world to generate the best receiving positions based on
      * @param num_positions The number of receiving positions to generate
      * @param existing_receiver_positions A set of existing receiver positions that will
@@ -48,7 +48,7 @@ class Strategy
      * will be made from. If not provided, the ball position will be used. This could be
      * helpful if you are trying to position the receivers based on the ball's future
      * position.
-     * 
+     *
      * @return A vector of
      *      min(num_positions, num_friendly_robots - existing_receiver_positions.size())
      * positions that the receivers could use.
