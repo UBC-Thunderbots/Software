@@ -45,12 +45,11 @@ class SimulatedTestRunner(TbotsTestRunner):
         """Initialize the SimulatorTestRunner
 
         :param test_name: The name of the test to run
-        :param thunderscope: The thunderscope to use, None if not used
+        :param thunderscope: The Thunderscope to use, None if not used
         :param simulator_proto_unix_io: The simulator proto unix io to use
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
-
         """
         super(SimulatedTestRunner, self).__init__(
             test_name,
@@ -65,7 +64,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         """Sets the simulation worldstate
 
         :param worldstate: proto containing the desired worldstate
-
         """
         self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
@@ -75,7 +73,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         the window from the main thread.
 
         :param args: The args passed in from the hook
-
         """
         self.__stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
         self.last_exception = args.exc_value
@@ -86,7 +83,6 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         :param delay: How long to wait before closing everything, defaults
                       to PROCESS_BUFFER_DELAY_S to minimize buffer warnings
-
         """
         time.sleep(delay)
 
@@ -323,7 +319,6 @@ class InvariantTestRunner(SimulatedTestRunner):
                                 that should hold on every tick
         :param inv_eventually_validation_sequence_set: Validation functions for invariant testing
                                 that should eventually be true, before the test ends
-
         """
         threading.excepthook = self.excepthook
 

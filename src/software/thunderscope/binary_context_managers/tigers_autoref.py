@@ -55,8 +55,8 @@ class TigersAutoref(TimeProvider):
         :param ci_mode:         true to run the autoref binary in CI mode (use system time or use the time from the
                                 CiInput messages)
         :param buffer_size:     buffer size for the SSL wrapper and referee packets
-        :suppress_logs:          true silences logs from the Autoref binary, otherwise shows them (its very verbose)
-        :show_gui:              true shows the Tigers' autoref GUI, false runs it in headless mode
+        :param suppress_logs:   true silences logs from the Autoref binary, otherwise shows them (its very verbose)
+        :param show_gui:        true shows the Tigers' autoref GUI, false runs it in headless mode
         """
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None

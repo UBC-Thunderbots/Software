@@ -47,6 +47,7 @@ class FieldTestRunner(TbotsTestRunner):
         """Initialize the FieldTestRunner
 
         :param test_name: The name of the test to run
+        :param thunderscope: The Thunderscope to use, None if not used
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
