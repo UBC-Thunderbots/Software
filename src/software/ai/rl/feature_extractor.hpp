@@ -6,7 +6,8 @@
 
 /**
  * A FeatureExtractor extracts the values of features from the state of a
- * Markov decision process (MDP).
+ * Markov decision process (MDP). A feature is an individual measurable property
+ * of the state.
  *
  * @tparam TState the type representing the state of the MDP
  * @tparam TAction the type representing the set of actions the agent can execute
