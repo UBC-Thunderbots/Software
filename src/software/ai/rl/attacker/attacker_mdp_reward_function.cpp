@@ -1,4 +1,4 @@
-#include "software/ai/evaluation/q_learning/attacker_mdp_reward_function.h"
+#include "software/ai/rl/attacker/attacker_mdp_reward_function.h"
 
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"

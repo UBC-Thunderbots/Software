@@ -3,17 +3,17 @@
 #include <optional>
 
 #include "proto/q_learning.pb.h"
-#include "software/ai/evaluation/q_learning/bandits/action_selection_strategy.hpp"
-#include "software/ai/evaluation/q_learning/q_function.hpp"
+#include "software/ai/rl/action_selection/action_selection_strategy.hpp"
+#include "software/ai/rl/q_function.hpp"
 
 /**
  * QPolicy is a policy that uses a Q-function to select its actions.
  *
- * A policy is the RL agent's strategy. It is a function that takes a state `s` and 
+ * A policy is the RL agent's strategy. It is a function that takes a state `s` and
  * outputs an action `a`; i.e. it defines how the agent should behave in any given state.
  *
  * The goal of RL is to find an optimal policy which maximizes the expected return,
- * i.e. the cumulative, discounted reward over any and all successive time steps, 
+ * i.e. the cumulative, discounted reward over any and all successive time steps,
  * starting from some given initial time step.
  *
  * @tparam TState the type representing the state of the Markov decision process (MDP)

@@ -5,7 +5,7 @@
 #include <random>
 #include <vector>
 
-#include "software/ai/evaluation/q_learning/bandits/action_selection_strategy.hpp"
+#include "software/ai/rl/action_selection/action_selection_strategy.hpp"
 
 /**
  * The epsilon-greedy strategy is a simple action selection strategy that effectively
@@ -15,7 +15,7 @@
  * actions. This means that it is as likely to choose the worst action as it is to choose
  * the best action.
  *
- * https://gibberblot.github.io/rl-notes/single-agent/multi-armed-bandits.html#epsilon-greedy-strategy
+ * https://gibberblot.github.io/rl-notes/single-agent/multi-armed-action_selection.html#epsilon-greedy-strategy
  *
  * @tparam TState the type representing the state of the Markov decision process (MDP)
  * @tparam TAction the type representing the set of actions the agent can execute

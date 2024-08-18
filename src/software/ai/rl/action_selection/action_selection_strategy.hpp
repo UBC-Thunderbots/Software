@@ -3,7 +3,7 @@
 #include <tuple>
 
 #include "proto/q_learning.pb.h"
-#include "software/ai/evaluation/q_learning/q_function.hpp"
+#include "software/ai/rl/q_function.hpp"
 
 /**
  * Strategy for selecting an action for a given state, i.e. a solution to the

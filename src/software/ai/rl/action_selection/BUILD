@@ -5,7 +5,7 @@ cc_library(
     hdrs = ["action_selection_strategy.hpp"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//software/ai/evaluation/q_learning:q_function",
+        "//software/ai/rl:q_function",
     ],
 )
 

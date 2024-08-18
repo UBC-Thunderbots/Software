@@ -13,6 +13,11 @@
 class PenaltyKickPlay : public Play
 {
    public:
+    /**
+     * Creates a PenaltyKickPlay
+     *
+     * @param strategy the Strategy shared by all of AI
+     */
     PenaltyKickPlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield,

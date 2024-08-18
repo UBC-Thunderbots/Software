@@ -1,13 +1,13 @@
 #pragma once
 
-#include "software/ai/evaluation/q_learning/attacker_mdp_action.h"
-#include "software/ai/evaluation/q_learning/attacker_mdp_feature_extractor.h"
-#include "software/ai/evaluation/q_learning/attacker_mdp_reward_function.h"
-#include "software/ai/evaluation/q_learning/bandits/epsilon_greedy_strategy.hpp"
-#include "software/ai/evaluation/q_learning/bandits/softmax_strategy.hpp"
-#include "software/ai/evaluation/q_learning/linear_q_function.hpp"
-#include "software/ai/evaluation/q_learning/q_policy.hpp"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/rl/action_selection/epsilon_greedy_strategy.hpp"
+#include "software/ai/rl/action_selection/softmax_strategy.hpp"
+#include "software/ai/rl/attacker/attacker_mdp_action.h"
+#include "software/ai/rl/attacker/attacker_mdp_feature_extractor.h"
+#include "software/ai/rl/attacker/attacker_mdp_reward_function.h"
+#include "software/ai/rl/linear_q_function.hpp"
+#include "software/ai/rl/q_policy.hpp"
 
 /**
  * The Attacker is the main ball handler during offensive gameplay. It executes
@@ -107,7 +107,7 @@ class AttackerTactic : public Tactic
 
     // File to load Q-function weights from for initialization
     inline static const std::string ATTACKER_MDP_Q_FUNCTION_INITIAL_WEIGHTS_FILE =
-        "software/ai/evaluation/q_learning/attacker_mdp_q_function_weights.csv";
+        "software/ai/rl/attacker/attacker_mdp_q_function_weights.csv";
 
     // Name of file that Q-function weights will be saved to at runtime
     // TODO (#3249): Append timestamp to Q-function weights file name

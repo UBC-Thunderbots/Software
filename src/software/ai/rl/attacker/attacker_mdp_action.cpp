@@ -1,4 +1,4 @@
-#include "software/ai/evaluation/q_learning/attacker_mdp_action.h"
+#include "software/ai/rl/attacker/attacker_mdp_action.h"
 
 std::unique_ptr<Skill> createSkillFromAttackerMdpAction(
     AttackerMdpAction action, std::shared_ptr<Strategy> strategy)

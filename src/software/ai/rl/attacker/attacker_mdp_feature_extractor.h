@@ -1,17 +1,8 @@
 #pragma once
 
-#include "software/ai/evaluation/q_learning/attacker_mdp_action.h"
-#include "software/ai/evaluation/q_learning/feature_extractor.hpp"
-
-/**
- * State representation of the Markov decision process (MDP) modelling
- * the Attacker agent's gameplay decision making.
- */
-struct AttackerMdpState
-{
-    WorldPtr world_ptr;
-    std::shared_ptr<Strategy> strategy;
-};
+#include "software/ai/rl/attacker/attacker_mdp_action.h"
+#include "software/ai/rl/attacker/attacker_mdp_state.h"
+#include "software/ai/rl/feature_extractor.hpp"
 
 /**
  * FeatureExtractor that extracts the values of features from a AttackerMdpState.

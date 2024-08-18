@@ -4,8 +4,8 @@
 
 #include "csv.hpp"
 #include "proto/q_learning.pb.h"
-#include "software/ai/evaluation/q_learning/feature_extractor.hpp"
-#include "software/ai/evaluation/q_learning/q_function.hpp"
+#include "software/ai/rl/feature_extractor.hpp"
+#include "software/ai/rl/q_function.hpp"
 
 /**
  * Implementation of a Q-function with linear function approximation.

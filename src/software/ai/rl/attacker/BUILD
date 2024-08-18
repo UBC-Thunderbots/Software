@@ -14,23 +14,24 @@ cc_library(
 )
 
 cc_library(
+    name = "attacker_mdp_state",
+    hdrs = ["attacker_mdp_state.h"],
+    deps = [
+        "//software/ai:strategy",
+    ],
+)
+
+cc_library(
     name = "attacker_mdp_feature_extractor",
     srcs = ["attacker_mdp_feature_extractor.cpp"],
     hdrs = ["attacker_mdp_feature_extractor.h"],
     deps = [
         ":attacker_mdp_action",
-        ":feature_extractor",
+        ":attacker_mdp_state",
         "//shared:constants",
         "//software/ai/evaluation:possession",
+        "//software/ai/rl:feature_extractor",
         "//software/math:math_functions",
-    ],
-)
-
-cc_library(
-    name = "feature_extractor",
-    hdrs = ["feature_extractor.hpp"],
-    deps = [
-        "//software/util/make_enum",
     ],
 )
 
@@ -43,37 +44,5 @@ cc_library(
         "//software/logger",
         "//software/math:math_functions",
         "//software/world",
-    ],
-)
-
-cc_library(
-    name = "q_function",
-    hdrs = ["q_function.hpp"],
-    deps = [
-        "//software/util/make_enum",
-    ],
-)
-
-cc_library(
-    name = "linear_q_function",
-    hdrs = ["linear_q_function.hpp"],
-    deps = [
-        ":feature_extractor",
-        ":q_function",
-        "//proto:tbots_cc_proto",
-        "@csv",
-        "@eigen",
-    ],
-)
-
-cc_library(
-    name = "q_policy",
-    hdrs = ["q_policy.hpp"],
-    deps = [
-        ":feature_extractor",
-        ":q_function",
-        "//proto:tbots_cc_proto",
-        "//software/ai/evaluation/q_learning/bandits:action_selection_strategy",
-        "@eigen",
     ],
 )

@@ -61,7 +61,7 @@ src/external/external
 *.csv
 
 # Explicitly unignore files with weights
-!software/ai/evaluation/q_learning/attacker_mdp_q_function_weights.csv
+!software/ai/rl/attacker/attacker_mdp_q_function_weights.csv
 
 ### Node ###
 
