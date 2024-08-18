@@ -15,7 +15,7 @@
  * Q-values are more likely to be selected, but there is still a non-zero probability of
  * selecting actions with lower Q-values.
  *
- * https://gibberblot.github.io/rl-notes/single-agent/multi-armed-action_selection.html#softmax-strategy
+ * https://gibberblot.github.io/rl-notes/single-agent/multi-armed-bandits.html#softmax-strategy
  *
  * Softmax visualization:
  * https://colab.research.google.com/drive/10ogYKW_mswenUXdC_nA4mE1jfa-xrMkH?usp=sharing

@@ -16,8 +16,7 @@
  *
  * Resources:
  * - https://en.wikipedia.org/wiki/Q-learning
- * -
- * https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html#dqn-algorithm
+ * - https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
  * - https://huggingface.co/learn/deep-rl-course/en/unit2/q-learning
  * - https://gibberblot.github.io/rl-notes/single-agent/temporal-difference-learning.html
  *
