@@ -9,8 +9,7 @@ import "proto/ssl_vision_detection_tracked.proto";
 message TrackerWrapperPacket
 {
     // A random UUID of the source that is kept constant at the source while running
-    // If multiple sources are broadcasting to the same network, this id can be used to
-    // identify individual sources
+    // If multiple sources are broadcasting to the same network, this id can be used to identify individual sources
     required string uuid = 1;
     // The name of the source software that is producing this messages.
     optional string source_name = 2;
