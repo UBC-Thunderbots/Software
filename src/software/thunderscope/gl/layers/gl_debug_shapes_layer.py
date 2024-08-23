@@ -26,7 +26,6 @@ class GLDebugShapesLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -146,7 +145,8 @@ class GLDebugShapesLayer(GLLayer):
         ):
             circle_shape_graphic.set_radius(circle_shape.radius)
             circle_shape_graphic.set_position(
-                circle_shape.origin.x_meters, circle_shape.origin.y_meters,
+                circle_shape.origin.x_meters,
+                circle_shape.origin.y_meters,
             )
             circle_shape_text_graphic.setData(
                 text=name,

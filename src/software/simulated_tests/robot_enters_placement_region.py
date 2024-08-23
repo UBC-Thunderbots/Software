@@ -10,11 +10,11 @@ from software.simulated_tests.validation import (
 
 
 class RobotEntersPlacementRegion(Validation):
-
     """Checks if a Robot enters the ball placement stadium region."""
 
     def __init__(self, placement_point):
-        """
+        """Constructor
+
         :param placement_point: The ball placement coordinates
         """
         self.placement_point = placement_point
@@ -28,8 +28,8 @@ class RobotEntersPlacementRegion(Validation):
         """Checks if robots enter the ball placement region
 
         :param world: The world msg to validate
-        :returns: PASSING when robots enter and stay for over two seconds
-                  FAILING otherwise
+        :return: PASSING when robots enter and stay for over two seconds
+                 FAILING otherwise
         """
         segment = tbots_cpp.Segment(
             self.placement_point,
@@ -56,9 +56,7 @@ class RobotEntersPlacementRegion(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) shows regions to enter
-        """
+        """(override) shows regions to enter"""
         segment = tbots_cpp.Segment(
             self.placement_point,
             tbots_cpp.createPoint(world.ball.current_state.global_position),

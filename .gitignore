@@ -148,7 +148,7 @@ src/config
 *.ipynb
 
 # codespell dictionary
-formatting_scripts/dictionary/
+scripts/dictionary/
 
 # clangd for nvim lsp
 src/.clangd

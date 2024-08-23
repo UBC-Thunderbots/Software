@@ -8,7 +8,6 @@ from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.or_validation import OrValidation
 
 from software.simulated_tests.ball_moves_from_rest import (
-    BallNeverMovesFromRest,
     BallEventuallyMovesFromRest,
 )
 from software.simulated_tests.friendly_team_scored import *
@@ -17,7 +16,6 @@ from software.simulated_tests.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )
-from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
@@ -101,7 +99,6 @@ def test_enemy_free_kick_play(
 ):
     # Setup Bots
     def setup(*args):
-
         # Game Controller Setup
         simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN

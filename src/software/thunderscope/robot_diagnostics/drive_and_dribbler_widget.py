@@ -2,7 +2,6 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
 import software.python_bindings as tbots_cpp
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -13,7 +12,6 @@ class DriveAndDribblerWidget(QWidget):
         """Initialize the widget to control the robot's motors
 
         :param proto_unix_io: the proto_unix_io object
-
         """
         self.input_a = time.time()
         self.constants = tbots_cpp.create2021RobotConstants()
@@ -31,8 +29,7 @@ class DriveAndDribblerWidget(QWidget):
         self.setLayout(layout)
 
     def refresh(self) -> None:
-        """Refresh the widget and send the a MotorControl message with the current values
-        """
+        """Refresh the widget and send the a MotorControl message with the current values"""
         motor_control = MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
 
@@ -49,11 +46,9 @@ class DriveAndDribblerWidget(QWidget):
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def value_change(self, value: float) -> str:
-        """
-        Converts the given float value to a string label
+        """Converts the given float value to a string label
 
         :param value: float value to be converted
-
         """
         value = float(value)
         value_str = "%.2f" % value
@@ -63,9 +58,7 @@ class DriveAndDribblerWidget(QWidget):
         """Create a widget to control the direct velocity of the robot's motors
 
         :param title: the name of the slider
-
         """
-
         group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
@@ -114,7 +107,7 @@ class DriveAndDribblerWidget(QWidget):
             self.angular_velocity_slider, self.angular_velocity_label, self.value_change
         )
 
-        self.stop_and_reset_direct = common_widgets.create_push_button("Stop and Reset")
+        self.stop_and_reset_direct = QPushButton("Stop and Reset")
         self.stop_and_reset_direct.clicked.connect(self.reset_direct_sliders)
 
         dbox.addLayout(x_layout)
@@ -132,9 +125,7 @@ class DriveAndDribblerWidget(QWidget):
         """Create a widget to control the dribbler RPM
 
         :param title: the name of the slider
-
         """
-
         group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
@@ -157,9 +148,7 @@ class DriveAndDribblerWidget(QWidget):
             self.value_change,
         )
 
-        self.stop_and_reset_dribbler = common_widgets.create_push_button(
-            "Stop and Reset"
-        )
+        self.stop_and_reset_dribbler = QPushButton("Stop and Reset")
         self.stop_and_reset_dribbler.clicked.connect(self.reset_dribbler_slider)
 
         dbox.addLayout(dribbler_layout)
@@ -171,10 +160,10 @@ class DriveAndDribblerWidget(QWidget):
         return group_box
 
     def toggle_all(self, enable: bool) -> None:
-        """
-        Disables or enables all sliders and buttons depending on boolean parameter
+        """Disables or enables all sliders and buttons depending on boolean parameter
 
         Updates listener functions and stylesheets accordingly
+
         :param enable: boolean parameter, True is enable and False is disable
         """
         if enable:
@@ -226,30 +215,23 @@ class DriveAndDribblerWidget(QWidget):
                 self.enabled = False
 
     def disconnect_sliders(self) -> None:
-        """
-        Disconnect listener for changing values for all sliders
-        """
+        """Disconnect listener for changing values for all sliders"""
         self.x_velocity_slider.valueChanged.disconnect()
         self.y_velocity_slider.valueChanged.disconnect()
         self.angular_velocity_slider.valueChanged.disconnect()
         self.dribbler_speed_rpm_slider.valueChanged.disconnect()
 
     def reset_direct_sliders(self) -> None:
-        """Reset direct sliders back to 0
-        """
+        """Reset direct sliders back to 0"""
         self.x_velocity_slider.setValue(0)
         self.y_velocity_slider.setValue(0)
         self.angular_velocity_slider.setValue(0)
 
     def reset_dribbler_slider(self) -> None:
-        """
-        Reset the dribbler slider back to 0
-        """
+        """Reset the dribbler slider back to 0"""
         self.dribbler_speed_rpm_slider.setValue(0)
 
     def reset_all_sliders(self) -> None:
-        """
-        Reset all sliders back to 0
-        """
+        """Reset all sliders back to 0"""
         self.reset_direct_sliders()
         self.reset_dribbler_slider()

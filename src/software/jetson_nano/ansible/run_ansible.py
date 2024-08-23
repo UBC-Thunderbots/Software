@@ -17,6 +17,7 @@ NANO_USER = "robot"
 ROBOT_IP_PREFIX = "192.168.0.20"
 MAX_NUM_ROBOTS = 8
 
+
 # loads variables, inventory, and play into Ansible API, then runs it
 def ansible_runner(playbook: str, options: dict = {}):
     loader = DataLoader()

@@ -3,8 +3,7 @@ from software.thunderscope.gl.widgets.icon_loader import get_icon
 
 
 class GLGamecontrollerToolbarIconLoader:
-    """
-    Stores icones for the GL Gamecontroller Toolbar widget
+    """Stores icons for the GL Gamecontroller Toolbar widget
 
     Since they are class level variables, they are initialized only once
     when they are first accessed
@@ -21,8 +20,7 @@ class GLGamecontrollerToolbarIconLoader:
 
 
 def get_halt_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Halt icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
+    """Loads the Halt icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
     """
@@ -36,8 +34,7 @@ def get_halt_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_stop_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Stop icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
+    """Loads the Stop icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
     """
@@ -51,8 +48,7 @@ def get_stop_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_normal_start_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Normal Start icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
+    """Loads the Normal Start icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
     """
@@ -66,8 +62,7 @@ def get_normal_start_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_force_start_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Force Start icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
+    """Loads the Force Start icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
     """
@@ -81,8 +76,7 @@ def get_force_start_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_yellow_icon() -> QtGui.QPixmap:
-    """
-    Loads the Yellow icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
+    """Loads the Yellow icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
     """
@@ -95,8 +89,7 @@ def get_yellow_icon() -> QtGui.QPixmap:
 
 
 def get_blue_icon() -> QtGui.QPixmap:
-    """
-    Loads the Blue icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
+    """Loads the Blue icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
     """
@@ -109,8 +102,7 @@ def get_blue_icon() -> QtGui.QPixmap:
 
 
 def get_open_window_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Open Window icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
+    """Loads the Open Window icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
     """

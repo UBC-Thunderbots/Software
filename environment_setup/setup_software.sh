@@ -62,14 +62,14 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    python3.8       # Python 3
-    python3.8-dev # Python 3 headers
-    python3.8-venv # Virtual Environment
-    python3-pip   # Required for bazel to install python dependencies for build targets
-    python3-protobuf # This is required for the "NanoPb" library, which does not
-                    # properly manage this as a bazel dependency, so we have
-                    # to manually install it ourselves
-    python3-yaml 	# Load dynamic parameter configuration files
+    python3.10        # Python 3
+    python3.10-dev    # Python 3 headers
+    python3.10-venv   # Virtual Environment
+    python3-pip       # Required for bazel to install python dependencies for build targets
+    python3-protobuf  # This is required for the "NanoPb" library, which does not
+                      # properly manage this as a bazel dependency, so we have
+                      # to manually install it ourselves
+    python3-yaml 	  # Load dynamic parameter configuration files
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libffi-dev # needed to use _ctypes in Python3
@@ -114,7 +114,12 @@ print_status_msg "Setting Up Virtual Python Environment"
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
+if ! curl -sS https://bootstrap.pypa.io/get-pip.py | sudo /usr/bin/python3.10 ; then
+    print_status_msg "Error: Installing pip failed"
+    exit 1
+fi
+
+if ! sudo /usr/bin/python3.10 -m venv /opt/tbotspython ; then
     print_status_msg "Error: Setting up virtual environment failed"
     exit 1
 fi
@@ -149,8 +154,15 @@ print_status_msg "Compiling TIGERS AutoRef"
 sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/refs/heads/autoref-ci.zip -O /tmp/autoref-ci.zip
 unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
 touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
-/tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/
-cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
+
+if ! /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/; then
+    print_status_msg "Building TIGERS AutoRef failed. Downloading mirror"
+    
+    wget https://github.com/UBC-Thunderbots/AutoReferee/releases/download/autoref-ci/autoReferee.tar.gz -O /tmp/autoReferee.tar.gz
+    tar -xzf /tmp/autoReferee.tar.gz -C /opt/tbotspython/
+else
+    cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
+fi
 
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
@@ -160,8 +172,11 @@ print_status_msg "Finished setting up AutoRef"
 # Install Bazel
 print_status_msg "Installing Bazel"
 
+# Uninstall Bazel first
+sudo rm -rf $HOME/.bazel
+
 # Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
-sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
+sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
 sudo chmod +x /tmp/bazel-installer.sh
 sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
 echo "source ${HOME}/.bazel/bin/bazel-complete.bash" >> ~/.bashrc
@@ -184,8 +199,8 @@ sudo service udev restart
 # allow user access to serial ports
 sudo usermod -a -G dialout $USER
 
-# installs PlatformIO to global environment
-if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.1.13; then
+# install PlatformIO to global environment
+if ! sudo /usr/bin/python3.10 -m pip install platformio==6.1.13; then
     print_status_msg "Error: Installing PlatformIO failed"
     exit 1
 fi

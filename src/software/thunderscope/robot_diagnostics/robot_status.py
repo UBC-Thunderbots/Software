@@ -6,19 +6,16 @@ from google.protobuf.message import Message
 
 
 class RobotStatusView(QWidget):
-    """
-    Class to show a detailed view of the robot's current state
+    """Class to show a detailed view of the robot's current state
 
     Displays all the information in the RobotStatus message in a collapsible
     tree format
     """
 
     def __init__(self) -> None:
-        """
-        Initializes the robot status widget
+        """Initializes the robot status widget
         Builds the parameter tree with a default primitive
         """
-
         super(RobotStatusView, self).__init__()
 
         self.robot_status_visible = True
@@ -44,13 +41,12 @@ class RobotStatusView(QWidget):
         self.toggle_visibility()
 
     def update(self, new_message: Message, *path: str) -> None:
-        """
-        Updates the tree with new values from a new message if the tree is visible
+        """Updates the tree with new values from a new message if the tree is visible
+
         :param new_message: the new message to get values from
         :param path: the path of the current message
                       string args starting from the highest parent field
         """
-
         if self.robot_status_visible:
             for descriptor in new_message.DESCRIPTOR.fields:
                 key = descriptor.name
@@ -67,9 +63,7 @@ class RobotStatusView(QWidget):
                     )
 
     def toggle_visibility(self) -> None:
-        """
-        Toggles the visibility of this widget
-        """
+        """Toggles the visibility of this widget"""
         self.robot_status_visible = not self.robot_status_visible
 
         if self.robot_status_visible:

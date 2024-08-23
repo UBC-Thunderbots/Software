@@ -1,12 +1,11 @@
-#!/opt/tbotspython/bin/python3.8
+#!/opt/tbotspython/bin/python3
 
 import os
 import sys
 import iterfzf
 import itertools
-from subprocess import PIPE, run, check_call
+from subprocess import PIPE, run
 import argparse
-from thefuzz import fuzz
 from thefuzz import process
 
 # thefuzz is a fuzzy string matcher in python
@@ -19,7 +18,6 @@ THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="Run stuff", add_help=False)
 
     parser.add_argument("action", choices=["build", "run", "test"])
@@ -137,7 +135,9 @@ if __name__ == "__main__":
 
     if args.interactive or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
         filtered_targets = process.extract(
-            args.search_query, list(targets.keys()), limit=NUM_FILTERED_MATCHES_TO_SHOW
+            args.search_query,
+            list(target_dict.keys()),
+            limit=NUM_FILTERED_MATCHES_TO_SHOW,
         )
         targets = [
             target_dict[filtered_target_name[0]]
