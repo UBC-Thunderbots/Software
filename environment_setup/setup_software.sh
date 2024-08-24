@@ -155,7 +155,6 @@ install_java $arch
 print_status_msg "Compiling TIGERS AutoRef"
 install_autoref $arch
 
-
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
 

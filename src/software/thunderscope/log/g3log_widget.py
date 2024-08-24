@@ -1,5 +1,6 @@
 from pyqtgraph.Qt.QtWidgets import *
 import queue
+import qdarktheme
 from software.py_constants import *
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
@@ -18,6 +19,8 @@ class g3logWidget(QWidget):
                             Set lower for more realtime plots. Default is arbitrary
         """
         QWidget.__init__(self)
+
+        palette = qdarktheme.load_palette()
 
         self.console_widget = pg_console.ConsoleWidget()
         self.console_widget.setStyleSheet(

@@ -15,7 +15,7 @@ install_autoref () {
     if ! /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=$java_home; then
         print_status_msg "Building TIGERS AutoRef failed. Downloading mirror"
     
-        wget $mirror -o /tmp/autoreferee.tar.gz
+        wget $mirror -O /tmp/autoreferee.tar.gz
         tar -xzf /tmp/autoReferee.tar.gz -C /opt/tbotspython/
     else
         cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
