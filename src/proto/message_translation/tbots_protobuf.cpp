@@ -321,8 +321,8 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
 {
     auto plot_juggler_value_msg = std::make_unique<TbotsProto::PlotJugglerValue>();
     double now =
-        static_cast<double>(std::chrono::system_clock::now().time_since_epoch().count() /
-                            NANOSECONDS_PER_SECOND);
+        static_cast<double>(std::chrono::system_clock::now().time_since_epoch().count()) /
+                            NANOSECONDS_PER_SECOND;
     plot_juggler_value_msg->set_timestamp(now);
     for (auto const& [key, val] : values)
     {
