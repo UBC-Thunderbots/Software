@@ -16,10 +16,13 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
 {
     switch (direct_control.motor_control().drive_control_case())
     {
+        case TbotsProto::MotorControl::DRIVE_CONTROL_NOT_SET:
+            LOG(FATAL) << "Drive control not set in DirectControlPrimitive";
+            break;
+
         case TbotsProto::MotorControl::kDirectPerWheelControl:
-        {
             LOG(FATAL) << "Direct per-wheel control is not supported in simulation";
-        }
+            break;
 
         case TbotsProto::MotorControl::kDirectVelocityControl:
         {

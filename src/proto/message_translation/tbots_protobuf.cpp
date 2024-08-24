@@ -479,7 +479,7 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2));
 }
 
-double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
+int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
                                           RobotConstants_t robot_constants)
 {
     switch (dribbler_mode)
@@ -489,10 +489,10 @@ double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode
         case TbotsProto::DribblerMode::MAX_FORCE:
             return robot_constants.max_force_dribbler_speed_rpm;
         case TbotsProto::DribblerMode::OFF:
-            return 0.0;
+            return 0;
         default:
             LOG(WARNING) << "DribblerMode is invalid" << std::endl;
-            return 0.0;
+            return 0;
     }
 }
 

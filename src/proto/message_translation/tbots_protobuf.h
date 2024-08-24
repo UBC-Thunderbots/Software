@@ -267,7 +267,7 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
  *
  * @return the dribbler speed in RPM
  */
-double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
+int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
                                           RobotConstants_t robot_constants);
 
 /**
