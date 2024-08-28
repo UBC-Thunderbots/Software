@@ -1,8 +1,8 @@
 <!---
-This file outlines a list of common things that should be addressed when opening a PR. It's built from previous issues we've seen in a lot of pull requests. If you notice something that's being noted in a lot of PR's, it should probably be added here to help save people time in the future.
--->
+This file outlines a list of common things that should be addressed when opening a PR. It's built from previous issues we've seen in a lot of pull requests. If you notice something that's being noted in a lot of PRs, it should probably be added here to help save people time in the future.
 
-## Please fill out the following before requesting review on this PR
+Please fill out the following before requesting review on this PR!
+-->
 
 ### Description
 
@@ -19,13 +19,14 @@ This file outlines a list of common things that should be addressed when opening
 ### Resolved Issues
 
 <!--
-    Link any issues that this PR resolved. Ex. `resolves #1, #2, and #5` (note that they MUST be specified like this so Github can automatically close them then this PR merges)
+    Link any issues that this PR resolved. Ex. `resolves #1, closes #2, fixes #5` (note that they MUST be specified like this so Github can automatically close them then this PR merges)
 -->
 
 ### Length Justification and Key Files to Review
 
-<!-- If this pull request is longer then **500** lines (additions + deletions), please justify here why we *cannot* break this up into multiple pull requests
-and list the key files that contain the main idea of your PR -->
+<!-- 
+    If this pull request is longer then **500** lines (additions + deletions), please justify here why we *cannot* break this up into multiple pull requests and list the key files that contain the main content of your PR 
+-->
 
 ### Review Checklist
 
