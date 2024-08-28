@@ -22,9 +22,8 @@ import time
 
 
 class TigersAutoref(TimeProvider):
-    """
-    A wrapper over the TigersAutoref binary. It coordinates communication between the Simulator, TigersAutoref and
-    Gamecontroller. 
+    """A wrapper over the TigersAutoref binary. It coordinates communication between the
+    Simulator, TigersAutoref and Gamecontroller.
 
     In CI mode, the flow of data corresponds to:
 
@@ -46,19 +45,18 @@ class TigersAutoref(TimeProvider):
         tick_rate_ms: int,
         ci_mode: bool = False,
         buffer_size: int = 5,
-        supress_logs: bool = True,
+        suppress_logs: bool = True,
         show_gui: bool = False,
     ) -> None:
-        """
-        Constructor
+        """Constructor
 
         :param gc:              gamecontroller instance
         :param tick_rate_ms:    the interval between subsequent SSL Vision packets
         :param ci_mode:         true to run the autoref binary in CI mode (use system time or use the time from the
                                 CiInput messages)
         :param buffer_size:     buffer size for the SSL wrapper and referee packets
-        :supress_logs:          true silences logs from the Autoref binary, otherwise shows them (its very verbose)
-        :show_gui:              true shows the Tigers' autoref GUI, false runs it in headless mode
+        :param suppress_logs:   true silences logs from the Autoref binary, otherwise shows them (its very verbose)
+        :param show_gui:        true shows the Tigers' autoref GUI, false runs it in headless mode
         """
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
@@ -68,14 +66,14 @@ class TigersAutoref(TimeProvider):
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.gamecontroller = gc
-        self.supress_logs = supress_logs
+        self.suppress_logs = suppress_logs
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
 
         self.current_timestamp = int(time.time_ns())
         self.timestamp_mutex = threading.Lock()
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> TigersAutoref:
         if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
             logging.warning(
                 "Could not find autoref binary, did you run ./setup_software.sh"
@@ -99,24 +97,21 @@ class TigersAutoref(TimeProvider):
             return self.current_timestamp * SECONDS_PER_NANOSECOND
 
     def _force_gamecontroller_to_accept_all_events(self) -> list[CiOutput]:
-        """
-        Force the Gamecontroller to accept all game events proposed by the Autoref
+        """Force the Gamecontroller to accept all game events proposed by the Autoref
 
         :return: a list of CiOutput protos from the Gamecontroller
         """
         game_event_proto_map = Config()
 
         for game_event in GameEvent.Type.DESCRIPTOR.values_by_name:
-            game_event_proto_map.game_event_behavior[
-                game_event
-            ] = Config.Behavior.BEHAVIOR_ACCEPT
+            game_event_proto_map.game_event_behavior[game_event] = (
+                Config.Behavior.BEHAVIOR_ACCEPT
+            )
 
         return self.gamecontroller.update_game_engine_config(game_event_proto_map)
 
     def _send_geometry(self) -> None:
-        """
-        Sends updated field geometry to the AutoRef so that the TigersAutoref knows about field sizes.
-        """
+        """Sends updated field geometry to the AutoRef so that the TigersAutoref knows about field sizes."""
         ssl_wrapper = self.wrapper_buffer.get(block=True)
         ci_input = AutoRefCiInput()
         ci_input.detection.append(ssl_wrapper.detection)
@@ -137,8 +132,7 @@ class TigersAutoref(TimeProvider):
             self._forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
 
     def _persistently_connect_to_autoref(self) -> bool:
-        """
-        Connect to the TigersAutoref binary. Retry connection a few times if the connection doesn't go through in case
+        """Connect to the TigersAutoref binary. Retry connection a few times if the connection doesn't go through in case
         the binary hasn't started yet.
 
         :return: True if the action was successful, False otherwise
@@ -157,8 +151,7 @@ class TigersAutoref(TimeProvider):
         return False
 
     def _send_to_autoref_and_forward_to_gamecontroller(self) -> None:
-        """
-        Main communication loop that sets up the TigersAutoref and coordinates communication between Simulator,
+        """Main communication loop that sets up the TigersAutoref and coordinates communication between Simulator,
         TigersAutoref and Gamecontroller. Returns early if connection to the TigersAutoref binary was unsuccessful.
         """
         if not self._persistently_connect_to_autoref():
@@ -209,8 +202,7 @@ class TigersAutoref(TimeProvider):
     def _forward_to_gamecontroller(
         self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
     ) -> list[CiOutput]:
-        """
-        Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the
+        """Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the
         given tracker_wrapper to support asynchronous ticking.
 
         :param tracker_wrapper TrackerWrapperPacket for the Gamecontroller to track
@@ -226,9 +218,7 @@ class TigersAutoref(TimeProvider):
         return self.gamecontroller.send_ci_input(ci_input)
 
     def _start_autoref(self) -> None:
-        """
-        Starts the TigersAutoref binary.
-        """
+        """Starts the TigersAutoref binary."""
         autoref_cmd = "software/autoref/run_autoref"
 
         if not self.show_gui:
@@ -237,7 +227,7 @@ class TigersAutoref(TimeProvider):
         if self.ci_mode:
             autoref_cmd += " --ci"
 
-        if self.supress_logs:
+        if self.suppress_logs:
             with open(os.devnull, "w") as fp:
                 self.tigers_autoref_proc = Popen(
                     autoref_cmd.split(" "), stdout=fp, stderr=fp
@@ -246,11 +236,10 @@ class TigersAutoref(TimeProvider):
             self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
     def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO) -> None:
-        """
-        Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the
+        """Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the
         Gamecontroller in CI mode.
 
-        :param autoref_proto_unix_io:               the proto unix io for the Autoref to receive SSLWrapperPackets
+        :param autoref_proto_unix_io: the proto unix io for the Autoref to receive SSLWrapperPackets
         """
         autoref_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
         autoref_proto_unix_io.register_observer(Referee, self.referee_buffer)

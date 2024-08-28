@@ -18,8 +18,8 @@ class BallStopsInRegion(Validation):
         """Checks if the ball stops in the provided regions
 
         :param world: The world msg to validate
-        :returns: FAILING until a ball stops in any of the regions
-                  PASSING when a ball stops in a region
+        :return: FAILING until a ball stops in any of the regions
+                 PASSING when a ball stops in a region
         """
         for region in self.regions:
             if tbots_cpp.contains(
@@ -38,8 +38,7 @@ class BallStopsInRegion(Validation):
         """Returns the underlying geometry this validation is checking
 
         :param world: The world msg to create validation geometry from
-        :returns: ValidationGeometry containing geometry to visualize
-
+        :return: ValidationGeometry containing geometry to visualize
         """
         return create_validation_geometry(self.regions)
 

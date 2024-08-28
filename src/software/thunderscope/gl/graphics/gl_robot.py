@@ -20,13 +20,14 @@ class GLRobot(GLMeshItem):
         color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
     ) -> None:
         """Initialize the GLRobot
-        
+
         :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
-
         """
         super().__init__(
-            parentItem=parent_item, meshdata=self.__get_mesh_data(), color=color,
+            parentItem=parent_item,
+            meshdata=self.__get_mesh_data(),
+            color=color,
         )
 
         self.x = 0
@@ -35,10 +36,9 @@ class GLRobot(GLMeshItem):
 
     def set_position(self, x: float, y: float) -> None:
         """Set the position of the graphic in the scene
-        
+
         :param x: The x coordinate to position the graphic at
         :param y: The y coordinate to position the graphic at
-        
         """
         if self.x == x and self.y == y:
             return
@@ -49,9 +49,8 @@ class GLRobot(GLMeshItem):
 
     def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
-        
-        :param degrees: The orientation of the graphic in degrees
 
+        :param degrees: The orientation of the graphic in degrees
         """
         # We need to add 45 degrees to our desired orientation in order
         # to get the flat side of the robot (i.e. its front) to face
@@ -66,13 +65,11 @@ class GLRobot(GLMeshItem):
         self.orientation = degrees
 
     def __get_mesh_data(self) -> MeshData:
-        """
-        Return a MeshData instance with vertices and faces computed
+        """Return a MeshData instance with vertices and faces computed
         for the surface of a cylinder with a flat side wall.
         This represents the geometry of a robot.
 
-        :returns: the computed MeshData instance 
-
+        :return: the computed MeshData instance
         """
         top_face_points = GLRobotOutline.get_robot_outline(
             z_coordinate=ROBOT_MAX_HEIGHT_METERS
@@ -95,4 +92,7 @@ class GLRobot(GLMeshItem):
         for index in range(len(top_face_points) - 1):
             faces.append([index, index + 1, len(circle_points)])
 
-        return MeshData(vertexes=np.array(points), faces=np.array(faces),)
+        return MeshData(
+            vertexes=np.array(points),
+            faces=np.array(faces),
+        )

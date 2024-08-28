@@ -11,11 +11,11 @@ from software.simulated_tests.validation import (
 
 
 class BallSpeedThreshold(Validation):
-
     """Checks if the ball speed is at or above some threshold."""
 
     def __init__(self, speed_threshold):
-        """
+        """Constructor
+
         :param speed_threshold: The speed threshold in m/s
         """
         self.speed_threshold = speed_threshold
@@ -24,8 +24,8 @@ class BallSpeedThreshold(Validation):
         """Checks if the ball speed is at or above some threshold
 
         :param world: The world msg to validate
-        :returns: FAILING if the ball speed is below some threshold
-                  PASSING if the ball speed is at or above some threshold
+        :return: FAILING if the ball speed is below some threshold
+                 PASSING if the ball speed is at or above some threshold
         """
         if (
             tbots_cpp.createVector(world.ball.current_state.global_velocity).length()
@@ -36,7 +36,7 @@ class BallSpeedThreshold(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """override"""
+        """(override) shows regions to enter"""
         if get_ball_speed(world.ball) == 0:
             return create_validation_geometry([])
 

@@ -24,14 +24,13 @@ class GLCircle(GLShape):
         line_width: float = LINE_WIDTH,
     ) -> None:
         """Initialize the GLCircle
-        
+
         :param parent_item: The parent item of the graphic
         :param radius: The radius of the circle
         :param num_points: The number of points to generate when creating the circle
         :param outline_color: The color of the circle's outline
         :param fill_color: The color used to fill the circle, or None if no fill
         :param line_width: The line width of the circle's outline
-
         """
         super().__init__(
             parent_item=parent_item,
@@ -50,7 +49,6 @@ class GLCircle(GLShape):
 
         :param radius: The radius of the circle
         :param num_points: The number of points to generate when creating the circle
-        
         """
         if self.radius == radius:
             return

@@ -34,7 +34,6 @@ class GLStadium(GLShape):
         :param outline_color: The color of the stadium's outline
         :param fill_color: The color used to fill the stadium, or None if no fill
         :param line_width: The line width of the stadium's outline
-
         """
         super().__init__(
             parent_item=parent_item,
@@ -55,9 +54,7 @@ class GLStadium(GLShape):
         :param radius: The radius of the stadium
         :param length: The length of the top and bottom lines of the stadium
         :param num_points: The number of points per semicircle to generate when drawing the stadium
-
         """
-
         if (
             self.radius == radius
             and self.length == length
@@ -76,9 +73,7 @@ class GLStadium(GLShape):
 
         :param radius: The radius of the stadium
         :param num_points: The number of points per semicircle to generate when drawing the stadium
-
         """
-
         if self.radius == radius and self.num_points == num_points:
             return
 
@@ -92,9 +87,7 @@ class GLStadium(GLShape):
 
         :param length: The length of the top and bottom lines of the stadium
         :param num_points: The number of points per semicircle to generate when drawing the stadium
-
         """
-
         if self.length == length and self.num_points == num_points:
             return
 
@@ -107,7 +100,6 @@ class GLStadium(GLShape):
         """Updates the stadium to match the parameters of another stadium
 
         :param stadium: The stadium to copy the parameters from
-
         """
         x_start_to_end = stadium.segment.end.x_meters - stadium.segment.start.x_meters
         y_start_to_end = stadium.segment.end.y_meters - stadium.segment.start.y_meters
