@@ -1,25 +1,10 @@
-install_autoref () {
-    sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/refs/heads/autoref-ci.zip -O /tmp/autoref-ci.zip
-    unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
-    touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
+install_autoref() {
+    autoref_commit=b30660b78728c3ce159de8ae096181a1ec52e9ba
+    sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/${autoref_commit}.zip -O /tmp/autoReferee.zip
+    unzip -q -o -d /tmp/ /tmp/autoReferee.zip
 
-    java_home=/opt/tbotspython/jdk-17.0.12/
-    mirror=""
-    if is_x86 $1; then
-        java_home=/usr/lib/jvm/jdk-17.0.12-oracle-x64/
-        mirror="https://github.com/ubc-thunderbots/autoreferee/releases/download/autoref-ci/autoreferee.tar.gz"
-    fi
-
-    ln -s $java_home /opt/tbotspython/bin/jdk
-
-    if ! /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=$java_home; then
-        print_status_msg "Building TIGERS AutoRef failed. Downloading mirror"
-    
-        wget $mirror -O /tmp/autoreferee.tar.gz
-        tar -xzf /tmp/autoReferee.tar.gz -C /opt/tbotspython/
-    else
-        cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
-    fi
+    /tmp/AutoReferee-${autoref_commit}/./gradlew installDist -p /tmp/AutoReferee-${autoref_commit} -Dorg.gradle.java.home=/opt/tbotspython/bin/jdk
+    cp -r /tmp/AutoReferee-${autoref_commit}/build/install/autoReferee /opt/tbotspython/
 }
 
 install_bazel() {
@@ -30,27 +15,40 @@ install_bazel() {
     fi
 
     wget -nc $download -O /tmp/bazel
-    sudo mv /tmp/bazel /usr/bin/
+    sudo mv /tmp/bazel /usr/bin/bazel
     sudo chmod +x /usr/bin/bazel
 }
 
 install_gamecontroller () {
+    go_arch=arm64
     if is_x86 $1; then
-        sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.12.3/ssl-game-controller_v3.12.3_linux_amd64 -O /opt/tbotspython/gamecontroller
-    else
-        sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.12.3/ssl-game-controller_v3.12.3_linux_arm64 -O /opt/tbotspython/gamecontroller
+        go_arch=amd64
     fi
+    sudo wget -N https://go.dev/dl/go1.23.0.linux-${go_arch}.tar.gz -O /tmp/go.tar.gz
+    tar -C /tmp -xf /tmp/go.tar.gz
+    export PATH=$PATH:/tmp/go/bin
+    sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/archive/refs/tags/v3.12.3.zip -O /tmp/ssl-game-controller.zip
+    unzip -q -o -d /tmp/ /tmp/ssl-game-controller.zip
+    cd /tmp/ssl-game-controller-3.12.3
+    make install
+    go build cmd/ssl-game-controller/main.go
+    sudo mv main /opt/tbotspython/gamecontroller
     sudo chmod +x /opt/tbotspython/gamecontroller
 }
 
 install_java () {
+    echo "Installing Java 17 $1"
+    java_home=""
     if is_x86 $1; then
         sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.12_linux-x64_bin.deb -O /tmp/jdk-17.0.12.deb
         sudo apt install /tmp/./jdk-17.0.12.deb
-        return
+        java_home=/usr/lib/jvm/jdk-17.0.12-oracle-x64/
+    else
+        sudo wget -N https://download.oracle.com/java/17/latest/jdk-17_linux-aarch64_bin.tar.gz -O /tmp/jdk-17.0.12.tar.gz
+        tar -xzf /tmp/jdk-17.0.12.tar.gz -C /opt/tbotspython/
+        java_home=/opt/tbotspython/jdk-17.0.12/
     fi
-    sudo wget https://download.oracle.com/java/17/latest/jdk-17_linux-aarch64_bin.tar.gz -O /opt/jdk-17.0.12.tar.gz
-    tar -xvzf jdk-17.0.12.tar.gz -C /opt/tbotspython/
+    sudo ln -s $java_home /opt/tbotspython/bin/jdk
 }
 
 is_x86() {

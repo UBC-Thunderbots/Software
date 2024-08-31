@@ -21,6 +21,7 @@ cd "$CURR_DIR" || exit
 source util.sh
 
 arch=$(uname -m)
+print_status_msg "Detected architecture: ${arch}"
 
 print_status_msg "Installing Utilities and Dependencies"
 
@@ -91,7 +92,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(qt5-default)
     
     # This fixes missing headers by notifying the linker
-    ldconfig
+    sudo ldconfig
 fi
 
 if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; then
