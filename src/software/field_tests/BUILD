@@ -46,8 +46,7 @@ py_test(
         "pivot_kick_field_test.py",
     ],
     deps = [
-        "//software/field_tests:field_test_fixture",
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:tbots_test_runner",
         "//software/simulated_tests:validation",
         requirement("pytest"),
