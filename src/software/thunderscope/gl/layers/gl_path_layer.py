@@ -23,7 +23,6 @@ class GLPathLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-                            
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -38,7 +37,6 @@ class GLPathLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         path_list = self.path_visualization_buffer.get(block=False).paths
         primitive_set = self.primitive_set_buffer.get(
             block=False
@@ -56,7 +54,8 @@ class GLPathLayer(GLLayer):
 
         # Ensure we have the same number of graphics as protos
         self.path_graphics.resize(
-            len(paths), lambda: GLPolygon(outline_color=Colors.NAVIGATOR_PATH_COLOR),
+            len(paths),
+            lambda: GLPolygon(outline_color=Colors.NAVIGATOR_PATH_COLOR),
         )
         self.destination_graphics.resize(
             len(requested_destinations),

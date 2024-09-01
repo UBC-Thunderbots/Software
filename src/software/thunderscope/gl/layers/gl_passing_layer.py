@@ -3,7 +3,6 @@ from pyqtgraph.opengl import *
 import time
 import queue
 
-import numpy as np
 
 from proto.visualization_pb2 import PassVisualization
 
@@ -28,7 +27,6 @@ class GLPassingLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-                            
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -43,10 +41,9 @@ class GLPassingLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         try:
             pass_vis = self.pass_visualization_buffer.queue.get_nowait()
-        except queue.Empty as empty:
+        except queue.Empty:
             pass_vis = None
 
         if not pass_vis:
@@ -68,9 +65,11 @@ class GLPassingLayer(GLLayer):
         self.pass_graphics.resize(
             1,
             lambda: GLPolygon(
-                outline_color=Colors.COMMITTED_PASS_VISUALIZATION_COLOR
-                if pass_vis.pass_committed
-                else Colors.UNCOMMITTED_PASS_VISUALIZATION_COLOR
+                outline_color=(
+                    Colors.COMMITTED_PASS_VISUALIZATION_COLOR
+                    if pass_vis.pass_committed
+                    else Colors.UNCOMMITTED_PASS_VISUALIZATION_COLOR
+                )
             ),
         )
 

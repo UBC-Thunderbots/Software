@@ -1,27 +1,21 @@
-import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
-from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import MULTI_PLANE_POINTS
-
-import numpy as np
-from typing import List
 
 
 class MouseInSceneEvent:
     """Wraps QMouseEvent and includes additional data about the point in the 3D scene
-    that was picked by the mouse cursor
-    as well as points in other planes that correspond to the mouse cursor
+    that was picked by the mouse cursor as well as points in other planes that correspond
+    to the mouse cursor
     """
 
     def __init__(
         self,
         mouse_event: QtGui.QMouseEvent,
         point_in_scene: QtGui.QVector3D,
-        multi_plane_points: List[QtGui.QVector3D],
+        multi_plane_points: list[QtGui.QVector3D],
     ):
         """Initialize the MouseInSceneEvent
 
@@ -36,7 +30,8 @@ class MouseInSceneEvent:
 
 class ExtendedGLViewWidget(GLViewWidget):
     """Extends GLViewWidget with ability to determine coordinates of the
-    mouse cursor position in the 3D scene"""
+    mouse cursor position in the 3D scene
+    """
 
     # Signal emitted when mouse has picked a point in the 3D scene (shift + click)
     mouse_in_scene_pressed_signal = QtCore.pyqtSignal(MouseInSceneEvent)
@@ -51,12 +46,8 @@ class ExtendedGLViewWidget(GLViewWidget):
     # (detect_mouse_movement_in_scene must be enabled for this signal to be emitted)
     mouse_in_scene_moved_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
-    def __init__(self, bufferswap_counter: FrameTimeCounter = None) -> None:
-        """
-        Initialize the ExtendedGLViewWidget
-        bufferswap_counter: a counter that is used to track fps
-
-        """
+    def __init__(self) -> None:
+        """Initialize the ExtendedGLViewWidget"""
         super().__init__()
 
         # Fixes strange bug where mousePos is not initialized
@@ -70,18 +61,6 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         # This must be enabled for the mouse_moved_in_scene_signal to be emitted
         self.detect_mouse_movement_in_scene = False
-
-        # adding a callback for fps purpose
-        self.bufferswap_counter = bufferswap_counter
-        if self.bufferswap_counter == None:
-            self.bufferswap_counter = FrameTimeCounter()
-        self.frameSwapped.connect(self.frameswap_callback)
-
-    def frameswap_callback(self):
-        """
-        adding a frameswap callback
-        """
-        self.bufferswap_counter.add_one_datapoint()
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was pressed
@@ -110,12 +89,10 @@ class ExtendedGLViewWidget(GLViewWidget):
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was moved
-        
-        :param event: The event
 
+        :param event: The event
         """
         if self.point_picked or self.detect_mouse_movement_in_scene:
-
             point_in_scene_event = MouseInSceneEvent(
                 event,
                 self.get_point_in_scene(event.position()),
@@ -135,9 +112,8 @@ class ExtendedGLViewWidget(GLViewWidget):
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was released
-        
-        :param event: The event
 
+        :param event: The event
         """
         if self.point_picked:
             self.point_picked = False
@@ -153,10 +129,10 @@ class ExtendedGLViewWidget(GLViewWidget):
 
     def get_multi_plane_points_in_scene(
         self, mouse_pos: QtCore.QPoint
-    ) -> List[QtGui.QVector3D]:
-        """
-        Determines the coordinates of the points on the x-y planes and a few planes above it
+    ) -> list[QtGui.QVector3D]:
+        """Determines the coordinates of the points on the x-y planes and a few planes above it
         in the 3D scene that the mouse is pointing at
+
         :param mouse_pos: the coordinates of the mouse relative to the ExtendedGLViewWidget
         :return: a list of points in the 3D scene representing where the mouse is pointing to on multiple planes
         """
@@ -191,8 +167,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         :param mouse_pos: the coordinates of the mouse relative to the ExtendedGLViewWidget
         :param z_height: the z axis height of the plane that the mouse event should point to
                             default is 0 (x-y plane)
-        :returns: the point in the 3D scene that represents where the mouse is pointing to
-
+        :return: the point in the 3D scene that represents where the mouse is pointing to
         """
         # Get viewport
         viewport_width = self.width()

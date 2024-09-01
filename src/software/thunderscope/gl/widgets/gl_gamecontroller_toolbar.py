@@ -10,9 +10,7 @@ import software.thunderscope.gl.widgets.toolbar_icons.gamecontroller.icon_loader
 
 
 class GamecontrollerPlays:
-    """
-    The different plays that can be set for each team
-    """
+    """The different plays that can be set for each team"""
 
     NONE = "None"
     DIRECT = "Direct"
@@ -22,9 +20,7 @@ class GamecontrollerPlays:
 
 
 class GamecontrollerEvents:
-    """
-    The different event that we can send for each team
-    """
+    """The different event that we can send for each team"""
 
     YELLOW = "Yellow Card"
     RED = "Red Card"
@@ -33,17 +29,14 @@ class GamecontrollerEvents:
 
 
 class GLGamecontrollerToolbar(GLToolbar):
-    """
-    A toolbar with controls to send GameController commands from Thunderscope
-    """
+    """A toolbar with controls to send GameController commands from Thunderscope"""
 
     GAME_CONTROLLER_URL = "http://localhost:8081"
 
     def __init__(
         self, parent: QWidget, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool
     ):
-        """
-        Initializes the toolbar and constructs its layout
+        """Initializes the toolbar and constructs its layout
 
         :param parent: the parent to overlay this toolbar over
         :param proto_unix_io the ProtoUnixIO object to send the manual gamecontroller commands to
@@ -107,26 +100,23 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.__toggle_normal_start_button()
 
         self.layout().addWidget(QLabel("<b>Gamecontroller</b>"))
-        self.__add_seperator(self.layout())
+        self.__add_separator(self.layout())
         self.layout().addWidget(self.stop_button)
         self.layout().addWidget(self.halt_button)
         self.layout().addWidget(self.force_start_button)
-        self.__add_seperator(self.layout())
+        self.__add_separator(self.layout())
         self.layout().addWidget(self.plays_menu_button)
         self.layout().addWidget(self.normal_start_button)
-        self.__add_seperator(self.layout())
+        self.__add_separator(self.layout())
         self.layout().addWidget(self.gc_browser_button)
         self.layout().addStretch()
 
     def refresh(self) -> None:
-        """
-        Refreshes the UI to update toolbar position
-        """
+        """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
 
-    def __add_seperator(self, layout: QBoxLayout) -> None:
-        """
-        Adds a separator line with enough spacing to the given layout
+    def __add_separator(self, layout: QBoxLayout) -> None:
+        """Adds a separator line with enough spacing to the given layout
 
         :param layout: the layout to add the separator to
         """
@@ -135,8 +125,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         layout.addSpacing(10)
 
     def __add_plays_menu_items(self, is_blue: bool) -> None:
-        """
-        Initializes the plays menu with the available plays for the given team
+        """Initializes the plays menu with the available plays for the given team
 
         :param is_blue: if the team to add items for is blue (True) or yellow (False)
         """
@@ -156,9 +145,8 @@ class GLGamecontrollerToolbar(GLToolbar):
     def __plays_menu_handler(
         self, play: GamecontrollerPlays, icon: QtGui.QIcon, is_blue: bool
     ) -> None:
-        """
-        The handler called when a play is selected. Sends the right gc command
-        based on the play we want. 
+        """The handler called when a play is selected. Sends the right gc command
+        based on the play we want.
         Updates the UI to indicate the play that was selected
         Toggles the normal start button so we can start the play
         """
@@ -176,16 +164,15 @@ class GLGamecontrollerToolbar(GLToolbar):
             command_type = Command.Type.PENALTY
 
         self.__send_gc_command(
-            command_type, (SslTeam.BLUE if is_blue else SslTeam.YELLOW),
+            command_type,
+            (SslTeam.BLUE if is_blue else SslTeam.YELLOW),
         )
 
         if not self.normal_start_enabled:
             self.__toggle_normal_start_button()
 
     def __toggle_normal_start_button(self) -> None:
-        """ 
-        Toggles the enabled / disabled state of the Normal Start button
-        """
+        """Toggles the enabled / disabled state of the Normal Start button"""
         self.normal_start_enabled = not self.normal_start_enabled
         self.normal_start_button.setStyleSheet(
             self.get_button_style(self.normal_start_enabled)
@@ -205,8 +192,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         callback: Callable[[], None],
         display_text: str = None,
     ) -> QPushButton:
-        """
-        Sets up a button with the given name and callback
+        """Sets up a button with the given name and callback
 
         :param icon: the icon displayed on the button
         :param tooltip: the tooltip displayed when hovering over the button
@@ -225,26 +211,19 @@ class GLGamecontrollerToolbar(GLToolbar):
         return button
 
     def __send_stop_command(self) -> None:
-        """
-        Sends a STOP command to the gamecontroller
-        """
+        """Sends a STOP command to the gamecontroller"""
         self.__send_gc_command(Command.Type.STOP, SslTeam.UNKNOWN)
 
     def __send_force_start_command(self) -> None:
-        """
-        Sends a FORCE_START command for the current friendly team to the gamecontroller
-        """
+        """Sends a FORCE_START command for the current friendly team to the gamecontroller"""
         self.__send_gc_command(Command.Type.FORCE_START, SslTeam.UNKNOWN)
 
     def __send_halt_command(self) -> None:
-        """
-        Sends a HALT command for the current friendly team to the gamecontroller
-        """
+        """Sends a HALT command for the current friendly team to the gamecontroller"""
         self.__send_gc_command(Command.Type.HALT, SslTeam.UNKNOWN)
 
     def __send_normal_start_command(self) -> None:
-        """
-        Sends a NORMAL START command for the current friendly team to the gamecontroller
+        """Sends a NORMAL START command for the current friendly team to the gamecontroller
         And resets the plays menu selection
         """
         if self.normal_start_enabled:
@@ -256,8 +235,7 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.plays_menu_button.setIcon(QtGui.QIcon())
 
     def __send_gc_command(self, command: Command.Type, team: Team) -> None:
-        """
-        Sends the given command to the gamecontroller for the given Team
+        """Sends the given command to the gamecontroller for the given Team
         If ball_pos is defined, sets the ball position
 
         :param command the command to send
