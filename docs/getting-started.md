@@ -54,10 +54,10 @@ Table of Contents
 ## Introduction
 
 These instructions assume that you have the following accounts setup:
-- [Github](https://github.com/login)
+- [GitHub](https://github.com/login)
 - [Discord](https://discord.com). Please contact a Thunderbots lead to receive the invite link.
 
-These instructions assume you have a basic understanding of Linux and the command-line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem, and how to run programs or scripts.
+These instructions assume you have a basic understanding of Linux and the command-line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem and how to run programs or scripts.
 
 ## Installation and Setup
 
@@ -75,18 +75,25 @@ You can use Ubuntu 20.04 LTS and Ubuntu 22.04 LTS inside Windows through Windows
 4. Click the `Fork` button in the top-right to fork the repository ([click here to learn about Forks](https://help.github.com/en/articles/fork-a-repo))
    1. Click on your user when prompted
    2. You should be automatically redirected to your new fork
-5. Clone your fork of the repository. As GitHub is forcing users to stop using usernames and passwords, we will be using the SSH link.  Returning members who are migrating to using SSH after cloning from a previous method can use the following instructions to set up a new local repository using SSH.
-   1. To connect to GitHub using SSH, if not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).  For each computer you contribute to GitHub with, you will need an additional SSH Key pair linked to your account.
-   2.  After you have successfully set up a SSH key for your device and added it to GitHub, you can clone the repository using the following command (you can put it wherever you like):
-        1.  Eg. `git clone git@github.com:<your_username>/Software.git`
-        2.  You can find this link under the green `Clone or Download` button on the main page of the Software repository, under the SSH tab.  (This should now be available after adding your SSH key to GitHub successfully.)
+5. Clone your fork of the repository. We recommend cloning using HTTPS since it is the easiest to set up. You should be able to clone your fork using the following command (you can put it wherever you like):
+   ```
+   git clone https://github.com/<your_username>/Software.git
+   ```
+   You can find your fork's remote URL under the green `Code` button on the main page of your fork on GitHub, under the HTTPS tab.
+
+   If you would like to clone using SSH:
+
+   1. If not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).  For each computer you contribute to GitHub with, you will need an additional SSH Key pair linked to your account.
+   2.  After you have successfully set up a SSH key for your device and added it to GitHub, you can clone the repository using the following command:
+        1.  e.g. `git clone git@github.com:<your_username>/Software.git`
+        2.  You can find this link under the green `Clone or Download` button on the main page of your fork on GitHub, under the SSH tab.  (This should now be available after adding your SSH key to GitHub successfully.)
 6. Set up your git remotes ([what is a remote and how does it work?](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes))
    1. You should have a remote named `origin` that points to your fork of the repository. Git will have set this up automatically when you cloned your fork in the previous step.
    2. You will need to add a second remote, named `upstream`, that points to our main Software repository, which is where you created your fork from. (**Note:** This is _not_ your fork)
       1. Open a terminal and navigate to the folder you cloned (your fork): `cd path/to/the/repository/Software`
-      2. Navigate to our main Software repository in your browser and copy the url from the "Clone or Download" button. Copy the HTTPS url if you originally cloned with HTTPS, and use the SSH url if you previously cloned with SSH
+      2. Navigate to our main Software repository in your browser and copy the url from the green `Code` button. Copy the HTTPS url if you originally cloned with HTTPS, or use the SSH url if you previously cloned with SSH
       3. From your terminal, add the new remote by running `git remote add upstream <the url>` (without the angle brackets)
-         1. Eg. `git remote add upstream https://github.com/UBC-Thunderbots/Software.git`
+         1. e.g. `git remote add upstream https://github.com/UBC-Thunderbots/Software.git`
       4. That's it. If you want to double check your remotes are set up correctly, run `git remote -v` from your terminal (at the base of the repository folder again). You should see two entries: `origin` with the url for your fork of the repository, and `upstream` with the url for the main repository
 
 *See our [workflow](#workflow) for how to use git to make branches, submit Pull Requests, and track issues*
@@ -95,10 +102,10 @@ You can use Ubuntu 20.04 LTS and Ubuntu 22.04 LTS inside Windows through Windows
 
 We have several setup scripts to help you easily install the necessary dependencies in order to build and run our code. You will want to run the following scripts, which can all be found in `Software/environment_setup`
 
-* Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
+* Inside a terminal, navigate to the environment_setup folder. e.g. `cd path/to/the/repository/Software/environment_setup`
 * Run `./setup_software.sh`
   * You will be prompted for your admin password
-  * This script will install everything necessary in order to build and run our main `AI` software 
+  * This script will install everything necessary in order to build and run our software 
 
 ### Installing an IDE
 
@@ -119,18 +126,17 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 ##### Installing CLion
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-* Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
+* Run `./install_clion.sh` (* **We highly recommend using the script and not downloading CLion yourself unless you know what you're doing.** The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
 * When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
 
-### Installing an IDE: VSCode
+### Installing an IDE: VS Code
 
-VSCode is the more lightweight IDE, with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated into this IDE.
+VS Code is a more lightweight "IDE", with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated by default into VS Code.
 
 1. Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-2. Run `./install_vscode.sh` (* **DO NOT** download VSCode yourself unless you know what you're doing. The `install_vscode.sh` script will grab the most stable version of VSCode *)
-3. Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop.
-&. Click `Open Folder` and navigate to where you cloned software. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
-4. VSCode will prompt you to install recommended extensions, click `Install`, this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc..)
+2. Run `./install_vscode.sh` (* **We highly recommend using the script and not downloading VSCode yourself unless you know what you're doing.** The `install_vscode.sh` script will grab the most stable version of VSCode *)
+3. Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop. Go to  File -> Open Folder and navigate to where you cloned the software repo. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
+4. VSCode will prompt you to install recommended extensions. Click `Install` — this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc.)
 5. Navigate to File -> Preferences -> Settings -> Workspace -> Extensions -> Bazel and select the `Bazel: Enable Code Lens` option.
 
 ### Editing with Vim or NeoVim
@@ -158,7 +164,7 @@ These tools require a `compile_commands.json` file, which can be generated by fo
 
 ### Building from the command-line using the fuzzy finder
 
-We have a ./tbots.py test runner script in the src folder that will fuzzy find for targets. For example, 
+We have a `tbots.py` test runner script in the src folder that will fuzzy find for targets and call Bazel. For example, 
 
 1. Build a specific target for running (for example): `./tbots.py build angletest`
 2. Run a specific target by running (for example): `./tbots.py run goalietactictest -t`
@@ -168,7 +174,7 @@ where the `-t` flag indicates whether Thunderscope should be launched. Run `./tb
 
 ### Building with CLion
 
-First we need to setup CLion
+First, we need to setup CLion:
 1. Open CLion
 2. Select `Import Bazel Project`
 3. Set `Workspace` to wherever you cloned the repository + `/src`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src`.
@@ -178,7 +184,7 @@ First we need to setup CLion
 7. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
 
 Now that you're setup, if you can run it on the command line, you can run it in CLion. There are two main ways of doing so.
-1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
+1. Open any `BUILD` file and right click on a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
 2. Add a custom build configuration (more powerful, so make sure you understand this!)
     1. Select `Add Configuration` from the drop-down in the top-right of CLion
     2. Click on `+`, choose `Bazel Command`.
@@ -195,8 +201,8 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 
 ### Running our AI, Simulator, SimulatedTests or Robot Diagnostics
 
-1. Run our AI on Thunderscope:
-    - Thunderscope is the software that coordinates our AI, Simulator, Visualizer and RobotDiagnostics
+1. Run our AI on [Thunderscope](./software-architecture-and-design.md#thunderscope-gui):
+    - [Thunderscope](./software-architecture-and-design.md#thunderscope-gui) is the software that coordinates and visualizes our AI, Simulator, and RobotDiagnostics.
     - After launching Thunderscope, we can see what the AI is currently "seeing" and interact with it through dynamic parameters. 
     - If we want to run with simulated AI vs AI:
         - `./tbots.py run thunderscope_main --enable_autoref` will start Thunderscope with a Simulator, a blue FullSystem, yellow FullSystem and a headless Autoref.
@@ -298,7 +304,7 @@ To debug from the command line, first you need to build your target with the deb
 
 ## Profiling 
 
-Profiling is an optimization tool used to identify the time and space used by code, with a detailed breakdown to help identify areas of potential performance improvements. Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence the only way is via command line. Use the following command:
+Profiling is an optimization tool used to identify the time and space used by code, with a detailed breakdown to help identify areas of potential performance improvements. Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence, the only way to profile our software is via the command line.
 
 ### Callgrind
 
@@ -349,7 +355,9 @@ We use ansible to automatically update software running on the Jetson Nano. [Mor
 
 To update binaries on a working robot, you can run:
 
-`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
+```
+bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>
+```
 
 ## Setting up Virtual Robocup 2021
 
@@ -372,7 +380,7 @@ After editing the dockerfile, build the image and push it to dockerhub with the 
 
 ## Issue and Project Tracking
 
-We try keep our issue and project tracking fairly simple, to reduce the overhead associated with tracking all the information and to make it easier to follow. If you are unfamiliar with GitHub issues, [this article](https://guides.github.com/features/issues/) gives a good overview.
+We try keep our issue and project tracking fairly simple to reduce the overhead associated with tracking all the information and to make it easier to follow. If you are unfamiliar with GitHub issues, [this article](https://guides.github.com/features/issues/) gives a good overview.
 
 ### Issues
 
@@ -403,10 +411,12 @@ For each Issue of project you are working on, you should have a separate branch.
 1. Navigate to the base folder of your Software repository: `cd path/to/the/repository/Software`
 2. Make git aware of any new changes to `upstream` by running `git fetch upstream`
 3. Create a new branch from `upstream/master` by running `git checkout upstream/master` then `git checkout -b your-branch-name`
-   1. Our branch naming convention is: `your_name/branch_name` (all lowercase, words separated by underscores). The branch name should be short and descriptive of the work being done on the branch.
    
-**Example:** if you were working on a new navigation system using RRT and your name was "Bob" your branch name might look like: `bob/new_rrt_navigator`
-4. You can now commit changes to this branch, and push them to your fork with `git push origin your_branch_name` or `git push -u`
+   Our branch naming convention is: `your_name/branch_name` (all lowercase, words separated by underscores). The branch name should be short and descriptive of the work being done on the branch.
+   
+   **Example:** if you were working on a new navigation system using RRT and your name was "Bob" your branch name might look like: `bob/new_rrt_navigator`
+
+4. You can now commit changes to this branch and push them to your fork with `git push origin your_branch_name` or `git push -u`
 
 <details>
 <summary>Aside: Why should you only create branches from "upstream/master"?</summary>
@@ -421,7 +431,7 @@ tl;dr Always create new branches from upstream/master. Do not create branches fr
 
 ### Making Commits
 
-We don't impose any rules for how you should be committing code, just keep the following general rules in mind:
+We don't impose any rules for how you should be committing code, just keep the following general guidelines in mind:
 
 1. Commits should represent logical steps in your workflow. Avoid making commits too large, and try keep related changes together
 2. Commit messages should give a good idea of the changes made. You don't have to go in-depth with technical details, but no one will know what you've done if your commit message is "fixed broken stuff"
@@ -435,13 +445,13 @@ To do this, you have 2 options: rebase or merge. [What's the difference?](https:
 
 Merging is generally recommended, because it is easier to handle conflicts and get stuff working. To merge, simply run `git pull upstream master`.
 
-Rebasing requires more knowledge of git and can cause crazy merge conflicts, so it isn't recommended. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`.
+Rebasing requires more knowledge of git and can cause crazy merge conflicts, so it isn't recommended. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`. The main benefit of rebasing is that you get a clean, linear commit history; however, we squash all the commits in each PR into a single commit before merging into master, so the extra effort involved in rebasing is pointless.
 
 If you do rebase or merge and get conflicts, you'll need to resolve them manually. [See here for a quick tutorials on what conflicts are and how to resolve them](https://www.atlassian.com/git/tutorials/using-branches/merge-conflicts). Feel free to do this in your IDE or with whatever tool you are most comfortable with. Updating your branch often helps keep conflicts to a minimum, and when they do appear they are usually smaller. Ask for help if you're really stuck!
 
 ### Formatting Your Code
 
-We use [clang-format](https://electronjs.org/docs/development/clang-format) to automatically format our code. Using an automatic tool helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what it does.
+We use a variety of code formatters and linters to automatically format our code. Using automatic tools helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what these tools enforce.
 
 To format the code, from the `Software` directory run `./formatting_scripts/fix_formatting.sh`.
 
