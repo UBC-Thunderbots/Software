@@ -1,12 +1,17 @@
 repos:
 -   repo: local
     hooks:
-    -   id: fix_formatting
+    -   id: compile_pip_requirements
+        name: compile pip requirements
+        language: system
+        entry: scripts/compile_pip_requirements.sh
+
+    -   id: lint_and_format
         name: fix common trivial code errors
         language: system
-        entry: formatting_scripts/fix_formatting.sh 
+        entry: scripts/lint_and_format.sh 
 
     -   id: generate_fsm_diagrams
         name: generate new FSM diagrams
         language: python
-        entry: ./src/software/ai/fsm_diagram_generator.py
+        entry: scripts/fsm_diagram_generator.py

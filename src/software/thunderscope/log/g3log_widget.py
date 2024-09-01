@@ -1,6 +1,6 @@
-import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
 import queue
+import qdarktheme
 from software.py_constants import *
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
@@ -12,21 +12,22 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class g3logWidget(QWidget):
-    def __init__(self, buffer_size=10):
+    def __init__(self, buffer_size: int = 10):
         """The g3log widget is a console widget that displays g3log messages
 
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         QWidget.__init__(self)
+
+        palette = qdarktheme.load_palette()
 
         self.console_widget = pg_console.ConsoleWidget()
         self.console_widget.setStyleSheet(
             """
             border: none;
             border-radius: 5px;
-            background: #232629;
+            background: #101012;
             """
         )
 
@@ -62,13 +63,12 @@ class g3logWidget(QWidget):
             LogLevel.CONTRACT: "CONTRACT",
         }
 
-    def refresh(self):
-        """Update the log widget with another log message
-        """
+    def refresh(self) -> None:
+        """Update the log widget with another log message"""
         # Need to make sure the message is new before logging it
         try:
             log = self.log_buffer.queue.get_nowait()
-        except queue.Empty as empty:
+        except queue.Empty:
             return
 
         # Checks whether this type of log is enabled from checkboxes

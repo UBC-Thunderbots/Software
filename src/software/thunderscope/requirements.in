@@ -1,0 +1,5 @@
+colorama==0.4.6
+netifaces==0.11.0
+numpy==1.25.0
+pyqtgraph==0.13.7
+pyqtdarktheme==2.1.0

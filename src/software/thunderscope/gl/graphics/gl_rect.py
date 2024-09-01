@@ -23,14 +23,13 @@ class GLRect(GLShape):
         line_width: float = LINE_WIDTH,
     ) -> None:
         """Initialize the GLRect
-        
+
         :param parent_item: The parent item of the graphic
         :param x_length: The length of the rectangle in the x direction
         :param y_length: The length of the rectangle in the y direction
         :param outline_color: The color of the rectangle's outline
         :param fill_color: The color used to fill the rectangle, or None if no fill
         :param line_width: The line width of the rectangle's outline
-
         """
         self.x_length = 0
         self.y_length = 0
@@ -46,10 +45,9 @@ class GLRect(GLShape):
 
     def set_dimensions(self, x_length: float = 0, y_length: float = 0) -> None:
         """Set the dimensions of the rectangle
-        
+
         :param x_length: The length of the rectangle in the x direction
         :param y_length: The length of the rectangle in the y direction
-
         """
         if x_length == 0 or y_length == 0:
             return

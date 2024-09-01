@@ -17,12 +17,9 @@ Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
-SetPlay --> SetPlay : [gameStateHalted]\n<i>(resetSetPlay</i>
-setupHaltPlay_A) --> Halt
-SetPlay --> SetPlay : [gameStateStopped]\n<i>(resetSetPlay</i>
-setupStopPlay_A) --> Stop
-SetPlay --> SetPlay : [gameStatePlaying]\n<i>(resetSetPlay</i>
-setupOffensePlay_A) --> Playing
+SetPlay --> Halt : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
+SetPlay --> Stop : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
+SetPlay --> Playing : [gameStatePlaying]\n<i>resetSetPlay, setupOffensePlay</i>
 SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Terminate:::terminate --> Terminate:::terminate
 
@@ -360,6 +357,9 @@ direction LR
 BlockPassState --> InterceptBallState : [passStarted]\n<i>interceptBall</i>
 BlockPassState --> BlockPassState : <i>blockPass</i>
 InterceptBallState --> BlockPassState : [ballDeflected]\n<i>blockPass</i>
+InterceptBallState --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
+DribbleFSM --> BlockPassState : [!ballNearbyWithoutThreat]\n<i>blockPass</i>
+DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
 InterceptBallState --> InterceptBallState : <i>interceptBall</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 

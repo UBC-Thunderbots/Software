@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -5,8 +7,6 @@ from software.thunderscope.constants import IndividualRobotMode, EstopMode
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.import_all_protos import *
-from pyqtgraph.Qt import QtCore
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 from colorama import Fore, Style
 import logging
 from typing import Any, Callable, Tuple, Type
@@ -20,9 +20,8 @@ DISCONNECTED = "DISCONNECTED"
 
 logger = logging.getLogger(__name__)
 
-
-class RobotCommunication(object):
-    """ Communicate with the robots """
+class RobotCommunication:
+    """Communicate with the robots"""
 
     def __init__(
         self,
@@ -45,7 +44,6 @@ class RobotCommunication(object):
         :param estop_baudrate: The baudrate of the estop
         :param enable_radio: Whether to use radio to send primitives to robots
         :param referee_port: the referee port that we are using. If this is None, the default port is used
-
         """
         self.is_setup_for_fullsystem = False
 
@@ -280,8 +278,7 @@ class RobotCommunication(object):
         )
 
     def toggle_keyboard_estop(self) -> None:
-        """
-        If keyboard estop is being used, toggles the estop state
+        """If keyboard estop is being used, toggles the estop state
         And sends a message to the console
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
@@ -290,15 +287,14 @@ class RobotCommunication(object):
             print(
                 "Keyboard Estop changed to "
                 + (
-                    f"\x1b[32mPLAY \x1b[0m"
+                    "\x1b[32mPLAY \x1b[0m"
                     if self.estop_is_playing
-                    else f"\x1b[31;20mSTOP \x1b[0m"
+                    else "\x1b[31;20mSTOP \x1b[0m"
                 )
             )
 
     def toggle_robot_connection(self, mode: IndividualRobotMode, robot_id: int):
-        """
-        Changes the input mode for a robot between None, Manual, or AI
+        """Changes the input mode for a robot between None, Manual, or AI
         If changing from anything to None, add robot to disconnected map
         So we can send multiple stop primitives to make sure it stops
 
@@ -317,8 +313,7 @@ class RobotCommunication(object):
             self.robots_connected_to_fullsystem.add(robot_id)
 
     def __send_estop_state(self) -> None:
-        """
-        Constant loop which sends the current estop status proto if estop is not disabled
+        """Constant loop which sends the current estop status proto if estop is not disabled
         Uses the keyboard estop value for keyboard estop mode
         If we're in physical estop mode, uses the physical estop value
         If estop has just changed from playing to stop, set flag to send stop primitive once to connected robots
@@ -343,8 +338,8 @@ class RobotCommunication(object):
                 time.sleep(0.1)
 
     def __should_send_packet(self) -> bool:
-        """
-        Returns True if the proto sending threads should send a proto
+        """Returns True if the proto sending threads should send a proto
+
         :return: boolean
         """
         return (
@@ -369,7 +364,6 @@ class RobotCommunication(object):
 
         send_override_primitive_set can be used to send a primitive set, which
         is useful to dip in and out of robot diagnostics.
-
         """
         network_config = self.network_config_buffer.get(
             block=True if self.accept_next_network_config else False,
@@ -441,12 +435,14 @@ class RobotCommunication(object):
             primitive_set = PrimitiveSet(
                 time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                 stay_away_from_ball=False,
-                robot_primitives=robot_primitives
-                if not self.should_send_stop
-                else {
-                    robot_id: Primitive(stop=StopPrimitive())
-                    for robot_id in robot_primitives.keys()
-                },
+                robot_primitives=(
+                    robot_primitives
+                    if not self.should_send_stop
+                    else {
+                        robot_id: Primitive(stop=StopPrimitive())
+                        for robot_id in robot_primitives.keys()
+                    }
+                ),
                 sequence_number=self.sequence_number,
             )
 
@@ -461,18 +457,17 @@ class RobotCommunication(object):
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
-        """
-        Forwards to proto unix IO iff running is true
+        """Forwards to proto unix IO iff running is true
+
         :param data: the data to be passed through
         :param type: the proto type
         """
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> RobotCommunication:
         """Enter RobotCommunication context manager. Setup multicast listeners
         for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
-
         """
         self.running = True
 
@@ -482,8 +477,8 @@ class RobotCommunication(object):
         return self
 
     def __receive_robot_status(self, robot_status: Message) -> None:
-        """
-        Forwards the given robot status to the full system along with the round-trip time
+        """Forwards the given robot status to the full system along with the round-trip time
+
         :param robot_status: RobotStatus to forward to fullsystem
         """
         round_trip_time_seconds = time.time() - (
@@ -499,7 +494,6 @@ class RobotCommunication(object):
         """Exit RobotCommunication context manager
 
         Ends all currently running loops and joins all currently active threads
-
         """
         self.running = False
 

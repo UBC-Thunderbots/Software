@@ -13,7 +13,6 @@ from google.protobuf.message import Message
 class ProtoUnixIO:
     """The ProtoUnixIO is responsible for communicating protobufs over unix sockets.
 
-
                                                           Register Protobuf
                                                           to a buffer to
                                                           receive data
@@ -23,7 +22,7 @@ class ProtoUnixIO:
         ProtoUnixReceiver ┌───────────────────┐           ┌──┬──┬──┬──┬──┐
                 ──────────>                   ├──────────>│  │  │  │  │  │
                           │                   │           └──┴──┴──┴──┴──┘
-                          │    ProtoUnixIO    │           ThreadSafeBuffer 
+                          │    ProtoUnixIO    │           ThreadSafeBuffer
         ProtoUnixSender   │                   │
                 <─────────┤                   <──────────── send_proto
                           └───────────────────┘
@@ -51,7 +50,6 @@ class ProtoUnixIO:
     TL;DR This class manages inter-thread communication through register_observer
     and send_proto calls. If unix senders/receivers are attached to a proto type,
     then the data is also sent/received over the sockets.
-
     """
 
     def __init__(self) -> None:
@@ -68,7 +66,6 @@ class ProtoUnixIO:
         send place it in the other buffers.
 
         :param receive_buffer: The queue to consume from
-
         """
         while self.running:
             proto = receive_buffer.get()
@@ -93,7 +90,6 @@ class ProtoUnixIO:
 
         :param proto_class: Class of protobuf to consume
         :param buffer: buffer from the widget to register
-
         """
         if proto_class.DESCRIPTOR.full_name in self.proto_observers:
             self.proto_observers[proto_class.DESCRIPTOR.full_name].append(buffer)
@@ -104,7 +100,6 @@ class ProtoUnixIO:
         """Register a buffer to observe all incoming protobufs
 
         :param buffer: buffer to push protos onto
-        
         """
         self.all_proto_observers.append(buffer)
 
@@ -122,7 +117,6 @@ class ProtoUnixIO:
         :param block: If block is True, then block until a free space opens up
                       to put the proto. Otherwise, proto will be dropped if queue is full.
         :param timeout: If block is True, then wait for this many seconds
-
         """
         if proto_class.DESCRIPTOR.full_name in self.proto_observers:
             for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
@@ -141,11 +135,10 @@ class ProtoUnixIO:
     ) -> None:
         """Creates a unix sender and registers an observer
         of the proto_class to send the data over the unix_path socket.
-        
+
         :param runtime_dir: The runtime_dir where all protos will be sent to
         :param unix_path: The unix socket path within the runtime_dir to open
         :param proto_class: The protobuf type to send
-
         """
         sender = ThreadedUnixSender(
             unix_path=runtime_dir + unix_path, proto_type=proto_class
@@ -162,17 +155,18 @@ class ProtoUnixIO:
     ) -> None:
         """Creates a unix listener of that protobuf type and provides
         incoming data to registered observers.
-        
+
         :param runtime_dir: The runtime_dir where all protos will be sent to
         :param unix_path: The unix path within the runtime_dir to send data over
         :param proto_class: The prototype to send
         :param from_log_visualize: If the protobuf is coming from LOG(VISUALIZE)
-
         """
         listener = ThreadedUnixListener(
-            runtime_dir + f"/{proto_class.DESCRIPTOR.full_name}"
-            if from_log_visualize and not unix_path
-            else runtime_dir + unix_path,
+            (
+                runtime_dir + f"/{proto_class.DESCRIPTOR.full_name}"
+                if from_log_visualize and not unix_path
+                else runtime_dir + unix_path
+            ),
             proto_class=proto_class,
         )
         key = proto_class.DESCRIPTOR.full_name
@@ -185,9 +179,7 @@ class ProtoUnixIO:
         self.send_proto_to_observer_threads[key].start()
 
     def force_close(self) -> None:
-        """
-        Closes all unix senders and receivers
-        """
+        """Closes all unix senders and receivers"""
         self.running = False
         for sender in self.unix_senders.items():
             sender[1].force_stop()

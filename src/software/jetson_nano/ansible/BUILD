@@ -1,8 +1,15 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@ansible_deps//:requirements.bzl", "requirement")
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
+compile_pip_requirements(
+    name = "requirements",
+    src = "requirements.in",
+    requirements_txt = "requirements_lock.txt",
+)
 
 py_binary(
     name = "run_ansible",
@@ -14,7 +21,6 @@ py_binary(
         ":scripts",
         "//software/jetson_nano:setup_nano",
         "//software/jetson_nano:thunderloop_main",
-        "//software/jetson_nano/display:robot_ui_zip",
         "//software/jetson_nano/linux_configs:device_tree",
         "//software/jetson_nano/linux_configs:extlinux",
         "//software/jetson_nano/linux_configs/systemd:systemd_files",

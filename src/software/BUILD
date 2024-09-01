@@ -109,3 +109,12 @@ pybind_extension(
         ":python_bindings_lib",
     ],
 )
+
+py_library(
+    name = "conftest",
+    srcs = ["conftest.py"],
+    deps = [
+        "//software/field_tests:field_test_fixture",
+        "//software/simulated_tests:simulated_test_fixture",
+    ],
+)

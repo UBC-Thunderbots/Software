@@ -13,7 +13,7 @@ py_test(
     deps = [
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:import_all_protos",
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope/replay:proto_player",
         requirement("pytest"),

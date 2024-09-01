@@ -2,7 +2,6 @@ from typing import Callable, NoReturn
 
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
-import software.python_bindings as tbots_cpp
 from software.py_constants import SECONDS_PER_MILLISECOND
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -19,8 +18,7 @@ def exit_poller(
     on_exit: Callable[[], None],
     poll_duration_s: float = 0.5,
 ) -> NoReturn:
-    """
-    Calls the on_exit callback once the elapsed exit_duration has passed from the start of this function call, 
+    """Calls the on_exit callback once the elapsed exit_duration has passed from the start of this function call,
     polling every poll_duration using system time
 
     :param time_provider:   used to compare all timestamps
@@ -43,11 +41,10 @@ def async_sim_ticker(
     tscope: Thunderscope,
     buffer_timeout_s: int = 1,
 ) -> None:
-    """
-    Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
+    """Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
 
-    :param tick_rate_ms:            the interval between consequent ticks (ms) 
-    :param blue_proto_unix_io:      ProtoUnixIO for the Blue FullSystem 
+    :param tick_rate_ms:            the interval between consequent ticks (ms)
+    :param blue_proto_unix_io:      ProtoUnixIO for the Blue FullSystem
     :param yellow_proto_unix_io:    ProtoUnixIO for the Yellow FullSystem
     :param sim_proto_unix_io:       ProtoUnixIO for the Simulation
     :param tscope:                  Thunderscope instance that is tied to the simulation ticking
@@ -95,8 +92,7 @@ def async_sim_ticker(
 def realtime_sim_ticker(
     tick_rate_ms: int, sim_proto_unix_io: ProtoUnixIO, tscope: Thunderscope
 ) -> None:
-    """
-    Tick simulation in real-time. Requires Thunderscope to be open.
+    """Tick simulation in real-time. Requires Thunderscope to be open.
 
     :param tick_rate_ms:        the interval between consequent ticks (ms) and delay between sending Vision messages
     :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
@@ -120,8 +116,7 @@ def realtime_sim_ticker(
 
 
 def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int) -> None:
-    """
-    Ensure that simulator has synchronized with the default world state.
+    """Ensure that simulator has synchronized with the default world state.
 
     :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
     :param num_robots:          Number of robots to initialize the simulator with
