@@ -20,6 +20,7 @@ DISCONNECTED = "DISCONNECTED"
 
 logger = logging.getLogger(__name__)
 
+
 class RobotCommunication:
     """Communicate with the robots"""
 
@@ -134,10 +135,11 @@ class RobotCommunication:
         self.print_current_network_config()
 
     def setup_for_fullsystem(
-        self, referee_interface: str, vision_interface: str,
+        self,
+        referee_interface: str,
+        vision_interface: str,
     ) -> None:
-        """
-        Sets up a listener for SSL vision and referee data
+        """Sets up a listener for SSL vision and referee data
 
         :param referee_interface: the interface to listen for referee data
         :param vision_interface: the interface to listen for vision data
@@ -198,8 +200,7 @@ class RobotCommunication:
     def __setup_for_robot_communication(
         self, robot_communication_interface: str
     ) -> None:
-        """
-        Set up senders and listeners for communicating with the robots
+        """Set up senders and listeners for communicating with the robots
 
         :param robot_communication_interface: the interface to listen/send for robot status data. Ignored for sending
         primitives if using radio
@@ -213,8 +214,7 @@ class RobotCommunication:
         is_listener_setup_successfully = True
 
         def setup_listener(listener_creator: Callable[[], Tuple[Any, str]]) -> Any:
-            """
-            Sets up a listener with the given creator function. Logs any errors that occur.
+            """Sets up a listener with the given creator function. Logs any errors that occur.
 
             :param listener_creator: the function to create the listener. It must return a type of
             (listener object, error)
@@ -371,7 +371,7 @@ class RobotCommunication:
         )
         while self.running:
             if network_config is not None and self.accept_next_network_config:
-                logging.info(f"[RobotCommunication] Received new NetworkConfig")
+                logging.info("[RobotCommunication] Received new NetworkConfig")
 
                 if self.is_setup_for_fullsystem:
                     self.setup_for_fullsystem(
@@ -500,13 +500,10 @@ class RobotCommunication:
         self.run_primitive_set_thread.join()
 
     def print_current_network_config(self) -> None:
-        """
-        Prints the current network configuration to the console
-        """
+        """Prints the current network configuration to the console"""
 
         def output_string(comm_name: str, status: str) -> str:
-            """
-            Returns a formatted string with the communication name and status
+            """Returns a formatted string with the communication name and status
 
             Any status other than DISCONNECTED will be coloured green, otherwise red
 

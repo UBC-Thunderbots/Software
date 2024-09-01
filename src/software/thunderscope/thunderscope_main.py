@@ -5,7 +5,6 @@ import os
 import sys
 import threading
 from robot_communication import DISCONNECTED
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *

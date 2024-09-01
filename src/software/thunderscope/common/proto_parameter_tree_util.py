@@ -137,8 +137,7 @@ def __create_parameter_read_only(key, value, descriptor):
 
 
 def __create_network_enum(key, value, _):
-    """
-    Lists all the network interfaces available on the system as enum options for the given parameter field.
+    """Lists all the network interfaces available on the system as enum options for the given parameter field.
 
     :param key: The name of the parameter
     :param value: The default value
