@@ -207,11 +207,11 @@ class Gamecontroller:
         ci_input = CiInput(timestamp=int(time.time_ns()))
         api_input = Input()
         change = Change()
-        new_command = NewCommand()
+        new_command = Change.NewCommand()
         command = Command(type=gc_command, for_team=team)
 
         new_command.command.CopyFrom(command)
-        change.new_command.CopyFrom(new_command)
+        change.new_command_change.CopyFrom(new_command)
         api_input.change.CopyFrom(change)
         ci_input.api_inputs.append(api_input)
 
