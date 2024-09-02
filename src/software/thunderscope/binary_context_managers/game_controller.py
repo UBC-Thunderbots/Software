@@ -292,7 +292,6 @@ class Gamecontroller:
         game_update = Change.UpdateConfig()
         game_update.division = division
         game_update.first_kickoff_team = SslTeam.BLUE
-        game_update.auto_continue = True
         game_update.match_type = MatchType.FRIENDLY
 
         return game_update
