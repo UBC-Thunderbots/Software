@@ -1,13 +1,11 @@
 #pragma once
 #include <math.h>
 
-
 // Some platformio targets don't support STL, so we can't
 // use unordered_map, string, .... We guard all networking stuff with
 #ifndef PLATFORMIO_BUILD
 #include <string>
 #include <unordered_map>
-
 
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
