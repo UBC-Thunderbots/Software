@@ -150,7 +150,7 @@ install_gamecontroller $arch
 
 print_status_msg "Setting up TIGERS AutoRef"
 
-print_status_msg "Installing TIGERS dependency: Java 17"
+print_status_msg "Installing TIGERS dependency: Java 21"
 install_java $arch
 
 print_status_msg "Compiling TIGERS AutoRef"

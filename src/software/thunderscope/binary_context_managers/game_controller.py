@@ -227,7 +227,7 @@ class Gamecontroller:
             )
             change = Change()
             api_input = Input()
-            change.set_ball_placement_pos.CopyFrom(ball_placement_pos)
+            change.set_ball_placement_pos_change.CopyFrom(ball_placement_pos)
             api_input.change.CopyFrom(change)
             ci_input.api_inputs.append(api_input)
 
@@ -264,7 +264,7 @@ class Gamecontroller:
 
         return ci_output_list
 
-    def reset_team(self, name: str, team: str) -> UpdateTeamState:
+    def reset_team(self, name: str, team: str) -> Change.UpdateTeamState:
         """Returns an UpdateTeamState proto for the gamecontroller to reset team info.
 
         :param name name of the new team
@@ -272,24 +272,24 @@ class Gamecontroller:
 
         :return: corresponding UpdateTeamState proto
         """
-        update_team_state = UpdateTeamState()
+        update_team_state = Change.UpdateTeamState()
         update_team_state.for_team = team
-        update_team_state.team_name = name
-        update_team_state.goals = 0
-        update_team_state.timeouts_left = 4
-        update_team_state.timeout_time_left = "05:00"
-        update_team_state.can_place_ball = True
+        update_team_state.team_name.value = name
+        update_team_state.goals.value = 0
+        update_team_state.timeouts_left.value = 4
+        update_team_state.timeout_time_left.value = "05:00"
+        update_team_state.can_place_ball.value = True
 
         return update_team_state
 
-    def reset_game(self, division: proto.ssl_gc_common_pb2.Division) -> UpdateConfig:
+    def reset_game(self, division: proto.ssl_gc_common_pb2.Division) -> Change.UpdateConfig:
         """Returns an UpdateConfig proto for the Gamecontroller to reset game info.
 
         :param division the Division proto corresponding to the game division to set up the Gamecontroller for
 
         :return: corresponding UpdateConfig proto
         """
-        game_update = UpdateConfig()
+        game_update = Change.UpdateConfig()
         game_update.division = division
         game_update.first_kickoff_team = SslTeam.BLUE
         game_update.auto_continue = True
@@ -309,19 +309,19 @@ class Gamecontroller:
         ci_input = CiInput(timestamp=int(time.time_ns()))
         input_blue_update = Input()
         input_blue_update.reset_match = True
-        input_blue_update.change.update_team_state.CopyFrom(
+        input_blue_update.change.update_team_state_change.CopyFrom(
             self.reset_team("BLUE", SslTeam.BLUE)
         )
 
         input_yellow_update = Input()
         input_yellow_update.reset_match = True
-        input_yellow_update.change.update_team_state.CopyFrom(
+        input_yellow_update.change.update_team_state_change.CopyFrom(
             self.reset_team("YELLOW", SslTeam.YELLOW)
         )
 
         input_game_update = Input()
         input_game_update.reset_match = True
-        input_game_update.change.update_config.CopyFrom(self.reset_game(division))
+        input_game_update.change.update_config_change.CopyFrom(self.reset_game(division))
 
         ci_input.api_inputs.append(input_blue_update)
         ci_input.api_inputs.append(input_yellow_update)

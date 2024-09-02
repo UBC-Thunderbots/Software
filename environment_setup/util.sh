@@ -37,18 +37,14 @@ install_gamecontroller () {
 }
 
 install_java () {
-    echo "Installing Java 17 $1"
     java_home=""
+    java_download=https://download.oracle.com/java/21/latest/jdk-21_linux-aarch64_bin.tar.gz
     if is_x86 $1; then
-        sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.12_linux-x64_bin.deb -O /tmp/jdk-17.0.12.deb
-        sudo apt install /tmp/./jdk-17.0.12.deb
-        java_home=/usr/lib/jvm/jdk-17.0.12-oracle-x64/
-    else
-        sudo wget -N https://download.oracle.com/java/17/latest/jdk-17_linux-aarch64_bin.tar.gz -O /tmp/jdk-17.0.12.tar.gz
-        tar -xzf /tmp/jdk-17.0.12.tar.gz -C /opt/tbotspython/
-        java_home=/opt/tbotspython/jdk-17.0.12/
+        java_download=https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz
     fi
-    sudo ln -s $java_home /opt/tbotspython/bin/jdk
+    sudo wget -N $java_download -O /tmp/jdk-21.tar.gz
+    tar -xzf /tmp/jdk-21.tar.gz -C /opt/tbotspython/
+    mv /opt/tbotspython/jdk-21* /opt/tbotspython/bin/jdk
 }
 
 is_x86() {
