@@ -71,8 +71,9 @@ class MoveTactic : public Tactic
     MoveFSM::ControlParams control_params;
 };
 
-// Creates a new tactic called PenaltySetupTactic that is a duplicate of MoveTactic
+// Creates duplicates of MoveTactic for various situations
 COPY_TACTIC(PenaltySetupTactic, MoveTactic)
 COPY_TACTIC(MoveGoalieToGoalLineTactic, MoveTactic)
 COPY_TACTIC(PrepareKickoffMoveTactic, MoveTactic)
 COPY_TACTIC(PlaceBallMoveTactic, MoveTactic)
+COPY_TACTIC(AvoidInterferenceTactic, MoveTactic)

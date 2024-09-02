@@ -16,20 +16,14 @@ from software.thunderscope.constants import *
 from software.thunderscope.thunderscope_config import TScopeConfig
 
 
-class Thunderscope(object):
-
-    """ Thunderscope is our main visualizer that can visualize our field,
+class Thunderscope:
+    """Thunderscope is our main visualizer that can visualize our field,
     obstacles, paths, performance metrics, logs, plots. Thunderscope also
     provides tools to interact with the robots.
 
     Thunderscope uses pyqtgraph, which is highly configurable during runtime.
-    Users can move docks (purple bar) around, double click to pop them out into
+    Users can move docks (blue bars) around, double click to pop them out into
     another window, etc. https://pyqtgraph.readthedocs.io/en/latest/
-
-    The setup_* functions return docks. See configure_full_system_layout for an
-    example. The returned docks can be arranged differently based on the
-    use case (robot diagnostics, simulation, robocup, demo, etc..)
-
     """
 
     def __init__(
@@ -44,9 +38,7 @@ class Thunderscope(object):
         :param layout_path: The path to the layout to load
         :param refresh_interval_ms:
             The interval in milliseconds to refresh all the widgets.
-
         """
-
         self.refresh_interval_ms = refresh_interval_ms
         self.widgets = {}
         self.refresh_timers = []
@@ -133,7 +125,6 @@ class Thunderscope(object):
     def save_layout(self) -> None:
         """Open a file dialog to save the layout and any other
         registered state to a file
-
         """
         # Create a folder at SAVED_LAYOUT_PATH if it doesn't exist
         try:
@@ -173,9 +164,7 @@ class Thunderscope(object):
 
         :param filename: The filename to load the layout from. If None, then
                          open a file dialog.
-
         """
-
         if filename is None:
             filename, _ = QFileDialog.getOpenFileName(
                 self.window,
@@ -208,7 +197,6 @@ class Thunderscope(object):
         passed into thunderscope.
 
         :param refresh_func: The function to call at refresh_interval_ms
-
         """
         refresh_timer = QtCore.QTimer()
         refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
@@ -219,8 +207,6 @@ class Thunderscope(object):
 
     def show(self) -> None:
         """Show the main window"""
-
-        self.window.show()
         self.window.showMaximized()
         pyqtgraph.exec()
 
@@ -230,5 +216,4 @@ class Thunderscope(object):
 
     def close(self) -> None:
         """Close the main window"""
-
         QtCore.QTimer.singleShot(0, self.window.close)

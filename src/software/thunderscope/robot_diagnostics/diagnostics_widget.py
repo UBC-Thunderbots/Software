@@ -1,4 +1,3 @@
-from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 from proto.import_all_protos import *
@@ -23,8 +22,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 
 
 class DiagnosticsWidget(QScrollArea):
-    """
-    The DiagnosticsWidget contains all widgets related to diagnostics:
+    """The DiagnosticsWidget contains all widgets related to diagnostics:
         - HandheldDeviceStatusWidget
         - DiagnosticsInputWidget
         - DriveAndDribblerWidget
@@ -107,8 +105,7 @@ class DiagnosticsWidget(QScrollArea):
         self.setWidgetResizable(True)
 
     def __control_mode_update_handler(self, mode: ControlMode) -> None:
-        """
-        Handler for managing a control mode update
+        """Handler for managing a control mode update
         :param mode: The new mode that is being used
         """
         self.__control_mode = mode
@@ -117,19 +114,16 @@ class DiagnosticsWidget(QScrollArea):
     def __handheld_device_connection_status_update_handler(
         self, status: HandheldDeviceConnectionStatus
     ):
-        """
-        Handler for propagating
+        """Handler for propagating
         :param status: The new mode that is being used
         """
         self.__handheld_device_status = status
 
     def refresh(self):
-        """
-        Refreshes sub-widgets so that they display the most recent status values.
+        """Refreshes sub-widgets so that they display the most recent status values.
         If in handheld mode, then also visually updates driver, dribbler and chicker sliders
         to the values currently being set by the handheld device.
         """
-
         # update controller status view with most recent controller status
         self.handheld_device_status_widget.refresh(self.__handheld_device_status)
 

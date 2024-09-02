@@ -20,9 +20,8 @@ class GLMeasureLayer(GLLayer):
 
     def __init__(self, name: str) -> None:
         """Initialize the GLMeasureLayer
-        
-        :param name: The displayed name of the layer
 
+        :param name: The displayed name of the layer
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -40,9 +39,8 @@ class GLMeasureLayer(GLLayer):
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was pressed and picked a point in the 3D scene
-        
-        :param event: The event
 
+        :param event: The event
         """
         self.measurement_points_cache.append(event.point_in_scene)
 
@@ -57,7 +55,6 @@ class GLMeasureLayer(GLLayer):
         # If we have at least one previous measurement point, then adding a new point
         # will create a line between the last point and the new point
         if len(self.measurement_points_cache) > 1:
-
             first_point = self.measurement_points_cache[-2]
             second_point = self.measurement_points_cache[-1]
 
@@ -93,7 +90,6 @@ class GLMeasureLayer(GLLayer):
         # If two points are already in the cache, adding a new point will form an angle
         # between the three points
         if len(self.measurement_points_cache) == 3:
-
             # Calculate the angle
             a = self.measurement_points_cache[0]
             b = self.measurement_points_cache[1]
@@ -127,9 +123,8 @@ class GLMeasureLayer(GLLayer):
 
     def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was moved within the 3D scene
-        
+
         :param event: The event
-        
         """
         self.mouse_point_in_scene = event.point_in_scene
 
@@ -142,7 +137,6 @@ class GLMeasureLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         # Display coordinates of point at mouse cursor
 
         if not self.cursor_coords_graphic:

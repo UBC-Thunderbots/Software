@@ -1,15 +1,8 @@
-import pytest
-
-import software.python_bindings as tbots_cpp
-import sys
-from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
 
 from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import create_logger
-from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
-from proto.message_translation.tbots_protobuf import create_world_state
 import math
 
 logger = create_logger(__name__)
@@ -223,5 +216,4 @@ def test_one_robots_square(field_test_runner):
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)

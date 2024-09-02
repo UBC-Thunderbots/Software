@@ -17,6 +17,7 @@ proto_library(
         "primitive.proto",
         "robot_crash_msg.proto",
         "robot_log_msg.proto",
+        "robot_statistic.proto",
         "robot_status_msg.proto",
         "tactic.proto",
         "tbots_software_msgs.proto",
@@ -52,6 +53,7 @@ py_proto_library(
         "parameters.proto",
         "play.proto",
         "primitive.proto",
+        "robot_statistic.proto",
         "robot_status_msg.proto",
         "tactic.proto",
         "tbots_software_msgs.proto",
@@ -136,6 +138,16 @@ proto_library(
 )
 
 proto_library(
+    name = "validation_proto",
+    srcs = [
+        "validation.proto",
+    ],
+    deps = [
+        ":tbots_proto",
+    ],
+)
+
+proto_library(
     name = "visualization_proto",
     srcs = [
         "visualization.proto",
@@ -162,6 +174,11 @@ cc_proto_library(
 cc_proto_library(
     name = "sensor_msg_cc_proto",
     deps = [":sensor_msg_proto"],
+)
+
+cc_proto_library(
+    name = "validation_cc_proto",
+    deps = [":validation_proto"],
 )
 
 cc_proto_library(

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 import pyqtgraph as pg
 
@@ -16,7 +15,7 @@ from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_heatmap import GLHeatmap
 from software.thunderscope.gl.graphics.gl_gradient_legend import GLGradientLegend
 
-from software.thunderscope.constants import Colors, DepthValues
+from software.thunderscope.constants import DepthValues
 
 
 class GLCostVisOverlayLayer(GLLayer):
@@ -24,9 +23,8 @@ class GLCostVisOverlayLayer(GLLayer):
 
     def __init__(self, cost_vis_layer: GLCostVisLayer) -> None:
         """Initialize the GLCostVisOverlayLayer
-        
-        :param cost_vis_layer: The GLCostVisLayer this overlay layer is related to
 
+        :param cost_vis_layer: The GLCostVisLayer this overlay layer is related to
         """
         super().__init__("GLCostVisOverlayLayer")
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
@@ -36,12 +34,11 @@ class GLCostVisOverlayLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         if not self.legend_graphic:
             self.legend_graphic = GLGradientLegend(
                 parent_item=self,
                 size=(10, 100),
-                offset=(16, -16),
+                offset=(16, -40),
                 gradient=self.cost_vis_layer.color_map_gradient,
                 title="Passing",
             )
@@ -62,11 +59,11 @@ class GLCostVisOverlayLayer(GLLayer):
 
 class GLCostVisLayer(GLLayer):
     """GLLayer that visualizes pass cost data as a heatmap.
-    
+
     This layer enables us to sample different pass cost functions
     in the field and visualize them.
 
-    WARNING: This layer may slow down AI significantly if the number of points 
+    WARNING: This layer may slow down AI significantly if the number of points
     sampled is too high.
 
     WARNING: The checkbox for generate_sample_passes should only be checked
@@ -82,7 +79,6 @@ class GLCostVisLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-                            
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BENEATH_BACKGROUND_DEPTH)
@@ -103,13 +99,12 @@ class GLCostVisLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         self.cached_world = self.world_buffer.get(block=False)
         field = self.cached_world.field
 
         try:
             cost_vis = self.cost_visualization_buffer.queue.get_nowait()
-        except queue.Empty as empty:
+        except queue.Empty:
             cost_vis = None
 
         if not cost_vis:

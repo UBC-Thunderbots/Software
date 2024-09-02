@@ -24,6 +24,9 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
       
+      - name: Install pip
+        run: curl -sS https://bootstrap.pypa.io/get-pip.py | python
+
       - uses: pre-commit/action@v3.0.0
 
       - uses: pre-commit-ci/lite-action@v1.0.1

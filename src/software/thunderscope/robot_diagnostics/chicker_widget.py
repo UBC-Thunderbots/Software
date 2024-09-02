@@ -1,4 +1,3 @@
-import pyqtgraph as pg
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
@@ -18,7 +17,7 @@ class ChickerCommandMode(Enum):
 
 
 class ChickerWidget(QWidget):
-    def __init__(self, proto_unix_io) -> None:
+    def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
         """Handles the robot diagnostics input to create a PowerControl message
         to be sent to the robots.
 
@@ -29,10 +28,8 @@ class ChickerWidget(QWidget):
         will not work until the capacitors charge up and the cooldown is over.
 
         :param proto_unix_io: proto_unix_io object to send messages to the robot
-
         """
-
-        super(ChickerWidget, self).__init__()
+        super().__init__()
 
         self.proto_unix_io: ProtoUnixIO = proto_unix_io
 
@@ -143,22 +140,19 @@ class ChickerWidget(QWidget):
         chicker_widget_vbox_layout.addWidget(self.auto_kick_chip_buttons_box)
 
     def set_kick_power_slider_value(self, value: float) -> None:
-        """
-        Set the kick power slider to a specific value.
+        """Set the kick power slider to a specific value.
         :param value: The value to set for the slider
         """
         self.kick_power_slider.setValue(value)
 
     def set_chip_distance_slider_value(self, value: float) -> None:
-        """
-        Set the chip distance slider to a specific value.
+        """Set the chip distance slider to a specific value.
         :param value: the value to set for the slider
         """
         self.chip_distance_slider.setValue(value)
 
     def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
-        """
-        If buttons are enabled, sends a Kick command and disables buttons
+        """If buttons are enabled, sends a Kick command and disables buttons
 
         Attaches a callback to re-enable buttons after 3 seconds
 
@@ -174,15 +168,11 @@ class ChickerWidget(QWidget):
             QTimer.singleShot(CHICKER_TIMEOUT, self.enable_kick_chip_buttons)
 
     def disable_kick_chip_buttons(self) -> None:
-        """
-        Disables the buttons
-        """
+        """Disables the buttons"""
         self.kick_chip_buttons_enable = False
 
     def enable_kick_chip_buttons(self) -> None:
-        """
-        If buttons should be enabled, enables them
-        """
+        """If buttons should be enabled, enables them"""
         if self.no_auto_selected:
             self.kick_chip_buttons_enable = True
 
@@ -191,8 +181,7 @@ class ChickerWidget(QWidget):
             self.__initialize_default_power_control_values()
 
     def set_should_enable_buttons(self, enable: bool) -> None:
-        """
-        Changes if buttons are clickable or not based on boolean parameter
+        """Changes if buttons are clickable or not based on boolean parameter
 
         :param enable: boolean to indicate whether buttons should be made clickable or not
         """
@@ -207,10 +196,7 @@ class ChickerWidget(QWidget):
         """Sends a [auto]kick or [auto]chip primitive
 
         :param command: enum int value to indicate what primitive to send
-        :returns: None
-
         """
-
         # gets slider values
         kick_power_value = self.kick_power_slider.value()
         chip_distance_value = self.chip_distance_slider.value()
@@ -237,8 +223,7 @@ class ChickerWidget(QWidget):
             self.__initialize_default_power_control_values()
 
     def __initialize_default_power_control_values(self) -> None:
-        """
-        Sends an empty proto to the proto unix io buffer
+        """Sends an empty proto to the proto unix io buffer
         This is due to a bug in robot_communication where if a new PowerControl message is not sent,
         The previous, cached message is resent to the robot repeatedly which we don't want for kick/chip
         So sending an empty message overwrites the cache and prevents spamming commands
@@ -268,7 +253,6 @@ class ChickerWidget(QWidget):
         self.set_should_enable_buttons(mode == ControlMode.DIAGNOSTICS)
 
     def refresh(self, mode: ControlMode) -> None:
-
         # Update this widgets accessibility to the user based on the ControlMode parameter
         self.update_widget_accessibility(mode)
 

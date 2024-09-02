@@ -83,6 +83,10 @@ pybind_library(
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:tbots_geometry",
         "//shared:robot_constants",
+        "//software:constants",
+        "//software/ai/passing:eighteen_zone_pitch_division",
+        "//software/ai/passing:pass_generator",
+        "//software/ai/passing:receiver_position_generator",
         "//software/estop:threaded_estop_reader",
         "//software/geom:angle",
         "//software/geom:point",
@@ -103,5 +107,14 @@ pybind_extension(
     name = "python_bindings",
     deps = [
         ":python_bindings_lib",
+    ],
+)
+
+py_library(
+    name = "conftest",
+    srcs = ["conftest.py"],
+    deps = [
+        "//software/field_tests:field_test_fixture",
+        "//software/simulated_tests:simulated_test_fixture",
     ],
 )

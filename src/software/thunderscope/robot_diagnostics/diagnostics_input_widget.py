@@ -1,6 +1,6 @@
 from typing import Type
 
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 import software.thunderscope.common.common_widgets as common_widgets
@@ -12,26 +12,24 @@ from software.thunderscope.robot_diagnostics.handheld_device_status_view import 
 
 
 class ControlMode(IntEnum):
-    """
-    Enum for the 2 modes of control (Manual and XBox)
-    """
+    """Enum for the 2 modes of control (Manual and Xbox)"""
 
     DIAGNOSTICS = 0
     HANDHELD = 1
 
 
 class DiagnosticsInputToggleWidget(QWidget):
-    """
-    Class to allow the user to switch between Manual, XBox, and Fullsystem control through Thunderscope UI
+    """Class to allow the user to switch between Manual, Xbox, and Fullsystem control
+    through Thunderscope UI
 
     Disables Manual controls in the other two modes
-
     """
 
     def __init__(self, diagnostics_input_mode_signal: Type[QtCore.pyqtSignal]) -> None:
-        """
-        Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
-        :param diagnostics_input_mode_signal The signal to emit when the input mode changes
+        """Initialises a new Fullsystem Connect Widget to allow switching
+        between Diagnostics and Xbox control
+
+        :param diagnostics_input_mode_signal: The signal to emit when the input mode changes
         """
         super(DiagnosticsInputToggleWidget, self).__init__()
 
@@ -69,8 +67,8 @@ class DiagnosticsInputToggleWidget(QWidget):
         self.setLayout(diagnostics_input_widget_vbox_layout)
 
     def refresh(self, status: HandheldDeviceConnectionStatus) -> None:
-        """
-        Refresh this widget.
+        """Refresh this widget.
+
         If the handheld device is connected:
             - enables the handheld button
         If the handheld device is disconnected:

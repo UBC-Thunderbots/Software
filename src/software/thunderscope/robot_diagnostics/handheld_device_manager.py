@@ -3,7 +3,6 @@ from logging import Logger
 from threading import Thread, Event
 from typing import Type
 
-import evdev.ecodes
 import numpy
 from evdev import InputDevice, ecodes, list_devices, InputEvent
 
@@ -19,8 +18,7 @@ from software.thunderscope.robot_diagnostics.diagnostics_input_widget import Con
 
 
 class HandheldDeviceManager(object):
-    """
-    This class is responsible for managing the connection between a computer and a handheld device to control robots.
+    """This class is responsible for managing the connection between a computer and a handheld device to control robots.
     This class relies on the `evdev` python package, in order to implement parsing and control flow for device events.
     More info & docs can be found here: https://python-evdev.readthedocs.io/en/latest/apidoc.html
     """
@@ -61,38 +59,30 @@ class HandheldDeviceManager(object):
         self.__initialize_handheld_device()
 
     def __initialize_default_motor_control_values(self) -> None:
-        """
-        This method sets all required fields in the motor
+        """This method sets all required fields in the motor
         control proto to the default/minimum default value
         """
         self.motor_control = MotorControl()
         self.motor_control.direct_velocity_control.velocity.x_component_meters = 0.0
         self.motor_control.direct_velocity_control.velocity.y_component_meters = 0.0
-        self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-            0.0
-        )
+        self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = 0.0
         self.motor_control.dribbler_speed_rpm = 0
 
     def __initialize_default_power_control_values(self) -> None:
-        """
-        This method sets all required fields in the power
+        """This method sets all required fields in the power
         control proto to the default/minimum default value
         """
-
         # default values for power control
         self.power_control = PowerControl()
         self.power_control.geneva_slot = 3
 
     def reinitialize_handheld_device(self) -> None:
-        """
-        Reinitialize handheld_device
-        """
+        """Reinitialize handheld_device"""
         self.__clear_handheld_device()
         self.__initialize_handheld_device()
 
     def __initialize_handheld_device(self) -> None:
-        """
-        Attempt to initialize a a connection to a handheld device,
+        """Attempt to initialize a a connection to a handheld device,
         which may or may not be successful.
         The first handheld device that is recognized as a valid will be used.
         Valid handheld devices are any devices whose name has a matching HDIEConfig
@@ -107,9 +97,11 @@ class HandheldDeviceManager(object):
             ):
                 self.__stop_thread_signal_event.clear()
                 self.handheld_device = handheld_device
-                self.handheld_device_config: DeviceConfig = HandheldDeviceConstants.HANDHELD_DEVICE_NAME_CONFIG_MAP[
-                    handheld_device.name
-                ]
+                self.handheld_device_config: DeviceConfig = (
+                    HandheldDeviceConstants.HANDHELD_DEVICE_NAME_CONFIG_MAP[
+                        handheld_device.name
+                    ]
+                )
                 break
 
         if (
@@ -137,8 +129,7 @@ class HandheldDeviceManager(object):
             self.logger.debug(list(map(lambda d: InputDevice(d).name, list_devices())))
 
     def __get_handheld_device_connection_status(self) -> HandheldDeviceConnectionStatus:
-        """
-        Get and return the latest connection status, based on the `handheld device` field
+        """Get and return the latest connection status, based on the `handheld device` field
         :return: the current status of the handheld device connection
         """
         return (
@@ -155,8 +146,7 @@ class HandheldDeviceManager(object):
         self.__initialize_default_power_control_values()
 
     def refresh(self, mode: ControlMode):
-        """
-        Refresh this class.
+        """Refresh this class.
         Spawns a new thread that runs the handheld device event
         processing function if Control.Mode is Diagnostics,
         otherwise, stops and joins the thread, if it is running
@@ -178,8 +168,7 @@ class HandheldDeviceManager(object):
             self.proto_unix_io.send_proto(PowerControl, self.power_control)
 
     def __clear_handheld_device(self) -> None:
-        """
-        Clears handheld device & config field by setting to null,
+        """Clears handheld device & config field by setting to null,
         and emits a disconnected notification signal.
         """
         self.handheld_device = None
@@ -189,8 +178,7 @@ class HandheldDeviceManager(object):
         )
 
     def __shutdown_event_listener_thread(self) -> None:
-        """
-        Shut down the event processing loop by setting the stop event flag,
+        """Shut down the event processing loop by setting the stop event flag,
         and then joins the handling thread, if it is alive.
         """
         # TODO (#3165): Use trace level logging here
@@ -201,15 +189,11 @@ class HandheldDeviceManager(object):
         self.__stop_thread_signal_event.clear()
 
     def __start_event_listener_thread(self) -> None:
-        """
-        Starts the thread that runs the event processing loop.
-        """
+        """Starts the thread that runs the event processing loop."""
         self.__handheld_device_event_loop_thread.start()
 
     def __setup_new_event_listener_thread(self):
-        """
-        Initializes a new thread that will run the event processing loop
-        """
+        """Initializes a new thread that will run the event processing loop"""
         # TODO (#3165): Use trace level self.logger here
         # self.logger.debug("Initializing new handheld device event loop thread")
         self.__handheld_device_event_loop_thread = Thread(
@@ -217,8 +201,7 @@ class HandheldDeviceManager(object):
         )
 
     def __event_loop(self) -> None:
-        """
-        This is the method that contains the event processing loop
+        """This is the method that contains the event processing loop
         that is called runs in the event handling thread.
         An infinite while loop reads and processes events one by one, using the evdev API.
         Old events are skipped if they exceed a threshold, and any caught errors
@@ -262,12 +245,10 @@ class HandheldDeviceManager(object):
             return
 
     def __process_event(self, event: InputEvent) -> None:
-        """
-        Processes the given device event. Sets corresponding motor & power control values
+        """Processes the given device event. Sets corresponding motor & power control values
         based on the event type, using the current config set in self.handheld_device_config
         :param event: The event to process.
         """
-
         # TODO (#3165): Use trace level self.logger here
         # self.logger.debug(
         #     "Processing handheld device event with type: "
@@ -309,8 +290,8 @@ class HandheldDeviceManager(object):
                 )
 
             elif event.code == self.handheld_device_config.dribbler_speed.event_code:
-                self.dribbler_speed_accumulator = self.__interpret_dribbler_speed_event_value(
-                    event.value
+                self.dribbler_speed_accumulator = (
+                    self.__interpret_dribbler_speed_event_value(event.value)
                 )
 
             elif (
@@ -350,8 +331,7 @@ class HandheldDeviceManager(object):
     def __interpret_move_event_value(
         event_value: float, max_value: float, normalizing_multiplier: float
     ) -> float:
-        """
-        Interpret the event_value that corresponds to movement control
+        """Interpret the event_value that corresponds to movement control
         :param event_value: the value for the current event being interpreted
         :param max_value: max value for this type of event event type
         :param normalizing_multiplier: multiplier for converting between
@@ -367,8 +347,7 @@ class HandheldDeviceManager(object):
     def __interpret_dribbler_enabled_event_value(
         event_value: float, max_value: float
     ) -> bool:
-        """
-        Interpret the event_value that corresponds to controlling whether the dribbler is enabled
+        """Interpret the event_value that corresponds to controlling whether the dribbler is enabled
         :param event_value: the value for the current event being interpreted
         :param max_value: max value for this type of event event type
         :return: The interpreted value that can be set a value for a field in robot control
@@ -378,8 +357,7 @@ class HandheldDeviceManager(object):
         ) > HandheldDeviceConstants.BUTTON_PRESSED_THRESHOLD
 
     def __interpret_dribbler_speed_event_value(self, event_value: float) -> int:
-        """
-        Interprets the event value that corresponds to controlling the dribbler speed.
+        """Interprets the event value that corresponds to controlling the dribbler speed.
         :param event_value: the value for the current event being interpreted
         :return: the interpreted value to be used for the new dribbler speed on the robot
         """
@@ -391,8 +369,7 @@ class HandheldDeviceManager(object):
         )
 
     def __interpret_kick_event_value(self, event_value: float) -> float:
-        """
-        Interprets the event value that corresponds to controlling the dribbler speed.
+        """Interprets the event value that corresponds to controlling the dribbler speed.
         :param event_value: the value for the current event being interpreted
         :return: the interpreted value to be used for the kick power on the robot
         """
@@ -404,8 +381,7 @@ class HandheldDeviceManager(object):
         )
 
     def __interpret_chip_event_value(self, event_value: float) -> float:
-        """
-        Interprets the event value that corresponds to controlling the chip distance.
+        """Interprets the event value that corresponds to controlling the chip distance.
         :param value: the value for the current event being interpreted
         :return: the interpreted value to be used for the chip distance on the robot
         """

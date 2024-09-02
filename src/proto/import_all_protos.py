@@ -7,8 +7,7 @@ def get_top_level_modules(package):
     """Grab all modules that are 1 level deep.
 
     :param package: package (name or actual module) to grab from
-    :returns: list[str]
-
+    :return: list[str]
     """
     results = []
 
@@ -25,7 +24,6 @@ def import_all_classes(package, input_globals):
 
     :param package: The package to import from
     :param input_globals: globals() from where this is called
-
     """
     results = get_top_level_modules(package)
 

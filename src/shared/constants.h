@@ -26,6 +26,12 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
 static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
+// ProtoLogger constants for replay files
+static const std::string REPLAY_FILE_EXTENSION      = "replay";
+static const std::string REPLAY_METADATA_DELIMITER  = ",";
+static const std::string REPLAY_FILE_VERSION_PREFIX = "version:";
+static const unsigned int REPLAY_FILE_VERSION       = 2;
+
 #endif  // PLATFORMIO_BUILD
 
 // Redis default server connections properties
@@ -45,21 +51,27 @@ static const short unsigned int ROBOT_CRASH_PORT  = 42074;
 // this is an int to avoid Wconversion with lwip
 static const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 
-static const char PROTO_MSG_TYPE_DELIMITER[4] = "!!!";
-
 // This file contains all constants that are shared between our software (AI)
 // and firmware code. Since this needs to be compiled by both C and C++, everything
 // should be defined in a way that's compatible with C.
 
 /* Game Rules */
 // The max allowed speed of the ball, in metres per second
+// https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_speed
 static const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
+// The safe max speed of the ball that we should shoot at, in metres per second
+static const double BALL_SAFE_MAX_SPEED_METERS_PER_SECOND =
+    BALL_MAX_SPEED_METERS_PER_SECOND - 0.5;
+// The distance that the ball has to travel for it to be considered in play
+// after a kick-off, free kick, or penalty kick.
+// https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_in_and_out_of_play
+static const double BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS = 0.05;
 // The max allowed height of the robots, in metres
 static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
 static const double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
-static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.07;
+static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.078;
 // The approximate radius of the ball according to the SSL rulebook
 static const double BALL_MAX_RADIUS_METERS = 0.0215;
 // According to the rules, 80% of the ball must be seen at all times. Robots may not
@@ -67,10 +79,13 @@ static const double BALL_MAX_RADIUS_METERS = 0.0215;
 static const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
 
 // The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
-static const double BALL_MASS_KG = 0.004593;
+constexpr double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per
 // second
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
+// The margin by which the speed of the robot should stay below the maximum allowed speed
+// when the stop command is issued
+static const double STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND = 0.2;
 // The max allowed speed of the robot before collisions would incur a foul
 static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
 // The minimum distance from the ball all robots must be when the stop command is issued
@@ -82,6 +97,28 @@ static const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
 static const double ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4.0;
 
 static const double ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED = 9.81;
+// The minimum distance the non-placing team must keep to avoid ball placement
+// interference
+static const double ENEMY_BALL_PLACEMENT_DISTANCE_METERS = 0.5;
+
+/*Simulator Constants*/
+
+// these values are set in coordination with other objects the ball will collide with.
+// the resulting coefficient of friction is the product of both objects friction value.
+
+// the sliding friction the ball experiences in Newtons
+constexpr double BALL_SLIDING_FRICTION_NEWTONS = 1.0;
+// the restitution of the ball
+constexpr double BALL_RESTITUTION = 1.0;
+// the transition factor where the ball goes from sliding to rolling
+constexpr double FRICTION_TRANSITION_FACTOR = 5.0 / 7.0;
+// the stationary ball speed in m/s
+constexpr double STATIONARY_BALL_SPEED_METERS_PER_SECOND = 0.01;
+// the acceleration the ball experiences due to rolling friction in m/s^2
+constexpr double BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED = -0.5;
+// the acceleration the ball experiences due to sliding friction in m/s^2
+constexpr double BALL_SLIDING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED =
+    -BALL_SLIDING_FRICTION_NEWTONS / BALL_MASS_KG;
 
 /* Unit Conversion */
 static const double MILLIMETERS_PER_METER = 1000.0;
@@ -115,8 +152,11 @@ static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
 static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 
 // How many robots are allowed in each division
-static const unsigned DIV_A_NUM_ROBOTS = 11;
-static const unsigned DIV_B_NUM_ROBOTS = 6;
+static const unsigned int DIV_A_NUM_ROBOTS = 11;
+static const unsigned int DIV_B_NUM_ROBOTS = 6;
+
+// The maximum time in seconds given to Full System to cleanly exit the process.
+static const double MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC = 0.5;
 
 // Battery Constants
 static const unsigned NUM_CELLS_IN_BATTERY    = 3;

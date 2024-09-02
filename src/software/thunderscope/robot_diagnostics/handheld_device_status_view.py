@@ -1,14 +1,12 @@
 from enum import Enum
 from typing import Type
 
-import pyqtgraph as pg
 
 from proto.import_all_protos import *
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 
-import software.thunderscope.common.common_widgets as common_widgets
 from software.py_constants import *
 
 
@@ -21,8 +19,7 @@ class HandheldDeviceStatusView(QWidget):
     def __init__(
         self, reinitialize_handheld_device_signal: Type[QtCore.pyqtSignal]
     ) -> None:
-        """
-        Initialize the HandheldDeviceStatusView widget.
+        """Initialize the HandheldDeviceStatusView widget.
         This widget shows the user the current state of the connection with a handheld device,
         as well as a button that attempts to reinitialize a handheld device object when clicked
         :param reinitialize_handheld_device_signal: The signal to use for the reinitialize button
@@ -72,8 +69,7 @@ class HandheldDeviceStatusView(QWidget):
         self.setLayout(widget_layout)
 
     def set_view_state(self, connection_state: HandheldDeviceConnectionStatus) -> None:
-        """
-        Sets the label to display the correct status depending on the connection state
+        """Sets the label to display the correct status depending on the connection state
         :param connection_state: The state to use
         """
         self.handheld_device_status.setText(
@@ -86,8 +82,7 @@ class HandheldDeviceStatusView(QWidget):
     def refresh(
         self, connection_state=HandheldDeviceConnectionStatus.DISCONNECTED
     ) -> None:
-        """
-        Refreshes this widget.
+        """Refreshes this widget.
         The status label will reflect to the user the current state of the handheld device connection
         :param connection_state: The new state of the handheld device connection
         """

@@ -1,4 +1,3 @@
-import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import SPEED_SEGMENT_SCALE
@@ -36,8 +35,8 @@ def get_current_ball_angle(ball):
 
 def get_ball_speed(ball):
     ball_speed = math.sqrt(
-        ball.current_state.global_velocity.x_component_meters ** 2
-        + ball.current_state.global_velocity.y_component_meters ** 2
+        ball.current_state.global_velocity.x_component_meters**2
+        + ball.current_state.global_velocity.y_component_meters**2
     )
 
     return ball_speed

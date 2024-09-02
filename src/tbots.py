@@ -1,12 +1,11 @@
-#!/opt/tbotspython/bin/python3.8
+#!/opt/tbotspython/bin/python3
 
 import os
 import sys
 import iterfzf
 import itertools
-from subprocess import PIPE, run, check_call
+from subprocess import PIPE, run
 import argparse
-from thefuzz import fuzz
 from thefuzz import process
 
 # thefuzz is a fuzzy string matcher in python
@@ -19,7 +18,6 @@ THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="Run stuff", add_help=False)
 
     parser.add_argument("action", choices=["build", "run", "test"])
@@ -32,12 +30,18 @@ if __name__ == "__main__":
         help="Print the generated Bazel command",
     )
     parser.add_argument(
-        "-o",
-        "--optimized_build",
+        "-no",
+        "--no_optimized_build",
         action="store_true",
-        help="Compile binaries with -O3 optimizations",
+        default=False,
+        help="Compile binaries without -O3 optimizations",
     )
-    parser.add_argument("-d", "--debug_build", action="store_true")
+    parser.add_argument(
+        "-d",
+        "--debug_build",
+        action="store_true",
+        help="Compile binaries with debug symbols",
+    )
     parser.add_argument(
         "-ds",
         "--select_debug_binaries",
@@ -51,7 +55,7 @@ if __name__ == "__main__":
         "--flash_robots",
         nargs="+",
         type=int,
-        help="A list of space seperated integers representing the robot IDs "
+        help="A list of space separated integers representing the robot IDs "
         "that should be flashed by the deploy_nano Ansible playbook",
         action="store",
     )
@@ -113,21 +117,32 @@ if __name__ == "__main__":
     targets = list(
         itertools.chain.from_iterable(
             [
-                run(query, stdout=PIPE).stdout.split(b"\n")
+                run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
                 for query in bazel_queries[args.action]
             ]
         )
     )
-    target, confidence = process.extract(args.search_query, targets, limit=1)[0]
-    target = str(target, encoding="utf-8")
+    # Create a dictionary to map target names to complete bazel targets
+    target_dict = {target.split(b":")[-1]: target for target in targets}
+
+    # Use thefuzz to find the best matching target name
+    most_similar_target_name, confidence = process.extract(
+        args.search_query, list(target_dict.keys()), limit=1
+    )[0]
+    target = str(target_dict[most_similar_target_name], encoding="utf-8")
 
     print("Found target {} with confidence {}".format(target, confidence))
 
     if args.interactive or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
         filtered_targets = process.extract(
-            args.search_query, targets, limit=NUM_FILTERED_MATCHES_TO_SHOW
+            args.search_query,
+            list(target_dict.keys()),
+            limit=NUM_FILTERED_MATCHES_TO_SHOW,
         )
-        targets = [filtered_target[0] for filtered_target in filtered_targets]
+        targets = [
+            target_dict[filtered_target_name[0]]
+            for filtered_target_name in filtered_targets
+        ]
         target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
         print("User selected {}".format(target))
 
@@ -137,9 +152,9 @@ if __name__ == "__main__":
     if args.debug_build or args.select_debug_binaries:
         command += ["-c", "dbg"]
 
-    # Trigger an optimized build. Note that Thunderloop should always be
-    # compiled with optimizations for best formance
-    if args.optimized_build or args.flash_robots:
+    # Trigger an optimized build by default. Note that Thunderloop should always be
+    # compiled with optimizations for best performance
+    if not args.no_optimized_build or args.flash_robots:
         command += ["--copt=-O3"]
 
     # Used for when flashing Jetsons
@@ -154,18 +169,6 @@ if __name__ == "__main__":
             unknown_args += ["--debug_blue_full_system"]
         if "yellow" in args.select_debug_binaries:
             unknown_args += ["--debug_yellow_full_system"]
-
-    # If its a binary, then run under gdb. We need to special case thunderscope
-    # because it relies on --debug_simulator, --debug_blue_full_system and
-    # --debug_yellow_full_system prompts the user to run the command under gdb
-    # instead. So we only run_under gdb if its _not_ a thunderscope debug command
-    if args.action in "run" and args.debug_build:
-        if (
-            "--debug_yellow_full_system" not in unknown_args
-            and "--debug_blue_full_system" not in unknown_args
-            and "--debug_simulator" not in unknown_args
-        ):
-            command += ["--run_under=gdb"]
 
     # To run the Tracy profile, enable the TRACY_ENABLE macro
     if args.tracy:

@@ -1,7 +1,4 @@
-import pyqtgraph as pg
-from google.protobuf import text_format
-from typing import List
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from proto.import_all_protos import *
@@ -16,20 +13,17 @@ class RobotViewComponent(QWidget):
     """Class to show a snapshot of the robot's current state,
     along with an expandable view of the full robot state
 
-    Displays the vision pattern, capacitor/battery voltages,
-    and other information about the robot state. Displays the whole RobotStatus
-    message when expanded
-
+    Displays the vision pattern, capacitor/battery voltages, and other information
+    about the robot state. Displays the whole RobotStatus message when expanded
     """
 
     def __init__(
         self,
         robot_id: int,
-        available_control_modes: List[IndividualRobotMode],
+        available_control_modes: list[IndividualRobotMode],
         individual_robot_control_mode_signal: Type[QtCore.pyqtSignal],
     ):
-        """
-        Sets up a Robot Info Widget and a Robot Status Widget for each robot
+        """Sets up a Robot Info Widget and a Robot Status Widget for each robot
 
         Sets the Robot Status widget to None so that it can be added later on button click
 
@@ -57,8 +51,7 @@ class RobotViewComponent(QWidget):
         self.setLayout(self.layout)
 
     def robot_status_expand(self) -> None:
-        """
-        Handles the info button click event from the Robot Info widget
+        """Handles the info button click event from the Robot Info widget
         If robot status widget is not defined, initialises one and adds it to this layout
         If robot status widget is defined, toggles its visibility
         """
@@ -68,21 +61,22 @@ class RobotViewComponent(QWidget):
 
         self.robot_status.toggle_visibility()
 
-    def update(self, robot_status: RobotStatus) -> None:
-        """
-        Updates the Robot View Components with the new robot status message
+    def update(
+        self, robot_status: RobotStatus, round_trip_time: RobotStatistic
+    ) -> None:
+        """Updates the Robot View Components with the new robot status message
         Updates the robot info widget and, if initialized, the robot status widget as well
 
         :param robot_status: the new message data to update the widget with
+        :param round_trip_time: robot statistic proto to update with new metrics
         """
-        self.robot_info.update(robot_status)
+        self.robot_info.update(robot_status, round_trip_time)
         if self.robot_status:
             self.robot_status.update(robot_status)
 
 
 class RobotView(QScrollArea):
-    """
-    Widget that displays a collection of robot view components for all
+    """Widget that displays a collection of robot view components for all
     robots currently being used
 
     Contains signal to communicate with robot diagnostics when control mode changes
@@ -90,18 +84,16 @@ class RobotView(QScrollArea):
 
     individual_robot_control_mode_signal = QtCore.pyqtSignal(int, IndividualRobotMode)
 
-    def __init__(self, available_control_modes: List[IndividualRobotMode]) -> None:
-
-        """
-        Initialize the robot view component for each robot.
+    def __init__(self, available_control_modes: list[IndividualRobotMode]) -> None:
+        """Initialize the robot view component for each robot.
 
         :param available_control_modes: the currently available input modes for the robots
                                         according to what mode thunderscope is run in
         """
-
         super().__init__()
 
         self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
+        self.round_trip_time_buffer = ThreadSafeBuffer(10, RobotStatistic)
 
         self.layout = QVBoxLayout()
 
@@ -124,15 +116,16 @@ class RobotView(QScrollArea):
         self.setWidgetResizable(True)
 
     def refresh(self) -> None:
-        """
-        Refresh the view
+        """Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
-        Until the buffer is empty
+        until the buffer is empty
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
+        round_trip_time = self.round_trip_time_buffer.get(
+            block=False, return_cached=False
+        )
 
-        while robot_status is not None:
-            self.robot_view_widgets[robot_status.robot_id].update(robot_status)
-            robot_status = self.robot_status_buffer.get(
-                block=False, return_cached=False
+        if robot_status is not None and round_trip_time is not None:
+            self.robot_view_widgets[robot_status.robot_id].update(
+                robot_status, round_trip_time
             )

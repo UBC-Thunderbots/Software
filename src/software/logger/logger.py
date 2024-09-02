@@ -9,7 +9,6 @@ basicConfig(
 def create_logger(name) -> Logger:
     """Create a logger given the name of the logger
 
-    :returns: A Logger
-
+    :return: A Logger
     """
     return getLogger(name)

@@ -10,40 +10,57 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir)
+UnixSimulatorBackend::UnixSimulatorBackend(
+    std::string runtime_dir, const std::shared_ptr<ProtoLogger>& proto_logger)
+    : proto_logger(proto_logger)
 {
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
         runtime_dir + ROBOT_STATUS_PATH,
-        boost::bind(&Backend::receiveRobotStatus, this, _1)));
+        [&](TbotsProto::RobotStatus& msg) { receiveRobotStatus(msg); }, proto_logger));
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
         runtime_dir + SSL_WRAPPER_PATH,
-        boost::bind(&Backend::receiveSSLWrapperPacket, this, _1)));
+        [&](SSLProto::SSL_WrapperPacket& msg) { receiveSSLWrapperPacket(msg); },
+        proto_logger));
 
     ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
         runtime_dir + SSL_REFEREE_PATH,
-        boost::bind(&Backend::receiveSSLReferee, this, _1)));
+        [&](SSLProto::Referee& msg) { receiveSSLReferee(msg); }, proto_logger));
 
     sensor_proto_input.reset(new ThreadedProtoUnixListener<SensorProto>(
         runtime_dir + SENSOR_PROTO_PATH,
-        boost::bind(&Backend::receiveSensorProto, this, _1)));
+        [&](SensorProto& msg) { receiveSensorProto(msg); }, proto_logger));
 
     dynamic_parameter_update_request_listener.reset(
         new ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
             runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
-            boost::bind(&UnixSimulatorBackend::receiveThunderbotsConfig, this, _1)));
+            [&](TbotsProto::ThunderbotsConfig& msg) { receiveThunderbotsConfig(msg); },
+            proto_logger));
+
+    // The following listeners have an empty callback since their values are
+    // only used by proto_logger for replay purposes.
+    validation_proto_set_listener.reset(
+        new ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>(
+            runtime_dir + VALIDATION_PROTO_SET_PATH,
+            [](TbotsProto::ValidationProtoSet& v) {}, proto_logger));
+
+    robot_log_listener.reset(new ThreadedProtoUnixListener<TbotsProto::RobotLog>(
+        runtime_dir + ROBOT_LOG_PATH, [](TbotsProto::RobotLog& v) {}, proto_logger));
+
+    robot_crash_listener.reset(new ThreadedProtoUnixListener<TbotsProto::RobotCrash>(
+        runtime_dir + ROBOT_CRASH_PATH, [](TbotsProto::RobotCrash& v) {}, proto_logger));
 
     // Protobuf Outputs
-    world_output.reset(
-        new ThreadedProtoUnixSender<TbotsProto::World>(runtime_dir + WORLD_PATH));
+    world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(
+        runtime_dir + WORLD_PATH, proto_logger));
 
     primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
-        runtime_dir + PRIMITIVE_PATH));
+        runtime_dir + PRIMITIVE_PATH, proto_logger));
 
     dynamic_parameter_update_respone_sender.reset(
         new ThreadedProtoUnixSender<TbotsProto::ThunderbotsConfig>(
-            runtime_dir + DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH));
+            runtime_dir + DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH, proto_logger));
 }
 
 void UnixSimulatorBackend::receiveThunderbotsConfig(TbotsProto::ThunderbotsConfig request)
@@ -73,4 +90,11 @@ void UnixSimulatorBackend::onValueReceived(World world)
         "World Hz",
         static_cast<float>(
             FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
+
+    last_world_time_sec.store(world.getMostRecentTimestamp().toSeconds());
+}
+
+double UnixSimulatorBackend::getLastWorldTimeSec()
+{
+    return last_world_time_sec.load();
 }

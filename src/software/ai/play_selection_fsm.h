@@ -46,25 +46,22 @@ struct PlaySelectionFSM
     bool gameStateSetupRestart(const Update& event);
 
     /**
-     * Guards for whether the play is being overridden
-     *
-     * @param event The PlaySelection::Update event
-     *
-     * @return whether the play is being overridden
-     */
-    bool playOverridden(const Update& event);
-
-    /**
      * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay, or OffensePlay
      *
      * @param event The PlaySelection::Update event
      *
      */
-    void setupOverridePlay(Update event);
     void setupSetPlay(const Update& event);
     void setupStopPlay(const Update& event);
     void setupHaltPlay(const Update& event);
     void setupOffensePlay(const Update& event);
+
+    /**
+     * Action to reset the current SetPlay to none
+     *
+     * @param event The PlaySelection::Update event
+     */
+    void resetSetPlay(const Update& event);
 
     auto operator()()
     {
@@ -86,6 +83,7 @@ struct PlaySelectionFSM
         DEFINE_SML_ACTION(setupStopPlay)
         DEFINE_SML_ACTION(setupHaltPlay)
         DEFINE_SML_ACTION(setupOffensePlay)
+        DEFINE_SML_ACTION(resetSetPlay)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -110,14 +108,18 @@ struct PlaySelectionFSM
 
             // Check for transitions to other states, if not then default to running the
             // current play
-            SetPlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A     = Halt_S,
-            SetPlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A    = Stop_S,
-            SetPlay_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A = Playing_S,
+            SetPlay_S + Update_E[gameStateHalted_G] / (resetSetPlay_A, setupHaltPlay_A) =
+                Halt_S,
+            SetPlay_S + Update_E[gameStateStopped_G] / (resetSetPlay_A, setupStopPlay_A) =
+                Stop_S,
+            SetPlay_S + Update_E[gameStatePlaying_G] /
+                            (resetSetPlay_A, setupOffensePlay_A) = Playing_S,
+            SetPlay_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A,
 
             X + Update_E = X);
     }
 
    private:
     TbotsProto::AiConfig ai_config;
-    std::shared_ptr<Play> current_play;
+    std::optional<TbotsProto::PlayName> current_set_play;
 };

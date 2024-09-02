@@ -1,74 +1,77 @@
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 from software.py_constants import *
 
 
 class FloatSlider(QSlider):
-    """
-    This class extends QSlider to offer support to float values instead of just ints
-    """
+    """This class extends QSlider to offer support to float values instead of just ints"""
 
     floatValueChanged = pyqtSignal(float)
 
-    def __init__(self, decimals=1, *args, **kwargs):
-        """
-        Creates a FloatSlider with the given number of decimal places
+    def __init__(self, decimals: int = 1, *args, **kwargs):
+        """Creates a FloatSlider with the given number of decimal places
+
         :param decimals: number of decimal places that value of slider should have
         """
         super(FloatSlider, self).__init__(*args, **kwargs)
-        self.decimals = 10 ** decimals
+        self.decimals = 10**decimals
 
         # slider now emits a float value signal every time its value changes
         self.valueChanged.connect(self.emitFloatValueChanged)
 
-    def emitFloatValueChanged(self):
-        """
-        Emits a signal with the slider's float value
-        """
+    def emitFloatValueChanged(self) -> None:
+        """Emits a signal with the slider's float value"""
         self.floatValueChanged.emit(self.value())
 
-    def value(self):
-        """
-        Gets the actual value of the slider and converts it to the float value
+    def value(self) -> float:
+        """Gets the actual value of the slider and converts it to the float value
         of corresponding decimal places
+
         :return: the float value of the slider
         """
         return float(super(FloatSlider, self).value()) / self.decimals
 
-    def setMinimum(self, min_val):
-        """
-        Sets a minimum float value for this slider
+    def setMinimum(self, min_val: float) -> None:
+        """Sets a minimum float value for this slider
+
         :param min_val: value to set as the minimum
         """
-        return super(FloatSlider, self).setMinimum(min_val * self.decimals)
+        return super(FloatSlider, self).setMinimum(int(min_val * self.decimals))
 
-    def setMaximum(self, max_val):
-        """
-        Sets a maximum float value for this slider
+    def setMaximum(self, max_val: float) -> None:
+        """Sets a maximum float value for this slider
+
         :param max_val: value to set as the maximum
         """
-        return super(FloatSlider, self).setMaximum(max_val * self.decimals)
+        return super(FloatSlider, self).setMaximum(int(max_val * self.decimals))
 
-    def setValue(self, value):
-        """
-        Sets a float value as the value for this slider
+    def setValue(self, value: float) -> None:
+        """Sets a float value as the value for this slider
+
         :param value: value to set as the slider's value
         """
         super(FloatSlider, self).setValue(int(value * self.decimals))
 
 
 class ColorQLabel(QLabel):
-    """
-    A QLabel that changes color based on the float value it holds
+    """A QLabel that changes color based on the float value it holds
     Can provide a custom min and max value
     The label starts off with no color and becomes more Red as the value increases up till the max value
     """
 
-    def __init__(self, min_val: float = 0, max_val: float = 100):
-        """
-        Initializes the ColorQLabel with the given min and max bounds
+    def __init__(
+        self,
+        label_text: str,
+        initial_value: str,
+        min_val: float = 0,
+        max_val: float = 100,
+    ):
+        """Initializes the ColorQLabel with the given label, min and max bounds
         Or 0 and 100 as default
+
+        :param label_text: the text displayed within this label as a string.
+        :param initial_value: the initial string value of the label
         :param min_val: the minimum value of the label color (no color)
         :param max_val: the maxmimum value of the label color (100% red)
         """
@@ -76,23 +79,24 @@ class ColorQLabel(QLabel):
 
         self.min = min_val
         self.max = max_val
+        self.label_text = label_text
+        self.initial_value = initial_value
 
-        self.setText("P%NA")
+        self.setText(label_text + initial_value)
         self.__update_background_color(0)
 
     def set_float_val(self, val: float) -> None:
+        """Sets the current value of the label to the given float value
+
+        :param val: the new float value
         """
-        Sets the current value of the label to the given float value
-        :param val:  the value to 
-        :return: 
-        """
-        self.setText(f"P%{val:02d}")
+        self.setText(f"{self.label_text}{val:02d}")
         self.__update_background_color(val)
 
     def __update_background_color(self, val: float) -> None:
-        """
-        Converts the given float to an percentage using the current min-max range
+        """Converts the given float to an percentage using the current min-max range
         Updates the background color's opacity to be that percentage
+
         :param val: the float value of the label to update
         """
         percent = max(0, min(float(val - self.min) / (self.max - self.min), 1))
@@ -101,24 +105,23 @@ class ColorQLabel(QLabel):
 
 
 class ColorProgressBar(QProgressBar):
-    """
-    This class extends QProgressBar to support floats instead of ints
+    """This class extends QProgressBar to support floats instead of ints
     Also changes progress bar color based on percentage filled
     """
 
     floatValueChanged = pyqtSignal(float)
 
     def __init__(self, min_val: float, max_val: float, decimals: int = 2):
-        """
-        Creates a ColorProgressBar with the specified min, max and decimals
+        """Creates a ColorProgressBar with the specified min, max and decimals
         Sets initial slider color to grey
+
         :param min_val: min value of slider
         :param max_val: max value of slider
         :param decimals: number of decimal places to be used
         """
         super(ColorProgressBar, self).__init__()
 
-        self.decimals = 10 ** decimals
+        self.decimals = 10**decimals
 
         super(ColorProgressBar, self).setRange(
             int(min_val * self.decimals), int(max_val * self.decimals)
@@ -131,19 +134,16 @@ class ColorProgressBar(QProgressBar):
         self.valueChanged.connect(self.emitFloatValueChanged)
 
     def emitFloatValueChanged(self) -> None:
-        """
-        Emits a signal with the slider's float value
-        """
+        """Emits a signal with the slider's float value"""
         self.floatValueChanged.emit(self.value())
 
     def setValue(self, value: float) -> None:
-        """
-        Sets the value of the slider to the given float value
+        """Sets the value of the slider to the given float value
         Sets the color of the slider based on the percentage filled
             - 100% to 50% -> Green to Yellow
             - 50% to 0% -> Yellow to Red
+
         :param value: the float value to set
-        :return:
         """
         super(ColorProgressBar, self).setValue(value * self.decimals)
 
@@ -166,8 +166,7 @@ class ColorProgressBar(QProgressBar):
             )
 
     def getPercentage(self):
-        """
-        Gets the current percentage between 0 and 1 from the current value
+        """Gets the current percentage between 0 and 1 from the current value
         Compared to the current min and max
         """
         return min(
@@ -181,33 +180,25 @@ class ColorProgressBar(QProgressBar):
         )
 
     def maximum(self) -> float:
-        """
-        Gets the maximum value of this progress bar as a float
-        """
+        """Gets the maximum value of this progress bar as a float"""
         return float(super(ColorProgressBar, self).maximum()) / self.decimals
 
     def minimum(self) -> float:
-        """
-        Gets the minimum value of this progress bar as a float
-        """
+        """Gets the minimum value of this progress bar as a float"""
         return float(super(ColorProgressBar, self).minimum()) / self.decimals
 
     def value(self) -> float:
-        """
-        Gets the current value of this progress bar as a float
-        """
+        """Gets the current value of this progress bar as a float"""
         return float(super(ColorProgressBar, self).value()) / self.decimals
 
 
 class ToggleableButton(QPushButton):
-    """
-    A QPushButton which can be enabled or disabled
+    """A QPushButton which can be enabled or disabled
     Indicates with cursor if it is enabled or disabled
     """
 
     def __init__(self, enabled: bool):
-        """
-        Creates a new button with the given state
+        """Creates a new button with the given state
 
         :param enabled: the starting state of the button
         """
@@ -215,16 +206,15 @@ class ToggleableButton(QPushButton):
         self.enabled = enabled
 
     def toggle_enabled(self, enabled: bool):
-        """
-        Toggles the enabled state of the button
+        """Toggles the enabled state of the button
         :param enabled: the new enabled state
         """
         self.enabled = enabled
 
     def enterEvent(self, event) -> None:
-        """
-        Sets the cursor to depending on if the button is enabled
+        """Sets the cursor to depending on if the button is enabled
         to indicate that this widget is clickable or unclickable
+
         :param event: the mouse enter event
         """
         self.setCursor(
@@ -242,7 +232,6 @@ def create_buttons(text: list):
     :return group_box, buttons:
             QGroupBox object - add this to the widget
             list of QPushButton objects - use this to perform tasks on the buttons
-
     """
     group_box = QGroupBox()
     num_buttons = len(text)
@@ -267,7 +256,7 @@ def create_radio(text: list, radio_group):
 
     :param text: - list of text for all buttons
     :param radio_group: QButtonGroup to add these buttons to
-    :return group_box, buttons: 
+    :return group_box, buttons:
                 QGroupBox object - add this to the widget
                 list of QRadioButton object - use this to perform tasks on the buttons
     """
@@ -336,7 +325,6 @@ def create_slider(text, min_val, max_val, tick_spacing):
             QSlider object - use this to perform tasks on the button
             displays value of slider, update this when value is changed
     """
-
     slider = QSlider(Qt.Orientation.Horizontal)
 
     return create_slider_abs(slider, text, min_val, max_val, tick_spacing)
@@ -355,22 +343,9 @@ def create_float_slider(text, decimals, min_val, max_val, tick_spacing):
             QSlider object - use this to perform tasks on the button
             displays value of slider, update this when value is changed
     """
-
     slider = FloatSlider(decimals, Qt.Orientation.Horizontal)
 
     return create_slider_abs(slider, text, min_val, max_val, tick_spacing)
-
-
-def create_push_button(title):
-    """Create a push button
-
-    :param title: the name of the button
-
-    """
-    push_button = QPushButton(title)
-    push_button.setFixedWidth(150)
-
-    return push_button
 
 
 def set_table_data(
@@ -382,7 +357,6 @@ def set_table_data(
     :param table: table widget that will contain the data
     :param header_size_hint_width_expansion: the factor multiplied by the length of the header
     :param item_size_hint_width_expansion: the factor multiplied by the length of the item
-
     """
     horizontal_headers = []
 
@@ -407,28 +381,27 @@ def set_table_data(
 
 
 def enable_button(button):
-    """
-    Disables the given button and sets ui to reflect that visually to the user.
+    """Disables the given button and sets the button UI to reflect that
+    visually to the user.
+
     :param button: button to change the state of
-    :returns: None
     """
     button.setStyleSheet("background-color: White")
     button.setEnabled(True)
 
 
 def disable_button(button):
-    """Disables the given button and sets ui to reflect that visually to the user.
+    """Disables the given button and sets the button UI to reflect that
+    visually to the user.
 
     :param button: button to change the state of
-    :returns: None
     """
     button.setStyleSheet("background-color: Grey")
     button.setEnabled(False)
 
 
 def disable_slider(slider):
-    """
-    Disables a slider by getting the current value and setting the slider to that
+    """Disables a slider by getting the current value and setting the slider to that
     value upon every value change
 
     This results in slider value not changing even when slider is moved
@@ -451,8 +424,8 @@ def disable_slider(slider):
 
 
 def enable_slider(slider, label, get_value):
-    """
-    Enables a slider by connecting a function to update label upon value change
+    """Enables a slider by connecting a function to update label upon value change
+
     :param slider: slider widget to be enabled
     :param label: label widget corresponding to the slider
     :param get_value: function to translate slider value into label text
@@ -462,9 +435,9 @@ def enable_slider(slider, label, get_value):
 
 
 def disable_radio_button(button_group):
-    """
-    Disables a whole radio button group
+    """Disables a whole radio button group
     Sets all buttons to unselected and disables their onClick function
+
     :param button_group: button group to disable
     """
     button_group.setExclusive(False)
@@ -475,8 +448,8 @@ def disable_radio_button(button_group):
 
 
 def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
-    """
-    Draws a robot bounded by the given rectangle with a chord defined by the given angles
+    """Draws a robot bounded by the given rectangle with a chord defined by the given angles
+
     :param painter: the QPainter object that is drawing in thunderscope
     :param rect: the rectangle that is bounding the robot's circle
     :param start_angle_degree: the start of the chord, measured anti-clockwise from the horizontal middle in degrees
@@ -485,23 +458,28 @@ def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
     convert_degree = -16
 
     painter.drawChord(
-        rect, start_angle_degree * convert_degree, span_angle_degree * convert_degree,
+        rect,
+        start_angle_degree * convert_degree,
+        span_angle_degree * convert_degree,
     )
 
 
 def display_tooltip(event, tooltip_text):
-    """
-    Checks given event to see if it is an Enter or Leave event
+    """Checks given event to see if it is an Enter or Leave event
     Upon Enter, displays a tooltip with the given text
     Upon Leave, hides the tooltip
+
     :param event: event to check
     :param tooltip_text: the text to display in the tooltip
     """
     if str(event.type()) == "Type.Enter":
         QToolTip.showText(
-            QPoint(int(event.globalPosition().x()), int(event.globalPosition().y()),),
+            QPoint(
+                int(event.globalPosition().x()),
+                int(event.globalPosition().y()),
+            ),
             tooltip_text,
-            msecShowTime=20 * MILLISECONDS_PER_SECOND,
+            msecShowTime=int(20 * MILLISECONDS_PER_SECOND),
         )
     elif str(event.type()) == "Type.Leave":
         QToolTip.hideText()
