@@ -9,12 +9,10 @@ from software.simulated_tests.ball_speed_threshold import *
 from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
     pytest_main,
 )
 from software.simulated_tests.ball_is_off_ground import *
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
 
 
 @pytest.mark.parametrize(
@@ -48,7 +46,6 @@ def test_crease_positioning(
     ball_initial_velocity,
     simulated_test_runner,
 ):
-
     # Setup Robot
     def setup(*args):
         simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -211,7 +208,10 @@ def test_crease_autochip(
 
     # Always Validation
     always_validation_sequence_set = [
-        [BallIsAlwaysOnGround(threshold=0.05), NeverExcessivelyDribbles(),]
+        [
+            BallIsAlwaysOnGround(threshold=0.05),
+            NeverExcessivelyDribbles(),
+        ]
     ]
     # Eventually Validation
     eventually_validation_sequence_set = [[]]
@@ -299,7 +299,10 @@ def test_crease_get_ball(
 
     # Always Validation
     always_validation_sequence_set = [
-        [BallIsAlwaysOnGround(threshold=0.05), NeverExcessivelyDribbles(),]
+        [
+            BallIsAlwaysOnGround(threshold=0.05),
+            NeverExcessivelyDribbles(),
+        ]
     ]
     # Eventually Validation
     eventually_validation_sequence_set = [[]]

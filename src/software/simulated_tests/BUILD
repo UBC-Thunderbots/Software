@@ -1,6 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+
+compile_pip_requirements(
+    name = "requirements",
+    src = "requirements.in",
+    requirements_txt = "requirements_lock.txt",
+)
 
 py_test(
     name = "simulated_test_ball_model",
@@ -12,7 +19,7 @@ py_test(
         "exclusive",
     ],
     deps = [
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
         requirement("pytest"),

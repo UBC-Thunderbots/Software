@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class RobotEntersRegion(Validation):
-
     """Checks if a Robot enters any of the provided regions."""
 
     def __init__(self, regions=None):
@@ -20,8 +19,8 @@ class RobotEntersRegion(Validation):
         """Checks if _any_ robot enters the provided regions
 
         :param world: The world msg to validate
-        :returns: FAILING until a robot enters any of the regions
-                  PASSING when a robot enters
+        :return: FAILING until a robot enters any of the regions
+                 PASSING when a robot enters
         """
         for region in self.regions:
             for robot in world.friendly_team.team_robots:
@@ -35,9 +34,7 @@ class RobotEntersRegion(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) shows regions to enter
-        """
+        """(override) shows regions to enter"""
         return create_validation_geometry(self.regions)
 
     def __repr__(self):
@@ -55,7 +52,6 @@ class RobotEntersRegion(Validation):
 
 
 class NumberOfRobotsEntersRegion(Validation):
-
     """Checks if a certain number of Robots enters a specific region."""
 
     def __init__(self, region, req_robot_cnt):
@@ -68,8 +64,8 @@ class NumberOfRobotsEntersRegion(Validation):
         """Checks if a specific number of robots enter the provided region
 
         :param world: The world msg to validate
-        :returns: FAILING until req_robot_cnt robots enter the region
-                  PASSING when req_robot_cnt robots enters
+        :return: FAILING until req_robot_cnt robots enter the region
+                 PASSING when req_robot_cnt robots enters
         """
         # Update the map with latest robot status
         for robot in world.friendly_team.team_robots:
@@ -89,9 +85,7 @@ class NumberOfRobotsEntersRegion(Validation):
             return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) shows region to enter
-        """
+        """(override) shows region to enter"""
         return create_validation_geometry([self.region])
 
     def __repr__(self):

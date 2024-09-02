@@ -21,7 +21,6 @@ class GLSimulatorLayer(GLLayer):
         :param friendly_colour_yellow: Is the friendly_colour_yellow?
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.FOREGROUND_DEPTH)
@@ -38,7 +37,6 @@ class GLSimulatorLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         sim_world_state = self.simulator_state_buffer.get(block=False)
 
         # X and Y reversed due to ER-Force's coordinate conventions

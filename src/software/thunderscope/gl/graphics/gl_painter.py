@@ -11,9 +11,8 @@ class GLPainter(GLGraphicsItem):
 
     def __init__(self, parent_item: Optional[GLGraphicsItem] = None) -> None:
         """Initialize the GLPainter
-        
+
         :param parent_item: The parent item of the graphic
-        
         """
         super().__init__(parentItem=parent_item)
         self.draw_functions = []
@@ -22,19 +21,17 @@ class GLPainter(GLGraphicsItem):
         self, draw_function: Callable[[QtGui.QPainter, QtCore.QRect], None]
     ):
         """Register a draw function with this GLPainter.
-        
+
         The draw function must accept a QPainter that it will use to perform
         drawing operations and a QRect that indicates the viewport dimensions.
         The draw function should not call end() on the QPainter.
 
         :param draw_function: The draw function to register
-
         """
         self.draw_functions.append(draw_function)
 
     def paint(self):
         """Called by the GLViewWidget to draw this graphic"""
-
         self.setupGLState()
 
         painter = QtGui.QPainter(self.view())

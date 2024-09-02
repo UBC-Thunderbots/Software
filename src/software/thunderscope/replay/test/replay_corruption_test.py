@@ -1,18 +1,16 @@
-"""
-TO GIVE CONTEXT FOR THE THIS TEST: 
+"""TO GIVE CONTEXT FOR THE THIS TEST:
 
-The idea of this test is to check how robust proto player is against corrupted file entries. 
-We are going to test how robust proto player is by intentionally creating corrupted replay files 
-and seeing whether or not proto player could play the replay files. 
+The idea of this test is to check how robust proto player is against corrupted file entries.
+We are going to test how robust proto player is by intentionally creating corrupted replay files
+and seeing whether or not proto player could play the replay files.
 
-Steps to test: 
-    1. we create a directory to store the replay files 
-    2. we create invalid entries of two type: the data is actually corrupted, and we are missing a delimiter. We 
+Steps to test:
+    1. we create a directory to store the replay files
+    2. we create invalid entries of two type: the data is actually corrupted, and we are missing a delimiter. We
         mixed those replay entries with valid replay entries to check if proto player could actually player those
         entries
     4. we check to see if there are uncaught exception. If there are, we know fore sure proto player wouldn't work!
 """
-import pytest
 
 import time
 from typing import Callable
@@ -37,8 +35,7 @@ TMP_REPLAY_SAVE_PATH = "/tmp/test_file_corruption"
 
 
 def create_random_proto() -> Message:
-    """
-    creating the proto that are going to be saved to the disk
+    """Creating the proto that are going to be saved to the disk
 
     :return: the proto that we are referencing
     """
@@ -47,11 +44,10 @@ def create_random_proto() -> Message:
 
 
 def create_valid_log_entry(proto: Message, current_time: float) -> str:
-    """
-    creating normal log entries
+    """Creating normal log entries
 
-    :proto: the reference proto
-    :current_time: the reference time
+    :param proto: the reference proto
+    :param current_time: the reference time
     :return: the log entries that the replay file format uses
     """
     serialized_proto = base64.b64encode(proto.SerializeToString())
@@ -64,11 +60,10 @@ def create_valid_log_entry(proto: Message, current_time: float) -> str:
 
 
 def create_missing_delimeter_log_entry(proto: Message, current_time: float) -> str:
-    """
-    creating corrupted log entries
+    """Creating corrupted log entries
 
-    :proto: the reference proto
-    :current_time: the reference time
+    :param proto: the reference proto
+    :param current_time: the reference time
     :return: the log entries that the replay file format uses
     """
     serialized_proto = base64.b64encode(proto.SerializeToString())
@@ -80,11 +75,10 @@ def create_missing_delimeter_log_entry(proto: Message, current_time: float) -> s
 
 
 def create_corrupt_log_entry(proto: Message, current_time: float) -> str:
-    """
-    creating corrupted log entries
+    """Creating corrupted log entries
 
-    :proto: the reference proto
-    :current_time: the reference time
+    :param proto: the reference proto
+    :param current_time: the reference time
     :return: the log entries that the replay file format uses
     """
     serialized_proto = base64.b64encode(proto.SerializeToString())
@@ -103,17 +97,15 @@ def make_part_replay_chunks(
     gen_log_entry_func: Callable[[Message, float], None],
     frequency=0.1,
 ):
-    """
-    making a part of the replay chunks and appending it to the 0.replay file. There would be a frequency% chance that a
-    invalid log  entry are created
+    """Making a part of the replay chunks and appending it to the 0.replay file.
+    There would be a frequency% chance that a invalid log entry are created
 
-
-    :list_of_protos: the list of proto that we are referencing when creating the log entries
-    :save_path: where we are saving the replay file
-    :duration: how long do we want to create these replay chunks
-    :start_time: when is the replay chunk being started? 
-    :gen_log_entry_func: the function that is used to generate invalid log entries 
-    :frequency: what percent of the time should we call gen_log_entry_func
+    :param list_of_protos: the list of proto that we are referencing when creating the log entries
+    :param save_path: where we are saving the replay file
+    :param duration: how long do we want to create these replay chunks
+    :param start_time: when is the replay chunk being started?
+    :param gen_log_entry_func: the function that is used to generate invalid log entries
+    :param frequency: what percent of the time should we call gen_log_entry_func
     """
     os.makedirs(save_path, exist_ok=True)
     path_to_replay_file = os.path.join(save_path, "0.replay")
@@ -135,13 +127,12 @@ def make_part_replay_chunks(
 
 
 def make_replay_chunk(size_of_replay_chunk=1000):
-    """
-    Creating a replay chunks that is like the following: 
+    """Creating a replay chunks that is like the following:
     1. from 0 to 0.1 seconds, it all of the entries are valid
-    2. from 0.1 to 0.2 seconds, 10% of the proto cannot be decoded 
+    2. from 0.1 to 0.2 seconds, 10% of the proto cannot be decoded
     3. from 0.2 to 0.3 seconds, 10% of the proto are missing delimiter
 
-    :size_of_replay_chunks: the size of the replay chunks we want to make
+    :param size_of_replay_chunks: the size of the replay chunks we want to make
     """
     # making sure previous test results doesn't affect the new test
     shutil.rmtree(TMP_REPLAY_SAVE_PATH, ignore_errors=True)
@@ -169,18 +160,14 @@ def make_replay_chunk(size_of_replay_chunk=1000):
 
 
 def cleanup():
-    """
-    cleaning up this test by deleting the replay files 
-    """
+    """Cleaning up this test by deleting the replay files"""
     shutil.rmtree(TMP_REPLAY_SAVE_PATH)
 
 
 def create_test_player() -> ProtoPlayer:
-    """
-    Creating a protoplayer and setting a seed so that the generated 
+    """Creating a protoplayer and setting a seed so that the generated
     replay file stays the same over time!
     """
-
     make_replay_chunk()
 
     io = ProtoUnixIO()
@@ -189,9 +176,7 @@ def create_test_player() -> ProtoPlayer:
 
 
 def test_for_file_corruption():
-    """
-    testing whether or not the proto player could play corrupted zipfile! 
-    """
+    """Testing whether or not the proto player could play corrupted zipfile!"""
     player = create_test_player()
 
     # block until the player has finished playing!
@@ -206,7 +191,5 @@ def test_for_file_corruption():
 
 
 if __name__ == "__main__":
-    """
-    Please read the header of this file for more context on what it is testing!
-    """
+    """Please read the header of this file for more context on what it is testing!"""
     pytest_main(__file__)

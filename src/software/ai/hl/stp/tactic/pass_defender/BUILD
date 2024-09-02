@@ -17,6 +17,8 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic:move_primitive",
+        "//software/ai/hl/stp/tactic/defender:defender_fsm_base",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/geom/algorithms",
         "//software/logger",
     ],
@@ -42,7 +44,7 @@ py_test(
         "exclusive",
     ],
     deps = [
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
         requirement("pytest"),

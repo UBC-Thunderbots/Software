@@ -9,9 +9,7 @@ import numpy.typing as npt
 
 
 class GLHeatmap(GLMeshItem):
-    """
-    Displays a heatmap on the cartesian plane (i.e. x-y plane)
-    """
+    """Displays a heatmap on the cartesian plane (i.e. x-y plane)"""
 
     # Float between 0.0 - 1.0 representing alpha transparency of heatmap
     HEATMAP_ALPHA = 0.8
@@ -22,11 +20,10 @@ class GLHeatmap(GLMeshItem):
         color_map: pg.ColorMap = None,
     ) -> None:
         """Initialize the GLHeatmap
-        
+
         :param parent_item: The parent item of the graphic
         :param color_map: ColorMap to map scalar data values to the color space.
                           If no ColorMap is provided, the default is a grayscale ColorMap.
-
         """
         self.x_length = 0
         self.y_length = 0
@@ -43,10 +40,9 @@ class GLHeatmap(GLMeshItem):
 
     def set_dimensions(self, x_length: float = 0, y_length: float = 0) -> None:
         """Set the dimensions of the heatmap
-        
+
         :param x_length: The length of the heatmap in the x direction
         :param y_length: The length of the heatmap in the y direction
-
         """
         if x_length == 0 or y_length == 0:
             return
@@ -61,7 +57,6 @@ class GLHeatmap(GLMeshItem):
         """Update the data in this heatmap
 
         :param data: A 2D matrix representing the data to display in the heatmap
-
         """
         rows = data.shape[0]
         cols = data.shape[1]

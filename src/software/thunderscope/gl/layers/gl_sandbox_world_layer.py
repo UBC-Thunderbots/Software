@@ -1,5 +1,5 @@
 import math
-from typing import List, Tuple, Optional, Dict
+from typing import Optional
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtGui import *
@@ -7,11 +7,11 @@ from pyqtgraph.opengl import *
 from software.py_constants import *
 from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class RobotOperation:
-    """
-    An operation that changes the state of the robots on the field
+    """An operation that changes the state of the robots on the field
     Contains the id of the robot to change, its new and previous positions if applicable
     And the id of the next robot to add after this operation completes
     """
@@ -19,8 +19,8 @@ class RobotOperation:
     def __init__(
         self,
         id: int,
-        prev_pos: Optional[Tuple[int, int]],
-        pos: Optional[Tuple[int, int]],
+        prev_pos: Optional[tuple[int, int]],
+        pos: Optional[tuple[int, int]],
         next_id: int,
     ):
         self.type = type
@@ -35,9 +35,7 @@ class EnemyAtMousePositionError(Exception):
 
 
 class GLSandboxWorldLayer(GLWorldLayer):
-    """
-    GLWorldLayer that adds functionality to add, remove, and change the state of the robots on the field
-    """
+    """GLWorldLayer that adds functionality to add, remove, and change the state of the robots on the field"""
 
     undo_toggle_enabled_signal = pyqtSignal(bool)
     redo_toggle_enabled_signal = pyqtSignal(bool)
@@ -47,12 +45,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
     def __init__(
         self,
         name: str,
-        simulator_io,
+        simulator_io: ProtoUnixIO,
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
     ):
-        """
-        Initializes a GLSandboxWorldLayer
+        """Initializes a GLSandboxWorldLayer
 
         :param name: The displayed name of the layer
         :param simulator_io: The simulator io communicate with the simulator
@@ -79,26 +76,26 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.should_init_curr_robot_ids = True
 
         # the local state of robots (if simulator is paused)
-        # map of robot id to a Tuple with the robot coordinates and orientation
+        # map of robot id to a tuple with the robot coordinates and orientation
         # or None if the robot has been removed already
         # (easier to keep track of robots rather than removing the entry entirely)
-        self.local_robot_positions: Dict[int, Tuple[QVector3D, float]] = {}
+        self.local_robot_positions: dict[int, tuple[QVector3D, float]] = {}
 
         # the state of robots before running the simulator
         # the robot state if only manual moves are considered
-        self.pre_sim_robot_positions: Dict[int, Tuple[QVector3D, float]] = {}
+        self.pre_sim_robot_positions: dict[int, tuple[QVector3D, float]] = {}
 
         # stacks for undo and redo operations
         self.undo_operations = []
         self.redo_operations = []
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
-        """
-        Requires Ctrl + Shift to be pressed along with mouse click
+        """Requires Ctrl + Shift to be pressed along with mouse click
         Gets the point(s) that the mouse click corresponds to on the xy-plane and other planes
         Determines if a robot is present at that position
         If so, sets fields to indicate that a robot is selected
         If not, checks for double click and adds a robot on the xy-plane coordinates
+
         :param event: the event containing the xy-plane and other plane coordinates
         """
         # forward event to super method for ball placement
@@ -123,13 +120,13 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.__handle_existing_robot_event(event, robot_id, index)
 
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
-        """
-        Requires Ctrl + Shift to be pressed along with mouse click
+        """Requires Ctrl + Shift to be pressed along with mouse click
 
         Gets the point(s) that the mouse has moved to on the xy-plane and other planes
         If a robot is currently selected, determines if another robot is present at the new position
         If so, returns
         If not, moves the selected robot to the new position
+
         :param event: the event containing the xy-plane and other plane coordinates
         """
         super().mouse_in_scene_dragged(event)
@@ -179,8 +176,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
             )
 
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
-        """
-        Reset the selected robot and the in progress move
+        """Reset the selected robot and the in progress move
+
         :param event: the mouse event
         """
         super().mouse_in_scene_released(event)
@@ -192,8 +189,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.move_in_progress = False
 
     def refresh_graphics(self) -> None:
-        """
-        Calls the super class refresh graphics
+        """Calls the super class refresh graphics
 
         If there are any pre-loaded robots in the world, updates curr robots ids
         to reflect this and stay consistent
@@ -219,11 +215,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.should_init_curr_robot_ids = False
 
     def undo(self) -> None:
-        """
-        Undoes the last operation
+        """Undoes the last operation
         Adds a corresponding opposite move to the redo list so we can redo if necessary
         """
-
         # skip if nothing to undo
         if len(self.undo_operations) == 0:
             return
@@ -249,11 +243,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.__undo_redo_internal(operation)
 
     def redo(self) -> None:
-        """
-        Redoes the last undo operation
+        """Redoes the last undo operation
         Adds a corresponding opposite move to the undo list so we can undo if necessary
         """
-
         # skip if nothing to redo
         if len(self.redo_operations) == 0:
             return
@@ -279,8 +271,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.__undo_redo_internal(operation)
 
     def toggle_play_state(self) -> bool:
-        """
-        When the simulator is paused / played, reset the local positions
+        """When the simulator is paused / played, reset the local positions
+
         :return: the current boolean play state
         """
         # the super method handles the actual pausing of the simulator
@@ -292,24 +284,22 @@ class GLSandboxWorldLayer(GLWorldLayer):
         return curr_play_state
 
     def reset_to_pre_sim(self) -> None:
-        """
-        Resets all robot positions to what they were before the simulator ran
-        """
+        """Resets all robot positions to what they were before the simulator ran"""
         for robot_id, state in self.pre_sim_robot_positions.items():
             self.__update_world_state(robot_id, state[0], state[1])
 
     def __add_undo_operation(self, operation: RobotOperation) -> None:
-        """
-        Adds an undo operation to the list and emits the toggle enable signal
+        """Adds an undo operation to the list and emits the toggle enable signal
+
         :param operation: the operation to add to the undo list
         """
         self.undo_operations.append(operation)
         self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
 
     def __undo_redo_internal(self, operation: RobotOperation) -> None:
-        """
-        Helper method to apply a RobotOperation
+        """Helper method to apply a RobotOperation
         Updates robot positions and the next id
+
         :param operation: the operation to apply
         """
         self.next_id = operation.next_id
@@ -324,11 +314,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
     def __handle_existing_robot_event(
         self, event: MouseInSceneEvent, robot_id: int, index: int
     ) -> None:
-        """
-        Handles a mouse event when a position where a robot is present is clicked
+        """Handles a mouse event when a position where a robot is present is clicked
         Marks the robot as selected (for drag moving)
         If double clicked, removes the robot at the position
         Else, starts a double click
+
         :param event: the event containing the xy-plane and other plane coordinates
         :param robot_id: the id of the robot that was clicked on
         :param index: the plane index that the robot was selected on
@@ -347,7 +337,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
             # add an undo operation to add back the robot
             self.__add_undo_operation(
                 RobotOperation(
-                    robot_id, None, event.multi_plane_points[index], self.next_id,
+                    robot_id,
+                    None,
+                    event.multi_plane_points[index],
+                    self.next_id,
                 )
             )
             # remove the robot
@@ -361,10 +354,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
             QTimer.singleShot(500, self.__toggle_robot_remove_double_click)
 
     def __handle_new_robot_event(self, event: MouseInSceneEvent) -> None:
-        """
-        Handles a mouse event when an empty position is clicked
+        """Handles a mouse event when an empty position is clicked
         If double clicked, adds a new robot at that position
         Else, starts a double click
+
         :param event: the mouse event with the new robot's position
         """
         # if the current point is a double click in progress
@@ -389,8 +382,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
             QTimer.singleShot(500, self.__toggle_robot_add_double_click)
 
     def __get_next_robot_id(self, curr_next_id: int) -> int:
-        """
-        Gets the id of the next robot to add based on the currently added robot ids
+        """Gets the id of the next robot to add based on the currently added robot ids
+
         :param curr_next_id: the current next id to add
         """
         # start with the default next id
@@ -403,26 +396,22 @@ class GLSandboxWorldLayer(GLWorldLayer):
         return next_id
 
     def __toggle_robot_add_double_click(self) -> None:
-        """
-        Resets the robot add double click flag
-        """
+        """Resets the robot add double click flag"""
         if self.robot_add_double_click:
             self.robot_add_double_click = None
 
     def __toggle_robot_remove_double_click(self) -> None:
-        """
-        Resets the robot remove double click flag
-        """
+        """Resets the robot remove double click flag"""
         if self.robot_remove_double_click:
             self.robot_remove_double_click = None
 
     def __add_robot_to_state(
         self, world_state: WorldState, id: int, pos: QVector3D, orientation: float
     ) -> WorldState:
-        """
-        Adds a robot with the given state and id to the given world state
+        """Adds a robot with the given state and id to the given world state
         To the right team based on current team color
         Converts position and orientation if needed
+
         :param world_state: the world state to add robot to
         :param id: the id of the robot to add
         :param pos: the new QVector3D position of the robot
@@ -436,7 +425,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # build the robot state
         robot_state = RobotState(
             global_position=Point(
-                x_meters=converted_pos.x(), y_meters=converted_pos.y(),
+                x_meters=converted_pos.x(),
+                y_meters=converted_pos.y(),
             ),
             global_orientation=Angle(radians=converted_orientation),
         )
@@ -448,9 +438,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         return world_state
 
     def __remove_robot_from_state(self, world_state: WorldState, id: int) -> WorldState:
-        """
-        Removes a robot with the given id from the right team in the given world state
+        """Removes a robot with the given id from the right team in the given world state
         Based on current team color
+
         :param world_state: the world state to remove robot from
         :param id: the id of the robot to remove
         """
@@ -461,14 +451,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
         return world_state
 
     def __identify_robot(
-        self, multi_plane_points: List[QVector3D]
-    ) -> Tuple[Optional[int], Optional[int]]:
+        self, multi_plane_points: list[QVector3D]
+    ) -> tuple[Optional[int], Optional[int]]:
         """Identify which robot was clicked on the team
 
         :param multi_plane_points: points on the x-y plane and planes above it corresponding to the mouse click
-        :returns: The robot if one is present at the mouse position,
-                    along with the index of the plane it was identified on,
-                    else None, None
+        :return: The robot if one is present at the mouse position,
+                 along with the index of the plane it was identified on,
+                 else None, None
         """
         # first, check if there's any enemy robots being clicked on
         # return None immediately if so (since we can't edit enemy robot state)
@@ -513,8 +503,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
     def __identify_robot_helper(
         self, multi_plane_points, pos_x, pos_y
     ) -> Optional[int]:
-        """
-        Loops over the multi plane points given and checks if any of them are within the radius of the given robot
+        """Loops over the multi plane points given and checks if any of them are within the radius of the given robot
+
         :param multi_plane_points: the points on the xy planes and planes above it to check
         :param pos_x: the x pos of the robot
         :param pos_y: the y pos of the robot
@@ -536,17 +526,16 @@ class GLSandboxWorldLayer(GLWorldLayer):
         new_orientation: float,
         clear_redo=True,
     ) -> None:
-        """
-        Send out a WorldState proto with the existing robots
+        """Send out a WorldState proto with the existing robots
         If new position is provided, adds a robot with the given id at the given position
         Else, removes the robot with the given id from the robot state
+
         :param new_robot_id: the id of the robot to add / remove / move
         :param new_pos: the new QVector3D position of the robot (None if robot to be removed)
         :param new_orientation: the new orientation of the robot (radians)
         :param clear_redo: If True, indicates a new action instead of an action from the undo/redo list.
                             clears redo list if True
         """
-
         world_state = WorldState()
 
         # copy over existing robots for the current team
@@ -592,9 +581,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         new_pos: Optional[QVector3D],
         new_orientation: float = 0,
     ) -> WorldState:
-        """
-        Updates the world state with the new robot position for the given id
+        """Updates the world state with the new robot position for the given id
         New position is defined if adding / moving a robot and None if removing one
+
         :param world_state: the world state to change
         :param robot_id: the id of thr robot to add / move / remove
         :param new_pos: the new position of the robot, or None if removing
@@ -625,7 +614,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
     def __invert_robot_if_defending_negative_half(
         self, point: QVector3D, orientation: float
-    ) -> Tuple[QVector3D, float]:
+    ) -> tuple[QVector3D, float]:
         """If we are defending the negative half of the field, we invert the position and orientation
         of a robot  to match up with the visualization.
 
@@ -645,8 +634,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
     # # # # # # # # # # # # # # # # # # # #
 
     def _update_robots_graphics(self) -> None:
-        """
-        Overrides the _update_robots_graphics method in the super class
+        """Overrides the _update_robots_graphics method in the super class
         Adds local state robots to the friendly team cache before updating the robot graphics
         """
         for robot_id, pos in self.local_robot_positions.items():
