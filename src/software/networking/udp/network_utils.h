@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ifaddrs.h>
-
+#include <optional>
 #include <string>
 
 /**
@@ -14,9 +14,9 @@
  * found
  * @param ipv4 If true, get the IPv4 address, otherwise get the IPv6 address
  *
- * @return true if the IP address was found, false otherwise
+ * @return IP address if it was found, otherwise nullopt
  */
-bool getLocalIp(const std::string& interface, std::string& ip_address, bool ipv4 = true);
+std::optional<std::string> getLocalIp(const std::string& interface, bool ipv4 = true);
 
 /**
  * Check if the given string follows the IPv6 address format
