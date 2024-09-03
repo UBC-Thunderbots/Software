@@ -4,7 +4,7 @@
 
 TEST(NetworkUtilsTest, getLocalIpValidInterface)
 {
-    std::string interface = "lo";
+    std::string interface               = "lo";
     std::optional<std::string> local_ip = getLocalIp(interface, true);
     EXPECT_TRUE(local_ip);
     EXPECT_EQ(local_ip.value(), "127.0.0.1");
