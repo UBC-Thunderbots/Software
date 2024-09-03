@@ -10,8 +10,6 @@
  * The modified ip_address is valid only if the function returns true
  *
  * @param interface The interface to get the IP address from
- * @param ip_address A reference to the std::string that will store the IP address if
- * found
  * @param ipv4 If true, get the IPv4 address, otherwise get the IPv6 address
  *
  * @return IP address if it was found, otherwise nullopt
