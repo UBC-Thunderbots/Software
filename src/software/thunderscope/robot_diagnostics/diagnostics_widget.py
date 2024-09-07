@@ -70,11 +70,6 @@ class DiagnosticsWidget(QScrollArea):
         # connect input mode signal with handler
         self.diagnostics_input_mode_signal.connect(self.__control_mode_update_handler)
 
-        # connect handheld device reinitialization signal with handler
-        self.reinitialize_handheld_device_signal.connect(
-            lambda: self.handheld_device_handler.reinitialize_handheld_device()
-        )
-
         # connect handheld device connection status toggle signal with handler
         self.handheld_device_connection_status_signal.connect(
             self.__handheld_device_connection_status_update_handler
@@ -85,6 +80,11 @@ class DiagnosticsWidget(QScrollArea):
             self.logger,
             self.proto_unix_io,
             self.handheld_device_connection_status_signal,
+        )
+
+        # connect handheld device reinitialization signal with handler
+        self.reinitialize_handheld_device_signal.connect(
+            self.handheld_device_handler.reinitialize_handheld_device
         )
 
         # layout for the entire diagnostics tab

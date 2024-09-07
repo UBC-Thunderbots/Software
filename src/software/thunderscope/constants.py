@@ -302,27 +302,6 @@ class TrailValues:
     DEFAULT_TRAIL_SAMPLING_RATE = 0
 
 
-class RobotControlType(Enum):
-    MOVE_X = 1
-    MOVE_Y = 2
-    ROTATE = 3
-    KICK = 4
-    CHIP = 5
-    KICK_POWER = 6
-    DRIBBLER_SPEED = 7
-    DRIBBLER_ENABLE_1 = 8
-    DRIBBLER_ENABLE_2 = 9
-
-
-# TODO: come up with less ambiguous/weird name
-class HandheldDeviceConfigKeys(Enum):
-    CODE = 1
-    MAX_VALUE = 2
-
-
-# nomenclature:
-
-
 @dataclass
 class DeviceKeyEvent:
     """This dataclass holds the code for a "EV_KEY" input event"""
@@ -384,8 +363,8 @@ class HandheldDeviceConstants:
 
     HANDHELD_DEVICE_NAME_CONFIG_MAP = {
         "Microsoft Xbox One X pad": XboxConfig,
-        "Microsoft X-Box One S pad": XboxConfig,
-        "Microsoft X-Box 360 pad": XboxConfig,
+        "Microsoft Xbox One S pad": XboxConfig,
+        "Microsoft Xbox 360 pad": XboxConfig,
     }
 
     INPUT_DELAY_THRESHOLD = 0.01
@@ -394,8 +373,6 @@ class HandheldDeviceConstants:
     DEADZONE_PERCENTAGE = 0.05
 
     DRIBBLER_RPM_STEPPER = 1000
-    # This is actually considered to be an "indefinite" speed in the robots software backend
-    DRIBBLER_MAX_RPM = 10000
 
     KICK_POWER_STEPPER = 1
     MIN_KICK_POWER = 1

@@ -127,7 +127,7 @@ class DriveAndDribblerWidget(QWidget):
             self.__value_change_handler,
         )
 
-        self.stop_and_reset_direct = common_widgets.create_push_button("Stop and Reset")
+        self.stop_and_reset_direct = QPushButton("Stop and Reset")
         self.stop_and_reset_direct.clicked.connect(self.__reset_direct_sliders)
 
         dbox.addLayout(x_layout)
@@ -167,9 +167,7 @@ class DriveAndDribblerWidget(QWidget):
             self.__value_change_handler,
         )
 
-        self.stop_and_reset_dribbler = common_widgets.create_push_button(
-            "Stop and Reset"
-        )
+        self.stop_and_reset_dribbler = QPushButton("Stop and Reset")
         self.stop_and_reset_dribbler.clicked.connect(self.__reset_dribbler_slider)
 
         dbox.addLayout(dribbler_layout)

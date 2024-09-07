@@ -66,7 +66,7 @@ class ChickerWidget(QWidget):
             1,
             HandheldDeviceConstants.MIN_CHIP_POWER,
             HandheldDeviceConstants.MAX_CHIP_POWER,
-            HandheldDeviceConstants.CHIP_DISTANCE_STEPPER,
+            int(HandheldDeviceConstants.CHIP_DISTANCE_STEPPER),
         )
 
         kick_chip_sliders_hbox_layout.addLayout(self.chip_distance_slider_layout)

@@ -5,6 +5,7 @@ from typing import Type
 
 import numpy
 from evdev import InputDevice, ecodes, list_devices, InputEvent
+from pyqtgraph.Qt import QtCore
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
@@ -364,8 +365,8 @@ class HandheldDeviceManager(object):
         return numpy.clip(
             a=self.dribbler_speed_accumulator
             - event_value * HandheldDeviceConstants.DRIBBLER_RPM_STEPPER,
-            a_min=-HandheldDeviceConstants.DRIBBLER_MAX_RPM,
-            a_max=HandheldDeviceConstants.DRIBBLER_MAX_RPM,
+            a_min=self.constants.indefinite_dribbler_speed_rpm,
+            a_max=-self.constants.indefinite_dribbler_speed_rpm,
         )
 
     def __interpret_kick_event_value(self, event_value: float) -> float:
