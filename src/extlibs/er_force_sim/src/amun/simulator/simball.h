@@ -46,47 +46,47 @@ class camun::simulator::SimBall
    public:
     /**
      * Processes velocity and forces to be applied on the ball
-     * 
-     * @param robot_collision whether the ball collides with a robot in 
+     *
+     * @param robot_collision whether the ball collides with a robot in
      * this simulation tick
      */
     void begin(bool robot_collision);
 
-    bool update(SSLProto::SSL_DetectionBall& ball, float stddev, float stddevArea,
+    bool update(SSLProto::SSL_DetectionBall &ball, float stddev, float stddevArea,
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
                 float visibilityThreshold, btVector3 positionOffset);
 
     void move(const sslsim::TeleportBall &ball);
-    
+
     void kick(const btVector3 &power);
-    
+
     /**
-     * Returns the ball's position projected onto the floor (z component is not included) 
-     * 
+     * Returns the ball's position projected onto the floor (z component is not included)
+     *
      * @return the ball position
      */
     btVector3 position() const;
-    
+
     /**
-     * Returns the ball's linear velocity 
-     * 
-     * @return the ball velocity 
+     * Returns the ball's linear velocity
+     *
+     * @return the ball velocity
      */
     btVector3 speed() const;
 
     void writeBallState(world::SimBall &ball) const;
-    
+
     void restoreState(const world::SimBall &ball);
-    
+
     btRigidBody *body() const
     {
         return m_body.get();
     }
-    
+
     bool isInvalid() const;
 
     // can be used to add ball mis-detections
-    bool addDetection(SSLProto::SSL_DetectionBall& ball, btVector3 pos, float stddev,
+    bool addDetection(SSLProto::SSL_DetectionBall &ball, btVector3 pos, float stddev,
                       float stddevArea, const btVector3 &cameraPosition,
                       bool enableInvisibleBall, float visibilityThreshold,
                       btVector3 positionOffset);

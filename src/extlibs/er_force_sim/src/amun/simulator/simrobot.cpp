@@ -625,7 +625,7 @@ robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand
     return response;
 }
 
-void SimRobot::update(SSLProto::SSL_DetectionRobot& robot, float stddev_p,
+void SimRobot::update(SSLProto::SSL_DetectionRobot &robot, float stddev_p,
                       float stddev_phi, int64_t time, btVector3 positionOffset)
 {
     // setup vision packet
@@ -691,7 +691,7 @@ bool SimRobot::touchesBall(const SimBall &ball) const
     return false;
 }
 
-void SimRobot::update(world::SimRobot& robot, const SimBall &ball) const
+void SimRobot::update(world::SimRobot &robot, const SimBall &ball) const
 {
     btTransform transform;
     m_motionState->getWorldTransform(transform);

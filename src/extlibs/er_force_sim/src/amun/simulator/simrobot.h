@@ -50,35 +50,35 @@ class camun::simulator::SimRobot
     void begin(SimBall &ball, double time);
 
     bool canKickBall(const SimBall &ball) const;
-    
+
     void tryKick(const SimBall &ball, float power, double time);
-    
+
     robot::RadioResponse setCommand(const SSLSimulationProto::RobotCommand &command,
                                     const SimBall &ball, bool charge, float rxLoss,
                                     float txLoss);
-    
-    void update(SSLProto::SSL_DetectionRobot& robot, float stddev_p, float stddev_phi,
+
+    void update(SSLProto::SSL_DetectionRobot &robot, float stddev_p, float stddev_phi,
                 int64_t time, btVector3 positionOffset);
-    
-    void update(world::SimRobot& robot, const SimBall &ball) const;
-    
+
+    void update(world::SimRobot &robot, const SimBall &ball) const;
+
     void restoreState(const world::SimRobot &robot);
-    
+
     void move(const sslsim::TeleportRobot &robot);
-    
+
     bool isFlipped();
-    
+
     btVector3 position() const;
-    
+
     btVector3 dribblerCorner(bool left) const;
-    
+
     int64_t getLastSendTime() const
     {
         return m_lastSendTime;
     }
-    
+
     void setDribbleMode(bool perfectDribbler);
-    
+
     void stopDribbling();
 
     const robot::Specs &specs() const
