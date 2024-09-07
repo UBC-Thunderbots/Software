@@ -81,8 +81,6 @@ class GLValidationLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-        :param test_name_pos_x: The x position of the test name
-        :param test_name_pos_y: The y position of the test name
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)

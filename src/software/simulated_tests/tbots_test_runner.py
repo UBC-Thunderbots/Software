@@ -22,9 +22,11 @@ class TbotsTestRunner:
         """Initialize the TestRunner.
 
         :param test_name: The name of the test to run
+        :param thunderscope: The Thunderscope to use, None if not used
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
+        :param: is_yellow_friendly: if yellow is the friendly team
         """
         self.test_name = test_name
         self.thunderscope = thunderscope
@@ -76,15 +78,15 @@ class TbotsTestRunner:
         """Sends a gamecontroller command that is to be broadcasted to the given team
 
         :param gc_command: the gamecontroller command
-        :param is_blue: whether the command should be sent to the blue team
+        :param is_friendly: whether the command should be sent to the friendly team
         :param final_ball_placement_point: where to place the ball in ball placement
         """
-        team = Team.BLUE
-        # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
-        if (is_friendly and self.is_yellow_friendly) or not (
-            is_friendly or self.is_yellow_friendly
-        ):
-            team = Team.YELLOW
+        friendly_team, enemy_team = (
+            (Team.YELLOW, Team.BLUE)
+            if self.is_yellow_friendly
+            else (Team.BLUE, Team.YELLOW)
+        )
+        team = friendly_team if is_friendly else enemy_team
 
         self.gamecontroller.send_gc_command(
             gc_command=gc_command,

@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Sequence, Any
+from typing import Optional, Sequence, Any
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from pyqtgraph.Qt.QtWidgets import *
