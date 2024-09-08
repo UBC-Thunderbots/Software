@@ -137,6 +137,17 @@ Information about the robot status is communicated and stored as `RobotStatus` p
 # Design Patterns
 Below are the main design patterns we use in our code, and what they are used for.
 
+## Abstract Classes and Inheritance
+While not a "design pattern" per se, inheritance and related OOP paradigms are prevalent throughout of our code base. Abstract classes let us define interfaces for various components of our code. Then we can implement different objects that obey the interface, and use them interchangeably, with the guarantee that as long as they follow the same interface we can use them in the same way.
+
+To learn more about inheritance in C++, read the following `learncpp.com` articles:
+- [Introduction to inheritance](https://www.learncpp.com/cpp-tutorial/introduction-to-inheritance/)
+- [Virtual functions](https://www.learncpp.com/cpp-tutorial/pointers-and-references-to-the-base-class-of-derived-objects/)
+
+Examples of this can be found in many places, including:
+* [Plays](#plays)
+* [Tactics](#tactics)
+
 ## Singleton Pattern
 The Singleton pattern is useful for having a single, global instance of an object that can be accessed from anywhere. Though it's generally considered an anti-pattern (aka _bad_), it is useful in specific scenarios.
 
@@ -156,8 +167,6 @@ Read http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/ for more i
 
 The auto-registering factory is particularly useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
 
-The Factory pattern is also used to create different [Backends](#backend)
-
 
 ## Visitor Pattern
 The Visitor pattern is useful when we need to perform different operations on a group of "similar" objects, like objects that inherit from the same parent class (e.g. [Tactic](#tactics)). We might only know all these objects are a [Tactic](#tactic), but we don't know specifically which type each one is (eg. `AttackerTactic` vs `ReceiverTactic`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
@@ -173,8 +182,9 @@ Our implementation of this pattern consists of two classes, `Observer` and `Subj
 
 ### Threaded Observer
 In our system, we need to be able to do multiple things (receive camera data, run the [AI](#ai), send commands to the robots) at the same time. In order to facilitate this, we extend the `Observer` to the `ThreadedObserver` class. The `ThreadedObserver` starts a thread with an infinite loop that waits for new data from `Subject` and performs some operation with it.
-
-**WARNING:** If a class extends multiple `ThreadedObserver`s (for example, [AI](#ai) could extend `ThreadedObserver<World>` and `ThreadedObserver<RobotStatus>`), then there will be two threads running, one for each observer. We **do not check** for data race conditions between observers, so it's entirely possible that one `ThreadedObserver` thread could read/write from data at the same time as the other `ThreadedObserver` is reading/writing the same data. Please make sure any data read/written to/from multiple `ThreadedObserver`s is thread-safe.
+ 
+> [!WARNING]  
+> If a class extends multiple `ThreadedObserver`s (for example, [AI](#ai) could extend `ThreadedObserver<World>` and `ThreadedObserver<RobotStatus>`), then there will be two threads running, one for each observer. We **do not check** for data race conditions between observers, so it's entirely possible that one `ThreadedObserver` thread could read/write from data at the same time as the other `ThreadedObserver` is reading/writing the same data. Please make sure any data read/written to/from multiple `ThreadedObserver`s is thread-safe.
 
 One example of this is [SensorFusion](#sensor-fusion), which extends `Subject<World>` and the [AI](#ai), which extends `ThreadedObserver<World>`. [SensorFusion](#sensor-fusion) runs in one thread and sends data to the [AI](#ai), which receives and processes it another thread.
 
@@ -538,18 +548,15 @@ Tactics can use Skills in a hierarchical way.
 Tactics use [Primitives](#primitives) to implement their behaviour, so that it can decouple strategy from the [Navigator](#navigation).
 
 ### Plays
-The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like Plays in real-life soccer. Examples include:
-1. A Play for taking friendly free kicks
-2. A Play for defending enemy kickoffs
-3. A general defense play
-4. A passing-based offense play
-5. A dribbling-based offense play
+The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like plays in real-life soccer. Examples include:
 
-Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics` are being used as the state of the game changes, which allows us to implement more complex behaviour. Read the section on [Coroutines](#coroutines) to learn more about how we write strategy with "stages".
+- A play for taking friendly free kicks
+- A play for defending enemy kickoffs
+- A general defense play
+- A passing-based offense play
+- A dribbling-based offense play
 
-Furthermore, every play specifies an `Applicable` and `Invariant` condition. These are used to determine what plays should be run at what time, and when a Play should terminate.
-
-`Applicable` indicates when a `Play` can be started. For example, we would not want to start a `Defense Play` if our team is in possession of the ball. The `Invariant` condition is a condition that must always be met for the `Play` to continue running. If this condition ever becomes false, the current `Play` will stop running and a new one will be chosen. For example, once we start running a friendly `Corner Kick` play, we want the `Play` to continue running as long as the enemy team does not have possession of the ball.
+Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics` are being used as the state of the game changes, which allows us to implement more complex behaviour. Read the section on [FSMs](#finite-state-machines) to learn more about how we write strategy with "stages".
 
 
 ## Navigation
@@ -602,7 +609,7 @@ Thunderscope has a field visualizer that uses [PyQtGraph's 3D graphics system](h
 ### Layers
 We organize our graphics into "layers" so that we can toggle the visibility of different parts of our visualization. Each layer is responsible for visualizing a specific portion of our AI (e.g. vision data, path planning, passing, etc.). A layer can also handle layer-specific functionality; for instance, `GLWorldLayer` lets the user place or kick the ball using the mouse. The base class for a layer is [`GLLayer`](../src/software/thunderscope/gl/layers/gl_layer.py).
 
-A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayer`s could also be nested within one another. 
+A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a hierarchical tree-like structure.
 
 # Simulator
 Our simulator is what we use for physics simulation to do testing when we don't have access to real field. The simulator is a standalone application that simulates the following components' functionalities:
