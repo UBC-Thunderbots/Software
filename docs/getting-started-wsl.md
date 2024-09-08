@@ -27,14 +27,13 @@ If you are not using Windows 11 or the latest version of Windows 10 and would pr
 1. You'll need to be on build 19041 or later to use WSL2. If you have updated to Windows 10 version 2004 or newer, you will be able to use WSL2. 
 2. When you have ensured that your Windows version supports WSL2, do the following to enable it.
     - Enable WSL by opening an Administrator PowerShell window and running command 
-    ```
-    dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-    ```
+        ```
+        dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+        ```
     - Enable the 'Virtual Machine Platform' component by Administrator PowerShell window and running command 
-    ```
-    dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
-
-    ``` 
+        ```
+        dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+        ``` 
     - Reboot your machine.
 3. Now, let's install Ubuntu.
     - Download the WSL2 kernel from [here](https://docs.microsoft.com/en-us/windows/wsl/wsl2-kernel).
@@ -74,9 +73,9 @@ Create a `.wslconfig` file in your `%UserProfile%` directory (typically your hom
 networkingMode = mirrored
 ```
 
-This will enable [mirrored mode networking for WSL](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking). This mode “mirrors” the networking interfaces you have on Windows into Linux, which improves networking capabilities and compatibility.
+This will enable [mirrored mode networking for WSL](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking). This mode “mirrors” the networking interfaces you have on Windows onto Linux, which improves networking capabilities and compatibility.
 
-When selecting a network interface to use, choose `eth0` or similar. There probably won’t be a `wlan0` interface since WSL only sees the virtual network interface `eth0`. 
+When selecting a network interface to use, choose `eth...`/`en...` or similar. There probably won’t be a `wlan` interface since WSL only sees the virtual network interface `eth...`. 
 
 ## USB Issues
 
