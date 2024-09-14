@@ -29,6 +29,14 @@ config_setting(
     values = {"cpu": "jetson_nano"},
 )
 
+platform(
+    name = "robot",
+    constraint_values = [
+        "@platforms//cpu:arm64",
+        "@platforms//os:linux",
+    ],
+)
+
 # This represents a mapping of CPU -> Compiler To Use
 # The CPU can be chosen by using `--cpu` as a bazel flag (ex. `--cpu=jetson_nano`)
 # otherwise it will default to using whatever CPU is in the system doing the compiling
@@ -160,4 +168,18 @@ cc_toolchain_config_jetson_nano(
         "strip": "wrapper/jetson_nano_strip",
     },
     toolchain_identifier = "gcc-jetson_nano",
+)
+
+toolchain(
+    name = "cc_toolchain_for_embedded_arm_linux",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:arm64",
+        "@platforms//os:linux",
+    ],
+    toolchain = ":cc_toolchain_jetson_nano",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
