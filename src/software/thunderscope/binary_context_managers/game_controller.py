@@ -218,7 +218,7 @@ class Gamecontroller:
         # Do this only if ball placement pos is specified
         if final_ball_placement_point:
             # Set position
-            ball_placement_pos = SetBallPlacementPos()
+            ball_placement_pos = Change.SetBallPlacementPos()
             ball_placement_pos.pos.CopyFrom(
                 Vector2(
                     x=float(final_ball_placement_point.x()),
@@ -232,11 +232,11 @@ class Gamecontroller:
             ci_input.api_inputs.append(api_input)
 
             # Start Placement
-            change = Change()
             api_input = Input()
-            start_placement = StartBallPlacement()
-            change.start_ball_placement.CopyFrom(start_placement)
-            api_input.change.CopyFrom(change)
+            start_placement = ContinueAction()
+            start_placement.type = ContinueAction.Type.BALL_PLACEMENT_START
+            start_placement.for_team = team
+            api_input.continue_action.CopyFrom(start_placement)
             ci_input.api_inputs.append(api_input)
 
         ci_output_list = self.send_ci_input(ci_input)
