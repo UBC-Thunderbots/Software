@@ -134,7 +134,7 @@ Thunderloop::~Thunderloop() {}
 /*
  * Run the main robot loop!
  */
-[[noreturn]] void Thunderloop::runLoop()
+void Thunderloop::runLoop()
 {
     // Timing
     struct timespec next_shot;

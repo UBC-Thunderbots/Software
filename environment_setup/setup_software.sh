@@ -48,10 +48,10 @@ host_software_packages=(
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
-    gcc-9 # We use gcc 9.3.0
+    gcc-10 # Full system compiles with gcc 10
     libstdc++6-9-dbg
     git # required for build
-    g++-9
+    g++-10
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
     libprotobuf-dev
