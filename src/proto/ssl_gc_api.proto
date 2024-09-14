@@ -26,8 +26,9 @@ message Output
 message Protocol
 {
     // Is this a delta only?
-    // Entries that were already sent are not sent again, because the protocol is immutable anyway.
-    // But if the game is reset, the whole protocol must be replaced. That's what this flag is for.
+    // Entries that were already sent are not sent again, because the protocol is
+    // immutable anyway. But if the game is reset, the whole protocol must be replaced.
+    // That's what this flag is for.
     optional bool delta = 1;
     // The (delta) list of entries
     repeated ProtocolEntry entry = 2;

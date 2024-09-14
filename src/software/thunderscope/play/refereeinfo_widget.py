@@ -47,7 +47,9 @@ class RefereeInfoWidget(QWidget):
         if not referee_msg_dict:
             return
 
-        stage_time_left_s = int(referee_msg_dict["stageTimeLeft"]) * SECONDS_PER_MICROSECOND
+        stage_time_left_s = (
+            int(referee_msg_dict["stageTimeLeft"]) * SECONDS_PER_MICROSECOND
+        )
         p = (
             f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
             + f"Stage Time Left: {int(stage_time_left_s / SECONDS_PER_MINUTE):02d}"

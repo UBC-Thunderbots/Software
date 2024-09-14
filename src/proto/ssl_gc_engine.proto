@@ -123,37 +123,37 @@ message ContinueAction
 
     enum Type
     {
-        TYPE_UNKNOWN = 0;
-        HALT = 1;
-        RESUME_FROM_HALT = 10;
-        STOP_GAME = 2;
-        FORCE_START = 11;
-        FREE_KICK = 17;
-        NEXT_COMMAND = 3;
-        BALL_PLACEMENT_START = 4;
-        BALL_PLACEMENT_CANCEL = 9;
+        TYPE_UNKNOWN            = 0;
+        HALT                    = 1;
+        RESUME_FROM_HALT        = 10;
+        STOP_GAME               = 2;
+        FORCE_START             = 11;
+        FREE_KICK               = 17;
+        NEXT_COMMAND            = 3;
+        BALL_PLACEMENT_START    = 4;
+        BALL_PLACEMENT_CANCEL   = 9;
         BALL_PLACEMENT_COMPLETE = 14;
-        BALL_PLACEMENT_FAIL = 15;
-        TIMEOUT_START = 5;
-        TIMEOUT_STOP = 6;
-        BOT_SUBSTITUTION = 7;
-        NEXT_STAGE = 8;
-        END_GAME = 16;
-        ACCEPT_GOAL = 12;
-        REJECT_GOAL = 20;
-        NORMAL_START = 13;
-        CHALLENGE_ACCEPT = 18;
-        CHALLENGE_REJECT = 19;
+        BALL_PLACEMENT_FAIL     = 15;
+        TIMEOUT_START           = 5;
+        TIMEOUT_STOP            = 6;
+        BOT_SUBSTITUTION        = 7;
+        NEXT_STAGE              = 8;
+        END_GAME                = 16;
+        ACCEPT_GOAL             = 12;
+        REJECT_GOAL             = 20;
+        NORMAL_START            = 13;
+        CHALLENGE_ACCEPT        = 18;
+        CHALLENGE_REJECT        = 19;
     }
 
     enum State
     {
         STATE_UNKNOWN = 0;
-        BLOCKED = 1;
-        WAITING = 2;
-        READY_AUTO = 3;
-        READY_MANUAL = 4;
-        DISABLED = 5;
+        BLOCKED       = 1;
+        WAITING       = 2;
+        READY_AUTO    = 3;
+        READY_MANUAL  = 4;
+        DISABLED      = 5;
     }
 }
 

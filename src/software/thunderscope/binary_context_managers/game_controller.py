@@ -282,7 +282,9 @@ class Gamecontroller:
 
         return update_team_state
 
-    def reset_game(self, division: proto.ssl_gc_common_pb2.Division) -> Change.UpdateConfig:
+    def reset_game(
+        self, division: proto.ssl_gc_common_pb2.Division
+    ) -> Change.UpdateConfig:
         """Returns an UpdateConfig proto for the Gamecontroller to reset game info.
 
         :param division the Division proto corresponding to the game division to set up the Gamecontroller for
@@ -320,7 +322,9 @@ class Gamecontroller:
 
         input_game_update = Input()
         input_game_update.reset_match = True
-        input_game_update.change.update_config_change.CopyFrom(self.reset_game(division))
+        input_game_update.change.update_config_change.CopyFrom(
+            self.reset_game(division)
+        )
 
         ci_input.api_inputs.append(input_blue_update)
         ci_input.api_inputs.append(input_yellow_update)

@@ -26,6 +26,6 @@ message RobotId
 enum Division
 {
     DIV_UNKNOWN = 0;
-    DIV_A = 1;
-    DIV_B = 2;
+    DIV_A       = 1;
+    DIV_B       = 2;
 }

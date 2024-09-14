@@ -10,10 +10,10 @@ import "proto/ssl_gc_geometry.proto";
 // Capabilities that a source implementation can have
 enum Capability
 {
-    CAPABILITY_UNKNOWN = 0;
-    CAPABILITY_DETECT_FLYING_BALLS = 1;
+    CAPABILITY_UNKNOWN               = 0;
+    CAPABILITY_DETECT_FLYING_BALLS   = 1;
     CAPABILITY_DETECT_MULTIPLE_BALLS = 2;
-    CAPABILITY_DETECT_KICKED_BALLS = 3;
+    CAPABILITY_DETECT_KICKED_BALLS   = 3;
 }
 
 // A single tracked ball
@@ -77,7 +77,8 @@ message TrackedFrame
     // A monotonous increasing frame counter
     required uint32 frame_number = 1;
     // The unix timestamp in [s] of the data
-    // If timestamp is larger than timestamp_captured, the source has applied a prediction already
+    // If timestamp is larger than timestamp_captured, the source has applied a prediction
+    // already
     required double timestamp = 2;
 
     // The list of detected balls
@@ -87,8 +88,9 @@ message TrackedFrame
     // The list of detected robots of both teams
     repeated TrackedRobot robots = 4;
 
-    // Information about a kicked ball, if the ball was kicked by a robot and is still moving
-    // Note: This field is optional. Some source implementations might not set this at any time
+    // Information about a kicked ball, if the ball was kicked by a robot and is still
+    // moving Note: This field is optional. Some source implementations might not set this
+    // at any time
     optional KickedBall kicked_ball = 5;
 
     // List of capabilities of the source implementation
