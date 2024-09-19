@@ -210,10 +210,12 @@ Rather than using the `return` keyword to return data, coroutines use the `yield
 
 See the following C++ pseudocode for an example. This coroutine function computes and returns the fibonacci sequence.
 ```cpp
-int fib(Coroutine::push_type& yield) {
+int fib(Coroutine::push_type& yield) 
+{
     int f1 = 1;
     int f2 = 0;
-    while(true) {
+    while (true) 
+    {
         int fn = f1 + f2; // Compute the next value in the sequence
         f2 = f1; // Save the previous 2 values
         f1 = fn;
@@ -221,7 +223,8 @@ int fib(Coroutine::push_type& yield) {
     }
 }
 
-int main() {
+int main() 
+{
     // Coroutine setup stuff
     // Lets pretend that we have created the Coroutine and called it `yield`
     std::cout << fib(yield) << std::endl; // Prints 1
@@ -264,14 +267,17 @@ In the past, we had issues with our gameplay logic "committing" to decisions if 
 
 Here's a more specific example. In this example we are going to pretend to write a [Tactic](#tactic) that will pass the ball.
 ```cpp
-def executeStrategy(IntentCoroutine::push_type& yield, Pass pass) {
-    do {
+def executeStrategy(IntentCoroutine::push_type& yield, Pass pass) 
+{
+    do 
+    {
         yield(/* align the robot to make the pass */)
-    } while(current_time < pass.start_time);
+    } while (current_time < pass.start_time);
     
-    do {
+    do 
+    {
         yield(/* kick the ball at the pass location */)
-    } while(/* robot has not kicked the ball */)
+    } while (/* robot has not kicked the ball */)
 }
 ```
 We will pretend that this function is getting called 30 times per second to get the most up-to-date gameplay decision.

@@ -16,13 +16,13 @@ Table of Contents
          * [Installing an IDE: CLion](#installing-an-ide-clion)
             * [Getting your Student License](#getting-your-student-license)
             * [Installing CLion](#installing-clion)
-      * [Installing an IDE: VSCode](#installing-an-ide-vscode)
+      * [Installing an IDE: VS Code](#installing-an-ide-vs-code)
       * [Editing with Vim or NeoVim](#editing-with-vim-or-neovim)
    * [Building and Running the Code](#building-and-running-the-code)
       * [Building from the command-line](#building-from-the-command-line)
       * [Building from the command-line using the fuzzy finder](#building-from-the-command-line-using-the-fuzzy-finder)
       * [Building with CLion](#building-with-clion)
-      * [Building with VSCode](#building-with-vscode)
+      * [Building with VS Code](#building-with-vs-code)
       * [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
    * [Debugging](#debugging)
       * [Debugging with CLion](#debugging-with-clion)
@@ -75,18 +75,16 @@ You can use Ubuntu 20.04 LTS and Ubuntu 22.04 LTS inside Windows through Windows
 4. Click the `Fork` button in the top-right to fork the repository ([click here to learn about Forks](https://help.github.com/en/articles/fork-a-repo))
    1. Click on your user when prompted
    2. You should be automatically redirected to your new fork
-5. Clone your fork of the repository. We recommend cloning using HTTPS since it is the easiest to set up. You should be able to clone your fork using the following command (you can put it wherever you like):
-   ```
-   git clone https://github.com/<your_username>/Software.git
-   ```
-   You can find your fork's remote URL under the green `Code` button on the main page of your fork on GitHub, under the HTTPS tab.
+5. Clone your fork of the repository. As GitHub is forcing users to stop using usernames and passwords for authorization, we will be using the SSH link. 
 
-   If you would like to clone using SSH:
+   To clone using SSH:
 
    1. If not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).  For each computer you contribute to GitHub with, you will need an additional SSH Key pair linked to your account.
    2.  After you have successfully set up a SSH key for your device and added it to GitHub, you can clone the repository using the following command:
         1.  e.g. `git clone git@github.com:<your_username>/Software.git`
         2.  You can find this link under the green `Clone or Download` button on the main page of your fork on GitHub, under the SSH tab.  (This should now be available after adding your SSH key to GitHub successfully.)
+
+   Alternatively, you can clone using HTTPS. You'll need to either use a credential helper (Git Credential Manager, GitHub CLI, etc.) or a personal access token ([details here](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls)).
 6. Set up your git remotes ([what is a remote and how does it work?](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes))
    1. You should have a remote named `origin` that points to your fork of the repository. Git will have set this up automatically when you cloned your fork in the previous step.
    2. You will need to add a second remote, named `upstream`, that points to our main Software repository, which is where you created your fork from. (**Note:** This is _not_ your fork)
@@ -109,7 +107,7 @@ We have several setup scripts to help you easily install the necessary dependenc
 
 ### Installing an IDE
 
-For those who prefer working on C/C++ with an IDE, we provide two options: CLion for an integrated experience and VSCode for a more lightweight setup. Both support our build system `bazel`.
+For those who prefer working on C/C++ with an IDE, we provide two options: CLion for an integrated experience and VS Code for a more lightweight setup. Both support our build system `bazel`.
 
 #### Installing an IDE: CLion
 
@@ -134,9 +132,9 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 VS Code is a more lightweight "IDE", with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated by default into VS Code.
 
 1. Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-2. Run `./install_vscode.sh` (* **We highly recommend using the script and not downloading VSCode yourself unless you know what you're doing.** The `install_vscode.sh` script will grab the most stable version of VSCode *)
+2. Run `./install_vscode.sh` (* **We highly recommend using the script and not downloading VS Code yourself unless you know what you're doing.** The `install_vscode.sh` script will grab the most stable version of VS Code *)
 3. Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop. Go to  File -> Open Folder and navigate to where you cloned the software repo. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
-4. VSCode will prompt you to install recommended extensions. Click `Install` — this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc.)
+4. VS Code will prompt you to install recommended extensions. Click `Install` — this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc.)
 5. Navigate to File -> Preferences -> Settings -> Workspace -> Extensions -> Bazel and select the `Bazel: Enable Code Lens` option.
 
 ### Editing with Vim or NeoVim
@@ -192,9 +190,9 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     4. For `Bazel Command` you can put any Bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
 
-### Building with VSCode
+### Building with VS Code
 
-1. Open VSCode
+1. Open VS Code
 2. Navigate to `Software/src/software/geom/BUILD`
 3. On top of every `cc_test`, `cc_library` and `cc_binary` there should be a `Test ...`, `Build ...` or `Run ...` for the respective target.
 4. Click `Test //software/geom:angle_test` to run the `angle_test`
