@@ -30,7 +30,7 @@ config_setting(
 )
 
 platform(
-    name = "robot",
+    name = "jetson_nano_platform",
     constraint_values = [
         "@platforms//cpu:arm64",
         "@platforms//os:linux",

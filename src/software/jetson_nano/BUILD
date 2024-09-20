@@ -58,6 +58,10 @@ cc_binary(
         "//shared:constants",
         "@boost//:program_options",
     ],
+    exec_compatible_with = [
+        "@platforms//cpu:arm",
+        "@platforms//os:linux",
+    ],
 )
 
 sh_binary(
