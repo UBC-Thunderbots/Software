@@ -404,5 +404,6 @@ new_git_repository(
 )
 
 register_toolchains(
-    "//cc_toolchain:cc_toolchain_for_embedded_arm_linux",
+    "//cc_toolchain:cc_toolchain_for_jetson_nano_linux",
+    "//cc_toolchain:cc_toolchain_for_k8_fullsystem",
 )

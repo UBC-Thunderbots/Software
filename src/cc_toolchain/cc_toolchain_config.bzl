@@ -711,9 +711,6 @@ def _jetson_nano_impl(ctx):
 cc_toolchain_config_jetson_nano = rule(
     implementation = _jetson_nano_impl,
     attrs = {
-        "cpu": attr.string(mandatory = True, values = [
-            "jetson_nano",
-        ]),
         "builtin_include_directories": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),
         "host_compiler_warnings": attr.string_list(),

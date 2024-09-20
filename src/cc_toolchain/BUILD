@@ -154,7 +154,6 @@ cc_toolchain_config_jetson_nano(
         "external/jetson_nano_gcc/aarch64-linux-gnu/libc/lib/",
         "external/jetson_nano_gcc/aarch64-linux-gnu/libc/usr/include/",
     ],
-    cpu = "jetson_nano",
     tool_paths = {
         "ar": "wrapper/jetson_nano_ar",
         "cpp": "wrapper/jetson_nano_cpp",
@@ -171,7 +170,7 @@ cc_toolchain_config_jetson_nano(
 )
 
 toolchain(
-    name = "cc_toolchain_for_embedded_arm_linux",
+    name = "cc_toolchain_for_jetson_nano_linux",
     exec_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
@@ -181,5 +180,15 @@ toolchain(
         "@platforms//os:linux",
     ],
     toolchain = ":cc_toolchain_jetson_nano",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+toolchain(
+    name = "cc_toolchain_for_k8_fullsystem",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":cc_toolchain_linux_gcc",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
