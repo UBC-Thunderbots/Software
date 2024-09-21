@@ -1,8 +1,8 @@
 #pragma once
 
-#include "software/util/make_enum/make_enum_helpers.hpp"
-
 #include <stdexcept>
+
+#include "software/util/make_enum/make_enum_helpers.hpp"
 
 /**
  * Creates a "smart" enum with compile-time, template-friendly reflection.
