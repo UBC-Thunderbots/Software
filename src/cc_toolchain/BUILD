@@ -10,16 +10,25 @@ environment(name = "k8")
 
 environment(name = "k8_jetson_nano_cross_compile")
 
+environment(name = "aarch64")
+
 environment_group(
     name = "cpus",
     defaults = [
+        ":aarch64",
         ":k8",
         ":k8_jetson_nano_cross_compile",
     ],
     environments = [
+        ":aarch64",
         ":k8",
         ":k8_jetson_nano_cross_compile",
     ],
+)
+
+config_setting(
+    name = "cpu_aarch64",
+    values = {"cpu": "aarch64"},
 )
 
 config_setting(
@@ -35,7 +44,7 @@ config_setting(
 platform(
     name = "jetson_nano_platform",
     constraint_values = [
-        "@platforms//cpu:arm64",
+        "@platforms//cpu:aarch64",
         "@platforms//os:linux",
     ],
 )
@@ -47,6 +56,9 @@ cc_toolchain_suite(
         # k8 is any x86 system
         "k8": "cc_toolchain_linux_k8_gcc",
         "k8|compiler": "cc_toolchain_linux_k8_gcc",
+        # aarch64 is for ARM64 systems and the robot
+        "aarch64": "cc_toolchain_linux_aarch64_gcc",
+        "aarch64|compiler": "cc_toolchain_linux_aarch64_gcc",
         # jetson nano 4GB system
         "k8_jetson_nano_cross_compile": "cc_toolchain_k8_jetson_nano_cross_compile",
         "k8_jetson_nano_cross_compile|compiler": "cc_toolchain_k8_jetson_nano_cross_compile",
@@ -82,13 +94,13 @@ filegroup(
 )
 
 filegroup(
-    name = "linux_arm64_gcc_all",
+    name = "linux_aarch64_gcc_all",
     srcs = [
         ":linux_gcc_wrapper",
-        "@linux_arm64_gcc//:includes",
-        "@linux_arm64_gcc//:libs",
-        "@linux_arm64_gcc//:runtime_libs",
-        "@linux_arm64_gcc//:static_libs",
+        "@linux_aarch64_gcc//:includes",
+        "@linux_aarch64_gcc//:libs",
+        "@linux_aarch64_gcc//:runtime_libs",
+        "@linux_aarch64_gcc//:static_libs",
     ],
 )
 
@@ -104,14 +116,14 @@ cc_toolchain_config_fullsystem(
 )
 
 cc_toolchain_config_fullsystem(
-    name = "linux_arm64_gcc",
+    name = "linux_aarch64_gcc",
     builtin_include_directories = [
         "/usr/lib/gcc/aarch64-linux-gnu/",
     ] + make_builtin_include_directories(),
-    host_system_name = "arm64",
-    target_cpu = "arm64",
-    target_system_name = "arm64",
-    toolchain_identifier = "linux_arm64_gcc",
+    host_system_name = "aarch64",
+    target_cpu = "aarch64",
+    target_system_name = "aarch64",
+    toolchain_identifier = "linux_aarch64_gcc",
 )
 
 cc_toolchain(
@@ -136,20 +148,20 @@ cc_toolchain(
 )
 
 cc_toolchain(
-    name = "cc_toolchain_linux_arm64_gcc",
-    all_files = ":linux_arm64_gcc_all",
-    ar_files = ":linux_arm64_gcc_all",
-    as_files = ":linux_arm64_gcc_all",
-    compiler_files = ":linux_arm64_gcc_all",
-    dwp_files = ":linux_arm64_gcc_all",
-    dynamic_runtime_lib = "@linux_arm64_gcc//:runtime_libs",
-    linker_files = ":linux_arm64_gcc_all",
-    objcopy_files = ":linux_arm64_gcc_all",
-    static_runtime_lib = "@linux_arm64_gcc//:static_libs",
-    strip_files = ":linux_arm64_gcc_all",
+    name = "cc_toolchain_linux_aarch64_gcc",
+    all_files = ":linux_aarch64_gcc_all",
+    ar_files = ":linux_aarch64_gcc_all",
+    as_files = ":linux_aarch64_gcc_all",
+    compiler_files = ":linux_aarch64_gcc_all",
+    dwp_files = ":linux_aarch64_gcc_all",
+    dynamic_runtime_lib = "@linux_aarch64_gcc//:runtime_libs",
+    linker_files = ":linux_aarch64_gcc_all",
+    objcopy_files = ":linux_aarch64_gcc_all",
+    static_runtime_lib = "@linux_aarch64_gcc//:static_libs",
+    strip_files = ":linux_aarch64_gcc_all",
     supports_param_files = True,
-    toolchain_config = ":linux_arm64_gcc",
-    toolchain_identifier = "arm64_gcc",
+    toolchain_config = ":linux_aarch64_gcc",
+    toolchain_identifier = "aarch64_gcc",
 )
 
 cc_toolchain(
@@ -201,7 +213,7 @@ toolchain(
         "@platforms//cpu:x86_64",
     ],
     target_compatible_with = [
-        "@platforms//cpu:arm64",
+        "@platforms//cpu:aarch64",
         "@platforms//os:linux",
     ],
     toolchain = ":cc_toolchain_k8_jetson_nano_cross_compile",
@@ -219,11 +231,11 @@ toolchain(
 )
 
 toolchain(
-    name = "cc_toolchain_for_arm64",
+    name = "cc_toolchain_for_aarch64",
     exec_compatible_with = [
-        "@platforms//cpu:arm64",
+        "@platforms//cpu:aarch64",
         "@platforms//os:linux",
     ],
-    toolchain = ":cc_toolchain_linux_arm64_gcc",
+    toolchain = ":cc_toolchain_linux_aarch64_gcc",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
