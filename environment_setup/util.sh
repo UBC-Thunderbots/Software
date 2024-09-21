@@ -30,6 +30,7 @@ install_gamecontroller () {
     sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/archive/refs/tags/v3.12.3.zip -O /tmp/ssl-game-controller.zip
     unzip -q -o -d /tmp/ /tmp/ssl-game-controller.zip
     cd /tmp/ssl-game-controller-3.12.3
+    wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
     make install
     go build cmd/ssl-game-controller/main.go
     sudo mv main /opt/tbotspython/gamecontroller
