@@ -1,9 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
-load(":cc_toolchain_config.bzl",
-    "cc_toolchain_config_k8_jetson_nano_cross_compile",
+load(
+    ":cc_toolchain_config.bzl",
     "cc_toolchain_config_fullsystem",
-    "make_builtin_include_directories")
+    "cc_toolchain_config_k8_jetson_nano_cross_compile",
+    "make_builtin_include_directories",
+)
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")

@@ -53,14 +53,14 @@ cc_binary(
         "-lpthread",
         "-lrt",
     ],
+    target_compatible_with = [
+        "@platforms//cpu:arm64",
+        "@platforms//os:linux",
+    ],
     deps = [
         ":thunderloop",
         "//shared:constants",
         "@boost//:program_options",
-    ],
-    target_compatible_with = [
-        "@platforms//cpu:arm64",
-        "@platforms//os:linux",
     ],
 )
 
