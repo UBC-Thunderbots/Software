@@ -236,6 +236,12 @@ new_local_repository(
     path = "/",
 )
 
+new_local_repository(
+    name = "linux_arm64_gcc",
+    build_file = "@//extlibs:linux_arm64_gcc.BUILD",
+    path = "/",
+)
+
 # libclang-dev is installed into the system through setup_software.sh
 new_local_repository(
     name = "libclang",
@@ -244,8 +250,8 @@ new_local_repository(
 )
 
 http_archive(
-    name = "jetson_nano_gcc",
-    build_file = "@//extlibs:jetson_nano_gcc.BUILD",
+    name = "k8_jetson_nano_cross_compile_gcc",
+    build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
     sha256 = "73eed74e593e2267504efbcf3678918bb22409ab7afa3dc7c135d2c6790c2345",
     strip_prefix = "gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu",
     urls = [
@@ -404,6 +410,7 @@ new_git_repository(
 )
 
 register_toolchains(
-    "//cc_toolchain:cc_toolchain_for_jetson_nano_linux",
-    "//cc_toolchain:cc_toolchain_for_k8_fullsystem",
+    "//cc_toolchain:cc_toolchain_for_k8_jetson_nano_cross_compile",
+    "//cc_toolchain:cc_toolchain_for_k8",
+    "//cc_toolchain:cc_toolchain_for_arm64",
 )
