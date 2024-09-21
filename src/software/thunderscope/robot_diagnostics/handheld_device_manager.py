@@ -96,6 +96,7 @@ class HandheldDeviceManager(object):
                 and handheld_device.name
                 in HandheldDeviceConstants.HANDHELD_DEVICE_NAME_CONFIG_MAP
             ):
+                print("I've been executed!")
                 self.__stop_thread_signal_event.clear()
                 self.handheld_device = handheld_device
                 self.handheld_device_config: DeviceConfig = (
@@ -334,7 +335,7 @@ class HandheldDeviceManager(object):
     ) -> float:
         """Interpret the event_value that corresponds to movement control
         :param event_value: the value for the current event being interpreted
-        :param max_value: max value for this type of event event type
+        :param max_value: max value for this type event type
         :param normalizing_multiplier: multiplier for converting between
         :return: The interpreted value that can be set a value for a field in robot movement control
         """
@@ -350,7 +351,7 @@ class HandheldDeviceManager(object):
     ) -> bool:
         """Interpret the event_value that corresponds to controlling whether the dribbler is enabled
         :param event_value: the value for the current event being interpreted
-        :param max_value: max value for this type of event event type
+        :param max_value: max value for this event type
         :return: The interpreted value that can be set a value for a field in robot control
         """
         return (

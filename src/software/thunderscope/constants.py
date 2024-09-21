@@ -363,14 +363,14 @@ class HandheldDeviceConstants:
 
     HANDHELD_DEVICE_NAME_CONFIG_MAP = {
         "Microsoft Xbox One X pad": XboxConfig,
-        "Microsoft Xbox One S pad": XboxConfig,
+        "Microsoft X-Box One S pad": XboxConfig,
         "Microsoft Xbox 360 pad": XboxConfig,
     }
 
     INPUT_DELAY_THRESHOLD = 0.01
     EVENT_LOOP_SLEEP_DURATION = 0.0005
     BUTTON_PRESSED_THRESHOLD = 0.5
-    DEADZONE_PERCENTAGE = 0.05
+    DEADZONE_PERCENTAGE = 0.20
 
     DRIBBLER_RPM_STEPPER = 1000
 

@@ -308,7 +308,7 @@ class RobotInfo(QWidget):
 
         self.__update_ui(robot_status, round_trip_time)
 
-        QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
+        QtCore.QTimer.singleShot(int(DISCONNECT_DURATION_MS), self.disconnect_robot)
 
     def disconnect_robot(self) -> None:
         """Calculates the time between the last robot status and now
