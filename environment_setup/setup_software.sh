@@ -122,6 +122,11 @@ if ! sudo /usr/bin/python3.12 -m venv /opt/tbotspython ; then
     exit 1
 fi
 
+if [[ $(lsb_release -rs) == "20.04" ]] || [[ $(lsb_release -rs) == "22.04" ]]; then
+    # Install pip if it is not a system-managed package
+    sudo /usr/bin/python3.12 -m ensurepip
+fi
+
 if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     print_status_msg "Error: Upgrading pip version in venv failed"
     exit 1
@@ -138,9 +143,6 @@ fi
 if [[ $(lsb_release -rs) == "24.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu24_requirements.txt
 fi
-
-# Install pip
-sudo /usr/bin/python3.12 -m ensurepip
 
 sudo chown -R $USER:$USER /opt/tbotspython
 
