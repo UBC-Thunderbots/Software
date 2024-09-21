@@ -99,12 +99,12 @@ if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; t
     sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
 
-virtualenv_opt_args = ""
+virtualenv_opt_args=""
 if [[ $(lsb_release -rs) == "24.04" ]]; then
     host_software_packages+=(python3-pyqt6)
     host_software_packages+=(pyqt6-dev-tools)
 
-    virtualenv_opt_args = "--system_site_packages"
+    virtualenv_opt_args="--system-site-packages"
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
