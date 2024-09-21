@@ -99,8 +99,12 @@ if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; t
     sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
 
+virtualenv_opt_args = ""
 if [[ $(lsb_release -rs) == "24.04" ]]; then
     host_software_packages+=(python3-pyqt6)
+    host_software_packages+=(pyqt6-dev-tools)
+
+    virtualenv_opt_args = "--system_site_packages"
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -114,7 +118,7 @@ print_status_msg "Setting Up Virtual Python Environment"
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-if ! sudo /usr/bin/python3.12 -m venv /opt/tbotspython ; then
+if ! sudo /usr/bin/python3.12 -m venv /opt/tbotspython $virtualenv_opt_args ; then
     print_status_msg "Error: Setting up virtual environment failed"
     exit 1
 fi
