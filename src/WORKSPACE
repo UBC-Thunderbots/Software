@@ -231,8 +231,8 @@ new_local_repository(
 )
 
 new_local_repository(
-    name = "linux_gcc",
-    build_file = "@//extlibs:linux_gcc.BUILD",
+    name = "linux_k8_gcc",
+    build_file = "@//extlibs:linux_k8_gcc.BUILD",
     path = "/",
 )
 

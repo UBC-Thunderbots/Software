@@ -2,54 +2,12 @@ package(default_visibility = ["//visibility:public"])
 
 load(":cc_toolchain_config.bzl", "cc_toolchain_config_jetson_nano", "cc_toolchain_config_k8")
 
-# Create environments for each CPU this toolchain supports
-environment(name = "k8")
-
-environment(name = "jetson_nano")
-
-environment_group(
-    name = "cpus",
-    defaults = [
-        ":k8",
-        ":jetson_nano",
-    ],
-    environments = [
-        ":k8",
-        ":jetson_nano",
-    ],
-)
-
-config_setting(
-    name = "cpu_k8",
-    values = {"cpu": "k8"},
-)
-
-config_setting(
-    name = "cpu_jetson_nano",
-    values = {"cpu": "jetson_nano"},
-)
-
 platform(
     name = "jetson_nano_platform",
     constraint_values = [
         "@platforms//cpu:arm64",
         "@platforms//os:linux",
     ],
-)
-
-# This represents a mapping of CPU -> Compiler To Use
-# The CPU can be chosen by using `--cpu` as a bazel flag (ex. `--cpu=jetson_nano`)
-# otherwise it will default to using whatever CPU is in the system doing the compiling
-cc_toolchain_suite(
-    name = "toolchain",
-    toolchains = {
-        # k8 is any x86 system
-        "k8": "cc_toolchain_linux_gcc",
-        "k8|compiler": "cc_toolchain_linux_gcc",
-        # jetson nano 4GB system
-        "jetson_nano": "cc_toolchain_jetson_nano",
-        "jetson_nano|compiler": "cc_toolchain_jetson_nano",
-    },
 )
 
 filegroup(
@@ -70,18 +28,29 @@ filegroup(
 )
 
 filegroup(
-    name = "linux_gcc_all",
+    name = "linux_k8_gcc_all",
     srcs = [
         ":linux_gcc_wrapper",
-        "@linux_gcc//:includes",
-        "@linux_gcc//:libs",
-        "@linux_gcc//:runtime_libs",
-        "@linux_gcc//:static_libs",
+        "@linux_k8_gcc//:includes",
+        "@linux_k8_gcc//:libs",
+        "@linux_k8_gcc//:runtime_libs",
+        "@linux_k8_gcc//:static_libs",
+    ],
+)
+
+filegroup(
+    name = "linux_arm64_gcc_all",
+    srcs = [
+        ":linux_gcc_wrapper",
+        "@linux_arm64_gcc//:includes",
+        "@linux_arm64_gcc//:libs",
+        "@linux_arm64_gcc//:runtime_libs",
+        "@linux_arm64_gcc//:static_libs",
     ],
 )
 
 cc_toolchain_config_k8(
-    name = "linux_gcc",
+    name = "linux_k8_gcc",
     builtin_include_directories = [
         "/usr/lib/gcc/x86_64-linux-gnu/",
         "/usr/include/",
@@ -103,28 +72,45 @@ cc_toolchain_config_k8(
         "objdump": "/usr/bin/objdump",
         "strip": "/usr/bin/strip",
     },
-    toolchain_identifier = "linux_gcc-k8",
+    toolchain_identifier = "linux_k8_gcc-k8",
 )
 
 cc_toolchain(
-    name = "cc_toolchain_linux_gcc",
-    all_files = ":linux_gcc_all",
-    ar_files = ":linux_gcc_all",
-    as_files = ":linux_gcc_all",
-    compiler_files = ":linux_gcc_all",
-    dwp_files = ":linux_gcc_all",
-    dynamic_runtime_lib = "@linux_gcc//:runtime_libs",
-    linker_files = ":linux_gcc_all",
-    objcopy_files = ":linux_gcc_all",
-    static_runtime_lib = "@linux_gcc//:static_libs",
-    strip_files = ":linux_gcc_all",
+    name = "cc_toolchain_linux_k8_gcc",
+    all_files = ":linux_k8_gcc_all",
+    ar_files = ":linux_k8_gcc_all",
+    as_files = ":linux_k8_gcc_all",
+    compiler_files = ":linux_k8_gcc_all",
+    dwp_files = ":linux_k8_gcc_all",
+    dynamic_runtime_lib = "@linux_k8_gcc//:runtime_libs",
+    linker_files = ":linux_k8_gcc_all",
+    objcopy_files = ":linux_k8_gcc_all",
+    static_runtime_lib = "@linux_k8_gcc//:static_libs",
+    strip_files = ":linux_k8_gcc_all",
     supports_param_files = True,
     # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
     # when possible
     # https://github.com/bazelbuild/intellij/issues/486
     tags = ["no-ide"],
-    toolchain_config = ":linux_gcc",
+    toolchain_config = ":linux_k8_gcc",
     toolchain_identifier = "k8_gcc-x86_64",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_linux_arm64_gcc",
+    all_files = ":linux_arm64_gcc_all",
+    ar_files = ":linux_arm64_gcc_all",
+    as_files = ":linux_arm64_gcc_all",
+    compiler_files = ":linux_arm64_gcc_all",
+    dwp_files = ":linux_arm64_gcc_all",
+    dynamic_runtime_lib = "@linux_arm64_gcc//:runtime_libs",
+    linker_files = ":linux_arm64_gcc_all",
+    objcopy_files = ":linux_arm64_gcc_all",
+    static_runtime_lib = "@linux_arm64_gcc//:static_libs",
+    strip_files = ":linux_arm64_gcc_all",
+    supports_param_files = True,
+    toolchain_config = ":linux_arm64_gcc",
+    toolchain_identifier = "arm64_gcc-x86_64",
 )
 
 cc_toolchain(
@@ -189,6 +175,16 @@ toolchain(
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],
-    toolchain = ":cc_toolchain_linux_gcc",
+    toolchain = ":cc_toolchain_linux_k8_gcc",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+toolchain(
+    name = "cc_toolchain_for_arm64_fullsystem",
+    exec_compatible_with = [
+        "@platforms//cpu:arm64",
+        "@platforms//os:linux",
+    ],
+    toolchain = ":cc_toolchain_linux_arm64_gcc",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
