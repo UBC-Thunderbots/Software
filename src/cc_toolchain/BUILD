@@ -171,10 +171,10 @@ cc_toolchain_config_jetson_nano(
 )
 
 toolchain(
-    name = "cc_toolchain_for_embedded_arm_linux",
+    name = "cc_toolchain_for_x86_cross_compile_jetson_nano",
     exec_compatible_with = [
-        "@platforms//os:linux",
         "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
     ],
     target_compatible_with = [
         "@platforms//cpu:arm64",

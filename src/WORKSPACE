@@ -404,5 +404,5 @@ new_git_repository(
 )
 
 register_toolchains(
-    "//cc_toolchain:cc_toolchain_for_embedded_arm_linux",
+    "//cc_toolchain:cc_toolchain_for_x86_cross_compile_jetson_nano",
 )
