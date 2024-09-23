@@ -321,7 +321,7 @@ def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorL
     return robot_error_log
 
 
-def setup_estop_view(proto_unix_io) -> EstopView:
+def setup_estop_view(proto_unix_io: ProtoUnixIO) -> EstopView:
     """Setup the estop view widget
 
     :param proto_unix_io: The proto unix io object for the full system
@@ -342,10 +342,8 @@ def setup_diagnostics_widget(
     - ControllerStatusViewWidget
 
     :param proto_unix_io: The proto unix io object
-    :returns: The diagnostics widget that contains
-    the control input switch, drive & dribbler sliders,
-    chicker control and controller handler
-
+    :returns: The diagnostics widget that contains the control input switch,
+              drive & dribbler sliders, chicker control and controller handler
     """
     diagnostics_widget = DiagnosticsWidget(proto_unix_io)
 

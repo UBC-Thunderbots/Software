@@ -19,7 +19,7 @@ from software.thunderscope.constants import (
 )
 
 
-class RobotCommunication(object):
+class RobotCommunication:
     """Communicate with the robots"""
 
     def __init__(

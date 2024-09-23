@@ -1,5 +1,3 @@
-from typing import Type
-
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
@@ -25,17 +23,13 @@ class DiagnosticsInputToggleWidget(QWidget):
     Disables Manual controls in the other two modes
     """
 
-    def __init__(self, diagnostics_input_mode_signal: Type[QtCore.pyqtSignal]) -> None:
+    control_mode_changed_signal = QtCore.pyqtSignal(ControlMode)
+
+    def __init__(self) -> None:
         """Initialises a new Fullsystem Connect Widget to allow switching
         between Diagnostics and Xbox control
-
-        :param diagnostics_input_mode_signal: The signal to emit when the input mode changes
         """
         super(DiagnosticsInputToggleWidget, self).__init__()
-
-        self.__control_mode = ControlMode.DIAGNOSTICS
-
-        self.diagnostics_input_mode_signal = diagnostics_input_mode_signal
 
         diagnostics_input_widget_vbox_layout = QVBoxLayout()
 
@@ -45,17 +39,16 @@ class DiagnosticsInputToggleWidget(QWidget):
             ["Diagnostics Control", "Handheld Control"], self.connect_options_group
         )
 
-        self.connect_options_box.layout().setContentsMargins(0, 0, 0, 0)
         self.connect_options_box.setTitle("Diagnostics Input")
 
         self.diagnostics_control_button = self.connect_options[ControlMode.DIAGNOSTICS]
         self.handheld_control_button = self.connect_options[ControlMode.HANDHELD]
 
         self.diagnostics_control_button.clicked.connect(
-            lambda: self.diagnostics_input_mode_signal.emit(ControlMode.DIAGNOSTICS)
+            lambda: self.control_mode_changed_signal.emit(ControlMode.DIAGNOSTICS)
         )
         self.handheld_control_button.clicked.connect(
-            lambda: self.diagnostics_input_mode_signal.emit(ControlMode.HANDHELD)
+            lambda: self.control_mode_changed_signal.emit(ControlMode.HANDHELD)
         )
 
         # default to diagnostics input, and disable handheld
@@ -66,8 +59,8 @@ class DiagnosticsInputToggleWidget(QWidget):
 
         self.setLayout(diagnostics_input_widget_vbox_layout)
 
-    def refresh(self, status: HandheldDeviceConnectionStatus) -> None:
-        """Refresh this widget.
+    def update(self, status: HandheldDeviceConnectionStatus) -> None:
+        """Update this widget.
 
         If the handheld device is connected:
             - enables the handheld button
@@ -76,7 +69,7 @@ class DiagnosticsInputToggleWidget(QWidget):
             - sets the diagnostics button to checked
             - emits diagnostics input change signal
 
-        :param status:
+        :param status: the current handheld device connection status
         """
         if status == HandheldDeviceConnectionStatus.CONNECTED:
             self.handheld_control_button.setEnabled(True)
@@ -84,4 +77,11 @@ class DiagnosticsInputToggleWidget(QWidget):
         elif status == HandheldDeviceConnectionStatus.DISCONNECTED:
             self.diagnostics_control_button.setChecked(True)
             self.handheld_control_button.setEnabled(False)
-            self.diagnostics_input_mode_signal.emit(ControlMode.DIAGNOSTICS)
+            self.control_mode_changed_signal.emit(ControlMode.DIAGNOSTICS)
+
+    def get_control_mode(self) -> ControlMode:
+        return (
+            ControlMode.DIAGNOSTICS
+            if self.diagnostics_control_button.isChecked()
+            else ControlMode.HANDHELD
+        )

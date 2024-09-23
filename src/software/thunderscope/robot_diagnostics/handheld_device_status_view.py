@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Type
 
 
 from proto.import_all_protos import *
@@ -16,22 +15,19 @@ class HandheldDeviceConnectionStatus(Enum):
 
 
 class HandheldDeviceStatusView(QWidget):
-    def __init__(
-        self, reinitialize_handheld_device_signal: Type[QtCore.pyqtSignal]
-    ) -> None:
+    reinitialize_handheld_device_signal = QtCore.pyqtSignal()
+
+    def __init__(self) -> None:
         """Initialize the HandheldDeviceStatusView widget.
         This widget shows the user the current state of the connection with a handheld device,
         as well as a button that attempts to reinitialize a handheld device object when clicked
-        :param reinitialize_handheld_device_signal: The signal to use for the reinitialize button
         """
         super(HandheldDeviceStatusView, self).__init__()
-
-        self.reinitialize_handheld_device_signal = reinitialize_handheld_device_signal
 
         self.handheld_device_status = QLabel()
         self.handheld_device_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.status_label_view_map: dict[HandheldDeviceConnectionStatus, (str, str)] = {
+        self.status_label_view_map = {
             HandheldDeviceConnectionStatus.CONNECTED: (
                 "Handheld Device is Connected",
                 "background-color: green",
@@ -42,19 +38,15 @@ class HandheldDeviceStatusView(QWidget):
             ),
         }
 
-        # initialize device refresh button
         self.handheld_device_reinitialize_button = QPushButton()
-        self.handheld_device_reinitialize_button.setText(
-            "Re-initialize Handheld Device"
-        )
+        self.handheld_device_reinitialize_button.setText("Detect Handheld Device")
         self.handheld_device_reinitialize_button.clicked.connect(
             self.reinitialize_handheld_device_signal
         )
 
         box = QGroupBox()
         hbox_layout = QHBoxLayout()
-        hbox_layout.setContentsMargins(0, 0, 0, 0)
-        box.setTitle("Handheld Device Status and Re-initialization")
+        box.setTitle("Handheld Device Status")
         widget_layout = QVBoxLayout()
 
         hbox_layout.addWidget(self.handheld_device_status)
@@ -64,26 +56,15 @@ class HandheldDeviceStatusView(QWidget):
 
         box.setLayout(hbox_layout)
         widget_layout.addWidget(box)
-
-        self.set_view_state(HandheldDeviceConnectionStatus.DISCONNECTED)
         self.setLayout(widget_layout)
 
-    def set_view_state(self, connection_state: HandheldDeviceConnectionStatus) -> None:
+        self.update(HandheldDeviceConnectionStatus.DISCONNECTED)
+
+    def update(self, connection_state: HandheldDeviceConnectionStatus) -> None:
         """Sets the label to display the correct status depending on the connection state
+
         :param connection_state: The state to use
         """
-        self.handheld_device_status.setText(
-            self.status_label_view_map[connection_state][0]
-        )
-        self.handheld_device_status.setStyleSheet(
-            self.status_label_view_map[connection_state][1]
-        )
-
-    def refresh(
-        self, connection_state=HandheldDeviceConnectionStatus.DISCONNECTED
-    ) -> None:
-        """Refreshes this widget.
-        The status label will reflect to the user the current state of the handheld device connection
-        :param connection_state: The new state of the handheld device connection
-        """
-        self.set_view_state(connection_state)
+        text, color = self.status_label_view_map[connection_state]
+        self.handheld_device_status.setText(text)
+        self.handheld_device_status.setStyleSheet(color)

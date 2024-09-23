@@ -326,11 +326,10 @@ class DeviceConfig:
     chip: DeviceKeyEvent
     chicker_power: DeviceAbsEvent
     dribbler_speed: DeviceAbsEvent
-    primary_dribbler_enable: DeviceAbsEvent
-    secondary_dribbler_enable: DeviceAbsEvent
+    dribbler_enable: DeviceAbsEvent
 
 
-class HandheldDeviceConstants:
+class DiagnosticsConstants:
     XboxConfig = DeviceConfig(
         # Name: "ABS_X"
         # Canonical: Left joystick X-axis
@@ -353,12 +352,9 @@ class HandheldDeviceConstants:
         # Name: "ABS_HAT0Y"
         # Canonical: D-pad Y-axis
         dribbler_speed=DeviceAbsEvent(event_code=17, max_value=1.0),
-        # Name: "ABS_Z"
-        # Canonical: Left trigger
-        primary_dribbler_enable=DeviceAbsEvent(event_code=2, max_value=1023.0),
         # Name: "ABS_RZ"
         # Canonical: Right trigger
-        secondary_dribbler_enable=DeviceAbsEvent(event_code=5, max_value=1023.0),
+        dribbler_enable=DeviceAbsEvent(event_code=5, max_value=1023.0),
     )
 
     HANDHELD_DEVICE_NAME_CONFIG_MAP = {

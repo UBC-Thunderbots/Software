@@ -4,7 +4,7 @@ from software.py_constants import *
 from proto.import_all_protos import *
 from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
-from software.thunderscope.constants import HandheldDeviceConstants
+from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
@@ -33,14 +33,12 @@ class ChickerWidget(QWidget):
 
         self.proto_unix_io: ProtoUnixIO = proto_unix_io
 
-        # initial values
         self.__initialize_default_power_control_values()
 
         chicker_widget_vbox_layout = QVBoxLayout()
         self.setLayout(chicker_widget_vbox_layout)
 
         kick_chip_sliders_hbox_layout = QHBoxLayout()
-        kick_chip_sliders_hbox_layout.setContentsMargins(0, 0, 0, 0)
 
         # Initializing power slider for kicking
         (
@@ -49,9 +47,9 @@ class ChickerWidget(QWidget):
             self.kick_power_label,
         ) = common_widgets.create_slider(
             "Power (m/s)",
-            HandheldDeviceConstants.MIN_KICK_POWER,
-            HandheldDeviceConstants.MAX_KICK_POWER,
-            HandheldDeviceConstants.KICK_POWER_STEPPER,
+            DiagnosticsConstants.MIN_KICK_POWER,
+            DiagnosticsConstants.MAX_KICK_POWER,
+            DiagnosticsConstants.KICK_POWER_STEPPER,
         )
 
         kick_chip_sliders_hbox_layout.addLayout(self.kick_power_slider_layout)
@@ -64,9 +62,9 @@ class ChickerWidget(QWidget):
         ) = common_widgets.create_float_slider(
             "Chip Distance (m)",
             1,
-            HandheldDeviceConstants.MIN_CHIP_POWER,
-            HandheldDeviceConstants.MAX_CHIP_POWER,
-            int(HandheldDeviceConstants.CHIP_DISTANCE_STEPPER),
+            DiagnosticsConstants.MIN_CHIP_POWER,
+            DiagnosticsConstants.MAX_CHIP_POWER,
+            int(DiagnosticsConstants.CHIP_DISTANCE_STEPPER),
         )
 
         kick_chip_sliders_hbox_layout.addLayout(self.chip_distance_slider_layout)
@@ -84,7 +82,6 @@ class ChickerWidget(QWidget):
         ) = common_widgets.create_buttons(["Kick", "Chip"])
 
         self.kick_chip_buttons_box.setTitle("Single Kick and Chip")
-        self.kick_chip_buttons_box.layout().setContentsMargins(0, 0, 0, 0)
 
         self.kick_button = self.kick_chip_buttons[0]
         self.chip_button = self.kick_chip_buttons[1]
@@ -108,7 +105,6 @@ class ChickerWidget(QWidget):
             ["No Auto", "Auto Kick", "Auto Chip"], self.radio_buttons_group
         )
         self.auto_kick_chip_buttons_box.setTitle("Auto Kick and Chip")
-        self.auto_kick_chip_buttons_box.layout().setContentsMargins(0, 0, 0, 0)
 
         self.no_auto_button = self.auto_kick_chip_buttons[0]
         self.auto_kick_button = self.auto_kick_chip_buttons[1]
@@ -158,7 +154,6 @@ class ChickerWidget(QWidget):
 
         :param command: Command to send. One of ChickerCommandMode.KICK or ChickerCommandMode.CHIP
         """
-        # if button is enabled
         if self.kick_chip_buttons_enable:
             # send kick primitive
             self.send_command(command)
