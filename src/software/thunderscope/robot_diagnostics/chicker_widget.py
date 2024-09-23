@@ -92,11 +92,6 @@ class ChickerWidget(QWidget):
         chicker_widget_vbox_layout.addWidget(self.kick_chip_buttons_box)
 
         # Initializing auto kick & chip buttons
-        self.button_clickable_map = {
-            "no_auto": True,
-            "auto_kick": True,
-            "auto_chip": True,
-        }
         self.radio_buttons_group = QButtonGroup()
         (
             self.auto_kick_chip_buttons_box,
@@ -137,20 +132,21 @@ class ChickerWidget(QWidget):
 
     def set_kick_power_slider_value(self, value: float) -> None:
         """Set the kick power slider to a specific value.
+
         :param value: The value to set for the slider
         """
         self.kick_power_slider.setValue(value)
 
     def set_chip_distance_slider_value(self, value: float) -> None:
         """Set the chip distance slider to a specific value.
+
         :param value: the value to set for the slider
         """
         self.chip_distance_slider.setValue(value)
 
     def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
-        """If buttons are enabled, sends a Kick command and disables buttons
-
-        Attaches a callback to re-enable buttons after 3 seconds
+        """If the kick/chip buttons are enabled, sends a kick/chip command and disables the buttons.
+        The buttons will be re-enabled after CHICKER_TIMEOUT.
 
         :param command: Command to send. One of ChickerCommandMode.KICK or ChickerCommandMode.CHIP
         """
@@ -159,7 +155,7 @@ class ChickerWidget(QWidget):
             self.send_command(command)
             self.disable_kick_chip_buttons()
 
-            # set and start timer to re-enable buttons after 3 seconds
+            # set and start timer to re-enable buttons after CHICKER_TIMEOUT
             QTimer.singleShot(int(CHICKER_TIMEOUT), self.enable_kick_chip_buttons)
 
     def disable_kick_chip_buttons(self) -> None:
@@ -232,17 +228,18 @@ class ChickerWidget(QWidget):
         """Change button color and clickable state.
 
         :param button: button to change the state of
-        :returns: None
-
         """
-        if self.kick_chip_buttons_enable:
-            button.setStyleSheet("")
-            button.setEnabled(True)
-        else:
-            button.setStyleSheet("background-color: grey")
-            button.setEnabled(False)
+        button.setEnabled(self.kick_chip_buttons_enable)
+        button.setStyleSheet(
+            "" if self.kick_chip_buttons_enable else "background-color: grey"
+        )
 
     def update_widget_accessibility(self, mode: ControlMode):
+        """Disables or enables all sliders and buttons depending on the given control mode.
+        Sliders and buttons are enabled in DIAGNOSTICS mode, and disabled in HANDHELD mode
+
+        :param mode: the current control mode
+        """
         self.auto_kick_button.setEnabled(mode == ControlMode.DIAGNOSTICS)
         self.auto_chip_button.setEnabled(mode == ControlMode.DIAGNOSTICS)
         self.set_should_enable_buttons(mode == ControlMode.DIAGNOSTICS)
@@ -254,7 +251,10 @@ class ChickerWidget(QWidget):
             common_widgets.disable_slider(self.kick_power_slider)
             common_widgets.disable_slider(self.chip_distance_slider)
 
-    def refresh(self, mode: ControlMode) -> None:
+    def refresh(self) -> None:
+        """Update the currently persisted PowerControl proto based on the widget's 
+        slider values and sends out autokick/autochip commands if they are enabled 
+        """
         # get kick power value slider value and set the label to that value
         kick_power_value = self.kick_power_slider.value()
         self.kick_power_label.setText(str(kick_power_value))

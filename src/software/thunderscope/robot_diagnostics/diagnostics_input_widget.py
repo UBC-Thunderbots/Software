@@ -10,26 +10,21 @@ from software.thunderscope.robot_diagnostics.handheld_device_status_view import 
 
 
 class ControlMode(IntEnum):
-    """Enum for the 2 modes of control (Manual and Xbox)"""
+    """Enum representing the available control modes in Robot Diagnostics"""
 
     DIAGNOSTICS = 0
     HANDHELD = 1
 
 
 class DiagnosticsInputToggleWidget(QWidget):
-    """Class to allow the user to switch between Manual, Xbox, and Fullsystem control
-    through Thunderscope UI
-
-    Disables Manual controls in the other two modes
-    """
+    """Widget for switching between manual (Diagnostics) and Xbox (Handheld) control"""
 
     control_mode_changed_signal = QtCore.pyqtSignal(ControlMode)
+    """Signal emitted when the control mode changes"""
 
     def __init__(self) -> None:
-        """Initialises a new Fullsystem Connect Widget to allow switching
-        between Diagnostics and Xbox control
-        """
-        super(DiagnosticsInputToggleWidget, self).__init__()
+        """Initialise the DiagnosticsInputToggleWidget"""
+        super().__init__()
 
         diagnostics_input_widget_vbox_layout = QVBoxLayout()
 
@@ -60,7 +55,7 @@ class DiagnosticsInputToggleWidget(QWidget):
         self.setLayout(diagnostics_input_widget_vbox_layout)
 
     def update(self, status: HandheldDeviceConnectionStatus) -> None:
-        """Update this widget.
+        """Update this widget with the current handheld device connection status. 
 
         If the handheld device is connected:
             - enables the handheld button
@@ -80,6 +75,10 @@ class DiagnosticsInputToggleWidget(QWidget):
             self.control_mode_changed_signal.emit(ControlMode.DIAGNOSTICS)
 
     def get_control_mode(self) -> ControlMode:
+        """Get the currently selected control mode.
+        
+        :returns: the currently selected control mode
+        """
         return (
             ControlMode.DIAGNOSTICS
             if self.diagnostics_control_button.isChecked()

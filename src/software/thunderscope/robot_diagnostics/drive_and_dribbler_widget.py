@@ -27,21 +27,37 @@ class DriveAndDribblerWidget(QWidget):
 
         self.setLayout(layout)
 
-    def set_x_velocity_slider(self, value: float):
+    def set_x_velocity_slider(self, value: float) -> None:
+        """Set the value of the slider controlling the robot's X velocity
+        
+        :param value: the value to set the slider to in m/s
+        """
         self.x_velocity_slider.setValue(value)
 
-    def set_y_velocity_slider(self, value: float):
+    def set_y_velocity_slider(self, value: float) -> None:
+        """Set the value of the slider controlling the robot's Y velocity
+        
+        :param value: the value to set the slider to in m/s
+        """
         self.y_velocity_slider.setValue(value)
 
-    def set_angular_velocity_slider(self, value: float):
+    def set_angular_velocity_slider(self, value: float) -> None:
+        """Set the value of the slider controlling the robot's angular velocity
+        
+        :param value: the value to set the slider to in rad/s
+        """
         self.angular_velocity_slider.setValue(value)
 
-    def set_dribbler_velocity_slider(self, value: float):
+    def set_dribbler_velocity_slider(self, value: float) -> None:
+        """Set the value of the slider controlling the robot's dribbler velocity
+        
+        :param value: the value to set the slider to in RPM
+        """
         self.dribbler_speed_rpm_slider.setValue(value)
 
-    def refresh(self, mode: ControlMode) -> None:
-        """Refresh the widget's sliders
-        Collect motor control values and persist in the primitive field
+    def refresh(self) -> None:
+        """Update the currently persisted MotorControl proto based on the widget's slider values  
+        and sends out the proto
         """
         self.motor_control.dribbler_speed_rpm = int(
             self.dribbler_speed_rpm_slider.value()
@@ -57,17 +73,21 @@ class DriveAndDribblerWidget(QWidget):
 
         self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.angular_velocity_slider.value()
 
-        if mode == ControlMode.DIAGNOSTICS:
-            self.proto_unix_io.send_proto(MotorControl, self.motor_control)
+        self.proto_unix_io.send_proto(MotorControl, self.motor_control)
 
     def __value_change_handler(self, value: float) -> str:
-        """Converts the given float value to a string label
+        """Convert the given float value to a string label
+
         :param value: float value to be converted
         """
         return "%.2f" % float(value)
 
     def __setup_direct_velocity(self) -> QGroupBox:
-        """Create a widget to control the direct velocity of the robot's motors"""
+        """Create a widget to control the direct velocity of the robot's motors
+        
+        :returns: a QGroupBox containing sliders and controls for controlling the 
+                  direct velocity of the robot's motors
+        """
         group_box = QGroupBox("Drive")
         dbox = QVBoxLayout()
 
@@ -137,7 +157,11 @@ class DriveAndDribblerWidget(QWidget):
         return group_box
 
     def __setup_dribbler(self) -> QGroupBox:
-        """Create a widget to control the dribbler RPM"""
+        """Create a widget to control the dribbler speed
+        
+        :returns: a QGroupBox containing a slider and controls for controlling the
+                  robot's dribbler speed
+        """
         group_box = QGroupBox("Dribbler")
         dbox = QVBoxLayout()
 
@@ -171,11 +195,10 @@ class DriveAndDribblerWidget(QWidget):
         return group_box
 
     def update_widget_accessibility(self, mode: ControlMode) -> None:
-        """Disables or enables all sliders and buttons depending on ControlMode parameter.
+        """Disables or enables all sliders and buttons depending on the given control mode.
         Sliders are enabled in DIAGNOSTICS mode, and disabled in HANDHELD mode
-        Updates listener functions and stylesheets accordingly
 
-        :param mode: ControlMode enum parameter
+        :param mode: the current control mode
         """
         if mode == ControlMode.DIAGNOSTICS:
             # enable all sliders by adding listener to update label with slider value

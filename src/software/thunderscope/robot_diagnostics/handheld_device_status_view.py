@@ -60,11 +60,11 @@ class HandheldDeviceStatusView(QWidget):
 
         self.update(HandheldDeviceConnectionStatus.DISCONNECTED)
 
-    def update(self, connection_state: HandheldDeviceConnectionStatus) -> None:
-        """Sets the label to display the correct status depending on the connection state
+    def update(self, connection_status: HandheldDeviceConnectionStatus) -> None:
+        """Sets the label to display the correct status depending on the connection status
 
-        :param connection_state: The state to use
+        :param connection_status: the connection status to display
         """
-        text, color = self.status_label_view_map[connection_state]
+        text, color = self.status_label_view_map[connection_status]
         self.handheld_device_status.setText(text)
         self.handheld_device_status.setStyleSheet(color)

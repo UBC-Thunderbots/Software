@@ -31,6 +31,11 @@ class HandheldDeviceManager(QtCore.QObject):
         logger: Logger,
         proto_unix_io: ProtoUnixIO,
     ):
+        """Initialize the HandheldDeviceManager
+        
+        :param logger: the logger to use
+        :param proto_unix_io: the proto unix io to use for sending protos
+        """
         super().__init__()
 
         self.lock = RLock()

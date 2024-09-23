@@ -22,18 +22,18 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 
 
 class DiagnosticsWidget(QScrollArea):
-    """The DiagnosticsWidget contains all widgets related to diagnostics:
+    """The DiagnosticsWidget contains all widgets related to Robot Diagnostics:
         - HandheldDeviceStatusWidget
         - DiagnosticsInputWidget
         - DriveAndDribblerWidget
         - ChickerWidget
-
-    This widget is also responsible for controlling the diagnostics inout,
-    either from the DriverAndDribblerWidget or the HandheldDeviceManager,
-    depending on the user selected choice from the DiagnosticsWidget UI
     """
 
     def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
+        """Initialize the DiagnosticsWidget
+        
+        :param proto_unix_io: proto unix io to configure the diagnostics widgets with
+        """
         super(DiagnosticsWidget, self).__init__()
 
         self.logger = create_logger("RobotDiagnostics")
@@ -45,12 +45,12 @@ class DiagnosticsWidget(QScrollArea):
         self.chicker_widget = ChickerWidget(self.proto_unix_io)
         self.diagnostics_control_input_widget = DiagnosticsInputToggleWidget()
 
-        self.handheld_device_handler = HandheldDeviceManager(
+        self.handheld_device_manager = HandheldDeviceManager(
             self.logger,
             self.proto_unix_io,
         )
 
-        self.handheld_device_handler.handheld_device_connection_status_signal.connect(
+        self.handheld_device_manager.handheld_device_connection_status_signal.connect(
             self.__handheld_device_connection_status_signal_handler
         )
 
@@ -59,10 +59,10 @@ class DiagnosticsWidget(QScrollArea):
         )
 
         self.handheld_device_status_widget.reinitialize_handheld_device_signal.connect(
-            self.handheld_device_handler.reinitialize_handheld_device
+            self.handheld_device_manager.reinitialize_handheld_device
         )
 
-        self.handheld_device_handler.reinitialize_handheld_device()
+        self.handheld_device_manager.reinitialize_handheld_device()
 
         diagnostics_widget_vbox_layout = QVBoxLayout()
         diagnostics_widget_vbox_layout.addWidget(self.handheld_device_status_widget)
@@ -80,37 +80,41 @@ class DiagnosticsWidget(QScrollArea):
         self.setWidgetResizable(True)
 
     def __control_mode_changed_signal_handler(self, mode: ControlMode) -> None:
-        """Handler for managing a control mode update
-        :param mode: The new mode that is being used
+        """Handler for the control_mode_changed_signal emitted by DiagnosticsControlInputWidget
+
+        :param mode: the currently selected control mode 
         """
-        self.handheld_device_handler.set_enabled(mode == ControlMode.HANDHELD)
+        self.handheld_device_manager.set_enabled(mode == ControlMode.HANDHELD)
         self.drive_dribbler_widget.update_widget_accessibility(mode)
         self.chicker_widget.update_widget_accessibility(mode)
 
     def __handheld_device_connection_status_signal_handler(
         self, status: HandheldDeviceConnectionStatus
-    ):
-        """Handler for propagating
-        :param status: The new mode that is being used
+    ) -> None:
+        """Handler for the handheld_device_connection_status_signal emitted by HandheldDeviceManager
+        
+        :param status: the new handheld device connection status
         """
         self.handheld_device_status_widget.update(status)
         self.diagnostics_control_input_widget.update(status)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """Refreshes sub-widgets so that they display the most recent status values.
         If in handheld mode, then also visually updates driver, dribbler and chicker sliders
         to the values currently being set by the handheld device.
         """
         control_mode = self.diagnostics_control_input_widget.get_control_mode()
 
-        self.drive_dribbler_widget.refresh(control_mode)
-        self.chicker_widget.refresh(control_mode)
+        self.chicker_widget.refresh()
 
-        if control_mode == ControlMode.HANDHELD:
-            with self.handheld_device_handler.lock:
-                motor_control = self.handheld_device_handler.motor_control
-                kick_power = self.handheld_device_handler.kick_power
-                chip_distance = self.handheld_device_handler.chip_distance
+        if control_mode == ControlMode.DIAGNOSTICS:
+            self.drive_dribbler_widget.refresh()
+
+        elif control_mode == ControlMode.HANDHELD:
+            with self.handheld_device_manager.lock:
+                motor_control = self.handheld_device_manager.motor_control
+                kick_power = self.handheld_device_manager.kick_power
+                chip_distance = self.handheld_device_manager.chip_distance
 
                 self.drive_dribbler_widget.set_x_velocity_slider(
                     motor_control.direct_velocity_control.velocity.x_component_meters
