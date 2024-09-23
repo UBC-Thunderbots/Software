@@ -29,34 +29,34 @@ class DriveAndDribblerWidget(QWidget):
 
     def set_x_velocity_slider(self, value: float) -> None:
         """Set the value of the slider controlling the robot's X velocity
-        
+
         :param value: the value to set the slider to in m/s
         """
         self.x_velocity_slider.setValue(value)
 
     def set_y_velocity_slider(self, value: float) -> None:
         """Set the value of the slider controlling the robot's Y velocity
-        
+
         :param value: the value to set the slider to in m/s
         """
         self.y_velocity_slider.setValue(value)
 
     def set_angular_velocity_slider(self, value: float) -> None:
         """Set the value of the slider controlling the robot's angular velocity
-        
+
         :param value: the value to set the slider to in rad/s
         """
         self.angular_velocity_slider.setValue(value)
 
     def set_dribbler_velocity_slider(self, value: float) -> None:
         """Set the value of the slider controlling the robot's dribbler velocity
-        
+
         :param value: the value to set the slider to in RPM
         """
         self.dribbler_speed_rpm_slider.setValue(value)
 
     def refresh(self) -> None:
-        """Update the currently persisted MotorControl proto based on the widget's slider values  
+        """Update the currently persisted MotorControl proto based on the widget's slider values
         and sends out the proto
         """
         self.motor_control.dribbler_speed_rpm = int(
@@ -84,8 +84,8 @@ class DriveAndDribblerWidget(QWidget):
 
     def __setup_direct_velocity(self) -> QGroupBox:
         """Create a widget to control the direct velocity of the robot's motors
-        
-        :returns: a QGroupBox containing sliders and controls for controlling the 
+
+        :returns: a QGroupBox containing sliders and controls for controlling the
                   direct velocity of the robot's motors
         """
         group_box = QGroupBox("Drive")
@@ -158,7 +158,7 @@ class DriveAndDribblerWidget(QWidget):
 
     def __setup_dribbler(self) -> QGroupBox:
         """Create a widget to control the dribbler speed
-        
+
         :returns: a QGroupBox containing a slider and controls for controlling the
                   robot's dribbler speed
         """

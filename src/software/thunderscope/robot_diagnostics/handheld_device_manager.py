@@ -15,6 +15,17 @@ from software.thunderscope.robot_diagnostics.handheld_device_status_view import 
     HandheldDeviceConnectionStatus,
 )
 
+from dataclasses import dataclass
+
+
+@dataclass
+class HandheldDeviceConnectionChangedEvent:
+    connection_status: HandheldDeviceConnectionStatus
+    """The new handheld device connection status"""
+
+    device_name: str | None
+    """The name of the connected handheld device"""
+
 
 class HandheldDeviceManager(QtCore.QObject):
     """This class is responsible for managing the connection between a computer and a handheld device to control robots.
@@ -23,8 +34,9 @@ class HandheldDeviceManager(QtCore.QObject):
     """
 
     handheld_device_connection_status_signal = QtCore.pyqtSignal(
-        HandheldDeviceConnectionStatus
+        HandheldDeviceConnectionChangedEvent
     )
+    """Signal emitted when the handheld device connection status changes"""
 
     def __init__(
         self,
@@ -32,7 +44,7 @@ class HandheldDeviceManager(QtCore.QObject):
         proto_unix_io: ProtoUnixIO,
     ):
         """Initialize the HandheldDeviceManager
-        
+
         :param logger: the logger to use
         :param proto_unix_io: the proto unix io to use for sending protos
         """
@@ -115,12 +127,18 @@ class HandheldDeviceManager(QtCore.QObject):
                         handheld_device.name
                     ]
 
-                self.handheld_device_connection_status_signal.emit(
-                    HandheldDeviceConnectionStatus.CONNECTED
-                )
-                self.logger.debug("Successfully initialized handheld!")
-                self.logger.debug('Device name: "' + self.handheld_device.name + '"')
-                self.logger.debug("Device path: " + self.handheld_device.path)
+                    self.handheld_device_connection_status_signal.emit(
+                        HandheldDeviceConnectionChangedEvent(
+                            HandheldDeviceConnectionStatus.CONNECTED,
+                            self.handheld_device.name,
+                        )
+                    )
+
+                    self.logger.debug("Successfully initialized handheld!")
+                    self.logger.debug(
+                        'Device name: "' + self.handheld_device.name + '"'
+                    )
+                    self.logger.debug("Device path: " + self.handheld_device.path)
 
                 return
 
@@ -138,7 +156,9 @@ class HandheldDeviceManager(QtCore.QObject):
             self.handheld_device_config = None
 
         self.handheld_device_connection_status_signal.emit(
-            HandheldDeviceConnectionStatus.DISCONNECTED
+            HandheldDeviceConnectionChangedEvent(
+                HandheldDeviceConnectionStatus.DISCONNECTED, None
+            )
         )
 
     def __event_loop(self) -> None:

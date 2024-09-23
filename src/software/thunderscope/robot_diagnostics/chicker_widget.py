@@ -252,8 +252,8 @@ class ChickerWidget(QWidget):
             common_widgets.disable_slider(self.chip_distance_slider)
 
     def refresh(self) -> None:
-        """Update the currently persisted PowerControl proto based on the widget's 
-        slider values and sends out autokick/autochip commands if they are enabled 
+        """Update the currently persisted PowerControl proto based on the widget's
+        slider values and sends out autokick/autochip commands if they are enabled
         """
         # get kick power value slider value and set the label to that value
         kick_power_value = self.kick_power_slider.value()

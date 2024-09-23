@@ -55,7 +55,7 @@ class DiagnosticsInputToggleWidget(QWidget):
         self.setLayout(diagnostics_input_widget_vbox_layout)
 
     def update(self, status: HandheldDeviceConnectionStatus) -> None:
-        """Update this widget with the current handheld device connection status. 
+        """Update this widget with the current handheld device connection status.
 
         If the handheld device is connected:
             - enables the handheld button
@@ -76,7 +76,7 @@ class DiagnosticsInputToggleWidget(QWidget):
 
     def get_control_mode(self) -> ControlMode:
         """Get the currently selected control mode.
-        
+
         :returns: the currently selected control mode
         """
         return (
