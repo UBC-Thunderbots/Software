@@ -84,6 +84,8 @@ class DiagnosticsWidget(QScrollArea):
         :param mode: The new mode that is being used
         """
         self.handheld_device_handler.set_enabled(mode == ControlMode.HANDHELD)
+        self.drive_dribbler_widget.update_widget_accessibility(mode)
+        self.chicker_widget.update_widget_accessibility(mode)
 
     def __handheld_device_connection_status_signal_handler(
         self, status: HandheldDeviceConnectionStatus

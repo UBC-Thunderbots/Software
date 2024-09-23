@@ -60,8 +60,8 @@ class HandheldDeviceManager(QtCore.QObject):
         self.event_loop_thread.start()
 
     def __initialize_default_motor_control_values(self) -> None:
-        """This method sets all required fields in the motor
-        control proto to the default/minimum default value
+        """This method sets all required fields in the motor control proto to
+        the default/minimum default value
         """
         self.motor_control = MotorControl()
         self.motor_control.direct_velocity_control.velocity.x_component_meters = 0.0
@@ -70,18 +70,23 @@ class HandheldDeviceManager(QtCore.QObject):
         self.motor_control.dribbler_speed_rpm = 0
 
     def __initialize_default_power_control_values(self) -> None:
-        """This method sets all required fields in the power
-        control proto to the default/minimum default value
+        """This method sets all required fields in the power control proto to
+        the default/minimum default value
         """
         self.power_control = PowerControl()
         self.power_control.geneva_slot = 3
 
     def set_enabled(self, enabled) -> None:
+        """Enable or disable the HandheldDeviceManager from processing input events.
+
+        :param enabled: whether to enable (True) or disable (False) the
+                        HandheldDeviceManager from processing input events
+        """
         with self.lock:
             self.enabled = enabled
 
     def reinitialize_handheld_device(self) -> None:
-        """Reinitialize handheld_device"""
+        """Attempt to reinitialize a connection to a handheld device."""
         self.__clear_handheld_device()
         self.__initialize_handheld_device()
 
@@ -120,7 +125,7 @@ class HandheldDeviceManager(QtCore.QObject):
         self.logger.debug(list(map(lambda d: InputDevice(d).name, list_devices())))
 
     def __clear_handheld_device(self) -> None:
-        """Clears handheld device & config field by setting to null,
+        """Clears handheld device and config field by setting them to None,
         and emits a disconnected notification signal.
         """
         with self.lock:
@@ -178,9 +183,10 @@ class HandheldDeviceManager(QtCore.QObject):
             self.logger.critical("Error message: " + str(e))
 
     def __process_event(self, event: InputEvent) -> None:
-        """Processes the given device event. Sets corresponding motor & power control values
+        """Processes the given device event. Sets corresponding motor and power control values
         based on the event type, using the current config set in self.handheld_device_config
-        :param event: The event to process.
+
+        :param event: The input event to process
         """
         config = self.handheld_device_config
 

@@ -160,7 +160,7 @@ class ChickerWidget(QWidget):
             self.disable_kick_chip_buttons()
 
             # set and start timer to re-enable buttons after 3 seconds
-            QTimer.singleShot(CHICKER_TIMEOUT, self.enable_kick_chip_buttons)
+            QTimer.singleShot(int(CHICKER_TIMEOUT), self.enable_kick_chip_buttons)
 
     def disable_kick_chip_buttons(self) -> None:
         """Disables the buttons"""
@@ -236,10 +236,10 @@ class ChickerWidget(QWidget):
 
         """
         if self.kick_chip_buttons_enable:
-            button.setStyleSheet("background-color: White")
+            button.setStyleSheet("")
             button.setEnabled(True)
         else:
-            button.setStyleSheet("background-color: Grey")
+            button.setStyleSheet("background-color: grey")
             button.setEnabled(False)
 
     def update_widget_accessibility(self, mode: ControlMode):
@@ -247,10 +247,14 @@ class ChickerWidget(QWidget):
         self.auto_chip_button.setEnabled(mode == ControlMode.DIAGNOSTICS)
         self.set_should_enable_buttons(mode == ControlMode.DIAGNOSTICS)
 
-    def refresh(self, mode: ControlMode) -> None:
-        # Update this widgets accessibility to the user based on the ControlMode parameter
-        self.update_widget_accessibility(mode)
+        if mode == ControlMode.DIAGNOSTICS:
+            common_widgets.enable_slider(self.kick_power_slider)
+            common_widgets.enable_slider(self.chip_distance_slider)
+        elif mode == ControlMode.HANDHELD:
+            common_widgets.disable_slider(self.kick_power_slider)
+            common_widgets.disable_slider(self.chip_distance_slider)
 
+    def refresh(self, mode: ControlMode) -> None:
         # get kick power value slider value and set the label to that value
         kick_power_value = self.kick_power_slider.value()
         self.kick_power_label.setText(str(kick_power_value))

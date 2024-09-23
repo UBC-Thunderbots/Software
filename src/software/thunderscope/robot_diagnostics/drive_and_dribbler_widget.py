@@ -1,4 +1,3 @@
-import time
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
@@ -13,15 +12,13 @@ from software.thunderscope.common import common_widgets
 class DriveAndDribblerWidget(QWidget):
     def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
         """Initialize the widget to control the robot's motors"""
-        super(DriveAndDribblerWidget, self).__init__()
+        super().__init__()
 
         self.proto_unix_io = proto_unix_io
 
         self.motor_control = MotorControl()
 
-        self.input_a = time.time()
         self.constants = tbots_cpp.create2021RobotConstants()
-        QWidget.__init__(self)
         layout = QVBoxLayout()
 
         # Add widgets to layout
@@ -44,12 +41,8 @@ class DriveAndDribblerWidget(QWidget):
 
     def refresh(self, mode: ControlMode) -> None:
         """Refresh the widget's sliders
-        Enable or disable this widgets sliders and buttons based on mode value
         Collect motor control values and persist in the primitive field
         """
-        # Update this widgets accessibility to the user based on the ControlMode parameter
-        self.update_widget_accessibility(mode)
-
         self.motor_control.dribbler_speed_rpm = int(
             self.dribbler_speed_rpm_slider.value()
         )
@@ -113,16 +106,20 @@ class DriveAndDribblerWidget(QWidget):
         )
 
         # add listener functions for sliders to update label with slider value
-        common_widgets.enable_slider(
-            self.x_velocity_slider, self.x_velocity_label, self.__value_change_handler
+        self.x_velocity_slider.valueChanged.connect(
+            lambda: self.x_velocity_label.setText(
+                self.__value_change_handler(self.x_velocity_slider.value())
+            )
         )
-        common_widgets.enable_slider(
-            self.y_velocity_slider, self.y_velocity_label, self.__value_change_handler
+        self.y_velocity_slider.valueChanged.connect(
+            lambda: self.y_velocity_label.setText(
+                self.__value_change_handler(self.y_velocity_slider.value())
+            )
         )
-        common_widgets.enable_slider(
-            self.angular_velocity_slider,
-            self.angular_velocity_label,
-            self.__value_change_handler,
+        self.angular_velocity_slider.valueChanged.connect(
+            lambda: self.angular_velocity_label.setText(
+                self.__value_change_handler(self.angular_velocity_slider.value())
+            )
         )
 
         self.stop_and_reset_direct = QPushButton("Stop and Reset")
@@ -156,11 +153,10 @@ class DriveAndDribblerWidget(QWidget):
             1,
         )
 
-        # add listener function to update label with slider value
-        common_widgets.enable_slider(
-            self.dribbler_speed_rpm_slider,
-            self.dribbler_speed_rpm_label,
-            self.__value_change_handler,
+        self.dribbler_speed_rpm_slider.valueChanged.connect(
+            lambda: self.dribbler_speed_rpm_label.setText(
+                self.__value_change_handler(self.dribbler_speed_rpm_slider.value())
+            )
         )
 
         self.stop_and_reset_dribbler = QPushButton("Stop and Reset")
@@ -178,59 +174,32 @@ class DriveAndDribblerWidget(QWidget):
         """Disables or enables all sliders and buttons depending on ControlMode parameter.
         Sliders are enabled in DIAGNOSTICS mode, and disabled in HANDHELD mode
         Updates listener functions and stylesheets accordingly
+
         :param mode: ControlMode enum parameter
         """
         if mode == ControlMode.DIAGNOSTICS:
-            # disconnect all sliders
-            self.__disconnect_sliders()
-
             # enable all sliders by adding listener to update label with slider value
-            common_widgets.enable_slider(
-                self.x_velocity_slider,
-                self.x_velocity_label,
-                self.__value_change_handler,
-            )
-            common_widgets.enable_slider(
-                self.y_velocity_slider,
-                self.y_velocity_label,
-                self.__value_change_handler,
-            )
-            common_widgets.enable_slider(
-                self.angular_velocity_slider,
-                self.angular_velocity_label,
-                self.__value_change_handler,
-            )
-            common_widgets.enable_slider(
-                self.dribbler_speed_rpm_slider,
-                self.dribbler_speed_rpm_label,
-                self.__value_change_handler,
-            )
+            common_widgets.enable_slider(self.x_velocity_slider)
+            common_widgets.enable_slider(self.y_velocity_slider)
+            common_widgets.enable_slider(self.angular_velocity_slider)
+            common_widgets.enable_slider(self.dribbler_speed_rpm_slider)
 
             # enable buttons
             common_widgets.enable_button(self.stop_and_reset_dribbler)
             common_widgets.enable_button(self.stop_and_reset_direct)
 
         elif mode == ControlMode.HANDHELD:
-            # reset slider values and disconnect
             self.__reset_all_sliders()
-            # self.__disconnect_sliders()
 
             # disable all sliders by adding listener to keep slider value the same
-            # common_widgets.disable_slider(self.x_velocity_slider)
-            # common_widgets.disable_slider(self.y_velocity_slider)
-            # common_widgets.disable_slider(self.angular_velocity_slider)
-            # common_widgets.disable_slider(self.dribbler_speed_rpm_slider)
+            common_widgets.disable_slider(self.x_velocity_slider)
+            common_widgets.disable_slider(self.y_velocity_slider)
+            common_widgets.disable_slider(self.angular_velocity_slider)
+            common_widgets.disable_slider(self.dribbler_speed_rpm_slider)
 
             # disable buttons
             common_widgets.disable_button(self.stop_and_reset_dribbler)
             common_widgets.disable_button(self.stop_and_reset_direct)
-
-    def __disconnect_sliders(self) -> None:
-        """Disconnect listener for changing values for all sliders"""
-        self.x_velocity_slider.valueChanged.disconnect()
-        self.y_velocity_slider.valueChanged.disconnect()
-        self.angular_velocity_slider.valueChanged.disconnect()
-        self.dribbler_speed_rpm_slider.valueChanged.disconnect()
 
     def __reset_direct_sliders(self) -> None:
         """Reset direct sliders back to 0"""
