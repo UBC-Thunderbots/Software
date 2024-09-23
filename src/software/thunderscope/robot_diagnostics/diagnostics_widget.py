@@ -23,15 +23,15 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 
 class DiagnosticsWidget(QScrollArea):
     """The DiagnosticsWidget contains all widgets related to Robot Diagnostics:
-        - HandheldDeviceStatusWidget
-        - DiagnosticsInputWidget
-        - DriveAndDribblerWidget
-        - ChickerWidget
+    - HandheldDeviceStatusWidget
+    - DiagnosticsInputWidget
+    - DriveAndDribblerWidget
+    - ChickerWidget
     """
 
     def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
         """Initialize the DiagnosticsWidget
-        
+
         :param proto_unix_io: proto unix io to configure the diagnostics widgets with
         """
         super(DiagnosticsWidget, self).__init__()
@@ -82,7 +82,7 @@ class DiagnosticsWidget(QScrollArea):
     def __control_mode_changed_signal_handler(self, mode: ControlMode) -> None:
         """Handler for the control_mode_changed_signal emitted by DiagnosticsControlInputWidget
 
-        :param mode: the currently selected control mode 
+        :param mode: the currently selected control mode
         """
         self.handheld_device_manager.set_enabled(mode == ControlMode.HANDHELD)
         self.drive_dribbler_widget.update_widget_accessibility(mode)
@@ -92,7 +92,7 @@ class DiagnosticsWidget(QScrollArea):
         self, status: HandheldDeviceConnectionStatus
     ) -> None:
         """Handler for the handheld_device_connection_status_signal emitted by HandheldDeviceManager
-        
+
         :param status: the new handheld device connection status
         """
         self.handheld_device_status_widget.update(status)
