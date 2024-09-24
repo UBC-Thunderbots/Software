@@ -17,17 +17,20 @@ class ChickerCommandMode(Enum):
 
 
 class ChickerWidget(QWidget):
+    """Handles the robot diagnostics input to create a PowerControl message
+    to be sent to the robots.
+
+    NOTE: The powerboards run in regulation mode, which means that they are
+    always charged and do not need to be explicitly charged.
+
+    The powerboard also has an internal cooldown, so spamming kick or chip
+    will not work until the capacitors charge up and the cooldown is over.
+    """
+
     def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
-        """Handles the robot diagnostics input to create a PowerControl message
-        to be sent to the robots.
+        """Initialize the ChickerWidget
 
-        NOTE: The powerboards run in regulation mode, which means that they are
-        always charged and do not need to be explicitly charged.
-
-        The powerboard also has an internal cooldown, so spamming kick or chip
-        will not work until the capacitors charge up and the cooldown is over.
-
-        :param proto_unix_io: proto_unix_io object to send messages to the robot
+        :param proto_unix_io: ProtoUnixIO to send messages to the robot
         """
         super().__init__()
 
@@ -137,7 +140,7 @@ class ChickerWidget(QWidget):
         self.chip_distance_slider.setValue(value)
 
     def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
-        """If the kick/chip buttons are enabled, sends a kick/chip command and disables the buttons.
+        """If the kick/chip buttons are enabled, send a kick/chip command and disables the buttons.
         The buttons will be re-enabled after CHICKER_TIMEOUT.
 
         :param command: Command to send. One of ChickerCommandMode.KICK or ChickerCommandMode.CHIP
@@ -152,7 +155,7 @@ class ChickerWidget(QWidget):
             QTimer.singleShot(int(CHICKER_TIMEOUT), self.update_kick_chip_buttons_accessibility)
 
     def update_kick_chip_buttons_accessibility(self) -> None:
-        """Enables or disables the kick/chip buttons depending on whether autokick/autochip is on"""
+        """Enable or disable the kick/chip buttons depending on whether autokick/autochip is on"""
         if self.no_auto_button.isChecked():
             common_widgets.enable_button(self.kick_button)
             common_widgets.enable_button(self.chip_button)
@@ -161,7 +164,7 @@ class ChickerWidget(QWidget):
             common_widgets.disable_button(self.chip_button)
 
     def send_command(self, command: ChickerCommandMode) -> None:
-        """Sends a [auto]kick or [auto]chip primitive
+        """Send a [auto]kick or [auto]chip primitive
 
         :param command: enum int value to indicate what primitive to send
         """
@@ -191,7 +194,7 @@ class ChickerWidget(QWidget):
             self.__initialize_default_power_control_values()
 
     def __initialize_default_power_control_values(self) -> None:
-        """Sends an empty proto to the proto unix io buffer
+        """Send an empty proto to the proto unix io buffer.
         This is due to a bug in robot_communication where if a new PowerControl message is not sent,
         The previous, cached message is resent to the robot repeatedly which we don't want for kick/chip
         So sending an empty message overwrites the cache and prevents spamming commands
@@ -202,7 +205,7 @@ class ChickerWidget(QWidget):
         self.proto_unix_io.send_proto(PowerControl, self.power_control, True)
 
     def update_widget_accessibility(self, mode: ControlMode):
-        """Disables or enables all sliders and buttons depending on the given control mode.
+        """Enable or disable all sliders and buttons depending on the given control mode.
         Sliders and buttons are enabled in DIAGNOSTICS mode, and disabled in HANDHELD mode
 
         :param mode: the current control mode
@@ -224,10 +227,7 @@ class ChickerWidget(QWidget):
             common_widgets.disable_button(self.chip_button)
 
     def refresh(self) -> None:
-        """Update the currently persisted PowerControl proto based on the widget's
-        slider values and sends out autokick/autochip commands if they are enabled
-        """
-        # If auto is enabled, we want to populate the autochip or kick message
+        """Send autokick/autochip commands if enabled"""
         if self.auto_kick_button.isChecked():
             self.send_command(ChickerCommandMode.AUTOKICK)
         elif self.auto_chip_button.isChecked():

@@ -23,16 +23,19 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 
 class DiagnosticsWidget(QScrollArea):
     """The DiagnosticsWidget contains all widgets related to Robot Diagnostics:
+
     - HandheldDeviceStatusWidget
     - DiagnosticsInputWidget
     - DriveAndDribblerWidget
     - ChickerWidget
+
     """
 
     def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
         """Initialize the DiagnosticsWidget
 
-        :param proto_unix_io: proto unix io to configure the diagnostics widgets with
+        :param proto_unix_io: ProtoUnixIO (for sending messages to the robot)
+                              to configure the diagnostics widgets with
         """
         super(DiagnosticsWidget, self).__init__()
 
@@ -101,8 +104,8 @@ class DiagnosticsWidget(QScrollArea):
         self.diagnostics_control_input_widget.update(event.connection_status)
 
     def refresh(self) -> None:
-        """Refreshes sub-widgets so that they display the most recent status values.
-        If in handheld mode, then also visually updates driver, dribbler and chicker sliders
+        """Refresh sub-widgets so that they display the most recent status values.
+        If in handheld mode, visually update driver, dribbler and chicker sliders
         to the values currently being set by the handheld device.
         """
         control_mode = self.diagnostics_control_input_widget.get_control_mode()

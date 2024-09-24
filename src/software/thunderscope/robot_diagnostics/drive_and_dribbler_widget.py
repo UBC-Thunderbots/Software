@@ -10,8 +10,15 @@ from software.thunderscope.common import common_widgets
 
 
 class DriveAndDribblerWidget(QWidget):
+    """Handles the robot diagnostics input to create a MotorControl message
+    to be sent to the robots.
+    """
+
     def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
-        """Initialize the widget to control the robot's motors"""
+        """Initialize the DriveAndDribblerWidget
+
+        :param proto_unix_io: ProtoUnixIO to send messages to the robot
+        """
         super().__init__()
 
         self.proto_unix_io = proto_unix_io

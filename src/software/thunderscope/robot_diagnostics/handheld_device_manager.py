@@ -46,7 +46,7 @@ class HandheldDeviceManager(QtCore.QObject):
         """Initialize the HandheldDeviceManager
 
         :param logger: the logger to use
-        :param proto_unix_io: the proto unix io to use for sending protos
+        :param proto_unix_io: ProtoUnixIO to send messages to the robot
         """
         super().__init__()
 
