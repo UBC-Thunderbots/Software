@@ -38,9 +38,6 @@ class ChickerWidget(QWidget):
         chicker_widget_vbox_layout = QVBoxLayout()
         self.setLayout(chicker_widget_vbox_layout)
 
-        kick_chip_sliders_hbox_layout = QHBoxLayout()
-
-        # Initializing power slider for kicking
         (
             self.kick_power_slider_layout,
             self.kick_power_slider,
@@ -52,9 +49,6 @@ class ChickerWidget(QWidget):
             DiagnosticsConstants.KICK_POWER_STEPPER,
         )
 
-        kick_chip_sliders_hbox_layout.addLayout(self.kick_power_slider_layout)
-
-        # Initializing distance slider for chipping
         (
             self.chip_distance_slider_layout,
             self.chip_distance_slider,
@@ -67,6 +61,16 @@ class ChickerWidget(QWidget):
             int(DiagnosticsConstants.CHIP_DISTANCE_STEPPER),
         )
 
+        self.kick_power_slider.valueChanged.connect(
+            lambda: self.kick_power_label.setText(str(self.kick_power_slider.value()))
+        )
+
+        self.chip_distance_slider.valueChanged.connect(
+            lambda: self.chip_distance_label.setText(str(self.chip_distance_slider.value()))
+        )
+
+        kick_chip_sliders_hbox_layout = QHBoxLayout()
+        kick_chip_sliders_hbox_layout.addLayout(self.kick_power_slider_layout)
         kick_chip_sliders_hbox_layout.addLayout(self.chip_distance_slider_layout)
 
         kick_chip_sliders_box = QGroupBox()
@@ -86,9 +90,6 @@ class ChickerWidget(QWidget):
         self.kick_button = self.kick_chip_buttons[0]
         self.chip_button = self.kick_chip_buttons[1]
 
-        # set buttons to be initially enabled
-        self.kick_chip_buttons_enable = True
-
         chicker_widget_vbox_layout.addWidget(self.kick_chip_buttons_box)
 
         # Initializing auto kick & chip buttons
@@ -107,25 +108,16 @@ class ChickerWidget(QWidget):
 
         # Set no auto button to be selected by default on launch
         self.no_auto_button.setChecked(True)
-        self.no_auto_selected = True
 
-        # Initialize on-click handlers for kick & chip buttons.
+        self.no_auto_button.toggled.connect(
+            self.update_kick_chip_buttons_accessibility
+        )
+
         self.kick_button.clicked.connect(
             lambda: self.send_command_and_timeout(ChickerCommandMode.KICK)
         )
         self.chip_button.clicked.connect(
             lambda: self.send_command_and_timeout(ChickerCommandMode.CHIP)
-        )
-
-        # Initialize on-click handlers for no auto, auto kick and auto chip buttons.
-        self.no_auto_button.toggled.connect(
-            lambda: self.set_should_enable_buttons(True)
-        )
-        self.auto_kick_button.toggled.connect(
-            lambda: self.set_should_enable_buttons(False)
-        )
-        self.auto_chip_button.toggled.connect(
-            lambda: self.set_should_enable_buttons(False)
         )
 
         chicker_widget_vbox_layout.addWidget(self.auto_kick_chip_buttons_box)
@@ -150,38 +142,23 @@ class ChickerWidget(QWidget):
 
         :param command: Command to send. One of ChickerCommandMode.KICK or ChickerCommandMode.CHIP
         """
-        if self.kick_chip_buttons_enable:
-            # send kick primitive
+        if self.kick_button.isEnabled() and self.chip_button.isEnabled():
+            common_widgets.disable_button(self.kick_button)
+            common_widgets.disable_button(self.chip_button)
+
             self.send_command(command)
-            self.disable_kick_chip_buttons()
 
             # set and start timer to re-enable buttons after CHICKER_TIMEOUT
-            QTimer.singleShot(int(CHICKER_TIMEOUT), self.enable_kick_chip_buttons)
+            QTimer.singleShot(int(CHICKER_TIMEOUT), self.update_kick_chip_buttons_accessibility)
 
-    def disable_kick_chip_buttons(self) -> None:
-        """Disables the buttons"""
-        self.kick_chip_buttons_enable = False
-
-    def enable_kick_chip_buttons(self) -> None:
-        """If buttons should be enabled, enables them"""
-        if self.no_auto_selected:
-            self.kick_chip_buttons_enable = True
-
-            # clears the proto buffer when buttons are re-enabled
-            # just to start fresh and clear any unwanted protos
-            self.__initialize_default_power_control_values()
-
-    def set_should_enable_buttons(self, enable: bool) -> None:
-        """Changes if buttons are clickable or not based on boolean parameter
-
-        :param enable: boolean to indicate whether buttons should be made clickable or not
-        """
-        self.no_auto_selected = enable
-
-        if enable:
-            self.enable_kick_chip_buttons()
+    def update_kick_chip_buttons_accessibility(self) -> None:
+        """Enables or disables the kick/chip buttons depending on whether autokick/autochip is on"""
+        if self.no_auto_button.isChecked():
+            common_widgets.enable_button(self.kick_button)
+            common_widgets.enable_button(self.chip_button)
         else:
-            self.disable_kick_chip_buttons()
+            common_widgets.disable_button(self.kick_button)
+            common_widgets.disable_button(self.chip_button)
 
     def send_command(self, command: ChickerCommandMode) -> None:
         """Sends a [auto]kick or [auto]chip primitive
@@ -224,49 +201,32 @@ class ChickerWidget(QWidget):
         self.power_control.geneva_slot = 3
         self.proto_unix_io.send_proto(PowerControl, self.power_control, True)
 
-    def refresh_button_state(self, button: QPushButton) -> None:
-        """Change button color and clickable state.
-
-        :param button: button to change the state of
-        """
-        button.setEnabled(self.kick_chip_buttons_enable)
-        button.setStyleSheet(
-            "" if self.kick_chip_buttons_enable else "background-color: grey"
-        )
-
     def update_widget_accessibility(self, mode: ControlMode):
         """Disables or enables all sliders and buttons depending on the given control mode.
         Sliders and buttons are enabled in DIAGNOSTICS mode, and disabled in HANDHELD mode
 
         :param mode: the current control mode
         """
-        self.auto_kick_button.setEnabled(mode == ControlMode.DIAGNOSTICS)
-        self.auto_chip_button.setEnabled(mode == ControlMode.DIAGNOSTICS)
-        self.set_should_enable_buttons(mode == ControlMode.DIAGNOSTICS)
-
         if mode == ControlMode.DIAGNOSTICS:
             common_widgets.enable_slider(self.kick_power_slider)
             common_widgets.enable_slider(self.chip_distance_slider)
+            common_widgets.enable_button(self.no_auto_button)
+            common_widgets.enable_button(self.auto_kick_button)
+            common_widgets.enable_button(self.auto_chip_button)
+            self.update_kick_chip_buttons_accessibility()
         elif mode == ControlMode.HANDHELD:
             common_widgets.disable_slider(self.kick_power_slider)
             common_widgets.disable_slider(self.chip_distance_slider)
+            common_widgets.disable_button(self.no_auto_button)
+            common_widgets.disable_button(self.auto_kick_button)
+            common_widgets.disable_button(self.auto_chip_button)
+            common_widgets.disable_button(self.kick_button)
+            common_widgets.disable_button(self.chip_button)
 
     def refresh(self) -> None:
         """Update the currently persisted PowerControl proto based on the widget's
         slider values and sends out autokick/autochip commands if they are enabled
         """
-        # get kick power value slider value and set the label to that value
-        kick_power_value = self.kick_power_slider.value()
-        self.kick_power_label.setText(str(kick_power_value))
-
-        # get chip distance value slider value and set the label to that value
-        chip_distance_value = self.chip_distance_slider.value()
-        self.chip_distance_label.setText(str(chip_distance_value))
-
-        # refresh button state to reflect to user current status
-        self.refresh_button_state(self.kick_button)
-        self.refresh_button_state(self.chip_button)
-
         # If auto is enabled, we want to populate the autochip or kick message
         if self.auto_kick_button.isChecked():
             self.send_command(ChickerCommandMode.AUTOKICK)
