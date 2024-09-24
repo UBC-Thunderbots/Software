@@ -69,7 +69,9 @@ class ChickerWidget(QWidget):
         )
 
         self.chip_distance_slider.valueChanged.connect(
-            lambda: self.chip_distance_label.setText(str(self.chip_distance_slider.value()))
+            lambda: self.chip_distance_label.setText(
+                str(self.chip_distance_slider.value())
+            )
         )
 
         kick_chip_sliders_hbox_layout = QHBoxLayout()
@@ -112,9 +114,7 @@ class ChickerWidget(QWidget):
         # Set no auto button to be selected by default on launch
         self.no_auto_button.setChecked(True)
 
-        self.no_auto_button.toggled.connect(
-            self.update_kick_chip_buttons_accessibility
-        )
+        self.no_auto_button.toggled.connect(self.update_kick_chip_buttons_accessibility)
 
         self.kick_button.clicked.connect(
             lambda: self.send_command_and_timeout(ChickerCommandMode.KICK)
@@ -152,7 +152,9 @@ class ChickerWidget(QWidget):
             self.send_command(command)
 
             # set and start timer to re-enable buttons after CHICKER_TIMEOUT
-            QTimer.singleShot(int(CHICKER_TIMEOUT), self.update_kick_chip_buttons_accessibility)
+            QTimer.singleShot(
+                int(CHICKER_TIMEOUT), self.update_kick_chip_buttons_accessibility
+            )
 
     def update_kick_chip_buttons_accessibility(self) -> None:
         """Enable or disable the kick/chip buttons depending on whether autokick/autochip is on"""
