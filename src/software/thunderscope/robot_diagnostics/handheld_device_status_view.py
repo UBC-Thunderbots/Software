@@ -34,7 +34,7 @@ class HandheldDeviceStatusView(QWidget):
         self.detect_handheld_device_button = QPushButton()
         self.detect_handheld_device_button.setText("Detect Handheld Device")
         self.detect_handheld_device_button.setSizePolicy(
-            QSizePolicy.Policy.Expanding, 
+            QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
         self.detect_handheld_device_button.clicked.connect(
