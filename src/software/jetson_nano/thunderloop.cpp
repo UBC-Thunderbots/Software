@@ -362,12 +362,8 @@ Thunderloop::~Thunderloop() {}
         thunderloop_status_.set_iteration_time_ms(loop_duration_ns /
                                                   NANOSECONDS_PER_MILLISECOND);
 
-        // Make sure the iteration can fit inside the period of the loop
-        loop_duration_seconds =
-            static_cast<double>(loop_duration_ns) * SECONDS_PER_NANOSECOND;
-
-        // Calculate next shot taking into account how long this iteration took
-        next_shot.tv_nsec += interval - static_cast<long int>(loop_duration_ns);
+        // Calculate next shot (which is an absolute time)
+        next_shot.tv_nsec += interval;
         timespecNorm(next_shot);
 
         FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
