@@ -33,6 +33,12 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "fake_clock",
+    srcs = ["fake_clock.cpp"],
+    hdrs = ["fake_clock.h"],
+)
+
 cc_test(
     name = "test_util_test",
     srcs = ["test_util_test.cpp"],

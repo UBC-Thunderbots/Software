@@ -4,7 +4,9 @@
 
 #include <thread>
 
-class TestObserver : public Observer<int>
+#include "software/test_util/fake_clock.h"
+
+class TestObserver : public Observer<int, FakeClock>
 {
    public:
     std::optional<int> getMostRecentValueFromBufferWrapper()
@@ -19,35 +21,34 @@ namespace TestUtil
      * Tests getDataReceivedPerSecond by filling the buffer
      *
      * @param test_observer The observer to test
-     * @param data_received_period_milliseconds The period between receiving data
+     * @param data_received_period_ms The period between receiving data in milliseconds
      * @param number_of_messages number of messages to send to the buffer
      *
      * @return AssertionSuccess the observer returns the correct data received per second
      */
     ::testing::AssertionResult testGetDataReceivedPerSecondByFillingBuffer(
-        TestObserver test_observer, unsigned int data_received_period_milliseconds,
+        TestObserver test_observer, unsigned int data_received_period_ms,
         unsigned int number_of_messages)
     {
-        auto wall_time_start = std::chrono::steady_clock::now();
+        auto wall_time_start = FakeClock::now();
         for (unsigned int i = 0; i < number_of_messages; i++)
         {
             test_observer.receiveValue(i);
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(data_received_period_milliseconds));
+            FakeClock::advance(std::chrono::milliseconds(data_received_period_ms));
         }
 
-        auto wall_time_now = std::chrono::steady_clock::now();
+        auto wall_time_now = FakeClock::now();
         double test_duration_s =
             static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(
                                     wall_time_now - wall_time_start)
                                     .count()) *
             SECONDS_PER_MILLISECOND;
         double scaling_factor =
-            test_duration_s / (data_received_period_milliseconds *
+            test_duration_s / (data_received_period_ms *
                                SECONDS_PER_MILLISECOND * number_of_messages);
         double expected_actual_difference =
             std::abs(test_observer.getDataReceivedPerSecond() -
-                     1 / (data_received_period_milliseconds * SECONDS_PER_MILLISECOND) *
+                     1 / (data_received_period_ms * SECONDS_PER_MILLISECOND) *
                          scaling_factor);
         if (expected_actual_difference < 50)
         {
