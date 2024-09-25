@@ -133,6 +133,7 @@ class Thunderscope:
             logging.warning(
                 f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files"
             )
+            return
 
         filename, _ = QFileDialog.getSaveFileName(
             self.window,

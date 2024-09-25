@@ -558,8 +558,8 @@ def get_move_update_control_params(
     :return: an AssignedTacticPlayControlParams message with this robot's params added
     """
     params = params if params else AssignedTacticPlayControlParams()
-    params.assigned_tactics[robot_id].move.CopyFrom(
-        MoveTactic(
+    params.assigned_tactics[robot_id].move_skill.CopyFrom(
+        MoveSkillTactic(
             destination=Point(x_meters=destination.x(), y_meters=destination.y()),
             final_orientation=Angle(radians=desired_orientation.toRadians()),
             final_speed=final_speed,

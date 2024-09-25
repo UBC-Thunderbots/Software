@@ -5,23 +5,25 @@
 #include <Tracy.hpp>
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/skill/stop/stop_skill.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
-
-Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
-    : ai_config(ai_config),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
-      stop_tactics(),
+Play::Play(bool requires_goalie, std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
+      goalie_tactic(std::make_shared<GoalieTactic>(strategy)),
+      stop_skill_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
       world_ptr_(std::nullopt),
-      obstacle_factory(ai_config.robot_navigation_obstacle_config())
+      obstacle_factory(strategy->getAiConfig().robot_navigation_obstacle_config())
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
-        stop_tactics.push_back(std::make_shared<StopTactic>());
+        stop_skill_tactics.push_back(
+            std::make_shared<AssignedSkillTactic<StopSkill>>(strategy));
     }
 }
 
@@ -111,7 +113,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     obstacle_list.Clear();
     path_visualization.Clear();
 
-    tactic_robot_id_assignment.clear();
+    std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
 
     std::optional<Robot> goalie_robot = world_ptr->friendlyTeam().goalie();
     std::vector<Robot> robots         = world_ptr->friendlyTeam().getAllRobots();
@@ -121,7 +123,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         if (goalie_robot.has_value())
         {
             RobotId goalie_robot_id = goalie_robot.value().id();
-            tactic_robot_id_assignment.emplace(goalie_tactic, goalie_robot_id);
+            current_tactic_robot_id_assignment.emplace(goalie_tactic, goalie_robot_id);
 
             robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
                          robots.end());
@@ -189,18 +191,17 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             else if (i == (priority_tactics.size() - 1))
             {
                 // If assigning the last tactic vector, then assign rest of robots with
-                // StopTactics
+                // stop skill tactics
                 for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
                 {
-                    tactic_vector.push_back(stop_tactics[ii]);
+                    tactic_vector.push_back(stop_skill_tactics[ii]);
                 }
             }
 
-            auto [remaining_robots, new_primitives_to_assign,
-                  current_tactic_robot_id_assignment] =
+            auto [remaining_robots, new_primitives_to_assign, assignment] =
                 assignTactics(world_ptr, tactic_vector, robots);
 
-            tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
+            current_tactic_robot_id_assignment.merge(assignment);
 
             for (auto &[robot_id, primitive] :
                  new_primitives_to_assign->robot_primitives())
@@ -212,6 +213,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             robots = remaining_robots;
         }
     }
+
+    tactic_robot_id_assignment = current_tactic_robot_id_assignment;
 
     // TODO (#3104): Remove duplicated obstacles from obstacle_list
     // Visualize all obstacles and paths

@@ -5,13 +5,12 @@
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(TbotsProto::AiConfig ai_config)
-    : DefensePlayFSMBase::DefensePlayFSMBase(ai_config)
+EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(std::shared_ptr<Strategy> strategy)
+    : DefensePlayFSMBase(strategy)
 {
 }
 
@@ -43,7 +42,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
 
     auto assignments = getAllDefenderAssignments(
         enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
-        ai_config.defense_play_config().defender_assignment_config());
+        strategy->getAiConfig().defense_play_config().defender_assignment_config());
 
     if (assignments.size() == 0)
     {
@@ -53,7 +52,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     // Adds designated free kick defender to block the direction the kicker is facing
     if (!enemy_threats.empty())
     {
-        auto block_free_kicker = std::make_shared<PassDefenderTactic>(ai_config);
+        auto block_free_kicker = std::make_shared<PassDefenderTactic>(strategy);
         Vector block_direction =
             Vector::createFromAngle(enemy_threats[0].robot.orientation());
         block_kick_point =
@@ -110,7 +109,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
                      distance(friendly_goal_center, block_kick_point) >=
                          ball_far_threshold_m)
             {
-                auto mid_zone_defender = std::make_shared<PassDefenderTactic>(ai_config);
+                auto mid_zone_defender = std::make_shared<PassDefenderTactic>(strategy);
                 Point mid_point =
                     Point((event.common.world_ptr->ball().position().toVector() +
                            friendly_goal_center.toVector()) /

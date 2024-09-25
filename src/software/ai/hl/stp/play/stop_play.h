@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
 
@@ -11,7 +13,7 @@
 class StopPlay : public Play
 {
    public:
-    StopPlay(TbotsProto::AiConfig config);
+    StopPlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

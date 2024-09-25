@@ -5,6 +5,7 @@
 #include "proto/play_info_msg.pb.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/play_selection_fsm.h"
+#include "software/ai/strategy.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
@@ -17,10 +18,11 @@ class Ai final
     Ai() = delete;
 
     /**
-     * Create an AI with given configurations
-     * @param ai_config_ The AI configuration
+     * Create an AI
+     *
+     * @param strategy the Strategy
      */
-    explicit Ai(const TbotsProto::AiConfig& ai_config);
+    explicit Ai(std::shared_ptr<Strategy> strategy);
 
     /**
      * Overrides the play
@@ -28,6 +30,22 @@ class Ai final
      * @param play play to override with
      */
     void overridePlay(std::unique_ptr<Play> play);
+
+    /**
+     * Overrides the play from the play proto
+     *
+     * @param play_proto the play proto
+     */
+    void overridePlayFromProto(const TbotsProto::Play& play_proto);
+
+    /**
+     * Overrides the play with AssignedTacticsPlay and overrides the tactics
+     *
+     * @param assigned_tactic_play_control_params the control params for
+     * AssignedTacticsPlay
+     */
+    void overrideTactics(const TbotsProto::AssignedTacticPlayControlParams&
+                             assigned_tactic_play_control_params);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current
@@ -38,7 +56,7 @@ class Ai final
      * @return the Primitives that should be run by our Robots given the current
      * state of the world.
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const WorldPtr& world_ptr);
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world);
 
     /**
      * Returns information about the currently running plays and tactics, including the
@@ -48,29 +66,11 @@ class Ai final
      */
     TbotsProto::PlayInfo getPlayInfo() const;
 
-    /**
-     * Overrides the play from the play proto
-     *
-     * @param play_proto the play proto
-     */
-    void overridePlayFromProto(TbotsProto::Play play_proto);
-
-    /**
-     * Update the AiConfig proto
-     *
-     * @param ai_config The new AiConfig proto
-     */
-    void updateAiConfig(TbotsProto::AiConfig& ai_config);
-
    private:
-    void checkAiConfig();
-
-    TbotsProto::AiConfig ai_config_;
+    std::shared_ptr<Strategy> strategy;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
-    std::unique_ptr<Play> current_play;
-    TbotsProto::Play current_override_play_proto;
-    bool ai_config_changed;
+    std::shared_ptr<Play> current_play;
 
     // inter play communication
     InterPlayCommunication inter_play_communication;

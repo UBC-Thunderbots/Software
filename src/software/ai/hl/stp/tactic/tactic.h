@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/primitive.h"
+#include "software/ai/hl/stp/primitive/primitive.h"
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -32,8 +32,8 @@
  * - A passer
  * - A receiver (for a pass)
  *
- * Tactics are stateful, and use Primitives to implement their behaviour. They also
- * make heavy use of our Evaluation functions in order to help them make decisions.
+ * Tactics are stateful, and use Skills and Primitives to implement their behaviour. They
+ * also make heavy use of our Evaluation functions in order to help them make decisions.
  */
 class Tactic
 {
@@ -43,7 +43,7 @@ class Tactic
      *
      * @param capability_reqs_ The capability requirements for running this tactic
      */
-    explicit Tactic(const std::set<RobotCapability> &capability_reqs_);
+    explicit Tactic(const std::set<RobotCapability> &capability_reqs);
 
     Tactic() = delete;
 
@@ -81,7 +81,7 @@ class Tactic
      * @param last_execution_robot The robot id of the robot that last executed the
      * primitive for this tactic
      */
-    void setLastExecutionRobot(std::optional<RobotId> last_execution_robot);
+    virtual void setLastExecutionRobot(std::optional<RobotId> last_execution_robot);
 
     /**
      * Updates and returns a set of primitives for all friendly robots from this tactic
@@ -90,7 +90,7 @@ class Tactic
      *
      * @return the next primitive
      */
-    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr);
+    virtual std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr);
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself

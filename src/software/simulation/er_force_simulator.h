@@ -4,7 +4,7 @@
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "software/jetson_nano/primitive_executor.h"
+#include "software/embedded/primitive_executor.h"
 #include "software/physics/euclidean_to_wheel.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"

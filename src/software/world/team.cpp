@@ -188,17 +188,26 @@ const std::vector<Robot>& Team::getAllRobots() const
 
 std::vector<Robot> Team::getAllRobotsExceptGoalie() const
 {
-    auto goalie_robot = goalie();
-    std::vector<Robot> all_robots;
-    for (auto it = team_robots_.begin(); it != team_robots_.end(); it++)
+    std::vector<Robot> robots_to_ignore;
+
+    std::optional<Robot> goalie_robot = goalie();
+    if (goalie_robot)
     {
-        if (goalie_robot && *it == *goalie_robot)
-        {
-            continue;
-        }
-        all_robots.emplace_back(*it);
+        robots_to_ignore.push_back(*goalie_robot);
     }
 
+    return getAllRobotsExcept(robots_to_ignore);
+}
+
+std::vector<Robot> Team::getAllRobotsExcept(
+    const std::vector<Robot>& robots_to_ignore) const
+{
+    std::vector<Robot> all_robots;
+    std::copy_if(team_robots_.begin(), team_robots_.end(), std::back_inserter(all_robots),
+                 [&](const Robot& robot) {
+                     return std::find(robots_to_ignore.begin(), robots_to_ignore.end(),
+                                      robot) == robots_to_ignore.end();
+                 });
     return all_robots;
 }
 

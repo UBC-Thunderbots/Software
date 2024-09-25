@@ -1,7 +1,7 @@
 #include "defender_fsm_base.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
 bool DefenderFSMBase::ballNearbyWithoutThreat(
@@ -54,15 +54,19 @@ bool DefenderFSMBase::ballNearbyWithoutThreat(
 }
 
 void DefenderFSMBase::prepareGetPossession(
-    const TacticUpdate& tactic_update,
-    boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const TacticUpdate& tactic_update, std::shared_ptr<Strategy> strategy,
+    boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     Point ball_position     = tactic_update.world_ptr->ball().position();
     Point enemy_goal_center = tactic_update.world_ptr->field().enemyGoal().centre();
     auto ball_to_net_vector = Vector(enemy_goal_center - ball_position);
-    DribbleFSM::ControlParams control_params{
+
+    DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = ball_position,
         .final_dribble_orientation = ball_to_net_vector.orientation(),
-        .allow_excessive_dribbling = false};
-    processEvent(DribbleFSM::Update(control_params, tactic_update));
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL};
+
+    processEvent(DribbleSkillFSM::Update(
+        control_params, SkillUpdate(tactic_update.robot, tactic_update.world_ptr,
+                                    strategy, tactic_update.set_primitive)));
 }

@@ -1,0 +1,8 @@
+---
+
+- name: Add user robot to dialout
+  become: true
+  become_method: sudo
+  tags:
+    - add_user_robot_to_dialout
+  command: 'adduser robot dialout'

@@ -60,6 +60,9 @@ src/external/external
 *.log
 *.csv
 
+# Explicitly unignore files with weights
+!software/ai/rl/attacker/attacker_mdp_q_function_weights.csv
+
 ### Node ###
 
 # Dependencies

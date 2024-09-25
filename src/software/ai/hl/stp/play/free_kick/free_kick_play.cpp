@@ -3,8 +3,8 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-FreeKickPlay::FreeKickPlay(TbotsProto::AiConfig config)
-    : Play(config, true), fsm{FreeKickPlayFSM{config}}, control_params{}
+FreeKickPlay::FreeKickPlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy), fsm{FreeKickPlayFSM{strategy}}, control_params{}
 {
 }
 
@@ -28,4 +28,5 @@ std::vector<std::string> FreeKickPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay, std::shared_ptr<Strategy>>
+    factory;

@@ -2,8 +2,10 @@
 
 #include "software/logger/custom_logging_levels.h"
 
-ColouredCoutSink::ColouredCoutSink(bool print_detailed)
-    : print_detailed(print_detailed), log_merger(LogMerger())
+ColouredCoutSink::ColouredCoutSink(bool print_detailed, bool reduce_repetition)
+    : print_detailed(print_detailed),
+      reduce_repetition(reduce_repetition),
+      log_merger(LogMerger())
 {
 }
 
@@ -54,9 +56,16 @@ void ColouredCoutSink::resetColour()
 void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
 {
     g3::LogMessage new_log = log_entry.get();
-    for (g3::LogMessage log : log_merger.log(new_log))
+    if (reduce_repetition)
     {
-        displaySingleLog(log);
+        for (g3::LogMessage log : log_merger.log(new_log))
+        {
+            displaySingleLog(log);
+        }
+    }
+    else
+    {
+        displaySingleLog(new_log);
     }
 }
 
@@ -66,7 +75,7 @@ void ColouredCoutSink::displaySingleLog(g3::LogMessage &log)
     auto colour = colourToString(getColour(level));
 
     if (level.value == VISUALIZE.value || level.value == CSV.value ||
-        level.value == PLOTJUGGLER.value)
+        level.value == CSV_OVERWRITE.value || level.value == PLOTJUGGLER.value)
     {
         // Don't log anything that calls LOG(VISUALIZE) and LOG(CSV)
         return;

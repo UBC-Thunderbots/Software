@@ -1,25 +1,26 @@
 #include "software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h"
 
-EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
-      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(ai_config),
-                               std::make_shared<CreaseDefenderTactic>(ai_config)}),
+EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
+      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(strategy),
+                               std::make_shared<CreaseDefenderTactic>(strategy)}),
       avoid_interference_tactics({
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
+          std::make_shared<AvoidInterferenceTactic>(strategy),
+          std::make_shared<AvoidInterferenceTactic>(strategy),
+          std::make_shared<AvoidInterferenceTactic>(strategy),
+          std::make_shared<AvoidInterferenceTactic>(strategy),
+          std::make_shared<AvoidInterferenceTactic>(strategy),
+          std::make_shared<AvoidInterferenceTactic>(strategy),
       }),
-      move_tactics({
-          std::make_shared<MoveTactic>(),
-          std::make_shared<MoveTactic>(),
-          std::make_shared<MoveTactic>(),
+      move_skill_tactics({
+          std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+          std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+          std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
       }),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
-      distance_to_keep_meters(
-          ai_config.enemy_ball_placement_play_config().distance_to_keep_meters()),
+      goalie_tactic(std::make_shared<GoalieTactic>(strategy)),
+      distance_to_keep_meters(strategy->getAiConfig()
+                                  .enemy_ball_placement_play_config()
+                                  .distance_to_keep_meters()),
       nearly_placed_threshold_meters(0.5)
 {
 }
@@ -95,13 +96,17 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
             }
             // Move to destination point while aligning to the ball
             avoid_interference_tactics[idx]->updateControlParams(
-                destination, (ball_pos - robot.position()).orientation(), 0);
+                {.destination       = destination,
+                 .final_orientation = (ball_pos - robot.position()).orientation(),
+                 .final_speed       = 0});
         }
         else
         {
             // Stay in place while aligning to the ball
             avoid_interference_tactics[idx]->updateControlParams(
-                robot.position(), (ball_pos - robot.position()).orientation(), 0);
+                {.destination       = robot.position(),
+                 .final_orientation = (ball_pos - robot.position()).orientation(),
+                 .final_speed       = 0});
         }
         tactics_to_run[0].emplace_back(avoid_interference_tactics[idx]);
         idx++;
@@ -128,7 +133,7 @@ void EnemyBallPlacementPlayFSM::enterDefensiveFormation(const Update& event)
     // Create goalie
     tactics_to_run[0].emplace_back(goalie_tactic);
 
-    // Create move tactics
+    // Create move skill tactics
     Vector positioning_vector = world_ptr->field().friendlyGoalCenter() - ball_pos;
     positioning_vector        = positioning_vector.normalize() * distance_to_keep_meters;
 
@@ -139,15 +144,21 @@ void EnemyBallPlacementPlayFSM::enterDefensiveFormation(const Update& event)
     Point left   = world_ptr->ball().position() + left_vector;
     Point right  = world_ptr->ball().position() + right_vector;
 
-    move_tactics[0]->updateControlParams(
-        center, positioning_vector.orientation() + Angle::half(), 0);
-    move_tactics[1]->updateControlParams(left, left_vector.orientation() + Angle::half(),
-                                         0);
-    move_tactics[2]->updateControlParams(right,
-                                         right_vector.orientation() + Angle::half(), 0);
-    tactics_to_run[0].emplace_back(move_tactics[0]);
-    tactics_to_run[0].emplace_back(move_tactics[1]);
-    tactics_to_run[0].emplace_back(move_tactics[2]);
+    move_skill_tactics[0]->updateControlParams(
+        {.destination       = center,
+         .final_orientation = positioning_vector.orientation() + Angle::half(),
+         .final_speed       = 0});
+    move_skill_tactics[1]->updateControlParams(
+        {.destination       = left,
+         .final_orientation = left_vector.orientation() + Angle::half(),
+         .final_speed       = 0});
+    move_skill_tactics[2]->updateControlParams(
+        {.destination       = right,
+         .final_orientation = right_vector.orientation() + Angle::half(),
+         .final_speed       = 0});
+    tactics_to_run[0].emplace_back(move_skill_tactics[0]);
+    tactics_to_run[0].emplace_back(move_skill_tactics[1]);
+    tactics_to_run[0].emplace_back(move_skill_tactics[2]);
 
     // Set tactics to run
     event.common.set_tactics(tactics_to_run);

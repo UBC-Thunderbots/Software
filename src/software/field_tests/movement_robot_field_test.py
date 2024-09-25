@@ -24,16 +24,16 @@ logger = createLogger(__name__)
 #     robot_y_destination = -1
 #     rob_pos_p = Point(x_meters=robot_x_destination, y_meters=robot_y_destination)
 #
-#     move_tactic = MoveTactic()
-#     move_tactic.destination.CopyFrom(rob_pos_p)
-#     move_tactic.final_speed = 0.0
-#     move_tactic.dribbler_mode = DribblerMode.OFF
-#     move_tactic.final_orientation.CopyFrom(Angle(radians=angle))
-#     move_tactic.ball_collision_type = BallCollisionType.AVOID
-#     move_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=0.0))
-#     move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
-#     move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
-#     move_tactic.target_spin_rev_per_s = 0.0
+#     move_skill_tactic = MoveSkillTactic()
+#     move_skill_tactic.destination.CopyFrom(rob_pos_p)
+#     move_skill_tactic.final_speed = 0.0
+#     move_skill_tactic.dribbler_mode = DribblerMode.OFF
+#     move_skill_tactic.final_orientation.CopyFrom(Angle(radians=angle))
+#     move_skill_tactic.ball_collision_type = BallCollisionType.AVOID
+#     move_skill_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=0.0))
+#     move_skill_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
+#     move_skill_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
+#     move_skill_tactic.target_spin_rev_per_s = 0.0
 #
 #     # setup world state
 #     initial_worldstate = create_world_state(
@@ -47,7 +47,7 @@ logger = createLogger(__name__)
 #     # Setup Tactic
 #     params = AssignedTacticPlayControlParams()
 #
-#     params.assigned_tactics[ROBOT_ID].move.CopyFrom(move_tactic)
+#     params.assigned_tactics[ROBOT_ID].move.CopyFrom(move_skill_tactic)
 #
 #     # Eventually Validation
 #     eventually_validation_sequence_set = [
@@ -71,7 +71,7 @@ logger = createLogger(__name__)
 
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
-    test_angles = [0, 45, 90, 180, 270, 0]
+    test_angles = [0, math.pi, 0, math.pi, 0, math.pi]
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     if len(world.friendly_team.team_robots) == 0:
@@ -93,41 +93,38 @@ def test_basic_rotation(field_test_runner):
     logger.info("staying in pos {rob_pos_p}")
 
     for angle in test_angles:
-        move_tactic = MoveTactic()
-        move_tactic.destination.CopyFrom(rob_pos_p)
-        move_tactic.final_speed = 0.0
-        move_tactic.dribbler_mode = DribblerMode.OFF
-        move_tactic.final_orientation.CopyFrom(Angle(radians=angle))
-        move_tactic.ball_collision_type = BallCollisionType.AVOID
-        move_tactic.auto_chip_or_kick.CopyFrom(
+        move_skill_tactic = MoveSkillTactic()
+        move_skill_tactic.destination.CopyFrom(rob_pos_p)
+        move_skill_tactic.final_speed = 0.0
+        move_skill_tactic.dribbler_mode = DribblerMode.OFF
+        move_skill_tactic.final_orientation.CopyFrom(Angle(radians=angle))
+        move_skill_tactic.ball_collision_type = BallCollisionType.AVOID
+        move_skill_tactic.auto_chip_or_kick.CopyFrom(
             AutoChipOrKick(autokick_speed_m_per_s=0.0)
         )
-        move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
-        move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
-        move_tactic.target_spin_rev_per_s = 0.0
+        move_skill_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
+        move_skill_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
+        move_skill_tactic.target_spin_rev_per_s = 0.0
 
         # Setup Tactic
         params = AssignedTacticPlayControlParams()
 
-        params.assigned_tactics[id].move.CopyFrom(move_tactic)
+        params.assigned_tactics[id].move.CopyFrom(move_skill_tactic)
 
         field_test_runner.set_tactics(params, True)
         field_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
-            test_timeout_s=5,
+            test_timeout_s=3,
         )
-        # Send a stop tactic after the test finishes
-        stop_tactic = StopTactic()
+        # Send a stop skill tactic after the test finishes
+        stop_skill_tactic = StopSkillTactic()
         params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
-        # send the stop tactic
+        params.assigned_tactics[id].stop_skill.CopyFrom(stop_skill_tactic)
         field_test_runner.set_tactics(params, True)
 
         # validate by eye
         logger.info(f"robot set to {angle} orientation")
-
-        time.sleep(2)
 
 
 def test_one_robots_square(field_test_runner):
@@ -151,7 +148,7 @@ def test_one_robots_square(field_test_runner):
     point3 = Point(x_meters=-1.5, y_meters=-0.6)
     point4 = Point(x_meters=-1.5, y_meters=0.6)
 
-    tactic_0 = MoveTactic(
+    tactic_0 = MoveSkillTactic(
         destination=point1,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
@@ -162,7 +159,7 @@ def test_one_robots_square(field_test_runner):
         obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
         target_spin_rev_per_s=0.0,
     )
-    tactic_1 = MoveTactic(
+    tactic_1 = MoveSkillTactic(
         destination=point2,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
@@ -173,7 +170,7 @@ def test_one_robots_square(field_test_runner):
         obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
         target_spin_rev_per_s=0.0,
     )
-    tactic_2 = MoveTactic(
+    tactic_2 = MoveSkillTactic(
         destination=point3,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
@@ -184,7 +181,7 @@ def test_one_robots_square(field_test_runner):
         obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
         target_spin_rev_per_s=0.0,
     )
-    tactic_3 = MoveTactic(
+    tactic_3 = MoveSkillTactic(
         destination=point4,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
@@ -209,10 +206,10 @@ def test_one_robots_square(field_test_runner):
             test_timeout_s=4,
         )
 
-    # Send a stop tactic after the test finishes
-    stop_tactic = StopTactic()
+    # Send a stop skill tactic after the test finishes
+    stop_skill_tactic = StopSkillTactic()
     params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
+    params.assigned_tactics[id].stop_skill.CopyFrom(stop_skill_tactic)
 
 
 if __name__ == "__main__":

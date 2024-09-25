@@ -1,21 +1,16 @@
 #include "software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h"
 
-FreeKickPlayFSM::FreeKickPlayFSM(const TbotsProto::AiConfig &ai_config)
-    : ai_config(ai_config),
-      align_to_ball_tactic(std::make_shared<MoveTactic>()),
-      shoot_tactic(std::make_shared<KickTactic>()),
-      chip_tactic(std::make_shared<ChipTactic>()),
-      passer_tactic(std::make_shared<KickTactic>()),
-      receiver_tactic(
-          std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config())),
+FreeKickPlayFSM::FreeKickPlayFSM(std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
+      align_to_ball_tactic(std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy)),
+      shoot_tactic(std::make_shared<AssignedSkillTactic<KickSkill>>(strategy)),
+      chip_tactic(std::make_shared<AssignedSkillTactic<ChipSkill>>(strategy)),
+      passer_tactic(std::make_shared<AssignedSkillTactic<KickSkill>>(strategy)),
+      receiver_tactic(std::make_shared<ReceiverTactic>(strategy)),
       receiver_positioning_tactics(
-          {std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()}),
-      defense_play(std::make_shared<DefensePlay>(ai_config)),
-      receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
-          std::make_shared<const EighteenZonePitchDivision>(
-              Field::createSSLDivisionBField()),
-          ai_config.passing_config())),
-      pass_generator(ai_config.passing_config()),
+          {std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy),
+           std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy)}),
+      defense_play(std::make_shared<DefensePlay>(strategy)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0})
 {
@@ -51,15 +46,15 @@ void FreeKickPlayFSM::updateReceiverPositioningTactics(
     if (num_tactics != receiver_positioning_tactics.size())
     {
         receiver_positioning_tactics =
-            std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
-        std::generate(receiver_positioning_tactics.begin(),
-                      receiver_positioning_tactics.end(),
-                      []() { return std::make_shared<MoveTactic>(); });
+            std::vector<std::shared_ptr<AssignedSkillTactic<MoveSkill>>>(num_tactics);
+        std::generate(
+            receiver_positioning_tactics.begin(), receiver_positioning_tactics.end(),
+            [&]() { return std::make_shared<AssignedSkillTactic<MoveSkill>>(strategy); });
     }
 
-    std::vector<Point> best_receiving_positions =
-        receiver_position_generator.getBestReceivingPositions(
-            *world, num_tactics, existing_receiver_positions, pass_origin_override);
+    std::vector<Point> best_receiving_positions = strategy->getBestReceivingPositions(
+        *world, num_tactics, existing_receiver_positions, pass_origin_override);
+
     // Note that getBestReceivingPositions may return fewer positions than requested
     // if there are not enough robots, so we will need to check the size of the vector.
     for (unsigned int i = 0;
@@ -69,9 +64,11 @@ void FreeKickPlayFSM::updateReceiverPositioningTactics(
         Angle receiver_orientation =
             (world->ball().position() - best_receiving_positions[i]).orientation();
         receiver_positioning_tactics[i]->updateControlParams(
-            best_receiving_positions[i], receiver_orientation, 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
+            {.destination             = best_receiving_positions[i],
+             .final_orientation       = receiver_orientation,
+             .final_speed             = 0.0,
+             .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+             .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE});
     }
 }
 
@@ -124,8 +121,10 @@ void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)
     Vector direction_to_face = position_to_face - ball_pos;
 
     align_to_ball_tactic->updateControlParams(
-        ball_pos - direction_to_face.normalize(ROBOT_MAX_RADIUS_METERS * 2),
-        direction_to_face.orientation(), 0);
+        {.destination =
+             ball_pos - direction_to_face.normalize(ROBOT_MAX_RADIUS_METERS * 2),
+         .final_orientation = direction_to_face.orientation(),
+         .final_speed       = 0});
 }
 
 bool FreeKickPlayFSM::shotFound(const Update &event)
@@ -135,9 +134,9 @@ bool FreeKickPlayFSM::shotFound(const Update &event)
                               event.common.world_ptr->enemyTeam(),
                               event.common.world_ptr->ball().position(), TeamType::ENEMY);
     return shot.has_value() &&
-           shot->getOpenAngle() >
-               Angle::fromDegrees(
-                   ai_config.attacker_tactic_config().min_open_angle_for_shot_deg());
+           shot->getOpenAngle() > Angle::fromDegrees(strategy->getAiConfig()
+                                                         .attacker_tactic_config()
+                                                         .min_open_angle_for_shot_deg());
 }
 
 void FreeKickPlayFSM::shootBall(const Update &event)
@@ -148,8 +147,8 @@ void FreeKickPlayFSM::shootBall(const Update &event)
     Point ball_pos = event.common.world_ptr->ball().position();
 
     shoot_tactic->updateControlParams(
-        ball_pos, (shot->getPointToShootAt() - ball_pos).orientation(),
-        BALL_MAX_SPEED_METERS_PER_SECOND);
+        {ball_pos, (shot->getPointToShootAt() - ball_pos).orientation(),
+         BALL_MAX_SPEED_METERS_PER_SECOND});
     tactics_to_run[0].emplace_back(shoot_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -165,7 +164,9 @@ bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update &event)
     Duration time_since_pass_optimization_start =
         event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time;
     return time_since_pass_optimization_start.toSeconds() >
-           ai_config.free_kick_play_config().max_time_commit_to_pass_seconds();
+           strategy->getAiConfig()
+               .free_kick_play_config()
+               .max_time_commit_to_pass_seconds();
 }
 
 void FreeKickPlayFSM::chipBall(const Update &event)
@@ -199,8 +200,11 @@ void FreeKickPlayFSM::chipBall(const Update &event)
         }
     }
 
-    chip_tactic->updateControlParams(event.common.world_ptr->ball().position(),
-                                     chip_target);
+    Point chip_origin  = event.common.world_ptr->ball().position();
+    Vector chip_vector = chip_target - chip_origin;
+
+    chip_tactic->updateControlParams(
+        {chip_origin, chip_vector.orientation(), chip_vector.length()});
     tactics_to_run[0].emplace_back(chip_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -233,7 +237,7 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
         robots_to_ignore.push_back(robot_with_ball_opt.value().id());
     }
     best_pass_and_score_so_far =
-        pass_generator.getBestPass(*event.common.world_ptr, robots_to_ignore);
+        strategy->getBestPass(*event.common.world_ptr, robots_to_ignore);
 
     event.common.set_tactics(tactics_to_run);
 }
@@ -245,11 +249,11 @@ bool FreeKickPlayFSM::passFound(const Update &event)
             .toSeconds();
 
     double abs_min_pass_score =
-        ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+        strategy->getAiConfig().passing_config().abs_min_pass_score();
     double min_perfect_pass_score =
-        ai_config.shoot_or_pass_play_config().min_perfect_pass_score();
+        strategy->getAiConfig().passing_config().min_perfect_pass_score();
     double pass_score_ramp_down_duration =
-        ai_config.free_kick_play_config().max_time_commit_to_pass_seconds();
+        strategy->getAiConfig().free_kick_play_config().max_time_commit_to_pass_seconds();
 
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
@@ -274,9 +278,9 @@ bool FreeKickPlayFSM::shouldAbortPass(const Update &event)
     // Abort pass if the pass score has dropped significantly
     best_pass_and_score_so_far.rating =
         ratePass(*event.common.world_ptr, best_pass_and_score_so_far.pass,
-                 ai_config.passing_config());
+                 strategy->getAiConfig().passing_config());
     double abs_min_pass_score =
-        ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+        strategy->getAiConfig().passing_config().abs_min_pass_score();
     return best_pass_and_score_so_far.rating < abs_min_pass_score;
 }
 
@@ -287,9 +291,9 @@ void FreeKickPlayFSM::passBall(const Update &event)
 
     Pass pass = best_pass_and_score_so_far.pass;
 
-    passer_tactic->updateControlParams(pass.passerPoint(), pass.passerOrientation(),
-                                       pass.speed());
-    receiver_tactic->updateControlParams(pass);
+    passer_tactic->updateControlParams(
+        {pass.passerPoint(), pass.passerOrientation(), pass.speed()});
+    receiver_tactic->updateControlParams(pass.receiverPoint());
     tactics_to_run[0].emplace_back(passer_tactic);
     tactics_to_run[0].emplace_back(receiver_tactic);
 

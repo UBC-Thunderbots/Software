@@ -1,8 +1,11 @@
 #pragma once
 
+#include <memory>
+
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/strategy.h"
 
 /**
  * Play for defending penalty kicks
@@ -10,7 +13,7 @@
 class PenaltyKickEnemyPlay : public Play
 {
    public:
-    PenaltyKickEnemyPlay(TbotsProto::AiConfig config);
+    PenaltyKickEnemyPlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
@@ -18,6 +21,6 @@ class PenaltyKickEnemyPlay : public Play
     std::vector<std::string> getState() override;
 
    private:
-    FSM<PenaltyKickEnemyPlayFSM> fsm;
+    std::unique_ptr<FSM<PenaltyKickEnemyPlayFSM>> fsm;
     PenaltyKickEnemyPlayFSM::ControlParams control_params;
 };

@@ -216,6 +216,15 @@ def configure_base_fullsystem(
             stretch=WidgetStretchData(y=4),
         ),
         TScopeWidget(
+            name="Q-Learning Info",
+            widget=setup_q_learning_info(
+                **{"proto_unix_io": full_system_proto_unix_io}
+            ),
+            anchor="Referee Info",
+            position=WidgetPosition.BELOW,
+            stretch=WidgetStretchData(y=4),
+        ),
+        TScopeWidget(
             name="Play Info",
             widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Referee Info",
@@ -486,7 +495,11 @@ def configure_replay_view(
                     replay=True,
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
+                    extra_widgets=[
+                        configure_robot_view_fullsystem(
+                            proto_unix_io_map[ProtoUnixIOTypes.BLUE]
+                        )
+                    ],
                 ),
             )
         )
@@ -505,7 +518,11 @@ def configure_replay_view(
                     replay=True,
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
+                    extra_widgets=[
+                        configure_robot_view_fullsystem(
+                            proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+                        )
+                    ],
                 ),
             )
         )

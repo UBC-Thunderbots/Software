@@ -41,3 +41,8 @@ py_library(
         ":frametime_counter",
     ],
 )
+
+py_library(
+    name = "bar_graph_widget",
+    srcs = ["bar_graph_widget.py"],
+)

@@ -7,20 +7,28 @@
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> Halt
-Halt --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
-Halt --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
-Halt --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
-Stop --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
-Stop --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
-Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
-Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
-Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
-Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
-SetPlay --> Halt : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
-SetPlay --> Stop : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
-SetPlay --> Playing : [gameStatePlaying]\n<i>resetSetPlay, setupOffensePlay</i>
-SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+[*] --> HaltState
+HaltState --> StopState : [gameStateStopped]\n<i>setupStopPlay</i>
+HaltState --> OffensePlayState : [gameStatePlaying && !enemyHasPossession]\n<i>setupOffensePlay</i>
+HaltState --> DefensePlayState : [gameStatePlaying && enemyHasPossession]\n<i>setupDefensePlay</i>
+HaltState --> SetPlayState : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+StopState --> HaltState : [gameStateHalted]\n<i>setupHaltPlay</i>
+StopState --> OffensePlayState : [gameStatePlaying && !enemyHasPossession]\n<i>setupOffensePlay</i>
+StopState --> DefensePlayState : [gameStatePlaying && enemyHasPossession]\n<i>setupDefensePlay</i>
+StopState --> SetPlayState : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+OffensePlayState --> HaltState : [gameStateHalted]\n<i>terminateOffensePlay, setupHaltPlay</i>
+OffensePlayState --> StopState : [gameStateStopped]\n<i>terminateOffensePlay, setupStopPlay</i>
+OffensePlayState --> SetPlayState : [gameStateSetupRestart]\n<i>terminateOffensePlay, setupSetPlay</i>
+OffensePlayState --> DefensePlayState : [enemyHasPossession]\n<i>terminateOffensePlay, setupDefensePlay</i>
+DefensePlayState --> HaltState : [gameStateHalted]\n<i>setupHaltPlay</i>
+DefensePlayState --> StopState : [gameStateStopped]\n<i>setupStopPlay</i>
+DefensePlayState --> SetPlayState : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+DefensePlayState --> OffensePlayState : [!enemyHasPossession]\n<i>setupOffensePlay</i>
+SetPlayState --> HaltState : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
+SetPlayState --> StopState : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
+SetPlayState --> OffensePlayState : [gameStatePlaying && !enemyHasPossession]\n<i>resetSetPlay, setupOffensePlay</i>
+SetPlayState --> DefensePlayState : [gameStatePlaying && enemyHasPossession]\n<i>resetSetPlay, setupDefensePlay</i>
+SetPlayState --> SetPlayState : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -33,33 +41,24 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> StartState
-StartState --> AlignPlacementState : [!shouldKickOffWall]\n<i>alignPlacement</i>
-StartState --> KickOffWallState : [shouldKickOffWall]
-KickOffWallState --> KickOffWallState : [!kickDone && shouldKickOffWall]\n<i>kickOffWall</i>
-KickOffWallState --> KickOffWallState : [kickDone]
-KickOffWallState --> AlignPlacementState : [!kickDone]
-AlignPlacementState --> KickOffWallState : [shouldKickOffWall]
+StartState --> AlignPlacementState : [!shouldPickOffWall]\n<i>alignPlacement</i>
+StartState --> AlignWallState : [shouldPickOffWall]
+AlignWallState --> AlignWallState : [!wallAlignDone && shouldPickOffWall]\n<i>alignWall</i>
+AlignWallState --> PickOffWallState : [wallAlignDone]\n<i>setPickOffDest</i>
+AlignWallState --> AlignPlacementState : [!shouldPickOffWall]
+PickOffWallState --> PickOffWallState : [!wallPickOffDone]\n<i>pickOffWall</i>
+PickOffWallState --> ReleaseBallState : [wallPickOffDone]\n<i>startWait</i>
+AlignPlacementState --> AlignWallState : [shouldPickOffWall]
 AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
 AlignPlacementState --> PlaceBallState : [alignDone]
 PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
-PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
-WaitState --> WaitState : [!waitDone]
-WaitState --> RetreatState : [waitDone]
+PlaceBallState --> ReleaseBallState : [ballPlaced]\n<i>startWait</i>
+ReleaseBallState --> ReleaseBallState : [!waitDone && ballPlaced]\n<i>releaseBall</i>
+ReleaseBallState --> StartState : [!ballPlaced]
+ReleaseBallState --> RetreatState : [waitDone]
 RetreatState --> Terminate:::terminate : [retreatDone && ballPlaced]
 RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
-
-```
-
-## [CreaseDefensePlayFSM](/src/software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> DefenseState
-DefenseState --> DefenseState : <i>defendDefenseArea</i>
-Terminate:::terminate --> Terminate:::terminate
+RetreatState --> StartState : [!ballPlaced]
 
 ```
 
@@ -130,22 +129,6 @@ ChipState --> Terminate:::terminate : [chipDone]
 
 ```
 
-## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> OffensiveState
-OffensiveState --> DefensiveState : [enemyHasPossession]\n<i>setupDefensiveStrategy</i>
-OffensiveState --> OffensiveState : <i>setupOffensiveStrategy</i>
-DefensiveState --> OffensiveState : [!enemyHasPossession]\n<i>setupOffensiveStrategy</i>
-DefensiveState --> DefensiveState : <i>setupDefensiveStrategy</i>
-Terminate:::terminate --> Terminate:::terminate
-
-```
-
 ## [PenaltyKickPlayFSM](/src/software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h)
 
 ```mermaid
@@ -177,99 +160,48 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [ShootOrPassPlayFSM](/src/software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h)
+## [ChipSkillFSM](/src/software/ai/hl/stp/skill/chip/chip_skill_fsm.h)
 
 ```mermaid
 
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> StartState
-StartState --> AttemptShotState : <i>startLookingForPass</i>
-AttemptShotState --> TakePassState : [passFound]\n<i>takePass</i>
-AttemptShotState --> Terminate:::terminate : [tookShot]
-AttemptShotState --> AttemptShotState : [!passFound]\n<i>lookForPass</i>
-TakePassState --> AttemptShotState : [shouldAbortPass]\n<i>startLookingForPass</i>
-TakePassState --> TakePassState : [!passCompleted]\n<i>takePass</i>
-TakePassState --> Terminate:::terminate : [passCompleted]\n<i>takePass</i>
-Terminate:::terminate --> AttemptShotState : <i>startLookingForPass</i>
-
-```
-
-## [AttackerFSM](/src/software/ai/hl/stp/tactic/attacker/attacker_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> DribbleFSM
-DribbleFSM --> PivotKickFSM : [shouldKick]\n<i>pivotKick</i>
-DribbleFSM --> DribbleFSM : [!shouldKick]\n<i>keepAway</i>
-PivotKickFSM --> PivotKickFSM : <i>pivotKick</i>
-PivotKickFSM --> Terminate:::terminate
-Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
-
-```
-
-## [ChipFSM](/src/software/ai/hl/stp/tactic/chip/chip_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> GetBehindBallFSM
-GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
-GetBehindBallFSM --> ChipState
-ChipState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
+[*] --> GetBehindBallSkillFSM
+GetBehindBallSkillFSM --> GetBehindBallSkillFSM : <i>updateGetBehindBall</i>
+GetBehindBallSkillFSM --> ChipState
+ChipState --> GetBehindBallSkillFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
 ChipState --> ChipState : [!ballChicked]\n<i>updateChip</i>
 ChipState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
 
-## [CreaseDefenderFSM](/src/software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h)
+## [DribbleSkillFSM](/src/software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h)
 
 ```mermaid
 
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> MoveFSM
-MoveFSM --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
-MoveFSM --> MoveFSM : <i>blockThreat</i>
-MoveFSM --> Terminate:::terminate
-DribbleFSM --> MoveFSM : [!ballNearbyWithoutThreat]\n<i>blockThreat</i>
-DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
-Terminate:::terminate --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
-Terminate:::terminate --> MoveFSM : <i>blockThreat</i>
-
-```
-
-## [DribbleFSM](/src/software/ai/hl/stp/tactic/dribble/dribble_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> GetPossession
-GetPossession --> Dribble : [havePossession]\n<i>startDribble</i>
-GetPossession --> GetPossession : [!havePossession]\n<i>getPossession</i>
-Dribble --> GetPossession : [lostPossession]\n<i>getPossession</i>
-Dribble --> LoseBall : [shouldLoseBall]\n<i>loseBall</i>
-Dribble --> Dribble : [!dribblingDone]\n<i>dribble</i>
+[*] --> GetBallControl
+GetBallControl --> Dribble : [haveBallControl]\n<i>dribble</i>
+GetBallControl --> GetBallControl : <i>getBallControl</i>
+Dribble --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
+Dribble --> LoseBall : [shouldLoseBall && shouldExcessivelyDribble]\n<i>loseBall</i>
+Dribble --> Terminate:::terminate : [shouldLoseBall && !shouldExcessivelyDribble]\n<i>dribble</i>
 Dribble --> Terminate:::terminate : [dribblingDone]\n<i>dribble</i>
-LoseBall --> LoseBall : [!lostPossession]\n<i>loseBall</i>
-LoseBall --> GetPossession : [lostPossession]\n<i>getPossession</i>
-Terminate:::terminate --> GetPossession : [lostPossession]\n<i>getPossession</i>
+Dribble --> Dribble : <i>dribble</i>
+LoseBall --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
+LoseBall --> LoseBall : <i>loseBall</i>
+Terminate:::terminate --> Terminate:::terminate : [!shouldExcessivelyDribble]\n<i>dribble</i>
+Terminate:::terminate --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
 Terminate:::terminate --> Dribble : [!dribblingDone]\n<i>dribble</i>
 Terminate:::terminate --> Terminate:::terminate : <i>dribble</i>
 
 ```
 
-## [GetBehindBallFSM](/src/software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h)
+## [GetBehindBallSkillFSM](/src/software/ai/hl/stp/skill/get_behind_ball/get_behind_ball_skill_fsm.h)
 
 ```mermaid
 
@@ -284,54 +216,39 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [GoalieFSM](/src/software/ai/hl/stp/tactic/goalie/goalie_fsm.h)
+## [KeepAwaySkillFSM](/src/software/ai/hl/stp/skill/keep_away/keep_away_skill_fsm.h)
 
 ```mermaid
 
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> PositionToBlock
-PositionToBlock --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-PositionToBlock --> DribbleFSM : [shouldEvacuateCrease]\n<i>retrieveFromDeadZone</i>
-PositionToBlock --> Panic : [shouldPanic]\n<i>panic</i>
-PositionToBlock --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
-PositionToBlock --> PositionToBlock : <i>positionToBlock</i>
-DribbleFSM --> PivotKickFSM : [retrieveDone]\n<i>updatePivotKick</i>
-DribbleFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-DribbleFSM --> DribbleFSM : [ballInInflatedDefenseArea]\n<i>retrieveFromDeadZone</i>
-DribbleFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
-Panic --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-Panic --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
-Panic --> PositionToBlock : [panicDone]\n<i>positionToBlock</i>
-Panic --> Panic : <i>panic</i>
-PivotKickFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-PivotKickFSM --> PivotKickFSM : [ballInInflatedDefenseArea]\n<i>updatePivotKick</i>
-PivotKickFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
-MoveToGoalLine --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-MoveToGoalLine --> PositionToBlock : [!shouldMoveToGoalLine]\n<i>positionToBlock</i>
-Terminate:::terminate --> Terminate:::terminate
+[*] --> DribbleSkillFSM
+DribbleSkillFSM --> Terminate:::terminate : [!shouldKeepAway]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
+DribbleSkillFSM --> DribbleSkillFSM : <i>keepAway</i>
+DribbleSkillFSM --> Terminate:::terminate
+Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
 
-## [KickFSM](/src/software/ai/hl/stp/tactic/kick/kick_fsm.h)
+## [KickSkillFSM](/src/software/ai/hl/stp/skill/kick/kick_skill_fsm.h)
 
 ```mermaid
 
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> GetBehindBallFSM
-GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
-GetBehindBallFSM --> KickState
-KickState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
+[*] --> GetBehindBallSkillFSM
+GetBehindBallSkillFSM --> GetBehindBallSkillFSM : <i>updateGetBehindBall</i>
+GetBehindBallSkillFSM --> KickState
+KickState --> GetBehindBallSkillFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
 KickState --> KickState : [!ballChicked]\n<i>updateKick</i>
 KickState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
 
-## [MoveFSM](/src/software/ai/hl/stp/tactic/move/move_fsm.h)
+## [MoveSkillFSM](/src/software/ai/hl/stp/skill/move/move_skill_fsm.h)
 
 ```mermaid
 
@@ -346,6 +263,125 @@ Terminate:::terminate --> Terminate:::terminate : <i>updateMove</i>
 
 ```
 
+## [PassSkillFSM](/src/software/ai/hl/stp/skill/pass/pass_skill_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> DribbleSkillFSM
+DribbleSkillFSM --> PivotKickSkillFSM : [passFound]\n<i>takePass</i>
+DribbleSkillFSM --> DribbleSkillFSM : <i>findPass</i>
+DribbleSkillFSM --> PivotKickSkillFSM
+PivotKickSkillFSM --> Terminate:::terminate : [shouldAbortPass]\n<i>abortPass</i>
+PivotKickSkillFSM --> PivotKickSkillFSM : <i>takePass</i>
+PivotKickSkillFSM --> Suspended
+Suspended --> Terminate:::terminate : [passReceived || strayPass]\n<i>resetSkillState</i>
+Suspended --> Suspended
+Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
+
+```
+
+## [PivotKickSkillFSM](/src/software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StartState
+StartState --> DribbleSkillFSM : <i>getBallControlAndPivot</i>
+DribbleSkillFSM --> DribbleSkillFSM : <i>getBallControlAndPivot</i>
+DribbleSkillFSM --> KickStartState
+KickStartState --> KickState : <i>setKickStartTime, kickBall</i>
+KickState --> Terminate:::terminate : [ballKicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
+KickState --> DribbleSkillFSM : [lostBallControl]\n<i>getBallControlAndPivot</i>
+KickState --> KickState : <i>kickBall</i>
+Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
+
+```
+
+## [ShootSkillFSM](/src/software/ai/hl/stp/skill/shoot/shoot_skill_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> DribbleSkillFSM
+DribbleSkillFSM --> DribbleSkillFSM : <i>getBallControl</i>
+DribbleSkillFSM --> PivotKickSkillFSM
+PivotKickSkillFSM --> Terminate:::terminate : [shouldAbortShot]\n<i>abortShot</i>
+PivotKickSkillFSM --> PivotKickSkillFSM : <i>pivotKick</i>
+PivotKickSkillFSM --> Terminate:::terminate
+Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
+
+```
+
+## [StopSkillFSM](/src/software/ai/hl/stp/skill/stop/stop_skill_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StopState
+StopState --> StopState : [!stopDone]\n<i>updateStop</i>
+StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+
+```
+
+## [CreaseDefenderFSM](/src/software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> MoveSkillFSM
+MoveSkillFSM --> DribbleSkillFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
+MoveSkillFSM --> MoveSkillFSM : <i>blockThreat</i>
+MoveSkillFSM --> Terminate:::terminate
+DribbleSkillFSM --> MoveSkillFSM : [!ballNearbyWithoutThreat]\n<i>blockThreat</i>
+DribbleSkillFSM --> DribbleSkillFSM : <i>prepareGetPossession</i>
+Terminate:::terminate --> DribbleSkillFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
+Terminate:::terminate --> MoveSkillFSM : <i>blockThreat</i>
+
+```
+
+## [GoalieFSM](/src/software/ai/hl/stp/tactic/goalie/goalie_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> PositionToBlock
+PositionToBlock --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+PositionToBlock --> DribbleSkillFSM : [shouldEvacuateCrease]\n<i>retrieveFromDeadZone</i>
+PositionToBlock --> Panic : [shouldPanic]\n<i>panic</i>
+PositionToBlock --> PivotKickSkillFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
+PositionToBlock --> PositionToBlock : <i>positionToBlock</i>
+DribbleSkillFSM --> PivotKickSkillFSM : [retrieveDone]\n<i>updatePivotKick</i>
+DribbleSkillFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+DribbleSkillFSM --> DribbleSkillFSM : [ballInInflatedDefenseArea]\n<i>retrieveFromDeadZone</i>
+DribbleSkillFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
+Panic --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+Panic --> PivotKickSkillFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
+Panic --> PositionToBlock : [panicDone]\n<i>positionToBlock</i>
+Panic --> Panic : <i>panic</i>
+PivotKickSkillFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+PivotKickSkillFSM --> PivotKickSkillFSM : [ballInInflatedDefenseArea]\n<i>updatePivotKick</i>
+PivotKickSkillFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
+MoveToGoalLine --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+MoveToGoalLine --> PositionToBlock : [!shouldMoveToGoalLine]\n<i>positionToBlock</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
 ## [PassDefenderFSM](/src/software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h)
 
 ```mermaid
@@ -357,9 +393,9 @@ direction LR
 BlockPassState --> InterceptBallState : [passStarted]\n<i>interceptBall</i>
 BlockPassState --> BlockPassState : <i>blockPass</i>
 InterceptBallState --> BlockPassState : [ballDeflected]\n<i>blockPass</i>
-InterceptBallState --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
-DribbleFSM --> BlockPassState : [!ballNearbyWithoutThreat]\n<i>blockPass</i>
-DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
+InterceptBallState --> DribbleSkillFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
+DribbleSkillFSM --> BlockPassState : [!ballNearbyWithoutThreat]\n<i>blockPass</i>
+DribbleSkillFSM --> DribbleSkillFSM : <i>prepareGetPossession</i>
 InterceptBallState --> InterceptBallState : <i>interceptBall</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
@@ -372,30 +408,13 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> DribbleFSM
-DribbleFSM --> DribbleFSM : [!takePenaltyShot]\n<i>updateApproachKeeper</i>
-DribbleFSM --> KickFSM : [timeOutApproach]\n<i>shoot</i>
-DribbleFSM --> DribbleFSM : <i>adjustOrientationForShot</i>
-DribbleFSM --> KickFSM
-KickFSM --> KickFSM : <i>shoot</i>
-KickFSM --> Terminate:::terminate
-Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
-
-```
-
-## [PivotKickFSM](/src/software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> StartState
-StartState --> DribbleFSM : <i>getPossessionAndPivot</i>
-DribbleFSM --> DribbleFSM : <i>getPossessionAndPivot</i>
-DribbleFSM --> KickState
-KickState --> KickState : [!ballKicked]\n<i>kickBall</i>
-KickState --> Terminate:::terminate : [ballKicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
+[*] --> DribbleSkillFSM
+DribbleSkillFSM --> DribbleSkillFSM : [!takePenaltyShot]\n<i>updateApproachKeeper</i>
+DribbleSkillFSM --> KickSkillFSM : [timeOutApproach]\n<i>shoot</i>
+DribbleSkillFSM --> DribbleSkillFSM : <i>adjustOrientationForShot</i>
+DribbleSkillFSM --> KickSkillFSM
+KickSkillFSM --> KickSkillFSM : <i>shoot</i>
+KickSkillFSM --> Terminate:::terminate
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
@@ -411,11 +430,14 @@ direction LR
 WaitingForPassState --> WaitingForPassState : [!passStarted]\n<i>updateReceive</i>
 WaitingForPassState --> OneTouchShotState : [passStarted && onetouchPossible]\n<i>updateOnetouch</i>
 WaitingForPassState --> ReceiveAndDribbleState : [passStarted && !onetouchPossible]\n<i>updateReceive</i>
-ReceiveAndDribbleState --> ReceiveAndDribbleState : [!passFinished]\n<i>adjustReceive</i>
-OneTouchShotState --> OneTouchShotState : [!passFinished && !strayPass]\n<i>updateOnetouch</i>
-OneTouchShotState --> ReceiveAndDribbleState : [!passFinished && strayPass]\n<i>adjustReceive</i>
-ReceiveAndDribbleState --> Terminate:::terminate : [passFinished]\n<i>adjustReceive</i>
-OneTouchShotState --> Terminate:::terminate : [passFinished]\n<i>updateOnetouch</i>
+ReceiveAndDribbleState --> WaitingForPassState : [passReceivedByTeammate]\n<i>updateReceive</i>
+ReceiveAndDribbleState --> DribbleSkillFSM : [strayPass || slowPass]\n<i>retrieveBall</i>
+ReceiveAndDribbleState --> ReceiveAndDribbleState : <i>adjustReceive</i>
+DribbleSkillFSM --> WaitingForPassState : [passReceivedByTeammate]\n<i>updateReceive</i>
+DribbleSkillFSM --> DribbleSkillFSM : <i>retrieveBall</i>
+OneTouchShotState --> OneTouchShotState : [!passReceived && !strayPass]\n<i>updateOnetouch</i>
+OneTouchShotState --> ReceiveAndDribbleState : [!passReceived && strayPass]\n<i>adjustReceive</i>
+OneTouchShotState --> WaitingForPassState : [passReceived]\n<i>updateOnetouch</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
@@ -427,32 +449,17 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> MoveFSM
-MoveFSM --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
-MoveFSM --> MoveFSM : <i>blockShot</i>
-MoveFSM --> StealAndChipState
+[*] --> MoveSkillFSM
+MoveSkillFSM --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
+MoveSkillFSM --> MoveSkillFSM : <i>blockShot</i>
+MoveSkillFSM --> StealAndChipState
 BlockPassState --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
-BlockPassState --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
+BlockPassState --> MoveSkillFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 StealAndChipState --> StealAndChipState : [enemyThreatHasBall]\n<i>stealAndChip</i>
 StealAndChipState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
-Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
+Terminate:::terminate --> MoveSkillFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
-
-```
-
-## [StopFSM](/src/software/ai/hl/stp/tactic/stop/stop_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> StopState
-StopState --> StopState : [!stopDone]\n<i>updateStop</i>
-StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 
 ```
 

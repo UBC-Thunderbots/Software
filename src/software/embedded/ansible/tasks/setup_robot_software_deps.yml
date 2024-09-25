@@ -1,0 +1,30 @@
+---
+
+- name: Sync Setup Script
+  become: true
+  become_method: sudo
+  ansible.posix.synchronize:
+    src: ../../setup_robot_software_deps.sh
+    dest: ~/
+    recursive: yes
+    copy_links: yes
+
+# Output is streamed to target host's (Jetson/Pi's /tmp/setup.log)
+- name: Running the setup script, this will take a while
+  become_method: sudo
+  become: true
+  command: '/home/{{ ansible_user }}/setup_robot_software_deps.sh >& /tmp/setup.log'
+  register: result
+  args:
+    chdir: ~/
+
+- name: Configure Redis persistence setting
+  become: true
+  become_method: sudo
+  ansible.builtin.lineinfile:
+    path: /etc/redis/redis.conf
+    state: present
+    regexp: ^(appendonly)
+    line: 'appendonly yes'
+    backrefs: yes
+

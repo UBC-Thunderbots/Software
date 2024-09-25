@@ -9,3 +9,5 @@ struct PassWithRating
 };
 
 bool operator==(const PassWithRating &lhs, const struct PassWithRating &rhs);
+
+bool operator<(const PassWithRating &lhs, const struct PassWithRating &rhs);

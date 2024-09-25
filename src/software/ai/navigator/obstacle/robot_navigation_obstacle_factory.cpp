@@ -158,7 +158,9 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(
     const Point &ball_position) const
 {
-    return createFromShape(Circle(ball_position, BALL_MAX_RADIUS_METERS));
+    return createFromShape(Circle(
+        ball_position,
+        BALL_MAX_RADIUS_METERS + config.additional_ball_obstacle_inflation_meters()));
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createStadiumEnemyRobotObstacle(

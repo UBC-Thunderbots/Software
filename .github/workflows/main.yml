@@ -30,12 +30,17 @@ jobs:
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
-            -//software/jetson_nano/...      \
+            -//software/embedded/...      \
 
       - name: Jetson Nano Build Test
         run: |
           cd src
-          bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main --copt=-O3
+          bazel build --cpu=jetson_nano //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO
+
+      - name: Raspberry Pi Build Test
+        run: |
+          cd src
+          bazel build --cpu=jetson_nano //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI
 
   software-tests:
     name: Software Tests
@@ -58,8 +63,8 @@ jobs:
             -//software/field_tests/...      \
             -//software/ai/navigator/...
 
-  jetson-nano-tests:
-    name: Jetson Nano Software Tests
+  robot-tests:
+    name: Robot Software Tests
     runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
@@ -85,7 +90,12 @@ jobs:
       - name: Jetson Nano Build
         run: |
          cd src
-         bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main --copt=-O3
+         bazel build --cpu=jetson_nano //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO
+
+      - name: Raspberry Pi Build
+        run: |
+         cd src
+         bazel build --cpu=jetson_nano //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI
 
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests

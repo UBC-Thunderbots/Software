@@ -3,8 +3,9 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/skill/move/move_skill.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/logger/logger.h"
 
 struct PenaltyKickEnemyPlayFSM
@@ -23,9 +24,9 @@ struct PenaltyKickEnemyPlayFSM
     /**
      * Creates a penalty kick enemy play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit PenaltyKickEnemyPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit PenaltyKickEnemyPlayFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Action to set up the robots in position to start the enemy penalty kick
@@ -75,6 +76,6 @@ struct PenaltyKickEnemyPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics;
+    std::shared_ptr<Strategy> strategy;
+    std::vector<std::shared_ptr<AssignedSkillTactic<MoveSkill>>> move_skill_tactics;
 };

@@ -3,7 +3,7 @@
 #include <Tracy.hpp>
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/tactic/primitive.h"
+#include "software/ai/hl/stp/primitive/primitive.h"
 #include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
 

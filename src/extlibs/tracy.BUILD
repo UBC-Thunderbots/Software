@@ -12,5 +12,6 @@ cc_library(
         ],
     ),
     includes = ["public/tracy"],
+    linkopts = ["-ldl"],
     visibility = ["//visibility:public"],
 )

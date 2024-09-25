@@ -7,9 +7,9 @@
 #include "software/util/typename/typename.h"
 
 /**
- * The Tactic FSM framework uses the [SML library](https://github.com/boost-ext/sml), and
- * aims to create a readable style of FSM to implement tactic gameplay. See the MoveTactic
- * for an example of how to implement a tactic using this framework
+ * Our FSM framework uses the [SML library](https://github.com/boost-ext/sml), and
+ * aims to create a readable style of FSM to implement STP (Skills, Tactics, Plays)
+ * gameplay.
  */
 
 // An alias for an FSM

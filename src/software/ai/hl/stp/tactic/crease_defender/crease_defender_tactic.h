@@ -3,7 +3,6 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/segment.h"
 
@@ -33,9 +32,9 @@ class CreaseDefenderTactic : public Tactic
     /**
      * Creates a new CreaseDefenderTactic
      *
-     * @param ai_config The AI configuration
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit CreaseDefenderTactic(TbotsProto::AiConfig ai_config);
+    explicit CreaseDefenderTactic(std::shared_ptr<Strategy> strategy);
 
     CreaseDefenderTactic() = delete;
 
@@ -61,7 +60,8 @@ class CreaseDefenderTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
+    std::shared_ptr<Strategy> strategy;
+
     std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
     CreaseDefenderFSM::ControlParams control_params;
-    TbotsProto::AiConfig ai_config;
 };

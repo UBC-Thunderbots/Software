@@ -176,6 +176,36 @@ class World final
     TeamPossession getTeamWithPossession() const;
 
     /**
+     * Sets the segment representing the displacement of the ball (in metres) due to
+     * the friendly team continuously dribbling the ball across the field.
+     *
+     * @see getDribbleDisplacement for details
+     *
+     * @param distance the displacement of the ball
+     */
+    void setDribbleDisplacement(const std::optional<Segment>& displacement);
+
+    /**
+     * Gets a segment representing the displacement of the ball (in metres) due to
+     * the friendly team continuously dribbling the ball across the field.
+     *
+     * - The start point of the segment is the point on the field where the friendly
+     *   team started dribbling the ball.
+     *
+     * - The end point of the segment is the current position of the ball.
+     *
+     * - The length of the segment is the distance between where the friendly team
+     *   started dribbling the ball and where the ball is now.
+     *
+     * If the friendly team does not have possession over the ball, std::nullopt
+     * is returned.
+     *
+     * @return A segment representing the displacement of the ball (in metres) due to
+     * the friendly team continuously dribbling the ball
+     */
+    const std::optional<Segment>& getDribbleDisplacement() const;
+
+    /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
      * friendly_team, enemy_team and game_state are equal. The last update
      * timestamp and histories are not part of the equality.
@@ -210,12 +240,19 @@ class World final
     GameState current_game_state_;
     RefereeStage current_referee_stage_;
     Timestamp last_update_timestamp_;
+
     // A small buffer that stores previous referee command
     boost::circular_buffer<RefereeCommand> referee_command_history_;
+
     // A small buffer that stores previous referee stage
     boost::circular_buffer<RefereeStage> referee_stage_history_;
-    // which team has possession of the ball
+
+    // Which team has possession of the ball
     TeamPossession team_with_possession_;
+
+    // Segment representing the displacement of the ball (in metres) due to
+    // the friendly team continuously dribbling the ball across the field
+    std::optional<Segment> dribble_displacement_;
 };
 
 using WorldPtr = std::shared_ptr<const World>;

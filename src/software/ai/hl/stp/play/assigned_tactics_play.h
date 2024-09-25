@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/strategy.h"
 
 /**
  * Play that runs assigned tactics
@@ -9,7 +10,7 @@
 class AssignedTacticsPlay : public Play
 {
    public:
-    AssignedTacticsPlay(TbotsProto::AiConfig config);
+    AssignedTacticsPlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

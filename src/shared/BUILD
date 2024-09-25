@@ -5,18 +5,18 @@ load(
     "@platformio_rules//platformio:platformio.bzl",
     "platformio_library",
 )
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+platformio_library(
+    name = "constants_platformio",
+    hdr = "constants.h",
+)
 
 cc_library(
     name = "constants",
     srcs = [],
     hdrs = ["constants.h"],
-    deps = [],
     alwayslink = True,
-)
-
-platformio_library(
-    name = "constants_platformio",
-    hdr = "constants.h",
 )
 
 cc_library(
@@ -28,7 +28,5 @@ cc_library(
         "2021_robot_constants.h",
         "robot_constants.h",
     ],
-    deps = [
-        ":constants",
-    ],
+    deps = [":constants"],
 )

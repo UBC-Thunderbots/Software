@@ -12,9 +12,9 @@ class FreeKickPlay : public Play
     /**
      * Creates a free kick play
      *
-     * @param ai_config the play config for this play
+     * @param strategy the Strategy shared by all of AI
      */
-    FreeKickPlay(TbotsProto::AiConfig config);
+    FreeKickPlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

@@ -18,42 +18,61 @@ void MotionConstraintVisitor::visit(const CreaseDefenderTactic &tactic)
 
 void MotionConstraintVisitor::visit(const ShadowEnemyTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const MoveTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const ChipTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const KickTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const PivotKickTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
-{
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
-    current_motion_constraints.erase(
-        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
-    current_motion_constraints.insert(
-        TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
-}
-
-void MotionConstraintVisitor::visit(const PrepareKickoffMoveTactic &tactic)
-{
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
-    current_motion_constraints.erase(
-        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
-    current_motion_constraints.insert(
-        TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
-}
-
-void MotionConstraintVisitor::visit(const StopTactic &tactic) {}
-
 void MotionConstraintVisitor::visit(const PenaltyKickTactic &tactic)
 {
     current_motion_constraints.erase(
         TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
     current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA);
     current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
+}
+
+void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
+
+void MotionConstraintVisitor::visit(const AttackerTactic &tactic) {}
+
+void MotionConstraintVisitor::visit(const PassDefenderTactic &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<ChipSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<DribbleSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<GetBehindBallSkill> &tactic)
+{
+}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<KeepAwaySkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<KickSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<KickPassSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<ChipPassSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<MoveSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<PivotKickSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<ShootSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<DribbleShootSkill> &tactic)
+{
+}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<StopSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const KickoffChipSkillTactic &tactic)
+{
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
+    current_motion_constraints.erase(
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+    current_motion_constraints.insert(
+        TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
+}
+
+void MotionConstraintVisitor::visit(const BallPlacementDribbleSkillTactic &tactic)
+{
+    current_motion_constraints.clear();
 }
 
 void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
@@ -65,39 +84,7 @@ void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
         TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
 }
 
-void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const AttackerTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const MoveTestTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const StopTestTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const GoalieTestTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const DribbleTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
-{
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_HALF);
-    current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
-}
-
-void MotionConstraintVisitor::visit(const PlaceBallTactic &tactic)
-{
-    current_motion_constraints.clear();
-}
-
-void MotionConstraintVisitor::visit(const PlaceBallMoveTactic &tactic)
-{
-    current_motion_constraints.clear();
-}
-
-void MotionConstraintVisitor::visit(const WallKickoffTactic &tactic)
+void MotionConstraintVisitor::visit(const BallPlacementMoveSkillTactic &tactic)
 {
     current_motion_constraints.clear();
 }
@@ -106,8 +93,6 @@ void MotionConstraintVisitor::visit(const AvoidInterferenceTactic &tactic)
 {
     current_motion_constraints.clear();
 }
-
-void MotionConstraintVisitor::visit(const PassDefenderTactic &tactic) {}
 
 std::set<TbotsProto::MotionConstraint>
 MotionConstraintVisitor::getUpdatedMotionConstraints(

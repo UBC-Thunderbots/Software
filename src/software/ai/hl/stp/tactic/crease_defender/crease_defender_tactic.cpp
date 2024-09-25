@@ -9,18 +9,18 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-CreaseDefenderTactic::CreaseDefenderTactic(TbotsProto::AiConfig ai_config)
+CreaseDefenderTactic::CreaseDefenderTactic(std::shared_ptr<Strategy> strategy)
     : Tactic({RobotCapability::Move}),
+      strategy(strategy),
       fsm_map(),
       control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                      TbotsProto::BallStealMode::STEAL}),
-      ai_config(ai_config)
+                      TbotsProto::BallStealMode::STEAL})
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<CreaseDefenderFSM>>(
-            CreaseDefenderFSM(ai_config), DribbleFSM(ai_config.dribble_tactic_config()));
+            CreaseDefenderFSM(strategy), DribbleSkillFSM());
     }
 }
 
@@ -47,7 +47,7 @@ void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(
-            CreaseDefenderFSM(ai_config), DribbleFSM(ai_config.dribble_tactic_config()));
+            CreaseDefenderFSM(strategy), DribbleSkillFSM());
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(CreaseDefenderFSM::Update(control_params, tactic_update));

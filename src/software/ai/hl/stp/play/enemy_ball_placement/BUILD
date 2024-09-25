@@ -15,8 +15,8 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/hl/stp/play",
+        "//software/ai/hl/stp/tactic/assigned_skill:specialized_assigned_skill_tactics",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/util/generic_factory",
         "//software/world:game_state",
     ],
