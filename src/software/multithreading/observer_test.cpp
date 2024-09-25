@@ -44,12 +44,11 @@ namespace TestUtil
                                     .count()) *
             SECONDS_PER_MILLISECOND;
         double scaling_factor =
-            test_duration_s / (data_received_period_ms *
-                               SECONDS_PER_MILLISECOND * number_of_messages);
-        double expected_actual_difference =
-            std::abs(test_observer.getDataReceivedPerSecond() -
-                     1 / (data_received_period_ms * SECONDS_PER_MILLISECOND) *
-                         scaling_factor);
+            test_duration_s /
+            (data_received_period_ms * SECONDS_PER_MILLISECOND * number_of_messages);
+        double expected_actual_difference = std::abs(
+            test_observer.getDataReceivedPerSecond() -
+            1 / (data_received_period_ms * SECONDS_PER_MILLISECOND) * scaling_factor);
         if (expected_actual_difference < 50)
         {
             return ::testing::AssertionSuccess();

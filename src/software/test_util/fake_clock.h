@@ -14,7 +14,8 @@
  * Satisfies the TrivialClock requirements and thus can replace any standard clock
  * in the chrono library (e.g. std::chrono::steady_clock).
  */
-class FakeClock {
+class FakeClock
+{
    public:
     typedef uint64_t rep;
     typedef std::nano period;
@@ -43,8 +44,8 @@ class FakeClock {
     static void reset() noexcept;
 
    private:
-    FakeClock() = delete;
-    ~FakeClock() = delete;
+    FakeClock()                 = delete;
+    ~FakeClock()                = delete;
     FakeClock(FakeClock const&) = delete;
 
     static time_point now_;

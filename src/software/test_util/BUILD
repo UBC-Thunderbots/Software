@@ -63,5 +63,5 @@ cc_test(
     deps = [
         ":fake_clock",
         "//shared/test_util:tbots_gtest_main",
-    ]
+    ],
 )
