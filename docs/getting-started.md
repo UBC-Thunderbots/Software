@@ -123,19 +123,18 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 
 ##### Installing CLion
 
-* Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-* Run `./install_clion.sh` (* **We highly recommend using the script and not downloading CLion yourself unless you know what you're doing.** The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
-* When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
+1. Follow [the latest instructions from JetBrains](https://www.jetbrains.com/help/clion/installation-guide.html#toolbox) on installing CLion. We recommend installing CLion through the JetBrains Toolbox App which makes it easy to upgrade/downgrade your version of CLion if necessary.
+2. When you run CLion for the first time, you will be prompted to enter your JetBrains account or License credentials. Use your student account.
+3. Install the [Bazel plugin for CLion](https://plugins.jetbrains.com/plugin/9554-bazel-for-clion).
 
 ### Installing an IDE: VS Code
 
 VS Code is a more lightweight "IDE", with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated by default into VS Code.
 
-1. Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-2. Run `./install_vscode.sh` (* **We highly recommend using the script and not downloading VS Code yourself unless you know what you're doing.** The `install_vscode.sh` script will grab the most stable version of VS Code *)
-3. Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop. Go to  File -> Open Folder and navigate to where you cloned the software repo. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
-4. VS Code will prompt you to install recommended extensions. Click `Install` — this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc.)
-5. Navigate to File -> Preferences -> Settings -> Workspace -> Extensions -> Bazel and select the `Bazel: Enable Code Lens` option.
+1. Follow the [latest instructions from the VS Code documentation](https://code.visualstudio.com/docs/setup/linux) on installing VS Code.
+2. Open VS Code. Go to File -> Open Folder and navigate to where you cloned the software repo. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
+3. VS Code will prompt you to install recommended extensions. Click `Install` — this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc.)
+4. Navigate to File -> Preferences -> Settings -> Workspace -> Extensions -> Bazel and select the `Bazel: Enable Code Lens` option.
 
 ### Editing with Vim or NeoVim
 
@@ -300,7 +299,7 @@ Debugging in CLion is as simple as running the above instructions for building C
 
 To debug from the command line, first you need to build your target with the debugging flag - `bazel build -c dbg //some/target:here`. When the target builds, you should see a path `bazel-bin/<target>`. Copy that path, and run `gdb <path>`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it. Alternatively, you could do `bazel run -c dbg --run_under="gdb" //some/target:here`, which will run the target in `gdb`. While this is taken directly from the Bazel docs, gdb may sometimes hang when using `--run_under`, so building the target first with debugging flags and running afterwards is preferred.
 
-## Profiling 
+## Profiling
 
 Profiling is an optimization tool used to identify the time and space used by code, with a detailed breakdown to help identify areas of potential performance improvements. Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence, the only way to profile our software is via the command line.
 
@@ -343,11 +342,11 @@ Tracy also samples call stacks. If the profiled binary is run with root permissi
 
     ./tbots.py run thunderscope_main --tracy --sudo
 
-## Building for Jetson Nano 
+## Building for Jetson Nano
 
 To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain for Jetson Nano. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
 
-## Deploying to Jetson Nano 
+## Deploying to Jetson Nano
 
 We use ansible to automatically update software running on the Jetson Nano. [More info here.](useful-robot-commands.md#flashing-the-nano) 
 
