@@ -56,3 +56,12 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
     ],
 )
+
+cc_test(
+    name = "fake_clock_test",
+    srcs = ["fake_clock_test.cpp"],
+    deps = [
+        ":fake_clock",
+        "//shared/test_util:tbots_gtest_main",
+    ]
+)

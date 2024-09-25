@@ -7,6 +7,10 @@
 /**
  * Fake clock convenient for testing purposes.
  *
+ * Tests that rely on sleeping can be non-deterministic and flaky since they
+ * depend on real time to elapse. Use this clock instead, which can be explicitly
+ * advanced without sleeping.
+ *
  * Satisfies the TrivialClock requirements and thus can replace any standard clock
  * in the chrono library (e.g. std::chrono::steady_clock).
  */
