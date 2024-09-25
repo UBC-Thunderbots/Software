@@ -1,7 +1,11 @@
 # The Simulator from Roboterfußballmannschaft der Friedrich-Alexander-Universität Erlangen-Nürnberg Robotics Erlangen's SSL-Team ER-Force's Framework
-The simulator was adapted from [robotics-erlangen/framework](https://github.com/robotics-erlangen/framework). It was modified so that time steps could be controlled by a stepSimulation function.
+
+The simulator is adapted from [robotics-erlangen/framework](https://github.com/robotics-erlangen/framework). It contains several bug fixes and general code quality improvements, and it is modified so that time steps can be controlled by a `stepSimulation` function.
+
 
 ## Copyright
+
+```
 /***************************************************************************
  *   Copyright 2020 Michael Eischer, Philipp Nordhus, Andreas Wendler      *
  *   Robotics Erlangen e.V.                                                *
@@ -21,3 +25,4 @@ The simulator was adapted from [robotics-erlangen/framework](https://github.com/
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
+```

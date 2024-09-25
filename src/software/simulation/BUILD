@@ -9,7 +9,7 @@ cc_library(
         "//extlibs/er_force_sim/config/simulator:2020B.txt",
     ],
     deps = [
-        "//extlibs/er_force_sim/src/amun/simulator:simulator_qt",
+        "//extlibs/er_force_sim/src/amun/simulator",
         "//proto/message_translation:ssl_detection",
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_simulation_robot_control",
