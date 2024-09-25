@@ -28,9 +28,10 @@ class HandheldDeviceConnectionChangedEvent:
 
 
 class HandheldDeviceManager(QtCore.QObject):
-    """This class is responsible for managing the connection between a computer and a handheld device to control robots.
-    This class relies on the `evdev` python package, in order to implement parsing and control flow for device events.
-    More info & docs can be found here: https://python-evdev.readthedocs.io/en/latest/apidoc.html
+    """This class is responsible for managing the connection between a computer and a
+    handheld device to control robots. This class relies on the `evdev` python package
+    in order to implement parsing and control flow for device events.
+    See: https://python-evdev.readthedocs.io/en/latest/apidoc.html
     """
 
     handheld_device_connection_status_signal = QtCore.pyqtSignal(
@@ -77,8 +78,8 @@ class HandheldDeviceManager(QtCore.QObject):
         self.event_loop_thread.start()
 
     def __initialize_default_motor_control_values(self) -> None:
-        """This method sets all required fields in the motor control proto to
-        the default/minimum default value
+        """Set all required fields in the motor control proto to their
+        default/minimum values
         """
         self.motor_control = MotorControl()
         self.motor_control.direct_velocity_control.velocity.x_component_meters = 0.0
@@ -87,8 +88,8 @@ class HandheldDeviceManager(QtCore.QObject):
         self.motor_control.dribbler_speed_rpm = 0
 
     def __initialize_default_power_control_values(self) -> None:
-        """This method sets all required fields in the power control proto to
-        the default/minimum default value
+        """Set all required fields in the power control proto to their
+        default/minimum values
         """
         self.power_control = PowerControl()
         self.power_control.geneva_slot = 3
@@ -148,8 +149,8 @@ class HandheldDeviceManager(QtCore.QObject):
         self.logger.debug(list(map(lambda d: InputDevice(d).name, list_devices())))
 
     def __clear_handheld_device(self) -> None:
-        """Clears handheld device and config field by setting them to None,
-        and emits a disconnected notification signal.
+        """Clear the handheld device and config fields by setting them to None,
+        and emit a disconnected notification signal.
         """
         with self.lock:
             self.handheld_device = None
@@ -162,12 +163,14 @@ class HandheldDeviceManager(QtCore.QObject):
         )
 
     def __event_loop(self) -> None:
+        """Loop that continuously reads and processes events from the connected handheld device."""
         while True:
             with self.lock:
                 self.__read_and_process_event()
             time.sleep(DiagnosticsConstants.EVENT_LOOP_SLEEP_DURATION)
 
     def __read_and_process_event(self) -> None:
+        """Try reading an event from the connected handheld device and process it."""
         if not self.handheld_device:
             return
 
@@ -208,7 +211,7 @@ class HandheldDeviceManager(QtCore.QObject):
             self.logger.critical("Error message: " + str(e))
 
     def __process_event(self, event: InputEvent) -> None:
-        """Processes the given device event. Sets corresponding motor and power control values
+        """Process the given device event. Set the corresponding motor and power control values
         based on the event type, using the current config set in self.handheld_device_config
 
         :param event: The input event to process
@@ -298,7 +301,7 @@ class HandheldDeviceManager(QtCore.QObject):
         return button_percent_pressed > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
 
     def __interpret_dribbler_speed_event_value(self, event_value: float) -> int:
-        """Interprets the event value that corresponds to controlling the dribbler speed.
+        """Interpret the event value that corresponds to controlling the dribbler speed.
 
         :param event_value: the value for the current event being interpreted
         :return: the interpreted value to be used for the new dribbler speed on the robot
@@ -313,7 +316,7 @@ class HandheldDeviceManager(QtCore.QObject):
         )
 
     def __interpret_kick_event_value(self, event_value: float) -> float:
-        """Interprets the event value that corresponds to controlling the dribbler speed.
+        """Interpret the event value that corresponds to controlling the dribbler speed.
 
         :param event_value: the value for the current event being interpreted
         :return: the interpreted value to be used for the kick power on the robot
@@ -325,7 +328,7 @@ class HandheldDeviceManager(QtCore.QObject):
         )
 
     def __interpret_chip_event_value(self, event_value: float) -> float:
-        """Interprets the event value that corresponds to controlling the chip distance.
+        """Interpret the event value that corresponds to controlling the chip distance.
 
         :param value: the value for the current event being interpreted
         :return: the interpreted value to be used for the chip distance on the robot
