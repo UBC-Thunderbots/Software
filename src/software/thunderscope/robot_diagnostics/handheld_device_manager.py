@@ -170,7 +170,11 @@ class HandheldDeviceManager(QtCore.QObject):
             time.sleep(DiagnosticsConstants.EVENT_LOOP_SLEEP_DURATION)
 
     def __read_and_process_event(self) -> None:
-        """Try reading an event from the connected handheld device and process it."""
+        """Try reading an event from the connected handheld device and process it.
+
+        This method is not thread-safe. Callers must acquire self.lock beforehand
+        to guarantee exclusive access to the HandheldDeviceManager's mutable state.
+        """
         if not self.handheld_device:
             return
 
@@ -213,6 +217,9 @@ class HandheldDeviceManager(QtCore.QObject):
     def __process_event(self, event: InputEvent) -> None:
         """Process the given device event. Set the corresponding motor and power control values
         based on the event type, using the current config set in self.handheld_device_config
+
+        This method is not thread-safe. Callers must acquire self.lock beforehand
+        to guarantee exclusive access to the HandheldDeviceManager's mutable state.
 
         :param event: The input event to process
         """

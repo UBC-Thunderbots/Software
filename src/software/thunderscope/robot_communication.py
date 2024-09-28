@@ -99,7 +99,7 @@ class RobotCommunication:
         # TODO: (#3174): move estop state management out of robot_communication
         self.estop_mode = estop_mode
         self.estop_path = estop_path
-        self.estop_buadrate = estop_baudrate
+        self.estop_baudrate = estop_baudrate
 
         # initialising the estop
         # tries to access a plugged in estop. if not found, throws an exception
@@ -114,7 +114,7 @@ class RobotCommunication:
         if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
             try:
                 self.estop_reader = tbots_cpp.ThreadedEstopReader(
-                    self.estop_path, self.estop_buadrate
+                    self.estop_path, self.estop_baudrate
                 )
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
