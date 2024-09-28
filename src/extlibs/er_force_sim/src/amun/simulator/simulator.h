@@ -21,19 +21,16 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include <QtCore/QByteArray>
-#include <QtCore/QList>
-#include <QtCore/QMap>
-#include <QtCore/QPair>
-#include <QtCore/QQueue>
+#include <memory>
 #include <random>
-#include <tuple>
+#include <utility>
 
-#include "extlibs/er_force_sim/src/protobuf/command.h"
-#include "extlibs/er_force_sim/src/protobuf/sslsim.h"
+#include "extlibs/er_force_sim/src/core/rng.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
-
+#include "simball.h"
+#include "simfield.h"
+#include "simrobot.h"
 
 // higher values break the rolling friction of the ball
 const float SIMULATOR_SCALE  = 10.0f;
@@ -41,37 +38,19 @@ const float SUB_TIMESTEP     = 1 / 200.f;
 const float COLLISION_MARGIN = 0.04f;
 const float FOCAL_LENGTH     = 390.f;
 
-
-class QByteArray;
-class QTimer;
-class Timer;
-class SSL_GeometryFieldSize;
-
 namespace camun
 {
     namespace simulator
     {
-        class SimRobot;
         class Simulator;
-        class ErrorAggregator;
         struct SimulatorData;
-
-        enum class ErrorSource
-        {
-            BLUE,
-            YELLOW,
-            CONFIG
-        };
     }  // namespace simulator
 }  // namespace camun
 
-class camun::simulator::Simulator : public QObject
+class camun::simulator::Simulator
 {
-    Q_OBJECT
-
    public:
-    typedef QMap<unsigned int, QPair<SimRobot *, unsigned int>>
-        RobotMap; /*First int: ID, Second int: Generation*/
+    typedef std::map<unsigned int, std::unique_ptr<SimRobot>> RobotMap;
 
     /**
      * Creates a simulator with the given set up
@@ -79,22 +58,6 @@ class camun::simulator::Simulator : public QObject
      * @param setup the simulator set up
      */
     explicit Simulator(const amun::SimulatorSetup &setup);
-    ~Simulator() override;
-    Simulator(const Simulator &) = delete;
-    Simulator &operator=(const Simulator &) = delete;
-
-    /**
-     * Seeds the pseudorandom generator
-     *
-     * @param seed
-     */
-    void seedPRGN(uint32_t seed);
-
-   signals:
-    void gotPacket(const QByteArray &data, qint64 time, QString sender);
-    void sendRadioResponses(const QList<robot::RadioResponse> &responses);
-    void sendRealData(const QByteArray &data);  // sends amun::SimulatorState
-    void sendSSLSimError(const QList<SSLSimError> &errors, ErrorSource source);
 
    public:
     /**
@@ -145,11 +108,6 @@ class camun::simulator::Simulator : public QObject
      */
     void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command);
 
-   public slots:
-    void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,
-                             qint64 processingStart);
-    void setFlipped(bool flipped);
-
    private:
     /**
      * Accepts and executes a blue or yellow robot control command
@@ -161,42 +119,91 @@ class camun::simulator::Simulator : public QObject
      */
     std::vector<robot::RadioResponse> acceptRobotControlCommand(
         const SSLSimulationProto::RobotControl &control, bool isBlue);
-    void sendSSLSimErrorInternal(ErrorSource source);
+
     void resetFlipped(RobotMap &robots, float side);
-    std::tuple<QList<QByteArray>, QByteArray, qint64> createVisionPacket();
-    void resetVisionPackets();
     void setTeam(RobotMap &list, float side, const robot::Team &team,
-                 QMap<uint32_t, robot::Specs> &specs);
+                 std::map<uint32_t, robot::Specs> &specs);
     void moveBall(const sslsim::TeleportBall &ball);
     void moveRobot(const sslsim::TeleportRobot &robot);
-    void teleportRobotToFreePosition(SimRobot *robot);
-    void initializeDetection(SSLProto::SSL_DetectionFrame *detection,
-                             std::size_t cameraId);
+    void initializeDetection(SSLProto::SSL_DetectionFrame &detection, size_t cameraId);
 
    private:
-    typedef std::tuple<SSLSimRobotControl, qint64, bool> RadioCommand;
-    SimulatorData *m_data;
-    QQueue<RadioCommand> m_radioCommands;
-    QQueue<std::tuple<QList<QByteArray>, QByteArray, qint64>> m_visionPackets;
-    QQueue<QTimer *> m_visionTimers;
-    QTimer *m_trigger;
-    qint64 m_time;
-    qint64 m_lastSentStatusTime;
+    std::unique_ptr<SimulatorData> m_data;
+
     bool m_enabled;
     bool m_charge;
-    // systemDelay + visionProcessingTime = visionDelay
-    qint64 m_visionDelay;
-    qint64 m_visionProcessingTime;
 
-    qint64 m_minRobotDetectionTime = 0;
-    qint64 m_minBallDetectionTime  = 0;
-    qint64 m_lastBallSendTime      = 0;
-    std::map<qint64, unsigned> m_lastFrameNumber;
-    ErrorAggregator *m_aggregator;
+    int64_t m_time;
+    int64_t m_visionDelay;  // systemDelay + visionProcessingTime = visionDelay
+    int64_t m_visionProcessingTime;
+    int64_t m_minRobotDetectionTime = 0;
+    int64_t m_minBallDetectionTime  = 0;
+    int64_t m_lastBallSendTime      = 0;
 
-
+    std::map<size_t, unsigned int> m_lastFrameNumber;
 
     std::mt19937 rand_shuffle_src = std::mt19937(std::random_device()());
+};
+
+
+/* Friction and restitution between robots, ball and field: (empirical
+ * measurments) Ball vs. Robot: Restitution: about 0.60 Friction: trial and
+ * error in simulator 0.18 (similar results as in reality)
+ *
+ * Ball vs. Floor:
+ * Restitution: sqrt(h'/h) = sqrt(0.314) = 0.56
+ * Friction: \mu_k = -a / g (while slipping) = 0.35
+ *
+ * Robot vs. Floor:
+ * Restitution and Friction should be as low as possible
+ *
+ * Calculations:
+ * Variables: r: restitution, f: friction
+ * Indices: b: ball; f: floor; r: robot
+ *
+ * r_b * r_f = 0.56
+ * r_b * r_r = 0.60
+ * r_f * r_r = small
+ * => r_b = 1; r_f = 0.56; r_r = 0.60
+ *
+ * f_b * f_f = 0.35
+ * f_b * f_r = 0.22
+ * f_f * f_r = very small
+ * => f_b = 1; f_f = 0.35; f_r = 0.22
+ */
+
+struct camun::simulator::SimulatorData
+{
+    RNG rng;
+    std::unique_ptr<btDefaultCollisionConfiguration> collision;
+    std::unique_ptr<btCollisionDispatcher> dispatcher;
+    std::unique_ptr<btBroadphaseInterface> overlappingPairCache;
+    std::unique_ptr<btSequentialImpulseConstraintSolver> solver;
+    std::shared_ptr<btDiscreteDynamicsWorld> dynamicsWorld;
+    world::Geometry geometry;
+    std::vector<SSLProto::SSL_GeometryCameraCalibration> reportedCameraSetup;
+    std::vector<btVector3> cameraPositions;
+    std::unique_ptr<SimField> field;
+    std::shared_ptr<SimBall> ball;
+    Simulator::RobotMap robotsBlue;
+    Simulator::RobotMap robotsYellow;
+    std::map<uint32_t, robot::Specs> specsBlue;
+    std::map<uint32_t, robot::Specs> specsYellow;
+    bool flip;
+    float stddevBall;
+    float stddevBallArea;
+    float stddevRobot;
+    float stddevRobotPhi;
+    float ballDetectionsAtDribbler;  // per robot per second
+    bool enableInvisibleBall;
+    float ballVisibilityThreshold;
+    float cameraOverlap;
+    float cameraPositionError;
+    float objectPositionOffset;
+    float robotCommandPacketLoss;
+    float robotReplyPacketLoss;
+    float missingBallDetections;
+    bool dribblePerfect;
 };
 
 #endif  // SIMULATOR_H
