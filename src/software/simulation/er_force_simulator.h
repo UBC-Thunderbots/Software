@@ -230,6 +230,6 @@ class ErForceSimulator
 
     bool ramping;
 
-    const QString CONFIG_FILE      = "simulator/2020";
-    const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
+    const std::string CONFIG_FILE      = "simulator/2020";
+    const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
 };

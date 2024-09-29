@@ -39,15 +39,6 @@ message Geometry
     optional Division division                       = 19 [default = A];
 }
 
-message DivisionDimensions
-{
-    required float field_width_a  = 1;
-    required float field_height_a = 2;
-
-    required float field_width_b  = 3;
-    required float field_height_b = 4;
-}
-
 message BallPosition
 {
     required int64 time                   = 1;

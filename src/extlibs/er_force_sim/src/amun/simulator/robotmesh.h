@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2015 Philipp Nordhus                                        *
+ *   Copyright 2015 Michael Eischer, Philipp Nordhus                       *
  *   Robotics Erlangen e.V.                                                *
  *   http://www.robotics-erlangen.de/                                      *
  *   info@robotics-erlangen.de                                             *
@@ -18,23 +18,19 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef COMMAND_H
-#define COMMAND_H
+#ifndef ROBOTMESH_H
+#define ROBOTMESH_H
 
-#include <QtCore/QSharedPointer>
+#include <tuple>
+#include <vector>
 
-#include "extlibs/er_force_sim/src/protobuf/command.pb.h"
+namespace camun
+{
+    namespace simulator
+    {
+        std::vector<std::vector<std::tuple<float, float, float>>> createRobotMesh(
+            float radius, float height, float angle, float holeDepth, float holeHeight);
+    }  // namespace simulator
+}  // namespace camun
 
-//! @file command.h
-//! @addtogroup protobuf
-//! @{
-
-void simulatorSetupSetDefault(amun::SimulatorSetup &setup);
-
-// position is in meters in our coordinate system
-SSL_GeometryCameraCalibration createDefaultCamera(int cameraId, float x, float y,
-                                                  float z);
-
-//! @}
-
-#endif  // COMMAND_H
+#endif  // ROBOTMESH_H
