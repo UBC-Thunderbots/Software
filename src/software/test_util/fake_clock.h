@@ -17,10 +17,10 @@
 class FakeClock
 {
    public:
-    typedef uint64_t rep;
-    typedef std::nano period;
-    typedef std::chrono::duration<rep, period> duration;
-    typedef std::chrono::time_point<FakeClock> time_point;
+    using rep = uint64_t;
+    using period = std::nano;
+    using duration = std::chrono::duration<rep, period>;
+    using time_point = std::chrono::time_point<FakeClock>;
     inline static const bool is_steady = false;
 
     /**
