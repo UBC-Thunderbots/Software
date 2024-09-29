@@ -73,7 +73,7 @@ TEST_P(ColouredCoutSinkTest, testLogInfoNoDetails)
 // LOG(FATAL) isn't tested because it causes a SIGABRT
 INSTANTIATE_TEST_CASE_P(
     All, ColouredCoutSinkTest,
-    ::testing::Values(
-        std::make_tuple<LEVELS, FG_Colour>(LEVELS(INFO), FG_Colour::WHITE),
-        std::make_tuple<LEVELS, FG_Colour>(LEVELS(DEBUG), FG_Colour::GREEN),
-        std::make_tuple<LEVELS, FG_Colour>(LEVELS(WARNING), FG_Colour::YELLOW)));
+    ::testing::Values(std::make_tuple<LEVELS, FG_Colour>(LEVELS(INFO), FG_Colour::WHITE),
+                      std::make_tuple<LEVELS, FG_Colour>(LEVELS(DEBUG), FG_Colour::GREEN),
+                      std::make_tuple<LEVELS, FG_Colour>(LEVELS(WARNING),
+                                                         FG_Colour::YELLOW)));
