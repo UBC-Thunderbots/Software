@@ -86,6 +86,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
+    testNetworkConnection();
+
     g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
                                              enable_log_merging);
@@ -469,4 +471,31 @@ void Thunderloop::updateErrorCodes()
         robot_status_.mutable_error_code()->Add(
             TbotsProto::ErrorCode::UNSTABLE_POWER_SUPPLY);
     }
+}
+
+void Thunderloop::testNetworkConnection()
+{
+    ThreadedUdpSender network_test(
+        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
+        UNUSED_PORT, true);
+
+    // Send an empty packet on the specific network interface to
+    // ensure wifi is connected. Keeps trying until successful
+    while (true)
+    {
+        try
+        {
+            network_test.sendString("");
+            break;
+        }
+        catch (std::exception& e)
+        {
+            // Resend the message after a delay
+            LOG(WARNING) << "Thunderloop cannot connect to network!"
+                         << "Waiting for connection...";
+            sleep(PING_RETRY_DELAY_S);
+        }
+    }
+
+    LOG(INFO) << "Thunderloop connected to network!";
 }

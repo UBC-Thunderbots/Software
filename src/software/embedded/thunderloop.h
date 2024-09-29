@@ -99,6 +99,12 @@ class Thunderloop
      */
     void updateErrorCodes();
 
+    /**
+     * Tests that Thunderloop is connected to the network and
+     * keeps trying to connect until successful.
+     */
+    void Thunderloop::testNetworkConnection()
+
 
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
@@ -135,6 +141,9 @@ class Thunderloop
 
     // 500 millisecond timeout on receiving primitives before we stop the robots
     const double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
+
+    // Timeout after a failed ping request
+    const int PING_RETRY_DELAY_S = 1;
 
     const std::string PATH_TO_RINGBUFFER_LOG = "/var/log/dmesg";
 
