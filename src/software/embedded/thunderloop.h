@@ -103,7 +103,7 @@ class Thunderloop
      * Tests that Thunderloop is connected to the network and
      * keeps trying to connect until successful.
      */
-    void Thunderloop::testNetworkConnection()
+    void testNetworkConnection()
 
 
     // Input Msg Buffers
