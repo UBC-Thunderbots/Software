@@ -106,8 +106,8 @@ class Thunderloop
     void Thunderloop::testNetworkConnection()
 
 
-    // Input Msg Buffers
-    TbotsProto::PrimitiveSet primitive_set_;
+        // Input Msg Buffers
+        TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
     TbotsProto::Primitive primitive_;
     TbotsProto::DirectControlPrimitive direct_control_;
