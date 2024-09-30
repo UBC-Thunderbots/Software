@@ -13,7 +13,7 @@ from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
 from google.protobuf.message import Message
-from typing import Callable, Type
+from typing import Callable, Type, List
 
 
 class ProtoPlayer:
@@ -43,6 +43,7 @@ class ProtoPlayer:
     """
 
     PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
+    CHUNK_INDEX_FILENAME = 'chunks.index'
 
     def __init__(self, log_folder_path: str, proto_unix_io: ProtoUnixIO) -> None:
         """Creates a proto player that plays back all protos
@@ -75,6 +76,8 @@ class ProtoPlayer:
         self.version = ProtoPlayer.get_replay_chunk_format_version(
             self.sorted_chunks[0]
         )
+
+        self.chunks_indices = self.get_chunk_index()
 
         # We can get the total runtime of the log from the last entry in the last chunk
         self.end_time = self.find_actual_endtime()
@@ -129,6 +132,66 @@ class ProtoPlayer:
             return False
         except Exception:
             return True
+
+    def build_chunk_index(self) -> dict[str: tuple[float, float]]:
+        """
+        Build the chunk index and store the index into the index file
+
+        NOTE:
+        A chunk index entry contains (start timestamp, end timestamp, filename)
+        Start timestamp: timestamp of the first log entry in the chunk
+        End timestamp: timestamp of the last log entry in the chunk
+        Filename: chunk file name (%d.reply)
+
+        :return: list of chunk index file entry
+        """
+        chunk_indices: dict[str: tuple[float, float]] = dict()
+        for chunk_name in self.sorted_chunks:
+            chunk_data = ProtoPlayer.load_replay_chunk(
+                chunk_name, self.version
+            )
+            if chunk_data:
+                start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk_data[0], self.version)
+                end_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk_data[-1], self.version)
+                chunk_indices[os.path.basename(chunk_name)] = (start_timestamp, end_timestamp)
+        if chunk_indices:
+            with open(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'w') as index_file:
+                index_file.write(f'Generated on {time.time()}\n')
+                for key, value in chunk_indices:
+                    index_file.write(f'{value[0]}, {value[1]}, {key}\n')
+            logging.info('Wrote chunk index files')
+        else:
+            logging.warning(f'Failed to build chunk index for {self.log_folder_path}')
+        return chunk_indices
+
+
+    def is_chunk_indexed(self) -> bool:
+        return os.path.exists(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME))
+
+    def load_chunk_index(self) -> dict[str: tuple[float, float]]:
+        chunk_indices: dict[str: tuple[float, float]] = dict()
+        try:
+            with open(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'r') as index_file:
+                # skip the first timestamp line
+                index_file.readline()
+
+                for line in index_file:
+                    start_timestamp, end_timestamp, chunk_name = line.split(',')
+                    start_timestamp = float(start_timestamp)
+                    end_timestamp = float(end_timestamp)
+                    chunk_name = chunk_name.strip()
+                    chunk_indices[chunk_name] = (start_timestamp, end_timestamp)
+            logging.info("Pre-existing chunk index file found and loaded." + str(chunk_indices))
+        except Exception as e:
+            logging.warning(f"An Exception occurred when loading chunk index file {e}")
+        return chunk_indices
+
+    def get_chunk_index(self) -> dict[str: tuple[float, float]]:
+        if not self.is_chunk_indexed():
+            return self.build_chunk_index()
+        else:
+            return self.load_chunk_index()
+
 
     def is_proto_player_playing(self) -> bool:
         """Return whether or not the proto player is being played.
@@ -419,9 +482,12 @@ class ProtoPlayer:
         # with a timestamp less than (but closest to) the seek_time we want
         # to seek to.
         def __bisect_chunks_by_timestamp(chunk: str) -> None:
-            chunk = ProtoPlayer.load_replay_chunk(chunk, self.version)
-            start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk[0], self.version)
-            return start_timestamp
+            if self.chunks_indices and os.path.basename(chunk) in self.chunks_indices:
+                return self.chunks_indices[os.path.basename(chunk)][0]
+            else:
+                chunk = ProtoPlayer.load_replay_chunk(chunk, self.version)
+                start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk[0], self.version)
+                return start_timestamp
 
         with self.replay_controls_mutex:
             self.current_chunk_index = ProtoPlayer.binary_search(
