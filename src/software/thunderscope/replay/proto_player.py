@@ -138,7 +138,7 @@ class ProtoPlayer:
         Build the chunk index and store the index into the index file
 
         NOTE:
-        A chunk index entry contains (start timestamp, end timestamp, filename)
+        A chunk index entry is a key value pair [filename: (start timestamp, end timestamp)]
         Start timestamp: timestamp of the first log entry in the chunk
         End timestamp: timestamp of the last log entry in the chunk
         Filename: chunk file name (%d.reply)
@@ -166,9 +166,19 @@ class ProtoPlayer:
 
 
     def is_chunk_indexed(self) -> bool:
+        """
+        Returns true if the chunk index is already built.
+
+        :return: if the chunk index file exists
+        """
         return os.path.exists(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME))
 
     def load_chunk_index(self) -> dict[str: tuple[float, float]]:
+        """
+        Loads the chunk index file.
+
+        :return: the chunk indices.
+        """
         chunk_indices: dict[str: tuple[float, float]] = dict()
         try:
             with open(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'r') as index_file:
@@ -187,6 +197,12 @@ class ProtoPlayer:
         return chunk_indices
 
     def get_chunk_index(self) -> dict[str: tuple[float, float]]:
+        """
+        Returns the chunk indices.
+        NOTE: if the chunk index was not built, this function will automatically build one.
+
+        :return: chunk indices.
+        """
         if not self.is_chunk_indexed():
             return self.build_chunk_index()
         else:
