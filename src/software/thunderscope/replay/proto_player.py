@@ -191,7 +191,7 @@ class ProtoPlayer:
                     end_timestamp = float(end_timestamp)
                     chunk_name = chunk_name.strip()
                     chunk_indices[chunk_name] = (start_timestamp, end_timestamp)
-            logging.info("Pre-existing chunk index file found and loaded." + str(chunk_indices))
+            logging.info("Pre-existing chunk index file found and loaded.")
         except Exception as e:
             logging.warning(f"An Exception occurred when loading chunk index file {e}")
         return chunk_indices
