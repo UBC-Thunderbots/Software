@@ -77,6 +77,7 @@ class ProtoPlayer:
             self.sorted_chunks[0]
         )
 
+        # build or load index for chunks
         self.chunks_indices = self.get_chunk_index()
 
         # We can get the total runtime of the log from the last entry in the last chunk
