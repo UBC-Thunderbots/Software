@@ -11,13 +11,11 @@ TEST(MoveFSMTest, test_transitions)
     MoveFSM::ControlParams control_params{
         .destination             = Point(2, 3),
         .final_orientation       = Angle::half(),
-        .final_speed             = 0.0,
         .dribbler_mode           = TbotsProto::DribblerMode::OFF,
         .ball_collision_type     = TbotsProto::BallCollisionType::AVOID,
         .auto_chip_or_kick       = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
-        .target_spin_rev_per_s   = 0.0};
+        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE};
 
     FSM<MoveFSM> fsm;
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
@@ -45,13 +43,11 @@ TEST(MoveFSMTest, test_transitions)
     control_params = MoveFSM::ControlParams{
         .destination             = Point(1, -3),
         .final_orientation       = Angle::half(),
-        .final_speed             = 0.0,
-        .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+	.dribbler_mode           = TbotsProto::DribblerMode::OFF,
         .ball_collision_type     = TbotsProto::BallCollisionType::AVOID,
         .auto_chip_or_kick       = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
-        .target_spin_rev_per_s   = 0.0};
+	.max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE};
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));

@@ -50,7 +50,7 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
         Angle receiver_orientation =
             (world->ball().position() - best_receiving_positions[i]).orientation();
         offensive_positioning_tactics[i]->updateControlParams(
-            best_receiving_positions[i], receiver_orientation, 0.0,
+            best_receiving_positions[i], receiver_orientation,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
     }
