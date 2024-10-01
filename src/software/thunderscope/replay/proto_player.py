@@ -497,8 +497,13 @@ class ProtoPlayer:
         # to seek to.
         def __bisect_chunks_by_timestamp(chunk: str) -> None:
             if self.chunks_indices and os.path.basename(chunk) in self.chunks_indices:
-                return self.chunks_indices[os.path.basename(chunk)][0]
+                return self.chunks_indices[os.path.basename(chunk)]
             else:
+                logging.warning(
+                   f"Use old algorithm to jump, which might result in lagging " +
+                   f"Please try deleting {ProtoPlayer.CHUNK_INDEX_FILENAME} in the replay file folder" +
+                   f" and re-run Thunderscope to enable the indexing for faster speed!"
+                )
                 chunk = ProtoPlayer.load_replay_chunk(chunk, self.version)
                 start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk[0], self.version)
                 return start_timestamp

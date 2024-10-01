@@ -101,9 +101,9 @@ def test_for_building_index_on_valid_chunks():
     # validate index with load index function
     chunk_indices = player.load_chunk_index()
     assert len(chunk_indices) == CHUNK_FILES_NUM
-    for filename, period in chunk_indices.items():
+    for filename, start_timestamp in chunk_indices.items():
         index_of_file = int(filename.replace(".replay", ""))
-        assert period[0] - 0.05 <= index_of_file * DURATION_PER_CHUNK
+        assert start_timestamp - 0.05 <= index_of_file * DURATION_PER_CHUNK
 
     # test seeking a timestamp
     # jump to the beginning of the chunk
