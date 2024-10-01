@@ -139,22 +139,20 @@ class ProtoPlayer:
         Build the chunk index and store the index into the index file
 
         NOTE:
-        A chunk index entry is a key value pair [filename: (start timestamp, end timestamp)]
+        A chunk index entry is a key value pair [filename: start timestamp]
         Start timestamp: timestamp of the first log entry in the chunk
-        End timestamp: timestamp of the last log entry in the chunk
         Filename: chunk file name (%d.reply)
 
         :return: list of chunk index file entry
         """
-        chunk_indices: dict[str: tuple[float, float]] = dict()
+        chunk_indices: dict[str: float] = dict()
         for chunk_name in self.sorted_chunks:
             chunk_data = ProtoPlayer.load_replay_chunk(
                 chunk_name, self.version
             )
             if chunk_data:
                 start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk_data[0], self.version)
-                end_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk_data[-1], self.version)
-                chunk_indices[os.path.basename(chunk_name)] = (start_timestamp, end_timestamp)
+                chunk_indices[os.path.basename(chunk_name)] = start_timestamp
         if chunk_indices:
             with open(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'w') as index_file:
                 index_file.write(f'Generated on {time.time()}\n')
@@ -174,24 +172,23 @@ class ProtoPlayer:
         """
         return os.path.exists(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME))
 
-    def load_chunk_index(self) -> dict[str: tuple[float, float]]:
+    def load_chunk_index(self) -> dict[str: tuple[float]]:
         """
         Loads the chunk index file.
 
         :return: the chunk indices.
         """
-        chunk_indices: dict[str: tuple[float, float]] = dict()
+        chunk_indices: dict[str: float] = dict()
         try:
             with open(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'r') as index_file:
                 # skip the first timestamp line
                 index_file.readline()
 
                 for line in index_file:
-                    start_timestamp, end_timestamp, chunk_name = line.split(',')
+                    start_timestamp, chunk_name = line.split(',')
                     start_timestamp = float(start_timestamp)
-                    end_timestamp = float(end_timestamp)
                     chunk_name = chunk_name.strip()
-                    chunk_indices[chunk_name] = (start_timestamp, end_timestamp)
+                    chunk_indices[chunk_name] = start_timestamp
             logging.info("Pre-existing chunk index file found and loaded.")
         except Exception as e:
             logging.warning(f"An Exception occurred when loading chunk index file {e}")
