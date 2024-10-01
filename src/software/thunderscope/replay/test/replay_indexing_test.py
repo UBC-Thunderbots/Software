@@ -98,7 +98,6 @@ def test_for_building_index_on_valid_chunks():
 
     # validate index with load index function
     chunk_indices = player.load_chunk_index()
-    print(chunk_indices)
     assert len(chunk_indices) == CHUNK_FILES_NUM
     assert player.chunks_indices
     for filename, start_timestamp in chunk_indices.items():
