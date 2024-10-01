@@ -9,7 +9,7 @@ Steps to test:
     2. we create invalid entries of two type: the data is actually corrupted, and we are missing a delimiter. We
         mixed those replay entries with valid replay entries to check if proto player could actually player those
         entries
-    4. we check to see if there are uncaught exception. If there are, we know fore sure proto player wouldn't work!
+    3. we check to see if there are uncaught exception. If there are, we know fore sure proto player wouldn't work!
 """
 
 import time
