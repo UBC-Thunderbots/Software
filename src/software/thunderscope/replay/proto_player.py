@@ -134,7 +134,7 @@ class ProtoPlayer:
         except Exception:
             return True
 
-    def build_chunk_index(self) -> dict[str: float]:
+    def build_chunk_index(self, folder_path: str) -> dict[str: float]:
         """
         Build the chunk index and store the index into the index file
 
@@ -142,6 +142,8 @@ class ProtoPlayer:
         A chunk index entry is a key value pair [filename: start timestamp]
          - Start timestamp: timestamp of the first log entry in the chunk
          - Filename: replay chunk file name (%d.reply)
+
+        :param folder_path: folder containing all the replay files
 
         :return: a dictionary for mapping replay filename to the start
             timestamp of the first entry in the chunk.
@@ -155,13 +157,13 @@ class ProtoPlayer:
                 start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk_data[0], self.version)
                 chunk_indices[os.path.basename(chunk_name)] = start_timestamp
         if chunk_indices:
-            with open(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'w') as index_file:
+            with open(os.path.join(folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'w') as index_file:
                 index_file.write(f'Generated on {time.time()}\n')
                 for key, value in chunk_indices.items():
                     index_file.write(f'{value}, {key}\n')
             logging.info('Created chunk index file successfully.')
         else:
-            logging.warning(f'Failed to build chunk index for {self.log_folder_path}')
+            logging.warning(f'Failed to build chunk index for {folder_path}')
         return chunk_indices
 
 
@@ -203,13 +205,13 @@ class ProtoPlayer:
         :return: chunk indices.
         """
         if not self.is_chunk_indexed():
-            return self.build_chunk_index()
+            return self.build_chunk_index(self.log_folder_path)
         else:
             try:
                 return self.load_chunk_index()
             except Exception as e:
                 logging.log(f"Exception occurred when loading chunk index, trying to rebuild. Message: {e}")
-                return self.build_chunk_index()
+                return self.build_chunk_index(self.log_folder_path)
 
 
     def is_proto_player_playing(self) -> bool:
@@ -411,7 +413,7 @@ class ProtoPlayer:
                     self.current_entry_index += 1
                     if self.current_packet_time >= end_time:
                         logging.info("Clip saved!")
-                        self.build_chunk_index()
+                        self.build_chunk_index(directory)
                         return
             # Load the next chunk
                 self.current_chunk_index += 1

@@ -94,7 +94,7 @@ def test_for_building_index_on_valid_chunks():
     player = create_test_player()
 
     # generate chunk index file
-    player.build_chunk_index()
+    player.build_chunk_index(player.log_folder_path)
 
     # validate index with load index function
     chunk_indices = player.load_chunk_index()
