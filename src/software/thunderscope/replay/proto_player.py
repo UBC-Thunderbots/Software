@@ -157,7 +157,7 @@ class ProtoPlayer:
             with open(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'w') as index_file:
                 index_file.write(f'Generated on {time.time()}\n')
                 for key, value in chunk_indices.items():
-                    index_file.write(f'{value[0]}, {value[1]}, {key}\n')
+                    index_file.write(f'{value}, {key}\n')
             logging.info('Created chunk index file successfully.')
         else:
             logging.warning(f'Failed to build chunk index for {self.log_folder_path}')
