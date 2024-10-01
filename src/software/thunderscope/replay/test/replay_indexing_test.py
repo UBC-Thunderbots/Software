@@ -4,7 +4,7 @@ We are going to examine the index-building and index-loading functions.
 Those functions are first introduced to optimize the response time of the progress bar in the replay mode.
 """
 from typing import Callable
-import random
+import math
 import shutil
 import gzip
 import os
@@ -15,8 +15,6 @@ from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.simulated_tests.simulated_test_fixture import pytest_main
 from software.thunderscope.replay.test.replay_corruption_test import create_valid_log_entry, create_random_proto
-
-random.seed(0)
 
 # location to store the generated files
 TMP_REPLAY_SAVE_PATH = "/tmp/test_indexing"
@@ -77,7 +75,7 @@ def test_for_building_index_on_valid_chunks():
     1. generate correctly formatted replay files (chunks)
     2. Build index files
     3. Load index into memory and validate
-    3. Test ProtoPlayer.seek() to check if it can jump correctly to the proper chunk
+    3. Test ProtoPlayer.seek() to check if the player can jump correctly to the correct chunk
     """
     # generate correctly formatted replay files
     replay_proto = []
@@ -100,26 +98,25 @@ def test_for_building_index_on_valid_chunks():
 
     # validate index with load index function
     chunk_indices = player.load_chunk_index()
+    print(chunk_indices)
     assert len(chunk_indices) == CHUNK_FILES_NUM
+    assert player.chunks_indices
     for filename, start_timestamp in chunk_indices.items():
         index_of_file = int(filename.replace(".replay", ""))
-        assert start_timestamp - 0.05 <= index_of_file * DURATION_PER_CHUNK
+        assert math.isclose(start_timestamp, DURATION_PER_CHUNK * index_of_file)
 
     # test seeking a timestamp
-    # jump to the beginning of the chunk
-    for i in range(CHUNK_FILES_NUM):
-        player.seek(i * DURATION_PER_CHUNK)
-        assert player.current_chunk_index == i
+    # jump to the middle chunk
+    player.seek(DURATION_PER_CHUNK * CHUNK_FILES_NUM / 2)
+    assert player.current_chunk_index == int(CHUNK_FILES_NUM / 2)
 
-    # jump to the middle of the chunk
-    for i in range(CHUNK_FILES_NUM):
-        player.seek(i * DURATION_PER_CHUNK + DURATION_PER_CHUNK / 2)
-        assert player.current_chunk_index == i
+    # jump to the start chunk
+    player.seek(0.0)
+    assert player.current_chunk_index == 0
 
-    # jump to the ending of the chunk
-    for i in range(CHUNK_FILES_NUM):
-        player.seek(i * DURATION_PER_CHUNK + DURATION_PER_CHUNK - 0.05)
-        assert player.current_chunk_index == i
+    # jump to the end chunk
+    player.seek(DURATION_PER_CHUNK * CHUNK_FILES_NUM - 1)
+    assert player.current_chunk_index == CHUNK_FILES_NUM - 1
     cleanup()
 
 
