@@ -134,16 +134,17 @@ class ProtoPlayer:
         except Exception:
             return True
 
-    def build_chunk_index(self) -> dict[str: tuple[float, float]]:
+    def build_chunk_index(self) -> dict[str: float]:
         """
         Build the chunk index and store the index into the index file
 
         NOTE:
         A chunk index entry is a key value pair [filename: start timestamp]
-        Start timestamp: timestamp of the first log entry in the chunk
-        Filename: chunk file name (%d.reply)
+         - Start timestamp: timestamp of the first log entry in the chunk
+         - Filename: replay chunk file name (%d.reply)
 
-        :return: list of chunk index file entry
+        :return: a dictionary for mapping replay filename to the start
+            timestamp of the first entry in the chunk.
         """
         chunk_indices: dict[str: float] = dict()
         for chunk_name in self.sorted_chunks:
@@ -172,7 +173,7 @@ class ProtoPlayer:
         """
         return os.path.exists(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME))
 
-    def load_chunk_index(self) -> dict[str: tuple[float]]:
+    def load_chunk_index(self) -> dict[str: float]:
         """
         Loads the chunk index file.
 
@@ -194,7 +195,7 @@ class ProtoPlayer:
             logging.warning(f"An Exception occurred when loading chunk index file {e}")
         return chunk_indices
 
-    def get_chunk_index(self) -> dict[str: tuple[float, float]]:
+    def get_chunk_index(self) -> dict[str: float]:
         """
         Returns the chunk indices.
         NOTE: if the chunk index was not built, this function will automatically build one.
@@ -204,7 +205,11 @@ class ProtoPlayer:
         if not self.is_chunk_indexed():
             return self.build_chunk_index()
         else:
-            return self.load_chunk_index()
+            try:
+                return self.load_chunk_index()
+            except Exception as e:
+                logging.log(f"Exception occurred when loading chunk index, trying to rebuild. Message: {e}")
+                return self.build_chunk_index()
 
 
     def is_proto_player_playing(self) -> bool:
