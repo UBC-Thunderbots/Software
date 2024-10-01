@@ -141,8 +141,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveTactic &tactic_proto,
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(
         createPoint(tactic_proto.destination()),
-        createAngle(tactic_proto.final_orientation()),
-        tactic_proto.dribbler_mode(), tactic_proto.ball_collision_type(),
+        createAngle(tactic_proto.final_orientation()), tactic_proto.dribbler_mode(),
+        tactic_proto.ball_collision_type(),
         createAutoChipOrKick(tactic_proto.auto_chip_or_kick()),
         tactic_proto.max_allowed_speed_mode(), tactic_proto.obstacle_avoidance_mode());
     return tactic;

@@ -21,8 +21,7 @@ MoveTactic::MoveTactic()
 }
 
 void MoveTactic::updateControlParams(
-    Point destination, Angle final_orientation, 
-    TbotsProto::DribblerMode dribbler_mode,
+    Point destination, Angle final_orientation, TbotsProto::DribblerMode dribbler_mode,
     TbotsProto::BallCollisionType ball_collision_type, AutoChipOrKick auto_chip_or_kick,
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
     TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode)
