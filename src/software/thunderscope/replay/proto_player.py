@@ -13,7 +13,7 @@ from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
 from google.protobuf.message import Message
-from typing import Callable, Type, List
+from typing import Callable, Type
 
 
 class ProtoPlayer:

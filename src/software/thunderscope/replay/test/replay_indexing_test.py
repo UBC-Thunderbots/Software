@@ -3,7 +3,6 @@ This test is for testing the chunk indexing function of the proto player.
 We are going to examine the index-building and index-loading functions.
 Those functions are first introduced to optimize the response time of the progress bar in the replay mode.
 """
-import time
 from typing import Callable
 import random
 import shutil
@@ -12,7 +11,6 @@ import os
 from google.protobuf.message import Message
 from software.py_constants import *
 
-from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.simulated_tests.simulated_test_fixture import pytest_main
