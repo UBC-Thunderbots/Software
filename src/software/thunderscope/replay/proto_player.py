@@ -411,8 +411,9 @@ class ProtoPlayer:
                     self.current_entry_index += 1
                     if self.current_packet_time >= end_time:
                         logging.info("Clip saved!")
+                        self.build_chunk_index()
                         return
-                # Load the next chunk
+            # Load the next chunk
                 self.current_chunk_index += 1
                 replay_index += 1
 
