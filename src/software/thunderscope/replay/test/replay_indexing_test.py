@@ -1,8 +1,8 @@
-"""
-This test is for testing the chunk indexing function of the proto player.
+"""This test is for testing the chunk indexing function of the proto player.
 We are going to examine the index-building and index-loading functions.
 Those functions are first introduced to optimize the response time of the progress bar in the replay mode.
 """
+
 from typing import Callable
 import math
 import shutil
@@ -14,7 +14,10 @@ from software.py_constants import *
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.simulated_tests.simulated_test_fixture import pytest_main
-from software.thunderscope.replay.test.replay_corruption_test import create_valid_log_entry, create_random_proto
+from software.thunderscope.replay.test.replay_corruption_test import (
+    create_valid_log_entry,
+    create_random_proto,
+)
 
 # location to store the generated files
 TMP_REPLAY_SAVE_PATH = "/tmp/test_indexing"
@@ -28,27 +31,28 @@ ENTRY_NUM_PER_FILE = 100
 # length of time that every chunk represents
 DURATION_PER_CHUNK = 5
 
+
 def create_test_player() -> ProtoPlayer:
-    """
-    Create a dummy protoplayer for testing
+    """Create a dummy protoplayer for testing
     :return: a protoplayer for testing
     """
     return ProtoPlayer(TMP_REPLAY_SAVE_PATH, ProtoUnixIO())
+
 
 def cleanup():
     """Clean up this test by deleting the replay files generated"""
     shutil.rmtree(TMP_REPLAY_SAVE_PATH)
 
+
 def generate_chunk(
-        list_of_protos: [Message],
-        save_path: str,
-        filename: str,
-        duration: float,
-        start_time: float,
-        gen_log_entry_func: Callable[[Message, float], str]
+    list_of_protos: [Message],
+    save_path: str,
+    filename: str,
+    duration: float,
+    start_time: float,
+    gen_log_entry_func: Callable[[Message, float], str],
 ):
-    """
-    Generate one replay chunk for testing.
+    """Generate one replay chunk for testing.
 
     :param list_of_protos: the list of proto being referenced when generating log entries
     :param save_path: directory for saving the chunk file
@@ -68,8 +72,7 @@ def generate_chunk(
 
 
 def test_for_building_index_on_valid_chunks():
-    """
-    Test building index file on correctly formatted replay files
+    """Test building index file on correctly formatted replay files
 
     Test steps:
     1. generate correctly formatted replay files (chunks)
@@ -88,7 +91,7 @@ def test_for_building_index_on_valid_chunks():
             f"{i}.replay",
             DURATION_PER_CHUNK,
             DURATION_PER_CHUNK * i,
-            create_valid_log_entry
+            create_valid_log_entry,
         )
 
     player = create_test_player()
@@ -119,5 +122,5 @@ def test_for_building_index_on_valid_chunks():
     cleanup()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest_main(__file__)

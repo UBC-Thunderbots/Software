@@ -43,7 +43,7 @@ class ProtoPlayer:
     """
 
     PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
-    CHUNK_INDEX_FILENAME = 'chunks.index'
+    CHUNK_INDEX_FILENAME = "chunks.index"
 
     def __init__(self, log_folder_path: str, proto_unix_io: ProtoUnixIO) -> None:
         """Creates a proto player that plays back all protos
@@ -134,11 +134,11 @@ class ProtoPlayer:
         except Exception:
             return True
 
-    def build_chunk_index(self, folder_path: str) -> dict[str: float]:
-        """
-        Build the chunk index and store the index into the index file
+    def build_chunk_index(self, folder_path: str) -> dict[str:float]:
+        """Build the chunk index and store the index into the index file
 
-        NOTE:
+        Note:
+        ----
         A chunk index entry is a key value pair [filename: start timestamp]
          - Start timestamp: timestamp of the first log entry in the chunk
          - Filename: replay chunk file name (%d.reply)
@@ -147,48 +147,53 @@ class ProtoPlayer:
 
         :return: a dictionary for mapping replay filename to the start
             timestamp of the first entry in the chunk.
+
         """
-        chunk_indices: dict[str: float] = dict()
+        chunk_indices: dict[str:float] = dict()
         for chunk_name in self.sorted_chunks:
-            chunk_data = ProtoPlayer.load_replay_chunk(
-                chunk_name, self.version
-            )
+            chunk_data = ProtoPlayer.load_replay_chunk(chunk_name, self.version)
             if chunk_data:
-                start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk_data[0], self.version)
+                start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(
+                    chunk_data[0], self.version
+                )
                 chunk_indices[os.path.basename(chunk_name)] = start_timestamp
         if chunk_indices:
-            with open(os.path.join(folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'w') as index_file:
-                index_file.write(f'Generated on {time.time()}\n')
+            with open(
+                os.path.join(folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), "w"
+            ) as index_file:
+                index_file.write(f"Generated on {time.time()}\n")
                 for key, value in chunk_indices.items():
-                    index_file.write(f'{value}, {key}\n')
-            logging.info('Created chunk index file successfully.')
+                    index_file.write(f"{value}, {key}\n")
+            logging.info("Created chunk index file successfully.")
         else:
-            logging.warning(f'Failed to build chunk index for {folder_path}')
+            logging.warning(f"Failed to build chunk index for {folder_path}")
         return chunk_indices
 
-
     def is_chunk_indexed(self) -> bool:
-        """
-        Returns true if the chunk index is already built.
+        """Returns true if the chunk index is already built.
 
         :return: if the chunk index file exists
         """
-        return os.path.exists(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME))
+        return os.path.exists(
+            os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME)
+        )
 
-    def load_chunk_index(self) -> dict[str: float]:
-        """
-        Loads the chunk index file.
+    def load_chunk_index(self) -> dict[str:float]:
+        """Loads the chunk index file.
 
         :return: the chunk indices.
         """
-        chunk_indices: dict[str: float] = dict()
+        chunk_indices: dict[str:float] = dict()
         try:
-            with open(os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), 'r') as index_file:
+            with open(
+                os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME),
+                "r",
+            ) as index_file:
                 # skip the first timestamp line
                 index_file.readline()
 
                 for line in index_file:
-                    start_timestamp, chunk_name = line.split(',')
+                    start_timestamp, chunk_name = line.split(",")
                     start_timestamp = float(start_timestamp)
                     chunk_name = chunk_name.strip()
                     chunk_indices[chunk_name] = start_timestamp
@@ -197,9 +202,8 @@ class ProtoPlayer:
             logging.warning(f"An Exception occurred when loading chunk index file {e}")
         return chunk_indices
 
-    def get_chunk_index(self) -> dict[str: float]:
-        """
-        Returns the chunk indices.
+    def get_chunk_index(self) -> dict[str:float]:
+        """Returns the chunk indices.
         NOTE: if the chunk index was not built, this function will automatically build one.
 
         :return: chunk indices.
@@ -210,9 +214,10 @@ class ProtoPlayer:
             try:
                 return self.load_chunk_index()
             except Exception as e:
-                logging.log(f"Exception occurred when loading chunk index, trying to rebuild. Message: {e}")
+                logging.log(
+                    f"Exception occurred when loading chunk index, trying to rebuild. Message: {e}"
+                )
                 return self.build_chunk_index(self.log_folder_path)
-
 
     def is_proto_player_playing(self) -> bool:
         """Return whether or not the proto player is being played.
@@ -415,7 +420,7 @@ class ProtoPlayer:
                         logging.info("Clip saved!")
                         self.build_chunk_index(directory)
                         return
-            # Load the next chunk
+                # Load the next chunk
                 self.current_chunk_index += 1
                 replay_index += 1
 
@@ -508,12 +513,14 @@ class ProtoPlayer:
                 return self.chunks_indices[os.path.basename(chunk)]
             else:
                 logging.warning(
-                   f"Use old algorithm to jump, which might result in lagging " +
-                   f"Please try deleting {ProtoPlayer.CHUNK_INDEX_FILENAME} in the replay file folder" +
-                   f" and re-run Thunderscope to enable the indexing for faster speed!"
+                    "Use old algorithm to jump, which might result in lagging "
+                    + f"Please try deleting {ProtoPlayer.CHUNK_INDEX_FILENAME} in the replay file folder"
+                    + " and re-run Thunderscope to enable the indexing for faster speed!"
                 )
                 chunk = ProtoPlayer.load_replay_chunk(chunk, self.version)
-                start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk[0], self.version)
+                start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(
+                    chunk[0], self.version
+                )
                 return start_timestamp
 
         with self.replay_controls_mutex:
