@@ -171,7 +171,9 @@ class ProtoPlayer:
             except Exception as e:
                 logging.warning(f"Failed to build chunk index for {folder_path}: {e}")
         else:
-            logging.warning(f"Failed to build chunk index for {folder_path} : No chunk data.")
+            logging.warning(
+                f"Failed to build chunk index for {folder_path} : No chunk data."
+            )
         return chunk_indices
 
     def is_chunk_indexed(self) -> bool:
