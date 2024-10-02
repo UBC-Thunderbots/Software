@@ -74,31 +74,31 @@ class TbotsProtobufTest : public ::testing::Test
         auto traj_path_nodes_1 = traj_path_1.getTrajectoryPathNodes();
         auto traj_path_nodes_2 = traj_path_2.getTrajectoryPathNodes();
         ASSERT_EQ(traj_path_nodes_1.size(), traj_path_nodes_2.size());
-        ASSERT_FLOAT_EQ(traj_path_nodes_1[0].getTrajectoryEndTime(),
+        ASSERT_DOUBLE_EQ(traj_path_nodes_1[0].getTrajectoryEndTime(),
                         traj_path_nodes_2[0].getTrajectoryEndTime());
 
-        for (int i = 0; i < traj_path_nodes_1.size(); i++)
+        for (std::size_t i = 0; i < traj_path_nodes_1.size(); i++)
         {
             EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getPosition(0.0),
                       traj_path_nodes_2[i].getTrajectory()->getPosition(0.0))
                 << " Position at index " << i << " is not equal";
         }
 
-        for (int i = 0; i < traj_path_nodes_1.size(); i++)
+        for (std::size_t i = 0; i < traj_path_nodes_1.size(); i++)
         {
             EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getVelocity(0.0),
                       traj_path_nodes_2[i].getTrajectory()->getVelocity(0.0))
                 << " Velocity at index " << i << " is not equal";
         }
 
-        for (int i = 0; i < traj_path_nodes_1.size(); i++)
+        for (std::size_t i = 0; i < traj_path_nodes_1.size(); i++)
         {
             EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getAcceleration(0.0),
                       traj_path_nodes_2[i].getTrajectory()->getAcceleration(0.0))
                 << " Acceleration at index " << i << " is not equal";
         }
 
-        for (int i = 0; i < traj_path_nodes_1.size(); i++)
+        for (std::size_t i = 0; i < traj_path_nodes_1.size(); i++)
         {
             EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getDestination(),
                       traj_path_nodes_2[i].getTrajectory()->getDestination())
@@ -176,7 +176,7 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
         start_position, initial_destination, initial_velocity, constraints);
     TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
 
-    for (int i = 1; i < sub_destinations.size(); i++)
+    for (std::size_t i = 1; i < sub_destinations.size(); i++)
     {
         trajectory_path.append(sub_destination_connection_times[i - 1],
                                sub_destinations[i], constraints);
@@ -195,12 +195,12 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
     *(params.mutable_initial_velocity()) = *createVectorProto(initial_velocity);
     params.set_max_speed_mode(max_allowed_speed_mode);
 
-    for (int i = 0; i < sub_destinations.size(); ++i)
+    for (std::size_t i = 0; i < sub_destinations.size(); ++i)
     {
         TbotsProto::TrajectoryPathParams2D::SubDestination sub_destination_proto;
         *(sub_destination_proto.mutable_sub_destination()) =
             *createPointProto(sub_destinations[i]);
-        sub_destination_proto.set_connection_time_s(sub_destination_connection_times[i]);
+        sub_destination_proto.set_connection_time_s(static_cast<float>(sub_destination_connection_times[i]));
         *(params.add_sub_destinations()) = sub_destination_proto;
     }
 
