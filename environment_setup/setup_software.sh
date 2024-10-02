@@ -95,6 +95,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
 fi
 
 if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; then
+    # This is required because a Braille TTY device that Linux provides a driver for conflicts with the ESP32
     wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/85-brltty.rules
     sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi

@@ -122,10 +122,9 @@ class LoggerSingleton
     }
 
     // levels is this vector are filtered out of the filtered log rotate sink
-    std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE,    CSV,
-                                                 INFO,  ROBOT_STATUS, PLOTJUGGLER};
-    std::vector<LEVELS> default_level_filter  = {VISUALIZE, CSV, ROBOT_STATUS,
-                                                PLOTJUGGLER};
+    std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE, CSV, INFO,
+                                                 PLOTJUGGLER};
+    std::vector<LEVELS> default_level_filter  = {VISUALIZE, CSV, PLOTJUGGLER};
     const std::string filter_suffix           = "_filtered";
     const std::string log_name                = "thunderbots";
     std::unique_ptr<g3::LogWorker> logWorker;
