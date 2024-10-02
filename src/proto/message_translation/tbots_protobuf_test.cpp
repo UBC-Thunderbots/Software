@@ -75,7 +75,7 @@ class TbotsProtobufTest : public ::testing::Test
         auto traj_path_nodes_2 = traj_path_2.getTrajectoryPathNodes();
         ASSERT_EQ(traj_path_nodes_1.size(), traj_path_nodes_2.size());
         ASSERT_DOUBLE_EQ(traj_path_nodes_1[0].getTrajectoryEndTime(),
-                        traj_path_nodes_2[0].getTrajectoryEndTime());
+                         traj_path_nodes_2[0].getTrajectoryEndTime());
 
         for (std::size_t i = 0; i < traj_path_nodes_1.size(); i++)
         {
@@ -200,7 +200,8 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
         TbotsProto::TrajectoryPathParams2D::SubDestination sub_destination_proto;
         *(sub_destination_proto.mutable_sub_destination()) =
             *createPointProto(sub_destinations[i]);
-        sub_destination_proto.set_connection_time_s(static_cast<float>(sub_destination_connection_times[i]));
+        sub_destination_proto.set_connection_time_s(
+            static_cast<float>(sub_destination_connection_times[i]));
         *(params.add_sub_destinations()) = sub_destination_proto;
     }
 
