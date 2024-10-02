@@ -114,7 +114,7 @@ jobs:
         with:
           name: blue-sim-test-proto-logs
           path: |
-            /tmp/tbots/blue/test
+            /tmp/tbots/blue/test/*/proto_*
 
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
@@ -123,7 +123,7 @@ jobs:
         with:
           name: yellow-sim-test-proto-logs
           path: |
-            /tmp/tbots/yellow/test
+            /tmp/tbots/yellow/test/*/proto_*
 
   autorefd-game:
     name: AutoRef'd Game (3 Minutes)
