@@ -115,7 +115,7 @@ class ProtoPlayer:
             )
 
         # Sort the files by their chunk index
-        def __sort_replay_chunks(file_path: str):
+        def __sort_replay_chunks(file_path: os.PathLike):
             head, tail = os.path.split(file_path)
             replay_index, _ = tail.split(".")
             return int(replay_index)
@@ -160,15 +160,18 @@ class ProtoPlayer:
                 )
                 chunk_indices[os.path.basename(chunk_name)] = start_timestamp
         if chunk_indices:
-            with open(
-                os.path.join(folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), "w"
-            ) as index_file:
-                index_file.write(f"Generated on {time.time()}\n")
-                for filename, start_timestamp in chunk_indices.items():
-                    index_file.write(f"{start_timestamp}, {filename}\n")
-            logging.info("Created chunk index file successfully.")
+            try:
+                with open(
+                    os.path.join(folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), "w"
+                ) as index_file:
+                    index_file.write(f"Generated on {time.time()}\n")
+                    for filename, start_timestamp in chunk_indices.items():
+                        index_file.write(f"{start_timestamp}, {filename}\n")
+                logging.info("Created chunk index file successfully.")
+            except Exception as e:
+                logging.warning(f"Failed to build chunk index for {folder_path}: {e}")
         else:
-            logging.warning(f"Failed to build chunk index for {folder_path}")
+            logging.warning(f"Failed to build chunk index for {folder_path} : No chunk data.")
         return chunk_indices
 
     def is_chunk_indexed(self) -> bool:
