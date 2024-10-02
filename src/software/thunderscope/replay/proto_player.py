@@ -45,7 +45,9 @@ class ProtoPlayer:
     PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
     CHUNK_INDEX_FILENAME = "chunks.index"
 
-    def __init__(self, log_folder_path: os.PathLike, proto_unix_io: ProtoUnixIO) -> None:
+    def __init__(
+        self, log_folder_path: os.PathLike, proto_unix_io: ProtoUnixIO
+    ) -> None:
         """Creates a proto player that plays back all protos
 
         :param log_folder_path: The path to the log file.
