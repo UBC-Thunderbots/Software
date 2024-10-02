@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Environment Setup
         run: |
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Environment Setup
         run: |
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Environment Setup
         run: |
@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         
       - name: Environment Setup
         run: |
@@ -110,27 +110,27 @@ jobs:
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: blue-ai-proto-logs
+          name: blue-sim-test-proto-logs
           path: |
-            /tmp/tbots/blue/logs
+            /tmp/tbots/blue/test
 
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: yellow-ai-proto-logs
+          name: yellow-sim-test-proto-logs
           path: |
-            /tmp/tbots/yellow/logs
+            /tmp/tbots/yellow/test
 
   autorefd-game:
     name: AutoRef'd Game (3 Minutes)
     runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Environment Setup
         run: |
@@ -144,7 +144,7 @@ jobs:
       - name: Upload AI vs AI logs
         # Ensure that simulated test logs get uploaded
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: blue-ai-vs-ai-proto-logs
           path: |
@@ -153,7 +153,7 @@ jobs:
       - name: Upload AI vs AI logs
         # Ensure that simulated test logs get uploaded
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: yellow-ai-vs-ai-proto-logs
           path: |
