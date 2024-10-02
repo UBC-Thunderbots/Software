@@ -124,7 +124,7 @@ message MoveTactic
     required Point destination = 1;
     // The orientation the robot should have when it arrives at its destination
     required Angle final_orientation = 2;
-    // 3 reserved field number
+    reserved 3, 8;
     // How to run the dribbler
     required DribblerMode dribbler_mode = 4;
     // How to navigate around the ball
