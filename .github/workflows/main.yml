@@ -11,9 +11,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ubuntu22-tests:
-    name: Ubuntu 22.04 Build
-    runs-on: ubuntu-22.04
+  multiplatform-build:
+    strategy:
+      matrix:
+        platform: [ ubuntu-22.04, ubuntu-24.04, ubuntu-24.04_arm64 ]
+
+    name: Ubuntu Alternate Builds
+    runs-on: ${{ matrix.platform }}
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2

@@ -104,9 +104,9 @@ http_archive(
 http_archive(
     name = "g3log",
     build_file = "@//extlibs:g3log.BUILD",
-    sha256 = "176fcf4e1634aba425549c32f76426d7976ab6973370785fd6b76986e9f7b20e",
-    strip_prefix = "g3log-1.3.3",
-    url = "https://github.com/KjellKod/g3log/archive/1.3.3.zip",
+    sha256 = "2177e6dfd86fa7465c44c8ef5c3b6ab98ffc94e1130355d6982f7d886cb7bec9",
+    strip_prefix = "g3log-2.4",
+    url = "https://github.com/KjellKod/g3log/archive/refs/tags/2.4.zip",
 )
 
 http_archive(
