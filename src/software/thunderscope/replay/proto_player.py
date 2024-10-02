@@ -104,7 +104,7 @@ class ProtoPlayer:
         :return: the sorted replay files
         """
         # Load up all replay files in the log folder
-        replay_files = glob.glob(os.path.join(log_folder_path, f"/*.{REPLAY_FILE_EXTENSION}"))
+        replay_files = glob.glob(f"{log_folder_path}/*.{REPLAY_FILE_EXTENSION}")
 
         if len(replay_files) == 0:
             raise ValueError(
