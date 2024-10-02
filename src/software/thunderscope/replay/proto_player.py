@@ -45,7 +45,7 @@ class ProtoPlayer:
     PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
     CHUNK_INDEX_FILENAME = "chunks.index"
 
-    def __init__(self, log_folder_path: str, proto_unix_io: ProtoUnixIO) -> None:
+    def __init__(self, log_folder_path: os.PathLike, proto_unix_io: ProtoUnixIO) -> None:
         """Creates a proto player that plays back all protos
 
         :param log_folder_path: The path to the log file.
@@ -97,14 +97,14 @@ class ProtoPlayer:
         self.error_bit_flag = ProtoPlayerFlags.NO_ERROR_FLAG
 
     @staticmethod
-    def sort_and_get_replay_files(log_folder_path):
+    def sort_and_get_replay_files(log_folder_path: os.PathLike):
         """Sorting the replay files
 
         :param log_folder_path: the path to the folder that we are going to be sorting!
         :return: the sorted replay files
         """
         # Load up all replay files in the log folder
-        replay_files = glob.glob(log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
+        replay_files = glob.glob(os.path.join(log_folder_path, f"/*.{REPLAY_FILE_EXTENSION}"))
 
         if len(replay_files) == 0:
             raise ValueError(
@@ -134,7 +134,7 @@ class ProtoPlayer:
         except Exception:
             return True
 
-    def build_chunk_index(self, folder_path: str) -> dict[str:float]:
+    def build_chunk_index(self, folder_path: os.PathLike) -> dict[str, float]:
         """Build the chunk index and store the index into the index file
 
         Note:
@@ -149,7 +149,7 @@ class ProtoPlayer:
             timestamp of the first entry in the chunk.
 
         """
-        chunk_indices: dict[str:float] = dict()
+        chunk_indices: dict[str, float] = dict()
         for chunk_name in self.sorted_chunks:
             chunk_data = ProtoPlayer.load_replay_chunk(chunk_name, self.version)
             if chunk_data:
@@ -162,8 +162,8 @@ class ProtoPlayer:
                 os.path.join(folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), "w"
             ) as index_file:
                 index_file.write(f"Generated on {time.time()}\n")
-                for key, value in chunk_indices.items():
-                    index_file.write(f"{value}, {key}\n")
+                for filename, start_timestamp in chunk_indices.items():
+                    index_file.write(f"{start_timestamp}, {filename}\n")
             logging.info("Created chunk index file successfully.")
         else:
             logging.warning(f"Failed to build chunk index for {folder_path}")
@@ -178,12 +178,12 @@ class ProtoPlayer:
             os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME)
         )
 
-    def load_chunk_index(self) -> dict[str:float]:
+    def load_chunk_index(self) -> dict[str, float]:
         """Loads the chunk index file.
 
         :return: the chunk indices.
         """
-        chunk_indices: dict[str:float] = dict()
+        chunk_indices: dict[str, float] = dict()
         try:
             with open(
                 os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME),
@@ -202,7 +202,7 @@ class ProtoPlayer:
             logging.warning(f"An Exception occurred when loading chunk index file {e}")
         return chunk_indices
 
-    def get_chunk_index(self) -> dict[str:float]:
+    def get_chunk_index(self) -> dict[str, float]:
         """Returns the chunk indices.
         NOTE: if the chunk index was not built, this function will automatically build one.
 
@@ -210,14 +210,14 @@ class ProtoPlayer:
         """
         if not self.is_chunk_indexed():
             return self.build_chunk_index(self.log_folder_path)
-        else:
-            try:
-                return self.load_chunk_index()
-            except Exception as e:
-                logging.log(
-                    f"Exception occurred when loading chunk index, trying to rebuild. Message: {e}"
-                )
-                return self.build_chunk_index(self.log_folder_path)
+
+        try:
+            return self.load_chunk_index()
+        except Exception as e:
+            logging.warning(
+                f"Exception occurred when loading chunk index, trying to rebuild. Message: {e}"
+            )
+            return self.build_chunk_index(self.log_folder_path)
 
     def is_proto_player_playing(self) -> bool:
         """Return whether or not the proto player is being played.
@@ -252,7 +252,7 @@ class ProtoPlayer:
         return 0.0
 
     @staticmethod
-    def load_replay_chunk(replay_chunk_path: str, version: int) -> list:
+    def load_replay_chunk(replay_chunk_path: os.PathLike, version: int) -> list:
         """Reads a replay chunk.
 
         :param replay_chunk_path: The path to the replay chunk.
@@ -291,7 +291,7 @@ class ProtoPlayer:
         return cached_data
 
     @staticmethod
-    def get_replay_chunk_format_version(replay_chunk_path: str) -> int:
+    def get_replay_chunk_format_version(replay_chunk_path: os.PathLike) -> int:
         """Reads a replay chunk.
 
         :param replay_chunk_path: The path to the replay chunk.
@@ -508,7 +508,7 @@ class ProtoPlayer:
         # Let's binary search through the chunks to find the chunk that starts
         # with a timestamp less than (but closest to) the seek_time we want
         # to seek to.
-        def __bisect_chunks_by_timestamp(chunk: str) -> None:
+        def __get_timestamp_for_chunk(chunk: str) -> float:
             if self.chunks_indices and os.path.basename(chunk) in self.chunks_indices:
                 return self.chunks_indices[os.path.basename(chunk)]
             else:
@@ -525,7 +525,7 @@ class ProtoPlayer:
 
         with self.replay_controls_mutex:
             self.current_chunk_index = ProtoPlayer.binary_search(
-                self.sorted_chunks, seek_time, key=__bisect_chunks_by_timestamp
+                self.sorted_chunks, seek_time, key=__get_timestamp_for_chunk
             )
 
         # Let's binary search through the entries in the chunk to find the closest

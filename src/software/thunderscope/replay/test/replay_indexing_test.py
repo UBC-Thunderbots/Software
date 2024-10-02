@@ -46,7 +46,7 @@ def cleanup():
 
 def generate_chunk(
     list_of_protos: [Message],
-    save_path: str,
+    save_path: os.PathLike,
     filename: str,
     duration: float,
     start_time: float,
