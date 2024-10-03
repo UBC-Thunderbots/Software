@@ -9,7 +9,7 @@ Steps to test:
     2. we create invalid entries of two type: the data is actually corrupted, and we are missing a delimiter. We
         mixed those replay entries with valid replay entries to check if proto player could actually player those
         entries
-    4. we check to see if there are uncaught exception. If there are, we know fore sure proto player wouldn't work!
+    3. we check to see if there are uncaught exception. If there are, we know for sure proto player wouldn't work!
 """
 
 import time
@@ -94,7 +94,7 @@ def make_part_replay_chunks(
     save_path: str,
     duration: float,
     start_time: float,
-    gen_log_entry_func: Callable[[Message, float], None],
+    gen_log_entry_func: Callable[[Message, float], str],
     frequency=0.1,
 ):
     """Making a part of the replay chunks and appending it to the 0.replay file.
