@@ -144,7 +144,7 @@ class ProtoPlayer:
         ----
         A chunk index entry is a key value pair [filename: start timestamp]
          - Start timestamp: timestamp of the first log entry in the chunk
-         - Filename: replay chunk file name (%d.reply)
+         - Filename: replay chunk file name (%d.replay)
 
         :param folder_path: folder containing all the replay files
 
