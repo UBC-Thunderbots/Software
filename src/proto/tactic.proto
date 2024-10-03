@@ -133,7 +133,6 @@ message MoveTactic
     required AutoChipOrKick auto_chip_or_kick = 6;
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 7;
-    // 8 Reserved field number
     // The obstacle avoidance mode to use while moving
     required ObstacleAvoidanceMode obstacle_avoidance_mode = 9;
 }
