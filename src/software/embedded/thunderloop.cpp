@@ -86,7 +86,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
-    testNetworkConnection();
+    waitForNetworkUp();
 
     g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
@@ -473,11 +473,11 @@ void Thunderloop::updateErrorCodes()
     }
 }
 
-void Thunderloop::testNetworkConnection()
+void Thunderloop::waitForNetworkUp()
 {
     ThreadedUdpSender network_test(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
-        UNUSED_PORT, true);
+        NETWORK_COMM_TEST_PORT, true);
 
     // Send an empty packet on the specific network interface to
     // ensure wifi is connected. Keeps trying until successful

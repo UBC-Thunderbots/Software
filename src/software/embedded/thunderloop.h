@@ -100,14 +100,13 @@ class Thunderloop
     void updateErrorCodes();
 
     /**
-     * Tests that Thunderloop is connected to the network and
-     * keeps trying to connect until successful.
+     * Wait for networking communication to be established. This function is blocking.
      */
-    void testNetworkConnection()
+    void waitForNetworkUp();
 
 
-        // Input Msg Buffers
-        TbotsProto::PrimitiveSet primitive_set_;
+    // Input Msg Buffers
+    TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
     TbotsProto::Primitive primitive_;
     TbotsProto::DirectControlPrimitive direct_control_;
