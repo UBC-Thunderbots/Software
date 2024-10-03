@@ -491,9 +491,9 @@ def configure_replay_view(
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[],
                     frame_swap_counter=frame_swap_frametime_counter,
-                    refresh_counter=refresh_func_frametime_counter
+                    refresh_counter=refresh_func_frametime_counter,
                 ),
-                refresh_counter=refresh_func_frametime_counter
+                refresh_counter=refresh_func_frametime_counter,
             )
         )
 
@@ -513,9 +513,9 @@ def configure_replay_view(
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[],
                     frame_swap_counter=frame_swap_frametime_counter,
-                    refresh_counter=refresh_func_frametime_counter
+                    refresh_counter=refresh_func_frametime_counter,
                 ),
-                refresh_counter=refresh_func_frametime_counter
+                refresh_counter=refresh_func_frametime_counter,
             )
         )
 
