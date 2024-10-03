@@ -20,6 +20,9 @@ install_bazel() {
 }
 
 install_gamecontroller () {
+    # TODO(#3335): Whenever we deprecate Ubuntu 20.04, we can just grab the latest version of the SSL game controller
+    # binary from the releases page. This is a workaround since the latest version of the game controller is compiled
+    # with a newer GLIBC version than what is available on Ubuntu 20.04.
     go_arch=arm64
     if is_x86 $1; then
         go_arch=amd64
