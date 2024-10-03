@@ -474,10 +474,8 @@ def configure_replay_view(
     # Must be called before widgets are initialized below
     initialize_application()
 
-    blue_refresh_func_counter = FrameTimeCounter()
-    yellow_refresh_func_counter = FrameTimeCounter()
-
     if blue_replay_log:
+        blue_refresh_func_counter = FrameTimeCounter()
         proto_unix_io_map[ProtoUnixIOTypes.BLUE] = ProtoUnixIO()
         tabs.append(
             TScopeTab(
@@ -498,6 +496,7 @@ def configure_replay_view(
         )
 
     if yellow_replay_log:
+        yellow_refresh_func_counter = FrameTimeCounter()
         proto_unix_io_map[ProtoUnixIOTypes.YELLOW] = ProtoUnixIO()
         tabs.append(
             TScopeTab(
