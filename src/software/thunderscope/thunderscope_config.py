@@ -474,8 +474,8 @@ def configure_replay_view(
     # Must be called before widgets are initialized below
     initialize_application()
 
-    refresh_func_frametime_counter = FrameTimeCounter()
-    frame_swap_frametime_counter = FrameTimeCounter()
+    blue_refresh_func_counter = FrameTimeCounter()
+    yellow_refresh_func_counter = FrameTimeCounter()
 
     if blue_replay_log:
         proto_unix_io_map[ProtoUnixIOTypes.BLUE] = ProtoUnixIO()
@@ -490,10 +490,10 @@ def configure_replay_view(
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[],
-                    frame_swap_counter=frame_swap_frametime_counter,
-                    refresh_counter=refresh_func_frametime_counter,
+                    frame_swap_counter=FrameTimeCounter(),
+                    refresh_counter=blue_refresh_func_counter,
                 ),
-                refresh_counter=refresh_func_frametime_counter,
+                refresh_counter=blue_refresh_func_counter,
             )
         )
 
@@ -512,10 +512,10 @@ def configure_replay_view(
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[],
-                    frame_swap_counter=frame_swap_frametime_counter,
-                    refresh_counter=refresh_func_frametime_counter,
+                    frame_swap_counter=FrameTimeCounter(),
+                    refresh_counter=yellow_refresh_func_counter,
                 ),
-                refresh_counter=refresh_func_frametime_counter,
+                refresh_counter=yellow_refresh_func_counter,
             )
         )
 
