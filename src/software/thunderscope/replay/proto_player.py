@@ -165,8 +165,10 @@ class ProtoPlayer:
                 with open(
                     os.path.join(folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), "w"
                 ) as index_file:
-                    index_file.write(f"Version: {ProtoPlayer.CHUNK_INDEX_FILE_VERSION}, "
-                                     f"Generated on {time.time():.0f}\n")
+                    index_file.write(
+                        f"Version: {ProtoPlayer.CHUNK_INDEX_FILE_VERSION}, "
+                        f"Generated on {time.time():.0f}\n"
+                    )
                     for filename, start_timestamp in chunk_indices.items():
                         index_file.write(f"{start_timestamp}, {filename}\n")
                 logging.info("Created chunk index file successfully.")
