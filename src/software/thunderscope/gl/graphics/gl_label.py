@@ -9,16 +9,15 @@ from software.thunderscope.constants import Colors
 
 
 class GLLabel(GLPainter):
-    """Displays a 2D text label on the viewport
-    """
+    """Displays a 2D text label on the viewport"""
 
     def __init__(
-            self,
-            parent_item: Optional[GLGraphicsItem] = None,
-            font: QFont = QFont("Roboto", 8),
-            text_color: QColor = Colors.PRIMARY_TEXT_COLOR,
-            offset: tuple[int, int] = (0, 0),
-            text: str = "",
+        self,
+        parent_item: Optional[GLGraphicsItem] = None,
+        font: QFont = QFont("Roboto", 8),
+        text_color: QColor = Colors.PRIMARY_TEXT_COLOR,
+        offset: tuple[int, int] = (0, 0),
+        text: str = "",
     ) -> None:
         """Initialize the GLGradientLegend
 
@@ -42,23 +41,19 @@ class GLLabel(GLPainter):
 
         self.add_draw_function(self.draw_label)
 
-    def draw_label(
-            self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect
-    ) -> None:
+    def draw_label(self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect) -> None:
         """Draw the label
 
         :param painter: The QPainter to perform drawing operations with
         :param viewport_rect: The QRect indicating the viewport dimensions
         """
-
         # calculate width and height of the label
         painter.setFont(self.font)
         bounds = painter.boundingRect(
             QtCore.QRectF(0, 0, 0, 0),
-            QtCore.Qt.AlignmentFlag.AlignLeft
-            | QtCore.Qt.AlignmentFlag.AlignVCenter,
+            QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter,
             str(self.text),
-            )
+        )
 
         width = round(bounds.width())
         height = round(bounds.height())
@@ -74,14 +69,10 @@ class GLLabel(GLPainter):
             y = viewport_rect.top() + self.offset[1]
 
         if self.text:
-            painter.drawText(
-                QtCore.QPoint(x, y),
-                self.text
-            )
+            painter.drawText(QtCore.QPoint(x, y), self.text)
 
     def set_text(self, new_text: str) -> None:
-        """
-        Update the text being displayed
+        """Update the text being displayed
         :param new_text: new text being displayed
         """
         self.text = new_text

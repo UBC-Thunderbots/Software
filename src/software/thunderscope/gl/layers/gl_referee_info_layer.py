@@ -17,8 +17,7 @@ class GLRefereeInfoLayer(GLLayer):
     GAMESTATE_PREFIX = "Game State: "
 
     def __init__(self, name: str, buffer_size: int = 1) -> None:
-        """
-        Initialize the GLRefereeInfoLayer
+        """Initialize the GLRefereeInfoLayer
 
         :param name: The displayed name of the layer
         :param buffer_size: the buffer size, set higher for smoother plots.
@@ -34,12 +33,9 @@ class GLRefereeInfoLayer(GLLayer):
         self.gamestate_type_text: Optional[GLLabel] = None
         self.command_type_text: Optional[GLLabel] = None
 
-
     def refresh_graphics(self) -> None:
         """Update displays in the layer"""
-        referee_proto = self.referee_vis_buffer.get(
-            block=False, return_cached=False
-        )
+        referee_proto = self.referee_vis_buffer.get(block=False, return_cached=False)
         if not referee_proto:
             return
 
@@ -51,19 +47,22 @@ class GLRefereeInfoLayer(GLLayer):
             self.gamestate_type_text = GLLabel(
                 parent_item=self,
                 offset=(-10, 50),
-                text=GLRefereeInfoLayer.GAMESTATE_PREFIX + referee_msg_dict['stage'],
+                text=GLRefereeInfoLayer.GAMESTATE_PREFIX + referee_msg_dict["stage"],
             )
             self.referee_text_graphics.append(self.gamestate_type_text)
         else:
-            self.gamestate_type_text.set_text(GLRefereeInfoLayer.GAMESTATE_PREFIX + referee_msg_dict['stage'])
+            self.gamestate_type_text.set_text(
+                GLRefereeInfoLayer.GAMESTATE_PREFIX + referee_msg_dict["stage"]
+            )
 
         if not self.command_type_text:
             self.command_type_text = GLLabel(
                 parent_item=self,
                 offset=(-10, 70),
-                text=GLRefereeInfoLayer.GAMESTATE_PREFIX + referee_msg_dict['command'],
+                text=GLRefereeInfoLayer.GAMESTATE_PREFIX + referee_msg_dict["command"],
             )
             self.referee_text_graphics.append(self.command_type_text)
         else:
-            self.command_type_text.set_text(GLRefereeInfoLayer.REFEREE_COMMAND_PREFIX + referee_msg_dict['command'])
-
+            self.command_type_text.set_text(
+                GLRefereeInfoLayer.REFEREE_COMMAND_PREFIX + referee_msg_dict["command"]
+            )

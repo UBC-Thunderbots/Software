@@ -26,7 +26,7 @@ from software.thunderscope.gl.layers import (
     gl_simulator_layer,
     gl_tactic_layer,
     gl_cost_vis_layer,
-    gl_trail_layer, 
+    gl_trail_layer,
     gl_referee_info_layer,
 )
 
@@ -130,7 +130,9 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
     trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
-    referee_layer = gl_referee_info_layer.GLRefereeInfoLayer("Referee Info", visualization_buffer_size)
+    referee_layer = gl_referee_info_layer.GLRefereeInfoLayer(
+        "Referee Info", visualization_buffer_size
+    )
 
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
@@ -192,7 +194,7 @@ def setup_gl_widget(
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
         (DebugShapes, debug_shapes_layer.debug_shapes_buffer),
-        (Referee, referee_layer.referee_vis_buffer)
+        (Referee, referee_layer.referee_vis_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 
