@@ -26,7 +26,8 @@ from software.thunderscope.gl.layers import (
     gl_simulator_layer,
     gl_tactic_layer,
     gl_cost_vis_layer,
-    gl_trail_layer, gl_referee_info_layer,
+    gl_trail_layer, 
+    gl_referee_info_layer,
 )
 
 
