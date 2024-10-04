@@ -9,13 +9,13 @@ HaltTestPlay::HaltTestPlay(TbotsProto::AiConfig config) : Play(config, false) {}
 void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                   const WorldPtr &world_ptr)
 {
-    auto stop_test_tactic_1 = std::make_shared<StopTactic>();
-    auto stop_test_tactic_2 = std::make_shared<StopTactic>();
-    auto stop_test_tactic_3 = std::make_shared<StopTactic>();
+    auto halt_test_tactic_1 = std::make_shared<HaltTactic>();
+    auto halt_test_tactic_2 = std::make_shared<HaltTactic>();
+    auto halt_test_tactic_3 = std::make_shared<HaltTactic>();
 
     do
     {
-        yield({{stop_test_tactic_1, stop_test_tactic_2, stop_test_tactic_3}});
+        yield({{halt_test_tactic_1, halt_test_tactic_2, halt_test_tactic_3}});
     } while (true);
 }
 

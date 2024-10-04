@@ -171,7 +171,7 @@ class Play
                                 const WorldPtr& world_ptr) = 0;
 
     // Stop tactic common to all plays for robots that don't have tactics assigned
-    TacticVector stop_tactics;
+    TacticVector halt_tactics;
 
     // Whether this play requires a goalie
     const bool requires_goalie;

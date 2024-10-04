@@ -13,7 +13,7 @@
 Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : ai_config(ai_config),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
-      stop_tactics(),
+      halt_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
       world_ptr_(std::nullopt),
@@ -21,7 +21,7 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
-        stop_tactics.push_back(std::make_shared<StopTactic>());
+        halt_tactics.push_back(std::make_shared<HaltTactic>());
     }
 }
 
@@ -192,7 +192,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 // StopTactics
                 for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
                 {
-                    tactic_vector.push_back(stop_tactics[ii]);
+                    tactic_vector.push_back(halt_tactics[ii]);
                 }
             }
 
