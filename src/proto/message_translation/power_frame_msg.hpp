@@ -113,13 +113,13 @@ TbotsProto_PowerStatus inline createNanoPbPowerStatus(
 }
 
 /**
- * Calculates width of pulse for chicker
- * @param kick_constant
- * @param kick_coefficient
+ * Calculates width of the pulse for chicker
+ * @param kick_constant The constant to use in the kick speed to pulse width conversion
+ * @param kick_coefficient The coefficient to use in the kick speed to pulse width conversion
  * @param speed Speed of the desired kick in m/s
  * @return Width of pulse
  */
-uint32_t calculateChickerPulseWidth(int kick_constant, double kick_coefficient, float speed){
+inline uint32_t calculateChickerPulseWidth(int kick_constant, double kick_coefficient, float speed){
     return static_cast<uint32_t>(kick_constant * std::exp(kick_coefficient * speed));
 }
 
@@ -130,6 +130,9 @@ uint32_t calculateChickerPulseWidth(int kick_constant, double kick_coefficient, 
  * Converts a google protobuf power control msg to its nanopb representation
  *
  * @param google_control protobuf message to convert
+ * @param kick_coeff The coefficient to use for the chicker pulse width calculation
+ * @param kick_constant The constant to use in the chicker pulse width calculation
+ * @param chip_pulse_width The width of the pulse to use for the chipper
  * @return a nanopb power control msg matching provided protobuf
  */
 
