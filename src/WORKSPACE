@@ -46,7 +46,7 @@ pip_parse(
 pip_parse(
     name = "ansible_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
-    requirements_lock = "//software/jetson_nano/ansible:requirements_lock.txt",
+    requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
 )
 
 pip_parse(
