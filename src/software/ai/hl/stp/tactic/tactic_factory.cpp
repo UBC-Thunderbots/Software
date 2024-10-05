@@ -29,7 +29,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
         PROTO_CREATE_TACTIC_CASE(PivotKick, pivot_kick)
         PROTO_CREATE_TACTIC_CASE(Receiver, receiver)
         PROTO_CREATE_TACTIC_CASE(ShadowEnemy, shadow_enemy)
-        PROTO_CREATE_TACTIC_CASE(Stop, stop)
+        PROTO_CREATE_TACTIC_CASE(Halt, halt)
         case TbotsProto::Tactic::TACTIC_NOT_SET:
         {
             LOG(FATAL) << "Tactic not set";

@@ -121,7 +121,7 @@ def test_basic_rotation(field_test_runner):
         halt_tactic = HaltTactic()
         params = AssignedTacticPlayControlParams()
         params.assigned_tactics[id].stop.CopyFrom(halt_tactic)
-        # send the stop tactic
+        # send the halt tactic
         field_test_runner.set_tactics(params, True)
 
         # validate by eye
