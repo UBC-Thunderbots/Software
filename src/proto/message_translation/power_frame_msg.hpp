@@ -112,6 +112,17 @@ TbotsProto_PowerStatus inline createNanoPbPowerStatus(
     return status;
 }
 
+/**
+ * Calculates width of pulse for chicker
+ * @param kick_constant
+ * @param kick_coefficient
+ * @param speed Speed of the desired kick in m/s
+ * @return Width of pulse
+ */
+uint32_t calculateChickerPulseWidth(int kick_constant, double kick_coefficient, float speed){
+    return static_cast<uint32_t>(kick_constant * std::exp(kick_coefficient * speed));
+}
+
 // These functions are only used in power service so they are excluded from platformio
 // Protobuf needs additional support to run on an esp32
 #ifndef PLATFORMIO_BUILD
@@ -139,9 +150,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             nanopb_control.chicker.chicker_command.kick_pulse_width =
-                static_cast<uint32_t>(
-                    kick_constant *
-                    std::exp(kick_coeff * google_control.chicker().kick_speed_m_per_s()));
+                    calculateChickerPulseWidth(kick_constant, kick_coeff, google_control.chicker().kick_speed_m_per_s());
             break;
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =
@@ -158,11 +167,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         .which_auto_chip_or_kick =
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
-                        .auto_chip_or_kick.autokick_pulse_width = static_cast<uint32_t>(
-                        kick_constant *
-                        std::exp(kick_coeff * google_control.chicker()
-                                                  .auto_chip_or_kick()
-                                                  .autokick_speed_m_per_s()));
+                        .auto_chip_or_kick.autokick_pulse_width =
+                            calculateChickerPulseWidth(kick_constant, kick_coeff, google_control.chicker().auto_chip_or_kick().autokick_speed_m_per_s());
                     break;
                 case TbotsProto::AutoChipOrKick::kAutochipDistanceMeters:
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
