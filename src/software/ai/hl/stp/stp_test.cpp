@@ -42,7 +42,7 @@ TEST_F(STPTest, test_get_play_info)
 
     std::string expected_play_name, expected_tactic_name;
     expected_play_name   = "HaltPlay";
-    expected_tactic_name = "StopTactic";
+    expected_tactic_name = "HaltTactic";
 
     TbotsProto::PlayInfo expected_play_info_msg = TbotsProto::PlayInfo();
     expected_play_info_msg.mutable_play()->set_play_name(expected_play_name);

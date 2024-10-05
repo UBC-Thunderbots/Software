@@ -23,7 +23,7 @@ class PenaltySetupTactic;
 class PivotKickTactic;
 class ReceiverTactic;
 class ShadowEnemyTactic;
-class StopTactic;
+class HaltTactic;
 class StopTestTactic;
 class MoveGoalieToGoalLineTactic;
 class PrepareKickoffMoveTactic;
@@ -65,7 +65,7 @@ class TacticVisitor
     virtual void visit(const PivotKickTactic &tactic)            = 0;
     virtual void visit(const ReceiverTactic &tactic)             = 0;
     virtual void visit(const ShadowEnemyTactic &tactic)          = 0;
-    virtual void visit(const StopTactic &tactic)                 = 0;
+    virtual void visit(const HaltTactic &tactic)                 = 0;
     virtual void visit(const StopTestTactic &tactic)             = 0;
     virtual void visit(const MoveGoalieToGoalLineTactic &tactic) = 0;
     virtual void visit(const PrepareKickoffMoveTactic &tactic)   = 0;

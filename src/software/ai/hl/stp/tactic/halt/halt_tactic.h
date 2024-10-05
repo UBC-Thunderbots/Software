@@ -1,19 +1,19 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/stop/stop_fsm.h"
+#include "software/ai/hl/stp/tactic/halt/halt_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
- * The StopTactic will stop the robot from moving. The robot will actively try and brake
+ * The HaltTactic will stop the robot from moving. The robot will actively try and brake
  * to come to a halt.
  */
-class StopTactic : public Tactic
+class HaltTactic : public Tactic
 {
    public:
     /**
-     * Creates a new StopTactic
+     * Creates a new HaltTactic
      */
-    explicit StopTactic();
+    explicit HaltTactic();
 
     void accept(TacticVisitor& visitor) const override;
 
@@ -22,5 +22,5 @@ class StopTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    std::map<RobotId, std::unique_ptr<FSM<StopFSM>>> fsm_map;
+    std::map<RobotId, std::unique_ptr<FSM<HaltFSM>>> fsm_map;
 };

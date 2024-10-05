@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 
-struct StopFSM
+struct HaltFSM
 {
    public:
     class StopState;
@@ -14,23 +14,23 @@ struct StopFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Constructor for StopFSM struct
+     * Constructor for HaltFSM struct
      */
-    explicit StopFSM() {}
+    explicit HaltFSM() {}
 
     /**
      * Action to set the StopPrimitive
      *
-     * @param event StopFSM::Update
+     * @param event HaltFSM::Update
      */
     void updateStop(const Update& event);
 
     /**
-     * Guard if the stop is done
+     * Guard if the halt is done
      *
-     * @param event StopFSM::Update
+     * @param event HaltFSM::Update
      *
-     * @return if the robot has stopped
+     * @return if the robot has halted
      */
     bool stopDone(const Update& event);
 

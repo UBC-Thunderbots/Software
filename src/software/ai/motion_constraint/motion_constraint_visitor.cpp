@@ -46,7 +46,7 @@ void MotionConstraintVisitor::visit(const PrepareKickoffMoveTactic &tactic)
         TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
 }
 
-void MotionConstraintVisitor::visit(const StopTactic &tactic) {}
+void MotionConstraintVisitor::visit(const HaltTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const PenaltyKickTactic &tactic)
 {
