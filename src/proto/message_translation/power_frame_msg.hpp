@@ -119,7 +119,9 @@ TbotsProto_PowerStatus inline createNanoPbPowerStatus(
  * @param speed Speed of the desired kick in m/s
  * @return Width of pulse
  */
-uint32_t calculateChickerPulseWidth(int kick_constant, double kick_coefficient, float speed){
+uint32_t calculateChickerPulseWidth(int kick_constant, double kick_coefficient,
+                                    float speed)
+{
     return static_cast<uint32_t>(kick_constant * std::exp(kick_coefficient * speed));
 }
 
@@ -150,7 +152,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             nanopb_control.chicker.chicker_command.kick_pulse_width =
-                    calculateChickerPulseWidth(kick_constant, kick_coeff, google_control.chicker().kick_speed_m_per_s());
+                calculateChickerPulseWidth(kick_constant, kick_coeff,
+                                           google_control.chicker().kick_speed_m_per_s());
             break;
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =
@@ -168,7 +171,10 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
                         .auto_chip_or_kick.autokick_pulse_width =
-                            calculateChickerPulseWidth(kick_constant, kick_coeff, google_control.chicker().auto_chip_or_kick().autokick_speed_m_per_s());
+                        calculateChickerPulseWidth(kick_constant, kick_coeff,
+                                                   google_control.chicker()
+                                                       .auto_chip_or_kick()
+                                                       .autokick_speed_m_per_s());
                     break;
                 case TbotsProto::AutoChipOrKick::kAutochipDistanceMeters:
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
