@@ -206,7 +206,6 @@ def hrvo_setup(
                 if friendly_robots_final_orientations
                 else desired_orientation
             ),
-            0,
             params=blue_params,
         )
 
@@ -217,7 +216,7 @@ def hrvo_setup(
 
     for index, destination in enumerate(enemy_robots_destinations):
         yellow_params = get_move_update_control_params(
-            index, destination, tbots.Angle.fromRadians(0), 0, params=yellow_params
+            index, destination, tbots.Angle.fromRadians(0), params=yellow_params
         )
 
     simulated_test_runner.set_tactics(yellow_params, False)
