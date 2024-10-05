@@ -19,7 +19,7 @@ class GLLabel(GLPainter):
         offset: tuple[int, int] = (0, 0),
         text: str = "",
     ) -> None:
-        """Initialize the GLGradientLegend
+        """Initialize the GLLabel
 
         :param parent_item: The parent item of the graphic
         :param font: The font using to render the text
