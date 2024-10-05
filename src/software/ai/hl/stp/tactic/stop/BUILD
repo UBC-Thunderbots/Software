@@ -28,8 +28,8 @@ cc_test(
 )
 
 cc_test(
-    name = "stop_tactic_test",
-    srcs = ["stop_tactic_test.cpp"],
+    name = "halt_tactic_test",
+    srcs = ["halt_tactic_test.cpp"],
     deps = [
         ":halt_tactic",
         "//shared/test_util:tbots_gtest_main",

@@ -8,14 +8,14 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
-class StopTacticTest : public SimulatedErForceSimPlayTestFixture
+class HaltTacticTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
 };
 
-TEST_F(StopTacticTest, robot_already_stopped)
+TEST_F(HaltTacticTest, robot_already_stopped)
 {
     BallState ball_state(Point(0, 0.5), Vector(0, 0));
 
@@ -41,7 +41,7 @@ TEST_F(StopTacticTest, robot_already_stopped)
             Duration::fromSeconds(5));
 }
 
-TEST_F(StopTacticTest, robot_start_moving)
+TEST_F(HaltTacticTest, robot_start_moving)
 {
     BallState ball_state(Point(0, 0.5), Vector(0, 0));
 
