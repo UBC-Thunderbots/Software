@@ -189,7 +189,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             else if (i == (priority_tactics.size() - 1))
             {
                 // If assigning the last tactic vector, then assign rest of robots with
-                // StopTactics
+                // HaltTactics
                 for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
                 {
                     tactic_vector.push_back(halt_tactics[ii]);
