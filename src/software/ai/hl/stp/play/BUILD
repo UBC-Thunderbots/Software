@@ -27,7 +27,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/stop:halt_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],
@@ -84,7 +84,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/stop:halt_tactic",
         "//software/logger",
         "//software/util/generic_factory",
         "//software/world:game_state",
@@ -119,7 +119,7 @@ cc_library(
     deps = [
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/stop:halt_tactic",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/ai/navigator/trajectory:trajectory_planner",
         "//software/ai/passing:pass_with_rating",
@@ -303,7 +303,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/stop:halt_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],

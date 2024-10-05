@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/halt_tactic.h"
 #include "software/test_util/test_util.h"
 
 /**
@@ -450,7 +450,7 @@ TEST_F(STPTacticAssignmentTest,
 }
 
 TEST_F(STPTacticAssignmentTest,
-       test_assigning_stop_tactics_to_unassigned_non_goalie_robots)
+       test_assigning_halt_tactics_to_unassigned_non_goalie_robots)
 {
     // Test that HaltTactic is assigned to remaining robots without tactics
 

@@ -117,10 +117,10 @@ def test_basic_rotation(field_test_runner):
             eventually_validation_sequence_set=[[]],
             test_timeout_s=5,
         )
-        # Send a stop tactic after the test finishes
-        stop_tactic = StopTactic()
+        # Send a halt tactic after the test finishes
+        halt_tactic = HaltTactic()
         params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
+        params.assigned_tactics[id].stop.CopyFrom(halt_tactic)
         # send the stop tactic
         field_test_runner.set_tactics(params, True)
 
@@ -209,10 +209,10 @@ def test_one_robots_square(field_test_runner):
             test_timeout_s=4,
         )
 
-    # Send a stop tactic after the test finishes
-    stop_tactic = StopTactic()
+    # Send a halt tactic after the test finishes
+    halt_tactic = HaltTactic()
     params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
+    params.assigned_tactics[id].stop.CopyFrom(halt_tactic)
 
 
 if __name__ == "__main__":
