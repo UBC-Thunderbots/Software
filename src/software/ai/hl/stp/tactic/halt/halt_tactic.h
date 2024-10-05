@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/stop/halt_fsm.h"
+#include "software/ai/hl/stp/tactic/halt/halt_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**

@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
-#include "software/ai/hl/stp/tactic/stop/halt_tactic.h"
+#include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 #include "software/test_util/test_util.h"
 
 /**

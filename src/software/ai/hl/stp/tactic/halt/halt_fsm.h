@@ -26,11 +26,11 @@ struct HaltFSM
     void updateStop(const Update& event);
 
     /**
-     * Guard if the stop is done
+     * Guard if the halt is done
      *
      * @param event HaltFSM::Update
      *
-     * @return if the robot has stopped
+     * @return if the robot has halted
      */
     bool stopDone(const Update& event);
 
