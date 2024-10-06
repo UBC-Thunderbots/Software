@@ -8,7 +8,7 @@ from pyqtgraph.opengl.items.GLTextItem import GLTextItem
 
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.constants import DepthValues, Colors, is_field_message_empty, DEFAULT_EMPTY_FIELD_WORLD
+from software.thunderscope.constants import DepthValues, Colors
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
 from software.thunderscope.gl.helpers.observable_list import ObservableList
@@ -35,11 +35,11 @@ class GLRefereeInfoLayer(GLLayer):
 
     @staticmethod
     def is_point_in_circle(
-            point: tuple[float | int, float | int],
-            center: tuple[float | int, float | int],
-            radius: float | int) -> bool:
-        """
-        Returns true if the point is in the circle.
+        point: tuple[float | int, float | int],
+        center: tuple[float | int, float | int],
+        radius: float | int,
+    ) -> bool:
+        """Returns true if the point is in the circle.
 
         :param point: coordinates of a point in xy plane.
         :param center: coordinates of the circle center in xy plane.
@@ -58,7 +58,9 @@ class GLRefereeInfoLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
         self.referee_vis_buffer = ThreadSafeBuffer(buffer_size, Referee)
-        self.ball_placement_vis_buffer = ThreadSafeBuffer(buffer_size, BallPlacementVisualization)
+        self.ball_placement_vis_buffer = ThreadSafeBuffer(
+            buffer_size, BallPlacementVisualization
+        )
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
 
         self.cached_world = None
@@ -127,13 +129,20 @@ class GLRefereeInfoLayer(GLLayer):
             ball_state = self.cached_world.ball.current_state
             if not self.ball_placement_point_hidden:
                 if GLRefereeInfoLayer.is_point_in_circle(
-                        (ball_state.global_position.x_meters, ball_state.global_position.y_meters),
-                        (new_placement_point.x_meters, new_placement_point.y_meters),
-                        BALL_PLACEMENT_TOLERANCE_RADIUS_METERS
+                    (
+                        ball_state.global_position.x_meters,
+                        ball_state.global_position.y_meters,
+                    ),
+                    (new_placement_point.x_meters, new_placement_point.y_meters),
+                    BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
                 ):
-                    self.placement_tolerance_graphic.set_outline_color(self.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_ON)
+                    self.placement_tolerance_graphic.set_outline_color(
+                        self.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_ON
+                    )
                 else:
-                    self.placement_tolerance_graphic.set_outline_color(self.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_OFF)
+                    self.placement_tolerance_graphic.set_outline_color(
+                        self.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_OFF
+                    )
 
             if self.ball_placement_point_hidden:
                 self.ball_placement_point = new_placement_point
@@ -186,15 +195,16 @@ class GLRefereeInfoLayer(GLLayer):
                     self.placement_target_graphic.radius + 0.01
                 )
                 self.shrink_target = (
-                        self.placement_target_graphic.radius
-                        >= BALL_PLACEMENT_TOLERANCE_RADIUS_METERS
+                    self.placement_target_graphic.radius
+                    >= BALL_PLACEMENT_TOLERANCE_RADIUS_METERS
                 )
 
             # update the count-down graphics
-            time_left = max(int(self.cached_referee_info['currentActionTimeRemaining']) // 1000000, 0)
-            self.ball_placement_countdown_graphic.setData(
-                text=f"{time_left}s"
+            time_left = max(
+                int(self.cached_referee_info["currentActionTimeRemaining"]) // 1000000,
+                0,
             )
+            self.ball_placement_countdown_graphic.setData(text=f"{time_left}s")
 
     def __update_referee_info(self):
         """Update gamestate and command info text displays"""

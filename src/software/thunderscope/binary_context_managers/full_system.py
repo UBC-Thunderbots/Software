@@ -184,7 +184,7 @@ gdb --args bazel-bin/{self.full_system}
             PlayInfo,
             ObstacleList,
             DebugShapes,
-            BallPlacementVisualization
+            BallPlacementVisualization,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,

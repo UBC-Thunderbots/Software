@@ -196,7 +196,7 @@ def setup_gl_widget(
         (DebugShapes, debug_shapes_layer.debug_shapes_buffer),
         (Referee, referee_layer.referee_vis_buffer),
         (BallPlacementVisualization, referee_layer.ball_placement_vis_buffer),
-        (World, referee_layer.world_buffer)
+        (World, referee_layer.world_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 
