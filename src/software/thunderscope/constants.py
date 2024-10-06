@@ -241,13 +241,6 @@ class Colors:
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
-    RED = QtGui.QColor(255, 0, 0, 255)
-    BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR = QtGui.QColor(0, 255, 0, 255)
-    BALL_PLACEMENT_TARGET_VISUALIZATION_COLOR = FIELD_LINE_COLOR
-    BALL_PLACEMENT_ROBOT_AVOID_AREA_VISUALIZATION_COLOR = RED
-    BREAKBEAM_TRIPPED_COLOR = RED
-    RED_TEXT_COLOR = RED
-
     DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
     NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
@@ -272,6 +265,7 @@ class Colors:
     ROBOT_MIDDLE_BLUE = QtGui.QColor(0, 0, 255, 255)
     PINK = QtGui.QColor(255, 0, 255)
     GREEN = QtGui.QColor(0, 255, 0)
+    RED = QtGui.QColor(255, 0, 0, 255)
 
     # Creates a default vision pattern lookup with the actual colors used on the robots
     VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(PINK, GREEN)

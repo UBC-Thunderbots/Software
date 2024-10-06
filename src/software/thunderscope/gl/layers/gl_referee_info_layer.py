@@ -1,3 +1,4 @@
+import math
 import time
 from typing import Optional
 
@@ -6,7 +7,8 @@ from google.protobuf.json_format import MessageToDict
 from pyqtgraph.opengl.items.GLTextItem import GLTextItem
 
 from proto.import_all_protos import *
-from software.thunderscope.constants import DepthValues, Colors
+from software.py_constants import *
+from software.thunderscope.constants import DepthValues, Colors, is_field_message_empty, DEFAULT_EMPTY_FIELD_WORLD
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
 from software.thunderscope.gl.helpers.observable_list import ObservableList
@@ -20,6 +22,32 @@ class GLRefereeInfoLayer(GLLayer):
     REFEREE_COMMAND_PREFIX = "Command: "
     GAMESTATE_PREFIX = "Game State: "
 
+    # outline color of the avoid area for ball placement
+    BALL_PLACEMENT_ROBOT_AVOID_AREA_VISUALIZATION_COLOR = Colors.RED
+    # outline color of the tolerance region for ball placement (when the ball is inside)
+    BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_ON = Colors.GREEN
+    # outline color of the tolerance region for ball placement (when the ball is outside)
+    BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_OFF = Colors.RED
+    # outline color of the target mark
+    BALL_PLACEMENT_TARGET_VISUALIZATION_COLOR = Colors.FIELD_LINE_COLOR
+    # text color for count down
+    COUNT_DOWN_TEXT_COLOR = Colors.RED
+
+    @staticmethod
+    def is_point_in_circle(
+            point: tuple[float | int, float | int],
+            center: tuple[float | int, float | int],
+            radius: float | int) -> bool:
+        """
+        Returns true if the point is in the circle.
+
+        :param point: coordinates of a point in xy plane.
+        :param center: coordinates of the circle center in xy plane.
+        :param radius: radius of the circle
+        :return: true if the point is in the circle.
+        """
+        return math.dist(point, center) < radius
+
     def __init__(self, name: str, buffer_size: int = 1) -> None:
         """Initialize the GLRefereeInfoLayer
 
@@ -29,54 +57,84 @@ class GLRefereeInfoLayer(GLLayer):
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
-        self.referee_vis_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
-        self.ball_placement_vis_buffer = ThreadSafeBuffer(buffer_size, BallPlacementVisualization, False)
+        self.referee_vis_buffer = ThreadSafeBuffer(buffer_size, Referee)
+        self.ball_placement_vis_buffer = ThreadSafeBuffer(buffer_size, BallPlacementVisualization)
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+
+        self.cached_world = None
+        self.cached_referee_info = None
 
         self.referee_text_graphics = ObservableList(self._graphics_changed)
 
         self.placement_tolerance_graphic = GLCircle(
             parent_item=self,
             radius=BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
-            outline_color=Colors.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR,
+            outline_color=self.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_OFF,
         )
 
         self.placement_target_graphic = GLCircle(
             parent_item=self,
             radius=BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
-            outline_color=Colors.BALL_PLACEMENT_TARGET_VISUALIZATION_COLOR,
+            outline_color=self.BALL_PLACEMENT_TARGET_VISUALIZATION_COLOR,
         )
 
         self.robot_avoid_circle_graphic = GLCircle(
             parent_item=self,
             radius=BALL_PLACEMENT_ROBOT_AVOID_RADIUS_METERS,
-            outline_color=Colors.BALL_PLACEMENT_ROBOT_AVOID_AREA_VISUALIZATION_COLOR,
-        )
-        self.robot_avoid_circle_graphic.setDepthValue(
-            DepthValues.ABOVE_FOREGROUND_DEPTH
+            outline_color=self.BALL_PLACEMENT_ROBOT_AVOID_AREA_VISUALIZATION_COLOR,
         )
 
         # initialize the two text items to display
         self.gamestate_type_text: Optional[GLLabel] = None
         self.command_type_text: Optional[GLLabel] = None
 
-    def update_ball_placement(self):
+        self.ball_placement_countdown_graphic: Optional[GLTextItem] = None
+
+        self.ball_placement_point = None
+        self.ball_placement_point_hidden = False
+        self.shrink_target = True
+        self.placement_start_time = 0
+
+    def __update_ball_placement(self) -> None:
+        """Update ball placement visuals"""
         ball_placement_vis_proto = self.ball_placement_vis_buffer.get(
             block=False, return_cached=False
         )
 
-        if ball_placement_vis_proto is None and not self.ball_placement_point_hidden:
+        if not self.ball_placement_countdown_graphic:
+            self.ball_placement_countdown_graphic = GLTextItem(
+                parentItem=self,
+                font=QtGui.QFont("Roboto", 7, weight=700),
+                color=self.COUNT_DOWN_TEXT_COLOR,
+            )
+
+        if not ball_placement_vis_proto and not self.ball_placement_point_hidden:
             self.placement_tolerance_graphic.hide()
             self.placement_target_graphic.hide()
             self.robot_avoid_circle_graphic.hide()
-
-            if self.ball_placement_countdown_graphic:
-                self.ball_placement_countdown_graphic.hide()
+            self.ball_placement_countdown_graphic.hide()
 
             self.ball_placement_point_hidden = True
             self.shrink_target = True
             return
-        elif ball_placement_vis_proto is not None:
+
+        if ball_placement_vis_proto:
+            # move the ball placement graphics to the new point
             new_placement_point = ball_placement_vis_proto.ball_placement_point
+
+            # update the color of the target circle according to the position of the ball.
+            # if the ball lies inside the tolerance circle, the circle will be green, otherwise red.
+            ball_state = self.cached_world.ball.current_state
+            if not self.ball_placement_point_hidden:
+                if GLRefereeInfoLayer.is_point_in_circle(
+                        (ball_state.global_position.x_meters, ball_state.global_position.y_meters),
+                        (new_placement_point.x_meters, new_placement_point.y_meters),
+                        BALL_PLACEMENT_TOLERANCE_RADIUS_METERS
+                ):
+                    self.placement_tolerance_graphic.set_outline_color(self.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_ON)
+                else:
+                    self.placement_tolerance_graphic.set_outline_color(self.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_OFF)
+
             if self.ball_placement_point_hidden:
                 self.ball_placement_point = new_placement_point
 
@@ -101,11 +159,6 @@ class GLRefereeInfoLayer(GLLayer):
                 )
                 self.robot_avoid_circle_graphic.show()
 
-                self.ball_placement_countdown_graphic = GLTextItem(
-                    parentItem=self,
-                    font=QtGui.QFont("Roboto", 7, weight=700),
-                    color=Colors.RED_TEXT_COLOR,
-                )
                 self.ball_placement_countdown_graphic.setData(
                     text=f"{BALL_PLACEMENT_TIME_LIMIT_S}s",
                     pos=[
@@ -122,6 +175,7 @@ class GLRefereeInfoLayer(GLLayer):
                 self.placement_start_time = time.time()
                 self.ball_placement_point_hidden = False
 
+            # shrinking or expanding placement target graphic
             if self.shrink_target:
                 self.placement_target_graphic.set_radius(
                     self.placement_target_graphic.radius - 0.01
@@ -136,15 +190,14 @@ class GLRefereeInfoLayer(GLLayer):
                         >= BALL_PLACEMENT_TOLERANCE_RADIUS_METERS
                 )
 
-            time_since_start = int(time.time() - self.placement_start_time)
-            if time_since_start <= BALL_PLACEMENT_TIME_LIMIT_S:
-                self.ball_placement_countdown_graphic.setData(
-                    text=f"{BALL_PLACEMENT_TIME_LIMIT_S - time_since_start}s"
-                )
-            else:
-                self.ball_placement_countdown_graphic.setData(text=f"{0}s")
+            # update the count-down graphics
+            time_left = max(int(self.cached_referee_info['currentActionTimeRemaining']) // 1000000, 0)
+            self.ball_placement_countdown_graphic.setData(
+                text=f"{time_left}s"
+            )
 
-    def update_text_info(self):
+    def __update_referee_info(self):
+        """Update gamestate and command info text displays"""
         referee_proto = self.referee_vis_buffer.get(block=False, return_cached=False)
         if not referee_proto:
             return
@@ -152,6 +205,7 @@ class GLRefereeInfoLayer(GLLayer):
         referee_msg_dict = MessageToDict(referee_proto)
         if not referee_msg_dict:
             return
+        self.cached_referee_info = referee_msg_dict
 
         if not self.gamestate_type_text:
             self.gamestate_type_text = GLLabel(
@@ -178,6 +232,8 @@ class GLRefereeInfoLayer(GLLayer):
             )
 
     def refresh_graphics(self) -> None:
-        """Update displays in the layer"""
-        self.update_text_info()
-        self.update_ball_placement()
+        """Refresh all displays in the layer"""
+        self.cached_world = self.world_buffer.get(block=False, return_cached=True)
+
+        self.__update_referee_info()
+        self.__update_ball_placement()
