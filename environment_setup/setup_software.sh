@@ -195,6 +195,10 @@ if ! /usr/bin/python3.12 /tmp/./get-platformio.py; then
     exit 1
 fi
 
+# link platformio to /usr/local/bin so that bazel can find it
+sudo rm /usr/local/bin/platformio
+sudo ln -s ~/.platformio/penv/bin/platformio /usr/local/bin/platformio
+
 print_status_msg "Done PlatformIO Setup"
 
 print_status_msg "Done Software Setup, please reboot for changes to take place"
