@@ -210,11 +210,11 @@ cc_toolchain_config_k8_jetson_nano_cross_compile(
 
 toolchain(
     name = "cc_toolchain_for_k8_jetson_nano_cross_compile",
-    exec_compatible_with = [
+    target_compatible_with = [
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
-    target_compatible_with = [
+    exec_compatible_with = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
     ],
