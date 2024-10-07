@@ -1,0 +1,5 @@
+[Match]
+Driver=brcmfmac
+
+[Link]
+Name=tbotswifi5

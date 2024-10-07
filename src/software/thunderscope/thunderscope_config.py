@@ -479,6 +479,7 @@ def configure_replay_view(
     initialize_application()
 
     if blue_replay_log:
+        blue_refresh_func_counter = FrameTimeCounter()
         proto_unix_io_map[ProtoUnixIOTypes.BLUE] = ProtoUnixIO()
         tabs.append(
             TScopeTab(
@@ -491,11 +492,15 @@ def configure_replay_view(
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[],
+                    frame_swap_counter=FrameTimeCounter(),
+                    refresh_counter=blue_refresh_func_counter,
                 ),
+                refresh_counter=blue_refresh_func_counter,
             )
         )
 
     if yellow_replay_log:
+        yellow_refresh_func_counter = FrameTimeCounter()
         proto_unix_io_map[ProtoUnixIOTypes.YELLOW] = ProtoUnixIO()
         tabs.append(
             TScopeTab(
@@ -510,7 +515,10 @@ def configure_replay_view(
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[],
+                    frame_swap_counter=FrameTimeCounter(),
+                    refresh_counter=yellow_refresh_func_counter,
                 ),
+                refresh_counter=yellow_refresh_func_counter,
             )
         )
 
