@@ -8,8 +8,9 @@
  * "Subject<T>" to receive new instances of type T when they are available
  *
  * @tparam T The type of object this class is observing
+ * @tparam Clock A clock that satisfies the TrivialClock requirements
  */
-template <typename T>
+template <typename T, typename Clock = std::chrono::steady_clock>
 class Observer
 {
    public:
@@ -79,34 +80,34 @@ class Observer
     boost::circular_buffer<std::chrono::milliseconds> receive_time_buffer;
 };
 
-template <typename T>
-Observer<T>::Observer(size_t buffer_size, bool log_buffer_full)
+template <typename T, typename Clock>
+Observer<T, Clock>::Observer(size_t buffer_size, bool log_buffer_full)
     : buffer(buffer_size, log_buffer_full), receive_time_buffer(TIME_BUFFER_SIZE)
 {
 }
 
-template <typename T>
-void Observer<T>::receiveValue(T val)
+template <typename T, typename Clock>
+void Observer<T, Clock>::receiveValue(T val)
 {
     receive_time_buffer.push_back(std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now().time_since_epoch()));
+        Clock::now().time_since_epoch()));
     buffer.push(std::move(val));
 }
 
-template <typename T>
-std::optional<T> Observer<T>::popMostRecentlyReceivedValue(Duration max_wait_time)
+template <typename T, typename Clock>
+std::optional<T> Observer<T, Clock>::popMostRecentlyReceivedValue(Duration max_wait_time)
 {
     return buffer.popMostRecentlyAddedValue(max_wait_time);
 }
 
-template <typename T>
-std::optional<T> Observer<T>::popLeastRecentlyReceivedValue(Duration max_wait_time)
+template <typename T, typename Clock>
+std::optional<T> Observer<T, Clock>::popLeastRecentlyReceivedValue(Duration max_wait_time)
 {
     return buffer.popLeastRecentlyAddedValue(max_wait_time);
 }
 
-template <typename T>
-double Observer<T>::getDataReceivedPerSecond()
+template <typename T, typename Clock>
+double Observer<T, Clock>::getDataReceivedPerSecond()
 {
     if (receive_time_buffer.empty())
     {

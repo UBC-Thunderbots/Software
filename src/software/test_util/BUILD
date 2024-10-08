@@ -33,6 +33,12 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "fake_clock",
+    srcs = ["fake_clock.cpp"],
+    hdrs = ["fake_clock.h"],
+)
+
 cc_test(
     name = "test_util_test",
     srcs = ["test_util_test.cpp"],
@@ -47,6 +53,15 @@ cc_test(
     srcs = ["equal_within_tolerance_test.cpp"],
     deps = [
         ":test_util",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
+    name = "fake_clock_test",
+    srcs = ["fake_clock_test.cpp"],
+    deps = [
+        ":fake_clock",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
