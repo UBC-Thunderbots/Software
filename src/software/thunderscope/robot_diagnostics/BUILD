@@ -24,21 +24,15 @@ py_library(
 )
 
 py_library(
-    name = "handheld_device_manager",
-    srcs = ["handheld_device_manager.py"],
-    deps = [
-        "//proto:software_py_proto",
-        "//software/logger:py_logger",
-        "//software/thunderscope:constants",
-        "//software/thunderscope:thread_safe_buffer",
-        requirement("pyqtgraph"),
-    ],
+    name = "handheld_controller",
+    srcs = ["handheld_controller.py"],
 )
 
 py_library(
-    name = "handheld_device_status_view",
-    srcs = ["handheld_device_status_view.py"],
+    name = "handheld_controller_widget",
+    srcs = ["handheld_controller_widget.py"],
     deps = [
+        ":handheld_controller",
         "//software/thunderscope:constants",
         requirement("pyqtgraph"),
     ],
@@ -53,20 +47,8 @@ py_library(
         "//software/thunderscope:thread_safe_buffer",
         "//software/thunderscope:thunderscope_types",
         "//software/thunderscope/robot_diagnostics:chicker",
-        "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
-        "//software/thunderscope/robot_diagnostics:handheld_device_manager",
-        "//software/thunderscope/robot_diagnostics:handheld_device_status_view",
-        requirement("pyqtgraph"),
-    ],
-)
-
-py_library(
-    name = "diagnostics_input_widget",
-    srcs = ["diagnostics_input_widget.py"],
-    deps = [
-        "//software/thunderscope:constants",
-        "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope/robot_diagnostics:handheld_controller_widget",
         requirement("pyqtgraph"),
     ],
 )

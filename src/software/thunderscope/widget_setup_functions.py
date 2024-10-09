@@ -338,7 +338,6 @@ def setup_diagnostics_widget(
     """Setup the diagnostics widget, which contains the following sub-widgets:
     - ChickerWidget
     - DriveAndDribblerWidget
-    - DiagnosticsInputWidget
     - ControllerStatusViewWidget
 
     :param proto_unix_io: The proto unix io object

@@ -101,7 +101,6 @@ py_library(
         "//software/thunderscope/play:refereeinfo_widget",
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
-        "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
         "//software/thunderscope/robot_diagnostics:diagnostics_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         "//software/thunderscope/robot_diagnostics:estop_view",

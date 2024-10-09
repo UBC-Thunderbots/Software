@@ -5,11 +5,12 @@ from proto.import_all_protos import *
 from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import DiagnosticsConstants
-from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class ChickerCommandMode(Enum):
+    """The types of chicker commands that we can send to the robots"""
+
     KICK = 1
     CHIP = 2
     AUTOKICK = 3
@@ -17,8 +18,10 @@ class ChickerCommandMode(Enum):
 
 
 class ChickerWidget(QWidget):
-    """Handles the robot diagnostics input to create a PowerControl message
-    to be sent to the robots.
+    """This widget provides an interface to send PowerControl messages for
+    kicking and chipping actions to the robot. It has sliders for adjusting
+    the kick power and chip distance, as well as buttons for sending single
+    kick/chip commands or turning on autokick/autochip.
 
     NOTE: The powerboards run in regulation mode, which means that they are
     always charged and do not need to be explicitly charged.
@@ -36,7 +39,9 @@ class ChickerWidget(QWidget):
 
         self.proto_unix_io: ProtoUnixIO = proto_unix_io
 
-        self.__initialize_default_power_control_values()
+        self.enabled = True
+
+        self.kick_chip_locked = False
 
         chicker_widget_vbox_layout = QVBoxLayout()
         self.setLayout(chicker_widget_vbox_layout)
@@ -65,13 +70,11 @@ class ChickerWidget(QWidget):
         )
 
         self.kick_power_slider.valueChanged.connect(
-            lambda: self.kick_power_label.setText(str(self.kick_power_slider.value()))
+            lambda new_value: self.kick_power_label.setText(str(new_value))
         )
 
-        self.chip_distance_slider.valueChanged.connect(
-            lambda: self.chip_distance_label.setText(
-                str(self.chip_distance_slider.value())
-            )
+        self.chip_distance_slider.floatValueChanged.connect(
+            lambda new_value: self.chip_distance_label.setText(str(new_value))
         )
 
         kick_chip_sliders_hbox_layout = QHBoxLayout()
@@ -111,10 +114,10 @@ class ChickerWidget(QWidget):
         self.auto_kick_button = self.auto_kick_chip_buttons[1]
         self.auto_chip_button = self.auto_kick_chip_buttons[2]
 
-        # Set no auto button to be selected by default on launch
         self.no_auto_button.setChecked(True)
-
-        self.no_auto_button.toggled.connect(self.update_kick_chip_buttons_accessibility)
+        self.no_auto_button.toggled.connect(
+            self.__update_kick_chip_buttons_accessibility
+        )
 
         self.kick_button.clicked.connect(
             lambda: self.send_command_and_timeout(ChickerCommandMode.KICK)
@@ -125,112 +128,116 @@ class ChickerWidget(QWidget):
 
         chicker_widget_vbox_layout.addWidget(self.auto_kick_chip_buttons_box)
 
-    def set_kick_power_slider_value(self, value: float) -> None:
-        """Set the kick power slider to a specific value.
-
-        :param value: The value to set for the slider
-        """
-        self.kick_power_slider.setValue(value)
-
-    def set_chip_distance_slider_value(self, value: float) -> None:
-        """Set the chip distance slider to a specific value.
-
-        :param value: the value to set for the slider
-        """
-        self.chip_distance_slider.setValue(value)
-
     def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
-        """If the kick/chip buttons are enabled, send a kick/chip command and disables the buttons.
-        The buttons will be re-enabled after CHICKER_TIMEOUT.
+        """If the kick/chip buttons are enabled and unlocked, send a kick/chip command
+        and then disable and lock the buttons. The buttons will be re-enabled and unlocked
+        after CHICKER_TIMEOUT.
 
-        :param command: Command to send. One of ChickerCommandMode.KICK or ChickerCommandMode.CHIP
+        :param command: the chicker command to send; should be either
+                        ChickerCommandMode.KICK or ChickerCommandMode.CHIP
         """
-        if self.kick_button.isEnabled() and self.chip_button.isEnabled():
+        if not self.kick_chip_locked:
+            self.kick_chip_locked = True
+
             common_widgets.disable_button(self.kick_button)
             common_widgets.disable_button(self.chip_button)
 
             self.send_command(command)
 
-            # set and start timer to re-enable buttons after CHICKER_TIMEOUT
-            QTimer.singleShot(
-                int(CHICKER_TIMEOUT), self.update_kick_chip_buttons_accessibility
-            )
+            def unlock_kick_chip():
+                self.kick_chip_locked = False
+                self.__update_kick_chip_buttons_accessibility()
 
-    def update_kick_chip_buttons_accessibility(self) -> None:
+            QTimer.singleShot(int(CHICKER_TIMEOUT), unlock_kick_chip)
+
+    def send_command(self, command: ChickerCommandMode) -> None:
+        """Send a [auto]kick or [auto]chip primitive with the currently set
+        kick power or chip distance
+
+        :param command: the type of chicker command to send
+        """
+        # Get slider values
+        kick_power = self.kick_power_slider.value()
+        chip_dist = self.chip_distance_slider.value()
+
+        # Send kick, chip, autokick, or autochip primitive
+        power_control = PowerControl()
+        power_control.geneva_slot = 3
+
+        if command == ChickerCommandMode.KICK:
+            power_control.chicker.kick_speed_m_per_s = kick_power
+        elif command == ChickerCommandMode.CHIP:
+            power_control.chicker.chip_distance_meters = chip_dist
+        elif command == ChickerCommandMode.AUTOKICK:
+            power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = kick_power
+        elif command == ChickerCommandMode.AUTOCHIP:
+            power_control.chicker.auto_chip_or_kick.autochip_distance_meters = chip_dist
+
+        self.proto_unix_io.send_proto(PowerControl, power_control)
+
+        if command == ChickerCommandMode.KICK or command == ChickerCommandMode.CHIP:
+            # We need to send an empty message to the PowerControl proto buffer to prevent the
+            # spamming of kick/chip commands. This is because if no new messages are received in the
+            # buffer, the last sent message will be repeatedly resent to the robot, which we don't
+            # want for kick/chip.
+            power_control = PowerControl()
+            power_control.geneva_slot = 3
+            self.proto_unix_io.send_proto(PowerControl, power_control, True)
+
+    def enable(self) -> None:
+        """Enable all sliders and buttons in the ChickerWidget"""
+        if self.enabled:
+            return
+
+        self.enabled = True
+
+        common_widgets.enable_slider(self.kick_power_slider)
+        common_widgets.enable_slider(self.chip_distance_slider)
+        common_widgets.enable_button(self.no_auto_button)
+        common_widgets.enable_button(self.auto_kick_button)
+        common_widgets.enable_button(self.auto_chip_button)
+        self.__update_kick_chip_buttons_accessibility()
+
+    def disable(self) -> None:
+        """Disable all sliders and buttons in the ChickerWidget"""
+        if not self.enabled:
+            return
+
+        self.enabled = False
+
+        common_widgets.disable_slider(self.kick_power_slider)
+        common_widgets.disable_slider(self.chip_distance_slider)
+        common_widgets.disable_button(self.no_auto_button)
+        common_widgets.disable_button(self.auto_kick_button)
+        common_widgets.disable_button(self.auto_chip_button)
+        common_widgets.disable_button(self.kick_button)
+        common_widgets.disable_button(self.chip_button)
+
+    def override_slider_values(self, kick_power: int, chip_distance: float) -> None:
+        """Set the widget's sliders to match the given values.
+
+        :param kick_power: the value to set the kick power slider to
+        :param chip_distance: the value to set the chip distance slider to
+        """
+        self.kick_power_slider.setValue(kick_power)
+        self.chip_distance_slider.setValue(chip_distance)
+
+    def refresh(self) -> None:
+        """Send out autokick/autochip commands if enabled"""
+        if self.auto_kick_button.isChecked():
+            self.send_command(ChickerCommandMode.AUTOKICK)
+        elif self.auto_chip_button.isChecked():
+            self.send_command(ChickerCommandMode.AUTOCHIP)
+
+    def __update_kick_chip_buttons_accessibility(self) -> None:
         """Enable or disable the kick/chip buttons depending on whether autokick/autochip is on"""
-        if self.no_auto_button.isChecked():
+        if (
+            self.enabled
+            and not self.kick_chip_locked
+            and self.no_auto_button.isChecked()
+        ):
             common_widgets.enable_button(self.kick_button)
             common_widgets.enable_button(self.chip_button)
         else:
             common_widgets.disable_button(self.kick_button)
             common_widgets.disable_button(self.chip_button)
-
-    def send_command(self, command: ChickerCommandMode) -> None:
-        """Send a [auto]kick or [auto]chip primitive
-
-        :param command: enum int value to indicate what primitive to send
-        """
-        # gets slider values
-        kick_power_value = self.kick_power_slider.value()
-        chip_distance_value = self.chip_distance_slider.value()
-
-        # sends kick, chip, autokick, or autochip primitive
-        if command == ChickerCommandMode.KICK:
-            self.power_control.chicker.kick_speed_m_per_s = kick_power_value
-        elif command == ChickerCommandMode.CHIP:
-            self.power_control.chicker.chip_distance_meters = chip_distance_value
-        elif command == ChickerCommandMode.AUTOKICK:
-            self.power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = (
-                kick_power_value
-            )
-        elif command == ChickerCommandMode.AUTOCHIP:
-            self.power_control.chicker.auto_chip_or_kick.autochip_distance_meters = (
-                chip_distance_value
-            )
-
-        self.proto_unix_io.send_proto(PowerControl, self.power_control)
-
-        # clears the proto buffer for kick or chip commands
-        # so only one kick / chip is sent
-        if command == ChickerCommandMode.KICK or command == ChickerCommandMode.CHIP:
-            self.__initialize_default_power_control_values()
-
-    def __initialize_default_power_control_values(self) -> None:
-        """Send an empty proto to the proto unix io buffer.
-        This is due to a bug in robot_communication where if a new PowerControl message is not sent,
-        The previous, cached message is resent to the robot repeatedly which we don't want for kick/chip
-        So sending an empty message overwrites the cache and prevents spamming commands
-        If buffer is full, blocks execution until buffer has space
-        """
-        self.power_control = PowerControl()
-        self.power_control.geneva_slot = 3
-        self.proto_unix_io.send_proto(PowerControl, self.power_control, True)
-
-    def update_widget_accessibility(self, mode: ControlMode):
-        """Enable or disable all sliders and buttons depending on the given control mode.
-        Sliders and buttons are enabled in DIAGNOSTICS mode, and disabled in HANDHELD mode
-
-        :param mode: the current control mode
-        """
-        if mode == ControlMode.DIAGNOSTICS:
-            common_widgets.enable_slider(self.kick_power_slider)
-            common_widgets.enable_slider(self.chip_distance_slider)
-            common_widgets.enable_button(self.no_auto_button)
-            common_widgets.enable_button(self.auto_kick_button)
-            common_widgets.enable_button(self.auto_chip_button)
-            self.update_kick_chip_buttons_accessibility()
-        elif mode == ControlMode.HANDHELD:
-            common_widgets.disable_slider(self.kick_power_slider)
-            common_widgets.disable_slider(self.chip_distance_slider)
-            common_widgets.disable_button(self.no_auto_button)
-            common_widgets.disable_button(self.auto_kick_button)
-            common_widgets.disable_button(self.auto_chip_button)
-            common_widgets.disable_button(self.kick_button)
-            common_widgets.disable_button(self.chip_button)
-
-    def refresh(self) -> None:
-        """Send autokick/autochip commands if enabled"""
-        if self.auto_kick_button.isChecked():
-            self.send_command(ChickerCommandMode.AUTOKICK)
-        elif self.auto_chip_button.isChecked():
-            self.send_command(ChickerCommandMode.AUTOCHIP)

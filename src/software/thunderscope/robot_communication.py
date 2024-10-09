@@ -221,7 +221,8 @@ class RobotCommunication:
         )
 
     def __run_primitive_set(self) -> None:
-        """Forward PrimitiveSet protos from fullsystem to the robots.
+        """Forward PrimitiveSet protos from Fullsystem and MotorControl/PowerControl
+        protos from Robot Diagnostics to the robots.
 
         For AI protos, blocks for 10ms if no proto is available, and then returns a cached proto
 
@@ -230,12 +231,6 @@ class RobotCommunication:
 
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
-
-        NOTE: If disconnect_fullsystem_from_robots is called, then the packets
-        will not be forwarded to the robots.
-
-        send_override_primitive_set can be used to send a primitive set, which
-        is useful to dip in and out of robot diagnostics.
         """
         while self.running:
             # map of robot id to diagnostics/fullsystem primitive map

@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from pyqtgraph.Qt import QtGui
 from OpenGL.GL import *
 from proto.import_all_protos import *
@@ -302,69 +300,16 @@ class TrailValues:
     DEFAULT_TRAIL_SAMPLING_RATE = 0
 
 
-@dataclass
-class DeviceKeyEvent:
-    """This dataclass holds the code for a "EV_KEY" input event"""
-
-    event_code: int
-
-
-@dataclass
-class DeviceAbsEvent:
-    """This dataclass holds the code and max value for an "EV_ABS" input event"""
-
-    event_code: int
-    max_value: float
-
-
-@dataclass
-class DeviceConfig:
-    move_x: DeviceAbsEvent
-    move_y: DeviceAbsEvent
-    move_rot: DeviceAbsEvent
-    kick: DeviceKeyEvent
-    chip: DeviceKeyEvent
-    chicker_power: DeviceAbsEvent
-    dribbler_speed: DeviceAbsEvent
-    dribbler_enable: DeviceAbsEvent
-
-
 class DiagnosticsConstants:
-    XboxConfig = DeviceConfig(
-        # Name: "ABS_X"
-        # Canonical: Left joystick X-axis
-        move_x=DeviceAbsEvent(event_code=0, max_value=32767.0),
-        # Name: "ABS_Y"
-        # Canonical: Left joystick Y-axis
-        move_y=DeviceAbsEvent(event_code=1, max_value=32767.0),
-        # Name: "ABS_RX"
-        # Canonical: Right joystick X-axis
-        move_rot=DeviceAbsEvent(event_code=3, max_value=32767.0),
-        # Name: "BTN_A"
-        # Canonical: "A" Button
-        kick=DeviceKeyEvent(event_code=304),
-        # Name: "BTN_Y"
-        # Canonical: "Y" Button
-        chip=DeviceKeyEvent(event_code=308),
-        # Name: "ABS_HAT0X
-        # Canonical: D-pad X-axis
-        chicker_power=DeviceAbsEvent(event_code=16, max_value=1.0),
-        # Name: "ABS_HAT0Y"
-        # Canonical: D-pad Y-axis
-        dribbler_speed=DeviceAbsEvent(event_code=17, max_value=1.0),
-        # Name: "ABS_RZ"
-        # Canonical: Right trigger
-        dribbler_enable=DeviceAbsEvent(event_code=5, max_value=1023.0),
-    )
+    """Constants for Robot Diagnostics"""
 
-    HANDHELD_DEVICE_NAME_CONFIG_MAP = {
-        "Microsoft Xbox One X pad": XboxConfig,
-        "Microsoft X-Box One S pad": XboxConfig,
-        "Microsoft Xbox 360 pad": XboxConfig,
+    # Device names of the controllers supported for controlling robots
+    SUPPORTED_CONTROLLERS = {
+        "Microsoft Xbox One X pad",
+        "Microsoft X-Box One S pad",
+        "Microsoft Xbox 360 pad",
     }
 
-    INPUT_DELAY_THRESHOLD = 0.01
-    EVENT_LOOP_SLEEP_DURATION = 0.0005
     BUTTON_PRESSED_THRESHOLD = 0.5
     DEADZONE_PERCENTAGE = 0.20
 
