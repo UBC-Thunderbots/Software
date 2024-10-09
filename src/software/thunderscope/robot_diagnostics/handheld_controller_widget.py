@@ -121,6 +121,8 @@ class HandheldControllerWidget(QWidget):
         return box
 
     def __read_controller_inputs(self) -> None:
+        """Read and interpret the current controller input values."""
+
         def with_deadzone(abs_value: float) -> float:
             return (
                 abs_value
