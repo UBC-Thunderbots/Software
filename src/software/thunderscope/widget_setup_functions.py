@@ -37,9 +37,6 @@ from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
 from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
-from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
-    DriveAndDribblerWidget,
-)
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
@@ -332,18 +329,12 @@ def setup_estop_view(proto_unix_io: ProtoUnixIO) -> EstopView:
     return estop_view
 
 
-def setup_diagnostics_widget(
-    proto_unix_io: ProtoUnixIO,
-) -> DriveAndDribblerWidget:
-    """Setup the diagnostics widget, which contains the following sub-widgets:
-    - ChickerWidget
-    - DriveAndDribblerWidget
-    - ControllerStatusViewWidget
+def setup_diagnostics_widget(proto_unix_io: ProtoUnixIO) -> DiagnosticsWidget:
+    """Set up the diagnostics widget that provides an interface for manually
+    controlling our robots
 
-    :param proto_unix_io: The proto unix io object
-    :returns: The diagnostics widget that contains the control input switch,
-              drive & dribbler sliders, chicker control and controller handler
+    :param proto_unix_io: ProtoUnixIO for sending messages to the robot
+    :returns: the diagnostics widget
     """
     diagnostics_widget = DiagnosticsWidget(proto_unix_io)
-
     return diagnostics_widget
