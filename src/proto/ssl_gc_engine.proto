@@ -5,26 +5,25 @@ package SSLProto;
 import "proto/ssl_gc_geometry.proto";
 import "proto/ssl_gc_common.proto";
 
+import "google/protobuf/timestamp.proto";
+
 // The GC state contains settings and state independent of the match state
 message GcState
 {
-    // The state of each team
+    // the state of each team
     map<string, GcStateTeam> team_state = 1;
 
     // the states of the auto referees
     map<string, GcStateAutoRef> auto_ref_state = 2;
 
-    // the states of the attached trackers
-    map<string, GcStateTracker> tracker_state = 3;
+    // the attached trackers (uuid -> source_name)
+    map<string, string> trackers = 3;
 
-    // the state of the currently selected tracker
-    optional GcStateTracker tracker_state_gc = 4;
+    // the next actions that can be executed when continuing
+    repeated ContinueAction continue_actions = 4;
 
-    // can the match be continued right now?
-    optional bool ready_to_continue = 5;
-
-    // list of issues that hinders the game from continuing
-    repeated string continuation_issues = 6;
+    // the next actions that can be executed when continuing
+    repeated ContinueHint continue_hints = 5;
 }
 
 // The GC state for a single team
@@ -103,4 +102,62 @@ message Robot
 
     // robot position [m]
     optional Vector2 pos = 2;
+}
+
+message ContinueAction
+{
+    // type of action that will be performed next
+    required Type type = 1;
+
+    // for which team (if team specific)
+    required Team for_team = 2;
+
+    // list of issues that hinders the game from continuing
+    repeated string continuation_issues = 3;
+
+    // timestamp at which the action will be ready (to give some preparation time)
+    optional google.protobuf.Timestamp ready_at = 4;
+
+    // state of the action
+    optional State state = 5;
+
+    enum Type
+    {
+        TYPE_UNKNOWN            = 0;
+        HALT                    = 1;
+        RESUME_FROM_HALT        = 10;
+        STOP_GAME               = 2;
+        FORCE_START             = 11;
+        FREE_KICK               = 17;
+        NEXT_COMMAND            = 3;
+        BALL_PLACEMENT_START    = 4;
+        BALL_PLACEMENT_CANCEL   = 9;
+        BALL_PLACEMENT_COMPLETE = 14;
+        BALL_PLACEMENT_FAIL     = 15;
+        TIMEOUT_START           = 5;
+        TIMEOUT_STOP            = 6;
+        BOT_SUBSTITUTION        = 7;
+        NEXT_STAGE              = 8;
+        END_GAME                = 16;
+        ACCEPT_GOAL             = 12;
+        REJECT_GOAL             = 20;
+        NORMAL_START            = 13;
+        CHALLENGE_ACCEPT        = 18;
+        CHALLENGE_REJECT        = 19;
+    }
+
+    enum State
+    {
+        STATE_UNKNOWN = 0;
+        BLOCKED       = 1;
+        WAITING       = 2;
+        READY_AUTO    = 3;
+        READY_MANUAL  = 4;
+        DISABLED      = 5;
+    }
+}
+
+message ContinueHint
+{
+    required string message = 1;
 }

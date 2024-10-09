@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 #include "software/util/make_enum/make_enum_helpers.hpp"
 
 /**

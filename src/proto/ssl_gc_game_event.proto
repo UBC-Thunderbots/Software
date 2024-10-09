@@ -15,6 +15,10 @@ import "proto/ssl_gc_geometry.proto";
 // so.
 message GameEvent
 {
+    // A globally unique id of the game event.
+    optional string id = 50;
+
+    // The type of the game event.
     optional Type type = 40;
 
     // The origins of this game event.
@@ -22,6 +26,9 @@ message GameEvent
     // Contains autoRef name(s), if it originates from one or more autoRefs.
     // Ignored if sent by autoRef to game controller.
     repeated string origin = 41;
+
+    // Unix timestamp in microseconds when the event was created.
+    optional uint64 created_timestamp = 49;
 
     // the event that occurred
     oneof event
@@ -43,6 +50,7 @@ message GameEvent
         BotPushedBot bot_pushed_bot                        = 24;
         BotHeldBallDeliberately bot_held_ball_deliberately = 26;
         BotTippedOver bot_tipped_over                      = 27;
+        BotDroppedParts bot_dropped_parts                  = 51;
 
         // Non-Stopping Fouls
 
@@ -69,17 +77,45 @@ message GameEvent
         PlacementSucceeded placement_succeeded                 = 5;
         PenaltyKickFailed penalty_kick_failed                  = 45;
 
-        NoProgressInGame no_progress_in_game = 2;
-        PlacementFailed placement_failed     = 3;
-        MultipleCards multiple_cards         = 32;
-        MultipleFouls multiple_fouls         = 34;
-        BotSubstitution bot_substitution     = 37;
-        TooManyRobots too_many_robots        = 38;
-        ChallengeFlag challenge_flag         = 46;
-        EmergencyStop emergency_stop         = 47;
+        NoProgressInGame no_progress_in_game                = 2;
+        PlacementFailed placement_failed                    = 3;
+        MultipleCards multiple_cards                        = 32;
+        MultipleFouls multiple_fouls                        = 34;
+        BotSubstitution bot_substitution                    = 37;
+        ExcessiveBotSubstitution excessive_bot_substitution = 52;
+        TooManyRobots too_many_robots                       = 38;
+        ChallengeFlag challenge_flag                        = 46;
+        ChallengeFlagHandled challenge_flag_handled         = 48;
+        EmergencyStop emergency_stop                        = 47;
 
         UnsportingBehaviorMinor unsporting_behavior_minor = 35;
         UnsportingBehaviorMajor unsporting_behavior_major = 36;
+
+        // Deprecated events
+
+        // replaced by ready_to_continue flag
+        Prepared prepared = 1 [deprecated = true];
+        // obsolete
+        IndirectGoal indirect_goal = 9 [deprecated = true];
+        // replaced by the meta-information in the possible_goal event
+        ChippedGoal chipped_goal = 10 [deprecated = true];
+        // obsolete
+        KickTimeout kick_timeout = 12 [deprecated = true];
+        // rule removed
+        AttackerTouchedOpponentInDefenseArea attacker_touched_opponent_in_defense_area =
+            16 [deprecated = true];
+        // obsolete
+        AttackerTouchedOpponentInDefenseArea
+            attacker_touched_opponent_in_defense_area_skipped = 42 [deprecated = true];
+        // obsolete
+        BotCrashUnique bot_crash_unique_skipped = 23 [deprecated = true];
+        // can not be used as long as autoRefs do not judge pushing
+        BotPushedBot bot_pushed_bot_skipped = 25 [deprecated = true];
+        // rule removed
+        DefenderInDefenseAreaPartially defender_in_defense_area_partially = 30
+            [deprecated = true];
+        // the referee msg already indicates this
+        MultiplePlacementFailures multiple_placement_failures = 33 [deprecated = true];
     }
 
     // the ball left the field normally
@@ -89,7 +125,7 @@ message GameEvent
         required Team by_team = 1;
         // the bot that last touched the ball
         optional uint32 by_bot = 2;
-        // the location where the ball left the field
+        // the location where the ball left the field [m]
         optional Vector2 location = 3;
     }
     // the ball left the field via goal line and a team committed an aimless kick
@@ -99,9 +135,9 @@ message GameEvent
         required Team by_team = 1;
         // the bot that last touched the ball
         optional uint32 by_bot = 2;
-        // the location where the ball left the field
+        // the location where the ball left the field [m]
         optional Vector2 location = 3;
-        // the location where the ball was last touched
+        // the location where the ball was last touched [m]
         optional Vector2 kick_location = 4;
     }
     // a team shot a goal
@@ -113,12 +149,13 @@ message GameEvent
         optional Team kicking_team = 6;
         // the bot that shot the goal
         optional uint32 kicking_bot = 2;
-        // the location where the ball entered the goal
+        // the location where the ball entered the goal [m]
         optional Vector2 location = 3;
         // the location where the ball was kicked (for deciding if this was a valid goal)
+        // [m]
         optional Vector2 kick_location = 4;
         // the maximum height the ball reached during the goal kick (for deciding if this
-        // was a valid goal)
+        // was a valid goal) [m]
         optional float max_ball_height = 5;
         // number of robots of scoring team when the ball entered the goal (for deciding
         // if this was a valid goal)
@@ -135,9 +172,9 @@ message GameEvent
         required Team by_team = 1;
         // the bot that kicked the ball - at least the team must be set
         optional uint32 by_bot = 2;
-        // the location where the ball entered the goal
+        // the location where the ball entered the goal [m]
         optional Vector2 location = 3;
-        // the location where the ball was kicked
+        // the location where the ball was kicked [m]
         optional Vector2 kick_location = 4;
     }
     // the ball entered the goal, but was initially chipped
@@ -147,12 +184,12 @@ message GameEvent
         required Team by_team = 1;
         // the bot that kicked the ball
         optional uint32 by_bot = 2;
-        // the location where the ball entered the goal
+        // the location where the ball entered the goal [m]
         optional Vector2 location = 3;
-        // the location where the ball was kicked
+        // the location where the ball was kicked [m]
         optional Vector2 kick_location = 4;
         // the maximum height [m] of the ball, before it entered the goal and since the
-        // last kick
+        // last kick [m]
         optional float max_ball_height = 5;
     }
     // a bot moved too fast while the game was stopped
@@ -162,7 +199,7 @@ message GameEvent
         required Team by_team = 1;
         // the bot that was too fast
         optional uint32 by_bot = 2;
-        // the location of the bot
+        // the location of the bot [m]
         optional Vector2 location = 3;
         // the bot speed [m/s]
         optional float speed = 4;
@@ -174,7 +211,7 @@ message GameEvent
         required Team by_team = 1;
         // the bot that violates the distance to the kick point
         optional uint32 by_bot = 2;
-        // the location of the bot
+        // the location of the bot [m]
         optional Vector2 location = 3;
         // the distance [m] from bot to the kick point (including the minimum radius)
         optional float distance = 4;
@@ -186,7 +223,7 @@ message GameEvent
         optional uint32 bot_yellow = 1;
         // the bot of the blue team
         optional uint32 bot_blue = 2;
-        // the location of the crash (center between both bots)
+        // the location of the crash (center between both bots) [m]
         optional Vector2 location = 3;
         // the calculated crash speed [m/s] of the two bots
         optional float crash_speed = 4;
@@ -207,7 +244,7 @@ message GameEvent
         optional uint32 violator = 2;
         // the bot of the opposite team that was involved in the crash
         optional uint32 victim = 3;
-        // the location of the crash (center between both bots)
+        // the location of the crash (center between both bots) [m]
         optional Vector2 location = 4;
         // the calculated crash speed vector [m/s] of the two bots
         optional float crash_speed = 5;
@@ -227,7 +264,7 @@ message GameEvent
         optional uint32 violator = 2;
         // the bot of the opposite team that was pushed
         optional uint32 victim = 3;
-        // the location of the push (center between both bots)
+        // the location of the push (center between both bots) [m]
         optional Vector2 location = 4;
         // the pushed distance [m]
         optional float pushed_distance = 5;
@@ -239,9 +276,21 @@ message GameEvent
         required Team by_team = 1;
         // the bot that tipped over
         optional uint32 by_bot = 2;
-        // the location of the bot
+        // the location of the bot [m]
         optional Vector2 location = 3;
-        // the location of the ball at the moment when this foul occurred
+        // the location of the ball at the moment when this foul occurred [m]
+        optional Vector2 ball_location = 4;
+    }
+    // a bot dropped parts
+    message BotDroppedParts
+    {
+        // the team that found guilty
+        required Team by_team = 1;
+        // the bot that dropped the parts
+        optional uint32 by_bot = 2;
+        // the location where the parts were dropped [m]
+        optional Vector2 location = 3;
+        // the location of the ball at the moment when this foul occurred [m]
         optional Vector2 ball_location = 4;
     }
     // a defender other than the keeper was fully located inside its own defense and
@@ -252,7 +301,7 @@ message GameEvent
         required Team by_team = 1;
         // the bot that is inside the penalty area
         optional uint32 by_bot = 2;
-        // the location of the bot
+        // the location of the bot [m]
         optional Vector2 location = 3;
         // the distance [m] from bot case to the nearest point outside the defense area
         optional float distance = 4;
@@ -269,7 +318,7 @@ message GameEvent
         optional Vector2 location = 3;
         // the distance [m] that the bot is inside the penalty area
         optional float distance = 4;
-        // the location of the ball at the moment when this foul occurred
+        // the location of the ball at the moment when this foul occurred [m]
         optional Vector2 ball_location = 5;
     }
     // an attacker touched the ball inside the opponent defense area
@@ -279,7 +328,7 @@ message GameEvent
         required Team by_team = 1;
         // the bot that is inside the penalty area
         optional uint32 by_bot = 2;
-        // the location of the bot
+        // the location of the bot [m]
         optional Vector2 location = 3;
         // the distance [m] that the bot is inside the penalty area
         optional float distance = 4;
@@ -291,7 +340,7 @@ message GameEvent
         required Team by_team = 1;
         // the bot that kicked too fast
         optional uint32 by_bot = 2;
-        // the location of the ball at the time of the highest speed
+        // the location of the ball at the time of the highest speed [m]
         optional Vector2 location = 3;
         // the absolute initial ball speed (kick speed) [m/s]
         optional float initial_ball_speed = 4;
@@ -305,9 +354,9 @@ message GameEvent
         required Team by_team = 1;
         // the bot that dribbled too far
         optional uint32 by_bot = 2;
-        // the location where the dribbling started
+        // the location where the dribbling started [m]
         optional Vector2 start = 3;
-        // the location where the maximum dribbling distance was reached
+        // the location where the maximum dribbling distance was reached [m]
         optional Vector2 end = 4;
     }
     // an attacker touched the opponent robot inside defense area
@@ -319,7 +368,7 @@ message GameEvent
         optional uint32 by_bot = 2;
         // the bot of the opposite team that was touched
         optional uint32 victim = 4;
-        // the location of the contact point between both bots
+        // the location of the contact point between both bots [m]
         optional Vector2 location = 3;
     }
     // an attacker touched the ball multiple times when it was not allowed to
@@ -329,7 +378,7 @@ message GameEvent
         required Team by_team = 1;
         // the bot that touched the ball twice
         optional uint32 by_bot = 2;
-        // the location of the ball when it was first touched
+        // the location of the ball when it was first touched [m]
         optional Vector2 location = 3;
     }
     // an attacker was located too near to the opponent defense area during stop or free
@@ -340,11 +389,11 @@ message GameEvent
         required Team by_team = 1;
         // the bot that is too close to the defense area
         optional uint32 by_bot = 2;
-        // the location of the bot
+        // the location of the bot [m]
         optional Vector2 location = 3;
         // the distance [m] of the bot to the penalty area
         optional float distance = 4;
-        // the location of the ball at the moment when this foul occurred
+        // the location of the ball at the moment when this foul occurred [m]
         optional Vector2 ball_location = 5;
     }
     // a bot held the ball for too long
@@ -354,7 +403,7 @@ message GameEvent
         required Team by_team = 1;
         // the bot that holds the ball
         optional uint32 by_bot = 2;
-        // the location of the ball
+        // the location of the ball [m]
         optional Vector2 location = 3;
         // the duration [s] that the bot hold the ball
         optional float duration = 4;
@@ -366,10 +415,10 @@ message GameEvent
         required Team by_team = 1;
         // the bot that interfered the placement
         optional uint32 by_bot = 2;
-        // the location of the bot
+        // the location of the bot [m]
         optional Vector2 location = 3;
     }
-    // a team collected multiple cards (yellow and red), which results in a penalty kick
+    // a team collected multiple yellow cards
     message MultipleCards
     {
         // the team that received multiple yellow cards
@@ -380,6 +429,8 @@ message GameEvent
     {
         // the team that collected multiple fouls
         required Team by_team = 1;
+        // the list of game events that caused the multiple fouls
+        repeated GameEvent caused_game_events = 2;
     }
     // a team failed to place the ball multiple times in a row
     message MultiplePlacementFailures
@@ -392,7 +443,7 @@ message GameEvent
     {
         // the team that that should have kicked
         required Team by_team = 1;
-        // the location of the ball
+        // the location of the ball [m]
         optional Vector2 location = 2;
         // the time [s] that was waited
         optional float time = 3;
@@ -412,6 +463,8 @@ message GameEvent
         required Team by_team = 1;
         // the remaining distance [m] from ball to placement position
         optional float remaining_distance = 2;
+        // the distance [m] of the nearest own robot to the ball
+        optional float nearest_own_bot_distance = 3;
     }
     // a team was found guilty for minor unsporting behavior
     message UnsportingBehaviorMinor
@@ -434,7 +487,7 @@ message GameEvent
     {
         // the team that found guilty
         required Team by_team = 1;
-        // the location of the ball
+        // the location of the ball [m]
         optional Vector2 location = 2;
         // the duration [s] that the keeper hold the ball
         optional float duration = 3;
@@ -464,11 +517,25 @@ message GameEvent
         // the team that substitutes robots
         required Team by_team = 1;
     }
-    // A challenge flag, requested by a team previously, is flagged
-    message ChallengeFlag
+    // A foul for excessive bot substitutions
+    message ExcessiveBotSubstitution
     {
         // the team that substitutes robots
         required Team by_team = 1;
+    }
+    // A challenge flag, requested by a team previously, is flagged
+    message ChallengeFlag
+    {
+        // the team that requested the challenge flag
+        required Team by_team = 1;
+    }
+    // A challenge, flagged recently, has been handled by the referee
+    message ChallengeFlagHandled
+    {
+        // the team that requested the challenge flag
+        required Team by_team = 1;
+        // the challenge was accepted by the referee
+        required bool accepted = 2;
     }
     // An emergency stop, requested by team previously, occurred
     message EmergencyStop
@@ -485,7 +552,7 @@ message GameEvent
         optional int32 num_robots_allowed = 2;
         // number of robots currently on the field
         optional int32 num_robots_on_field = 3;
-        // the location of the ball at the moment when this foul occurred
+        // the location of the ball at the moment when this foul occurred [m]
         optional Vector2 ball_location = 4;
     }
     // a robot chipped the ball over the field boundary out of the playing surface
@@ -493,7 +560,7 @@ message GameEvent
     {
         // the team that has too many robots
         required Team by_team = 1;
-        // the location of the ball
+        // the location of the ball [m]
         optional Vector2 location = 2;
     }
     // the penalty kick failed (by time or by keeper)
@@ -501,8 +568,10 @@ message GameEvent
     {
         // the team that last touched the ball
         required Team by_team = 1;
-        // the location of the ball at the moment of this event
+        // the location of the ball at the moment of this event [m]
         optional Vector2 location = 2;
+        // an explanation of the failure
+        optional string reason = 3;
     }
 
     enum Type
@@ -526,6 +595,7 @@ message GameEvent
         BOT_PUSHED_BOT             = 24;  // triggered by human ref
         BOT_HELD_BALL_DELIBERATELY = 26;  // triggered by human ref
         BOT_TIPPED_OVER            = 27;  // triggered by human ref
+        BOT_DROPPED_PARTS          = 47;  // triggered by human ref
 
         // Non-Stopping Fouls
 
@@ -539,6 +609,7 @@ message GameEvent
         DEFENDER_TOO_CLOSE_TO_KICK_POINT = 29;  // triggered by autoRef
         BOT_TOO_FAST_IN_STOP             = 28;  // triggered by autoRef
         BOT_INTERFERED_PLACEMENT         = 20;  // triggered by autoRef
+        EXCESSIVE_BOT_SUBSTITUTION       = 48;  // triggered by GC
 
         // Scoring goals
 
@@ -552,16 +623,30 @@ message GameEvent
         PLACEMENT_SUCCEEDED          = 5;   // triggered by autoRef
         PENALTY_KICK_FAILED          = 43;  // triggered by GC and autoRef
 
-        NO_PROGRESS_IN_GAME = 2;   // triggered by GC
-        PLACEMENT_FAILED    = 3;   // triggered by GC
-        MULTIPLE_CARDS      = 32;  // triggered by GC
-        MULTIPLE_FOULS      = 34;  // triggered by GC
-        BOT_SUBSTITUTION    = 37;  // triggered by GC
-        TOO_MANY_ROBOTS     = 38;  // triggered by GC
-        CHALLENGE_FLAG      = 44;  // triggered by GC
-        EMERGENCY_STOP      = 45;  // triggered by GC
+        NO_PROGRESS_IN_GAME    = 2;   // triggered by GC
+        PLACEMENT_FAILED       = 3;   // triggered by GC
+        MULTIPLE_CARDS         = 32;  // triggered by GC
+        MULTIPLE_FOULS         = 34;  // triggered by GC
+        BOT_SUBSTITUTION       = 37;  // triggered by GC
+        TOO_MANY_ROBOTS        = 38;  // triggered by GC
+        CHALLENGE_FLAG         = 44;  // triggered by GC
+        CHALLENGE_FLAG_HANDLED = 46;  // triggered by GC
+        EMERGENCY_STOP         = 45;  // triggered by GC
 
         UNSPORTING_BEHAVIOR_MINOR = 35;  // triggered by human ref
         UNSPORTING_BEHAVIOR_MAJOR = 36;  // triggered by human ref
+
+        // Deprecated events
+
+        PREPARED                                          = 1 [deprecated = true];
+        INDIRECT_GOAL                                     = 9 [deprecated = true];
+        CHIPPED_GOAL                                      = 10 [deprecated = true];
+        KICK_TIMEOUT                                      = 12 [deprecated = true];
+        ATTACKER_TOUCHED_OPPONENT_IN_DEFENSE_AREA         = 16 [deprecated = true];
+        ATTACKER_TOUCHED_OPPONENT_IN_DEFENSE_AREA_SKIPPED = 40 [deprecated = true];
+        BOT_CRASH_UNIQUE_SKIPPED                          = 23 [deprecated = true];
+        BOT_PUSHED_BOT_SKIPPED                            = 25 [deprecated = true];
+        DEFENDER_IN_DEFENSE_AREA_PARTIALLY                = 30 [deprecated = true];
+        MULTIPLE_PLACEMENT_FAILURES                       = 33 [deprecated = true];
     }
 }

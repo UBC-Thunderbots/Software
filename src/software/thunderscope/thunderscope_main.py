@@ -4,6 +4,17 @@ import logging
 import os
 import sys
 import threading
+
+import google.protobuf
+from google.protobuf.internal import api_implementation
+
+protobuf_impl_type = api_implementation.Type()
+assert protobuf_impl_type == "upb", (
+    f"Trying to use the {protobuf_impl_type} protobuf implementation. "
+    "Please use the upb implementation, available in python protobuf version 4.21.0 and above."
+    f"The current version of protobuf is {google.protobuf.__version__}"
+)
+
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
