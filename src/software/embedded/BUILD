@@ -90,7 +90,7 @@ cc_binary(
         "-lpthread",
         "-lrt",
     ],
-    exec_compatible_with = [
+    target_compatible_with = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
     ],

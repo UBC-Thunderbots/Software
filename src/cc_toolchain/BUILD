@@ -44,7 +44,7 @@ config_setting(
 )
 
 platform(
-    name = "jetson_nano_platform",
+    name = "robot",
     constraint_values = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
@@ -210,11 +210,11 @@ cc_toolchain_config_k8_jetson_nano_cross_compile(
 
 toolchain(
     name = "cc_toolchain_for_k8_jetson_nano_cross_compile",
-    target_compatible_with = [
+    exec_compatible_with = [
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
-    exec_compatible_with = [
+    target_compatible_with = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
     ],
@@ -228,6 +228,10 @@ toolchain(
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
     toolchain = ":cc_toolchain_linux_k8_gcc",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
@@ -235,6 +239,10 @@ toolchain(
 toolchain(
     name = "cc_toolchain_for_aarch64",
     exec_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
     ],
