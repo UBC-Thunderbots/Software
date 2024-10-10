@@ -26,14 +26,12 @@ logger = create_logger(__name__)
 #
 #     move_tactic = MoveTactic()
 #     move_tactic.destination.CopyFrom(rob_pos_p)
-#     move_tactic.final_speed = 0.0
 #     move_tactic.dribbler_mode = DribblerMode.OFF
 #     move_tactic.final_orientation.CopyFrom(Angle(radians=angle))
 #     move_tactic.ball_collision_type = BallCollisionType.AVOID
 #     move_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=0.0))
 #     move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
 #     move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
-#     move_tactic.target_spin_rev_per_s = 0.0
 #
 #     # setup world state
 #     initial_worldstate = create_world_state(
@@ -95,7 +93,6 @@ def test_basic_rotation(field_test_runner):
     for angle in test_angles:
         move_tactic = MoveTactic()
         move_tactic.destination.CopyFrom(rob_pos_p)
-        move_tactic.final_speed = 0.0
         move_tactic.dribbler_mode = DribblerMode.OFF
         move_tactic.final_orientation.CopyFrom(Angle(radians=angle))
         move_tactic.ball_collision_type = BallCollisionType.AVOID
@@ -104,7 +101,6 @@ def test_basic_rotation(field_test_runner):
         )
         move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
         move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
-        move_tactic.target_spin_rev_per_s = 0.0
 
         # Setup Tactic
         params = AssignedTacticPlayControlParams()
@@ -153,47 +149,39 @@ def test_one_robots_square(field_test_runner):
 
     tactic_0 = MoveTactic(
         destination=point1,
-        final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
         final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
         obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
-        target_spin_rev_per_s=0.0,
     )
     tactic_1 = MoveTactic(
         destination=point2,
-        final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
         final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
         obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
-        target_spin_rev_per_s=0.0,
     )
     tactic_2 = MoveTactic(
         destination=point3,
-        final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
         final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
         obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
-        target_spin_rev_per_s=0.0,
     )
     tactic_3 = MoveTactic(
         destination=point4,
-        final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
         final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
         obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
-        target_spin_rev_per_s=0.0,
     )
     tactics = [tactic_0, tactic_1, tactic_2, tactic_3]
 

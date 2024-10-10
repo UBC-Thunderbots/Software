@@ -17,8 +17,6 @@ struct MoveFSM
         Point destination;
         // The orientation the robot should have when it arrives at its destination
         Angle final_orientation;
-        // The speed the robot should have when it arrives at its destination
-        double final_speed;
         // How to run the dribbler
         TbotsProto::DribblerMode dribbler_mode;
         // How to navigate around the ball
@@ -29,8 +27,6 @@ struct MoveFSM
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
         // The obstacle avoidance mode
         TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
-        // The target spin while moving in revolutions per second
-        double target_spin_rev_per_s;
     };
 
     // this struct defines the only event that the MoveFSM responds to
