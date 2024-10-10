@@ -145,7 +145,7 @@ class ColorProgressBar(QProgressBar):
 
         :param value: the float value to set
         """
-        super(ColorProgressBar, self).setValue(value * self.decimals)
+        super(ColorProgressBar, self).setValue(int(value * self.decimals))
 
         # clamp percent to make sure it's between 0% and 100%
         percent = self.getPercentage()
@@ -380,30 +380,46 @@ def set_table_data(
     table.setHorizontalHeaderLabels(horizontal_headers)
 
 
-def change_button_state(button, enable):
-    """Change button color and clickable state.
+def disconnect_signal(signal: QtCore.Signal):
+    """Helper function to disconnect all connections for a Qt signal.
+    Suppresses TypeErrors thrown by Signal.disconnect() if there are no connections.
+    """
+    try:
+        signal.disconnect()
+    except TypeError:
+        pass
+
+
+def enable_button(button):
+    """Enables the given button and sets the button UI to reflect that
+    visually to the user.
 
     :param button: button to change the state of
-    :param enable: bool: if True: enable this button, if False: disable
     """
-    if enable:
-        button.setStyleSheet("background-color: White")
-        button.setCheckable(True)
-    else:
-        button.setStyleSheet("background-color: Grey")
-        button.setCheckable(False)
+    button.setStyleSheet("")
+    button.setEnabled(True)
+
+
+def disable_button(button):
+    """Disables the given button and sets the button UI to reflect that
+    visually to the user.
+
+    :param button: button to change the state of
+    """
+    button.setStyleSheet("background-color: grey")
+    button.setEnabled(False)
 
 
 def disable_slider(slider):
     """Disables a slider by getting the current value and setting the slider to that
-    value upon every value change
+    value every time the slider is moved
 
     This results in slider value not changing even when slider is moved
 
     :param slider: slider widget to be disabled
     """
     old_val = slider.value()
-    slider.valueChanged.connect(lambda: slider.setValue(old_val))
+    slider.sliderMoved.connect(lambda new_val: slider.setValue(old_val))
     slider.setStyleSheet(
         "QSlider::sub-page:horizontal"
         "{"
@@ -417,15 +433,13 @@ def disable_slider(slider):
     )
 
 
-def enable_slider(slider, label, get_value):
-    """Enables a slider by connecting a function to update label upon value change
+def enable_slider(slider):
+    """Enables a slider that was disabled with disable_slider
 
     :param slider: slider widget to be enabled
-    :param label: label widget corresponding to the slider
-    :param get_value: function to translate slider value into label text
     """
-    slider.valueChanged.connect(lambda: label.setText(get_value(slider.value())))
-    slider.setStyleSheet("QSlider::groove:horizontal" "{" "border-width: 0px" "}")
+    disconnect_signal(slider.sliderMoved)
+    slider.setStyleSheet("")
 
 
 def disable_radio_button(button_group):

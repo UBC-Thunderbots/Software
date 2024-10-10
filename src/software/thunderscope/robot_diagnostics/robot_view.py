@@ -21,7 +21,7 @@ class RobotViewComponent(QWidget):
         self,
         robot_id: int,
         available_control_modes: list[IndividualRobotMode],
-        control_mode_signal: Type[QtCore.pyqtSignal],
+        individual_robot_control_mode_signal: Type[QtCore.pyqtSignal],
     ):
         """Sets up a Robot Info Widget and a Robot Status Widget for each robot
 
@@ -30,7 +30,7 @@ class RobotViewComponent(QWidget):
         :param robot_id: id of the current robot
         :param available_control_modes: the currently available input modes for the robots
                                         according to what mode thunderscope is run in
-        :param control_mode_signal: the signal to emit when control mode changes
+        :param individual_robot_control_mode_signal: the signal to emit when control mode changes
                                     in order to communicate to robot communications
         """
         super().__init__()
@@ -39,7 +39,7 @@ class RobotViewComponent(QWidget):
         self.layout = QVBoxLayout()
 
         self.robot_info = RobotInfo(
-            robot_id, available_control_modes, control_mode_signal
+            robot_id, available_control_modes, individual_robot_control_mode_signal
         )
         self.layout.addWidget(self.robot_info)
 
@@ -82,7 +82,7 @@ class RobotView(QScrollArea):
     Contains signal to communicate with robot diagnostics when control mode changes
     """
 
-    control_mode_signal = QtCore.pyqtSignal(int, int)
+    individual_robot_control_mode_signal = QtCore.pyqtSignal(int, IndividualRobotMode)
 
     def __init__(self, available_control_modes: list[IndividualRobotMode]) -> None:
         """Initialize the robot view component for each robot.
@@ -101,7 +101,7 @@ class RobotView(QScrollArea):
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             robot_view_widget = RobotViewComponent(
-                id, available_control_modes, self.control_mode_signal
+                id, available_control_modes, self.individual_robot_control_mode_signal
             )
             self.robot_view_widgets.append(robot_view_widget)
             self.layout.addWidget(robot_view_widget)

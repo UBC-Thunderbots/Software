@@ -56,7 +56,6 @@ class MotorFaultView(QWidget):
 
         self.layout.addWidget(self.motor_fault_display)
 
-        self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
     def event(self, event: QEvent) -> bool:
