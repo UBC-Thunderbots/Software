@@ -145,6 +145,7 @@ Thunderloop::~Thunderloop() {}
     struct timespec current_time;
     struct timespec last_chipper_fired;
     struct timespec last_kicker_fired;
+    struct timespec prev_iter_start_time;
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
@@ -163,11 +164,16 @@ Thunderloop::~Thunderloop() {}
     clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
+    clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
 
     double loop_duration_seconds = 0.0;
 
     for (;;)
     {
+        struct timespec time_since_prev_iter;
+        clock_gettime(CLOCK_MONOTONIC, &current_time);
+        ScopedTimespecTimer::timespecDiff(&current_time, &prev_iter_start_time, &time_since_prev_iter);
+        prev_iter_start_time = current_time;
         {
             // Wait until next shot
             //
@@ -319,9 +325,10 @@ Thunderloop::~Thunderloop() {}
                 ScopedTimespecTimer timer(&poll_time);
 
                 ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
+                double time_since_prev_iter_sec = getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND;
 
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
-                                                     loop_duration_seconds);
+                                                     time_since_prev_iter_sec);
             }
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
