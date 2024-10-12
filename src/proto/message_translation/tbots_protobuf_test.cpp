@@ -75,7 +75,8 @@ class TbotsProtobufTest : public ::testing::Test
         auto traj_path_nodes_2 = traj_path_2.getTrajectoryPathNodes();
         ASSERT_EQ(traj_path_nodes_1.size(), traj_path_nodes_2.size());
 
-        // In some cases, the trajectory end time may have lost precision when converting between doubles and floats
+        // In some cases, the trajectory end time may have lost precision when converting
+        // between doubles and floats
         ASSERT_NEAR(traj_path_nodes_1[0].getTrajectoryEndTime(),
                     traj_path_nodes_2[0].getTrajectoryEndTime(), 0.000001);
 
