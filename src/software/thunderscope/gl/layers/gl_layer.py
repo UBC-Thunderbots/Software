@@ -87,18 +87,32 @@ class GLLayer(GLGraphicsItem):
         """
         if change.action == ChangeAction.ADD:
             for graphic in change.elements:
-                # Manually setting the parent of the GLGraphicsItem to this
-                # layer since GLGraphicsItem.setParentItem does not work
-                # correctly
-                self._GLGraphicsItem__children.add(graphic)
-                graphic._GLGraphicsItem__parent = self
-                self.view().addItem(graphic)
+                graphic.setParentItem(self)
 
         elif change.action == ChangeAction.REMOVE:
             for graphic in change.elements:
-                # Manually removing the GLGraphicsItem as a child of this
-                # layer since GLGraphicsItem.setParentItem does not work
-                # correctly
-                self._GLGraphicsItem__children.remove(graphic)
-                graphic._GLGraphicsItem__parent = None
-                self.view().removeItem(graphic)
+                graphic.setParentItem(None)
+
+def setParentItem_patched(self, parent: GLGraphicsItem) -> None:
+    """Patched version of GLGraphicsItem.setParentItem that properly
+    removes this item from the scenegraph when the parent param is None.
+
+    From the original pyqtgraph documentation:
+    Sets this item's parent in the scenegraph hierarchy.
+
+    :param parent: the GLGraphicsItem to set as the parent of this item.
+                   If None, this item is removed from the scenegraph.
+    """
+    if parent:
+        parent._GLGraphicsItem__children.add(self)
+        self._GLGraphicsItem__parent = parent
+        if parent.view():
+            parent.view().addItem(self)
+    else:
+        if self._GLGraphicsItem__parent:
+            self._GLGraphicsItem__parent._GLGraphicsItem__children.remove(self)
+        self._GLGraphicsItem__parent = None
+        if self.view():
+            self.view().removeItem(self)
+
+GLGraphicsItem.setParentItem = setParentItem_patched
