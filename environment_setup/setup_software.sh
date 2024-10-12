@@ -94,10 +94,14 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo ldconfig
 fi
 
+# Clear the download cache
+rm -rf /tmp/tbots_download_cache
+mkdir /tmp/tbots_download_cache
+
 if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; then
     # This is required because a Braille TTY device that Linux provides a driver for conflicts with the ESP32
-    wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/85-brltty.rules
-    sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
+    wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/tbots_download_cache/85-brltty.rules
+    sudo mv /tmp/tbots_download_cache/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
 
 virtualenv_opt_args=""
@@ -171,6 +175,11 @@ print_status_msg "Installing Bazel"
 install_bazel $arch
 
 print_status_msg "Done Installing Bazel"
+
+print_status_msg "Install clang-format"
+install_clang_format $arch
+print_status_msg "Done installing clang-format"
+
 print_status_msg "Setting Up PlatformIO"
 
 # setup platformio to compile arduino code
@@ -189,8 +198,8 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # install PlatformIO to global environment
-wget -O /tmp/get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py
-if ! /usr/bin/python3.12 /tmp/./get-platformio.py; then
+wget -O /tmp/tbots_download_cache/get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py
+if ! /usr/bin/python3.12 /tmp/tbots_download_cache/./get-platformio.py; then
     print_status_msg "Error: Installing PlatformIO failed"
     exit 1
 fi
