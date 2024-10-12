@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
     # Used for when flashing Jetsons
     if args.flash_robots:
-        command += ["--cpu=jetson_nano"]
+        command += ["--platforms=//cc_toolchain:robot"]
 
     # Select debug binaries to run
     if args.select_debug_binaries:

@@ -11,9 +11,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ubuntu22-tests:
-    name: Ubuntu 22.04 Build
-    runs-on: ubuntu-22.04
+  multiplatform-build:
+    strategy:
+      matrix:
+        platform: [ ubuntu-22.04, ubuntu-24.04 ]
+
+    name: Ubuntu Alternate Builds
+    runs-on: ${{ matrix.platform }}
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
@@ -25,22 +29,24 @@ jobs:
       - name: Software Build Test
         run: |
           cd src
-          bazel build --show_timestamps       \
-            -- //... -//software:unix_full_system \
-            -//software/simulated_tests/...  \
-            -//software/ai/hl/...            \
-            -//software/field_tests/...      \
-            -//software/embedded/...      \
+          bazel build --show_timestamps --copt=-O3  \
+            -- //... -//software:unix_full_system   \
+            -//software/simulated_tests/...         \
+            -//software/ai/hl/...                   \
+            -//software/field_tests/...             \
+            -//software/embedded/...                \
+            -//cc_toolchain/...
 
       - name: Jetson Nano Build Test
         run: |
           cd src
-          bazel build --cpu=jetson_nano //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//cc_toolchain:robot
 
       - name: Raspberry Pi Build Test
         run: |
           cd src
-          bazel build --cpu=jetson_nano //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//cc_toolchain:robot
+
 
   software-tests:
     name: Software Tests
@@ -61,7 +67,8 @@ jobs:
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
-            -//software/ai/navigator/...
+            -//software/ai/navigator/...     \
+            -//cc_toolchain/...
 
   robot-tests:
     name: Robot Software Tests
@@ -90,12 +97,14 @@ jobs:
       - name: Jetson Nano Build
         run: |
          cd src
-         bazel build --cpu=jetson_nano //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//cc_toolchain:robot
+
 
       - name: Raspberry Pi Build
         run: |
          cd src
-         bazel build --cpu=jetson_nano //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//cc_toolchain:robot
+
 
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
@@ -112,9 +121,9 @@ jobs:
         run: |
           cd src
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps       \
-            //software:unix_full_system           \
-            //software/simulated_tests/...   \
-            //software/ai/hl/... \
+            //software:unix_full_system       \
+            //software/simulated_tests/...    \
+            //software/ai/hl/...              \
             //software/ai/navigator/...
 
       - name: Upload simulated test proto logs

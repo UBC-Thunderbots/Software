@@ -6,4 +6,4 @@
 # only link in the direct dependencies for each shared lib, but because 
 # bazel delays linking to the end of the build, this means some (non-direct) 
 # dependencies of the final target will not be linked in
-exec /usr/bin/gcc-9 -Wl,--no-as-needed "$@"
+exec /usr/bin/gcc-10 -Wl,--no-as-needed "$@"

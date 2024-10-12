@@ -6,6 +6,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <fstream>
 #include <iostream>
 
 #include "shared/constants.h"
@@ -109,7 +110,7 @@ std::vector<std::string> ArduinoUtil::getSerialDevices()
 
 std::optional<std::string> ArduinoUtil::readFileLine(boost::filesystem::path path)
 {
-    boost::filesystem::ifstream f(path.c_str());
+    std::ifstream f(path.c_str());
     std::string res;
     if (f.is_open())
     {

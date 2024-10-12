@@ -67,11 +67,11 @@ typedef struct RobotConstants
     float dribbler_width_meters;
 
     // Indefinite dribbler mode sets a speed that can be maintained indefinitely [rpm]
-    float indefinite_dribbler_speed_rpm;
+    int indefinite_dribbler_speed_rpm;
 
     // Max force dribbler mode sets the speed that applies the maximum amount of force on
     // the ball [rpm]
-    float max_force_dribbler_speed_rpm;
+    int max_force_dribbler_speed_rpm;
 
     // The maximum acceleration achievable by our motors [m/s^2]
     float motor_max_acceleration_m_per_s_2;
