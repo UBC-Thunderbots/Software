@@ -152,6 +152,10 @@ static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
 // The total number of possible robot ids between two teams
 static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 
+// How many robots are allowed in each division
+static const unsigned int DIV_A_NUM_ROBOTS = 11;
+static const unsigned int DIV_B_NUM_ROBOTS = 6;
+
 // The maximum time in seconds given to Full System to cleanly exit the process.
 static const double MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC = 0.5;
 
@@ -173,9 +177,6 @@ static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND;
-// How many robots are allowed in each division
-static const unsigned DIV_A_NUM_ROBOTS = 11;
-static const unsigned DIV_B_NUM_ROBOTS = 6;
 
 // Kick Spd to Pulse Width Safety Constraint Constants
 

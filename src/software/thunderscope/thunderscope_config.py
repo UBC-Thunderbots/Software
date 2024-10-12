@@ -252,24 +252,12 @@ def configure_base_diagnostics(
             anchor="Logs",
         ),
         TScopeWidget(
-            name="Drive and Dribbler",
-            widget=setup_drive_and_dribbler_widget(
+            name="Diagnostics",
+            widget=setup_diagnostics_widget(
                 **{"proto_unix_io": diagnostics_proto_unix_io}
             ),
             anchor="Logs",
             position=WidgetPosition.RIGHT,
-        ),
-        TScopeWidget(
-            name="Chicker",
-            widget=setup_chicker_widget(**{"proto_unix_io": diagnostics_proto_unix_io}),
-            anchor="Drive and Dribbler",
-            position=WidgetPosition.BELOW,
-        ),
-        TScopeWidget(
-            name="Manual Control Input",
-            widget=setup_diagnostics_input_widget(),
-            anchor="Chicker",
-            position=WidgetPosition.TOP,
         ),
     ] + extra_widgets
 
