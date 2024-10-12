@@ -28,7 +28,7 @@ void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
         }
         else
         {
-            move_tactic->updateControlParams(Point(0, 0), Angle::zero(), 0.0);
+            move_tactic->updateControlParams(Point(0, 0), Angle::zero());
             result.emplace_back(move_tactic);
         }
         yield({result});

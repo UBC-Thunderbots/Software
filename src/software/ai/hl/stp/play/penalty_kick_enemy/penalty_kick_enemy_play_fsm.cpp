@@ -26,8 +26,7 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
         move_tactics.at(i)->updateControlParams(
             Point(event.common.world_ptr->field().enemyPenaltyMark().x() + 1.75,
                   y_offset),
-            event.common.world_ptr->field().enemyGoalCenter().toVector().orientation(),
-            0);
+            event.common.world_ptr->field().enemyGoalCenter().toVector().orientation());
     }
 
     // Move goalie to the goal line

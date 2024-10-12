@@ -79,7 +79,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 chip_targets[i].origin() -
                 Vector::createFromAngle(orientation).normalize(ROBOT_MAX_RADIUS_METERS);
             ;
-            move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0);
+            move_to_open_area_tactics[i]->updateControlParams(position, orientation);
             result[0].emplace_back(move_to_open_area_tactics[i]);
         }
 
