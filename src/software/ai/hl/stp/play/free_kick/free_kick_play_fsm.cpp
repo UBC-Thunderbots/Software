@@ -69,7 +69,7 @@ void FreeKickPlayFSM::updateReceiverPositioningTactics(
         Angle receiver_orientation =
             (world->ball().position() - best_receiving_positions[i]).orientation();
         receiver_positioning_tactics[i]->updateControlParams(
-            best_receiving_positions[i], receiver_orientation, 0.0,
+            best_receiving_positions[i], receiver_orientation,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
     }
@@ -125,7 +125,7 @@ void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)
 
     align_to_ball_tactic->updateControlParams(
         ball_pos - direction_to_face.normalize(ROBOT_MAX_RADIUS_METERS * 2),
-        direction_to_face.orientation(), 0);
+        direction_to_face.orientation());
 }
 
 bool FreeKickPlayFSM::shotFound(const Update &event)

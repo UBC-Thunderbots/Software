@@ -1,0 +1,6 @@
+---
+
+- name: Success msg
+  debug:
+    msg:
+      - "[Robot ID = {{ inventory_hostname }}]"

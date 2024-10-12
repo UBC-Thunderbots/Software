@@ -90,15 +90,12 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
     host_software_packages+=(libncurses5)
-    host_software_packages+=(qt5-default)
     
     # This fixes missing headers by notifying the linker
     ldconfig
 fi
 
 if [[ $(lsb_release -rs) == "22.04" ]]; then
-    host_software_packages+=(qtbase5-dev)
-
     wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/85-brltty.rules
     sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
