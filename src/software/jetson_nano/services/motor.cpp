@@ -209,6 +209,7 @@ void MotorService::setup()
     }
 
     is_initialized_ = true;
+    LOG(CSV, "velocity_logs.csv") << "front_right,front_left,back_left,back_right";
 }
 
 void MotorService::setUpDriveMotor(uint8_t motor)
@@ -474,6 +475,10 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     TbotsProto::MotorStatus motor_status =
         updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
                           back_right_velocity, dribbler_rpm);
+
+    LOG(DEBUG) << "SLIPPAGE CHECK: " << front_right_velocity - front_left_velocity + back_left_velocity - back_right_velocity;
+
+    LOG(CSV, "velocity_logs.csv") << front_right_velocity << "," << front_left_velocity << "," << back_left_velocity << "," << back_right_velocity << "\n";
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
