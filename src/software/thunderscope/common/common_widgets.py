@@ -145,7 +145,7 @@ class ColorProgressBar(QProgressBar):
 
         :param value: the float value to set
         """
-        super(ColorProgressBar, self).setValue(value * self.decimals)
+        super(ColorProgressBar, self).setValue(int(value * self.decimals))
 
         # clamp percent to make sure it's between 0% and 100%
         percent = self.getPercentage()
