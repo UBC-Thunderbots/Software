@@ -168,7 +168,7 @@ Thunderloop::~Thunderloop() {}
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
     clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
 
-    double loop_duration_seconds = 0.0;
+//    double loop_duration_seconds = 0.0;
 
     for (;;)
     {
