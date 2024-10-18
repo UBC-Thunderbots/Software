@@ -46,7 +46,7 @@ pip_parse(
 pip_parse(
     name = "ansible_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
-    requirements_lock = "//software/jetson_nano/ansible:requirements_lock.txt",
+    requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
 )
 
 pip_parse(
@@ -212,22 +212,6 @@ git_repository(
     commit = "f531f8a8c3f8ca0923f9219c72fcca511555f824",
     remote = "https://github.com/jbeder/yaml-cpp.git",
     shallow_since = "1571237073 -0500",
-)
-
-# Qt bazel rules from https://github.com/justbuchanan/bazel_rules_qt
-git_repository(
-    name = "bazel_rules_qt",
-    commit = "7665177f47bf514176d5f8575a7334f030203e3d",
-    remote = "https://github.com/justbuchanan/bazel_rules_qt.git",
-    shallow_since = "1614109311 -0800",
-)
-
-# Right now qt5 is installed on the system using the setup_software.sh script
-# We assume we can find the headers in the "standard" path used in this rule
-new_local_repository(
-    name = "qt",
-    build_file = "@bazel_rules_qt//:qt.BUILD",
-    path = "/usr/include/x86_64-linux-gnu/qt5/",
 )
 
 new_local_repository(

@@ -43,9 +43,10 @@ static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
 static const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
-static const short unsigned int ROBOT_STATUS_PORT = 42071;
-static const short unsigned int ROBOT_LOGS_PORT   = 42072;
-static const short unsigned int ROBOT_CRASH_PORT  = 42074;
+static const short unsigned int ROBOT_STATUS_PORT      = 42071;
+static const short unsigned int ROBOT_LOGS_PORT        = 42072;
+static const short unsigned int ROBOT_CRASH_PORT       = 42074;
+static const short unsigned int NETWORK_COMM_TEST_PORT = 42075;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip

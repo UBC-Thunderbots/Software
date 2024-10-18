@@ -95,13 +95,13 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
             }
             // Move to destination point while aligning to the ball
             avoid_interference_tactics[idx]->updateControlParams(
-                destination, (ball_pos - robot.position()).orientation(), 0);
+                destination, (ball_pos - robot.position()).orientation());
         }
         else
         {
             // Stay in place while aligning to the ball
             avoid_interference_tactics[idx]->updateControlParams(
-                robot.position(), (ball_pos - robot.position()).orientation(), 0);
+                robot.position(), (ball_pos - robot.position()).orientation());
         }
         tactics_to_run[0].emplace_back(avoid_interference_tactics[idx]);
         idx++;
@@ -140,11 +140,10 @@ void EnemyBallPlacementPlayFSM::enterDefensiveFormation(const Update& event)
     Point right  = world_ptr->ball().position() + right_vector;
 
     move_tactics[0]->updateControlParams(
-        center, positioning_vector.orientation() + Angle::half(), 0);
-    move_tactics[1]->updateControlParams(left, left_vector.orientation() + Angle::half(),
-                                         0);
+        center, positioning_vector.orientation() + Angle::half());
+    move_tactics[1]->updateControlParams(left, left_vector.orientation() + Angle::half());
     move_tactics[2]->updateControlParams(right,
-                                         right_vector.orientation() + Angle::half(), 0);
+                                         right_vector.orientation() + Angle::half());
     tactics_to_run[0].emplace_back(move_tactics[0]);
     tactics_to_run[0].emplace_back(move_tactics[1]);
     tactics_to_run[0].emplace_back(move_tactics[2]);

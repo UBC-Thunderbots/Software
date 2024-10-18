@@ -54,5 +54,4 @@ TEST_P(CSVSinkTest, test_csv_log_levels_not_logging)
 INSTANTIATE_TEST_CASE_P(All, CSVSinkTest,
                         ::testing::Values(std::make_tuple<LEVELS>(LEVELS(INFO)),
                                           std::make_tuple<LEVELS>(LEVELS(DEBUG)),
-                                          std::make_tuple<LEVELS>(LEVELS(ROBOT_STATUS)),
                                           std::make_tuple<LEVELS>(LEVELS(WARNING))));
