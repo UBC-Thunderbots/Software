@@ -38,8 +38,11 @@ py_library(
     srcs = ["robot_info.py"],
     deps = [
         ":motor_fault_view",
+        ":ssh_dialog",
+        "//software/embedded/ansible:run_ansible",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope/common:worker_thread",
         requirement("pyqtgraph"),
     ],
 )
@@ -95,6 +98,16 @@ py_library(
     deps = [
         ":robot_status",
         "//software/thunderscope/robot_diagnostics/robot_error_log_icons:error_log_constants",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "ssh_dialog",
+    srcs = ["ssh_dialog.py"],
+    deps = [
+        "//software/embedded/constants:py_constants",
+        "//software/thunderscope/common:common_widgets",
         requirement("pyqtgraph"),
     ],
 )

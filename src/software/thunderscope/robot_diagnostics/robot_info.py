@@ -10,6 +10,11 @@ from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultV
 import time as time
 from typing import Type
 from collections import deque
+from software.embedded.ansible.run_ansible import AnsibleResult
+from software.thunderscope.common.worker_thread import WorkerThread
+from software.thunderscope.robot_diagnostics.ssh_dialog import SSHDialog
+import subprocess
+import os
 
 
 class BreakbeamLabel(QLabel):
@@ -144,7 +149,31 @@ class RobotInfo(QWidget):
         self.control_mode_menu = self.create_control_mode_menu(available_control_modes)
 
         # Robot Status expand button
-        self.robot_status_expand = self.create_robot_status_expand_button()
+        self.robot_status_expand = QPushButton("Robot Status")
+        self.robot_status_expand.setCheckable(True)
+
+        # Thunderloop menu button
+        self.thunderloop_button = QPushButton("Thunderloop")
+        self.thunderloop_menu = QMenu()
+        self.thunderloop_menu.addAction(
+            "Restart Thunderloop",
+            lambda: self.__run_ansible_playbook("restart_thunderloop.yml"),
+        )
+        self.thunderloop_menu.addAction(
+            "Flash Thunderloop",
+            lambda: self.__run_ansible_playbook("deploy_robot_software.yml"),
+        )
+        self.thunderloop_button.setMenu(self.thunderloop_menu)
+
+        # Workaround for Qt bug where QPushButton does not remove its "open"
+        # pseudo-state after its QMenu is closed
+        self.thunderloop_button.setStyleSheet(
+            "QPushButton:open:!hover { background: transparent; }"
+        )
+
+        # Dialog for entering in credentials to SSH into the robot
+        self.ssh_dialog = SSHDialog(parent=self, robot_id=self.robot_id)
+        self.ssh_connected = False
 
         # motor fault visualisation for the 4 wheel motors
         self.motor_fault_view = MotorFaultView()
@@ -152,6 +181,7 @@ class RobotInfo(QWidget):
         self.control_mode_layout.addWidget(self.motor_fault_view)
         self.control_mode_layout.addWidget(self.control_mode_menu)
         self.control_mode_layout.addWidget(self.robot_status_expand)
+        self.control_mode_layout.addWidget(self.thunderloop_button)
 
         self.status_layout.addLayout(self.control_mode_layout)
 
@@ -184,16 +214,6 @@ class RobotInfo(QWidget):
 
         self.layout.addLayout(self.status_layout)
         self.setLayout(self.layout)
-
-    def create_robot_status_expand_button(self) -> QPushButton:
-        """Creates the button to expand / collapse the robot status view
-
-        :return: QPushButton object
-        """
-        button = QPushButton()
-        button.setCheckable(True)
-        button.setText("INFO")
-        return button
 
     def create_control_mode_menu(
         self, available_control_modes: list[IndividualRobotMode]
@@ -387,3 +407,50 @@ class RobotInfo(QWidget):
         self.previous_primitive_rtt_values.append(new_time)
         sum_rtt_time_milliseconds = sum(self.previous_primitive_rtt_values)
         return int(sum_rtt_time_milliseconds / len(self.previous_primitive_rtt_values))
+
+    def __run_ansible_playbook(self, playbook: str) -> None:
+        """Runs an Ansible playbook on this robot.
+
+        This method runs run_ansible.py via tbots.py to trigger a bazel build
+        of Thunderloop. Certain playbooks (e.g. flashing Thunderloop) require that
+        robot software binaries are built ahead of the playbook execution.
+
+        Ansible connects to the robot via SSH. If there are no previously saved SSH
+        credentials or if connecting to the robot previously failed, the user will be
+        prompted to enter the robot's IP/hostname and user password.
+
+        :param playbook: the playbook to run
+        """
+        if not self.ssh_connected:
+            dialog_accepted = self.ssh_dialog.exec()
+            if not dialog_accepted:
+                return
+
+        def restart_thunderloop() -> AnsibleResult:
+            self.thunderloop_button.setEnabled(False)
+
+            command = f"""
+                ./tbots.py run run_ansible
+                --platform {self.ssh_dialog.robot_platform.value}
+                --playbook {playbook}
+                --hosts {self.ssh_dialog.ssh_host}
+                --ssh_pass {self.ssh_dialog.ssh_password}
+                --timeout 10
+                --jobs 4
+                """
+
+            result = subprocess.run(
+                command.split(), cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", ".")
+            )
+
+            return AnsibleResult(result.returncode)
+
+        def restart_thunderloop_finished(ansible_result: AnsibleResult) -> None:
+            self.thunderloop_button.setEnabled(True)
+            self.ssh_connected = (
+                AnsibleResult.RUN_UNREACHABLE_HOSTS not in ansible_result
+            )
+
+        self.__worker_thread = WorkerThread(restart_thunderloop)
+        self.__worker_thread.finished.connect(restart_thunderloop_finished)
+        self.__worker_thread.start()

@@ -30,6 +30,7 @@ py_binary(
         "//software/power:powerloop_tar",
     ],
     deps = [
+        "//software/embedded/constants:py_constants",
         requirement("ansible"),
     ],
 )

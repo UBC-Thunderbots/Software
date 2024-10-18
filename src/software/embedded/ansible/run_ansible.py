@@ -5,30 +5,50 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
 from ansible.vars.manager import VariableManager
+from enum import Flag
+from software.embedded.constants.py_constants import RobotPlatform, NetworkConstants
+
+import sys
 import os
 import argparse
 import subprocess
 
-# Wrapper around Ansible's Python API, which is used to run scripts on multiple robots (hosts) at once
-# documentation can be found here: https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
-
 HOST_GROUP = "THUNDERBOTS_HOSTS"
-NANO_USER = "robot"
-ROBOT_IP_PREFIX = "192.168.0.20"
+HOST_USERNAME = "robot"
+DEFAULT_SSH_CONNECTION_TIMEOUT = 60
 MAX_NUM_ROBOTS = 8
 
 
-# loads variables, inventory, and play into Ansible API, then runs it
-def ansible_runner(playbook: str, options: dict = {}):
-    loader = DataLoader()
+class AnsibleResult(Flag):
+    """Exit codes indicating the execution status of an Ansible playbook"""
 
-    print("starting ansible run")
+    RUN_OK = 0
+    RUN_ERROR = 1
+    RUN_FAILED_HOSTS = 2
+    RUN_UNREACHABLE_HOSTS = 4
+    RUN_FAILED_BREAK_PLAY = 8
+    RUN_UNKNOWN_ERROR = 255
+
+
+def ansible_runner(playbook: str, options: dict = {}) -> int:
+    """Run an Ansible playbook.
+
+    Ansible is used to remotely run scripts on multiple robots (hosts) at once.
+    Documentation on the Ansible Python API can be found here:
+    https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
+
+    :param playbook: the playbook to run
+    :param options: the options to pass to the playbook executor
+    :return: the exit code from the playbook executor
+    """
+    loader = DataLoader()
 
     # parse options
     vars = set(options.get("extra_vars", []))
     tags = set(options.get("tags", {}))
     skip_tags = set(options.get("skip_tags", {}))
     ssh_pass = options.get("ssh_pass", "")
+    timeout = options.get("timeout", DEFAULT_SSH_CONNECTION_TIMEOUT)
 
     hosts = set(options.get("hosts", []))
     host_aliases = hosts.copy()
@@ -36,19 +56,25 @@ def ansible_runner(playbook: str, options: dict = {}):
     if not hosts:
         # Spawn multiple processes to ping different robots
         ping_processes = {}
-        for i in range(MAX_NUM_ROBOTS):
-            ip = ROBOT_IP_PREFIX + str(i)
-            # Ping 3 times waiting 1s for timeout
-            command = ["ping", "-w 1", "-c 3", ip]
-            ping_processes[i] = subprocess.Popen(command, stdout=subprocess.DEVNULL)
+
+        for robot_id in range(MAX_NUM_ROBOTS):
+            for platform in RobotPlatform:
+                ip = str(NetworkConstants.get_ip_address(robot_id, platform))
+
+                # Ping 3 times waiting 1s for timeout
+                command = f"ping -w 1 -c 3 {ip}"
+                ping_processes[(robot_id, ip)] = subprocess.Popen(
+                    command.split(), stdout=subprocess.DEVNULL
+                )
+
         while ping_processes:
-            for i, proc in ping_processes.items():
+            for (robot_id, ip), proc in ping_processes.items():
                 # Check status of ping processes
                 if proc.poll() is not None:
-                    del ping_processes[i]
+                    del ping_processes[(robot_id, ip)]
                     if proc.returncode == 0:
-                        hosts.add(ROBOT_IP_PREFIX + str(i))
-                        host_aliases.add(i)
+                        hosts.add(ip)
+                        host_aliases.add(robot_id)
                     break
 
     num_forks = len(hosts)
@@ -63,7 +89,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         connection="ssh",
         module_path=None,
         forks=num_forks,
-        remote_user=NANO_USER,
+        remote_user=HOST_USERNAME,
         private_key_file=None,
         ssh_common_args="-o StrictHostKeyChecking=no",
         ssh_extra_args=None,
@@ -75,7 +101,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         start_at_task=None,
         extra_vars=vars,
         skip_tags=skip_tags,
-        timeout=60,  # connection config timeout
+        timeout=timeout,
     )
 
     # for ansible, an inventory represents our fleet of robots. Each host in the inventory belongs to a group.
@@ -102,12 +128,17 @@ def ansible_runner(playbook: str, options: dict = {}):
         passwords={"conn_pass": ssh_pass, "become_pass": ssh_pass},
     )
 
-    pbex.run()
+    return pbex.run()
 
 
-def main():
+if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--playbook", "-pb", required=True, help="The YAML playbook to run")
+    ap.add_argument(
+        "--playbook",
+        "-pb",
+        required=True,
+        help="Ansible playbook to run (must include the .yml extension)",
+    )
     ap.add_argument(
         "--ssh_pass", "-pwd", required=False, help="Password to ssh into hosts"
     )
@@ -119,7 +150,6 @@ def main():
         help="space separated list of hosts to run on",
         default=[],
     )
-
     ap.add_argument(
         "--tags",
         "-t",
@@ -144,11 +174,16 @@ def main():
         help="space separated list of variables to set in the form key=value",
         default=[],
     )
+    ap.add_argument(
+        "--timeout",
+        "-to",
+        required=False,
+        help="SSH connection timeout in seconds",
+        default=DEFAULT_SSH_CONNECTION_TIMEOUT,
+    )
 
     args = vars(ap.parse_args())
 
-    ansible_runner(playbook=args["playbook"], options=args)
+    ansible_result = ansible_runner(playbook=args["playbook"], options=args)
 
-
-if __name__ == "__main__":
-    main()
+    sys.exit(ansible_result)

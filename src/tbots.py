@@ -4,9 +4,22 @@ import os
 import sys
 import iterfzf
 import itertools
-from subprocess import PIPE, run
 import argparse
 from thefuzz import process
+from subprocess import PIPE, run
+from software.embedded.constants.py_constants import RobotPlatform, NetworkConstants
+
+TBOTS_PY_DESCRIPTION = """
+tbots.py is a helper script that simplifies running and testing Bazel targets.
+It finds the Bazel target that most closely matches your search query and then 
+runs a Bazel command with that target.
+
+e.g. ./tbots.py run thunderscope 
+     generates: bazel run //software/thunderscope:thunderscope_main  
+
+tbots.py also accepts various optional arguments that will be passed to Bazel
+or the binary/test being run.
+"""
 
 # thefuzz is a fuzzy string matcher in python
 # https://github.com/seatgeek/thefuzz
@@ -18,7 +31,11 @@ THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run stuff", add_help=False)
+    parser = argparse.ArgumentParser(
+        description=TBOTS_PY_DESCRIPTION,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        add_help=False,
+    )
 
     parser.add_argument("action", choices=["build", "run", "test"])
     parser.add_argument("search_query")
@@ -61,7 +78,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-pwd",
-        "--pwd",
+        "--ssh_pass",
         type=str,
         help="Password used by Ansible when SSHing into the robots",
         action="store",
@@ -81,8 +98,15 @@ if __name__ == "__main__":
         "-pl",
         "--platform",
         type=str,
-        choices=["PI", "NANO"],
+        choices=[platform.value for platform in RobotPlatform],
         help="The platform to build Thunderloop for",
+        action="store",
+    )
+    parser.add_argument(
+        "-j",
+        "--jobs",
+        type=int,
+        help="Limit the maximum number of concurrent jobs Bazel can execute",
         action="store",
     )
 
@@ -94,7 +118,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
     args, unknown_args = parser.parse_known_args()
 
-    if bool(args.flash_robots) ^ bool(args.pwd):
+    if bool(args.flash_robots) ^ bool(args.ssh_pass):
         print(
             "If you want to flash robots, both the robot IDs and password must be provided"
         )
@@ -162,12 +186,8 @@ if __name__ == "__main__":
 
     # Trigger an optimized build by default. Note that Thunderloop should always be
     # compiled with optimizations for best performance
-    if not args.no_optimized_build or args.flash_robots:
+    if not args.no_optimized_build or args.platform:
         command += ["--copt=-O3"]
-
-    # Used for when flashing Jetsons
-    if args.flash_robots:
-        command += ["--cpu=jetson_nano"]
 
     # Select debug binaries to run
     if args.select_debug_binaries:
@@ -183,13 +203,15 @@ if __name__ == "__main__":
         command += ["--cxxopt=-DTRACY_ENABLE"]
 
     if args.platform:
+        command += ["--cpu=jetson_nano"]
         command += ["--//software/embedded:host_platform=" + args.platform]
 
+    if args.jobs:
+        command += ["--jobs=" + str(args.jobs)]
+
     # Don't cache test results
-    if args.action in "test":
+    if args.action == "test":
         command += ["--cache_test_results=false"]
-    if args.action in "run":
-        command += ["--"]
 
     bazel_arguments = unknown_args
     if args.stop_ai_on_start:
@@ -204,11 +226,13 @@ if __name__ == "__main__":
             sys.exit(1)
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        platform_ip = "0" if args.platform == "NANO" else "5"
-        bazel_arguments += [f"192.168.{platform_ip}.20{id}" for id in args.flash_robots]
-        bazel_arguments += ["-pwd", args.pwd]
+        bazel_arguments += [
+            NetworkConstants.get_ip_address(id, RobotPlatform(args.platform))
+            for id in args.flash_robots
+        ]
+        bazel_arguments += ["-pwd", args.ssh_pass]
 
-    if args.action in "test":
+    if args.action == "test":
         command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
 
         if (
@@ -220,18 +244,16 @@ if __name__ == "__main__":
                 "Do not run simulated pytests as a test when debugging, use ./tbots.py -d run instead"
             )
             sys.exit(1)
-
     else:
-        command += bazel_arguments
+        command += ["--"] + bazel_arguments
 
     # If the user requested a command dump, just print the command to run
     if args.print_command:
         print(" ".join(command))
 
-    # Otherwise, run the command! We use os.system here because we don't
-    # care about the output and subprocess doesn't seem to run qt for somereason
+    # Otherwise, run the command! We use os.system here because we don't care
+    # about the output and subprocess doesn't seem to run qt for some reason
     else:
         print(" ".join(command))
-        code = os.system(" ".join(command))
-        # propagate exit code
-        sys.exit(1 if code != 0 else 0)
+        exit_code = os.system(" ".join(command))
+        sys.exit(exit_code)
