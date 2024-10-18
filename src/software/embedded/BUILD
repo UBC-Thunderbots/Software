@@ -109,3 +109,14 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
     ],
 )
+
+cc_library(
+    name = "robot_localizer",
+    srcs = ["robot_localizer.cpp"],
+    hdrs = ["robot_localizer.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/sensor_fusion/filter:kalman_filter",
+        "@eigen"
+    ]
+)

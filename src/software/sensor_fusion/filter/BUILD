@@ -100,3 +100,15 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_library(
+    name = "kalman_filter",
+    srcs = ["kalman_filter.cpp"],
+    hdrs = ["kalman_filter.h"],
+    deps = [
+        "@eigen"
+    ],
+    visibility = [
+        "//visibility:public"
+    ]
+)

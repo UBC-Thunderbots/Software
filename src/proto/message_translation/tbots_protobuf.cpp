@@ -440,7 +440,7 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     }
 
     auto trajectory = std::make_shared<BangBangTrajectory2D>(
-        createPoint(params.start_position()), initial_destination, initial_velocity,
+        createPoint(params.start_position()), initial_destination, initial_velocity, // why were we previously using current initial velocity but skipping forward in time?
         constraints);
 
     TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);

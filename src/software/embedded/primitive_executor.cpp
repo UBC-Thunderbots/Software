@@ -62,7 +62,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
     Vector local_velocity = globalToLocalVelocity(
         trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
-        orientation_ + angular_velocity_*time_step_.toSeconds()/2);
+        orientation_ + angular_velocity_ * time_step_.toSeconds() / 2);
     Point position =
         trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
     double distance_to_destination =
