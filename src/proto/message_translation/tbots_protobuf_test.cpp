@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "software/test_util/equal_within_tolerance.h"
-#include "software/test_util/test_util.h"
+#include "software/test_util/test_util.h"{
 
 class TbotsProtobufTest : public ::testing::Test
 {
