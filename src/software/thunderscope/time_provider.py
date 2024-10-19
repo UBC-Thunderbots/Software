@@ -1,4 +1,5 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+
 
 class TimeProvider:
     """An interface for an object that can provide time information"""

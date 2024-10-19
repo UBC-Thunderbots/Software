@@ -2,7 +2,7 @@ from proto.import_all_protos import *
 from software.logger.logger import createLogger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.ssl_gc_common_pb2 import Team
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 logger = createLogger(__name__)
 

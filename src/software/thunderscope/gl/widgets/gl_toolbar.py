@@ -1,7 +1,7 @@
 import textwrap
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 
 class GLToolbar(QWidget):
@@ -27,13 +27,10 @@ class GLToolbar(QWidget):
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
         self.setLayout(QHBoxLayout())
 
-
     @abstractmethod
     def refresh(self) -> None:
         """Refreshes the UI (overridden by child classes)"""
         raise NotImplementedError("Subclasses must implement this method!")
-
-
 
     def get_button_style(self, is_enabled: bool = True) -> str:
         """Returns the stylesheet for a QPushButton based on if it's enabled or not

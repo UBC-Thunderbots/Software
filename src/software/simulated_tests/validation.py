@@ -1,7 +1,7 @@
 import software.python_bindings as tbots_cpp
 from proto.validation_pb2 import *
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 
 class Validation:

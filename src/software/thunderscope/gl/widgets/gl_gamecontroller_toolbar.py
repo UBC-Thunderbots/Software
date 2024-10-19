@@ -111,12 +111,9 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.layout().addWidget(self.gc_browser_button)
         self.layout().addStretch()
 
-
-
     def refresh(self) -> None:
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
-
 
     def __add_separator(self, layout: QBoxLayout) -> None:
         """Adds a separator line with enough spacing to the given layout
