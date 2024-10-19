@@ -20,6 +20,7 @@ int main(int argc, char **argv)
         int num_messages           = 100;
         int message_size_bytes     = 200;
         int timeout_duration_ms    = 10;
+        int initial_delay_s        = 20;
     };
 
     CommandLineArgs args;
@@ -54,6 +55,9 @@ int main(int argc, char **argv)
     desc.add_options()("timeout_duration_ms",
                        boost::program_options::value<int>(&args.timeout_duration_ms),
                        "The duration in milliseconds to wait for a response.");
+    desc.add_options()("initial_delay_s",
+            boost::program_options::value<int>(&args.initial_delay_s),
+            "The initial delay to wait before sending packets (s)");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -70,7 +74,7 @@ int main(int argc, char **argv)
         LatencyTesterPrimaryNode tester(args.interface,
             args.listen_channel, args.listen_port, args.send_channel, args.send_port,
             args.message_size_bytes, std::chrono::milliseconds(args.timeout_duration_ms));
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(args.initial_delay_s));
         tester.runTest(args.num_messages);
     }
 }
