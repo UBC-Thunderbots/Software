@@ -52,7 +52,7 @@ class GLLabel(GLPainter):
             QtCore.QRectF(0, 0, 0, 0),
             QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter,
             str(self.text),
-            )
+        )
 
         width = round(bounds.width())
         height = round(bounds.height())
