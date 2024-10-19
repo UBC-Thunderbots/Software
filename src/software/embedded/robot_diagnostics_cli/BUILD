@@ -13,7 +13,11 @@ compile_pip_requirements(
 py_binary(
     name = "robot_diagnostics_cli",
     srcs = [
-        ":robot_diagnostics_cli.py"
+        ":robot_diagnostics_cli.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+        "//software:python_bindings.so",
     ],
     deps = [
         requirement("typer"),
