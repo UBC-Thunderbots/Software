@@ -2,7 +2,7 @@ from proto.import_all_protos import *
 from software.logger.logger import createLogger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.ssl_gc_common_pb2 import Team
-
+from abc import abstractmethod
 
 logger = createLogger(__name__)
 
@@ -128,6 +128,7 @@ class TbotsTestRunner:
 
         fs_proto_unix_io.send_proto(Play, play)
 
+    @abstractmethod
     def set_worldState(self, worldstate: WorldState):
         """Sets the worldstate for the given team
 
@@ -135,6 +136,7 @@ class TbotsTestRunner:
         """
         raise NotImplementedError("abstract class method called set_worldstate")
 
+    @abstractmethod
     def run_test(
         self,
         always_validation_sequence_set=[[]],
