@@ -10,7 +10,7 @@ from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultV
 import time as time
 from typing import Type
 from collections import deque
-from software.embedded.ansible.run_ansible import AnsibleResult
+from software.embedded.constants.py_constants import AnsibleResult
 from software.thunderscope.common.worker_thread import WorkerThread
 from software.thunderscope.robot_diagnostics.ssh_dialog import SSHDialog
 import subprocess

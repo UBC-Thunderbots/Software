@@ -34,3 +34,14 @@ class NetworkConstants:
             return NetworkConstants.NANO_SUBNET[host]
         elif platform == RobotPlatform.PI:
             return NetworkConstants.PI_WIFI_5_SUBNET[host]
+
+
+class AnsibleResult(Flag):
+    """Exit codes indicating the execution status of an Ansible playbook"""
+
+    RUN_OK = 0
+    RUN_ERROR = 1
+    RUN_FAILED_HOSTS = 2
+    RUN_UNREACHABLE_HOSTS = 4
+    RUN_FAILED_BREAK_PLAY = 8
+    RUN_UNKNOWN_ERROR = 255

@@ -39,7 +39,7 @@ py_library(
     deps = [
         ":motor_fault_view",
         ":ssh_dialog",
-        "//software/embedded/ansible:run_ansible",
+        "//software/embedded/constants:py_constants",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
         "//software/thunderscope/common:worker_thread",

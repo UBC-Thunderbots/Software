@@ -5,7 +5,6 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
 from ansible.vars.manager import VariableManager
-from enum import Flag
 from software.embedded.constants.py_constants import RobotPlatform, NetworkConstants
 
 import sys
@@ -17,17 +16,6 @@ HOST_GROUP = "THUNDERBOTS_HOSTS"
 HOST_USERNAME = "robot"
 DEFAULT_SSH_CONNECTION_TIMEOUT = 60
 MAX_NUM_ROBOTS = 8
-
-
-class AnsibleResult(Flag):
-    """Exit codes indicating the execution status of an Ansible playbook"""
-
-    RUN_OK = 0
-    RUN_ERROR = 1
-    RUN_FAILED_HOSTS = 2
-    RUN_UNREACHABLE_HOSTS = 4
-    RUN_FAILED_BREAK_PLAY = 8
-    RUN_UNKNOWN_ERROR = 255
 
 
 def ansible_runner(playbook: str, options: dict = {}) -> int:
