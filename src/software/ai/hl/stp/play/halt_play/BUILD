@@ -4,8 +4,10 @@ load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 cc_library(
     name = "halt_play",
-    srcs = ["halt_play.cpp"],
-    hdrs = ["halt_play.h"],
+    srcs = ["halt_play.cpp",
+            "halt_play_fsm.cpp"],
+    hdrs = ["halt_play.h",
+            "halt_play_fsm.h"],
     deps = [
         "//software/ai/hl/stp/play:play",
         "//shared:constants",
