@@ -476,12 +476,13 @@ void Thunderloop::updateErrorCodes()
 void Thunderloop::waitForNetworkUp()
 {
     std::optional<std::string> error;
-    ThreadedUdpSender network_test(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)),
-        NETWORK_COMM_TEST_PORT, network_interface_, true, error);
+    ThreadedUdpSender network_test(std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)),
+                                   NETWORK_COMM_TEST_PORT, network_interface_, true,
+                                   error);
     if (error.has_value())
     {
-        LOG(FATAL) << "Thunderloop cannot connect to the network. Error: " << error.value();
+        LOG(FATAL) << "Thunderloop cannot connect to the network. Error: "
+                   << error.value();
     }
 
     // Send an empty packet on the specific network interface to
