@@ -126,13 +126,13 @@ class GLRefereeInfoLayer(GLLayer):
             new_placement_point = ball_placement_vis_proto.ball_placement_point
             if not self.ball_placement_in_progress:
                 # initialize the visuals
-                self.__display_ball_placement(new_placement_point)
+                self.__display_ball_placement_visuals(new_placement_point)
                 self.ball_placement_in_progress = True
             self.ball_placement_point = new_placement_point
         elif self.ball_placement_in_progress:
-            # finish ball placement visualization
-            self.__hide_visuals()
-            self.ball_placement_in_progress = False
+                # finish ball placement visualization
+                self.__hide_ball_placement_visuals()
+                self.ball_placement_in_progress = False
 
     def __update_referee_info(self):
         """Update gamestate and command info text displays"""
@@ -170,7 +170,7 @@ class GLRefereeInfoLayer(GLLayer):
             )
 
     def refresh_graphics(self) -> None:
-        """Refresh all displays in the layer"""
+        """Refresh all visuals for both ball placement and referee info"""
         self.cached_world = self.world_buffer.get(block=False, return_cached=True)
 
         self.__update_referee_info()
@@ -219,8 +219,9 @@ class GLRefereeInfoLayer(GLLayer):
         )
         self.ball_placement_countdown_graphic.setData(text=f"{time_left}s")
 
-    def __display_ball_placement(self, new_placement_point: Point) -> None:
-        """Display ball placement visuals
+    def __display_ball_placement_visuals(self, new_placement_point: Point) -> None:
+        """
+        Display ball placement visuals
         :param new_placement_point: ball placement point
         """
         self.ball_placement_point = new_placement_point
@@ -260,8 +261,10 @@ class GLRefereeInfoLayer(GLLayer):
         self.placement_start_time = time.time()
         self.ball_placement_in_progress = False
 
-    def __hide_visuals(self) -> None:
-        """Hide all the visuals"""
+    def __hide_ball_placement_visuals(self) -> None:
+        """
+        Hide all the visuals for ball placement
+        """
         self.placement_tolerance_graphic.hide()
         self.placement_target_graphic.hide()
         self.robot_avoid_circle_graphic.hide()
