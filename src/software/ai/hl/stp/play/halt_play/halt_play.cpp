@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/halt_play.h"
+#include "software/ai/hl/stp/play/halt_play/halt_play.h"
 
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"

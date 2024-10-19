@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <unordered_set>
 
-#include "software/ai/hl/stp/play/halt_play.h"
+#include "software/ai/hl/stp/play/halt_play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"

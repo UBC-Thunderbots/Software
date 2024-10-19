@@ -1,6 +1,6 @@
-#include "software/ai/hl/stp/play/halt_play.h"
+#include "software/ai/hl/stp/play/halt_play/halt_play.h"
 
-#include <gtest/gtest.h>
+#include <include/gtest/gtest.h>
 
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
