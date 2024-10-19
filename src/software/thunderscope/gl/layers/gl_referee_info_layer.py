@@ -41,12 +41,13 @@ class GLRefereeInfoLayer(GLLayer):
     ) -> bool:
         """Returns true if the point is in the circle.
 
-        :param point: coordinates of a point in xy plane.
-        :param center: coordinates of the circle center in xy plane.
+        :param point: a point on xy plane
+        :param center: center point of the circle
         :param radius: radius of the circle
         :return: true if the point is in the circle.
         """
-        return math.dist(point, center) < radius
+        return math.dist((point.x_meters, point.y_meters),
+                         (center.x_meters, center.y_meters)) < radius
 
     def __init__(self, name: str, buffer_size: int = 1) -> None:
         """Initialize the GLRefereeInfoLayer
@@ -110,18 +111,20 @@ class GLRefereeInfoLayer(GLLayer):
                 color=self.COUNT_DOWN_TEXT_COLOR,
             )
 
+        # if ball placement is in progress, update all the visuals
+        if self.ball_placement_in_progress:
+            self.__update_ball_placement_status(self.cached_world.ball.current_state, self.ball_placement_point)
+            self.__update_target_visual()
+
         if ball_placement_vis_proto:
-            self.ball_placement_in_progress = True
-            # move the ball placement graphics to the new point
             new_placement_point = ball_placement_vis_proto.ball_placement_point
-            ball_state = self.cached_world.ball.current_state
-            if self.ball_placement_in_progress:
+            if not self.ball_placement_in_progress:
+                # initialize the visuals
                 self.__display_ball_placement(new_placement_point)
-            else:
-                self.__update_ball_placement_status(ball_state, new_placement_point)
-                self.__update_target_visual()
-        else:
-            if self.ball_placement_in_progress:
+                self.ball_placement_in_progress = True
+            self.ball_placement_point = new_placement_point
+        elif self.ball_placement_in_progress:
+                # finish ball placement visualization
                 self.__hide_visuals()
                 self.ball_placement_in_progress = False
 
@@ -175,11 +178,8 @@ class GLRefereeInfoLayer(GLLayer):
         :param new_placement_point: new ball placement point to visualize
         """
         if GLRefereeInfoLayer.is_point_in_circle(
-                (
-                        ball_state.global_position.x_meters,
-                        ball_state.global_position.y_meters,
-                ),
-                (new_placement_point.x_meters, new_placement_point.y_meters),
+                ball_state.global_position,
+                new_placement_point,
                 BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
         ):
             self.placement_tolerance_graphic.set_outline_color(
@@ -204,7 +204,7 @@ class GLRefereeInfoLayer(GLLayer):
                 self.placement_target_graphic.radius + 0.01
             )
             self.shrink_target = (
-                    self.placement_target_graphic.radius >= BALL_PLACEMENT_TOLERANCE_RADIUS_METERS
+                self.placement_target_graphic.radius >= BALL_PLACEMENT_TOLERANCE_RADIUS_METERS
             )
 
         # update the count-down graphics

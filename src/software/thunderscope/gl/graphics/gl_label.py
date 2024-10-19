@@ -26,6 +26,10 @@ class GLLabel(GLPainter):
         :param text_color: The color for rendering the text.
         :param offset: The offset (x, y) from the viewport left and top edge
                        to use when positioning the label.
+                       If x is negative then the x offset is |x| pixels from
+                       the viewport right edge.
+                       If y is negative then the y offset is |y| pixels from
+                       the viewport bottom edge.
         :param text: The optional title to display above the legend
         """
         super().__init__(parent_item=parent_item)
@@ -39,7 +43,6 @@ class GLLabel(GLPainter):
 
     def draw_label(self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect) -> None:
         """Draw the label
-
         :param painter: The QPainter to perform drawing operations with
         :param viewport_rect: The QRect indicating the viewport dimensions
         """
@@ -49,10 +52,20 @@ class GLLabel(GLPainter):
             QtCore.QRectF(0, 0, 0, 0),
             QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter,
             str(self.text),
-        )
+            )
 
-        x = viewport_rect.left() + self.offset[0]
-        y = viewport_rect.top() + self.offset[1]
+        width = round(bounds.width())
+        height = round(bounds.height())
+
+        # Determine x and y coordinates of the label
+        if self.offset[0] < 0:
+            x = viewport_rect.right() + self.offset[0] - width
+        else:
+            x = viewport_rect.left() + self.offset[0]
+        if self.offset[1] < 0:
+            y = viewport_rect.bottom() + self.offset[1] - height
+        else:
+            y = viewport_rect.top() + self.offset[1]
 
         if self.text:
             painter.drawText(QtCore.QPoint(x, y), self.text)
