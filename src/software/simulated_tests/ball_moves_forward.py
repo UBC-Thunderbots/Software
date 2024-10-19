@@ -8,6 +8,8 @@ from software.simulated_tests.validation import (
 )
 
 
+
+
 class BallMovesForward(Validation):
     """Checks if ball is moving forward, i.e. in the +x direction"""
 

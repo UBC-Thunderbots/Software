@@ -255,6 +255,8 @@ class GLWidget(QWidget):
             self.gl_view_widget.removeItem(layer)
             layer = layer.related_layer
 
+
+
     def refresh(self) -> None:
         """Trigger an update on all the layers"""
         if self.player:
@@ -277,6 +279,7 @@ class GLWidget(QWidget):
                     if layer.visible():
                         layer.refresh_graphics()
                     layer = layer.related_layer
+
 
     def set_camera_view(self, camera_view: CameraView) -> None:
         """Set the camera position to a preset camera view
