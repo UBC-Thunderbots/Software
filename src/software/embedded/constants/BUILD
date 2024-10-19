@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@rules_python//python:defs.bzl", "py_library")
+
 cc_library(
     name = "constants",
     hdrs = [
@@ -14,4 +16,9 @@ cc_library(
     deps = [
         "//software/embedded:platform",
     ],
+)
+
+py_library(
+    name = "py_constants",
+    srcs = ["py_constants.py"],
 )

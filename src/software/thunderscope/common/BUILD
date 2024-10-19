@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@thunderscope_deps//:requirements.bzl", "requirement")
+
 py_library(
     name = "proto_configuration_widget",
     srcs = ["proto_configuration_widget.py"],
@@ -39,5 +41,13 @@ py_library(
     srcs = ["fps_widget.py"],
     deps = [
         ":frametime_counter",
+    ],
+)
+
+py_library(
+    name = "worker_thread",
+    srcs = ["worker_thread.py"],
+    deps = [
+        requirement("pyqtgraph"),
     ],
 )
