@@ -62,6 +62,7 @@ cc_library(
         "//software/util/scoped_timespec_timer",
         "//software/world:team",
         "@tracy",
+        "//software/embedded:robot_localizer"
     ],
 )
 
@@ -110,6 +111,15 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "robot_localizer_test",
+    srcs = ["robot_localizer_test.cpp"],
+    deps = [
+        ":robot_localizer",
+        "//shared/test_util:tbots_gtest_main"
+    ]
+)
+
 cc_library(
     name = "robot_localizer",
     srcs = ["robot_localizer.cpp"],
@@ -117,6 +127,10 @@ cc_library(
     deps = [
         "//proto:tbots_cc_proto",
         "//software/sensor_fusion/filter:kalman_filter",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software:constants",
+        "//software/util/scoped_timespec_timer",
         "@eigen"
     ]
 )

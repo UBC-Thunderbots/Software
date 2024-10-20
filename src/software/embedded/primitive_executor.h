@@ -41,7 +41,8 @@ class PrimitiveExecutor
      * @param angular_velocity The current angular velocity
      */
     void updateVelocity(const Vector &local_velocity,
-                        const AngularVelocity &angular_velocity);
+                        const AngularVelocity &angular_velocity,
+                        const Angle &orientation);
 
     /**
      * Set the robot id
@@ -75,7 +76,8 @@ class PrimitiveExecutor
     AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
-    Duration time_since_trajectory_creation_;
+    Duration time_since_angular_trajectory_creation_;
+    Duration time_since_linear_trajectory_creation_;
     Vector velocity_;
     AngularVelocity angular_velocity_;
     Angle orientation_;

@@ -16,6 +16,7 @@
 #include "software/embedded/services/power.h"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
+#include "software/embedded/robot_localizer.h"
 
 class Thunderloop
 {
@@ -137,6 +138,9 @@ class Thunderloop
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
+
+    // Robot localization model
+    RobotLocalizer robot_localizer_;
 
     // 500 millisecond timeout on receiving primitives before we stop the robots
     const double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;

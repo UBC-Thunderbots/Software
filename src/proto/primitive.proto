@@ -105,6 +105,8 @@ message Primitive
         StopPrimitive stop                    = 2;
         DirectControlPrimitive direct_control = 3;
     }
+    Angle orientation = 4;
+
 }
 
 message MovePrimitive

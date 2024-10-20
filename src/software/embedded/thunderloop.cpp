@@ -84,7 +84,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
-                          TeamColour::YELLOW, robot_id_)
+                          TeamColour::YELLOW, robot_id_),
+      robot_localizer_(8.0*8.0, 0.08*0.08, 4.0)
 {
     waitForNetworkUp();
 
@@ -224,6 +225,8 @@ Thunderloop::~Thunderloop() {}
                 // Save new primitive set
                 primitive_set_ = new_primitive_set;
 
+                robot_localizer_.UpdateVision(createAngle(primitive_set_.robot_orientations().at(robot_id_)), 0.04);
+
                 // Update primitive executor's primitive set
                 {
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
@@ -242,10 +245,20 @@ Thunderloop::~Thunderloop() {}
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
+                robot_localizer_.UpdateEncoders(createAngularVelocity(status.angular_velocity()));
+                // Step the robot localizer
+                robot_localizer_.Step(AngularVelocity::zero());
                 primitive_executor_.updateVelocity(
-                    createVector(status.local_velocity()),
-                    createAngularVelocity(status.angular_velocity()));
+                        createVector(status.local_velocity()),
+                        robot_localizer_.getAngularVelocity(),
+                        robot_localizer_.getOrientation());
             }
+            else {
+                // Step the robot localizer
+                robot_localizer_.Step(AngularVelocity::zero());
+            }
+
+
 
             // Timeout Overrides for Primitives
             // These should be after the new primitive update section above

@@ -4,6 +4,7 @@ package TbotsProto;
 
 import "proto/primitive.proto";
 import "proto/tbots_timestamp_msg.proto";
+import "proto/geometry.proto";
 
 message PrimitiveSet
 {
@@ -15,6 +16,8 @@ message PrimitiveSet
 
     // Robot ID to RadioPrimitive map
     map<uint32, Primitive> robot_primitives = 3;
+
+    map<uint32, Angle> robot_orientations = 5;
 
     uint64 sequence_number = 4;
 }
