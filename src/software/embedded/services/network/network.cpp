@@ -7,8 +7,6 @@ NetworkService::NetworkService(const std::string& ip_address,
 {
     sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
         ip_address, robot_status_sender_port, multicast);
-    local_sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
-            "127.0.0.1", robot_status_sender_port, multicast);
 
     udp_listener_primitive_set =
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(

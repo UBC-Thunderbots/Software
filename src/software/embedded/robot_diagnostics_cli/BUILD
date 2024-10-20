@@ -20,7 +20,7 @@ py_binary(
         "//software:python_bindings.so",
     ],
     deps = [
-        requirement("typer"),
+        requirement("typer_shell"),
         requirement("rich"),
     ],
 )
