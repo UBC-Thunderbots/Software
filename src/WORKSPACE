@@ -55,10 +55,17 @@ pip_parse(
     requirements_lock = "//software/simulated_tests:requirements_lock.txt",
 )
 
+pip_parse(
+    name = "robot_diagnostics_cli_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
+)
+
 load("@nanopb_deps//:requirements.bzl", nanopb_install_deps = "install_deps")
 load("@thunderscope_deps//:requirements.bzl", thunderscope_install_deps = "install_deps")
 load("@ansible_deps//:requirements.bzl", ansible_install_deps = "install_deps")
 load("@simulated_tests_deps//:requirements.bzl", simulated_tests_install_deps = "install_deps")
+load("@robot_diagnostics_cli_deps//:requirements.bzl", robot_diagnostics_cli_install_deps = "install_deps")
 
 nanopb_install_deps()
 
@@ -67,6 +74,8 @@ thunderscope_install_deps()
 ansible_install_deps()
 
 simulated_tests_install_deps()
+
+robot_diagnostics_cli_install_deps()
 
 all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
 

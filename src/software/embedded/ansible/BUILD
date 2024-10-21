@@ -28,6 +28,7 @@ py_binary(
         "//software/embedded/redis",
         "//software/embedded/services:robot_auto_test",
         "//software/power:powerloop_tar",
+#        INSERT SCRIPT HERE
     ],
     deps = [
         requirement("ansible"),
