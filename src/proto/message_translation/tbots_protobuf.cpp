@@ -321,8 +321,8 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
 {
     auto plot_juggler_value_msg = std::make_unique<TbotsProto::PlotJugglerValue>();
     double now =
-        static_cast<double>(std::chrono::system_clock::now().time_since_epoch().count() /
-                            NANOSECONDS_PER_SECOND);
+        static_cast<double>(std::chrono::system_clock::now().time_since_epoch().count()) /
+        NANOSECONDS_PER_SECOND;
     plot_juggler_value_msg->set_timestamp(now);
     for (auto const& [key, val] : values)
     {
@@ -479,8 +479,8 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2));
 }
 
-double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
-                                          RobotConstants_t robot_constants)
+int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
+                                       RobotConstants_t robot_constants)
 {
     switch (dribbler_mode)
     {
@@ -489,10 +489,10 @@ double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode
         case TbotsProto::DribblerMode::MAX_FORCE:
             return robot_constants.max_force_dribbler_speed_rpm;
         case TbotsProto::DribblerMode::OFF:
-            return 0.0;
+            return 0;
         default:
             LOG(WARNING) << "DribblerMode is invalid" << std::endl;
-            return 0.0;
+            return 0;
     }
 }
 

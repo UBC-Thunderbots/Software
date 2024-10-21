@@ -203,7 +203,7 @@ if __name__ == "__main__":
         command += ["--cxxopt=-DTRACY_ENABLE"]
 
     if args.platform:
-        command += ["--cpu=jetson_nano"]
+        command += ["--platforms=//cc_toolchain:robot"]
         command += ["--//software/embedded:host_platform=" + args.platform]
 
     if args.jobs:
