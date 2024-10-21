@@ -106,3 +106,12 @@ py_library(
         ":gl_shape",
     ],
 )
+
+py_library(
+    name = "gl_label",
+    srcs = ["gl_label.py"],
+    deps = [
+        requirement("pyqtgraph"),
+        ":gl_shape",
+    ],
+)
