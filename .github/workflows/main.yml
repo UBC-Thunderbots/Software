@@ -43,6 +43,7 @@ jobs:
           bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//cc_toolchain:robot
 
       - name: Raspberry Pi Build Test
+
         run: |
           cd src
           bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//cc_toolchain:robot
@@ -177,3 +178,17 @@ jobs:
           name: yellow-ai-vs-ai-proto-logs
           path: |
             /tmp/tbots/yellow/proto_*
+
+  alternate-build-status:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    name: Alternate Build Status
+    needs: [multiplatform-build]
+    steps:
+      - run: |
+          result="${{ needs.multiplatform-build.result }}"
+          if [[ $result == "success" ]]; then
+            exit 0
+          else
+            exit 1
+          fi
