@@ -43,7 +43,6 @@ jobs:
           bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//cc_toolchain:robot
 
       - name: Raspberry Pi Build Test
-
         run: |
           cd src
           bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//cc_toolchain:robot
