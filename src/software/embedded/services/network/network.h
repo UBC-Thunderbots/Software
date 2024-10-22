@@ -89,7 +89,6 @@ class NetworkService
     std::mutex primitive_set_mutex;
 
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotStatus>> sender;
-    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotStatus>> local_sender;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>
         udp_listener_primitive_set;
     std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::PrimitiveSet>>

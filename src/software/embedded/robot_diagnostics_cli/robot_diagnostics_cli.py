@@ -1,9 +1,8 @@
 from rich import print
 from rich.live import Live
 from rich.table import Table
-import random
-import software.python_bindings as tbots_cpp
-from software.py_constants import *
+# import software.python_bindings as tbots_cpp
+# from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
 
@@ -113,6 +112,12 @@ class RobotDiagnosticsCLI():
 
     def restart_thunderloop(self):
         # Execute some bash command
+        pass
+
+    def emote(self):
+        pass
+    def move_wheel(self):
+        # py_inquire wheel choice or use sub shell
         pass
 
 

@@ -31,7 +31,6 @@ TbotsProto::PrimitiveSet NetworkService::poll(TbotsProto::RobotStatus& robot_sta
         last_breakbeam_state_sent = robot_status.power_status().breakbeam_tripped();
         updatePrimitiveSetLog(robot_status);
         sender->sendProto(robot_status);
-        local_sender->sendProto(robot_status);
         network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
     }
     thunderloop_ticks = (thunderloop_ticks + 1) % THUNDERLOOP_HZ;
