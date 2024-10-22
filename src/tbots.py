@@ -118,7 +118,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
     args, unknown_args = parser.parse_known_args()
 
-    if bool(args.flash_robots) ^ bool(args.ssh_pass):
+    if args.flash_robots and not args.ssh_pass:
         print(
             "If you want to flash robots, both the robot IDs and password must be provided"
         )

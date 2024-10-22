@@ -8,7 +8,7 @@ import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
-from typing import Type
+from typing import Type, Optional
 from collections import deque
 from software.embedded.constants.py_constants import AnsibleResult
 from software.thunderscope.common.worker_thread import WorkerThread
@@ -152,12 +152,24 @@ class RobotInfo(QWidget):
         self.robot_status_expand = QPushButton("Robot Status")
         self.robot_status_expand.setCheckable(True)
 
-        # Thunderloop menu button
-        self.thunderloop_button = QPushButton("Thunderloop")
+        # Thunderloop button
+        self.thunderloop_button = QPushButton()
+        thunderloop_button_layout = QHBoxLayout()
+        thunderloop_button_layout.addWidget(QPushButton("Status"))
+        thunderloop_button_layout.addWidget(QLabel("Thunderloop"))
+        self.thunderloop_button.setLayout(thunderloop_button_layout)
+
+        # Thunderloop menu
         self.thunderloop_menu = QMenu()
         self.thunderloop_menu.addAction(
+            "Get Thunderloop Status",
+            lambda: self.__run_ansible_playbook("misc.yml", ["thunderloop_status"]),
+        )
+        self.thunderloop_menu.addAction(
             "Restart Thunderloop",
-            lambda: self.__run_ansible_playbook("restart_thunderloop.yml"),
+            lambda: self.__run_ansible_playbook(
+                "misc.yml", ["restart_thunderloop", "thunderloop_status"]
+            ),
         )
         self.thunderloop_menu.addAction(
             "Flash Thunderloop",
@@ -408,7 +420,9 @@ class RobotInfo(QWidget):
         sum_rtt_time_milliseconds = sum(self.previous_primitive_rtt_values)
         return int(sum_rtt_time_milliseconds / len(self.previous_primitive_rtt_values))
 
-    def __run_ansible_playbook(self, playbook: str) -> None:
+    def __run_ansible_playbook(
+        self, playbook: str, tags: Optional[list[str]] = None
+    ) -> None:
         """Runs an Ansible playbook on this robot.
 
         This method runs run_ansible.py via tbots.py to trigger a bazel build
@@ -420,13 +434,15 @@ class RobotInfo(QWidget):
         prompted to enter the robot's IP/hostname and user password.
 
         :param playbook: the playbook to run
+        :param tags: tags to pass to the playbook executor; if provided, only tasks
+                     with the selected tags will be run
         """
         if not self.ssh_connected:
             dialog_accepted = self.ssh_dialog.exec()
             if not dialog_accepted:
                 return
 
-        def restart_thunderloop() -> AnsibleResult:
+        def run_playbook() -> AnsibleResult:
             self.thunderloop_button.setEnabled(False)
 
             command = f"""
@@ -439,18 +455,21 @@ class RobotInfo(QWidget):
                 --jobs 4
                 """
 
+            if tags:
+                command += f"--tags {" ".join(tags)}"
+
             result = subprocess.run(
                 command.split(), cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", ".")
             )
 
             return AnsibleResult(result.returncode)
 
-        def restart_thunderloop_finished(ansible_result: AnsibleResult) -> None:
+        def on_playbook_finished(ansible_result: AnsibleResult) -> None:
             self.thunderloop_button.setEnabled(True)
             self.ssh_connected = (
                 AnsibleResult.RUN_UNREACHABLE_HOSTS not in ansible_result
             )
 
-        self.__worker_thread = WorkerThread(restart_thunderloop)
-        self.__worker_thread.finished.connect(restart_thunderloop_finished)
+        self.__worker_thread = WorkerThread(run_playbook)
+        self.__worker_thread.finished.connect(on_playbook_finished)
         self.__worker_thread.start()
