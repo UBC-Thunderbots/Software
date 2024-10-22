@@ -11,7 +11,7 @@
       - start
     binary_paths:
       thunderloop: ../../thunderloop_main
-  #      // ADD SOMETHINGS HERE
+#      // ADD SOMETHINGS HERE
 
   tasks:
 
@@ -65,7 +65,7 @@
             loop_var: service_name
           when: "'sync' in actions"
           tags: always
-#
+
         - name: Start Services
           become: true
           become_method: sudo
