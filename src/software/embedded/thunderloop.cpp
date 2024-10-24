@@ -118,11 +118,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
-
-    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
-    g_motor_service = motor_service_.get();
-    motor_service_->setup();
-    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
+//
+//    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+//    g_motor_service = motor_service_.get();
+//    motor_service_->setup();
+//    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -166,7 +166,7 @@ void Thunderloop::runLoop()
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
 
-    double loop_duration_seconds = 0.0;
+//    double loop_duration_seconds = 0.0;
 
     for (;;)
     {
@@ -322,8 +322,9 @@ void Thunderloop::runLoop()
 
                 ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
 
-                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
-                                                     loop_duration_seconds);
+//                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
+//                                                     loop_duration_seconds);
+                motor_status_ = std::nullopt;
             }
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
@@ -337,7 +338,7 @@ void Thunderloop::runLoop()
             robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
             *(robot_status_.mutable_time_sent())             = time_sent_;
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
-            *(robot_status_.mutable_motor_status())          = motor_status_.value();
+//            *(robot_status_.mutable_motor_status())          = motor_status_.value();
             *(robot_status_.mutable_power_status())          = power_status_;
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
@@ -365,8 +366,8 @@ void Thunderloop::runLoop()
                                                   NANOSECONDS_PER_MILLISECOND);
 
         // Make sure the iteration can fit inside the period of the loop
-        loop_duration_seconds =
-            static_cast<double>(loop_duration_ns) * SECONDS_PER_NANOSECOND;
+//        loop_duration_seconds =
+//            static_cast<double>(loop_duration_ns) * SECONDS_PER_NANOSECOND;
 
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - static_cast<long int>(loop_duration_ns);
