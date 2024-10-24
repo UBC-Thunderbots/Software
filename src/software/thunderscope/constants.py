@@ -265,6 +265,7 @@ class Colors:
     ROBOT_MIDDLE_BLUE = QtGui.QColor(0, 0, 255, 255)
     PINK = QtGui.QColor(255, 0, 255)
     GREEN = QtGui.QColor(0, 255, 0)
+    RED = QtGui.QColor(255, 0, 0, 255)
 
     # Creates a default vision pattern lookup with the actual colors used on the robots
     VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(PINK, GREEN)
