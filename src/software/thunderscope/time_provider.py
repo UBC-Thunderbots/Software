@@ -1,6 +1,10 @@
+from abc import abstractmethod
+
+
 class TimeProvider:
     """An interface for an object that can provide time information"""
 
+    @abstractmethod
     def time_provider(self) -> float:
         """Provide the current time in seconds since the epoch"""
         raise NotImplementedError(
