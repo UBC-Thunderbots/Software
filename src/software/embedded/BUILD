@@ -90,6 +90,10 @@ cc_binary(
         "-lpthread",
         "-lrt",
     ],
+    target_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
     deps = [
         ":thunderloop",
         "@boost//:program_options",
