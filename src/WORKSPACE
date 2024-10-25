@@ -27,7 +27,8 @@ load("@rules_python//python:repositories.bzl", "py_repositories")
 
 py_repositories()
 
-register_toolchains("//:py_toolchain")
+register_toolchains("//py_toolchain:py_toolchain")
+register_toolchains("//py_toolchain:k8_jetson_nano_cross_compile_py_cc_toolchain")
 
 load("@rules_python//python:pip.bzl", "pip_parse")
 
@@ -353,7 +354,7 @@ python_configure(
 # These headers are used by pybind11
 bind(
     name = "python_headers",
-    actual = "@local_config_python//:python_headers",
+    actual = "@rules_python//python/cc:current_py_cc_headers",
 )
 
 maybe(
