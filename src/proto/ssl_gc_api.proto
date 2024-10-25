@@ -56,4 +56,6 @@ message Input
     optional bool reset_match = 2;
     // An updated config delta
     optional Config config_delta = 3;
+    // Continue with action
+    optional ContinueAction continue_action = 4;
 }

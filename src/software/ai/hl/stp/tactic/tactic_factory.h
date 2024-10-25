@@ -42,7 +42,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ReceiverTactic &tactic_pr
                                      TbotsProto::AiConfig ai_config);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config);
-std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
+std::shared_ptr<Tactic> createTactic(const TbotsProto::HaltTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config);
 
 /**

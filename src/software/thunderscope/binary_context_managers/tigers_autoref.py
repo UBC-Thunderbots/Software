@@ -101,14 +101,15 @@ class TigersAutoref(TimeProvider):
 
         :return: a list of CiOutput protos from the Gamecontroller
         """
-        game_event_proto_map = Config()
+        gc_engine_config = Config()
+        gc_engine_config.auto_continue = True
 
         for game_event in GameEvent.Type.DESCRIPTOR.values_by_name:
-            game_event_proto_map.game_event_behavior[game_event] = (
+            gc_engine_config.game_event_behavior[game_event] = (
                 Config.Behavior.BEHAVIOR_ACCEPT
             )
 
-        return self.gamecontroller.update_game_engine_config(game_event_proto_map)
+        return self.gamecontroller.update_game_engine_config(gc_engine_config)
 
     def _send_geometry(self) -> None:
         """Sends updated field geometry to the AutoRef so that the TigersAutoref knows about field sizes."""
