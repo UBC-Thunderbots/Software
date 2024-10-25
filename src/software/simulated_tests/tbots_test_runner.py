@@ -2,12 +2,12 @@ from proto.import_all_protos import *
 from software.logger.logger import createLogger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.ssl_gc_common_pb2 import Team
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 logger = createLogger(__name__)
 
 
-class TbotsTestRunner:
+class TbotsTestRunner(ABC):
     """An abstract class that represents a test runner"""
 
     def __init__(

@@ -4,10 +4,10 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 
-class GLLayer(GLGraphicsItem):
+class GLLayer(GLGraphicsItem, ABC):
     """Represents a layer in the 3D visualization.
 
     A layer is added to the 3D scenegraph and represents a collection of

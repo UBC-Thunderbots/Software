@@ -1,10 +1,10 @@
 import textwrap
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 
-class GLToolbar(QWidget):
+class GLToolbar(QWidget, ABC):
     """Base class for a toolbar in our UI
 
     Has a refresh method to update UI

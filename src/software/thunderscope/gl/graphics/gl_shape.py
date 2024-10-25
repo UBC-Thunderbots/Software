@@ -5,10 +5,10 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from software.thunderscope.constants import Colors, LINE_WIDTH
 
 from typing import Optional
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 
-class GLShape(GLLinePlotItem):
+class GLShape(GLLinePlotItem, ABC):
     """Base class for a graphic that displays a shape on the
     cartesian plane (i.e. x-y plane)
     """
