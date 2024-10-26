@@ -44,7 +44,7 @@ py_cc_toolchain(
 
 py_cc_toolchain(
     name = "k8_jetson_nano_cross_compile_py_cc_toolchain_data",
-    headers = ":empty",
+    headers = "@py_cc_toolchain_for_k8_jetson_nano_cross_compile//:headers",
     libs = ":empty",
     python_version = "3.12",
 )

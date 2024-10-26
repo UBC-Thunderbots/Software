@@ -405,5 +405,11 @@ register_toolchains(
 new_local_repository(
     name = "py_cc_toolchain_for_host_x86_64",
     path = "/usr/include/python3.12/",
-    build_file = "@//extlibs:py_cc_k8_toolchain.BUILD",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_for_k8_jetson_nano_cross_compile",
+    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
 )
