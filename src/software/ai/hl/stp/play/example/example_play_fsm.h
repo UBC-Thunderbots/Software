@@ -4,7 +4,7 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/logger/logger.h"
 
 /**
  * An example Play that moves the robots in a circle around the ball
@@ -12,24 +12,45 @@
 
 struct ExamplePlayFSM
 {
+    class MoveState;
+
     struct ControlParams
     {
-        // TODO
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+
+    /**
+     * Creates an example play FSM
+     *
+     * @param ai_config the play config for this play FSM
+     */
+    explicit ExamplePlayFSM(const TbotsProto::AiConfig& ai_config);
+
+    /**
+     * Action that moves the robots to certain positions around the ball
+     *
+     * @param event the ExamplePlayFSM Update event
+     */
+    void moveToPosition(const Update& event);
 
     auto operator()()
     {
         using namespace boost::sml;
 
+        DEFINE_SML_STATE(MoveState)
+
         DEFINE_SML_EVENT(Update)
-        // TODO
+
+        DEFINE_SML_ACTION(moveToPosition)
 
         return make_transition_table(
                 // src_state + event [guard] / action = dest_state
+                *MoveState_S + Update_E / moveToPosition_A = MoveState_S,
 
-                // X + Update_E = X);
-                ); // TODO
+                X + Update_E = X);
     }
+
+   private:
+    TbotsProto::AiConfig ai_config;
 };
