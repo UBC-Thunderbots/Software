@@ -168,6 +168,20 @@ Thunderloop::~Thunderloop() {}
 
     double loop_duration_seconds = 0.0;
 
+    std::string thunderloop_hash, thunderloop_date_flashed;
+
+    std::ifstream hashFile("~/thunderbots_hashes/thunderloop.hash");
+    std::ifstream dateFile("~/thunderbots_hashes/thunderloop.date");
+
+    std::getline(hashFile, thunderloop_hash);
+    std::getline(dateFile, thunderloop_date_flashed);
+
+    hashFile.close();
+    dateFile.close();
+
+    robot_status_.set_thunderloop_version(thunderloop_hash);
+    robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
+
     for (;;)
     {
         {
