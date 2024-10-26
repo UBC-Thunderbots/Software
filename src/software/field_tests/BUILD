@@ -37,8 +37,7 @@ py_test(
         "exclusive",
     ],
     deps = [
-        "//software/field_tests:field_test_fixture",
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:tbots_test_runner",
         "//software/simulated_tests:validation",
         requirement("pytest"),
@@ -55,8 +54,7 @@ py_test(
         "exclusive",
     ],
     deps = [
-        "//software/field_tests:field_test_fixture",
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:tbots_test_runner",
         "//software/simulated_tests:validation",
         requirement("pytest"),
@@ -69,7 +67,7 @@ py_test(
         "passing_field_test.py",
     ],
     deps = [
-        "//software/field_tests:field_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],

@@ -27,7 +27,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/halt:halt_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],
@@ -82,9 +82,9 @@ cc_library(
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
+        "//software/ai/hl/stp/tactic/halt:halt_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
         "//software/util/generic_factory",
         "//software/world:game_state",
@@ -119,7 +119,7 @@ cc_library(
     deps = [
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/halt:halt_tactic",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/ai/navigator/trajectory:trajectory_planner",
         "//software/ai/passing:pass_with_rating",
@@ -213,7 +213,7 @@ py_test(
         "exclusive",
     ],
     deps = [
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],
@@ -259,7 +259,7 @@ py_test(
         "exclusive",
     ],
     deps = [
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
         requirement("pytest"),
@@ -290,7 +290,7 @@ py_test(
         "exclusive",
     ],
     deps = [
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],
@@ -303,7 +303,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/halt:halt_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],
@@ -346,7 +346,7 @@ py_test(
         "//proto:import_all_protos",
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],

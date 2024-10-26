@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class BallMovesForward(Validation):
-
     """Checks if ball is moving forward, i.e. in the +x direction"""
 
     def __init__(self, initial_ball_position):
@@ -19,8 +18,8 @@ class BallMovesForward(Validation):
         """Checks if ball is moving forward, i.e. in the +x direction
 
         :param world: The world msg to validate
-        :returns: FAILING if ball doesn't move forward
-                  PASSING if ball moves forward
+        :return: FAILING if ball doesn't move forward
+                 PASSING if ball moves forward
         """
         validation_status = ValidationStatus.FAILING
         current_ball_position = tbots_cpp.createPoint(
@@ -33,9 +32,7 @@ class BallMovesForward(Validation):
         return validation_status
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) Shows the last ball position line
-        """
+        """(override) Shows the last ball position line"""
         return create_validation_geometry(
             [
                 tbots_cpp.Rectangle(

@@ -1,10 +1,5 @@
-Table of Contents                                                                                                                                                                            
-=================                                                                                                                                                                            
- <!-- 
-    NOTE: when creating or re-creating a table of contents like this, you can
-    save a LOT of time by using this tool: 
-    https://github.com/ekalinin/github-markdown-toc
--->
+Table of Contents
+=================
 
 * [Software Setup](#software-setup)
    * [Introduction](#introduction)
@@ -30,8 +25,8 @@ Table of Contents
    * [Profiling](#profiling)
       * [Callgrind](#callgrind)
       * [Tracy](#tracy)
-   * [Building for Jetson Nano](#building-for-jetson-nano)
-   * [Deploying to Jetson Nano](#deploying-to-jetson-nano)
+   * [Building for the robot](#building-for-the-robot)
+   * [Deploying Robot Software to the robot](#deploying-robot-software-to-the-robot)
    * [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
       * [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
       * [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
@@ -49,6 +44,14 @@ Table of Contents
    * [Example Workflow](#example-workflow)
    * [Testing](#testing)
 
+<!-- 
+    Created by https://github.com/ekalinin/github-markdown-toc
+
+    NOTE: when creating or re-creating a table of contents like this, you can
+    save a LOT of time by using this tool: 
+    https://github.com/ekalinin/github-markdown-toc
+-->
+
 # Software Setup
 
 ## Introduction
@@ -63,9 +66,15 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 ### Operating systems
 
-We currently only support Linux, specifically Ubuntu 20.04 LTS and Ubuntu 22.04 LTS. You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
+We currently only support Linux, specifically Ubuntu.
 
-You can use Ubuntu 20.04 LTS and Ubuntu 22.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+If you have a X86_64 machine, we support Ubuntu 20.04 LTS, Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
+
+If you have a ARM64 (also known as AARCH64) machine, we support Ubuntu 24.04 LTS.
+
+You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
+
+You can use Ubuntu 20.04 LTS, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ### Getting the Code
 
@@ -215,8 +224,8 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - `[--run_blue | --run_yellow]` indicate which FullSystem to run
         - `[--run_diagnostics]` indicates if diagnostics should be loaded as well
       - If FullSystem is running, the robots receive input from the AI
-      - If Diagnostics is enabled, the robots can also receive input from Manual controls or XBox controls
-      - This mode allows us to test and debug the robots by setting each robot's input to be either AI, Manual Control or XBox Control
+      - If Diagnostics is enabled, the robots can also receive input from Manual controls or Xbox controls
+      - This mode allows us to test and debug the robots by setting each robot's input to be either AI, Manual Control or Xbox Control
       - Control mode for each robot can be set with each one's drop down menu in the Robot View widget
 
     - If we want to run it with real robots:
@@ -268,7 +277,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     - Manual Control
       - When a robot is in Manual control mode, the commands it receives depend on the radio buttons to the top-right
         - Diagnostics Control allows us to use the on-screen sliders and buttons to control the robot
-        - XBox control allows us to use a connected XBox controller to control the robots
+        - Xbox control allows us to use a connected Xbox controller to control the robots
 4. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
     1. For legacy C++ tests (#2581) with the visualizer:
@@ -345,17 +354,19 @@ Tracy also samples call stacks. If the profiled binary is run with root permissi
 
     ./tbots.py run thunderscope_main --tracy --sudo
 
-## Building for Jetson Nano 
+## Building for the robot
 
-To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain for Jetson Nano. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
+To build for the robot computer, build the target with the `--platforms=//cc_toolchain:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//cc_toolchain:robot //software/geom/...`.
 
-## Deploying to Jetson Nano 
+## Deploying Robot Software to the robot
 
-We use ansible to automatically update software running on the Jetson Nano. [More info here.](useful-robot-commands.md#flashing-the-nano) 
+We use Ansible to automatically update software running on the robot. [More info here.](useful-robot-commands.md#flashing-the-robots-compute-module) 
 
 To update binaries on a working robot, you can run:
 
-`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
+`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+
+Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), and `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
 
 ## Setting up Virtual Robocup 2021
 
@@ -449,7 +460,7 @@ If you do rebase or merge and get conflicts, you'll need to resolve them manuall
 
 We use [clang-format](https://electronjs.org/docs/development/clang-format) to automatically format our code. Using an automatic tool helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what it does.
 
-To format the code, from the `Software` directory run `./formatting_scripts/fix_formatting.sh`.
+To format the code, from the `Software` directory run `./scripts/lint_and_format.sh`.
 
 We recommend running the formatting script and then committing all your changes, so that your commits can more easily pass CI.
 

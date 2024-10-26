@@ -1,7 +1,4 @@
-import pyqtgraph as pg
-import software.thunderscope.constants as constants
 from google.protobuf.json_format import MessageToDict
-from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
@@ -10,7 +7,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class RefereeInfoWidget(QWidget):
-
     NUM_ROWS = 13
     NUM_COLS = 3
 
@@ -19,11 +15,10 @@ class RefereeInfoWidget(QWidget):
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
 
     def __init__(self, buffer_size: int = 1) -> None:
-        """Shows the referee information 
+        """Shows the referee information
 
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         QWidget.__init__(self)
 
@@ -40,8 +35,7 @@ class RefereeInfoWidget(QWidget):
         self.setLayout(self.vertical_layout)
 
     def refresh(self) -> None:
-        """Update the referee info widget with new referee information
-        """
+        """Update the referee info widget with new referee information"""
         referee = self.referee_buffer.get(block=False, return_cached=False)
 
         # Updating QTableWidget could be expensive, so we only update if there is new data
@@ -53,9 +47,13 @@ class RefereeInfoWidget(QWidget):
         if not referee_msg_dict:
             return
 
+        stage_time_left_s = (
+            int(referee_msg_dict["stageTimeLeft"]) * SECONDS_PER_MICROSECOND
+        )
         p = (
             f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
-            + f"Stage Time Left: {int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND / SECONDS_PER_MINUTE)}:{int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND % SECONDS_PER_MINUTE)}\n"
+            + f"Stage Time Left: {int(stage_time_left_s / SECONDS_PER_MINUTE):02d}"
+            + f":{int(stage_time_left_s % SECONDS_PER_MINUTE):02d}\n"
             + f"Stage: {referee_msg_dict['stage']}\n"
             + "Command: "
             + referee_msg_dict["command"]
@@ -102,7 +100,11 @@ class RefereeInfoWidget(QWidget):
                 yellow.append(referee_msg_dict["yellow"][info])
 
         set_table_data(
-            {"Team Info": team_info, "Blue": blue, "Yellow": yellow,},
+            {
+                "Team Info": team_info,
+                "Blue": blue,
+                "Yellow": yellow,
+            },
             self.referee_table,
             RefereeInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
             RefereeInfoWidget.ITEM_SIZE_HINT_WIDTH_EXPANSION,
@@ -112,8 +114,7 @@ class RefereeInfoWidget(QWidget):
         self.referee_table.resizeRowsToContents()
 
     def parse_yellow_card_times(self, team_info: TeamInfo) -> str:
-        """
-        Parses yellow card times from a TeamInfo Protobuf dict as a string output.
+        """Parses yellow card times from a TeamInfo Protobuf dict as a string output.
 
         :param team_info: TeamInfo protobuf dict to parse
         """

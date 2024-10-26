@@ -1,7 +1,6 @@
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import Qt, QTimer
 from proto.import_all_protos import *
-from typing import Dict, List
 from software.py_constants import *
 from software.thunderscope.robot_diagnostics.error_log_widgets import (
     RobotLogMessageWidget,
@@ -23,8 +22,7 @@ import time
 
 
 class RobotErrorLog(QScrollArea):
-    """
-    A log of all the errors from all robots during gameplay
+    """A log of all the errors from all robots during gameplay
 
     Allows for dynamically adding new entries
     """
@@ -46,17 +44,17 @@ class RobotErrorLog(QScrollArea):
         # when a robot has a battery warning, its map entry is set to True
         # which prevents spamming the same battery warning
         # set back to False if battery is back above warning level
-        self.low_battery_log_disabled: Dict[int, bool] = {}
+        self.low_battery_log_disabled: dict[int, bool] = {}
 
         # when the robot has an error code, its added to tne list keyed to the robot id
         # which prevents spamming the same error code log
         # list set back to empty if no error code
-        self.error_code_log_disabled: Dict[int, List[ErrorCode]] = {}
+        self.error_code_log_disabled: dict[int, list[ErrorCode]] = {}
 
         self.layout = QVBoxLayout()
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.error_log_messages: List[RobotLogMessageWidget] = []
+        self.error_log_messages: list[RobotLogMessageWidget] = []
 
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller
@@ -70,8 +68,7 @@ class RobotErrorLog(QScrollArea):
         self.scroll_to_bottom = False
 
     def refresh(self) -> None:
-        """
-        Refreshes the widget's graphics
+        """Refreshes the widget's graphics
 
         Gets the RobotCrash and RobotStatus messages from the buffers and adds
         the corresponding log messages if needed
@@ -96,7 +93,6 @@ class RobotErrorLog(QScrollArea):
 
         # empty out the buffer to get statuses for all current robots at once
         while robot_status is not None:
-
             # add log widgets for error code and low battery warnings
             self.__refresh_robot_status_error_code(robot_status)
             self.__refresh_robot_status_battery_voltage(robot_status)
@@ -114,16 +110,12 @@ class RobotErrorLog(QScrollArea):
             self.scroll_to_bottom = False
 
     def __scroll_logs_to_bottom(self) -> None:
-        """
-        Helper function to scroll the widget to the bottom
-        """
+        """Helper function to scroll the widget to the bottom"""
         self.ensureVisible(0, self.container.height())
         self.verticalScrollBar().setSliderPosition(self.verticalScrollBar().maximum())
 
     def __remove_closed_widgets(self) -> None:
-        """
-        Removes all log widgets which have been closed
-        """
+        """Removes all log widgets which have been closed"""
         widgets_to_delete = []
         # get all log widgets which have been closed
         for error_message in self.error_log_messages:
@@ -136,8 +128,7 @@ class RobotErrorLog(QScrollArea):
             self.error_log_messages.remove(widget)
 
     def __refresh_fatal_logs(self) -> None:
-        """
-        Gets a robot log from the buffer
+        """Gets a robot log from the buffer
         If fatal or contract and last log is older than timeout, adds a log to the widget and
         Records new last log time to prevent spamming
         """
@@ -149,7 +140,6 @@ class RobotErrorLog(QScrollArea):
                 robot_log.log_level == LogLevel.FATAL
                 or robot_log.log_level == LogLevel.CONTRACT
             ):
-
                 if (
                     robot_log.robot_id not in self.robot_last_fatal_time_s
                     or time.time() - self.robot_last_fatal_time_s[robot_log.robot_id]
@@ -159,8 +149,7 @@ class RobotErrorLog(QScrollArea):
                 self.robot_last_fatal_time_s[robot_log.robot_id] = time.time()
 
     def __refresh_robot_crash(self) -> None:
-        """
-        Gets a robot crash from the buffer
+        """Gets a robot crash from the buffer
         If last crash is older than timeout, adds a log to the widget and
         Records new last crash time to prevent spamming
         """
@@ -179,10 +168,10 @@ class RobotErrorLog(QScrollArea):
             self.robot_last_crash_time_s[robot_crash.robot_id] = time.time()
 
     def __refresh_robot_status_error_code(self, robot_status: RobotStatus) -> None:
-        """
-        Adds a log to the widget for each of the error codes in the RobotStatus message
+        """Adds a log to the widget for each of the error codes in the RobotStatus message
         Doesn't log if this robot has already logged a specific error code type (to prevent spam)
         Clears the types of error codes already added for a robot if no error
+
         :param robot_status: the RobotStatus message
         """
         # initialize the list if not in dict yet
@@ -209,10 +198,10 @@ class RobotErrorLog(QScrollArea):
                 self.error_code_log_disabled[robot_status.robot_id] = []
 
     def __refresh_robot_status_battery_voltage(self, robot_status: RobotStatus) -> None:
-        """
-        If the current robot's battery is lower than the threshold, adds a log
+        """If the current robot's battery is lower than the threshold, adds a log
         Records that this robot has already had a log added to prevent spamming
         Resets the spamming flag once voltage for this robot goes back above threshold
+
         :param robot_status: the RobotStatus message
         """
         # if the battery voltage is too low and a voltage log hasn't been sent for this robot yet, log it
@@ -230,8 +219,8 @@ class RobotErrorLog(QScrollArea):
             self.low_battery_log_disabled[robot_status.robot_id] = False
 
     def add_error_log_message(self, error_widget: RobotLogMessageWidget) -> None:
-        """
-        Adds the given error message to the log by making a new RobotErrorMessage
+        """Adds the given error message to the log by making a new RobotErrorMessage
+
         :param error_widget: the error widget to add to the log
         """
         self.error_log_messages.append(error_widget)

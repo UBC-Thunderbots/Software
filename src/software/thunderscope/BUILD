@@ -1,6 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+
+compile_pip_requirements(
+    name = "requirements",
+    src = "requirements.in",
+    requirements_txt = "requirements_lock.txt",
+)
 
 py_binary(
     name = "thunderscope_main",
@@ -135,6 +142,9 @@ py_library(
 py_library(
     name = "constants",
     srcs = ["constants.py"],
+    deps = [
+        requirement("protobuf"),
+    ],
 )
 
 py_library(

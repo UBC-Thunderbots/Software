@@ -18,8 +18,8 @@ class BallIsOffGround(Validation):
         """Checks if the ball has is threshold meters off the ground
 
         :param world: The world msg to validate
-        :returns: FAILING until a ball has a positive threshold distance off the ground
-                  PASSING when the ball has a positive threshold distance off the ground
+        :return: FAILING until a ball has a positive threshold distance off the ground
+                 PASSING when the ball has a positive threshold distance off the ground
         """
         if world.ball.current_state.distance_from_ground > self.threshold:
             return ValidationStatus.PASSING
@@ -30,7 +30,7 @@ class BallIsOffGround(Validation):
         """Returns the underlying geometry this validation is checking
 
         :param world: The world msg to create validation geometry from
-        :returns: ValidationGeometry containing geometry to visualize
+        :return: ValidationGeometry containing geometry to visualize
 
         """
         # TODO #3244: Make this a nicer visualization

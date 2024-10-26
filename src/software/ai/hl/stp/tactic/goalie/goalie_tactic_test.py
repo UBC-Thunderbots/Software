@@ -9,7 +9,6 @@ from software.simulated_tests.ball_speed_threshold import *
 from software.simulated_tests.robot_speed_threshold import *
 from software.simulated_tests.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -99,7 +98,6 @@ def test_goalie_blocks_shot(
     robot_initial_position,
     simulated_test_runner,
 ):
-
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
@@ -188,13 +186,15 @@ def test_goalie_blocks_shot(
         ),  # ball is just inside the dead zone in the Y direction
         (
             tbots_cpp.Point(0, 0),
-            False
+            False,
             # ball is just outside the dead zone in the X direction
         ),
     ],
 )
 def test_goalie_clears_from_dead_zone(
-    ball_position, should_clear, simulated_test_runner,
+    ball_position,
+    should_clear,
+    simulated_test_runner,
 ):
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(

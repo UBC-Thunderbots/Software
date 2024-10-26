@@ -30,9 +30,7 @@ def __create_int_parameter_writable(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
-
     # Extract the options from the descriptor, and store it
     # in the dictionary.
     options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
@@ -60,9 +58,7 @@ def __create_double_parameter_writable(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
-
     # Extract the options from the descriptor, and store it
     # in the dictionary.
     options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
@@ -77,7 +73,10 @@ def __create_double_parameter_writable(key, value, descriptor):
         "type": "float",
         "value": value,
         "default": value,
-        "limits": (min_max["min_double_value"], min_max["max_double_value"],),
+        "limits": (
+            min_max["min_double_value"],
+            min_max["max_double_value"],
+        ),
         "step": 0.01,
     }
 
@@ -90,7 +89,6 @@ def __create_enum_parameter(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
     options = []
 
@@ -114,7 +112,6 @@ def __create_bool_parameter(key, value, _):
     :param key: The name of the parameter
     :param value: The default value
     :param _: The proto descriptor, unused for bool
-
     """
     return {"name": key, "type": "bool", "value": value}
 
@@ -125,7 +122,6 @@ def __create_string_parameter_writable(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
     return {"name": key, "type": "text", "value": " "}
 
@@ -136,7 +132,6 @@ def __create_parameter_read_only(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
     return {"name": key, "type": "str", "value": value, "readonly": True}
 
@@ -156,8 +151,8 @@ def __create_network_enum(key, value, _):
 
 
 def get_string_val(descriptor, value):
-    """
-    Converts the given value to a string depending on the descriptor type
+    """Converts the given value to a string depending on the descriptor type
+
     :param descriptor: the descriptor of the current value
     :param value: the value to convert
     :return: A string version of the value
@@ -188,12 +183,10 @@ def config_proto_to_field_list(
     :param read_only: Whether the parameters should be read only or writable
     :param search_term: The search filter
     :param search_filter_threshold: the search filter threshold
-
     """
     field_list = []
 
     for descriptor in message.DESCRIPTOR.fields:
-
         key = descriptor.name
         value = getattr(message, descriptor.name)
 

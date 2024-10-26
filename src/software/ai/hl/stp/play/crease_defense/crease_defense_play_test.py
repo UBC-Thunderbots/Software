@@ -5,13 +5,11 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from proto.import_all_protos import *
-from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 
 def test_crease_defense_play(simulated_test_runner):
-
     # starting point must be Point
     ball_initial_pos = tbots_cpp.Point(0.9, 2.85)
     # placement point must be Vector2 to work with game controller

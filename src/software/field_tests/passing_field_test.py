@@ -7,7 +7,6 @@ from software.field_tests.field_test_fixture import *
 from software.simulated_tests.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
-from software import py_constants
 
 
 def test_passing(field_test_runner):
@@ -97,12 +96,11 @@ def test_passing(field_test_runner):
         test_timeout_s=5,
     )
 
-    # Send a stop tactic after the test finishes
-    stop_tactic = StopTactic()
+    # Send a halt tactic after the test finishes
+    halt_tactic = HaltTactic()
     params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[passer_robot_id].stop.CopyFrom(stop_tactic)
-    params.assigned_tactics[receiver_robot_id].stop.CopyFrom(stop_tactic)
-    # send the stop tactic
+    params.assigned_tactics[passer_robot_id].stop.CopyFrom(halt_tactic)
+    params.assigned_tactics[receiver_robot_id].stop.CopyFrom(halt_tactic)
     field_test_runner.set_tactics(params, True)
 
 

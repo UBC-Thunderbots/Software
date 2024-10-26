@@ -8,7 +8,7 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.gl.graphics.gl_shape import GLShape
 import software.thunderscope.gl.helpers.triangulate as triangulate
 
-from typing import Optional, List, Tuple
+from typing import Optional
 
 import math
 import numpy as np
@@ -25,11 +25,10 @@ class GLRobotOutline(GLShape):
         line_width: float = LINE_WIDTH,
     ) -> None:
         """Initialize the GLRobotOutline
-        
+
         :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
         :param line_width: The line width of the graphic
-
         """
         super().__init__(
             parent_item=parent_item,
@@ -42,14 +41,13 @@ class GLRobotOutline(GLShape):
     @staticmethod
     def get_robot_outline(
         z_coordinate: float = 0, num_points: int = 10
-    ) -> List[Tuple[float, float, float]]:
+    ) -> list[tuple[float, float, float]]:
         """Returns a list of points that represent the outline of a robot.
         The points will be on a plane parallel to the x-y plane.
 
         :param z_coordinate: The z coordinate of the plane to generate points on
         :param num_points: The number of points to generate
-        :returns: A list of 3-tuple points representing the outline of a robot
-
+        :return: A list of 3-tuple points representing the outline of a robot
         """
         # We compute points along 3/4 the circumference of a circle.
         # This is so that when we connect the points, there will be a chord
@@ -70,9 +68,8 @@ class GLRobotOutline(GLShape):
 
     def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
-        
-        :param degrees: The orientation of the graphic in degrees
 
+        :param degrees: The orientation of the graphic in degrees
         """
         # We need to add 45 degrees to our desired orientation in order
         # to get the flat side of the robot (i.e. its front) to face

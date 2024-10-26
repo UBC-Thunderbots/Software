@@ -12,8 +12,8 @@ class BallMovesForward(Validation):
     """Checks if ball is moving forward, i.e. in the +x direction"""
 
     def __init__(self, initial_ball_position: tbots.Point, tolerance: float = 0.1):
-        """
-        Constructs the validation
+        """Constructs the validation
+
         :param initial_ball_position: the initial position of the ball
         :param tolerance: the tolerance for determining the ball's direction of movement
                           to account for noisy world data
@@ -26,8 +26,8 @@ class BallMovesForward(Validation):
         """Checks if ball is moving forward
 
         :param world: The world msg to validate
-        :returns: FAILING if ball doesn't move in the direction
-                  PASSING if ball moves in the direction
+        :return: FAILING if ball doesn't move in the direction
+                 PASSING if ball moves in the direction
         """
         current_ball_position = world.ball.current_state.global_position.x_meters
 
@@ -44,9 +44,7 @@ class BallMovesForward(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) Shows the last ball position line
-        """
+        """(override) Shows the last ball position line"""
         return create_validation_geometry(
             [
                 tbots.Rectangle(
@@ -82,7 +80,6 @@ class BallMovesForwardInRegions(BallMovesForward):
         self.regions = regions
 
     def get_validation_status(self, world) -> ValidationStatus:
-
         for region in self.regions:
             if tbots.contains(
                 region, tbots.createPoint(world.ball.current_state.global_position)
@@ -92,9 +89,7 @@ class BallMovesForwardInRegions(BallMovesForward):
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) Shows the last ball position line, and the regions the ball should be moving in
-        """
+        """(override) Shows the last ball position line, and the regions the ball should be moving in"""
         return create_validation_geometry(self.regions)
 
     def __repr__(self):

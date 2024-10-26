@@ -7,7 +7,6 @@ from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_team_scored import *
 from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
-from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
@@ -15,15 +14,14 @@ from proto.ssl_gc_common_pb2 import Team
 def free_kick_play_setup(
     blue_bots, yellow_bots, ball_initial_pos, play_name, simulated_test_runner
 ):
-    """
-    Sets up the free kick play test
+    """Sets up the free kick play test
+
     :param blue_bots: positions of blue robots
     :param yellow_bots: positions of yellow robots
     :param ball_initial_pos: initial position of the ball
     :param play_name: current play being used for blue robots
     :param simulated_test_runner: the current test runner
     """
-
     # Game Controller Setup
     simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
@@ -156,7 +154,6 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos, must_s
     ],
 )
 def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bots):
-
     blue_bots = [
         tbots_cpp.Point(-4.5, 0),
         tbots_cpp.Point(-3, 1.5),

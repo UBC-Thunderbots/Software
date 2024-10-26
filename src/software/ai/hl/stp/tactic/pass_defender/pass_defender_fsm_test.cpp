@@ -7,11 +7,18 @@
 
 TEST(PassDefenderFSMTest, test_transitions)
 {
-    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-1, 0));
-    PassDefenderFSM::ControlParams control_params{.position_to_block_from = Point(-2, 0)};
-
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM()};
+    std::shared_ptr<World> world    = ::TestUtil::createBlankTestingWorld();
+    Robot robot                     = ::TestUtil::createRobotAtPos(Point(-1, 0));
+    std::vector<Point> enemy_robots = {
+        Point(1, 0),
+    };
+    ::TestUtil::setEnemyRobotPositions(world, enemy_robots, Timestamp::fromSeconds(123));
+    PassDefenderFSM::ControlParams control_params{
+        .position_to_block_from = Point(-2, 0),
+        .ball_steal_mode        = TbotsProto::BallStealMode::STEAL};
+    TbotsProto::AiConfig ai_config;
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(ai_config),
+                             DribbleFSM(ai_config.dribble_tactic_config())};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
@@ -31,12 +38,33 @@ TEST(PassDefenderFSMTest, test_transitions)
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::InterceptBallState>));
 
-    // Deflect ball away from pass defender
+    // Deflect ball away from pass defender and return to block state
     ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(124));
-    ::TestUtil::setBallVelocity(world, Vector(0, 1), Timestamp::fromSeconds(124));
+    ::TestUtil::setBallVelocity(world, Vector(0, 1), Timestamp::fromSeconds(125));
     EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::quarter()));
+    fsm.process_event(PassDefenderFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
 
-    // Transition back to BlockPassState
+    // Ball is now again kicked towards pass defender
+    ::TestUtil::setBallVelocity(world, Vector(-1, 0), Timestamp::fromSeconds(125));
+    EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::half()));
+
+    // Transition to InterceptBallState again
+    fsm.process_event(PassDefenderFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::InterceptBallState>));
+
+    // Move Ball Close and Transition to DribbleFSM from interception
+    ::TestUtil::setBallVelocity(world, Vector(-0.1, 0), Timestamp::fromSeconds(126));
+    ::TestUtil::setBallPosition(world, Point(-1.8, 0), Timestamp::fromSeconds(126));
+    fsm.process_event(PassDefenderFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
+
+    ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(126));
+    ::TestUtil::setBallVelocity(world, Vector(0, 1), Timestamp::fromSeconds(126));
+    // Deflect and Transition back to BlockPassState
     fsm.process_event(PassDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
@@ -48,9 +76,13 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
     // create the world and the robot to test at (0,0)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(0, 0));
-    PassDefenderFSM::ControlParams control_params{.position_to_block_from = Point(-2, 0)};
+    PassDefenderFSM::ControlParams control_params{
+        .position_to_block_from = Point(-2, 0),
+        .ball_steal_mode        = TbotsProto::BallStealMode::STEAL};
+    TbotsProto::AiConfig ai_config;
 
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM()};
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(ai_config),
+                             DribbleFSM(ai_config.dribble_tactic_config())};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));

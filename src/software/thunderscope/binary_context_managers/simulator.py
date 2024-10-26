@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import logging
 import time
@@ -11,9 +13,8 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.thunderscope.binary_context_managers.util import *
 
 
-class Simulator(object):
-
-    """ Simulator Context Manager """
+class Simulator:
+    """Simulator Context Manager"""
 
     def __init__(
         self,
@@ -29,21 +30,19 @@ class Simulator(object):
         :param simulator_runtime_dir: The directory to run the simulator in
         :param debug_simulator: Whether to run the simulator in debug mode
         :param enable_realism: a argument (--enable_realism) that is going to be passed to er_force_simulator_main binary
-
         """
         self.simulator_runtime_dir = simulator_runtime_dir
         self.debug_simulator = debug_simulator
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
 
-    def __enter__(self) -> "self":
-        """Enter the simulator context manager. 
+    def __enter__(self) -> Simulator:
+        """Enter the simulator context manager.
 
         If the debug mode is enabled then the binary is _not_ run and the
         command to debug under gdb is printed.
 
         :return: simulator context managed instance
-
         """
         # Setup unix socket directory
         try:
@@ -59,7 +58,6 @@ class Simulator(object):
             simulator_command += " --enable_realism"
 
         if self.debug_simulator:
-
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
             if not is_cmd_running(
@@ -99,7 +97,6 @@ gdb --args bazel-bin/{simulator_command}
         :param type: The type of exception that was raised
         :param value: The exception that was raised
         :param traceback: The traceback of the exception
-
         """
         if self.er_force_simulator_proc:
             self.er_force_simulator_proc.kill()
@@ -112,16 +109,13 @@ gdb --args bazel-bin/{simulator_command}
         yellow_full_system_proto_unix_io: ProtoUnixIO,
         autoref_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
-
         """Setup the proto unix io for the simulator
 
         :param simulator_proto_unix_io: The proto unix io of the simulator.
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
         :param autoref_proto_unix_io: the proto unix io for the autoref
-
         """
-
         # inputs to er_force_simulator_main
         for arg in [
             (SIMULATION_TICK_PATH, SimulatorTick),

@@ -22,7 +22,6 @@ class GLObstacleLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -78,7 +77,8 @@ class GLObstacleLayer(GLLayer):
         ):
             circle_obstacle_graphic.set_radius(circle_obstacle.radius)
             circle_obstacle_graphic.set_position(
-                circle_obstacle.origin.x_meters, circle_obstacle.origin.y_meters,
+                circle_obstacle.origin.x_meters,
+                circle_obstacle.origin.y_meters,
             )
 
         for stadium_obstacle_graphic, stadium_obstacle in zip(

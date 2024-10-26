@@ -4,14 +4,21 @@ import logging
 import os
 import sys
 import threading
-from robot_communication import DISCONNECTED
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+
+import google.protobuf
+from google.protobuf.internal import api_implementation
+
+protobuf_impl_type = api_implementation.Type()
+assert protobuf_impl_type == "upb", (
+    f"Trying to use the {protobuf_impl_type} protobuf implementation. "
+    "Please use the upb implementation, available in python protobuf version 4.21.0 and above."
+    f"The current version of protobuf is {google.protobuf.__version__}"
+)
+
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
-import software.python_bindings as tbots_cpp
 from software.py_constants import *
-import proto.message_translation.tbots_protobuf as tbots_protobuf
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
@@ -19,8 +26,6 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import (
     CI_DURATION_S,
-    ProtoUnixIOTypes,
-    SIM_TICK_RATE_MS,
 )
 from software.thunderscope.util import *
 
@@ -31,14 +36,11 @@ from software.thunderscope.binary_context_managers.game_controller import Gameco
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
 
-NUM_ROBOTS = DIV_B_NUM_ROBOTS
-
 ###########################################################################
 #                         Thunderscope Main                               #
 ###########################################################################
 
 if __name__ == "__main__":
-
     logging.getLogger().setLevel(logging.INFO)
 
     # Setup parser
@@ -231,24 +233,19 @@ if __name__ == "__main__":
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
     if not args.run_blue and not args.run_yellow and args.launch_gc:
         parser.error(
-            "--launch_gc has to be ran with --run_blue or --run_yellow argument"
+            "--launch_gc has to be run with --run_blue or --run_yellow argument"
         )
 
-    # Sanity check that an interface was provided if we are running diagnostics since it will not load the network
-    # configuration widget
-    if (
-        not (args.run_blue or args.run_yellow)
-        and args.run_diagnostics
-        and args.interface is None
-    ):
-        parser.error("Must specify interface")
+    # Sanity check that an interface was provided
+    if args.run_blue or args.run_yellow:
+        if args.interface is None:
+            parser.error("Must specify interface")
 
     ###########################################################################
     #                      Visualize CPP Tests                                #
     ###########################################################################
     # TODO (#2581) remove this
     if args.visualize_cpp_test:
-
         runtime_dir = "/tmp/tbots/gtest_logs"
 
         try:
@@ -308,7 +305,10 @@ if __name__ == "__main__":
             args.run_diagnostics,
             args.visualization_buffer_size,
         )
-        tscope = Thunderscope(config=tscope_config, layout_path=args.layout,)
+        tscope = Thunderscope(
+            config=tscope_config,
+            layout_path=args.layout,
+        )
 
         if args.run_blue:
             runtime_dir = args.blue_full_system_runtime_dir
@@ -329,7 +329,9 @@ if __name__ == "__main__":
         )
 
         with (
-            Gamecontroller(supress_logs=(not args.verbose), use_conventional_port=False)
+            Gamecontroller(
+                suppress_logs=(not args.verbose), use_conventional_port=False
+            )
             if args.launch_gc
             else contextlib.nullcontext()
         ) as gamecontroller, RobotCommunication(
@@ -339,9 +341,10 @@ if __name__ == "__main__":
             estop_mode=estop_mode,
             estop_path=estop_path,
             enable_radio=args.enable_radio,
-            referee_port=Gamecontroller.get_referee_port_static(gamecontroller),
+            referee_port=gamecontroller.get_referee_port()
+            if gamecontroller
+            else SSL_REFEREE_PORT,
         ) as robot_communication:
-
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
                 tscope.keyboard_estop_shortcut.activated.connect(
                     robot_communication.toggle_keyboard_estop
@@ -354,19 +357,14 @@ if __name__ == "__main__":
 
                         if robot_view_widget:
                             robot_view_widget.control_mode_signal.connect(
-                                lambda mode, robot_id: robot_communication.toggle_robot_connection(
+                                lambda mode,
+                                robot_id: robot_communication.toggle_robot_connection(
                                     mode, robot_id
                                 )
                             )
 
             if args.run_blue or args.run_yellow:
-                robot_communication.setup_for_fullsystem(
-                    referee_interface=args.interface
-                    if args.interface
-                    else DISCONNECTED,
-                    vision_interface=args.interface if args.interface else DISCONNECTED,
-                )
-                robot_communication.print_current_network_config()
+                robot_communication.setup_for_fullsystem()
                 full_system_runtime_dir = (
                     args.blue_full_system_runtime_dir
                     if args.run_blue
@@ -379,7 +377,6 @@ if __name__ == "__main__":
                     should_restart_on_crash=True,
                     run_sudo=args.sudo,
                 ) as full_system:
-
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
                     tscope.show()
@@ -394,7 +391,9 @@ if __name__ == "__main__":
     elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
             config=config.configure_replay_view(
-                args.blue_log, args.yellow_log, args.visualization_buffer_size,
+                args.blue_log,
+                args.yellow_log,
+                args.visualization_buffer_size,
             ),
             layout_path=args.layout,
         )
@@ -424,7 +423,7 @@ if __name__ == "__main__":
             """
             sync_simulation(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
-                0 if args.empty else NUM_ROBOTS,
+                0 if args.empty else DIV_B_NUM_ROBOTS,
             )
 
             if args.ci_mode:
@@ -458,7 +457,7 @@ if __name__ == "__main__":
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
         ) as yellow_fs, Gamecontroller(
-            supress_logs=(not args.verbose)
+            suppress_logs=(not args.verbose)
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -466,7 +465,7 @@ if __name__ == "__main__":
             TigersAutoref(
                 ci_mode=True,
                 gc=gamecontroller,
-                supress_logs=(not args.verbose),
+                suppress_logs=(not args.verbose),
                 tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
                 show_gui=args.show_autoref_gui,
             )
@@ -493,7 +492,9 @@ if __name__ == "__main__":
                 autoref_proto_unix_io,
             )
             if args.enable_autoref:
-                autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io,)
+                autoref.setup_ssl_wrapper_packets(
+                    autoref_proto_unix_io,
+                )
 
             # Start the simulator
             sim_ticker_thread = threading.Thread(
