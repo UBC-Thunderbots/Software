@@ -5,6 +5,8 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
 from ansible.vars.manager import VariableManager
+from ansible.plugins.loader import init_plugin_loader
+
 import os
 import argparse
 import subprocess
@@ -20,6 +22,7 @@ MAX_NUM_ROBOTS = 8
 
 # loads variables, inventory, and play into Ansible API, then runs it
 def ansible_runner(playbook: str, options: dict = {}):
+    init_plugin_loader()
     loader = DataLoader()
 
     print("starting ansible run")

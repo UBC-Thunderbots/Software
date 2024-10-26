@@ -1,0 +1,3 @@
+#!/bin/bash --norc
+
+exec external/k8_jetson_nano_cross_compile_gcc/bin/aarch64-linux-gnu-objdump "$@"
