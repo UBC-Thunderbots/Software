@@ -4,7 +4,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from abc import ABC, abstractmethod
 
 
-class GLToolbar(QWidget, ABC):
+class GLToolbar(QWidget):
     """Base class for a toolbar in our UI
 
     Has a refresh method to update UI
@@ -27,7 +27,7 @@ class GLToolbar(QWidget, ABC):
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
         self.setLayout(QHBoxLayout())
 
-    @abstractmethod
+
     def refresh(self) -> None:
         """Refreshes the UI (overridden by child classes)"""
         raise NotImplementedError("Subclasses must implement this method!")
