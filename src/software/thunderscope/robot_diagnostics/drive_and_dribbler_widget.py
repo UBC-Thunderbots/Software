@@ -52,6 +52,7 @@ class DriveAndDribblerWidget(QWidget):
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
 
         if not self.per_motor:
+            motor_control.ClearField("direct_per_wheel_control")
             motor_control.direct_velocity_control.velocity.x_component_meters = (
                 self.x_velocity_slider.value()
             )
@@ -62,6 +63,7 @@ class DriveAndDribblerWidget(QWidget):
                 self.angular_velocity_slider.value()
             )
         else:
+            motor_control.ClearField("direct_velocity_control")
             motor_control.direct_per_wheel_control.front_left_wheel_velocity = (
                 self.front_left_motor_slider.value()
             )
@@ -74,6 +76,7 @@ class DriveAndDribblerWidget(QWidget):
             motor_control.direct_per_wheel_control.back_right_wheel_velocity = (
                 self.back_right_motor_slider.value()
             )
+
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def value_change(self, value: float) -> str:
