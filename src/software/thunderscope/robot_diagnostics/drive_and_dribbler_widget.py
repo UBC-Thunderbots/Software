@@ -5,6 +5,14 @@ import software.python_bindings as tbots_cpp
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from enum import IntEnum
+
+
+class DriveMode(IntEnum):
+    """Enum for the 2 drive modes (direct velocity and per-motor)"""
+
+    VELOCITY = 0
+    MOTOR = 1
 
 
 class DriveAndDribblerWidget(QWidget):
@@ -28,11 +36,12 @@ class DriveAndDribblerWidget(QWidget):
         self.drive_widget.addWidget(self.direct_velocity_widget)
         self.drive_widget.addWidget(self.per_motor_widget)
 
-        layout.addWidget(self.setup_drive_switch("Drive Mode Switch"))
+        layout.addWidget(self.setup_drive_switch_radio("Drive Mode Switch"))
         layout.addWidget(self.drive_widget)
         layout.addWidget(self.setup_dribbler("Dribbler"))
 
         self.enabled = True
+        self.per_motor = False
         self.setLayout(layout)
         self.toggle_control_mode(True)
         self.toggle_dribbler_sliders(True)
@@ -42,16 +51,29 @@ class DriveAndDribblerWidget(QWidget):
         motor_control = MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
 
-        motor_control.direct_velocity_control.velocity.x_component_meters = (
-            self.x_velocity_slider.value()
-        )
-        motor_control.direct_velocity_control.velocity.y_component_meters = (
-            self.y_velocity_slider.value()
-        )
-        motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-            self.angular_velocity_slider.value()
-        )
-
+        if not self.per_motor:
+            motor_control.direct_velocity_control.velocity.x_component_meters = (
+                self.x_velocity_slider.value()
+            )
+            motor_control.direct_velocity_control.velocity.y_component_meters = (
+                self.y_velocity_slider.value()
+            )
+            motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                self.angular_velocity_slider.value()
+            )
+        else:
+            motor_control.direct_per_wheel_control.front_left_wheel_velocity = (
+                self.front_left_motor_slider.value()
+            )
+            motor_control.direct_per_wheel_control.front_right_wheel_velocity = (
+                self.front_right_motor_slider.value()
+            )
+            motor_control.direct_per_wheel_control.back_left_wheel_velocity = (
+                self.back_left_motor_slider.value()
+            )
+            motor_control.direct_per_wheel_control.back_right_wheel_velocity = (
+                self.back_right_motor_slider.value()
+            )
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def value_change(self, value: float) -> str:
@@ -63,28 +85,27 @@ class DriveAndDribblerWidget(QWidget):
         value_str = "%.2f" % value
         return value_str
 
-    def setup_drive_switch(self, title: str) -> QGroupBox:
-        """Create a widget to switch between per-motor and velocity control modes
+    def setup_drive_switch_radio(self, title: str) -> QGroupBox:
+        """Create a radio button widget to switch between per-motor and velocity control modes
 
         :param title: group box name
         """
         group_box = QGroupBox(title)
         dbox = QVBoxLayout()
-
-        # Each button disables itself after being pressed.
-        self.use_per_motor = QPushButton("Per-Motor")
-        self.use_per_motor.clicked.connect(self.switch_to_motor)
-
-        self.use_direct_velocity = QPushButton("Velocity Control")
-        self.use_direct_velocity.clicked.connect(self.switch_to_velocity)
-
-        dbox.addWidget(
-            self.use_direct_velocity, alignment=Qt.AlignmentFlag.AlignCenter
+        self.connect_options_group = QButtonGroup()
+        radio_button_names = ["Velocity Control", "Per Motor Control"]
+        self.connect_options_box, self.connect_options = common_widgets.create_radio(
+            radio_button_names, self.connect_options_group
         )
-        dbox.addWidget(
-            self.use_per_motor, alignment=Qt.AlignmentFlag.AlignCenter
+        self.use_direct_velocity = self.connect_options[DriveMode.VELOCITY]
+        self.use_per_motor = self.connect_options[DriveMode.MOTOR]
+        self.use_direct_velocity.clicked.connect(
+            self.switch_to_velocity
         )
-
+        self.use_per_motor.clicked.connect(
+            self.switch_to_motor
+        )
+        dbox.addWidget(self.connect_options_box)
         group_box.setLayout(dbox)
 
         return group_box
@@ -167,6 +188,7 @@ class DriveAndDribblerWidget(QWidget):
 
         :param title: the name of the group box
         """
+
         group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
@@ -297,6 +319,7 @@ class DriveAndDribblerWidget(QWidget):
 
         if use_direct:
             # Show the direct velocity widget
+            self.per_motor = False
             self.drive_widget.setCurrentWidget(self.direct_velocity_widget)
 
             # Enable direct sliders and disable motor sliders
@@ -316,11 +339,10 @@ class DriveAndDribblerWidget(QWidget):
             common_widgets.disable_slider(self.back_right_motor_slider)
 
             common_widgets.change_button_state(self.stop_and_reset_direct, True)
-            common_widgets.change_button_state(self.use_direct_velocity, True)
             common_widgets.change_button_state(self.stop_and_reset_per_motor, False)
-            common_widgets.change_button_state(self.use_per_motor, False)
 
         else:
+            self.per_motor = True
             # Show the per motor widget
             self.drive_widget.setCurrentWidget(self.per_motor_widget)
 
@@ -343,9 +365,7 @@ class DriveAndDribblerWidget(QWidget):
             common_widgets.disable_slider(self.angular_velocity_slider)
 
             common_widgets.change_button_state(self.stop_and_reset_per_motor, True)
-            common_widgets.change_button_state(self.use_per_motor, True)
             common_widgets.change_button_state(self.stop_and_reset_direct, False)
-            common_widgets.change_button_state(self.use_direct_velocity, False)
 
     def toggle_dribbler_sliders(self, enable: bool) -> None:
         """Enables or disables dribbler sliders.
