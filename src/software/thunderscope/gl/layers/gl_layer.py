@@ -1,9 +1,9 @@
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
-
 from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
+from software.thunderscope.gl.helpers.gl_patches import *
 
 
 class GLLayer(GLGraphicsItem):
@@ -12,26 +12,19 @@ class GLLayer(GLGraphicsItem):
     A layer is added to the 3D scenegraph and represents a collection of
     GLGraphicsItems to be displayed together. GLGraphicsItems should be
     added as children of a GLLayer.
+
+    GLLayers themselves can also be added as a children of a GLLayer,
+    enabling us to group together related layers.
     """
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, parent_item: GLGraphicsItem | None = None) -> None:
         """Initialize the GLLayer
 
         :param name: The displayed name of the layer
+        :param parent_item: The parent GLGraphicsItem of the GLLayer
         """
-        super().__init__()
+        super().__init__(parent_item)
         self.name = name
-
-        # GLLayers can point to one another with this field, forming a
-        # linked list of "related" GLLayers.
-        #
-        # Related layers are grouped together and treated as a single layer
-        # in the layer menu. This lets us treat multiple layers rendered at
-        # different depths as one unit and toggle their visibility together
-        # as a whole.
-        #
-        # WARNING: Related GLLayers should not be parents/children of each other
-        self.related_layer: GLLayer = None
 
     def refresh_graphics(self) -> None:
         """Updates the GLGraphicsItems in this layer"""
@@ -92,27 +85,3 @@ class GLLayer(GLGraphicsItem):
         elif change.action == ChangeAction.REMOVE:
             for graphic in change.elements:
                 graphic.setParentItem(None)
-
-def setParentItem_patched(self, parent: GLGraphicsItem) -> None:
-    """Patched version of GLGraphicsItem.setParentItem that properly
-    removes this item from the scenegraph when the parent param is None.
-
-    From the original pyqtgraph documentation:
-    Sets this item's parent in the scenegraph hierarchy.
-
-    :param parent: the GLGraphicsItem to set as the parent of this item.
-                   If None, this item is removed from the scenegraph.
-    """
-    if parent:
-        parent._GLGraphicsItem__children.add(self)
-        self._GLGraphicsItem__parent = parent
-        if parent.view():
-            parent.view().addItem(self)
-    else:
-        if self._GLGraphicsItem__parent:
-            self._GLGraphicsItem__parent._GLGraphicsItem__children.remove(self)
-        self._GLGraphicsItem__parent = None
-        if self.view():
-            self.view().removeItem(self)
-
-GLGraphicsItem.setParentItem = setParentItem_patched
