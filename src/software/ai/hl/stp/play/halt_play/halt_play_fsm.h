@@ -17,7 +17,7 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 
-class HaltPlayFSM{
+struct HaltPlayFSM{
     struct ControlParams
     {
     };
@@ -27,8 +27,6 @@ class HaltPlayFSM{
 
     void updateStop(const Update& event);
 
-    private:
-        PriorityTacticVector halt_tactics;
 
     auto operator()()
     {
@@ -46,4 +44,8 @@ class HaltPlayFSM{
 
                 X + Update_E /updateStop_A             = X);
     }
+
+    private:
+        PriorityTacticVector halt_tactics;
+
 };

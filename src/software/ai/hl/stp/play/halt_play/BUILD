@@ -33,6 +33,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "halt_play_fsm_test",
+    srcs = ["halt_play_fsm_test.cpp"],
+    deps = [
+        ":halt_play",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+
 py_test(
     name = "halt_play_test",
     srcs = [
