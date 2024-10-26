@@ -21,7 +21,8 @@ void BallPlacementPlay::updateTactics(const PlayUpdate &play_update)
     auto event = BallPlacementPlayFSM::Update(control_params, play_update);
     fsm.process_event(event);
 
-    std::optional<Point> placement_point = event.common.world_ptr->gameState().getBallPlacementPoint();
+    std::optional<Point> placement_point =
+        event.common.world_ptr->gameState().getBallPlacementPoint();
     if (placement_point.has_value())
     {
         TbotsProto::BallPlacementVisualization ball_placement_vis_msg;
