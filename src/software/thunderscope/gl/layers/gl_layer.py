@@ -7,7 +7,7 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInScen
 from abc import ABC, abstractmethod
 
 
-class GLLayer(GLGraphicsItem, ABC):
+class GLLayer(GLGraphicsItem):
     """Represents a layer in the 3D visualization.
 
     A layer is added to the 3D scenegraph and represents a collection of
@@ -34,7 +34,7 @@ class GLLayer(GLGraphicsItem, ABC):
         # WARNING: Related GLLayers should not be parents/children of each other
         self.related_layer: GLLayer = None
 
-    @abstractmethod
+
     def refresh_graphics(self) -> None:
         """Updates the GLGraphicsItems in this layer"""
         raise NotImplementedError("Subclasses must implement this method!")
