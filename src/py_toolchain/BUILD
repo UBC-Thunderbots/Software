@@ -21,6 +21,27 @@ toolchain(
     toolchain_type = "@bazel_tools//tools/python:toolchain_type",
 )
 
+toolchain(
+    name = "py_cc_toolchain_for_host_x86_64",
+    toolchain = ":py_cc_toolchain_for_host_x86_64_data",
+    toolchain_type = "@rules_python//python/cc:toolchain_type",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+)
+
+py_cc_toolchain(
+    name = "py_cc_toolchain_for_host_x86_64_data",
+    headers = "@py_cc_toolchain_for_host_x86_64//:headers",
+    libs = ":empty",
+    python_version = "3.12",
+)
+
 py_cc_toolchain(
     name = "k8_jetson_nano_cross_compile_py_cc_toolchain_data",
     headers = ":empty",
