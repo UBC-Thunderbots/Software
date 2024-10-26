@@ -5,7 +5,7 @@
 #ifndef BAZEL_BUILD_THUNDERBOTS_HALT_PLAY_FSM_H
 #define BAZEL_BUILD_THUNDERBOTS_HALT_PLAY_FSM_H
 
-#endif //BAZEL_BUILD_THUNDERBOTS_HALT_PLAY_FSM_H
+#endif  // BAZEL_BUILD_THUNDERBOTS_HALT_PLAY_FSM_H
 
 
 #pragma once
@@ -13,11 +13,11 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/logger/logger.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/logger/logger.h"
 
-struct HaltPlayFSM{
+struct HaltPlayFSM
+{
     struct ControlParams
     {
     };
@@ -39,13 +39,12 @@ struct HaltPlayFSM{
         DEFINE_SML_ACTION(updateStop)
 
         return make_transition_table(
-                // src_state + event [guard] / action = dest_state
-                *HaltState_S + Update_E / updateStop_A = HaltState_S,
+            // src_state + event [guard] / action = dest_state
+            *HaltState_S + Update_E / updateStop_A = HaltState_S,
 
-                X + Update_E /updateStop_A             = X);
+            X + Update_E / updateStop_A = X);
     }
 
-    private:
-        PriorityTacticVector halt_tactics;
-
+   private:
+    PriorityTacticVector halt_tactics;
 };
