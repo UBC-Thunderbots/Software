@@ -27,7 +27,10 @@ load("@rules_python//python:repositories.bzl", "py_repositories")
 
 py_repositories()
 
-register_toolchains("//:py_toolchain")
+register_toolchains("//py_toolchain:py_toolchain")
+
+register_toolchains("//py_toolchain:k8_jetson_nano_cross_compile_py_cc_toolchain",
+                    "//py_toolchain:py_cc_toolchain_for_host_x86_64")
 
 load("@rules_python//python:pip.bzl", "pip_parse")
 
@@ -338,31 +341,31 @@ bind(
 
 http_archive(
     name = "pybind11_bazel",
-    sha256 = "9c2919136d7c3b4a4c4a4c0ac5eb97c101c5f59c417e4f1abe70c370b1590b73",
-    strip_prefix = "pybind11_bazel-2e5f4a6beece3b92d2f87744f305eb52b6852aa9",
-    urls = ["https://github.com/pybind/pybind11_bazel/archive/2e5f4a6beece3b92d2f87744f305eb52b6852aa9.zip"],
+    sha256 = "9df284330336958c837fb70dc34c0a6254dac52a5c983b3373a8c2bbb79ac35e",
+    strip_prefix = "pybind11_bazel-2.13.6",
+    urls = ["https://github.com/pybind/pybind11_bazel/releases/download/v2.13.6/pybind11_bazel-2.13.6.zip"],
 )
 
 # We still require the pybind library.
 http_archive(
     name = "pybind11",
-    build_file = "@pybind11_bazel//:pybind11.BUILD",
+    build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
     sha256 = "411f77380c43798506b39ec594fc7f2b532a13c4db674fcf2b1ca344efaefb68",
     strip_prefix = "pybind11-2.12.0",
     urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.12.0.zip"],
 )
 
-load("@pybind11_bazel//:python_configure.bzl", "python_configure")
-
-python_configure(
-    name = "local_config_python",
-    python_version = "3",
-)
+#load("@pybind11_bazel//:python_configure.bzl", "python_configure")
+#
+#python_configure(
+#    name = "local_config_python",
+#    python_version = "3",
+#)
 
 # These headers are used by pybind11
 bind(
     name = "python_headers",
-    actual = "@local_config_python//:python_headers",
+    actual = "@rules_python//python/cc:current_py_cc_headers",
 )
 
 maybe(
@@ -406,4 +409,16 @@ register_toolchains(
     "//cc_toolchain:cc_toolchain_for_k8_jetson_nano_cross_compile",
     "//cc_toolchain:cc_toolchain_for_k8",
     "//cc_toolchain:cc_toolchain_for_aarch64",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_for_host_x86_64",
+    path = "/usr/include/python3.12/",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_for_k8_jetson_nano_cross_compile",
+    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
 )
