@@ -1,41 +1,30 @@
 #include "software/ai/hl/stp/play/example/example_play.h"
 
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ExamplePlay::ExamplePlay(TbotsProto::AiConfig config) : Play(config, false) {}
+ExamplePlay::ExamplePlay(TbotsProto::AiConfig config)
+    : Play(config, true), fsm{ExamplePlayFSM{config}}, control_params{}
+{
+}
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                 const WorldPtr &world_ptr)
+                                  const WorldPtr &world_ptr)
 {
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics(DIV_A_NUM_ROBOTS);
-    std::generate(move_tactics.begin(), move_tactics.end(),
-                  []() { return std::make_shared<MoveTactic>(); });
+    // This function doesn't get called and it will be removed once coroutines are phased
+    // out
+}
 
-    // Continue to loop to demonstrate the example play indefinitely
-    do
-    {
-        // The angle between each robot spaced out in a circle around the ball
-        Angle angle_between_robots =
-            Angle::full() / static_cast<double>(move_tactics.size());
+void ExamplePlay::updateTactics(const PlayUpdate &play_update)
+{
+    fsm.process_event(ExamplePlayFSM::Update(control_params, play_update));
+}
 
-        for (size_t k = 0; k < move_tactics.size(); k++)
-        {
-            move_tactics[k]->updateControlParams(
-                world_ptr->ball().position() +
-                    Vector::createFromAngle(angle_between_robots *
-                                            static_cast<double>(k + 1)),
-                (angle_between_robots * static_cast<double>(k + 1)) + Angle::half());
-        }
-
-        // yield the Tactics this Play wants to run, in order of priority
-        // If there are fewer robots in play, robots at the end of the list will not be
-        // assigned
-        TacticVector result = {};
-        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
-        yield({result});
-
-    } while (true);
+std::vector<std::string> ExamplePlay::getState()
+{
+    std::vector<std::string> state;
+    state.emplace_back(objectTypeName(*this) + " - " + getCurrentFullStateName(fsm));
+    return state;
 }
 
 // Register this play in the genericFactory

@@ -1,15 +1,20 @@
 package(default_visibility = ["//visibility:public"])
 
-# We force linking for all plays so that the static variables required for the
-# "factory" design pattern to work are linked in
-# https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 cc_library(
     name = "example_play",
-    srcs = ["example_play.cpp"],
-    hdrs = ["example_play.h"],
+    srcs = [
+        "example_play.cpp",
+        "example_play_fsm.cpp"
+    ],
+    hdrs = [
+        "example_play.h",
+        "example_play_fsm.h"
+    ],
     deps = [
         "//shared:constants",
+        "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/generic_factory",
