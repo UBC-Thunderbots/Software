@@ -4,7 +4,6 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
-from abc import ABC, abstractmethod
 
 
 class GLLayer(GLGraphicsItem):
@@ -33,7 +32,6 @@ class GLLayer(GLGraphicsItem):
         #
         # WARNING: Related GLLayers should not be parents/children of each other
         self.related_layer: GLLayer = None
-
 
     def refresh_graphics(self) -> None:
         """Updates the GLGraphicsItems in this layer"""
