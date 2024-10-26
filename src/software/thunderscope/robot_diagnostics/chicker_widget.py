@@ -122,7 +122,7 @@ class ChickerWidget(QWidget):
             self.disable_kick_chip_buttons()
 
             # set and start timer to re-enable buttons after 3 seconds
-            QTimer.singleShot(CHICKER_TIMEOUT, self.enable_kick_chip_buttons)
+            QTimer.singleShot(int(CHICKER_TIMEOUT), self.enable_kick_chip_buttons)
 
     def disable_kick_chip_buttons(self) -> None:
         """Disables the buttons"""
