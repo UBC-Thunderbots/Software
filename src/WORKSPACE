@@ -29,8 +29,10 @@ py_repositories()
 
 register_toolchains("//py_toolchain:py_toolchain")
 
-register_toolchains("//py_toolchain:k8_jetson_nano_cross_compile_py_cc_toolchain",
-                    "//py_toolchain:py_cc_toolchain_for_host_x86_64")
+register_toolchains(
+    "//py_toolchain:k8_jetson_nano_cross_compile_py_cc_toolchain",
+    "//py_toolchain:py_cc_toolchain_for_host_x86_64",
+)
 
 load("@rules_python//python:pip.bzl", "pip_parse")
 
@@ -404,12 +406,12 @@ register_toolchains(
 
 new_local_repository(
     name = "py_cc_toolchain_for_host_x86_64",
-    path = "/usr/include/python3.12/",
     build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/usr/include/python3.12/",
 )
 
 new_local_repository(
     name = "py_cc_toolchain_for_k8_jetson_nano_cross_compile",
-    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
     build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
 )
