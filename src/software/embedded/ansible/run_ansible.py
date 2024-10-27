@@ -5,6 +5,7 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
 from ansible.vars.manager import VariableManager
+from ansible.plugins.loader import init_plugin_loader
 from software.embedded.constants.py_constants import RobotPlatform, NetworkConstants
 
 import sys
@@ -29,6 +30,7 @@ def ansible_runner(playbook: str, options: dict = {}) -> int:
     :param options: the options to pass to the playbook executor
     :return: the exit code from the playbook executor
     """
+    init_plugin_loader()
     loader = DataLoader()
 
     # parse options
