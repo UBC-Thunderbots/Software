@@ -43,11 +43,3 @@ py_library(
         ":frametime_counter",
     ],
 )
-
-py_library(
-    name = "worker_thread",
-    srcs = ["worker_thread.py"],
-    deps = [
-        requirement("pyqtgraph"),
-    ],
-)

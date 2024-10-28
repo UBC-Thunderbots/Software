@@ -42,7 +42,6 @@ py_library(
         "//software/embedded/constants:py_constants",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
-        "//software/thunderscope/common:worker_thread",
         requirement("pyqtgraph"),
     ],
 )

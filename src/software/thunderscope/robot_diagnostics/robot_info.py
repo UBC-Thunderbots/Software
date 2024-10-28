@@ -11,9 +11,7 @@ import time as time
 from typing import Type, Optional
 from collections import deque
 from software.embedded.constants.py_constants import AnsibleResult
-from software.thunderscope.common.worker_thread import WorkerThread
 from software.thunderscope.robot_diagnostics.ssh_dialog import SSHDialog
-import subprocess
 import os
 
 
@@ -152,15 +150,14 @@ class RobotInfo(QWidget):
         self.robot_status_expand = QPushButton("Robot Status")
         self.robot_status_expand.setCheckable(True)
 
-        # Thunderloop button
-        self.thunderloop_button = QPushButton()
-        thunderloop_button_layout = QHBoxLayout()
-        thunderloop_button_layout.addWidget(QPushButton("Status"))
-        thunderloop_button_layout.addWidget(QLabel("Thunderloop"))
-        self.thunderloop_button.setLayout(thunderloop_button_layout)
-
-        # Thunderloop menu
+        # Thunderloop menu button
+        self.thunderloop_button = QPushButton("Thunderloop")
         self.thunderloop_menu = QMenu()
+        self.show_ansible_output_action = QtGui.QAction("Show Ansible Output")
+        self.show_ansible_output_action.setCheckable(True)
+        self.thunderloop_menu.addAction(self.show_ansible_output_action)
+        self.thunderloop_menu.addAction("Configure SSH", lambda: self.ssh_dialog.exec())
+        self.thunderloop_menu.addSection("Actions")
         self.thunderloop_menu.addAction(
             "Get Thunderloop Status",
             lambda: self.__run_ansible_playbook("misc.yml", ["thunderloop_status"]),
@@ -175,17 +172,29 @@ class RobotInfo(QWidget):
             "Flash Thunderloop",
             lambda: self.__run_ansible_playbook("deploy_robot_software.yml"),
         )
-        self.thunderloop_button.setMenu(self.thunderloop_menu)
 
         # Workaround for Qt bug where QPushButton does not remove its "open"
-        # pseudo-state after its QMenu is closed
-        self.thunderloop_button.setStyleSheet(
-            "QPushButton:open:!hover { background: transparent; }"
+        # pseudo-state after its QMenu (set using QPushButton.setMenu) is closed.
+        # Instead of setMenu, manually open the QMenu when the QPushButton is clicked
+        self.thunderloop_button.clicked.connect(
+            lambda: self.thunderloop_menu.exec(
+                self.thunderloop_button.mapToGlobal(
+                    self.thunderloop_button.rect().bottomLeft()
+                )
+            )
         )
 
         # Dialog for entering in credentials to SSH into the robot
         self.ssh_dialog = SSHDialog(parent=self, robot_id=self.robot_id)
         self.ssh_connected = False
+
+        # Process for running Ansible playbooks (to restart/flash Thunderloop)
+        self.ansible_process = QtCore.QProcess(self)
+        self.ansible_process.started.connect(self.__ansible_process_started)
+        self.ansible_process.finished.connect(self.__ansible_process_finished)
+        self.ansible_process.setWorkingDirectory(
+            os.environ.get("BUILD_WORKSPACE_DIRECTORY", ".")
+        )
 
         # motor fault visualisation for the 4 wheel motors
         self.motor_fault_view = MotorFaultView()
@@ -442,34 +451,34 @@ class RobotInfo(QWidget):
             if not dialog_accepted:
                 return
 
-        def run_playbook() -> AnsibleResult:
-            self.thunderloop_button.setEnabled(False)
+        args = f"""
+            run run_ansible
+            --platform {self.ssh_dialog.robot_platform.value}
+            --playbook {playbook}
+            --hosts {self.ssh_dialog.ssh_host}
+            --ssh_pass {self.ssh_dialog.ssh_password}
+            --timeout 10
+            --jobs 4
+            """
 
-            command = f"""
-                ./tbots.py run run_ansible
-                --platform {self.ssh_dialog.robot_platform.value}
-                --playbook {playbook}
-                --hosts {self.ssh_dialog.ssh_host}
-                --ssh_pass {self.ssh_dialog.ssh_password}
-                --timeout 10
-                --jobs 4
-                """
+        if tags:
+            args += f"--tags {" ".join(tags)}"
 
-            if tags:
-                command += f"--tags {" ".join(tags)}"
+        self.ansible_process.start("./tbots.py", args.split())
 
-            result = subprocess.run(
-                command.split(), cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", ".")
-            )
+    def __ansible_process_started(self) -> None:
+        """Handler for the self.ansible_process.started signal that disables the
+        Thunderloop button
+        """
+        self.thunderloop_button.setEnabled(False)
+        self.show_ansible_output_action.setChecked(True)
 
-            return AnsibleResult(result.returncode)
+    def __ansible_process_finished(self, exit_code: int) -> None:
+        """Handler for the self.ansible_process.finished signal that enables the
+        Thunderloop button and updates the SSH connection status
 
-        def on_playbook_finished(ansible_result: AnsibleResult) -> None:
-            self.thunderloop_button.setEnabled(True)
-            self.ssh_connected = (
-                AnsibleResult.RUN_UNREACHABLE_HOSTS not in ansible_result
-            )
-
-        self.__worker_thread = WorkerThread(run_playbook)
-        self.__worker_thread.finished.connect(on_playbook_finished)
-        self.__worker_thread.start()
+        :param exit_code: the exit code of the process
+        """
+        ansible_result = AnsibleResult(exit_code)
+        self.ssh_connected = AnsibleResult.RUN_UNREACHABLE_HOSTS not in ansible_result
+        self.thunderloop_button.setEnabled(True)

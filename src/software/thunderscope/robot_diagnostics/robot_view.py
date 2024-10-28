@@ -1,4 +1,4 @@
-from pyqtgraph.Qt import QtCore
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from proto.import_all_protos import *
@@ -44,6 +44,29 @@ class RobotViewComponent(QWidget):
         self.layout.addWidget(self.robot_info)
 
         self.robot_status = None
+
+        self.ansible_output = QTextEdit()
+        font = QtGui.QFont("Courier New")
+        font.setStyleStrategy(QtGui.QFont.StyleStrategy.PreferAntialias)
+        self.ansible_output.setFont(font)
+        self.ansible_output.setMinimumHeight(300)
+        self.ansible_output.setReadOnly(True)
+        self.ansible_output.setVisible(False)
+        self.layout.addWidget(self.ansible_output)
+
+        self.robot_info.show_ansible_output_action.toggled.connect(
+            lambda checked: self.ansible_output.setVisible(checked)
+        )
+        self.robot_info.ansible_process.readyReadStandardOutput.connect(
+            lambda: self.ansible_output.append(
+                self.robot_info.ansible_process.readAllStandardOutput().data().decode()
+            )
+        )
+        self.robot_info.ansible_process.readyReadStandardError.connect(
+            lambda: self.ansible_output.append(
+                self.robot_info.ansible_process.readAllStandardError().data().decode()
+            )
+        )
 
         self.robot_info.robot_status_expand.clicked.connect(self.robot_status_expand)
 
