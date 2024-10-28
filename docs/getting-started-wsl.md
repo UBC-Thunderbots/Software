@@ -2,13 +2,17 @@
 
 ## Table of Contents
 
-* [Table of Contents](#table-of-contents)
-* [Introduction](#introduction)
-* [WSLg Setup (Windows 11/10 - Recommended)](#wslg-setup-windows-1110---recommended)
-* [WSL2 Setup (Windows 10)](#wsl2-setup-windows-10)
-    * [X Server Setup](#x-server-setup)
-* [Networking Issues](#networking-issues)
-* [USB Issues](#usb-issues)
+<!--TOC-->
+
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+- [WSLg Setup (Windows 11/10 - Recommended)](#wslg-setup-windows-1110---recommended)
+- [WSL2 Setup (Windows 10)](#wsl2-setup-windows-10)
+  - [X Server Setup](#x-server-setup)
+- [Networking Issues](#networking-issues)
+- [USB Issues](#usb-issues)
+
+<!--TOC-->
 
 ## Introduction
 

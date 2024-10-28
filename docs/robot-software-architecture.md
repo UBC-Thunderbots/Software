@@ -1,14 +1,20 @@
 # Robot Software Architecture
 
 # Table of Contents
-* [Tools](#tools)
-   * [Ansible](#ansible)
-   * [Systemd](#systemd)
-   * [Redis](#redis)
-* [Redis](#redis)
-* [Thunderloop](#thunderloop)
-* [Announcements](#announcements)
-* [Display](#display)
+
+<!--TOC-->
+
+- [Table of Contents](#table-of-contents)
+- [Robot Software Diagram](#robot-software-diagram)
+- [Tools](#tools)
+  - [Ansible](#ansible)
+  - [Systemd](#systemd)
+  - [Redis](#redis)
+- [Thunderloop](#thunderloop)
+
+<!--TOC-->
+
+# Robot Software Diagram
 
 ![Robot Software Diagram](images/robot_software_diagram.svg)
 
