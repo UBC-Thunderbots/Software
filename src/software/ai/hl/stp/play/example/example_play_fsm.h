@@ -45,10 +45,10 @@ struct ExamplePlayFSM
         DEFINE_SML_ACTION(moveToPosition)
 
         return make_transition_table(
-                // src_state + event [guard] / action = dest_state
-                *MoveState_S + Update_E / moveToPosition_A = MoveState_S,
+            // src_state + event [guard] / action = dest_state
+            *MoveState_S + Update_E / moveToPosition_A = MoveState_S,
 
-                X + Update_E = X);
+            X + Update_E = X);
     }
 
    private:

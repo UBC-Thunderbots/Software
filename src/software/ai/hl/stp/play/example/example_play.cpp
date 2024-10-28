@@ -9,7 +9,7 @@ ExamplePlay::ExamplePlay(TbotsProto::AiConfig config)
 }
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                  const WorldPtr &world_ptr)
+                                 const WorldPtr &world_ptr)
 {
     // This function doesn't get called and it will be removed once coroutines are phased
     // out

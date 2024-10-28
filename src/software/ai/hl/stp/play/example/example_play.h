@@ -7,7 +7,7 @@
  */
 class ExamplePlay : public Play
 {
-public:
+   public:
     /**
      * Creates an example play
      *
@@ -20,7 +20,7 @@ public:
     void updateTactics(const PlayUpdate &play_update) override;
     std::vector<std::string> getState() override;
 
-private:
+   private:
     FSM<ExamplePlayFSM> fsm;
     ExamplePlayFSM::ControlParams control_params;
 };
