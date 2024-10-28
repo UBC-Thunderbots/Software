@@ -8,7 +8,7 @@
 
 /**
  * An example Play that moves the robots in a circle around the ball
- * */
+ */
 
 struct ExamplePlayFSM
 {
