@@ -24,9 +24,9 @@ void ExamplePlayFSM::moveToPosition(const Update &event)
                 (angle_between_robots * static_cast<double>(k + 1)) + Angle::half());
     }
 
-//    // yield the Tactics this Play wants to run, in order of priority
-//    // If there are fewer robots in play, robots at the end of the list will not be assigned
-//    TacticVector result = {};
-//    result.insert(result.end(), move_tactics.begin(), move_tactics.end());
-//    yield({result});
+    // set the Tactics this Play wants to run, in order of priority
+    // If there are fewer robots in play, robots at the end of the list will not be assigned
+    TacticVector result = {};
+    result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+    event.common.set_tactics({result});
 }
