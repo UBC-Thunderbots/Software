@@ -206,7 +206,6 @@ def hrvo_setup(
                 if friendly_robots_final_orientations
                 else desired_orientation
             ),
-            0,
             params=blue_params,
         )
 
@@ -217,7 +216,7 @@ def hrvo_setup(
 
     for index, destination in enumerate(enemy_robots_destinations):
         yellow_params = get_move_update_control_params(
-            index, destination, tbots.Angle.fromRadians(0), 0, params=yellow_params
+            index, destination, tbots.Angle.fromRadians(0), params=yellow_params
         )
 
     simulated_test_runner.set_tactics(yellow_params, False)
@@ -541,7 +540,6 @@ def get_move_update_control_params(
     robot_id: int,
     destination: tbots.Point,
     desired_orientation: tbots.Angle,
-    final_speed: float,
     params: AssignedTacticPlayControlParams = None,
 ):
     """Constructs the control params for a Move Tactic for a single robot
@@ -551,7 +549,6 @@ def get_move_update_control_params(
     :param robot_id: the id of the robot who will be assigned these params
     :param destination: the destination of the robot
     :param desired_orientation: the desired orientation of the robot
-    :param final_speed: the final speed of the robot
     :param params: AssignedTacticPlayControlParams message
                    if not None, add this robot's params to this
                    else, create a new message and add
@@ -562,12 +559,10 @@ def get_move_update_control_params(
         MoveTactic(
             destination=Point(x_meters=destination.x(), y_meters=destination.y()),
             final_orientation=Angle(radians=desired_orientation.toRadians()),
-            final_speed=final_speed,
             dribbler_mode=DribblerMode.OFF,
             ball_collision_type=BallCollisionType.ALLOW,
             auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
             max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-            target_spin_rev_per_s=0.0,
             obstacle_avoidance_mode=ObstacleAvoidanceMode.AGGRESSIVE,
         )
     )

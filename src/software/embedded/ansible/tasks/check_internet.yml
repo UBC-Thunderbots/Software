@@ -1,0 +1,8 @@
+---
+
+- name: check internet connection
+  tags: check_internet
+  uri:
+    url: "https://google.com"
+    timeout: 30
+    status_code: 200
