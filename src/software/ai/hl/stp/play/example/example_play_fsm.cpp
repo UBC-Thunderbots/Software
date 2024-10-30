@@ -1,10 +1,5 @@
 #include "software/ai/hl/stp/play/example/example_play_fsm.h"
 
-ExamplePlayFSM::ExamplePlayFSM(const TbotsProto::AiConfig &ai_config)
-    : ai_config(ai_config)
-{
-}
-
 void ExamplePlayFSM::moveToPosition(const Update &event)
 {
     std::vector<std::shared_ptr<MoveTactic>> move_tactics(DIV_A_NUM_ROBOTS);
