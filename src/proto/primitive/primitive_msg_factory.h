@@ -30,5 +30,5 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitiveProto();
  * @return Pointer to the DirectControl Primitive
  */
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
-    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_rpm,
+    const Vector &velocity, AngularVelocity angular_velocity, int dribbler_rpm,
     const TbotsProto::AutoChipOrKick &auto_chip_or_kick);

@@ -66,9 +66,15 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 ### Operating systems
 
-We currently only support Linux, specifically Ubuntu 20.04 LTS and Ubuntu 22.04 LTS. You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
+We currently only support Linux, specifically Ubuntu.
 
-You can use Ubuntu 20.04 LTS and Ubuntu 22.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+If you have a X86_64 machine, we support Ubuntu 20.04 LTS, Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
+
+If you have a ARM64 (also known as AARCH64) machine, we support Ubuntu 24.04 LTS.
+
+You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
+
+You can use Ubuntu 20.04 LTS, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ### Getting the Code
 
@@ -350,7 +356,7 @@ Tracy also samples call stacks. If the profiled binary is run with root permissi
 
 ## Building for the robot
 
-To build for the robot computer, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
+To build for the robot computer, build the target with the `--platforms=//cc_toolchain:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//cc_toolchain:robot //software/geom/...`.
 
 ## Deploying Robot Software to the robot
 
@@ -358,7 +364,7 @@ We use Ansible to automatically update software running on the robot. [More info
 
 To update binaries on a working robot, you can run:
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), and `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
 
