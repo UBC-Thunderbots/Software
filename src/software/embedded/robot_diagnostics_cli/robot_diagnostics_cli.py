@@ -2,7 +2,7 @@ from rich import print
 from rich.live import Live
 from rich.table import Table
 # import software.python_bindings as tbots_cpp
-# from software.py_constants import *
+from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
 
@@ -20,17 +20,17 @@ class RobotDiagnosticsCLI():
         self.test_val = 0
 
         # Receiver / probably want to fetch channel from redis cache
-        self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
-            str(getRobotMulticastChannel(0)) + "%" + "eth0",
-            ROBOT_STATUS_PORT,
-            self.__receive_robot_status,
-            True,
-            )
-
+        # self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
+        #     str(getRobotMulticastChannel(0)) + "%" + "eth0",
+        #     ROBOT_STATUS_PORT,
+        #     self.__receive_robot_status,
+        #     True,
+        #     )
+        print(ROBOT_STATUS_PORT)
         # Sender / What is the network interface here?
-        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-            str(getRobotMulticastChannel(0)) + "%" + "eth0", PRIMITIVE_PORT, True
-        )
+        # self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
+        #     str(getRobotMulticastChannel(0)) + "%" + "eth0", PRIMITIVE_PORT, True
+        # )
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Forwards the given robot status to the full system along with the round-trip time

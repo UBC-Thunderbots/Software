@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@robot_diagnostics_cli_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 compile_pip_requirements(
     name = "requirements",
@@ -22,6 +23,7 @@ py_binary(
     deps = [
         requirement("typer_shell"),
         requirement("rich"),
+        requirement("protobuf"),
     ],
 )
 
