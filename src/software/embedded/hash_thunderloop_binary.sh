@@ -7,7 +7,7 @@ touch ~/thunderbots_hashes/thunderloop.hash
 touch ~/thunderbots_hashes/thunderloop.date
 
 : '
-md5sum produces the MD5 hash of a provided file, followed by the name of the file seperated by a space
+md5sum produces the MD5 hash of a provided file, followed by the name of the file separated by a space
 example output:
 
 a60a083f11289d0904c9c4bf8fa59a59  thunderloop
