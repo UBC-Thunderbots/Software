@@ -20,9 +20,6 @@ cc_library(
     alwayslink = True,
 )
 
-
-
-
 cc_library(
     name = "kickoff_enemy_play",
     srcs = ["kickoff_enemy_play.cpp"],
@@ -123,7 +120,6 @@ cc_library(
     name = "all_plays",
     deps = [
         ":example_play",
-        "//software/ai/hl/stp/play/halt_play:halt_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
         ":shoot_or_chip_play",
@@ -134,6 +130,7 @@ cc_library(
         "//software/ai/hl/stp/play/enemy_ball_placement:enemy_ball_placement_play",
         "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
         "//software/ai/hl/stp/play/free_kick:free_kick_play",
+        "//software/ai/hl/stp/play/halt_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
@@ -222,10 +219,6 @@ cc_test(
         "//software/world",
     ],
 )
-
-
-
-
 
 cc_test(
     name = "shoot_or_chip_play_cpp_test",

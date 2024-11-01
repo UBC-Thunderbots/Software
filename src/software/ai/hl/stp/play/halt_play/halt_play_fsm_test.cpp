@@ -20,8 +20,8 @@ TEST(HaltPlayFSMTest, test_transitions)
     fsm.process_event(HaltPlayFSM::Update(
         HaltPlayFSM::ControlParams{},
         PlayUpdate(
-                world, num_tactics, [](PriorityTacticVector new_tactics) {},
-                InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+            world, num_tactics, [](PriorityTacticVector new_tactics) {},
+            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<HaltPlayFSM::HaltState>));
 }

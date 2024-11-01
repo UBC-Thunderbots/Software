@@ -7,7 +7,8 @@
 #include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 
-struct HaltPlayFSM{
+struct HaltPlayFSM
+{
     struct ControlParams
     {
     };
@@ -41,13 +42,12 @@ struct HaltPlayFSM{
         DEFINE_SML_ACTION(updateStop)
 
         return make_transition_table(
-                // src_state + event [guard] / action = dest_state
-                *HaltState_S + Update_E / updateStop_A = HaltState_S,
+            // src_state + event [guard] / action = dest_state
+            *HaltState_S + Update_E / updateStop_A = HaltState_S,
 
-                X + Update_E /updateStop_A             = X);
+            X + Update_E / updateStop_A = X);
     }
 
-    private:
-        PriorityTacticVector halt_tactics;
-
+   private:
+    PriorityTacticVector halt_tactics;
 };

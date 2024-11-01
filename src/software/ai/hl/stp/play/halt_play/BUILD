@@ -4,12 +4,15 @@ load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 cc_library(
     name = "halt_play",
-    srcs = ["halt_play.cpp",
-            "halt_play_fsm.cpp"],
-    hdrs = ["halt_play.h",
-            "halt_play_fsm.h"],
+    srcs = [
+        "halt_play.cpp",
+        "halt_play_fsm.cpp",
+    ],
+    hdrs = [
+        "halt_play.h",
+        "halt_play_fsm.h",
+    ],
     deps = [
-        "//software/ai/hl/stp/play:play",
         "//shared:constants",
         "//software/ai/hl/stp/tactic/halt:halt_tactic",
         "//software/logger",
@@ -22,8 +25,8 @@ cc_test(
     name = "halt_play_cpp_test",
     srcs = ["halt_play_test.cpp"],
     deps = [
-        "//shared/test_util:tbots_gtest_main",
         ":halt_play",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
@@ -42,7 +45,6 @@ cc_test(
         "//software/test_util",
     ],
 )
-
 
 py_test(
     name = "halt_play_test",
