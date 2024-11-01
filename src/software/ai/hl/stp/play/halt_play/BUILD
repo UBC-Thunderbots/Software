@@ -11,7 +11,7 @@ cc_library(
     deps = [
         "//software/ai/hl/stp/play:play",
         "//shared:constants",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/halt:halt_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],

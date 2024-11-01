@@ -1,20 +1,10 @@
-//
-// Created by grayson on 2024-10-19.
-//
-
-#ifndef BAZEL_BUILD_THUNDERBOTS_HALT_PLAY_FSM_H
-#define BAZEL_BUILD_THUNDERBOTS_HALT_PLAY_FSM_H
-
-#endif //BAZEL_BUILD_THUNDERBOTS_HALT_PLAY_FSM_H
-
-
 #pragma once
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/logger/logger.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 
 struct HaltPlayFSM{
@@ -25,6 +15,18 @@ struct HaltPlayFSM{
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    /**
+     * Creates a Halt Play FSM
+     *
+     * @param ai_config the play config for this FSM
+     */
+    explicit HaltPlayFSM(TbotsProto::AiConfig ai_config);
+
+    /**
+     * Action to make each robot stop
+     *
+     * @param event the HaltPlayFSM Event
+     */
     void updateStop(const Update& event);
 
 

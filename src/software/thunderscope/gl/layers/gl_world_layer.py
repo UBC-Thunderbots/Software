@@ -77,11 +77,13 @@ class GLWorldLayer(GLLayer):
             Qt.Key.Key_Shift,
             Qt.Key.Key_Up,
             Qt.Key.Key_Down,
+            Qt.Key.Key_O,
         ]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
 
         self.display_robot_ids = True
+        self.display_robot_names = True
         self.display_speed_lines = True
         self.is_playing = True
         self.simulation_speed = 1.0
@@ -149,6 +151,8 @@ class GLWorldLayer(GLLayer):
             self.display_robot_ids = not self.display_robot_ids
         elif event.key() == QtCore.Qt.Key.Key_S:
             self.display_speed_lines = not self.display_speed_lines
+        elif event.key() == QtCore.Qt.Key.Key_O:
+            self.display_robot_names = not self.display_robot_names
 
         # If user is holding ctrl + space, send a command to simulator to pause the gameplay
         if (
