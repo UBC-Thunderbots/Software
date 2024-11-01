@@ -3,9 +3,8 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/logger/logger.h"
 #include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/logger/logger.h"
 
 struct HaltPlayFSM
 {
