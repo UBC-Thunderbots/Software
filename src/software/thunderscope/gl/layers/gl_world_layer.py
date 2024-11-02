@@ -368,6 +368,7 @@ class GLWorldLayer(GLLayer):
             self.friendly_robot_graphics,
             self.friendly_robot_id_graphics,
             self.friendly_robot_name_graphics,
+            ROBOT_NAMES_FROM_ID,
         )
         self.__update_robot_graphics(
             self._cached_enemy_team,
@@ -375,6 +376,7 @@ class GLWorldLayer(GLLayer):
             self.enemy_robot_graphics,
             self.enemy_robot_id_graphics,
             ObservableList(),
+            {}
         )
 
     def __update_field_graphics(self, field: Field) -> None:
@@ -452,6 +454,7 @@ class GLWorldLayer(GLLayer):
         robot_graphics: ObservableList,
         robot_id_graphics: ObservableList,
         robot_name_graphics: ObservableList,
+        robot_names:dict[int:str],
     ) -> None:
         """Update the GLGraphicsItems that display the robots
 
@@ -460,6 +463,7 @@ class GLWorldLayer(GLLayer):
         :param robot_graphics: The ObservableList containing the robot graphics for this team
         :param robot_id_graphics: The ObservableList containing the robot ID graphics for this team
         :param robot_name_graphics: The ObservableList containing the robot Name graphics for this team.
+        :param robot_names: A dict mapping ids to names of robots
         """
         # Ensure we have the same number of graphics as robots
         robot_graphics.resize(len(robots), lambda: GLRobot())
@@ -492,37 +496,42 @@ class GLWorldLayer(GLLayer):
             robot_graphic.setColor(color)
             robot_graphic.show()
 
-            if self.display_robot_ids:
-                robot_id_graphic.show()
-
-                robot_id_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
-
-                robot_id_graphic.setData(
-                    text=str(robot_id),
-                    pos=[
-                        pos_x - (ROBOT_MAX_RADIUS_METERS / 2),
-                        pos_y,
-                        ROBOT_MAX_HEIGHT_METERS + 0.1,
-                    ],
-                )
-
-            else:
-                robot_id_graphic.hide()
-            if self.display_robot_names:
-                robot_name_graphic.show()
-
-                robot_name_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
-
-                robot_name_graphic.setData(
-                    text=ROBOT_NAMES_FROM_ID[robot_id],
-                    pos=[
+            self.__update_robot_label_graphic(
+                self.display_robot_ids,
+                robot_id_graphic,
+                str(robot_id),
+                (
+                    pos_x - (ROBOT_MAX_RADIUS_METERS / 2),
+                    pos_y,
+                    ROBOT_MAX_HEIGHT_METERS + 0.1
+                ),
+            )
+            if robot_id in robot_names:
+                self.__update_robot_label_graphic(
+                    self.display_robot_names,
+                    robot_name_graphic,
+                    robot_names[robot_id],
+                    (
                         pos_x - (ROBOT_MAX_RADIUS_METERS / 2)+0.2,
                         pos_y,
-                        ROBOT_MAX_HEIGHT_METERS + 0.1,
-                    ],
+                        ROBOT_MAX_HEIGHT_METERS + 0.1
+                    ),
                 )
-            else:
-                robot_name_graphic.hide()
+    def __update_robot_label_graphic(
+            self,
+            toggle:bool,
+            label:GLTextItem,
+            text:str,
+            pos:tuple[float, float, float],
+    ) -> None:
+        if toggle:
+            label.show()
+
+            label.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
+
+            label.setData(text=text, pos=list(pos))
+        else:
+            label.hide()
 
     def __update_robot_status_graphics(self) -> None:
         """Update the robot status graphics"""
