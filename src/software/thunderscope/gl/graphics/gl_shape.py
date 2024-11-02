@@ -5,7 +5,7 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from software.thunderscope.constants import Colors, LINE_WIDTH
 
 from typing import Optional
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 
 class GLShape(GLLinePlotItem):
