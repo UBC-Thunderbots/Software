@@ -130,18 +130,25 @@ class HandheldControllerWidget(QWidget):
                 else 0
             )
 
-        move_axis_x = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_X))
-        move_axis_y = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_Y))
+        move_axis_x = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_Y))
+        move_axis_y = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_X))
         move_axis_rot = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_RX))
 
+        left_trigger_value = self.handheld_controller.abs_value(ecodes.ABS_Z)
+        speed_factor = (
+            DiagnosticsConstants.SPEED_SLOWDOWN_FACTOR
+            if left_trigger_value > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
+            else 1
+        )
+
         self.motor_control.direct_velocity_control.velocity.x_component_meters = (
-            move_axis_x * self.constants.robot_max_speed_m_per_s
+            -move_axis_x * self.constants.robot_max_speed_m_per_s * speed_factor
         )
         self.motor_control.direct_velocity_control.velocity.y_component_meters = (
-            -move_axis_y * self.constants.robot_max_speed_m_per_s
+            -move_axis_y * self.constants.robot_max_speed_m_per_s * speed_factor
         )
         self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-            -move_axis_rot * self.constants.robot_max_ang_speed_rad_per_s
+            -move_axis_rot * self.constants.robot_max_ang_speed_rad_per_s * speed_factor
         )
 
         d_pad_axis_x = self.handheld_controller.abs_value(ecodes.ABS_HAT0X)
@@ -174,10 +181,11 @@ class HandheldControllerWidget(QWidget):
             )
 
         right_trigger_value = self.handheld_controller.abs_value(ecodes.ABS_RZ)
-        if right_trigger_value > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD:
-            self.motor_control.dribbler_speed_rpm = self.dribbler_speed
-        else:
-            self.motor_control.dribbler_speed_rpm = 0
+        self.motor_control.dribbler_speed_rpm = (
+            self.dribbler_speed
+            if right_trigger_value > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
+            else 0
+        )
 
         btn_a = self.handheld_controller.key_down(ecodes.BTN_A)
         btn_b = self.handheld_controller.key_down(ecodes.BTN_B)
