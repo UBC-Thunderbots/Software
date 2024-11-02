@@ -7,7 +7,7 @@ from abc import abstractmethod
 logger = createLogger(__name__)
 
 
-class TbotsTestRunner():
+class TbotsTestRunner:
     """An abstract class that represents a test runner"""
 
     def __init__(

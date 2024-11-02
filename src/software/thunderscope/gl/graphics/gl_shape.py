@@ -5,7 +5,6 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from software.thunderscope.constants import Colors, LINE_WIDTH
 
 from typing import Optional
-from abc import abstractmethod
 
 
 class GLShape(GLLinePlotItem):
@@ -85,7 +84,6 @@ class GLShape(GLLinePlotItem):
             if self.fill_graphic:
                 self.fill_graphic.setParentItem(None)
                 self.fill_graphic = None
-
 
     def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing

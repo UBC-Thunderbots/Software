@@ -4,7 +4,7 @@ from proto.validation_pb2 import *
 from abc import abstractmethod
 
 
-class Validation():
+class Validation:
     """A validation function"""
 
     @abstractmethod

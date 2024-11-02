@@ -1,7 +1,6 @@
 import textwrap
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
-from abc import abstractmethod
 
 
 class GLToolbar(QWidget):
@@ -26,7 +25,6 @@ class GLToolbar(QWidget):
         self.setStyleSheet("background-color: rgba(0,0,0,0);" "padding: 0px;")
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
         self.setLayout(QHBoxLayout())
-
 
     def refresh(self) -> None:
         """Refreshes the UI (overridden by child classes)"""
