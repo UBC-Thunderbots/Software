@@ -137,6 +137,7 @@ class GLWorldLayer(GLLayer):
         self.friendly_robot_id_graphics = ObservableList(self._graphics_changed)
         self.friendly_robot_name_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_id_graphics = ObservableList(self._graphics_changed)
+        self.enemy_robot_name_graphics = ObservableList(self._graphics_changed)
         self.breakbeam_graphics = ObservableList(self._graphics_changed)
         self.auto_kick_graphics = ObservableList(self._graphics_changed)
         self.auto_chip_graphics = ObservableList(self._graphics_changed)
@@ -368,14 +369,14 @@ class GLWorldLayer(GLLayer):
             self.friendly_robot_graphics,
             self.friendly_robot_id_graphics,
             self.friendly_robot_name_graphics,
-            ROBOT_NAMES_FROM_ID,
+            ROBOT_NAMES_FROM_ID
         )
         self.__update_robot_graphics(
             self._cached_enemy_team,
             enemy_colour,
             self.enemy_robot_graphics,
             self.enemy_robot_id_graphics,
-            ObservableList(),
+            self.enemy_robot_name_graphics,
             {}
         )
 
