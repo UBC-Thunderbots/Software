@@ -525,6 +525,13 @@ class GLWorldLayer(GLLayer):
             text:str,
             pos:tuple[float, float, float],
     ) -> None:
+        """Updates the text labels (id and name) above a robot.
+
+        :param toggle: toggles display for the displayed text.
+        :param label: The label to change.
+        :param str: The text to display.
+        :param pos: The position of the text.
+        """
         if toggle:
             label.show()
 
