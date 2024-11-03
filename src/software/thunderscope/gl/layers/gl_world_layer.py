@@ -369,7 +369,7 @@ class GLWorldLayer(GLLayer):
             self.friendly_robot_graphics,
             self.friendly_robot_id_graphics,
             self.friendly_robot_name_graphics,
-            ROBOT_NAMES_FROM_ID
+            ROBOT_NAMES_FROM_ID,
         )
         self.__update_robot_graphics(
             self._cached_enemy_team,
@@ -377,7 +377,7 @@ class GLWorldLayer(GLLayer):
             self.enemy_robot_graphics,
             self.enemy_robot_id_graphics,
             self.enemy_robot_name_graphics,
-            {}
+            {},
         )
 
     def __update_field_graphics(self, field: Field) -> None:
@@ -455,7 +455,7 @@ class GLWorldLayer(GLLayer):
         robot_graphics: ObservableList,
         robot_id_graphics: ObservableList,
         robot_name_graphics: ObservableList,
-        robot_names:dict[int:str],
+        robot_names: dict[int:str],
     ) -> None:
         """Update the GLGraphicsItems that display the robots
 
@@ -504,7 +504,7 @@ class GLWorldLayer(GLLayer):
                 (
                     pos_x - (ROBOT_MAX_RADIUS_METERS / 2),
                     pos_y,
-                    ROBOT_MAX_HEIGHT_METERS + 0.1
+                    ROBOT_MAX_HEIGHT_METERS + 0.1,
                 ),
             )
             if robot_id in robot_names:
@@ -513,17 +513,18 @@ class GLWorldLayer(GLLayer):
                     robot_name_graphic,
                     robot_names[robot_id],
                     (
-                        pos_x - (ROBOT_MAX_RADIUS_METERS / 2)+0.2,
+                        pos_x - (ROBOT_MAX_RADIUS_METERS / 2) + 0.2,
                         pos_y,
-                        ROBOT_MAX_HEIGHT_METERS + 0.1
+                        ROBOT_MAX_HEIGHT_METERS + 0.1,
                     ),
                 )
+
     def __update_robot_label_graphic(
-            self,
-            toggle:bool,
-            label:GLTextItem,
-            text:str,
-            pos:tuple[float, float, float],
+        self,
+        toggle: bool,
+        label: GLTextItem,
+        text: str,
+        pos: tuple[float, float, float],
     ) -> None:
         """Updates the text labels (id and name) above a robot.
 
