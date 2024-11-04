@@ -69,7 +69,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        LoggerSingleton::initializeLogger(args.runtime_dir, nullptr, true, false);
+        LoggerSingleton::initializeLogger(args.runtime_dir, nullptr, false);
 
         LatencyTesterPrimaryNode tester(args.interface,
             args.listen_channel, args.listen_port, args.send_channel, args.send_port,
