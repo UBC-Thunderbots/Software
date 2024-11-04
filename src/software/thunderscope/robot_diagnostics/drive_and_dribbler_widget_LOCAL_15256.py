@@ -39,11 +39,10 @@ class DriveAndDribblerWidget(QWidget):
         layout.addWidget(self.drive_widget)
         layout.addWidget(self.setup_dribbler("Dribbler"))
 
-        # default to direct velocity
-        self.drive_mode = DriveMode.VELOCITY
+        self.drive_mode = DriveMode.MOTOR
         self.use_direct_velocity.setChecked(True)
-        self.toggle_drive_mode(DriveMode.VELOCITY)
         self.setLayout(layout)
+        self.toggle_drive_mode(True)
         self.toggle_dribbler_sliders(True)
 
     def refresh(self) -> None:
@@ -103,10 +102,10 @@ class DriveAndDribblerWidget(QWidget):
         self.use_direct_velocity = self.connect_options[DriveMode.VELOCITY]
         self.use_per_motor = self.connect_options[DriveMode.MOTOR]
         self.use_direct_velocity.clicked.connect(
-            lambda: self.toggle_drive_mode(DriveMode.VELOCITY)
+            lambda: self.toggle_drive_mode(True)
         )
         self.use_per_motor.clicked.connect(
-            lambda: self.toggle_drive_mode(DriveMode.MOTOR)
+            lambda: self.toggle_drive_mode(False)
         )
         vbox.addWidget(self.connect_options_box)
         group_box.setLayout(vbox)
@@ -315,7 +314,6 @@ class DriveAndDribblerWidget(QWidget):
         self.disconnect_motor_sliders()
 
         if use_drive_mode == DriveMode.VELOCITY:
-
             # Show the direct velocity widget
             self.drive_widget.setCurrentWidget(self.direct_velocity_widget)
 

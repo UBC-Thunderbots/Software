@@ -30,7 +30,9 @@ class DriveAndDribblerWidget(QWidget):
         self.proto_unix_io = proto_unix_io
 
         # create swappable widget system using stacked widgets
-        self.direct_velocity_widget = self.setup_direct_velocity("Drive - Direct Velocity")
+        self.direct_velocity_widget = self.setup_direct_velocity(
+            "Drive - Direct Velocity"
+        )
         self.per_motor_widget = self.setup_per_motor("Drive - Per Motor")
         self.drive_widget.addWidget(self.direct_velocity_widget)
         self.drive_widget.addWidget(self.per_motor_widget)
@@ -39,11 +41,10 @@ class DriveAndDribblerWidget(QWidget):
         layout.addWidget(self.drive_widget)
         layout.addWidget(self.setup_dribbler("Dribbler"))
 
-        # default to direct velocity
-        self.drive_mode = DriveMode.VELOCITY
+        self.drive_mode = DriveMode.MOTOR
         self.use_direct_velocity.setChecked(True)
-        self.toggle_drive_mode(DriveMode.VELOCITY)
         self.setLayout(layout)
+        self.toggle_drive_mode(True)
         self.toggle_dribbler_sliders(True)
 
     def refresh(self) -> None:
@@ -59,9 +60,13 @@ class DriveAndDribblerWidget(QWidget):
             motor_control.direct_velocity_drive.velocity.y_component_meters = (
                 self.y_velocity_slider.value()
             )
+<<<<<<< HEAD
             motor_control.direct_velocity_drive.angular_velocity.radians_per_second = (
                 self.angular_velocity_slider.value()
             )
+=======
+            motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.angular_velocity_slider.value()
+>>>>>>> 2b88ee68a0a266e5e01447616a4509f08fb35821
         else:
             motor_control.ClearField("direct_velocity_control")
             motor_control.direct_per_wheel_drive.front_left_wheel_velocity = (
@@ -102,14 +107,21 @@ class DriveAndDribblerWidget(QWidget):
         )
         self.use_direct_velocity = self.connect_options[DriveMode.VELOCITY]
         self.use_per_motor = self.connect_options[DriveMode.MOTOR]
+<<<<<<< HEAD
         self.use_direct_velocity.clicked.connect(
-            lambda: self.toggle_drive_mode(DriveMode.VELOCITY)
+            lambda: self.toggle_drive_mode(True)
         )
         self.use_per_motor.clicked.connect(
-            lambda: self.toggle_drive_mode(DriveMode.MOTOR)
+            lambda: self.toggle_drive_mode(False)
         )
         vbox.addWidget(self.connect_options_box)
         group_box.setLayout(vbox)
+=======
+        self.use_direct_velocity.clicked.connect(self.switch_to_velocity)
+        self.use_per_motor.clicked.connect(self.switch_to_motor)
+        dbox.addWidget(self.connect_options_box)
+        group_box.setLayout(dbox)
+>>>>>>> 2b88ee68a0a266e5e01447616a4509f08fb35821
 
         return group_box
 
@@ -185,7 +197,6 @@ class DriveAndDribblerWidget(QWidget):
 
         :param title: the name of the group box
         """
-
         group_box = QGroupBox(title)
         dbox = QVBoxLayout()
 
@@ -239,7 +250,9 @@ class DriveAndDribblerWidget(QWidget):
             self.front_left_motor_slider, self.front_left_motor_label, self.value_change
         )
         common_widgets.enable_slider(
-            self.front_right_motor_slider, self.front_right_motor_label, self.value_change
+            self.front_right_motor_slider,
+            self.front_right_motor_label,
+            self.value_change,
         )
         common_widgets.enable_slider(
             self.back_left_motor_slider, self.back_left_motor_label, self.value_change
@@ -315,7 +328,6 @@ class DriveAndDribblerWidget(QWidget):
         self.disconnect_motor_sliders()
 
         if use_drive_mode == DriveMode.VELOCITY:
-
             # Show the direct velocity widget
             self.drive_widget.setCurrentWidget(self.direct_velocity_widget)
 
@@ -327,7 +339,9 @@ class DriveAndDribblerWidget(QWidget):
                 self.y_velocity_slider, self.y_velocity_label, self.value_change
             )
             common_widgets.enable_slider(
-                self.angular_velocity_slider, self.angular_velocity_label, self.value_change
+                self.angular_velocity_slider,
+                self.angular_velocity_label,
+                self.value_change,
             )
 
             common_widgets.disable_slider(self.front_left_motor_slider)
@@ -344,16 +358,24 @@ class DriveAndDribblerWidget(QWidget):
 
             # Enable motor sliders and disable direct sliders
             common_widgets.enable_slider(
-                self.front_left_motor_slider, self.front_left_motor_label, self.value_change
+                self.front_left_motor_slider,
+                self.front_left_motor_label,
+                self.value_change,
             )
             common_widgets.enable_slider(
-                self.front_right_motor_slider, self.front_right_motor_label, self.value_change
+                self.front_right_motor_slider,
+                self.front_right_motor_label,
+                self.value_change,
             )
             common_widgets.enable_slider(
-                self.back_left_motor_slider, self.back_left_motor_label, self.value_change
+                self.back_left_motor_slider,
+                self.back_left_motor_label,
+                self.value_change,
             )
             common_widgets.enable_slider(
-                self.back_right_motor_slider, self.back_right_motor_label, self.value_change
+                self.back_right_motor_slider,
+                self.back_right_motor_label,
+                self.value_change,
             )
 
             common_widgets.disable_slider(self.x_velocity_slider)
