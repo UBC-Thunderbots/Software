@@ -1,10 +1,11 @@
 from rich import print
 from rich.live import Live
 from rich.table import Table
-# import software.python_bindings as tbots_cpp
+import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
+from proto.import_all_protos import *
 
 class RobotDiagnosticsCLI():
     def __init__(self) -> None:
@@ -17,36 +18,29 @@ class RobotDiagnosticsCLI():
         self.app.command(short_help="Spins the dribbler")(self.dribble)
         self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
 
-        self.test_val = 0
-
         # Receiver / probably want to fetch channel from redis cache
-        # self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
-        #     str(getRobotMulticastChannel(0)) + "%" + "eth0",
-        #     ROBOT_STATUS_PORT,
-        #     self.__receive_robot_status,
-        #     True,
-        #     )
-        print(ROBOT_STATUS_PORT)
+        self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
+            str(getRobotMulticastChannel(0)) + "%" + "eth0",
+            ROBOT_STATUS_PORT,
+            self.__receive_robot_status,
+            True,
+            )
+
         # Sender / What is the network interface here?
-        # self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-        #     str(getRobotMulticastChannel(0)) + "%" + "eth0", PRIMITIVE_PORT, True
-        # )
+        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
+            str(getRobotMulticastChannel(0)) + "%" + "eth0", PRIMITIVE_PORT, True
+        )
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Forwards the given robot status to the full system along with the round-trip time
 
         :param robot_status: RobotStatus to forward to fullsystem
         """
-        # round_trip_time_seconds = time.time() - (
-        #     robot_status.adjusted_time_sent.epoch_timestamp_seconds
-        # )
-        # self.__forward_to_proto_unix_io(
-        #     RobotStatistic,
-        #     RobotStatistic(round_trip_time_seconds=round_trip_time_seconds),
-        # )
-        # self.__forward_to_proto_unix_io(RobotStatus, robot_status)
-        print(f"Received: {robot_status.adjusted_time_sent.epoch_timestamp_seconds}")
-        self.test_val = robot_status.adjusted_time_sent.epoch_timestamp_seconds
+        self.epoch_timestamp_seconds = robot_status.time_sent.epoch_timestamp_seconds
+        self.battery_voltage = robot_status.power_status.battery_voltage
+        self.robot_id = robot_status.robot_id
+        self.primitive_packet_loss_percentage = robot_status.network_status.primitive_packet_loss_percentage
+        self.running_primitive = robot_status.primitive_executor_status.running_primitive
 
     def __clamp(self, num: float, min_val: float, max_val: float) -> float:
         return max(min(num, max_val), min_val)
@@ -55,17 +49,21 @@ class RobotDiagnosticsCLI():
         """Make a new table."""
         table = Table()
         table.add_column("Robot ID")
-        table.add_column("Status")
         table.add_column("Battery (V)")
+        table.add_column("Packet Loss (%)")
+        table.add_column("Status")
+        table.add_column("Lifetime (s)")
 
-        value = self.test_val
-        status = ""
-        if value < 50:
-            status = "[red]OFFLINE"
-        else:
+        status = "[red]OFFLINE"
+        if self.running_primitive:
             status = "[green]ONLINE"
+
         table.add_row(
-            f"{0}", f"{value:3.2f}", status
+            f"{self.robot_id}",
+            f"{self.battery_voltage:3.2f}",
+            f"{self.primitive_packet_loss_percentage}",
+            status,
+            f"{self.epoch_timestamp_seconds}"
         )
         return table
 

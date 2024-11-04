@@ -19,6 +19,7 @@ py_binary(
     data = [
         "//software:py_constants.so",
         "//software:python_bindings.so",
+        "//proto:import_all_protos",
     ],
     deps = [
         requirement("typer_shell"),
