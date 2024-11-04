@@ -93,7 +93,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
-                                                    Angle::zero(), 0);
+                                                    Angle::zero());
             result[0].emplace_back(move_tactics.at(i));
         }
 
@@ -123,7 +123,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
-                                                    Angle::zero(), 0);
+                                                    Angle::zero());
             result[0].emplace_back(move_tactics.at(i));
         }
 

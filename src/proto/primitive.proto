@@ -92,12 +92,6 @@ message PowerControl
         };
     }
 
-    message GenevaControl
-    {
-        float angle_deg          = 1;
-        float rotation_speed_rpm = 2;
-    }
-
     ChickerControl chicker  = 1;
     Geneva.Slot geneva_slot = 2;
 }

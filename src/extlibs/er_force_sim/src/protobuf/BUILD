@@ -1,5 +1,3 @@
-load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
-
 package(default_visibility = ["//visibility:public"])
 
 load("@rules_proto//proto:defs.bzl", "proto_library")
@@ -35,16 +33,13 @@ py_proto_library(
     ],
 )
 
-qt_cc_library(
-    name = "protobuf_qt",
+cc_library(
+    name = "protobuf",
     srcs = glob(["*.cpp"]),
     hdrs = glob(["*.h"]),
     linkstatic = True,
     deps = [
         ":protobuf_cc_lib",
         "//proto:ssl_simulation_cc_proto",
-        "@qt//:qt_core",
-        "@qt//:qt_gui",
-        "@qt//:qt_widgets",
     ],
 )

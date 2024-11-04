@@ -23,8 +23,6 @@
 
 #include <btBulletDynamicsCommon.h>
 
-#include <QtCore/QList>
-
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 
 namespace camun
@@ -32,27 +30,26 @@ namespace camun
     namespace simulator
     {
         class SimField;
-    }
+    }  // namespace simulator
 }  // namespace camun
 
 class camun::simulator::SimField
 {
    public:
-    SimField(btDiscreteDynamicsWorld *world, const world::Geometry &geometry);
+    SimField(std::shared_ptr<btDiscreteDynamicsWorld> world,
+             const world::Geometry &geometry);
     ~SimField();
-    SimField(const SimField &) = delete;
-    SimField &operator=(const SimField &) = delete;
 
    private:
     void addObject(btCollisionShape *shape, const btTransform &transform,
                    float restitution, float friction);
 
    private:
-    btDiscreteDynamicsWorld *m_world;
-    btCollisionShape *m_plane;
-    btCollisionShape *m_goalSide;
-    btCollisionShape *m_goalBack;
-    QList<btCollisionObject *> m_objects;
+    std::shared_ptr<btDiscreteDynamicsWorld> m_world;
+    std::unique_ptr<btCollisionShape> m_plane;
+    std::unique_ptr<btCollisionShape> m_goalSide;
+    std::unique_ptr<btCollisionShape> m_goalBack;
+    std::vector<std::unique_ptr<btCollisionObject>> m_objects;
 };
 
 #endif  // SIMFIELD_H
