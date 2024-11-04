@@ -89,16 +89,16 @@ You can use Ubuntu 20.04 LTS, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Window
    1. If not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).  For each computer you contribute to GitHub with, you will need an additional SSH Key pair linked to your account.
    2.  After you have successfully set up a SSH key for your device and added it to GitHub, you can clone the repository using the following command:
         1.  e.g. `git clone git@github.com:<your_username>/Software.git`
-        2.  You can find this link under the green `Clone or Download` button on the main page of your fork on GitHub, under the SSH tab.  (This should now be available after adding your SSH key to GitHub successfully.)
+        2.  You can find this link under the green `Code` button on the main page of your fork on GitHub, under the SSH tab.  (This should now be available after adding your SSH key to GitHub successfully.)
 
    Alternatively, you can clone using HTTPS. You'll need to either use a credential helper (Git Credential Manager, GitHub CLI, etc.) or a personal access token ([details here](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls)).
 6. Set up your git remotes ([what is a remote and how does it work?](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes))
    1. You should have a remote named `origin` that points to your fork of the repository. Git will have set this up automatically when you cloned your fork in the previous step.
    2. You will need to add a second remote, named `upstream`, that points to our main Software repository, which is where you created your fork from. (**Note:** This is _not_ your fork)
       1. Open a terminal and navigate to the folder you cloned (your fork): `cd path/to/the/repository/Software`
-      2. Navigate to our main Software repository in your browser and copy the url from the green `Code` button. Copy the HTTPS url if you originally cloned with HTTPS, or use the SSH url if you previously cloned with SSH
+      2. Navigate to our main Software repository in your browser and copy the url from the green `Code` button. Copy the SSH url if you originally cloned with SSH, or use the HTTPS url if you previously cloned with HTTPS
       3. From your terminal, add the new remote by running `git remote add upstream <the url>` (without the angle brackets)
-         1. e.g. `git remote add upstream https://github.com/UBC-Thunderbots/Software.git`
+         1. e.g. `git remote add upstream git@github.com:UBC-Thunderbots/Software.git`
       4. That's it. If you want to double check your remotes are set up correctly, run `git remote -v` from your terminal (at the base of the repository folder again). You should see two entries: `origin` with the url for your fork of the repository, and `upstream` with the url for the main repository
 
 *See our [workflow](#workflow) for how to use git to make branches, submit Pull Requests, and track issues*
@@ -408,7 +408,7 @@ In general, we follow the Forking Workflow
 
 ### Creating a new Branch
 
-For each Issue of project you are working on, you should have a separate branch. This helps keep work organized and separate.
+For each issue that you work on, you should have a separate branch. This helps keep work organized and separate.
 
 **Branches should always be created from the latest code on the `master` branch of our main Software repository**. If you followed the steps in [Installation and Setup](#installation-and-setup), this will be `upstream/master`. Once this branch is created, you can push it to your fork and update it with commits until it is ready to merge. 
 
@@ -423,7 +423,7 @@ For each Issue of project you are working on, you should have a separate branch.
 4. You can now commit changes to this branch and push them to your fork with `git push origin your_branch_name` or `git push -u`
 
 <details>
-<summary>Aside: Why should you only create branches from "upstream/master"?</summary>
+<summary>Aside: Why should you only create branches from <code>upstream/master</code>?</summary>
 
 Because we squash our commits when we merge Pull Requests, a new commit with a new hash will be created, containing the multiple commits from the PR branch. Because the hashes are different, git will not recognize that the squashed commit and the series of commits that are inside the squashed commit contain the same changes, which can result in conflicts.
 
@@ -449,9 +449,9 @@ To do this, you have 2 options: rebase or merge. [What's the difference?](https:
 
 Merging is generally recommended, because it is easier to handle conflicts and get stuff working. To merge, simply run `git pull upstream master`.
 
-Rebasing requires more knowledge of git and can cause crazy merge conflicts, so it isn't recommended. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`. The main benefit of rebasing is that you get a clean, linear commit history; however, we squash all the commits in each PR into a single commit before merging into master, so the extra effort involved in rebasing is pointless.
+Rebasing requires more knowledge of git and can cause crazy merge conflicts, so it isn't recommended. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`. The main benefit of rebasing is that you get a clean, linear commit history; however, we squash all the commits in each PR into a single commit before merging into master, so the extra effort involved in rebasing is somewhat pointless.
 
-If you do rebase or merge and get conflicts, you'll need to resolve them manually. [See here for a quick tutorials on what conflicts are and how to resolve them](https://www.atlassian.com/git/tutorials/using-branches/merge-conflicts). Feel free to do this in your IDE or with whatever tool you are most comfortable with. Updating your branch often helps keep conflicts to a minimum, and when they do appear they are usually smaller. Ask for help if you're really stuck!
+If you do rebase or merge and get conflicts, you'll need to resolve them manually. [See here for a quick tutorial on what conflicts are and how to resolve them](https://www.atlassian.com/git/tutorials/using-branches/merge-conflicts). Feel free to do this in your IDE or with whatever tool you are most comfortable with. Updating your branch often helps keep conflicts to a minimum, and when they do appear they are usually smaller. Ask for help if you're really stuck!
 
 ### Formatting Your Code
 
@@ -488,14 +488,14 @@ The Pull Request process usually looks like the following:
        5. Mark the Pull Request as "Approved" when you think it looks good
     2. **If you are the recipient of the review (the PR creator):**
        1. **Make sure to reply to the PR comments as you address / fix issues**. This helps the reviewers know you have made a change without having to go check the code diffs to see if you made a change.
-          1. Eg. Reply with "done" or "fixed" to comments as you address them
+          1. e.g. Reply with "done" or "fixed" to comments as you address them
           2. Leave comments unresolved, let the reviewer resolve them.
        2. Don't be afraid to ask for clarification regarding changes or suggest alternatives if you don't agree with what was suggested. The reviewers and reviewee should work together to come up with the best solution.
        3. **Do not resolve conversations as you address them** (but make sure to leave a comment as mentioned above). That is the responsibility of the reviewers.
        4. Once you have addressed all the comments, re-request review from reviewers.
-11. Make sure our automated tests with Github Actions are passing. There will be an indicator near the bottom of the Pull Request. If something fails, you can click on the links provided to get more information and debug the problems. More than likely, you'll just need to re-run clang-format on the code.
+11. Make sure our automated tests with Github Actions are passing. There will be an indicator near the bottom of the Pull Request. If something fails, you can click on the links provided to get more information and debug the problems.
 12. Once your Pull Request has been approved and the automated tests pass, you can merge the code. There will be a big 'merge" button at the bottom of the Pull Request with several options to choose from
-    1. We only allow "Squash and merge". This is because it keep the commit history on `upstream/master` shorter and cleaner, without losing any context from the commit messages (since they are combined in the squashed commit. A squashed commit also makes it easier to revert and entire change/feature, rather than having to "know" the range of commits to revert.
+    1. We only allow "Squash and merge". This is because it keeps the commit history on `upstream/master` shorter and cleaner, without losing any context from the commit messages (since they are combined in the squashed commit. A squashed commit also makes it easier to revert and entire change/feature, rather than having to "know" the range of commits to revert.
 13. That's it, your changes have been merged! You will be given the option to delete your remote branch. but are not required to do so. We recommend it since it will keep your fork cleaner, but you can do whatever you like.
 
 *Remember, code reviews can be tough. As a reviewer, it can be very tricky to give useful constructive criticism without coming off as condescending or degrading (emotions are hard to express through text!). As the recipient of a code review, it might feel like you are being criticized too harshly and that your hard work is being attacked. Remember that these are your teammates, who are not trying to arbitrarily devalue your contributions but are trying to help make the code as good as possible, for the good of the team.*
