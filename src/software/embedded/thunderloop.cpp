@@ -174,7 +174,8 @@ void Thunderloop::runLoop()
     {
         struct timespec time_since_prev_iter;
         clock_gettime(CLOCK_MONOTONIC, &current_time);
-        ScopedTimespecTimer::timespecDiff(&current_time, &prev_iter_start_time, &time_since_prev_iter);
+        ScopedTimespecTimer::timespecDiff(&current_time, &prev_iter_start_time,
+                                          &time_since_prev_iter);
         prev_iter_start_time = current_time;
         {
             // Wait until next shot
@@ -327,7 +328,8 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
 
                 ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
-                double time_since_prev_iter_sec = getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND;
+                double time_since_prev_iter_sec =
+                    getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND;
 
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
                                                      time_since_prev_iter_sec);
