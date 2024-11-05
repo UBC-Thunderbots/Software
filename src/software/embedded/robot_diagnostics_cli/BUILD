@@ -25,6 +25,7 @@ py_binary(
         requirement("typer_shell"),
         requirement("rich"),
         requirement("protobuf"),
+        requirement("redis"),
     ],
 )
 

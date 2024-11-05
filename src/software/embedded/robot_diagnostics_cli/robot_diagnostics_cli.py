@@ -6,8 +6,9 @@ from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
 from proto.import_all_protos import *
+import redis
 
-class RobotDiagnosticsCLI():
+class RobotDiagnosticsCLI:
     def __init__(self) -> None:
         self.app = make_typer_shell(prompt="⚡ ")
         self.app.command(short_help="Rotates the robot")(self.rotate)
@@ -17,18 +18,27 @@ class RobotDiagnosticsCLI():
         self.app.command(short_help="Show Robot stats")(self.stats)
         self.app.command(short_help="Spins the dribbler")(self.dribble)
         self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
+        self.app.command(short_help="Shows Redis Values")(self.redis)
+
+        self.redis = redis.StrictRedis(
+            host=REDIS_DEFAULT_HOST,
+            port=REDIS_DEFAULT_PORT,
+            charset="utf-8",
+            decode_responses=True
+        )
+        self.channel_id = int(self.redis.get(ROBOT_ID_REDIS_KEY))
 
         # Receiver / probably want to fetch channel from redis cache
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
-            str(getRobotMulticastChannel(0)) + "%" + "eth0",
+            str(getRobotMulticastChannel(self.channel_id)) + "%" + "eth0",
             ROBOT_STATUS_PORT,
             self.__receive_robot_status,
             True,
-            )
+        )
 
         # Sender / What is the network interface here?
         self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-            str(getRobotMulticastChannel(0)) + "%" + "eth0", PRIMITIVE_PORT, True
+            str(getRobotMulticastChannel(self.channel_id)) + "%" + "eth0", PRIMITIVE_PORT, True
         )
 
     def __receive_robot_status(self, robot_status: Message) -> None:
@@ -42,11 +52,8 @@ class RobotDiagnosticsCLI():
         self.primitive_packet_loss_percentage = robot_status.network_status.primitive_packet_loss_percentage
         self.running_primitive = robot_status.primitive_executor_status.running_primitive
 
-    def __clamp(self, num: float, min_val: float, max_val: float) -> float:
-        return max(min(num, max_val), min_val)
-
-    def __generate_table(self) -> Table:
-        """Make a new table."""
+    def __generate_stats_table(self) -> Table:
+        """Make a new table with robot status information."""
         table = Table()
         table.add_column("Robot ID")
         table.add_column("Battery (V)")
@@ -59,7 +66,7 @@ class RobotDiagnosticsCLI():
             status = "[green]ONLINE"
 
         table.add_row(
-            f"{self.robot_id}",
+            f"{self.redis.get(ROBOT_ID_REDIS_KEY)}",
             f"{self.battery_voltage:3.2f}",
             f"{self.primitive_packet_loss_percentage}",
             status,
@@ -67,6 +74,35 @@ class RobotDiagnosticsCLI():
         )
         return table
 
+    def __generate_redis_table(self) -> Table:
+        """Make a new table with redis value information."""
+        table = Table()
+        table.add_column("Redis Value Name")
+        table.add_column("Key")
+        table.add_column("Value")
+
+        table.add_row("Robot ID", f"{ROBOT_ID_REDIS_KEY}",
+                      f"{self.redis.get(ROBOT_ID_REDIS_KEY)}")
+        table.add_row("Channel ID", f"{ROBOT_MULTICAST_CHANNEL_REDIS_KEY}",
+                      f"{self.redis.get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY)}")
+        table.add_row("Network Interface", f"{ROBOT_NETWORK_INTERFACE_REDIS_KEY}",
+                      f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}")
+        table.add_row("Kick Constant", f"{ROBOT_KICK_CONSTANT_REDIS_KEY}",
+                      f"{self.redis.get(ROBOT_KICK_CONSTANT_REDIS_KEY)}")
+        table.add_row("Kick Coefficient", f"{ROBOT_KICK_EXP_COEFF_REDIS_KEY}",
+                      f"{self.redis.get(ROBOT_KICK_EXP_COEFF_REDIS_KEY)}")
+        table.add_row("Chip Pulse Width", f"{ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY}",
+                      f"{self.redis.get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)}")
+        table.add_row("Battery Voltage", f"{ROBOT_CURRENT_DRAW_REDIS_KEY}",
+                      f"{self.redis.get(ROBOT_CURRENT_DRAW_REDIS_KEY)}")
+        table.add_row("Capacitor Voltage", f"{ROBOT_BATTERY_VOLTAGE_REDIS_KEY}",
+                      f"{self.redis.get(ROBOT_BATTERY_VOLTAGE_REDIS_KEY)}")
+
+        return table
+
+    def __clamp(self, val: float, min_val: float, max_val: float) -> float:
+        # Faster than numpy & fewer dependencies
+        return min(max(val, min_val), max_val)
     def rotate(self, velocity_in_rad: float) -> None:
         # CLAMP SPEED
         MAX_SPEED_RAD = 4
@@ -100,9 +136,14 @@ class RobotDiagnosticsCLI():
         print(f"Kicking at {speed_m_per_s} meters per second")
 
     def stats(self) -> None:
-        with Live(self.__generate_table(), refresh_per_second=4) as live:
+        with Live(self.__generate_stats_table(), refresh_per_second=4) as live:
             while True:
-                live.update(self.__generate_table())
+                live.update(self.__generate_stats_table())
+
+    def redis(self):
+        with Live(self.__generate_redis_table(), refresh_per_second=4) as live:
+            while True:
+                live.update(self.__generate_redis_table())
 
     def dribble(self, velocity_rad_per_s: float) -> None:
         velocity_rad_per_s = self.__clamp(velocity_rad_per_s, 0, 5.0)
@@ -114,6 +155,7 @@ class RobotDiagnosticsCLI():
 
     def emote(self):
         pass
+
     def move_wheel(self):
         # py_inquire wheel choice or use sub shell
         pass
@@ -122,4 +164,3 @@ class RobotDiagnosticsCLI():
 if __name__ == "__main__":
     while True:
         RobotDiagnosticsCLI().app()
-
