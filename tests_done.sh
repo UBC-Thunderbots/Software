@@ -31,3 +31,6 @@ apt-get update && apt-get install -y     libglvnd-dev    libxi-dev     libxrandr
 # opengl testing command
 glxinfo
 glxgears
+
+# Enable IGLX on host
+defaults write org.xquartz.X11 enable_iglx -bool true
