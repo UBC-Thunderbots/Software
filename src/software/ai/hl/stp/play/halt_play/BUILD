@@ -17,7 +17,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/halt:halt_tactic",
         "//software/logger",
         "//software/util/generic_factory",
-
+        "//software/ai/hl/stp/play"
     ],
     alwayslink = True,
 )
