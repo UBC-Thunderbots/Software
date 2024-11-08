@@ -1,8 +1,9 @@
 FROM ubuntu:24.04
 
-RUN apt-get update && apt-get install -y software-properties-common wget fzf
+RUN apt-get update && apt-get install -y software-properties-common wget fzf x11-apps
 
-RUN add-apt-repository ppa:kisak/kisak-mesa -y && apt update && apt upgrade -y
+# RUN add-apt-repository ppa:kisak/kisak-mesa -y && apt update && apt upgrade -y
+RUN add-apt-repository ppa:oibaf/graphics-drivers -y && apt update && apt upgrade -y
 
 # RUN apt-get update && apt-get install -y \
 #     mesa-utils \
