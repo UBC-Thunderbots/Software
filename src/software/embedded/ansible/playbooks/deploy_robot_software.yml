@@ -11,6 +11,8 @@
       - start
     binary_paths:
       thunderloop: ../../thunderloop_main
+    zip_paths:
+      diagnostics: ../../robot_diagnostics_cli/robot_diagnostics_cli_zip.zip
 #      // ADD SOMETHINGS HERE
 
   tasks:
@@ -65,6 +67,29 @@
             loop_var: service_name
           when: "'sync' in actions"
           tags: always
+
+        - name: Sync Zipped Binaries
+          with_items: "{{ zip_paths }}"
+          loop_control:
+            loop_var: zip_name
+          ansible.posix.synchronize:
+            src: "{{ zip_paths[zip_name] }}"
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+          tags: always
+
+        - name: Unzipping Binaries
+          command: 'unzip ~/thunderbots_binaries/*.zip'
+          args:
+            chdir: ~/thunderbots_binaries
+
+#        - name: Create symbolic link to diagnostics CLI
+#          file:
+#            src: /home/robot/thunderbots_binaries/robot_diagnostics_cli/robot_diagnostics_cli
+#            dest: /home/robot/tbots
+#            state: link
+#            force: yes
 
         - name: Start Services
           become: true

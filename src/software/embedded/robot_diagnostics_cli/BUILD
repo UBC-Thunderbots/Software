@@ -27,5 +27,12 @@ py_binary(
         requirement("protobuf"),
         requirement("redis"),
     ],
+    python_version = "PY3",
 )
 
+genrule(
+    name = "robot_diagnostics_cli_zip",
+    outs = ["robot_diagnostics_cli_zip.zip"],
+    srcs = [":robot_diagnostics_cli"],
+    cmd = "zip -r $@ $(location :robot_diagnostics_cli)*",
+)

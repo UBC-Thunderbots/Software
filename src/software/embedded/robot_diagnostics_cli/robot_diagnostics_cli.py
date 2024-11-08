@@ -10,6 +10,7 @@ import redis
 
 class RobotDiagnosticsCLI:
     def __init__(self) -> None:
+        """Setup constructor for the Shell CLI"""
         self.app = make_typer_shell(prompt="⚡ ")
         self.app.command(short_help="Rotates the robot")(self.rotate)
         self.app.command(short_help="Moves the robot")(self.move)
@@ -40,6 +41,65 @@ class RobotDiagnosticsCLI:
         self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
             str(getRobotMulticastChannel(self.channel_id)) + "%" + "eth0", PRIMITIVE_PORT, True
         )
+        self.sequence_number = 0
+
+    def __run_primitive_set(self) -> None:
+        """Forward PrimitiveSet protos from diagnostics to the robots.
+
+        For Diagnostics protos, does not block and returns cached message if none available
+        Sleeps for 10ms for diagnostics
+
+        If the emergency stop is tripped, the PrimitiveSet will not be sent so
+        that the robots timeout and stop.
+        """
+        # total primitives for all robots
+        robot_primitives = {}
+
+        # get the manual control primitive
+        ## THIS IS THE ONE TO LOOK INTO FURTHER
+        diagnostics_primitive = DirectControlPrimitive(
+            motor_control=self.motor_control_diagnostics_buffer.get(block=False),
+            power_control=self.power_control_diagnostics_buffer.get(block=False),
+        )
+
+
+        # for all robots connected to diagnostics, set their primitive
+        for robot_id in self.robots_connected_to_manual:
+            robot_primitives[robot_id] = Primitive(
+                direct_control=diagnostics_primitive
+            )
+
+        # sends a final stop primitive to all disconnected robots and removes them from list
+        # in order to prevent robots acting on cached old primitives
+        for robot_id, num_times_to_stop in self.robots_to_be_disconnected.items():
+            if num_times_to_stop > 0:
+                robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
+                self.robots_to_be_disconnected[robot_id] = num_times_to_stop - 1
+
+        # initialize total primitive set and send it
+        primitive_set = PrimitiveSet(
+            time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
+            stay_away_from_ball=False,
+            robot_primitives=(
+                robot_primitives
+                if not self.should_send_stop
+                else {
+                    robot_id: Primitive(stop=StopPrimitive())
+                    for robot_id in robot_primitives.keys()
+                }
+            ),
+            sequence_number=self.sequence_number,
+        )
+
+        self.sequence_number += 1
+
+        if self.__should_send_packet() or self.should_send_stop:
+            self.send_primitive_set.send_proto(primitive_set)
+            self.should_send_stop = False
+
+        # sleep if not running fullsystem
+        if not self.robots_connected_to_fullsystem:
+            time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Forwards the given robot status to the full system along with the round-trip time
@@ -57,7 +117,7 @@ class RobotDiagnosticsCLI:
         table = Table()
         table.add_column("Robot ID")
         table.add_column("Battery (V)")
-        table.add_column("Packet Loss (%)")
+        table.add_column("Packet Loss (%)") # remove that
         table.add_column("Status")
         table.add_column("Lifetime (s)")
 
@@ -67,7 +127,7 @@ class RobotDiagnosticsCLI:
 
         table.add_row(
             f"{self.redis.get(ROBOT_ID_REDIS_KEY)}",
-            f"{self.battery_voltage:3.2f}",
+            f"{self.battery_voltage}",
             f"{self.primitive_packet_loss_percentage}",
             status,
             f"{self.epoch_timestamp_seconds}"
@@ -76,9 +136,9 @@ class RobotDiagnosticsCLI:
 
     def __generate_redis_table(self) -> Table:
         """Make a new table with redis value information."""
-        table = Table()
+        table = Table(show_header=True, header_style="bold blue")
         table.add_column("Redis Value Name")
-        table.add_column("Key")
+        table.add_column("Key", style="dim")
         table.add_column("Value")
 
         table.add_row("Robot ID", f"{ROBOT_ID_REDIS_KEY}",
@@ -141,6 +201,7 @@ class RobotDiagnosticsCLI:
                 live.update(self.__generate_stats_table())
 
     def redis(self):
+        # use single table instead of live
         with Live(self.__generate_redis_table(), refresh_per_second=4) as live:
             while True:
                 live.update(self.__generate_redis_table())
@@ -150,7 +211,7 @@ class RobotDiagnosticsCLI:
         print(f"Spinning dribbler at {velocity_rad_per_s} rad per second")
 
     def restart_thunderloop(self):
-        # Execute some bash command
+        # Execute some bash command with subprocess
         pass
 
     def emote(self):
@@ -160,6 +221,9 @@ class RobotDiagnosticsCLI:
         # py_inquire wheel choice or use sub shell
         pass
 
+    def print_logs(self):
+        # View journalctl logs -> call subprocess -> param that captures stdout, feed into typer
+        pass
 
 if __name__ == "__main__":
     while True:

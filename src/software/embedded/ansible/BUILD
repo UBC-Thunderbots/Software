@@ -28,7 +28,7 @@ py_binary(
         "//software/embedded/redis",
         "//software/embedded/services:robot_auto_test",
         "//software/power:powerloop_tar",
-        "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli",
+        "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli_zip",
 #        INSERT SCRIPT HERE
     ],
     deps = [
