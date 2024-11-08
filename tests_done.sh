@@ -1,8 +1,8 @@
 # Run on Ubu24
-sudo docker run --rm -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix/ -v /home/minghao/.cache/bazel:/root/.cache/bazel --name test test:latest
+sudo docker run --rm -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix/ -v $HOME/.cache:/root/.cache --name test test:latest
 
 # Run on Mac
-sudo docker run --rm -it -e DISPLAY=host.docker.internal:0 --mount type=bind,source=$HOME/Programs/Thunderbot/.cache/bazel,target=/root/.cache/bazel --mount type=bind,source=$HOME/Programs/Thunderbot/Software,target=/Software -v /tmp/.X11-unix:/tmp/.X11-unix --privileged --name testv1 --net=host test:0.1
+sudo docker run --rm -it -e DISPLAY=host.docker.internal:0 --mount type=bind,source=$HOME/Programs/Thunderbot/.cache,target=/root/.cache --mount type=bind,source=$HOME/Programs/Thunderbot/Software,target=/Software -v /tmp/.X11-unix:/tmp/.X11-unix --privileged --name testv1 --net=host test:0.1
 
 # Run bazel inside docker
 bazel run //software/thunderscope:thunderscope_main
@@ -33,4 +33,5 @@ glxinfo
 glxgears
 
 # Enable IGLX on host
+xhost +
 defaults write org.xquartz.X11 enable_iglx -bool true
