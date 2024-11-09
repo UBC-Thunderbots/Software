@@ -8,7 +8,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from enum import IntEnum
 
 
-class DriveMode(IntEnum):
+class ControlMode(IntEnum):
     """Enum for the 2 drive modes (direct velocity and per-motor)"""
     VELOCITY = 0
     MOTOR = 1
@@ -25,24 +25,22 @@ class DriveAndDribblerWidget(QWidget):
         QWidget.__init__(self)
 
         layout = QVBoxLayout()
-        self.drive_widget = QStackedWidget()
+        self.control_widget = QStackedWidget()
 
         self.proto_unix_io = proto_unix_io
 
         # create swappable widget system using stacked widgets
-        self.direct_velocity_widget = self.setup_direct_velocity("Drive - Direct Velocity")
-        self.per_motor_widget = self.setup_per_motor("Drive - Per Motor")
-        self.drive_widget.addWidget(self.direct_velocity_widget)
-        self.drive_widget.addWidget(self.per_motor_widget)
+        self.direct_velocity_widget = self.setup_direct_velocity("Control - Direct Velocity")
+        self.per_motor_widget = self.setup_per_motor("Control - Per Motor")
+        self.control_widget.addWidget(self.direct_velocity_widget)
+        self.control_widget.addWidget(self.per_motor_widget)
 
         layout.addWidget(self.setup_drive_switch_radio("Drive Mode Switch"))
-        layout.addWidget(self.drive_widget)
+        layout.addWidget(self.control_widget)
         layout.addWidget(self.setup_dribbler("Dribbler"))
 
         # default to direct velocity
-        self.drive_mode = DriveMode.VELOCITY
-        self.use_direct_velocity.setChecked(True)
-        self.toggle_drive_mode(DriveMode.VELOCITY)
+        self.use_direct_velocity.click()
         self.setLayout(layout)
         self.toggle_dribbler_sliders(True)
 
@@ -50,30 +48,29 @@ class DriveAndDribblerWidget(QWidget):
         """Refresh the widget and send the a MotorControl message with the current values"""
         motor_control = MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
-
-        if not self.drive_mode == DriveMode.VELOCITY:
+        if self.control_mode == ControlMode.MOTOR:
             motor_control.ClearField("direct_per_wheel_control")
-            motor_control.direct_velocity_drive.velocity.x_component_meters = (
+            motor_control.direct_velocity_control.velocity.x_component_meters = (
                 self.x_velocity_slider.value()
             )
-            motor_control.direct_velocity_drive.velocity.y_component_meters = (
+            motor_control.direct_velocity_control.velocity.y_component_meters = (
                 self.y_velocity_slider.value()
             )
-            motor_control.direct_velocity_drive.angular_velocity.radians_per_second = (
+            motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
                 self.angular_velocity_slider.value()
             )
         else:
             motor_control.ClearField("direct_velocity_control")
-            motor_control.direct_per_wheel_drive.front_left_wheel_velocity = (
+            motor_control.direct_per_wheel_control.front_left_wheel_velocity = (
                 self.front_left_motor_slider.value()
             )
-            motor_control.direct_per_wheel_drive.front_right_wheel_velocity = (
+            motor_control.direct_per_wheel_control.front_right_wheel_velocity = (
                 self.front_right_motor_slider.value()
             )
-            motor_control.direct_per_wheel_drive.back_left_wheel_velocity = (
+            motor_control.direct_per_wheel_control.back_left_wheel_velocity = (
                 self.back_left_motor_slider.value()
             )
-            motor_control.direct_per_wheel_drive.back_right_wheel_velocity = (
+            motor_control.direct_per_wheel_control.back_right_wheel_velocity = (
                 self.back_right_motor_slider.value()
             )
 
@@ -100,13 +97,13 @@ class DriveAndDribblerWidget(QWidget):
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
             radio_button_names, self.connect_options_group
         )
-        self.use_direct_velocity = self.connect_options[DriveMode.VELOCITY]
-        self.use_per_motor = self.connect_options[DriveMode.MOTOR]
+        self.use_direct_velocity = self.connect_options[ControlMode.VELOCITY]
+        self.use_per_motor = self.connect_options[ControlMode.MOTOR]
         self.use_direct_velocity.clicked.connect(
-            lambda: self.toggle_drive_mode(DriveMode.VELOCITY)
+            lambda: self.toggle_control_mode(ControlMode.VELOCITY)
         )
         self.use_per_motor.clicked.connect(
-            lambda: self.toggle_drive_mode(DriveMode.MOTOR)
+            lambda: self.toggle_control_mode(ControlMode.MOTOR)
         )
         vbox.addWidget(self.connect_options_box)
         group_box.setLayout(vbox)
@@ -303,21 +300,23 @@ class DriveAndDribblerWidget(QWidget):
 
         return group_box
 
-    def toggle_drive_mode(self, use_drive_mode: IntEnum) -> None:
+    def toggle_control_mode(self, use_control_mode: IntEnum) -> None:
         """Switches between 'Direct Velocity' and 'Per Motor' drive modes.
 
-        :param use_drive_mode: DriveMode.VELOCITY or DriveMode.MOTOR, switch to that mode.
+        :param use_control_mode: ControlMode.VELOCITY or ControlMode.MOTOR, switch to that mode.
         """
+
+        self.control_mode = use_control_mode
         # reset sliders
         self.reset_motor_sliders()
         self.reset_direct_sliders()
         self.disconnect_direct_sliders()
         self.disconnect_motor_sliders()
 
-        if use_drive_mode == DriveMode.VELOCITY:
+        if use_control_mode == ControlMode.VELOCITY:
 
             # Show the direct velocity widget
-            self.drive_widget.setCurrentWidget(self.direct_velocity_widget)
+            self.control_widget.setCurrentWidget(self.direct_velocity_widget)
 
             # Enable direct sliders and disable motor sliders
             common_widgets.enable_slider(
@@ -340,7 +339,7 @@ class DriveAndDribblerWidget(QWidget):
 
         else:
             # Show the per motor widget
-            self.drive_widget.setCurrentWidget(self.per_motor_widget)
+            self.control_widget.setCurrentWidget(self.per_motor_widget)
 
             # Enable motor sliders and disable direct sliders
             common_widgets.enable_slider(
