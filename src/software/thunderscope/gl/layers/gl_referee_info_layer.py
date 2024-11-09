@@ -98,16 +98,17 @@ class GLRefereeInfoLayer(GLLayer):
 
         # if ball placement is in progress, update all the visuals
         if self.ball_placement_in_progress:
-            self.__update_ball_placement_status(
-                self.cached_world.ball.current_state
-            )
+            self.__update_ball_placement_status(self.cached_world.ball.current_state)
             self.__update_target_visual()
 
         if ball_placement_vis_proto:
             new_placement_point = ball_placement_vis_proto.ball_placement_point
             if not self.ball_placement_in_progress:
                 # initialize the visuals
-                self.ball_placement_tolerance_circle = tbots_cpp.Circle(tbots_cpp.createPoint(new_placement_point), BALL_PLACEMENT_TOLERANCE_RADIUS_METERS)
+                self.ball_placement_tolerance_circle = tbots_cpp.Circle(
+                    tbots_cpp.createPoint(new_placement_point),
+                    BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
+                )
                 self.__display_ball_placement_visuals(new_placement_point)
                 self.ball_placement_in_progress = True
             self.ball_placement_point = new_placement_point
@@ -158,16 +159,14 @@ class GLRefereeInfoLayer(GLLayer):
         self.__update_referee_info()
         self.__update_ball_placement()
 
-    def __update_ball_placement_status(
-        self, ball_state: BallState
-    ) -> None:
+    def __update_ball_placement_status(self, ball_state: BallState) -> None:
         """Update ball placement circle color corresponding to ball position.
         If the ball lies inside the tolerance circle, the circle will be green, otherwise red.
         :param ball_state: state of the ball
         """
         if tbots_cpp.contains(
             self.ball_placement_tolerance_circle,
-            tbots_cpp.createPoint(ball_state.global_position)
+            tbots_cpp.createPoint(ball_state.global_position),
         ):
             self.placement_tolerance_graphic.set_outline_color(
                 self.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_ON
@@ -196,7 +195,8 @@ class GLRefereeInfoLayer(GLLayer):
         # update the count-down graphics
         if self.cached_referee_info:
             time_left = max(
-                int(self.cached_referee_info["currentActionTimeRemaining"]) // 1000000, 0
+                int(self.cached_referee_info["currentActionTimeRemaining"]) // 1000000,
+                0,
             )
             self.ball_placement_countdown_graphic.setData(text=f"{time_left}s")
 
