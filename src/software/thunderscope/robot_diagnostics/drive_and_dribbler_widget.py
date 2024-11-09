@@ -48,7 +48,7 @@ class DriveAndDribblerWidget(QWidget):
         """Refresh the widget and send the a MotorControl message with the current values"""
         motor_control = MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
-        if self.control_mode == ControlMode.MOTOR:
+        if self.control_mode == ControlMode.VELOCITY:
             motor_control.ClearField("direct_per_wheel_control")
             motor_control.direct_velocity_control.velocity.x_component_meters = (
                 self.x_velocity_slider.value()
