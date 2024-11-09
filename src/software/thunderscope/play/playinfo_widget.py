@@ -34,7 +34,9 @@ class PlayInfoWidget(QWidget):
 
     def refresh(self) -> None:
         """Update the play info widget with new play information"""
-        playinfo = self.playinfo_buffer.get(block=False, return_cached=False).GetOptions()
+        playinfo = self.playinfo_buffer.get(
+            block=False, return_cached=False
+        ).GetOptions()
 
         # Updating QTableWidget could be expensive, so we only update if there is new data
         if playinfo is None or playinfo == self.last_playinfo:

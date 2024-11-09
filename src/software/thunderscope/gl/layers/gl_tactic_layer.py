@@ -38,9 +38,7 @@ class GLTacticLayer(GLLayer):
         self.cached_world = self.world_buffer.get(block=False)
         play_info = self.play_info_buffer.get(block=False).GetOptions()
 
-        self.__update_tactic_name_graphics(
-            self.cached_world.friendly_team, play_info
-        )
+        self.__update_tactic_name_graphics(self.cached_world.friendly_team, play_info)
 
     def __update_tactic_name_graphics(self, team: Team, play_info) -> None:
         """Update the GLGraphicsItems that display tactic data
