@@ -1,8 +1,7 @@
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
-from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
-
+from proto.import_all_protos import *
 
 def __create_int_parameter_writable(key, value, descriptor):
     """Converts an int field of a proto to a NumericParameterItem with
@@ -16,10 +15,10 @@ def __create_int_parameter_writable(key, value, descriptor):
     """
     # Extract the options from the descriptor, and store it
     # in the dictionary.
-    options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
+    options = descriptor.GetOptions()
 
     try:
-        min_max = options["[TbotsProto.bounds]"]
+        minimum, maximum = options.Extensions[bounds].min_double_value, options.Extensions[bounds].max_double_value
     except KeyError:
         raise KeyError("{} missing ParameterRangeOptions".format(key))
 
@@ -28,7 +27,7 @@ def __create_int_parameter_writable(key, value, descriptor):
         "type": "int",
         "value": value,
         "default": value,
-        "limits": (int(min_max["min_int_value"]), int(min_max["max_int_value"])),
+        "limits": (int(minimum), int(maximum)),
         "step": 1,
     }
 
@@ -44,10 +43,10 @@ def __create_double_parameter_writable(key, value, descriptor):
     """
     # Extract the options from the descriptor, and store it
     # in the dictionary.
-    options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
+    options = descriptor.GetOptions()
 
     try:
-        min_max = options["[TbotsProto.bounds]"]
+        minimum, maximum = options.Extensions[bounds].min_double_value, options.Extensions[bounds].max_double_value
     except KeyError:
         raise KeyError("{} missing ParameterRangeOptions".format(key))
 
@@ -57,8 +56,8 @@ def __create_double_parameter_writable(key, value, descriptor):
         "value": value,
         "default": value,
         "limits": (
-            min_max["min_double_value"],
-            min_max["max_double_value"],
+            minimum,
+            maximum,
         ),
         "step": 0.01,
     }

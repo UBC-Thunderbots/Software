@@ -1,4 +1,3 @@
-from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
@@ -36,25 +35,23 @@ class RefereeInfoWidget(QWidget):
 
     def refresh(self) -> None:
         """Update the referee info widget with new referee information"""
-        referee = self.referee_buffer.get(block=False, return_cached=False)
+        referee = self.referee_buffer.get(block=False, return_cached=False).GetOptions()
 
         # Updating QTableWidget could be expensive, so we only update if there is new data
         if referee is None:
             return
 
-        referee_msg_dict = MessageToDict(referee)
-
-        if not referee_msg_dict:
+        if not referee:
             return
 
         p = (
-            f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
-            + f"Stage Time Left: {int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND / SECONDS_PER_MINUTE)}:{int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND % SECONDS_PER_MINUTE)}\n"
-            + f"Stage: {referee_msg_dict['stage']}\n"
+            f"Packet Timestamp: {round(float(referee.packetTimestamp()) * SECONDS_PER_MICROSECOND, 3)}\n" #['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
+            + f"Stage Time Left: {int(referee['stageTimeLeft'] * SECONDS_PER_MICROSECOND / SECONDS_PER_MINUTE)}:{int(referee_msg_dict['stageTimeLeft'] * SECONDS_PER_MICROSECOND % SECONDS_PER_MINUTE)}\n"
+            + f"Stage: {referee.stage()}\n"
             + "Command: "
-            + referee_msg_dict["command"]
+            + referee.command()
             + "\n"
-            + f"Blue Team on Positive Half: {referee_msg_dict['blueTeamOnPositiveHalf']}\n"
+            + f"Blue Team on Positive Half: {referee.blueTeamOnPositiveHalf()}\n"
         )
         self.referee_info.setText(p)
 
@@ -62,7 +59,7 @@ class RefereeInfoWidget(QWidget):
         blue = []
         yellow = []
 
-        for team_info_name in referee_msg_dict["blue"]:
+        for team_info_name in referee.blue():
             if team_info_name == "timeouts":
                 team_info.append("remainingTimeouts")
             elif team_info_name == "goalkeeper":
@@ -70,7 +67,7 @@ class RefereeInfoWidget(QWidget):
             else:
                 team_info.append(team_info_name)
 
-        for team_info_name in referee_msg_dict["yellow"]:
+        for team_info_name in referee.yellow():
             if team_info_name in team_info:
                 continue
 
@@ -83,17 +80,17 @@ class RefereeInfoWidget(QWidget):
 
         for info in team_info:
             if info == "yellowCardTimes":
-                blue.append(self.parse_yellow_card_times(referee_msg_dict["blue"]))
-                yellow.append(self.parse_yellow_card_times(referee_msg_dict["yellow"]))
+                blue.append(self.parse_yellow_card_times(referee.blue()))
+                yellow.append(self.parse_yellow_card_times(referee.yellow()))
             elif info == "remainingTimeouts":
-                blue.append(referee_msg_dict["blue"]["timeouts"])
-                yellow.append(referee_msg_dict["yellow"]["timeouts"])
+                blue.append(referee.blue().timeouts())
+                yellow.append(referee.yellow().timeouts())
             elif info == "goalkeeperID":
-                blue.append(referee_msg_dict["blue"]["goalkeeper"])
-                yellow.append(referee_msg_dict["yellow"]["goalkeeper"])
+                blue.append(referee.blue().goalkeepers())
+                yellow.append(referee.yellow().goalkeeper())
             else:
-                blue.append(referee_msg_dict["blue"][info])
-                yellow.append(referee_msg_dict["yellow"][info])
+                blue.append(referee.blue().info())
+                yellow.append(referee.yellow().info())
 
         set_table_data(
             {

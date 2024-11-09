@@ -1,5 +1,4 @@
 from proto.play_info_msg_pb2 import PlayInfo
-from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.common.common_widgets import set_table_data
@@ -35,7 +34,7 @@ class PlayInfoWidget(QWidget):
 
     def refresh(self) -> None:
         """Update the play info widget with new play information"""
-        playinfo = self.playinfo_buffer.get(block=False, return_cached=False)
+        playinfo = self.playinfo_buffer.get(block=False, return_cached=False).GetOptions()
 
         # Updating QTableWidget could be expensive, so we only update if there is new data
         if playinfo is None or playinfo == self.last_playinfo:
@@ -43,34 +42,32 @@ class PlayInfoWidget(QWidget):
 
         self.last_playinfo = playinfo
 
-        play_info_dict = MessageToDict(playinfo)
-
         robot_ids = []
         tactic_fsm_states = []
         tactic_names = []
         play_name = []
 
-        if "robotTacticAssignment" not in play_info_dict:
+        if "robotTacticAssignment" not in playinfo:
             return
 
         num_rows = max(
-            len(play_info_dict["robotTacticAssignment"]),
-            len(play_info_dict["play"]["playState"]),
+            len(playinfo.robotTacticAssignment()),
+            len(playinfo.play.playState()),
         )
 
         # setting table size dynamically
         self.play_table.setRowCount(num_rows)
 
-        for state in play_info_dict["play"]["playState"]:
+        for state in playinfo.play().playstate():
             play_name.append(state)
 
-        for robot_id in sorted(play_info_dict["robotTacticAssignment"]):
+        for robot_id in sorted(playinfo.robotTacticAssignment()):
             robot_ids.append(robot_id)
             tactic_fsm_states.append(
-                play_info_dict["robotTacticAssignment"][robot_id]["tacticFsmState"]
+                playinfo.robotTacticAssignment().robot_id().tacticFsmState()
             )
             tactic_names.append(
-                play_info_dict["robotTacticAssignment"][robot_id]["tacticName"]
+                playinfo.robotTacticAssignment().robot_id().tacticName()
             )
 
         set_table_data(
