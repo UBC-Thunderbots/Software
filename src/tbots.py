@@ -227,7 +227,7 @@ if __name__ == "__main__":
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
         bazel_arguments += [
-            NetworkConstants.get_ip_address(id, RobotPlatform(args.platform))
+            str(NetworkConstants.get_ip_address(id, RobotPlatform(args.platform)))
             for id in args.flash_robots
         ]
         bazel_arguments += ["-pwd", args.ssh_pass]

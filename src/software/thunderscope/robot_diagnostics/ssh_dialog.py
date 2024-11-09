@@ -12,8 +12,6 @@ class SSHDialog(QDialog):
     binaries or execute platform-specific tasks.
     """
 
-    DEFAULT_SSH_PASSWORD = "thunderbots"
-
     def __init__(self, parent: QWidget = None, robot_id: int = 0):
         """Initialize the SSHDialog
 
@@ -45,7 +43,6 @@ class SSHDialog(QDialog):
         self.ssh_host_textbox = QLineEdit()
 
         self.ssh_password_textbox = QLineEdit()
-        self.ssh_password_textbox.setText(SSHDialog.DEFAULT_SSH_PASSWORD)
 
         self.ssh_group_box = QGroupBox("SSH")
         ssh_group_box_layout = QVBoxLayout()
