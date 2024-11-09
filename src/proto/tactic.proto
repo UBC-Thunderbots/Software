@@ -28,7 +28,7 @@ message Tactic
         PivotKickTactic pivot_kick                          = 11;
         ReceiverTactic receiver                             = 12;
         ShadowEnemyTactic shadow_enemy                      = 13;
-        StopTactic stop                                     = 14;
+        HaltTactic halt                                     = 14;
         PassDefenderTactic pass_defender                    = 15;
     }
 }
@@ -124,8 +124,7 @@ message MoveTactic
     required Point destination = 1;
     // The orientation the robot should have when it arrives at its destination
     required Angle final_orientation = 2;
-    // The speed the robot should have when it arrives at its destination
-    required double final_speed = 3;
+    reserved 3, 8;
     // How to run the dribbler
     required DribblerMode dribbler_mode = 4;
     // How to navigate around the ball
@@ -134,8 +133,6 @@ message MoveTactic
     required AutoChipOrKick auto_chip_or_kick = 6;
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 7;
-    // The target spin while moving in revolutions per second
-    required double target_spin_rev_per_s = 8;
     // The obstacle avoidance mode to use while moving
     required ObstacleAvoidanceMode obstacle_avoidance_mode = 9;
 }
@@ -179,4 +176,4 @@ message ShadowEnemyTactic
     required double shadow_distance = 2;
 }
 
-message StopTactic {}
+message HaltTactic {}

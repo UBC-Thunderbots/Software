@@ -144,13 +144,11 @@ void CreaseDefenderFSM::blockThreat(
     MoveFSM::ControlParams control_params{
         .destination             = destination,
         .final_orientation       = face_threat_orientation,
-        .final_speed             = 0.0,
         .dribbler_mode           = TbotsProto::DribblerMode::OFF,
         .ball_collision_type     = ball_collision_type,
         .auto_chip_or_kick       = auto_chip_or_kick,
         .max_allowed_speed_mode  = event.control_params.max_allowed_speed_mode,
-        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-        .target_spin_rev_per_s   = 0.0};
+        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE};
 
     // Update the get behind ball fsm
     processEvent(MoveFSM::Update(control_params, event.common));

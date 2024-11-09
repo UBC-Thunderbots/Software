@@ -16,11 +16,14 @@
 
 ## Ansible
 
-[Ansible](https://www.ansible.com/overview/how-ansible-works) allows us to run actions on multiple robots at once. Actions are communicated through YAML files called playbooks. Playbooks contain a series of tasks (ex move a file, run this script, output this command) and logic dictating dependencies between tasks. When playbooks are run, Ansible establishes an SSH connection between the user's computer and target Jetson Nanos, allowing it to run the tasks in the playbook. Output from each task, and any other requested output, is displayed on the console
+[Ansible](https://www.ansible.com/overview/how-ansible-works) allows us to run actions on multiple robots at once. Actions are communicated through YAML files called playbooks. Playbooks contain a series of tasks (eg. move a file, run this script, output this command) and logic dictating dependencies between tasks. When playbooks are run, Ansible establishes an SSH connection between the user's computer and robot, allowing it to run the tasks in the playbook. Output from each task, and any other requested output, is displayed on the console
 
 For a more detailed look at how Ansible works, [see the RFC](https://docs.google.com/document/d/1hN3Us2Vjr8z6ihqUVp_3L7rrjKc-EZ-l2hZJc31gNOc/edit)
 
-Example command: `bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
+Example command: `bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+* <platform>: `PI` or `NANO` depending on the computer on the robot
+* <robot_ip>: IP address of the robot
+* <robot_password>: Password of the robot
 
 More commands available [here](useful-robot-commands.md#off-robot-commands)
 
@@ -36,14 +39,6 @@ To learn more about how it works, [see the RFC](https://docs.google.com/document
 
 # Thunderloop
 
-Thunderloop is software that runs in a loop. It continuously polls services (unrelated from Systemd) sending relevant control proto (`PowerControl`, `MotorControl`) and receiving back status proto. Currently we have a [Network](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/jetson_nano/services/network/network.cpp), [Power](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/jetson_nano/services/power.cpp) and [Motor service](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/jetson_nano/services/motor.cpp). Thunderloop also receives `World` and `PrimitiveSet` Proto from AI and sends back Robot Status.
+Thunderloop is software that runs in a loop. It continuously polls services (unrelated from Systemd), sending relevant control protos (`PowerControl`, `MotorControl`) and receiving back status protos from the power and motor boards. Currently we have a [Network](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/embedded/services/network/network.cpp), [Power](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/embedded/services/power.cpp) and [Motor](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/embedded/services/motor.cpp) services. Thunderloop also receives `World` and `PrimitiveSet` protos from AI and sends back `Robot Status` protos.
 
-Motor and Power service both interface with their respective electrical boards over different communication interfaces, namely SPI and UART respectively.
-
-# Announcements
- 
-Broadcasts packets for what robot IDs are connected to wifi and what IPs they have. Combined with `robot_broadcast_receiver.py` allows us to see all robots on the network.
-
-# Display
-
-Displays information about the robot for us. Uses redis to receive info from other processes. Can also change values with physical buttons.
+Motor and Power services both interface with their respective electrical boards over different communication interfaces, namely SPI and UART respectively.
