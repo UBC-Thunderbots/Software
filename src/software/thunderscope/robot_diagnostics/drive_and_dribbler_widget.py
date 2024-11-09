@@ -41,8 +41,8 @@ class DriveAndDribblerWidget(QWidget):
 
         # default to direct velocity
         self.use_direct_velocity.click()
+        self.toggle_dribbler_slider(True)
         self.setLayout(layout)
-        self.toggle_dribbler_sliders(True)
 
     def refresh(self) -> None:
         """Refresh the widget and send the a MotorControl message with the current values"""
@@ -362,8 +362,8 @@ class DriveAndDribblerWidget(QWidget):
             common_widgets.change_button_state(self.stop_and_reset_per_motor, True)
             common_widgets.change_button_state(self.stop_and_reset_direct, False)
 
-    def toggle_dribbler_sliders(self, enable: bool) -> None:
-        """Enables or disables dribbler sliders.
+    def toggle_dribbler_slider(self, enable: bool) -> None:
+        """Enables or disables dribbler slider.
 
         :param enable: True to enable, False to disable
         """
