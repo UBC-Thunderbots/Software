@@ -1,4 +1,3 @@
-import math
 import time
 from typing import Optional
 
@@ -8,6 +7,7 @@ from pyqtgraph.opengl.items.GLTextItem import GLTextItem
 
 from proto.import_all_protos import *
 from software.py_constants import *
+import software.python_bindings as tbots_cpp
 from software.thunderscope.constants import DepthValues, Colors
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
@@ -32,26 +32,6 @@ class GLRefereeInfoLayer(GLLayer):
     BALL_PLACEMENT_TARGET_VISUALIZATION_COLOR = Colors.FIELD_LINE_COLOR
     # text color for count down
     COUNT_DOWN_TEXT_COLOR = Colors.RED
-
-    @staticmethod
-    def is_point_in_circle(
-        point: Point,
-        center: Point,
-        radius: float,
-    ) -> bool:
-        """Returns true if the point is in the circle.
-
-        :param point: a point on xy plane
-        :param center: center point of the circle
-        :param radius: radius of the circle
-        :return: true if the point is in the circle.
-        """
-        return (
-            math.dist(
-                (point.x_meters, point.y_meters), (center.x_meters, center.y_meters)
-            )
-            < radius
-        )
 
     def __init__(self, name: str, buffer_size: int = 1) -> None:
         """Initialize the GLRefereeInfoLayer
@@ -99,6 +79,7 @@ class GLRefereeInfoLayer(GLLayer):
 
         self.ball_placement_point = None
         self.ball_placement_in_progress = False
+        self.ball_placement_tolerance_circle = None
         self.shrink_target = True
         self.placement_start_time = 0
 
@@ -118,7 +99,7 @@ class GLRefereeInfoLayer(GLLayer):
         # if ball placement is in progress, update all the visuals
         if self.ball_placement_in_progress:
             self.__update_ball_placement_status(
-                self.cached_world.ball.current_state, self.ball_placement_point
+                self.cached_world.ball.current_state
             )
             self.__update_target_visual()
 
@@ -126,6 +107,7 @@ class GLRefereeInfoLayer(GLLayer):
             new_placement_point = ball_placement_vis_proto.ball_placement_point
             if not self.ball_placement_in_progress:
                 # initialize the visuals
+                self.ball_placement_tolerance_circle = tbots_cpp.Circle(tbots_cpp.createPoint(new_placement_point), BALL_PLACEMENT_TOLERANCE_RADIUS_METERS)
                 self.__display_ball_placement_visuals(new_placement_point)
                 self.ball_placement_in_progress = True
             self.ball_placement_point = new_placement_point
@@ -177,17 +159,15 @@ class GLRefereeInfoLayer(GLLayer):
         self.__update_ball_placement()
 
     def __update_ball_placement_status(
-        self, ball_state: BallState, new_placement_point: Point
+        self, ball_state: BallState
     ) -> None:
         """Update ball placement circle color corresponding to ball position.
         If the ball lies inside the tolerance circle, the circle will be green, otherwise red.
         :param ball_state: state of the ball
-        :param new_placement_point: new ball placement point to visualize
         """
-        if GLRefereeInfoLayer.is_point_in_circle(
-            ball_state.global_position,
-            new_placement_point,
-            BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
+        if tbots_cpp.contains(
+            self.ball_placement_tolerance_circle,
+            tbots_cpp.createPoint(ball_state.global_position)
         ):
             self.placement_tolerance_graphic.set_outline_color(
                 self.BALL_PLACEMENT_TOLERANCE_VISUALIZATION_COLOR_ON
@@ -214,10 +194,11 @@ class GLRefereeInfoLayer(GLLayer):
             )
 
         # update the count-down graphics
-        time_left = max(
-            int(self.cached_referee_info["currentActionTimeRemaining"]) // 1000000, 0
-        )
-        self.ball_placement_countdown_graphic.setData(text=f"{time_left}s")
+        if self.cached_referee_info:
+            time_left = max(
+                int(self.cached_referee_info["currentActionTimeRemaining"]) // 1000000, 0
+            )
+            self.ball_placement_countdown_graphic.setData(text=f"{time_left}s")
 
     def __display_ball_placement_visuals(self, new_placement_point: Point) -> None:
         """Display ball placement visuals
