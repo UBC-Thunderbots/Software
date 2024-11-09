@@ -16,7 +16,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLObstacleLayer(GLLayer):
     """GLLayer that visualizes obstacles"""
 
-    def __init__(self, name: str, buffer_size: int = 1) -> None:
+    def __init__(self, name: str, buffer_size: nt = 1) -> None:
         """Initialize the GLObstacleLayer
 
         :param name: The displayed name of the layer
