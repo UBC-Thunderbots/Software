@@ -1,12 +1,16 @@
 from rich import print
 from rich.live import Live
 from rich.table import Table
+from rich.console import Console
 import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
 from proto.import_all_protos import *
 import redis
+import subprocess
+import InquirerPy
+
 
 class RobotDiagnosticsCLI:
     def __init__(self) -> None:
@@ -16,10 +20,12 @@ class RobotDiagnosticsCLI:
         self.app.command(short_help="Moves the robot")(self.move)
         self.app.command(short_help="Chips the chipper")(self.chip)
         self.app.command(short_help="Kicks the kicker")(self.kick)
-        self.app.command(short_help="Show Robot stats")(self.stats)
+        self.app.command(short_help="Show Robot Status Info")(self.stats)
         self.app.command(short_help="Spins the dribbler")(self.dribble)
         self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
         self.app.command(short_help="Shows Redis Values")(self.redis)
+        self.app.command(short_help="Prints Thunderloop Logs")(self.print_thunderloop_logs)
+        self.app.command(short_help="Prints Thunderloop Status")(self.print_thunderloop_status)
 
         self.redis = redis.StrictRedis(
             host=REDIS_DEFAULT_HOST,
@@ -28,20 +34,26 @@ class RobotDiagnosticsCLI:
             decode_responses=True
         )
         self.channel_id = int(self.redis.get(ROBOT_ID_REDIS_KEY))
+        self.robot_id = str(self.redis.get(ROBOT_ID_REDIS_KEY))
 
-        # Receiver / probably want to fetch channel from redis cache
+        # Receiver
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
-            str(getRobotMulticastChannel(self.channel_id)) + "%" + "eth0",
+            str(getRobotMulticastChannel(
+                self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}",
             ROBOT_STATUS_PORT,
             self.__receive_robot_status,
             True,
         )
 
-        # Sender / What is the network interface here?
+        # Sender
         self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-            str(getRobotMulticastChannel(self.channel_id)) + "%" + "eth0", PRIMITIVE_PORT, True
+            str(getRobotMulticastChannel(
+                self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}", PRIMITIVE_PORT, True
         )
         self.sequence_number = 0
+        self.console = Console()
+        self.command_duration_seconds = 2.0
+
 
     def __run_primitive_set(self) -> None:
         """Forward PrimitiveSet protos from diagnostics to the robots.
@@ -62,19 +74,10 @@ class RobotDiagnosticsCLI:
             power_control=self.power_control_diagnostics_buffer.get(block=False),
         )
 
-
         # for all robots connected to diagnostics, set their primitive
-        for robot_id in self.robots_connected_to_manual:
-            robot_primitives[robot_id] = Primitive(
-                direct_control=diagnostics_primitive
-            )
-
-        # sends a final stop primitive to all disconnected robots and removes them from list
-        # in order to prevent robots acting on cached old primitives
-        for robot_id, num_times_to_stop in self.robots_to_be_disconnected.items():
-            if num_times_to_stop > 0:
-                robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
-                self.robots_to_be_disconnected[robot_id] = num_times_to_stop - 1
+        robot_primitives[self.robot_id] = Primitive(
+            direct_control=diagnostics_primitive
+        )
 
         # initialize total primitive set and send it
         primitive_set = PrimitiveSet(
@@ -97,38 +100,31 @@ class RobotDiagnosticsCLI:
             self.send_primitive_set.send_proto(primitive_set)
             self.should_send_stop = False
 
-        # sleep if not running fullsystem
-        if not self.robots_connected_to_fullsystem:
-            time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
-
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Forwards the given robot status to the full system along with the round-trip time
 
-        :param robot_status: RobotStatus to forward to fullsystem
+        :param robot_status: RobotStatus to extract information from
         """
         self.epoch_timestamp_seconds = robot_status.time_sent.epoch_timestamp_seconds
         self.battery_voltage = robot_status.power_status.battery_voltage
-        self.robot_id = robot_status.robot_id
         self.primitive_packet_loss_percentage = robot_status.network_status.primitive_packet_loss_percentage
-        self.running_primitive = robot_status.primitive_executor_status.running_primitive
+        self.primitive_executor_step_time_ms = robot_status.thunderloop_status.primitive_executor_step_time_ms
 
     def __generate_stats_table(self) -> Table:
         """Make a new table with robot status information."""
         table = Table()
         table.add_column("Robot ID")
         table.add_column("Battery (V)")
-        table.add_column("Packet Loss (%)") # remove that
         table.add_column("Status")
         table.add_column("Lifetime (s)")
 
         status = "[red]OFFLINE"
-        if self.running_primitive:
+        if self.primitive_executor_step_time_ms:
             status = "[green]ONLINE"
 
         table.add_row(
             f"{self.redis.get(ROBOT_ID_REDIS_KEY)}",
             f"{self.battery_voltage}",
-            f"{self.primitive_packet_loss_percentage}",
             status,
             f"{self.epoch_timestamp_seconds}"
         )
@@ -157,19 +153,61 @@ class RobotDiagnosticsCLI:
                       f"{self.redis.get(ROBOT_CURRENT_DRAW_REDIS_KEY)}")
         table.add_row("Capacitor Voltage", f"{ROBOT_BATTERY_VOLTAGE_REDIS_KEY}",
                       f"{self.redis.get(ROBOT_BATTERY_VOLTAGE_REDIS_KEY)}")
-
         return table
 
     def __clamp(self, val: float, min_val: float, max_val: float) -> float:
+        """Simple Math Clamp function
+
+        :param val: Value to clamp
+        :param min_val: Minimum (Lower) Bound
+        :param max_val: Maximum (Upper) Bound
+        """
         # Faster than numpy & fewer dependencies
         return min(max(val, min_val), max_val)
-    def rotate(self, velocity_in_rad: float) -> None:
-        # CLAMP SPEED
+
+    def stats(self) -> None:
+        """CLI Command to generate Incoming RobotStatus Proto information"""
+        with Live(self.__generate_stats_table(), refresh_per_second=4) as live:
+            while True:
+                live.update(self.__generate_stats_table())
+
+    def redis(self):
+        """CLI Command to generate Onboard Redis information"""
+        self.console.print(self.__generate_redis_table())
+
+    def print_thunderloop_status(self):
+        """CLI Command to print Thunderloop service status"""
+        log = subprocess.call(["service", "thunderloop", "status"])
+        print(log)
+
+    def restart_thunderloop(self):
+        """CLI Command to restart Thunderloop service and print status"""
+        subprocess.run(["service", "thunderloop", "restart"])
+        self.print_thunderloop_status()
+
+    def print_thunderloop_logs(self):
+        """CLI Command to print device logs"""
+        log = subprocess.call(["sudo", "journalctl", "-f", "-n", "100"])
+        print(log)
+
+    def rotate(self, velocity_in_rad: float, duration_seconds: float = self.command_duration_seconds) -> None:
+        """CLI Command to rotate the robot
+
+        :param velocity_in_rad: Angular Velocity to rotate the robot
+        :param duration: Duration to rotate the robot
+        """
         MAX_SPEED_RAD = 4
         velocity_in_rad = self.__clamp(velocity_in_rad, -MAX_SPEED_RAD, MAX_SPEED_RAD)
-        print(f"Rotating at {velocity_in_rad} rad/s")
+        print(f"Rotating at {velocity_in_rad} rad/s for {duration_seconds} seconds")
 
-    def move(self, direction: str, speed: float) -> None:
+    def move(self, direction: str, speed_m_per_s: float,
+             duration_seconds: float = self.command_duration_seconds) -> None:
+        """CLI Command to move the robot in the specified direction
+
+        :param direction: Direction to move
+        :param speed_m_per_s: Speed to move the robot at
+        :param duration_seconds: Duration to move
+        """
         default_commands: dict = {
             "forward": 90,
             "back": 270,
@@ -181,9 +219,9 @@ class RobotDiagnosticsCLI:
         # CLAMP SPEED
         MAX_VALUE = 100
         MIN_VALUE = 0
-        speed = self.__clamp(speed, MIN_VALUE, MAX_VALUE)
+        speed_m_per_s = self.__clamp(speed_m_per_s, MIN_VALUE, MAX_VALUE)
         if direction in default_commands:
-            print(f"Going {direction} and mapping to {default_commands[direction]} at the current speed {speed}")
+            print(f"Going {direction} and mapping to {default_commands[direction]} at the current speed {speed_m_per_s}")
         else:
             print("ERROR: INVALID COMMAND")
 
@@ -195,36 +233,17 @@ class RobotDiagnosticsCLI:
         speed_m_per_s = self.__clamp(speed_m_per_s, 0, 6.0)
         print(f"Kicking at {speed_m_per_s} meters per second")
 
-    def stats(self) -> None:
-        with Live(self.__generate_stats_table(), refresh_per_second=4) as live:
-            while True:
-                live.update(self.__generate_stats_table())
-
-    def redis(self):
-        # use single table instead of live
-        with Live(self.__generate_redis_table(), refresh_per_second=4) as live:
-            while True:
-                live.update(self.__generate_redis_table())
-
     def dribble(self, velocity_rad_per_s: float) -> None:
         velocity_rad_per_s = self.__clamp(velocity_rad_per_s, 0, 5.0)
         print(f"Spinning dribbler at {velocity_rad_per_s} rad per second")
-
-    def restart_thunderloop(self):
-        # Execute some bash command with subprocess
-        pass
-
-    def emote(self):
-        pass
 
     def move_wheel(self):
         # py_inquire wheel choice or use sub shell
         pass
 
-    def print_logs(self):
-        # View journalctl logs -> call subprocess -> param that captures stdout, feed into typer
+    def emote(self):
         pass
 
+
 if __name__ == "__main__":
-    while True:
-        RobotDiagnosticsCLI().app()
+    RobotDiagnosticsCLI().app()
