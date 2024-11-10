@@ -4,17 +4,16 @@
 
 TEST(NetworkUtilsTest, getLocalIpValidInterface)
 {
-    std::string interface = "lo";
-    std::string ip_address;
-    EXPECT_TRUE(getLocalIp(interface, ip_address, true));
-    EXPECT_EQ(ip_address, "127.0.0.1");
+    std::string interface               = "lo";
+    std::optional<std::string> local_ip = getLocalIp(interface, true);
+    EXPECT_TRUE(local_ip);
+    EXPECT_EQ(local_ip.value(), "127.0.0.1");
 }
 
 TEST(NetworkUtilsTest, getLocalIpInvalidInterface)
 {
     std::string interface = "interfaceymcinterfaceface";
-    std::string ip_address;
-    EXPECT_FALSE(getLocalIp(interface, ip_address, true));
+    EXPECT_FALSE(getLocalIp(interface, true));
 }
 
 TEST(NetworkUtilsTest, isIpv6Valid)

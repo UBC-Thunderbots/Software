@@ -41,8 +41,8 @@ void UdpSender::setupMulticast(const boost::asio::ip::address& ip_address,
 {
     if (ip_address.is_v4())
     {
-        std::string interface_ip;
-        if (!getLocalIp(interface, interface_ip))
+        std::optional<std::string> interface_ip = getLocalIp(interface);
+        if (!interface_ip.has_value())
         {
             std::stringstream ss;
             ss << "UdpSender: Could not get the local IP address for the interface "
@@ -55,7 +55,7 @@ void UdpSender::setupMulticast(const boost::asio::ip::address& ip_address,
 
         socket_.set_option(boost::asio::ip::multicast::join_group(
             ip_address.to_v4(),
-            boost::asio::ip::address::from_string(interface_ip).to_v4()));
+            boost::asio::ip::address::from_string(interface_ip.value()).to_v4()));
         return;
     }
 
