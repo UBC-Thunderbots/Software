@@ -12,7 +12,7 @@
     binary_paths:
       thunderloop: ../../thunderloop_main
     zip_paths:
-      diagnostics: ../../robot_diagnostics_cli/robot_diagnostics_cli_zip.zip
+      diagnostics: ../../robot_diagnostics_cli/robot_diagnostics_cli_tar.tar
 #      // ADD SOMETHINGS HERE
 
   tasks:
@@ -80,7 +80,7 @@
           tags: always
 
         - name: Unzipping Binaries
-          command: 'unzip ~/thunderbots_binaries/*.zip'
+          command: 'tar xopf ~/thunderbots_binaries/*.tar'
           args:
             chdir: ~/thunderbots_binaries
 

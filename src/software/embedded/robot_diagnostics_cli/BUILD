@@ -4,6 +4,8 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("@robot_diagnostics_cli_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("//:defs.bzl", "pkg_executable")
 
 compile_pip_requirements(
     name = "requirements",
@@ -27,12 +29,17 @@ py_binary(
         requirement("protobuf"),
         requirement("redis"),
     ],
-    python_version = "PY3",
 )
 
-genrule(
-    name = "robot_diagnostics_cli_zip",
-    outs = ["robot_diagnostics_cli_zip.zip"],
-    srcs = [":robot_diagnostics_cli"],
-    cmd = "zip -r $@ $(location :robot_diagnostics_cli)*",
+pkg_tar(
+    name = "robot_diagnostics_cli_tar",
+    srcs = [
+        ":robot_diagnostics_cli_pkg",
+        ],
+)
+
+pkg_executable(
+    name = "robot_diagnostics_cli_pkg",
+    bin = ":robot_diagnostics_cli",
+    path = "robot_diagnostics_cli",
 )
