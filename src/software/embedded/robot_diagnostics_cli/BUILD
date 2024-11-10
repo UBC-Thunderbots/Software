@@ -36,6 +36,7 @@ pkg_tar(
     srcs = [
         ":robot_diagnostics_cli_pkg",
         ],
+    extension = "tar.gz"
 )
 
 pkg_executable(
