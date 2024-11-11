@@ -8,20 +8,20 @@
 
 TEST(ExamplePlayFSMTest, test_transitions)
 {
-std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-TbotsProto::AiConfig ai_config;
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    TbotsProto::AiConfig ai_config;
 
-FSM<ExamplePlayFSM> fsm(ExamplePlayFSM{});
+    FSM<ExamplePlayFSM> fsm(ExamplePlayFSM{});
 
-EXPECT_TRUE(fsm.is(boost::sml::state<ExamplePlayFSM::MoveState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<ExamplePlayFSM::MoveState>));
 
-int num_tactics = 6;
+    int num_tactics = 6;
 
-fsm.process_event(ExamplePlayFSM::Update(
+    fsm.process_event(ExamplePlayFSM::Update(
         ExamplePlayFSM::ControlParams{},
         PlayUpdate(
-                world, num_tactics, [](PriorityTacticVector new_tactics) {},
-                InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+            world, num_tactics, [](PriorityTacticVector new_tactics) {},
+            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
-EXPECT_TRUE(fsm.is(boost::sml::state<ExamplePlayFSM::MoveState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<ExamplePlayFSM::MoveState>));
 }
