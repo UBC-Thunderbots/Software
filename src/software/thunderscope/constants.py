@@ -135,7 +135,7 @@ ROBOT_NAMES_FROM_ID = {
     4: "Swolebot",
     5: "Killit",
     6: "Aimbot",
-    7: "Ball-E"
+    7: "Ball-E",
 }
 
 THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
