@@ -85,7 +85,7 @@ class GLWorldLayer(GLLayer):
 
         self.display_robot_ids = True
         self.display_speed_lines = True
-        self.display_robot_names = True
+        self.display_robot_names = False
         self.is_playing = True
         self.simulation_speed = 1.0
 
