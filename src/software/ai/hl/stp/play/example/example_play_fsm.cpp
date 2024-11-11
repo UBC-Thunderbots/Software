@@ -1,11 +1,13 @@
 #include "software/ai/hl/stp/play/example/example_play_fsm.h"
 
-void ExamplePlayFSM::moveToPosition(const Update &event)
+ExamplePlayFSM::ExamplePlayFSM() : move_tactics(DIV_A_NUM_ROBOTS)
 {
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics(DIV_A_NUM_ROBOTS);
     std::generate(move_tactics.begin(), move_tactics.end(),
                   []() { return std::make_shared<MoveTactic>(); });
+}
 
+void ExamplePlayFSM::moveToPosition(const Update &event)
+{
     // The angle between each robot spaced out in a circle around the ball
     Angle angle_between_robots = Angle::full() / static_cast<double>(move_tactics.size());
 

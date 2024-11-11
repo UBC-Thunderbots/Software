@@ -8,11 +8,6 @@
 class ExamplePlay : public Play
 {
    public:
-    /**
-     * Creates an example play
-     *
-     * @param ai_config the play config for this play
-     */
     ExamplePlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield,

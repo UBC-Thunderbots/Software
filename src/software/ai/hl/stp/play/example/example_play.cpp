@@ -3,6 +3,11 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
+ExamplePlay::ExamplePlay(TbotsProto::AiConfig config)
+: Play(config, false), fsm{ExamplePlayFSM{}}, control_params{}
+{
+}
+
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield,
                                  const WorldPtr &world_ptr)
 {

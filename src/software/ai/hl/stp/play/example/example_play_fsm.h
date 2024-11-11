@@ -23,9 +23,8 @@ struct ExamplePlayFSM
     /**
      * Creates an example play FSM
      *
-     * @param ai_config the play config for this play FSM
      */
-    explicit ExamplePlayFSM(const TbotsProto::AiConfig& ai_config);
+    explicit ExamplePlayFSM();
 
     /**
      * Action that moves the robots to certain positions around the ball
@@ -52,5 +51,5 @@ struct ExamplePlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
+    std::vector<std::shared_ptr<MoveTactic>> move_tactics;
 };
