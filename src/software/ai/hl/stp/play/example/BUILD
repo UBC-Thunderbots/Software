@@ -35,3 +35,13 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_test(
+    name = "example_play_fsm_test",
+    srcs = ["example_play_fsm_test.cpp"],
+    deps = [
+        ":example_play",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
