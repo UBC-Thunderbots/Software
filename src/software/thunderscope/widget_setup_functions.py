@@ -137,8 +137,12 @@ def setup_gl_widget(
 
     draw_obstacle_layer = GLDrawPolygonObstacleLayer(
         "Draw Obstalce Layer",
-        full_system_proto_unix_io if not friendly_colour_yellow else enemy_team_io, # blue
-        full_system_proto_unix_io if friendly_colour_yellow else enemy_team_io, # yellow
+        full_system_proto_unix_io
+        if not friendly_colour_yellow
+        else enemy_team_io,  # blue
+        full_system_proto_unix_io
+        if friendly_colour_yellow
+        else enemy_team_io,  # yellow
     )
 
     gl_widget.add_layer(draw_obstacle_layer, True)

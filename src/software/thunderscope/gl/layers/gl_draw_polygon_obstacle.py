@@ -40,7 +40,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         self.rendering_polygons: List[GLPolygon] = []
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
-        """responding to key events that are going to push obstacles to the stack or add point
+        """Responding to key events that are going to push obstacles to the stack or add point
 
         :param event: a qt key event indicating the button that are pressed
         """
@@ -51,8 +51,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             self.clear_polygons()
 
     def clear_polygons(self):
-        """clearing the obstacles"""
-
+        """Clearing the obstacles"""
         self.points.clear()
         self.obstacles.clear()
 
@@ -65,8 +64,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         self._send_to_fs()
 
     def push_polygon_to_list(self):
-        """pushing the fully drawn polygon to the stack"""
-
+        """Pushing the fully drawn polygon to the stack"""
         points = [
             Point(x_meters=point[0], y_meters=point[1]) for point in self.points[:-1]
         ]
@@ -85,7 +83,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         self._send_to_fs()
 
     def _add_one_point(self, point: tuple[float, float]):
-        """adding one points to a polygon
+        """Adding one points to a polygon
 
         :param point: represent the point (x,y) that is added to the polygon
         """
@@ -113,7 +111,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         self._send_to_fs()
 
     def _send_to_fs(self):
-        """sending a list of virtual obstacles to full system"""
+        """Sending a list of virtual obstacles to full system"""
         obstacles = self.obstacles.copy()
 
         points = [
@@ -134,7 +132,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         )
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
-        """adding the point in scene
+        """Adding the point in scene
 
         :param event: the mouse event
         """

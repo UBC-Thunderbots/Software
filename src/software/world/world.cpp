@@ -84,8 +84,9 @@ void World::updateRefereeCommand(const RefereeCommand &command)
     // Take the consensus of the previous referee messages
     if (!referee_command_history_.empty() &&
         std::all_of(referee_command_history_.begin(), referee_command_history_.end(),
-                    [&](auto game_state)
-                    { return game_state == referee_command_history_.front(); }))
+                    [&](auto game_state) {
+                        return game_state == referee_command_history_.front();
+                    }))
     {
         current_game_state_.updateRefereeCommand(command);
     }
