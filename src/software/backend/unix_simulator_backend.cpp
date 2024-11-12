@@ -40,7 +40,6 @@ UnixSimulatorBackend::UnixSimulatorBackend(
             proto_logger));
 
     // external obstacles for bang bang trajectory planner
-    std::cout << runtime_dir + VIRTUAL_OBSTACLES_UNIX_PATH << std::endl;
     external_obstacles_list_.reset(
         new ThreadedProtoUnixListener<TbotsProto::VirtualObstacles>(
             runtime_dir + VIRTUAL_OBSTACLES_UNIX_PATH,
