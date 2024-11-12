@@ -168,8 +168,6 @@ void Thunderloop::runLoop()
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
     clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
 
-    double loop_duration_seconds = 0.0;
-
     for (;;)
     {
         struct timespec time_since_prev_iter;
