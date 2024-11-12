@@ -6,6 +6,7 @@ from pyqtgraph.opengl import *
 
 from proto.import_all_protos import *
 from software.py_constants import *
+from software.thunderscope.gl.helpers.observable_list import ObservableList
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
@@ -37,7 +38,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         self.obstacles: List[Obstacle] = []
 
         # used for keeping track and rendering multiple polygons
-        self.rendering_polygons: List[GLPolygon] = []
+        self.rendering_polygons: ObservableList = ObservableList(self._graphics_changed) 
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Responding to key events that are going to push obstacles to the stack or add point
@@ -57,7 +58,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         for polygon in self.rendering_polygons:
             polygon.hide()
-        self.rendering_polygons.clear()
+        self.rendering_polygons.resize(0, lambda: {})
         self.current_polygon.hide()
         self.current_polygon = GLPolygon(parent_item=self, line_width=2)
 
