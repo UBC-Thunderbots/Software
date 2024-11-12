@@ -126,6 +126,7 @@ py_library(
         ":proto_unix_io",
         ":thunderscope_types",
         ":widget_names_to_setup",
+        requirement("pyqtdarktheme-fork"),
     ],
 )
 
