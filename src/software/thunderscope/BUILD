@@ -95,6 +95,7 @@ py_library(
         "//software/thunderscope/gl/layers:gl_trail_layer",
         "//software/thunderscope/gl/layers:gl_validation_layer",
         "//software/thunderscope/gl/layers:gl_world_layer",
+        "//software/thunderscope/gl/layers:gl_draw_polygon_obstacle",
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",

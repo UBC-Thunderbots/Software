@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
@@ -185,7 +186,23 @@ void MovePrimitive::updateObstacles(
     field_obstacles =
         obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
 
-    obstacles = field_obstacles;
+    // adding virtual obstalces
+    auto virtual_obstacles = world.getVirtualObstacles().obstacles();
+    for (TbotsProto::Obstacle &obstacle : virtual_obstacles)
+    {
+        if (!obstacle.has_polygon())
+        {
+            LOG(WARNING)
+                << "Virtual Obstacles contain obstalce that is not a polygon. Shape igonred";
+
+            continue;
+        }
+
+        Polygon obstacle_polygon     = createPolygon(obstacle.polygon());
+        ObstaclePtr current_obstacle = obstacle_factory.createFromShape(obstacle_polygon);
+        obstacles.push_back(current_obstacle);
+    }
+
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {

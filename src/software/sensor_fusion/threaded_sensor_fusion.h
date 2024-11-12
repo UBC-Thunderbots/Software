@@ -10,7 +10,9 @@
 class ThreadedSensorFusion
     : public Subject<World>,
       public FirstInFirstOutThreadedObserver<SensorProto>,
-      public FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>
+      public FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>,
+      public FirstInFirstOutThreadedObserver<TbotsProto::VirtualObstacles>
+
 {
    public:
     explicit ThreadedSensorFusion(TbotsProto::SensorFusionConfig config);
@@ -19,6 +21,7 @@ class ThreadedSensorFusion
    private:
     void onValueReceived(SensorProto sensor_msg) override;
     void onValueReceived(TbotsProto::ThunderbotsConfig config) override;
+    void onValueReceived(TbotsProto::VirtualObstacles list) override;
 
     SensorFusion sensor_fusion;
     TbotsProto::SensorFusionConfig sensor_fusion_config;

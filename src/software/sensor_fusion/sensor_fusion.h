@@ -48,6 +48,12 @@ class SensorFusion
      */
     std::optional<World> getWorld() const;
 
+    /**
+     * Set the virtual obstacles in the world
+     *
+     */
+    void setVirtualObstacles(TbotsProto::VirtualObstacles &virtual_obstacles);
+
     // Number of vision packets to indicate that the vision client most likely reset,
     // determined experimentally with the simulator
     static constexpr unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
@@ -182,4 +188,6 @@ class SensorFusion
 
     // The timestamp, in seconds, of the most recently received vision packet
     double last_t_capture;
+
+    TbotsProto::VirtualObstacles virtual_obstacles_;
 };

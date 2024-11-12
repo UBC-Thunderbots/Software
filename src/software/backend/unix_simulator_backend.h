@@ -37,6 +37,8 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
 
     // ThreadedProtoUnix** to communicate with Thunderscope
     // Inputs
+    std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::VirtualObstacles>>
+        external_obstacles_list_;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotStatus>>
         robot_status_input;
     std::unique_ptr<ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>>

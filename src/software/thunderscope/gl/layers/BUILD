@@ -156,3 +156,13 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_draw_polygon_obstacle",
+    srcs = ["gl_draw_polygon_obstacle.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
+        requirement("pyqtgraph"),
+    ],
+)

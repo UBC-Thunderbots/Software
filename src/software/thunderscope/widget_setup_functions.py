@@ -7,6 +7,9 @@ from proto.import_all_protos import *
 from software.thunderscope.common.fps_widget import FPSWidget
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.common.proto_plotter import ProtoPlotter
+from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
+    GLDrawPolygonObstacleLayer,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
@@ -57,6 +60,7 @@ from software.thunderscope.replay.proto_player import ProtoPlayer
 def setup_gl_widget(
     sim_proto_unix_io: ProtoUnixIO,
     full_system_proto_unix_io: ProtoUnixIO,
+    enemy_team_io: ProtoUnixIO,
     friendly_colour_yellow: bool,
     visualization_buffer_size: int,
     sandbox_mode: bool = False,
@@ -94,6 +98,7 @@ def setup_gl_widget(
         "Validation", visualization_buffer_size
     )
     path_layer = gl_path_layer.GLPathLayer("Paths", visualization_buffer_size)
+
     obstacle_layer = gl_obstacle_layer.GLObstacleLayer(
         "Obstacles", visualization_buffer_size
     )
@@ -130,6 +135,13 @@ def setup_gl_widget(
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
     trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
 
+    draw_obstacle_layer = GLDrawPolygonObstacleLayer(
+        "Draw Obstalce Layer",
+        full_system_proto_unix_io if not friendly_colour_yellow else enemy_team_io, # blue
+        full_system_proto_unix_io if friendly_colour_yellow else enemy_team_io, # yellow
+    )
+
+    gl_widget.add_layer(draw_obstacle_layer, True)
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(path_layer)

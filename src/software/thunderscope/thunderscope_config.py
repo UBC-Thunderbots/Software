@@ -114,6 +114,7 @@ def configure_estop(proto_unix_io):
 
 def configure_base_fullsystem(
     full_system_proto_unix_io: ProtoUnixIO,
+    enemy_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
     friendly_colour_yellow: bool,
     sandbox_mode: bool = False,
@@ -153,6 +154,7 @@ def configure_base_fullsystem(
                     "sim_proto_unix_io": sim_proto_unix_io,
                     "friendly_colour_yellow": friendly_colour_yellow,
                     "visualization_buffer_size": visualization_buffer_size,
+                    "enemy_team_io": enemy_proto_unix_io,
                     "frame_swap_counter": frame_swap_counter,
                 }
             ),
@@ -311,6 +313,7 @@ def configure_two_ai_gamecontroller_view(
                 name="Blue FullSystem",
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                    enemy_proto_unix_io = proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
@@ -327,6 +330,7 @@ def configure_two_ai_gamecontroller_view(
                     full_system_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.YELLOW
                     ],
+                    enemy_proto_unix_io = proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,

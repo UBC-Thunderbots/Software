@@ -8,6 +8,7 @@ PYBIND11_MODULE(py_constants, m)
 {
     m.attr("BALL_MAX_SPEED_METERS_PER_SECOND") = BALL_MAX_SPEED_METERS_PER_SECOND;
     m.attr("ROBOT_MAX_HEIGHT_METERS")          = ROBOT_MAX_HEIGHT_METERS;
+    m.attr("VIRTUAL_OBSTACLES_UNIX_PATH")      = VIRTUAL_OBSTACLES_UNIX_PATH;
     m.attr("ROBOT_MAX_RADIUS_METERS")          = ROBOT_MAX_RADIUS_METERS;
     m.attr("ROBOT_MAX_HEIGHT_MILLIMETERS") =
         ROBOT_MAX_HEIGHT_METERS * MILLIMETERS_PER_METER;
@@ -66,14 +67,16 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("WORLD_STATE_RECEIVED_TRIGGER_PATH") = WORLD_STATE_RECEIVED_TRIGGER_PATH;
 
     // Multicast Channels
-    m.def("getRobotMulticastChannel", [](py::args& args) {
-        if (args.size() != 1)
-        {
-            throw std::runtime_error("must provide channel number only");
-        }
+    m.def("getRobotMulticastChannel",
+          [](py::args& args)
+          {
+              if (args.size() != 1)
+              {
+                  throw std::runtime_error("must provide channel number only");
+              }
 
-        return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
-    });
+              return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
+          });
 
     // Ports
     m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
