@@ -127,10 +127,10 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             obstacles.append(obstacle)
 
         self.blue_fu_io.send_proto(
-            VirtualObstacles, ObstacleListTwo(obstacles=obstacles)
+            VirtualObstacles, VirtualObstacles(obstacles=obstacles)
         )
         self.yellow_fs_io.send_proto(
-            VirtualObstacles, ObstacleListTwo(obstacles=obstacles)
+            VirtualObstacles, VirtualObstacles(obstacles=obstacles)
         )
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
