@@ -185,6 +185,7 @@ void MovePrimitive::updateObstacles(
     // Separately store the non-robot + non-ball obstacles
     field_obstacles =
         obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
+    obstacles = field_obstacles;
 
     // adding virtual obstalces
     auto virtual_obstacles = world.getVirtualObstacles().obstacles();
