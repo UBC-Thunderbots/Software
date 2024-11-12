@@ -38,7 +38,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         self.obstacles: List[Obstacle] = []
 
         # used for keeping track and rendering multiple polygons
-        self.rendering_polygons: ObservableList = ObservableList(self._graphics_changed) 
+        self.rendering_polygons: ObservableList = ObservableList(self._graphics_changed)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Responding to key events that are going to push obstacles to the stack or add point
