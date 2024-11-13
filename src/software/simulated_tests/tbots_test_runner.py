@@ -1,10 +1,10 @@
 from proto.import_all_protos import *
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.ssl_gc_common_pb2 import Team
 from abc import abstractmethod
 
-logger = createLogger(__name__)
+logger = create_logger(__name__)
 
 
 class TbotsTestRunner:

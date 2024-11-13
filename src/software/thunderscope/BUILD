@@ -101,7 +101,7 @@ py_library(
         "//software/thunderscope/play:refereeinfo_widget",
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
-        "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
+        "//software/thunderscope/robot_diagnostics:diagnostics_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         "//software/thunderscope/robot_diagnostics:estop_view",
         "//software/thunderscope/robot_diagnostics:robot_error_log",
@@ -165,6 +165,7 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
+        "//software/logger:py_logger",
         "//software/thunderscope:constants",
     ],
 )
