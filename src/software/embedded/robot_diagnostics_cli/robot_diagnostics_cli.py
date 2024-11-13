@@ -37,7 +37,6 @@ class RobotDiagnosticsCLI:
         )
         self.channel_id = int(self.redis.get(ROBOT_ID_REDIS_KEY))
         self.robot_id = str(self.redis.get(ROBOT_ID_REDIS_KEY))
-        self.running = False
         self.sequence_number = 0
         self.console = Console()
         self.command_duration_seconds = 2.0
@@ -74,7 +73,7 @@ class RobotDiagnosticsCLI:
         """
         return ((self.estop_mode != EstopMode.DISABLE_ESTOP) and self.estop_is_playing)
 
-    def __run_primitive_set(self, diagnostics_primitive: DirectControlPrimitive) -> None:
+    def __run_primitive_set(self, diagnostics_primitive: Primitive) -> None:
         """Forward PrimitiveSet protos from diagnostics to the robots.
 
         For Diagnostics protos, does not block and returns cached message if none available
@@ -85,20 +84,18 @@ class RobotDiagnosticsCLI:
         """
 
         # for all robots connected to diagnostics, set their primitive
-        self.robot_primitives[self.robot_id] = Primitive(
-            direct_control=diagnostics_primitive
-        )
+        self.robot_primitives[self.robot_id] = diagnostics_primitive
 
         # initialize total primitive set and send it
         primitive_set = PrimitiveSet(
             time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
             stay_away_from_ball=False,
             robot_primitives=(
-                robot_primitives
+                self.robot_primitives
                 if not self.should_send_stop
                 else {
                     robot_id: Primitive(stop=StopPrimitive())
-                    for robot_id in robot_primitives.keys()
+                    for robot_id in self.robot_primitives.keys()
                 }
             ),
             sequence_number=self.sequence_number,
@@ -226,8 +223,12 @@ class RobotDiagnosticsCLI:
         :param velocity_in_rad: Angular Velocity to rotate the robot
         :param duration: Duration to rotate the robot
         """
+
         MAX_SPEED_RAD = 4
         velocity_in_rad = self.__clamp(velocity_in_rad, -MAX_SPEED_RAD, MAX_SPEED_RAD)
+        # for _ in track(range(100), description="Running..."):
+        #     self.__run_primitive_set()
+        #     time.sleep(0.01)
         print(f"Rotating at {velocity_in_rad} rad/s for {duration_seconds} seconds")
 
     def move(self, direction: str, speed_m_per_s: float,
@@ -294,7 +295,7 @@ class RobotDiagnosticsCLI:
                 self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}", PRIMITIVE_PORT, True
         )
 
-        self.running = True
+
         return self
 
     def __exit__(self, type, value, traceback) -> None:
@@ -302,11 +303,7 @@ class RobotDiagnosticsCLI:
 
         Ends all currently running loops and joins all currently active threads
         """
-        self.running = False
-
-        # self.receive_robot_log.close()
         self.receive_robot_status.close()
-        # self.run_primitive_set_thread.join()
 
 if __name__ == "__main__":
     with RobotDiagnosticsCLI() as cli:
