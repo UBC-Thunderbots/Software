@@ -48,6 +48,25 @@
         shell: ping -c 10 -w 2 {{ ip }} | tail -1
         register: res
 
+  - name: Restart Thunderloop
+    become: true
+    become_method: sudo
+    ansible.builtin.systemd:
+      name: thunderloop
+      masked: false
+      daemon_reload: true
+      state: restarted
+    register: res
+    tags:
+      - restart_thunderloop
+      - never
+
+  - name: Get Thunderloop status
+    shell: service thunderloop status
+    register: res
+    tags:
+      - thunderloop_status
+      - never
 
   - name: Command Output
     tags:
