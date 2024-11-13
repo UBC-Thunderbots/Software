@@ -28,6 +28,7 @@ class GLLayer(GLGraphicsItem):
 
     def refresh_graphics(self) -> None:
         """Updates the GLGraphicsItems in this layer"""
+        raise NotImplementedError("Subclasses must implement this method!")
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
