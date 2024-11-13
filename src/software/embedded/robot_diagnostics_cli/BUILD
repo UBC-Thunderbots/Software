@@ -22,12 +22,15 @@ py_binary(
         "//software:py_constants.so",
         "//software:python_bindings.so",
         "//proto:import_all_protos",
+        "//software/embedded/constants:py_constants",
+        "//software/thunderscope:thread_safe_buffer",
     ],
     deps = [
         requirement("typer_shell"),
         requirement("rich"),
         requirement("protobuf"),
-        requirement("redis")
+        requirement("redis"),
+        requirement("inquirerpy"),
     ],
 )
 

@@ -6,11 +6,13 @@ import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
+from software.embedded.constants.py_constants import (
+    get_estop_config, EstopMode, DEFAULT_PRIMITIVE_DURATION)
 from proto.import_all_protos import *
 import redis
 import subprocess
 import InquirerPy
-
+import time
 
 class RobotDiagnosticsCLI:
     def __init__(self) -> None:
@@ -35,27 +37,44 @@ class RobotDiagnosticsCLI:
         )
         self.channel_id = int(self.redis.get(ROBOT_ID_REDIS_KEY))
         self.robot_id = str(self.redis.get(ROBOT_ID_REDIS_KEY))
-
-        # Receiver
-        self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
-            str(getRobotMulticastChannel(
-                self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}",
-            ROBOT_STATUS_PORT,
-            self.__receive_robot_status,
-            True,
-        )
-
-        # Sender
-        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-            str(getRobotMulticastChannel(
-                self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}", PRIMITIVE_PORT, True
-        )
+        self.running = False
         self.sequence_number = 0
         self.console = Console()
         self.command_duration_seconds = 2.0
 
+        # total primitives for all robots
+        self.robot_primitives = {}
 
-    def __run_primitive_set(self) -> None:
+        # for all robots connected to diagnostics, set their primitive
+        self.robot_primitives[self.robot_id] = Primitive(stop=StopPrimitive())
+
+        # initialising the estop
+        # tries to access a plugged in estop. if not found, throws an exception
+        # if using keyboard estop, skips this step
+        self.estop_reader = None
+        self.estop_is_playing = False
+        # when the estop has just been stopped,
+        # we want to send a stop primitive once to all currently connected robots
+        self.should_send_stop = False
+        self.estop_mode, self.estop_path = (
+            get_estop_config(keyboard_estop=True, disable_communication=False))
+        # only checks for estop if we are in physical estop mode
+        if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+            try:
+                self.estop_reader = tbots_cpp.ThreadedEstopReader(
+                    uart_port=self.estop_path, baud_rate=115200
+                )
+            except Exception:
+                raise Exception(f"Invalid Estop found at location {self.estop_path}")
+
+    def __should_send_packet(self) -> bool:
+        """Returns True if the proto sending threads should send a proto
+
+        :return: boolean
+        """
+        return ((self.estop_mode != EstopMode.DISABLE_ESTOP) and self.estop_is_playing)
+
+    def __run_primitive_set(self, diagnostics_primitive: DirectControlPrimitive) -> None:
         """Forward PrimitiveSet protos from diagnostics to the robots.
 
         For Diagnostics protos, does not block and returns cached message if none available
@@ -64,18 +83,9 @@ class RobotDiagnosticsCLI:
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
         """
-        # total primitives for all robots
-        robot_primitives = {}
-
-        # get the manual control primitive
-        ## THIS IS THE ONE TO LOOK INTO FURTHER
-        diagnostics_primitive = DirectControlPrimitive(
-            motor_control=self.motor_control_diagnostics_buffer.get(block=False),
-            power_control=self.power_control_diagnostics_buffer.get(block=False),
-        )
 
         # for all robots connected to diagnostics, set their primitive
-        robot_primitives[self.robot_id] = Primitive(
+        self.robot_primitives[self.robot_id] = Primitive(
             direct_control=diagnostics_primitive
         )
 
@@ -100,6 +110,26 @@ class RobotDiagnosticsCLI:
             self.send_primitive_set.send_proto(primitive_set)
             self.should_send_stop = False
 
+    def __send_estop_state(self) -> None:
+        """Constant loop which sends the current estop status proto if estop is not disabled
+        Always in physical estop mode, uses the physical estop value
+        If estop has just changed from playing to stop, set flag to send stop primitive once to connected robots
+        """
+        previous_estop_is_playing = True
+        if self.estop_mode != EstopMode.DISABLE_ESTOP:
+            while True:
+                if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+                    self.estop_is_playing = self.estop_reader.isEstopPlay()
+
+                # Send stop primitive once when estop is paused
+                if previous_estop_is_playing and not self.estop_is_playing:
+                    self.should_send_stop = True
+                else:
+                    self.should_send_stop = False
+
+                previous_estop_is_playing = self.estop_is_playing
+                time.sleep(0.1)
+
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Forwards the given robot status to the full system along with the round-trip time
 
@@ -115,11 +145,11 @@ class RobotDiagnosticsCLI:
         table = Table()
         table.add_column("Robot ID")
         table.add_column("Battery (V)")
-        table.add_column("Status")
+        table.add_column("Thunderloop Status")
         table.add_column("Lifetime (s)")
 
         status = "[red]OFFLINE"
-        if self.primitive_executor_step_time_ms:
+        if subprocess.call(["systemctl", "is-active", "--quiet", "thunderloop.service"]) == 0:
             status = "[green]ONLINE"
 
         table.add_row(
@@ -190,7 +220,7 @@ class RobotDiagnosticsCLI:
         log = subprocess.call(["sudo", "journalctl", "-f", "-n", "100"])
         print(log)
 
-    def rotate(self, velocity_in_rad: float, duration_seconds: float = self.command_duration_seconds) -> None:
+    def rotate(self, velocity_in_rad: float, duration_seconds: float = DEFAULT_PRIMITIVE_DURATION) -> None:
         """CLI Command to rotate the robot
 
         :param velocity_in_rad: Angular Velocity to rotate the robot
@@ -201,7 +231,7 @@ class RobotDiagnosticsCLI:
         print(f"Rotating at {velocity_in_rad} rad/s for {duration_seconds} seconds")
 
     def move(self, direction: str, speed_m_per_s: float,
-             duration_seconds: float = self.command_duration_seconds) -> None:
+             duration_seconds: float = DEFAULT_PRIMITIVE_DURATION) -> None:
         """CLI Command to move the robot in the specified direction
 
         :param direction: Direction to move
@@ -221,7 +251,8 @@ class RobotDiagnosticsCLI:
         MIN_VALUE = 0
         speed_m_per_s = self.__clamp(speed_m_per_s, MIN_VALUE, MAX_VALUE)
         if direction in default_commands:
-            print(f"Going {direction} and mapping to {default_commands[direction]} at the current speed {speed_m_per_s}")
+            print(
+                f"Going {direction} and mapping to {default_commands[direction]} at the current speed {speed_m_per_s}")
         else:
             print("ERROR: INVALID COMMAND")
 
@@ -244,6 +275,39 @@ class RobotDiagnosticsCLI:
     def emote(self):
         pass
 
+    def __enter__(self):
+        """Enter RobotDiagnosticsCLI context manager. Setup multicast listeners
+        for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
+        """
+        # Receiver
+        self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
+            str(getRobotMulticastChannel(
+                self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}",
+            ROBOT_STATUS_PORT,
+            self.__receive_robot_status,
+            True,
+            )
+
+        # Sender
+        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
+            str(getRobotMulticastChannel(
+                self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}", PRIMITIVE_PORT, True
+        )
+
+        self.running = True
+        return self
+
+    def __exit__(self, type, value, traceback) -> None:
+        """Exit RobotDiagnosticsCLI context manager
+
+        Ends all currently running loops and joins all currently active threads
+        """
+        self.running = False
+
+        # self.receive_robot_log.close()
+        self.receive_robot_status.close()
+        # self.run_primitive_set_thread.join()
 
 if __name__ == "__main__":
-    RobotDiagnosticsCLI().app()
+    with RobotDiagnosticsCLI() as cli:
+        cli.app()

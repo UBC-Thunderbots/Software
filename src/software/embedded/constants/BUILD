@@ -15,3 +15,11 @@ cc_library(
         "//software/embedded:platform",
     ],
 )
+
+py_library(
+    name = "py_constants",
+    srcs = [":py_constants.py"],
+#    deps = [
+#        requirement("protobuf"),
+#    ],
+)
