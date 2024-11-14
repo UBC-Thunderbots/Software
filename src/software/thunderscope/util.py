@@ -111,13 +111,12 @@ def realtime_sim_ticker(
             tick = SimulatorTick(milliseconds=tick_rate_ms)
             sim_proto_unix_io.send_proto(SimulatorTick, tick)
 
-        time.sleep(
-            per_tick_delay_s
-            / simulation_state_message.simulation_speed
-        )
+        time.sleep(per_tick_delay_s / simulation_state_message.simulation_speed)
 
 
-def sync_simulation(tscope: Thunderscope, num_robots: int, timeout_s: float = 0.1) -> None:
+def sync_simulation(
+    tscope: Thunderscope, num_robots: int, timeout_s: float = 0.1
+) -> None:
     """Ensure that simulator has synchronized with the default world state.
 
     :param tscope:              Thunderscope instance that is tied to this instance of the simulation

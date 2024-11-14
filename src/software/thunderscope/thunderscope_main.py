@@ -494,7 +494,7 @@ if __name__ == "__main__":
                 autoref.setup_ssl_wrapper_packets(
                     autoref_proto_unix_io,
                 )
-                    
+
             # Start the simulator
             sim_ticker_thread = threading.Thread(
                 target=__ticker,
