@@ -100,6 +100,11 @@ def realtime_sim_ticker(
     """
     simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
     sim_proto_unix_io.register_observer(SimulationState, simulation_state_buffer)
+    per_tick_delay_s = tick_rate_ms * SECONDS_PER_MILLISECOND
+
+    # Wait for Thunderscope to launch
+    while not tscope.is_open():
+        time.sleep(per_tick_delay_s)
 
     # Tick simulation if Thundersocpe is open
     while tscope.is_open():
@@ -110,7 +115,7 @@ def realtime_sim_ticker(
             sim_proto_unix_io.send_proto(SimulatorTick, tick)
 
         time.sleep(
-            (tick_rate_ms * SECONDS_PER_MILLISECOND)
+            per_tick_delay_s
             / simulation_state_message.simulation_speed
         )
 
