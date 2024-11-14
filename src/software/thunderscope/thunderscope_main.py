@@ -421,7 +421,7 @@ if __name__ == "__main__":
 
             """
             sync_simulation(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                tscope,
                 0 if args.empty else DIV_B_NUM_ROBOTS,
             )
 
