@@ -47,8 +47,9 @@ py_library(
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/binary_context_managers:tigers_autoref",
-        requirement("pyqtgraph"),
         requirement("numpy"),
+        requirement("pyqtdarktheme-fork"),
+        requirement("pyqtgraph"),
     ],
 )
 

@@ -421,7 +421,7 @@ if __name__ == "__main__":
 
             """
             sync_simulation(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                tscope,
                 0 if args.empty else DIV_B_NUM_ROBOTS,
             )
 
@@ -494,7 +494,7 @@ if __name__ == "__main__":
                 autoref.setup_ssl_wrapper_packets(
                     autoref_proto_unix_io,
                 )
-
+                    
             # Start the simulator
             sim_ticker_thread = threading.Thread(
                 target=__ticker,

@@ -35,6 +35,7 @@ py_library(
         ":handheld_controller",
         "//software/thunderscope:constants",
         requirement("pyqtgraph"),
+        requirement("evdev"),
     ],
 )
 
