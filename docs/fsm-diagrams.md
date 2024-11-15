@@ -130,6 +130,19 @@ ChipState --> Terminate:::terminate : [chipDone]
 
 ```
 
+## [HaltPlayFSM](/src/software/ai/hl/stp/play/halt_play/halt_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> HaltState
+HaltState --> HaltState : <i>updateStop</i>
+Terminate:::terminate --> Terminate:::terminate : <i>updateStop</i>
+
+```
+
 ## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
 
 ```mermaid
