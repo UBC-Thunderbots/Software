@@ -15,8 +15,6 @@
 #include "software/logger/network_logger.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
-#include "software/world/robot_state.h"
-#include "software/world/team.h"
 
 /**
  * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -143,14 +141,12 @@ void Thunderloop::runLoop()
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
-    struct timespec last_world_received_time;
     struct timespec current_time;
     struct timespec last_chipper_fired;
     struct timespec last_kicker_fired;
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
-    TbotsProto::World new_world;
     const TbotsProto::PrimitiveSet empty_primitive_set;
 
     // Loop interval
@@ -162,7 +158,6 @@ void Thunderloop::runLoop()
     // CLOCK_REALTIME can jump backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
-    clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
 
@@ -184,7 +179,7 @@ void Thunderloop::runLoop()
             // Collect jetson status
             jetson_status_.set_cpu_temperature(getCpuTemperature());
 
-            // Network Service: receive newest world, primitives and set out the last
+            // Network Service: receive newest primitives and send out the last
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
@@ -199,8 +194,8 @@ void Thunderloop::runLoop()
 
             uint64_t last_handled_primitive_set = primitive_set_.sequence_number();
 
-            // Updating primitives and world with newly received data
-            // and setting the correct time elasped since last primitive / world
+            // Updating primitives with newly received data
+            // and setting the correct time elasped since last primitive
 
             struct timespec time_since_last_primitive_received;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
