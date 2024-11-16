@@ -15,7 +15,7 @@ PowerService::PowerService()
         throw std::runtime_error("USB not plugged into the Jetson Nano");
     }
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
-    this->read_thread = std::thread(boost::bind(&PowerService::continuousRead, this));
+    this->read_thread = std::thread(std::bind(&PowerService::continuousRead, this));
 }
 
 PowerService::~PowerService()

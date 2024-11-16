@@ -11,8 +11,8 @@ NonTerminatingFunctionValidator::NonTerminatingFunctionValidator(
        // otherwise the World inside the coroutine will not update properly when the
        // pointer is updated, and the wrong validation_function may be run.
       validation_sequence(
-          boost::bind(&NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper,
-                      this, _1, world, validation_function)),
+          std::bind(&NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper,
+                      this, std::placeholders::_1, world, validation_function)),
       world_(world),
       validation_function_(validation_function)
 {
@@ -24,8 +24,8 @@ std::optional<std::string> NonTerminatingFunctionValidator::executeAndCheckForFa
     if (!validation_sequence)
     {
         // Re-start the coroutine by re-creating it
-        validation_sequence = ValidationCoroutine::pull_type(boost::bind(
-            &NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper, this, _1,
+        validation_sequence = ValidationCoroutine::pull_type(std::bind(
+            &NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper, this, std::placeholders::_1,
             world_, validation_function_));
     }
 

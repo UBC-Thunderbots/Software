@@ -90,7 +90,7 @@ void ProtoUnixListener<ReceiveProtoT>::startListen()
     // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
     socket_.async_receive_from(boost::asio::buffer(raw_received_data_, UNIX_BUFFER_SIZE),
                                listen_endpoint_,
-                               boost::bind(&ProtoUnixListener::handleDataReception, this,
+                               std::bind(&ProtoUnixListener::handleDataReception, this,
                                            boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
 }

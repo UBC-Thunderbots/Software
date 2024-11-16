@@ -12,13 +12,13 @@ ThreadedEstopReader::ThreadedEstopReader(std::unique_ptr<UartCommunication> uart
       timer(io_service, boost::posix_time::milliseconds(INTERVAL_BETWEEN_READS_MS)),
       uart_reader(std::move(uart_reader))
 {
-    estop_thread = std::thread(boost::bind(&ThreadedEstopReader::continousRead, this));
+    estop_thread = std::thread(std::bind(&ThreadedEstopReader::continousRead, this));
 }
 
 void ThreadedEstopReader::continousRead()
 {
     timer.async_wait(
-        boost::bind(&ThreadedEstopReader::tick, this, boost::asio::placeholders::error));
+        std::bind(&ThreadedEstopReader::tick, this, boost::asio::placeholders::error));
     io_service.run();
 }
 
@@ -87,7 +87,7 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
         // Reschedule the timer for interval seconds in the future:
         timer.expires_from_now(next_interval);
         // Posts the timer event
-        timer.async_wait(boost::bind(&ThreadedEstopReader::tick, this,
+        timer.async_wait(std::bind(&ThreadedEstopReader::tick, this,
                                      boost::asio::placeholders::error));
     }
 }

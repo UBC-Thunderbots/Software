@@ -89,7 +89,7 @@ ThreadedObserver<T>::ThreadedObserver(size_t buffer_size, bool log_buffer_full)
       IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {
     pull_from_buffer_thread = std::thread(
-        boost::bind(&ThreadedObserver::continuouslyPullValuesFromBuffer, this));
+        std::bind(&ThreadedObserver::continuouslyPullValuesFromBuffer, this));
 }
 
 template <typename T>
