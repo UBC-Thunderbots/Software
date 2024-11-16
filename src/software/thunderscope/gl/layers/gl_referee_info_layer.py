@@ -8,7 +8,7 @@ from pyqtgraph.opengl.items.GLTextItem import GLTextItem
 from proto.import_all_protos import *
 from software.py_constants import *
 import software.python_bindings as tbots_cpp
-from software.thunderscope.constants import DepthValues, Colors
+from software.thunderscope.constants import DepthValues, Colors, THUNDERSCOPE_UI_FONT_NAME
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
 from software.thunderscope.gl.helpers.observable_list import ObservableList
@@ -81,7 +81,6 @@ class GLRefereeInfoLayer(GLLayer):
         self.ball_placement_in_progress = False
         self.ball_placement_tolerance_circle = None
         self.shrink_target = True
-        self.placement_start_time = 0
 
     def __update_ball_placement(self) -> None:
         """Update ball placement visuals"""
@@ -92,7 +91,7 @@ class GLRefereeInfoLayer(GLLayer):
         if not self.ball_placement_countdown_graphic:
             self.ball_placement_countdown_graphic = GLTextItem(
                 parentItem=self,
-                font=QtGui.QFont("Roboto", 7, weight=700),
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 7, weight=700),
                 color=self.COUNT_DOWN_TEXT_COLOR,
             )
 
@@ -237,8 +236,6 @@ class GLRefereeInfoLayer(GLLayer):
             ],
         )
         self.ball_placement_countdown_graphic.show()
-
-        self.placement_start_time = time.time()
         self.ball_placement_in_progress = False
 
     def __hide_ball_placement_visuals(self) -> None:

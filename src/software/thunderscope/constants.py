@@ -173,6 +173,8 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     """
 )
 
+THUNDERSCOPE_UI_FONT_NAME = "Roboto"
+
 
 def is_field_message_empty(field: Field) -> bool:
     """Checks if a field message is empty
