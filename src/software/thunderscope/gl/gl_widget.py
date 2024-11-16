@@ -23,6 +23,8 @@ from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.world_pb2 import SimulationState
+from proto.replay_bookmark_pb2 import ReplayBookmark
+from proto.tbots_timestamp_msg_pb2 import Timestamp
 
 
 class GLWidget(QWidget):
@@ -96,6 +98,7 @@ class GLWidget(QWidget):
             layers_menu=self.layers_menu,
             toolbars_menu=self.toolbars_menu,
             sandbox_mode=sandbox_mode,
+            on_add_bookmark=self.add_bookmark
         )
 
         # Setup gamecontroller toolbar
@@ -122,6 +125,7 @@ class GLWidget(QWidget):
         self.layers = []
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
+        self.proto_unix_io = proto_unix_io
 
     def get_sim_control_toolbar(self):
         """Returns the simulation control toolbar"""
@@ -380,3 +384,11 @@ class GLWidget(QWidget):
             distance *= half_x_length_with_buffer
 
         return distance
+
+    def add_bookmark(self):
+        timestamp = self.player.current_packet_time if self.player else 0
+        QMessageBox.information(self, "Bookmark", f"Added Bookmark")
+        print(f"add bookmark at {timestamp}")
+        timestamp_proto = Timestamp(epoch_timestamp_seconds=0.0)
+        bookmark = ReplayBookmark(timestamp=timestamp_proto)
+        self.proto_unix_io.send_proto(ReplayBookmark, bookmark)

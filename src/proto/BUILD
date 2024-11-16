@@ -63,6 +63,7 @@ py_proto_library(
         "vision.proto",
         "visualization.proto",
         "world.proto",
+        "replay_bookmark.proto"
     ],
     deps = [
         "@nanopb//:nanopb_options_py_proto",
