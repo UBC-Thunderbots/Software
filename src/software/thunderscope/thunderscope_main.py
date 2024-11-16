@@ -359,12 +359,11 @@ if __name__ == "__main__":
                 for tab in tscope_config.tabs:
                     if hasattr(tab, "widgets"):
                         robot_view_widget = tab.find_widget("Robot View")
-
-                        if robot_view_widget:
-                            robot_view_widget.control_mode_signal.connect(
-                                lambda mode,
-                                robot_id: robot_communication.toggle_robot_connection(
-                                    mode, robot_id
+                        if robot_view_widget is not None:
+                            robot_view_widget.individual_robot_control_mode_signal.connect(
+                                lambda robot_id,
+                                robot_mode: robot_communication.toggle_individual_robot_control_mode(
+                                    robot_id, robot_mode
                                 )
                             )
 
@@ -433,7 +432,7 @@ if __name__ == "__main__":
 
             """
             sync_simulation(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                tscope,
                 0 if args.empty else DIV_B_NUM_ROBOTS,
             )
 
