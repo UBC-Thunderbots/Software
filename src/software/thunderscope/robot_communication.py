@@ -8,7 +8,6 @@ import time
 import os
 import software.python_bindings as tbots_cpp
 
-from typing import Type
 from google.protobuf.message import Message
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
@@ -307,7 +306,6 @@ class RobotCommunication:
             (robot_id, IndividualRobotMode.AI)
             for robot_id in self.robot_control_mode_map.keys()
         )
-
 
     def toggle_keyboard_estop(self) -> None:
         """If keyboard estop is being used, toggles the estop state
