@@ -4,7 +4,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from typing import Optional
 
 from software.thunderscope.gl.graphics.gl_painter import GLPainter
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, THUNDERSCOPE_UI_FONT_NAME
 
 
 class GLGradientLegend(GLPainter):
@@ -47,8 +47,8 @@ class GLGradientLegend(GLPainter):
         self.title = title
 
         self.text_pen = QtGui.QPen(Colors.PRIMARY_TEXT_COLOR)
-        self.labels_font = QtGui.QFont("Roboto", 8)
-        self.title_font = QtGui.QFont("Roboto", 9, QtGui.QFont.Weight.Bold)
+        self.labels_font = QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8)
+        self.title_font = QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 9, QtGui.QFont.Weight.Bold)
 
         self.add_draw_function(self.draw_gradient_legend)
 

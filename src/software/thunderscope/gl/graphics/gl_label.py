@@ -5,7 +5,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from typing import Optional
 
 from software.thunderscope.gl.graphics.gl_painter import GLPainter
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, THUNDERSCOPE_UI_FONT_NAME
 
 
 class GLLabel(GLPainter):
@@ -14,7 +14,7 @@ class GLLabel(GLPainter):
     def __init__(
         self,
         parent_item: Optional[GLGraphicsItem] = None,
-        font: QFont = QFont("Roboto", 8),
+        font: QFont = QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
         text_color: QColor = Colors.PRIMARY_TEXT_COLOR,
         offset: tuple[int, int] = (0, 0),
         text: str = "",
