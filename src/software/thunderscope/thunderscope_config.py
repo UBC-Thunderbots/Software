@@ -11,7 +11,7 @@ from software.thunderscope.thunderscope_types import (
     WidgetStretchData,
 )
 import pyqtgraph
-from qt_material import apply_stylesheet
+import qdarktheme
 import signal
 import os
 
@@ -39,11 +39,7 @@ def initialize_application() -> None:
     app = pyqtgraph.mkQApp("Thunderscope")
 
     # Setup stylesheet
-    extra = {
-        # Make thunderscope more dense
-        "density_scale": "-2",
-    }
-    apply_stylesheet(app, theme="dark_blue.xml", extra=extra)
+    qdarktheme.setup_theme()
 
 
 def configure_robot_view_fullsystem(
@@ -256,24 +252,12 @@ def configure_base_diagnostics(
             anchor="Logs",
         ),
         TScopeWidget(
-            name="Drive and Dribbler",
-            widget=setup_drive_and_dribbler_widget(
+            name="Diagnostics",
+            widget=setup_diagnostics_widget(
                 **{"proto_unix_io": diagnostics_proto_unix_io}
             ),
             anchor="Logs",
             position=WidgetPosition.RIGHT,
-        ),
-        TScopeWidget(
-            name="Chicker",
-            widget=setup_chicker_widget(**{"proto_unix_io": diagnostics_proto_unix_io}),
-            anchor="Drive and Dribbler",
-            position=WidgetPosition.BELOW,
-        ),
-        TScopeWidget(
-            name="Manual Control Input",
-            widget=setup_diagnostics_input_widget(),
-            anchor="Chicker",
-            position=WidgetPosition.TOP,
         ),
     ] + extra_widgets
 
