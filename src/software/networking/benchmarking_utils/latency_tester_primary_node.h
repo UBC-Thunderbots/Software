@@ -10,6 +10,10 @@ class LatencyTesterPrimaryNode : public LatencyTesterNode
                              const int message_size,
                              const std::chrono::milliseconds& timeout_duration);
 
+    LatencyTesterPrimaryNode(const std::string& interface, const unsigned short listen_port,
+            const std::string& send_ip, const unsigned short send_port, const int message_size,
+            const std::chrono::milliseconds& timeout_duration);
+
     void printStatistics();
 
     void runTest(const int num_messages);
@@ -17,6 +21,8 @@ class LatencyTesterPrimaryNode : public LatencyTesterNode
     virtual void onReceive(const char* message, const size_t& size) override;
 
    private:
+    void initialize(const int message_size, const std::chrono::milliseconds& timeout_duration);
+
     void sendTransaction();
 
     std::string send_buffer_;

@@ -12,11 +12,26 @@ LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
     const std::chrono::milliseconds& timeout_duration)
     : LatencyTesterNode(interface, listen_channel, listen_port, send_channel, send_port,
                         std::bind(&LatencyTesterPrimaryNode::onReceive, this,
-                                  std::placeholders::_1, std::placeholders::_2)),
-      response_received_(false),
-      num_timeouts_(0),
-      timeout_duration_(timeout_duration)
+                                  std::placeholders::_1, std::placeholders::_2))
 {
+    initialize(message_size, timeout_duration);
+}
+
+LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(const std::string& interface, const unsigned short listen_port,
+        const std::string& send_ip, const unsigned short send_port, const int message_size,
+        const std::chrono::milliseconds& timeout_duration)
+    : LatencyTesterNode(interface, listen_port, send_ip, send_port, std::bind(&LatencyTesterPrimaryNode::onReceive,
+                                                                   this, std::placeholders::_1, std::placeholders::_2))
+{
+    initialize(message_size, timeout_duration);
+}
+
+void LatencyTesterPrimaryNode::initialize(const int message_size, const std::chrono::milliseconds& timeout_duration)
+{
+    response_received_ = false;
+    num_timeouts_ = 0;
+    timeout_duration_ = timeout_duration;
+
     std::string charset =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     send_buffer_.resize(message_size);
@@ -24,7 +39,7 @@ LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
     {
         send_buffer_[i] = charset[rand() % charset.size()];
     }
-};
+}
 
 void LatencyTesterPrimaryNode::printStatistics()
 {

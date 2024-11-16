@@ -8,5 +8,8 @@ class LatencyTesterSecondaryNode : public LatencyTesterNode
     LatencyTesterSecondaryNode(const std::string& interface, const int listen_channel, const unsigned short listen_port,
                                const int send_channel, const unsigned short send_port);
 
+    LatencyTesterSecondaryNode(const std::string& interface, const unsigned short listen_port,
+            const std::string& send_ip, const unsigned short send_port);
+
     virtual void onReceive(const char* message, const size_t& size) override;
 };

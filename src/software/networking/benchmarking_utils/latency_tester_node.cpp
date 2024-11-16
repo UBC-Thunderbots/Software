@@ -1,5 +1,6 @@
 #include "software/networking/benchmarking_utils/latency_tester_node.h"
 
+#include "latency_tester_node.h"
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
@@ -8,8 +9,7 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface, const int lis
                                      const int send_channel,
                                      const unsigned short send_port,
                                      ReceiveCallback receive_callback)
-    : io_listener_service_(),
-      io_sender_service_()
+    : LatencyTesterNode()
 {
     std::optional<std::string> error;
 
@@ -26,9 +26,33 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface, const int lis
     {
         LOG(FATAL) << "Error creating UdpSender: " << error.value();
     }
+}
 
-    listener_thread_ = std::thread([this]() { io_listener_service_.run(); });
-    sender_thread_   = std::thread([this]() { io_sender_service_.run(); }); 
+LatencyTesterNode::LatencyTesterNode(const std::string& interface, const unsigned short listen_port,
+                                     const std::string& send_ip, const unsigned short send_port, ReceiveCallback receive_callback)
+    : LatencyTesterNode()
+{
+    std::optional<std::string> error;
+
+    listener_ = std::make_unique<UdpListener>(io_listener_service_, listen_port, receive_callback, error);
+    if (error)
+    {
+        LOG(FATAL) << "Error creating UdpListener: " << error.value();
+    }
+
+    sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port, interface, false, error);
+    if (error)
+    {
+        LOG(FATAL) << "Error creating UdpSender: " << error.value();
+    }
+}
+
+LatencyTesterNode::LatencyTesterNode()
+    : io_listener_service_(),
+      io_sender_service_(),
+      listener_thread_([this]() { io_listener_service_.run(); }),
+      sender_thread_([this]() { io_sender_service_.run(); })
+{
 }
 
 LatencyTesterNode::~LatencyTesterNode()

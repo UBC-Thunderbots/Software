@@ -12,6 +12,8 @@ class LatencyTesterNode
     LatencyTesterNode(const std::string& interface, const int listen_channel, const unsigned short listen_port,
                       const int send_channel, const unsigned short send_port,
                       ReceiveCallback receive_callback);
+    LatencyTesterNode(const std::string& interface, const unsigned short listen_port, const std::string& send_ip,
+            const unsigned short send_port, ReceiveCallback receive_callback);
 
     ~LatencyTesterNode();
 
@@ -20,6 +22,10 @@ class LatencyTesterNode
     virtual void onReceive(const char* message, const size_t&) = 0;
 
    private:
+    LatencyTesterNode();
+
+    void startServiceThreads();
+
     boost::asio::io_service io_listener_service_;
     std::unique_ptr<UdpListener> listener_;
 

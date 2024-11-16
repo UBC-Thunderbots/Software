@@ -21,6 +21,8 @@ int main(int argc, char **argv)
         int message_size_bytes     = 200;
         int timeout_duration_ms    = 10;
         int initial_delay_s        = 20;
+        bool multicast             = false;
+        std::string send_ip        = "";
     };
 
     CommandLineArgs args;
@@ -31,18 +33,9 @@ int main(int argc, char **argv)
     desc.add_options()("runtime_dir",
                        boost::program_options::value<std::string>(&args.runtime_dir),
                        "The directory to output logs.");
-    desc.add_options()("interface",
-                       boost::program_options::value<std::string>(&args.interface),
-                       "The interface to bind to.");
-    desc.add_options()("listen_channel",
-                       boost::program_options::value<int>(&args.listen_channel),
-                       "The channel to listen on.");
     desc.add_options()("listen_port",
                        boost::program_options::value<unsigned short>(&args.listen_port),
                        "The port to listen on.");
-    desc.add_options()("send_channel",
-                       boost::program_options::value<int>(&args.send_channel),
-                       "The channel to send on.");
     desc.add_options()("send_port",
                        boost::program_options::value<unsigned short>(&args.send_port),
                        "The port to send on.");
@@ -58,6 +51,25 @@ int main(int argc, char **argv)
     desc.add_options()("initial_delay_s",
             boost::program_options::value<int>(&args.initial_delay_s),
             "The initial delay to wait before sending packets (s)");
+    desc.add_options()("multicast",
+            boost::program_options::value<bool>(&args.multicast),
+            "Use multicast instead of unicast for communication.");
+    desc.add_options()("interface",
+                       boost::program_options::value<std::string>(&args.interface),
+                       "The interface to bind to.");
+
+    // Multicast Options
+    desc.add_options()("listen_channel",
+                       boost::program_options::value<int>(&args.listen_channel),
+                       "The channel to listen on.");
+    desc.add_options()("send_channel",
+                       boost::program_options::value<int>(&args.send_channel),
+                       "The channel to send on.");
+
+    // Unicast Options
+    desc.add_options()("send_ip",
+                       boost::program_options::value<std::string>(&args.send_ip),
+                       "The IP of the receiver for unicast communication.");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -71,10 +83,21 @@ int main(int argc, char **argv)
     {
         LoggerSingleton::initializeLogger(args.runtime_dir, nullptr, false);
 
-        LatencyTesterPrimaryNode tester(args.interface,
-            args.listen_channel, args.listen_port, args.send_channel, args.send_port,
-            args.message_size_bytes, std::chrono::milliseconds(args.timeout_duration_ms));
+        std::chrono::milliseconds timeout_duration_ms(args.timeout_duration_ms);
+        std::unique_ptr<LatencyTesterPrimaryNode> tester;
+        if (args.multicast)
+        {
+            tester = std::make_unique<LatencyTesterPrimaryNode>(args.interface,
+                args.listen_channel, args.listen_port, args.send_channel, args.send_port,
+                args.message_size_bytes, timeout_duration_ms);
+        }
+        else
+        {
+            tester = std::make_unique<LatencyTesterPrimaryNode>(args.interface, args.listen_port, args.send_ip,
+                    args.send_port, args.message_size_bytes, timeout_duration_ms);
+        }
+
         std::this_thread::sleep_for(std::chrono::seconds(args.initial_delay_s));
-        tester.runTest(args.num_messages);
+        tester->runTest(args.num_messages);
     }
 }
