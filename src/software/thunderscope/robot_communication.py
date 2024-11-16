@@ -5,10 +5,10 @@ import logging
 import threading
 from typing import Any, Callable, Tuple, Type
 import time
+from typing import Any, Callable, Tuple, Type
 import os
 import software.python_bindings as tbots_cpp
 
-from typing import Type
 from google.protobuf.message import Message
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
@@ -103,6 +103,15 @@ class RobotCommunication:
         self.current_proto_unix_io.register_observer(
             PowerControl, self.power_control_primitive_buffer
         )
+
+        # dynamic map of robot id to the individual control mode
+        self.robot_control_mode_map: dict[int, IndividualRobotMode] = {}
+
+        # static map of robot id to stop primitive
+        self.robot_stop_primitives_map: dict[int, StopPrimitive] = {}
+
+        # dynamic map of robot id to the number of times to send a stop primitive
+        self.robot_stop_primitive_send_count_map: dict[int, int] = {}
 
         # Whether to accept the next configuration update. We will be provided a proto configuration from the
         # ProtoConfigurationWidget. If the user provides an interface, we will accept it as the first network
@@ -538,11 +547,6 @@ class RobotCommunication:
         """
         self.running = False
 
-        self.close_for_fullsystem()
-
-        # TODO (#3172): if `--disable_communication` is set, this throws a runtime error on exit
-        self.receive_robot_log.close()
-        self.receive_robot_status.close()
         self.run_primitive_set_thread.join()
 
     def print_current_network_config(self) -> None:
