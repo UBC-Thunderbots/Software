@@ -6,7 +6,11 @@ from pyqtgraph.opengl import *
 
 from proto.visualization_pb2 import AttackerVisualization
 
-from software.thunderscope.constants import Colors, DepthValues, THUNDERSCOPE_UI_FONT_NAME
+from software.thunderscope.constants import (
+    Colors,
+    DepthValues,
+    THUNDERSCOPE_UI_FONT_NAME,
+)
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -97,7 +101,8 @@ class GLAttackerLayer(GLLayer):
             self.shot_open_angle_graphics.resize(
                 1,
                 lambda: GLTextItem(
-                    font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8), color=Colors.SHOT_VISUALIZATION_COLOR
+                    font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+                    color=Colors.SHOT_VISUALIZATION_COLOR,
                 ),
             )
 

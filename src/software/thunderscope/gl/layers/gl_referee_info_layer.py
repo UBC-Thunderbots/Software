@@ -1,4 +1,3 @@
-import time
 from typing import Optional
 
 from PyQt6 import QtGui
@@ -8,7 +7,11 @@ from pyqtgraph.opengl.items.GLTextItem import GLTextItem
 from proto.import_all_protos import *
 from software.py_constants import *
 import software.python_bindings as tbots_cpp
-from software.thunderscope.constants import DepthValues, Colors, THUNDERSCOPE_UI_FONT_NAME
+from software.thunderscope.constants import (
+    DepthValues,
+    Colors,
+    THUNDERSCOPE_UI_FONT_NAME,
+)
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
 from software.thunderscope.gl.helpers.observable_list import ObservableList
