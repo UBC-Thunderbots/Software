@@ -13,6 +13,7 @@ class BallEntersRegion(Validation):
 
     def __init__(self, regions=None):
         self.regions = regions if regions else []
+        self.ball_position = None
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the ball enters the provided regions
@@ -27,6 +28,7 @@ class BallEntersRegion(Validation):
             ):
                 return ValidationStatus.PASSING
 
+        self.ball_position = world.ball.current_state.global_position
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
@@ -41,7 +43,7 @@ class BallEntersRegion(Validation):
     def __repr__(self):
         return "Checking ball in regions " + ",".join(
             repr(region) for region in self.regions
-        )
+        ) + ", ball position: " + str(self.ball_position) if self.ball_position else ""
 
 
 (
