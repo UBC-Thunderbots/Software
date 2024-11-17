@@ -25,6 +25,7 @@ proto_library(
         "team.proto",
         "vision.proto",
         "world.proto",
+        "replay_bookmark.proto"
     ],
     deps = [
         "@com_google_protobuf//:descriptor_proto",

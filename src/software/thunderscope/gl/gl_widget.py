@@ -389,8 +389,7 @@ class GLWidget(QWidget):
 
     def add_bookmark(self):
         """Handler for clicking 'add bookmark' button """
-        timestamp = self.player.current_packet_time if self.player else time.time()
-        timestamp_proto = Timestamp(epoch_timestamp_seconds=timestamp)
-        bookmark = ReplayBookmark(timestamp=timestamp_proto)
+        timestamp = time.time()
+        bookmark = ReplayBookmark(timestamp=Timestamp(epoch_timestamp_seconds=timestamp))
         self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
         QMessageBox.information(self, "Bookmark", f"Added Bookmark")
