@@ -1,3 +1,5 @@
+import time
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
@@ -386,9 +388,9 @@ class GLWidget(QWidget):
         return distance
 
     def add_bookmark(self):
-        timestamp = self.player.current_packet_time if self.player else 0
-        QMessageBox.information(self, "Bookmark", f"Added Bookmark")
-        print(f"add bookmark at {timestamp}")
-        timestamp_proto = Timestamp(epoch_timestamp_seconds=0.0)
+        """Handler for clicking 'add bookmark' button """
+        timestamp = self.player.current_packet_time if self.player else time.time()
+        timestamp_proto = Timestamp(epoch_timestamp_seconds=timestamp)
         bookmark = ReplayBookmark(timestamp=timestamp_proto)
         self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
+        QMessageBox.information(self, "Bookmark", f"Added Bookmark")

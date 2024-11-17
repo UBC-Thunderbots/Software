@@ -44,7 +44,9 @@ class ProtoPlayer:
 
     PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
     CHUNK_INDEX_FILENAME = "chunks.index"
+    BOOKMARK_INDEX_FILENAME = "bookmarks.index"
     CHUNK_INDEX_FILE_VERSION = 1
+    BOOKMARK_INDEX_FILE_VERSION = 1
 
     def __init__(
         self, log_folder_path: os.PathLike, proto_unix_io: ProtoUnixIO
@@ -159,6 +161,11 @@ class ProtoPlayer:
                 start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(
                     chunk_data[0], self.version
                 )
+                for data in chunk_data:
+                    _, protobuf_type, data = ProtoPlayer.unpack_log_entry(data, self.version)
+                    logging.info(protobuf_type)
+                    if protobuf_type == ReplayBookmark:
+                        logging.info("Found a bookmark")
                 chunk_indices[os.path.basename(chunk_name)] = start_timestamp
         if chunk_indices:
             try:
