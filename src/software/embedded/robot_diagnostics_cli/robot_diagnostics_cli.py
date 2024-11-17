@@ -1,3 +1,4 @@
+import typer
 from rich import print
 from rich.live import Live
 from rich.table import Table
@@ -8,7 +9,7 @@ from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
 from software.embedded.constants.py_constants import (
-    get_estop_config, EstopMode, DEFAULT_PRIMITIVE_DURATION)
+    get_estop_config, EstopMode, DEFAULT_PRIMITIVE_DURATION, ROBOT_MAX_ANG_SPEED_RAD_PER_S)
 from proto.import_all_protos import *
 import redis
 import subprocess
@@ -16,6 +17,8 @@ import InquirerPy
 import time
 import typer as Typer
 from functools import wraps
+from typing import Optional
+from typing_extensions import Annotated
 
 
 class RobotDiagnosticsCLI:
@@ -30,8 +33,9 @@ class RobotDiagnosticsCLI:
         self.app.command(short_help="Spins the dribbler")(self.dribble)
         self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
         self.app.command(short_help="Shows Redis Values")(self.redis)
-        self.app.command(short_help="Prints Thunderloop Logs")(self.print_thunderloop_logs)
-        self.app.command(short_help="Prints Thunderloop Status")(self.print_thunderloop_status)
+        self.app.command(short_help="Prints Thunderloop Logs")(self.log)
+        self.app.command(short_help="Prints Thunderloop Status")(self.status)
+        self.app.command(short_help="Toggles easy selection shell (For new users)")(self.toggle_simple_mode)
 
         self.redis = redis.StrictRedis(
             host=REDIS_DEFAULT_HOST,
@@ -45,7 +49,7 @@ class RobotDiagnosticsCLI:
         self.console = Console()
         self.command_duration_seconds = 2.0
         self.send_primitive_interval_s = 0.01
-
+        self.easy_mode_enabled = False
         # total primitives for all robots
         self.robot_primitives = {}
 
@@ -224,7 +228,7 @@ class RobotDiagnosticsCLI:
         """CLI Command to generate Onboard Redis information"""
         self.console.print(self.__generate_redis_table())
 
-    def print_thunderloop_status(self):
+    def status(self):
         """CLI Command to print Thunderloop service status"""
         log = subprocess.call(["service", "thunderloop", "status"])
         print(log)
@@ -232,38 +236,56 @@ class RobotDiagnosticsCLI:
     def restart_thunderloop(self):
         """CLI Command to restart Thunderloop service and print status"""
         subprocess.run(["service", "thunderloop", "restart"])
-        self.print_thunderloop_status()
+        self.status()
 
-    def print_thunderloop_logs(self):
+    def log(self):
         """CLI Command to print device logs"""
         log = subprocess.call(["sudo", "journalctl", "-f", "-n", "100"])
         print(log)
 
-    @catch_interrupt_exception()
-    def rotate(self, velocity_in_rad: float, duration_seconds: float = DEFAULT_PRIMITIVE_DURATION) -> None:
-        """CLI Command to rotate the robot
+    def toggle_simple_mode(self):
+        """Toggles Easy Shell Mode.
 
-        :param velocity_in_rad: Angular Velocity to rotate the robot
-        :param duration: Duration to rotate the robot
+        - Easy Mode: Enables selection menu for functions
+        - Regular Mode [Default]: Flags for functions
         """
+        self.easy_mode_enabled = not self.easy_mode_enabled
+        print(f"Easy Shell Mode set to {self.easy_mode_enabled}")
+
+    @catch_interrupt_exception()
+    def rotate(self,
+               velocity: Annotated[Optional[float], typer.Option(
+                   help=f"Clamped to +{ROBOT_MAX_ANG_SPEED_RAD_PER_S} & -{ROBOT_MAX_ANG_SPEED_RAD_PER_S} rad/s")] = 0,
+               duration_seconds: Annotated[Optional[float], typer.Option(
+                   help="Duration in rotate in seconds")] = DEFAULT_PRIMITIVE_DURATION
+               ) -> None:
+        """CLI Command to rotate the robot. Clamped by robot_max_ang_speed_rad_per_s.
+
+        :param velocity: Angular Velocity to rotate the robot
+        :param duration_seconds: Duration to rotate the robot
+        """
+        # TODO: Add InquirerPy with self.easy_mode_enabled
         self.__run_primitive_set(Primitive(stop=StopPrimitive()))
-        MAX_SPEED_RAD = 4
-        velocity_in_rad = self.__clamp(velocity_in_rad, -MAX_SPEED_RAD, MAX_SPEED_RAD)
+        velocity = self.__clamp(
+            velocity,
+            -ROBOT_MAX_ANG_SPEED_RAD_PER_S,
+            ROBOT_MAX_ANG_SPEED_RAD_PER_S
+        )
         motor_control_primitive = MotorControl()
-        motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = velocity_in_rad
+        motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = velocity
         direct_control_primitive = DirectControlPrimitive(
             motor_control=motor_control_primitive,
             power_control=PowerControl()
         )
         for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=f"Rotating at {velocity_in_rad} rad/s for {duration_seconds} seconds"):
+                       description=f"Rotating at {velocity} rad/s for {duration_seconds} seconds"):
             self.__run_primitive_set(
                 Primitive(direct_control=direct_control_primitive)
             )
             time.sleep(self.send_primitive_interval_s)
         self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
-    def move(self, direction: str, speed_m_per_s: float,
+    def move(self, direction: str, wheels: List[int], speed_m_per_s: float,
              duration_seconds: float = DEFAULT_PRIMITIVE_DURATION) -> None:
         """CLI Command to move the robot in the specified direction
 

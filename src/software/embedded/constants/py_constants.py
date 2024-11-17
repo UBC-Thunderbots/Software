@@ -1,8 +1,11 @@
 import os
 from enum import IntEnum
+import software.python_bindings as tbots_cpp
 
 DEFAULT_PRIMITIVE_DURATION = 2.0
+ROBOT_CONSTANTS = tbots_cpp.create2021RobotConstants()
 
+ROBOT_MAX_ANG_SPEED_RAD_PER_S = ROBOT_CONSTANTS.robot_max_ang_speed_rad_per_s
 
 class EstopMode(IntEnum):
     """Enum for the various estop modes we can run thunderscope in
