@@ -210,6 +210,7 @@ void Thunderloop::runLoop()
             network_status_.set_ms_since_last_primitive_received(
                 getMilliseconds(time_since_last_primitive_received));
 
+            LOG(INFO) << "PRIMITIVE INFO: " << primitive_set_.DebugString();
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
@@ -358,7 +359,7 @@ void Thunderloop::runLoop()
 //                redis_client_->asyncCommit();
 //            }
 
-            updateErrorCodes();
+//            updateErrorCodes();
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -454,18 +455,18 @@ void Thunderloop::updateErrorCodes()
     robot_status_.clear_error_code();
 
     // Updates error status
-//    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
-//    {
-//        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
-//    }
-//    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
-//    {
-//        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
-//    }
-//    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
-//    {
-//        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
-//    }
+    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
+    }
+    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
+    }
+    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
+    }
 
     if (!isPowerStable(log_file))
     {

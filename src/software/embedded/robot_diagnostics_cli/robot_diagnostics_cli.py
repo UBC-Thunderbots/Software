@@ -2,6 +2,7 @@ from rich import print
 from rich.live import Live
 from rich.table import Table
 from rich.console import Console
+from rich.progress import track
 import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from typer_shell import make_typer_shell
@@ -13,6 +14,9 @@ import redis
 import subprocess
 import InquirerPy
 import time
+import typer as Typer
+from functools import wraps
+
 
 class RobotDiagnosticsCLI:
     def __init__(self) -> None:
@@ -36,10 +40,11 @@ class RobotDiagnosticsCLI:
             decode_responses=True
         )
         self.channel_id = int(self.redis.get(ROBOT_ID_REDIS_KEY))
-        self.robot_id = str(self.redis.get(ROBOT_ID_REDIS_KEY))
+        self.robot_id = int(self.redis.get(ROBOT_ID_REDIS_KEY))
         self.sequence_number = 0
         self.console = Console()
         self.command_duration_seconds = 2.0
+        self.send_primitive_interval_s = 0.01
 
         # total primitives for all robots
         self.robot_primitives = {}
@@ -84,8 +89,8 @@ class RobotDiagnosticsCLI:
         """
 
         # for all robots connected to diagnostics, set their primitive
-        self.robot_primitives[self.robot_id] = diagnostics_primitive
 
+        self.robot_primitives[self.robot_id] = diagnostics_primitive
         # initialize total primitive set and send it
         primitive_set = PrimitiveSet(
             time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
@@ -103,9 +108,26 @@ class RobotDiagnosticsCLI:
 
         self.sequence_number += 1
 
-        if self.__should_send_packet() or self.should_send_stop:
-            self.send_primitive_set.send_proto(primitive_set)
-            self.should_send_stop = False
+        # if self.__should_send_packet() or self.should_send_stop:
+        self.send_primitive_set.send_proto(primitive_set)
+        self.should_send_stop = False
+
+    def catch_interrupt_exception(exit_code=1):
+        """Decorator for handling keyboard exceptions and safely clearing cached primitives"""
+
+        def decorator(func):
+            @wraps(func)
+            def wrapper(self, *args, **kwargs):
+                try:
+                    return func(self, *args, **kwargs)
+                except KeyboardInterrupt:
+                    print("Stopped Primitive Send")
+                    self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+                    raise Typer.Exit(code=exit_code)
+
+            return wrapper
+
+        return decorator
 
     def __send_estop_state(self) -> None:
         """Constant loop which sends the current estop status proto if estop is not disabled
@@ -217,19 +239,29 @@ class RobotDiagnosticsCLI:
         log = subprocess.call(["sudo", "journalctl", "-f", "-n", "100"])
         print(log)
 
+    @catch_interrupt_exception()
     def rotate(self, velocity_in_rad: float, duration_seconds: float = DEFAULT_PRIMITIVE_DURATION) -> None:
         """CLI Command to rotate the robot
 
         :param velocity_in_rad: Angular Velocity to rotate the robot
         :param duration: Duration to rotate the robot
         """
-
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
         MAX_SPEED_RAD = 4
         velocity_in_rad = self.__clamp(velocity_in_rad, -MAX_SPEED_RAD, MAX_SPEED_RAD)
-        # for _ in track(range(100), description="Running..."):
-        #     self.__run_primitive_set()
-        #     time.sleep(0.01)
-        print(f"Rotating at {velocity_in_rad} rad/s for {duration_seconds} seconds")
+        motor_control_primitive = MotorControl()
+        motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = velocity_in_rad
+        direct_control_primitive = DirectControlPrimitive(
+            motor_control=motor_control_primitive,
+            power_control=PowerControl()
+        )
+        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
+                       description=f"Rotating at {velocity_in_rad} rad/s for {duration_seconds} seconds"):
+            self.__run_primitive_set(
+                Primitive(direct_control=direct_control_primitive)
+            )
+            time.sleep(self.send_primitive_interval_s)
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
     def move(self, direction: str, speed_m_per_s: float,
              duration_seconds: float = DEFAULT_PRIMITIVE_DURATION) -> None:
@@ -287,14 +319,13 @@ class RobotDiagnosticsCLI:
             ROBOT_STATUS_PORT,
             self.__receive_robot_status,
             True,
-            )
+        )
 
         # Sender
         self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
             str(getRobotMulticastChannel(
                 self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}", PRIMITIVE_PORT, True
         )
-
 
         return self
 
@@ -304,6 +335,7 @@ class RobotDiagnosticsCLI:
         Ends all currently running loops and joins all currently active threads
         """
         self.receive_robot_status.close()
+
 
 if __name__ == "__main__":
     with RobotDiagnosticsCLI() as cli:

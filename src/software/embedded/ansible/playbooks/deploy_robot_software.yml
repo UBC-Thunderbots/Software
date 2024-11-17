@@ -13,7 +13,6 @@
       thunderloop: ../../thunderloop_main
     archive_paths:
       robot_diagnostics_cli_tar:  ../../robot_diagnostics_cli/robot_diagnostics_cli_tar.tar.gz
-#      // ADD SOMETHINGS HERE
 
   tasks:
 
@@ -78,7 +77,6 @@
             dest: ~/thunderbots_binaries/
             recursive: yes
             copy_links: yes
-            _local_rsync_password: thunderbots
           tags: always
 
         - name: Unarchiving Binaries
