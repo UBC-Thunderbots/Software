@@ -350,6 +350,67 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
     return new_friendly_team;
 }
 
+void SensorFusion::updateDribbleDisplacement()
+{
+    // Dribble distance algorithm taken from TIGERs autoref implementation
+    // https://t.ly/vNZf9
+
+    if (!ball.has_value())
+    {
+        return;
+    }
+
+    // Add new touching robots and remove non-touching robots
+    for (const Robot &robot : friendly_team.getAllRobots())
+    {
+        if (robot.isNearDribbler(ball->position(),
+                                 sensor_fusion_config.touching_ball_threshold()))
+        {
+            // Insert only occurs if the map doesn't already contain a value
+            // with the key robot.id()
+            ball_contacts_by_friendly_robots.insert(
+                    std::make_pair(robot.id(), ball->position()));
+        }
+        else
+        {
+            ball_contacts_by_friendly_robots.erase(robot.id());
+        }
+    }
+
+    // Remove touching robots that have vanished
+    for (const auto &[robot_id, contact_point] : ball_contacts_by_friendly_robots)
+    {
+        if (std::none_of(friendly_team.getAllRobots().begin(),
+                         friendly_team.getAllRobots().end(),
+                         [&](const Robot &robot) { return robot.id() == robot_id; }))
+        {
+            ball_contacts_by_friendly_robots.erase(robot_id);
+        }
+    }
+
+    // Compute displacements from initial contact points to current ball position
+    std::vector<Segment> dribble_displacements;
+    dribble_displacements.reserve(ball_contacts_by_friendly_robots.size());
+    std::transform(ball_contacts_by_friendly_robots.begin(),
+                   ball_contacts_by_friendly_robots.end(),
+                   std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
+                const Point contact_point = kv_pair.second;
+                return Segment(contact_point, ball->position());
+            });
+
+    // Set dribble_displacement to the longest of dribble_displacements
+    if (dribble_displacements.empty())
+    {
+        dribble_displacement = std::nullopt;
+    }
+    else
+    {
+        dribble_displacement = *std::max_element(
+                dribble_displacements.begin(), dribble_displacements.end(),
+                [](const Segment &a, const Segment &b) { return a.length() < b.length(); });
+    }
+}
+
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
@@ -436,4 +497,5 @@ void SensorFusion::resetWorldComponents()
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     possession           = TeamPossession::FRIENDLY_TEAM;
+    dribble_displacement = std::nullopt;
 }
