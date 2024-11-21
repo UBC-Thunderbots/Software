@@ -48,7 +48,7 @@ class DriveAndDribblerWidget(QWidget):
         self.toggle_dribbler_sliders(True)
 
     def refresh(self) -> None:
-        """Refresh the widget and send the a MotorControl message with the current values"""
+        """Refresh the widget and send the MotorControl message with the current values depending on the ControlMode"""
         motor_control = MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
         if self.control_mode == ControlMode.MOTOR:
@@ -389,15 +389,17 @@ class DriveAndDribblerWidget(QWidget):
             common_widgets.change_button_state(self.stop_and_reset_dribbler, False)
 
     def disconnect_direct_sliders(self) -> None:
-        """Disconnect listener for changing values for motor sliders"""
+        """Disconnect motor slider value listeners"""
         self.x_velocity_slider.valueChanged.disconnect()
         self.y_velocity_slider.valueChanged.disconnect()
         self.angular_velocity_slider.valueChanged.disconnect()
 
     def disconnect_dribbler_sliders(self) -> None:
+        """Disconnect dribbler slider value listener"""
         self.dribbler_speed_rpm_slider.valueChanged.disconnect()
 
     def disconnect_motor_sliders(self) -> None:
+        """Disconnect per motor slider value listeners"""
         self.front_left_motor_slider.valueChanged.disconnect()
         self.front_right_motor_slider.valueChanged.disconnect()
         self.back_left_motor_slider.valueChanged.disconnect()
