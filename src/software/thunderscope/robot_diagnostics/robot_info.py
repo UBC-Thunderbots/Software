@@ -75,19 +75,19 @@ class RobotInfo(QWidget):
         self,
         robot_id: int,
         available_control_modes: list[IndividualRobotMode],
-        control_mode_signal: Type[QtCore.pyqtSignal],
+        individual_robot_control_mode_signal: Type[QtCore.pyqtSignal],
     ) -> None:
         """Initialize a single robot's info widget
 
         :param robot_id: id of robot whose info is being displayed
         :param available_control_modes: the currently available input modes for the robots
                                         according to what mode thunderscope is run in
-        :param control_mode_signal: signal that should be emitted when a robot changes control mode
+        :param individual_robot_control_mode_signal: signal that should be emitted when a robot changes control mode
         """
         super().__init__()
 
         self.robot_id = robot_id
-        self.control_mode_signal = control_mode_signal
+        self.individual_robot_control_mode_signal = individual_robot_control_mode_signal
 
         self.time_of_last_robot_status = time.time()
 
@@ -221,8 +221,9 @@ class RobotInfo(QWidget):
             )
 
         control_mode_menu.currentIndexChanged.connect(
-            lambda mode, robot_id=self.robot_id: self.control_mode_signal.emit(
-                mode, robot_id
+            lambda mode,
+            robot_id=self.robot_id: self.individual_robot_control_mode_signal.emit(
+                robot_id, IndividualRobotMode(mode)
             )
         )
 

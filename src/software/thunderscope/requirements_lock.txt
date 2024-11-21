@@ -4,6 +4,13 @@
 #
 #    bazel run //software/thunderscope:requirements.update
 #
+darkdetect==0.7.1 \
+    --hash=sha256:3efe69f8ecd5f1b7f4fbb0d1d93f656b0e493c45cc49222380ffe2a529cbc866 \
+    --hash=sha256:47be3cf5134432ddb616bbffc927237718407914993c82809983e7ccebf49013
+    # via pyqtdarktheme-fork
+evdev==1.7.0 \
+    --hash=sha256:95bd2a1e0c6ce2cd7a2ecc6e6cd9736ff794b3ad5cb54d81d8cbc2e414d0b870
+    # via -r software/thunderscope/requirements.in
 numpy==1.26.4 \
     --hash=sha256:03a8c78d01d9781b28a6989f6fa1bb2c4f2d51201cf99d3dd875df6fbd96b23b \
     --hash=sha256:08beddf13648eb95f8d867350f6a018a4be2e5ad54c8d8caed89ebca558b2818 \
@@ -56,6 +63,16 @@ protobuf==5.27.3 \
     --hash=sha256:c2a105c24f08b1e53d6c7ffe69cb09d0031512f0b72f812dd4005b8112dbe91e \
     --hash=sha256:c84eee2c71ed83704f1afbf1a85c3171eab0fd1ade3b399b3fad0884cbcca8bf \
     --hash=sha256:dcb307cd4ef8fec0cf52cb9105a03d06fbb5275ce6d84a6ae33bc6cf84e0a07b
+    # via -r software/thunderscope/requirements.in
+pyqt6-qt6==6.6.1 \
+    --hash=sha256:0409aa09b8dae90d5f00ba2d9761e671dfbc54ab169cff8f4cdfecd7f664fd0f \
+    --hash=sha256:41f1ed3eadc00540c205a0e897ae0e0fffc21b896e575214f7c5b9c86d2037d1 \
+    --hash=sha256:8dcac0bd9df13d63deafb6a61969b832c34467da4a28d2b7abf78066bfce22e6 \
+    --hash=sha256:e7df8851c93886412d890d0ecc62b39f42521861ee7a80982136d65903e1f2c5
+    # via -r software/thunderscope/requirements.in
+pyqtdarktheme-fork==2.3.2 \
+    --hash=sha256:3ea94fed5df262d960378409357c63032639f749794d766f41a45ad8558b2523 \
+    --hash=sha256:d96ee64f0884678fad9b6bc352d5e37d84ca786fa60ed32ffaa7e6c6bc67e964
     # via -r software/thunderscope/requirements.in
 pyqtgraph==0.13.7 \
     --hash=sha256:64f84f1935c6996d0e09b1ee66fe478a7771e3ca6f3aaa05f00f6e068321d9e3 \
