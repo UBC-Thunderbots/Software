@@ -27,6 +27,7 @@ from software.thunderscope.gl.layers import (
     gl_tactic_layer,
     gl_cost_vis_layer,
     gl_trail_layer,
+    gl_movement_field_test_layer
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
@@ -118,6 +119,12 @@ def setup_gl_widget(
             visualization_buffer_size,
         )
     )
+
+    field_test_movement_layer = gl_movement_field_test_layer.GLMovementFieldTestLayer(
+        "Movement FieldTest Layer",
+        full_system_proto_unix_io
+    )
+
     simulator_layer = gl_simulator_layer.GLSimulatorLayer(
         "Simulator", friendly_colour_yellow, visualization_buffer_size
     )
@@ -135,6 +142,7 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, True)
+    gl_widget.add_layer(field_test_movement_layer, False)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
@@ -168,6 +176,7 @@ def setup_gl_widget(
     for arg in [
         (World, world_layer.world_buffer),
         (World, cost_vis_layer.world_buffer),
+        (World, field_test_movement_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
         (ObstacleList, obstacle_layer.obstacles_list_buffer),

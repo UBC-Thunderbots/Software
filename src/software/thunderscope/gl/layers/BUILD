@@ -157,3 +157,12 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_movement_field_test_layer", 
+    srcs = ["gl_movement_field_test_layer.py"],
+    deps  = [
+        ":gl_layer",
+        "//software/thunderscope:proto_unix_io"
+    ]
+)
