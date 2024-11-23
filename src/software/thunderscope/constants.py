@@ -171,7 +171,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     Layout file (on save) is located at {SAVED_LAYOUT_PATH}<br>
 
     <b><code>p</code></b> Push the current obstacle to the obstacle stack. GLDrawPolygonObstalce layer must be enabled.<br><br>
-    <b><code>c</code></b> Clear the virutal obstacle stack GLDrawPolygonObstalce layer must be enabled. <br><br>
+    <b><code>c</code></b> Clear the virtual obstacle stack GLDrawPolygonObstalce layer must be enabled. <br><br>
 
 
     """
