@@ -83,6 +83,7 @@ class ProtoPlayer:
         )
 
         # build or load index for chunks
+        self.bookmark_indices = list()
         self.chunks_indices = self.get_chunk_index()
 
         # We can get the total runtime of the log from the last entry in the last chunk
@@ -163,9 +164,8 @@ class ProtoPlayer:
                 )
                 for data in chunk_data:
                     _, protobuf_type, data = ProtoPlayer.unpack_log_entry(data, self.version)
-                    logging.info(protobuf_type)
                     if protobuf_type == ReplayBookmark:
-                        logging.info("Found a bookmark")
+                        self.bookmark_indices.append(data.timestamp.epoch_timestamp_seconds)
                 chunk_indices[os.path.basename(chunk_name)] = start_timestamp
         if chunk_indices:
             try:

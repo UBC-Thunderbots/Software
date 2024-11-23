@@ -1,7 +1,12 @@
 import time
+
+from PyQt6 import QtWidgets
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
 from functools import partial
+
+from software.thunderscope.common.common_widgets import create_radio
+from software.thunderscope.replay.bookmark_marker import BookmarkMarker
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.common import common_widgets
 from software.py_constants import *
@@ -90,6 +95,10 @@ class ReplayControls(QWidget):
             tick_spacing=1,
         )
 
+        self.bookmarks_markers = []
+        self.create_bookmarks()
+        self.update_bookmarks()
+
         # Setup mouse interactions
         self.replay_slider.valueChanged.connect(self.__on_replay_slider_value_changed)
         self.replay_slider.sliderReleased.connect(self.__on_replay_slider_released)
@@ -174,6 +183,25 @@ class ReplayControls(QWidget):
         self.player.seek(absolute_time)
         if self.was_playing:
             self.player.play()
+
+    def create_bookmarks(self) -> None:
+        for timestamp in self.player.bookmark_indices:
+            bookmark = BookmarkMarker(2000)
+            self.replay_layout.addWidget(bookmark)
+            bookmark.show()
+            self.bookmarks_markers.append(bookmark)
+
+    def update_bookmarks(self) -> None:
+        opt = QtWidgets.QStyleOptionSlider()
+        self.replay_slider.initStyleOption(opt)
+        for markers in self.bookmarks_markers:
+            rect = self.replay_slider.style().subControlRect(
+                QtWidgets.QStyle.CC_Slider,
+                opt,
+                QtWidgets.QStyle.SC_SliderHandle,
+                self.replay_slider
+            )
+            markers.move(rect.center().x() - markers.width() / 2 + self.replay_slider.x(), 0)
 
     def __on_save_clip_clicked(self) -> None:
         """When the button is clicked, save clip if current time is after the clip start time"""
