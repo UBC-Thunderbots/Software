@@ -27,7 +27,7 @@ from software.thunderscope.gl.layers import (
     gl_tactic_layer,
     gl_cost_vis_layer,
     gl_trail_layer,
-    gl_movement_field_test_layer
+    gl_movement_field_test_layer,
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
@@ -121,8 +121,7 @@ def setup_gl_widget(
     )
 
     field_test_movement_layer = gl_movement_field_test_layer.GLMovementFieldTestLayer(
-        "Movement FieldTest Layer",
-        full_system_proto_unix_io
+        "Movement FieldTest Layer", full_system_proto_unix_io
     )
 
     simulator_layer = gl_simulator_layer.GLSimulatorLayer(

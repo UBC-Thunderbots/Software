@@ -11,7 +11,6 @@ logger = create_logger(__name__)
 
 
 class GLMovementFieldTestLayer(GLLayer):
-
     def __init__(
         self, name: str, fullsystem_io: ProtoUnixIO, buffer_size: int = 5
     ) -> None:
@@ -28,7 +27,7 @@ class GLMovementFieldTestLayer(GLLayer):
         self.friendly_robot_on_field = []
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
-        """move to the point clicked
+        """Move to the point clicked
 
         :param event: The event
         """
@@ -43,11 +42,10 @@ class GLMovementFieldTestLayer(GLLayer):
         self.move_to_point(point)
 
     def move_to_point(self, point):
-        """move to a point
+        """Move to a point
 
         :param point: the point we are commanding the robot to move to
         """
-
         if len(self.friendly_robot_on_field) == 0:
             logger.warning("There are no friendly robots on the field.")
             return
