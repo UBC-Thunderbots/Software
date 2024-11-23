@@ -37,7 +37,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 
 class GLWorldLayer(GLLayer):
     """GLLayer that visualizes the world and vision data"""
-
+    TEXT_GRAPHICS_QFONT = QtGui.QFont("Roboto", 10, weight=700)
     def __init__(
         self,
         name: str,
@@ -471,14 +471,14 @@ class GLWorldLayer(GLLayer):
         robot_id_graphics.resize(
             len(robots),
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 10, weight=700),
+                font=GLWorldLayer.TEXT_GRAPHICS_QFONT,
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
         )
         robot_name_graphics.resize(
             len(robots),
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 10, weight=700),
+                font=GLWorldLayer.TEXT_GRAPHICS_QFONT,
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
         )
