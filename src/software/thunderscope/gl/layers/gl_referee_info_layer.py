@@ -112,7 +112,6 @@ class GLRefereeInfoLayer(GLLayer):
                     BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
                 )
                 self.__display_ball_placement_visuals(new_placement_point)
-                self.ball_placement_in_progress = True
             self.ball_placement_point = new_placement_point
         elif self.ball_placement_in_progress:
             # finish ball placement visualization
@@ -239,6 +238,7 @@ class GLRefereeInfoLayer(GLLayer):
             ],
         )
         self.ball_placement_countdown_graphic.show()
+        self.ball_placement_in_progress = True
 
     def __hide_ball_placement_visuals(self) -> None:
         """Hide all the visuals for ball placement"""
