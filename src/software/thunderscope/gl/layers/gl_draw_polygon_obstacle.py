@@ -45,10 +45,10 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         if not self.visible():
             return
 
-        if event.key() == Qt.Key.Key_Q:
+        if event.key() == Qt.Key.Key_P:
             self.push_polygon_to_list()
 
-        if event.key() == Qt.Key.Key_W:
+        if event.key() == Qt.Key.Key_C:
             self.clear_polygons()
 
     def clear_polygons(self):
