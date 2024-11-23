@@ -7,6 +7,7 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 import software.python_bindings as tbots_cpp
 
+from pyqtgraph.Qt import QtGui
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -25,10 +26,16 @@ class GLMaxDribbleLayer(GLLayer):
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, tbots_cpp.World)
 
-        self.dribble_radius_graphics = ObservableList(self._graphics_changed)
-        self.dribble_circle_graphics = ObservableList(self._graphics_changed)
+        self.color = QtGui.QColor(255,0,0,255)
 
-    def refreshGraphics(self) -> None:
+        self.dribble_radius_graphic = GLPolygon(parent_item = self, outline_color = self.color)
+        self.dribble_circle_graphic = GLCircle(parent_item = self, outline_color = self.color)
+
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
-        dribble_displacement = self.dribble_displacement_buffer
+        self.dribble_radius_graphic.set_outline_color(self.color)
+        self.dribble_circle_graphic.set_outline_color(self.color)
+
+        dribbleDispSegment = self.world_buffer.get(block=False).dribbleDisplacement
+
