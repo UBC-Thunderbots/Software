@@ -48,7 +48,9 @@ class GLGradientLegend(GLPainter):
 
         self.text_pen = QtGui.QPen(Colors.PRIMARY_TEXT_COLOR)
         self.labels_font = QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8)
-        self.title_font = QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 9, QtGui.QFont.Weight.Bold)
+        self.title_font = QtGui.QFont(
+            THUNDERSCOPE_UI_FONT_NAME, 9, QtGui.QFont.Weight.Bold
+        )
 
         self.add_draw_function(self.draw_gradient_legend)
 

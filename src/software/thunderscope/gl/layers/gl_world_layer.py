@@ -15,7 +15,8 @@ from software.thunderscope.constants import (
     is_field_message_empty,
     SIMULATION_SPEEDS,
     LINE_WIDTH,
-    CustomGLOptions, THUNDERSCOPE_UI_FONT_NAME,
+    CustomGLOptions,
+    THUNDERSCOPE_UI_FONT_NAME,
 )
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle

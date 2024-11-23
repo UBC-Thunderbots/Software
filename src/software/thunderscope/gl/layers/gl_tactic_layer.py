@@ -7,7 +7,11 @@ from google.protobuf.json_format import MessageToDict
 
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.constants import Colors, DepthValues, THUNDERSCOPE_UI_FONT_NAME
+from software.thunderscope.constants import (
+    Colors,
+    DepthValues,
+    THUNDERSCOPE_UI_FONT_NAME,
+)
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
@@ -57,7 +61,8 @@ class GLTacticLayer(GLLayer):
         self.tactic_fsm_info_graphics.resize(
             len(team.team_robots),
             lambda: GLTextItem(
-                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8), color=Colors.SECONDARY_TEXT_COLOR
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+                color=Colors.SECONDARY_TEXT_COLOR,
             ),
         )
 

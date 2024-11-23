@@ -5,7 +5,11 @@ import math
 import numpy as np
 
 from software.py_constants import *
-from software.thunderscope.constants import Colors, DepthValues, THUNDERSCOPE_UI_FONT_NAME
+from software.thunderscope.constants import (
+    Colors,
+    DepthValues,
+    THUNDERSCOPE_UI_FONT_NAME,
+)
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere

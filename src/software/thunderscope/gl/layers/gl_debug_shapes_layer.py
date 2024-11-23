@@ -6,7 +6,11 @@ from pyqtgraph.opengl import *
 
 from proto.visualization_pb2 import DebugShapes
 
-from software.thunderscope.constants import Colors, DepthValues, THUNDERSCOPE_UI_FONT_NAME
+from software.thunderscope.constants import (
+    Colors,
+    DepthValues,
+    THUNDERSCOPE_UI_FONT_NAME,
+)
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -89,7 +93,8 @@ class GLDebugShapesLayer(GLLayer):
         self.poly_shape_name_graphics.resize(
             len(poly_named_shapes),
             lambda: GLTextItem(
-                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8), color=Colors.DEBUG_SHAPES_COLOR
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+                color=Colors.DEBUG_SHAPES_COLOR,
             ),
         )
 
@@ -100,7 +105,8 @@ class GLDebugShapesLayer(GLLayer):
         self.circle_shape_name_graphics.resize(
             len(circle_named_shapes),
             lambda: GLTextItem(
-                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8), color=Colors.DEBUG_SHAPES_COLOR
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+                color=Colors.DEBUG_SHAPES_COLOR,
             ),
         )
 
@@ -111,7 +117,8 @@ class GLDebugShapesLayer(GLLayer):
         self.stadium_shape_name_graphics.resize(
             len(stadium_named_shapes),
             lambda: GLTextItem(
-                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8), color=Colors.DEBUG_SHAPES_COLOR
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+                color=Colors.DEBUG_SHAPES_COLOR,
             ),
         )
 
