@@ -5,7 +5,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
-from software.thunderscope.gl.graphics.gl_stadium import GLStadium
+import software.python_bindings as tbots_cpp
 
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
@@ -23,5 +23,12 @@ class GLMaxDribbleLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
+        self.world_buffer = ThreadSafeBuffer(buffer_size, tbots_cpp.World)
+
         self.dribble_radius_graphics = ObservableList(self._graphics_changed)
         self.dribble_circle_graphics = ObservableList(self._graphics_changed)
+
+    def refreshGraphics(self) -> None:
+        """Update graphics in this layer"""
+
+        dribble_displacement = self.dribble_displacement_buffer
