@@ -14,7 +14,8 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       // Store a small buffer of previous referee commands so we can filter out noise
       referee_command_history_(REFEREE_COMMAND_BUFFER_SIZE),
       referee_stage_history_(REFEREE_COMMAND_BUFFER_SIZE),
-      team_with_possession_(TeamPossession::FRIENDLY_TEAM)
+      team_with_possession_(TeamPossession::FRIENDLY_TEAM),
+      dribble_displacement_(std::nullopt)
 {
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
@@ -172,4 +173,13 @@ void World::setTeamWithPossession(TeamPossession team_with_possesion)
 TeamPossession World::getTeamWithPossession() const
 {
     return team_with_possession_;
+}
+void World::setDribbleDisplacement(const std::optional<Segment> &displacement)
+{
+    dribble_displacement_ = displacement;
+}
+
+const std::optional<Segment> &World::getDribbleDisplacement() const
+{
+    return dribble_displacement_;
 }
