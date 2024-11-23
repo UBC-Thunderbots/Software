@@ -1,16 +1,21 @@
 import software.python_bindings as tbots_cpp
 from proto.validation_pb2 import *
 
+from abc import abstractmethod
+
 
 class Validation:
     """A validation function"""
 
+    @abstractmethod
     def get_validation_status(self, world) -> ValidationStatus:
         raise NotImplementedError("get_validation_status is not implemented")
 
+    @abstractmethod
     def get_validation_type(self, world) -> ValidationType:
         raise NotImplementedError("get_validation_type is not implemented")
 
+    @abstractmethod
     def get_validation_geometry(self, world) -> ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
 

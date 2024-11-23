@@ -303,6 +303,32 @@ class TrailValues:
     DEFAULT_TRAIL_SAMPLING_RATE = 0
 
 
+class DiagnosticsConstants:
+    """Constants for Robot Diagnostics"""
+
+    # Device names of the controllers supported for controlling robots
+    SUPPORTED_CONTROLLERS = {
+        "Microsoft Xbox One X pad",
+        "Microsoft X-Box One S pad",
+        "Microsoft Xbox 360 pad",
+    }
+
+    BUTTON_PRESSED_THRESHOLD = 0.5
+    DEADZONE_PERCENTAGE = 0.20
+
+    SPEED_SLOWDOWN_FACTOR = 0.25
+
+    DRIBBLER_RPM_STEPPER = 1000
+
+    KICK_POWER_STEPPER = 1
+    MIN_KICK_POWER = 1
+    MAX_KICK_POWER = 10
+
+    CHIP_DISTANCE_STEPPER = 0.5
+    MIN_CHIP_POWER = 0.5
+    MAX_CHIP_POWER = 5.0
+
+
 class ProtoConfigurationConstant:
     DEFAULT_SAVE_DIRECTORY = "/opt/tbotspython/thunderbots_configuration_proto"
     DEFAULT_SAVE_PATH = DEFAULT_SAVE_DIRECTORY + "/default_configuration.proto"
