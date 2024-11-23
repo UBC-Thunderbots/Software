@@ -207,7 +207,7 @@ class World final
     /**
      * Get a list of virtual obstacles
      *
-     * @return a list of virtual obstacles 
+     * @return a list of virtual obstacles
      */
     TbotsProto::VirtualObstacles getVirtualObstacles() const;
 

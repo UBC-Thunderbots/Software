@@ -18,17 +18,15 @@ class GLDrawPolygonObstacleLayer(GLLayer):
     to avoid.
     """
 
-    def __init__(
-            self, name: str, friendly_io: ProtoUnixIO
-    ) -> None:
+    def __init__(self, name: str, friendly_io: ProtoUnixIO) -> None:
         """Initialize this layer
 
-        :param name:            the name of this layer 
+        :param name:            the name of this layer
         :param friendly_io:     the friendly_io
         """
         super().__init__(name)
 
-        self.friendly_io : ProtoUnixIO = friendly_io
+        self.friendly_io: ProtoUnixIO = friendly_io
 
         self.current_polygon: GLPolygon = GLPolygon(parent_item=self, line_width=2)
         # Tuple[float, float] represents a point (x,y)
@@ -45,7 +43,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         :param event: a qt key event indicating the button that are pressed
         """
         if not self.visible():
-            return 
+            return
 
         if event.key() == Qt.Key.Key_Q:
             self.push_polygon_to_list()
