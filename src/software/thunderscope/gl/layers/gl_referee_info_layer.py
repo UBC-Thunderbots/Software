@@ -236,7 +236,6 @@ class GLRefereeInfoLayer(GLLayer):
             ],
         )
         self.ball_placement_countdown_graphic.show()
-        self.ball_placement_in_progress = False
 
     def __hide_ball_placement_visuals(self) -> None:
         """Hide all the visuals for ball placement"""
