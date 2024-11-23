@@ -6,6 +6,7 @@ DEFAULT_PRIMITIVE_DURATION = 2.0
 ROBOT_CONSTANTS = tbots_cpp.create2021RobotConstants()
 
 ROBOT_MAX_ANG_SPEED_RAD_PER_S = ROBOT_CONSTANTS.robot_max_ang_speed_rad_per_s
+ROBOT_MAX_SPEED_M_PER_S = ROBOT_CONSTANTS.robot_max_speed_m_per_s
 
 class EstopMode(IntEnum):
     """Enum for the various estop modes we can run thunderscope in

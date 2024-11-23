@@ -1,3 +1,5 @@
+import math
+
 import typer
 from rich import print
 from rich.live import Live
@@ -8,8 +10,7 @@ import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
-from software.embedded.constants.py_constants import (
-    get_estop_config, EstopMode, DEFAULT_PRIMITIVE_DURATION, ROBOT_MAX_ANG_SPEED_RAD_PER_S)
+from software.embedded.constants.py_constants import *
 from proto.import_all_protos import *
 import redis
 import subprocess
@@ -257,7 +258,7 @@ class RobotDiagnosticsCLI:
                velocity: Annotated[Optional[float], typer.Option(
                    help=f"Clamped to +{ROBOT_MAX_ANG_SPEED_RAD_PER_S} & -{ROBOT_MAX_ANG_SPEED_RAD_PER_S} rad/s")] = 0,
                duration_seconds: Annotated[Optional[float], typer.Option(
-                   help="Duration in rotate in seconds")] = DEFAULT_PRIMITIVE_DURATION
+                   help="Duration to rotate in seconds")] = DEFAULT_PRIMITIVE_DURATION
                ) -> None:
         """CLI Command to rotate the robot. Clamped by robot_max_ang_speed_rad_per_s.
 
@@ -285,31 +286,44 @@ class RobotDiagnosticsCLI:
             time.sleep(self.send_primitive_interval_s)
         self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
-    def move(self, direction: str, wheels: List[int], speed_m_per_s: float,
-             duration_seconds: float = DEFAULT_PRIMITIVE_DURATION) -> None:
+    @catch_interrupt_exception()
+    def move(self,
+             angle: Annotated[Optional[float], typer.Option(
+                 help=f"Direction to move in degrees")] = 90,
+             speed: Annotated[Optional[float], typer.Option(
+                 help=f"Clamped to {0} & {ROBOT_MAX_SPEED_M_PER_S} m/s")] = 0,
+             duration_seconds: Annotated[Optional[float], typer.Option(
+                 help="Duration to move in seconds")] = DEFAULT_PRIMITIVE_DURATION
+             ) -> None:
         """CLI Command to move the robot in the specified direction
 
-        :param direction: Direction to move
-        :param speed_m_per_s: Speed to move the robot at
+        :param angle: Direction to move
+        :param speed: Speed to move the robot at
         :param duration_seconds: Duration to move
         """
-        default_commands: dict = {
-            "forward": 90,
-            "back": 270,
-            "left": 180,
-            "right": 0
-        }
-        direction = direction.strip()
-        direction = direction.lower()
-        # CLAMP SPEED
-        MAX_VALUE = 100
-        MIN_VALUE = 0
-        speed_m_per_s = self.__clamp(speed_m_per_s, MIN_VALUE, MAX_VALUE)
-        if direction in default_commands:
-            print(
-                f"Going {direction} and mapping to {default_commands[direction]} at the current speed {speed_m_per_s}")
-        else:
-            print("ERROR: INVALID COMMAND")
+        # TODO: Add InquirerPy with self.easy_mode_enabled
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+        speed = self.__clamp(
+            val=speed,
+            min_val=0,
+            max_val=ROBOT_MAX_SPEED_M_PER_S
+        )
+        motor_control_primitive = MotorControl()
+        motor_control_primitive.direct_velocity_control.velocity = Vector(
+            x_component_meters=speed * math.cos(angle),
+            y_component_meters=speed * math.sin(angle)
+        )
+        direct_control_primitive = DirectControlPrimitive(
+            motor_control=motor_control_primitive,
+            power_control=PowerControl()
+        )
+        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
+                       description=f"Moving at {speed} rad/s for {duration_seconds} seconds"):
+            self.__run_primitive_set(
+                Primitive(direct_control=direct_control_primitive)
+            )
+            time.sleep(self.send_primitive_interval_s)
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
     def chip(self, distance_meter: float = 1.0) -> None:
         distance_meter = self.__clamp(distance_meter, 0, 2.0)
