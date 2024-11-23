@@ -75,9 +75,10 @@ class GLMovementFieldTestLayer(GLLayer):
         """Updating the world cache"""
         world = self.world_buffer.get(block=False, return_cached=False)
 
-        if world is None: 
-            return 
+        if world is None:
+            return
 
-        if world.friendly_team: 
-            self.friendly_robot_on_field = [robot.id for robot in world.friendly_team.team_robots]
-
+        if world.friendly_team:
+            self.friendly_robot_on_field = [
+                robot.id for robot in world.friendly_team.team_robots
+            ]
