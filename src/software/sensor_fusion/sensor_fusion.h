@@ -51,8 +51,9 @@ class SensorFusion
     /**
      * Set the virtual obstacles in the world
      *
+     * @param virtual_obstacles a list of virtual obstacles
      */
-    void setVirtualObstacles(TbotsProto::VirtualObstacles &virtual_obstacles);
+    void setVirtualObstacles(TbotsProto::VirtualObstacles virtual_obstacles);
 
     // Number of vision packets to indicate that the vision client most likely reset,
     // determined experimentally with the simulator

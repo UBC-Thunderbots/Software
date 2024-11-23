@@ -34,5 +34,12 @@ class Backend : public Subject<SensorProto>,
     void receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg);
     void receiveSSLReferee(SSLProto::Referee msg);
     void receiveSensorProto(SensorProto sensor_msg);
+
+    /**
+     * Callback function that receive a list of new virtual obstacles from
+     * Subject<VirtualObstacles>
+     *
+     * @param new_obstacles_list a new obstacles list we are having
+     */
     void receiveObstacleList(TbotsProto::VirtualObstacles new_obstacle_list);
 };

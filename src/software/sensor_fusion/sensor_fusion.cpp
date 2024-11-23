@@ -439,7 +439,7 @@ void SensorFusion::resetWorldComponents()
     possession           = TeamPossession::FRIENDLY_TEAM;
 }
 
-void SensorFusion::setVirtualObstacles(TbotsProto::VirtualObstacles &virtual_obstacles)
+void SensorFusion::setVirtualObstacles(TbotsProto::VirtualObstacles virtual_obstacles)
 {
     virtual_obstacles_ = virtual_obstacles;
 }

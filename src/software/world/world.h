@@ -197,7 +197,18 @@ class World final
     // The size of the referee history buffers to filter out noise with
     static constexpr unsigned int REFEREE_COMMAND_BUFFER_SIZE = 3;
 
+    /**
+     * A a list of virtual obstacles
+     *
+     * @param virtual_obstacles a list of the virtual_obstacles
+     */
     void setVirtualObstacles(const TbotsProto::VirtualObstacles& virtual_obstacles);
+
+    /**
+     * Get a list of virtual obstacles
+     *
+     * @return a list of virtual obstacles 
+     */
     TbotsProto::VirtualObstacles getVirtualObstacles() const;
 
    private:

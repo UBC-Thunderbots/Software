@@ -60,7 +60,6 @@ from software.thunderscope.replay.proto_player import ProtoPlayer
 def setup_gl_widget(
     sim_proto_unix_io: ProtoUnixIO,
     full_system_proto_unix_io: ProtoUnixIO,
-    enemy_team_io: ProtoUnixIO,
     friendly_colour_yellow: bool,
     visualization_buffer_size: int,
     sandbox_mode: bool = False,
@@ -138,14 +137,9 @@ def setup_gl_widget(
     draw_obstacle_layer = GLDrawPolygonObstacleLayer(
         "Draw Obstalce Layer",
         full_system_proto_unix_io
-        if not friendly_colour_yellow
-        else enemy_team_io,  # blue
-        full_system_proto_unix_io
-        if friendly_colour_yellow
-        else enemy_team_io,  # yellow
     )
 
-    gl_widget.add_layer(draw_obstacle_layer, True)
+    gl_widget.add_layer(draw_obstacle_layer, False)
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(path_layer)

@@ -19,17 +19,16 @@ class GLDrawPolygonObstacleLayer(GLLayer):
     """
 
     def __init__(
-        self, name, blue_fs_io: ProtoUnixIO, yellow_fs_io: ProtoUnixIO
+            self, name: str, friendly_io: ProtoUnixIO
     ) -> None:
-        """Initial this layer
+        """Initialize this layer
 
-        :param blue_fs_io: the blue full system Protounix io
-        :param yellow_fs_io: the yellow full system Protounix io
+        :param name:            the name of this layer 
+        :param friendly_io:     the friendly_io
         """
         super().__init__(name)
 
-        self.blue_fu_io: ProtoUnixIO = blue_fs_io
-        self.yellow_fs_io: ProtoUnixIO = yellow_fs_io
+        self.friendly_io : ProtoUnixIO = friendly_io
 
         self.current_polygon: GLPolygon = GLPolygon(parent_item=self, line_width=2)
         # Tuple[float, float] represents a point (x,y)
@@ -45,6 +44,9 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         :param event: a qt key event indicating the button that are pressed
         """
+        if not self.visible():
+            return 
+
         if event.key() == Qt.Key.Key_Q:
             self.push_polygon_to_list()
 
@@ -127,10 +129,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             obstacle = Obstacle(polygon=polygon)
             obstacles.append(obstacle)
 
-        self.blue_fu_io.send_proto(
-            VirtualObstacles, VirtualObstacles(obstacles=obstacles)
-        )
-        self.yellow_fs_io.send_proto(
+        self.friendly_io.send_proto(
             VirtualObstacles, VirtualObstacles(obstacles=obstacles)
         )
 
@@ -139,10 +138,10 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         :param event: the mouse event
         """
+        if not self.visible():
+            return
+
         point = event.point_in_scene
         self._add_one_point((point.x(), point.y()))
 
         return super().mouse_in_scene_pressed(event)
-
-    def refresh_graphics(self) -> None:
-        return super().refresh_graphics()
