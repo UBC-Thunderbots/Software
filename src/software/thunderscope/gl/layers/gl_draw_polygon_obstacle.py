@@ -102,7 +102,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             self.points.append(start_point)
             self.current_polygon.set_points(self.points)
             self._send_to_fs()
-            return 
+            return
 
         # creating a general polygon
         start_point = self.points[0]
