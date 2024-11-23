@@ -11,7 +11,8 @@ from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
 from software.embedded.constants.py_constants import (DEFAULT_PRIMITIVE_DURATION,
-    ROBOT_MAX_ANG_SPEED_RAD_PER_S, ROBOT_MAX_SPEED_M_PER_S, get_estop_config, EstopMode, MAX_FORCE_DRIBBLER_SPEED_RPM)
+                                                      ROBOT_MAX_ANG_SPEED_RAD_PER_S, ROBOT_MAX_SPEED_M_PER_S,
+                                                      get_estop_config, EstopMode, MAX_FORCE_DRIBBLER_SPEED_RPM)
 from proto.import_all_protos import *
 import redis
 import subprocess
@@ -19,7 +20,7 @@ import InquirerPy
 import time
 import typer as Typer
 from functools import wraps
-from typing import Optional
+from typing import List, Optional, Tuple
 from typing_extensions import Annotated
 
 
@@ -27,17 +28,18 @@ class RobotDiagnosticsCLI:
     def __init__(self) -> None:
         """Setup constructor for the Shell CLI"""
         self.app = make_typer_shell(prompt="⚡ ")
-        self.app.command(short_help="Rotates the robot")(self.rotate)
+        self.app.command(short_help="Toggles easy selection shell (For new users)")(self.toggle_simple_mode)
         self.app.command(short_help="Moves the robot")(self.move)
+        self.app.command(short_help="Moves specific wheels of the robot")(self.move_wheel)
+        self.app.command(short_help="Rotates the robot")(self.rotate)
+        self.app.command(short_help="Spins the dribbler")(self.dribble)
         self.app.command(short_help="Chips the chipper")(self.chip)
         self.app.command(short_help="Kicks the kicker")(self.kick)
         self.app.command(short_help="Show Robot Status Info")(self.stats)
-        self.app.command(short_help="Spins the dribbler")(self.dribble)
-        self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
         self.app.command(short_help="Shows Redis Values")(self.redis)
         self.app.command(short_help="Prints Thunderloop Logs")(self.log)
         self.app.command(short_help="Prints Thunderloop Status")(self.status)
-        self.app.command(short_help="Toggles easy selection shell (For new users)")(self.toggle_simple_mode)
+        self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
 
         self.redis = redis.StrictRedis(
             host=REDIS_DEFAULT_HOST,
@@ -406,6 +408,7 @@ class RobotDiagnosticsCLI:
             time.sleep(self.send_primitive_interval_s)
         self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
+    @catch_interrupt_exception()
     def dribble(self,
                 velocity: Annotated[Optional[float], typer.Option(
                     help=f"Clamped to {-MAX_FORCE_DRIBBLER_SPEED_RPM} & {MAX_FORCE_DRIBBLER_SPEED_RPM} rpm")] = 0,
@@ -438,9 +441,54 @@ class RobotDiagnosticsCLI:
             time.sleep(self.send_primitive_interval_s)
         self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
-    def move_wheel(self):
-        # py_inquire wheel choice or use sub shell
-        pass
+    @catch_interrupt_exception()
+    def move_wheel(self,
+                   wheels: Annotated[List[int], typer.Argument(
+                       help=f'Wheel to rotate {{1:"NE", 2:"SE", 3:"SW", 4:"NW"}}')],
+                   velocity: Annotated[Optional[float], typer.Option(
+                       help=f"Clamped to {-ROBOT_MAX_SPEED_M_PER_S} & {ROBOT_MAX_SPEED_M_PER_S} m/s")] = 0,
+                   duration_seconds: Annotated[Optional[float], typer.Option(
+                       help="Duration to move in seconds")] = DEFAULT_PRIMITIVE_DURATION
+                   ) -> None:
+        """CLI Command to move the robot in the specified direction
+
+        :param wheels: Wheels to rotate
+        :param velocity: Velocity to rotate the wheel
+        :param duration_seconds: Duration to move
+        """
+
+        # TODO: Add InquirerPy with self.easy_mode_enabled
+        # TODO: Confirm max speed for wheel rotation (it is currently net robot velocity)
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+        wheel_map = {1: 0, 2: 0, 3: 0, 4: 0}
+        velocity = self.__clamp(
+            val=velocity,
+            min_val=-ROBOT_MAX_SPEED_M_PER_S,
+            max_val=ROBOT_MAX_SPEED_M_PER_S
+        )
+
+        for wheel in wheels:
+            if wheel not in wheels:
+                return
+            wheel_map[wheel] = velocity
+        motor_control_primitive = MotorControl()
+
+        motor_control_primitive.direct_per_wheel_control.front_left_wheel_velocity = wheel_map[1]
+        motor_control_primitive.direct_per_wheel_control.back_left_wheel_velocity=wheel_map[2]
+        motor_control_primitive.direct_per_wheel_control.front_right_wheel_velocity=wheel_map[3]
+        motor_control_primitive.direct_per_wheel_control.back_right_wheel_velocity=wheel_map[4]
+
+        direct_control_primitive = DirectControlPrimitive(
+            motor_control=motor_control_primitive,
+            power_control=PowerControl()
+        )
+        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
+                       description=f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"):
+            self.__run_primitive_set(
+                Primitive(direct_control=direct_control_primitive)
+            )
+            time.sleep(self.send_primitive_interval_s)
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
     def emote(self):
         pass
