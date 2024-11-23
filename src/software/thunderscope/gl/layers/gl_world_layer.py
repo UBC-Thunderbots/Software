@@ -37,7 +37,9 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 
 class GLWorldLayer(GLLayer):
     """GLLayer that visualizes the world and vision data"""
+
     TEXT_GRAPHICS_QFONT = QtGui.QFont("Roboto", 10, weight=700)
+
     def __init__(
         self,
         name: str,
