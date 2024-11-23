@@ -329,8 +329,8 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
 
                 ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
-                double time_since_prev_iter_sec =
-                    getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND;
+//                double time_since_prev_iter_sec =
+//                    getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND;
 
 //                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
 //                                                     time_since_prev_iter_sec);

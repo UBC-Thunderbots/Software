@@ -10,7 +10,8 @@ import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from typer_shell import make_typer_shell
 from google.protobuf.message import Message
-from software.embedded.constants.py_constants import *
+from software.embedded.constants.py_constants import (DEFAULT_PRIMITIVE_DURATION,
+    ROBOT_MAX_ANG_SPEED_RAD_PER_S, ROBOT_MAX_SPEED_M_PER_S, get_estop_config, EstopMode, MAX_FORCE_DRIBBLER_SPEED_RPM)
 from proto.import_all_protos import *
 import redis
 import subprocess
@@ -297,7 +298,7 @@ class RobotDiagnosticsCLI:
              ) -> None:
         """CLI Command to move the robot in the specified direction
 
-        :param angle: Direction to move
+        :param angle: Direction to move in degrees
         :param speed: Speed to move the robot at
         :param duration_seconds: Duration to move
         """
@@ -318,24 +319,124 @@ class RobotDiagnosticsCLI:
             power_control=PowerControl()
         )
         for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=f"Moving at {speed} rad/s for {duration_seconds} seconds"):
+                       description=f"Moving at {speed} m/s for {duration_seconds} seconds"):
             self.__run_primitive_set(
                 Primitive(direct_control=direct_control_primitive)
             )
             time.sleep(self.send_primitive_interval_s)
         self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
-    def chip(self, distance_meter: float = 1.0) -> None:
-        distance_meter = self.__clamp(distance_meter, 0, 2.0)
-        print(f"Chipping {distance_meter} meters")
+    @catch_interrupt_exception()
+    def chip(self,
+             distance: Annotated[Optional[float], typer.Option(
+                 help=f"Distance to chip in meters")] = 0,
+             auto: Annotated[Optional[bool], typer.Option(
+                 help=f"Enables auto chip (OVERWRITES CHIP DISTANCE)")] = False,
+             duration_seconds: Annotated[Optional[float], typer.Option(
+                 help="Duration to be in chip mode in seconds")] = DEFAULT_PRIMITIVE_DURATION
+             ) -> None:
+        """CLI Command to chip for a specified distance
+        :param distance: Distance to chip in meters
+        :param auto: Enables auto chip (OVERWRITES CHIP DISTANCE)
+        :param duration_seconds: Duration to be in chip mode in seconds
+        """
+        # TODO: Add InquirerPy with self.easy_mode_enabled
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+        distance = self.__clamp(
+            val=distance,
+            min_val=0,
+            max_val=ROBOT_MAX_SPEED_M_PER_S
+        )
+        power_control_primitive = PowerControl()
+        if not auto:
+            power_control_primitive.chicker.chip_distance_meters = distance
+        else:
+            # TODO: Change this to a constant from somewhere else
+            power_control_primitive.chicker.auto_chip_or_kick.autochip_distance_meters = 1.5
+        direct_control_primitive = DirectControlPrimitive(
+            motor_control=MotorControl(),
+            power_control=power_control_primitive
+        )
+        description = f"Chipping {distance} m" if not auto else f"Auto Chip Enabled for {duration_seconds} seconds"
+        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
+                       description=description):
+            self.__run_primitive_set(
+                Primitive(direct_control=direct_control_primitive)
+            )
+            time.sleep(self.send_primitive_interval_s)
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
-    def kick(self, speed_m_per_s: float = 2.0) -> None:
-        speed_m_per_s = self.__clamp(speed_m_per_s, 0, 6.0)
-        print(f"Kicking at {speed_m_per_s} meters per second")
+    @catch_interrupt_exception()
+    def kick(self,
+             speed: Annotated[Optional[float], typer.Option(
+                 help=f"Speed to kick in meters per second")] = 0,
+             auto: Annotated[Optional[bool], typer.Option(
+                 help=f"Enables auto kick (OVERWRITES KICK SPEED)")] = False,
+             duration_seconds: Annotated[Optional[float], typer.Option(
+                 help="Duration to be in kick mode in seconds")] = DEFAULT_PRIMITIVE_DURATION
+             ) -> None:
+        """CLI Command to kick at the specified speed
+        :param speed: Speed to kick in meters per second
+        :param auto: Enables auto kick (OVERWRITES KICK SPEED)
+        :param duration_seconds: Duration to be in kick mode in seconds
+        """
+        # TODO: Add InquirerPy with self.easy_mode_enabled
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+        speed = self.__clamp(
+            val=speed,
+            min_val=0,
+            max_val=ROBOT_MAX_SPEED_M_PER_S
+        )
+        power_control_primitive = PowerControl()
+        if not auto:
+            power_control_primitive.chicker.kick_speed_m_per_s = speed
+        else:
+            # TODO: Change this to a constant from somewhere else
+            power_control_primitive.chicker.auto_chip_or_kick.autokick_speed_m_per_s = 1.5
+        direct_control_primitive = DirectControlPrimitive(
+            motor_control=MotorControl(),
+            power_control=power_control_primitive
+        )
+        description = f"Kicking at {speed} m/s" if not auto else f"Auto Kick Enabled for {duration_seconds} seconds"
+        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
+                       description=description):
+            self.__run_primitive_set(
+                Primitive(direct_control=direct_control_primitive)
+            )
+            time.sleep(self.send_primitive_interval_s)
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
-    def dribble(self, velocity_rad_per_s: float) -> None:
-        velocity_rad_per_s = self.__clamp(velocity_rad_per_s, 0, 5.0)
-        print(f"Spinning dribbler at {velocity_rad_per_s} rad per second")
+    def dribble(self,
+                velocity: Annotated[Optional[float], typer.Option(
+                    help=f"Clamped to {-MAX_FORCE_DRIBBLER_SPEED_RPM} & {MAX_FORCE_DRIBBLER_SPEED_RPM} rpm")] = 0,
+                duration_seconds: Annotated[Optional[float], typer.Option(
+                    help="Duration to move in seconds")] = DEFAULT_PRIMITIVE_DURATION
+                ) -> None:
+        """CLI Command to rotate the robot's dribbler in the specified rpm
+
+        :param velocity: Speed & Direction to rotate the dribbler
+        :param duration_seconds: Duration to rotate
+        """
+        # TODO: Add InquirerPy with self.easy_mode_enabled
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+        velocity = self.__clamp(
+            val=velocity,
+            min_val=-MAX_FORCE_DRIBBLER_SPEED_RPM,
+            max_val=MAX_FORCE_DRIBBLER_SPEED_RPM
+        )
+        motor_control_primitive = MotorControl()
+        motor_control_primitive.dribbler_speed_rpm = int(velocity)
+        direct_control_primitive = DirectControlPrimitive(
+            motor_control=motor_control_primitive,
+            power_control=PowerControl()
+        )
+        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
+                       description=f"Spinning dribbler at {velocity} rpm for {duration_seconds} seconds"):
+            self.__run_primitive_set(
+                Primitive(direct_control=direct_control_primitive)
+            )
+            time.sleep(self.send_primitive_interval_s)
+        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
     def move_wheel(self):
         # py_inquire wheel choice or use sub shell
