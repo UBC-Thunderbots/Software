@@ -11,11 +11,16 @@ NetworkService::NetworkService(const std::string& ip_address,
     udp_listener_primitive_set =
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(
             ip_address, primitive_listener_port,
-            [&](TbotsProto::PrimitiveSet primitive_set) { primitiveSetCallback(primitive_set); }, multicast);
+            [&](TbotsProto::PrimitiveSet primitive_set) {
+                primitiveSetCallback(primitive_set);
+            },
+            multicast);
 
     radio_listener_primitive_set =
         std::make_unique<ThreadedProtoRadioListener<TbotsProto::PrimitiveSet>>(
-            [&](TbotsProto::PrimitiveSet primitive_set) { primitiveSetCallback(primitive_set); });
+            [&](TbotsProto::PrimitiveSet primitive_set) {
+                primitiveSetCallback(primitive_set);
+            });
 }
 
 TbotsProto::PrimitiveSet NetworkService::poll(TbotsProto::RobotStatus& robot_status)

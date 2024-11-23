@@ -88,7 +88,7 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
         timer.expires_from_now(next_interval);
         // Posts the timer event
         timer.async_wait(std::bind(&ThreadedEstopReader::tick, this,
-                                     boost::asio::placeholders::error));
+                                   boost::asio::placeholders::error));
     }
 }
 
