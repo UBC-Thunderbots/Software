@@ -22,7 +22,7 @@ import typer as Typer
 from functools import wraps
 from typing import List, Optional, Tuple
 from typing_extensions import Annotated
-
+import threading
 
 class RobotDiagnosticsCLI:
     def __init__(self) -> None:
@@ -69,15 +69,20 @@ class RobotDiagnosticsCLI:
         # we want to send a stop primitive once to all currently connected robots
         self.should_send_stop = False
         self.estop_mode, self.estop_path = (
-            get_estop_config(keyboard_estop=True, disable_communication=False))
+            get_estop_config(keyboard_estop=False, disable_communication=False))
+
+        self.send_estop_state_thread = threading.Thread(
+            target=self.__update_estop_state, daemon=True
+        )
+
         # only checks for estop if we are in physical estop mode
         if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
             try:
                 self.estop_reader = tbots_cpp.ThreadedEstopReader(
-                    uart_port=self.estop_path, baud_rate=115200
+                    self.estop_path, 115200
                 )
-            except Exception:
-                raise Exception(f"Invalid Estop found at location {self.estop_path}")
+            except Exception as e:
+                raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
 
     def __should_send_packet(self) -> bool:
         """Returns True if the proto sending threads should send a proto
@@ -86,19 +91,9 @@ class RobotDiagnosticsCLI:
         """
         return ((self.estop_mode != EstopMode.DISABLE_ESTOP) and self.estop_is_playing)
 
-    def __run_primitive_set(self, diagnostics_primitive: Primitive) -> None:
-        """Forward PrimitiveSet protos from diagnostics to the robots.
-
-        For Diagnostics protos, does not block and returns cached message if none available
-        Sleeps for 10ms for diagnostics
-
-        If the emergency stop is tripped, the PrimitiveSet will not be sent so
-        that the robots timeout and stop.
-        """
-
-        # for all robots connected to diagnostics, set their primitive
-
-        self.robot_primitives[self.robot_id] = diagnostics_primitive
+    def __send_primitive_set(self, primitive: Primitive) -> None:
+        """Forward PrimitiveSet protos from diagnostics to the robots."""
+        self.robot_primitives[self.robot_id] = primitive
         # initialize total primitive set and send it
         primitive_set = PrimitiveSet(
             time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
@@ -116,9 +111,23 @@ class RobotDiagnosticsCLI:
 
         self.sequence_number += 1
 
-        # if self.__should_send_packet() or self.should_send_stop:
-        self.send_primitive_set.send_proto(primitive_set)
-        self.should_send_stop = False
+        if self.__should_send_packet() or self.should_send_stop:
+            self.send_primitive_set.send_proto(primitive_set)
+            self.should_send_stop = False
+
+    def __run_primitive_set(self, diagnostics_primitive: Primitive) -> None:
+        """Forward PrimitiveSet protos from diagnostics to the robots.
+
+        Updates/polls the Estop state
+
+        If the emergency stop is tripped, the PrimitiveSet will not be sent so
+        that the robots timeout and stop.
+        """
+        if self.should_send_stop:
+            raise KeyboardInterrupt
+        else:
+            self.__send_primitive_set(diagnostics_primitive)
+
 
     def catch_interrupt_exception(exit_code=1):
         """Decorator for handling keyboard exceptions and safely clearing cached primitives"""
@@ -132,13 +141,16 @@ class RobotDiagnosticsCLI:
                     print("Stopped Primitive Send")
                     self.__run_primitive_set(Primitive(stop=StopPrimitive()))
                     raise Typer.Exit(code=exit_code)
-
+                except Exception as e:
+                    self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+                    print(f"Unknown Exception {e}")
+                    raise Typer.Exit(code=exit_code)
             return wrapper
 
         return decorator
 
-    def __send_estop_state(self) -> None:
-        """Constant loop which sends the current estop status proto if estop is not disabled
+    def __update_estop_state(self) -> bool:
+        """Updates the current estop status proto if estop is not disabled
         Always in physical estop mode, uses the physical estop value
         If estop has just changed from playing to stop, set flag to send stop primitive once to connected robots
         """
@@ -147,6 +159,7 @@ class RobotDiagnosticsCLI:
             while True:
                 if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
+                    print(self.estop_reader)
 
                 # Send stop primitive once when estop is paused
                 if previous_estop_is_playing and not self.estop_is_playing:
@@ -156,6 +169,15 @@ class RobotDiagnosticsCLI:
 
                 previous_estop_is_playing = self.estop_is_playing
                 time.sleep(0.1)
+
+        # if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+        #     self.should_send_stop = self.estop_reader.isEstopPlay()
+        #     print(self.should_send_stop)
+        # elif self.estop_mode == EstopMode.KEYBOARD_ESTOP:
+        #     self.should_send_stop = False
+        # elif self.estop_mode == EstopMode.DISABLE_ESTOP:
+        #     self.should_send_stop = True
+        # return self.should_send_stop
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Forwards the given robot status to the full system along with the round-trip time
@@ -312,10 +334,8 @@ class RobotDiagnosticsCLI:
             max_val=ROBOT_MAX_SPEED_M_PER_S
         )
         motor_control_primitive = MotorControl()
-        motor_control_primitive.direct_velocity_control.velocity = Vector(
-            x_component_meters=speed * math.cos(angle),
-            y_component_meters=speed * math.sin(angle)
-        )
+        motor_control_primitive.direct_velocity_control.velocity.x_component_meters = speed * math.cos(angle)
+        motor_control_primitive.direct_velocity_control.velocity.y_component_meters = speed * math.sin(angle)
         direct_control_primitive = DirectControlPrimitive(
             motor_control=motor_control_primitive,
             power_control=PowerControl()
@@ -360,11 +380,12 @@ class RobotDiagnosticsCLI:
             power_control=power_control_primitive
         )
         description = f"Chipping {distance} m" if not auto else f"Auto Chip Enabled for {duration_seconds} seconds"
+        self.__run_primitive_set(
+            Primitive(direct_control=direct_control_primitive)
+        )
         for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
                        description=description):
-            self.__run_primitive_set(
-                Primitive(direct_control=direct_control_primitive)
-            )
+            self.__run_primitive_set(Primitive(stop=StopPrimitive()))
             time.sleep(self.send_primitive_interval_s)
         self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
@@ -400,11 +421,12 @@ class RobotDiagnosticsCLI:
             power_control=power_control_primitive
         )
         description = f"Kicking at {speed} m/s" if not auto else f"Auto Kick Enabled for {duration_seconds} seconds"
+        self.__run_primitive_set(
+            Primitive(direct_control=direct_control_primitive)
+        )
         for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
                        description=description):
-            self.__run_primitive_set(
-                Primitive(direct_control=direct_control_primitive)
-            )
+            self.__run_primitive_set(Primitive(stop=StopPrimitive()))
             time.sleep(self.send_primitive_interval_s)
         self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
@@ -512,6 +534,7 @@ class RobotDiagnosticsCLI:
                 self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}", PRIMITIVE_PORT, True
         )
 
+        self.send_estop_state_thread.start()
         return self
 
     def __exit__(self, type, value, traceback) -> None:
