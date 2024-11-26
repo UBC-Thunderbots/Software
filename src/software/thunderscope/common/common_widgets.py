@@ -2,6 +2,7 @@ from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 from software.py_constants import *
+import math
 
 
 class FloatSlider(QSlider):
@@ -147,23 +148,38 @@ class ColorProgressBar(QProgressBar):
         """
         super(ColorProgressBar, self).setValue(int(value * self.decimals))
 
-        # clamp percent to make sure it's between 0% and 100%
-        percent = self.getPercentage()
+        def sigmoid_interpolate(val, x1, y1, x2, y2):
+            """
+            Interpolates a value along a sigmoid curve.
 
-        if percent < 0.5:
-            super(ColorProgressBar, self).setStyleSheet(
-                "QProgressBar::chunk"
-                "{"
-                f"background: rgb(255, {255 * (2 * percent)}, 0)"
-                "}"
-            )
+            :param val: Value to interpolate
+            :param x1: Lower bound
+            :param y1: Value at lower bound
+            :param x2: Upper bound
+            :param y2: Value at upper bound
+            :return: The sigmoid-interpolated value
+            """
+            xc = (x1 + x2) / 2
+            k = 10 / (x2 - x1)
+            return y1 + (y2 - y1) / (1 + math.exp(-k * (val - xc)))
+
+        percent = self.getPercentage()
+        if 0 < percent < 0.5:
+            r = 200
+            g = sigmoid_interpolate(percent, 0, 0, 0.5, 200)
+        elif percent < 0:
+            r = 200
+            g = 0
         else:
-            super(ColorProgressBar, self).setStyleSheet(
-                "QProgressBar::chunk"
-                "{"
-                f"background: rgb({255 * 2 * (1 - percent)}, 255, 0)"
-                "}"
-            )
+            r = sigmoid_interpolate(percent, 0.5, 200, 1, 0)
+            g = 200
+
+        super(ColorProgressBar, self).setStyleSheet(
+            "QProgressBar::chunk"
+            "{"
+            f"background: rgb({r}, {g}, 0)"
+            "}"
+        )
 
     def getPercentage(self):
         """Gets the current percentage between 0 and 1 from the current value
@@ -173,9 +189,7 @@ class ColorProgressBar(QProgressBar):
             1,
             max(
                 0,
-                int(
-                    (self.value() - self.minimum()) / (self.maximum() - self.minimum())
-                ),
+                (self.value() - self.minimum()) / (self.maximum() - self.minimum()),
             ),
         )
 
