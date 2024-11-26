@@ -9,6 +9,7 @@ ROBOT_MAX_ANG_SPEED_RAD_PER_S = ROBOT_CONSTANTS.robot_max_ang_speed_rad_per_s
 ROBOT_MAX_SPEED_M_PER_S = ROBOT_CONSTANTS.robot_max_speed_m_per_s
 MAX_FORCE_DRIBBLER_SPEED_RPM = ROBOT_CONSTANTS.max_force_dribbler_speed_rpm
 
+
 class EstopMode(IntEnum):
     """Enum for the various estop modes we can run thunderscope in
 
@@ -21,9 +22,11 @@ class EstopMode(IntEnum):
     KEYBOARD_ESTOP = 1
     PHYSICAL_ESTOP = 2
 
+
 # Paths to check for estop when running diagnostics
 ESTOP_PATH_1 = "/dev/ttyACM0"
 ESTOP_PATH_2 = "/dev/ttyUSB0"
+
 
 def get_estop_config(
         keyboard_estop: bool, disable_communication: bool

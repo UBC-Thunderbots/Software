@@ -61,19 +61,11 @@ class RobotDiagnosticsCLI:
         self.robot_primitives[self.robot_id] = Primitive(stop=StopPrimitive())
 
         # initialising the estop
-        # tries to access a plugged in estop. if not found, throws an exception
-        # if using keyboard estop, skips this step
         self.estop_reader = None
         self.estop_is_playing = False
-        # when the estop has just been stopped,
-        # we want to send a stop primitive once to all currently connected robots
         self.should_send_stop = False
         self.estop_mode, self.estop_path = (
             get_estop_config(keyboard_estop=False, disable_communication=False))
-
-        self.send_estop_state_thread = threading.Thread(
-            target=self.__update_estop_state, daemon=True
-        )
 
         # only checks for estop if we are in physical estop mode
         if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
@@ -81,11 +73,13 @@ class RobotDiagnosticsCLI:
                 self.estop_reader = tbots_cpp.ThreadedEstopReader(
                     self.estop_path, 115200
                 )
+                self.__update_estop_state()
             except Exception as e:
                 raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
 
+
     def __should_send_packet(self) -> bool:
-        """Returns True if the proto sending threads should send a proto
+        """Returns True if should send a proto
 
         :return: boolean
         """
@@ -123,11 +117,11 @@ class RobotDiagnosticsCLI:
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
         """
+        self.__update_estop_state()
         if self.should_send_stop:
             raise KeyboardInterrupt
         else:
             self.__send_primitive_set(diagnostics_primitive)
-
 
     def catch_interrupt_exception(exit_code=1):
         """Decorator for handling keyboard exceptions and safely clearing cached primitives"""
@@ -136,48 +130,32 @@ class RobotDiagnosticsCLI:
             @wraps(func)
             def wrapper(self, *args, **kwargs):
                 try:
+                    self.__run_primitive_set(Primitive(stop=StopPrimitive()))
                     return func(self, *args, **kwargs)
                 except KeyboardInterrupt:
-                    print("Stopped Primitive Send")
+                    print("E-Stop Activated: Stopped Primitive Send")
                     self.__run_primitive_set(Primitive(stop=StopPrimitive()))
                     raise Typer.Exit(code=exit_code)
                 except Exception as e:
                     self.__run_primitive_set(Primitive(stop=StopPrimitive()))
-                    print(f"Unknown Exception {e}")
+                    print(f"Unknown Exception: {e}")
                     raise Typer.Exit(code=exit_code)
+                finally:
+                    self.__run_primitive_set(Primitive(stop=StopPrimitive()))
             return wrapper
 
         return decorator
 
-    def __update_estop_state(self) -> bool:
+    def __update_estop_state(self) -> None:
         """Updates the current estop status proto if estop is not disabled
         Always in physical estop mode, uses the physical estop value
-        If estop has just changed from playing to stop, set flag to send stop primitive once to connected robots
         """
-        previous_estop_is_playing = True
-        if self.estop_mode != EstopMode.DISABLE_ESTOP:
-            while True:
-                if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
-                    self.estop_is_playing = self.estop_reader.isEstopPlay()
-                    print(self.estop_reader)
-
-                # Send stop primitive once when estop is paused
-                if previous_estop_is_playing and not self.estop_is_playing:
-                    self.should_send_stop = True
-                else:
-                    self.should_send_stop = False
-
-                previous_estop_is_playing = self.estop_is_playing
-                time.sleep(0.1)
-
-        # if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
-        #     self.should_send_stop = self.estop_reader.isEstopPlay()
-        #     print(self.should_send_stop)
-        # elif self.estop_mode == EstopMode.KEYBOARD_ESTOP:
-        #     self.should_send_stop = False
-        # elif self.estop_mode == EstopMode.DISABLE_ESTOP:
-        #     self.should_send_stop = True
-        # return self.should_send_stop
+        if self.estop_mode == EstopMode.DISABLE_ESTOP:
+            self.should_send_stop = False
+        elif self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+            self.should_send_stop = not self.estop_reader.isEstopPlay()
+        else:
+            self.should_send_stop = True
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Forwards the given robot status to the full system along with the round-trip time
@@ -291,7 +269,6 @@ class RobotDiagnosticsCLI:
         :param duration_seconds: Duration to rotate the robot
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
         velocity = self.__clamp(
             velocity,
             -ROBOT_MAX_ANG_SPEED_RAD_PER_S,
@@ -309,7 +286,6 @@ class RobotDiagnosticsCLI:
                 Primitive(direct_control=direct_control_primitive)
             )
             time.sleep(self.send_primitive_interval_s)
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
     @catch_interrupt_exception()
     def move(self,
@@ -327,7 +303,6 @@ class RobotDiagnosticsCLI:
         :param duration_seconds: Duration to move
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
         speed = self.__clamp(
             val=speed,
             min_val=0,
@@ -346,7 +321,6 @@ class RobotDiagnosticsCLI:
                 Primitive(direct_control=direct_control_primitive)
             )
             time.sleep(self.send_primitive_interval_s)
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
     @catch_interrupt_exception()
     def chip(self,
@@ -363,7 +337,6 @@ class RobotDiagnosticsCLI:
         :param duration_seconds: Duration to be in chip mode in seconds
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
         distance = self.__clamp(
             val=distance,
             min_val=0,
@@ -383,11 +356,11 @@ class RobotDiagnosticsCLI:
         self.__run_primitive_set(
             Primitive(direct_control=direct_control_primitive)
         )
-        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=description):
-            self.__run_primitive_set(Primitive(stop=StopPrimitive()))
-            time.sleep(self.send_primitive_interval_s)
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+        if auto:
+            for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
+                           description=description):
+                self.__run_primitive_set(direct_control_primitive)
+                time.sleep(self.send_primitive_interval_s)
 
     @catch_interrupt_exception()
     def kick(self,
@@ -404,7 +377,6 @@ class RobotDiagnosticsCLI:
         :param duration_seconds: Duration to be in kick mode in seconds
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
         speed = self.__clamp(
             val=speed,
             min_val=0,
@@ -424,11 +396,11 @@ class RobotDiagnosticsCLI:
         self.__run_primitive_set(
             Primitive(direct_control=direct_control_primitive)
         )
-        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=description):
-            self.__run_primitive_set(Primitive(stop=StopPrimitive()))
-            time.sleep(self.send_primitive_interval_s)
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+        if auto:
+            for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
+                           description=description):
+                self.__run_primitive_set(direct_control_primitive)
+                time.sleep(self.send_primitive_interval_s)
 
     @catch_interrupt_exception()
     def dribble(self,
@@ -443,7 +415,6 @@ class RobotDiagnosticsCLI:
         :param duration_seconds: Duration to rotate
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
         velocity = self.__clamp(
             val=velocity,
             min_val=-MAX_FORCE_DRIBBLER_SPEED_RPM,
@@ -461,7 +432,6 @@ class RobotDiagnosticsCLI:
                 Primitive(direct_control=direct_control_primitive)
             )
             time.sleep(self.send_primitive_interval_s)
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
     @catch_interrupt_exception()
     def move_wheel(self,
@@ -481,7 +451,6 @@ class RobotDiagnosticsCLI:
 
         # TODO: Add InquirerPy with self.easy_mode_enabled
         # TODO: Confirm max speed for wheel rotation (it is currently net robot velocity)
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
         wheel_map = {1: 0, 2: 0, 3: 0, 4: 0}
         velocity = self.__clamp(
             val=velocity,
@@ -496,9 +465,9 @@ class RobotDiagnosticsCLI:
         motor_control_primitive = MotorControl()
 
         motor_control_primitive.direct_per_wheel_control.front_left_wheel_velocity = wheel_map[1]
-        motor_control_primitive.direct_per_wheel_control.back_left_wheel_velocity=wheel_map[2]
-        motor_control_primitive.direct_per_wheel_control.front_right_wheel_velocity=wheel_map[3]
-        motor_control_primitive.direct_per_wheel_control.back_right_wheel_velocity=wheel_map[4]
+        motor_control_primitive.direct_per_wheel_control.back_left_wheel_velocity = wheel_map[2]
+        motor_control_primitive.direct_per_wheel_control.front_right_wheel_velocity = wheel_map[3]
+        motor_control_primitive.direct_per_wheel_control.back_right_wheel_velocity = wheel_map[4]
 
         direct_control_primitive = DirectControlPrimitive(
             motor_control=motor_control_primitive,
@@ -510,7 +479,6 @@ class RobotDiagnosticsCLI:
                 Primitive(direct_control=direct_control_primitive)
             )
             time.sleep(self.send_primitive_interval_s)
-        self.__run_primitive_set(Primitive(stop=StopPrimitive()))
 
     def emote(self):
         pass
@@ -534,7 +502,6 @@ class RobotDiagnosticsCLI:
                 self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}", PRIMITIVE_PORT, True
         )
 
-        self.send_estop_state_thread.start()
         return self
 
     def __exit__(self, type, value, traceback) -> None:
