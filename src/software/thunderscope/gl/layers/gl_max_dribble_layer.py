@@ -33,9 +33,12 @@ class GLMaxDribbleLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
+        dribbleDispSegment = self.world_buffer.get(block=False).dribbleDisplacement
 
         self.dribble_radius_graphic.set_outline_color(self.color)
+        self.dribble_radius_graphic.set_points(
+            [tuple(dribbleDispSegment.getStart), tuple(dribbleDispSegment.getEnd)]
+        )
         self.dribble_circle_graphic.set_outline_color(self.color)
 
-        dribbleDispSegment = self.world_buffer.get(block=False).dribbleDisplacement
 
