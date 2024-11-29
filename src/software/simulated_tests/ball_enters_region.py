@@ -41,9 +41,14 @@ class BallEntersRegion(Validation):
         return create_validation_geometry(self.regions)
 
     def __repr__(self):
-        return "Checking ball in regions " + ",".join(
-            repr(region) for region in self.regions
-        ) + ", ball position: " + str(self.ball_position) if self.ball_position else ""
+        return (
+            "Checking ball in regions "
+            + ",".join(repr(region) for region in self.regions)
+            + ", ball position: "
+            + str(self.ball_position)
+            if self.ball_position
+            else ""
+        )
 
 
 (

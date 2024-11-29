@@ -110,16 +110,18 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
 
         case TbotsProto::MotionConstraint::FRIENDLY_GOAL:
         {
-            const Rectangle &friendly_goal = field.friendlyGoal();
+            const Rectangle &friendly_goal          = field.friendlyGoal();
             std::vector<ObstaclePtr> goal_obstacles = createGoalObstacles(friendly_goal);
-            obstacles.insert(obstacles.end(), goal_obstacles.begin(), goal_obstacles.end());
+            obstacles.insert(obstacles.end(), goal_obstacles.begin(),
+                             goal_obstacles.end());
             break;
         }
         case TbotsProto::MotionConstraint::ENEMY_GOAL:
         {
-            const Rectangle &enemy_goal = field.enemyGoal();
+            const Rectangle &enemy_goal             = field.enemyGoal();
             std::vector<ObstaclePtr> goal_obstacles = createGoalObstacles(enemy_goal);
-            obstacles.insert(obstacles.end(), goal_obstacles.begin(), goal_obstacles.end());
+            obstacles.insert(obstacles.end(), goal_obstacles.begin(),
+                             goal_obstacles.end());
             break;
         }
 
@@ -132,8 +134,8 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
     return obstacles;
 }
 
-std::vector<ObstaclePtr>
-RobotNavigationObstacleFactory::createGoalObstacles(const Rectangle &goal) const
+std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createGoalObstacles(
+    const Rectangle &goal) const
 {
     // Adjust the goal obstacle radius slightly
     const double goal_obstacle_radius = ROBOT_MAX_RADIUS_METERS - 0.01;
