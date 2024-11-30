@@ -27,6 +27,8 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface, const int lis
     {
         LOG(FATAL) << "Error creating UdpSender: " << error.value();
     }
+
+    startServiceThreads();
 }
 
 LatencyTesterNode::LatencyTesterNode(const std::string& interface, const unsigned short listen_port,
@@ -47,9 +49,11 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface, const unsigne
     {
         LOG(FATAL) << "Error creating UdpSender: " << error.value();
     }
+
+    startServiceThreads();
 }
 
-void LatencyTesterNode::init()
+void LatencyTesterNode::startServiceThreads()
 {
     listener_thread_ = std::thread([this]() { io_listener_service_.run(); });
     sender_thread_   = std::thread([this]() { io_sender_service_.run(); });

@@ -22,8 +22,6 @@ class LatencyTesterNode
     virtual void onReceive(const char* message, const size_t&) = 0;
 
    private:
-    void init();
-
     void startServiceThreads();
 
     boost::asio::io_service io_listener_service_;
