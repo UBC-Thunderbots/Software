@@ -85,7 +85,8 @@ class ProtoPlayer:
 
         # build or load index for chunks
         self.bookmark_indices = list()
-        self.chunks_indices = self.get_chunk_index()
+        self.chunks_indices  = dict()
+        self.load_or_build_index()
 
         # We can get the total runtime of the log from the last entry in the last chunk
         self.end_time = self.find_actual_endtime()
@@ -140,35 +141,6 @@ class ProtoPlayer:
             return False
         except Exception:
             return True
-
-    def build_chunk_index(self, folder_path: os.PathLike) -> dict[str, float]:
-        """Build the chunk index and store the index into the index file
-
-        Note:
-        ----
-        A chunk index entry is a key value pair [filename: start timestamp]
-         - Start timestamp: timestamp of the first log entry in the chunk
-         - Filename: replay chunk file name (%d.replay)
-
-        :param folder_path: folder containing all the replay files
-
-        :return: a dictionary for mapping replay filename to the start
-            timestamp of the first entry in the chunk.
-
-        """
-        chunk_indices: dict[str, float] = dict()
-        for chunk_name in self.sorted_chunks:
-            chunk_data = ProtoPlayer.load_replay_chunk(chunk_name, self.version)
-            if chunk_data:
-                start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(
-                    chunk_data[0], self.version
-                )
-                for data in chunk_data:
-                    _, protobuf_type, data = ProtoPlayer.unpack_log_entry(data, self.version)
-                    if protobuf_type == ReplayBookmark:
-                        self.bookmark_indices.append(data.timestamp.epoch_timestamp_seconds)
-                chunk_indices[os.path.basename(chunk_name)] = start_timestamp
-        return chunk_indices
 
     def handle_log_line_for_chunk(self, line_no: int, chunk_name:str, timestamp: float, _: Type[Message], __: Message):
         if line_no == 0:
@@ -299,20 +271,23 @@ class ProtoPlayer:
         except Exception as e:
             logging.warning(f"An Exception occurred when loading bookmark file {e}")
 
-    def get_chunk_index(self):
-        """Returns the chunk indices.
-        NOTE: if the chunk index was not built, this function will automatically build one.
+    def load_or_build_index(self):
         """
+        Load bookmark index and chunk index. If none is found, build one first then load.
+        """
+        handler_list = list()
         if not self.is_chunk_indexed():
-            self.build_chunk_index(self.log_folder_path)
-
-        try:
+            handler_list.append(lambda: self.handle_log_line_for_chunk)
+        else:
             self.load_chunk_index()
-        except Exception as e:
-            logging.warning(
-                f"Exception occurred when loading chunk index, trying to rebuild. Message: {e}"
-            )
-            self.build_chunk_index(self.log_folder_path)
+
+        if not self.is_bookmark_indexed():
+            handler_list.append(lambda: self.handle_log_line_for_bookmark)
+        else:
+            self.load_bookmark_index()
+
+        if handler_list:
+            self.preprocess_replay_file(handler_list)
 
     def is_proto_player_playing(self) -> bool:
         """Return whether or not the proto player is being played.
