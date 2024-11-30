@@ -1,3 +1,4 @@
+#include "software/logger/logger.h"
 #include "software/networking/benchmarking_utils/latency_tester_secondary_node.h"
 
 #include <boost/program_options.hpp>
@@ -12,12 +13,13 @@ int main(int argc, char **argv)
         bool help = false;
 
         std::string interface = "";
+        std::string runtime_dir = "/tmp/tbots";
         int listen_channel         = 1;
         unsigned short listen_port = 43001;
         int send_channel           = 0;
         unsigned short send_port   = 43000;
         std::string send_ip        = "";
-        bool multicast             = false;
+        bool unicast             = false;
     };
 
     CommandLineArgs args;
@@ -25,6 +27,8 @@ int main(int argc, char **argv)
 
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
                        "Help screen");
+    desc.add_options()("runtime_dir", boost::program_options::value<std::string>(&args.runtime_dir),
+                       "The directory to output logs.");
     desc.add_options()("interface",
                        boost::program_options::value<std::string>(&args.interface),
                        "The interface to bind to.");
@@ -35,9 +39,9 @@ int main(int argc, char **argv)
                        boost::program_options::value<unsigned short>(&args.send_port),
                        "The port to send on.");
 
-    desc.add_options()("multicast",
-            boost::program_options::value<bool>(&args.multicast),
-            "Use multicast instead of unicast for communication.");
+    desc.add_options()("unicast",
+            boost::program_options::value<bool>(&args.unicast),
+            "Use unicast instead of multicast for communication.");
 
     // Multicast options
     desc.add_options()("listen_channel",
@@ -62,16 +66,22 @@ int main(int argc, char **argv)
     }
     else
     {
+        LoggerSingleton::initializeLogger(args.runtime_dir, nullptr, false);
+
         std::unique_ptr<LatencyTesterSecondaryNode> tester;
-        if (args.multicast)
-        {
-            tester = std::make_unique<LatencyTesterSecondaryNode>(args.interface, args.listen_channel,
-                                                                  args.listen_port, args.send_channel, args.send_port);
-        }
-        else
+        if (args.unicast)
         {
             tester = std::make_unique<LatencyTesterSecondaryNode>(args.interface, args.listen_port, args.send_ip,
                     args.send_port);
+        }
+        else
+        {
+            LOG(INFO) << "Creating multicast latency tester";
+            LOG(INFO) << "Listen channel: " << args.listen_channel << ", Listen port: " << args.listen_port;
+            LOG(INFO) << "Send channel: " << args.send_channel << ", Send port: " << args.send_port;
+
+            tester = std::make_unique<LatencyTesterSecondaryNode>(args.interface, args.listen_channel,
+                                                                  args.listen_port, args.send_channel, args.send_port);
         }
 
         while (true)

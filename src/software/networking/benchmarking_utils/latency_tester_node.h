@@ -22,7 +22,7 @@ class LatencyTesterNode
     virtual void onReceive(const char* message, const size_t&) = 0;
 
    private:
-    LatencyTesterNode();
+    void init();
 
     void startServiceThreads();
 

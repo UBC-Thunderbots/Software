@@ -9,7 +9,8 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface, const int lis
                                      const int send_channel,
                                      const unsigned short send_port,
                                      ReceiveCallback receive_callback)
-    : LatencyTesterNode()
+    : io_listener_service_(),
+      io_sender_service_()
 {
     std::optional<std::string> error;
 
@@ -30,7 +31,8 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface, const int lis
 
 LatencyTesterNode::LatencyTesterNode(const std::string& interface, const unsigned short listen_port,
                                      const std::string& send_ip, const unsigned short send_port, ReceiveCallback receive_callback)
-    : LatencyTesterNode()
+    : io_listener_service_(),
+      io_sender_service_()
 {
     std::optional<std::string> error;
 
@@ -47,12 +49,10 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface, const unsigne
     }
 }
 
-LatencyTesterNode::LatencyTesterNode()
-    : io_listener_service_(),
-      io_sender_service_(),
-      listener_thread_([this]() { io_listener_service_.run(); }),
-      sender_thread_([this]() { io_sender_service_.run(); })
+void LatencyTesterNode::init()
 {
+    listener_thread_ = std::thread([this]() { io_listener_service_.run(); });
+    sender_thread_   = std::thread([this]() { io_sender_service_.run(); });
 }
 
 LatencyTesterNode::~LatencyTesterNode()
