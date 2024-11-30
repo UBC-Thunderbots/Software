@@ -388,8 +388,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("friendlyTeam", &World::friendlyTeam)
         .def("enemyTeam", &World::enemyTeam)
         .def("ball", &World::ball)
-        .def("field", &World::field)
-        .def("dribbleDisplacement", &World::getDribbleDisplacement);
+        .def("field", &World::field);
 
     // Listeners
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
