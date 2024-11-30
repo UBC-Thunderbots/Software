@@ -111,14 +111,14 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
         case TbotsProto::MotionConstraint::FRIENDLY_GOAL:
         {
             const Rectangle &friendly_goal = field.friendlyGoal();
-            std::vector<ObstaclePtr> goal_obstacles = createGoalObstacles(friendly_goal);
+            std::vector<ObstaclePtr> goal_obstacles = createGoalObstacles(friendly_goal, true);
             obstacles.insert(obstacles.end(), goal_obstacles.begin(), goal_obstacles.end());
             break;
         }
         case TbotsProto::MotionConstraint::ENEMY_GOAL:
         {
             const Rectangle &enemy_goal = field.enemyGoal();
-            std::vector<ObstaclePtr> goal_obstacles = createGoalObstacles(enemy_goal);
+            std::vector<ObstaclePtr> goal_obstacles = createGoalObstacles(enemy_goal, false);
             obstacles.insert(obstacles.end(), goal_obstacles.begin(), goal_obstacles.end());
             break;
         }
@@ -133,7 +133,7 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
 }
 
 std::vector<ObstaclePtr>
-RobotNavigationObstacleFactory::createGoalObstacles(const Rectangle &goal) const
+RobotNavigationObstacleFactory::createGoalObstacles(const Rectangle &goal, bool isFriendly) const
 {
     // Adjust the goal obstacle radius slightly
     const double goal_obstacle_radius = ROBOT_MAX_RADIUS_METERS - 0.01;
@@ -148,14 +148,26 @@ RobotNavigationObstacleFactory::createGoalObstacles(const Rectangle &goal) const
     obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(
         Segment(goal.posXNegYCorner(), goal.negXNegYCorner()), goal_obstacle_radius)));
 
-    // Create left goal wall obstacle
-    obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(
-        Segment(goal.negXPosYCorner(), goal.negXNegYCorner()), goal_obstacle_radius)));
+
+	// Create left and right goal wall obstacle
+    if (isFriendly) {
+        Segment segment = Segment(goal.negXPosYCorner(), goal.negXNegYCorner());
+        obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(segment, goal_obstacle_radius)));
+
+    } else {
+	  	Segment segment = Segment(goal.posXPosYCorner(), goal.posXNegYCorner());
+        obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(segment, goal_obstacle_radius)));
+
+    }
+
+
+
+
+
+
 
     return obstacles;
 }
-
-
 
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
@@ -172,7 +184,6 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
 
     return obstacles;
 }
-
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(
     const Point &ball_position) const

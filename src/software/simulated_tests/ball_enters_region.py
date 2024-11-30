@@ -22,13 +22,12 @@ class BallEntersRegion(Validation):
         :return: FAILING until a ball enters any of the regions
                  PASSING when a ball enters
         """
+        self.ball_position = world.ball.current_state.global_position
         for region in self.regions:
             if tbots_cpp.contains(
                 region, tbots_cpp.createPoint(world.ball.current_state.global_position)
             ):
                 return ValidationStatus.PASSING
-
-        self.ball_position = world.ball.current_state.global_position
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
