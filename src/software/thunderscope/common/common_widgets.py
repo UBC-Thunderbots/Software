@@ -149,8 +149,7 @@ class ColorProgressBar(QProgressBar):
         super(ColorProgressBar, self).setValue(int(value * self.decimals))
 
         def sigmoid_interpolate(val, x1, y1, x2, y2):
-            """
-            Interpolates a value along a sigmoid curve.
+            """Interpolates a value along a sigmoid curve.
 
             :param val: Value to interpolate
             :param x1: Lower bound
@@ -175,10 +174,7 @@ class ColorProgressBar(QProgressBar):
             g = 200
 
         super(ColorProgressBar, self).setStyleSheet(
-            "QProgressBar::chunk"
-            "{"
-            f"background: rgb({r}, {g}, 0)"
-            "}"
+            "QProgressBar::chunk" "{" f"background: rgb({r}, {g}, 0)" "}"
         )
 
     def getPercentage(self):
