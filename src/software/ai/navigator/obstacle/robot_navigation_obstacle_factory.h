@@ -162,4 +162,21 @@ class RobotNavigationObstacleFactory
                                          const Rectangle &field_lines,
                                          const Rectangle &field_boundary,
                                          double additional_expansion_amount = 0.0) const;
+
+
+    /**
+     * creates a set of obstacles for a specified goal (friendly or enemy)
+     * generates a collection of obstacles representing the posts and walls of specified
+     * goal. The obstacles are created with a slight expansion to avoid interference with
+     * goalkeepers or other objects that might be near the goal. if isFriendly is true,
+     * line segment is from negXPosYCorner to negXNegYCorner, otherwide the line segment
+     * for enemy net is from posXPosYCorner to posXNegYCorner
+     * @param goal the friendly_goal or enemy_goal
+     * @param isFriendly is either true or false
+     *
+     * @return A vector of obstacle pointers (`std::vector<ObstaclePtr>`) representing the
+     * obstacles at the goal.
+     */
+    std::vector<ObstaclePtr> createGoalObstacles(const Rectangle &goal,
+                                                 bool isFriendly) const;
 };
