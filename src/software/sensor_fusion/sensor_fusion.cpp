@@ -11,6 +11,7 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       enemy_team(),
       game_state(),
       referee_stage(std::nullopt),
+      dribble_displacement(std::nullopt),
       ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
@@ -33,6 +34,7 @@ std::optional<World> SensorFusion::getWorld() const
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
         new_world.setTeamWithPossession(possession);
+        new_world.setDribbleDisplacement(dribble_displacement);
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
@@ -320,8 +322,10 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     if (ball && field)
     {
+
         possession = possession_tracker->getTeamWithPossession(friendly_team, enemy_team,
                                                                *ball, *field);
+    updateDribbleDisplacement();
     }
 }
 
@@ -376,7 +380,6 @@ void SensorFusion::updateDribbleDisplacement()
             ball_contacts_by_friendly_robots.erase(robot.id());
         }
     }
-
     // Remove touching robots that have vanished
     for (const auto &[robot_id, contact_point] : ball_contacts_by_friendly_robots)
     {
@@ -387,10 +390,10 @@ void SensorFusion::updateDribbleDisplacement()
             ball_contacts_by_friendly_robots.erase(robot_id);
         }
     }
-
     // Compute displacements from initial contact points to current ball position
     std::vector<Segment> dribble_displacements;
     dribble_displacements.reserve(ball_contacts_by_friendly_robots.size());
+
     std::transform(ball_contacts_by_friendly_robots.begin(),
                    ball_contacts_by_friendly_robots.end(),
                    std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
@@ -409,6 +412,7 @@ void SensorFusion::updateDribbleDisplacement()
                 dribble_displacements.begin(), dribble_displacements.end(),
                 [](const Segment &a, const Segment &b) { return a.length() < b.length(); });
     }
+
 }
 
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
