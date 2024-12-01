@@ -122,6 +122,12 @@ class SensorFusion
     BallDetection invert(BallDetection ball_detection) const;
 
     /**
+     * Updates the segment representing the displacement of the ball due to
+     * the friendly team continuously dribbling the ball across the field.
+     */
+    void updateDribbleDisplacement();
+
+    /**
      * Checks for a vision reset and if there is one, then reset SensorFusion
      *
      * @param t_capture The t_capture of a new packet
@@ -160,6 +166,23 @@ class SensorFusion
     Team enemy_team;
     GameState game_state;
     std::optional<RefereeStage> referee_stage;
+
+    // Points on the field where a friendly bot initially touched the ball
+    std::map<RobotId, Point> ball_contacts_by_friendly_robots;
+    // Segment representing the displacement of the ball (in metres) due to
+    // the friendly team continuously dribbling the ball across the field.
+    //
+    // - The start point of the segment is the point on the field where the friendly
+    //   team started dribbling the ball.
+    //
+    // - The end point of the segment is the current position of the ball.
+    //
+    // - The length of the segment is the distance between where the friendly team
+    //   started dribbling the ball and where the ball is now.
+    //
+    // If the friendly team does not have possession over the ball, this is std::nullopt.
+    std::optional<Segment> dribble_displacement;
+
 
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
