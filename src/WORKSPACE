@@ -370,6 +370,14 @@ load("@rules_third_party//libraries:bullet.bzl", "bullet")
 # https://github.com/bulletphysics/bullet3 to the WORKSPACE
 bullet()
 
+http_archive(
+    name = "pytorch",
+    build_file = "@//extlibs:pytorch.BUILD",
+    sha256 = "618ca54eef82a1dca46ff1993d5807d9c0deb0bae147da4974166a147cb562fa",
+    strip_prefix = "libtorch",
+    url = "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.5.1%2Bcpu.zip",
+)
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # Hedron's Compile Commands Extractor for Bazel
