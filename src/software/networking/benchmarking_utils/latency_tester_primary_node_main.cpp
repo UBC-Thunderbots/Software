@@ -87,6 +87,10 @@ int main(int argc, char **argv)
         std::unique_ptr<LatencyTesterPrimaryNode> tester;
         if (args.unicast)
         {
+            LOG(INFO) << "Running unicast latency test";
+            LOG(INFO) << "Listen port: " << args.listen_port;
+            LOG(INFO) << "Send IP: " << args.send_ip << ":" << args.send_port;
+
             tester = std::make_unique<LatencyTesterPrimaryNode>(args.interface, args.listen_port, args.send_ip,
                     args.send_port, args.message_size_bytes, timeout_duration_ms);
         }

@@ -10,9 +10,7 @@ LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
     const std::string& interface, const int listen_channel, const unsigned short listen_port, const int send_channel,
     const unsigned short send_port, const int message_size,
     const std::chrono::milliseconds& timeout_duration)
-    : LatencyTesterNode(interface, listen_channel, listen_port, send_channel, send_port,
-                        std::bind(&LatencyTesterPrimaryNode::onReceive, this,
-                                  std::placeholders::_1, std::placeholders::_2))
+    : LatencyTesterNode(interface, listen_channel, listen_port, send_channel, send_port)
 {
     initialize(message_size, timeout_duration);
 }
@@ -20,8 +18,7 @@ LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
 LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(const std::string& interface, const unsigned short listen_port,
         const std::string& send_ip, const unsigned short send_port, const int message_size,
         const std::chrono::milliseconds& timeout_duration)
-    : LatencyTesterNode(interface, listen_port, send_ip, send_port, std::bind(&LatencyTesterPrimaryNode::onReceive,
-                                                                   this, std::placeholders::_1, std::placeholders::_2))
+    : LatencyTesterNode(interface, listen_port, send_ip, send_port)
 {
     initialize(message_size, timeout_duration);
 }

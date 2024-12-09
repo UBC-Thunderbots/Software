@@ -5,17 +5,13 @@ LatencyTesterSecondaryNode::LatencyTesterSecondaryNode(const std::string& interf
                                                        const unsigned short listen_port,
                                                        const int send_channel,
                                                        const unsigned short send_port)
-    : LatencyTesterNode(interface, listen_channel, listen_port, send_channel, send_port,
-                        std::bind(&LatencyTesterSecondaryNode::onReceive, this,
-                                  std::placeholders::_1, std::placeholders::_2))
+    : LatencyTesterNode(interface, listen_channel, listen_port, send_channel, send_port)
 {
 }
 
 LatencyTesterSecondaryNode::LatencyTesterSecondaryNode(const std::string& interface, const unsigned short listen_port,
                                                        const std::string& send_ip, const unsigned short send_port)
-    : LatencyTesterNode(interface, listen_port, send_ip, send_port,
-                        std::bind(&LatencyTesterSecondaryNode::onReceive, this,
-                                  std::placeholders::_1, std::placeholders::_2))
+    : LatencyTesterNode(interface, listen_port, send_ip, send_port)
 {
 }
 
