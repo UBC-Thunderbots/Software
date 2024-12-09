@@ -23,6 +23,10 @@ UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_
     if (multicast)
     {
         setupMulticast(boost_ip, interface, error);
+        if (error)
+        {
+            return;
+        }
     }
 }
 

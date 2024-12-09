@@ -42,7 +42,6 @@ cc_library(
     hdrs = [
         "udp_sender.h",
     ],
-    visibility = ["//visibility:private"],
     deps = [
         ":network_utils",
         "@boost//:asio",
@@ -106,8 +105,15 @@ cc_library(
 )
 
 cc_library(
-    name = "udp_network_factory",
+    name = "udp_listener",
+    srcs = [
+        "udp_listener.cpp",
+    ],
     hdrs = [
-        "udp_network_factory.hpp",
+        "udp_listener.h",
+    ],
+    deps = [
+        "//software/logger:logger",
+        "@boost//:asio",
     ],
 )

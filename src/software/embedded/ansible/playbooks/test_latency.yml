@@ -1,0 +1,31 @@
+--name: Test Latency
+  hosts: THUNDERBOTS_HOSTS
+  vars:
+    all_services:
+      - thunderloop
+    all_actions:
+      - stop
+      - sync
+      - start
+    binary_path: "../../../networking/benchmarking_utils/latency_tester_secondary_node"
+
+  tasks:
+
+    - debug:
+        msg: "[Robot ID = {{ inventory_hostname }}]"
+      tags: always
+
+    - name: Upload latency testing script
+      block:
+        - include_role:
+          stop_systemd_service
+          vars:
+            service_name: "{{ ROBOT_MAIN_SERVICE }}"
+
+        - include_role:
+          sync_binaries
+          vars:
+            binary_path: ../../latency_test.py
+            dest_path: "${{ ROBOT_BINARY_HOME }}" + "/latency_tester_secondary_node_main"
+
+        - include_role:
