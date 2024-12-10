@@ -1,12 +1,23 @@
 #include "software/embedded/services/network/network.h"
 
-NetworkService::NetworkService(const std::string& ip_address,
+NetworkService::NetworkService(const RobotId & robot_id,
+                               const std::string& ip_address,
                                unsigned short primitive_listener_port,
                                unsigned short robot_status_sender_port,
-                               const std::string& interface, bool multicast)
-    : primitive_tracker(ProtoTracker("primitive set"))
+                               unsigned short full_system_to_robot_ip_notification_port,
+                               unsigned short robot_to_full_system_ip_notification_port,
+                               const std::string& interface)
+    : interface(interface),
+      robot_status_sender_port(robot_status_sender_port),
+      primitive_tracker(ProtoTracker("primitive set"))
 {
     std::optional<std::string> error;
+
+    // fullsystem_to_robot_ip_listener = makeResource<>
+    fullsystem_to_robot_ip_listener = std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
+            ip_address, full_system_to_robot_ip_notification_port, interface,
+            std::bind(&NetworkService::onFullSystemIpNotification, this, _1), true, error);
+
     sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
         ip_address, robot_status_sender_port, interface, multicast, error);
     if (error)

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "proto/tbots_timestamp_msg.proto";
+
+package TbotsProto;
+
+message IpNotification
+{
+    int32 robot_id = 1;
+    string ip_address = 2;
+}
