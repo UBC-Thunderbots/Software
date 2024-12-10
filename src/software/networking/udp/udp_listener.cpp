@@ -142,15 +142,9 @@ void UdpListener::handleDataReception(const boost::system::error_code& error,
     {
         // Call the receive callback with the received data
         receive_callback_(raw_received_data_.data(), num_bytes_received);
-
-        // Start listening for more data
-        startListen();
     }
     else
     {
-        // Start listening again to receive the next data
-        startListen();
-
         LOG(WARNING) << "UdpListener: Error receiving data: " << error.message()
                      << std::endl;
     }
@@ -162,4 +156,7 @@ void UdpListener::handleDataReception(const boost::system::error_code& error,
             << "which means that the receive buffer is full and data loss has potentially occurred. "
             << "Consider increasing MAX_BUFFER_LENGTH";
     }
+
+    // Start listening for more data
+    startListen();
 }

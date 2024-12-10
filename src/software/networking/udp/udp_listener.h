@@ -4,9 +4,27 @@
 
 typedef std::function<void(const char*, const size_t&)> ReceiveCallback;
 
+/**
+ * Creates a UDP listener that can listen on a given port and interface.
+ */
 class UdpListener
 {
    public:
+    /**
+     * Creates a UDP listener.
+     *
+     * A user must check the user-provided error string to see if the listener construction was successful.
+     *
+     * @param io_service The service thread to use for the network communication resource
+     * @param ip_address If multicast is true, this address is the multicast group to join. Otherwise, this is the IP
+     * address of the local interface to listen on
+     * @param port The port to listen on
+     * @param interface The networking interface to listen on
+     * @param multicast If true, the listener will join the multicast group given by `ip_address`, otherwise it will
+     * listen on the local interface given by `ip_address` and `interface`
+     * @param receive_callback The callback to call when a new message is received
+     * @param error A user-provided optional string to store any error messages
+     */
     UdpListener(boost::asio::io_service& io_service,
             const std::string& ip_address,
                 unsigned short port,
@@ -15,19 +33,42 @@ class UdpListener
                 ReceiveCallback receive_callback,
                 std::optional<std::string>& error);
 
+    /**
+     * Creates a UDP listener that listens on the given port on all interfaces.
+     *
+     * A user must check the user-provided error string to see if the listener construction was successful.
+     *
+     * @param io_service The service thread to use for the network communication resource
+     * @param port The port to listen on
+     * @param receive_callback The callback to call when a new message is received
+     */
     UdpListener(boost::asio::io_service& io_service,
                 const unsigned short port,
                 ReceiveCallback receive_callback,
                 std::optional<std::string>& error);
 
+
+    /**
+     * Destructor.
+     */
     virtual ~UdpListener();
 
    private:
+    /**
+     * Cleans up all associated networking resources with this listener.
+     */
     void close();
 
+    /**
+     * Handles the reception of data from the network as well as any errors that may occur before calling the
+     * user-provided callback.
+     */
     void handleDataReception(const boost::system::error_code& error,
                              std::size_t bytes_transferred);
 
+    /**
+     * Starts listening for data on the socket.
+     */
     void startListen();
 
     /**
@@ -43,10 +84,13 @@ class UdpListener
                         const std::string& listen_interface,
                         std::optional<std::string>& error);
 
+    // The maximum buffer length for the raw data received from the network
     static constexpr unsigned int MAX_BUFFER_LENGTH = 9000;
 
+    // Whether this listener should continue running
     bool running_;
 
+    // The raw data received from the network
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
 
     // A UDP socket to receive data on

@@ -30,6 +30,10 @@ int main(int argc, char **argv)
 
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
                        "Help screen");
+
+    desc.add_options()("unicast", boost::program_options::bool_switch(&args.unicast),
+                       "Use unicast instead of multicast for communication");
+
     desc.add_options()("runtime_dir",
                        boost::program_options::value<std::string>(&args.runtime_dir),
                        "The directory to output logs.");
@@ -51,9 +55,6 @@ int main(int argc, char **argv)
     desc.add_options()("initial_delay_s",
             boost::program_options::value<int>(&args.initial_delay_s),
             "The initial delay to wait before sending packets (s)");
-    desc.add_options()("unicast",
-            boost::program_options::value<bool>(&args.unicast),
-            "Use unicast instead of multicast for communication.");
     desc.add_options()("interface",
                        boost::program_options::value<std::string>(&args.interface),
                        "The interface to bind to.");

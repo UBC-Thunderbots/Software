@@ -8,8 +8,6 @@
 /**
  * Given an interface, get the IP address associated with that interface
  *
- * The modified ip_address is valid only if the function returns true
- *
  * @param interface The interface to get the IP address from
  * @param ipv4 If true, get the IPv4 address, otherwise get the IPv6 address
  *

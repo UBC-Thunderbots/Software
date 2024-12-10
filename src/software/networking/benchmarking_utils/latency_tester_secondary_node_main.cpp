@@ -27,6 +27,10 @@ int main(int argc, char **argv)
 
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
                        "Help screen");
+
+    desc.add_options()("unicast", boost::program_options::bool_switch(&args.unicast),
+                       "Use unicast instead of multicast for communication");
+
     desc.add_options()("runtime_dir", boost::program_options::value<std::string>(&args.runtime_dir),
                        "The directory to output logs.");
     desc.add_options()("interface",
@@ -38,10 +42,6 @@ int main(int argc, char **argv)
     desc.add_options()("send_port",
                        boost::program_options::value<unsigned short>(&args.send_port),
                        "The port to send on.");
-
-    desc.add_options()("unicast",
-            boost::program_options::value<bool>(&args.unicast),
-            "Use unicast instead of multicast for communication.");
 
     // Multicast options
     desc.add_options()("listen_channel",
@@ -71,6 +71,10 @@ int main(int argc, char **argv)
         std::unique_ptr<LatencyTesterSecondaryNode> tester;
         if (args.unicast)
         {
+            LOG(INFO) << "Creating unicast latency tester";
+            LOG(INFO) << "Listen port: " << args.listen_port;
+            LOG(INFO) << "Sender IP: " << args.send_ip << ":" << args.send_port;
+
             tester = std::make_unique<LatencyTesterSecondaryNode>(args.interface, args.listen_port, args.send_ip,
                     args.send_port);
         }
