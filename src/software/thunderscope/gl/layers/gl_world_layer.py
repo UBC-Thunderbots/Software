@@ -532,7 +532,7 @@ class GLWorldLayer(GLLayer):
 
         :param toggle: toggles display for the displayed text.
         :param label: The label to change.
-        :param str: The text to display.
+        :param text: The text to display.
         :param pos: The position of the text.
         """
         if toggle:
