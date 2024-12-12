@@ -3,8 +3,9 @@
 #include <mutex>
 #include <queue>
 
+#include "proto/ip_notification.pb.h"
+#include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
-#include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/services/network/proto_tracker.h"
@@ -13,6 +14,7 @@
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/time/duration.h"
 #include "software/time/timestamp.h"
+#include "software/world/robot_state.h"
 
 class NetworkService
 {
@@ -21,24 +23,25 @@ class NetworkService
      * Service that communicates with our AI
      * Opens all the required ports and maintains them until destroyed.
      *
+     * @param robot_id The robot id of the robot
      * @param ip_address The IP Address the service should connect to
      * @param primitive_listener_port The port to listen for primitive protos
+     * @param full_system_to_robot_ip_notification_port The port to listen for full system IP discovery notification
+     * @param robot_to_full_system_ip_notification_port The port to send robot IP discovery notification
      * @param robot_status_sender_port The port to send robot status
      * @param interface the interface to listen and send on
-     * @param multicast  If true, then the provided IP address is a multicast address and
-     * we should join the group
      */
-    NetworkService(const std::string& ip_address, unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, const std::string& interface,
-                   bool multicast);
+    NetworkService(const RobotId& robot_id, const std::string& ip_address, unsigned short primitive_listener_port,
+                   unsigned short robot_status_sender_port, unsigned short full_system_to_robot_ip_notification_port,
+                  unsigned short robot_to_full_system_ip_notification_port, const std::string& interface);
 
     /**
      * When the network service is polled, it sends the robot_status and returns
-     * a tuple of the most recent PrimitiveSet
+     * a tuple of the most recent Primitive
      *
-     * @returns a tuple of the stored primitive_set
+     * @returns a tuple of the stored primitive
      */
-    TbotsProto::PrimitiveSet poll(TbotsProto::RobotStatus& robot_status);
+    TbotsProto::Primitive poll(TbotsProto::RobotStatus& robot_status);
 
    private:
     /**
@@ -56,18 +59,18 @@ class NetworkService
     bool shouldSendNewRobotStatus(const TbotsProto::RobotStatus& robot_status) const;
 
     /**
-     * Tracks the given primitive set for calculating round-trip time if valid
+     * Tracks the given primitive for calculating round-trip time if valid
      *
-     * @param input A potential primitive set to be logged
+     * @param input A potential primitive to be logged
      */
-    void logNewPrimitiveSet(const TbotsProto::PrimitiveSet& new_primitive_set);
+    void logNewPrimitive(const TbotsProto::Primitive& new_primitive);
 
     /**
-     * Updates the cached primitive sets for Thunderscope to calculate round-trip time
+     * Updates the cached primitive for Thunderscope to calculate round-trip time
      *
      * @param robot_status The robot status to compare to within the cache
      */
-    void updatePrimitiveSetLog(TbotsProto::RobotStatus& robot_status);
+    void updatePrimitiveLog(TbotsProto::RobotStatus& robot_status);
 
     /**
      * Getter for the current epoch time in seconds as a double
@@ -86,21 +89,52 @@ class NetworkService
         static_cast<unsigned int>(1500 / ROBOT_STATUS_BROADCAST_RATE_HZ);
 
     // Variables
-    TbotsProto::PrimitiveSet primitive_set_msg;
 
-    std::mutex primitive_set_mutex;
+    // Mutex protects the primitive message
+    std::mutex primitive_mutex;
+    TbotsProto::Primitive primitive_msg;
 
-    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotStatus>> sender;
-    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>
-        udp_listener_primitive_set;
-    std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::PrimitiveSet>>
+    // Mutex protects the fullsystem IP address
+    std::mutex fullsystem_ip_mutex;
+    std::optional<std::string> fullsystem_ip;
+
+    // Mutex protects the robot status sender
+    std::mutex robot_status_sender_mutex;
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotStatus>> robot_status_sender;
+
+    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::IpNotification>> fullsystem_to_robot_ip_listener;
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::IpNotification>> robot_to_fullsystem_ip_sender;
+    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::Primitive>>
+        udp_listener_primitive;
+    std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::Primitive>>
         radio_listener_primitive_set;
 
+    std::string interface;
+
+    unsigned short robot_status_sender_port;
     unsigned int network_ticks     = 0;
     unsigned int thunderloop_ticks = 0;
 
-    // Callback function for storing the received primitive_sets
-    void primitiveSetCallback(TbotsProto::PrimitiveSet input);
+    /**
+     * Handler for received primitive packets
+     *
+     * @param input The primitive packet received
+     */
+    void primitiveCallback(TbotsProto::Primitive input);
+
+    /**
+     * Handler for received full system IP notification packets
+     *
+     * @param ip_notification The IP notification packet received
+     */
+    void onFullSystemIpNotification(const TbotsProto::IpNotification& ip_notification);
+
+    /**
+     * Send a robot status message over the network
+     *
+     * @param robot_status The robot status message to send
+     */
+    void sendRobotStatus(const TbotsProto::RobotStatus& robot_status);
 
     // ProtoTrackers for tracking recent primitive_set packet loss
     ProtoTracker primitive_tracker;
@@ -119,4 +153,6 @@ class NetworkService
     };
 
     std::deque<RoundTripTime> primitive_set_rtt;
+
+    TbotsProto::IpNotification robot_ip_notification_msg;
 };

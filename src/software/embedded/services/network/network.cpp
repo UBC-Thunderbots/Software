@@ -1,6 +1,6 @@
 #include "software/embedded/services/network/network.h"
 
-NetworkService::NetworkService(const RobotId & robot_id,
+NetworkService::NetworkService(const RobotId& robot_id,
                                const std::string& ip_address,
                                unsigned short primitive_listener_port,
                                unsigned short robot_status_sender_port,
@@ -17,18 +17,22 @@ NetworkService::NetworkService(const RobotId & robot_id,
     fullsystem_to_robot_ip_listener = std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
             ip_address, full_system_to_robot_ip_notification_port, interface,
             std::bind(&NetworkService::onFullSystemIpNotification, this, _1), true, error);
-
-    sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
-        ip_address, robot_status_sender_port, interface, multicast, error);
     if (error)
     {
         LOG(FATAL) << *error;
     }
 
-    udp_listener_primitive_set =
-        std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(
+    robot_to_fullsystem_ip_sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
+            ip_address, robot_to_full_system_ip_notification_port, interface, false, error);
+    if (error)
+    {
+        LOG(FATAL) << *error;
+    }
+
+    udp_listener_primitive =
+        std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
             ip_address, primitive_listener_port, interface,
-            boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast,
+            std::bind(&NetworkService::primitiveCallback, this, _1), false,
             error);
     if (error)
     {
@@ -36,13 +40,54 @@ NetworkService::NetworkService(const RobotId & robot_id,
     }
 
     radio_listener_primitive_set =
-        std::make_unique<ThreadedProtoRadioListener<TbotsProto::PrimitiveSet>>(
-            boost::bind(&NetworkService::primitiveSetCallback, this, _1));
+        std::make_unique<ThreadedProtoRadioListener<TbotsProto::Primitive>>(
+            std::bind(&NetworkService::primitiveCallback, this, _1));
+
+    robot_ip_notification_msg.set_robot_id(robot_id);
+    std::optional<std::string> local_ip = getLocalIp(interface);
+    if (local_ip)
+    {
+        robot_ip_notification_msg.set_ip_address(*local_ip);
+    }
+    else
+    {
+        LOG(FATAL) << "Failed to get IP addresses associated with " << interface;
+    }
 }
 
-TbotsProto::PrimitiveSet NetworkService::poll(TbotsProto::RobotStatus& robot_status)
+void NetworkService::onFullSystemIpNotification(const TbotsProto::IpNotification& ip_notification)
 {
-    std::scoped_lock lock{primitive_set_mutex};
+    std::string new_fullsystem_ip = ip_notification.ip_address();
+    bool rebuild_sender = false;
+
+    {
+        std::scoped_lock lock(fullsystem_ip_mutex);
+        if (!fullsystem_ip.has_value() || fullsystem_ip.value() != new_fullsystem_ip)
+        {
+            fullsystem_ip = new_fullsystem_ip;
+            rebuild_sender = true;
+        }
+    }
+
+    if (rebuild_sender)
+    {
+        std::unique_lock lock(robot_status_sender_mutex);
+
+        std::optional<std::string> error;
+        robot_status_sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
+            fullsystem_ip.value(), robot_status_sender_port, interface, false, error);
+        if (error)
+        {
+            LOG(FATAL) << *error;
+        }
+
+        LOG(INFO) << "Now sending RobotStatus messages to " << fullsystem_ip.value();
+    }
+}
+
+TbotsProto::Primitive NetworkService::poll(TbotsProto::RobotStatus& robot_status)
+{
+    std::scoped_lock lock{primitive_mutex};
 
     robot_status.mutable_network_status()->set_primitive_packet_loss_percentage(
         static_cast<unsigned int>(primitive_tracker.getLossRate() * 100));
@@ -51,12 +96,12 @@ TbotsProto::PrimitiveSet NetworkService::poll(TbotsProto::RobotStatus& robot_sta
     if (shouldSendNewRobotStatus(robot_status))
     {
         last_breakbeam_state_sent = robot_status.power_status().breakbeam_tripped();
-        updatePrimitiveSetLog(robot_status);
-        sender->sendProto(robot_status);
+        updatePrimitiveLog(robot_status);
+        sendRobotStatus(robot_status);
         network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
     }
     thunderloop_ticks = (thunderloop_ticks + 1) % THUNDERLOOP_HZ;
-    return primitive_set_msg;
+    return primitive_msg;
 }
 
 bool NetworkService::shouldSendNewRobotStatus(
@@ -79,64 +124,74 @@ bool NetworkService::shouldSendNewRobotStatus(
            require_heartbeat_status_update;
 }
 
-void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
+void NetworkService::sendRobotStatus(const TbotsProto::RobotStatus& robot_status)
 {
-    std::scoped_lock<std::mutex> lock(primitive_set_mutex);
+    std::scoped_lock lock(robot_status_sender_mutex);
+
+    if (robot_status_sender)
+    {
+        robot_status_sender->sendProto(robot_status);
+    }
+}
+
+void NetworkService::primitiveCallback(const TbotsProto::Primitive& input)
+{
+    std::scoped_lock<std::mutex> lock(primitive_mutex);
     const uint64_t seq_num = input.sequence_number();
 
-    logNewPrimitiveSet(input);
+    logNewPrimitive(input);
 
     primitive_tracker.send(seq_num);
     if (primitive_tracker.isLastValid())
     {
-        primitive_set_msg = input;
+        primitive_msg = input;
     }
 }
 
-void NetworkService::logNewPrimitiveSet(const TbotsProto::PrimitiveSet& new_primitive_set)
+void NetworkService::logNewPrimitive(const TbotsProto::Primitive& new_primitive)
 {
-    if (primitive_set_rtt.size() >= PRIMITIVE_DEQUE_MAX_SIZE)
+    if (primitive_rtt.size() >= PRIMITIVE_DEQUE_MAX_SIZE)
     {
         LOG(WARNING)
             << "Too many primitive sets logged for round-trip calculations, halting log process";
         return;
     }
 
-    if (!primitive_set_rtt.empty() && new_primitive_set.sequence_number() <=
-                                          primitive_set_rtt.back().primitive_sequence_num)
+    if (!primitive_rtt.empty() && new_primitive.sequence_number() <=
+                                          primitive_rtt.back().primitive_sequence_num)
     {
         // If the proto is older than the last received proto, then ignore it
         return;
     }
 
     NetworkService::RoundTripTime current_round_trip_time;
-    current_round_trip_time.primitive_sequence_num = new_primitive_set.sequence_number();
+    current_round_trip_time.primitive_sequence_num = new_primitive.sequence_number();
     current_round_trip_time.thunderscope_sent_time_seconds =
-        new_primitive_set.time_sent().epoch_timestamp_seconds();
+        new_primitive.time_sent().epoch_timestamp_seconds();
     current_round_trip_time.thunderloop_recieved_time_seconds =
         getCurrentEpochTimeInSeconds();
 
-    primitive_set_rtt.emplace_back(current_round_trip_time);
+    primitive_rtt.emplace_back(current_round_trip_time);
 }
 
-void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus& robot_status)
+void NetworkService::updatePrimitiveLog(TbotsProto::RobotStatus& robot_status)
 {
     uint64_t seq_num = robot_status.last_handled_primitive_set();
-    while (!primitive_set_rtt.empty())
+    while (!primitive_rtt.empty())
     {
-        if (primitive_set_rtt.front().primitive_sequence_num == seq_num)
+        if (primitive_rtt.front().primitive_sequence_num == seq_num)
         {
             double received_epoch_time_seconds =
-                primitive_set_rtt.front().thunderloop_recieved_time_seconds;
+                primitive_rtt.front().thunderloop_recieved_time_seconds;
             double processing_time_seconds =
                 getCurrentEpochTimeInSeconds() - received_epoch_time_seconds;
 
             robot_status.mutable_adjusted_time_sent()->set_epoch_timestamp_seconds(
-                primitive_set_rtt.front().thunderscope_sent_time_seconds +
+                primitive_rtt.front().thunderscope_sent_time_seconds +
                 processing_time_seconds);
             return;
         }
-        primitive_set_rtt.pop_front();
+        primitive_rtt.pop_front();
     }
 }
 
