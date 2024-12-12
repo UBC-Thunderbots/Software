@@ -129,18 +129,19 @@ inline uint32_t calculateChickerPulseWidth(int kick_constant, double kick_coeffi
 // These functions are only used in power service so they are excluded from platformio
 // Protobuf needs additional support to run on an esp32
 #ifndef PLATFORMIO_BUILD
+
 /**
  * Converts a google protobuf power control msg to its nanopb representation
  *
- * @param google_control protobuf message to convert
+ * @param power_control protobuf message to convert
  * @param kick_coeff The coefficient to use for the chicker pulse width calculation
  * @param kick_constant The constant to use in the chicker pulse width calculation
  * @param chip_pulse_width The width of the pulse to use for the chipper
+ *
  * @return a nanopb power control msg matching provided protobuf
  */
-
 TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
-    const TbotsProto::PowerControl& google_control, double kick_coeff, int kick_constant,
+    const TbotsProto::PowerControl& power_control, double kick_coeff, int kick_constant,
     int chip_pulse_width)
 {
     TbotsProto_PowerPulseControl nanopb_control =
@@ -150,14 +151,16 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     kick_constant = std::min(kick_constant, MAX_KICK_CONSTANT);
     kick_coeff    = std::min(kick_coeff, MAX_KICK_COEFFICIENT);
 
-    switch (google_control.chicker().chicker_command_case())
+    switch (power_control.chicker().chicker_command_case())
     {
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
+            // TODO (#3193): refactor kick pulse width calculation out into seperate
+            // function
             nanopb_control.chicker.chicker_command.kick_pulse_width =
                 calculateChickerPulseWidth(kick_constant, kick_coeff,
-                                           google_control.chicker().kick_speed_m_per_s());
+                                           power_control.chicker().kick_speed_m_per_s());
             break;
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =
@@ -167,7 +170,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_auto_chip_or_kick_tag;
-            switch (google_control.chicker().auto_chip_or_kick().auto_chip_or_kick_case())
+            switch (power_control.chicker().auto_chip_or_kick().auto_chip_or_kick_case())
             {
                 case TbotsProto::AutoChipOrKick::kAutokickSpeedMPerS:
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
@@ -176,7 +179,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
                         .auto_chip_or_kick.autokick_pulse_width =
                         calculateChickerPulseWidth(kick_constant, kick_coeff,
-                                                   google_control.chicker()
+                                                   power_control.chicker()
                                                        .auto_chip_or_kick()
                                                        .autokick_speed_m_per_s());
                     break;
@@ -195,7 +198,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         default:
             break;
     }
-    switch (google_control.geneva_slot())
+    switch (power_control.geneva_slot())
     {
         case TbotsProto::Geneva::LEFT:
             nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_LEFT;

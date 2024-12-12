@@ -3,6 +3,7 @@ from typing import Callable, NoReturn
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
 from software.py_constants import SECONDS_PER_MILLISECOND
+from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
@@ -100,6 +101,7 @@ def realtime_sim_ticker(
     """
     simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
     sim_proto_unix_io.register_observer(SimulationState, simulation_state_buffer)
+    per_tick_delay_s = tick_rate_ms * SECONDS_PER_MILLISECOND
 
     # Tick simulation if Thundersocpe is open
     while tscope.is_open():
@@ -109,18 +111,19 @@ def realtime_sim_ticker(
             tick = SimulatorTick(milliseconds=tick_rate_ms)
             sim_proto_unix_io.send_proto(SimulatorTick, tick)
 
-        time.sleep(
-            (tick_rate_ms * SECONDS_PER_MILLISECOND)
-            / simulation_state_message.simulation_speed
-        )
+        time.sleep(per_tick_delay_s / simulation_state_message.simulation_speed)
 
 
-def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int) -> None:
+def sync_simulation(
+    tscope: Thunderscope, num_robots: int, timeout_s: float = 0.1
+) -> None:
     """Ensure that simulator has synchronized with the default world state.
 
-    :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
+    :param tscope:              Thunderscope instance that is tied to this instance of the simulation
     :param num_robots:          Number of robots to initialize the simulator with
+    :param timeout_s:           How long to wait before we retry our attempt to synchronize with the simulator
     """
+    sim_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM]
     world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
     sim_proto_unix_io.register_observer(
         WorldStateReceivedTrigger, world_state_received_buffer
@@ -132,7 +135,7 @@ def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int) -> None:
 
         try:
             world_state_received = world_state_received_buffer.get(
-                block=True, timeout=0.1
+                block=True, timeout=timeout_s
             )
         except queue.Empty:
             # Did not receive a response within timeout period
@@ -140,3 +143,7 @@ def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int) -> None:
         else:
             # Received a response from the simulator
             break
+
+    # Wait for Thunderscope to launch
+    while not tscope.is_open():
+        time.sleep(timeout_s)
