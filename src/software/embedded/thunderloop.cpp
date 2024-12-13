@@ -109,9 +109,9 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
-    network_service_ = std::make_unique<NetworkService>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), PRIMITIVE_PORT,
-        ROBOT_STATUS_PORT, network_interface, true);
+    network_service_ = std::make_unique<NetworkService>(robot_id,
+        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), PRIMITIVE_PORT, ROBOT_STATUS_PORT,
+        FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT, ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT, network_interface);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 

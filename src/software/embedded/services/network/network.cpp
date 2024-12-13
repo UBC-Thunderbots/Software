@@ -11,37 +11,20 @@ NetworkService::NetworkService(const RobotId& robot_id,
       robot_status_sender_port(robot_status_sender_port),
       primitive_tracker(ProtoTracker("primitive set"))
 {
-    std::optional<std::string> error;
-
-    // fullsystem_to_robot_ip_listener = makeResource<>
-    fullsystem_to_robot_ip_listener = std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
+    fullsystem_to_robot_ip_listener = createNetworkResource<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
             ip_address, full_system_to_robot_ip_notification_port, interface,
-            std::bind(&NetworkService::onFullSystemIpNotification, this, _1), true, error);
-    if (error)
-    {
-        LOG(FATAL) << *error;
-    }
+            std::bind(&NetworkService::onFullSystemIpNotification, this, std::placeholders::_1), true);
 
-    robot_to_fullsystem_ip_sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
-            ip_address, robot_to_full_system_ip_notification_port, interface, false, error);
-    if (error)
-    {
-        LOG(FATAL) << *error;
-    }
+    robot_to_fullsystem_ip_sender = createNetworkResource<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
+            ip_address, robot_to_full_system_ip_notification_port, interface, false);
 
-    udp_listener_primitive =
-        std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
-            ip_address, primitive_listener_port, interface,
-            std::bind(&NetworkService::primitiveCallback, this, _1), false,
-            error);
-    if (error)
-    {
-        LOG(FATAL) << *error;
-    }
+    udp_listener_primitive = createNetworkResource<ThreadedProtoUdpListener<TbotsProto::Primitive>>(ip_address,
+            primitive_listener_port, interface,
+            std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1), false);
 
     radio_listener_primitive_set =
         std::make_unique<ThreadedProtoRadioListener<TbotsProto::Primitive>>(
-            std::bind(&NetworkService::primitiveCallback, this, _1));
+            std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
 
     robot_ip_notification_msg.set_robot_id(robot_id);
     std::optional<std::string> local_ip = getLocalIp(interface);
@@ -100,6 +83,13 @@ TbotsProto::Primitive NetworkService::poll(TbotsProto::RobotStatus& robot_status
         sendRobotStatus(robot_status);
         network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
     }
+
+    if (ip_notification_ticks == 0)
+    {
+        robot_to_fullsystem_ip_sender->sendProto(robot_ip_notification_msg);
+    }
+    ip_notification_ticks = (ip_notification_ticks + 1) % IP_DISCOVERY_NOTIFICATION_RATE_HZ;
+
     thunderloop_ticks = (thunderloop_ticks + 1) % THUNDERLOOP_HZ;
     return primitive_msg;
 }

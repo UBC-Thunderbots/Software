@@ -79,10 +79,44 @@ class NetworkService
      */
     double getCurrentEpochTimeInSeconds();
 
+    /**
+     * Handler for received primitive packets
+     *
+     * @param input The primitive packet received
+     */
+    void primitiveCallback(const TbotsProto::Primitive& input);
+
+    /**
+     * Handler for received full system IP notification packets
+     *
+     * @param ip_notification The IP notification packet received
+     */
+    void onFullSystemIpNotification(const TbotsProto::IpNotification& ip_notification);
+
+    /**
+     * Send a robot status message over the network
+     *
+     * @param robot_status The robot status message to send
+     */
+    void sendRobotStatus(const TbotsProto::RobotStatus& robot_status);
+
+    /**
+     * Creates a network resource with the given arguments.
+     *
+     * This function is intended to be used to create a UDP listener or sender and abstract away the failure checking.
+     *
+     * @tparam NetworkResource The type of network resource to create (UDP listener or sender)
+     * @tparam argsT The types of the arguments to pass to the constructor of the network resource
+     * @param args The arguments to pass to the constructor of the UDP listener or sender
+     */
+    template <typename NetworkResource, typename... argsT>
+    std::unique_ptr<NetworkResource> createNetworkResource(argsT... args);
+
     // Constants
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
     static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
         ROBOT_STATUS_BROADCAST_RATE_HZ / (THUNDERLOOP_HZ + 1.0);
+    static constexpr int IP_DISCOVERY_NOTIFICATION_RATE_HZ = 1 * THUNDERLOOP_HZ;
 
     // increases size of deque when robot status messages are sent less frequently
     static constexpr unsigned int PRIMITIVE_DEQUE_MAX_SIZE =
@@ -109,32 +143,16 @@ class NetworkService
     std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::Primitive>>
         radio_listener_primitive_set;
 
+    // The network interface to listen and send messages on
     std::string interface;
 
+    // Port to send robot status messages
     unsigned short robot_status_sender_port;
+
+    // Counters for tracking rate-limited events
+    unsigned int ip_notification_ticks = 0;
     unsigned int network_ticks     = 0;
     unsigned int thunderloop_ticks = 0;
-
-    /**
-     * Handler for received primitive packets
-     *
-     * @param input The primitive packet received
-     */
-    void primitiveCallback(TbotsProto::Primitive input);
-
-    /**
-     * Handler for received full system IP notification packets
-     *
-     * @param ip_notification The IP notification packet received
-     */
-    void onFullSystemIpNotification(const TbotsProto::IpNotification& ip_notification);
-
-    /**
-     * Send a robot status message over the network
-     *
-     * @param robot_status The robot status message to send
-     */
-    void sendRobotStatus(const TbotsProto::RobotStatus& robot_status);
 
     // ProtoTrackers for tracking recent primitive_set packet loss
     ProtoTracker primitive_tracker;
@@ -152,7 +170,23 @@ class NetworkService
         double thunderloop_recieved_time_seconds = 0;
     };
 
-    std::deque<RoundTripTime> primitive_set_rtt;
+    // Stores the most recent primitives for calculating round-trip time
+    std::deque<RoundTripTime> primitive_rtt;
 
+    // IP discovery message to send on the network
     TbotsProto::IpNotification robot_ip_notification_msg;
 };
+
+template <typename NetworkResource, typename... argsT>
+std::unique_ptr<NetworkResource> NetworkService::createNetworkResource(argsT... args)
+{
+    std::optional<std::string> error;
+
+    auto resource = std::make_unique<NetworkResource>(args..., error);
+    if (error.has_value())
+    {
+        LOG(FATAL) << "Failed to create network resource: " << error.value();
+    }
+
+    return resource;
+}
