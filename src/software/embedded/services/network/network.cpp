@@ -86,7 +86,7 @@ TbotsProto::Primitive NetworkService::poll(TbotsProto::RobotStatus& robot_status
 
     if (ip_notification_ticks == 0)
     {
-        robot_to_fullsystem_ip_sender->sendProto(robot_ip_notification_msg);
+        robot_to_fullsystem_ip_sender->sendProto(robot_ip_notification_msg, true);
     }
     ip_notification_ticks = (ip_notification_ticks + 1) % IP_DISCOVERY_NOTIFICATION_RATE_HZ;
 
@@ -120,7 +120,7 @@ void NetworkService::sendRobotStatus(const TbotsProto::RobotStatus& robot_status
 
     if (robot_status_sender)
     {
-        robot_status_sender->sendProto(robot_status);
+        robot_status_sender->sendProto(robot_status, true);
     }
 }
 

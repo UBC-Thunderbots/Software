@@ -24,7 +24,14 @@ ThreadedUdpSender::~ThreadedUdpSender()
     io_service_thread.join();
 }
 
-void ThreadedUdpSender::sendString(const std::string& message)
+void ThreadedUdpSender::sendString(const std::string& message, bool async)
 {
-    udp_sender.sendString(message);
+    if (async)
+    {
+        udp_sender.sendStringAsync(message);
+    }
+    else
+    {
+        udp_sender.sendString(message);
+    }
 }

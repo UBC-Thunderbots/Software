@@ -150,9 +150,7 @@ void Thunderloop::runLoop()
     struct timespec prev_iter_start_time;
 
     // Input buffer
-    TbotsProto::PrimitiveSet new_primitive_set;
-    TbotsProto::World new_world;
-    const TbotsProto::PrimitiveSet empty_primitive_set;
+    TbotsProto::Primitive new_primitive;
 
     // Loop interval
     int interval =
@@ -196,13 +194,13 @@ void Thunderloop::runLoop()
 
                 ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
 
-                new_primitive_set = network_service_->poll(robot_status_);
+                new_primitive = network_service_->poll(robot_status_);
             }
 
             thunderloop_status_.set_network_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
-            uint64_t last_handled_primitive_set = primitive_set_.sequence_number();
+            uint64_t last_handled_primitive_set = primitive_.sequence_number();
 
             // Updating primitives and world with newly received data
             // and setting the correct time elasped since last primitive / world
@@ -217,11 +215,11 @@ void Thunderloop::runLoop()
 
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
-            if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
-                primitive_set_.time_sent().epoch_timestamp_seconds())
+            if (new_primitive.time_sent().epoch_timestamp_seconds() >
+                primitive_.time_sent().epoch_timestamp_seconds())
             {
-                // Save new primitive set
-                primitive_set_ = new_primitive_set;
+                // Save new primitive
+                primitive_ = new_primitive;
 
                 // Update primitive executor's primitive set
                 {
@@ -230,7 +228,7 @@ void Thunderloop::runLoop()
                     // Start new primitive
                     {
                         ScopedTimespecTimer timer(&poll_time);
-                        primitive_executor_.updatePrimitiveSet(primitive_set_);
+                        primitive_executor_.updatePrimitive(primitive_);
                     }
 
                     thunderloop_status_.set_primitive_executor_start_time_ms(

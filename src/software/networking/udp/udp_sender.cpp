@@ -1,7 +1,5 @@
 #include "udp_sender.h"
 
-#include <iostream>
-
 #include "software/networking/udp/network_utils.h"
 
 UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
@@ -33,6 +31,15 @@ UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_
 void UdpSender::sendString(const std::string& message)
 {
     socket_.send_to(boost::asio::buffer(message, message.length()), receiver_endpoint);
+}
+
+void UdpSender::sendStringAsync(const std::string& message)
+{
+    // The caller is responsible for keeping the buffer until the completion handler is called. The trick here is to
+    // use a smart pointer to manage the buffer's lifetime and associate it with the completion handler.
+    std::shared_ptr<std::string> message_copy = std::make_shared<std::string>(message);
+    socket_.async_send_to(boost::asio::buffer(*message_copy, message_copy->length()), receiver_endpoint,
+            [message_copy](const boost::system::error_code&, std::size_t) {});
 }
 
 void UdpSender::setupMulticast(const boost::asio::ip::address& ip_address,

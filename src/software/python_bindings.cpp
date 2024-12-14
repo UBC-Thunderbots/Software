@@ -129,6 +129,19 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
               // Use as: listener, error = create{name}ProtoListener(...)
               return std::make_tuple(listener, error);
           });
+
+    m.def(create_pyclass_name.c_str(),
+            [](unsigned short port, const std::function<void(T)>& callback) {
+                // Pybind doesn't bind references in some cases
+                // (https://pybind11.readthedocs.io/en/stable/faq.html#limitations-involving-reference-arguments)
+                std::optional<std::string> error;
+                std::shared_ptr<Class> listener = std::make_shared<Class>(
+                    port, callback, error);
+
+                // Return the listener and the error message to the Python side
+                // Use as: listener, error = create{name}ProtoListener(...)
+                return std::make_tuple(listener, error);
+            });
 }
 
 template <typename T>
@@ -425,10 +438,12 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
     declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
     declareThreadedProtoUdpListener<TbotsProto::RobotCrash>(m, "RobotCrash");
+    declareThreadedProtoUdpListener<TbotsProto::IpNotification>(m, "RobotIpNotification");
 
     // Senders
-    declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
-    declareThreadedProtoRadioSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
+    declareThreadedProtoUdpSender<TbotsProto::Primitive>(m, "Primitive");
+    declareThreadedProtoRadioSender<TbotsProto::Primitive>(m, "Primitive");
+    declareThreadedProtoUdpSender<TbotsProto::IpNotification>(m, "FullsystemIpBroadcast");
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(
@@ -492,4 +507,10 @@ PYBIND11_MODULE(python_bindings, m)
         .value("PLAY", EstopState::PLAY)
         .value("STATUS_ERROR", EstopState::STATUS_ERROR)
         .export_values();
+
+    m.def("getLocalIp", [](const std::string& interface, const bool& use_ipv4) {
+        std::string ip_address;
+        bool found_ip = getLocalIp(interface, ip_address, use_ipv4);
+        return std::make_tuple(found_ip, ip_address);
+    });
 }

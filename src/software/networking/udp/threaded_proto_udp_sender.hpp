@@ -40,16 +40,18 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      * This function returns after the message has been sent.
      *
      * @param message The protobuf message to send
+     * @param async If true, the message will be sent asynchronously otherwise it will be send synchronously
      */
-    void sendProto(const SendProto& message);
+    void sendProto(const SendProto& message, bool async = false);
+
 
    private:
     std::string data_buffer;
 };
 
 template <class SendProto>
-void ThreadedProtoUdpSender<SendProto>::sendProto(const SendProto& message)
+void ThreadedProtoUdpSender<SendProto>::sendProto(const SendProto& message, bool async)
 {
     message.SerializeToString(&data_buffer);
-    sendString(data_buffer);
+    sendString(data_buffer, async);
 }

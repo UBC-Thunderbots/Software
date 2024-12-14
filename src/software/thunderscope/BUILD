@@ -9,6 +9,15 @@ compile_pip_requirements(
     requirements_txt = "requirements_lock.txt",
 )
 
+py_library(
+    name = "communication_manager",
+    srcs = ["communication_manager.py"],
+    data = [
+        "//software:py_constants.so",
+        "//software:python_bindings.so",
+    ],
+)
+
 py_binary(
     name = "thunderscope_main",
     srcs = ["thunderscope_main.py"],

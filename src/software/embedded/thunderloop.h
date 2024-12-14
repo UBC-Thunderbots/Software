@@ -106,7 +106,6 @@ class Thunderloop
 
 
     // Input Msg Buffers
-    TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
     TbotsProto::Primitive primitive_;
     TbotsProto::DirectControlPrimitive direct_control_;

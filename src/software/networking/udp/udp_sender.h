@@ -49,6 +49,14 @@ class UdpSender
      */
     void sendString(const std::string& message);
 
+    /**
+     * Sends a string message to the initialized ip address and port _asynchronously_
+     * This function returns immediately.
+     *
+     * @param message The string message to send
+     */
+    void sendStringAsync(const std::string& message);
+
    private:
     // A UDP socket to send data over
     boost::asio::ip::udp::socket socket_;
