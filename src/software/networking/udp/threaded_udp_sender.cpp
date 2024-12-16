@@ -24,6 +24,16 @@ ThreadedUdpSender::~ThreadedUdpSender()
     io_service_thread.join();
 }
 
+std::string ThreadedUdpSender::getInterface() const
+{
+    return udp_sender.getInterface();
+}
+
+std::string ThreadedUdpSender::getIpAddress() const
+{
+    return udp_sender.getIpAddress();
+}
+
 void ThreadedUdpSender::sendString(const std::string& message, bool async)
 {
     if (async)

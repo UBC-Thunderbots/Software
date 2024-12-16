@@ -27,19 +27,30 @@ class UdpSender
               unsigned short port, const std::string& interface, bool multicast,
               std::optional<std::string>& error);
 
+    /**
+     * Destructor
+     */
     ~UdpSender();
 
     /**
-     * Set up multicast for the given multicast ip address and interface
+     * Get the interface that this sender is sending on.
      *
-     * Any errors during setup will be stored in the error string
-     *
-     * @param ip_address The multicast ip address to join
-     * @param interface The interface to join the multicast group on
-     * @param error A user-provided optional string to store any errors that occur
+     * @return The interface as a string
      */
-    void setupMulticast(const boost::asio::ip::address& ip_address,
-                        const std::string& interface, std::optional<std::string>& error);
+    std::string getInterface() const;
+
+    /**
+     * Get the IP address that this sender is sending to.
+     *
+     * @return The IP address as a string
+     */
+    std::string getIpAddress() const;
+
+    /**
+     * Get the port that this sender is sending to
+     *
+     * @return The port as an unsigned short
+     */
 
     /**
      * Sends a string message to the initialized ip address and port
@@ -58,9 +69,27 @@ class UdpSender
     void sendStringAsync(const std::string& message);
 
    private:
+    /**
+     * Set up multicast for the given multicast ip address and interface
+     *
+     * Any errors during setup will be stored in the error string
+     *
+     * @param ip_address The multicast ip address to join
+     * @param interface The interface to join the multicast group on
+     * @param error A user-provided optional string to store any errors that occur
+     */
+    void setupMulticast(const boost::asio::ip::address& ip_address,
+                        const std::string& interface, std::optional<std::string>& error);
+
     // A UDP socket to send data over
     boost::asio::ip::udp::socket socket_;
 
     // The endpoint for the receiver
     boost::asio::ip::udp::endpoint receiver_endpoint;
+
+    // The interface to send data on
+    std::string interface_;
+
+    // The IP address to send data to (IPv4 in dotted decimal or IPv6 in hex string)
+    std::string ip_address_;
 };

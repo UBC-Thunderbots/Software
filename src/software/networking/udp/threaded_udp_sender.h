@@ -30,7 +30,24 @@ class ThreadedUdpSender
                       const std::string& interface, bool multicast,
                       std::optional<std::string>& error);
 
+    /**
+     * Destructor will stop the io_service thread
+     */
     ~ThreadedUdpSender();
+
+    /**
+     * Get the interface that this sender is sending on.
+     *
+     * @return The interface as a string
+     */
+    std::string getInterface() const;
+
+    /**
+     * Get the IP address that this sender is sending to.
+     *
+     * @return The IP address as a string
+     */
+    std::string getIpAddress() const;
 
     /**
      * Sends a string message to the initialized ip address and port
@@ -44,7 +61,10 @@ class ThreadedUdpSender
    private:
     // The io_service that will be used to service all network requests
     boost::asio::io_service io_service;
+
+    // The UdpSender that will be used to send data over the network
     UdpSender udp_sender;
+
     // The thread running the io_service in the background. This thread will run for the
     // entire lifetime of the class
     std::thread io_service_thread;

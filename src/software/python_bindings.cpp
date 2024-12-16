@@ -64,7 +64,9 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoUdpSender";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def("send_proto", &Class::sendProto);
+        .def("get_interface", &Class::getInterface)
+        .def("get_ip_address", &Class::getIpAddress)
+        .def("send_proto", &Class::sendProto, py::arg("async") = false);
 
     std::string create_pyclass_name = "create" + pyclass_name;
     m.def(create_pyclass_name.c_str(),
@@ -508,7 +510,7 @@ PYBIND11_MODULE(python_bindings, m)
         .value("STATUS_ERROR", EstopState::STATUS_ERROR)
         .export_values();
 
-    m.def("getLocalIp", [](const std::string& interface, const bool& use_ipv4) {
+    m.def("get_local_ip", [](const std::string& interface, const bool& use_ipv4) {
         std::string ip_address;
         bool found_ip = getLocalIp(interface, ip_address, use_ipv4);
         return std::make_tuple(found_ip, ip_address);

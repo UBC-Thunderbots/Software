@@ -36,6 +36,20 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
     }
 
     /**
+     * Get the interface that this sender is sending on.
+     *
+     * @return The interface as a string
+     */
+    std::string getInterface() const;
+
+    /**
+     * Get the IP address that this sender is sending to.
+     *
+     * @return The IP address as a string
+     */
+    std::string getIpAddress() const;
+
+    /**
      * Sends a protobuf message to the initialized ip address and port
      * This function returns after the message has been sent.
      *
@@ -48,6 +62,18 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
    private:
     std::string data_buffer;
 };
+
+template <class SendProto>
+std::string ThreadedProtoUdpSender<SendProto>::getInterface() const
+{
+    return ThreadedUdpSender::getInterface();
+}
+
+template <class SendProto>
+std::string ThreadedProtoUdpSender<SendProto>::getIpAddress() const
+{
+    return ThreadedUdpSender::getIpAddress();
+}
 
 template <class SendProto>
 void ThreadedProtoUdpSender<SendProto>::sendProto(const SendProto& message, bool async)
