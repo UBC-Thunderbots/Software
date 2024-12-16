@@ -16,6 +16,7 @@ std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
         tactic, current_motion_constraints);
 
     current_motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_GOAL);
+    current_motion_constraints.insert(TbotsProto::MotionConstraint::ENEMY_GOAL);
 
     return current_motion_constraints;
 }
