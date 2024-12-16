@@ -168,6 +168,7 @@ py_library(
     deps = [
         "//software/logger:py_logger",
         "//software/thunderscope:constants",
+        requirement("colorama"),
     ],
 )
 
