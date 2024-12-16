@@ -61,6 +61,7 @@ class Thunderloop
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
     std::unique_ptr<PowerService> power_service_;
+    std::unique_ptr<NetworkService> local_network_service_;
 
     // Clients
     std::unique_ptr<RedisClient> redis_client_;
