@@ -15,7 +15,6 @@ assert protobuf_impl_type == "upb", (
     f"The current version of protobuf is {google.protobuf.__version__}"
 )
 
-from robot_communication import DISCONNECTED
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
@@ -339,16 +338,18 @@ if __name__ == "__main__":
             )
             if args.launch_gc
             else contextlib.nullcontext()
-        ) as gamecontroller, RobotCommunication(
+        ) as gamecontroller, WifiCommunicationManager(
+                current_proto_unix_io=current_proto_unix_io,
+                multicast_channel=getRobotMulticastChannel(args.channel),
+                interface=args.interface,
+                referee_port=gamecontroller.get_referee_port() if gamecontroller else SSL_REFEREE_PORT
+        ) as wifi_communication_manager, RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
-            multicast_channel=getRobotMulticastChannel(args.channel),
+            wifi_communication_manager=wifi_communication_manager,
             interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
             enable_radio=args.enable_radio,
-            referee_port=gamecontroller.get_referee_port()
-            if gamecontroller
-            else SSL_REFEREE_PORT,
         ) as robot_communication:
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
                 tscope.keyboard_estop_shortcut.activated.connect(

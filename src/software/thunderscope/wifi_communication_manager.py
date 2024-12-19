@@ -1,15 +1,36 @@
+from software.logger.logger import create_logger
 import software.python_bindings as tbots_cpp
 from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
 
+from colorama import Fore, Style
 from threading import Lock
 
 DISCONNECTED = "DISCONNECTED"
 """A constant to represent a disconnected interface"""
 
-def WifiCommunicationManager():
-    BROADCAST_HZ = 1.0
+logger = create_logger(__name__)
 
-    def __init__(self, current_proto_unix_io: ProtoUnixIO, interface: Union[str, None] = None):
+def WifiCommunicationManager():
+    """Manages WiFi communication between different modules of the system."""
+
+    BROADCAST_HZ = 1.0
+    """The frequency at which to broadcast the full system IP address"""
+
+    def __init__(
+            self,
+            current_proto_unix_io: ProtoUnixIO,
+            multicast_channel: str,
+            should_setup_full_system: bool = False,
+            interface: Union[str, None] = None,
+            referee_port: int = SSL_REFEREE_PORT):
+        """
+        Sets up WiFi communication between this computer and the robots, SSL Vision, and SSL Referee
+
+        :param current_proto_unix_io: the current proto unix io object
+        :param multicast_channel: The multicast channel to use
+        :param interface: The interface to use for communication with the robots
+        :param referee_port: the referee port that we are using. If this is None, the default port is used
+        """
         ## Robot IP address tracking ##
         self.robot_ip_addresses: List[Tuple[Lock, Union[None, str]]] = (
                 [(Lock(), None)] for _ in range(MAX_ROBOT_IDS_PER_SIDE)
@@ -23,6 +44,8 @@ def WifiCommunicationManager():
         self.receive_robot_status: Union[None, tbots_cpp.RobotStatusProtoListener] = None
         self.receive_robot_log: Union[None, tbots_cpp.RobotLogProtoListener] = None
         self.receive_robot_crash: Union[None, tbots_cpp.RobotCrashProtoListener] = None
+        self.receive_ssl_referee_proto: Union[None, tbots_cpp.SSLRefereeProtoListener] = None
+        self.receive_ssl_wrapper: Union[None, tbots_cpp.SSLWrapperPacketProtoListener] = None
         self.robot_ip_listener: Union[None, tbots_cpp.RobotIpNotificationProtoListener] = None 
         self.fullsystem_ip_broadcaster: Tuple[Lock, Union[None, tbots_cpp.FullsystemIpBroadcast], IpNotification] = (
                 Lock(), None, IpNotification()
@@ -46,7 +69,10 @@ def WifiCommunicationManager():
         if interface:
             self.accept_next_network_config = False
             self.__setup_for_robot_communication(interface)
+        self.multicast_channel = multicast_channel
+        self.referee_port = referee_port
         
+        self.should_setup_full_system = should_setup_full_system
 
         ## Thread Management ##
         self.running = True
@@ -54,6 +80,10 @@ def WifiCommunicationManager():
 
     def __enter__(self):
         self.broadcast_ip = threading.thread(target=self.__broadcast_fullsystem_ip, daemon=True)
+
+    def __exit__(self);
+        self.running = False
+        self.broadcast_ip.join()
 
 
     def __broadcast_fullsystem_ip(self):
@@ -121,6 +151,55 @@ def WifiCommunicationManager():
             RobotStatistic(round_trip_time_seconds=round_trip_time_seconds),
         )
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
+
+
+    def __setup_full_system(self, referee_interface: str, vision_interface: str):
+        change_referee_interface = (
+                referee_interface != self.current_network_config.referee_interface
+        ) and (referee_interface != DISCONNECTED)
+
+        change_vision_interface = (
+                vision_interface != self.current_network_config.vision_interface
+        ) and (vision_interface != DISCONNECTED)
+
+        if change_referee_interface:
+            (
+                self.receive_ssl_referee_proto,
+                error,
+            ) = tbots_cpp.createSSLRefereeProtoListener(
+                SSL_REFEREE_ADDRESS,
+                self.referee_port,
+                referee_interface,
+                lambda data: self.__forward_to_proto_unix_io(SSL_Referee, data),
+                True,
+            )
+
+        
+            if error:
+                logger.error(f"Error setting up referee interface:\n{error}")
+            
+            self.current_network_config.referee_interface = (
+                referee_interface if not error else DISCONNECTED
+            )
+
+        if change_vision_interface:
+            (
+                self.receive_ssl_wrapper,
+                error,
+            ) = tbots_cpp.createSSLWrapperPacketProtoListener(
+                SSL_VISION_ADDRESS,
+                SSL_VISION_PORT,
+                vision_interface,
+                lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
+                True,
+            )
+
+        if error:
+            logger.error(f"Error setting up vision interface:\n{error}")
+
+        self.current_network_config.vision_interface = (
+            vision_interface if not error else DISCONNECTED
+        )
 
 
     def __setup_robot_communication(self, robot_communication_interface: str):
@@ -202,6 +281,20 @@ def WifiCommunicationManager():
             robot_communication_interface if is_setup_successfully else DISCONNECTED
         )
 
+    def poll(self) -> None:
+        """Polls and updates the network senders and listeners if a new network configuration is available"""
+        if network_config is not None and self.accept_next_network_config:
+            logging.info("Updating network configuration")
+
+            if self.should_setup_full_system:
+                self.__setup_full_system(
+                    network_config.referee_interface, network_config.vision_interface
+                )
+            self.__setup_robot_communication(network_config.robot_communication_interface)
+            
+
+
+
     def send_primitive(self, robot_id: int, primitive: Primitive) -> None:
         """Send the given primitive to the robot with the given id
 
@@ -214,3 +307,33 @@ def WifiCommunicationManager():
                 primitive_sender.send_proto(primitive, True)
             else:
                 logger.warning(f"Robot {robot_id} is not connected. Unable to send a primitive to it.")
+
+    def print_current_network_config(self) -> None:
+        """Prints the current network configuration to the console."""
+
+        def output_string(comm_name: str, status: str) -> str:
+            """Returns a formatted string with the given module we are communicating to, coloured based on the status.
+
+            Any status other than DISONNECTED will be coloured green, otherwise red.
+
+            :param comm_name: Whether we are connectng to the robot, SSL Vision or SSL Referee
+            :param status: The status to report to the user
+            """
+
+            colour = Fore.RED if status == DISCONNECTED else Fore.GREEN
+
+            return f"{comm_name}: {colour}{status} {Style.RESET_ALL}"
+
+        logging.info(
+            output_string("Robot Status\t",
+                              self.current_network_config.robot_communication_interface
+            )
+        )
+        logging.info(
+            output_string("Vision\t\t",
+                          self.current_network_config.vision_interface)
+        )
+        logging.info(
+            output_string("Referee\t",
+                        self.current_network_config.referee_interface)
+        )
