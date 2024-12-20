@@ -32,6 +32,13 @@ class Duration : public Time
     static const Duration fromMilliseconds(double milliseconds);
 
     /**
+     * Creates a new Duration value from a value in milliseconds
+     * @param microseconds A value in milliseconds, from which to create the Duration
+     * @return A Duration created from the given value
+     */
+    static const Duration fromMicroseconds(double microseconds);
+
+    /**
      * Compares Durations for equality. Durations are considered equal if their values
      * in seconds are within EPSILON from one another.
      *

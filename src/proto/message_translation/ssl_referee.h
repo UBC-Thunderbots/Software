@@ -35,3 +35,12 @@ RefereeStage createRefereeStage(const SSLProto::Referee &packet);
  * @return ball placement point if found
  */
 std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet);
+
+/**
+ * Converts a SSLProto::Referee_TeamInfo packet into a TeamInfo
+ *
+ * @param packet SSLProto::Referee_TeamInfo protobuf
+ *
+ * @return TeamInfo from SSLProto::Referee_TeamInfo packet
+ */
+TeamInfo createTeamInfo(const SSLProto::Referee_TeamInfo &packet);

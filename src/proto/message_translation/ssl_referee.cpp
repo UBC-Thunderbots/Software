@@ -114,3 +114,16 @@ std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet)
         return std::nullopt;
     }
 }
+
+TeamInfo createTeamInfo(const SSLProto::Referee_TeamInfo &packet)
+{
+    TbotsProto::GameState::TeamInfo team_info_msg;
+
+    team_info_msg.set_name(packet.name());
+    team_info_msg.set_score(packet.score());
+    team_info_msg.set_red_cards(packet.red_cards());
+    team_info_msg.set_yellow_cards(packet.yellow_cards());
+    team_info_msg.set_fouls_count(packet.foul_counter());
+
+    return TeamInfo(team_info_msg);
+}

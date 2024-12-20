@@ -2,22 +2,31 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play.h"
+#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/logger/logger.h"
 
 struct OffensePlayFSM
 {
-    class OffensiveState;
-    class DefensiveState;
+    class AttackState;
+    class PassState;
+    class ReceiveState;
 
     struct ControlParams
     {
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+
+    struct Terminate
+    {
+        WorldPtr world_ptr;
+    };
 
     /**
      * Creates an offense play FSM
@@ -26,66 +35,89 @@ struct OffensePlayFSM
      */
     explicit OffensePlayFSM(TbotsProto::AiConfig ai_config);
 
-    /**
-     * Guard to check whether the enemy team has possession of the ball
-     *
-     * @param event the FSM event
-     *
-     * @return whether the enemy team has possession of the ball
-     */
-    bool enemyHasPossession(const Update& event);
+    bool attackerDone(const Update& event) const;
+
+    bool attackerPassing(const Update& event) const;
+
+    bool shouldAbortPass(const Update& event) const;
+
+    bool passCompleted(const Update& event) const;
+
+    void attack(const Update& event);
+
+    void receive(const Update& event);
+
+    void resetTactics(const Update& event);
+
+    void terminate(const Terminate& event);
 
     /**
-     * Action to configure the play for offensive gameplay
+     * Updates the offensive positioning tactics
      *
-     * @param event the FSM event
+     * @param world the current world
+     * @param num_tactics the number of tactics to assign
+     * @param existing_receiver_positions a set of positions of existing receiver
+     * positions that should be taken into account when assigning additional
+     * offensive tactics
+     * @param pass_origin_override an optional point that the pass origin should be
+     * overridden to
      */
-    void setupOffensiveStrategy(const Update& event);
+    void updateOffensivePositioningTactics(
+        const WorldPtr world, unsigned int num_tactics,
+        const std::vector<Point>& existing_receiver_positions = {},
+        const std::optional<Point>& pass_origin_override      = std::nullopt);
 
-    /**
-     * Action to configure the play for defensive gameplay
-     *
-     * @param event the FSM event
-     */
-    void setupDefensiveStrategy(const Update& event);
-
-    /**
-     * Helper function to set the tactics for the play depending on the
-     * specified number of attackers and defenders to setup
-     *
-     * @param event the FSM event
-     * @param num_shoot_or_pass the number of attackers (ShootOrPassPlay)
-     * @param num_defenders the number of defenders (DefensePlay)
-     */
-    void setTactics(const Update& event, int num_shoot_or_pass, int num_defenders);
 
     auto operator()()
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(OffensiveState)
-        DEFINE_SML_STATE(DefensiveState)
+        DEFINE_SML_STATE(AttackState)
+        DEFINE_SML_STATE(PassState)
+        DEFINE_SML_STATE(ReceiveState)
 
         DEFINE_SML_EVENT(Update)
+        DEFINE_SML_EVENT(Terminate)
 
-        DEFINE_SML_GUARD(enemyHasPossession)
+        DEFINE_SML_GUARD(attackerDone)
+        DEFINE_SML_GUARD(attackerPassing)
+        DEFINE_SML_GUARD(shouldAbortPass)
+        DEFINE_SML_GUARD(passCompleted)
 
-        DEFINE_SML_ACTION(setupOffensiveStrategy)
-        DEFINE_SML_ACTION(setupDefensiveStrategy)
+        DEFINE_SML_ACTION(attack)
+        DEFINE_SML_ACTION(receive)
+        DEFINE_SML_ACTION(resetTactics)
+        DEFINE_SML_ACTION(terminate)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *OffensiveState_S + Update_E[enemyHasPossession_G] /
-                                    setupDefensiveStrategy_A       = DefensiveState_S,
-            OffensiveState_S + Update_E / setupOffensiveStrategy_A = OffensiveState_S,
-            DefensiveState_S + Update_E[!enemyHasPossession_G] /
-                                   setupOffensiveStrategy_A        = OffensiveState_S,
-            DefensiveState_S + Update_E / setupDefensiveStrategy_A = DefensiveState_S,
-            X + Update_E                                           = X);
+            *AttackState_S + Update_E[attackerPassing_G] / attack_A = PassState_S,
+            AttackState_S + Update_E[attackerDone_G] / (resetTactics_A, attack_A),
+            AttackState_S + Update_E / attack_A,
+            AttackState_S + Terminate_E / terminate_A,
+
+            PassState_S + Update_E[attackerDone_G] / receive_A = ReceiveState_S,
+            PassState_S + Update_E[shouldAbortPass_G] / (resetTactics_A, attack_A) =
+                AttackState_S,
+            PassState_S + Update_E / attack_A,
+            PassState_S + Terminate_E / terminate_A = AttackState_S,
+
+            ReceiveState_S + Update_E[passCompleted_G] / (resetTactics_A, attack_A) =
+                AttackState_S,
+            ReceiveState_S + Update_E / receive_A,
+            ReceiveState_S + Terminate_E / terminate_A = AttackState_S,
+
+            X + Update_E = X);
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
-    std::shared_ptr<ShootOrPassPlay> shoot_or_pass_play;
-    std::shared_ptr<DefensePlay> defense_play;
+    TbotsProto::AiConfig ai_config_;
+
+    std::shared_ptr<AttackerTactic> attacker_tactic_;
+    std::shared_ptr<ReceiverTactic> receiver_tactic_;
+    std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics_;
+
+    ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator_;
+    PassGenerator pass_generator_;
+    PassWithRating best_pass_with_rating_;
 };

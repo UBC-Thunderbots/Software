@@ -1,70 +1,64 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/passing/pass.h"
+#include "software/ai/rl/dqn.hpp"
+#include "software/ai/rl/exploration_strategies/epsilon_greedy_strategy.hpp"
+#include "software/ai/hl/stp/tactic/attacker/attacker_state.h"
 
-/**
- * This tactic is for a robot performing a pass. It should be used in conjunction with
- * the `ReceiverTactic` in order to complete the pass.
- *
- * Note that this tactic does not take into account the time the pass should occur at,
- * it simply tries to move to the best position to take the pass as fast as possible
- */
+#include "software/ai/hl/stp/tactic/attacker/attacker_skill_executor.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
+
 class AttackerTactic : public Tactic
 {
    public:
-    /**
-     * Creates a new AttackerTactic
-     *
-     * @param ai_config The AI configuration
-     */
     explicit AttackerTactic(TbotsProto::AiConfig ai_config);
 
     AttackerTactic() = delete;
 
-    /**
-     * Updates the control parameters for this AttackerTactic.
-     *
-     * @param updated_pass The pass to perform
-     */
-    void updateControlParams(const Pass& best_pass_so_far, bool pass_committed);
+    std::optional<AttackerSkill> getCurrentSkill() const;
 
-    /**
-     * Updates the control parameters for this AttackerTactic
-     *
-     * @param chip_target An optional point that the robot will chip towards when it is
-     * unable to shoot and is in danger of losing the ball to an enemy. If this value is
-     * not provided, the point defaults to the enemy goal
-     */
-    void updateControlParams(std::optional<Point> chip_target);
+    AttackerSkill selectSkill(const WorldPtr& world_ptr);
+
+    void terminate(const WorldPtr& world_ptr);
+
+    void updateControlParams(const Pass& pass);
 
     void accept(TacticVisitor& visitor) const override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
+    bool done() const override;
+
+    std::string getFSMState() const override;
 
    private:
+    /**
+     *
+     * @param new_world the current World
+     * @param is_final whether this is the final World in the current episode
+     */
+    void updateDQN(const WorldPtr& new_world, bool is_final);
+
+    float computeReward(const World& old_world, const World& new_world);
+
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    /**
-     * Log visualize the control parameters for this AttackerTactic
-     *
-     * @param world Current state of the world
-     * @param control_params The control parameters to visualize
-     */
-    void visualizeControlParams(const World& world,
-                                const AttackerFSM::ControlParams& control_params);
+    static constexpr float DQN_LEARNING_RATE   = 0.001f;
+    static constexpr float DQN_DISCOUNT_RATE   = 0.95f;
+    static constexpr float DQN_SOFT_UPDATE_TAU = 0.005f;
 
-    std::map<RobotId, std::unique_ptr<FSM<AttackerFSM>>> fsm_map;
+    static constexpr unsigned int REPLAY_BUFFER_CAPACITY = 10000;
+    static constexpr unsigned int TRANSITION_BATCH_SIZE  = 128;
 
-    // The pass to execute
-    std::optional<Pass> best_pass_so_far;
-    // whether we have committed to the above pass
-    bool pass_committed;
-    // The point the robot will chip towards if it is unable to shoot and is in danger
-    // of losing the ball to an enemy
-    std::optional<Point> chip_target;
+    static constexpr float EXPLORATION_EPSILON = 0.1f;
 
-    // AI config
-    TbotsProto::AiConfig ai_config;
+    DQN<AttackerState, AttackerSkill> dqn_;
+    ReplayBuffer<AttackerState, AttackerSkill> replay_buffer_;
+    EpsilonGreedyStrategy<AttackerSkill> epsilon_greedy_strategy_;
+
+    WorldPtr current_world_;
+    std::optional<AttackerState> current_state_;
+    std::optional<AttackerSkill> current_skill_;
+
+    std::map<RobotId, AttackerSkillExecutor> skill_executors_;
+
+    AttackerSkillExecutor::ControlParams control_params_;
+    TbotsProto::AiConfig ai_config_;
 };

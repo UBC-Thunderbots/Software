@@ -1,8 +1,7 @@
 #pragma once
 
-#include <torch/torch.h>
-
 #include "software/ai/rl/replay_buffer.hpp"
+#include "software/ai/rl/torch.h"
 
 /**
  * Deep Q-network. A DQN approximates the Q-learning value function
@@ -72,6 +71,7 @@ void DQN<TState, TAction>::update(const std::vector<Transition<TState, TAction>>
     torch::Tensor action_batch     = torch::empty({batch_size});
     torch::Tensor reward_batch     = torch::empty({batch_size});
     torch::Tensor next_state_batch = torch::empty({batch_size});
+    torch::Tensor done_batch       = torch::empty({batch_size});
 
     for (size_t i = 0; i < batch.size(); ++i)
     {
@@ -81,6 +81,7 @@ void DQN<TState, TAction>::update(const std::vector<Transition<TState, TAction>>
         action_batch[i]     = static_cast<int>(transition.action);
         reward_batch[i]     = transition.reward;
         next_state_batch[i] = transition.next_state.tensor;
+        done_batch[i]       = transition.done;
     }
 
     // Compute Q(s, a) using the current network
@@ -93,6 +94,10 @@ void DQN<TState, TAction>::update(const std::vector<Transition<TState, TAction>>
         torch::NoGradGuard no_grad;
         next_q_values = std::get<0>(target_net_->forward(next_state_batch).max(1));
     }
+
+    // Set next_q_values to 0 where s' is the final state
+    // (no more states after s', so Q(s', a) should only give the immediate reward)
+    next_q_values.index_put_({done_batch}, 0);
 
     // Compute target value of Q(s, a)
     torch::Tensor target_q_values = reward_batch + (next_q_values * discount_rate_);

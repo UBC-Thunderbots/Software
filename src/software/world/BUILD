@@ -77,6 +77,7 @@ cc_library(
     hdrs = ["game_state.h"],
     deps = [
         ":ball",
+        ":team_info",
         "//software/logger",
         "//software/util/make_enum",
     ],
@@ -185,6 +186,16 @@ cc_test(
         ":team",
         "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_library(
+    name = "team_info",
+    hdrs = ["team_info.h"],
+    srcs = ["team_info.cpp"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/time:duration",
     ],
 )
 

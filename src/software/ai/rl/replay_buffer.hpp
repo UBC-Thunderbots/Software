@@ -9,7 +9,8 @@
 
 /**
  * Transition tuple (state, action, reward, next state) capturing the
- * agent's experience.
+ * agent's experience. There is an additional "done" flag that indicates
+ * this is the final transition in an episode.
  *
  * @tparam TState type representing the state space of the environment
  * @tparam TAction type representing the action space of the environment
@@ -21,6 +22,7 @@ struct Transition
     TAction action;
     float reward;
     TState next_state;
+    bool done;
 };
 
 /**

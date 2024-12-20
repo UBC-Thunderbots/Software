@@ -25,5 +25,10 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     fsm.process_event(OffensePlayFSM::Update(control_params, play_update));
 }
 
+void OffensePlay::terminate(const WorldPtr& world_ptr)
+{
+    fsm.process_event(OffensePlayFSM::Terminate{world_ptr});
+}
+
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, OffensePlay, TbotsProto::AiConfig> factory;

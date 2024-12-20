@@ -82,7 +82,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
             pass_generator.getBestPass(*event.common.world_ptr, robots_to_ignore);
 
         // update the best pass in the attacker tactic
-        attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
+        // attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
 
         // add remaining tactics based on ranked zones
         updateOffensivePositioningTactics(event.common.world_ptr,
@@ -122,7 +122,7 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
     // if we make it here then we have committed to the pass
-    attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
+    // attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
     receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
     event.common.set_inter_play_communication_fun(
         InterPlayCommunication{.last_committed_pass = best_pass_and_score_so_far});

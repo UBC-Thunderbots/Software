@@ -1,37 +1,35 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
-#include "shared/constants.h"
+#include "software/ai/hl/stp/play/offense/offense_play.h"
 #include "software/ai/hl/stp/play/play.h"
 
 struct PlaySelectionFSM
 {
-    class Halt;
-    class Playing;
-    class Stop;
-    class SetPlay;
-    class OverridePlay;
+    class HaltState;
+    class StopState;
+    class SetPlayState;
+    class OffensePlayState;
+    class DefensePlayState;
 
     struct Update
     {
-        Update(const std::function<void(std::unique_ptr<Play>)>& set_current_play,
-               const GameState& game_state, const TbotsProto::AiConfig& ai_config)
+        Update(const std::function<void(std::shared_ptr<Play>)>& set_current_play,
+               const WorldPtr& world_ptr)
             : set_current_play(set_current_play),
-              game_state(game_state),
-              ai_config(ai_config)
+              world_ptr(world_ptr)
         {
         }
-        std::function<void(std::unique_ptr<Play>)> set_current_play;
-        GameState game_state;
-        TbotsProto::AiConfig ai_config;
+        std::function<void(std::shared_ptr<Play>)> set_current_play;
+        WorldPtr world_ptr;
     };
 
     /**
      * Creates a play selection FSM
      *
-     * @param ai_config the default play config for this play fsm
+     * @param ai_config the AI configuration
      */
-    explicit PlaySelectionFSM(TbotsProto::AiConfig ai_config);
+    explicit PlaySelectionFSM(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Guards for whether the game state is stopped, halted, playing, or in set up
@@ -46,15 +44,25 @@ struct PlaySelectionFSM
     bool gameStateSetupRestart(const Update& event);
 
     /**
-     * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay, or OffensePlay
+     * Guard to check whether the enemy team has possession of the ball
      *
      * @param event The PlaySelection::Update event
      *
+     * @return whether the enemy team has possession of the ball
+     */
+    bool enemyHasPossession(const Update& event);
+
+    /**
+     * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay,
+     * OffensePlay, or DefensePlay
+     *
+     * @param event The PlaySelection::Update event
      */
     void setupSetPlay(const Update& event);
     void setupStopPlay(const Update& event);
     void setupHaltPlay(const Update& event);
     void setupOffensePlay(const Update& event);
+    void setupDefensePlay(const Update& event);
 
     /**
      * Action to reset the current SetPlay to none
@@ -63,19 +71,28 @@ struct PlaySelectionFSM
      */
     void resetSetPlay(const Update& event);
 
+    /**
+     * Action to terminate the OffensePlay
+     *
+     * @param event The PlaySelection::Update event
+     */
+    void terminateOffensePlay(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(SetPlay)
-        DEFINE_SML_STATE(Halt)
-        DEFINE_SML_STATE(Playing)
-        DEFINE_SML_STATE(Stop)
+        DEFINE_SML_STATE(HaltState)
+        DEFINE_SML_STATE(StopState)
+        DEFINE_SML_STATE(SetPlayState)
+        DEFINE_SML_STATE(OffensePlayState)
+        DEFINE_SML_STATE(DefensePlayState)
 
         DEFINE_SML_GUARD(gameStateStopped)
         DEFINE_SML_GUARD(gameStateHalted)
         DEFINE_SML_GUARD(gameStatePlaying)
         DEFINE_SML_GUARD(gameStateSetupRestart)
+        DEFINE_SML_GUARD(enemyHasPossession)
 
         DEFINE_SML_EVENT(Update)
 
@@ -83,38 +100,62 @@ struct PlaySelectionFSM
         DEFINE_SML_ACTION(setupStopPlay)
         DEFINE_SML_ACTION(setupHaltPlay)
         DEFINE_SML_ACTION(setupOffensePlay)
+        DEFINE_SML_ACTION(setupDefensePlay)
         DEFINE_SML_ACTION(resetSetPlay)
+        DEFINE_SML_ACTION(terminateOffensePlay)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
 
-            // Check for transitions to other states, if not then default to running the
-            // current play
-            *Halt_S + Update_E[gameStateStopped_G] / setupStopPlay_A    = Stop_S,
-            Halt_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
-            Halt_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            *HaltState_S + Update_E[gameStateStopped_G] / setupStopPlay_A = StopState_S,
+            HaltState_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
+                              setupOffensePlay_A = OffensePlayState_S,
+            HaltState_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
+                              setupDefensePlay_A = DefensePlayState_S,
+            HaltState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
+                SetPlayState_S,
 
-            // Check for transitions to other states, if not then default to running the
-            // current play
-            Stop_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
-            Stop_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
-            Stop_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            StopState_S + Update_E[gameStateHalted_G] / setupHaltPlay_A = HaltState_S,
+            StopState_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
+                              setupOffensePlay_A = OffensePlayState_S,
+            StopState_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
+                              setupDefensePlay_A = DefensePlayState_S,
+            StopState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
+                SetPlayState_S,
 
-            // Check for transitions to other states, if not then default to running the
-            // current play
-            Playing_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
-            Playing_S + Update_E[gameStateStopped_G] / setupStopPlay_A     = Stop_S,
-            Playing_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            OffensePlayState_S +
+                Update_E[gameStateHalted_G] / (terminateOffensePlay_A, setupHaltPlay_A) =
+                HaltState_S,
+            OffensePlayState_S +
+                Update_E[gameStateStopped_G] / (terminateOffensePlay_A, setupStopPlay_A) =
+                StopState_S,
+            OffensePlayState_S + Update_E[gameStateSetupRestart_G] /
+                                     (terminateOffensePlay_A, setupSetPlay_A) =
+                SetPlayState_S,
+            OffensePlayState_S + Update_E[enemyHasPossession_G] /
+                                     (terminateOffensePlay_A, setupDefensePlay_A) =
+                DefensePlayState_S,
 
-            // Check for transitions to other states, if not then default to running the
-            // current play
-            SetPlay_S + Update_E[gameStateHalted_G] / (resetSetPlay_A, setupHaltPlay_A) =
-                Halt_S,
-            SetPlay_S + Update_E[gameStateStopped_G] / (resetSetPlay_A, setupStopPlay_A) =
-                Stop_S,
-            SetPlay_S + Update_E[gameStatePlaying_G] /
-                            (resetSetPlay_A, setupOffensePlay_A) = Playing_S,
-            SetPlay_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A,
+            DefensePlayState_S + Update_E[gameStateHalted_G] / setupHaltPlay_A =
+                HaltState_S,
+            DefensePlayState_S + Update_E[gameStateStopped_G] / setupStopPlay_A =
+                StopState_S,
+            DefensePlayState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
+                SetPlayState_S,
+            DefensePlayState_S + Update_E[!enemyHasPossession_G] / setupOffensePlay_A =
+                OffensePlayState_S,
+
+            SetPlayState_S + Update_E[gameStateHalted_G] /
+                                 (resetSetPlay_A, setupHaltPlay_A) = HaltState_S,
+            SetPlayState_S + Update_E[gameStateStopped_G] /
+                                 (resetSetPlay_A, setupStopPlay_A) = StopState_S,
+            SetPlayState_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
+                                 (resetSetPlay_A, setupOffensePlay_A) =
+                OffensePlayState_S,
+            SetPlayState_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
+                                 (resetSetPlay_A, setupDefensePlay_A) =
+                DefensePlayState_S,
+            SetPlayState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A,
 
             X + Update_E = X);
     }
@@ -122,4 +163,5 @@ struct PlaySelectionFSM
    private:
     TbotsProto::AiConfig ai_config;
     std::optional<TbotsProto::PlayName> current_set_play;
+    std::shared_ptr<OffensePlay> offense_play;
 };

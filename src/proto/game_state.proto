@@ -15,6 +15,7 @@ message GameState
         PLAY_STATE_READY   = 3;
         PLAY_STATE_PLAYING = 4;
     }
+
     enum RestartReason
     {
         RESTART_REASON_NONE           = 0;
@@ -24,6 +25,7 @@ message GameState
         RESTART_REASON_PENALTY        = 4;
         RESTART_REASON_BALL_PLACEMENT = 5;
     }
+
     enum RefereeCommand
     {
         REFEREE_COMMAND_HALT                 = 0;
@@ -45,9 +47,33 @@ message GameState
         REFEREE_COMMAND_BALL_PLACEMENT_US    = 16;
         REFEREE_COMMAND_BALL_PLACEMENT_THEM  = 17;
     }
+
+    message TeamInfo
+    {
+        // The team's name
+        required string name = 1;
+
+        // The number of goals scored by the team during normal play and overtime
+        required uint32 score = 2;
+
+        // The number of red cards issued to the team since the beginning of the game
+        required uint32 red_cards = 3;
+
+        // The total number of yellow cards issued to the team since the beginning of the game
+        required uint32 yellow_cards = 4;
+
+        // The amount of time left (in microseconds) on each active yellow card issued to the team
+        repeated uint32 yellow_card_times = 5;
+
+        // The total number of countable fouls that act towards yellow cards
+        optional uint32 fouls_count = 8;
+    }
+
     required PlayState play_state         = 1;
     required RestartReason restart_reason = 2;
     required RefereeCommand command       = 3;
     optional Ball ball                    = 4;
     optional Point ball_placement_point   = 5;
+    required TeamInfo friendly_team_info  = 6;
+    required TeamInfo enemy_team_info     = 7;
 }

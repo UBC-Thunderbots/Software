@@ -2,33 +2,36 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "attacker_tactic",
-    srcs = [
-        "attacker_fsm.cpp",
-        "attacker_tactic.cpp",
-    ],
-    hdrs = [
-        "attacker_fsm.h",
-        "attacker_tactic.h",
-    ],
+    hdrs = ["attacker_tactic.h"],
+    srcs = ["attacker_tactic.cpp"],
     deps = [
-        "//shared:constants",
-        "//software/ai/evaluation:keep_away",
-        "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
-        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
-        "//software/ai/passing:pass",
-        "//software/logger",
-        "//software/world:ball",
+        ":attacker_state",
+        ":attacker_skill_executor",
+        "//software/ai/hl/stp/tactic:tactic",
+        "//software/ai/rl:dqn",
+        "//software/ai/rl:replay_buffer",
+        "//software/ai/rl/exploration_strategies:epsilon_greedy_strategy",
     ],
 )
 
-cc_test(
-    name = "attacker_fsm_test",
-    srcs = ["attacker_fsm_test.cpp"],
+cc_library(
+    name = "attacker_state",
+    hdrs = ["attacker_state.h"],
     deps = [
-        ":attacker_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
+        "//software/ai/rl:torch",
+    ],
+)
+
+cc_library(
+    name = "attacker_skill_executor",
+    hdrs = ["attacker_skill_executor.h"],
+    srcs = ["attacker_skill_executor.cpp"],
+    deps = [
+        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
+        "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/evaluation:shot",
+        "//software/ai/passing:pass",
+        "//software/util/make_enum:make_enum",
     ],
 )
 

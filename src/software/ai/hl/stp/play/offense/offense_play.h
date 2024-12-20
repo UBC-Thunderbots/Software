@@ -15,7 +15,10 @@ class OffensePlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
+
     void updateTactics(const PlayUpdate &play_update) override;
+
+    void terminate(const WorldPtr &world_ptr);
 
    private:
     FSM<OffensePlayFSM> fsm;

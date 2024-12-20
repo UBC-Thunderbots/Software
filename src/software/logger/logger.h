@@ -38,7 +38,15 @@
     {                                                                                    \
     }                                                                                    \
     else                                                                                 \
-        LOG_1(level) << filename                                                         \
+        LOG_1(level) << filename
+
+// PyTorch defines its own LOG macro which we want to override with our custom LOG.
+// We don't know whether the PyTorch headers will be included before or after this
+// header file. Hence, push our custom LOG onto the macro stack so that we can access
+// it later (in the case that the preprocessor includes this header file before the
+// PyTorch headers).
+#pragma push_macro("LOG")
+
 /**                                                                                      \
  * This class acts as a Singleton that's responsible for initializing the logger.        \
  * We use a singleton rather than a generic function in this namespace because           \

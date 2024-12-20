@@ -1,37 +1,52 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
-#include "proto/message_translation/tbots_geometry.h"
-#include "shared/constants.h"
-#include "software/ai/evaluation/calc_best_shot.h"
-#include "software/logger/logger.h"
-#include "software/world/ball.h"
-
 AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
-      fsm_map(),
-      best_pass_so_far(std::nullopt),
-      pass_committed(false),
-      chip_target(std::nullopt),
-      ai_config(ai_config)
+      dqn_(DQN_LEARNING_RATE, DQN_DISCOUNT_RATE, DQN_SOFT_UPDATE_TAU),
+      replay_buffer_(REPLAY_BUFFER_CAPACITY),
+      epsilon_greedy_strategy_(EXPLORATION_EPSILON),
+      ai_config_(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()), AttackerFSM(ai_config));
+        skill_executors_[id] = AttackerSkillExecutor();
     }
 }
 
-void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
-                                         bool pass_committed)
+std::optional<AttackerSkill> AttackerTactic::getCurrentSkill() const
 {
-    // Update the control parameters stored by this Tactic
-    this->best_pass_so_far = best_pass_so_far;
-    this->pass_committed   = pass_committed;
+    return current_skill_;
 }
 
-void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
+AttackerSkill AttackerTactic::selectSkill(const WorldPtr& world_ptr)
 {
-    this->chip_target = chip_target;
+    updateDQN(world_ptr, false);
+
+    const torch::Tensor skill_probabilities = dqn_.act(current_state_.value());
+    current_skill_ = epsilon_greedy_strategy_.select(skill_probabilities);
+
+    for (auto& skill_executor : std::views::values(skill_executors_))
+    {
+        skill_executor.reset(current_skill_.value(), ai_config_);
+    }
+
+    return current_skill_.value();
+}
+
+void AttackerTactic::terminate(const WorldPtr& world_ptr)
+{
+    updateDQN(world_ptr, false);
+
+    current_world_.reset();
+    current_state_.reset();
+    current_skill_.reset();
+
+    setLastExecutionRobot(std::nullopt);
+}
+
+void AttackerTactic::updateControlParams(const Pass& pass)
+{
+    control_params_.pass = pass;
 }
 
 void AttackerTactic::accept(TacticVisitor& visitor) const
@@ -39,71 +54,73 @@ void AttackerTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
-void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
+bool AttackerTactic::done() const
 {
-    if (reset_fsm)
+    if (last_execution_robot.has_value())
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()), AttackerFSM(ai_config));
+        return skill_executors_.at(last_execution_robot.value()).done();
     }
-
-    std::optional<Shot> shot = calcBestShotOnGoal(
-        tactic_update.world_ptr->field(), tactic_update.world_ptr->friendlyTeam(),
-        tactic_update.world_ptr->enemyTeam(), tactic_update.world_ptr->ball().position(),
-        TeamType::ENEMY, {tactic_update.robot});
-    if (shot && shot->getOpenAngle() <
-                    Angle::fromDegrees(
-                        ai_config.attacker_tactic_config().min_open_angle_for_shot_deg()))
-    {
-        // reject shots that have an open angle below the minimum
-        shot = std::nullopt;
-    }
-
-    AttackerFSM::ControlParams control_params{.best_pass_so_far = best_pass_so_far,
-                                              .pass_committed   = pass_committed,
-                                              .shot             = shot,
-                                              .chip_target      = chip_target};
-
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(AttackerFSM::Update(control_params, tactic_update));
-
-    visualizeControlParams(*tactic_update.world_ptr, control_params);
+    return true;
 }
 
-void AttackerTactic::visualizeControlParams(
-    const World& world, const AttackerFSM::ControlParams& control_params)
+std::string AttackerTactic::getFSMState() const
 {
-    TbotsProto::AttackerVisualization pass_visualization_msg;
-
-    if (control_params.best_pass_so_far.has_value())
+    if (current_skill_.has_value())
     {
-        TbotsProto::Pass pass_msg;
-        *(pass_msg.mutable_passer_point()) =
-            *createPointProto(control_params.best_pass_so_far->passerPoint());
-        *(pass_msg.mutable_receiver_point()) =
-            *createPointProto(control_params.best_pass_so_far->receiverPoint());
-        pass_msg.set_pass_speed_m_per_s(control_params.best_pass_so_far->speed());
-        *(pass_visualization_msg.mutable_pass_()) = pass_msg;
+        return std::string(reflective_enum::nameOf(current_skill_.value()));
+    }
+    return "No Skill";
+}
+
+void AttackerTactic::updateDQN(const WorldPtr& new_world, bool is_final)
+{
+    const AttackerState new_state(*new_world);
+
+    if (current_state_.has_value() && current_skill_.has_value())
+    {
+        const Transition transition{.state  = current_state_.value(),
+                                    .action = current_skill_.value(),
+                                    .reward = computeReward(*current_world_, *new_world),
+                                    .next_state = new_state,
+                                    .done       = is_final};
+
+        replay_buffer_.store(transition);
     }
 
-    pass_visualization_msg.set_pass_committed(pass_committed);
+    current_world_ = new_world;
+    current_state_ = new_state;
 
-    if (control_params.shot.has_value())
+    if (replay_buffer_.size() >= TRANSITION_BATCH_SIZE)
     {
-        TbotsProto::Shot shot_msg;
-        *(shot_msg.mutable_shot_origin()) = *createPointProto(world.ball().position());
-        *(shot_msg.mutable_shot_target()) =
-            *createPointProto(control_params.shot->getPointToShootAt());
-        *(shot_msg.mutable_open_angle()) =
-            *createAngleProto(control_params.shot->getOpenAngle());
-        *(pass_visualization_msg.mutable_shot()) = shot_msg;
-    }
+        std::vector<Transition<AttackerState, AttackerSkill>> transitions =
+            replay_buffer_.sample(TRANSITION_BATCH_SIZE);
 
-    if (chip_target.has_value())
+        dqn_.update(transitions);
+    }
+}
+
+float AttackerTactic::computeReward(const World& old_world, const World& new_world)
+{
+    auto calc_goal_differential = [](const GameState& game_state)
     {
-        *(pass_visualization_msg.mutable_chip_target()) =
-            *createPointProto(chip_target.value());
-    }
+        const int friendly_goals = game_state.getFriendlyTeamInfo().getScore();
+        const int enemy_goals    = game_state.getFriendlyTeamInfo().getScore();
+        return friendly_goals - enemy_goals;
+    };
 
-    LOG(VISUALIZE) << pass_visualization_msg;
+    const int old_goal_differential   = calc_goal_differential(old_world.gameState());
+    const int new_goal_differential   = calc_goal_differential(new_world.gameState());
+    const int goal_differential_delta = new_goal_differential - old_goal_differential;
+
+    return static_cast<float>(goal_differential_delta);
+}
+
+void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
+{
+    const RobotId robot_id = tactic_update.robot.id();
+    if (reset_fsm)
+    {
+        skill_executors_.at(robot_id).reset(current_skill_.value(), ai_config_);
+    }
+    skill_executors_.at(robot_id).updatePrimitive(tactic_update, control_params_);
 }
