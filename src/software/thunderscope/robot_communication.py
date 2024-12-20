@@ -41,7 +41,6 @@ class RobotCommunication:
         self.is_setup_for_fullsystem = False
 
         self.sequence_number = 0
-        self.last_time = time.time()
         self.current_proto_unix_io = current_proto_unix_io
         self.estop_mode = estop_mode
 
@@ -112,9 +111,6 @@ class RobotCommunication:
         # if using keyboard estop, skips this step
         self.estop_reader = None
         self.estop_is_playing = False
-        # when the estop has just been stopped,
-        # we want to send a stop primitive once to all currently connected robots
-        self.should_send_stop = False
 
         # only checks for estop if we are in physical estop mode
         if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
@@ -137,7 +133,8 @@ class RobotCommunication:
         :param referee_interface: the interface to listen for referee data
         :param vision_interface: the interface to listen for vision data
         """
-        # TODO(arun): DO I need this?
+        self.wifi_communication_manager.setup_for_full_system(referee_interface=referee_interface,
+                                                              vision_interface=vision_interface)
 
         if not self.is_setup_for_fullsystem:
             self.robots_connected_to_fullsystem = {
@@ -188,13 +185,9 @@ class RobotCommunication:
                 if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
 
-                # Send stop primitive once when estop is paused
-                if previous_estop_is_playing and not self.estop_is_playing:
-                    self.should_send_stop = True
-                else:
-                    self.should_send_stop = False
-
-                previous_estop_is_playing = self.estop_is_playing
+                self.robot_stop_primitive_send_count_map = {
+                    NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+                }
 
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_is_playing)
@@ -229,6 +222,8 @@ class RobotCommunication:
         that the robots timeout and stop.
         """
         while self.running:
+            self.wifi_communication_manager.poll()
+
             # map of robot id to diagnostics/fullsystem primitive map
             robot_primitives_map = {}
 
@@ -284,21 +279,12 @@ class RobotCommunication:
                         num_times_to_stop - 1
                     )
 
-            # initialize total primitive set and send it
-            primitive_set = PrimitiveSet(
-                time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
-                stay_away_from_ball=False,
-                robot_primitives=self.robot_stop_primitives_map
-                if self.should_send_stop
-                else robot_primitives_map,
-                sequence_number=self.sequence_number,
-            )
+            if self.__should_send_packet():
+                for robot_id, primitive in robot_primitives_map.items():
+                    primitive.sequence_number = self.sequence_number
+                    primitive.time_sent = Timestamp(epoch_timestamp_seconds=time.time())
 
             self.sequence_number += 1
-
-            if self.__should_send_packet() or self.should_send_stop:
-                self.send_primitive_set.send_proto(primitive_set)
-                self.should_send_stop = False
 
             # sleep if not running fullsystem
             if IndividualRobotMode.AI not in self.robot_control_mode_map.values():

@@ -5,7 +5,7 @@
 UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
                      const unsigned short port, const std::string& interface,
                      bool multicast, std::optional<std::string>& error)
-    : socket_(io_service), interface(interface), ip_address(ip_address)
+    : socket_(io_service), interface_(interface), ip_address_(ip_address)
 {
     boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
     if (isIpv6(ip_address))

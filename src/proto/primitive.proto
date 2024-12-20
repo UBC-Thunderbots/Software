@@ -106,10 +106,12 @@ message Primitive
         DirectControlPrimitive direct_control = 3;
     }
 
+    // Sequence number for the primitive
     uint64 sequence_number = 4;
 
     reserved 5;
 
+    // Epoch timestamp when primitives were assigned
     Timestamp time_sent = 6;
 }
 

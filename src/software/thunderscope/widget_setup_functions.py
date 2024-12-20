@@ -57,6 +57,7 @@ def setup_gl_widget(
     replay: bool = False,
     replay_log: os.PathLike = None,
     frame_swap_counter: Optional[FrameTimeCounter] = None,
+    send_sync_message: bool = False,
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -69,6 +70,7 @@ def setup_gl_widget(
     :param replay_log: The file path of the replay log
     :param frame_swap_counter: FrameTimeCounter to keep track of the time between
                                frame swaps in the GLWidget
+    :param send_sync_message: Whether to synchronize Thunderscope with a listener
     :return: The GLWidget
     """
     # Create ProtoPlayer if replay is enabled

@@ -153,55 +153,6 @@ def WifiCommunicationManager():
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
 
-    def __setup_full_system(self, referee_interface: str, vision_interface: str):
-        change_referee_interface = (
-                referee_interface != self.current_network_config.referee_interface
-        ) and (referee_interface != DISCONNECTED)
-
-        change_vision_interface = (
-                vision_interface != self.current_network_config.vision_interface
-        ) and (vision_interface != DISCONNECTED)
-
-        if change_referee_interface:
-            (
-                self.receive_ssl_referee_proto,
-                error,
-            ) = tbots_cpp.createSSLRefereeProtoListener(
-                SSL_REFEREE_ADDRESS,
-                self.referee_port,
-                referee_interface,
-                lambda data: self.__forward_to_proto_unix_io(SSL_Referee, data),
-                True,
-            )
-
-        
-            if error:
-                logger.error(f"Error setting up referee interface:\n{error}")
-            
-            self.current_network_config.referee_interface = (
-                referee_interface if not error else DISCONNECTED
-            )
-
-        if change_vision_interface:
-            (
-                self.receive_ssl_wrapper,
-                error,
-            ) = tbots_cpp.createSSLWrapperPacketProtoListener(
-                SSL_VISION_ADDRESS,
-                SSL_VISION_PORT,
-                vision_interface,
-                lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
-                True,
-            )
-
-        if error:
-            logger.error(f"Error setting up vision interface:\n{error}")
-
-        self.current_network_config.vision_interface = (
-            vision_interface if not error else DISCONNECTED
-        )
-
-
     def __setup_robot_communication(self, robot_communication_interface: str):
         """
         Set up senders and listeners for communicating with the robots
@@ -268,8 +219,8 @@ def WifiCommunicationManager():
                 True,
             )
 
-        found_ip, local_ip = tbots_cpp.get_local_ip(robot_communication_interface, True)
-        if found_ip:
+        local_ip = tbots_cpp.get_local_ip(robot_communication_interface, True)
+        if local_ip:
             with self.fullsystem_ip_broadcaster[0]:
                 self.fullsystem_ip_broadcaster[1] = fullsystem_ip_broadcaster
                 self.fullsystem_ip_broadcaster[2].ip_address = local_ip
@@ -291,8 +242,65 @@ def WifiCommunicationManager():
                     network_config.referee_interface, network_config.vision_interface
                 )
             self.__setup_robot_communication(network_config.robot_communication_interface)
-            
+            self.print_current_network_config()
+        elif:
+            logger.warning("[RobotCommunication] We received a proto configuration update with a newer network "
+                           "configuration. We will ignore this update, likely because the interface was provided at "
+                           "startup. The next update will be accepted.")
+            self.accept_next_network_config = True
+            self.print_current_network_config()
 
+        # Set up the network on the next tick
+        network_config = self.network_config_buffer.get(block=False, return_cached=False)
+
+
+    def setup_for_full_system(self, referee_interface: str, vision_interface: str):
+        change_referee_interface = (
+                referee_interface != self.current_network_config.referee_interface
+        ) and (referee_interface != DISCONNECTED)
+
+        change_vision_interface = (
+                vision_interface != self.current_network_config.vision_interface
+        ) and (vision_interface != DISCONNECTED)
+
+        if change_referee_interface:
+            (
+                self.receive_ssl_referee_proto,
+                error,
+            ) = tbots_cpp.createSSLRefereeProtoListener(
+                SSL_REFEREE_ADDRESS,
+                self.referee_port,
+                referee_interface,
+                lambda data: self.__forward_to_proto_unix_io(SSL_Referee, data),
+                True,
+            )
+
+        
+            if error:
+                logger.error(f"Error setting up referee interface:\n{error}")
+            
+            self.current_network_config.referee_interface = (
+                referee_interface if not error else DISCONNECTED
+            )
+
+        if change_vision_interface:
+            (
+                self.receive_ssl_wrapper,
+                error,
+            ) = tbots_cpp.createSSLWrapperPacketProtoListener(
+                SSL_VISION_ADDRESS,
+                SSL_VISION_PORT,
+                vision_interface,
+                lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
+                True,
+            )
+
+        if error:
+            logger.error(f"Error setting up vision interface:\n{error}")
+
+        self.current_network_config.vision_interface = (
+            vision_interface if not error else DISCONNECTED
+        )
 
 
     def send_primitive(self, robot_id: int, primitive: Primitive) -> None:

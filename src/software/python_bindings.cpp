@@ -6,6 +6,7 @@
 
 #include <sstream>
 
+#include "proto/ip_notification.pb.h"
 #include "proto/geometry.pb.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/tbots_geometry.h"
@@ -66,7 +67,7 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
                                               py::buffer_protocol(), py::dynamic_attr())
         .def("get_interface", &Class::getInterface)
         .def("get_ip_address", &Class::getIpAddress)
-        .def("send_proto", &Class::sendProto, py::arg("async") = false);
+        .def("send_proto", &Class::sendProto, py::arg("message"), py::arg("async") = false);
 
     std::string create_pyclass_name = "create" + pyclass_name;
     m.def(create_pyclass_name.c_str(),
@@ -510,9 +511,5 @@ PYBIND11_MODULE(python_bindings, m)
         .value("STATUS_ERROR", EstopState::STATUS_ERROR)
         .export_values();
 
-    m.def("get_local_ip", [](const std::string& interface, const bool& use_ipv4) {
-        std::string ip_address;
-        bool found_ip = getLocalIp(interface, ip_address, use_ipv4);
-        return std::make_tuple(found_ip, ip_address);
-    });
+    m.def("get_local_ip", &getLocalIp);
 }
