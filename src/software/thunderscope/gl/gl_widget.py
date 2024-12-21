@@ -14,7 +14,7 @@ from software.thunderscope.constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
-from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
+from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar, MultiLayerToolbar
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
@@ -89,6 +89,8 @@ class GLWidget(QWidget):
         self.layers_menu = QMenu()
         self.toolbars_menu = QMenu()
         self.layers_menu_actions = {}
+
+
         self.simulation_control_toolbar = GLFieldToolbar(
             parent=self.gl_view_widget,
             on_camera_view_change=self.set_camera_view,
@@ -97,6 +99,10 @@ class GLWidget(QWidget):
             toolbars_menu=self.toolbars_menu,
             sandbox_mode=sandbox_mode,
         )
+
+        # 
+        layers = [self.simulation_control_toolbar]
+        self.multilayer_toolbar = MultiLayerToolbar(self.gl_view_widget, layers)
 
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(

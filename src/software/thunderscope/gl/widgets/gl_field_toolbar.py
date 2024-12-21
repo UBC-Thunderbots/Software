@@ -1,4 +1,8 @@
-from typing import Callable
+from typing import Callable, List
+from PyQt6.QtCore import Qt
+from numpy import who
+from pyqtgraph.Qt import QtCore
+from PyQt6.QtGui import QShortcut
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
@@ -218,3 +222,67 @@ class GLFieldToolbar(GLToolbar):
         :param callback: the callback function to update the simulation speed
         """
         self.speed_callback = callback
+
+
+class RandomToolbar(GLToolbar):
+    def __init__(self, parent): 
+        super(RandomToolbar, self).__init__(parent=parent)
+
+        self.pushbutton = QPushButton("Change button behavior")
+        self.menu = QMenu()
+
+        action_one = QtGui.QAction("click behavior one", self)
+        action_one.triggered.connect(self.callback)
+
+        action_two = QtGui.QAction("clik behavior two", self)
+        action_two.triggered.connect(self.callback)
+        
+        self.menu.addAction(action_one)
+        self.menu.addAction(action_two)
+        self.pushbutton.setStyleSheet(self.get_button_style())
+        self.pushbutton.setMenu(self.menu)
+        
+        self.layout().addWidget(self.pushbutton)
+
+    def callback(self): 
+        print("I just did something")
+
+
+# TODO: move this into a different layer in the future.
+"""
+This would be mvoed into a different class later on!
+"""
+class MultiLayerToolbar(QWidget):
+    def __init__(self, parent, layers) -> None:
+        super(MultiLayerToolbar, self).__init__(parent=parent)
+
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        self.setStyleSheet("background-color: rgba(0,0,0,0);" "padding: 0px;")
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
+        self.layout = QHBoxLayout()
+
+        self.layers : List[GLToolbar] = layers
+        self.layers.append(RandomToolbar(parent))
+
+        self.shortcut = QShortcut(Qt.Key.Key_F1, self)
+        self.shortcut.activated.connect(self.switch_layer)
+
+        QMenu()
+        self.shortcut = QShortcut(Qt.Key.Key_F2, self)
+        self.shortcut.activated.connect(self.switch_layer_two)
+
+        self.setLayout(self.layout)
+
+        self.layout.addWidget(self.layers[0])
+        self.layout.addWidget(self.layers[1])
+
+        self.layers[1].hide()
+
+    def switch_layer(self):
+        self.layers[1].hide()
+        self.layers[0].show()
+    
+    def switch_layer_two(self): 
+        self.layers[0].hide()
+        self.layers[1].show()
+
