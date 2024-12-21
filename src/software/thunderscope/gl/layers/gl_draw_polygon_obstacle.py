@@ -14,7 +14,7 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInScen
 
 
 class GLDrawPolygonObstacleLayer(GLLayer):
-    """A layer used to draw polygons that are going to represent obstacles for the trajectroy planner
+    """A layer used to draw polygons that are going to represent obstacles for the trajectory planner
     to avoid.
     """
 
@@ -71,7 +71,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         ]
 
         if len(points) <= 2:
-            print("Cannot push polygon to stack as there as less that points two.")
+            print("Cannot push polygon to stack as there are less than two points.")
             return
 
         polygon = Polygon(points=points)

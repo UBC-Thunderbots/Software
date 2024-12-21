@@ -21,7 +21,7 @@ class ThreadedSensorFusion
    private:
     void onValueReceived(SensorProto sensor_msg) override;
     void onValueReceived(TbotsProto::ThunderbotsConfig config) override;
-    void onValueReceived(TbotsProto::VirtualObstacles virtual_obstacle) override;
+    void onValueReceived(TbotsProto::VirtualObstacles virtual_obstacles) override;
 
     SensorFusion sensor_fusion;
     TbotsProto::SensorFusionConfig sensor_fusion_config;

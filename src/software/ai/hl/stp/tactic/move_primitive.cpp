@@ -194,7 +194,7 @@ void MovePrimitive::updateObstacles(
         if (!obstacle.has_polygon())
         {
             LOG(WARNING)
-                << "Virtual Obstacles contain obstalce that is not a polygon. Shape igonred";
+                << "Virtual Obstacles contain obstacle that is not a polygon. Shape ignored";
 
             continue;
         }
