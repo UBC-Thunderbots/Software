@@ -20,6 +20,7 @@ from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO

@@ -38,7 +38,7 @@ class ThreadedProtoUdpListener
      * Creates a ThreadedProtoUdpListener that will listen for ReceiveProtoT packets
      * from the network on any local address with given port. For every ReceiveProtoT
      * packet received, the receive_callback will be called to perform any operations
-     * desired by the caller.
+     * desired by the caller. This constructor should not be used for multicast communication.
      *
      * Any caller using this constructor should ensure that error is not set before using
      * the listener.
@@ -49,7 +49,7 @@ class ThreadedProtoUdpListener
      * from the network
      * @param error A user-provided optional string to store any error messages
      */
-    ThreadedProtoUdpListener(unsigned short port, const std::string& interface,
+    ThreadedProtoUdpListener(unsigned short port,
                              std::function<void(ReceiveProtoT)> receive_callback,
                              std::optional<std::string>& error = std::nullopt);
 
@@ -86,10 +86,10 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
 
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
-    const unsigned short port, const std::string& interface,
+    const unsigned short port,
     std::function<void(ReceiveProtoT)> receive_callback,
     std::optional<std::string>& error)
-    : io_service(), udp_listener(io_service, port, interface, receive_callback, error)
+    : io_service(), udp_listener(io_service, port, receive_callback, error)
 {
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });

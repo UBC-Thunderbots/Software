@@ -175,8 +175,16 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
+        ":wifi_communication_manager",
         "//software/logger:py_logger",
         "//software/thunderscope:constants",
+    ],
+)
+
+py_library(
+    name = "wifi_communication_manager",
+    srcs = ["wifi_communication_manager.py"],
+    deps = [
         requirement("colorama"),
     ],
 )

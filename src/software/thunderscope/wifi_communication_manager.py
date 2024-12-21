@@ -1,16 +1,25 @@
+from typing import Any, Callable, Tuple, Type, Union
+
+from proto.import_all_protos import *
 from software.logger.logger import create_logger
 import software.python_bindings as tbots_cpp
-from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
+from software.py_constants import *
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+
+from google.protobuf.message import Message
 
 from colorama import Fore, Style
-from threading import Lock
+import logging
+from threading import Lock, Thread
 
 DISCONNECTED = "DISCONNECTED"
 """A constant to represent a disconnected interface"""
 
-logger = create_logger(__name__)
+logger = create_logger(name=__name__, log_level=logging.DEBUG)
 
-def WifiCommunicationManager():
+
+class WifiCommunicationManager:
     """Manages WiFi communication between different modules of the system."""
 
     BROADCAST_HZ = 1.0
@@ -55,6 +64,7 @@ def WifiCommunicationManager():
         self.current_proto_unix_io = current_proto_unix_io
 
         ## Network Configuration ##
+        self.multicast_channel = multicast_channel
         self.network_config_buffer = ThreadSafeBuffer(1, NetworkConfig)
         self.current_proto_unix_io.register_observer(NetworkConfig, self.network_config_buffer)
         # Whether to accept the next configuration update. We will be provided a proto configuration from the
@@ -68,20 +78,23 @@ def WifiCommunicationManager():
         )
         if interface:
             self.accept_next_network_config = False
-            self.__setup_for_robot_communication(interface)
-        self.multicast_channel = multicast_channel
+            self.__setup_robot_communication(interface)
         self.referee_port = referee_port
         
         self.should_setup_full_system = should_setup_full_system
 
         ## Thread Management ##
         self.running = True
-        self.broadcast_ip: Union[None, threading.Thread] = None
+        self.broadcast_ip: Union[None, Thread] = None
+
+        logger.debug("[WifiCommunicationManager] Initialized")
+
 
     def __enter__(self):
-        self.broadcast_ip = threading.thread(target=self.__broadcast_fullsystem_ip, daemon=True)
+        self.broadcast_ip = Thread(target=self.__broadcast_fullsystem_ip, daemon=True)
 
-    def __exit__(self);
+
+    def __exit__(self):
         self.running = False
         self.broadcast_ip.join()
 
@@ -136,6 +149,37 @@ def WifiCommunicationManager():
         """
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
+
+
+    def __print_current_network_config(self) -> None:
+        """Prints the current network configuration to the console."""
+
+        def output_string(comm_name: str, status: str) -> str:
+            """Returns a formatted string with the given module we are communicating to, coloured based on the status.
+
+            Any status other than DISONNECTED will be coloured green, otherwise red.
+
+            :param comm_name: Whether we are connectng to the robot, SSL Vision or SSL Referee
+            :param status: The status to report to the user
+            """
+
+            colour = Fore.RED if status == DISCONNECTED else Fore.GREEN
+
+            return f"{comm_name}: {colour}{status} {Style.RESET_ALL}"
+
+        logging.info(
+            output_string("Robot Status\t",
+                              self.current_network_config.robot_communication_interface
+            )
+        )
+        logging.info(
+            output_string("Vision\t\t",
+                          self.current_network_config.vision_interface)
+        )
+        logging.info(
+            output_string("Referee\t",
+                        self.current_network_config.referee_interface)
+        )
 
 
     def __receive_robot_status(self, robot_status: Message) -> None:
@@ -209,21 +253,24 @@ def WifiCommunicationManager():
                     ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT,
                     robot_communication_interface,
                     self.__update_robot_ip,
-                    True)
+                    True))
 
         fullsystem_ip_broadcaster = setup_network_resource(
-            lambda: tbots_cpp.createFullsystemIpBroadcast(
+            lambda: tbots_cpp.createFullsystemIpBroadcastProtoUdpSender(
                 self.multicast_channel,
                 FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
                 robot_communication_interface,
                 True,
-            )
+            ))
 
         local_ip = tbots_cpp.get_local_ip(robot_communication_interface, True)
         if local_ip:
             with self.fullsystem_ip_broadcaster[0]:
-                self.fullsystem_ip_broadcaster[1] = fullsystem_ip_broadcaster
-                self.fullsystem_ip_broadcaster[2].ip_address = local_ip
+                self.fullsystem_ip_broadcaster = (
+                    self.fullsystem_ip_broadcaster[0],
+                    fullsystem_ip_broadcaster,
+                    IpNotification(ip_address=local_ip),
+                )
 
         for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.__connect_to_robot(robot_id)
@@ -232,8 +279,25 @@ def WifiCommunicationManager():
             robot_communication_interface if is_setup_successfully else DISCONNECTED
         )
 
+    def __update_robot_ip(self, robot_ip_notification: IpNotification) -> None:
+        """Given a received discovery message from a robot, update the robot's IP address
+
+        :param robot_ip_notification: IP notification message from a robot with its IP address
+        """
+        with self.robot_ip_addresses[robot_ip_notification.robot_id][0]:
+            old_ip_address = self.robot_ip_addresses[robot_ip_notification.robot_id][1]
+            if old_ip_address is None or old_ip_address != robot_ip_notification.ip_address:
+                logging.info(f"Robot {robot_ip_notification.robot_id} has IP address {robot_ip_notification.ip_address}")
+                self.robot_ip_addresses[robot_ip_notification.robot_id][1] = robot_ip_notification.ip_address
+                self.__connect_to_robot(robot_ip_notification.robot_id)
+
+
     def poll(self) -> None:
         """Polls and updates the network senders and listeners if a new network configuration is available"""
+
+        # Set up the network on the next tick
+        network_config = self.network_config_buffer.get(block=False, return_cached=False)
+
         if network_config is not None and self.accept_next_network_config:
             logging.info("Updating network configuration")
 
@@ -243,15 +307,12 @@ def WifiCommunicationManager():
                 )
             self.__setup_robot_communication(network_config.robot_communication_interface)
             self.print_current_network_config()
-        elif:
+        elif network_config is not None:
             logger.warning("[RobotCommunication] We received a proto configuration update with a newer network "
                            "configuration. We will ignore this update, likely because the interface was provided at "
                            "startup. The next update will be accepted.")
             self.accept_next_network_config = True
             self.print_current_network_config()
-
-        # Set up the network on the next tick
-        network_config = self.network_config_buffer.get(block=False, return_cached=False)
 
 
     def setup_for_full_system(self, referee_interface: str, vision_interface: str):
@@ -315,33 +376,3 @@ def WifiCommunicationManager():
                 primitive_sender.send_proto(primitive, True)
             else:
                 logger.warning(f"Robot {robot_id} is not connected. Unable to send a primitive to it.")
-
-    def print_current_network_config(self) -> None:
-        """Prints the current network configuration to the console."""
-
-        def output_string(comm_name: str, status: str) -> str:
-            """Returns a formatted string with the given module we are communicating to, coloured based on the status.
-
-            Any status other than DISONNECTED will be coloured green, otherwise red.
-
-            :param comm_name: Whether we are connectng to the robot, SSL Vision or SSL Referee
-            :param status: The status to report to the user
-            """
-
-            colour = Fore.RED if status == DISCONNECTED else Fore.GREEN
-
-            return f"{comm_name}: {colour}{status} {Style.RESET_ALL}"
-
-        logging.info(
-            output_string("Robot Status\t",
-                              self.current_network_config.robot_communication_interface
-            )
-        )
-        logging.info(
-            output_string("Vision\t\t",
-                          self.current_network_config.vision_interface)
-        )
-        logging.info(
-            output_string("Referee\t",
-                        self.current_network_config.referee_interface)
-        )

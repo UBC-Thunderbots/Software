@@ -1,3 +1,5 @@
+from typing import Self, Type
+
 import logging
 import threading
 import time
@@ -9,6 +11,7 @@ from proto.import_all_protos import *
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 from software.py_constants import *
 from software.thunderscope.constants import (
     ROBOT_COMMUNICATIONS_TIMEOUT_S,
@@ -121,7 +124,6 @@ class RobotCommunication:
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
-        self.print_current_network_config()
 
     def setup_for_fullsystem(
         self,
@@ -299,7 +301,7 @@ class RobotCommunication:
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
 
-    def __enter__(self) -> RobotCommunication:
+    def __enter__(self) -> Self:
         """Enter RobotCommunication context manager. Setup multicast listeners
         for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
         """
