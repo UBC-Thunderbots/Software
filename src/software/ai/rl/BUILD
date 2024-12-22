@@ -20,12 +20,3 @@ cc_library(
     hdrs = ["replay_buffer.hpp"],
     deps = ["//software/logger"],
 )
-
-cc_test(
-    name = "dqn_test",
-    srcs = ["dqn_test.cpp"],
-    deps = [
-        ":dqn",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)

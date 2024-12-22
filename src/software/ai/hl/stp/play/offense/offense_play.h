@@ -5,8 +5,12 @@
 #include "software/ai/hl/stp/play/play.h"
 
 /**
- * Play that tries to find a shot on net, passes if it couldn't, while keeping some robots
- * to protect the defense area
+ * OffensePlay is a Play that is run when we have possession of the ball.
+ * It is a Play that sets up tactics to make passes and score goals.
+ *
+ * The main ball handler in OffensePlay is AttackerTactic. OffensePlay enables
+ * coordination between the AttackerTactic and ReceiverTactic by relaying
+ * information between them.
  */
 class OffensePlay : public Play
 {
@@ -18,6 +22,11 @@ class OffensePlay : public Play
 
     void updateTactics(const PlayUpdate &play_update) override;
 
+    /**
+     * Terminates the play, ending the current episode.
+     *
+     * @param world_ptr the final World of the current episode
+     */
     void terminate(const WorldPtr &world_ptr);
 
    private:

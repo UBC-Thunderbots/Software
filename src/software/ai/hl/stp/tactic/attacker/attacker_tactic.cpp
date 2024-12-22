@@ -74,7 +74,7 @@ std::string AttackerTactic::getFSMState() const
 
 void AttackerTactic::updateDQN(const WorldPtr& new_world, bool is_final)
 {
-    const AttackerState new_state(*new_world);
+    const AttackerState new_state(*new_world, last_execution_robot);
 
     if (current_state_.has_value() && current_skill_.has_value())
     {

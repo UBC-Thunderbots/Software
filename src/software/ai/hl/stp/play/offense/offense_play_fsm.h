@@ -29,30 +29,84 @@ struct OffensePlayFSM
     };
 
     /**
-     * Creates an offense play FSM
+     * Creates an OffensePlayFSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config the AI configuration
      */
     explicit OffensePlayFSM(TbotsProto::AiConfig ai_config);
 
+    /**
+     * Guard to check whether the AttackerTactic has completed executing
+     * its current skill.
+     *
+     * @param event the OffensePlayFSM Update event
+     *
+     * @return whether the AttackerTactic is done executing its current skill
+     */
     bool attackerDone(const Update& event) const;
 
+    /**
+     * Guard to check whether the AttackerTactic is currently executing
+     * a passing skill.
+     *
+     * @param event the OffensePlayFSM Update event
+     *
+     * @return whether the AttackerTactic is currently executing a passing skill
+     */
     bool attackerPassing(const Update& event) const;
 
+    /**
+     * Guard to check whether to abort the current pass (if one is in progress).
+     *
+     * @param event the OffensePlayFSM Update event
+     *
+     * @return whether to abort the current pass
+     */
     bool shouldAbortPass(const Update& event) const;
 
+    /**
+     * Guard to check whether the ReceiverTactic has completed receiving the
+     * current pass (if one is in progress).
+     *
+     * @param event the OffensePlayFSM Update event
+     *
+     * @return whether the ReceiverTactic completed receiving the current pass
+     */
     bool passCompleted(const Update& event) const;
 
+    /**
+     * Action to update and assign an AttackerTactic, ReceiverTactic, and MoveTactics
+     * (for offensive positioning).
+     *
+     * @param event the OffensePlayFSM Update event
+     */
     void attack(const Update& event);
 
+    /**
+     * Action to update and assign a ReceiverTactic and MoveTactics (for offensive
+     * positioning).
+     *
+     * @param event the OffensePlayFSM Update event
+     */
     void receive(const Update& event);
 
+    /**
+     * Resets the AttackerTactic and ReceiverTactic.
+     * The AttackerTactic will select a new skill to execute.
+     *
+     * @param event the OffensePlayFSM Update event
+     */
     void resetTactics(const Update& event);
 
+    /**
+     * Terminates the play, ending the current episode.
+     *
+     * @param event the OffensePlayFSM Terminate event
+     */
     void terminate(const Terminate& event);
 
     /**
-     * Updates the offensive positioning tactics
+     * Updates the MoveTactics that will move to offensive receiver positions.
      *
      * @param world the current world
      * @param num_tactics the number of tactics to assign

@@ -1,25 +1,61 @@
 #pragma once
 
+#include "software/ai/hl/stp/tactic/attacker/attacker_skill_executor.h"
+#include "software/ai/hl/stp/tactic/attacker/attacker_state.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/rl/dqn.hpp"
 #include "software/ai/rl/exploration_strategies/epsilon_greedy_strategy.hpp"
-#include "software/ai/hl/stp/tactic/attacker/attacker_state.h"
 
-#include "software/ai/hl/stp/tactic/attacker/attacker_skill_executor.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
-
+/**
+ * The Attacker is the main ball handler during offensive gameplay. It executes
+ * sequences of skills (e.g. dribble, pass, kick, chip) to create chances and score goals.
+ *
+ * The Attacker selects which skills to execute according to a learned policy, which
+ * gives the probability of taking a given action (skill) in a given state (the World).
+ * We attempt to find an optimal policy using reinforcement learning algorithms.
+ */
 class AttackerTactic : public Tactic
 {
    public:
+    /**
+     * Constructs an AttackerTactic.
+     *
+     * @param ai_config the AI configuration
+     */
     explicit AttackerTactic(TbotsProto::AiConfig ai_config);
 
     AttackerTactic() = delete;
 
+    /**
+     * Returns the skill currently being executed by the AttackerTactic.
+     *
+     * @return the currently selected skill, or std::nullopt if no skill is selected
+     */
     std::optional<AttackerSkill> getCurrentSkill() const;
 
+    /**
+     * Selects a skill to execute based on the current World state, following the
+     * Attacker agent's current policy.
+     *
+     * @param world_ptr the current World
+     *
+     * @return the selected skill
+     */
     AttackerSkill selectSkill(const WorldPtr& world_ptr);
 
+    /**
+     * Terminates the AttackerTactic, ending the current episode.
+     *
+     * @param world_ptr the final World of the episode
+     */
     void terminate(const WorldPtr& world_ptr);
 
+    /**
+     * Updates the control parameters for this AttackerTactic.
+     *
+     * @param pass the pass to take, if the currently selected skill
+     * is a passing skill
+     */
     void updateControlParams(const Pass& pass);
 
     void accept(TacticVisitor& visitor) const override;
@@ -30,23 +66,37 @@ class AttackerTactic : public Tactic
 
    private:
     /**
+     * Updates the current state with the given World and runs the learning
+     * algorithm on the Attacker agent's DQN.
      *
      * @param new_world the current World
      * @param is_final whether this is the final World in the current episode
      */
     void updateDQN(const WorldPtr& new_world, bool is_final);
 
+    /**
+     * Computes the reward for the transition from the old World state to
+     * the new World state.
+     *
+     * @param old_world the old World
+     * @param new_world the new World
+     *
+     * @return the reward for this transition
+     */
     float computeReward(const World& old_world, const World& new_world);
 
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
+    // DQN hyperparameter values
     static constexpr float DQN_LEARNING_RATE   = 0.001f;
     static constexpr float DQN_DISCOUNT_RATE   = 0.95f;
     static constexpr float DQN_SOFT_UPDATE_TAU = 0.005f;
 
+    // Replay buffer hyperparameter values
     static constexpr unsigned int REPLAY_BUFFER_CAPACITY = 10000;
     static constexpr unsigned int TRANSITION_BATCH_SIZE  = 128;
 
+    // Epsilon value for epsilon-greedy exploration
     static constexpr float EXPLORATION_EPSILON = 0.1f;
 
     DQN<AttackerState, AttackerSkill> dqn_;

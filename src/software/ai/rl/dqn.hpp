@@ -14,16 +14,44 @@ template <typename TState, typename TAction>
 class DQN
 {
    public:
+    /**
+     * Constructs a DQN.
+     *
+     * @param learning_rate the learning rate (alpha)
+     * @param discount_rate the discount rate (gamma)
+     * @param soft_update_tau the tau to use in target network soft update rule
+     */
     explicit DQN(float learning_rate, float discount_rate, float soft_update_tau);
 
+    /**
+     * Processes the given state with the DQN to make a decision about what
+     * action to take.
+     *
+     * @param state the state to process
+     *
+     * @return an |A|-dimensional tensor containing the Q-values for the given state,
+     * where |A| is size of the action space. The Q-value at index i gives the network's
+     * approximation of Q(s, a), where i is the enum value of action a.
+     */
     torch::Tensor act(const TState& state);
 
+    /**
+     * Runs the update step of the deep Q-learning algorithm with a batch
+     * of transitions.
+     *
+     * @param batch the batch of transitions to update the DQN with
+     */
     void update(const std::vector<Transition<TState, TAction>>& batch);
 
    private:
     static constexpr int HIDDEN_LAYER_SIZE   = 128;
     static constexpr int CLIP_GRADIENT_VALUE = 100;
 
+    /**
+     * Helper for constructing a PyTorch feed-forward neural network for the DQN.
+     *
+     * @return a newly constructed PyTorch network for the DQN
+     */
     static std::shared_ptr<torch::nn::SequentialImpl> createNetwork();
 
     // Learning rate (denoted alpha in most literature)
@@ -32,6 +60,7 @@ class DQN
     // Discount rate (denoted gamma in most literature)
     float discount_rate_;
 
+    // Tau hyperparameter used in target network soft update rule
     float soft_update_tau_;
 
     torch::nn::Sequential current_net_;
