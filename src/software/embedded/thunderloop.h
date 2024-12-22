@@ -100,6 +100,15 @@ class Thunderloop
     void updateErrorCodes();
 
     /**
+     * Poll the power service
+     *
+     * @param poll_time Populates the time taken to poll the service
+     *
+     * @return The polled power status message
+     */
+    TbotsProto::PowerStatus pollPowerService(struct timespec& poll_time);
+
+    /**
      * Wait for networking communication to be established. This function is blocking.
      */
     void waitForNetworkUp();

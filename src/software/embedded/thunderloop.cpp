@@ -41,13 +41,16 @@ extern "C"
      */
     void tbotsExit(int signal_num)
     {
-        g_motor_service->resetMotorBoard();
+        if (g_motor_service)
+        {
+            g_motor_service->resetMotorBoard();
+        }
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
         // to log messages
         std::cerr << "\n\n!!!\nReceived termination signal: "
                   << g3::signalToStr(signal_num) << std::endl;
-        std::cerr << "Thunderloop shutting down and motor board reset\n!!!\n"
+        std::cerr << "Thunderloop shutting down\n!!!\n"
                   << std::endl;
 
         TbotsProto::RobotCrash crash_msg;
@@ -114,6 +117,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
         PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
+
+    if (PLATFORM == Platform::LIMITED_BUILD)
+    {
+        return;
+    }
 
     power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
@@ -273,16 +281,7 @@ void Thunderloop::runLoop()
                 getMilliseconds(poll_time));
 
             // Power Service: execute the power control command
-            {
-                ScopedTimespecTimer timer(&poll_time);
-
-                ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
-                           true);
-
-                power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
-                                         kick_constant_, chip_pulse_width_);
-            }
+            power_status_ = pollPowerService(poll_time);
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
@@ -420,6 +419,21 @@ double Thunderloop::getCpuTemperature()
         LOG(WARNING) << "Could not open CPU temperature file";
         return 0.0;
     }
+}
+
+TbotsProto::PowerStatus Thunderloop::pollPowerService(struct timespec& poll_time)
+{
+    ScopedTimespecTimer timer(&poll_time);
+
+    if (PLATFORM == Platform::LIMITED_BUILD)
+    {
+        return TbotsProto::PowerStatus();
+    }
+
+    ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
+
+    return power_service_->poll(direct_control_.power_control(), kick_coeff_,
+                                kick_constant_, chip_pulse_width_);
 }
 
 bool isPowerStable(std::ifstream& log_file)
