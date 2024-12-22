@@ -29,7 +29,7 @@ class RobotCommunication:
         self,
         current_proto_unix_io: ProtoUnixIO,
         estop_mode: EstopMode,
-        wifi_communication_manager: WifiCommunicationManager,
+        communication_manager: WifiCommunicationManager,
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
     ):
@@ -41,8 +41,6 @@ class RobotCommunication:
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
         """
-        self.is_setup_for_fullsystem = False
-
         self.sequence_number = 0
         self.current_proto_unix_io = current_proto_unix_io
         self.estop_mode = estop_mode
@@ -50,7 +48,7 @@ class RobotCommunication:
         self.estop_path = estop_path
         self.estop_buadrate = estop_baudrate
 
-        self.wifi_communication_manager = wifi_communication_manager
+        self.communication_manager = communication_manager
 
         self.running = False
 
@@ -124,26 +122,9 @@ class RobotCommunication:
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
-
-    def setup_for_fullsystem(
-        self,
-        referee_interface: str,
-        vision_interface: str,
-    ) -> None:
-        """Sets up a listener for SSL vision and referee data
-
-        :param referee_interface: the interface to listen for referee data
-        :param vision_interface: the interface to listen for vision data
-        """
-        self.wifi_communication_manager.setup_for_full_system(referee_interface=referee_interface,
-                                                              vision_interface=vision_interface)
-
-        if not self.is_setup_for_fullsystem:
-            self.robots_connected_to_fullsystem = {
-                robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-            }
-
-            self.is_setup_for_fullsystem = True
+        self.robots_connected_to_fullsystem = {
+            robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+        }
 
     def toggle_keyboard_estop(self) -> None:
         """If keyboard estop is being used, toggles the estop state
@@ -224,7 +205,7 @@ class RobotCommunication:
         that the robots timeout and stop.
         """
         while self.running:
-            self.wifi_communication_manager.poll()
+            self.communication_manager.poll()
 
             # map of robot id to diagnostics/fullsystem primitive map
             robot_primitives_map = {}

@@ -342,15 +342,14 @@ if __name__ == "__main__":
         ) as gamecontroller, WifiCommunicationManager(
                 current_proto_unix_io=current_proto_unix_io,
                 multicast_channel=getRobotMulticastChannel(args.channel),
+                should_setup_full_system=(args.run_blue or args.run_yellow),
                 interface=args.interface,
                 referee_port=gamecontroller.get_referee_port() if gamecontroller else SSL_REFEREE_PORT
         ) as wifi_communication_manager, RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
-            wifi_communication_manager=wifi_communication_manager,
-            interface=args.interface,
+            communication_manager=wifi_communication_manager,
             estop_mode=estop_mode,
             estop_path=estop_path,
-            enable_radio=args.enable_radio,
         ) as robot_communication:
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
                 tscope.keyboard_estop_shortcut.activated.connect(
@@ -370,13 +369,6 @@ if __name__ == "__main__":
                             )
 
             if args.run_blue or args.run_yellow:
-                robot_communication.setup_for_fullsystem(
-                    referee_interface=args.interface
-                    if args.interface
-                    else DISCONNECTED,
-                    vision_interface=args.interface if args.interface else DISCONNECTED,
-                )
-                robot_communication.print_current_network_config()
                 full_system_runtime_dir = (
                     args.blue_full_system_runtime_dir
                     if args.run_blue
