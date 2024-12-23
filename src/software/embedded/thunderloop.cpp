@@ -50,8 +50,7 @@ extern "C"
         // to log messages
         std::cerr << "\n\n!!!\nReceived termination signal: "
                   << g3::signalToStr(signal_num) << std::endl;
-        std::cerr << "Thunderloop shutting down\n!!!\n"
-                  << std::endl;
+        std::cerr << "Thunderloop shutting down\n!!!\n" << std::endl;
 
         TbotsProto::RobotCrash crash_msg;
         auto dump = g3::internal::stackdump();
@@ -321,7 +320,8 @@ void Thunderloop::runLoop()
             }
 
             // Motor Service: execute the motor control command
-            motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(), time_since_prev_iter);
+            motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(),
+                                             time_since_prev_iter);
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
@@ -412,8 +412,9 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
-TbotsProto::MotorStatus Thunderloop::pollMotorService(struct timespec& poll_time,
-        const TbotsProto::MotorControl& motor_control, const struct timespec& time_since_prev_iteration)
+TbotsProto::MotorStatus Thunderloop::pollMotorService(
+    struct timespec& poll_time, const TbotsProto::MotorControl& motor_control,
+    const struct timespec& time_since_prev_iteration)
 {
     ScopedTimespecTimer timer(&poll_time);
 
