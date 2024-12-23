@@ -104,7 +104,7 @@ class Thunderloop
      *
      * @param poll_time Populates the time taken to poll the service
      * @param motor_control Control message for the motors
-     * @param time_elapsed_since_last_poll_s Time elapsed since the last poll
+     * @param time_since_prev_iteration Stores the time difference since the last call
      */
     TbotsProto::MotorStatus pollMotorService(struct timespec &poll_time, const TbotsProto::MotorControl& motor_control,
             const struct timespec& time_since_prev_iteration);
