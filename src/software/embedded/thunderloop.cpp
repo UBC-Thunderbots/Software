@@ -118,7 +118,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    if (PLATFORM == Platform::LIMITED_BUILD)
+    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
     {
         return;
     }
