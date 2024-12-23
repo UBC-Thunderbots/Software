@@ -38,7 +38,6 @@ class GLMovementFieldTestLayer(GLLayer):
             return
 
         point = event.point_in_scene
-        logger.info(f"I am clicking on point: {point}")
         self.move_to_point(point)
 
     def move_to_point(self, point):
@@ -67,7 +66,6 @@ class GLMovementFieldTestLayer(GLLayer):
         assign_tactic.assigned_tactics[robot_id].move.CopyFrom(move_tactic)
 
         self.fullsystem_io.send_proto(AssignedTacticPlayControlParams, assign_tactic)
-        logger.info(f"I am moving moving robot: {robot_id} to  {point}")
 
     def refresh_graphics(self):
         """Updating the world cache"""
