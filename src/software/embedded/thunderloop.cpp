@@ -321,16 +321,7 @@ void Thunderloop::runLoop()
             }
 
             // Motor Service: execute the motor control command
-            {
-                ScopedTimespecTimer timer(&poll_time);
-
-                ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
-                double time_since_prev_iter_sec =
-                    getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND;
-
-                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
-                                                     time_since_prev_iter_sec);
-            }
+            motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(), time_since_prev_iter);
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
@@ -421,11 +412,28 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
+TbotsProto::MotorStatus Thunderloop::pollMotorService(struct timespec& poll_time,
+        const TbotsProto::MotorControl& motor_control, const struct timespec& time_since_prev_iteration)
+{
+    ScopedTimespecTimer timer(&poll_time);
+
+    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
+    {
+        return TbotsProto::MotorStatus();
+    }
+
+    ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
+
+    double time_since_prev_iteration_s =
+        getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
+    return motor_service_->poll(motor_control, time_since_prev_iteration_s);
+}
+
 TbotsProto::PowerStatus Thunderloop::pollPowerService(struct timespec& poll_time)
 {
     ScopedTimespecTimer timer(&poll_time);
 
-    if (PLATFORM == Platform::LIMITED_BUILD)
+    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
     {
         return TbotsProto::PowerStatus();
     }
