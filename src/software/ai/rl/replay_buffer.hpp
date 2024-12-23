@@ -18,6 +18,9 @@
 template <typename TState, typename TAction>
 struct Transition
 {
+    static_assert(reflective_enum::is_reflective_enum<TAction>::value,
+                  "TAction must be a reflective enum");
+
     TState state;
     TAction action;
     float reward;
@@ -40,6 +43,9 @@ struct Transition
 template <typename TState, typename TAction>
 class ReplayBuffer
 {
+    static_assert(reflective_enum::is_reflective_enum<TAction>::value,
+                  "TAction must be a reflective enum");
+
    public:
     /**
      * Constructs a fixed capacity replay buffer.

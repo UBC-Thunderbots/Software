@@ -96,8 +96,10 @@ class AttackerTactic : public Tactic
     static constexpr unsigned int REPLAY_BUFFER_CAPACITY = 10000;
     static constexpr unsigned int TRANSITION_BATCH_SIZE  = 128;
 
-    // Epsilon value for epsilon-greedy exploration
-    static constexpr float EXPLORATION_EPSILON = 0.1f;
+    // Epsilon-greedy hyperparameter values
+    static constexpr double EPSILON_START = 0.9;
+    static constexpr double EPSILON_END = 0.05;
+    static constexpr double EPSILON_DECAY_RATE = 1000;
 
     DQN<AttackerState, AttackerSkill> dqn_;
     ReplayBuffer<AttackerState, AttackerSkill> replay_buffer_;

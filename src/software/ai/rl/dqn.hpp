@@ -13,6 +13,9 @@
 template <typename TState, typename TAction>
 class DQN
 {
+    static_assert(reflective_enum::is_reflective_enum<TAction>::value,
+                  "TAction must be a reflective enum");
+
    public:
     /**
      * Constructs a DQN.
@@ -42,6 +45,21 @@ class DQN
      * @param batch the batch of transitions to update the DQN with
      */
     void update(const std::vector<Transition<TState, TAction>>& batch);
+
+    /**
+     * Save the weights of the current network to a file.
+     *
+     * @param file_path the file to save the network weights to
+     */
+    void save(const std::string& file_path) const;
+
+    /**
+     * Loads the weights from the given file into the current network and
+     * target network.
+     *
+     * @param file_path the file to load the network weights from
+     */
+    void load(const std::string& file_path);
 
    private:
     static constexpr int HIDDEN_LAYER_SIZE   = 128;
@@ -89,7 +107,7 @@ template <typename TState, typename TAction>
 torch::Tensor DQN<TState, TAction>::act(const TState& state)
 {
     torch::NoGradGuard no_grad;
-    return current_net_->forward(state.tensor);
+    return current_net_->forward(state.getTensor());
 }
 
 template <typename TState, typename TAction>
@@ -106,10 +124,10 @@ void DQN<TState, TAction>::update(const std::vector<Transition<TState, TAction>>
     {
         const Transition<TState, TAction>& transition = batch.at(i);
 
-        state_batch[i]      = transition.state.tensor;
+        state_batch[i]      = transition.state.getTensor();
         action_batch[i]     = static_cast<int>(transition.action);
         reward_batch[i]     = transition.reward;
-        next_state_batch[i] = transition.next_state.tensor;
+        next_state_batch[i] = transition.next_state.getTensor();
         done_batch[i]       = transition.done;
     }
 
@@ -156,6 +174,19 @@ void DQN<TState, TAction>::update(const std::vector<Transition<TState, TAction>>
             }
         }
     }
+}
+
+template <typename TState, typename TAction>
+void DQN<TState, TAction>::save(const std::string& file_path) const
+{
+    torch::save(current_net_, file_path);
+}
+
+template <typename TState, typename TAction>
+void DQN<TState, TAction>::load(const std::string& file_path)
+{
+    torch::load(current_net_, file_path);
+    torch::load(target_net_, file_path);
 }
 
 template <typename TState, typename TAction>

@@ -4,7 +4,7 @@ AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       dqn_(DQN_LEARNING_RATE, DQN_DISCOUNT_RATE, DQN_SOFT_UPDATE_TAU),
       replay_buffer_(REPLAY_BUFFER_CAPACITY),
-      epsilon_greedy_strategy_(EXPLORATION_EPSILON),
+      epsilon_greedy_strategy_(EPSILON_START, EPSILON_END, EPSILON_DECAY_RATE),
       ai_config_(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)

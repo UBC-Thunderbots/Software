@@ -8,13 +8,9 @@
  * Tensor state representation of the World and other information pertinent
  * to the Attacker agent.
  */
-struct AttackerState
+class AttackerState
 {
-    /**
-     * The 1-D tensor representation of the AttackerState.
-     */
-    torch::Tensor tensor;
-
+   public:
     /**
      * Constructs an AttackerState from a World.
      *
@@ -23,12 +19,22 @@ struct AttackerState
      * the AttackerTactic
      */
     explicit AttackerState(const World& world, std::optional<RobotId> last_attacker_robot)
-        : tensor(torch::cat(
+        : tensor_(torch::cat(
               {convertTeamToTensor(world.friendlyTeam()),
                convertTeamToTensor(world.enemyTeam()), convertBallToTensor(world.ball()),
                convertGameStateToTensor(world.gameState()),
-               torch::tensor(static_cast<float>(last_attacker_robot.value_or(0)))}))
+               torch::tensor({static_cast<float>(last_attacker_robot.value_or(0))})}))
     {
+    }
+
+    /**
+     * Returns the 1-D tensor representation of the AttackerState.
+     *
+     * @return the tensor representation of the AttackerState
+     */
+    torch::Tensor getTensor() const
+    {
+        return tensor_;
     }
 
     /**
@@ -41,7 +47,7 @@ struct AttackerState
         const World blank_world(Field::createSSLDivisionBField(),
                                 Ball(Point(), Vector(), Timestamp()), Team(), Team());
 
-        return AttackerState(blank_world, std::nullopt).tensor.size(0);
+        return AttackerState(blank_world, std::nullopt).getTensor().size(0);
     }
 
    private:
@@ -114,4 +120,7 @@ struct AttackerState
                               static_cast<float>(enemy_team_info.getFoulsCount())},
                              {torch::kFloat32});
     }
+
+    // The 1-D tensor representation of the AttackerState
+    torch::Tensor tensor_;
 };

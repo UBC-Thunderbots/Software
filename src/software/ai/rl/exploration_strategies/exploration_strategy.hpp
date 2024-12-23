@@ -19,10 +19,14 @@ class ExplorationStrategy
                   "TAction must be a reflective enum");
 
    public:
+    virtual ~ExplorationStrategy() = default;
+
     /**
      * Selects an action from the given probability distribution.
      *
-     * @param action_probabilities the action probability distribution
+     * @param action_probabilities the action probability distribution;
+     * |A|-dimensional tensor where |A| is the size of the action space
+     *
      * @return the selected action
      */
     virtual TAction select(torch::Tensor action_probabilities) = 0;
