@@ -34,12 +34,17 @@ class GLMovementFieldTestLayer(GLLayer):
         if not self.visible():
             return
 
-        if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
+        if not event.mouse_event.modifiers() == Qt.KeyboardModifier.AltModifier:
             return
 
         point = event.point_in_scene
-        logger.info(f"I am clicking on point: {point}")
         self.move_to_point(point)
+
+    def find_closest_robot(self, point): 
+        # finding the closest robot on field
+        closest_robot = self.friendly_robot_on_field[0].id 
+        for robot in  self.friendly_robot_on_field:
+            logger.info("robot: {} point: {}".format(robot.current_state.global_position, point))
 
     def move_to_point(self, point):
         """Move to a point
@@ -50,7 +55,9 @@ class GLMovementFieldTestLayer(GLLayer):
             logger.warning("There are no friendly robots on the field.")
             return
 
-        robot_id = self.friendly_robot_on_field[0]
+        # finding the cloest to the f 
+        self.find_closest_robot(point)
+        robot_id = self.friendly_robot_on_field[0].id
 
         point = Point(x_meters=point.x(), y_meters=point.y())
         move_tactic = MoveTactic(
@@ -67,7 +74,6 @@ class GLMovementFieldTestLayer(GLLayer):
         assign_tactic.assigned_tactics[robot_id].move.CopyFrom(move_tactic)
 
         self.fullsystem_io.send_proto(AssignedTacticPlayControlParams, assign_tactic)
-        logger.info(f"I am moving moving robot: {robot_id} to  {point}")
 
     def refresh_graphics(self):
         """Updating the world cache"""
@@ -78,5 +84,5 @@ class GLMovementFieldTestLayer(GLLayer):
 
         if world.friendly_team:
             self.friendly_robot_on_field = [
-                robot.id for robot in world.friendly_team.team_robots
+                robot for robot in world.friendly_team.team_robots
             ]

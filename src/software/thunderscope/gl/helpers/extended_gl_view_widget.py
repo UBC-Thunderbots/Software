@@ -72,9 +72,9 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         :param event: The event
         """
-        if (
-            event.buttons() == QtCore.Qt.MouseButton.LeftButton
-            and event.modifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier
+        if event.buttons() == QtCore.Qt.MouseButton.LeftButton and (
+            event.modifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier
+            or event.modifiers() & QtCore.Qt.KeyboardModifier.AltModifier
         ):
             self.point_picked = True
             point_in_scene_event = MouseInSceneEvent(
