@@ -40,11 +40,13 @@ class GLMovementFieldTestLayer(GLLayer):
         point = event.point_in_scene
         self.move_to_point(point)
 
-    def find_closest_robot(self, point): 
+    def find_closest_robot(self, point):
         # finding the closest robot on field
-        closest_robot = self.friendly_robot_on_field[0].id 
-        for robot in  self.friendly_robot_on_field:
-            logger.info("robot: {} point: {}".format(robot.current_state.global_position, point))
+        closest_robot = self.friendly_robot_on_field[0].id
+        for robot in self.friendly_robot_on_field:
+            logger.info(
+                "robot: {} point: {}".format(robot.current_state.global_position, point)
+            )
 
     def move_to_point(self, point):
         """Move to a point
@@ -55,7 +57,7 @@ class GLMovementFieldTestLayer(GLLayer):
             logger.warning("There are no friendly robots on the field.")
             return
 
-        # finding the cloest to the f 
+        # finding the cloest to the f
         self.find_closest_robot(point)
         robot_id = self.friendly_robot_on_field[0].id
 
