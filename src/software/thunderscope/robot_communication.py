@@ -65,8 +65,8 @@ class RobotCommunication:
         # static map of robot id to stop primitive
         self.robot_stop_primitives_map: dict[int, StopPrimitive] = {}
 
-        # dynamic map of robot id to the number of times to send a stop primitive
-        self.robot_stop_primitive_send_count_map: dict[int, int] = {}
+        # links robot id to the number of times to send a stop primitive
+        self.robot_stop_primitive_send_count: list[int] = [0] * MAX_ROBOT_IDS_PER_SIDE
 
         self.current_proto_unix_io.register_observer(
             PrimitiveSet, self.fullsystem_primitive_set_buffer
@@ -83,12 +83,6 @@ class RobotCommunication:
         # dynamic map of robot id to the individual control mode
         self.robot_control_mode_map: dict[int, IndividualRobotMode] = {}
 
-        # static map of robot id to stop primitive
-        self.robot_stop_primitives_map: dict[int, StopPrimitive] = {}
-
-        # dynamic map of robot id to the number of times to send a stop primitive
-        self.robot_stop_primitive_send_count_map: dict[int, int] = {}
-
         self.send_estop_state_thread = threading.Thread(
             target=self.__send_estop_state, daemon=True
         )
@@ -100,7 +94,6 @@ class RobotCommunication:
         for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_control_mode_map[robot_id] = IndividualRobotMode.NONE
             self.robot_stop_primitives_map[robot_id] = Primitive(stop=StopPrimitive())
-            self.robot_stop_primitive_send_count_map[robot_id] = 0
 
         # TODO: (#3174): move estop state management out of robot_communication
         self.estop_mode = estop_mode
@@ -152,9 +145,7 @@ class RobotCommunication:
         :param robot_id: the id of the robot whose mode we're changing
         """
         self.robot_control_mode_map[robot_id] = mode
-        self.robot_stop_primitive_send_count_map[robot_id] = (
-            NUM_TIMES_SEND_STOP if mode == IndividualRobotMode.NONE else 0
-        )
+        self.robot_stop_primitive_send_count[robot_id] = NUM_TIMES_SEND_STOP if mode == IndividualRobotMode.NONE else 0
 
     def __send_estop_state(self) -> None:
         """Constant loop which sends the current estop status proto if estop is not disabled
@@ -168,28 +159,26 @@ class RobotCommunication:
                 if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
 
-                self.robot_stop_primitive_send_count_map = {
+                self.robot_stop_primitive_send_count = [
                     NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-                }
+                ]
 
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_is_playing)
                 )
                 time.sleep(0.1)
 
-    def __should_send_packet(self) -> bool:
-        """Returns True if the proto sending threads should send a proto
+    def __should_send_packet(self, robot_id) -> bool:
+        """Returns True if the proto should be sent to the robot with the given id
+
+        :param robot_id: the id of the robot to potentially send the proto to
 
         :return: boolean
         """
         return (
             self.estop_mode != EstopMode.DISABLE_ESTOP
             and self.estop_is_playing
-            and (
-                IndividualRobotMode.AI
-                or IndividualRobotMode.MANUAL
-                in self.robot_id_individual_mode_dict.values()
-            )
+            and self.robot_control_mode_map[robot_id] != IndividualRobotMode.NONE
         )
 
     def __run_primitive_set(self) -> None:
@@ -252,20 +241,17 @@ class RobotCommunication:
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
-            for (
-                robot_id,
-                num_times_to_stop,
-            ) in self.robot_stop_primitive_send_count_map.items():
-                if num_times_to_stop > 0:
+            for (robot_id, num_times_to_send_stop) in enumerate(self.robot_stop_primitive_send_count):
+                if num_times_to_send_stop > 0:
                     robot_primitives_map[robot_id] = Primitive(stop=StopPrimitive())
-                    self.robot_stop_primitive_send_count_map[robot_id] = (
-                        num_times_to_stop - 1
-                    )
+                    self.robot_stop_primitive_send_count[robot_id] = num_times_to_send_stop - 1
 
-            if self.__should_send_packet():
-                for robot_id, primitive in robot_primitives_map.items():
-                    primitive.sequence_number = self.sequence_number
-                    primitive.time_sent = Timestamp(epoch_timestamp_seconds=time.time())
+            for robot_id, primitive in robot_primitives_map.items():
+                if not self.__should_send_packet(robot_id=robot_id):
+                    continue
+                primitive.sequence_number = self.sequence_number
+                primitive.time_sent.CopyFrom(Timestamp(epoch_timestamp_seconds=time.time()))
+                self.communication_manager.send_primitive(robot_id=robot_id, primitive=primitive)
 
             self.sequence_number += 1
 

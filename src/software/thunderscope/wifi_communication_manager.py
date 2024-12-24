@@ -47,9 +47,9 @@ class WifiCommunicationManager:
 
 
         ## Senders and Listeners ##
-        self.primitive_senders: List[Tuple[Lock, Union[None, tbots_cpp.PrimitiveSender]]] = (
-                [(Lock(), None)] for _ in range(MAX_ROBOT_IDS_PER_SIDE)
-        )
+        self.primitive_senders: List[Tuple[Lock, Union[None, tbots_cpp.PrimitiveSender]]] = [
+                (Lock(), None) for _ in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
         self.receive_robot_status: Union[None, tbots_cpp.RobotStatusProtoListener] = None
         self.receive_robot_log: Union[None, tbots_cpp.RobotLogProtoListener] = None
         self.receive_robot_crash: Union[None, tbots_cpp.RobotCrashProtoListener] = None
@@ -132,12 +132,15 @@ class WifiCommunicationManager:
                     primitive_sender.get_ip_address() != ip_address or
                     primitive_sender.get_interface() != self.current_network_config.robot_communication_interface
                     ):
-                self.primitive_senders[robot_id][1], error = tbots_cpp.createPrimitiveSender(
+                primitive_sender, error = tbots_cpp.createPrimitiveProtoUdpSender(
                     ip_address,
                     PRIMITIVE_PORT,
                     self.current_network_config.robot_communication_interface,
                     False,
                 )
+
+                if not error:
+                    self.primitive_senders[robot_id] = (self.primitive_senders[robot_id][0], primitive_sender)
 
         if error:
             logger.error(f"Error connecting to robot {robot_id}: {error}")
@@ -344,12 +347,19 @@ class WifiCommunicationManager:
 
         :param robot_ip_notification: IP notification message from a robot with its IP address
         """
+        should_reconnect = False
         with self.robot_ip_addresses[robot_ip_notification.robot_id][0]:
             old_ip_address = self.robot_ip_addresses[robot_ip_notification.robot_id][1]
             if old_ip_address is None or old_ip_address != robot_ip_notification.ip_address:
                 logging.info(f"Robot {robot_ip_notification.robot_id} has IP address {robot_ip_notification.ip_address}")
-                self.robot_ip_addresses[robot_ip_notification.robot_id][1] = robot_ip_notification.ip_address
-                self.__connect_to_robot(robot_ip_notification.robot_id)
+                self.robot_ip_addresses[robot_ip_notification.robot_id] = (
+                    self.robot_ip_addresses[robot_ip_notification.robot_id][0],
+                    robot_ip_notification.ip_address
+                )
+                should_reconnect = True
+
+        if should_reconnect:
+            self.__connect_to_robot(robot_ip_notification.robot_id)
 
 
     def poll(self) -> None:
