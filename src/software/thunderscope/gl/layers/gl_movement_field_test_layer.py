@@ -30,7 +30,10 @@ class GLMovementFieldTestLayer(GLLayer):
         self.is_selected = False
 
     def select_closest_robot(self, point):
-        """find the closest robot to a point"""
+        """find the closest robot to a point
+
+        :param point: the reference point to find the closest robot 
+        """
         closest_robot  = self.cached_team.getNearestRobot(tbots_cpp.Point(point.x(), point.y())) 
         if closest_robot is None: 
             logger.warning("No robot founds. Are you sure there is friendly robot on field?")
