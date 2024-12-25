@@ -2,6 +2,7 @@ import math
 from pyqtgraph.Qt.QtCore import Qt
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from proto.import_all_protos import *
+from software.thunderscope.gl.layers.gl_world_layer import tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.logger.logger import create_logger
 from software.thunderscope.gl.layers.gl_layer import GLLayer
@@ -24,40 +25,52 @@ class GLMovementFieldTestLayer(GLLayer):
 
         self.world_buffer: ThreadSafeBuffer = ThreadSafeBuffer(buffer_size, World)
         self.fullsystem_io: ProtoUnixIO = fullsystem_io
-        self.friendly_robot_on_field = []
+        self.selected_robot_id = 0
+        self.cached_team: tbots_cpp.Team = None
+        self.is_selected = False
+
+    def select_closest_robot(self, point):
+        """find the closest robot to a point"""
+        closest_robot  = self.cached_team.getNearestRobot(tbots_cpp.Point(point.x(), point.y())) 
+        if closest_robot is None: 
+            logger.warning("No robot founds. Are you sure there is friendly robot on field?")
+
+        self.selected_robot_id = closest_robot.id()
+        self.is_selected = True
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
-        """Move to the point clicked
+        """Move to the point clicked.
+        If Shift+Alt+Control is pressed, clicking selects a robot based on the closest point in scene.
+        If Shift+Alt is pressed, clicking moves a robot to the point in scene.
 
         :param event: The event
         """
         if not self.visible():
             return
 
-        if not event.mouse_event.modifiers() == Qt.KeyboardModifier.AltModifier:
+        if not event.mouse_event.modifiers() & Qt.KeyboardModifier.AltModifier:
             return
 
         point = event.point_in_scene
-        self.move_to_point(point)
-
-    def find_closest_robot(self, point): 
-        # finding the closest robot on field
-        closest_robot = self.friendly_robot_on_field[0].id 
-        for robot in  self.friendly_robot_on_field:
-            logger.info("robot: {} point: {}".format(robot.current_state.global_position, point))
+        if event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier:
+            # Shift+Alt+Control is pressed
+            self.select_closest_robot(point)
+        else:
+            # Shift+Alt is pressed
+            self.move_to_point(point)
 
     def move_to_point(self, point):
         """Move to a point
 
         :param point: the point we are commanding the robot to move to
         """
-        if len(self.friendly_robot_on_field) == 0:
-            logger.warning("There are no friendly robots on the field.")
+
+        # whether the selected_robot_index would cause index out of range issues
+        if not self.is_selected:
+            logger.warning("No robot selected to be moved")
             return
 
-        # finding the cloest to the f 
-        self.find_closest_robot(point)
-        robot_id = self.friendly_robot_on_field[0].id
+        robot_id = self.selected_robot_id
 
         point = Point(x_meters=point.x(), y_meters=point.y())
         move_tactic = MoveTactic(
@@ -82,7 +95,4 @@ class GLMovementFieldTestLayer(GLLayer):
         if world is None:
             return
 
-        if world.friendly_team:
-            self.friendly_robot_on_field = [
-                robot for robot in world.friendly_team.team_robots
-            ]
+        self.cached_team = tbots_cpp.Team(world.friendly_team)

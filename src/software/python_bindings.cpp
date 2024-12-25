@@ -150,11 +150,13 @@ PYBIND11_MODULE(python_bindings, m)
         .def(-py::self)
         .def(py::self == Point())
         .def(py::self != Point())
-        .def("__repr__", [](const Point& v) {
-            std::stringstream stream;
-            stream << v;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Point& v)
+             {
+                 std::stringstream stream;
+                 stream << v;
+                 return stream.str();
+             });
 
     py::class_<Vector>(m, "Vector")
         .def(py::init<float, float>())
@@ -180,11 +182,13 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::self *= double())
         .def(py::self / double())
         .def(py::self /= double())
-        .def("__repr__", [](const Vector& v) {
-            std::stringstream stream;
-            stream << v;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Vector& v)
+             {
+                 std::stringstream stream;
+                 stream << v;
+                 return stream.str();
+             });
 
     py::class_<Polygon>(m, "Polygon")
         .def(py::init<std::vector<Point>>())
@@ -192,11 +196,13 @@ PYBIND11_MODULE(python_bindings, m)
         .def("getPoints", &Polygon::getPoints)
         .def("getSegments", &Polygon::getSegments)
         // Overloaded
-        .def("__repr__", [](const Polygon& v) {
-            std::stringstream stream;
-            stream << v;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Polygon& v)
+             {
+                 std::stringstream stream;
+                 stream << v;
+                 return stream.str();
+             });
 
     py::class_<Angle>(m, "Angle")
         .def(py::init<>())
@@ -204,18 +210,21 @@ PYBIND11_MODULE(python_bindings, m)
         .def_static("fromDegrees", &Angle::fromDegrees)
         .def("toRadians", &Angle::toRadians)
         // Overloaded
-        .def("__repr__", [](const Angle& a) {
-            std::stringstream stream;
-            stream << a;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Angle& a)
+             {
+                 std::stringstream stream;
+                 stream << a;
+                 return stream.str();
+             });
 
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
     py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
         .def(py::init<Point, Point>())
         // Overloaded
         .def("__repr__",
-             [](const Rectangle& r) {
+             [](const Rectangle& r)
+             {
                  std::stringstream stream;
                  stream << r;
                  return stream.str();
@@ -248,7 +257,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::init<Point, double>())
         // Overloaded
         .def("__repr__",
-             [](const Circle& c) {
+             [](const Circle& c)
+             {
                  std::stringstream stream;
                  stream << c;
                  return stream.str();
@@ -259,11 +269,13 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Stadium>(m, "Stadium")
         .def(py::init<Segment, double>())
-        .def("__repr__", [](const Stadium& s) {
-            std::stringstream stream;
-            stream << s;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Stadium& s)
+             {
+                 std::stringstream stream;
+                 stream << s;
+                 return stream.str();
+             });
 
     py::class_<RobotConstants>(m, "RobotConstants")
         .def_readwrite("max_force_dribbler_speed_rpm",
@@ -328,12 +340,16 @@ PYBIND11_MODULE(python_bindings, m)
         .def("angularVelocity", &Robot::angularVelocity)
         .def("isNearDribbler", &Robot::isNearDribbler, py::arg("test_point"),
              py::arg("TOLERANCE") = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
-        .def("dribblerArea", &Robot::dribblerArea);
+        .def("dribblerArea", &Robot::dribblerArea)
+        .def("id", &Robot::id);
 
     py::class_<Team>(m, "Team")
+        .def(py::init<TbotsProto::Team>())
         .def(py::init<const std::vector<Robot>&>())
         .def("assignGoalie", &Team::assignGoalie)
-        .def("getAllRobots", &Team::getAllRobots);
+        .def("getAllRobots", &Team::getAllRobots)
+        .def("getNearestRobot",
+             py::overload_cast<const Point&>(&Team::getNearestRobot, py::const_));
 
     py::class_<Timestamp>(m, "Timestamp").def(py::init<>());
 
