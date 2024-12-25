@@ -18,13 +18,6 @@ NetworkService::NetworkService(const RobotId& robot_id,
     robot_to_fullsystem_ip_sender = createNetworkResource<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
             ip_address, robot_to_full_system_ip_notification_port, interface, false);
 
-    udp_listener_primitive = createNetworkResource<ThreadedProtoUdpListener<TbotsProto::Primitive>>(ip_address,
-            primitive_listener_port, interface,
-            std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1), false);
-
-    radio_listener_primitive_set =
-        std::make_unique<ThreadedProtoRadioListener<TbotsProto::Primitive>>(
-            std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
 
     robot_ip_notification_msg.set_robot_id(robot_id);
     std::optional<std::string> local_ip = getLocalIp(interface);
@@ -36,6 +29,14 @@ NetworkService::NetworkService(const RobotId& robot_id,
     {
         LOG(FATAL) << "Failed to get IP addresses associated with " << interface;
     }
+
+    udp_listener_primitive = createNetworkResource<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
+            primitive_listener_port,
+            std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
+
+    radio_listener_primitive_set =
+        std::make_unique<ThreadedProtoRadioListener<TbotsProto::Primitive>>(
+            std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
 }
 
 void NetworkService::onFullSystemIpNotification(const TbotsProto::IpNotification& ip_notification)

@@ -19,7 +19,7 @@ from software.thunderscope.constants import (
     EstopMode,
 )
 
-logger = logging.getLogger(__name__)
+logger = create_logger(__name__)
 
 
 class RobotCommunication:
@@ -51,8 +51,6 @@ class RobotCommunication:
         self.communication_manager = communication_manager
 
         self.running = False
-
-        self.logger = create_logger("RobotCommunication")
 
         self.fullsystem_primitive_set_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
@@ -125,7 +123,7 @@ class RobotCommunication:
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
             self.estop_is_playing = not self.estop_is_playing
-            self.logger.debug(
+            logger.debug(
                 "Keyboard Estop changed to "
                 + (
                     "\x1b[32mPLAY \x1b[0m"
@@ -159,9 +157,10 @@ class RobotCommunication:
                 if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
 
-                self.robot_stop_primitive_send_count = [
-                    NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-                ]
+                if not self.estop_is_playing:
+                    self.robot_stop_primitive_send_count = [
+                        NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+                    ]
 
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_is_playing)

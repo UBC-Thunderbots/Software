@@ -12,6 +12,7 @@ from google.protobuf.message import Message
 from colorama import Fore, Style
 import logging
 from threading import Lock, Thread
+import time
 
 DISCONNECTED = "DISCONNECTED"
 """A constant to represent a disconnected interface"""
@@ -95,6 +96,7 @@ class WifiCommunicationManager:
 
     def __enter__(self) -> Self:
         self.broadcast_ip = Thread(target=self.__broadcast_fullsystem_ip, daemon=True)
+        self.broadcast_ip.start()
         return self
 
 
@@ -106,7 +108,11 @@ class WifiCommunicationManager:
     def __broadcast_fullsystem_ip(self):
         """Notify the robots of this computer's IP address"""
         while self.running:
-            time.sleep(1.0 / BROADCAST_HZ)
+            with self.fullsystem_ip_broadcaster[0]:
+                fullsystem_ip_broadcaster = self.fullsystem_ip_broadcaster[1]
+                if fullsystem_ip_broadcaster is not None:
+                    fullsystem_ip_broadcaster.send_proto(self.fullsystem_ip_broadcaster[2], True)
+            time.sleep(1.0 / WifiCommunicationManager.BROADCAST_HZ)
 
 
     def __connect_to_robot(self, robot_id: int) -> None:
@@ -391,6 +397,7 @@ class WifiCommunicationManager:
         :param robot_id: the id of the robot to send the primitive to
         :param primitive: the primitive to send
         """
+        logger.debug(f"Sending primitive to robot {robot_id}")
         with self.primitive_senders[robot_id][0]:
             primitive_sender = self.primitive_senders[robot_id][1]
             if primitive_sender is not None:

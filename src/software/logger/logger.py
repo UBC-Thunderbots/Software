@@ -1,4 +1,4 @@
-from logging import Logger, basicConfig, getLogger, INFO
+from logging import Logger, basicConfig, getLogger, INFO, DEBUG
 
 
 
@@ -14,4 +14,5 @@ def create_logger(name, log_level: int = INFO) -> Logger:
         level=log_level,
         format="%(asctime)s - [%(levelname)s] - [%(threadName)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
     )
+
     return getLogger(name)
