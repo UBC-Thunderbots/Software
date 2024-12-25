@@ -30,13 +30,17 @@ class GLMovementFieldTestLayer(GLLayer):
         self.is_selected = False
 
     def select_closest_robot(self, point):
-        """find the closest robot to a point
+        """Find the closest robot to a point
 
-        :param point: the reference point to find the closest robot 
+        :param point: the reference point to find the closest robot
         """
-        closest_robot  = self.cached_team.getNearestRobot(tbots_cpp.Point(point.x(), point.y())) 
-        if closest_robot is None: 
-            logger.warning("No robot founds. Are you sure there is friendly robot on field?")
+        closest_robot = self.cached_team.getNearestRobot(
+            tbots_cpp.Point(point.x(), point.y())
+        )
+        if closest_robot is None:
+            logger.warning(
+                "No robot founds. Are you sure there is friendly robot on field?"
+            )
 
         self.selected_robot_id = closest_robot.id()
         self.is_selected = True
@@ -67,7 +71,6 @@ class GLMovementFieldTestLayer(GLLayer):
 
         :param point: the point we are commanding the robot to move to
         """
-
         # whether the selected_robot_index would cause index out of range issues
         if not self.is_selected:
             logger.warning("No robot selected to be moved")
