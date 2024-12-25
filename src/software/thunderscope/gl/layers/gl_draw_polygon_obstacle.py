@@ -1,3 +1,4 @@
+from textwrap import wrap
 from software.thunderscope.binary_context_managers.full_system import ProtoUnixIO
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from pyqtgraph.Qt import QtGui
@@ -81,35 +82,27 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         self.rendering_polygons.append(self.current_polygon)
         self.current_polygon = GLPolygon(parent_item=self, line_width=2)
-        self._send_to_fs()
 
     def _add_one_point(self, point: tuple[float, float]):
         """Adding one points to a polygon
 
         :param point: represent the point (x,y) that is added to the polygon
         """
-        # trying to create a line
         if len(self.points) < 2:
+            # creating a line segment
             self.points.append(point)
-            self.current_polygon.set_points(self.points)
-            return
-
-        # creating a triangle
-        if len(self.points) == 2:
+        elif len(self.points) == 2:
+            # creating a triangle
             start_point = self.points[0]
+            self.points.append(point)
+            self.points.append(start_point)
+        else: 
+            # creating a general polygon
+            start_point = self.points[0]
+            self.points.pop()  # removing the start point since the last point is always the start point
 
             self.points.append(point)
             self.points.append(start_point)
-            self.current_polygon.set_points(self.points)
-            self._send_to_fs()
-            return
-
-        # creating a general polygon
-        start_point = self.points[0]
-        self.points.pop()  # removing the start point since the last point is always the start point
-
-        self.points.append(point)
-        self.points.append(start_point)
         self.current_polygon.set_points(self.points)
         self._send_to_fs()
 
