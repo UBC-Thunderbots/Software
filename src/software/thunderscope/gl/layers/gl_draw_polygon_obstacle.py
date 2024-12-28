@@ -1,7 +1,7 @@
 from software.thunderscope.binary_context_managers.full_system import ProtoUnixIO
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt.QtCore import QTimer, Qt
 from pyqtgraph.opengl import *
 
 from proto.import_all_protos import *
@@ -26,6 +26,8 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         super().__init__(name)
 
+        import inspect 
+        print(inspect.getmro(GLDrawPolygonObstacleLayer))
         self.friendly_io: ProtoUnixIO = friendly_io
 
         self.current_polygon: GLPolygon = GLPolygon(parent_item=self, line_width=2)
@@ -37,6 +39,9 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         # used for keeping track and rendering multiple polygons
         self.rendering_polygons: ObservableList = ObservableList(self._graphics_changed)
 
+        self.is_double_click: bool = True
+
+
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Responding to key events that are going to push obstacles to the stack or add point
 
@@ -45,11 +50,11 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         if not self.visible():
             return
 
-        if event.key() == Qt.Key.Key_P:
-            self.push_polygon_to_list()
-
         if event.key() == Qt.Key.Key_C:
             self.clear_polygons()
+
+    def _reset_double_click(self): 
+        self.is_double_click = False 
 
     def clear_polygons(self):
         """Clearing the obstacles"""
@@ -130,6 +135,15 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         if not self.visible():
             return
+
+        # handle double click
+        if self.is_double_click:
+            self.push_polygon_to_list()
+            self.is_double_click = False 
+            return 
+        else: 
+            self.is_double_click = True 
+            QTimer.singleShot(500, self._reset_double_click)
 
         point = event.point_in_scene
         self._add_one_point((point.x(), point.y()))
