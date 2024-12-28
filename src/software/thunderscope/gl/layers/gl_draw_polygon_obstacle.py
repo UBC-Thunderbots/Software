@@ -40,7 +40,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         # used for keeping track and rendering multiple polygons
         self.rendering_polygons: ObservableList = ObservableList(self._graphics_changed)
 
-        self.is_double_click: bool = True
+        self.can_double_click: bool = True
 
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -127,13 +127,20 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         )
 
     def create_single_click_callback(self, event: MouseInSceneEvent):
+        """ creating a single shot callback to handle single click
+
+        :param event: The mouse event when a scene is pressed
+        """
         def _handle_single_click(): 
-            if self.is_double_click:
+            # This logic is somewhat non trivial. If we `can_double_click`, it indicates that 
+            # a double-click hasn't occurred within the 200 ms time window. 
+            # In other words, the user hasn't double-clicked, 
+            # so we will now interpret the action as a single click.
+            if self.can_double_click:
                 point = event.point_in_scene
                 self._add_one_point((point.x(), point.y()))
 
-            self.is_double_click = False
-
+            self.can_double_click = False
         return _handle_single_click
     
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
@@ -143,15 +150,14 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         if not self.visible():
             return
+        super().mouse_in_scene_pressed(event)
 
         # handle double click
-        if self.is_double_click:
+        if self.can_double_click:
             self.push_polygon_to_list()
-            self.is_double_click = False 
+            self.can_double_click = False 
             return 
         else: 
-            self.is_double_click = True 
+            self.can_double_click = True 
+            # handle single click
             QTimer.singleShot(200, self.create_single_click_callback(event))
-
-
-        return super().mouse_in_scene_pressed(event)
