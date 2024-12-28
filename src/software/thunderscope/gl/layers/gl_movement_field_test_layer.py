@@ -15,7 +15,7 @@ class GLMovementFieldTestLayer(GLLayer):
     def __init__(
         self, name: str, fullsystem_io: ProtoUnixIO, buffer_size: int = 5
     ) -> None:
-        """Initialize the GLMovementLayer
+        """Initialize the GLMovementFieldTestLayer
 
         :param name:            The displayed name of the layer
         :param buffer_size:     The buffer size we have

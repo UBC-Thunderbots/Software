@@ -170,6 +170,10 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Ctrl + R:</code></b> Remove the current layout file and reset the layout<br><br>
     Layout file (on save) is located at {SAVED_LAYOUT_PATH}<br>
 
+    <h3>GL Movement Field Test Layer</h3>
+    <b><code>Shift+Alt+Control+Click</code></b> Select the robot that is going to be moved<br>
+    <b><code>Shift+Alt+Click</code></b>Move the selected robot to the clicked point<br>
+
     """
 )
 
