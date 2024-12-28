@@ -365,7 +365,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.robot_add_double_click
             and self.robot_add_double_click == event.point_in_scene
         ):
-            print("double click have been called?")
             # add an undo operation to remove the robot that is being added
             self.__add_undo_operation(
                 RobotOperation(self.next_id, event.point_in_scene, None, self.next_id)
@@ -378,7 +377,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.next_id = self.__get_next_robot_id(self.next_id)
             self.__toggle_robot_add_double_click()
         else:
-            print("i have been called?")
             # start a double click
             self.robot_add_double_click = event.point_in_scene
             QTimer.singleShot(500, self.__toggle_robot_add_double_click)
