@@ -98,7 +98,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             start_point = self.points[0]
             self.points.append(point)
             self.points.append(start_point)
-        else: 
+        else:
             # creating a general polygon
             start_point = self.points[0]
             self.points.pop()  # removing the start point since the last point is always the start point
