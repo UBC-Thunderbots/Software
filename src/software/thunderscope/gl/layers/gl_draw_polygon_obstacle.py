@@ -1,3 +1,4 @@
+from numpy import who
 from software.thunderscope.binary_context_managers.full_system import ProtoUnixIO
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from pyqtgraph.Qt import QtGui
@@ -52,9 +53,6 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         if event.key() == Qt.Key.Key_C:
             self.clear_polygons()
-
-    def _reset_double_click(self): 
-        self.is_double_click = False 
 
     def clear_polygons(self):
         """Clearing the obstacles"""
@@ -128,6 +126,16 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             VirtualObstacles, VirtualObstacles(obstacles=obstacles)
         )
 
+    def create_single_click_callback(self, event: MouseInSceneEvent):
+        def _handle_single_click(): 
+            if self.is_double_click:
+                point = event.point_in_scene
+                self._add_one_point((point.x(), point.y()))
+
+            self.is_double_click = False
+
+        return _handle_single_click
+    
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Adding the point in scene
 
@@ -143,9 +151,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             return 
         else: 
             self.is_double_click = True 
-            QTimer.singleShot(500, self._reset_double_click)
+            QTimer.singleShot(200, self.create_single_click_callback(event))
 
-        point = event.point_in_scene
-        self._add_one_point((point.x(), point.y()))
 
         return super().mouse_in_scene_pressed(event)
