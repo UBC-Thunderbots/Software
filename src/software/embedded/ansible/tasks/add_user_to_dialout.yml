@@ -1,8 +1,7 @@
 ---
-
 - name: Add user robot to dialout
   become: true
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   tags:
     - add_user_robot_to_dialout
-  command: 'adduser robot dialout'
+  ansible.builtin.command: "adduser robot dialout"

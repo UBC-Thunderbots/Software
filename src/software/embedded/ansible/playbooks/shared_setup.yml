@@ -1,5 +1,4 @@
 ---
-
 - name: Success msg
   debug:
     msg:

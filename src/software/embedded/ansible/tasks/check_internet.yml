@@ -1,8 +1,7 @@
 ---
-
-- name: check internet connection
+- name: Check internet connection
   tags: check_internet
-  wait_for:
+  ansible.builtin.wait_for:
     host: google.com
     state: started
     delay: 0
