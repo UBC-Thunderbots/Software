@@ -1,4 +1,3 @@
-from textwrap import wrap
 from software.thunderscope.binary_context_managers.full_system import ProtoUnixIO
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from pyqtgraph.Qt import QtGui
