@@ -6,7 +6,6 @@
   ansible.posix.synchronize:
     src: ../../setup_robot_software_deps.sh
     dest: ~/
-    recursive: yes
     copy_links: yes
 
 # Output is streamed to target host's (Jetson/Pi's /tmp/setup.log)
@@ -28,3 +27,21 @@
     line: 'appendonly yes'
     backrefs: yes
 
+- name: Disable WiFi power management
+  block:
+    - name: Delete WiFi power management rule
+      become: true
+      become_method: sudo
+      ansible.builtin.file:
+        path: /etc/NetworkManager/conf.d/default-wifi-powersave-on.conf
+        state: absent
+
+    - name: Create WiFi power management rule
+      become: true
+      become_method: sudo
+      ansible.builtin.copy:
+        content: |
+          [connection]
+          wifi.powersave = 2
+        dest: /etc/NetworkManager/conf.d/default-wifi-powersave-on.conf
+        mode: '600'

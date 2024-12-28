@@ -2,7 +2,8 @@
 
 - name: check internet connection
   tags: check_internet
-  uri:
-    url: "https://google.com"
-    timeout: 30
-    status_code: 200
+  wait_for:
+    host: google.com
+    state: started
+    delay: 0
+    timeout: 10
