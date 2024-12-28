@@ -237,15 +237,6 @@ if __name__ == "__main__":
             "--launch_gc has to be ran with --run_blue or --run_yellow argument"
         )
 
-    # Sanity check that an interface was provided if we are running diagnostics since it will not load the network
-    # configuration widget
-    if (
-        not (args.run_blue or args.run_yellow)
-        and args.run_diagnostics
-        and args.interface is None
-    ):
-        parser.error("Must specify interface")
-
     ###########################################################################
     #                      Visualize CPP Tests                                #
     ###########################################################################
