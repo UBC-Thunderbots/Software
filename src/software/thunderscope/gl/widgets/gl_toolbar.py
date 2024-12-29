@@ -28,6 +28,7 @@ class GLToolbar(QWidget):
 
     def refresh(self) -> None:
         """Refreshes the UI (overridden by child classes)"""
+        raise NotImplementedError("Subclasses must implement this method!")
 
     def get_button_style(self, is_enabled: bool = True) -> str:
         """Returns the stylesheet for a QPushButton based on if it's enabled or not

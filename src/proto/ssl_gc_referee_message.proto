@@ -75,7 +75,7 @@ message Referee
     //
     // If the stage runs over its specified time, this value
     // becomes negative.
-    optional sint32 stage_time_left = 3;
+    optional sint64 stage_time_left = 3;
 
     // These are the "fine" states of play on the field.
     enum Command
@@ -101,16 +101,20 @@ message Referee
         // The blue team may take a direct free kick.
         DIRECT_FREE_BLUE = 9;
         // The yellow team may take an indirect free kick.
-        INDIRECT_FREE_YELLOW = 10;
+        INDIRECT_FREE_YELLOW = 10 [deprecated = true];
         // The blue team may take an indirect free kick.
-        INDIRECT_FREE_BLUE = 11;
+        INDIRECT_FREE_BLUE = 11 [deprecated = true];
         // The yellow team is currently in a timeout.
         TIMEOUT_YELLOW = 12;
         // The blue team is currently in a timeout.
         TIMEOUT_BLUE = 13;
         // The yellow team just scored a goal.
         // For information only.
-        // For rules compliance, teams must treat as STOP.
+        // Deprecated: Use the score field from the team infos instead. That way, you can
+        // also detect revoked goals.
+        GOAL_YELLOW = 14 [deprecated = true];
+        // The blue team just scored a goal. See also GOAL_YELLOW.
+        GOAL_BLUE = 15 [deprecated = true];
         // Equivalent to STOP, but the yellow team must pick up the ball and
         // drop it in the Designated Position.
         BALL_PLACEMENT_YELLOW = 16;
@@ -163,6 +167,12 @@ message Referee
         // Indicate if the team reached the maximum allowed ball placement failures and is
         // thus not allowed to place the ball anymore
         optional bool ball_placement_failures_reached = 15;
+        // The team is allowed to substitute one or more robots currently
+        optional bool bot_substitution_allowed = 16;
+        // The number of bot substitutions left by the team in this halftime
+        optional uint32 bot_substitutions_left = 17;
+        // The number of microseconds left for current bot substitution
+        optional uint32 bot_substitution_time_left = 18;
     }
 
     // Information about the two teams.
@@ -185,6 +195,11 @@ message Referee
     // coordinate system. Obviously, the yellow team will play on the opposite half.
     optional bool blue_team_on_positive_half = 10;
 
+    // The game event that caused the referee command.
+    // deprecated in favor of game_events.
+    //    optional Game_Event game_event = 11 [deprecated = true];
+    reserved 11;
+
     // The command that will be issued after the current stoppage and ball placement to
     // continue the game.
     optional Command next_command = 12;
@@ -194,7 +209,7 @@ message Referee
     reserved 13;
     repeated GameEvent game_events = 16;
 
-    // All non-finished proposed game events that may be processed next.
+    // All proposed game events that were detected since the last RUNNING state.
     reserved 14;
     repeated GameEventProposalGroup game_event_proposals = 17;
 
@@ -205,14 +220,19 @@ message Referee
     //  * free kicks
     //  * kickoff, penalty kick, force start
     //  * ball placement
-    optional int32 current_action_time_remaining = 15;
+    optional int64 current_action_time_remaining = 15;
+
+    // A message that can be displayed to the spectators, like a reason for a stoppage.
+    optional string status_message = 20;
 }
 
 // List of matching proposals
 message GameEventProposalGroup
 {
-    // The proposed game event.
-    repeated GameEvent game_event = 1;
+    // Unique ID of this group
+    optional string id = 3;
+    // The proposed game events
+    repeated GameEvent game_events = 1;
     // Whether the proposal group was accepted
     optional bool accepted = 2;
 }
