@@ -26,9 +26,6 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         super().__init__(name)
 
-        import inspect
-
-        print(inspect.getmro(GLDrawPolygonObstacleLayer))
         self.friendly_io: ProtoUnixIO = friendly_io
 
         self.current_polygon: GLPolygon = GLPolygon(parent_item=self, line_width=2)
