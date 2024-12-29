@@ -155,7 +155,7 @@ def setup_gl_widget(
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
 
     shift_button_toolbar = gl_widget.get_shift_button_toolbar()
-    shift_button_toolbar.disable_ball_movement_signal.connect(
+    shift_button_toolbar.enable_ball_movement_signal.connect(
         world_layer.should_move_ball_slot
     )
 

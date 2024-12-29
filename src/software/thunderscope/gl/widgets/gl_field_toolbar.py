@@ -1,8 +1,5 @@
-import textwrap
-from typing import Callable, List
-from PyQt6.QtGui import QKeySequence
+from typing import Callable
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.Qt.QtCore import pyqtSignal
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -52,7 +49,8 @@ class GLFieldToolbar(GLToolbar):
         super(GLFieldToolbar, self).__init__(parent=parent)
 
         # Setup Layers button for toggling visibility of layers
-        self.layers_button = QPushButton("layers")
+        self.layers_button = QPushButton()
+        self.layers_button.setText("Layers")
         self.layers_button.setStyleSheet(self.get_button_style())
         self.layers_button.setMenu(layers_menu)
 
@@ -220,90 +218,3 @@ class GLFieldToolbar(GLToolbar):
         :param callback: the callback function to update the simulation speed
         """
         self.speed_callback = callback
-
-
-class ShiftButtonToolbar(GLToolbar):
-    disable_ball_movement_signal = pyqtSignal(bool)
-
-    def __init__(self, parent) -> None:
-        super().__init__(parent)
-        self.menu = QMenu()
-        self.push_button = QPushButton()
-        self.push_button.setText("Change Shift Button Behavior")
-        button_style = textwrap.dedent(
-            f"""
-            QPushButton {{
-                color: #969696;
-                background-color: transparent;
-                border-color: transparent;
-                icon-size: 22px;
-                border-width: 4px;
-                border-radius: 4px;
-                height: 16px;
-            }}
-            QPushButton:hover {{
-                background-color: {"#363636"};
-                border-color: {"#363636"};
-            }}
-            """
-        )
-        self.push_button.setStyleSheet(button_style)
-        self.push_button.setMenu(self.menu)
-
-        self.actions = [
-            QtGui.QAction("[1] Disable Shift Click Ball Move"),
-            QtGui.QAction("[2] Enable Shift Click Ball Move"),
-        ]
-
-        self.actions[0].triggered.connect(self.disable_ball_movement)
-        self.actions[1].triggered.connect(self.enable_ball_movement)
-
-        for action in self.actions:
-            self.menu.addAction(action)
-
-        self.layout().addWidget(self.push_button)
-
-    def disable_ball_movement(self):
-        print("I have been disable")
-        self.disable_ball_movement_signal.emit(True)
-
-    def enable_ball_movement(self):
-        print("I have been enabled")
-        self.disable_ball_movement_signal.emit(False)
-
-
-class MultiToolbarLayer(QWidget):
-    def __init__(self, parent: QWidget, toolbars: List[GLToolbar]):
-        super().__init__(parent)
-
-        self.setLayout(QHBoxLayout())
-
-        self.toolbars: List[GLToolbar] = toolbars
-
-        for toolbar in toolbars:
-            self.layout().addWidget(toolbar)
-            toolbar.hide()
-
-        # Create a shortcut for the F1 key
-        self.shortcut_f1 = QtGui.QShortcut(QKeySequence("F1"), self)
-        self.shortcut_f1.activated.connect(lambda: self.show_toolbar(0))
-
-        self.shortcut_f1 = QtGui.QShortcut(QKeySequence("F2"), self)
-        self.shortcut_f1.activated.connect(lambda: self.show_toolbar(1))
-
-    def add_toolbar(self, toolbar: GLToolbar):
-        self.toolbars.append(toolbar)
-        self.layout().addWidget(toolbar)
-        toolbar.hide()
-
-        self.show_toolbar(0)
-
-    def show_toolbar(self, num):
-        # cannot show toolbar, since index is out of range
-        if num >= len(self.toolbars):
-            return
-
-        for toolbar in self.toolbars:
-            toolbar.hide()
-
-        self.toolbars[num].show()

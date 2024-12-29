@@ -11,13 +11,13 @@ from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from software.thunderscope.constants import *
 
+from software.thunderscope.gl.widgets.gl_multilayer_toolbar import MultilayerToolbar
+from software.thunderscope.gl.widgets.gl_shift_toolbar import ShiftButtonToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.gl.widgets.gl_field_toolbar import (
     GLFieldToolbar,
-    MultiToolbarLayer,
-    ShiftButtonToolbar,
 )
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
@@ -88,7 +88,7 @@ class GLWidget(QWidget):
         self.layout.addWidget(self.gl_view_widget)
 
         # setup multi layer toolbar
-        self.multi_layer_toolbar = MultiToolbarLayer(
+        self.multi_layer_toolbar = MultilayerToolbar(
             parent=self.gl_view_widget, toolbars=[]
         )
 
