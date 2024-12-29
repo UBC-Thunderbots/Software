@@ -226,7 +226,7 @@ class World final
     const std::optional<Segment>& getDribbleDisplacement() const;
 
 
-private:
+   private:
     /**
      * Searches all member objects of world for the most recent Timestamp value
      *

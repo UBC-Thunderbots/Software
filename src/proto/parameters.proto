@@ -416,8 +416,6 @@ message RobotCapabilitiesConfig
     required string broken_chippers = 2;
     // Comma-separated list of numbers of robots with broken kickers
     required string broken_kickers = 3;
-
-
 }
 
 message SensorFusionConfig
@@ -474,11 +472,8 @@ message SensorFusionConfig
 
     // Max distance between the ball and front of the robot for the robot to be
     // considered touching the ball (in m)
-    required double touching_ball_threshold_meters = 14 [
-            default                   = 0.1,
-            (bounds).min_double_value = 0.0,
-            (bounds).max_double_value = 1.0
-        ];
+    required double touching_ball_threshold_meters = 14
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message EnemyBallPlacementPlayConfig
