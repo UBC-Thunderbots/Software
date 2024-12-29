@@ -89,7 +89,7 @@ class GLWidget(QWidget):
             toolbars = []
         )
 
-        shift_button_toolbar = ShiftButtonToolbar(parent=self.multi_layer_toolbar)
+        self.shift_button_toolbar = ShiftButtonToolbar(parent=self.multi_layer_toolbar)
 
         # Setup toolbar
         self.measure_mode_enabled = False
@@ -108,7 +108,7 @@ class GLWidget(QWidget):
 
         # adding layer to the multitool bar layer
         self.multi_layer_toolbar.add_toolbar(self.simulation_control_toolbar)
-        self.multi_layer_toolbar.add_toolbar(shift_button_toolbar)
+        self.multi_layer_toolbar.add_toolbar(self.shift_button_toolbar)
 
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(
@@ -134,6 +134,9 @@ class GLWidget(QWidget):
         self.layers = []
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
+
+    def get_shift_button_toolbar(self): 
+        return self.shift_button_toolbar 
 
     def get_sim_control_toolbar(self):
         """Returns the simulation control toolbar"""

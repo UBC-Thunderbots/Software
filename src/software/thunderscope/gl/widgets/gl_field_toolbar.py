@@ -4,6 +4,7 @@ from PyQt6.QtGui import QKeySequence
 from numpy import who
 from pyqtgraph import QtCore
 from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt.QtCore import pyqtSignal
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from PyQt6.QtCore import Qt
@@ -225,6 +226,7 @@ class GLFieldToolbar(GLToolbar):
 
 
 class ShiftButtonToolbar(GLToolbar):
+    disable_ball_movement_signal = pyqtSignal(bool)
     def __init__(self, parent) -> None:
         super().__init__(parent)
         self.menu = QMenu()
@@ -265,18 +267,16 @@ class ShiftButtonToolbar(GLToolbar):
 
     def disable_ball_movement(self):
         print("I have been disable")
+        self.disable_ball_movement_signal.emit(True)
 
     def enable_ball_movement(self):
         print("I have been enabled")
-
+        self.disable_ball_movement_signal.emit(False)
 
 class MultiToolbarLayer(QWidget):
     def __init__(self, parent: QWidget, toolbars: List[GLToolbar]):
         super().__init__(parent)
 
-        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        self.setStyleSheet("background-color: rgba(0,0,0,0);" "padding: 0px;")
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
         self.setLayout(QHBoxLayout())
 
         self.toolbars: List[GLToolbar] = toolbars
@@ -308,3 +308,4 @@ class MultiToolbarLayer(QWidget):
             toolbar.hide()
 
         self.toolbars[num].show()
+
