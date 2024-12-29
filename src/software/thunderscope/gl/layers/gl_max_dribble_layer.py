@@ -15,7 +15,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 import math
 
 class GLMaxDribbleLayer(GLLayer):
-    """GLLayer"""
+    """Visualizes the maximumm dribbling distance when a robot controls the ball."""
 
     def __init__(self, name: str, buffer_size:int = 5) -> None:
         """Initialize the GLMaxDribbleLayer
@@ -40,11 +40,11 @@ class GLMaxDribbleLayer(GLLayer):
 
         world = self.world_buffer.get(block=False)
         if world.HasField("dribble_displacement"):
-            dribbleDisp = world.dribble_displacement
+            dribble_disp = world.dribble_displacement
 
-            dist = ((dribbleDisp.start.x_meters - dribbleDisp.end.x_meters)**2 + (dribbleDisp.start.y_meters - dribbleDisp.end.y_meters)**2)**(1/2)
+            dist =  tbots_cpp.createSegment(dribble_disp).length()git
             if dist >=1:
-                self.color = QtGui.QColor(255,0,255,255)
+                self.color = QtGui.QColor(255,0,255,255) # Purple for high constrast to show violation.
             elif  0.75 < dist <1:
                 self.color = QtGui.QColor(255, int(self.sigmoid_interpolate(dist,0.5,160,1, 0)),0, 200)
             else:
@@ -52,10 +52,10 @@ class GLMaxDribbleLayer(GLLayer):
 
             self.dribble_radius_graphic.set_outline_color(self.color)
             self.dribble_radius_graphic.set_points(
-                [(dribbleDisp.start.x_meters, dribbleDisp.start.y_meters), (dribbleDisp.end.x_meters, dribbleDisp.end.y_meters)]
+                [(dribble_disp.start.x_meters, dribble_disp.start.y_meters), (dribble_disp.end.x_meters, dribble_disp.end.y_meters)]
             )
             self.dribble_circle_graphic.set_outline_color(self.color)
-            self.dribble_circle_graphic.set_position(dribbleDisp.start.x_meters, dribbleDisp.start.y_meters)
+            self.dribble_circle_graphic.set_position(dribble_disp.start.x_meters, dribble_disp.start.y_meters)
             self.dribble_circle_graphic.show()
             self.dribble_radius_graphic.show()
         else:

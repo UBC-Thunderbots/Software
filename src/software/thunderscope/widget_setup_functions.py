@@ -124,7 +124,7 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
     trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
-    max_dribble_layer = gl_max_dribble_layer.GLMaxDribbleLayer("Max Dribble", visualization_buffer_size)
+    max_dribble_layer = gl_max_dribble_layer.GLMaxDribbleLayer("Dribble Tracking", visualization_buffer_size)
 
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)

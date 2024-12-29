@@ -16,8 +16,6 @@ std::unique_ptr<TbotsProto::World> createWorld(const World& world)
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
     if (world.getDribbleDisplacement().has_value()) {
         *(world_msg->mutable_dribble_displacement()) = *createSegmentProto(world.getDribbleDisplacement().value());
-    } else {
-        world_msg->clear_dribble_displacement();
     }
     return world_msg;
 }
@@ -36,8 +34,6 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
     world_msg->set_sequence_number(sequence_number);
     if (world.getDribbleDisplacement().has_value()) {
         *(world_msg->mutable_dribble_displacement()) = *createSegmentProto(world.getDribbleDisplacement().value());
-    } else {
-        world_msg->clear_dribble_displacement();
     }
     return world_msg;
 }

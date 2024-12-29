@@ -368,7 +368,7 @@ void SensorFusion::updateDribbleDisplacement()
     for (const Robot &robot : friendly_team.getAllRobots())
     {
         if (robot.isNearDribbler(ball->position(),
-                                 sensor_fusion_config.touching_ball_threshold()))
+                                 sensor_fusion_config.touching_ball_threshold_meters()))
         {
             // Insert only occurs if the map doesn't already contain a value
             // with the key robot.id()
