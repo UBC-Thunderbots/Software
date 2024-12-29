@@ -138,6 +138,17 @@ class GLWorldLayer(GLLayer):
         self.auto_chip_graphics = ObservableList(self._graphics_changed)
         self.speed_line_graphics = ObservableList(self._graphics_changed)
 
+
+        self.should_move_ball = False 
+
+    def should_move_ball_slot(self, should_move_ball): 
+        """ Set the ball movement behavior
+
+        :param should_move_ball: whether or not shift click would move the ball
+        """
+
+        self.should_move_ball = should_move_ball
+
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
 
@@ -224,21 +235,22 @@ class GLWorldLayer(GLLayer):
         if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             return
 
-        self.point_in_scene_picked = self._invert_position_if_defending_negative_half(
-            event.point_in_scene
-        )
+        if self.should_move_ball:
+            self.point_in_scene_picked = self._invert_position_if_defending_negative_half(
+                event.point_in_scene
+            )
 
-        # Send a command to the simulator to move the ball to the picked point
-        world_state = WorldState()
-        world_state.ball_state.CopyFrom(
-            BallState(
-                global_position=Point(
-                    x_meters=self.point_in_scene_picked.x(),
-                    y_meters=self.point_in_scene_picked.y(),
+            # Send a command to the simulator to move the ball to the picked point
+            world_state = WorldState()
+            world_state.ball_state.CopyFrom(
+                BallState(
+                    global_position=Point(
+                        x_meters=self.point_in_scene_picked.x(),
+                        y_meters=self.point_in_scene_picked.y(),
+                    )
                 )
             )
-        )
-        self.simulator_io.send_proto(WorldState, world_state)
+            self.simulator_io.send_proto(WorldState, world_state)
 
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was dragged within the 3D scene
