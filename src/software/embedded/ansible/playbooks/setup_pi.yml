@@ -99,14 +99,9 @@
         - name: Update config.txt to select custom SPI overlay
           become: true
           become_method: ansible.builtin.sudo
-          ansible.posix.synchronize:
+          ansible.builtin.copy:
             src: ../../linux_configs/pi/config.txt
             dest: /boot/firmware/
-            copy_links: true
-            rsync_opts:
-              - "--no-perms"
-              - "--no-o"
-              - "--no-g"
 
     - name: Change hostname
       tags: update_hostname
