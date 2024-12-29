@@ -4,13 +4,13 @@ cc_library(
     name = "latency_tester_node",
     srcs = ["latency_tester_node.cpp"],
     hdrs = ["latency_tester_node.h"],
+    visibility = ["//visibility:private"],
     deps = [
         "//shared:constants",
         "//software/networking/udp:udp_listener",
         "//software/networking/udp:udp_sender",
         "@boost//:asio",
     ],
-    visibility = ["//visibility:private"],
 )
 
 cc_binary(
@@ -22,7 +22,7 @@ cc_binary(
     ],
     deps = [
         ":latency_tester_node",
-        "//software/logger:logger",
+        "//software/logger",
         "//software/math:statistics_functions",
         "@boost//:program_options",
         "@tracy",

@@ -1,13 +1,14 @@
 #include "software/networking/benchmarking_utils/latency_tester_primary_node.h"
 
+#include <Tracy.hpp>
+
 #include "software/logger/logger.h"
 #include "software/math/statistics_functions.hpp"
 
-#include <Tracy.hpp>
-
 
 LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
-    const std::string& interface, const int listen_channel, const unsigned short listen_port, const int send_channel,
+    const std::string& interface, const int listen_channel,
+    const unsigned short listen_port, const int send_channel,
     const unsigned short send_port, const int message_size,
     const std::chrono::milliseconds& timeout_duration)
     : LatencyTesterNode(interface, listen_channel, listen_port, send_channel, send_port)
@@ -15,19 +16,21 @@ LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
     initialize(message_size, timeout_duration);
 }
 
-LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(const std::string& interface, const unsigned short listen_port,
-        const std::string& send_ip, const unsigned short send_port, const int message_size,
-        const std::chrono::milliseconds& timeout_duration)
+LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
+    const std::string& interface, const unsigned short listen_port,
+    const std::string& send_ip, const unsigned short send_port, const int message_size,
+    const std::chrono::milliseconds& timeout_duration)
     : LatencyTesterNode(interface, listen_port, send_ip, send_port)
 {
     initialize(message_size, timeout_duration);
 }
 
-void LatencyTesterPrimaryNode::initialize(const int message_size, const std::chrono::milliseconds& timeout_duration)
+void LatencyTesterPrimaryNode::initialize(
+    const int message_size, const std::chrono::milliseconds& timeout_duration)
 {
     response_received_ = false;
-    num_timeouts_ = 0;
-    timeout_duration_ = timeout_duration;
+    num_timeouts_      = 0;
+    timeout_duration_  = timeout_duration;
 
     std::string charset =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -42,8 +45,8 @@ void LatencyTesterPrimaryNode::printStatistics()
 {
     std::sort(latencies_.begin(), latencies_.end());
 
-    double latency_mean  = mean<long int>(latencies_);
-    double latency_stdev = stdevSample<long int>(latencies_);
+    double latency_mean     = mean<long int>(latencies_);
+    double latency_stdev    = stdevSample<long int>(latencies_);
     long int latency_median = latencies_[latencies_.size() / 2];
 
     LOG(INFO) << "Number of messages sent: " << latencies_.size();

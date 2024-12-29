@@ -4,25 +4,29 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
-LatencyTesterNode::LatencyTesterNode(const std::string& interface, const int listen_channel,
+LatencyTesterNode::LatencyTesterNode(const std::string& interface,
+                                     const int listen_channel,
                                      const unsigned short listen_port,
                                      const int send_channel,
                                      const unsigned short send_port)
-    : io_listener_service_(),
-      io_sender_service_()
+    : io_listener_service_(), io_sender_service_()
 {
     std::optional<std::string> error;
 
     std::string listen_ip = ROBOT_MULTICAST_CHANNELS.at(listen_channel);
-    listener_ = std::make_unique<UdpListener>(io_listener_service_, listen_ip, listen_port, interface, true,
-            std::bind(&LatencyTesterNode::onReceive, this, std::placeholders::_1, std::placeholders::_2), error);
+    listener_             = std::make_unique<UdpListener>(
+        io_listener_service_, listen_ip, listen_port, interface, true,
+        std::bind(&LatencyTesterNode::onReceive, this, std::placeholders::_1,
+                  std::placeholders::_2),
+        error);
     if (error)
     {
         LOG(FATAL) << "Error creating UdpListener: " << error.value();
     }
 
     std::string send_ip = ROBOT_MULTICAST_CHANNELS.at(send_channel);
-    sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port, interface, true, error);
+    sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port,
+                                          interface, true, error);
     if (error)
     {
         LOG(FATAL) << "Error creating UdpSender: " << error.value();
@@ -31,21 +35,26 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface, const int lis
     startServiceThreads();
 }
 
-LatencyTesterNode::LatencyTesterNode(const std::string& interface, const unsigned short listen_port,
-                                     const std::string& send_ip, const unsigned short send_port)
-    : io_listener_service_(),
-      io_sender_service_()
+LatencyTesterNode::LatencyTesterNode(const std::string& interface,
+                                     const unsigned short listen_port,
+                                     const std::string& send_ip,
+                                     const unsigned short send_port)
+    : io_listener_service_(), io_sender_service_()
 {
     std::optional<std::string> error;
 
-    listener_ = std::make_unique<UdpListener>(io_listener_service_, listen_port,
-            std::bind(&LatencyTesterNode::onReceive, this, std::placeholders::_1, std::placeholders::_2), error);
+    listener_ = std::make_unique<UdpListener>(
+        io_listener_service_, listen_port,
+        std::bind(&LatencyTesterNode::onReceive, this, std::placeholders::_1,
+                  std::placeholders::_2),
+        error);
     if (error)
     {
         LOG(FATAL) << "Error creating UdpListener: " << error.value();
     }
 
-    sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port, interface, false, error);
+    sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port,
+                                          interface, false, error);
     if (error)
     {
         LOG(FATAL) << "Error creating UdpSender: " << error.value();

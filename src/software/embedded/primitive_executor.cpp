@@ -22,8 +22,7 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
 {
 }
 
-void PrimitiveExecutor::updatePrimitive(
-    const TbotsProto::Primitive &primitive_msg)
+void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive &primitive_msg)
 {
     current_primitive_ = primitive_msg;
 
@@ -32,12 +31,11 @@ void PrimitiveExecutor::updatePrimitive(
         trajectory_path_ = createTrajectoryPathFromParams(
             current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
 
-        angular_trajectory_ = createAngularTrajectoryFromParams(
-            current_primitive_.move().w_traj_params(), angular_velocity_,
-            robot_constants_);
+        angular_trajectory_ =
+            createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
+                                              angular_velocity_, robot_constants_);
 
-        time_since_trajectory_creation_ =
-            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        time_since_trajectory_creation_ = Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
     }
 }
 

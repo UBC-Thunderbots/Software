@@ -1,47 +1,47 @@
 ---
-
 - name: Sync Setup Script
   become: true
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   ansible.posix.synchronize:
     src: ../../setup_robot_software_deps.sh
     dest: ~/
-    copy_links: yes
+    copy_links: true
 
 # Output is streamed to target host's (Jetson/Pi's /tmp/setup.log)
 - name: Running the setup script, this will take a while
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   become: true
-  command: '/home/{{ ansible_user }}/setup_robot_software_deps.sh >& /tmp/setup.log'
+  ansible.builtin.command: "/home/{{ ansible_user }}/setup_robot_software_deps.sh >& /tmp/setup.log"
   register: result
+  changed_when: true
   args:
     chdir: ~/
 
 - name: Configure Redis persistence setting
   become: true
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   ansible.builtin.lineinfile:
     path: /etc/redis/redis.conf
     state: present
     regexp: ^(appendonly)
-    line: 'appendonly yes'
-    backrefs: yes
+    line: "appendonly yes"
+    backrefs: true
 
 - name: Disable WiFi power management
   block:
     - name: Delete WiFi power management rule
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       ansible.builtin.file:
         path: /etc/NetworkManager/conf.d/default-wifi-powersave-on.conf
         state: absent
 
     - name: Create WiFi power management rule
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       ansible.builtin.copy:
         content: |
           [connection]
           wifi.powersave = 2
-        dest: /etc/NetworkManager/conf.d/default-wifi-powersave-on.conf
-        mode: '600'
+        dest: /etc/NetworkManager/conf.d/default-wifi-powersave-off.conf
+        mode: "600"

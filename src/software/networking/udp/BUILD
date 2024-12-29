@@ -113,7 +113,7 @@ cc_library(
         "udp_listener.h",
     ],
     deps = [
-        "//software/logger:logger",
+        "//software/logger",
         "@boost//:asio",
     ],
 )

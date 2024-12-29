@@ -43,10 +43,10 @@ static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
 static const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
-static constexpr short unsigned int ROBOT_STATUS_PORT      = 42071;
-static constexpr short unsigned int ROBOT_LOGS_PORT        = 42072;
-static constexpr short unsigned int ROBOT_CRASH_PORT       = 42074;
-static constexpr short unsigned int NETWORK_COMM_TEST_PORT = 42075;
+static constexpr short unsigned int ROBOT_STATUS_PORT                         = 42071;
+static constexpr short unsigned int ROBOT_LOGS_PORT                           = 42072;
+static constexpr short unsigned int ROBOT_CRASH_PORT                          = 42074;
+static constexpr short unsigned int NETWORK_COMM_TEST_PORT                    = 42075;
 static constexpr short unsigned int ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT = 42073;
 static constexpr short unsigned int FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT = 42076;
 

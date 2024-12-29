@@ -1,8 +1,8 @@
-#include "software/logger/logger.h"
-#include "software/networking/benchmarking_utils/latency_tester_primary_node.h"
-
 #include <boost/program_options.hpp>
 #include <iostream>
+
+#include "software/logger/logger.h"
+#include "software/networking/benchmarking_utils/latency_tester_primary_node.h"
 
 
 int main(int argc, char **argv)
@@ -11,8 +11,8 @@ int main(int argc, char **argv)
     {
         bool help = false;
 
-        std::string interface = "";
-        std::string runtime_dir = "/tmp/tbots";
+        std::string interface      = "";
+        std::string runtime_dir    = "/tmp/tbots";
         int listen_channel         = 0;
         unsigned short listen_port = 43000;
         int send_channel           = 1;
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
         int message_size_bytes     = 200;
         int timeout_duration_ms    = 10;
         int initial_delay_s        = 20;
-        bool unicast             = false;
+        bool unicast               = false;
         std::string send_ip        = "";
     };
 
@@ -53,8 +53,8 @@ int main(int argc, char **argv)
                        boost::program_options::value<int>(&args.timeout_duration_ms),
                        "The duration in milliseconds to wait for a response.");
     desc.add_options()("initial_delay_s",
-            boost::program_options::value<int>(&args.initial_delay_s),
-            "The initial delay to wait before sending packets (s)");
+                       boost::program_options::value<int>(&args.initial_delay_s),
+                       "The initial delay to wait before sending packets (s)");
     desc.add_options()("interface",
                        boost::program_options::value<std::string>(&args.interface),
                        "The interface to bind to.");
@@ -92,18 +92,21 @@ int main(int argc, char **argv)
             LOG(INFO) << "Listen port: " << args.listen_port;
             LOG(INFO) << "Send IP: " << args.send_ip << ":" << args.send_port;
 
-            tester = std::make_unique<LatencyTesterPrimaryNode>(args.interface, args.listen_port, args.send_ip,
-                    args.send_port, args.message_size_bytes, timeout_duration_ms);
+            tester = std::make_unique<LatencyTesterPrimaryNode>(
+                args.interface, args.listen_port, args.send_ip, args.send_port,
+                args.message_size_bytes, timeout_duration_ms);
         }
         else
         {
             LOG(INFO) << "Running multicast latency test";
-            LOG(INFO) << "Listen channel: " << args.listen_channel << ", Listen port: " << args.listen_port;
-            LOG(INFO) << "Send channel: " << args.send_channel << ", Send port: " << args.send_port;
+            LOG(INFO) << "Listen channel: " << args.listen_channel
+                      << ", Listen port: " << args.listen_port;
+            LOG(INFO) << "Send channel: " << args.send_channel
+                      << ", Send port: " << args.send_port;
 
-            tester = std::make_unique<LatencyTesterPrimaryNode>(args.interface,
-                args.listen_channel, args.listen_port, args.send_channel, args.send_port,
-                args.message_size_bytes, timeout_duration_ms);
+            tester = std::make_unique<LatencyTesterPrimaryNode>(
+                args.interface, args.listen_channel, args.listen_port, args.send_channel,
+                args.send_port, args.message_size_bytes, timeout_duration_ms);
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(args.initial_delay_s));

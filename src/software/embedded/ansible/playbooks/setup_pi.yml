@@ -1,10 +1,8 @@
 ---
-
 - name: Setting up the Raspberry Pi
   hosts: THUNDERBOTS_HOSTS
 
   tasks:
-
     - name: Check internet connection
       tags: dependencies
       ansible.builtin.import_tasks:
@@ -43,26 +41,28 @@
       block:
         - name: Backup cmdline.txt
           become: true
-          become_method: sudo
+          become_method: ansible.builtin.sudo
           ansible.builtin.copy:
             src: /boot/firmware/cmdline.txt
             dest: /boot/firmware/cmdline.txt.bak
             remote_src: true
+            mode: "0644"
 
         - name: Check if pcie_aspm is disabled
-          ansible.builtin.shell: 'grep -q "pcie_aspm=off" /boot/firmware/cmdline.txt'
+          ansible.builtin.command: 'grep -q "pcie_aspm=off" /boot/firmware/cmdline.txt'
           ignore_errors: true
           register: pcie_aspm_disabled
+          changed_when: false
 
         - name: Disable pcie_aspm
           when: pcie_aspm_disabled.rc != 0
           become: true
-          become_method: sudo
+          become_method: ansible.builtin.sudo
           ansible.builtin.lineinfile:
             path: /boot/firmware/cmdline.txt
             regexp: ^(\s*console.*)$
-            backrefs: yes
-            line: '\1 pcie_aspm=off'
+            backrefs: true
+            line: "\\1 pcie_aspm=off"
             state: present
 
     - name: Set up SPI and Wifi drivers
@@ -72,35 +72,37 @@
           ansible.posix.synchronize:
             src: ../../linux_configs/pi/setup.zip
             dest: ~/
-            copy_links: yes
+            copy_links: true
 
         - name: Unzip setup files
           ansible.builtin.unarchive:
             src: ~/setup.zip
             dest: ~/
             remote_src: true
-         
+
         - name: Set up Wifi drivers
           become: true
-          become_method: sudo
-          shell: 'mv /home/{{ ansible_user }}/iwlwifi* /lib/firmware/'
-
+          become_method: ansible.builtin.sudo
+          ansible.builtin.command:
+            cmd: "mv /home/{{ ansible_user }}/iwlwifi* /lib/firmware/"
+            creates: /lib/firmware/iwlwifi*.ucode
         - name: Set up systemd Wifi interface name rule
           ansible.builtin.import_tasks:
             file: ../tasks/setup_wifi_interface.yml
 
         - name: Set up SPI overlay
           become: true
-          become_method: sudo
-          shell: 'mv /home/{{ ansible_user }}/spi0-5cs.dtbo /boot/firmware/overlays/'
-
+          become_method: ansible.builtin.sudo
+          ansible.builtin.command:
+            cmd: "mv /home/{{ ansible_user }}/spi0-5cs.dtbo /boot/firmware/overlays/"
+            creates: /boot/firmware/overlays/spi0-5cs.dtbo
         - name: Update config.txt to select custom SPI overlay
           become: true
-          become_method: sudo
+          become_method: ansible.builtin.sudo
           ansible.posix.synchronize:
             src: ../../linux_configs/pi/config.txt
             dest: /boot/firmware/
-            copy_links: yes
+            copy_links: true
             rsync_opts:
               - "--no-perms"
               - "--no-o"

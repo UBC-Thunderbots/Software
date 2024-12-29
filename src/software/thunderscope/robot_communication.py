@@ -1,6 +1,5 @@
 from typing import Self, Type
 
-import logging
 import threading
 import time
 import os
@@ -143,7 +142,9 @@ class RobotCommunication:
         :param robot_id: the id of the robot whose mode we're changing
         """
         self.robot_control_mode_map[robot_id] = mode
-        self.robot_stop_primitive_send_count[robot_id] = NUM_TIMES_SEND_STOP if mode == IndividualRobotMode.NONE else 0
+        self.robot_stop_primitive_send_count[robot_id] = (
+            NUM_TIMES_SEND_STOP if mode == IndividualRobotMode.NONE else 0
+        )
 
     def __send_estop_state(self) -> None:
         """Constant loop which sends the current estop status proto if estop is not disabled
@@ -159,7 +160,8 @@ class RobotCommunication:
 
                 if not self.estop_is_playing:
                     self.robot_stop_primitive_send_count = [
-                        NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+                        NUM_TIMES_SEND_STOP
+                        for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
                     ]
 
                 self.current_proto_unix_io.send_proto(
@@ -240,17 +242,25 @@ class RobotCommunication:
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
-            for (robot_id, num_times_to_send_stop) in enumerate(self.robot_stop_primitive_send_count):
+            for robot_id, num_times_to_send_stop in enumerate(
+                self.robot_stop_primitive_send_count
+            ):
                 if num_times_to_send_stop > 0:
                     robot_primitives_map[robot_id] = Primitive(stop=StopPrimitive())
-                    self.robot_stop_primitive_send_count[robot_id] = num_times_to_send_stop - 1
+                    self.robot_stop_primitive_send_count[robot_id] = (
+                        num_times_to_send_stop - 1
+                    )
 
             for robot_id, primitive in robot_primitives_map.items():
                 if not self.__should_send_packet(robot_id=robot_id):
                     continue
                 primitive.sequence_number = self.sequence_number
-                primitive.time_sent.CopyFrom(Timestamp(epoch_timestamp_seconds=time.time()))
-                self.communication_manager.send_primitive(robot_id=robot_id, primitive=primitive)
+                primitive.time_sent.CopyFrom(
+                    Timestamp(epoch_timestamp_seconds=time.time())
+                )
+                self.communication_manager.send_primitive(
+                    robot_id=robot_id, primitive=primitive
+                )
 
             self.sequence_number += 1
 
@@ -277,7 +287,6 @@ class RobotCommunication:
         self.run_primitive_set_thread.start()
 
         return self
-
 
     def __exit__(self, type, value, traceback) -> None:
         """Exit RobotCommunication context manager

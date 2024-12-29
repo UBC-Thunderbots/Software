@@ -1,7 +1,6 @@
 #include "software/embedded/services/network/network.h"
 
-NetworkService::NetworkService(const RobotId& robot_id,
-                               const std::string& ip_address,
+NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_address,
                                unsigned short primitive_listener_port,
                                unsigned short robot_status_sender_port,
                                unsigned short full_system_to_robot_ip_notification_port,
@@ -11,11 +10,15 @@ NetworkService::NetworkService(const RobotId& robot_id,
       robot_status_sender_port(robot_status_sender_port),
       primitive_tracker(ProtoTracker("primitive set"))
 {
-    fullsystem_to_robot_ip_listener = createNetworkResource<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
+    fullsystem_to_robot_ip_listener =
+        createNetworkResource<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
             ip_address, full_system_to_robot_ip_notification_port, interface,
-            std::bind(&NetworkService::onFullSystemIpNotification, this, std::placeholders::_1), true);
+            std::bind(&NetworkService::onFullSystemIpNotification, this,
+                      std::placeholders::_1),
+            true);
 
-    robot_to_fullsystem_ip_sender = createNetworkResource<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
+    robot_to_fullsystem_ip_sender =
+        createNetworkResource<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
             ip_address, robot_to_full_system_ip_notification_port, interface, false);
 
 
@@ -30,7 +33,8 @@ NetworkService::NetworkService(const RobotId& robot_id,
         LOG(FATAL) << "Failed to get IP addresses associated with " << interface;
     }
 
-    udp_listener_primitive = createNetworkResource<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
+    udp_listener_primitive =
+        createNetworkResource<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
             primitive_listener_port,
             std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
 
@@ -39,16 +43,17 @@ NetworkService::NetworkService(const RobotId& robot_id,
             std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
 }
 
-void NetworkService::onFullSystemIpNotification(const TbotsProto::IpNotification& ip_notification)
+void NetworkService::onFullSystemIpNotification(
+    const TbotsProto::IpNotification& ip_notification)
 {
     std::string new_fullsystem_ip = ip_notification.ip_address();
-    bool rebuild_sender = false;
+    bool rebuild_sender           = false;
 
     {
         std::scoped_lock lock(fullsystem_ip_mutex);
         if (!fullsystem_ip.has_value() || fullsystem_ip.value() != new_fullsystem_ip)
         {
-            fullsystem_ip = new_fullsystem_ip;
+            fullsystem_ip  = new_fullsystem_ip;
             rebuild_sender = true;
         }
     }
@@ -58,8 +63,9 @@ void NetworkService::onFullSystemIpNotification(const TbotsProto::IpNotification
         std::unique_lock lock(robot_status_sender_mutex);
 
         std::optional<std::string> error;
-        robot_status_sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
-            fullsystem_ip.value(), robot_status_sender_port, interface, false, error);
+        robot_status_sender =
+            std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
+                fullsystem_ip.value(), robot_status_sender_port, interface, false, error);
         if (error)
         {
             LOG(FATAL) << *error;
@@ -89,7 +95,8 @@ TbotsProto::Primitive NetworkService::poll(TbotsProto::RobotStatus& robot_status
     {
         robot_to_fullsystem_ip_sender->sendProto(robot_ip_notification_msg, true);
     }
-    ip_notification_ticks = (ip_notification_ticks + 1) % IP_DISCOVERY_NOTIFICATION_RATE_HZ;
+    ip_notification_ticks =
+        (ip_notification_ticks + 1) % IP_DISCOVERY_NOTIFICATION_RATE_HZ;
 
     thunderloop_ticks = (thunderloop_ticks + 1) % THUNDERLOOP_HZ;
     return primitive_msg;
@@ -148,8 +155,8 @@ void NetworkService::logNewPrimitive(const TbotsProto::Primitive& new_primitive)
         return;
     }
 
-    if (!primitive_rtt.empty() && new_primitive.sequence_number() <=
-                                          primitive_rtt.back().primitive_sequence_num)
+    if (!primitive_rtt.empty() &&
+        new_primitive.sequence_number() <= primitive_rtt.back().primitive_sequence_num)
     {
         // If the proto is older than the last received proto, then ignore it
         return;
