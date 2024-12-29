@@ -14,7 +14,11 @@ from software.thunderscope.constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
-from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar, MultiToolbarLayer, ShiftButtonToolbar
+from software.thunderscope.gl.widgets.gl_field_toolbar import (
+    GLFieldToolbar,
+    MultiToolbarLayer,
+    ShiftButtonToolbar,
+)
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
@@ -83,10 +87,9 @@ class GLWidget(QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.gl_view_widget)
 
-        # setup multi layer toolbar 
+        # setup multi layer toolbar
         self.multi_layer_toolbar = MultiToolbarLayer(
-            parent = self.gl_view_widget, 
-            toolbars = []
+            parent=self.gl_view_widget, toolbars=[]
         )
 
         self.shift_button_toolbar = ShiftButtonToolbar(parent=self.multi_layer_toolbar)
@@ -135,8 +138,8 @@ class GLWidget(QWidget):
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
 
-    def get_shift_button_toolbar(self): 
-        return self.shift_button_toolbar 
+    def get_shift_button_toolbar(self):
+        return self.shift_button_toolbar
 
     def get_sim_control_toolbar(self):
         """Returns the simulation control toolbar"""

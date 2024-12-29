@@ -138,15 +138,13 @@ class GLWorldLayer(GLLayer):
         self.auto_chip_graphics = ObservableList(self._graphics_changed)
         self.speed_line_graphics = ObservableList(self._graphics_changed)
 
+        self.should_move_ball = False
 
-        self.should_move_ball = False 
-
-    def should_move_ball_slot(self, should_move_ball): 
-        """ Set the ball movement behavior
+    def should_move_ball_slot(self, should_move_ball):
+        """Set the ball movement behavior
 
         :param should_move_ball: whether or not shift click would move the ball
         """
-
         self.should_move_ball = should_move_ball
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -236,8 +234,8 @@ class GLWorldLayer(GLLayer):
             return
 
         if self.should_move_ball:
-            self.point_in_scene_picked = self._invert_position_if_defending_negative_half(
-                event.point_in_scene
+            self.point_in_scene_picked = (
+                self._invert_position_if_defending_negative_half(event.point_in_scene)
             )
 
             # Send a command to the simulator to move the ball to the picked point

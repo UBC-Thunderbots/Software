@@ -1,13 +1,10 @@
 import textwrap
 from typing import Callable, List
 from PyQt6.QtGui import QKeySequence
-from numpy import who
-from pyqtgraph import QtCore
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtCore import pyqtSignal
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
-from PyQt6.QtCore import Qt
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import (
     CameraView,
@@ -227,6 +224,7 @@ class GLFieldToolbar(GLToolbar):
 
 class ShiftButtonToolbar(GLToolbar):
     disable_ball_movement_signal = pyqtSignal(bool)
+
     def __init__(self, parent) -> None:
         super().__init__(parent)
         self.menu = QMenu()
@@ -273,6 +271,7 @@ class ShiftButtonToolbar(GLToolbar):
         print("I have been enabled")
         self.disable_ball_movement_signal.emit(False)
 
+
 class MultiToolbarLayer(QWidget):
     def __init__(self, parent: QWidget, toolbars: List[GLToolbar]):
         super().__init__(parent)
@@ -285,7 +284,7 @@ class MultiToolbarLayer(QWidget):
             self.layout().addWidget(toolbar)
             toolbar.hide()
 
-       # Create a shortcut for the F1 key
+        # Create a shortcut for the F1 key
         self.shortcut_f1 = QtGui.QShortcut(QKeySequence("F1"), self)
         self.shortcut_f1.activated.connect(lambda: self.show_toolbar(0))
 
@@ -304,8 +303,7 @@ class MultiToolbarLayer(QWidget):
         if num >= len(self.toolbars):
             return
 
-        for toolbar in self.toolbars: 
+        for toolbar in self.toolbars:
             toolbar.hide()
 
         self.toolbars[num].show()
-

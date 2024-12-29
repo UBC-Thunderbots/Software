@@ -1,4 +1,3 @@
-from numpy import who
 from software.thunderscope.binary_context_managers.full_system import ProtoUnixIO
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from pyqtgraph.Qt import QtGui
@@ -27,7 +26,8 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         super().__init__(name)
 
-        import inspect 
+        import inspect
+
         print(inspect.getmro(GLDrawPolygonObstacleLayer))
         self.friendly_io: ProtoUnixIO = friendly_io
 
@@ -41,7 +41,6 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         self.rendering_polygons: ObservableList = ObservableList(self._graphics_changed)
 
         self.can_double_click: bool = True
-
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Responding to key events that are going to push obstacles to the stack or add point
@@ -127,22 +126,24 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         )
 
     def create_single_click_callback(self, event: MouseInSceneEvent):
-        """ creating a single shot callback to handle single click
+        """Creating a single shot callback to handle single click
 
         :param event: The mouse event when a scene is pressed
         """
-        def _handle_single_click(): 
-            # This logic is somewhat non trivial. If we `can_double_click`, it indicates that 
-            # a double-click hasn't occurred within the 200 ms time window. 
-            # In other words, the user hasn't double-clicked, 
+
+        def _handle_single_click():
+            # This logic is somewhat non trivial. If we `can_double_click`, it indicates that
+            # a double-click hasn't occurred within the 200 ms time window.
+            # In other words, the user hasn't double-clicked,
             # so we will now interpret the action as a single click.
             if self.can_double_click:
                 point = event.point_in_scene
                 self._add_one_point((point.x(), point.y()))
 
             self.can_double_click = False
+
         return _handle_single_click
-    
+
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Adding the point in scene
 
@@ -155,9 +156,9 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         # handle double click
         if self.can_double_click:
             self.push_polygon_to_list()
-            self.can_double_click = False 
-            return 
-        else: 
-            self.can_double_click = True 
+            self.can_double_click = False
+            return
+        else:
+            self.can_double_click = True
             # handle single click
             QTimer.singleShot(200, self.create_single_click_callback(event))
