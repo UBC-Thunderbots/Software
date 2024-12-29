@@ -15,6 +15,7 @@ class HaltPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
+    void updateTactics(const PlayUpdate &play_update) override;
 
    private:
     FSM<HaltPlayFSM> fsm;
