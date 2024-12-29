@@ -25,14 +25,7 @@ bool OffensePlayFSM::attackerPassing(const Update& event) const
     return attacker_tactic_->getCurrentSkill() == AttackerSkill::PASS;
 }
 
-bool OffensePlayFSM::shouldAbortPass(const Update& event) const
-{
-    double abs_min_pass_score =
-        ai_config_.shoot_or_pass_play_config().abs_min_pass_score();
-    return best_pass_with_rating_.rating < abs_min_pass_score;
-}
-
-bool OffensePlayFSM::passCompleted(const Update& event) const
+bool OffensePlayFSM::shouldAbortPass(const Update& event)
 {
     const Point ball_position  = event.common.world_ptr->ball().position();
     const Point passer_point   = best_pass_with_rating_.pass.passerPoint();
@@ -40,35 +33,51 @@ bool OffensePlayFSM::passCompleted(const Update& event) const
     const double short_pass_threshold =
         ai_config_.shoot_or_pass_play_config().short_pass_threshold();
 
-    const Polygon pass_area_polygon =
-        Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5);
-
-    // calculate a polygon that contains the receiver and passer point, and checks if the
-    // ball is inside it. if the ball isn't being passed to the receiver then we should
-    // abort
     if ((receiver_point - passer_point).length() >= short_pass_threshold)
     {
+        const Polygon pass_area_polygon =
+            Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5);
+
+        // If the ball is outside of the "passing area", we should abort since the ball
+        // has likely strayed from the intended pass trajectory
         if (!contains(pass_area_polygon, ball_position))
         {
             return true;
         }
     }
 
-    // distance between robot and ball is too far, and it's not in flight,
-    // i.e. team might still have possession, but kicker/passer doesn't have control over
-    // ball
     const double ball_velocity = event.common.world_ptr->ball().velocity().length();
     const double ball_shot_threshold =
         ai_config_.shoot_or_pass_play_config().ball_shot_threshold();
     const double min_distance_to_pass =
         ai_config_.shoot_or_pass_play_config().min_distance_to_pass();
 
+    // If ball is not moving and is too far away from pass origin point, abort the pass
     if ((ball_velocity < ball_shot_threshold) &&
         ((ball_position - passer_point).length() > min_distance_to_pass))
     {
         return true;
     }
 
+    // If we haven't taken the pass yet (i.e. attacker is not done), abort the pass
+    // if its rating gets too low
+    if (!attacker_tactic_->done())
+    {
+        const double abs_min_pass_score =
+            ai_config_.shoot_or_pass_play_config().abs_min_pass_score();
+
+        best_pass_with_rating_.rating =
+            ratePass(*event.common.world_ptr, best_pass_with_rating_.pass,
+                     ai_config_.passing_config());
+
+        return best_pass_with_rating_.rating < abs_min_pass_score;
+    }
+
+    return false;
+}
+
+bool OffensePlayFSM::passReceived(const Update& event) const
+{
     return receiver_tactic_->done();
 }
 
@@ -114,17 +123,17 @@ void OffensePlayFSM::resetTactics(const Update& event)
     // Avoid passes to the goalie and the passing robot
     std::vector<RobotId> robots_to_ignore = {};
 
-    auto friendly_goalie_id_opt = event.common.world_ptr->friendlyTeam().getGoalieId();
-    if (friendly_goalie_id_opt.has_value())
+    auto friendly_goalie_id = event.common.world_ptr->friendlyTeam().getGoalieId();
+    if (friendly_goalie_id.has_value())
     {
-        robots_to_ignore.push_back(friendly_goalie_id_opt.value());
+        robots_to_ignore.push_back(friendly_goalie_id.value());
     }
 
-    auto robot_with_ball_opt = event.common.world_ptr->friendlyTeam().getNearestRobot(
+    auto robot_with_ball = event.common.world_ptr->friendlyTeam().getNearestRobot(
         event.common.world_ptr->ball().position());
-    if (robot_with_ball_opt.has_value())
+    if (robot_with_ball.has_value())
     {
-        robots_to_ignore.push_back(robot_with_ball_opt.value().id());
+        robots_to_ignore.push_back(robot_with_ball.value().id());
     }
 
     best_pass_with_rating_ =

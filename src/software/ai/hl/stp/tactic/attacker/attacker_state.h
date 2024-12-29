@@ -44,10 +44,16 @@ class AttackerState
      */
     static size_t size()
     {
-        const World blank_world(Field::createSSLDivisionBField(),
-                                Ball(Point(), Vector(), Timestamp()), Team(), Team());
+        // Static variable will be initialized only once with the result of the lambda
+        // when size() is first called
+        static const size_t size = []()
+        {
+            const World blank_world(Field::createSSLDivisionBField(),
+                                    Ball(Point(), Vector(), Timestamp()), Team(), Team());
 
-        return AttackerState(blank_world, std::nullopt).getTensor().size(0);
+            return AttackerState(blank_world, std::nullopt).getTensor().size(0);
+        }();
+        return size;
     }
 
    private:

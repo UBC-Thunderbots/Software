@@ -62,7 +62,7 @@ struct OffensePlayFSM
      *
      * @return whether to abort the current pass
      */
-    bool shouldAbortPass(const Update& event) const;
+    bool shouldAbortPass(const Update& event);
 
     /**
      * Guard to check whether the ReceiverTactic has completed receiving the
@@ -72,7 +72,7 @@ struct OffensePlayFSM
      *
      * @return whether the ReceiverTactic completed receiving the current pass
      */
-    bool passCompleted(const Update& event) const;
+    bool passReceived(const Update& event) const;
 
     /**
      * Action to update and assign an AttackerTactic, ReceiverTactic, and MoveTactics
@@ -136,7 +136,7 @@ struct OffensePlayFSM
         DEFINE_SML_GUARD(attackerDone)
         DEFINE_SML_GUARD(attackerPassing)
         DEFINE_SML_GUARD(shouldAbortPass)
-        DEFINE_SML_GUARD(passCompleted)
+        DEFINE_SML_GUARD(passReceived)
 
         DEFINE_SML_ACTION(attack)
         DEFINE_SML_ACTION(receive)
@@ -156,8 +156,8 @@ struct OffensePlayFSM
             PassState_S + Update_E / attack_A,
             PassState_S + Terminate_E / terminate_A = AttackState_S,
 
-            ReceiveState_S + Update_E[passCompleted_G] / (resetTactics_A, attack_A) =
-                AttackState_S,
+            ReceiveState_S + Update_E[shouldAbortPass_G || passReceived_G] /
+                                 (resetTactics_A, attack_A) = AttackState_S,
             ReceiveState_S + Update_E / receive_A,
             ReceiveState_S + Terminate_E / terminate_A = AttackState_S,
 

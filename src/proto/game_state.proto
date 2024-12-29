@@ -66,7 +66,7 @@ message GameState
         repeated uint32 yellow_card_times = 5;
 
         // The total number of countable fouls that act towards yellow cards
-        optional uint32 fouls_count = 8;
+        required uint32 fouls_count = 6;
     }
 
     required PlayState play_state         = 1;

@@ -114,11 +114,12 @@ template <typename TState, typename TAction>
 void DQN<TState, TAction>::update(const std::vector<Transition<TState, TAction>>& batch)
 {
     const int batch_size           = static_cast<int>(batch.size());
-    torch::Tensor state_batch      = torch::empty({batch_size});
-    torch::Tensor action_batch     = torch::empty({batch_size});
+    const int state_size           = static_cast<int>(TState::size());
+    torch::Tensor state_batch      = torch::empty({batch_size, state_size});
+    torch::Tensor action_batch     = torch::empty({batch_size}, {torch::kInt64});
     torch::Tensor reward_batch     = torch::empty({batch_size});
-    torch::Tensor next_state_batch = torch::empty({batch_size});
-    torch::Tensor done_batch       = torch::empty({batch_size});
+    torch::Tensor next_state_batch = torch::empty({batch_size, state_size});
+    torch::Tensor done_batch       = torch::empty({batch_size}, {torch::kBool});
 
     for (size_t i = 0; i < batch.size(); ++i)
     {
