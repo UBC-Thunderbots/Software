@@ -13,24 +13,7 @@ class ShiftButtonToolbar(GLToolbar):
         self.menu = QMenu()
         self.push_button = QPushButton()
         # TODO: make this a static method!
-        button_style = textwrap.dedent(
-            f"""
-            QPushButton {{
-                color: #969696;
-                background-color: transparent;
-                border-color: transparent;
-                icon-size: 22px;
-                border-width: 4px;
-                border-radius: 4px;
-                height: 16px;
-            }}
-            QPushButton:hover {{
-                background-color: {"#363636"};
-                border-color: {"#363636"};
-            }}
-            """
-        )
-        self.push_button.setStyleSheet(button_style)
+        self.push_button.setStyleSheet(GLToolbar.get_button_style())
         self.push_button.setMenu(self.menu)
 
         self.actions = [
