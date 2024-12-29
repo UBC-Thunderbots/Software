@@ -90,7 +90,6 @@ class GLWidget(QWidget):
         )
 
         shift_button_toolbar = ShiftButtonToolbar(parent=self.multi_layer_toolbar)
-        self.multi_layer_toolbar.add_toolbar(shift_button_toolbar)
 
         # Setup toolbar
         self.measure_mode_enabled = False
@@ -107,7 +106,9 @@ class GLWidget(QWidget):
             sandbox_mode=sandbox_mode,
         )
 
+        # adding layer to the multitool bar layer
         self.multi_layer_toolbar.add_toolbar(self.simulation_control_toolbar)
+        self.multi_layer_toolbar.add_toolbar(shift_button_toolbar)
 
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(

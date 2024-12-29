@@ -1,8 +1,12 @@
 import textwrap
 from typing import Callable, List
+from PyQt6.QtGui import QKeySequence
+from numpy import who
+from pyqtgraph import QtCore
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
+from PyQt6.QtCore import Qt
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import (
     CameraView,
@@ -49,9 +53,6 @@ class GLFieldToolbar(GLToolbar):
         """
         super(GLFieldToolbar, self).__init__(parent=parent)
 
-        import pudb 
-        pudb.set_trace()
-        print(f"correct parent is: {parent}")
         # Setup Layers button for toggling visibility of layers
         self.layers_button = QPushButton("layers")
         self.layers_button.setStyleSheet(self.get_button_style())
@@ -223,11 +224,9 @@ class GLFieldToolbar(GLToolbar):
         self.speed_callback = callback
 
 
-class ShiftButtonToolbar(QWidget):
+class ShiftButtonToolbar(GLToolbar):
     def __init__(self, parent) -> None:
-        print(f"The parent is {parent}")
         super().__init__(parent)
-        self.layout = QHBoxLayout()
         self.menu = QMenu()
         self.push_button = QPushButton()
         self.push_button.setText("Change Shift Button Behavior")
@@ -259,24 +258,26 @@ class ShiftButtonToolbar(QWidget):
         self.actions[0].triggered.connect(self.disable_ball_movement)
         self.actions[1].triggered.connect(self.enable_ball_movement)
 
-        for action in self.actions: 
+        for action in self.actions:
             self.menu.addAction(action)
 
+        self.layout().addWidget(self.push_button)
 
-        self.setLayout(self.layout)
-        self.layout.addWidget(self.push_button)
+    def disable_ball_movement(self):
+        print("I have been disable")
 
-    def disable_ball_movement(self): 
-        print("I have been disable") 
-
-    def enable_ball_movement(self): 
-        print("I have been enabled") 
+    def enable_ball_movement(self):
+        print("I have been enabled")
 
 
 class MultiToolbarLayer(QWidget):
     def __init__(self, parent: QWidget, toolbars: List[GLToolbar]):
         super().__init__(parent)
-        self.setLayout(QVBoxLayout())
+
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        self.setStyleSheet("background-color: rgba(0,0,0,0);" "padding: 0px;")
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
+        self.setLayout(QHBoxLayout())
 
         self.toolbars: List[GLToolbar] = toolbars
 
@@ -284,7 +285,12 @@ class MultiToolbarLayer(QWidget):
             self.layout().addWidget(toolbar)
             toolbar.hide()
 
-        self.show_toolbar(0)
+       # Create a shortcut for the F1 key
+        self.shortcut_f1 = QtGui.QShortcut(QKeySequence("F1"), self)
+        self.shortcut_f1.activated.connect(lambda: self.show_toolbar(0))
+
+        self.shortcut_f1 = QtGui.QShortcut(QKeySequence("F2"), self)
+        self.shortcut_f1.activated.connect(lambda: self.show_toolbar(1))
 
     def add_toolbar(self, toolbar: GLToolbar):
         self.toolbars.append(toolbar)
@@ -295,7 +301,10 @@ class MultiToolbarLayer(QWidget):
 
     def show_toolbar(self, num):
         # cannot show toolbar, since index is out of range
-        if num >=  len(self.toolbars):
-            return 
+        if num >= len(self.toolbars):
+            return
+
+        for toolbar in self.toolbars: 
+            toolbar.hide()
 
         self.toolbars[num].show()
