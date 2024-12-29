@@ -1,4 +1,3 @@
-import textwrap
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtCore import pyqtSignal
 from pyqtgraph.Qt.QtWidgets import *
@@ -41,11 +40,11 @@ class ShiftButtonToolbar(GLToolbar):
         self.push_button.setText("[1] Enable Shift Click Ball Move")
 
     def disable_ball_placement(self):
-        """disable shift click ball placement"""
+        """Disable shift click ball placement"""
         self.push_button.setText("[2] Disable Shift Click Ball Move")
         self.enable_ball_placement_signal.emit(False)
 
     def enable_ball_placement(self):
-        """enable shift click ball placement"""
+        """Enable shift click ball placement"""
         self.push_button.setText("[1] Enable Shift Click Ball Move")
         self.enable_ball_placement_signal.emit(True)
