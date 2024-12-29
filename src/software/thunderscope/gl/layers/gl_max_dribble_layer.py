@@ -42,7 +42,7 @@ class GLMaxDribbleLayer(GLLayer):
         if world.HasField("dribble_displacement"):
             dribble_disp = world.dribble_displacement
 
-            dist =  tbots_cpp.createSegment(dribble_disp).length()git
+            dist =  tbots_cpp.createSegment(dribble_disp).length()
             if dist >=1:
                 self.color = QtGui.QColor(255,0,255,255) # Purple for high constrast to show violation.
             elif  0.75 < dist <1:
