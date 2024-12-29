@@ -48,6 +48,7 @@
           become_method: ansible.builtin.sudo
           become: true
           register: robot_auto_test_output
+          changed_when: true
           ignore_errors: true
 
         - name: Print Binary Output

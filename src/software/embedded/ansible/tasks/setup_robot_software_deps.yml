@@ -13,6 +13,7 @@
   become: true
   ansible.builtin.command: "/home/{{ ansible_user }}/setup_robot_software_deps.sh >& /tmp/setup.log"
   register: result
+  changed_when: true
   args:
     chdir: ~/
 

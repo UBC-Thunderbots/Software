@@ -26,14 +26,19 @@ class NetworkService
      * @param robot_id The robot id of the robot
      * @param ip_address The IP Address the service should connect to
      * @param primitive_listener_port The port to listen for primitive protos
-     * @param full_system_to_robot_ip_notification_port The port to listen for full system IP discovery notification
-     * @param robot_to_full_system_ip_notification_port The port to send robot IP discovery notification
+     * @param full_system_to_robot_ip_notification_port The port to listen for full system
+     * IP discovery notification
+     * @param robot_to_full_system_ip_notification_port The port to send robot IP
+     * discovery notification
      * @param robot_status_sender_port The port to send robot status
      * @param interface the interface to listen and send on
      */
-    NetworkService(const RobotId& robot_id, const std::string& ip_address, unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, unsigned short full_system_to_robot_ip_notification_port,
-                  unsigned short robot_to_full_system_ip_notification_port, const std::string& interface);
+    NetworkService(const RobotId& robot_id, const std::string& ip_address,
+                   unsigned short primitive_listener_port,
+                   unsigned short robot_status_sender_port,
+                   unsigned short full_system_to_robot_ip_notification_port,
+                   unsigned short robot_to_full_system_ip_notification_port,
+                   const std::string& interface);
 
     /**
      * When the network service is polled, it sends the robot_status and returns
@@ -103,10 +108,13 @@ class NetworkService
     /**
      * Creates a network resource with the given arguments.
      *
-     * This function is intended to be used to create a UDP listener or sender and abstract away the failure checking.
+     * This function is intended to be used to create a UDP listener or sender and
+     * abstract away the failure checking.
      *
-     * @tparam NetworkResource The type of network resource to create (UDP listener or sender)
-     * @tparam argsT The types of the arguments to pass to the constructor of the network resource
+     * @tparam NetworkResource The type of network resource to create (UDP listener or
+     * sender)
+     * @tparam argsT The types of the arguments to pass to the constructor of the network
+     * resource
      * @param args The arguments to pass to the constructor of the UDP listener or sender
      */
     template <typename NetworkResource, typename... argsT>
@@ -136,8 +144,10 @@ class NetworkService
     std::mutex robot_status_sender_mutex;
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotStatus>> robot_status_sender;
 
-    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::IpNotification>> fullsystem_to_robot_ip_listener;
-    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::IpNotification>> robot_to_fullsystem_ip_sender;
+    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::IpNotification>>
+        fullsystem_to_robot_ip_listener;
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::IpNotification>>
+        robot_to_fullsystem_ip_sender;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::Primitive>>
         udp_listener_primitive;
     std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::Primitive>>
@@ -151,8 +161,8 @@ class NetworkService
 
     // Counters for tracking rate-limited events
     unsigned int ip_notification_ticks = 0;
-    unsigned int network_ticks     = 0;
-    unsigned int thunderloop_ticks = 0;
+    unsigned int network_ticks         = 0;
+    unsigned int thunderloop_ticks     = 0;
 
     // ProtoTrackers for tracking recent primitive_set packet loss
     ProtoTracker primitive_tracker;

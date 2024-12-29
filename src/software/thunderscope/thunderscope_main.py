@@ -340,11 +340,13 @@ if __name__ == "__main__":
             if args.launch_gc
             else contextlib.nullcontext()
         ) as gamecontroller, WifiCommunicationManager(
-                current_proto_unix_io=current_proto_unix_io,
-                multicast_channel=getRobotMulticastChannel(args.channel),
-                should_setup_full_system=(args.run_blue or args.run_yellow),
-                interface=args.interface,
-                referee_port=gamecontroller.get_referee_port() if gamecontroller else SSL_REFEREE_PORT
+            current_proto_unix_io=current_proto_unix_io,
+            multicast_channel=getRobotMulticastChannel(args.channel),
+            should_setup_full_system=(args.run_blue or args.run_yellow),
+            interface=args.interface,
+            referee_port=gamecontroller.get_referee_port()
+            if gamecontroller
+            else SSL_REFEREE_PORT,
         ) as wifi_communication_manager, RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
             communication_manager=wifi_communication_manager,

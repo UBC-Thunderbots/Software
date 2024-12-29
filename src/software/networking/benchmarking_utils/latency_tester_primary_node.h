@@ -19,9 +19,9 @@ class LatencyTesterPrimaryNode : public LatencyTesterNode
      * @param message_size The size of the messages to send
      * @param timeout_duration The duration to wait for a response before timing out
      */
-    LatencyTesterPrimaryNode(const std::string& interface, const int listen_channel, const unsigned short listen_port,
-                             const int send_channel, const unsigned short send_port,
-                             const int message_size,
+    LatencyTesterPrimaryNode(const std::string& interface, const int listen_channel,
+                             const unsigned short listen_port, const int send_channel,
+                             const unsigned short send_port, const int message_size,
                              const std::chrono::milliseconds& timeout_duration);
 
     /**
@@ -29,14 +29,16 @@ class LatencyTesterPrimaryNode : public LatencyTesterNode
      *
      * @param interface The network interface to use for network communication
      * @param listen_port The port to listen on for responses
-     * @param send_ip IP address of the node to bounce messages off of to test round trip times
+     * @param send_ip IP address of the node to bounce messages off of to test round trip
+     * times
      * @param send_port The port to send requests on
      * @param message_size The size of the messages to send
      * @param timeout_duration The duration to wait for a response before timing out
      */
-    LatencyTesterPrimaryNode(const std::string& interface, const unsigned short listen_port,
-            const std::string& send_ip, const unsigned short send_port, const int message_size,
-            const std::chrono::milliseconds& timeout_duration);
+    LatencyTesterPrimaryNode(const std::string& interface,
+                             const unsigned short listen_port, const std::string& send_ip,
+                             const unsigned short send_port, const int message_size,
+                             const std::chrono::milliseconds& timeout_duration);
 
     /**
      * Logs round trip time statistics for the test.
@@ -52,7 +54,8 @@ class LatencyTesterPrimaryNode : public LatencyTesterNode
 
    private:
     /**
-     * Records the round trip by noting the time the response was received from the request driven during `runTest`.
+     * Records the round trip by noting the time the response was received from the
+     * request driven during `runTest`.
      *
      * @param message Contents of the message received
      * @param size Size of the message received
@@ -60,14 +63,17 @@ class LatencyTesterPrimaryNode : public LatencyTesterNode
     void onReceive(const char* message, const size_t& size) override;
 
     /**
-     * Initializes the node to start a new benchmarking test and generates a random message to send for the given size.
+     * Initializes the node to start a new benchmarking test and generates a random
+     * message to send for the given size.
      *
-     * The same message is sent for all requests to eliminate the effect of message generation on the round trip time.
+     * The same message is sent for all requests to eliminate the effect of message
+     * generation on the round trip time.
      *
      * @param message_size The size of the messages to send
      * @param timeout_duration The duration to wait for a response before timing out
      */
-    void initialize(const int message_size, const std::chrono::milliseconds& timeout_duration);
+    void initialize(const int message_size,
+                    const std::chrono::milliseconds& timeout_duration);
 
     /**
      * Sends a transaction to the network.

@@ -6,7 +6,7 @@
 
 /**
  * @brief Calculate the mean of a vector of data
- * 
+ *
  * @tparam T The type of the data
  *
  * @param data The data
@@ -29,7 +29,7 @@ double mean(const std::vector<T> data)
  * @brief Calculate the sample standard deviation of a vector of data
  *
  * Returns 0.0 if the data has fewer than 2 elements.
- * 
+ *
  * @tparam T The type of the data
  *
  * @param data The data

@@ -44,6 +44,7 @@
       become: true
       become_method: ansible.builtin.sudo
       ansible.builtin.command: "udevadm trigger"
+      changed_when: true
       tags: configure_nano
 
     - name: Add user robot to dialout
@@ -79,10 +80,11 @@
       tags:
         - sync
         - device_tree
-      ansible.builtin.command: "unzip -o ~/device_tree.zip"
+      ansible.builtin.unarchive:
+        src: ~/device_tree.zip
+        dest: ~/
+        remote_src: true
       register: result
-      args:
-        chdir: ~/
 
     - name: Compile device tree
       tags:
@@ -90,6 +92,7 @@
         - device_tree
       ansible.builtin.shell: "dtc -q -I dts -O dtb ~/device_tree.dts > device_tree.dtb"
       register: result
+      changed_when: true
       args:
         chdir: ~/
 
@@ -101,6 +104,7 @@
         - device_tree
       ansible.builtin.command: "mv /home/robot/device_tree.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb"
       register: result
+      changed_when: true
       args:
         chdir: ~/
 
@@ -112,6 +116,7 @@
         - device_tree
       ansible.builtin.command: "mv /home/robot/extlinux.conf /boot/extlinux/extlinux.conf"
       register: result
+      changed_when: true
       args:
         chdir: ~/
 

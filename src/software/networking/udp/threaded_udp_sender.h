@@ -54,7 +54,8 @@ class ThreadedUdpSender
      * This function returns after the message has been sent.
      *
      * @param message The string message to send
-     * @param async If true, the message will be sent asynchronously otherwise it will be send synchronously
+     * @param async If true, the message will be sent asynchronously otherwise it will be
+     * send synchronously
      */
     void sendString(const std::string& message, bool async = false);
 

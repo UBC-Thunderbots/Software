@@ -1,12 +1,12 @@
 #include "software/networking/udp/udp_listener.h"
 
-#include "software/networking/udp/network_utils.h"
 #include "software/logger/logger.h"
+#include "software/networking/udp/network_utils.h"
 
 UdpListener::UdpListener(boost::asio::io_service& io_service,
                          const std::string& ip_address, unsigned short port,
-                         const std::string& listen_interface,
-                         bool multicast, ReceiveCallback receive_callback,
+                         const std::string& listen_interface, bool multicast,
+                         ReceiveCallback receive_callback,
                          std::optional<std::string>& error)
     : running_(true), socket_(io_service), receive_callback_(receive_callback)
 {
@@ -48,7 +48,8 @@ UdpListener::UdpListener(boost::asio::io_service& io_service,
 }
 
 UdpListener::UdpListener(boost::asio::io_service& io_service, const unsigned short port,
-                         ReceiveCallback receive_callback, std::optional<std::string>& error)
+                         ReceiveCallback receive_callback,
+                         std::optional<std::string>& error)
     : running_(true), socket_(io_service), receive_callback_(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
@@ -75,9 +76,9 @@ UdpListener::UdpListener(boost::asio::io_service& io_service, const unsigned sho
     startListen();
 }
 
-void UdpListener::setupMulticast(
-    const boost::asio::ip::address& ip_address, const std::string& listen_interface,
-    std::optional<std::string>& error)
+void UdpListener::setupMulticast(const boost::asio::ip::address& ip_address,
+                                 const std::string& listen_interface,
+                                 std::optional<std::string>& error)
 {
     if (ip_address.is_v4())
     {
@@ -98,9 +99,7 @@ void UdpListener::setupMulticast(
     socket_.set_option(boost::asio::ip::multicast::join_group(ip_address));
 }
 
-UdpListener::~UdpListener()
-{
-}
+UdpListener::~UdpListener() {}
 
 void UdpListener::close()
 {

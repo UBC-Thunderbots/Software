@@ -21,8 +21,9 @@ class LatencyTesterNode
      * @param send_channel The multicast channel to send on
      * @param send_port The port to send on
      */
-    LatencyTesterNode(const std::string& interface, const int listen_channel, const unsigned short listen_port,
-                      const int send_channel, const unsigned short send_port);
+    LatencyTesterNode(const std::string& interface, const int listen_channel,
+                      const unsigned short listen_port, const int send_channel,
+                      const unsigned short send_port);
 
     /**
      * Sets up a unicast benchmarking node.
@@ -32,8 +33,8 @@ class LatencyTesterNode
      * @param send_ip Unicast IP address of the endpoint to send to
      * @param send_port The port to send on
      */
-    LatencyTesterNode(const std::string& interface, const unsigned short listen_port, const std::string& send_ip,
-            const unsigned short send_port);
+    LatencyTesterNode(const std::string& interface, const unsigned short listen_port,
+                      const std::string& send_ip, const unsigned short send_port);
 
     /**
      * Cleans up the network resources
@@ -49,7 +50,8 @@ class LatencyTesterNode
 
    private:
     /**
-     * Callback function that is called when a message is received from another network benchmarking node.
+     * Callback function that is called when a message is received from another network
+     * benchmarking node.
      *
      * @param message Contents of the message received
      * @param size Size of the message received

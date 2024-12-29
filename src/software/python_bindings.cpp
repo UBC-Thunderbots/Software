@@ -6,8 +6,8 @@
 
 #include <sstream>
 
-#include "proto/ip_notification.pb.h"
 #include "proto/geometry.pb.h"
+#include "proto/ip_notification.pb.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/parameters.pb.h"
@@ -67,7 +67,8 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
                                               py::buffer_protocol(), py::dynamic_attr())
         .def("get_interface", &Class::getInterface)
         .def("get_ip_address", &Class::getIpAddress)
-        .def("send_proto", &Class::sendProto, py::arg("message"), py::arg("async") = false);
+        .def("send_proto", &Class::sendProto, py::arg("message"),
+             py::arg("async") = false);
 
     std::string create_pyclass_name = "create" + pyclass_name;
     m.def(create_pyclass_name.c_str(),
@@ -133,18 +134,17 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
               return std::make_tuple(listener, error);
           });
 
-    m.def(create_pyclass_name.c_str(),
-            [](unsigned short port, const std::function<void(T)>& callback) {
-                // Pybind doesn't bind references in some cases
-                // (https://pybind11.readthedocs.io/en/stable/faq.html#limitations-involving-reference-arguments)
-                std::optional<std::string> error;
-                std::shared_ptr<Class> listener = std::make_shared<Class>(
-                    port, callback, error);
+    m.def(create_pyclass_name.c_str(), [](unsigned short port,
+                                          const std::function<void(T)>& callback) {
+        // Pybind doesn't bind references in some cases
+        // (https://pybind11.readthedocs.io/en/stable/faq.html#limitations-involving-reference-arguments)
+        std::optional<std::string> error;
+        std::shared_ptr<Class> listener = std::make_shared<Class>(port, callback, error);
 
-                // Return the listener and the error message to the Python side
-                // Use as: listener, error = create{name}ProtoListener(...)
-                return std::make_tuple(listener, error);
-            });
+        // Return the listener and the error message to the Python side
+        // Use as: listener, error = create{name}ProtoListener(...)
+        return std::make_tuple(listener, error);
+    });
 }
 
 template <typename T>

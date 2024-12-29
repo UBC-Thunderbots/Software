@@ -122,8 +122,7 @@ function run_eof_new_line(){
 function run_ansible_lint(){
     printf "Running ansible-lint...\n\n"
 
-    cd $CURR_DIR/../src/software/embedded/ansible/playbooks && /opt/tbotspython/python3 -m ansible-lint --fix *.yml
-    cd $CURR_DIR/../src/software/embedded/ansible/tasks && /opt/tbotspython/python3 -m ansible-lint --fix *.yml
+    /opt/tbotspython/bin/ansible-lint $CURR_DIR/../src/software/embedded/ansible/**/*.yml --fix
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to lint and format Ansible files!***\n\n"

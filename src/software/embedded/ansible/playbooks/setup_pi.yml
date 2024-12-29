@@ -46,11 +46,13 @@
             src: /boot/firmware/cmdline.txt
             dest: /boot/firmware/cmdline.txt.bak
             remote_src: true
+            mode: "0644"
 
         - name: Check if pcie_aspm is disabled
           ansible.builtin.command: 'grep -q "pcie_aspm=off" /boot/firmware/cmdline.txt'
           ignore_errors: true
           register: pcie_aspm_disabled
+          changed_when: false
 
         - name: Disable pcie_aspm
           when: pcie_aspm_disabled.rc != 0
@@ -81,7 +83,9 @@
         - name: Set up Wifi drivers
           become: true
           become_method: ansible.builtin.sudo
-          ansible.builtin.shell: "mv /home/{{ ansible_user }}/iwlwifi* /lib/firmware/"
+          ansible.builtin.command:
+            cmd: "mv /home/{{ ansible_user }}/iwlwifi* /lib/firmware/"
+            creates: /lib/firmware/iwlwifi*.ucode
         - name: Set up systemd Wifi interface name rule
           ansible.builtin.import_tasks:
             file: ../tasks/setup_wifi_interface.yml
@@ -89,7 +93,9 @@
         - name: Set up SPI overlay
           become: true
           become_method: ansible.builtin.sudo
-          ansible.builtin.command: "mv /home/{{ ansible_user }}/spi0-5cs.dtbo /boot/firmware/overlays/"
+          ansible.builtin.command:
+            cmd: "mv /home/{{ ansible_user }}/spi0-5cs.dtbo /boot/firmware/overlays/"
+            creates: /boot/firmware/overlays/spi0-5cs.dtbo
         - name: Update config.txt to select custom SPI overlay
           become: true
           become_method: ansible.builtin.sudo

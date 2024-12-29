@@ -5,3 +5,4 @@
   tags:
     - add_user_robot_to_dialout
   ansible.builtin.command: "adduser robot dialout"
+  changed_when: true
