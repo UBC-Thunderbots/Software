@@ -20,6 +20,8 @@ message RobotStatus
     uint64 last_handled_primitive_set                 = 11;
     PrimitiveExecutorStatus primitive_executor_status = 12;
     Timestamp adjusted_time_sent                      = 13;
+    string thunderloop_version                        = 14;
+    string thunderloop_date_flashed                   = 15;
 }
 
 message PrimitiveExecutorStatus
