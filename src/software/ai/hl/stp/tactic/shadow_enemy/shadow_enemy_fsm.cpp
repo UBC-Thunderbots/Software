@@ -1,4 +1,5 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
+#include "software/geom/algorithms/distance.h"
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
@@ -45,6 +46,19 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
     LOG(WARNING) << "Enemy threat not initialized for robot " << event.common.robot.id()
                  << "\n";
     return false;
+}
+
+bool ShadowEnemyFSM::contestedBall(const Update &event)
+{
+
+    bool robot_contesting = distance(event.common.world_ptr->ball().position(),event.common.robot.position()) < 0.9;
+
+      if(robot_contesting){
+        LOG(WARNING) << "trueayyy" << std::endl;
+      }
+
+
+    return robot_contesting;
 }
 
 void ShadowEnemyFSM::blockPass(const Update &event)
@@ -111,7 +125,7 @@ void ShadowEnemyFSM::blockShot(const Update &event,
     processEvent(MoveFSM::Update(control_params, event.common));
 }
 
-void ShadowEnemyFSM::stealAndChip(const Update &event)
+void ShadowEnemyFSM::goAndSteal(const Update &event)
 {
     auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
@@ -122,5 +136,21 @@ void ShadowEnemyFSM::stealAndChip(const Update &event)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
+}
+
+void ShadowEnemyFSM::stealAndPull(const Update &event)
+{
+    auto ball_position = event.common.world_ptr->ball().position();
+    auto face_ball_orientation =
+        (ball_position - event.common.robot.position()).orientation();
+    auto pull_to_here = 
+        (event.common.robot.position() - ball_position) * 3 + ball_position;
+
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, pull_to_here, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
 }

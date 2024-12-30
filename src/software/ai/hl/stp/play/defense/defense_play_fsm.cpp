@@ -34,7 +34,6 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
     auto enemy_threats = getAllEnemyThreats(
         event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
         event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
-            LOG(WARNING) << "trueayyy" << std::endl;
 
 
  updateCreaseAndPassDefenders(event, enemy_threats);
@@ -42,7 +41,6 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
     if (pass_defenders.size() > 0)
     {
 
-            LOG(WARNING) << "doubleeayyy" << std::endl;
         pass_defenders.erase(pass_defenders.begin());
         updateShadowers(event, {enemy_threats.front()});
     }
