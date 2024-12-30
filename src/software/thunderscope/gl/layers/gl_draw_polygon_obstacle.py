@@ -17,7 +17,8 @@ class GLDrawPolygonObstacleLayer(GLLayer):
     """A layer used to draw polygons that are going to represent obstacles for the trajectory planner
     to avoid.
     """
-    DOUBLE_CLICK_INTERVAL = 200 
+
+    DOUBLE_CLICK_INTERVAL = 200
 
     def __init__(self, name: str, friendly_io: ProtoUnixIO) -> None:
         """Initialize this layer
@@ -159,9 +160,10 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         else:
             self.can_double_click = True
             # handle single click
-            QTimer.singleShot(self.DOUBLE_CLICK_INTERVAL, self.create_single_click_callback(event))
+            QTimer.singleShot(
+                self.DOUBLE_CLICK_INTERVAL, self.create_single_click_callback(event)
+            )
 
     def refresh_graphics(self) -> None:
-        """refreshing graphics"""
+        """Refreshing graphics"""
         return
-        
