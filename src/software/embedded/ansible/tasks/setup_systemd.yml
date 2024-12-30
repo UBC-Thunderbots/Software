@@ -19,10 +19,9 @@
       become_method: ansible.builtin.sudo
       become: true
       register: res
-      ansible.posix.synchronize:
+      ansible.builtin.copy:
         src: ../../linux_configs/systemd/thunderloop.service
-        dest: /etc/systemd/system
-        copy_links: true
+        dest: /etc/systemd/system/
 
     # NOTE: "Enabling systems" means they will start on boot
     - name: Enable system services

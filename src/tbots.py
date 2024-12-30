@@ -204,7 +204,7 @@ if __name__ == "__main__":
             sys.exit(1)
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        platform_ip = "0" if args.platform == "NANO" else "5"
+        platform_ip = "0" if args.platform == "NANO" else "6"
         bazel_arguments += [f"192.168.{platform_ip}.20{id}" for id in args.flash_robots]
         bazel_arguments += ["-pwd", args.pwd]
 
