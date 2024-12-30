@@ -41,7 +41,6 @@ class MultilayerToolbar(QWidget):
 
         :param toolbar: the toolbar going to be added to this layer
         """
-
         # we only support 2 toolbars as of current
         assert len(self.toolbars) <= 1
 
@@ -52,7 +51,7 @@ class MultilayerToolbar(QWidget):
         self.show_toolbar(0)
 
     def show_toolbar(self, num):
-        """display a toolbar
+        """Display a toolbar
 
         :param num: the index of the toolbar in the toolbars array going to be displayed
         """
