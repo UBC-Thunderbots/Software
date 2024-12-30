@@ -10,10 +10,14 @@ from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from software.thunderscope.constants import *
 
+from software.thunderscope.gl.widgets.gl_multilayer_toolbar import MultilayerToolbar
+from software.thunderscope.gl.widgets.gl_shift_toolbar import ShiftButtonToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
-from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
+from software.thunderscope.gl.widgets.gl_field_toolbar import (
+    GLFieldToolbar,
+)
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
@@ -82,6 +86,13 @@ class GLWidget(QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.gl_view_widget)
 
+        # setup multi layer toolbar
+        self.multi_layer_toolbar = MultilayerToolbar(
+            parent=self.gl_view_widget, toolbars=[]
+        )
+
+        self.shift_button_toolbar = ShiftButtonToolbar(parent=self.multi_layer_toolbar)
+
         # Setup toolbar
         self.measure_mode_enabled = False
         self.measure_layer = None
@@ -89,13 +100,17 @@ class GLWidget(QWidget):
         self.toolbars_menu = QMenu()
         self.layers_menu_actions = {}
         self.simulation_control_toolbar = GLFieldToolbar(
-            parent=self.gl_view_widget,
+            parent=self.multi_layer_toolbar,
             on_camera_view_change=self.set_camera_view,
             on_measure_mode=self.toggle_measure_mode,
             layers_menu=self.layers_menu,
             toolbars_menu=self.toolbars_menu,
             sandbox_mode=sandbox_mode,
         )
+
+        # adding layer to the multitool bar layer
+        self.multi_layer_toolbar.add_toolbar(self.simulation_control_toolbar)
+        self.multi_layer_toolbar.add_toolbar(self.shift_button_toolbar)
 
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(
@@ -121,6 +136,10 @@ class GLWidget(QWidget):
         self.layers = []
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
+
+    def get_shift_button_toolbar(self):
+        """Get the ShiftButtonToolbar"""
+        return self.shift_button_toolbar
 
     def get_sim_control_toolbar(self):
         """Returns the simulation control toolbar"""

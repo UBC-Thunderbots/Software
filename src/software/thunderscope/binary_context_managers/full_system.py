@@ -6,6 +6,7 @@ import time
 import threading
 
 from subprocess import Popen, TimeoutExpired
+from software.thunderscope.gl.layers.gl_obstacle_layer import ObstacleList
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from proto.import_all_protos import *
@@ -215,5 +216,6 @@ gdb --args bazel-bin/{self.full_system}
             (VALIDATION_PROTO_SET_PATH, ValidationProtoSet),
             (ROBOT_LOG_PATH, RobotLog),
             (ROBOT_CRASH_PATH, RobotCrash),
+            (VIRTUAL_OBSTACLES_UNIX_PATH, VirtualObstacles),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)
