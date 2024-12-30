@@ -33,8 +33,8 @@ class MultilayerToolbar(QWidget):
         self.shortcut_f1 = QtGui.QShortcut(QKeySequence("F1"), self)
         self.shortcut_f1.activated.connect(lambda: self.show_toolbar(0))
 
-        self.shortcut_f1 = QtGui.QShortcut(QKeySequence("F2"), self)
-        self.shortcut_f1.activated.connect(lambda: self.show_toolbar(1))
+        self.shortcut_f2 = QtGui.QShortcut(QKeySequence("F2"), self)
+        self.shortcut_f2.activated.connect(lambda: self.show_toolbar(1))
 
     def add_toolbar(self, toolbar: GLToolbar):
         """Adding a toolbar to the widget. Appends the toolbar at the end of the array

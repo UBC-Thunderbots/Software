@@ -135,7 +135,7 @@ def setup_gl_widget(
     trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
 
     draw_obstacle_layer = GLDrawPolygonObstacleLayer(
-        "Freehand Obstalce Layer", full_system_proto_unix_io
+        "Freehand Obstacle Layer", full_system_proto_unix_io
     )
 
     gl_widget.add_layer(draw_obstacle_layer, False)

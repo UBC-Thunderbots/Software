@@ -139,6 +139,7 @@ class GLWidget(QWidget):
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
 
     def get_shift_button_toolbar(self):
+        """Get the ShiftButtonToolbar"""
         return self.shift_button_toolbar
 
     def get_sim_control_toolbar(self):
