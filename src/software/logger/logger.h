@@ -85,7 +85,7 @@ class LoggerSingleton
         // tests:bazel-out/k8-fastbuild/bin/software/simulated_tests/TEST_NAME.runfiles/__main__/
         //   where TEST_NAME is the name of the simulated test
 
-        // Log locations can also be defined by setting the --logging_dir command line
+        // Log locations can also be defined by setting the --logging_dir command-line
         // arg. Note: log locations are defaulted to the bazel-out folder due to Bazel's
         // hermetic build principles
 
