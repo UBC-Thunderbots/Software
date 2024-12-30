@@ -18,7 +18,6 @@ class ShiftButtonToolbar(GLToolbar):
         super().__init__(parent)
         self.menu = QMenu()
         self.push_button = QPushButton()
-        # TODO: make this a static method!
         self.push_button.setStyleSheet(GLToolbar.get_button_style())
         self.push_button.setMenu(self.menu)
 
