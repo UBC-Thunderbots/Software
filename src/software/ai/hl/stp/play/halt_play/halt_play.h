@@ -1,6 +1,7 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
+#include "software/ai/hl/stp/play/halt_play/halt_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
 
 /**
@@ -14,4 +15,9 @@ class HaltPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
+    void updateTactics(const PlayUpdate &play_update) override;
+
+   private:
+    FSM<HaltPlayFSM> fsm;
+    HaltPlayFSM::ControlParams control_params;
 };
