@@ -465,5 +465,5 @@ PYBIND11_MODULE(python_bindings, m)
         .value("STATUS_ERROR", EstopState::STATUS_ERROR)
         .export_values();
 
-    m.def("sigmoid",&sigmoid);
+    m.def("sigmoid", &sigmoid);
 }
