@@ -322,10 +322,9 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     if (ball && field)
     {
-
         possession = possession_tracker->getTeamWithPossession(friendly_team, enemy_team,
                                                                *ball, *field);
-    updateDribbleDisplacement();
+        updateDribbleDisplacement();
     }
 }
 
@@ -373,7 +372,7 @@ void SensorFusion::updateDribbleDisplacement()
             // Insert only occurs if the map doesn't already contain a value
             // with the key robot.id()
             ball_contacts_by_friendly_robots.insert(
-                    std::make_pair(robot.id(), ball->position()));
+                std::make_pair(robot.id(), ball->position()));
         }
         else
         {
@@ -397,9 +396,9 @@ void SensorFusion::updateDribbleDisplacement()
     std::transform(ball_contacts_by_friendly_robots.begin(),
                    ball_contacts_by_friendly_robots.end(),
                    std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
-                const Point contact_point = kv_pair.second;
-                return Segment(contact_point, ball->position());
-            });
+                       const Point contact_point = kv_pair.second;
+                       return Segment(contact_point, ball->position());
+                   });
 
     // Set dribble_displacement to the longest of dribble_displacements
     if (dribble_displacements.empty())
@@ -409,10 +408,9 @@ void SensorFusion::updateDribbleDisplacement()
     else
     {
         dribble_displacement = *std::max_element(
-                dribble_displacements.begin(), dribble_displacements.end(),
-                [](const Segment &a, const Segment &b) { return a.length() < b.length(); });
+            dribble_displacements.begin(), dribble_displacements.end(),
+            [](const Segment &a, const Segment &b) { return a.length() < b.length(); });
     }
-
 }
 
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
