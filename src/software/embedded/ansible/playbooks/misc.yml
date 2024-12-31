@@ -25,7 +25,7 @@
         msg: "Reboot initiated by Ansible"
         connect_timeout: 20
         reboot_timeout: 1200
-        pre_reboot_delay: 0
+        pre_reboot_delay: "00"
         post_reboot_delay: 60
         test_command: whoami
       register: res
