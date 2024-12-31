@@ -137,7 +137,7 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, True)
-    gl_widget.add_layer(max_dribble_layer, False)
+    gl_widget.add_layer(max_dribble_layer, True)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
