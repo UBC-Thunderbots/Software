@@ -36,6 +36,7 @@
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/vector.h"
+#include "software/math/math_functions.h"
 #include "software/networking/radio/threaded_proto_radio_sender.hpp"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
@@ -463,4 +464,6 @@ PYBIND11_MODULE(python_bindings, m)
         .value("PLAY", EstopState::PLAY)
         .value("STATUS_ERROR", EstopState::STATUS_ERROR)
         .export_values();
+
+    m.def("sigmoid", &sigmoid);
 }
