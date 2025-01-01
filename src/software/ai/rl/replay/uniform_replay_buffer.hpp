@@ -5,31 +5,11 @@
 #include <random>
 #include <vector>
 
+#include "software/ai/rl/replay/transition.hpp"
 #include "software/logger/logger.h"
 
 /**
- * Transition tuple (state, action, reward, next state) capturing the
- * agent's experience. There is an additional "done" flag that indicates
- * this is the final transition in an episode.
- *
- * @tparam TState type representing the state space of the environment
- * @tparam TAction type representing the action space of the environment
- */
-template <typename TState, typename TAction>
-struct Transition
-{
-    static_assert(reflective_enum::is_reflective_enum<TAction>::value,
-                  "TAction must be a reflective enum");
-
-    TState state;
-    TAction action;
-    float reward;
-    TState next_state;
-    bool done;
-};
-
-/**
- * Replay buffer that stores the agent's experiences.
+ * Fixed capacity replay buffer with uniform random sampling.
  *
  * Instead of running learning updates on single experiences as they occur
  * during simulation, we store experiences in a buffer and "replay" to the
@@ -41,18 +21,18 @@ struct Transition
  * @tparam TAction type representing the action space of the environment
  */
 template <typename TState, typename TAction>
-class ReplayBuffer
+class UniformReplayBuffer
 {
     static_assert(reflective_enum::is_reflective_enum<TAction>::value,
                   "TAction must be a reflective enum");
 
    public:
     /**
-     * Constructs a fixed capacity replay buffer.
+     * Constructs a UniformReplayBuffer with the given capacity.
      *
      * @param capacity the maximum capacity of the replay buffer
      */
-    explicit ReplayBuffer(size_t capacity);
+    explicit UniformReplayBuffer(size_t capacity);
 
     /**
      * Stores an experience in the replay buffer.
@@ -84,12 +64,13 @@ class ReplayBuffer
 };
 
 template <typename TState, typename TAction>
-ReplayBuffer<TState, TAction>::ReplayBuffer(size_t capacity) : capacity_(capacity)
+UniformReplayBuffer<TState, TAction>::UniformReplayBuffer(size_t capacity)
+    : capacity_(capacity)
 {
 }
 
 template <typename TState, typename TAction>
-void ReplayBuffer<TState, TAction>::store(Transition<TState, TAction> experience)
+void UniformReplayBuffer<TState, TAction>::store(Transition<TState, TAction> experience)
 {
     memory_.push_back(std::move(experience));
     if (memory_.size() > capacity_)
@@ -99,7 +80,7 @@ void ReplayBuffer<TState, TAction>::store(Transition<TState, TAction> experience
 }
 
 template <typename TState, typename TAction>
-std::vector<Transition<TState, TAction>> ReplayBuffer<TState, TAction>::sample(
+std::vector<Transition<TState, TAction>> UniformReplayBuffer<TState, TAction>::sample(
     size_t batch_size) const
 {
     CHECK(batch_size <= memory_.size())
@@ -114,7 +95,7 @@ std::vector<Transition<TState, TAction>> ReplayBuffer<TState, TAction>::sample(
 }
 
 template <typename TState, typename TAction>
-size_t ReplayBuffer<TState, TAction>::size() const
+size_t UniformReplayBuffer<TState, TAction>::size() const
 {
     return memory_.size();
 }

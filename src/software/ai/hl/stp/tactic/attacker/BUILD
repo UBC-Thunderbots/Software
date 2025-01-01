@@ -2,15 +2,15 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "attacker_tactic",
-    hdrs = ["attacker_tactic.h"],
     srcs = ["attacker_tactic.cpp"],
+    hdrs = ["attacker_tactic.h"],
     deps = [
-        ":attacker_state",
         ":attacker_skill_executor",
-        "//software/ai/hl/stp/tactic:tactic",
+        ":attacker_state",
+        "//software/ai/hl/stp/tactic",
         "//software/ai/rl:dqn",
-        "//software/ai/rl:replay_buffer",
         "//software/ai/rl/exploration_strategies:epsilon_greedy_strategy",
+        "//software/ai/rl/replay:prioritized_replay_buffer",
     ],
 )
 
@@ -24,14 +24,14 @@ cc_library(
 
 cc_library(
     name = "attacker_skill_executor",
-    hdrs = ["attacker_skill_executor.h"],
     srcs = ["attacker_skill_executor.cpp"],
+    hdrs = ["attacker_skill_executor.h"],
     deps = [
-        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:shot",
+        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/passing:pass",
-        "//software/util/make_enum:make_enum",
+        "//software/util/make_enum",
     ],
 )
 

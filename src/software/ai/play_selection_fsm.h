@@ -16,8 +16,7 @@ struct PlaySelectionFSM
     {
         Update(const std::function<void(std::shared_ptr<Play>)>& set_current_play,
                const WorldPtr& world_ptr)
-            : set_current_play(set_current_play),
-              world_ptr(world_ptr)
+            : set_current_play(set_current_play), world_ptr(world_ptr)
         {
         }
         std::function<void(std::shared_ptr<Play>)> set_current_play;

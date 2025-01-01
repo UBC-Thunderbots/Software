@@ -59,10 +59,12 @@ message GameState
         // The number of red cards issued to the team since the beginning of the game
         required uint32 red_cards = 3;
 
-        // The total number of yellow cards issued to the team since the beginning of the game
+        // The total number of yellow cards issued to the team since the beginning of the
+        // game
         required uint32 yellow_cards = 4;
 
-        // The amount of time left (in microseconds) on each active yellow card issued to the team
+        // The amount of time left (in microseconds) on each active yellow card issued to
+        // the team
         repeated uint32 yellow_card_times = 5;
 
         // The total number of countable fouls that act towards yellow cards

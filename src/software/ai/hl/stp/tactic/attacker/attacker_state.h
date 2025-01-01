@@ -27,6 +27,8 @@ class AttackerState
     {
     }
 
+    AttackerState() = default;
+
     /**
      * Returns the 1-D tensor representation of the AttackerState.
      *
@@ -46,8 +48,7 @@ class AttackerState
     {
         // Static variable will be initialized only once with the result of the lambda
         // when size() is first called
-        static const size_t size = []()
-        {
+        static const size_t size = []() {
             const World blank_world(Field::createSSLDivisionBField(),
                                     Ball(Point(), Vector(), Timestamp()), Team(), Team());
 

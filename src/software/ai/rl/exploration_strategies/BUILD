@@ -4,8 +4,8 @@ cc_library(
     name = "exploration_strategy",
     hdrs = ["exploration_strategy.hpp"],
     deps = [
-        "//software/util/make_enum:make_enum",
         "//software/ai/rl:torch",
+        "//software/util/make_enum",
     ],
 )
 

@@ -93,7 +93,8 @@ std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);
  *
  * @return a unique_ptr to a TbotsProto::GameState::TeamInfo proto after conversion
  */
-std::unique_ptr<TbotsProto::GameState::TeamInfo> createTeamInfo(const TeamInfo& team_info);
+std::unique_ptr<TbotsProto::GameState::TeamInfo> createTeamInfo(
+    const TeamInfo& team_info);
 
 /**
  * Returns a TbotsProto::Timestamp proto given a timestamp.

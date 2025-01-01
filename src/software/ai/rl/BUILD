@@ -10,13 +10,7 @@ cc_library(
     name = "dqn",
     hdrs = ["dqn.hpp"],
     deps = [
-        ":replay_buffer",
         ":torch",
+        "//software/ai/rl/replay:transition",
     ],
-)
-
-cc_library(
-    name = "replay_buffer",
-    hdrs = ["replay_buffer.hpp"],
-    deps = ["//software/logger"],
 )

@@ -3,7 +3,8 @@
 AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       dqn_(DQN_LEARNING_RATE, DQN_DISCOUNT_RATE, DQN_SOFT_UPDATE_TAU),
-      replay_buffer_(REPLAY_BUFFER_CAPACITY),
+      replay_buffer_(REPLAY_BUFFER_CAPACITY, REPLAY_BUFFER_MIN_PRIORITY,
+                     REPLAY_BUFFER_ALPHA, REPLAY_BUFFER_BETA),
       epsilon_greedy_strategy_(EPSILON_START, EPSILON_END, EPSILON_DECAY_RATE),
       ai_config_(ai_config)
 {
@@ -90,19 +91,19 @@ void AttackerTactic::updateDQN(const WorldPtr& new_world, bool is_final)
     current_world_ = new_world;
     current_state_ = new_state;
 
-    if (replay_buffer_.size() >= TRANSITION_BATCH_SIZE)
+    if (replay_buffer_.size() >= REPLAY_BUFFER_BATCH_SIZE)
     {
-        std::vector<Transition<AttackerState, AttackerSkill>> transitions =
-            replay_buffer_.sample(TRANSITION_BATCH_SIZE);
+        auto [transitions, indices, weights] =
+            replay_buffer_.sample(REPLAY_BUFFER_BATCH_SIZE);
 
-        dqn_.update(transitions);
+        const torch::Tensor td_error = dqn_.update(transitions, weights);
+        replay_buffer_.updatePriorities(indices, td_error);
     }
 }
 
 float AttackerTactic::computeReward(const World& old_world, const World& new_world)
 {
-    auto calc_goal_differential = [](const GameState& game_state)
-    {
+    auto calc_goal_differential = [](const GameState& game_state) {
         const int friendly_goals = game_state.getFriendlyTeamInfo().getScore();
         const int enemy_goals    = game_state.getFriendlyTeamInfo().getScore();
         return friendly_goals - enemy_goals;

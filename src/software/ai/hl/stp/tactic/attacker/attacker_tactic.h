@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/rl/dqn.hpp"
 #include "software/ai/rl/exploration_strategies/epsilon_greedy_strategy.hpp"
+#include "software/ai/rl/replay/prioritized_replay_buffer.hpp"
 
 /**
  * The Attacker is the main ball handler during offensive gameplay. It executes
@@ -93,16 +94,19 @@ class AttackerTactic : public Tactic
     static constexpr float DQN_SOFT_UPDATE_TAU = 0.005f;
 
     // Replay buffer hyperparameter values
-    static constexpr unsigned int REPLAY_BUFFER_CAPACITY = 10000;
-    static constexpr unsigned int TRANSITION_BATCH_SIZE  = 128;
+    static constexpr unsigned int REPLAY_BUFFER_CAPACITY   = 16384;
+    static constexpr unsigned int REPLAY_BUFFER_BATCH_SIZE = 128;
+    static constexpr float REPLAY_BUFFER_MIN_PRIORITY      = 0.001f;
+    static constexpr float REPLAY_BUFFER_ALPHA             = 0.6f;
+    static constexpr float REPLAY_BUFFER_BETA              = 0.4f;
 
     // Epsilon-greedy hyperparameter values
-    static constexpr double EPSILON_START = 0.9;
-    static constexpr double EPSILON_END = 0.05;
+    static constexpr double EPSILON_START      = 0.9;
+    static constexpr double EPSILON_END        = 0.05;
     static constexpr double EPSILON_DECAY_RATE = 1000;
 
     DQN<AttackerState, AttackerSkill> dqn_;
-    ReplayBuffer<AttackerState, AttackerSkill> replay_buffer_;
+    PrioritizedReplayBuffer<AttackerState, AttackerSkill> replay_buffer_;
     EpsilonGreedyStrategy<AttackerSkill> epsilon_greedy_strategy_;
 
     WorldPtr current_world_;

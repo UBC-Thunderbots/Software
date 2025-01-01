@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/rl/replay_buffer.hpp"
+#include "software/ai/rl/replay/transition.hpp"
 #include "software/ai/rl/torch.h"
 
 /**
@@ -43,8 +43,13 @@ class DQN
      * of transitions.
      *
      * @param batch the batch of transitions to update the DQN with
+     * @param weights the weights to multiply the TD error by
+     *
+     * @return the temporal difference (TD) error between the target and the
+     * current network prediction
      */
-    void update(const std::vector<Transition<TState, TAction>>& batch);
+    torch::Tensor update(const std::vector<Transition<TState, TAction>>& batch,
+                         torch::Tensor weights);
 
     /**
      * Save the weights of the current network to a file.
@@ -96,11 +101,11 @@ DQN<TState, TAction>::DQN(float learning_rate, float discount_rate, float soft_u
       optimizer_(current_net_->parameters(), {learning_rate_})
 {
     CHECK(learning_rate_ >= 0 && learning_rate_ <= 1)
-        << "Learning rate must be between 0 and 1 inclusive";
+        << "learning_rate must be between 0 and 1 inclusive";
     CHECK(discount_rate_ >= 0 && discount_rate_ <= 1)
-        << "Discount rate must be between 0 and 1 inclusive";
+        << "discount_rate must be between 0 and 1 inclusive";
     CHECK(soft_update_tau_ >= 0 && soft_update_tau_ <= 1)
-        << "Tau must be between 0 and 1 inclusive";
+        << "soft_update_tau must be between 0 and 1 inclusive";
 }
 
 template <typename TState, typename TAction>
@@ -111,7 +116,8 @@ torch::Tensor DQN<TState, TAction>::act(const TState& state)
 }
 
 template <typename TState, typename TAction>
-void DQN<TState, TAction>::update(const std::vector<Transition<TState, TAction>>& batch)
+torch::Tensor DQN<TState, TAction>::update(
+    const std::vector<Transition<TState, TAction>>& batch, torch::Tensor weights)
 {
     const int batch_size           = static_cast<int>(batch.size());
     const int state_size           = static_cast<int>(TState::size());
@@ -150,8 +156,12 @@ void DQN<TState, TAction>::update(const std::vector<Transition<TState, TAction>>
     // Compute target value of Q(s, a)
     torch::Tensor target_q_values = reward_batch + (next_q_values * discount_rate_);
 
+    // Compute TD error
+    torch::Tensor td_error = torch::abs(target_q_values - q_values).detach();
+
     // Compute Huber loss
-    torch::Tensor loss = torch::nn::functional::huber_loss(q_values, target_q_values);
+    torch::Tensor loss =
+        torch::nn::functional::huber_loss(q_values * weights, target_q_values * weights);
 
     // Optimize current network
     optimizer_.zero_grad();
@@ -175,6 +185,8 @@ void DQN<TState, TAction>::update(const std::vector<Transition<TState, TAction>>
             }
         }
     }
+
+    return td_error;
 }
 
 template <typename TState, typename TAction>

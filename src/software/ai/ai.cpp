@@ -77,15 +77,17 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const WorldPtr& worl
     std::unique_ptr<TbotsProto::PrimitiveSet> primitive_set;
     if (static_cast<bool>(override_play))
     {
-        primitive_set = override_play->get(
-            world_ptr, inter_play_communication, [this](InterPlayCommunication comm)
-            { inter_play_communication = std::move(comm); });
+        primitive_set = override_play->get(world_ptr, inter_play_communication,
+                                           [this](InterPlayCommunication comm) {
+                                               inter_play_communication = std::move(comm);
+                                           });
     }
     else
     {
-        primitive_set = current_play->get(
-            world_ptr, inter_play_communication, [this](InterPlayCommunication comm)
-            { inter_play_communication = std::move(comm); });
+        primitive_set = current_play->get(world_ptr, inter_play_communication,
+                                          [this](InterPlayCommunication comm) {
+                                              inter_play_communication = std::move(comm);
+                                          });
     }
 
     FrameMarkEnd(TracyConstants::AI_FRAME_MARKER);

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/evaluation/shot.h"
-#include "software/ai/passing/pass.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
+#include "software/ai/passing/pass.h"
 #include "software/util/make_enum/make_enum.hpp"
 
 // clang-format off

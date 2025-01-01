@@ -14,8 +14,7 @@ TeamInfo::TeamInfo(const TbotsProto::GameState::TeamInfo& team_info_proto)
 {
     std::transform(team_info_proto.yellow_card_times().begin(),
                    team_info_proto.yellow_card_times().end(),
-                   std::back_inserter(yellow_card_times_),
-                   [](unsigned int microseconds) {
+                   std::back_inserter(yellow_card_times_), [](unsigned int microseconds) {
                        return Duration::fromMicroseconds(microseconds);
                    });
 }

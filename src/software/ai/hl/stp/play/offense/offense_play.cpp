@@ -25,7 +25,7 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     fsm.process_event(OffensePlayFSM::Update(control_params, play_update));
 }
 
-void OffensePlay::terminate(const WorldPtr& world_ptr)
+void OffensePlay::terminate(const WorldPtr &world_ptr)
 {
     fsm.process_event(OffensePlayFSM::Terminate{world_ptr});
 }

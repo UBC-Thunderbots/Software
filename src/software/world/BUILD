@@ -191,8 +191,8 @@ cc_test(
 
 cc_library(
     name = "team_info",
-    hdrs = ["team_info.h"],
     srcs = ["team_info.cpp"],
+    hdrs = ["team_info.h"],
     deps = [
         "//proto:tbots_cc_proto",
         "//software/time:duration",

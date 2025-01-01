@@ -57,6 +57,11 @@ EpsilonGreedyStrategy<TAction>::EpsilonGreedyStrategy(double epsilon_start,
       random_num_dist_(0, 1),
       random_action_dist_(0, static_cast<int>(reflective_enum::size<TAction>()) - 1)
 {
+    CHECK(epsilon_start >= 0 && epsilon_start <= 1)
+        << "epsilon_start must be between 0 and 1 inclusive";
+    CHECK(epsilon_end >= 0 && epsilon_end <= 1)
+        << "epsilon_end must be between 0 and 1 inclusive";
+    CHECK(epsilon_decay_rate > 0) << "epsilon_decay_rate must be greater than 0";
 }
 
 template <typename TAction>
