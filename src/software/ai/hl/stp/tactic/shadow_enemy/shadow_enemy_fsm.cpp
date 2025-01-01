@@ -48,13 +48,28 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
     return false;
 }
 
+bool ShadowEnemyFSM::blockedShot(const Update &event){
+
+    auto ball_position = event.common.world_ptr->ball().position();
+    Ray shot_block_direction(ball_position, event.common.robot.position() - ball_position);  
+    Segment goalLine(event.common.world_ptr->field().friendlyGoal().posXNegYCorner(), 
+        event.common.world_ptr->field().friendlyGoal().posXPosYCorner());
+ 
+    bool ball_blocked = intersects(goalLine, shot_block_direction);
+    return ball_blocked;
+
+}
+
+
 bool ShadowEnemyFSM::contestedBall(const Update &event)
 {
 
-    bool robot_contesting = distance(event.common.world_ptr->ball().position(),event.common.robot.position()) < 0.9;
+    bool robot_contesting = distance(event.common.world_ptr->ball().position(), event.common.robot.position()) < 0.9;
 
       if(robot_contesting){
-        LOG(WARNING) << "trueayyy" << std::endl;
+        LOG(WARNING) << event.common.world_ptr->getMostRecentTimestamp() << std::endl;
+      }else {
+        LOG(WARNING) << event.common.world_ptr->getMostRecentTimestamp() << "not contested" << distance(event.common.world_ptr->ball().position(), event.common.robot.position()) << std::endl;
       }
 
 

@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
 struct ShadowEnemyFSM
@@ -80,6 +81,15 @@ struct ShadowEnemyFSM
     bool contestedBall(const Update &event);
 
     /**
+     * Guard that checks if we have essentially blocked the shot
+     *
+     * @param event ShadowEnemyFSM::Update
+     *
+     * @return if we are blocking a shot
+     */
+    bool blockedShot(const Update &event);
+
+    /**
      * Action to block the pass to our shadowee
      *
      *
@@ -127,6 +137,7 @@ struct ShadowEnemyFSM
 
         DEFINE_SML_GUARD(enemyThreatHasBall)
         DEFINE_SML_GUARD(contestedBall)
+        DEFINE_SML_GUARD(blockedShot)
 
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(goAndSteal)
@@ -136,6 +147,7 @@ struct ShadowEnemyFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
+            MoveFSM_S + Update_E[blockedShot_G] / goAndSteal_A = GoAndStealState_S,
             MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = GoAndStealState_S,
             BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
             BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,
