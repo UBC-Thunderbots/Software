@@ -14,6 +14,7 @@ cc_library(
         "//software/networking/udp:threaded_proto_udp_sender",
         "//software/time:duration",
         "//software/time:timestamp",
+        "//software/world:robot_state",
         "@boost//:asio",
     ],
 )

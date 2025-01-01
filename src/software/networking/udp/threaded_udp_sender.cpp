@@ -1,9 +1,11 @@
 #include "software/networking/udp/threaded_udp_sender.h"
 
 ThreadedUdpSender::ThreadedUdpSender(const std::string& ip_address,
-                                     const unsigned short port, bool multicast)
+                                     const unsigned short port,
+                                     const std::string& interface, bool multicast,
+                                     std::optional<std::string>& error)
     : io_service(),
-      udp_sender(io_service, ip_address, port, multicast),
+      udp_sender(io_service, ip_address, port, interface, multicast, error),
       io_service_thread([this]() { io_service.run(); })
 {
 }
@@ -22,7 +24,24 @@ ThreadedUdpSender::~ThreadedUdpSender()
     io_service_thread.join();
 }
 
-void ThreadedUdpSender::sendString(const std::string& message)
+std::string ThreadedUdpSender::getInterface() const
 {
-    udp_sender.sendString(message);
+    return udp_sender.getInterface();
+}
+
+std::string ThreadedUdpSender::getIpAddress() const
+{
+    return udp_sender.getIpAddress();
+}
+
+void ThreadedUdpSender::sendString(const std::string& message, bool async)
+{
+    if (async)
+    {
+        udp_sender.sendStringAsync(message);
+    }
+    else
+    {
+        udp_sender.sendString(message);
+    }
 }

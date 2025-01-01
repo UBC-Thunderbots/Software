@@ -24,10 +24,10 @@ class PrimitiveExecutor
                                const RobotId robot_id);
 
     /**
-     * Update primitive executor with a new Primitive Set
-     * @param primitive_set_msg The primitive to start
+     * Update primitive executor with a new Primitive
+     * @param primitive_msg The primitive to start
      */
-    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set_msg);
+    void updatePrimitive(const TbotsProto::Primitive &primitive_msg);
 
     /**
      * Set the current primitive to the stop primitive

@@ -1,13 +1,18 @@
-
 #include "software/logger/plotjuggler_sink.h"
 
 #include <google/protobuf/util/json_util.h>
 
 #include "shared/constants.h"
 
-PlotJugglerSink::PlotJugglerSink()
-    : udp_sender(PLOTJUGGLER_GUI_DEFAULT_HOST, PLOTJUGGLER_GUI_DEFAULT_PORT, false)
+PlotJugglerSink::PlotJugglerSink(const std::string& interface)
+    : udp_sender(PLOTJUGGLER_GUI_DEFAULT_HOST, PLOTJUGGLER_GUI_DEFAULT_PORT, interface,
+                 false, error)
 {
+    if (error.has_value())
+    {
+        std::cerr << "Error setting up UDP sender for PlotJugglerSink: " << error.value();
+        std::terminate();
+    }
 }
 
 void PlotJugglerSink::sendToPlotJuggler(g3::LogMessageMover log_entry)

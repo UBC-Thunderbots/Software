@@ -1,12 +1,11 @@
 ---
-
 - name: Run systemd setup
   block:
     - name: Delete everything on ~/
-      file:
+      ansible.builtin.file:
         state: absent
         path: /home/robot/thunderbots_binaries
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       become: true
       register: result
 
@@ -14,28 +13,30 @@
       ansible.posix.synchronize:
         src: ../../thunderloop_main
         dest: ~/thunderbots_binaries/
-        copy_links: yes
+        copy_links: true
 
     - name: Sync Thunderloop systemd file
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       become: true
       register: res
-      ansible.posix.synchronize:
+      ansible.builtin.copy:
         src: ../../linux_configs/systemd/thunderloop.service
-        dest: /etc/systemd/system
-        copy_links: yes
+        dest: /etc/systemd/system/
+        mode: "0644"
 
-      # NOTE: "Enabling systems" means they will start on boot
+    # NOTE: "Enabling systems" means they will start on boot
     - name: Enable system services
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       ansible.builtin.systemd:
         name: thunderloop
-        enabled: yes
-        masked: no
-        daemon_reload: yes
+        enabled: true
+        masked: false
+        daemon_reload: true
 
     - name: Enable WiFi waiter service
       become: true
-      become_method: sudo
-      service: name=NetworkManager-wait-online enabled=yes
+      become_method: ansible.builtin.sudo
+      ansible.builtin.service:
+        name: NetworkManager-wait-online
+        enabled: "yes"
