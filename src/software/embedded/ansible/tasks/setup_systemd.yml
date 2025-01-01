@@ -22,6 +22,7 @@
       ansible.builtin.copy:
         src: ../../linux_configs/systemd/thunderloop.service
         dest: /etc/systemd/system/
+        mode: "0644"
 
     # NOTE: "Enabling systems" means they will start on boot
     - name: Enable system services

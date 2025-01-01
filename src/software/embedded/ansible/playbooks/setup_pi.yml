@@ -102,6 +102,7 @@
           ansible.builtin.copy:
             src: ../../linux_configs/pi/config.txt
             dest: /boot/firmware/
+            mode: "0444"
 
     - name: Change hostname
       tags: update_hostname
