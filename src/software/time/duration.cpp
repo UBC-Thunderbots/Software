@@ -20,6 +20,11 @@ const Duration Duration::fromMilliseconds(double milliseconds)
     return Duration(milliseconds * SECONDS_PER_MILLISECOND);
 }
 
+const Duration Duration::fromMicroseconds(double microseconds)
+{
+    return Duration(microseconds * SECONDS_PER_MICROSECOND);
+}
+
 bool Duration::operator==(const Duration &other) const
 {
     return std::fabs(other.toSeconds() - toSeconds()) < EPSILON;

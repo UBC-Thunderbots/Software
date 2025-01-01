@@ -284,6 +284,11 @@ std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_sta
             *createPointProto(ball_placement_point.value());
     }
 
+    *game_state_msg->mutable_friendly_team_info() =
+        *createTeamInfo(game_state.getFriendlyTeamInfo());
+    *game_state_msg->mutable_enemy_team_info() =
+        *createTeamInfo(game_state.getEnemyTeamInfo());
+
     return game_state_msg;
 }
 
@@ -298,6 +303,19 @@ std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)
     ball_state_msg->set_distance_from_ground(ball.currentState().distanceFromGround());
 
     return ball_state_msg;
+}
+
+std::unique_ptr<TbotsProto::GameState::TeamInfo> createTeamInfo(const TeamInfo& team_info)
+{
+    auto team_info_msg = std::make_unique<TbotsProto::GameState::TeamInfo>();
+
+    team_info_msg->set_name(team_info.getName());
+    team_info_msg->set_score(team_info.getScore());
+    team_info_msg->set_red_cards(team_info.getRedCards());
+    team_info_msg->set_yellow_cards(team_info.getYellowCards());
+    team_info_msg->set_fouls_count(team_info.getFoulsCount());
+
+    return team_info_msg;
 }
 
 std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestamp)

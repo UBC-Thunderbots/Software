@@ -3,6 +3,7 @@
 #include "software/geom/point.h"
 #include "software/util/make_enum/make_enum.hpp"
 #include "software/world/ball.h"
+#include "software/world/team_info.h"
 
 // clang-format off
 MAKE_ENUM(RefereeCommand,
@@ -428,6 +429,34 @@ class GameState
      */
     void setBallPlacementPoint(Point placementPoint);
 
+    /**
+     * Returns the TeamInfo for the friendly team
+     *
+     * @return the TeamInfo for the friendly team
+     */
+    const TeamInfo& getFriendlyTeamInfo() const;
+
+    /**
+     * Returns the TeamInfo for the enemy team
+     *
+     * @return the TeamInfo for the enemy team
+     */
+    const TeamInfo& getEnemyTeamInfo() const;
+
+    /**
+     * Updates the TeamInfo for the friendly team
+     *
+     * @param team_info the TeamInfo for the friendly team
+     */
+    void updateFriendlyTeamInfo(const TeamInfo& team_info);
+
+    /**
+     * Updates the TeamInfo for the enemy team
+     *
+     * @param team_info the TeamInfo for the enemy team
+     */
+    void updateEnemyTeamInfo(const TeamInfo& team_info);
+
    private:
     PlayState play_state_;
     RestartReason restart_reason_;
@@ -440,4 +469,7 @@ class GameState
     // The point at which the ball should be placed by robots before a restart. See
     // Robocup SSL Rules 9.2.
     std::optional<Point> ball_placement_point_;
+
+    TeamInfo friendly_team_info_;
+    TeamInfo enemy_team_info_;
 };

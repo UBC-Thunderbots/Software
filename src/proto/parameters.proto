@@ -44,6 +44,7 @@ message AiConfig
     required ReceiverTacticConfig receiver_tactic_config                    = 14;
     required CreaseDefenderConfig crease_defender_config                    = 15;
     required PassDefenderConfig pass_defender_config                        = 16;
+    required PivotKickConfig pivot_kick_config                              = 17;
 }
 
 message AiControlConfig
@@ -658,4 +659,23 @@ message DefenderStealConfig
     // Max speed of ball that pass defender will try and get possession
     required double max_ball_speed_to_get_m_per_s = 3
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
+}
+
+message PivotKickConfig
+{
+    // If ball and front of robot are separated by this distance, then we've lost
+    // control over the ball (in m)
+    required double lose_ball_control_distance_threshold = 1 [
+        default                   = 0.04,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
+
+    // If ball and front of robot are separated for this long, then we've lost
+    // control over the ball (in seconds)
+    required double lose_ball_control_time_threshold = 2 [
+        default                   = 1.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
 }
