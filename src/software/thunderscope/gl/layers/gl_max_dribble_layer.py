@@ -46,11 +46,12 @@ class GLMaxDribbleLayer(GLLayer):
             dribble_disp = world.dribble_displacement
 
             dist = tbots_cpp.createSegment(dribble_disp).length()
+
             if dist >= 1:
                 self.color = QtGui.QColor(
                     255, 0, 255, 255
                 )  # Purple for high contrast to show violation.
-            elif 0.75 < dist < 1:
+            elif 0.5 < dist < 1:
                 self.color = QtGui.QColor(
                     255, int(self.sigmoid_interpolate(dist, 0.5, 160, 1, 0)), 0, 200
                 )
@@ -88,6 +89,9 @@ class GLMaxDribbleLayer(GLLayer):
         :param y2: Value at upper bound
         :return: The sigmoid-interpolated value
         """
+
         xc = (x1 + x2) / 2
-        k = 10 / (x2 - x1)
-        return y1 + (y2 - y1) / (1 + math.exp(-k * (val - xc)))
+        width = x2 - x1
+
+        return y1 + (y2 - y1) * tbots_cpp.sigmoid(val, xc, width)
+
