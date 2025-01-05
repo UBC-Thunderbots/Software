@@ -13,6 +13,7 @@ from pyqtgraph.Qt import QtGui
 import math
 
 
+
 class GLMaxDribbleLayer(GLLayer):
     """Visualizes the maximumm dribbling distance when a robot controls the ball."""
 
