@@ -11,9 +11,6 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtGui
 
 
-import math
-
-
 class GLMaxDribbleLayer(GLLayer):
     """Visualizes the maximumm dribbling distance when a robot controls the ball."""
 
@@ -89,9 +86,7 @@ class GLMaxDribbleLayer(GLLayer):
         :param y2: Value at upper bound
         :return: The sigmoid-interpolated value
         """
-
         xc = (x1 + x2) / 2
         width = x2 - x1
 
         return y1 + (y2 - y1) * tbots_cpp.sigmoid(val, xc, width)
-
