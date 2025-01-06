@@ -148,7 +148,6 @@ RobotNavigationObstacleFactory::createGoalObstacles(const Rectangle &goal, bool 
     obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(
         Segment(goal.posXNegYCorner(), goal.negXNegYCorner()), goal_obstacle_radius)));
 
-
 	// Create left and right goal wall obstacle
     if (isFriendly) {
         Segment segment = Segment(goal.negXPosYCorner(), goal.negXNegYCorner());
@@ -157,14 +156,7 @@ RobotNavigationObstacleFactory::createGoalObstacles(const Rectangle &goal, bool 
     } else {
 	  	Segment segment = Segment(goal.posXPosYCorner(), goal.posXNegYCorner());
         obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(segment, goal_obstacle_radius)));
-
     }
-
-
-
-
-
-
 
     return obstacles;
 }
