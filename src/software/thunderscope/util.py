@@ -1,4 +1,7 @@
-from typing import Callable, NoReturn
+from typing import Callable, NoReturn, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from software.thunderscope.thunderscope import Thunderscope
 
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
@@ -41,7 +44,7 @@ def async_sim_ticker(
     blue_proto_unix_io: ProtoUnixIO,
     yellow_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
-    tscope,
+    tscope: "Thunderscope",
     buffer_timeout_s: int = 1,
 ) -> None:
     """Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
@@ -93,7 +96,7 @@ def async_sim_ticker(
 
 
 def realtime_sim_ticker(
-    tick_rate_ms: int, sim_proto_unix_io: ProtoUnixIO, tscope
+    tick_rate_ms: int, sim_proto_unix_io: ProtoUnixIO, tscope: "Thunderscope"
 ) -> None:
     """Tick simulation in real-time. Requires Thunderscope to be open.
 
@@ -117,7 +120,7 @@ def realtime_sim_ticker(
 
 
 def sync_simulation(
-    tscope, num_robots: int, timeout_s: float = 0.1
+    tscope: "Thunderscope", num_robots: int, timeout_s: float = 0.1
 ) -> None:
     """Ensure that simulator has synchronized with the default world state.
 
