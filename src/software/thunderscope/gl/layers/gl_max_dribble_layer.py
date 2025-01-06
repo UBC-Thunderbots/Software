@@ -14,6 +14,7 @@ import math
 
 
 
+
 class GLMaxDribbleLayer(GLLayer):
     """Visualizes the maximumm dribbling distance when a robot controls the ball."""
 
@@ -49,11 +50,16 @@ class GLMaxDribbleLayer(GLLayer):
 
             self.color = color_from_gradient(
                 dist,
-                [0, 0.5, 1, 1], # last bound needs to be repeated twice to achieve sharp colour snapping when dist > 1.
+                [
+                    0,
+                    0.5,
+                    1,
+                    1,
+                ],  # last bound needs to be repeated twice to achieve sharp colour snapping when dist > 1.
                 [0, 255, 255, 255],
                 [255, 160, 0, 0],
                 [0, 0, 0, 255],
-                [0, 200, 200, 255]
+                [0, 200, 200, 255],
             )
             self.dribble_radius_graphic.set_outline_color(self.color)
             self.dribble_radius_graphic.set_points(
