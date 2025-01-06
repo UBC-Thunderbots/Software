@@ -97,7 +97,7 @@ class ReplayControls(QWidget):
 
         self.bookmarks_markers = []
         self.create_bookmarks()
-        self.update_bookmarks()
+        # self.update_bookmarks()
 
         # Setup mouse interactions
         self.replay_slider.valueChanged.connect(self.__on_replay_slider_value_changed)
@@ -186,7 +186,7 @@ class ReplayControls(QWidget):
 
     def create_bookmarks(self) -> None:
         for timestamp in self.player.bookmark_indices:
-            bookmark = BookmarkMarker(2000)
+            bookmark = BookmarkMarker(timestamp, self.seek_absolute)
             self.replay_layout.addWidget(bookmark)
             bookmark.show()
             self.bookmarks_markers.append(bookmark)
