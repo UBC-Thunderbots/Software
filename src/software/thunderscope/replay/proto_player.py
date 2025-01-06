@@ -214,7 +214,7 @@ class ProtoPlayer:
                 for line_no, data in enumerate(chunk_data):
                     timestamp, protobuf_type, data = ProtoPlayer.unpack_log_entry(data, self.version)
                     for handler in handlers:
-                        handler(self, line_no, chunk_name, timestamp, protobuf_type, data)
+                        handler(line_no, chunk_name, timestamp, protobuf_type, data)
         self.finish_preprocess_replay_file()
 
 
@@ -277,12 +277,12 @@ class ProtoPlayer:
         """
         handler_list = list()
         if not self.is_chunk_indexed():
-            handler_list.append(lambda: self.handle_log_line_for_chunk)
+            handler_list.append(self.handle_log_line_for_chunk)
         else:
             self.load_chunk_index()
 
         if not self.is_bookmark_indexed():
-            handler_list.append(lambda: self.handle_log_line_for_bookmark)
+            handler_list.append(self.handle_log_line_for_bookmark)
         else:
             self.load_bookmark_index()
 

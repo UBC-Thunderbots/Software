@@ -190,6 +190,7 @@ class ReplayControls(QWidget):
             self.replay_layout.addWidget(bookmark)
             bookmark.show()
             self.bookmarks_markers.append(bookmark)
+            print("Initialized bookmark", timestamp)
 
     def update_bookmarks(self) -> None:
         opt = QtWidgets.QStyleOptionSlider()
