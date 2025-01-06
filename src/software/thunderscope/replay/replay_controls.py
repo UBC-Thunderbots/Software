@@ -1,11 +1,9 @@
 import time
 
-from PyQt6 import QtWidgets
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
 from functools import partial
 
-from software.thunderscope.common.common_widgets import create_radio
 from software.thunderscope.replay.bookmark_marker import BookmarkMarker
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.common import common_widgets
@@ -95,10 +93,6 @@ class ReplayControls(QWidget):
             tick_spacing=1,
         )
 
-        self.bookmarks_markers = []
-        self.create_bookmarks()
-        # self.update_bookmarks()
-
         # Setup mouse interactions
         self.replay_slider.valueChanged.connect(self.__on_replay_slider_value_changed)
         self.replay_slider.sliderReleased.connect(self.__on_replay_slider_released)
@@ -107,6 +101,9 @@ class ReplayControls(QWidget):
         self.controls_layout.addLayout(self.replay_layout)
         self.controls_layout.addLayout(self.buttons_layout)
         self.setLayout(self.controls_layout)
+
+        self.bookmarks_markers = []
+        self.create_bookmarks()
 
     def __on_play_pause_clicked(self) -> None:
         """When the play/pause button is clicked, toggle play/pause and set the text"""
@@ -186,23 +183,17 @@ class ReplayControls(QWidget):
 
     def create_bookmarks(self) -> None:
         for timestamp in self.player.bookmark_indices:
-            bookmark = BookmarkMarker(timestamp, self.seek_absolute)
-            self.replay_layout.addWidget(bookmark)
-            bookmark.show()
+            bookmark = BookmarkMarker(timestamp, self.seek_absolute, self.replay_slider, self)
+            # self.replay_layout.addWidget(bookmark)
             self.bookmarks_markers.append(bookmark)
-            print("Initialized bookmark", timestamp)
 
     def update_bookmarks(self) -> None:
-        opt = QtWidgets.QStyleOptionSlider()
-        self.replay_slider.initStyleOption(opt)
-        for markers in self.bookmarks_markers:
-            rect = self.replay_slider.style().subControlRect(
-                QtWidgets.QStyle.CC_Slider,
-                opt,
-                QtWidgets.QStyle.SC_SliderHandle,
-                self.replay_slider
-            )
-            markers.move(rect.center().x() - markers.width() / 2 + self.replay_slider.x(), 0)
+        for marker in self.bookmarks_markers:
+            marker.update()
+
+    def resizeEvent(self, a0):
+        super().resizeEvent(a0)
+        self.update_bookmarks()
 
     def __on_save_clip_clicked(self) -> None:
         """When the button is clicked, save clip if current time is after the clip start time"""

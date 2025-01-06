@@ -1,8 +1,9 @@
 from collections.abc import Callable
 
-from PyQt6.QtCore import QSize
+from PyQt6.QtCore import QSize, QRect
 from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QPushButton
+from PyQt6.QtWidgets import QPushButton, QSlider
+from software.py_constants import *
 
 
 class BookmarkMarker(QPushButton):
@@ -13,14 +14,22 @@ class BookmarkMarker(QPushButton):
     MARKER_COLOR = QColor(130, 130, 130)
 
     # Radius of the visual
-    MARKER_RADIUS = 10
+    MARKER_RADIUS = 5
 
-    def __init__(self, value: float, click_func: Callable[[float], None], parent=None):
+    def __init__(self, value: float, click_func: Callable[[float], None], slider: QSlider, parent=None):
         super(BookmarkMarker, self).__init__(parent)
         self.value = value
+        self.slider = slider
 
         self.clicked.connect(lambda _: click_func(value))
-        self.setFixedSize(QSize(BookmarkMarker.MARKER_RADIUS, BookmarkMarker.MARKER_RADIUS))
-        self.setStyleSheet(f"border : 1px solid black;background-color : green; color: yellow; border-radius : {BookmarkMarker.MARKER_RADIUS}px")
+        self.setGeometry(0, 0, BookmarkMarker.MARKER_RADIUS * 2, BookmarkMarker.MARKER_RADIUS * 2)
+        self.setStyleSheet(f"border : 2px solid {BookmarkMarker.MARKER_COLOR.name()}; color:{BookmarkMarker.MARKER_COLOR.name()}; border-radius: {BookmarkMarker.MARKER_RADIUS}px")
 
+        self.update()
+
+    def update(self):
+        super().update()
+        slider_rect: QRect = self.slider.geometry()
+        max_val = self.slider.maximum() / MILLISECONDS_PER_SECOND
+        self.move(int(slider_rect.width() * self.value // max_val), 35)
 
