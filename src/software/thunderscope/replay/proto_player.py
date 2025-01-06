@@ -146,18 +146,19 @@ class ProtoPlayer:
         if line_no == 0:
             self.chunks_indices[os.path.basename(chunk_name)] = timestamp
 
-    def handle_log_line_for_bookmark(self, _: int, __: float, ___:str, protobuf_type: Type[Message], data: Message):
+    def handle_log_line_for_bookmark(self, _: int, __: float, timestamp:str, protobuf_type: Type[Message], data: Message):
         """
         record replay bookmark in the index
 
         :param _: argument not used
         :param __: argument not used
-        :param ___: argument not used
+        :param timestamp: packet timestamp of bookmark proto being sent. This value is aligned to the scale of the
+            progress bar, so this value should be used instead of the timestamp in proto data.
         :param protobuf_type: type of the proto
         :param data: proto data
         """
         if protobuf_type == ReplayBookmark:
-            self.bookmark_indices.append(data.timestamp.epoch_timestamp_seconds)
+            self.bookmark_indices.append(timestamp)
 
     def finish_preprocess_replay_file(self):
         """
