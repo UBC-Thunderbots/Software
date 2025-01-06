@@ -15,7 +15,8 @@ void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // out.
 }
 
-void HaltPlay::updateTactics(const PlayUpdate &play_update){
+void HaltPlay::updateTactics(const PlayUpdate &play_update)
+{
     fsm.process_event(HaltPlayFSM::Update(control_params, play_update));
 }
 
