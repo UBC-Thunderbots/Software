@@ -17,6 +17,13 @@ class BookmarkMarker(QPushButton):
     MARKER_RADIUS = 5
 
     def __init__(self, value: float, click_func: Callable[[float], None], slider: QSlider, parent=None):
+        """
+        Create a bookmark visual
+        :param value: timestamp of the bookmark
+        :param click_func: callback when the bookmark is clicked
+        :param slider: slider object to bind the bookmark with
+        :param parent: parent of the current qt widget
+        """
         super(BookmarkMarker, self).__init__(parent)
         self.value = value
         self.slider = slider
@@ -28,7 +35,9 @@ class BookmarkMarker(QPushButton):
         self.update()
 
     def update(self):
+        """Update bookmark visuals display"""
         super().update()
+        # Re-calculate the position of the visuals
         slider_rect: QRect = self.slider.geometry()
         max_val = self.slider.maximum() / MILLISECONDS_PER_SECOND
         self.move(int(slider_rect.width() * self.value // max_val), 35)
