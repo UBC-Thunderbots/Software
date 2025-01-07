@@ -10,9 +10,6 @@ from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtGui
 from software.thunderscope.util import *
-import math
-
-
 
 
 class GLMaxDribbleLayer(GLLayer):
@@ -77,4 +74,3 @@ class GLMaxDribbleLayer(GLLayer):
         else:
             self.dribble_radius_graphic.hide()
             self.dribble_circle_graphic.hide()
-
