@@ -51,8 +51,10 @@ UnixSimulatorBackend::UnixSimulatorBackend(
     robot_crash_listener.reset(new ThreadedProtoUnixListener<TbotsProto::RobotCrash>(
         runtime_dir + ROBOT_CRASH_PATH, [](TbotsProto::RobotCrash& v) {}, proto_logger));
 
-    replay_bookmark_listener.reset(new ThreadedProtoUnixListener<TbotsProto::ReplayBookmark>(
-        runtime_dir + REPLAY_BOOKMARK_PATH, [](TbotsProto::ReplayBookmark& v) {}, proto_logger));
+    replay_bookmark_listener.reset(
+        new ThreadedProtoUnixListener<TbotsProto::ReplayBookmark>(
+            runtime_dir + REPLAY_BOOKMARK_PATH, [](TbotsProto::ReplayBookmark& v) {},
+            proto_logger));
 
     // Protobuf Outputs
     world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(

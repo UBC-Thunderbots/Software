@@ -100,8 +100,8 @@ class GLWidget(QWidget):
             layers_menu=self.layers_menu,
             toolbars_menu=self.toolbars_menu,
             sandbox_mode=sandbox_mode,
-            replay_mode= player is not None,
-            on_add_bookmark=self.add_bookmark
+            replay_mode=player is not None,
+            on_add_bookmark=self.add_bookmark,
         )
 
         # Setup gamecontroller toolbar
@@ -389,8 +389,10 @@ class GLWidget(QWidget):
         return distance
 
     def add_bookmark(self):
-        """Handler for clicking 'add bookmark' button """
+        """Handler for clicking 'add bookmark' button"""
         timestamp = time.time()
-        bookmark = ReplayBookmark(timestamp=Timestamp(epoch_timestamp_seconds=timestamp))
+        bookmark = ReplayBookmark(
+            timestamp=Timestamp(epoch_timestamp_seconds=timestamp)
+        )
         self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
-        QMessageBox.information(self, "Bookmark", f"Added Bookmark")
+        QMessageBox.information(self, "Bookmark", "Added Bookmark")

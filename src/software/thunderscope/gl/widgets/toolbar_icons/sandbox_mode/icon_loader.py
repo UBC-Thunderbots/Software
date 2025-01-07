@@ -140,6 +140,7 @@ def get_measure_icon(color: str) -> QtGui.QPixmap:
 
     return GLFieldToolbarIconLoader.MEASURE_ICON
 
+
 def get_bookmark_icon(color: str) -> QtGui.QPixmap:
     """Loads the Bookmark icon pixmap as a GLFieldToolbarIconLoader attribute
 
@@ -153,4 +154,3 @@ def get_bookmark_icon(color: str) -> QtGui.QPixmap:
         )
 
     return GLFieldToolbarIconLoader.BOOKMARK_ICON
-

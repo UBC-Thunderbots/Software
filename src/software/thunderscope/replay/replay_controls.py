@@ -183,7 +183,9 @@ class ReplayControls(QWidget):
 
     def create_bookmarks(self) -> None:
         for timestamp in self.player.bookmark_indices:
-            bookmark = BookmarkMarker(timestamp, self.seek_absolute, self.replay_slider, self)
+            bookmark = BookmarkMarker(
+                timestamp, self.seek_absolute, self.replay_slider, self
+            )
             # self.replay_layout.addWidget(bookmark)
             self.bookmarks_markers.append(bookmark)
 

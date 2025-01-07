@@ -29,7 +29,7 @@ class GLFieldToolbar(GLToolbar):
         toolbars_menu: QMenu,
         sandbox_mode: bool = False,
         replay_mode: bool = False,
-        on_add_bookmark = Callable[[], None]
+        on_add_bookmark=Callable[[], None],
     ):
         """Set up the toolbar with these buttons:
 
@@ -121,7 +121,9 @@ class GLFieldToolbar(GLToolbar):
 
         if not replay_mode:
             self.bookmark_button = QPushButton()
-            self.bookmark_button.setIcon(icons.get_bookmark_icon(self.BUTTON_ICON_COLOR))
+            self.bookmark_button.setIcon(
+                icons.get_bookmark_icon(self.BUTTON_ICON_COLOR)
+            )
             self.bookmark_button.setShortcut("b")
             self.bookmark_button.setStyleSheet(self.get_button_style())
             self.bookmark_button.clicked.connect(on_add_bookmark)
@@ -180,7 +182,6 @@ class GLFieldToolbar(GLToolbar):
 
         if not replay_mode:
             self.layout().addWidget(self.bookmark_button)
-
 
     def refresh(self) -> None:
         """Refreshes the UI for all the toolbar icons and updates toolbar position"""

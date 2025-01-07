@@ -85,7 +85,7 @@ class ProtoPlayer:
 
         # build or load index for chunks
         self.bookmark_indices = list()
-        self.chunks_indices  = dict()
+        self.chunks_indices = dict()
         self.load_or_build_index()
 
         # We can get the total runtime of the log from the last entry in the last chunk
@@ -143,8 +143,7 @@ class ProtoPlayer:
             return True
 
     def handle_log_line_for_chunk(self, **kwargs):
-        """
-        find the time stamp of the first proto event in the replay file.
+        """Find the time stamp of the first proto event in the replay file.
         :param kwargs: a dictionary contains all the information about a line in the replay log.
             e.g. {
                 "protobuf_type": type of proto
@@ -154,12 +153,13 @@ class ProtoPlayer:
                 "chunk_name": file name of the chunk
             }
         """
-        if kwargs['line_no'] == 0:
-            self.chunks_indices[os.path.basename(kwargs['chunk_name'])] = kwargs['timestamp']
+        if kwargs["line_no"] == 0:
+            self.chunks_indices[os.path.basename(kwargs["chunk_name"])] = kwargs[
+                "timestamp"
+            ]
 
     def handle_log_line_for_bookmark(self, **kwargs) -> None:
-        """
-        Filter out bookmark protos in the replay log
+        """Filter out bookmark protos in the replay log
         :param kwargs: a dictionary contains all the information about a line in the replay log.
             e.g. {
                 "protobuf_type": type of proto
@@ -169,18 +169,19 @@ class ProtoPlayer:
                 "chunk_name": file name of the chunk
             }
         """
-        if kwargs['protobuf_type'] == ReplayBookmark:
-            self.bookmark_indices.append(kwargs['timestamp'])
+        if kwargs["protobuf_type"] == ReplayBookmark:
+            self.bookmark_indices.append(kwargs["timestamp"])
 
     def finish_preprocess_replay_file(self):
-        """
-        Finish off pre-processing and save all the pre-processing result to disk
-        """
+        """Finish off pre-processing and save all the pre-processing result to disk"""
         # save chunk indices
         if self.chunks_indices:
             try:
                 with open(
-                        os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME), "w"
+                    os.path.join(
+                        self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME
+                    ),
+                    "w",
                 ) as index_file:
                     index_file.write(
                         f"Version: {ProtoPlayer.CHUNK_INDEX_FILE_VERSION}, "
@@ -190,7 +191,9 @@ class ProtoPlayer:
                         index_file.write(f"{start_timestamp}, {filename}\n")
                 logging.info("Created chunk index file successfully.")
             except Exception as e:
-                logging.warning(f"Failed to build chunk index for {self.log_folder_path}: {e}")
+                logging.warning(
+                    f"Failed to build chunk index for {self.log_folder_path}: {e}"
+                )
         else:
             logging.warning(
                 f"Failed to build chunk index for {self.log_folder_path} : No chunk data."
@@ -198,7 +201,10 @@ class ProtoPlayer:
 
         # save bookmark indices
         if self.bookmark_indices:
-            with open(os.path.join(self.log_folder_path, ProtoPlayer.BOOKMARK_INDEX_FILENAME), "wb") as bookmark_file:
+            with open(
+                os.path.join(self.log_folder_path, ProtoPlayer.BOOKMARK_INDEX_FILENAME),
+                "wb",
+            ) as bookmark_file:
                 pickle.dump(self.bookmark_indices, bookmark_file)
                 logging.info("Created bookmark index file successfully.")
         else:
@@ -207,8 +213,7 @@ class ProtoPlayer:
             )
 
     def preprocess_replay_file(self, handlers: List[Callable[[...], None]]):
-        """
-        Start preprocessing replay files and build index according to the provided handlers
+        """Start preprocessing replay files and build index according to the provided handlers
 
         :param handlers: handler functions that will be applied to each line of the replay log.
                 This function will be provided following parameters
@@ -222,11 +227,18 @@ class ProtoPlayer:
                     chunk_data[0], self.version
                 )
                 for line_no, data in enumerate(chunk_data):
-                    timestamp, protobuf_type, data = ProtoPlayer.unpack_log_entry(data, self.version)
+                    timestamp, protobuf_type, data = ProtoPlayer.unpack_log_entry(
+                        data, self.version
+                    )
                     for handler in handlers:
-                        handler(line_no=line_no, chunk_name=chunk_name, timestamp=timestamp, protobuf_type=protobuf_type, data=data)
+                        handler(
+                            line_no=line_no,
+                            chunk_name=chunk_name,
+                            timestamp=timestamp,
+                            protobuf_type=protobuf_type,
+                            data=data,
+                        )
         self.finish_preprocess_replay_file()
-
 
     def is_chunk_indexed(self) -> bool:
         """Returns true if the chunk index is already built.
@@ -238,8 +250,7 @@ class ProtoPlayer:
         )
 
     def is_bookmark_indexed(self) -> bool:
-        """
-        Returns true if the bookmark index is already built.
+        """Returns true if the bookmark index is already built.
         :return: if the bookmark index exists
         """
         return os.path.exists(
@@ -247,8 +258,7 @@ class ProtoPlayer:
         )
 
     def load_chunk_index(self):
-        """Loads the chunk index file.
-        """
+        """Loads the chunk index file."""
         try:
             with open(
                 os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME),
@@ -266,15 +276,12 @@ class ProtoPlayer:
         except Exception as e:
             logging.warning(f"An Exception occurred when loading chunk index file {e}")
 
-
     def load_bookmark_index(self):
-        """
-        Loads the bookmark file
-        """
+        """Loads the bookmark file"""
         try:
             with open(
                 os.path.join(self.log_folder_path, ProtoPlayer.BOOKMARK_INDEX_FILENAME),
-                'rb'
+                "rb",
             ) as bookmark_file:
                 self.bookmark_indices = pickle.load(bookmark_file)
                 logging.info("Pre-existing chunk bookmark file found and loaded.")
@@ -282,9 +289,7 @@ class ProtoPlayer:
             logging.warning(f"An Exception occurred when loading bookmark file {e}")
 
     def load_or_build_index(self):
-        """
-        Load bookmark index and chunk index. If none is found, build first then load.
-        """
+        """Load bookmark index and chunk index. If none is found, build first then load."""
         # handler_list contains all the tasks to do when pre-processing the log data
         handler_list = list()
         if not self.is_chunk_indexed():

@@ -6,6 +6,7 @@ py_library(
     name = "icon_loader",
     srcs = ["icon_loader.py"],
     data = [
+        ":bookmark.svg",
         ":help.svg",
         ":measure.svg",
         ":pause.svg",
@@ -14,7 +15,6 @@ py_library(
         ":reset.svg",
         ":undo.svg",
         ":view.svg",
-        ":bookmark.svg",
         "//software/thunderscope/gl/widgets:icon_loader",
     ],
     deps = [
