@@ -1,4 +1,4 @@
-ansible-lint=24.12.2
+ansible-lint==24.12.2
 pyqtgraph==0.13.7
 pyqt6==6.6.1
 PyQt6-Qt6==6.6.1
