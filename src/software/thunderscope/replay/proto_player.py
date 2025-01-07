@@ -142,23 +142,35 @@ class ProtoPlayer:
         except Exception:
             return True
 
-    def handle_log_line_for_chunk(self, line_no: int, chunk_name:str, timestamp: float, _: Type[Message], __: Message):
-        if line_no == 0:
-            self.chunks_indices[os.path.basename(chunk_name)] = timestamp
-
-    def handle_log_line_for_bookmark(self, _: int, __: float, timestamp:str, protobuf_type: Type[Message], data: Message):
+    def handle_log_line_for_chunk(self, **kwargs):
         """
-        record replay bookmark in the index
-
-        :param _: argument not used
-        :param __: argument not used
-        :param timestamp: packet timestamp of bookmark proto being sent. This value is aligned to the scale of the
-            progress bar, so this value should be used instead of the timestamp in proto data.
-        :param protobuf_type: type of the proto
-        :param data: proto data
+        find the time stamp of the first proto event in the replay file.
+        :param kwargs: a dictionary contains all the information about a line in the replay log.
+            e.g. {
+                "protobuf_type": type of proto
+                "timestamp": timestamp when the proto is logged
+                "data": data of the proto message
+                "line_no": line number
+                "chunk_name": file name of the chunk
+            }
         """
-        if protobuf_type == ReplayBookmark:
-            self.bookmark_indices.append(timestamp)
+        if kwargs['line_no'] == 0:
+            self.chunks_indices[os.path.basename(kwargs['chunk_name'])] = kwargs['timestamp']
+
+    def handle_log_line_for_bookmark(self, **kwargs) -> None:
+        """
+        Filter out bookmark protos in the replay log
+        :param kwargs: a dictionary contains all the information about a line in the replay log.
+            e.g. {
+                "protobuf_type": type of proto
+                "timestamp": timestamp when the proto is logged
+                "data": data of the proto message
+                "line_no": line number
+                "chunk_name": file name of the chunk
+            }
+        """
+        if kwargs['protobuf_type'] == ReplayBookmark:
+            self.bookmark_indices.append(kwargs['timestamp'])
 
     def finish_preprocess_replay_file(self):
         """
@@ -179,32 +191,29 @@ class ProtoPlayer:
                 logging.info("Created chunk index file successfully.")
             except Exception as e:
                 logging.warning(f"Failed to build chunk index for {self.log_folder_path}: {e}")
-            else:
-                logging.warning(
-                    f"Failed to build chunk index for {self.log_folder_path} : No chunk data."
-                )
+        else:
+            logging.warning(
+                f"Failed to build chunk index for {self.log_folder_path} : No chunk data."
+            )
 
         # save bookmark indices
         if self.bookmark_indices:
-            with open(ProtoPlayer.BOOKMARK_INDEX_FILENAME, "wb") as bookmark_file:
+            with open(os.path.join(self.log_folder_path, ProtoPlayer.BOOKMARK_INDEX_FILENAME), "wb") as bookmark_file:
                 pickle.dump(self.bookmark_indices, bookmark_file)
+                logging.info("Created bookmark index file successfully.")
         else:
             logging.warning(
                 f"Failed to build bookmark index for {self.log_folder_path} : No bookmark data found."
             )
 
-    def preprocess_replay_file(self, handlers: List[Callable]):
+    def preprocess_replay_file(self, handlers: List[Callable[[...], None]]):
         """
-        Start preprocessing replay files and build index for optimizations
+        Start preprocessing replay files and build index according to the provided handlers
 
         :param handlers: handler functions that will be applied to each line of the replay log.
-                This function should accept (self: ProtoPlayer, line_no: int, chunk_name:str, timestamp: float,
-                protobuf_type: Type[Message], data: Message).
-                E.g. This function should look like
-
-                def some_handler(self: ProtoPlayer, line_no: int, chunk_name: str, timestamp: float,
-                    protobuf_type: Type[Message], data: Message):
-                    pass
+                This function will be provided following parameters
+                 (self: ProtoPlayer, line_no: int, chunk_name:str, timestamp: float,
+                    protobuf_type: Type[Message], data: Message).
         """
         for chunk_name in self.sorted_chunks:
             chunk_data = ProtoPlayer.load_replay_chunk(chunk_name, self.version)
@@ -215,7 +224,7 @@ class ProtoPlayer:
                 for line_no, data in enumerate(chunk_data):
                     timestamp, protobuf_type, data = ProtoPlayer.unpack_log_entry(data, self.version)
                     for handler in handlers:
-                        handler(line_no, chunk_name, timestamp, protobuf_type, data)
+                        handler(line_no=line_no, chunk_name=chunk_name, timestamp=timestamp, protobuf_type=protobuf_type, data=data)
         self.finish_preprocess_replay_file()
 
 
@@ -274,8 +283,9 @@ class ProtoPlayer:
 
     def load_or_build_index(self):
         """
-        Load bookmark index and chunk index. If none is found, build one first then load.
+        Load bookmark index and chunk index. If none is found, build first then load.
         """
+        # handler_list contains all the tasks to do when pre-processing the log data
         handler_list = list()
         if not self.is_chunk_indexed():
             handler_list.append(self.handle_log_line_for_chunk)
