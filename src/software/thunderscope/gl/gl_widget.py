@@ -100,6 +100,7 @@ class GLWidget(QWidget):
             layers_menu=self.layers_menu,
             toolbars_menu=self.toolbars_menu,
             sandbox_mode=sandbox_mode,
+            replay_mode= player is not None,
             on_add_bookmark=self.add_bookmark
         )
 

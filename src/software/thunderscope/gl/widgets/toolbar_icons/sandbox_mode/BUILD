@@ -14,6 +14,7 @@ py_library(
         ":reset.svg",
         ":undo.svg",
         ":view.svg",
+        ":bookmark.svg",
         "//software/thunderscope/gl/widgets:icon_loader",
     ],
     deps = [
