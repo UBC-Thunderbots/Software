@@ -114,6 +114,7 @@ cc_library(
     ],
     deps = [
         "//software/logger",
+        "//software/networking:tbots_network_exception",
         "@boost//:asio",
     ],
 )

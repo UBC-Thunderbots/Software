@@ -1,4 +1,4 @@
-from typing import Any, Callable, Self, Tuple, Type, Union
+from typing import Any, Callable, Self, Type
 
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
@@ -31,7 +31,7 @@ class WifiCommunicationManager:
         current_proto_unix_io: ProtoUnixIO,
         multicast_channel: str,
         should_setup_full_system: bool = False,
-        interface: Union[str, None] = None,
+        interface: str | None = None,
         referee_port: int = SSL_REFEREE_PORT,
     ):
         """Sets up WiFi communication between this computer and the robots, SSL Vision, and SSL Referee
@@ -42,30 +42,22 @@ class WifiCommunicationManager:
         :param referee_port: the referee port that we are using. If this is None, the default port is used
         """
         ## Robot IP address tracking ##
-        self.robot_ip_addresses: List[Tuple[Lock, Union[None, str]]] = [
+        self.robot_ip_addresses: list[tuple[Lock, str | None]] = [
             (Lock(), None) for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
 
-        ## Senders and Listeners ##
-        self.primitive_senders: List[
-            Tuple[Lock, Union[None, tbots_cpp.PrimitiveSender]]
+        ## Senders and listeners ##
+        self.primitive_senders: list[
+            tuple[Lock, tbots_cpp.PrimitiveSender | None]
         ] = [(Lock(), None) for _ in range(MAX_ROBOT_IDS_PER_SIDE)]
-        self.receive_robot_status: Union[None, tbots_cpp.RobotStatusProtoListener] = (
-            None
-        )
-        self.receive_robot_log: Union[None, tbots_cpp.RobotLogProtoListener] = None
-        self.receive_robot_crash: Union[None, tbots_cpp.RobotCrashProtoListener] = None
-        self.receive_ssl_referee_proto: Union[
-            None, tbots_cpp.SSLRefereeProtoListener
-        ] = None
-        self.receive_ssl_wrapper: Union[
-            None, tbots_cpp.SSLWrapperPacketProtoListener
-        ] = None
-        self.robot_ip_listener: Union[
-            None, tbots_cpp.RobotIpNotificationProtoListener
-        ] = None
-        self.fullsystem_ip_broadcaster: Tuple[
-            Lock, Union[None, tbots_cpp.FullsystemIpBroadcast], IpNotification
+        self.receive_robot_status: tbots_cpp.RobotStatusProtolistener | None =  None
+        self.receive_robot_log: tbots_cpp.RobotLogProtolistener | None = None
+        self.receive_robot_crash: tbots_cpp.RobotCrashProtolistener | None = None
+        self.receive_ssl_referee_proto: tbots_cpp.SSLRefereeProtolistener | None = None
+        self.receive_ssl_wrapper: tbots_cpp.SSLWrapperPacketProtolistener | None = None
+        self.robot_ip_listener: tbots_cpp.RobotIpNotificationProtolistener | None = None
+        self.fullsystem_ip_broadcaster: tuple[
+            Lock, tbots_cpp.FullsystemIpBroadcast | None, IpNotification
         ] = (Lock(), None, IpNotification())
 
         ## ProtoUnixIO ##
@@ -99,7 +91,7 @@ class WifiCommunicationManager:
 
         ## Thread Management ##
         self.running = True
-        self.broadcast_ip: Union[None, Thread] = None
+        self.broadcast_ip: Thread | None = None
 
         logger.debug("[WifiCommunicationManager] Initialized")
         self.__print_current_network_config()
@@ -279,7 +271,7 @@ class WifiCommunicationManager:
         """
         is_setup_successfully = True
 
-        def setup_network_resource(creator: Callable[[], Tuple[Any, str]]) -> Any:
+        def setup_network_resource(creator: Callable[[], tuple[Any, str]]) -> Any:
             """Sets up a network node with the given creator function. Logs any errors that occur.
 
             :param creator: the function to create the resource. It must return a type of

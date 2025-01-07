@@ -36,7 +36,7 @@ class RobotCommunication:
 
         :param current_proto_unix_io: the current proto unix io object
         :param estop_mode: what estop mode we are running right now, of type EstopMode
-        :param wifi communication manager: Handles WiFi communication to the robots
+        :param communication_manager: Handles WiFi communication to the robots
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
         """

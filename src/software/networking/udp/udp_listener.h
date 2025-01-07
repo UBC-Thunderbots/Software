@@ -13,8 +13,7 @@ class UdpListener
     /**
      * Creates a UDP listener.
      *
-     * A user must check the user-provided error string to see if the listener
-     * construction was successful.
+     * @throws TbotsNetworkException if the listener could not be created
      *
      * @param io_service The service thread to use for the network communication resource
      * @param ip_address If multicast is true, this address is the multicast group to
@@ -25,11 +24,10 @@ class UdpListener
      * `ip_address`, otherwise it will listen on the local interface given by `ip_address`
      * and `interface`
      * @param receive_callback The callback to call when a new message is received
-     * @param error A user-provided optional string to store any error messages
      */
     UdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
                 unsigned short port, const std::string& interface, bool multicast,
-                ReceiveCallback receive_callback, std::optional<std::string>& error);
+                ReceiveCallback receive_callback);
 
     /**
      * Creates a UDP listener that listens on the given port on all interfaces.
@@ -37,13 +35,14 @@ class UdpListener
      * A user must check the user-provided error string to see if the listener
      * construction was successful.
      *
+     * @throws TbotsNetworkException if the listener could not be created
+     *
      * @param io_service The service thread to use for the network communication resource
      * @param port The port to listen on
      * @param receive_callback The callback to call when a new message is received
      */
     UdpListener(boost::asio::io_service& io_service, const unsigned short port,
-                ReceiveCallback receive_callback, std::optional<std::string>& error);
-
+                ReceiveCallback receive_callback);
 
     /**
      * Destructor.
@@ -71,15 +70,13 @@ class UdpListener
     /**
      * Sets up multicast for the given ip_address and listen_interface
      *
-     * Any errors during setup will be stored in the error string
+     * @throws TbotsNetworkException if the multicast group could not be joined
      *
      * @param ip_address The ip address of the multicast group to join
      * @param listen_interface The interface to listen on
-     * @param error A user-provided optional string to store any error messages
      */
     void setupMulticast(const boost::asio::ip::address& ip_address,
-                        const std::string& listen_interface,
-                        std::optional<std::string>& error);
+                        const std::string& listen_interface);
 
     // The maximum buffer length for the raw data received from the network
     static constexpr unsigned int MAX_BUFFER_LENGTH = 9000;

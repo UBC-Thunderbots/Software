@@ -1,13 +1,13 @@
 #include "software/networking/udp/udp_listener.h"
 
 #include "software/logger/logger.h"
+#include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/network_utils.h"
 
 UdpListener::UdpListener(boost::asio::io_service& io_service,
                          const std::string& ip_address, unsigned short port,
                          const std::string& listen_interface, bool multicast,
-                         ReceiveCallback receive_callback,
-                         std::optional<std::string>& error)
+                         ReceiveCallback receive_callback)
     : running_(true), socket_(io_service), receive_callback_(receive_callback)
 {
     boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
@@ -31,25 +31,19 @@ UdpListener::UdpListener(boost::asio::io_service& io_service,
               "UdpListener running and using the port already. "
               "(ip = "
            << ip_address << ", port = " << port << ")";
-        error = ss.str();
-        return;
+        throw TbotsNetworkException(ss.str());
     }
 
     if (multicast)
     {
-        setupMulticast(boost_ip, listen_interface, error);
-        if (error)
-        {
-            return;
-        }
+        setupMulticast(boost_ip, listen_interface);
     }
 
     startListen();
 }
 
 UdpListener::UdpListener(boost::asio::io_service& io_service, const unsigned short port,
-                         ReceiveCallback receive_callback,
-                         std::optional<std::string>& error)
+                         ReceiveCallback receive_callback)
     : running_(true), socket_(io_service), receive_callback_(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
@@ -69,16 +63,14 @@ UdpListener::UdpListener(boost::asio::io_service& io_service, const unsigned sho
               "UdpListener running and using the port already. "
               "(port = "
            << port << ")";
-        error = ss.str();
-        return;
+        throw TbotsNetworkException(ss.str());
     }
 
     startListen();
 }
 
 void UdpListener::setupMulticast(const boost::asio::ip::address& ip_address,
-                                 const std::string& listen_interface,
-                                 std::optional<std::string>& error)
+                                 const std::string& listen_interface)
 {
     if (ip_address.is_v4())
     {
@@ -88,8 +80,7 @@ void UdpListener::setupMulticast(const boost::asio::ip::address& ip_address,
             std::stringstream ss;
             ss << "Could not find the local ip address for the given interface: "
                << listen_interface << std::endl;
-            error = ss.str();
-            return;
+            throw TbotsNetworkException(ss.str());
         }
         socket_.set_option(boost::asio::ip::multicast::join_group(
             ip_address.to_v4(),
