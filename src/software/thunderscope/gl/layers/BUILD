@@ -163,8 +163,8 @@ py_library(
     srcs = ["gl_max_dribble_layer.py"],
     deps = [
         ":gl_layer",
-        "//software/thunderscope/gl/graphics:gl_polygon",
         "//software/thunderscope:util",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )
