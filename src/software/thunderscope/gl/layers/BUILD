@@ -164,6 +164,7 @@ py_library(
     deps = [
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_polygon",
+        "//software/thunderscope:util",
         requirement("pyqtgraph"),
     ],
 )
