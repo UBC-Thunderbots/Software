@@ -2,8 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "tbots_network_exception",
-    hdrs = ["tbots_network_exception.h"],
     srcs = ["tbots_network_exception.cpp"],
+    hdrs = ["tbots_network_exception.h"],
 )
 
 py_library(

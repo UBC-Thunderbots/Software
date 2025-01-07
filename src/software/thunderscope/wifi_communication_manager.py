@@ -47,10 +47,10 @@ class WifiCommunicationManager:
         ]
 
         ## Senders and listeners ##
-        self.primitive_senders: list[
-            tuple[Lock, tbots_cpp.PrimitiveSender | None]
-        ] = [(Lock(), None) for _ in range(MAX_ROBOT_IDS_PER_SIDE)]
-        self.receive_robot_status: tbots_cpp.RobotStatusProtolistener | None =  None
+        self.primitive_senders: list[tuple[Lock, tbots_cpp.PrimitiveSender | None]] = [
+            (Lock(), None) for _ in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
+        self.receive_robot_status: tbots_cpp.RobotStatusProtolistener | None = None
         self.receive_robot_log: tbots_cpp.RobotLogProtolistener | None = None
         self.receive_robot_crash: tbots_cpp.RobotCrashProtolistener | None = None
         self.receive_ssl_referee_proto: tbots_cpp.SSLRefereeProtolistener | None = None

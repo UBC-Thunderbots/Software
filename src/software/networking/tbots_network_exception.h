@@ -4,7 +4,7 @@
 
 class TbotsNetworkException : public std::exception
 {
-public:
+   public:
     /**
      * Raises a networking exception that we can detect.
      *
@@ -14,6 +14,6 @@ public:
 
     virtual const char* what() const noexcept override;
 
-private:
+   private:
     std::string message;  // Explanation of the exception
 };
