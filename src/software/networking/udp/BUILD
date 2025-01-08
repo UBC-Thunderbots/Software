@@ -44,6 +44,7 @@ cc_library(
     ],
     deps = [
         ":network_utils",
+        "//software/networking:tbots_network_exception",
         "@boost//:asio",
     ],
 )

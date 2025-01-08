@@ -11,7 +11,7 @@ class UdpSender
      * Creates a UdpSender that sends strings over the network to the
      * given address and port.
      *
-     * Callers must ensure that error is not set before using this object.
+     * @throws TbotsNetworkException if the listener could not be created
      *
      * @param io_service The io_service to use to service outgoing SendString data
      * @param ip_address The ip address to send data on
@@ -21,11 +21,9 @@ class UdpSender
      * @param port The port to send SendString data to
      * @param interface The interface to send data on
      * @param multicast If true, joins the multicast group of given ip_address
-     * @param error A user-provided optional string to store any errors that occur
      */
     UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
-              unsigned short port, const std::string& interface, bool multicast,
-              std::optional<std::string>& error);
+              unsigned short port, const std::string& interface, bool multicast);
 
     /**
      * Destructor
@@ -72,14 +70,13 @@ class UdpSender
     /**
      * Set up multicast for the given multicast ip address and interface
      *
-     * Any errors during setup will be stored in the error string
+     * @throws TbotsNetworkException if the multicast group could not be joined
      *
      * @param ip_address The multicast ip address to join
      * @param interface The interface to join the multicast group on
-     * @param error A user-provided optional string to store any errors that occur
      */
     void setupMulticast(const boost::asio::ip::address& ip_address,
-                        const std::string& interface, std::optional<std::string>& error);
+                        const std::string& interface);
 
     // A UDP socket to send data over
     boost::asio::ip::udp::socket socket_;

@@ -13,8 +13,7 @@ class ThreadedUdpSender
      * Creates a UdpSender that sends the sendString over the network on the
      * given address and port.
      *
-     * All callers must check the error string to see if the initialization was successful
-     * before using the object.
+     * @throws TbotsNetworkException if the multicast group could not be joined if the multicast option is requested
      *
      * @param ip_address The ip address to send data on
      * (IPv4 in dotted decimal or IPv6 in hex string)
@@ -23,12 +22,9 @@ class ThreadedUdpSender
      * @param port The port to send sendString data on
      * @param interface The interface to send data on
      * @param multicast If true, joins the multicast group of given ip_address
-     * @param error An optional user-provided string that will be set to an error message
-     * if an error occurs
      */
     ThreadedUdpSender(const std::string& ip_address, unsigned short port,
-                      const std::string& interface, bool multicast,
-                      std::optional<std::string>& error);
+                      const std::string& interface, bool multicast);
 
     /**
      * Destructor will stop the io_service thread

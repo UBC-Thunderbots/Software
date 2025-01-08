@@ -1,10 +1,11 @@
 #include "udp_sender.h"
 
+#include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/network_utils.h"
 
 UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
                      const unsigned short port, const std::string& interface,
-                     bool multicast, std::optional<std::string>& error)
+                     bool multicast)
     : socket_(io_service), interface_(interface), ip_address_(ip_address)
 {
     boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
@@ -20,11 +21,7 @@ UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_
 
     if (multicast)
     {
-        setupMulticast(boost_ip, interface, error);
-        if (error)
-        {
-            return;
-        }
+        setupMulticast(boost_ip, interface);
     }
 }
 
@@ -55,8 +52,7 @@ void UdpSender::sendStringAsync(const std::string& message)
 }
 
 void UdpSender::setupMulticast(const boost::asio::ip::address& ip_address,
-                               const std::string& interface,
-                               std::optional<std::string>& error)
+                               const std::string& interface)
 {
     if (ip_address.is_v4())
     {
@@ -67,9 +63,7 @@ void UdpSender::setupMulticast(const boost::asio::ip::address& ip_address,
             ss << "UdpSender: Could not get the local IP address for the interface "
                   "specified. (interface = "
                << interface << ")";
-            error = ss.str();
-
-            return;
+            throw TbotsNetworkException(ss.str());
         }
 
         socket_.set_option(boost::asio::ip::multicast::join_group(
