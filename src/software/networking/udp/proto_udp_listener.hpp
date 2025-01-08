@@ -22,7 +22,8 @@ class ProtoUdpListener
      * ReceiveProtoT packet received, the receive_callback will be called to perform any
      * operations desired by the caller
      *
-     * @throws TbotsNetworkException if the multicast group could not be joined if the multicast option is requested
+     * @throws TbotsNetworkException if the multicast group could not be joined if the
+     * multicast option is requested
      *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
      * @param ip_address The ip address of on which to listen for the given ReceiveProtoT
@@ -36,7 +37,8 @@ class ProtoUdpListener
      */
     ProtoUdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
                      unsigned short port, const std::string& listen_interface,
-                     std::function<void(ReceiveProtoT&)> receive_callback, bool multicast);
+                     std::function<void(ReceiveProtoT&)> receive_callback,
+                     bool multicast);
 
     /**
      * Creates an ProtoUdpListener that will listen for ReceiveProtoT packets from
@@ -44,7 +46,8 @@ class ProtoUdpListener
      * received, the receive_callback will be called to perform any operations desired by
      * the caller
      *
-     * @throws TbotsNetworkException if the multicast group could not be joined if the multicast option is requested
+     * @throws TbotsNetworkException if the multicast group could not be joined if the
+     * multicast option is requested
      *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
      * @param port The port on which to listen for ReceiveProtoT packets
@@ -71,7 +74,7 @@ class ProtoUdpListener
      * @param buffer A buffer containing the raw data received
      * @param num_bytes_received The number of bytes received that is valid in the buffer
      */
-    void handleDataReception(const char *buffer, const size_t &num_bytes_received);
+    void handleDataReception(const char* buffer, const size_t& num_bytes_received);
 
     /**
      * Start listening for data
@@ -88,7 +91,8 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
     const unsigned short port, const std::string& listen_interface,
     std::function<void(ReceiveProtoT&)> receive_callback, bool multicast)
-    : udp_listener_(io_service, ip_address, port, listen_interface, multicast, std::bind(handleDataReception, this, std::placeholders::_1)),
+    : udp_listener_(io_service, ip_address, port, listen_interface, multicast,
+                    std::bind(handleDataReception, this, std::placeholders::_1)),
       receive_callback(receive_callback)
 {
 }
@@ -98,13 +102,15 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const unsigned short port,
     std::function<void(ReceiveProtoT&)> receive_callback,
     std::optional<std::string>& error)
-    : udp_listener_(io_service, port, std::bind(handleDataReception, this, std::placeholders::_1)),
+    : udp_listener_(io_service, port,
+                    std::bind(handleDataReception, this, std::placeholders::_1)),
       receive_callback(receive_callback)
 {
 }
 
 template <class ReceiveProtoT>
-void ProtoUdpListener<ReceiveProtoT>::handleDataReception(const char *buffer, const size_t &num_bytes_received)
+void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
+    const char* buffer, const size_t& num_bytes_received)
 {
     auto packet_data = ReceiveProtoT();
     packet_data.ParseFromArray(raw_received_data_.data(),

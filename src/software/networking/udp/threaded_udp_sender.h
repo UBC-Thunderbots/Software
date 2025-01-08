@@ -13,7 +13,8 @@ class ThreadedUdpSender
      * Creates a UdpSender that sends the sendString over the network on the
      * given address and port.
      *
-     * @throws TbotsNetworkException if the multicast group could not be joined if the multicast option is requested
+     * @throws TbotsNetworkException if the multicast group could not be joined if the
+     * multicast option is requested
      *
      * @param ip_address The ip address to send data on
      * (IPv4 in dotted decimal or IPv6 in hex string)
