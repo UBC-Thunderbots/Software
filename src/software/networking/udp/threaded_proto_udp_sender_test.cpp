@@ -4,18 +4,17 @@
 
 #include "google/protobuf/empty.pb.h"
 
+#include "software/networking/tbots_network_exception.h"
+
 TEST(ThreadedProtoUdpSenderTest, error_finding_local_ip_address)
 {
-    std::optional<std::string> error;
-    ThreadedProtoUdpSender<google::protobuf::Empty>(
-        "224.5.23.1", 40000, "interfacemcinterfaceface", true, error);
-    EXPECT_TRUE(error.has_value());
+    EXPECT_THROW(ThreadedProtoUdpSender<google::protobuf::Empty>(
+        "224.5.23.1", 40000, "interfacemcinterfaceface", true),
+            TbotsNetworkException);
 }
 
 TEST(ThreadedProtoUdpSenderTest, no_error_creating_socket)
 {
-    std::optional<std::string> error;
-    ThreadedProtoUdpSender<google::protobuf::Empty>("224.5.23.1", 40000, "lo", true,
-                                                    error);
-    EXPECT_FALSE(error.has_value());
+    EXPECT_THROW(ThreadedProtoUdpSender<google::protobuf::Empty>("224.5.23.1", 40000, "lo", true),
+            TbotsNetworkException);
 }

@@ -49,12 +49,12 @@ class UdpListener
      */
     virtual ~UdpListener();
 
-   private:
     /**
      * Cleans up all associated networking resources with this listener.
      */
     void close();
 
+   private:
     /**
      * Handles the reception of data from the network as well as any errors that may occur
      * before calling the user-provided callback.

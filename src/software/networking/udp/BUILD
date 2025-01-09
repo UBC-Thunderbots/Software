@@ -29,6 +29,7 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         ":network_utils",
+        ":udp_listener",
         "//software/logger",
         "//software/util/typename",
     ],

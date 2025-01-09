@@ -11,26 +11,15 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface,
                                      const unsigned short send_port)
     : io_listener_service_(), io_sender_service_()
 {
-    std::optional<std::string> error;
-
     std::string listen_ip = ROBOT_MULTICAST_CHANNELS.at(listen_channel);
     listener_             = std::make_unique<UdpListener>(
         io_listener_service_, listen_ip, listen_port, interface, true,
         std::bind(&LatencyTesterNode::onReceive, this, std::placeholders::_1,
-                  std::placeholders::_2),
-        error);
-    if (error)
-    {
-        LOG(FATAL) << "Error creating UdpListener: " << error.value();
-    }
+                  std::placeholders::_2));
 
     std::string send_ip = ROBOT_MULTICAST_CHANNELS.at(send_channel);
     sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port,
-                                          interface, true, error);
-    if (error)
-    {
-        LOG(FATAL) << "Error creating UdpSender: " << error.value();
-    }
+                                          interface, true);
 
     startServiceThreads();
 }
@@ -41,24 +30,13 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface,
                                      const unsigned short send_port)
     : io_listener_service_(), io_sender_service_()
 {
-    std::optional<std::string> error;
-
     listener_ = std::make_unique<UdpListener>(
         io_listener_service_, listen_port,
         std::bind(&LatencyTesterNode::onReceive, this, std::placeholders::_1,
-                  std::placeholders::_2),
-        error);
-    if (error)
-    {
-        LOG(FATAL) << "Error creating UdpListener: " << error.value();
-    }
+                  std::placeholders::_2));
 
     sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port,
-                                          interface, false, error);
-    if (error)
-    {
-        LOG(FATAL) << "Error creating UdpSender: " << error.value();
-    }
+                                          interface, false);
 
     startServiceThreads();
 }

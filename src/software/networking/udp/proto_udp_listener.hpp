@@ -9,7 +9,7 @@
 
 #include "software/logger/logger.h"
 #include "software/networking/udp/network_utils.h"
-#include "software/networking/udp/proto_udp_listener.hpp"
+#include "software/networking/udp/udp_listener.h"
 #include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT>
@@ -92,7 +92,7 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     const unsigned short port, const std::string& listen_interface,
     std::function<void(ReceiveProtoT&)> receive_callback, bool multicast)
     : udp_listener_(io_service, ip_address, port, listen_interface, multicast,
-                    std::bind(handleDataReception, this, std::placeholders::_1)),
+                    std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this, std::placeholders::_1)),
       receive_callback(receive_callback)
 {
 }
@@ -100,10 +100,9 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const unsigned short port,
-    std::function<void(ReceiveProtoT&)> receive_callback,
-    std::optional<std::string>& error)
+    std::function<void(ReceiveProtoT&)> receive_callback)
     : udp_listener_(io_service, port,
-                    std::bind(handleDataReception, this, std::placeholders::_1)),
+                    std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this, std::placeholders::_1)),
       receive_callback(receive_callback)
 {
 }
@@ -113,7 +112,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const char* buffer, const size_t& num_bytes_received)
 {
     auto packet_data = ReceiveProtoT();
-    packet_data.ParseFromArray(raw_received_data_.data(),
+    packet_data.ParseFromArray(buffer,
                                static_cast<int>(num_bytes_received));
     receive_callback(packet_data);
 }
