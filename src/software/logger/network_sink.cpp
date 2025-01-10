@@ -6,18 +6,21 @@
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 #include "software/logger/custom_logging_levels.h"
+#include "software/networking/tbots_network_exception.h"
 
 NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int robot_id,
                          bool enable_log_merging)
     : robot_id(robot_id), log_merger(LogMerger(enable_log_merging))
 {
-    std::optional<std::string> error;
-    log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(channel)), ROBOT_LOGS_PORT, interface,
-        true, error));
-    if (error)
+    try
     {
-        std::cerr << error.value() << std::endl;
+        log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
+            std::string(ROBOT_MULTICAST_CHANNELS.at(channel)), ROBOT_LOGS_PORT, interface,
+            true));
+    }
+    catch (const TbotsNetworkException& error)
+    {
+        std::cerr << error.what() << std::endl;
         std::terminate();
     }
 }

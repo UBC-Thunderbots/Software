@@ -105,21 +105,6 @@ class NetworkService
      */
     void sendRobotStatus(const TbotsProto::RobotStatus& robot_status);
 
-    /**
-     * Creates a network resource with the given arguments.
-     *
-     * This function is intended to be used to create a UDP listener or sender and
-     * abstract away the failure checking.
-     *
-     * @tparam NetworkResource The type of network resource to create (UDP listener or
-     * sender)
-     * @tparam argsT The types of the arguments to pass to the constructor of the network
-     * resource
-     * @param args The arguments to pass to the constructor of the UDP listener or sender
-     */
-    template <typename NetworkResource, typename... argsT>
-    std::unique_ptr<NetworkResource> createNetworkResource(argsT... args);
-
     // Constants
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
     static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
@@ -186,17 +171,3 @@ class NetworkService
     // IP discovery message to send on the network
     TbotsProto::IpNotification robot_ip_notification_msg;
 };
-
-template <typename NetworkResource, typename... argsT>
-std::unique_ptr<NetworkResource> NetworkService::createNetworkResource(argsT... args)
-{
-    std::optional<std::string> error;
-
-    auto resource = std::make_unique<NetworkResource>(args..., error);
-    if (error.has_value())
-    {
-        LOG(FATAL) << "Failed to create network resource: " << error.value();
-    }
-
-    return resource;
-}

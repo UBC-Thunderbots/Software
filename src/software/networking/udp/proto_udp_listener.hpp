@@ -92,7 +92,7 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     const unsigned short port, const std::string& listen_interface,
     std::function<void(ReceiveProtoT&)> receive_callback, bool multicast)
     : udp_listener_(io_service, ip_address, port, listen_interface, multicast,
-                    std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this, std::placeholders::_1)),
+                    std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this, std::placeholders::_1, std::placeholders::_2)),
       receive_callback(receive_callback)
 {
 }
@@ -102,7 +102,7 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const unsigned short port,
     std::function<void(ReceiveProtoT&)> receive_callback)
     : udp_listener_(io_service, port,
-                    std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this, std::placeholders::_1)),
+                    std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this, std::placeholders::_1, std::placeholders::_2)),
       receive_callback(receive_callback)
 {
 }

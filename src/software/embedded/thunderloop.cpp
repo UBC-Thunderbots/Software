@@ -13,6 +13,7 @@
 #include "software/embedded/services/motor.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
+#include "software/networking/tbots_network_exception.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
@@ -59,11 +60,10 @@ extern "C"
         crash_msg.set_exit_signal(g3::signalToStr(signal_num));
         *(crash_msg.mutable_status()) = *robot_status;
 
-        std::optional<std::string> error;
-        auto sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotCrash>>(
+        auto sender = ThreadedProtoUdpSender<TbotsProto::RobotCrash>(
             std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)), ROBOT_CRASH_PORT,
-            network_interface, true, error);
-        sender->sendProto(crash_msg);
+            network_interface, true);
+        sender.sendProto(crash_msg);
         std::cerr << "Broadcasting robot crash msg";
 
         exit(signal_num);
@@ -500,14 +500,15 @@ void Thunderloop::updateErrorCodes()
 
 void Thunderloop::waitForNetworkUp()
 {
-    std::optional<std::string> error;
-    ThreadedUdpSender network_test(std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)),
-                                   NETWORK_COMM_TEST_PORT, network_interface_, true,
-                                   error);
-    if (error.has_value())
+    std::unique_ptr<ThreadedUdpSender> network_tester;
+    try
     {
-        LOG(FATAL) << "Thunderloop cannot connect to the network. Error: "
-                   << error.value();
+        network_tester = std::make_unique<ThreadedUdpSender>(std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)),
+                                   NETWORK_COMM_TEST_PORT, network_interface_, true);
+    }
+    catch (TbotsNetworkException& e)
+    {
+        LOG(FATAL) << "Thunderloop cannot connect to the network. Error: " << e.what();
     }
 
     // Send an empty packet on the specific network interface to
@@ -516,7 +517,7 @@ void Thunderloop::waitForNetworkUp()
     {
         try
         {
-            network_test.sendString("");
+            network_tester->sendString("");
             break;
         }
         catch (std::exception& e)

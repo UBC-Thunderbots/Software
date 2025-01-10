@@ -1,5 +1,7 @@
 #include "software/embedded/services/network/network.h"
 
+#include "software/networking/tbots_network_exception.h"
+
 NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_address,
                                unsigned short primitive_listener_port,
                                unsigned short robot_status_sender_port,
@@ -10,17 +12,29 @@ NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_ad
       robot_status_sender_port(robot_status_sender_port),
       primitive_tracker(ProtoTracker("primitive set"))
 {
-    fullsystem_to_robot_ip_listener =
-        createNetworkResource<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
-            ip_address, full_system_to_robot_ip_notification_port, interface,
-            std::bind(&NetworkService::onFullSystemIpNotification, this,
-                      std::placeholders::_1),
-            true);
+    try
+    {
+        fullsystem_to_robot_ip_listener =
+            std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
+                ip_address, full_system_to_robot_ip_notification_port, interface,
+                std::bind(&NetworkService::onFullSystemIpNotification, this,
+                          std::placeholders::_1),
+                true);
 
-    robot_to_fullsystem_ip_sender =
-        createNetworkResource<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
-            ip_address, robot_to_full_system_ip_notification_port, interface, false);
+        robot_to_fullsystem_ip_sender =
+            std::make_unique<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
+                ip_address, robot_to_full_system_ip_notification_port, interface, false);
 
+
+        udp_listener_primitive =
+            std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
+                primitive_listener_port,
+                std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
+    }
+    catch (const TbotsNetworkException& e)
+    {
+        LOG(FATAL) << e.what();
+    }
 
     robot_ip_notification_msg.set_robot_id(robot_id);
     std::optional<std::string> local_ip = getLocalIp(interface);
@@ -32,11 +46,6 @@ NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_ad
     {
         LOG(FATAL) << "Failed to get IP addresses associated with " << interface;
     }
-
-    udp_listener_primitive =
-        createNetworkResource<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
-            primitive_listener_port,
-            std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
 
     radio_listener_primitive_set =
         std::make_unique<ThreadedProtoRadioListener<TbotsProto::Primitive>>(
@@ -62,13 +71,15 @@ void NetworkService::onFullSystemIpNotification(
     {
         std::unique_lock lock(robot_status_sender_mutex);
 
-        std::optional<std::string> error;
-        robot_status_sender =
-            std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
-                fullsystem_ip.value(), robot_status_sender_port, interface, false, error);
-        if (error)
+        try
         {
-            LOG(FATAL) << *error;
+            robot_status_sender =
+                std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
+                    fullsystem_ip.value(), robot_status_sender_port, interface, false);
+        }
+        catch (const TbotsNetworkException& error)
+        {
+            LOG(FATAL) << error.what();
         }
 
         LOG(INFO) << "Now sending RobotStatus messages to " << fullsystem_ip.value();

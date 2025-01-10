@@ -37,6 +37,7 @@
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/vector.h"
+#include "software/networking/tbots_network_exception.h"
 #include "software/networking/radio/threaded_proto_radio_sender.hpp"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
@@ -65,25 +66,11 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoUdpSender";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
+        .def(py::init<const std::string&, unsigned short, const std::string&, bool>())
         .def("get_interface", &Class::getInterface)
         .def("get_ip_address", &Class::getIpAddress)
         .def("send_proto", &Class::sendProto, py::arg("message"),
              py::arg("async") = false);
-
-    std::string create_pyclass_name = "create" + pyclass_name;
-    m.def(create_pyclass_name.c_str(),
-          [](const std::string& ip_address, unsigned short port,
-             const std::string& interface, bool multicast) {
-              // Pybind doesn't bind references in some cases
-              // (https://pybind11.readthedocs.io/en/stable/faq.html#limitations-involving-reference-arguments)
-              std::optional<std::string> error;
-              std::shared_ptr<Class> sender =
-                  std::make_shared<Class>(ip_address, port, interface, multicast, error);
-
-              // Return the sender and the error message to the Python side
-              // Use as: sender, error = create{name}ProtoUdpSender(...)
-              return std::make_tuple(sender, error);
-          });
 }
 
 /**
@@ -116,35 +103,9 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
+        .def(py::init<const std::string&, unsigned short, const std::string&, const std::function<void(T)>&, bool>())
+        .def(py::init<unsigned short, const std::function<void(T)>&>())
         .def("close", &Class::close);
-
-    std::string create_pyclass_name = "create" + pyclass_name;
-    m.def(create_pyclass_name.c_str(),
-          [](const std::string& ip_address, unsigned short port,
-             const std::string& interface, const std::function<void(T)>& callback,
-             bool multicast) {
-              // Pybind doesn't bind references in some cases
-              // (https://pybind11.readthedocs.io/en/stable/faq.html#limitations-involving-reference-arguments)
-              std::optional<std::string> error;
-              std::shared_ptr<Class> listener = std::make_shared<Class>(
-                  ip_address, port, interface, callback, multicast, error);
-
-              // Return the listener and the error message to the Python side
-              // Use as: listener, error = create{name}ProtoListener(...)
-              return std::make_tuple(listener, error);
-          });
-
-    m.def(create_pyclass_name.c_str(), [](unsigned short port,
-                                          const std::function<void(T)>& callback) {
-        // Pybind doesn't bind references in some cases
-        // (https://pybind11.readthedocs.io/en/stable/faq.html#limitations-involving-reference-arguments)
-        std::optional<std::string> error;
-        std::shared_ptr<Class> listener = std::make_shared<Class>(port, callback, error);
-
-        // Return the listener and the error message to the Python side
-        // Use as: listener, error = create{name}ProtoListener(...)
-        return std::make_tuple(listener, error);
-    });
 }
 
 template <typename T>
@@ -447,6 +408,8 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpSender<TbotsProto::Primitive>(m, "Primitive");
     declareThreadedProtoRadioSender<TbotsProto::Primitive>(m, "Primitive");
     declareThreadedProtoUdpSender<TbotsProto::IpNotification>(m, "FullsystemIpBroadcast");
+
+    py::register_exception<TbotsNetworkException>(m, "TbotsNetworkException");
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(
