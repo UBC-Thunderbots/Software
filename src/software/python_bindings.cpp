@@ -37,8 +37,8 @@
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/vector.h"
-#include "software/networking/tbots_network_exception.h"
 #include "software/networking/radio/threaded_proto_radio_sender.hpp"
+#include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/uart/boost_uart_communication.h"
@@ -103,7 +103,8 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<const std::string&, unsigned short, const std::string&, const std::function<void(T)>&, bool>())
+        .def(py::init<const std::string&, unsigned short, const std::string&,
+                      const std::function<void(T)>&, bool>())
         .def(py::init<unsigned short, const std::function<void(T)>&>())
         .def("close", &Class::close);
 }

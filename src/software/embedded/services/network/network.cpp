@@ -28,8 +28,8 @@ NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_ad
 
         udp_listener_primitive =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
-                primitive_listener_port,
-                std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
+                primitive_listener_port, std::bind(&NetworkService::primitiveCallback,
+                                                   this, std::placeholders::_1));
     }
     catch (const TbotsNetworkException& e)
     {

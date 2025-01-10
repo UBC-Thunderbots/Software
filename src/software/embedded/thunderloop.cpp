@@ -503,8 +503,9 @@ void Thunderloop::waitForNetworkUp()
     std::unique_ptr<ThreadedUdpSender> network_tester;
     try
     {
-        network_tester = std::make_unique<ThreadedUdpSender>(std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)),
-                                   NETWORK_COMM_TEST_PORT, network_interface_, true);
+        network_tester = std::make_unique<ThreadedUdpSender>(
+            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), NETWORK_COMM_TEST_PORT,
+            network_interface_, true);
     }
     catch (TbotsNetworkException& e)
     {
