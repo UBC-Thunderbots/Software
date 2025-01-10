@@ -112,8 +112,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const char* buffer, const size_t& num_bytes_received)
 {
     auto packet_data = ReceiveProtoT();
-    packet_data.ParseFromArray(buffer,
-                               static_cast<int>(num_bytes_received));
+    packet_data.ParseFromArray(buffer, static_cast<int>(num_bytes_received));
     receive_callback(packet_data);
 }
 

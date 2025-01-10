@@ -62,7 +62,8 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
 template <class SendProto>
 ThreadedProtoUdpSender<SendProto>::ThreadedProtoUdpSender(const std::string& ip_address,
                                                           unsigned short port,
-                                                          const std::string& interface, bool multicast)
+                                                          const std::string& interface,
+                                                          bool multicast)
     : ThreadedUdpSender(ip_address, port, interface, multicast)
 {
 }
