@@ -11,13 +11,6 @@ class OrValidation(Validation):
         """An or extension to the validation function"""
         self.validations = validations
 
-        validation_type_initial = self.validations[0].get_validation_type()
-
-        for validation in self.validations:
-            validation_type = validation.get_validation_type()
-            if validation_type != validation_type_initial:
-                raise TypeError("type of validation instances is not consistent")
-
     def get_validation_status(self, world):
         for validation in self.validations:
             if validation.get_validation_status(world) == ValidationStatus.PASSING:
