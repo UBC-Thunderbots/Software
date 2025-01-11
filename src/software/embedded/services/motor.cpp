@@ -470,9 +470,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
                           back_right_velocity, dribbler_rpm);
 
-    LOG(DEBUG) << "SLIPPAGE CHECK: " << front_right_velocity - front_left_velocity + back_left_velocity - back_right_velocity;
+//    LOG(DEBUG) << "SLIPPAGE CHECK: " << front_right_velocity - front_left_velocity + back_left_velocity - back_right_velocity;
 
-    LOG(CSV, "velocity_logs.csv") << front_right_velocity << "," << front_left_velocity << "," << back_left_velocity << "," << back_right_velocity << "\n";
+//    LOG(CSV, "velocity_logs.csv") << front_right_velocity << "," << front_left_velocity << "," << back_left_velocity << "," << back_right_velocity << "\n";
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs

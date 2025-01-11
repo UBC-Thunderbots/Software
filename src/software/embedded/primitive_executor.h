@@ -61,6 +61,8 @@ class PrimitiveExecutor
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
         TbotsProto::PrimitiveExecutorStatus &status);
 
+    AngularVelocity getTargetAngularAcceleration();
+
    private:
     /*
      * Compute the next target linear _local_ velocity the robot should be at.
@@ -80,6 +82,7 @@ class PrimitiveExecutor
     Duration time_since_linear_trajectory_creation_;
     Vector velocity_;
     AngularVelocity angular_velocity_;
+    AngularVelocity prev_target_angular_velocity_;
     Angle orientation_;
     TeamColour friendly_team_colour_;
     RobotConstants_t robot_constants_;

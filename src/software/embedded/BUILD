@@ -55,6 +55,7 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//software/embedded/redis",
         "//software/embedded/services:motor",
+        "//software/embedded/services:imu",
         "//software/embedded/services:power",
         "//software/embedded/services/network",
         "//software/logger:network_logger",
@@ -131,6 +132,7 @@ cc_library(
         "//software/geom:angular_velocity",
         "//software:constants",
         "//software/util/scoped_timespec_timer",
+        "//software/embedded/services:imu",
         "@eigen"
     ]
 )

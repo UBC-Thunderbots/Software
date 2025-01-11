@@ -104,6 +104,11 @@ ALL_CPP_ACTIONS = [
     ACTION_NAMES.cpp_link_nodeps_dynamic_library,
 ]
 
+def make_builtin_include_directories():
+    return [
+        "usr/include/"
+    ]
+
 def _make_common_features(ctx):
     result = {}
 
@@ -666,14 +671,30 @@ def _jetson_nano_impl(ctx):
 
     supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
+    builtin_include_directories_feature = feature(
+            name = "builtin_include_directories",
+            flag_sets = [
+                flag_set(
+                    actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                    flag_groups = [flag_group(
+                        flags = [
+                            "-I{}".format(dir)
+                            for dir in ctx.attr.builtin_include_directories
+                        ],
+                    )],
+                ),
+            ],
+        )
+
     features = common.values() + [
         stdlib_feature,
         supports_pic_feature,
         common_feature,
         opt_feature,
+        builtin_include_directories_feature,
     ]
 
-    cxx_builtin_include_directories = ctx.attr.builtin_include_directories
+#    cxx_builtin_include_directories = ctx.attr.builtin_include_directories
 
     tool_paths = [
         tool_path(name = name, path = path)
@@ -689,7 +710,7 @@ def _jetson_nano_impl(ctx):
             features = features,
             action_configs = action_configs,
             artifact_name_patterns = [],
-            cxx_builtin_include_directories = cxx_builtin_include_directories,
+            cxx_builtin_include_directories = ctx.attr.builtin_include_directories,
             toolchain_identifier = ctx.attr.toolchain_identifier,
             host_system_name = host_system_name,
             target_system_name = ctx.attr.target_system_name,

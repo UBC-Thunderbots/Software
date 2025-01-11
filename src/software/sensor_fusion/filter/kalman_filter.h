@@ -60,9 +60,8 @@ public:
     void update(Eigen::Matrix<double, dim_z, 1> z) {
 
         Eigen::Matrix<double, dim_z, 1> y = z - H * x; // residual
-        std::cout << y << std::endl;
         Eigen::Matrix<double, dim_z, dim_z> sum = H * P * H.transpose() + R;
-        Eigen::Matrix<double, dim_z, dim_z> newSum = sum.unaryExpr([](double l){return (abs(l)<1e-20)?0.:l;});
+        Eigen::Matrix<double, dim_z, dim_z> newSum = sum.unaryExpr([](double l){return (fabs(l)<1.0e-20)?0.:l;});
         Eigen::Matrix<double, dim_x, dim_z> K = P * (H.transpose() * newSum.completeOrthogonalDecomposition().pseudoInverse()); // Kalman gain
         Eigen::Matrix<double, dim_x, 1> newX = x + K * y;
         x = newX;

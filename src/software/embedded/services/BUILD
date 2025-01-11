@@ -23,6 +23,19 @@ cc_library(
 )
 
 cc_library(
+    name = "imu",
+    srcs = ["imu.cpp"],
+    hdrs = ["imu.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/logger",
+        "//software/geom:angular_velocity",
+        "@eigen",
+        "@usr//:libi2c"
+    ],
+)
+
+cc_library(
     name = "power",
     srcs = ["power.cpp"],
     hdrs = ["power.h"],

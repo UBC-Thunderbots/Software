@@ -469,7 +469,7 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
         const TbotsProto::TrajectoryParamsAngular1D& params, const Angle& start_angle,
         const AngularVelocity& initial_velocity, const RobotConstants& robot_constants) {
     return BangBangTrajectory1DAngular(
-            initial_orientation, createAngle(params.final_angle()),
+            start_angle, createAngle(params.final_angle()),
             initial_velocity,
             AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
             AngularVelocity::fromRadians(

@@ -221,6 +221,7 @@ class RobotCommunication:
         while self.running:
             # total primitives for all robots
             robot_primitives = {}
+            robot_orientations = {}
 
             if self.robots_connected_to_fullsystem:
                 # Get the primitives
@@ -229,9 +230,11 @@ class RobotCommunication:
                 )
 
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
+                fullsystem_orientations = dict(primitive_set.robot_orientations)
                 for robot_id in fullsystem_primitives.keys():
                     if robot_id in self.robots_connected_to_fullsystem:
                         robot_primitives[robot_id] = fullsystem_primitives[robot_id]
+                        robot_orientations[robot_id] = fullsystem_orientations[robot_id]
 
             # get the manual control primitive
             diagnostics_primitive = DirectControlPrimitive(
@@ -266,6 +269,7 @@ class RobotCommunication:
                         for robot_id in robot_primitives.keys()
                     }
                 ),
+                robot_orientations=robot_orientations,
                 sequence_number=self.sequence_number,
             )
 

@@ -83,9 +83,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const WorldPtr& worl
                                            [this](InterPlayCommunication comm) {
                                                inter_play_communication = std::move(comm);
                                            });
-        for(auto const &robot: world_ptr->friendlyTeam().getAllRobots()) {
-            (*primitive_set->mutable_robot_orientations())[robot.id()] = *createAngleProto(robot.orientation());
-        }
+
 
     }
     else
@@ -95,7 +93,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const WorldPtr& worl
                                               inter_play_communication = std::move(comm);
                                           });
     }
-
+    for(auto const &robot: world_ptr->friendlyTeam().getAllRobots()) {
+        (*primitive_set->mutable_robot_orientations())[robot.id()] = *createAngleProto(robot.orientation());
+    }
     FrameMarkEnd(TracyConstants::AI_FRAME_MARKER);
 
     return primitive_set;

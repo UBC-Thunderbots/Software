@@ -85,7 +85,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_),
-      robot_localizer_(8.0*8.0, 0.08*0.08, 4.0)
+      robot_localizer_(0.5, 0.01*0.01, 0.5*0.5, 0.1*0.1)
 {
     waitForNetworkUp();
 
@@ -123,7 +123,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
-    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
+
+    imu_service_ = std::make_unique<ImuService>();
+
+    LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -217,6 +221,8 @@ Thunderloop::~Thunderloop() {}
             network_status_.set_ms_since_last_primitive_received(
                 getMilliseconds(time_since_last_primitive_received));
 
+
+
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
@@ -225,7 +231,11 @@ Thunderloop::~Thunderloop() {}
                 // Save new primitive set
                 primitive_set_ = new_primitive_set;
 
-                robot_localizer_.UpdateVision(createAngle(primitive_set_.robot_orientations().at(robot_id_)), 0.04);
+                auto orientation_msg_iter = primitive_set_.robot_orientations().find((uint32_t) robot_id_);
+                if (orientation_msg_iter != primitive_set_.robot_orientations().end()) {
+                    robot_localizer_.RollbackVision(createAngle(orientation_msg_iter->second), 0.015);
+                }
+
 
                 // Update primitive executor's primitive set
                 {
@@ -242,23 +252,27 @@ Thunderloop::~Thunderloop() {}
                 }
             }
 
+            robot_localizer_.Step(AngularVelocity::zero());
+            auto imu_poll = imu_service_->pollHeadingRate();
+
+            if (imu_poll.has_value()) {
+                robot_localizer_.UpdateIMU(imu_poll.value());
+            }
+
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
                 robot_localizer_.UpdateEncoders(createAngularVelocity(status.angular_velocity()));
+
                 // Step the robot localizer
-                robot_localizer_.Step(AngularVelocity::zero());
+
                 primitive_executor_.updateVelocity(
                         createVector(status.local_velocity()),
                         robot_localizer_.getAngularVelocity(),
                         robot_localizer_.getOrientation());
-            }
-            else {
-                // Step the robot localizer
-                robot_localizer_.Step(AngularVelocity::zero());
-            }
 
 
+            }
 
             // Timeout Overrides for Primitives
             // These should be after the new primitive update section above
@@ -299,7 +313,8 @@ Thunderloop::~Thunderloop() {}
             }
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
-
+//            LOG(INFO) << imu_service_->pollHeadingRate().value().toRadians();
+//            imu_service_->pollHeadingRate();
             struct timespec time_since_kicker_fired;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             ScopedTimespecTimer::timespecDiff(&current_time, &last_kicker_fired,
@@ -441,7 +456,7 @@ bool isPowerStable(std::ifstream& log_file)
     // power supply is indeed stable
     if (!log_file.is_open())
     {
-        LOG(WARNING) << "Cannot dmesg log file. Do you have permission?";
+//        LOG(WARNING) << "Cannot dmesg log file. Do you have permission?";
         return true;
     }
 

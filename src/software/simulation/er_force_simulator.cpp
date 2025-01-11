@@ -302,6 +302,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.yellow_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
+    const auto robot_orient_map      = getRobotIdToOrientationMap(sim_robots);
 
     yellow_team_world_msg               = std::move(world_msg);
     const TbotsProto::World world_proto = *yellow_team_world_msg;
@@ -311,7 +312,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
         {
             auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                              world_proto, local_vel, angular_vel);
+                              world_proto, local_vel, angular_vel, robot_orient_map.at(robot_id) + Angle::fromDegrees(180));
         }
     }
 }
@@ -323,6 +324,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.blue_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
+    const auto robot_orient_map      = getRobotIdToOrientationMap(sim_robots);
 
     blue_team_world_msg                 = std::move(world_msg);
     const TbotsProto::World world_proto = *blue_team_world_msg;
@@ -333,7 +335,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
         {
             auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                              world_proto, local_vel, angular_vel);
+                              world_proto, local_vel, angular_vel, robot_orient_map.at(robot_id));
         }
     }
 }
@@ -343,7 +345,7 @@ void ErForceSimulator::setRobotPrimitive(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
     const TbotsProto::World& world_msg, const Vector& local_velocity,
-    const AngularVelocity angular_velocity)
+    const AngularVelocity angular_velocity, const Angle& orientation)
 {
     // Set to NEG_X because the world msg in this simulator is normalized
     // correctly
@@ -353,7 +355,7 @@ void ErForceSimulator::setRobotPrimitive(
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
         primitive_executor->updatePrimitiveSet(primitive_set_msg);
-        primitive_executor->updateVelocity(local_velocity, angular_velocity);
+        primitive_executor->updateVelocity(local_velocity, angular_velocity, orientation); // TODO: fix this
     }
     else
     {
@@ -578,4 +580,17 @@ ErForceSimulator::getRobotIdToLocalVelocityMap(
         robot_to_local_velocity[sim_robot.id()] = {local_vel, angular_vel};
     }
     return robot_to_local_velocity;
+}
+
+std::map<RobotId, Angle>
+ErForceSimulator::getRobotIdToOrientationMap(
+        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots)
+{
+    std::map<RobotId, Angle> robot_to_orientation;
+    for (const auto& sim_robot : sim_robots)
+    {
+        const Angle angle = Angle::fromRadians(sim_robot.angle());
+        robot_to_orientation[sim_robot.id()] = angle;
+    }
+    return robot_to_orientation;
 }

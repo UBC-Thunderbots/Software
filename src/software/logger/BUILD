@@ -165,7 +165,6 @@ py_library(
     name = "py_logger",
     srcs = [
         "logger.py",
-        "csv_logger.py"
     ],
 )
 

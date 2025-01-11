@@ -27,7 +27,7 @@ void RobotLocalizer::Step(AngularVelocity targetAcceleration) {
                  timeSquared/2,deltaTimeSeconds, 1;
     filter_.Q *= process_noise_variance_;
     Eigen::Matrix<double, 1, 1> u;
-    u << targetAcceleration.toRadians();
+    u << targetAcceleration.toRadians() * deltaTimeSeconds; // change in angular velocity due to control input
     thisPredict.F = filter_.F;
     thisPredict.Q = filter_.Q;
     thisPredict.B = filter_.B;
@@ -37,16 +37,11 @@ void RobotLocalizer::Step(AngularVelocity targetAcceleration) {
     filter_.predict(u);
 }
 
-void RobotLocalizer::UpdateVision(Angle orientation, double ageSeconds) {
+void RobotLocalizer::RollbackVision(Angle orientation, double ageSeconds) {
     // Since this update is old, we roll back to when it would have come in, then recompute the filter steps since then
     clock_gettime(CLOCK_MONOTONIC, &current_time_);
     if (history.empty()) {
-        Eigen::Matrix<double, 2, 1> z; // heading, angular velocity
-        z << filter_.x(0, 0) + (orientation - Angle::fromRadians(filter_.x(0, 0))).clamp().toRadians(),
-             0; // this is the coterminal angle of orientation closest to x[0,0]
-        filter_.H << 1, 0, 0,
-                     0, 0, 0;
-        filter_.update(z);
+        UpdateVision(orientation);
         return;
     }
     auto it = history.begin();
@@ -56,12 +51,7 @@ void RobotLocalizer::UpdateVision(Angle orientation, double ageSeconds) {
         double thisAgeSeconds = (double)thisAge.tv_sec + (double)thisAge.tv_nsec * SECONDS_PER_NANOSECOND;
         if (thisAgeSeconds >= ageSeconds) { // now iterator is right before the new update
             if (it == history.begin()) {
-                Eigen::Matrix<double, 2, 1> z; // heading, angular velocity
-                z << filter_.x(0, 0) + (orientation - Angle::fromRadians(filter_.x(0, 0))).clamp().toRadians(),
-                        0; // this is the coterminal angle of orientation closest to x[0,0]
-                filter_.H << 1, 0, 0,
-                        0, 0, 0;
-                filter_.update(z);
+                UpdateVision(orientation);
                 return;
             }
             --it;
@@ -78,11 +68,7 @@ void RobotLocalizer::UpdateVision(Angle orientation, double ageSeconds) {
     }
     filter_.x = it->pre_mean;
     filter_.P = it->pre_covariance;
-    Eigen::Matrix<double, 2, 1> z; // heading, angular velocity
-    z << filter_.x(0, 0) + (orientation - Angle::fromRadians(filter_.x(0, 0))).clamp().toRadians(), 0; // this is the coterminal angle of orientation closest to x[0,0]
-    filter_.H << 1, 0, 0,
-                 0, 0, 0;
-    filter_.update(z);
+    UpdateVision(orientation);
     // roll back to the present
     do {
         std::cout << "Rolling" << std::endl;
@@ -103,6 +89,17 @@ void RobotLocalizer::UpdateVision(Angle orientation, double ageSeconds) {
     } while (it != history.begin());
 }
 
+void RobotLocalizer::UpdateVision(Angle orientation) {
+    Eigen::Matrix<double, 4, 1> z; // heading, angular velocity
+    z << filter_.x(0, 0) + (orientation - Angle::fromRadians(filter_.x(0, 0))).clamp().toRadians(),
+            0, 0, 0; // this is the coterminal angle of orientation closest to x[0,0]
+    filter_.H << 1, 0, 0,
+            0, 0, 0,
+            0, 0, 0,
+            0, 0, 0;
+    filter_.update(z);
+}
+
 void RobotLocalizer::UpdateEncoders(AngularVelocity angularVelocity) {
     FilterStep thisStep;
     Update thisUpdate;
@@ -111,9 +108,30 @@ void RobotLocalizer::UpdateEncoders(AngularVelocity angularVelocity) {
     thisStep.pre_mean = filter_.x;
     thisStep.pre_covariance = filter_.P;
     filter_.H << 0, 0, 0,
-                 0, 1, 0;
-    Eigen::Matrix<double, 2, 1> z; // heading, angular velocity
-    z << 0, angularVelocity.toRadians();
+                 0, 1, 0,
+                 0, 0, 0,
+                 0, 0, 0;
+    Eigen::Matrix<double, 4, 1> z; // heading, angular velocity
+    z << 0, angularVelocity.toRadians(), 0, 0;
+    thisUpdate.z = z;
+    thisUpdate.H = filter_.H;
+    thisStep.update = std::optional<Update>(thisUpdate);
+    history.push_front(thisStep);
+    filter_.update(z);
+}
+void RobotLocalizer::UpdateIMU(AngularVelocity angularVelocity) {
+    FilterStep thisStep;
+    Update thisUpdate;
+    clock_gettime(CLOCK_MONOTONIC, &current_time_);
+    thisStep.birthday = current_time_;
+    thisStep.pre_mean = filter_.x;
+    thisStep.pre_covariance = filter_.P;
+    filter_.H << 0, 0, 0,
+            0, 0, 0,
+            0, 1, 0,
+            0, 0, 0;
+    Eigen::Matrix<double, 4, 1> z; // heading, angular velocity
+    z << 0, 0, angularVelocity.toRadians(), 0;
     thisUpdate.z = z;
     thisUpdate.H = filter_.H;
     thisStep.update = std::optional<Update>(thisUpdate);
@@ -131,6 +149,26 @@ AngularVelocity RobotLocalizer::getAngularVelocity() {
 
 double RobotLocalizer::getAngularAccelerationRadians() {
     return filter_.x(2, 0);
+}
+
+void RobotLocalizer::UpdateTargetAcceleration(AngularVelocity angularAcceleration) {
+    FilterStep thisStep;
+    Update thisUpdate;
+    clock_gettime(CLOCK_MONOTONIC, &current_time_);
+    thisStep.birthday = current_time_;
+    thisStep.pre_mean = filter_.x;
+    thisStep.pre_covariance = filter_.P;
+    filter_.H << 0, 0, 0,
+                 0, 0, 0,
+                 0, 0, 0,
+                 0, 0, 1;
+    Eigen::Matrix<double, 4, 1> z; // heading, angular velocity
+    z << 0, 0, 0, angularAcceleration.toRadians();
+    thisUpdate.z = z;
+    thisUpdate.H = filter_.H;
+    thisStep.update = std::optional<Update>(thisUpdate);
+    history.push_front(thisStep);
+    filter_.update(z);
 }
 
 

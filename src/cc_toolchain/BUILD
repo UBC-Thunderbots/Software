@@ -145,6 +145,7 @@ cc_toolchain_config_jetson_nano(
         "external/jetson_nano_gcc/aarch64-linux-gnu/include/",
         "external/jetson_nano_gcc/aarch64-linux-gnu/libc/lib/",
         "external/jetson_nano_gcc/aarch64-linux-gnu/libc/usr/include/",
+        "/usr/include/",
     ],
     cpu = "jetson_nano",
     tool_paths = {
