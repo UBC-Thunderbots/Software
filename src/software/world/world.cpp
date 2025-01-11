@@ -4,7 +4,8 @@
 
 World::World(const Field &field, const Ball &ball, const Team &friendly_team,
              const Team &enemy_team, unsigned int buffer_size)
-    : field_(field),
+    : dribble_displacement_(std::nullopt),
+      field_(field),
       ball_(ball),
       friendly_team_(friendly_team),
       enemy_team_(enemy_team),
@@ -172,4 +173,13 @@ void World::setTeamWithPossession(TeamPossession team_with_possesion)
 TeamPossession World::getTeamWithPossession() const
 {
     return team_with_possession_;
+}
+void World::setDribbleDisplacement(const std::optional<Segment> &displacement)
+{
+    dribble_displacement_ = displacement;
+}
+
+const std::optional<Segment> &World::getDribbleDisplacement() const
+{
+    return dribble_displacement_;
 }
