@@ -3,7 +3,6 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 from software.py_constants import *
 from software.util import color_from_gradient
-import math
 
 
 class FloatSlider(QSlider):
@@ -156,12 +155,15 @@ class ColorProgressBar(QProgressBar):
             [255, 255, 0],
             [0, 255, 255],
             [0, 0, 0],
-            [255, 255, 255]
+            [255, 255, 255],
         )
 
         # Extract color into CSS form.
         super(ColorProgressBar, self).setStyleSheet(
-            "QProgressBar::chunk" "{" f"background: rgb({color.red}, {color.green}, {color.blue})" "}"
+            "QProgressBar::chunk"
+            "{"
+            f"background: rgb({color.red}, {color.green}, {color.blue})"
+            "}"
         )
 
     def getPercentage(self):
