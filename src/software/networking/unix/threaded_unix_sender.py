@@ -6,8 +6,6 @@ import socket
 from threading import Thread
 from typing import Generic, TypeVar
 
-from google.protobuf import text_format
-from google.protobuf.any_pb2 import Any
 from google.protobuf.message import EncodeError, Message
 from software.py_constants import UNIX_BUFFER_SIZE
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -16,13 +14,11 @@ T = TypeVar("T", bound=Message)
 
 
 class ThreadedUnixSender(Generic[T]):
-
     MAX_SEND_FAILURES_BEFORE_LOG = 100
 
     def __init__(
         self, unix_path: str, proto_type: type[T], max_buffer_size: int = 3
     ) -> None:
-
         """Send protobufs over unix sockets
 
         :param unix_path: The unix path to send the protobuf to
@@ -46,8 +42,7 @@ class ThreadedUnixSender(Generic[T]):
         self.send_failures = 0
 
     def force_stop(self) -> None:
-        """Stop handling requests
-        """
+        """Stop handling requests"""
         self.stop = True
         self.socket.close()
 
@@ -88,5 +83,5 @@ class ThreadedUnixSender(Generic[T]):
         """
         try:
             self.proto_buffer.put(proto)
-        except queue.Full as queue_full:
+        except queue.Full:
             logging.warning("send buffer overrun for {}".format(self.unix_path))

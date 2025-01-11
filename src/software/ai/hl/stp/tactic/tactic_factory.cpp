@@ -29,7 +29,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
         PROTO_CREATE_TACTIC_CASE(PivotKick, pivot_kick)
         PROTO_CREATE_TACTIC_CASE(Receiver, receiver)
         PROTO_CREATE_TACTIC_CASE(ShadowEnemy, shadow_enemy)
-        PROTO_CREATE_TACTIC_CASE(Stop, stop)
+        PROTO_CREATE_TACTIC_CASE(Halt, halt)
         case TbotsProto::Tactic::TACTIC_NOT_SET:
         {
             LOG(FATAL) << "Tactic not set";
@@ -70,13 +70,12 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ChipTactic &tactic_proto,
 std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    // TODO-AKHIL: Implement this
-    auto tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
 
     tactic->updateControlParams(createPoint(tactic_proto.enemy_threat_origin()),
                                 tactic_proto.crease_defender_alignment(),
-                                tactic_proto.max_allowed_speed_mode());
+                                tactic_proto.max_allowed_speed_mode(),
+                                tactic_proto.ball_steal_mode());
 
     return tactic;
 }
@@ -142,19 +141,19 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveTactic &tactic_proto,
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(
         createPoint(tactic_proto.destination()),
-        createAngle(tactic_proto.final_orientation()), tactic_proto.final_speed(),
-        tactic_proto.dribbler_mode(), tactic_proto.ball_collision_type(),
+        createAngle(tactic_proto.final_orientation()), tactic_proto.dribbler_mode(),
+        tactic_proto.ball_collision_type(),
         createAutoChipOrKick(tactic_proto.auto_chip_or_kick()),
-        tactic_proto.max_allowed_speed_mode(), tactic_proto.obstacle_avoidance_mode(),
-        tactic_proto.target_spin_rev_per_s());
+        tactic_proto.max_allowed_speed_mode(), tactic_proto.obstacle_avoidance_mode());
     return tactic;
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PassDefenderTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic = std::make_shared<PassDefenderTactic>();
-    tactic->updateControlParams(createPoint(tactic_proto.position_to_block_from()));
+    auto tactic = std::make_shared<PassDefenderTactic>(ai_config);
+    tactic->updateControlParams(createPoint(tactic_proto.position_to_block_from()),
+                                tactic_proto.ball_steal_mode());
     return tactic;
 }
 
@@ -178,7 +177,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickTactic &tactic_p
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ReceiverTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic              = std::make_shared<ReceiverTactic>();
+    auto tactic = std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config());
     std::optional<Pass> pass = std::nullopt;
     if (tactic_proto.has_pass())
     {
@@ -203,10 +202,10 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic
     return tactic;
 }
 
-std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
+std::shared_ptr<Tactic> createTactic(const TbotsProto::HaltTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic = std::make_shared<StopTactic>();
+    auto tactic = std::make_shared<HaltTactic>();
     return tactic;
 }
 

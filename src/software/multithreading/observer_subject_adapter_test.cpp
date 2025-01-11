@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #include "software/multithreading/observer.hpp"
 #include "software/multithreading/subject.hpp"
 

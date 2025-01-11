@@ -19,8 +19,8 @@ class BallEntersRegion(Validation):
         """Checks if the ball enters the provided regions
 
         :param world: The world msg to validate
-        :returns: FAILING until a ball enters any of the regions
-                  PASSING when a ball enters
+        :return: FAILING until a ball enters any of the regions
+                 PASSING when a ball enters
         """
         for region in self.regions:
             if tbots_cpp.contains(
@@ -34,7 +34,7 @@ class BallEntersRegion(Validation):
         """Returns the underlying geometry this validation is checking
 
         :param world: The world msg to create validation geometry from
-        :returns: ValidationGeometry containing geometry to visualize
+        :return: ValidationGeometry containing geometry to visualize
 
         """
         return create_validation_geometry(self.regions)

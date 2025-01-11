@@ -47,10 +47,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     goalie_tactic = std::make_shared<GoalieTactic>(ai_config, stop_mode);
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(ai_config),
+        std::make_shared<CreaseDefenderTactic>(ai_config),
     };
 
     do
@@ -82,23 +80,25 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         move_tactics.at(0)->updateControlParams(
             ball_defense_point_center,
-            (world_ptr->ball().position() - ball_defense_point_center).orientation(), 0,
+            (world_ptr->ball().position() - ball_defense_point_center).orientation(),
             stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
         move_tactics.at(1)->updateControlParams(
             ball_defense_point_left,
-            (world_ptr->ball().position() - ball_defense_point_left).orientation(), 0,
+            (world_ptr->ball().position() - ball_defense_point_left).orientation(),
             stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
         move_tactics.at(2)->updateControlParams(
             ball_defense_point_right,
-            (world_ptr->ball().position() - ball_defense_point_right).orientation(), 0,
+            (world_ptr->ball().position() - ball_defense_point_right).orientation(),
             stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT, stop_mode);
+                                  TbotsProto::CreaseDefenderAlignment::LEFT, stop_mode,
+                                  TbotsProto::BallStealMode::IGNORE);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT, stop_mode);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT, stop_mode,
+                                  TbotsProto::BallStealMode::IGNORE);
 
         // insert all the tactics to the result
         result[0].emplace_back(std::get<0>(crease_defender_tactics));

@@ -25,7 +25,7 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield,
                 world_ptr->ball().position() +
                     Vector::createFromAngle(angle_between_robots *
                                             static_cast<double>(k + 1)),
-                (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0);
+                (angle_between_robots * static_cast<double>(k + 1)) + Angle::half());
         }
 
         // yield the Tactics this Play wants to run, in order of priority

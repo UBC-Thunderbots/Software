@@ -21,17 +21,15 @@ class MoveTactic : public Tactic
      * @param destination The destination to move to (in global coordinates)
      * @param final_orientation The final orientation the robot should have at
      * the destination
-     * @param final_speed The final speed the robot should have at the destination
      * @param dribbler_mode The dribbler mode
      * @param ball_collision_type how to navigate around the ball
      * @param auto_chip_or_kick The command to autochip or autokick
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      * @param obstacle_avoidance_mode How safe we should be when avoiding obstacles,
      * particularly enemy robots
-     * @param target_spin_rev_per_s The target spin while moving in revolutions per second
      */
     void updateControlParams(
-        Point destination, Angle final_orientation, double final_speed,
+        Point destination, Angle final_orientation,
         TbotsProto::DribblerMode dribbler_mode = TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType ball_collision_type =
             TbotsProto::BallCollisionType::AVOID,
@@ -39,8 +37,7 @@ class MoveTactic : public Tactic
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode =
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-        double target_spin_rev_per_s = 0.0);
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
 
     /**
      * Updates the params assuming that the dribbler and chicker and while avoiding the
@@ -49,13 +46,11 @@ class MoveTactic : public Tactic
      * @param destination The destination to move to (in global coordinates)
      * @param final_orientation The final orientation the robot should have at
      * the destination
-     * @param final_speed The final speed the robot should have at the destination
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      * @param obstacle_avoidance_mode How safe we should be when avoiding obstacles,
      * particularly enemy robots
      */
     void updateControlParams(Point destination, Angle final_orientation,
-                             double final_speed,
                              TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
                              TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode);
 
@@ -71,8 +66,9 @@ class MoveTactic : public Tactic
     MoveFSM::ControlParams control_params;
 };
 
-// Creates a new tactic called PenaltySetupTactic that is a duplicate of MoveTactic
+// Creates duplicates of MoveTactic for various situations
 COPY_TACTIC(PenaltySetupTactic, MoveTactic)
 COPY_TACTIC(MoveGoalieToGoalLineTactic, MoveTactic)
 COPY_TACTIC(PrepareKickoffMoveTactic, MoveTactic)
 COPY_TACTIC(PlaceBallMoveTactic, MoveTactic)
+COPY_TACTIC(AvoidInterferenceTactic, MoveTactic)

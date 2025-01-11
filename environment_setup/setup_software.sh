@@ -11,18 +11,17 @@
 # unit tests
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-print_status_msg () {
-   echo "================================================================"
-   echo $1
-   echo "================================================================"
-}
-
 # Save the parent dir of this so we can always run commands relative to the
 # location of this script, no matter where it is called from. This
 # helps prevent bugs and odd behaviour if this script is run through a symlink
 # or from a different directory.
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd "$CURR_DIR" || exit
+
+source util.sh
+
+arch=$(uname -m)
+print_status_msg "Detected architecture: ${arch}"
 
 print_status_msg "Installing Utilities and Dependencies"
 
@@ -49,10 +48,10 @@ host_software_packages=(
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
-    gcc-9 # We use gcc 9.3.0
+    gcc-10 # Full system compiles with gcc 10
     libstdc++6-9-dbg
     git # required for build
-    g++-9
+    g++-10
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
     libprotobuf-dev
@@ -62,14 +61,14 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    python3.8       # Python 3
-    python3.8-dev # Python 3 headers
-    python3.8-venv # Virtual Environment
-    python3-pip   # Required for bazel to install python dependencies for build targets
-    python3-protobuf # This is required for the "NanoPb" library, which does not
-                    # properly manage this as a bazel dependency, so we have
-                    # to manually install it ourselves
-    python3-yaml 	# Load dynamic parameter configuration files
+    python3.12        # Python 3
+    python3.12-dev    # Python 3 headers
+    python3.12-venv   # Virtual Environment
+    python3-pip       # Required for bazel to install python dependencies for build targets
+    python3-protobuf  # This is required for the "NanoPb" library, which does not
+                      # properly manage this as a bazel dependency, so we have
+                      # to manually install it ourselves
+    python3-yaml 	  # Load dynamic parameter configuration files
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libffi-dev # needed to use _ctypes in Python3
@@ -90,17 +89,28 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
     host_software_packages+=(libncurses5)
-    host_software_packages+=(qt5-default)
     
     # This fixes missing headers by notifying the linker
-    ldconfig
+    sudo ldconfig
 fi
 
-if [[ $(lsb_release -rs) == "22.04" ]]; then
-    host_software_packages+=(qtbase5-dev)
+# Clear the download cache
+rm -rf /tmp/tbots_download_cache
+mkdir /tmp/tbots_download_cache
 
-    wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/85-brltty.rules
-    sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
+if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; then
+    # This is required because a Braille TTY device that Linux provides a driver for conflicts with the ESP32
+    wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/tbots_download_cache/85-brltty.rules
+    sudo mv /tmp/tbots_download_cache/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
+fi
+
+virtualenv_opt_args=""
+if [[ $(lsb_release -rs) == "24.04" ]]; then
+    host_software_packages+=(python3-pyqt6)
+    host_software_packages+=(pyqt6-dev-tools)
+    host_software_packages+=(python3-pyqt6.qtsvg)
+
+    virtualenv_opt_args="--system-site-packages"
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -114,9 +124,14 @@ print_status_msg "Setting Up Virtual Python Environment"
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
+if ! sudo /usr/bin/python3.12 -m venv /opt/tbotspython $virtualenv_opt_args ; then
     print_status_msg "Error: Setting up virtual environment failed"
     exit 1
+fi
+
+if [[ $(lsb_release -rs) == "20.04" ]] || [[ $(lsb_release -rs) == "22.04" ]]; then
+    # Install pip if it is not a system-managed package
+    sudo /usr/bin/python3.12 -m ensurepip
 fi
 
 if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
@@ -132,25 +147,23 @@ if [[ $(lsb_release -rs) == "22.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
 fi
 
-print_status_msg "Done Setting Up Virtual Python Environment"
-print_status_msg "Fetching game controller"
+if [[ $(lsb_release -rs) == "24.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install -r ubuntu24_requirements.txt
+fi
 
 sudo chown -R $USER:$USER /opt/tbotspython
-sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
-sudo chmod +x /opt/tbotspython/gamecontroller
+
+print_status_msg "Done Setting Up Virtual Python Environment"
+print_status_msg "Fetching game controller"
+install_gamecontroller $arch
 
 print_status_msg "Setting up TIGERS AutoRef"
 
-print_status_msg "Installing TIGERS dependency: Java 17"
-sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bin.deb -O /tmp/jdk-17.0.5.deb
-sudo apt install /tmp/./jdk-17.0.5.deb
+print_status_msg "Installing TIGERS dependency: Java 21"
+install_java $arch
 
 print_status_msg "Compiling TIGERS AutoRef"
-sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/refs/heads/autoref-ci.zip -O /tmp/autoref-ci.zip
-unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
-touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
-/tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/
-cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
+install_autoref $arch
 
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
@@ -160,13 +173,14 @@ print_status_msg "Finished setting up AutoRef"
 # Install Bazel
 print_status_msg "Installing Bazel"
 
-# Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
-sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
-sudo chmod +x /tmp/bazel-installer.sh
-sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
-echo "source ${HOME}/.bazel/bin/bazel-complete.bash" >> ~/.bashrc
+install_bazel $arch
 
 print_status_msg "Done Installing Bazel"
+
+print_status_msg "Install clang-format"
+install_clang_format $arch
+print_status_msg "Done installing clang-format"
+
 print_status_msg "Setting Up PlatformIO"
 
 # setup platformio to compile arduino code
@@ -184,11 +198,16 @@ sudo service udev restart
 # allow user access to serial ports
 sudo usermod -a -G dialout $USER
 
-# installs PlatformIO to global environment
-if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.1.13; then
+# install PlatformIO to global environment
+wget -O /tmp/tbots_download_cache/get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py
+if ! /usr/bin/python3.12 /tmp/tbots_download_cache/./get-platformio.py; then
     print_status_msg "Error: Installing PlatformIO failed"
     exit 1
 fi
+
+# link platformio to /usr/local/bin so that bazel can find it
+sudo rm /usr/local/bin/platformio
+sudo ln -s ~/.platformio/penv/bin/platformio /usr/local/bin/platformio
 
 print_status_msg "Done PlatformIO Setup"
 

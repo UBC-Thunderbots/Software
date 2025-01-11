@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/geom/point.h"
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 #include "software/world/ball.h"
 
 // clang-format off

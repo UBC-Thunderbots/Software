@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "software/logger/log_merger.h"
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 MAKE_ENUM(FG_Colour, YELLOW, RED, GREEN, WHITE);
 /**
@@ -18,7 +18,7 @@ class ColouredCoutSink
      * @param print_detailed If true, prints the log message as well as other details
      * (level, file line, etc). If false, only prints the message
      */
-    ColouredCoutSink(bool print_detailed);
+    ColouredCoutSink(bool print_detailed, bool reduce_repetition = true);
     /**
      * This is a helper function for mapping the FG_Colour enum to its relative
      * Linux xterm foreground color
@@ -62,6 +62,8 @@ class ColouredCoutSink
      * log message
      */
     bool print_detailed;
+
+    bool reduce_repetition;
 
     LogMerger log_merger;
 };

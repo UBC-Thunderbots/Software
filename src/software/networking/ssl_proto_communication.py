@@ -7,14 +7,11 @@ import google.protobuf.message as protobuf_message
 
 
 class SslSocketProtoParseException(Exception):
-    """
-    A custom exception raised by the SSL Socket class when a proto cannot be parsed
-    """
+    """A custom exception raised by the SSL Socket class when a proto cannot be parsed"""
 
 
-class SslSocket(object):
-    """
-    The SSL Socket class is responsible for communication with SSL protos from SSL binaries. The encoding that SSL uses
+class SslSocket:
+    """The SSL Socket class is responsible for communication with SSL protos from SSL binaries. The encoding that SSL uses
     is slightly different from our encoding when we send protobufs between different processes (and robots).
 
     Each SSL Proto message is preceded by an uvarint containing the message size in bytes, so we must read a certain
@@ -27,20 +24,23 @@ class SslSocket(object):
     RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(self, port: int) -> None:
-        """
-        Open a TCP socket with the given port, to communicate with other processes. It binds the socket to INADDR_ANY
+        """Open a TCP socket with the given port, to communicate with other processes. It binds the socket to INADDR_ANY
         which binds the socket to all local interfaces, meaning that it will listen to traffic on the specified port on
         ethernet, wifi,...
 
         :param port the port to bind to
         """
-        # bind to all local interfaces, TCP
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect(("", port))
+        try:
+            # bind to all local interfaces, TCP
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.connect(("", port))
+        except ConnectionRefusedError:
+            raise ConnectionRefusedError(
+                f"SSL Socket connection refused on port {port}. Is binary already running in a separate process?"
+            )
 
     def send(self, proto: protobuf_message.Message) -> None:
-        """
-        Send the proto through the socket.
+        """Send the proto through the socket.
 
         :param proto proto to send
         """
@@ -55,9 +55,8 @@ class SslSocket(object):
 
     def receive(
         self, proto_type: type[protobuf_message.Message]
-    ) -> List[protobuf_message.Message]:
-        """
-        Receives proto(s) on the socket and returns them, given the proto type to expect. This function is blocking
+    ) -> list[protobuf_message.Message]:
+        """Receives proto(s) on the socket and returns them, given the proto type to expect. This function is blocking
 
         :param proto_type the proto type to parse received data as
 
@@ -103,7 +102,5 @@ class SslSocket(object):
         return responses
 
     def close(self) -> None:
-        """
-        Closes the socket associated with this object.
-        """
+        """Closes the socket associated with this object."""
         self.socket.close()

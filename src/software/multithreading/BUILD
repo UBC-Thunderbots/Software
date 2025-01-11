@@ -37,7 +37,6 @@ cc_library(
         "thread_safe_buffer.hpp",
     ],
     deps = [
-        "//software/logger",
         "//software/time:duration",
         "//software/util/typename",
         "@boost//:circular_buffer",
@@ -65,6 +64,7 @@ cc_test(
     deps = [
         ":observer",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util:fake_clock",
     ],
 )
 

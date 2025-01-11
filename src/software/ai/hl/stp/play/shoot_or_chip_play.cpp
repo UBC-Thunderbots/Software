@@ -7,9 +7,9 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
@@ -30,10 +30,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
      */
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(ai_config),
+        std::make_shared<CreaseDefenderTactic>(ai_config),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
@@ -81,7 +79,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 chip_targets[i].origin() -
                 Vector::createFromAngle(orientation).normalize(ROBOT_MAX_RADIUS_METERS);
             ;
-            move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0);
+            move_to_open_area_tactics[i]->updateControlParams(position, orientation);
             result[0].emplace_back(move_to_open_area_tactics[i]);
         }
 

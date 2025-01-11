@@ -11,12 +11,9 @@ from software.simulated_tests import validation
 from software.thunderscope.constants import EstopMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 
 
 from software.thunderscope.thunderscope_config import configure_field_test_view
@@ -25,7 +22,7 @@ from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.estop_helpers import get_estop_config
 from software.py_constants import *
 
-logger = createLogger(__name__)
+logger = create_logger(__name__)
 
 WORLD_BUFFER_TIMEOUT = 5.0
 PROCESS_BUFFER_DELAY_S = 0.01
@@ -48,10 +45,12 @@ class FieldTestRunner(TbotsTestRunner):
         is_yellow_friendly=False,
     ):
         """Initialize the FieldTestRunner
+
         :param test_name: The name of the test to run
+        :param thunderscope: The Thunderscope to use, None if not used
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
-        :param gamecontroller: The gamecontroller context managed instance 
+        :param gamecontroller: The gamecontroller context managed instance
         :param publish_validation_protos: whether to publish validation protos
         :param: is_yellow_friendly: if yellow is the friendly team
         """
@@ -80,7 +79,7 @@ class FieldTestRunner(TbotsTestRunner):
             if len(self.friendly_robot_ids_field) == 0:
                 raise Exception("no friendly robots found on field")
 
-        except queue.Empty as empty:
+        except queue.Empty:
             raise Exception(
                 f"No Worlds were received with in {WORLD_BUFFER_TIMEOUT} seconds. Please make sure atleast 1 robot and 1 ball is present on the field."
             )
@@ -91,18 +90,17 @@ class FieldTestRunner(TbotsTestRunner):
         team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point=None,
     ):
+        """Send a command to the gamecontroller
 
+        :param gc_command: The command to send
+        :param team: The team which the command as attributed to
+        :param final_ball_placement_point: The ball placement point
+        """
         self.gamecontroller.send_ci_input(
             gc_command=gc_command,
             team=team,
             final_ball_placement_point=final_ball_placement_point,
         )
-
-    def time_provider(self):
-        """Provide the current time in seconds since the epoch"""
-
-        with self.timestamp_mutex:
-            return self.timestamp
 
     def run_test(
         self,
@@ -131,19 +129,13 @@ class FieldTestRunner(TbotsTestRunner):
             test_end_time = time.time() + test_timeout_s
 
             while time.time() < test_end_time:
-                # Update the timestamp logged by the ProtoLogger
-                with self.timestamp_mutex:
-
-                    ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                    self.timestamp = ssl_wrapper.detection.t_capture
-
                 while True:
                     try:
                         world = self.world_buffer.get(
                             block=True, timeout=WORLD_BUFFER_TIMEOUT
                         )
                         break
-                    except queue.Empty as empty:
+                    except queue.Empty:
                         # If we timeout, that means full_system missed the last
                         # wrapper and robot status, lets resend it.
                         logger.warning(
@@ -186,9 +178,7 @@ class FieldTestRunner(TbotsTestRunner):
             the window from the main thread.
 
             :param args: The args passed in from the hook
-
             """
-
             stop_test(delay=PAUSE_AFTER_FAIL_DELAY_S)
             self.last_exception = args.exc_value
             raise self.last_exception
@@ -210,6 +200,7 @@ class FieldTestRunner(TbotsTestRunner):
 
 def load_command_line_arguments():
     """Load from command line arguments using argpase
+
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
     """
@@ -339,8 +330,8 @@ def load_command_line_arguments():
 
 @pytest.fixture
 def field_test_runner():
-    """
-    Runs a field test
+    """Runs a field test
+
     :return: yields the runner to the test fixture
     """
     simulator_proto_unix_io = ProtoUnixIO()
@@ -373,84 +364,62 @@ def field_test_runner():
         debug_full_system=debug_full_sys,
         friendly_colour_yellow=args.run_yellow,
         should_restart_on_crash=False,
-    ) as friendly_fs, RobotCommunication(
+    ) as friendly_fs, Gamecontroller(
+        # we would be using conventional port if and only if we are playing in robocup.
+        suppress_logs=(not args.show_gamecontroller_logs),
+        use_conventional_port=False,
+    ) as gamecontroller, RobotCommunication(
         current_proto_unix_io=friendly_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(args.channel),
         interface=args.interface,
         estop_mode=estop_mode,
         estop_path=estop_path,
         enable_radio=args.enable_radio,
+        referee_port=gamecontroller.get_referee_port()
+        if gamecontroller
+        else SSL_REFEREE_PORT,
     ) as rc_friendly:
-        with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs)
-        ) as gamecontroller:
-            friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
-            rc_friendly.setup_for_fullsystem()
+        friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
+        rc_friendly.setup_for_fullsystem()
 
-            gamecontroller.setup_proto_unix_io(
-                blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
-            )
-            # Inject the proto unix ios into thunderscope and start the test
-            tscope = Thunderscope(
-                configure_field_test_view(
-                    simulator_proto_unix_io=simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                    yellow_is_friendly=args.run_yellow,
-                ),
-                layout_path=None,
-            )
-
-            # connect the keyboard estop toggle to the key event if needed
-            if estop_mode == EstopMode.KEYBOARD_ESTOP:
-                tscope.keyboard_estop_shortcut.activated.connect(
-                    rc_friendly.toggle_keyboard_estop
-                )
-                # we call this method to enable estop automatically when a field test starts
-                rc_friendly.toggle_keyboard_estop()
-                logger.warning(
-                    "\x1b[31;20m"
-                    + "Keyboard Estop Enabled, robots will start moving automatically when test starts!"
-                    + "\x1b[0m"
-                )
-
-            time.sleep(LAUNCH_DELAY_S)
-            runner = FieldTestRunner(
-                test_name=current_test,
+        gamecontroller.setup_proto_unix_io(
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+        )
+        # Inject the proto unix ios into thunderscope and start the test
+        tscope = Thunderscope(
+            configure_field_test_view(
+                simulator_proto_unix_io=simulator_proto_unix_io,
                 blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
                 yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                gamecontroller=gamecontroller,
-                thunderscope=tscope,
-                is_yellow_friendly=args.run_yellow,
+                yellow_is_friendly=args.run_yellow,
+            ),
+            layout_path=None,
+        )
+
+        # connect the keyboard estop toggle to the key event if needed
+        if estop_mode == EstopMode.KEYBOARD_ESTOP:
+            tscope.keyboard_estop_shortcut.activated.connect(
+                rc_friendly.toggle_keyboard_estop
+            )
+            # we call this method to enable estop automatically when a field test starts
+            rc_friendly.toggle_keyboard_estop()
+            logger.warning(
+                "\x1b[31;20m"
+                + "Keyboard Estop Enabled, robots will start moving automatically when test starts!"
+                + "\x1b[0m"
             )
 
-            friendly_proto_unix_io.register_observer(World, runner.world_buffer)
+        time.sleep(LAUNCH_DELAY_S)
+        runner = FieldTestRunner(
+            test_name=current_test,
+            blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+            gamecontroller=gamecontroller,
+            thunderscope=tscope,
+            is_yellow_friendly=args.run_yellow,
+        )
 
-            # Setup proto loggers.
-            #
-            # NOTE: Its important we use the test runners time provider because
-            # test will run as fast as possible with a varying tick rate. The
-            # SimulatorTestRunner time provider is tied to the simulators
-            # t_capture coming out of the wrapper packet (rather than time.time).
-            with ProtoLogger(
-                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as blue_logger, ProtoLogger(
-                f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as yellow_logger:
-                blue_full_system_proto_unix_io.register_to_observe_everything(
-                    blue_logger.buffer
-                )
-                yellow_full_system_proto_unix_io.register_to_observe_everything(
-                    yellow_logger.buffer
-                )
-                yield runner
-                print(
-                    f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}",
-                    flush=True,
-                )
-                print(
-                    f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}",
-                    flush=True,
-                )
+        friendly_proto_unix_io.register_observer(World, runner.world_buffer)
+
+        yield runner

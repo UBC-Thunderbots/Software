@@ -4,7 +4,7 @@ import time
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 
-from proto.visualization_pb2 import DebugShapesMap
+from proto.visualization_pb2 import DebugShapes
 
 from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -26,12 +26,11 @@ class GLDebugShapesLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.debug_shape_map_buffer = ThreadSafeBuffer(buffer_size, DebugShapesMap)
+        self.debug_shapes_buffer = ThreadSafeBuffer(buffer_size, DebugShapes)
         self.debug_shape_map = {}
 
         self.poly_shape_graphics = ObservableList(self._graphics_changed)
@@ -45,15 +44,16 @@ class GLDebugShapesLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         # Add all new shapes to the map
-        named_shapes = self.debug_shape_map_buffer.get(block=False, return_cached=False)
+        debug_shapes_proto = self.debug_shapes_buffer.get(
+            block=False, return_cached=False
+        )
         now = time.time()
-        while named_shapes is not None:
-            for name in named_shapes.named_shapes:
-                self.debug_shape_map[name] = (named_shapes.named_shapes[name], now)
+        while debug_shapes_proto is not None:
+            for debug_shape in debug_shapes_proto.debug_shapes:
+                self.debug_shape_map[debug_shape.unique_id] = (debug_shape, now)
 
-            named_shapes = self.debug_shape_map_buffer.get(
+            debug_shapes_proto = self.debug_shapes_buffer.get(
                 block=False, return_cached=False
             )
 
@@ -61,11 +61,15 @@ class GLDebugShapesLayer(GLLayer):
         poly_named_shapes = []
         circle_named_shapes = []
         stadium_named_shapes = []
-        for name, (shape, last_updated) in list(self.debug_shape_map.items()):
+        for unique_id, (debug_shape, last_updated) in list(
+            self.debug_shape_map.items()
+        ):
             if now - last_updated > self.MAX_GRAPHICS_DURATION_SEC:
-                del self.debug_shape_map[name]
+                del self.debug_shape_map[unique_id]
                 continue
 
+            shape = debug_shape.shape
+            name = debug_shape.debug_text
             if shape.HasField("polygon"):
                 poly_named_shapes.append((name, shape.polygon))
             elif shape.HasField("stadium"):
@@ -141,7 +145,8 @@ class GLDebugShapesLayer(GLLayer):
         ):
             circle_shape_graphic.set_radius(circle_shape.radius)
             circle_shape_graphic.set_position(
-                circle_shape.origin.x_meters, circle_shape.origin.y_meters,
+                circle_shape.origin.x_meters,
+                circle_shape.origin.y_meters,
             )
             circle_shape_text_graphic.setData(
                 text=name,

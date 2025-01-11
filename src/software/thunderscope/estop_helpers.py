@@ -1,13 +1,11 @@
 import os
-from typing import Tuple
 from software.thunderscope.constants import EstopMode, ESTOP_PATH_1, ESTOP_PATH_2
 
 
 def get_estop_config(
     keyboard_estop: bool, disable_communication: bool
-) -> Tuple[EstopMode, os.PathLike]:
-    """
-    Based on the estop mode argument provided, gets the corresponding
+) -> tuple[EstopMode, os.PathLike]:
+    """Based on the estop mode argument provided, gets the corresponding
     estop mode and estop path (defined for physical estop mode only)
     Defaults to Physical estop if the given args are both False
 
@@ -15,7 +13,6 @@ def get_estop_config(
     :param disable_communication: True if disable communications mode is enableds
     :return: tuple of estop mode enum value and estop path if needed
     """
-
     mode = EstopMode.PHYSICAL_ESTOP
     path = None
 

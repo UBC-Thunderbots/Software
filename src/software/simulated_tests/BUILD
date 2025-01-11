@@ -1,6 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+
+compile_pip_requirements(
+    name = "requirements",
+    src = "requirements.in",
+    requirements_txt = "requirements_lock.txt",
+)
 
 py_test(
     name = "simulated_test_ball_model",
@@ -12,7 +19,7 @@ py_test(
         "exclusive",
     ],
     deps = [
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software:conftest",
         "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
         requirement("pytest"),
@@ -73,7 +80,6 @@ py_library(
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
-        "//software/thunderscope/replay:proto_logger",
     ],
 )
 
@@ -98,7 +104,6 @@ py_library(
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
-        "//software/thunderscope/replay:proto_logger",
     ],
 )
 
@@ -107,13 +112,18 @@ py_library(
     srcs = [
         "avoid_collisions.py",
         "ball_enters_region.py",
+        "ball_is_off_ground.py",
         "ball_moves_forward.py",
+        "ball_moves_from_rest.py",
+        "ball_moves_in_direction.py",
         "ball_speed_threshold.py",
         "ball_stops_in_region.py",
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
+        "friendly_receives_ball_slow.py",
         "friendly_team_scored.py",
         "or_validation.py",
+        "robot_enters_placement_region.py",
         "robot_enters_region.py",
         "robot_enters_region_and_stops.py",
         "robot_speed_threshold.py",

@@ -2,24 +2,20 @@ import os
 import queue
 import socketserver
 from threading import Thread
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 from software import py_constants
 
-logger = createLogger(__name__)
+logger = create_logger(__name__)
 
 
 class ThreadedUnixListener:
     def __init__(self, unix_path, proto_class=None, max_buffer_size=100):
-
         """Receive protobuf over unix sockets and buffers them
 
         :param unix_path: The unix path to receive the new protobuf to plot
         :param proto_class: The protobuf to unpack from (None if its encoded in the payload)
-
         :param max_buffer_size: The size of the buffer
-
         """
-
         # cleanup the old path if it exists
         try:
             os.remove(unix_path)
@@ -27,7 +23,8 @@ class ThreadedUnixListener:
             pass
 
         self.server = socketserver.UnixDatagramServer(
-            unix_path, handler_factory(self.__buffer_protobuf, proto_class),
+            unix_path,
+            handler_factory(self.__buffer_protobuf, proto_class),
         )
         self.server.max_packet_size = py_constants.UNIX_BUFFER_SIZE
         self.stop = False
@@ -45,28 +42,24 @@ class ThreadedUnixListener:
 
         :param proto: The protobuf to buffer
         :raises: Warning
-
         """
         try:
             self.proto_buffer.put_nowait(proto)
-        except queue.Full as queue_full:
+        except queue.Full:
             logger.warning("buffer overrun for {}".format(self.unix_path))
 
     def serve_till_stopped(self):
-        """Keep handling requests until force_stop is called
-        """
+        """Keep handling requests until force_stop is called"""
         while not self.stop:
             self.server.handle_request()
 
     def force_stop(self):
-        """Stop handling requests
-        """
+        """Stop handling requests"""
         self.stop = True
         self.server.server_close()
 
     def start(self):
-        """Start handling requests
-        """
+        """Start handling requests"""
         self.stop = False
         self.serve_till_stopped()
 
@@ -78,9 +71,7 @@ class Session(socketserver.BaseRequestHandler):
         super().__init__(*args, **keys)
 
     def handle(self):
-        """Handle proto
-
-        """
+        """Handle proto"""
         if self.proto_class:
             self.handle_callback(self.proto_class.FromString(self.request[0]))
         else:

@@ -17,9 +17,10 @@ Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
-SetPlay --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
-SetPlay --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
-SetPlay --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
+SetPlay --> Halt : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
+SetPlay --> Stop : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
+SetPlay --> Playing : [gameStatePlaying]\n<i>resetSetPlay, setupOffensePlay</i>
+SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -72,6 +73,60 @@ direction LR
 [*] --> DefenseState
 DefenseState --> DefenseState : <i>defendAgainstThreats</i>
 Terminate:::terminate --> Terminate:::terminate
+
+```
+
+## [EnemyBallPlacementPlayFSM](/src/software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> WaitState
+WaitState --> AvoidState : [hasPlacementPoint]\n<i>setPlacementPoint</i>
+WaitState --> WaitState : [!hasPlacementPoint]
+AvoidState --> AvoidState : [!isNearlyPlaced]\n<i>avoid</i>
+AvoidState --> DefenseState : [isNearlyPlaced]
+DefenseState --> DefenseState : [isNearlyPlaced]\n<i>enterDefensiveFormation</i>
+DefenseState --> AvoidState : [!isNearlyPlaced]
+
+```
+
+## [EnemyFreeKickPlayFSM](/src/software/ai/hl/stp/play/enemy_free_kick/enemy_free_kick_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> BlockEnemyKickerState
+BlockEnemyKickerState --> BlockEnemyKickerState : <i>blockEnemyKicker</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
+## [FreeKickPlayFSM](/src/software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> SetupPositionState
+SetupPositionState --> SetupPositionState : [!setupDone]\n<i>setupPosition</i>
+SetupPositionState --> ShootState : [shotFound]
+ShootState --> ShootState : [!shotDone]\n<i>shootBall</i>
+ShootState --> Terminate:::terminate : [shotDone]
+SetupPositionState --> AttemptPassState : <i>startLookingForPass</i>
+AttemptPassState --> ChipState : [timeExpired]
+AttemptPassState --> AttemptPassState : [!passFound]\n<i>lookForPass</i>
+AttemptPassState --> PassState : [passFound]
+PassState --> AttemptPassState : [shouldAbortPass]
+PassState --> PassState : [!passDone]\n<i>passBall</i>
+PassState --> Terminate:::terminate : [passDone]
+ChipState --> ChipState : [!chipDone]\n<i>chipBall</i>
+ChipState --> Terminate:::terminate : [chipDone]
 
 ```
 
@@ -167,6 +222,7 @@ direction LR
 [*] --> GetBehindBallFSM
 GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
 GetBehindBallFSM --> ChipState
+ChipState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
 ChipState --> ChipState : [!ballChicked]\n<i>updateChip</i>
 ChipState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
@@ -181,8 +237,12 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> MoveFSM
+MoveFSM --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
 MoveFSM --> MoveFSM : <i>blockThreat</i>
 MoveFSM --> Terminate:::terminate
+DribbleFSM --> MoveFSM : [!ballNearbyWithoutThreat]\n<i>blockThreat</i>
+DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
+Terminate:::terminate --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
 Terminate:::terminate --> MoveFSM : <i>blockThreat</i>
 
 ```
@@ -254,6 +314,21 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [HaltFSM](/src/software/ai/hl/stp/tactic/halt/halt_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StopState
+StopState --> StopState : [!stopDone]\n<i>updateStop</i>
+StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+
+```
+
 ## [KickFSM](/src/software/ai/hl/stp/tactic/kick/kick_fsm.h)
 
 ```mermaid
@@ -264,6 +339,7 @@ direction LR
 [*] --> GetBehindBallFSM
 GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
 GetBehindBallFSM --> KickState
+KickState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
 KickState --> KickState : [!ballChicked]\n<i>updateKick</i>
 KickState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
@@ -296,6 +372,9 @@ direction LR
 BlockPassState --> InterceptBallState : [passStarted]\n<i>interceptBall</i>
 BlockPassState --> BlockPassState : <i>blockPass</i>
 InterceptBallState --> BlockPassState : [ballDeflected]\n<i>blockPass</i>
+InterceptBallState --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
+DribbleFSM --> BlockPassState : [!ballNearbyWithoutThreat]\n<i>blockPass</i>
+DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
 InterceptBallState --> InterceptBallState : <i>interceptBall</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
@@ -374,21 +453,6 @@ StealAndChipState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPas
 Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
-
-```
-
-## [StopFSM](/src/software/ai/hl/stp/tactic/stop/stop_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> StopState
-StopState --> StopState : [!stopDone]\n<i>updateStop</i>
-StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 
 ```
 

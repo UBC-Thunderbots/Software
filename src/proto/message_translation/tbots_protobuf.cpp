@@ -321,8 +321,8 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
 {
     auto plot_juggler_value_msg = std::make_unique<TbotsProto::PlotJugglerValue>();
     double now =
-        static_cast<double>(std::chrono::system_clock::now().time_since_epoch().count() /
-                            NANOSECONDS_PER_SECOND);
+        static_cast<double>(std::chrono::system_clock::now().time_since_epoch().count()) /
+        NANOSECONDS_PER_SECOND;
     plot_juggler_value_msg->set_timestamp(now);
     for (auto const& [key, val] : values)
     {
@@ -331,14 +331,12 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     return plot_juggler_value_msg;
 }
 
-std::unique_ptr<TbotsProto::DebugShapesMap> createDebugShapesMap(
-    const std::map<std::string, TbotsProto::Shape>& named_shapes)
+std::unique_ptr<TbotsProto::DebugShapes> createDebugShapes(
+    const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes)
 {
-    auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapesMap>();
-    for (auto const& [name, shape_proto] : named_shapes)
-    {
-        (*debug_shape_list_msg->mutable_named_shapes())[name] = shape_proto;
-    }
+    auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapes>();
+    (*debug_shape_list_msg->mutable_debug_shapes()) = {debug_shapes.begin(),
+                                                       debug_shapes.end()};
     return debug_shape_list_msg;
 }
 
@@ -481,8 +479,8 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2));
 }
 
-double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
-                                          RobotConstants_t robot_constants)
+int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
+                                       RobotConstants_t robot_constants)
 {
     switch (dribbler_mode)
     {
@@ -491,10 +489,10 @@ double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode
         case TbotsProto::DribblerMode::MAX_FORCE:
             return robot_constants.max_force_dribbler_speed_rpm;
         case TbotsProto::DribblerMode::OFF:
-            return 0.0;
+            return 0;
         default:
             LOG(WARNING) << "DribblerMode is invalid" << std::endl;
-            return 0.0;
+            return 0;
     }
 }
 
@@ -507,7 +505,8 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
             return robot_constants.robot_max_speed_m_per_s;
         case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
-            return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+            return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND -
+                   STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND;
         case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
             return COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         default:
