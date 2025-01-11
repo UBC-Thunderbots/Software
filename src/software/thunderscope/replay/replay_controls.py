@@ -182,19 +182,28 @@ class ReplayControls(QWidget):
             self.player.play()
 
     def create_bookmarks(self) -> None:
+        """
+        Create bookmark visuals
+        """
         for timestamp in self.player.bookmark_indices:
             bookmark = BookmarkMarker(
                 timestamp, self.seek_absolute, self.replay_slider, self
             )
-            # self.replay_layout.addWidget(bookmark)
             self.bookmarks_markers.append(bookmark)
 
     def update_bookmarks(self) -> None:
+        """
+        Update positions of bookmark visuals
+        """
         for marker in self.bookmarks_markers:
             marker.update()
 
-    def resizeEvent(self, a0):
-        super().resizeEvent(a0)
+    def resizeEvent(self, evt):
+        """
+        Compute the positions of bookmark visuals when resizing.
+        :param evt: resize event
+        """
+        super().resizeEvent(evt)
         self.update_bookmarks()
 
     def __on_save_clip_clicked(self) -> None:
