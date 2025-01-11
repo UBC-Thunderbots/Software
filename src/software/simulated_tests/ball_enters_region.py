@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class BallEntersRegion(Validation):
-
     """Checks if a ball enters any of the provided regions."""
 
     def __init__(self, regions=None):

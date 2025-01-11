@@ -11,6 +11,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from software.simulated_tests.or_validation import OrValidation
 
+
 # TODO 3119 Fix KickoffEnemyPlay
 @pytest.mark.parametrize("is_friendly_test", [True, """False"""])
 def test_kickoff_play(simulated_test_runner, is_friendly_test):
