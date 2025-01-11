@@ -1,8 +1,6 @@
 from proto.validation_pb2 import *
 from software.simulated_tests.validation import (
     Validation,
-    create_validation_geometry,
-    create_validation_types,
 )
 
 
@@ -25,7 +23,6 @@ class OrValidation(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world):
-
         validation_geometry = ValidationGeometry()
 
         for validation in self.validations:

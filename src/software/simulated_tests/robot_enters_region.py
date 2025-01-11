@@ -9,16 +9,14 @@ from software.simulated_tests.validation import (
 
 
 class MinNumberOfRobotsEntersRegion(Validation):
-
     """Checks if a certain number of Robots enters a specific set of regions."""
 
     def __init__(self, regions, req_robot_cnt):
-        """
-       Initializes the validation class with a set of regions and required count of robots
+        """Initializes the validation class with a set of regions and required count of robots
 
-       :param regions: the regions that will be checked for robot count
-       :param req_robot_cnt: the minimum number of unique robots that must be in the given regions
-       """
+        :param regions: the regions that will be checked for robot count
+        :param req_robot_cnt: the minimum number of unique robots that must be in the given regions
+        """
         self.regions = regions
         self.req_robot_cnt = req_robot_cnt
         # map to keep track of robot positions
@@ -30,7 +28,8 @@ class MinNumberOfRobotsEntersRegion(Validation):
         :param world: The world msg to validate
         :returns: FAILING until req_robot_cnt robots enter the set of regions
                   PASSING when req_robot_cnt robots enter the set of regions
-        # """
+        #
+        """
         robots_in_regions = set()
         for region in self.regions:
             for robot in world.friendly_team.team_robots:
@@ -46,9 +45,7 @@ class MinNumberOfRobotsEntersRegion(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) shows region to enter
-        """
+        """(override) shows region to enter"""
         return create_validation_geometry(self.regions)
 
     def __repr__(self):
@@ -69,7 +66,6 @@ class MinNumberOfRobotsEntersRegion(Validation):
 
 
 class RobotEntersRegion(MinNumberOfRobotsEntersRegion):
-
     """Checks if at least one robot is contained within the given regions"""
 
     def __init__(self, regions):
