@@ -134,6 +134,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>I:</code></b> Identify robots, toggle robot ID visibility<br>
     <b><code>M:</code></b> Toggle measure mode<br>
     <b><code>S:</code></b> Toggle visibility of robot/ball speed visualization<br>
+    <b><code>B:</code></b> Add a bookmark<br>
     <b><code>Ctrl + Space:</code></b> Stop AI vs AI simulation<br>
     <b><code>Ctrl + Up:</code></b> Increment simulation speed<br>
     <b><code>Ctrl + Down:</code></b> Decrement simulation speed<br>
