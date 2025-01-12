@@ -19,9 +19,9 @@ from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.thunderscope_config import configure_simulated_test_view
 
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 
-logger = createLogger(__name__)
+logger = create_logger(__name__)
 
 LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5

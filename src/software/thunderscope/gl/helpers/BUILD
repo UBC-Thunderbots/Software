@@ -11,6 +11,14 @@ py_library(
 )
 
 py_library(
+    name = "gl_patches",
+    srcs = ["gl_patches.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "observable_list",
     srcs = ["observable_list.py"],
     deps = [],

@@ -27,8 +27,8 @@ from software.thunderscope.gl.layers import (
     gl_tactic_layer,
     gl_cost_vis_layer,
     gl_trail_layer,
+    gl_max_dribble_layer,
 )
-
 
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
@@ -37,17 +37,12 @@ from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
-from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
-from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
-    DiagnosticsInputWidget,
-)
-from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
-    DriveAndDribblerWidget,
-)
+from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
+
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
@@ -129,6 +124,9 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
     trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
+    max_dribble_layer = gl_max_dribble_layer.GLMaxDribbleLayer(
+        "Dribble Tracking", visualization_buffer_size
+    )
 
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
@@ -141,6 +139,7 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, True)
+    gl_widget.add_layer(max_dribble_layer, True)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
@@ -174,6 +173,7 @@ def setup_gl_widget(
     for arg in [
         (World, world_layer.world_buffer),
         (World, cost_vis_layer.world_buffer),
+        (World, max_dribble_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
         (ObstacleList, obstacle_layer.obstacles_list_buffer),
@@ -324,7 +324,7 @@ def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorL
     return robot_error_log
 
 
-def setup_estop_view(proto_unix_io) -> EstopView:
+def setup_estop_view(proto_unix_io: ProtoUnixIO) -> EstopView:
     """Setup the estop view widget
 
     :param proto_unix_io: The proto unix io object for the full system
@@ -335,32 +335,12 @@ def setup_estop_view(proto_unix_io) -> EstopView:
     return estop_view
 
 
-def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
-    """Setup the chicker widget for robot diagnostics
+def setup_diagnostics_widget(proto_unix_io: ProtoUnixIO) -> DiagnosticsWidget:
+    """Set up the diagnostics widget that provides an interface for manually
+    controlling our robots
 
-    :param proto_unix_io: The proto unix io object
-    :return: The chicker widget
+    :param proto_unix_io: ProtoUnixIO for sending messages to the robot
+    :returns: the diagnostics widget
     """
-    chicker_widget = ChickerWidget(proto_unix_io)
-    return chicker_widget
-
-
-def setup_diagnostics_input_widget() -> DiagnosticsInputWidget:
-    """Sets up the diagnostics input widget
-
-    :return: The diagnostics input widget
-    """
-    diagnostics_input_widget = DiagnosticsInputWidget()
-    return diagnostics_input_widget
-
-
-def setup_drive_and_dribbler_widget(
-    proto_unix_io: ProtoUnixIO,
-) -> DriveAndDribblerWidget:
-    """Setup the drive and dribbler widget
-
-    :param proto_unix_io: The proto unix io object
-    :return: The drive and dribbler widget
-    """
-    drive_and_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
-    return drive_and_dribbler_widget
+    diagnostics_widget = DiagnosticsWidget(proto_unix_io)
+    return diagnostics_widget

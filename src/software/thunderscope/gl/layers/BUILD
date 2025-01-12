@@ -8,6 +8,7 @@ py_library(
     deps = [
         "//software/thunderscope:thread_safe_buffer",
         "//software/thunderscope/gl/helpers:extended_gl_view_widget",
+        "//software/thunderscope/gl/helpers:gl_patches",
         "//software/thunderscope/gl/helpers:observable_list",
         requirement("pyqtgraph"),
     ],
@@ -152,6 +153,17 @@ py_library(
     srcs = ["gl_trail_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_max_dribble_layer",
+    srcs = ["gl_max_dribble_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope:util",
         "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],

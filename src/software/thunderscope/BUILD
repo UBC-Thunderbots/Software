@@ -47,8 +47,9 @@ py_library(
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/binary_context_managers:tigers_autoref",
-        requirement("pyqtgraph"),
         requirement("numpy"),
+        requirement("pyqtdarktheme-fork"),
+        requirement("pyqtgraph"),
     ],
 )
 
@@ -86,6 +87,7 @@ py_library(
         "//software/thunderscope/gl/layers:gl_attacker_layer",
         "//software/thunderscope/gl/layers:gl_cost_vis_layer",
         "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
+        "//software/thunderscope/gl/layers:gl_max_dribble_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
         "//software/thunderscope/gl/layers:gl_path_layer",
@@ -101,7 +103,7 @@ py_library(
         "//software/thunderscope/play:refereeinfo_widget",
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
-        "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
+        "//software/thunderscope/robot_diagnostics:diagnostics_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         "//software/thunderscope/robot_diagnostics:estop_view",
         "//software/thunderscope/robot_diagnostics:robot_error_log",
@@ -126,6 +128,7 @@ py_library(
         ":proto_unix_io",
         ":thunderscope_types",
         ":widget_names_to_setup",
+        requirement("pyqtdarktheme-fork"),
     ],
 )
 
@@ -164,6 +167,7 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
+        "//software/logger:py_logger",
         "//software/thunderscope:constants",
     ],
 )
