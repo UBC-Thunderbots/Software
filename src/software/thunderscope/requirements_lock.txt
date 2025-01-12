@@ -72,11 +72,14 @@ pyqt-toast-notification==1.3.2 \
     --hash=sha256:135736ec0f16bff41104dee3c60ac318e5d55ae3378bf26892c6d08c36088ae6 \
     --hash=sha256:82688101202737736d51ab6c74a573b32266ecb7c8b0002f913407bd369737d9
     # via -r software/thunderscope/requirements.in
-pyqt6-qt6==6.6.1 \
-    --hash=sha256:0409aa09b8dae90d5f00ba2d9761e671dfbc54ab169cff8f4cdfecd7f664fd0f \
-    --hash=sha256:41f1ed3eadc00540c205a0e897ae0e0fffc21b896e575214f7c5b9c86d2037d1 \
-    --hash=sha256:8dcac0bd9df13d63deafb6a61969b832c34467da4a28d2b7abf78066bfce22e6 \
-    --hash=sha256:e7df8851c93886412d890d0ecc62b39f42521861ee7a80982136d65903e1f2c5
+pyqt6-qt6==6.8.1 \
+    --hash=sha256:006d786693d0511fbcf184a862edbd339c6ed1bb3bd9de363d73a19ed4b23dff \
+    --hash=sha256:08065d595f1e6fc2dde9f4450eeff89082f4bad26f600a8e9b9cc5966716bfcf \
+    --hash=sha256:1eb8460a1fdb38d0b2458c2974c01d471c1e59e4eb19ea63fc447aaba3ad530e \
+    --hash=sha256:20843cb86bd94942d1cd99e39bf1aeabb875b241a35a8ab273e4bbbfa63776db \
+    --hash=sha256:9f3790c4ce4dc576e48b8718d55fb8743057e6cbd53a6ca1dd253ffbac9b7287 \
+    --hash=sha256:a8bc2ed4ee5e7c6ff4dd1c7db0b27705d151fee5dc232bbd1bf17618f937f515 \
+    --hash=sha256:d6ca5d2b9d2ec0ee4a814b2175f641a5c4299cb80b45e0f5f8356632663f89b3
     # via -r software/thunderscope/requirements.in
 pyqtdarktheme-fork==2.3.2 \
     --hash=sha256:3ea94fed5df262d960378409357c63032639f749794d766f41a45ad8558b2523 \
