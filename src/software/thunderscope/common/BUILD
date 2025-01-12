@@ -1,5 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+
 py_library(
     name = "proto_configuration_widget",
     srcs = ["proto_configuration_widget.py"],
@@ -39,5 +42,13 @@ py_library(
     srcs = ["fps_widget.py"],
     deps = [
         ":frametime_counter",
+    ],
+)
+
+py_library(
+    name = "toast_msg_helper",
+    srcs = ["toast_msg_helper.py"],
+    deps = [
+        requirement("pyqt-toast-notification")
     ],
 )

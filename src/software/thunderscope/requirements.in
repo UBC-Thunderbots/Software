@@ -1,3 +1,4 @@
 numpy==1.26.4
 protobuf==5.27.3
 pyqtgraph==0.13.7
+pyqt-toast-notification==1.3.2

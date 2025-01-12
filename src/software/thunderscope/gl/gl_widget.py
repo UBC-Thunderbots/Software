@@ -28,6 +28,8 @@ from proto.world_pb2 import SimulationState
 from proto.replay_bookmark_pb2 import ReplayBookmark
 from proto.tbots_timestamp_msg_pb2 import Timestamp
 
+from software.thunderscope.common.toast_msg_helper import success_toast
+
 
 class GLWidget(QWidget):
     """Widget that handles GLLayers to produce a 3D visualization of the field/world
@@ -395,4 +397,4 @@ class GLWidget(QWidget):
             timestamp=Timestamp(epoch_timestamp_seconds=timestamp)
         )
         self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
-        QMessageBox.information(self, "Bookmark", "Added Bookmark")
+        success_toast(self.parentWidget(),"Added bookmark!")
