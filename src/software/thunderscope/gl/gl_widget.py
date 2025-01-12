@@ -384,4 +384,4 @@ class GLWidget(QWidget):
             timestamp=Timestamp(epoch_timestamp_seconds=timestamp)
         )
         self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
-        success_toast(self.parentWidget(),"Added bookmark!")
+        success_toast(self.parentWidget(), "Added bookmark!")
