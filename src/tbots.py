@@ -81,7 +81,7 @@ if __name__ == "__main__":
         "-pl",
         "--platform",
         type=str,
-        choices=["PI", "NANO"],
+        choices=["PI", "NANO", "LIMITED"],
         help="The platform to build Thunderloop for",
         action="store",
     )
