@@ -280,8 +280,9 @@ class RobotDiagnosticsCLI:
             motor_control=motor_control_primitive,
             power_control=PowerControl()
         )
+        description = f"Rotating at {velocity} rad/s for {duration_seconds} seconds"
         for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=f"Rotating at {velocity} rad/s for {duration_seconds} seconds"):
+                       description=description):
             self.__run_primitive_set(
                 Primitive(direct_control=direct_control_primitive)
             )
@@ -315,8 +316,9 @@ class RobotDiagnosticsCLI:
             motor_control=motor_control_primitive,
             power_control=PowerControl()
         )
+        description = f"Moving at {speed} m/s for {duration_seconds} seconds"
         for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=f"Moving at {speed} m/s for {duration_seconds} seconds"):
+                       description=description):
             self.__run_primitive_set(
                 Primitive(direct_control=direct_control_primitive)
             )
@@ -359,7 +361,7 @@ class RobotDiagnosticsCLI:
         if auto:
             for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
                            description=description):
-                self.__run_primitive_set(direct_control_primitive)
+                self.__run_primitive_set(Primitive(direct_control=direct_control_primitive))
                 time.sleep(self.send_primitive_interval_s)
 
     @catch_interrupt_exception()
@@ -399,7 +401,7 @@ class RobotDiagnosticsCLI:
         if auto:
             for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
                            description=description):
-                self.__run_primitive_set(direct_control_primitive)
+                self.__run_primitive_set(Primitive(direct_control=direct_control_primitive))
                 time.sleep(self.send_primitive_interval_s)
 
     @catch_interrupt_exception()
@@ -459,8 +461,6 @@ class RobotDiagnosticsCLI:
         )
 
         for wheel in wheels:
-            if wheel not in wheels:
-                return
             wheel_map[wheel] = velocity
         motor_control_primitive = MotorControl()
 

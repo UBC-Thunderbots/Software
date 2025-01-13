@@ -368,13 +368,6 @@ http_archive(
     urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.12.0.zip"],
 )
 
-#load("@pybind11_bazel//:python_configure.bzl", "python_configure")
-#
-#python_configure(
-#    name = "local_config_python",
-#    python_version = "3",
-#)
-
 # These headers are used by pybind11
 bind(
     name = "python_headers",

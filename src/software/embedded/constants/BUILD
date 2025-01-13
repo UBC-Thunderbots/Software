@@ -19,7 +19,4 @@ cc_library(
 py_library(
     name = "py_constants",
     srcs = [":py_constants.py"],
-#    deps = [
-#        requirement("protobuf"),
-#    ],
 )

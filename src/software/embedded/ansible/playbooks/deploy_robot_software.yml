@@ -61,7 +61,6 @@
             dest: ~/thunderbots_binaries/
             recursive: yes
             copy_links: yes
-            _local_rsync_password: thunderbots
           with_items: "{{ services }}"
           loop_control:
             loop_var: service_name
