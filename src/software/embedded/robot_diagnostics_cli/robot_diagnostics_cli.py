@@ -24,6 +24,7 @@ from typing import List, Optional, Tuple
 from typing_extensions import Annotated
 import threading
 
+
 class RobotDiagnosticsCLI:
     def __init__(self) -> None:
         """Setup constructor for the Shell CLI"""
@@ -76,7 +77,6 @@ class RobotDiagnosticsCLI:
                 self.__update_estop_state()
             except Exception as e:
                 raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
-
 
     def __should_send_packet(self) -> bool:
         """Returns True if should send a proto
@@ -281,12 +281,8 @@ class RobotDiagnosticsCLI:
             power_control=PowerControl()
         )
         description = f"Rotating at {velocity} rad/s for {duration_seconds} seconds"
-        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=description):
-            self.__run_primitive_set(
-                Primitive(direct_control=direct_control_primitive)
-            )
-            time.sleep(self.send_primitive_interval_s)
+        self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+                                       description)
 
     @catch_interrupt_exception()
     def move(self,
@@ -317,12 +313,8 @@ class RobotDiagnosticsCLI:
             power_control=PowerControl()
         )
         description = f"Moving at {speed} m/s for {duration_seconds} seconds"
-        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=description):
-            self.__run_primitive_set(
-                Primitive(direct_control=direct_control_primitive)
-            )
-            time.sleep(self.send_primitive_interval_s)
+        self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+                                       description)
 
     @catch_interrupt_exception()
     def chip(self,
@@ -359,10 +351,8 @@ class RobotDiagnosticsCLI:
             Primitive(direct_control=direct_control_primitive)
         )
         if auto:
-            for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                           description=description):
-                self.__run_primitive_set(Primitive(direct_control=direct_control_primitive))
-                time.sleep(self.send_primitive_interval_s)
+            self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+                                           description)
 
     @catch_interrupt_exception()
     def kick(self,
@@ -399,10 +389,8 @@ class RobotDiagnosticsCLI:
             Primitive(direct_control=direct_control_primitive)
         )
         if auto:
-            for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                           description=description):
-                self.__run_primitive_set(Primitive(direct_control=direct_control_primitive))
-                time.sleep(self.send_primitive_interval_s)
+            self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+                                           description)
 
     @catch_interrupt_exception()
     def dribble(self,
@@ -428,12 +416,9 @@ class RobotDiagnosticsCLI:
             motor_control=motor_control_primitive,
             power_control=PowerControl()
         )
-        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=f"Spinning dribbler at {velocity} rpm for {duration_seconds} seconds"):
-            self.__run_primitive_set(
-                Primitive(direct_control=direct_control_primitive)
-            )
-            time.sleep(self.send_primitive_interval_s)
+        description = f"Spinning dribbler at {velocity} rpm for {duration_seconds} seconds"
+        self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+                                       description)
 
     @catch_interrupt_exception()
     def move_wheel(self,
@@ -453,7 +438,7 @@ class RobotDiagnosticsCLI:
 
         # TODO: Add InquirerPy with self.easy_mode_enabled
         # TODO: Confirm max speed for wheel rotation (it is currently net robot velocity)
-        wheel_map = {1: 0, 2: 0, 3: 0, 4: 0}
+        wheel_velocity_map = {1: 0, 2: 0, 3: 0, 4: 0}
         velocity = self.__clamp(
             val=velocity,
             min_val=-ROBOT_MAX_SPEED_M_PER_S,
@@ -461,26 +446,34 @@ class RobotDiagnosticsCLI:
         )
 
         for wheel in wheels:
-            wheel_map[wheel] = velocity
+            wheel_velocity_map[wheel] = velocity
         motor_control_primitive = MotorControl()
-
-        motor_control_primitive.direct_per_wheel_control.front_left_wheel_velocity = wheel_map[1]
-        motor_control_primitive.direct_per_wheel_control.back_left_wheel_velocity = wheel_map[2]
-        motor_control_primitive.direct_per_wheel_control.front_right_wheel_velocity = wheel_map[3]
-        motor_control_primitive.direct_per_wheel_control.back_right_wheel_velocity = wheel_map[4]
+        motor_control_primitive.direct_per_wheel_control.front_left_wheel_velocity = wheel_velocity_map[1]
+        motor_control_primitive.direct_per_wheel_control.back_left_wheel_velocity = wheel_velocity_map[2]
+        motor_control_primitive.direct_per_wheel_control.front_right_wheel_velocity = wheel_velocity_map[3]
+        motor_control_primitive.direct_per_wheel_control.back_right_wheel_velocity = wheel_velocity_map[4]
 
         direct_control_primitive = DirectControlPrimitive(
             motor_control=motor_control_primitive,
             power_control=PowerControl()
         )
+        description = f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"
+        self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+                                       description)
+
+    def __run_primitive_over_time(self, duration_seconds: float, primitive_set: Primitive, description: str):
+        """Executes a primitive set synchronously for the specified amount of time in the console.
+        :param duration_seconds: Duration to execute in seconds
+        :param primitive_set: Primitive set to execute
+        :param description: The UI description to display in the console
+        """
         for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"):
-            self.__run_primitive_set(
-                Primitive(direct_control=direct_control_primitive)
-            )
+                       description=description):
+            self.__run_primitive_set(primitive_set)
             time.sleep(self.send_primitive_interval_s)
 
     def emote(self):
+        # TODO: Add an emote function!
         pass
 
     def __enter__(self):
@@ -506,7 +499,6 @@ class RobotDiagnosticsCLI:
 
     def __exit__(self, type, value, traceback) -> None:
         """Exit RobotDiagnosticsCLI context manager
-
         Ends all currently running loops and joins all currently active threads
         """
         self.receive_robot_status.close()
