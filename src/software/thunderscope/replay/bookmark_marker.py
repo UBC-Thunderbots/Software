@@ -48,4 +48,4 @@ class BookmarkMarker(QPushButton):
         # Re-calculate the position of the visuals
         slider_rect: QRect = self.slider.geometry()
         max_val = self.slider.maximum() / MILLISECONDS_PER_SECOND
-        self.move(int(slider_rect.width() * self.value // max_val), 35)
+        self.move(int(slider_rect.width() * self.value // max_val), 42)
