@@ -1,32 +1,26 @@
 import math
 
-import typer
+import typer as Typer
 from rich import print
 from rich.live import Live
 from rich.table import Table
 from rich.console import Console
-from rich.progress import track
-import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from typer_shell import make_typer_shell
-from google.protobuf.message import Message
 from software.embedded.constants.py_constants import (DEFAULT_PRIMITIVE_DURATION,
                                                       ROBOT_MAX_ANG_SPEED_RAD_PER_S, ROBOT_MAX_SPEED_M_PER_S,
-                                                      get_estop_config, EstopMode, MAX_FORCE_DRIBBLER_SPEED_RPM)
+                                                      MAX_FORCE_DRIBBLER_SPEED_RPM)
 from proto.import_all_protos import *
-import redis
 import subprocess
 import InquirerPy
-import time
-import typer as Typer
 from functools import wraps
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from typing_extensions import Annotated
-import threading
+from embedded_communication import EmbeddedCommunication
 
 
 class RobotDiagnosticsCLI:
-    def __init__(self) -> None:
+    def __init__(self, embedded_communication: EmbeddedCommunication) -> None:
         """Setup constructor for the Shell CLI"""
         self.app = make_typer_shell(prompt="⚡ ")
         self.app.command(short_help="Toggles easy selection shell (For new users)")(self.toggle_simple_mode)
@@ -42,86 +36,13 @@ class RobotDiagnosticsCLI:
         self.app.command(short_help="Prints Thunderloop Status")(self.status)
         self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
 
-        self.redis = redis.StrictRedis(
-            host=REDIS_DEFAULT_HOST,
-            port=REDIS_DEFAULT_PORT,
-            charset="utf-8",
-            decode_responses=True
-        )
-        self.channel_id = int(self.redis.get(ROBOT_ID_REDIS_KEY))
-        self.robot_id = int(self.redis.get(ROBOT_ID_REDIS_KEY))
-        self.sequence_number = 0
+        self.embedded_communication = embedded_communication
+        self.embedded_data = self.embedded_communication.embedded_data
+
         self.console = Console()
-        self.command_duration_seconds = 2.0
-        self.send_primitive_interval_s = 0.01
         self.easy_mode_enabled = False
-        # total primitives for all robots
-        self.robot_primitives = {}
 
-        # for all robots connected to diagnostics, set their primitive
-        self.robot_primitives[self.robot_id] = Primitive(stop=StopPrimitive())
 
-        # initialising the estop
-        self.estop_reader = None
-        self.estop_is_playing = False
-        self.should_send_stop = False
-        self.estop_mode, self.estop_path = (
-            get_estop_config(keyboard_estop=False, disable_communication=False))
-
-        # only checks for estop if we are in physical estop mode
-        if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
-            try:
-                self.estop_reader = tbots_cpp.ThreadedEstopReader(
-                    self.estop_path, 115200
-                )
-                self.__update_estop_state()
-            except Exception as e:
-                raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
-
-    def __should_send_packet(self) -> bool:
-        """Returns True if should send a proto
-
-        :return: boolean
-        """
-        return ((self.estop_mode != EstopMode.DISABLE_ESTOP) and self.estop_is_playing)
-
-    def __send_primitive_set(self, primitive: Primitive) -> None:
-        """Forward PrimitiveSet protos from diagnostics to the robots."""
-        self.robot_primitives[self.robot_id] = primitive
-        # initialize total primitive set and send it
-        primitive_set = PrimitiveSet(
-            time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
-            stay_away_from_ball=False,
-            robot_primitives=(
-                self.robot_primitives
-                if not self.should_send_stop
-                else {
-                    robot_id: Primitive(stop=StopPrimitive())
-                    for robot_id in self.robot_primitives.keys()
-                }
-            ),
-            sequence_number=self.sequence_number,
-        )
-
-        self.sequence_number += 1
-
-        if self.__should_send_packet() or self.should_send_stop:
-            self.send_primitive_set.send_proto(primitive_set)
-            self.should_send_stop = False
-
-    def __run_primitive_set(self, diagnostics_primitive: Primitive) -> None:
-        """Forward PrimitiveSet protos from diagnostics to the robots.
-
-        Updates/polls the Estop state
-
-        If the emergency stop is tripped, the PrimitiveSet will not be sent so
-        that the robots timeout and stop.
-        """
-        self.__update_estop_state()
-        if self.should_send_stop:
-            raise KeyboardInterrupt
-        else:
-            self.__send_primitive_set(diagnostics_primitive)
 
     def catch_interrupt_exception(exit_code=1):
         """Decorator for handling keyboard exceptions and safely clearing cached primitives"""
@@ -130,42 +51,22 @@ class RobotDiagnosticsCLI:
             @wraps(func)
             def wrapper(self, *args, **kwargs):
                 try:
-                    self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.run_primitive_set(Primitive(stop=StopPrimitive()))
                     return func(self, *args, **kwargs)
                 except KeyboardInterrupt:
                     print("E-Stop Activated: Stopped Primitive Send")
-                    self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.run_primitive_set(Primitive(stop=StopPrimitive()))
                     raise Typer.Exit(code=exit_code)
                 except Exception as e:
-                    self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.run_primitive_set(Primitive(stop=StopPrimitive()))
                     print(f"Unknown Exception: {e}")
                     raise Typer.Exit(code=exit_code)
                 finally:
-                    self.__run_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.run_primitive_set(Primitive(stop=StopPrimitive()))
+
             return wrapper
 
         return decorator
-
-    def __update_estop_state(self) -> None:
-        """Updates the current estop status proto if estop is not disabled
-        Always in physical estop mode, uses the physical estop value
-        """
-        if self.estop_mode == EstopMode.DISABLE_ESTOP:
-            self.should_send_stop = False
-        elif self.estop_mode == EstopMode.PHYSICAL_ESTOP:
-            self.should_send_stop = not self.estop_reader.isEstopPlay()
-        else:
-            self.should_send_stop = True
-
-    def __receive_robot_status(self, robot_status: Message) -> None:
-        """Forwards the given robot status to the full system along with the round-trip time
-
-        :param robot_status: RobotStatus to extract information from
-        """
-        self.epoch_timestamp_seconds = robot_status.time_sent.epoch_timestamp_seconds
-        self.battery_voltage = robot_status.power_status.battery_voltage
-        self.primitive_packet_loss_percentage = robot_status.network_status.primitive_packet_loss_percentage
-        self.primitive_executor_step_time_ms = robot_status.thunderloop_status.primitive_executor_step_time_ms
 
     def __generate_stats_table(self) -> Table:
         """Make a new table with robot status information."""
@@ -180,36 +81,36 @@ class RobotDiagnosticsCLI:
             status = "[green]ONLINE"
 
         table.add_row(
-            f"{self.redis.get(ROBOT_ID_REDIS_KEY)}",
-            f"{self.battery_voltage}",
+            f"{self.embedded_data.redis.get(ROBOT_ID_REDIS_KEY)}",
+            f"{self.embedded_communication.battery_voltage}",
             status,
-            f"{self.epoch_timestamp_seconds}"
+            f"{self.embedded_communication.epoch_timestamp_seconds}"
         )
         return table
 
     def __generate_redis_table(self) -> Table:
-        """Make a new table with redis value information."""
+        """Make a new table with embedded_data.redis value information."""
         table = Table(show_header=True, header_style="bold blue")
         table.add_column("Redis Value Name")
         table.add_column("Key", style="dim")
         table.add_column("Value")
 
         table.add_row("Robot ID", f"{ROBOT_ID_REDIS_KEY}",
-                      f"{self.redis.get(ROBOT_ID_REDIS_KEY)}")
+                      f"{self.embedded_data.redis.get(ROBOT_ID_REDIS_KEY)}")
         table.add_row("Channel ID", f"{ROBOT_MULTICAST_CHANNEL_REDIS_KEY}",
-                      f"{self.redis.get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY)}")
+                      f"{self.embedded_data.redis.get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY)}")
         table.add_row("Network Interface", f"{ROBOT_NETWORK_INTERFACE_REDIS_KEY}",
-                      f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}")
+                      f"{self.embedded_data.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}")
         table.add_row("Kick Constant", f"{ROBOT_KICK_CONSTANT_REDIS_KEY}",
-                      f"{self.redis.get(ROBOT_KICK_CONSTANT_REDIS_KEY)}")
+                      f"{self.embedded_data.redis.get(ROBOT_KICK_CONSTANT_REDIS_KEY)}")
         table.add_row("Kick Coefficient", f"{ROBOT_KICK_EXP_COEFF_REDIS_KEY}",
-                      f"{self.redis.get(ROBOT_KICK_EXP_COEFF_REDIS_KEY)}")
+                      f"{self.embedded_data.redis.get(ROBOT_KICK_EXP_COEFF_REDIS_KEY)}")
         table.add_row("Chip Pulse Width", f"{ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY}",
-                      f"{self.redis.get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)}")
+                      f"{self.embedded_data.redis.get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)}")
         table.add_row("Battery Voltage", f"{ROBOT_CURRENT_DRAW_REDIS_KEY}",
-                      f"{self.redis.get(ROBOT_CURRENT_DRAW_REDIS_KEY)}")
+                      f"{self.embedded_data.redis.get(ROBOT_CURRENT_DRAW_REDIS_KEY)}")
         table.add_row("Capacitor Voltage", f"{ROBOT_BATTERY_VOLTAGE_REDIS_KEY}",
-                      f"{self.redis.get(ROBOT_BATTERY_VOLTAGE_REDIS_KEY)}")
+                      f"{self.embedded_data.redis.get(ROBOT_BATTERY_VOLTAGE_REDIS_KEY)}")
         return table
 
     def __clamp(self, val: float, min_val: float, max_val: float) -> float:
@@ -258,9 +159,9 @@ class RobotDiagnosticsCLI:
 
     @catch_interrupt_exception()
     def rotate(self,
-               velocity: Annotated[Optional[float], typer.Option(
+               velocity: Annotated[Optional[float], Typer.Option(
                    help=f"Clamped to +{ROBOT_MAX_ANG_SPEED_RAD_PER_S} & -{ROBOT_MAX_ANG_SPEED_RAD_PER_S} rad/s")] = 0,
-               duration_seconds: Annotated[Optional[float], typer.Option(
+               duration_seconds: Annotated[Optional[float], Typer.Option(
                    help="Duration to rotate in seconds")] = DEFAULT_PRIMITIVE_DURATION
                ) -> None:
         """CLI Command to rotate the robot. Clamped by robot_max_ang_speed_rad_per_s.
@@ -281,16 +182,16 @@ class RobotDiagnosticsCLI:
             power_control=PowerControl()
         )
         description = f"Rotating at {velocity} rad/s for {duration_seconds} seconds"
-        self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+        self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
                                        description)
 
     @catch_interrupt_exception()
     def move(self,
-             angle: Annotated[Optional[float], typer.Option(
+             angle: Annotated[Optional[float], Typer.Option(
                  help=f"Direction to move in degrees")] = 90,
-             speed: Annotated[Optional[float], typer.Option(
+             speed: Annotated[Optional[float], Typer.Option(
                  help=f"Clamped to {0} & {ROBOT_MAX_SPEED_M_PER_S} m/s")] = 0,
-             duration_seconds: Annotated[Optional[float], typer.Option(
+             duration_seconds: Annotated[Optional[float], Typer.Option(
                  help="Duration to move in seconds")] = DEFAULT_PRIMITIVE_DURATION
              ) -> None:
         """CLI Command to move the robot in the specified direction
@@ -313,16 +214,16 @@ class RobotDiagnosticsCLI:
             power_control=PowerControl()
         )
         description = f"Moving at {speed} m/s for {duration_seconds} seconds"
-        self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+        self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
                                        description)
 
     @catch_interrupt_exception()
     def chip(self,
-             distance: Annotated[Optional[float], typer.Option(
+             distance: Annotated[Optional[float], Typer.Option(
                  help=f"Distance to chip in meters")] = 0,
-             auto: Annotated[Optional[bool], typer.Option(
+             auto: Annotated[Optional[bool], Typer.Option(
                  help=f"Enables auto chip (OVERWRITES CHIP DISTANCE)")] = False,
-             duration_seconds: Annotated[Optional[float], typer.Option(
+             duration_seconds: Annotated[Optional[float], Typer.Option(
                  help="Duration to be in chip mode in seconds")] = DEFAULT_PRIMITIVE_DURATION
              ) -> None:
         """CLI Command to chip for a specified distance
@@ -347,20 +248,20 @@ class RobotDiagnosticsCLI:
             power_control=power_control_primitive
         )
         description = f"Chipping {distance} m" if not auto else f"Auto Chip Enabled for {duration_seconds} seconds"
-        self.__run_primitive_set(
+        self.embedded_communication.run_primitive_set(
             Primitive(direct_control=direct_control_primitive)
         )
         if auto:
-            self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+            self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
                                            description)
 
     @catch_interrupt_exception()
     def kick(self,
-             speed: Annotated[Optional[float], typer.Option(
+             speed: Annotated[Optional[float], Typer.Option(
                  help=f"Speed to kick in meters per second")] = 0,
-             auto: Annotated[Optional[bool], typer.Option(
+             auto: Annotated[Optional[bool], Typer.Option(
                  help=f"Enables auto kick (OVERWRITES KICK SPEED)")] = False,
-             duration_seconds: Annotated[Optional[float], typer.Option(
+             duration_seconds: Annotated[Optional[float], Typer.Option(
                  help="Duration to be in kick mode in seconds")] = DEFAULT_PRIMITIVE_DURATION
              ) -> None:
         """CLI Command to kick at the specified speed
@@ -385,18 +286,18 @@ class RobotDiagnosticsCLI:
             power_control=power_control_primitive
         )
         description = f"Kicking at {speed} m/s" if not auto else f"Auto Kick Enabled for {duration_seconds} seconds"
-        self.__run_primitive_set(
+        self.embedded_communication.run_primitive_set(
             Primitive(direct_control=direct_control_primitive)
         )
         if auto:
-            self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+            self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
                                            description)
 
     @catch_interrupt_exception()
     def dribble(self,
-                velocity: Annotated[Optional[float], typer.Option(
+                velocity: Annotated[Optional[float], Typer.Option(
                     help=f"Clamped to {-MAX_FORCE_DRIBBLER_SPEED_RPM} & {MAX_FORCE_DRIBBLER_SPEED_RPM} rpm")] = 0,
-                duration_seconds: Annotated[Optional[float], typer.Option(
+                duration_seconds: Annotated[Optional[float], Typer.Option(
                     help="Duration to move in seconds")] = DEFAULT_PRIMITIVE_DURATION
                 ) -> None:
         """CLI Command to rotate the robot's dribbler in the specified rpm
@@ -417,16 +318,16 @@ class RobotDiagnosticsCLI:
             power_control=PowerControl()
         )
         description = f"Spinning dribbler at {velocity} rpm for {duration_seconds} seconds"
-        self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+        self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
                                        description)
 
     @catch_interrupt_exception()
     def move_wheel(self,
-                   wheels: Annotated[List[int], typer.Argument(
+                   wheels: Annotated[List[int], Typer.Argument(
                        help=f'Wheel to rotate {{1:"NE", 2:"SE", 3:"SW", 4:"NW"}}')],
-                   velocity: Annotated[Optional[float], typer.Option(
+                   velocity: Annotated[Optional[float], Typer.Option(
                        help=f"Clamped to {-ROBOT_MAX_SPEED_M_PER_S} & {ROBOT_MAX_SPEED_M_PER_S} m/s")] = 0,
-                   duration_seconds: Annotated[Optional[float], typer.Option(
+                   duration_seconds: Annotated[Optional[float], Typer.Option(
                        help="Duration to move in seconds")] = DEFAULT_PRIMITIVE_DURATION
                    ) -> None:
         """CLI Command to move the robot in the specified direction
@@ -458,52 +359,15 @@ class RobotDiagnosticsCLI:
             power_control=PowerControl()
         )
         description = f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"
-        self.__run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
+        self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
                                        description)
-
-    def __run_primitive_over_time(self, duration_seconds: float, primitive_set: Primitive, description: str):
-        """Executes a primitive set synchronously for the specified amount of time in the console.
-        :param duration_seconds: Duration to execute in seconds
-        :param primitive_set: Primitive set to execute
-        :param description: The UI description to display in the console
-        """
-        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=description):
-            self.__run_primitive_set(primitive_set)
-            time.sleep(self.send_primitive_interval_s)
 
     def emote(self):
         # TODO: Add an emote function!
         pass
 
-    def __enter__(self):
-        """Enter RobotDiagnosticsCLI context manager. Setup multicast listeners
-        for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
-        """
-        # Receiver
-        self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
-            str(getRobotMulticastChannel(
-                self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}",
-            ROBOT_STATUS_PORT,
-            self.__receive_robot_status,
-            True,
-        )
-
-        # Sender
-        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-            str(getRobotMulticastChannel(
-                self.channel_id)) + "%" + f"{self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}", PRIMITIVE_PORT, True
-        )
-
-        return self
-
-    def __exit__(self, type, value, traceback) -> None:
-        """Exit RobotDiagnosticsCLI context manager
-        Ends all currently running loops and joins all currently active threads
-        """
-        self.receive_robot_status.close()
 
 
 if __name__ == "__main__":
-    with RobotDiagnosticsCLI() as cli:
-        cli.app()
+    with EmbeddedCommunication() as embedded_communication:
+        RobotDiagnosticsCLI(embedded_communication).app()

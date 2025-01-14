@@ -26,6 +26,8 @@ py_binary(
         "//software/thunderscope:thread_safe_buffer",
     ],
     deps = [
+        "//software/embedded/robot_diagnostics_cli:embedded_communication",
+        "//software/embedded/robot_diagnostics_cli:embedded_data",
         requirement("typer_shell"),
         requirement("rich"),
         requirement("protobuf"),
@@ -46,4 +48,21 @@ pkg_executable(
     name = "robot_diagnostics_cli_pkg",
     bin = ":robot_diagnostics_cli",
     path = "robot_diagnostics_cli",
+)
+
+py_library(
+    name = "embedded_communication",
+    srcs = [":embedded_communication.py"],
+    deps = [
+        requirement("protobuf"),
+        requirement("redis"),
+    ],
+)
+
+py_library(
+    name = "embedded_data",
+    srcs = [":embedded_data.py"],
+    deps = [
+        requirement("redis"),
+    ],
 )
