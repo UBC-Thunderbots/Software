@@ -6,6 +6,8 @@ from rich.progress import track
 import software.python_bindings as tbots_cpp
 from software.py_constants import *
 import time
+import threading
+
 
 class EmbeddedCommunication:
     def __init__(self):
@@ -32,19 +34,23 @@ class EmbeddedCommunication:
         self.estop_mode, self.estop_path = (
             get_estop_config(keyboard_estop=False, disable_communication=False))
 
+        self.send_estop_state_thread = threading.Thread(
+            target=self.__update_estop_state, daemon=True
+        )
+
+        self.previous_estop_state = False
+
         # only checks for estop if we are in physical estop mode
         if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
             try:
                 self.estop_reader = tbots_cpp.ThreadedEstopReader(
                     self.estop_path, 115200
                 )
-                self.__update_estop_state()
             except Exception as e:
                 raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Forwards the given robot status to the full system along with the round-trip time
-
         :param robot_status: RobotStatus to extract information from
         """
         self.epoch_timestamp_seconds = robot_status.time_sent.epoch_timestamp_seconds
@@ -54,7 +60,6 @@ class EmbeddedCommunication:
 
     def __should_send_packet(self) -> bool:
         """Returns True if should send a proto
-
         :return: boolean
         """
         return ((self.estop_mode != EstopMode.DISABLE_ESTOP) and self.estop_is_playing)
@@ -87,12 +92,13 @@ class EmbeddedCommunication:
         """Updates the current estop status proto if estop is not disabled
         Always in physical estop mode, uses the physical estop value
         """
-        if self.estop_mode == EstopMode.DISABLE_ESTOP:
-            self.should_send_stop = False
-        elif self.estop_mode == EstopMode.PHYSICAL_ESTOP:
-            self.should_send_stop = not self.estop_reader.isEstopPlay()
-        else:
-            self.should_send_stop = True
+        while True:
+            if self.estop_mode == EstopMode.DISABLE_ESTOP:
+                self.should_send_stop = False
+            elif self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+                self.should_send_stop = not self.estop_reader.isEstopPlay()
+            else:
+                self.should_send_stop = True
 
     def run_primitive_set(self, diagnostics_primitive: Primitive) -> None:
         """Forward PrimitiveSet protos from diagnostics to the robots.
@@ -102,13 +108,12 @@ class EmbeddedCommunication:
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
         """
-        self.__update_estop_state()
         if self.should_send_stop:
             raise KeyboardInterrupt
         else:
             self.__send_primitive_set(diagnostics_primitive)
 
-    def run_primitive_over_time(self, duration_seconds: float, primitive_set: Primitive, description: str):
+    def run_primitive_over_time(self, duration_seconds: float, primitive_set: Primitive, description: str) -> None:
         """Executes a primitive set synchronously for the specified amount of time in the console.
         :param duration_seconds: Duration to execute in seconds
         :param primitive_set: Primitive set to execute
@@ -119,7 +124,7 @@ class EmbeddedCommunication:
             self.run_primitive_set(primitive_set)
             time.sleep(self.send_primitive_interval_s)
 
-    def __enter__(self):
+    def __enter__(self) -> EmbeddedData:
         """Enter RobotDiagnosticsCLI context manager. Setup multicast listeners
         for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
         """
@@ -130,7 +135,7 @@ class EmbeddedCommunication:
             ROBOT_STATUS_PORT,
             self.__receive_robot_status,
             True,
-            )
+        )
 
         # Sender
         self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
@@ -138,6 +143,7 @@ class EmbeddedCommunication:
                 self.channel_id)) + "%" + f"{self.embedded_data.get_network_interface()}", PRIMITIVE_PORT, True
         )
 
+        self.send_estop_state_thread.start()
         return self
 
     def __exit__(self, type, value, traceback) -> None:

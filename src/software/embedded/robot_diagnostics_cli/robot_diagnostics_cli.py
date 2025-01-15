@@ -1,5 +1,3 @@
-import math
-
 import typer as Typer
 from rich import print
 from rich.live import Live
@@ -7,9 +5,8 @@ from rich.table import Table
 from rich.console import Console
 from software.py_constants import *
 from typer_shell import make_typer_shell
-from software.embedded.constants.py_constants import (DEFAULT_PRIMITIVE_DURATION,
-                                                      ROBOT_MAX_ANG_SPEED_RAD_PER_S, ROBOT_MAX_SPEED_M_PER_S,
-                                                      MAX_FORCE_DRIBBLER_SPEED_RPM)
+from software.embedded.constants.py_constants import (DEFAULT_PRIMITIVE_DURATION, ROBOT_MAX_ANG_SPEED_RAD_PER_S,
+                                                      ROBOT_MAX_SPEED_M_PER_S, MAX_FORCE_DRIBBLER_SPEED_RPM)
 from proto.import_all_protos import *
 import subprocess
 import InquirerPy
@@ -41,8 +38,6 @@ class RobotDiagnosticsCLI:
 
         self.console = Console()
         self.easy_mode_enabled = False
-
-
 
     def catch_interrupt_exception(exit_code=1):
         """Decorator for handling keyboard exceptions and safely clearing cached primitives"""
@@ -81,7 +76,7 @@ class RobotDiagnosticsCLI:
             status = "[green]ONLINE"
 
         table.add_row(
-            f"{self.embedded_data.redis.get(ROBOT_ID_REDIS_KEY)}",
+            self.embedded_data.get_robot_id(),
             f"{self.embedded_communication.battery_voltage}",
             status,
             f"{self.embedded_communication.epoch_timestamp_seconds}"
@@ -96,32 +91,24 @@ class RobotDiagnosticsCLI:
         table.add_column("Value")
 
         table.add_row("Robot ID", f"{ROBOT_ID_REDIS_KEY}",
-                      f"{self.embedded_data.redis.get(ROBOT_ID_REDIS_KEY)}")
+                      self.embedded_data.get_robot_id())
         table.add_row("Channel ID", f"{ROBOT_MULTICAST_CHANNEL_REDIS_KEY}",
-                      f"{self.embedded_data.redis.get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY)}")
+                      self.embedded_data.get_channel_id())
         table.add_row("Network Interface", f"{ROBOT_NETWORK_INTERFACE_REDIS_KEY}",
-                      f"{self.embedded_data.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY)}")
+                      self.embedded_data.get_network_interface())
         table.add_row("Kick Constant", f"{ROBOT_KICK_CONSTANT_REDIS_KEY}",
-                      f"{self.embedded_data.redis.get(ROBOT_KICK_CONSTANT_REDIS_KEY)}")
+                      self.embedded_data.get_kick_constant())
         table.add_row("Kick Coefficient", f"{ROBOT_KICK_EXP_COEFF_REDIS_KEY}",
-                      f"{self.embedded_data.redis.get(ROBOT_KICK_EXP_COEFF_REDIS_KEY)}")
+                      self.embedded_data.get_kick_coeff())
         table.add_row("Chip Pulse Width", f"{ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY}",
-                      f"{self.embedded_data.redis.get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)}")
-        table.add_row("Battery Voltage", f"{ROBOT_CURRENT_DRAW_REDIS_KEY}",
-                      f"{self.embedded_data.redis.get(ROBOT_CURRENT_DRAW_REDIS_KEY)}")
-        table.add_row("Capacitor Voltage", f"{ROBOT_BATTERY_VOLTAGE_REDIS_KEY}",
-                      f"{self.embedded_data.redis.get(ROBOT_BATTERY_VOLTAGE_REDIS_KEY)}")
+                      self.embedded_data.get_chip_pulse_width())
+        table.add_row("Battery Voltage", f"{ROBOT_BATTERY_VOLTAGE_REDIS_KEY}",
+                      self.embedded_data.get_battery_volt())
+        table.add_row("Battery Current Draw", f"{ROBOT_CURRENT_DRAW_REDIS_KEY}",
+                      self.embedded_data.get_current_draw())
+        table.add_row("Capacitor Voltage", f"{ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY}",
+                      self.embedded_data.get_cap_volt())
         return table
-
-    def __clamp(self, val: float, min_val: float, max_val: float) -> float:
-        """Simple Math Clamp function
-
-        :param val: Value to clamp
-        :param min_val: Minimum (Lower) Bound
-        :param max_val: Maximum (Upper) Bound
-        """
-        # Faster than numpy & fewer dependencies
-        return min(max(val, min_val), max_val)
 
     def stats(self) -> None:
         """CLI Command to generate Incoming RobotStatus Proto information"""
@@ -165,25 +152,15 @@ class RobotDiagnosticsCLI:
                    help="Duration to rotate in seconds")] = DEFAULT_PRIMITIVE_DURATION
                ) -> None:
         """CLI Command to rotate the robot. Clamped by robot_max_ang_speed_rad_per_s.
-
         :param velocity: Angular Velocity to rotate the robot
         :param duration_seconds: Duration to rotate the robot
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        velocity = self.__clamp(
-            velocity,
-            -ROBOT_MAX_ANG_SPEED_RAD_PER_S,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_S
-        )
-        motor_control_primitive = MotorControl()
-        motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = velocity
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive,
-            power_control=PowerControl()
-        )
         description = f"Rotating at {velocity} rad/s for {duration_seconds} seconds"
-        self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
-                                       description)
+        self.embedded_communication.run_primitive_over_time(
+            duration_seconds,
+            self.embedded_data.get_rotate_primitive(velocity),
+            description)
 
     @catch_interrupt_exception()
     def move(self,
@@ -201,21 +178,11 @@ class RobotDiagnosticsCLI:
         :param duration_seconds: Duration to move
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        speed = self.__clamp(
-            val=speed,
-            min_val=0,
-            max_val=ROBOT_MAX_SPEED_M_PER_S
-        )
-        motor_control_primitive = MotorControl()
-        motor_control_primitive.direct_velocity_control.velocity.x_component_meters = speed * math.cos(angle)
-        motor_control_primitive.direct_velocity_control.velocity.y_component_meters = speed * math.sin(angle)
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive,
-            power_control=PowerControl()
-        )
-        description = f"Moving at {speed} m/s for {duration_seconds} seconds"
-        self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
-                                       description)
+        description = f"Moving at {speed} m/s for {duration_seconds} seconds towards {angle}"
+        self.embedded_communication.run_primitive_over_time(
+            duration_seconds,
+            self.embedded_data.get_move_primitive(angle, speed),
+            description)
 
     @catch_interrupt_exception()
     def chip(self,
@@ -227,33 +194,21 @@ class RobotDiagnosticsCLI:
                  help="Duration to be in chip mode in seconds")] = DEFAULT_PRIMITIVE_DURATION
              ) -> None:
         """CLI Command to chip for a specified distance
-        :param distance: Distance to chip in meters
+        :param distance: The distance to chip in meters
         :param auto: Enables auto chip (OVERWRITES CHIP DISTANCE)
         :param duration_seconds: Duration to be in chip mode in seconds
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        distance = self.__clamp(
-            val=distance,
-            min_val=0,
-            max_val=ROBOT_MAX_SPEED_M_PER_S
-        )
-        power_control_primitive = PowerControl()
-        if not auto:
-            power_control_primitive.chicker.chip_distance_meters = distance
-        else:
-            # TODO: Change this to a constant from somewhere else
-            power_control_primitive.chicker.auto_chip_or_kick.autochip_distance_meters = 1.5
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=MotorControl(),
-            power_control=power_control_primitive
-        )
         description = f"Chipping {distance} m" if not auto else f"Auto Chip Enabled for {duration_seconds} seconds"
-        self.embedded_communication.run_primitive_set(
-            Primitive(direct_control=direct_control_primitive)
-        )
+        primitive = self.embedded_data.get_kick_primitive(auto, distance)
         if auto:
-            self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
-                                           description)
+            self.embedded_communication.run_primitive_over_time(
+                duration_seconds,
+                primitive,
+                description)
+        else:
+            print(description)
+            self.embedded_communication.run_primitive_set(primitive)
 
     @catch_interrupt_exception()
     def kick(self,
@@ -265,33 +220,21 @@ class RobotDiagnosticsCLI:
                  help="Duration to be in kick mode in seconds")] = DEFAULT_PRIMITIVE_DURATION
              ) -> None:
         """CLI Command to kick at the specified speed
-        :param speed: Speed to kick in meters per second
+        :param speed: The speed to kick in meters per second
         :param auto: Enables auto kick (OVERWRITES KICK SPEED)
         :param duration_seconds: Duration to be in kick mode in seconds
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        speed = self.__clamp(
-            val=speed,
-            min_val=0,
-            max_val=ROBOT_MAX_SPEED_M_PER_S
-        )
-        power_control_primitive = PowerControl()
-        if not auto:
-            power_control_primitive.chicker.kick_speed_m_per_s = speed
-        else:
-            # TODO: Change this to a constant from somewhere else
-            power_control_primitive.chicker.auto_chip_or_kick.autokick_speed_m_per_s = 1.5
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=MotorControl(),
-            power_control=power_control_primitive
-        )
         description = f"Kicking at {speed} m/s" if not auto else f"Auto Kick Enabled for {duration_seconds} seconds"
-        self.embedded_communication.run_primitive_set(
-            Primitive(direct_control=direct_control_primitive)
-        )
+        primitive = self.embedded_data.get_kick_primitive(auto, speed)
         if auto:
-            self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
-                                           description)
+            self.embedded_communication.run_primitive_over_time(
+                duration_seconds,
+                primitive,
+                description)
+        else:
+            print(description)
+            self.embedded_communication.run_primitive_set(primitive)
 
     @catch_interrupt_exception()
     def dribble(self,
@@ -306,20 +249,12 @@ class RobotDiagnosticsCLI:
         :param duration_seconds: Duration to rotate
         """
         # TODO: Add InquirerPy with self.easy_mode_enabled
-        velocity = self.__clamp(
-            val=velocity,
-            min_val=-MAX_FORCE_DRIBBLER_SPEED_RPM,
-            max_val=MAX_FORCE_DRIBBLER_SPEED_RPM
-        )
-        motor_control_primitive = MotorControl()
-        motor_control_primitive.dribbler_speed_rpm = int(velocity)
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive,
-            power_control=PowerControl()
-        )
         description = f"Spinning dribbler at {velocity} rpm for {duration_seconds} seconds"
-        self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
-                                       description)
+        self.embedded_communication.run_primitive_over_time(
+            duration_seconds,
+            self.embedded_data.get_dribble_primitive(velocity),
+            description
+        )
 
     @catch_interrupt_exception()
     def move_wheel(self,
@@ -339,33 +274,17 @@ class RobotDiagnosticsCLI:
 
         # TODO: Add InquirerPy with self.easy_mode_enabled
         # TODO: Confirm max speed for wheel rotation (it is currently net robot velocity)
-        wheel_velocity_map = {1: 0, 2: 0, 3: 0, 4: 0}
-        velocity = self.__clamp(
-            val=velocity,
-            min_val=-ROBOT_MAX_SPEED_M_PER_S,
-            max_val=ROBOT_MAX_SPEED_M_PER_S
-        )
 
-        for wheel in wheels:
-            wheel_velocity_map[wheel] = velocity
-        motor_control_primitive = MotorControl()
-        motor_control_primitive.direct_per_wheel_control.front_left_wheel_velocity = wheel_velocity_map[1]
-        motor_control_primitive.direct_per_wheel_control.back_left_wheel_velocity = wheel_velocity_map[2]
-        motor_control_primitive.direct_per_wheel_control.front_right_wheel_velocity = wheel_velocity_map[3]
-        motor_control_primitive.direct_per_wheel_control.back_right_wheel_velocity = wheel_velocity_map[4]
-
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive,
-            power_control=PowerControl()
-        )
         description = f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"
-        self.embedded_communication.run_primitive_over_time(duration_seconds, Primitive(direct_control=direct_control_primitive),
-                                       description)
+        self.embedded_communication.run_primitive_over_time(
+            duration_seconds,
+            self.embedded_data.get_move_wheel_primitive(wheels, velocity),
+            description
+        )
 
     def emote(self):
         # TODO: Add an emote function!
         pass
-
 
 
 if __name__ == "__main__":
