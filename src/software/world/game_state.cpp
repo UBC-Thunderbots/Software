@@ -2,7 +2,10 @@
 
 #include "software/logger/logger.h"
 
-GameState::GameState(const TbotsProto::GameState& game_state_proto) : our_restart_(false)
+GameState::GameState(const TbotsProto::GameState& game_state_proto)
+    : our_restart_(false),
+      friendly_team_info_(TeamInfo(game_state_proto.friendly_team_info())),
+      enemy_team_info_(TeamInfo(game_state_proto.enemy_team_info()))
 {
     if (game_state_proto.has_ball())
     {
@@ -421,13 +424,35 @@ void GameState::setRestartCompleted()
     restart_reason_ = NONE;
 }
 
+const TeamInfo& GameState::getFriendlyTeamInfo() const
+{
+    return friendly_team_info_;
+}
+
+const TeamInfo& GameState::getEnemyTeamInfo() const
+{
+    return enemy_team_info_;
+}
+
+void GameState::updateFriendlyTeamInfo(const TeamInfo& team_info)
+{
+    friendly_team_info_ = team_info;
+}
+
+void GameState::updateEnemyTeamInfo(const TeamInfo& team_info)
+{
+    enemy_team_info_ = team_info;
+}
+
 bool GameState::operator==(const GameState& other) const
 {
     return this->play_state_ == other.play_state_ &&
            this->restart_reason_ == other.restart_reason_ &&
            this->command_ == other.command_ && this->ball_ == other.ball_ &&
            this->our_restart_ == other.our_restart_ &&
-           this->ball_placement_point_ == other.ball_placement_point_;
+           this->ball_placement_point_ == other.ball_placement_point_ &&
+           this->friendly_team_info_ == other.friendly_team_info_ &&
+           this->enemy_team_info_ == other.enemy_team_info_;
 }
 
 bool GameState::operator!=(const GameState& other) const
