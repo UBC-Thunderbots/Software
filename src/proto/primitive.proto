@@ -51,6 +51,8 @@ enum MotionConstraint
     ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
     // The friendly goal
     FRIENDLY_GOAL = 10;
+    // The enemy goal
+    ENEMY_GOAL = 11;
 }
 
 enum DribblerMode

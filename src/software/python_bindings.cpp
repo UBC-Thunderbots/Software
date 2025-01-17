@@ -37,6 +37,7 @@
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/vector.h"
+#include "software/math/math_functions.h"
 #include "software/networking/radio/threaded_proto_radio_sender.hpp"
 #include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
@@ -476,4 +477,5 @@ PYBIND11_MODULE(python_bindings, m)
         .export_values();
 
     m.def("get_local_ip", &getLocalIp);
+    m.def("sigmoid", &sigmoid);
 }
