@@ -132,7 +132,6 @@ class WifiCommunicationManager:
         if ip_address is None:
             return
 
-        error = None
         with self.primitive_senders[robot_id][0]:
             primitive_sender = self.primitive_senders[robot_id][1]
             if primitive_sender is None or (
@@ -140,23 +139,21 @@ class WifiCommunicationManager:
                 or primitive_sender.get_interface()
                 != self.current_network_config.robot_communication_interface
             ):
-                primitive_sender, error = tbots_cpp.createPrimitiveProtoUdpSender(
-                    ip_address,
-                    PRIMITIVE_PORT,
-                    self.current_network_config.robot_communication_interface,
-                    False,
-                )
-
-                if not error:
+                try:
+                    primitive_sender = tbots_cpp.PrimitiveProtoUdpSender(
+                        ip_address,
+                        PRIMITIVE_PORT,
+                        self.current_network_config.robot_communication_interface,
+                        False,
+                    )
                     self.primitive_senders[robot_id] = (
                         self.primitive_senders[robot_id][0],
                         primitive_sender,
                     )
+                    logger.info(f"Connected to robot {robot_id} at {ip_address}")
+                except tbots_cpp.TbotsNetworkException:
+                    logger.error(f"Error connecting to robot {robot_id}: {error}")
 
-        if error:
-            logger.error(f"Error connecting to robot {robot_id}: {error}")
-        else:
-            logger.info(f"Connected to robot {robot_id} at {ip_address}")
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
         """Forwards to proto unix IO iff running is true
@@ -226,42 +223,33 @@ class WifiCommunicationManager:
         error = None
 
         if change_referee_interface:
-            (
-                self.receive_ssl_referee_proto,
-                error,
-            ) = tbots_cpp.createSSLRefereeProtoListener(
-                SSL_REFEREE_ADDRESS,
-                self.referee_port,
-                referee_interface,
-                lambda data: self.__forward_to_proto_unix_io(SSL_Referee, data),
-                True,
-            )
-
-            if error:
-                logger.error(f"Error setting up referee interface:\n{error}")
-
-            self.current_network_config.referee_interface = (
-                referee_interface if not error else DISCONNECTED
-            )
+            try:
+                self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
+                    SSL_REFEREE_ADDRESS,
+                    self.referee_port,
+                    referee_interface,
+                    lambda data: self.__forward_to_proto_unix_io(SSL_Referee, data),
+                    True,
+                )
+                self.current_network_config.referee_interface = referee_interface
+            except tbots_cpp.TbotsNetworkException as e:
+                logger.error(f"Error setting up referee interface:\n{e}")
+                self.current_network_config.referee_interface = DISCONNECTED
 
         if change_vision_interface:
-            (
-                self.receive_ssl_wrapper,
-                error,
-            ) = tbots_cpp.createSSLWrapperPacketProtoListener(
-                SSL_VISION_ADDRESS,
-                SSL_VISION_PORT,
-                vision_interface,
-                lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
-                True,
-            )
+            try:
+                self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
+                    SSL_VISION_ADDRESS,
+                    SSL_VISION_PORT,
+                    vision_interface,
+                    lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
+                    True,
+                )
+                self.current_network_config.vision_interface = vision_interface
+            except tbots_cpp.TbotsNetworkException as e:
+                logger.error(f"Error setting up vision interface:\n{e}")
+                self.current_network_config.vision_interface = DISCONNECTED
 
-        if error:
-            logger.error(f"Error setting up vision interface:\n{error}")
-
-        self.current_network_config.vision_interface = (
-            vision_interface if not error else DISCONNECTED
-        )
 
     def __setup_robot_communication(self, robot_communication_interface: str):
         """Set up senders and listeners for communicating with the robots
@@ -274,11 +262,11 @@ class WifiCommunicationManager:
         def setup_network_resource(creator: Callable[[], tuple[Any, str]]) -> Any:
             """Sets up a network node with the given creator function. Logs any errors that occur.
 
-            :param creator: the function to create the resource. It must return a type of
-            (resource object, error)
+            :param creator: the function to create the resource.
             """
-            resource, error = creator()
-            if error:
+            try:
+                resource = creator()
+            except tbots_cpp.TbotsNetworkException:
                 logger.error(f"Error setting up robot status interface:\n{error}")
                 is_setup_successfully = False
             return resource
@@ -286,14 +274,14 @@ class WifiCommunicationManager:
         # Create unicast listeners for RobotStatus and RobotLog. These are all binded to all interfaces
         if self.receive_robot_status is None:
             self.receive_robot_status = setup_network_resource(
-                lambda: tbots_cpp.createRobotStatusProtoListener(
+                lambda: tbots_cpp.RobotStatusProtoListener(
                     ROBOT_STATUS_PORT, self.__receive_robot_status
                 )
             )
 
         if self.receive_robot_log is None:
             self.receive_robot_log = setup_network_resource(
-                lambda: tbots_cpp.createRobotLogProtoListener(
+                lambda: tbots_cpp.RobotLogProtoListener(
                     ROBOT_LOGS_PORT,
                     lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
                 )
@@ -312,7 +300,7 @@ class WifiCommunicationManager:
 
         # The following listeners and senders use multicast and are binded to a specific interface
         self.receive_robot_crash = setup_network_resource(
-            lambda: tbots_cpp.createRobotCrashProtoListener(
+            lambda: tbots_cpp.RobotCrashProtoListener(
                 self.multicast_channel,
                 ROBOT_CRASH_PORT,
                 robot_communication_interface,
@@ -322,7 +310,7 @@ class WifiCommunicationManager:
         )
 
         self.robot_ip_listener = setup_network_resource(
-            lambda: tbots_cpp.createRobotIpNotificationProtoListener(
+            lambda: tbots_cpp.RobotIpNotificationProtoListener(
                 self.multicast_channel,
                 ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT,
                 robot_communication_interface,
@@ -332,7 +320,7 @@ class WifiCommunicationManager:
         )
 
         fullsystem_ip_broadcaster = setup_network_resource(
-            lambda: tbots_cpp.createFullsystemIpBroadcastProtoUdpSender(
+            lambda: tbots_cpp.FullsystemIpBroadcastProtoUdpSender(
                 self.multicast_channel,
                 FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
                 robot_communication_interface,
