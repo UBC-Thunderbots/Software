@@ -101,11 +101,11 @@ class WifiCommunicationManager:
         self.broadcast_ip.start()
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         self.running = False
         self.broadcast_ip.join()
 
-    def __broadcast_fullsystem_ip(self):
+    def __broadcast_fullsystem_ip(self) -> None:
         """Notify the robots of this computer's IP address"""
         while self.running:
             with self.fullsystem_ip_broadcaster[0]:
@@ -206,7 +206,7 @@ class WifiCommunicationManager:
         )
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
-    def __setup_full_system(self, referee_interface: str, vision_interface: str):
+    def __setup_full_system(self, referee_interface: str, vision_interface: str) -> None:
         """Connect to the SSL Referee and SSL Vision interfaces.
 
         :param referee_interface: the interface to listen for SSL Referee data
@@ -219,8 +219,6 @@ class WifiCommunicationManager:
         change_vision_interface = (
             vision_interface != self.current_network_config.vision_interface
         ) and (vision_interface != DISCONNECTED)
-
-        error = None
 
         if change_referee_interface:
             try:
@@ -251,7 +249,7 @@ class WifiCommunicationManager:
                 self.current_network_config.vision_interface = DISCONNECTED
 
 
-    def __setup_robot_communication(self, robot_communication_interface: str):
+    def __setup_robot_communication(self, robot_communication_interface: str) -> None:
         """Set up senders and listeners for communicating with the robots
 
         :param robot_communication_interface: the interface to listen/send for robot status data. Ignored for sending
