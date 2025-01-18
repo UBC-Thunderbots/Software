@@ -26,9 +26,11 @@ class NetworkLoggerSingleton
     }
 
     /**
-     * Updates the underlying UDP sender associated with this network sink. Useful when a new FullSystem is connected.
+     * Updates the underlying UDP sender associated with this network sink. Useful when a
+     * new FullSystem is connected.
      */
-    static void replaceUdpSender(std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> new_sender)
+    static void replaceUdpSender(
+        std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> new_sender)
     {
         std::shared_ptr<NetworkLoggerSingleton> logger = NetworkLogger();
         if (!logger)
@@ -41,7 +43,8 @@ class NetworkLoggerSingleton
    private:
     static std::shared_ptr<NetworkLoggerSingleton> NetworkLogger()
     {
-        static std::shared_ptr<NetworkLoggerSingleton> s(new NetworkLoggerSingleton(robot_id, enable_log_merging));
+        static std::shared_ptr<NetworkLoggerSingleton> s(
+            new NetworkLoggerSingleton(robot_id, enable_log_merging));
         return s;
     }
 
@@ -49,8 +52,9 @@ class NetworkLoggerSingleton
     {
         logWorker = g3::LogWorker::createLogWorker();
 
-        network_sink_handle = logWorker->addSink(std::make_unique<NetworkSink>(robot_id, enable_log_merging),
-                &NetworkSink::sendToNetwork);
+        network_sink_handle = logWorker->addSink(
+            std::make_unique<NetworkSink>(robot_id, enable_log_merging),
+            &NetworkSink::sendToNetwork);
 
         // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle =
