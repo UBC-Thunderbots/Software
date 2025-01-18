@@ -186,7 +186,7 @@ int main(int argc, char **argv)
             runtime_dir + SIMULATION_TICK_PATH, [&](TbotsProto::SimulatorTick input) {
                 std::scoped_lock lock(simulator_mutex);
 
-                // Step the simulation and send back the wrapper packets and
+                // step the simulation and send back the wrapper packets and
                 // the robot status msgs
                 er_force_sim->stepSimulation(
                     Duration::fromMilliseconds(input.milliseconds()));

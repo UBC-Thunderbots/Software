@@ -694,8 +694,6 @@ def _jetson_nano_impl(ctx):
         builtin_include_directories_feature,
     ]
 
-#    cxx_builtin_include_directories = ctx.attr.builtin_include_directories
-
     tool_paths = [
         tool_path(name = name, path = path)
         for name, path in ctx.attr.tool_paths.items()

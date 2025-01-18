@@ -9,7 +9,9 @@
 #include "time.h"
 #include "software/embedded/services/imu.h"
 
-
+/**
+ * This class implements the KalmanFilter class to track robot orientation. It keeps a rolling history of the robot's state, so when vision updates come in, the filter can roll back and recompute with them.
+ */
 class RobotLocalizer {
 public:
     RobotLocalizer(double process_noise_variance, double vision_noise_variance, double encoder_noise_variance, double target_angular_acceleration_variance):
@@ -31,39 +33,55 @@ public:
 
     }
 
-    void Step(AngularVelocity targetAcceleration);
+    void step(const AngularVelocity& targetAcceleration);
 
-    /**
+    /** Update the orientation from vision based on an old reading.
      *
      * @param orientation Vision reading of the orientation of the robot in world space
      * @param ageSeconds Age in seconds of the vision snapshot (time since it was taken)
      */
-    void RollbackVision(Angle orientation, double ageSeconds);
+    void rollbackVision(const Angle& orientation, const double& ageSeconds);
 
-    /**
+    /** Update the orientation from vision.
      *
      * @param orientation Vision reading of the orientation of the robot in world space
      */
-    void UpdateVision(Angle orientation);
+    void updateVision(const Angle& orientation);
 
-    /**
+    /** Update the angular velocity from encoders.
      *
      * @param angularVelocity angular velocity of the robot
      */
-    void UpdateEncoders(AngularVelocity angularVelocity);
+    void updateEncoders(const AngularVelocity& angularVelocity);
 
-    /**
+    /** Update the angular velocity from IMU.
      *
      * @param angularVelocity angular velocity of the robot
      */
-    void UpdateIMU(AngularVelocity angularVelocity);
+    void updateImu(const AngularVelocity& angularVelocity);
 
+    /** Update the target acceleration.
+     *
+     * @param angularAcceleration Target angular acceleration of the robot.
+     */
+    void updateTargetAcceleration(const AngularVelocity& angularAcceleration);
 
-    void UpdateTargetAcceleration(AngularVelocity angularAcceleration);
-
-
+    /**
+     * Gets estimated orientation of the robot.
+     * @return estimated orientation of the robot.
+     */
     Angle getOrientation();
+
+    /**
+     * Gets estimated angular velocity of the robot.
+     * @return estimated angular velocity of the robot.
+     */
     AngularVelocity getAngularVelocity();
+
+    /**
+     * Gets estimated angular acceleration of the robot.
+     * @return estimated angular acceleration of the robot.
+     */
     double getAngularAccelerationRadians();
 
 private:
@@ -84,9 +102,19 @@ private:
         std::optional<Update> update;
         timespec birthday; // time at which step was executed
     };
-    // state is second order of orientation
-    // measurement is camera orientation (where angular velocity is hidden), wheel encoder inverse kinematics angular velocity, imu angular velocity, and intended angular acceleration
-    // control input is simply a target angular velocity
+    // State space vector:
+    // x = [
+    //    Orientation,
+    //    Angular velocity,
+    //    Angular acceleration
+    // ]
+    // Measurement space vector:
+    // z = [
+    //    Camera orientation,
+    //    Wheel encoder angular velocity,
+    //    IMU angular velocity,
+    //    Target angular acceleration
+    // ]
     KalmanFilter<3, 4, 1> filter_;
 
     double process_noise_variance_;

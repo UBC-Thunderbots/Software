@@ -52,7 +52,6 @@ ImuService::ImuService() {
     initialized_ = false;
     // Establish connection to the IMU and verify that the who am I pin is correct.
     file_descriptor_ = open("/dev/i2c-1", O_RDWR);
-    LOG(INFO) << "Chimbus!";
     int ret = ioctl(file_descriptor_, I2C_SLAVE_FORCE, 0x6b);
     if (ret < 0) {
         return;
@@ -65,10 +64,12 @@ ImuService::ImuService() {
     if (i2c_smbus_read_byte_data(file_descriptor_, 0x10) != 0b01000000) { // write unsuccessful
         return;
     }
-    i2c_smbus_write_byte_data(file_descriptor_, 0x11, 0b01000000);
-    if (i2c_smbus_read_byte_data(file_descriptor_, 0x11) != 0b01000000) { // write unsuccessful
+    // Set Gyroscope output data rate to 208 Hz, setting FS to 1000 dps (pg 61 of datasheet for lsm6dsl, pg 21)
+    i2c_smbus_write_byte_data(file_descriptor_, 0x11, 0b01011000);
+    if (i2c_smbus_read_byte_data(file_descriptor_, 0x11) != 0b01011000) { // write unsuccessful
         return;
     }
+
     initialized_ = true;
     LOG(INFO) << "Initialized IMU! Calibrating...";
     degrees_error_ = 0;
@@ -108,7 +109,7 @@ std::optional<AngularVelocity> ImuService::pollHeadingRate() {
     measured_mean = (measured_mean * (measured_samples - 1) + degrees_per_sec) / measured_samples;
 
     measured_variance = (measured_variance  * (measured_samples - 1) + pow(degrees_per_sec - measured_mean, 2)) / measured_samples;
-    std::cout << measured_variance << " samples: " << measured_samples << std::endl;
-    LOG(CSV, "variance.csv") << degrees_per_sec << "\n";
+    std::cout << degrees_per_sec << std::endl;
+    LOG(CSV, "imuspeeds.csv") << degrees_per_sec << "\n";
     return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
 }

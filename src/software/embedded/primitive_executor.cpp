@@ -52,9 +52,9 @@ void PrimitiveExecutor::setStopPrimitive()
     current_primitive_ = *createStopPrimitiveProto();
 }
 
-void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
-                                       const AngularVelocity &angular_velocity,
-                                       const Angle &orientation)
+void PrimitiveExecutor::updateState(const Vector &local_velocity,
+                                    const AngularVelocity &angular_velocity,
+                                    const Angle &orientation)
 {
     orientation_ = orientation.clamp();
     Vector actual_global_velocity = localToGlobalVelocity(local_velocity, orientation.clamp());
@@ -66,7 +66,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
     Vector local_velocity = globalToLocalVelocity(
         trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds()),
-        orientation_ + angular_velocity_ * time_step_.toSeconds() / 2 * 2);
+        orientation_ + angular_velocity_ * time_step_.toSeconds() / 2 * LEAN_BIAS);
     Point position =
         trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds());
     double distance_to_destination =
@@ -93,10 +93,8 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
         angular_trajectory_->getVelocity(time_since_angular_trajectory_creation_.toSeconds());
     Angle orientation_to_destination =
         orientation_.minDiff(angular_trajectory_->getDestination());
-//    LOG(INFO) << "Raw " << (angular_trajectory_->getPosition(time_since_angular_trajectory_creation_.toSeconds()) - orientation_).toDegrees();
     Angle error = orientation_.minSignedDiff(angular_trajectory_->getPosition(time_since_angular_trajectory_creation_.toSeconds()));
-//    LOG(INFO) << error.toDegrees();
-    angular_velocity = angular_velocity + error * 0; // TODO: MOVE kP to a constant (per robot???)
+    angular_velocity = angular_velocity + error * 0.3; // TODO: MOVE kP to a constant (per robot???)
     if (orientation_to_destination.toDegrees() < 5)
     {
         angular_velocity *= orientation_to_destination.toDegrees() / 5;
@@ -142,16 +140,11 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 return output;
             }
 
-            Angle error = prev_target_angular_velocity_ - angular_velocity_;
-
             Vector local_velocity            = getTargetLinearVelocity();
             AngularVelocity target_angular_velocity = getTargetAngularVelocity();
-//            LOG(INFO) << target_angular_velocity.toRadians();
-            // add integration term
-            prev_target_angular_velocity_ = target_angular_velocity;
 
             auto output = createDirectControlPrimitive(
-                local_velocity, target_angular_velocity + error * 0.0,
+                local_velocity, target_angular_velocity,
                 convertDribblerModeToDribblerSpeed(
                     current_primitive_.move().dribbler_mode(), robot_constants_),
                 current_primitive_.move().auto_chip_or_kick());

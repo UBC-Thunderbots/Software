@@ -15,14 +15,14 @@ public:
     std::optional<AngularVelocity> pollHeadingRate();
 
 
-    static constexpr double IMU_VARIANCE = (4.0*10.19803/1000.0)*(4.0*10.19803/1000.0); //stdev = 4mdeg/Hz noise density * sqrt(104) Hz * 1/1000 deg/mdeg
+    static constexpr double IMU_VARIANCE = (4.0*14.4222/1000.0)*(4.0*14.4222/1000.0); //stdev = 4mdeg/Hz noise density * sqrt(208) Hz * 1/1000 deg/mdeg
 private:
     bool initialized_ = false;
     int file_descriptor_ = 0;
     double degrees_error_;
 
     static constexpr double ACCELEROMETER_FULL_SCALE_G = 2.0;
-    static constexpr double IMU_FULL_SCALE_DPS = 250.0;
+    static constexpr double IMU_FULL_SCALE_DPS = 1000.0;
 
     double measured_variance = 0;
     double measured_mean = 0;

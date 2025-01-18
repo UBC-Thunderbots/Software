@@ -97,15 +97,15 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     auto allowable_delta_wheel_velocity = allowed_acceleration * time_to_ramp;
 
     // Ramp wheel velocity vector
-    // Step 1: Find absolute max velocity delta
+    // step 1: Find absolute max velocity delta
     auto delta_target_wheel_velocity = target_wheel_velocity - current_wheel_velocity;
     auto max_delta_target_wheel_velocity =
         delta_target_wheel_velocity.cwiseAbs().maxCoeff();
 
-    // Step 2: Compare max delta velocity against the calculated maximum
+    // step 2: Compare max delta velocity against the calculated maximum
     if (max_delta_target_wheel_velocity > allowable_delta_wheel_velocity)
     {
-        // Step 3: If larger, scale down to allowable max
+        // step 3: If larger, scale down to allowable max
         ramp_wheel_velocity =
             (delta_target_wheel_velocity / max_delta_target_wheel_velocity) *
                 allowable_delta_wheel_velocity +

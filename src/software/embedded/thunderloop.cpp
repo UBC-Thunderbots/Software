@@ -233,7 +233,7 @@ Thunderloop::~Thunderloop() {}
 
                 auto orientation_msg_iter = primitive_set_.robot_orientations().find((uint32_t) robot_id_);
                 if (orientation_msg_iter != primitive_set_.robot_orientations().end()) {
-                    robot_localizer_.RollbackVision(createAngle(orientation_msg_iter->second), 0.015);
+                    robot_localizer_.rollbackVision(createAngle(orientation_msg_iter->second), 0.015);
                 }
 
 
@@ -252,21 +252,21 @@ Thunderloop::~Thunderloop() {}
                 }
             }
 
-            robot_localizer_.Step(AngularVelocity::zero());
+            robot_localizer_.step(AngularVelocity::zero());
             auto imu_poll = imu_service_->pollHeadingRate();
 
             if (imu_poll.has_value()) {
-                robot_localizer_.UpdateIMU(imu_poll.value());
+                robot_localizer_.updateImu(imu_poll.value());
             }
 
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
-                robot_localizer_.UpdateEncoders(createAngularVelocity(status.angular_velocity()));
+                robot_localizer_.updateEncoders(createAngularVelocity(status.angular_velocity()));
 
-                // Step the robot localizer
+                // step the robot localizer
 
-                primitive_executor_.updateVelocity(
+                primitive_executor_.updateState(
                         createVector(status.local_velocity()),
                         robot_localizer_.getAngularVelocity(),
                         robot_localizer_.getOrientation());
@@ -282,7 +282,7 @@ Thunderloop::~Thunderloop() {}
             {
                 ScopedTimespecTimer timer(&poll_time);
 
-                ZoneNamedN(_tracy_step_primitive, "Thunderloop: Step Primitive", true);
+                ZoneNamedN(_tracy_step_primitive, "Thunderloop: step Primitive", true);
 
                 // Handle emergency stop override
                 auto nanoseconds_elapsed_since_last_primitive =
