@@ -91,8 +91,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     waitForNetworkUp();
 
     g3::overrideSetupSignals({});
-    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
-                                             enable_log_merging);
+    NetworkLoggerSingleton::initializeLogger(robot_id_, enable_log_merging);
 
     // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);
@@ -114,7 +113,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     network_service_ = std::make_unique<NetworkService>(
         robot_id, std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), PRIMITIVE_PORT,
         ROBOT_STATUS_PORT, FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
-        ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT, network_interface);
+        ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT, ROBOT_LOGS_PORT, network_interface);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 

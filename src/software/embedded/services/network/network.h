@@ -6,6 +6,7 @@
 #include "proto/ip_notification.pb.h"
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
+#include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/services/network/proto_tracker.h"
@@ -26,11 +27,12 @@ class NetworkService
      * @param robot_id The robot id of the robot
      * @param ip_address The IP Address the service should connect to
      * @param primitive_listener_port The port to listen for primitive protos
+     * @param robot_status_sender_port The port to send robot status
      * @param full_system_to_robot_ip_notification_port The port to listen for full system
      * IP discovery notification
      * @param robot_to_full_system_ip_notification_port The port to send robot IP
      * discovery notification
-     * @param robot_status_sender_port The port to send robot status
+     * @param robot_logs_port The port to send logs from
      * @param interface the interface to listen and send on
      */
     NetworkService(const RobotId& robot_id, const std::string& ip_address,
@@ -38,6 +40,7 @@ class NetworkService
                    unsigned short robot_status_sender_port,
                    unsigned short full_system_to_robot_ip_notification_port,
                    unsigned short robot_to_full_system_ip_notification_port,
+                   unsigned short robot_logs_port,
                    const std::string& interface);
 
     /**
@@ -137,6 +140,7 @@ class NetworkService
         udp_listener_primitive;
     std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::Primitive>>
         radio_listener_primitive_set;
+    std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> robot_log_sender;
 
     // The network interface to listen and send messages on
     std::string interface;

@@ -8,21 +8,16 @@
 #include "software/logger/custom_logging_levels.h"
 #include "software/networking/tbots_network_exception.h"
 
-NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int robot_id,
-                         bool enable_log_merging)
+NetworkSink::NetworkSink(int robot_id, bool enable_log_merging)
     : robot_id(robot_id), log_merger(LogMerger(enable_log_merging))
 {
-    try
-    {
-        log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
-            std::string(ROBOT_MULTICAST_CHANNELS.at(channel)), ROBOT_LOGS_PORT, interface,
-            true));
-    }
-    catch (const TbotsNetworkException& error)
-    {
-        std::cerr << error.what() << std::endl;
-        std::terminate();
-    }
+}
+
+void NetworkSink::replaceUdpSender(
+    std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> new_sender)
+{
+    std::unique_lock<std::mutex> lock(robot_log_sender_mutex);
+    robot_log_sender = new_sender;
 }
 
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
@@ -36,6 +31,16 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 
 void NetworkSink::sendOneLogToNetwork(const g3::LogMessage& log)
 {
+    std::optional<std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>>> log_sender;
+    {
+        std::unique_lock<std::mutex> lock(robot_log_sender_mutex);
+        log_sender = robot_log_sender;
+    }
+    if (!log_sender)
+    {
+        return;
+    }
+
     auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
     TbotsProto::LogLevel log_level_proto;
 
@@ -56,6 +61,6 @@ void NetworkSink::sendOneLogToNetwork(const g3::LogMessage& log)
             MILLISECONDS_PER_SECOND);
         *(log_msg_proto->mutable_created_timestamp()) = timestamp;
 
-        log_output->sendProto(*log_msg_proto);
+        robot_log_sender.value()->sendProto(*log_msg_proto);
     }
 }

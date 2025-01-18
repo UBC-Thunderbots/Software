@@ -1,5 +1,6 @@
 #include "software/embedded/services/network/network.h"
 
+#include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
 
 NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_address,
@@ -7,6 +8,7 @@ NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_ad
                                unsigned short robot_status_sender_port,
                                unsigned short full_system_to_robot_ip_notification_port,
                                unsigned short robot_to_full_system_ip_notification_port,
+                               unsigned short robot_logs_port,
                                const std::string& interface)
     : interface(interface),
       robot_status_sender_port(robot_status_sender_port),
@@ -76,6 +78,10 @@ void NetworkService::onFullSystemIpNotification(
             robot_status_sender =
                 std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
                     fullsystem_ip.value(), robot_status_sender_port, interface, false);
+            robot_log_sender =
+                std::make_shared<ThreadedProtoUdpSender<TbotsProto::RobotLog>>(
+                    fullsystem_ip.value(), ROBOT_LOGS_PORT, interface, false);
+            NetworkLoggerSingleton::replaceUdpSender(robot_log_sender);
         }
         catch (const TbotsNetworkException& error)
         {
