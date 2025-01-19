@@ -362,6 +362,34 @@ To update binaries on a working robot, you can run:
 
 Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), and `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
 
+## Testing Robot Software locally
+
+It is possible to run Thunderloop without having a fully-working robot. Using this mode is useful when testing features that don't require the power board or motors.
+
+1. To run Thunderloop locally on your computer
+    1. First, you must ensure that `redis` is installed. Installation instructions can be found [here](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-linux/). The result of these installation directions will likely enable `redis-server` as a service that starts on boot. You may want to run `sudo systemctl disable redis-server` to prevent this.
+    2. Next, run the command `redis-server` in a terminal.
+    3. Set up the following required REDIS constants by running the following commands in the terminal:
+        - `redis-cli set /robot_id "{robot_id}"` where `{robot_id}` is the robot's ID (e.g. `1`, `2`, etc.)
+        - `redis-cli set /network_interface "{network_interface}"` where `{network_interface}` is one of the interfaces listed by `ip a`.
+        - `redis-cli set /channel_id "{channel_id}"` where `{channel_id}` is the channel id of the robot (e.g. `1`, `2`, etc.)
+        - `redis-cli set /kick_coeff "{kick_coeff}"` where `{kick_coeff}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+        - `redis-cli set /kick_constant "{kick_constant}"` where `{kick_constant}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+        - `redis-cli set /chip_pulse_width "{chip_pulse_width}"` where `{chip_pulse_width}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+    4. Now, run Thunderloop with the following command:
+        - `bazel run //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED`
+
+2. If you have a robot PC that doesn't have proper communication with the power or motor board, you can still run Thunderloop in a limited capacity to test software features (eg. networking).
+    1. First, build the Thunderloop binary:
+        - `bazel build //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED --platforms=//cc_toolchain:robot`
+    2. Find the `<robot_ip>` of the robot you want to run Thunderloop on. This guide may help you find the IP address of the robot: [Useful Robot Commands](useful-robot-commands.md#Wifi-Disclaimer).
+    3. Copy the binary to the robot:
+        - `scp bazel-bin/software/embedded/thunderloop_main robot@<robot_ip>:/home/robot/thunderloop_main`
+    4. SSH into the robot using the following command:
+        - `ssh robot@<robot_ip>`
+    5. Run the Thunderloop binary on the robot:
+        - `sudo ./thunderloop_main`
+
 ## Setting up Virtual Robocup 2021
 
 ### Setting up the SSL Simulation Environment
@@ -369,15 +397,6 @@ Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), 
 1. Fork the [SSL-Simulation-Setup](https://github.com/RoboCup-SSL/ssl-simulation-setup) repository.  
 2. Clone it.
 3. Follow these [instructions](https://github.com/RoboCup-SSL/ssl-simulation-setup/blob/master/Readme.md) to set up and run the repository.
-
-### Pushing a Dockerfile to dockerhub
-
-After editing the dockerfile, build the image and push it to dockerhub with the following steps
-
-1. To build the image, make sure that you are in the same directory as your image, and then run `docker build -t ubcthunderbots/<image name>[:tag] .` Make sure that your chosen image name matches a repository in dockerhub. Here's an example with the Robocup 2021 setup image: `docker build -t ubcthunderbots/tbots-software-env:0.0.1`
-2. Now, push your image to dockerhub. Get the credentials for the Thunderbots dockerhub account from a software lead.
-   1. Log into the docker account with `docker login`. You will be prompted for a username and password
-   2. Now, push this image by its name: `docker push ubcthunderbots/<image name>[:tag]`
 
 # Workflow
 

@@ -27,6 +27,7 @@ from software.thunderscope.gl.layers import (
     gl_tactic_layer,
     gl_cost_vis_layer,
     gl_trail_layer,
+    gl_max_dribble_layer,
     gl_referee_info_layer,
 )
 
@@ -124,6 +125,9 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
     trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
+    max_dribble_layer = gl_max_dribble_layer.GLMaxDribbleLayer(
+        "Dribble Tracking", visualization_buffer_size
+    )
     referee_layer = gl_referee_info_layer.GLRefereeInfoLayer(
         "Referee Info", visualization_buffer_size
     )
@@ -139,6 +143,7 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, True)
+    gl_widget.add_layer(max_dribble_layer, True)
     gl_widget.add_layer(referee_layer)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
@@ -173,6 +178,7 @@ def setup_gl_widget(
     for arg in [
         (World, world_layer.world_buffer),
         (World, cost_vis_layer.world_buffer),
+        (World, max_dribble_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
         (ObstacleList, obstacle_layer.obstacles_list_buffer),
