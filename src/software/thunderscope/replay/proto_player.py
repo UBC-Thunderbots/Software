@@ -142,7 +142,7 @@ class ProtoPlayer:
         except Exception:
             return True
 
-    def handle_log_line_for_chunk(self, **kwargs):
+    def handle_log_line_for_chunk(self, **kwargs) -> None:
         """Find the time stamp of the first proto event in the replay file.
         :param kwargs: a dictionary contains all the information about a line in the replay log.
             e.g. {
@@ -172,7 +172,7 @@ class ProtoPlayer:
         if kwargs["protobuf_type"] == ReplayBookmark:
             self.bookmark_indices.append(kwargs["timestamp"])
 
-    def finish_preprocess_replay_file(self):
+    def finish_preprocess_replay_file(self) -> None:
         """Finish off pre-processing and save all the pre-processing result to disk"""
         # save chunk indices
         if self.chunks_indices:
@@ -212,7 +212,7 @@ class ProtoPlayer:
                 f"Failed to build bookmark index for {self.log_folder_path} : No bookmark data found."
             )
 
-    def preprocess_replay_file(self, handlers: List[Callable[[...], None]]):
+    def preprocess_replay_file(self, handlers: List[Callable[[...], None]]) -> None:
         """Start preprocessing replay files and build index according to the provided handlers
 
         :param handlers: handler functions that will be applied to each line of the replay log.
@@ -257,7 +257,7 @@ class ProtoPlayer:
             os.path.join(self.log_folder_path, ProtoPlayer.BOOKMARK_INDEX_FILENAME)
         )
 
-    def load_chunk_index(self):
+    def load_chunk_index(self) -> None:
         """Loads the chunk index file."""
         try:
             with open(
@@ -276,7 +276,7 @@ class ProtoPlayer:
         except Exception as e:
             logging.warning(f"An Exception occurred when loading chunk index file {e}")
 
-    def load_bookmark_index(self):
+    def load_bookmark_index(self) -> None:
         """Loads the bookmark file"""
         try:
             with open(

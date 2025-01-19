@@ -42,7 +42,7 @@ class BookmarkMarker(QPushButton):
 
         self.update()
 
-    def update(self):
+    def update(self) -> None:
         """Update bookmark visuals display"""
         super().update()
         # Re-calculate the position of the visuals
