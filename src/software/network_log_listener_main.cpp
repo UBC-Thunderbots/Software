@@ -8,6 +8,15 @@
 #include "shared/constants.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 
+class RobotLogListenerWrapper
+{
+    private:
+        std::mutex m;
+        std::optional<std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotLog>>> listener;
+};
+
+std::unordered_map<RobotId, RobotLogListenerWrapper> robot_log_listeners;
+
 /*
  * This standalone program listens for RobotLog protos on the specified ip address
  * and logs them
@@ -43,7 +52,7 @@ int main(int argc, char **argv)
     {
         bool help                     = false;
         std::string interface         = "";
-        int channel                   = 0;
+        std::string robot_ip_address  = "";
         std::vector<int> selected_ids = {};
     };
 
@@ -55,11 +64,9 @@ int main(int argc, char **argv)
     desc.add_options()("interface",
                        boost::program_options::value<std::string>(&args.interface),
                        "Network interface to listen for robot logs from");
-    desc.add_options()("channel", boost::program_options::value<int>(&args.channel),
-                       "Multicast channel to listen for robot logs on");
     desc.add_options()(
         "selected_ids",
-        boost::program_options::value<std::vector<int>>(&args.selected_ids)->multitoken(),
+        boost::program_options::value<std::vector<RobotId>>(&args.selected_ids)->multitoken(),
         "Space separated robot IDs to show logs from. If not specified, logs from all robots will be shown");
 
     boost::program_options::variables_map vm;
@@ -80,6 +87,12 @@ int main(int argc, char **argv)
     if (!vm.count("interface"))
     {
         LOG(FATAL) << "A network interface must be specified to listen on!";
+    }
+
+    std::optional<std::string> local_ip = getLocalIp(args.interface);
+    if (!local_ip)
+    {
+        LOG(FATAL) << "Could not get local IP address for interface: " << args.interface;
     }
 
     // Only show logs from robots in the selected_ids list, unless it is empty

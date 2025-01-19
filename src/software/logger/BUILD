@@ -36,6 +36,9 @@ cc_library(
     hdrs = [
         "network_logger.h",
     ],
+    srcs = [
+        "network_logger.cpp",
+    ],
     deps = [
         ":coloured_cout_sink",
         ":network_sink",
