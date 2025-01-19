@@ -9,7 +9,7 @@
 #include "software/geom/vector.h"
 
 EuclideanToWheel::EuclideanToWheel(const RobotConstants_t& robot_constants)
-    : robot_radius_m_(robot_constants.robot_radius_m), robot_constants_(robot_constants)
+    : robot_center_to_wheel_m_(robot_constants.robot_center_to_wheel_center_m), robot_constants_(robot_constants)
 {
     // Phi, the angle between the hemisphere line of the robot and the front wheel axles
     // [rads]
@@ -61,7 +61,7 @@ WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_veloc
     // need to multiply the angular velocity by the robot radius to
     // calculate the wheel velocity (robot tangential velocity)
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 8
-    euclidean_velocity[2] = euclidean_velocity[2] * robot_radius_m_;
+    euclidean_velocity[2] = euclidean_velocity[2] * robot_center_to_wheel_m_;
 
     return euclidean_to_wheel_velocity_D_ * euclidean_velocity;
 }
@@ -76,7 +76,7 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
     // velocity. This can be divided by the robot radius to calculate
     // the angular velocity
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 8
-    euclidean_velocity[2] = euclidean_velocity[2] / robot_radius_m_;
+    euclidean_velocity[2] = euclidean_velocity[2] / robot_center_to_wheel_m_;
 
     return euclidean_velocity;
 }

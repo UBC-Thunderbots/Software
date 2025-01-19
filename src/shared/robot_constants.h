@@ -15,6 +15,9 @@ typedef struct RobotConstants
     // The radius of the robot [m]
     float robot_radius_m;
 
+    // Distance from center of rotation of the robot to the center of a wheel [m]
+    float robot_center_to_wheel_center_m;
+
     // The maximum jerk this robot may safely undergo [m/s^3]
     float jerk_limit_kg_m_per_s_3;
 

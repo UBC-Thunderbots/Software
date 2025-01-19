@@ -23,10 +23,10 @@ public:
                      0,  4, 0,
                      0,  0,  5;
         filter_.B << 0.0, 1, 0.0;
-        filter_.R << vision_noise_variance, 0.0,                    0.0,0.0,
-                     0.0,                   encoder_noise_variance, 0.0,0.0,
-                     0.0,                   0.0,                    ImuService::IMU_VARIANCE,0.0,
-                     0.0,                   0.0,                    0.0,target_angular_acceleration_variance;
+        filter_.R << vision_noise_variance, 0.0,                    0.0,                      0.0,
+                     0.0,                   encoder_noise_variance, 0.0,                      0.0,
+                     0.0,                   0.0,                    ImuService::IMU_VARIANCE, 0.0,
+                     0.0,                   0.0,                    0.0,                      target_angular_acceleration_variance;
         filter_.x = Eigen::Matrix<double, 3, 1>(0.0, 0.0, 0.0);
         clock_gettime(CLOCK_MONOTONIC, &current_time_);
         clock_gettime(CLOCK_MONOTONIC, &last_step_);
