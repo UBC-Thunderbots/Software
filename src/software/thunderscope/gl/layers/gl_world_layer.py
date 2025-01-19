@@ -474,7 +474,7 @@ class GLWorldLayer(GLLayer):
         robot_id_graphics.resize(
             len(robots),
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 10, weight=700),
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 10, weight=700),
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
         )
