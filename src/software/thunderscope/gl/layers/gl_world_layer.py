@@ -17,7 +17,6 @@ from software.thunderscope.constants import (
     LINE_WIDTH,
     CustomGLOptions,
     ROBOT_NAMES_FROM_ID,
-    THUNDERSCOPE_UI_FONT_NAME,
 )
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -485,7 +484,6 @@ class GLWorldLayer(GLLayer):
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
         )
-
 
         for robot_graphic, robot_id_graphic, robot_name_graphic, robot_id in zip(
             robot_graphics,
