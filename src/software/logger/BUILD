@@ -33,11 +33,11 @@ cc_library(
 
 cc_library(
     name = "network_logger",
-    hdrs = [
-        "network_logger.h",
-    ],
     srcs = [
         "network_logger.cpp",
+    ],
+    hdrs = [
+        "network_logger.h",
     ],
     deps = [
         ":coloured_cout_sink",

@@ -10,9 +10,10 @@
 
 class RobotLogListenerWrapper
 {
-    private:
-        std::mutex m;
-        std::optional<std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotLog>>> listener;
+   private:
+    std::mutex m;
+    std::optional<std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotLog>>>
+        listener;
 };
 
 std::unordered_map<RobotId, RobotLogListenerWrapper> robot_log_listeners;
@@ -66,7 +67,8 @@ int main(int argc, char **argv)
                        "Network interface to listen for robot logs from");
     desc.add_options()(
         "selected_ids",
-        boost::program_options::value<std::vector<RobotId>>(&args.selected_ids)->multitoken(),
+        boost::program_options::value<std::vector<RobotId>>(&args.selected_ids)
+            ->multitoken(),
         "Space separated robot IDs to show logs from. If not specified, logs from all robots will be shown");
 
     boost::program_options::variables_map vm;

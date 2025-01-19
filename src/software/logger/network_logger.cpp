@@ -9,16 +9,16 @@ NetworkLoggerSingleton::NetworkLoggerSingleton(int robot_id, bool enable_log_mer
 {
     logWorker = g3::LogWorker::createLogWorker();
 
-    network_sink_handle = logWorker->addSink(std::make_unique<NetworkSink>(robot_id, enable_log_merging),
-            &NetworkSink::sendToNetwork);
+    network_sink_handle =
+        logWorker->addSink(std::make_unique<NetworkSink>(robot_id, enable_log_merging),
+                           &NetworkSink::sendToNetwork);
 
     // Sink for outputting logs to the terminal
-    auto colour_cout_sink_handle =
-        logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
-                           &ColouredCoutSink::displayColouredLog);
+    auto colour_cout_sink_handle = logWorker->addSink(
+        std::make_unique<ColouredCoutSink>(true), &ColouredCoutSink::displayColouredLog);
 
-    auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(CSV_PATH),
-                                              &CSVSink::appendToFile);
+    auto csv_sink_handle =
+        logWorker->addSink(std::make_unique<CSVSink>(CSV_PATH), &CSVSink::appendToFile);
 
     // Sink for PlotJuggler plotting
     auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>(),
@@ -35,7 +35,8 @@ void NetworkLoggerSingleton::initializeLogger(int robot_id, bool enable_log_merg
     }
 }
 
-void NetworkLoggerSingleton::replaceUdpSender(std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> new_sender)
+void NetworkLoggerSingleton::replaceUdpSender(
+    std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> new_sender)
 {
     if (!instance)
     {
