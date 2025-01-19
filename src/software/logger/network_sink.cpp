@@ -31,7 +31,8 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 
 void NetworkSink::sendOneLogToNetwork(const g3::LogMessage& log)
 {
-    std::optional<std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>>> log_sender;
+    std::optional<std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>>>
+        log_sender;
     {
         std::unique_lock<std::mutex> lock(robot_log_sender_mutex);
         log_sender = robot_log_sender;

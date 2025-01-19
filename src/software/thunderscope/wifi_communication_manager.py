@@ -154,7 +154,6 @@ class WifiCommunicationManager:
                 except tbots_cpp.TbotsNetworkException:
                     logger.error(f"Error connecting to robot {robot_id}: {error}")
 
-
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
         """Forwards to proto unix IO iff running is true
 
@@ -206,7 +205,9 @@ class WifiCommunicationManager:
         )
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
-    def __setup_full_system(self, referee_interface: str, vision_interface: str) -> None:
+    def __setup_full_system(
+        self, referee_interface: str, vision_interface: str
+    ) -> None:
         """Connect to the SSL Referee and SSL Vision interfaces.
 
         :param referee_interface: the interface to listen for SSL Referee data
@@ -240,14 +241,15 @@ class WifiCommunicationManager:
                     SSL_VISION_ADDRESS,
                     SSL_VISION_PORT,
                     vision_interface,
-                    lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
+                    lambda data: self.__forward_to_proto_unix_io(
+                        SSL_WrapperPacket, data
+                    ),
                     True,
                 )
                 self.current_network_config.vision_interface = vision_interface
             except tbots_cpp.TbotsNetworkException as e:
                 logger.error(f"Error setting up vision interface:\n{e}")
                 self.current_network_config.vision_interface = DISCONNECTED
-
 
     def __setup_robot_communication(self, robot_communication_interface: str) -> None:
         """Set up senders and listeners for communicating with the robots

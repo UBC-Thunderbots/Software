@@ -5,8 +5,8 @@
 
 #include "proto/ip_notification.pb.h"
 #include "proto/primitive.pb.h"
-#include "proto/robot_status_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/services/network/proto_tracker.h"
@@ -40,8 +40,7 @@ class NetworkService
                    unsigned short robot_status_sender_port,
                    unsigned short full_system_to_robot_ip_notification_port,
                    unsigned short robot_to_full_system_ip_notification_port,
-                   unsigned short robot_logs_port,
-                   const std::string& interface);
+                   unsigned short robot_logs_port, const std::string& interface);
 
     /**
      * When the network service is polled, it sends the robot_status and returns

@@ -25,11 +25,13 @@ class NetworkSink
     NetworkSink(int robot_id, bool enable_log_merging);
 
     /**
-     * Replaces the underlying UDP sender with a new one. Intended to be used when a new Full-System node is connected.
+     * Replaces the underlying UDP sender with a new one. Intended to be used when a new
+     * Full-System node is connected.
      *
      * @param new_sender the new UDP sender to use
      */
-    void replaceUdpSender(std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> new_sender);
+    void replaceUdpSender(
+        std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> new_sender);
 
     /**
      * This function is called on every call to LOG(). It sends a RobotLog proto on the
@@ -51,5 +53,6 @@ class NetworkSink
     LogMerger log_merger;
 
     std::mutex robot_log_sender_mutex;
-    std::optional<std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>>> robot_log_sender;
+    std::optional<std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>>>
+        robot_log_sender;
 };
