@@ -106,7 +106,8 @@ int main(int argc, char **argv)
         logFromNetworking(log);
     };
 
-    auto log_input = ThreadedProtoUdpListener<TbotsProto::RobotLog>(ROBOT_LOGS_PORT, robot_log_callback);
+    auto log_input = ThreadedProtoUdpListener<TbotsProto::RobotLog>(ROBOT_LOGS_PORT,
+                                                                    robot_log_callback);
 
     LOG(INFO) << "Network logger listening on channel "
               << ROBOT_MULTICAST_CHANNELS.at(args.channel) << " and interface "
@@ -128,16 +129,15 @@ int main(int argc, char **argv)
     }
 
     ThreadedProtoUdpSender<TbotsProto::IpNotification> fullsystem_ip_notification_sender(
-            ROBOT_MULTICAST_CHANNELS(args.channel),
-            FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
-            args.interface,
-            true);
+        ROBOT_MULTICAST_CHANNELS(args.channel), FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
+        args.interface, true);
     TbotsProto::IpNotification ip_notification;
     ip_notification.set_ip_address(*local_ip);
-    while(true)
+    while (true)
     {
         fullsystem_ip_notification_sender.sendProto(ip_notification);
-        std::this_thread::sleep_for(std::chrono::seconds(1.0 / FULL_SYSTEM_IP_NOTIFICATION_HZ));
+        std::this_thread::sleep_for(
+            std::chrono::seconds(1.0 / FULL_SYSTEM_IP_NOTIFICATION_HZ));
     }
 
     return 0;
