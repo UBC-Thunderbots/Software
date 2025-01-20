@@ -2,21 +2,16 @@
 #include <iostream>
 #include <numeric>
 
+#include "proto/ip_notification.pb.h"
 #include "proto/parameters.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
+#include "software/networking/udp/threaded_proto_udp_sender.hpp"
+#include "software/world/robot_state.h"
 
-class RobotLogListenerWrapper
-{
-   private:
-    std::mutex m;
-    std::optional<std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotLog>>>
-        listener;
-};
-
-std::unordered_map<RobotId, RobotLogListenerWrapper> robot_log_listeners;
+static constexpr int FULL_SYSTEM_IP_NOTIFICATION_HZ = 1;
 
 /*
  * This standalone program listens for RobotLog protos on the specified ip address
@@ -53,6 +48,7 @@ int main(int argc, char **argv)
     {
         bool help                     = false;
         std::string interface         = "";
+        int channel                   = 0;
         std::string robot_ip_address  = "";
         std::vector<int> selected_ids = {};
     };
@@ -65,6 +61,8 @@ int main(int argc, char **argv)
     desc.add_options()("interface",
                        boost::program_options::value<std::string>(&args.interface),
                        "Network interface to listen for robot logs from");
+    desc.add_options()("channel", boost::program_options::value<int>(&args.channel),
+                       "Multicast channel to listen for robot logs on");
     desc.add_options()(
         "selected_ids",
         boost::program_options::value<std::vector<RobotId>>(&args.selected_ids)
@@ -108,15 +106,7 @@ int main(int argc, char **argv)
         logFromNetworking(log);
     };
 
-    std::optional<std::string> error;
-    auto log_input = std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(args.channel)), ROBOT_LOGS_PORT,
-        args.interface, robot_log_callback, true, error);
-    if (error)
-    {
-        LOG(FATAL) << *error;
-    }
-
+    auto log_input = ThreadedProtoUdpListener<TbotsProto::RobotLog>(ROBOT_LOGS_PORT, robot_log_callback);
 
     LOG(INFO) << "Network logger listening on channel "
               << ROBOT_MULTICAST_CHANNELS.at(args.channel) << " and interface "
@@ -137,8 +127,18 @@ int main(int argc, char **argv)
         LOG(INFO) << "Showing logs from all robots" << std::endl;
     }
 
-    // This blocks forever without using the CPU
-    std::promise<void>().get_future().wait();
+    ThreadedProtoUdpSender<TbotsProto::IpNotification> fullsystem_ip_notification_sender(
+            ROBOT_MULTICAST_CHANNELS(args.channel),
+            FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
+            args.interface,
+            true);
+    TbotsProto::IpNotification ip_notification;
+    ip_notification.set_ip_address(*local_ip);
+    while(true)
+    {
+        fullsystem_ip_notification_sender.sendProto(ip_notification);
+        std::this_thread::sleep_for(std::chrono::seconds(1.0 / FULL_SYSTEM_IP_NOTIFICATION_HZ));
+    }
 
     return 0;
 }
