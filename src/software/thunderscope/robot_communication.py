@@ -369,11 +369,13 @@ class RobotCommunication:
         round_trip_time_seconds = time.time() - (
             robot_status.adjusted_time_sent.epoch_timestamp_seconds
         )
-        self.__forward_to_proto_unix_io(
-            RobotStatistic,
-            RobotStatistic(round_trip_time_seconds=round_trip_time_seconds),
+        robot_statistic = RobotStatistic(
+            robot_id=robot_status.robot_id,
+            round_trip_time_seconds=round_trip_time_seconds,
         )
+
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
+        self.__forward_to_proto_unix_io(RobotStatistic, robot_statistic)
 
     def __exit__(self, type, value, traceback) -> None:
         """Exit RobotCommunication context manager

@@ -3,4 +3,5 @@ syntax = "proto3";
 message RobotStatistic
 {
     double round_trip_time_seconds = 1;
+    uint32 robot_id                = 2;
 }
