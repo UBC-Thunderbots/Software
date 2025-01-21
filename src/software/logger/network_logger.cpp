@@ -3,9 +3,7 @@
 #include "software/logger/csv_sink.h"
 #include "software/logger/plotjuggler_sink.h"
 
-std::shared_ptr<NetworkLoggerSingleton> NetworkLoggerSingleton::instance;
-
-NetworkLoggerSingleton::NetworkLoggerSingleton(int robot_id, bool enable_log_merging)
+NetworkLoggerSingleton::NetworkLoggerSingleton(RobotId robot_id, bool enable_log_merging)
 {
     logWorker = g3::LogWorker::createLogWorker();
 
@@ -27,11 +25,12 @@ NetworkLoggerSingleton::NetworkLoggerSingleton(int robot_id, bool enable_log_mer
     g3::initializeLogging(logWorker.get());
 }
 
-void NetworkLoggerSingleton::initializeLogger(int robot_id, bool enable_log_merging)
+void NetworkLoggerSingleton::initializeLogger(RobotId robot_id, bool enable_log_merging)
 {
     if (!instance)
     {
-        instance = std::make_shared<NetworkLoggerSingleton>(robot_id, enable_log_merging);
+        NetworkLoggerSingleton::instance = std::shared_ptr<NetworkLoggerSingleton>(
+            new NetworkLoggerSingleton(robot_id, enable_log_merging));
     }
 }
 

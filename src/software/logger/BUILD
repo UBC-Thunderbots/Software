@@ -42,6 +42,7 @@ cc_library(
     deps = [
         ":coloured_cout_sink",
         ":network_sink",
+        "//software/world:robot_state",
         "@g3log",
         "@g3sinks",
     ],
