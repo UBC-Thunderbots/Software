@@ -49,8 +49,7 @@ int main(int argc, char **argv)
         bool help                     = false;
         std::string interface         = "";
         int channel                   = 0;
-        std::string robot_ip_address  = "";
-        std::vector<int> selected_ids = {};
+        std::vector<RobotId> selected_ids = {};
     };
 
     CommandLineArgs args;
@@ -128,7 +127,7 @@ int main(int argc, char **argv)
     }
 
     ThreadedProtoUdpSender<TbotsProto::IpNotification> fullsystem_ip_notification_sender(
-            ROBOT_MULTICAST_CHANNELS(args.channel),
+            ROBOT_MULTICAST_CHANNELS.at(args.channel),
             FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
             args.interface,
             true);
@@ -137,7 +136,8 @@ int main(int argc, char **argv)
     while(true)
     {
         fullsystem_ip_notification_sender.sendProto(ip_notification);
-        std::this_thread::sleep_for(std::chrono::seconds(1.0 / FULL_SYSTEM_IP_NOTIFICATION_HZ));
+        std::this_thread::sleep_for(std::chrono::milliseconds(
+                    static_cast<int>(1.0 / FULL_SYSTEM_IP_NOTIFICATION_HZ * SECONDS_PER_MILLISECOND)));
     }
 
     return 0;
