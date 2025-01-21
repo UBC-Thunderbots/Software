@@ -129,14 +129,19 @@ class RobotView(QScrollArea):
             block=False, return_cached=False
         )
 
-        if robot_status is not None and round_trip_time is not None and robot_status.robot_id == round_trip_time.robot_id: #if both pieces of data are available
+        if (
+            robot_status is not None
+            and round_trip_time is not None
+            and robot_status.robot_id == round_trip_time.robot_id
+        ):  # if both pieces of data are available
             self.robot_view_widgets[robot_status.robot_id].update(
                 robot_status=robot_status, round_trip_time=round_trip_time
             )
         else:
-            if robot_status is not None: 
+            if robot_status is not None:
                 self.robot_view_widgets[robot_status.robot_id].update(
-                    robot_status, round_trip_time=None,
+                    robot_status,
+                    round_trip_time=None,
                 )
             if round_trip_time is not None:
                 self.robot_view_widgets[round_trip_time.robot_id].update(
