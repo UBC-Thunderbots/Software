@@ -11,6 +11,8 @@
 
 /**
  * This class implements the KalmanFilter class to track robot orientation. It keeps a rolling history of the robot's state, so when vision updates come in, the filter can roll back and recompute with them.
+ *
+ * For information on the math and design of kalman filters, see relevant links in kalman_filter.h
  */
 class RobotLocalizer {
 public:
@@ -85,6 +87,9 @@ public:
     double getAngularAccelerationRadians();
 
 private:
+    /**
+     * Structures for storing history of filter states.
+     */
     struct Predict {
         Eigen::Matrix<double, 3, 3> F;
         Eigen::Matrix<double, 3, 3> Q;
@@ -102,6 +107,7 @@ private:
         std::optional<Update> update;
         timespec birthday; // time at which step was executed
     };
+    // The kalman filter has two main vectors, currently we are tracking in 3 dimensions and measuring in 4.
     // State space vector:
     // x = [
     //    Orientation,
@@ -117,6 +123,7 @@ private:
     // ]
     KalmanFilter<3, 4, 1> filter_;
 
+    // The variance of the process. The process is our prediction of the future.
     double process_noise_variance_;
 
     timespec current_time_;
