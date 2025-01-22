@@ -46,9 +46,9 @@ int main(int argc, char **argv)
     // load command line arguments
     struct CommandLineArgs
     {
-        bool help                     = false;
-        std::string interface         = "";
-        int channel                   = 0;
+        bool help                         = false;
+        std::string interface             = "";
+        int channel                       = 0;
         std::vector<RobotId> selected_ids = {};
     };
 
@@ -128,17 +128,15 @@ int main(int argc, char **argv)
     }
 
     ThreadedProtoUdpSender<TbotsProto::IpNotification> fullsystem_ip_notification_sender(
-            ROBOT_MULTICAST_CHANNELS.at(args.channel),
-            FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
-            args.interface,
-            true);
+        ROBOT_MULTICAST_CHANNELS.at(args.channel),
+        FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT, args.interface, true);
     TbotsProto::IpNotification ip_notification;
     ip_notification.set_ip_address(*local_ip);
     while (true)
     {
         fullsystem_ip_notification_sender.sendProto(ip_notification);
-        std::this_thread::sleep_for(std::chrono::milliseconds(
-                    static_cast<int>(1.0 / FULL_SYSTEM_IP_NOTIFICATION_HZ * SECONDS_PER_MILLISECOND)));
+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(
+            1.0 / FULL_SYSTEM_IP_NOTIFICATION_HZ * SECONDS_PER_MILLISECOND)));
     }
 
     return 0;

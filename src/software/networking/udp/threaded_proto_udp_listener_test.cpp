@@ -24,5 +24,5 @@ TEST(ThreadedProtoUdpListenerTest, error_creating_socket)
 TEST(ThreadedProtoUdpListenerTest, no_error_creating_socket)
 {
     ThreadedProtoUdpListener<google::protobuf::Empty>(
-                     "224.5.23.0", 40000, "lo", [](const auto&) {}, true);
+        "224.5.23.0", 40000, "lo", [](const auto&) {}, true);
 }
