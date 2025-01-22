@@ -3,6 +3,8 @@
 #include "software/logger/csv_sink.h"
 #include "software/logger/plotjuggler_sink.h"
 
+std::shared_ptr<NetworkLoggerSingleton> NetworkLoggerSingleton::instance;
+
 NetworkLoggerSingleton::NetworkLoggerSingleton(RobotId robot_id, bool enable_log_merging)
 {
     logWorker = g3::LogWorker::createLogWorker();

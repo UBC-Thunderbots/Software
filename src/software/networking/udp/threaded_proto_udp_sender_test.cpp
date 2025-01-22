@@ -14,7 +14,5 @@ TEST(ThreadedProtoUdpSenderTest, error_finding_local_ip_address)
 
 TEST(ThreadedProtoUdpSenderTest, no_error_creating_socket)
 {
-    EXPECT_THROW(
-        ThreadedProtoUdpSender<google::protobuf::Empty>("224.5.23.1", 40000, "lo", true),
-        TbotsNetworkException);
+    ThreadedProtoUdpSender<google::protobuf::Empty>("224.5.23.1", 40000, "lo", true);
 }

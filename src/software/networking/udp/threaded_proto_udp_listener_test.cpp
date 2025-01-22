@@ -23,7 +23,6 @@ TEST(ThreadedProtoUdpListenerTest, error_creating_socket)
 
 TEST(ThreadedProtoUdpListenerTest, no_error_creating_socket)
 {
-    EXPECT_THROW(ThreadedProtoUdpListener<google::protobuf::Empty>(
-                     "224.5.23.0", 40000, "lo", [](const auto&) {}, true),
-                 TbotsNetworkException);
+    ThreadedProtoUdpListener<google::protobuf::Empty>(
+                     "224.5.23.0", 40000, "lo", [](const auto&) {}, true);
 }
