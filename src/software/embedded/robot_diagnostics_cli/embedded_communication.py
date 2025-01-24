@@ -10,8 +10,10 @@ import threading
 
 
 class EmbeddedCommunication:
+    """Communication class for sending/executing protos with the robots"""
     def __init__(self):
-        self.send_primitive_set = None
+        """Establishes multicast connections and e-stop information"""
+        self.primitive_set_sender = None
         self.receive_robot_status = None
         self.embedded_data = EmbeddedData()
         self.channel_id = self.embedded_data.get_robot_id()
@@ -21,10 +23,10 @@ class EmbeddedCommunication:
         self.command_duration_seconds = 2.0
         self.send_primitive_interval_s = 0.01
 
-        # total primitives for all robots
+        # total primitives for this robots
         self.robot_primitives = {}
 
-        # for all robots connected to diagnostics, set their primitive
+        # Set the primitive of the local robot
         self.robot_primitives[self.robot_id] = Primitive(stop=StopPrimitive())
 
         # initialising the estop
@@ -38,20 +40,17 @@ class EmbeddedCommunication:
             target=self.__update_estop_state, daemon=True
         )
 
-        self.previous_estop_state = False
-
-        # only checks for estop if we are in physical estop mode
-        if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
-            try:
-                self.estop_reader = tbots_cpp.ThreadedEstopReader(
-                    self.estop_path, 115200
-                )
-            except Exception as e:
-                raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
+        # Always in PHYSICAL_ESTOP mode within CLI
+        try:
+            self.estop_reader = tbots_cpp.ThreadedEstopReader(
+                self.estop_path, 115200
+            )
+        except Exception as e:
+            raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
 
     def __receive_robot_status(self, robot_status: Message) -> None:
-        """Forwards the given robot status to the full system along with the round-trip time
-        :param robot_status: RobotStatus to extract information from
+        """Updates the dynamic information with the new RobotStatus message.
+        :param robot_status: The incoming RobotStatus proto from the robot to read
         """
         self.epoch_timestamp_seconds = robot_status.time_sent.epoch_timestamp_seconds
         self.battery_voltage = robot_status.power_status.battery_voltage
@@ -59,12 +58,12 @@ class EmbeddedCommunication:
         self.primitive_executor_step_time_ms = robot_status.thunderloop_status.primitive_executor_step_time_ms
 
     def __should_send_packet(self) -> bool:
-        """Returns True if should send a proto
+        """Returns True if a proto should be sent
         :return: boolean
         """
-        return ((self.estop_mode != EstopMode.DISABLE_ESTOP) and self.estop_is_playing)
+        return (self.estop_mode != EstopMode.DISABLE_ESTOP) and self.estop_is_playing
 
-    def __send_primitive_set(self, primitive: Primitive) -> None:
+    def send_primitive_set(self, primitive: Primitive) -> None:
         """Forward PrimitiveSet protos from diagnostics to the robots."""
         self.robot_primitives[self.robot_id] = primitive
         # initialize total primitive set and send it
@@ -85,13 +84,11 @@ class EmbeddedCommunication:
         self.sequence_number += 1
 
         if self.__should_send_packet() or self.should_send_stop:
-            self.send_primitive_set.send_proto(primitive_set)
+            self.primitive_set_sender.send_proto(primitive_set)
             self.should_send_stop = False
 
     def __update_estop_state(self) -> None:
-        """Updates the current estop status proto if estop is not disabled
-        Always in physical estop mode, uses the physical estop value
-        """
+        """Asynchronously updates the current estop status proto. Always in physical estop mode."""
         while True:
             if self.estop_mode == EstopMode.DISABLE_ESTOP:
                 self.should_send_stop = False
@@ -99,11 +96,10 @@ class EmbeddedCommunication:
                 self.should_send_stop = not self.estop_reader.isEstopPlay()
             else:
                 self.should_send_stop = True
+            time.sleep(0.1)
 
     def run_primitive_set(self, diagnostics_primitive: Primitive) -> None:
-        """Forward PrimitiveSet protos from diagnostics to the robots.
-
-        Updates/polls the Estop state
+        """Wrapper class that forwards PrimitiveSet protos from diagnostics to the robots.
 
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
@@ -111,7 +107,7 @@ class EmbeddedCommunication:
         if self.should_send_stop:
             raise KeyboardInterrupt
         else:
-            self.__send_primitive_set(diagnostics_primitive)
+            self.send_primitive_set(diagnostics_primitive)
 
     def run_primitive_over_time(self, duration_seconds: float, primitive_set: Primitive, description: str) -> None:
         """Executes a primitive set synchronously for the specified amount of time in the console.
@@ -126,9 +122,9 @@ class EmbeddedCommunication:
 
     def __enter__(self) -> EmbeddedData:
         """Enter RobotDiagnosticsCLI context manager. Setup multicast listeners
-        for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
+        for RobotStatus msgs, and multicast sender for PrimitiveSet
         """
-        # Receiver
+        # Multicast Receiver
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             str(getRobotMulticastChannel(
                 self.channel_id)) + "%" + f"{self.embedded_data.get_network_interface()}",
@@ -137,8 +133,8 @@ class EmbeddedCommunication:
             True,
         )
 
-        # Sender
-        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
+        # Multicast Sender
+        self.primitive_set_sender = tbots_cpp.PrimitiveSetProtoUdpSender(
             str(getRobotMulticastChannel(
                 self.channel_id)) + "%" + f"{self.embedded_data.get_network_interface()}", PRIMITIVE_PORT, True
         )

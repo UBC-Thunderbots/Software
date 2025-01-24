@@ -7,7 +7,9 @@ from software.embedded.constants.py_constants import (ROBOT_MAX_ANG_SPEED_RAD_PE
 
 
 class EmbeddedData:
+    """Model class responsible for interfacing with onboard disk data on the robot"""
     def __init__(self) -> None:
+        # Initializes the redis cache connection
         self.redis = redis.StrictRedis(
             host=REDIS_DEFAULT_HOST,
             port=REDIS_DEFAULT_PORT,

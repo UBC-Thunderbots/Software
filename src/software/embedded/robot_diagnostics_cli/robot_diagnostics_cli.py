@@ -9,18 +9,30 @@ from software.embedded.constants.py_constants import (DEFAULT_PRIMITIVE_DURATION
                                                       ROBOT_MAX_SPEED_M_PER_S, MAX_FORCE_DRIBBLER_SPEED_RPM)
 from proto.import_all_protos import *
 import subprocess
-import InquirerPy
 from functools import wraps
 from typing import List, Optional
 from typing_extensions import Annotated
 from embedded_communication import EmbeddedCommunication
+import logging
 
 
 class RobotDiagnosticsCLI:
+    """Onboard lightweight Diagnostics CLI interface running on the robots. UI and Main class"""
+
     def __init__(self, embedded_communication: EmbeddedCommunication) -> None:
-        """Setup constructor for the Shell CLI"""
-        self.app = make_typer_shell(prompt="⚡ ")
-        self.app.command(short_help="Toggles easy selection shell (For new users)")(self.toggle_simple_mode)
+        """Setup constructor for the Shell CLI
+        :param embedded_communication: Communication object with open connection to robots for sending protos
+        """
+        intro = """[bold gold]Welcome to the RobotDiagnostics CLI [/bold gold]
+        
+        Type [bold blue]help[/bold blue] for a list of commands. 
+        Use [bold blue]--help[/bold blue] in commands for extra info. 
+        If you ever have questions feel free to reach out!"""
+        self.app = make_typer_shell(
+            prompt="⚡ ",
+            launch=lambda x: print(intro),
+            intro="\n"
+        )
         self.app.command(short_help="Moves the robot")(self.move)
         self.app.command(short_help="Moves specific wheels of the robot")(self.move_wheel)
         self.app.command(short_help="Rotates the robot")(self.rotate)
@@ -33,7 +45,9 @@ class RobotDiagnosticsCLI:
         self.app.command(short_help="Prints Thunderloop Status")(self.status)
         self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
 
+        # Communication object responsible for proto execution/transmission
         self.embedded_communication = embedded_communication
+        # Data handler responsible for disk information
         self.embedded_data = self.embedded_communication.embedded_data
 
         self.console = Console()
@@ -46,18 +60,18 @@ class RobotDiagnosticsCLI:
             @wraps(func)
             def wrapper(self, *args, **kwargs):
                 try:
-                    self.embedded_communication.run_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
                     return func(self, *args, **kwargs)
                 except KeyboardInterrupt:
-                    print("E-Stop Activated: Stopped Primitive Send")
-                    self.embedded_communication.run_primitive_set(Primitive(stop=StopPrimitive()))
+                    logging.info("E-Stop Activated: Stopped Primitive Send")
+                    self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
                     raise Typer.Exit(code=exit_code)
                 except Exception as e:
-                    self.embedded_communication.run_primitive_set(Primitive(stop=StopPrimitive()))
-                    print(f"Unknown Exception: {e}")
+                    self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
+                    logging.info(f"Unknown Exception: {e}")
                     raise Typer.Exit(code=exit_code)
                 finally:
-                    self.embedded_communication.run_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
 
             return wrapper
 
@@ -135,15 +149,6 @@ class RobotDiagnosticsCLI:
         log = subprocess.call(["sudo", "journalctl", "-f", "-n", "100"])
         print(log)
 
-    def toggle_simple_mode(self):
-        """Toggles Easy Shell Mode.
-
-        - Easy Mode: Enables selection menu for functions
-        - Regular Mode [Default]: Flags for functions
-        """
-        self.easy_mode_enabled = not self.easy_mode_enabled
-        print(f"Easy Shell Mode set to {self.easy_mode_enabled}")
-
     @catch_interrupt_exception()
     def rotate(self,
                velocity: Annotated[Optional[float], Typer.Option(
@@ -155,7 +160,6 @@ class RobotDiagnosticsCLI:
         :param velocity: Angular Velocity to rotate the robot
         :param duration_seconds: Duration to rotate the robot
         """
-        # TODO: Add InquirerPy with self.easy_mode_enabled
         description = f"Rotating at {velocity} rad/s for {duration_seconds} seconds"
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
@@ -177,7 +181,6 @@ class RobotDiagnosticsCLI:
         :param speed: Speed to move the robot at
         :param duration_seconds: Duration to move
         """
-        # TODO: Add InquirerPy with self.easy_mode_enabled
         description = f"Moving at {speed} m/s for {duration_seconds} seconds towards {angle}"
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
@@ -198,7 +201,6 @@ class RobotDiagnosticsCLI:
         :param auto: Enables auto chip (OVERWRITES CHIP DISTANCE)
         :param duration_seconds: Duration to be in chip mode in seconds
         """
-        # TODO: Add InquirerPy with self.easy_mode_enabled
         description = f"Chipping {distance} m" if not auto else f"Auto Chip Enabled for {duration_seconds} seconds"
         primitive = self.embedded_data.get_kick_primitive(auto, distance)
         if auto:
@@ -224,7 +226,6 @@ class RobotDiagnosticsCLI:
         :param auto: Enables auto kick (OVERWRITES KICK SPEED)
         :param duration_seconds: Duration to be in kick mode in seconds
         """
-        # TODO: Add InquirerPy with self.easy_mode_enabled
         description = f"Kicking at {speed} m/s" if not auto else f"Auto Kick Enabled for {duration_seconds} seconds"
         primitive = self.embedded_data.get_kick_primitive(auto, speed)
         if auto:
@@ -248,7 +249,6 @@ class RobotDiagnosticsCLI:
         :param velocity: Speed & Direction to rotate the dribbler
         :param duration_seconds: Duration to rotate
         """
-        # TODO: Add InquirerPy with self.easy_mode_enabled
         description = f"Spinning dribbler at {velocity} rpm for {duration_seconds} seconds"
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
@@ -271,10 +271,7 @@ class RobotDiagnosticsCLI:
         :param velocity: Velocity to rotate the wheel
         :param duration_seconds: Duration to move
         """
-
-        # TODO: Add InquirerPy with self.easy_mode_enabled
         # TODO: Confirm max speed for wheel rotation (it is currently net robot velocity)
-
         description = f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
