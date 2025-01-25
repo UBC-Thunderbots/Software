@@ -170,7 +170,7 @@ torch::Tensor DQN<TState, TAction>::update(
     optimizer_.step();
 
     // Soft update of the target network's weights
-    // θ' = τ * θ + (1 + τ) * θ'
+    // θ' = τ * θ + (1 - τ) * θ'
     {
         torch::NoGradGuard no_grad;
         const auto& current_params = current_net_->named_parameters();

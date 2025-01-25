@@ -52,7 +52,7 @@ struct PlaySelectionFSM
     bool enemyHasPossession(const Update& event);
 
     /**
-     * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay,
+     * Action to set up a "set play", StopPlay, HaltPlay,
      * OffensePlay, or DefensePlay
      *
      * @param event The PlaySelection::Update event
@@ -64,7 +64,7 @@ struct PlaySelectionFSM
     void setupDefensePlay(const Update& event);
 
     /**
-     * Action to reset the current SetPlay to none
+     * Action to reset the current "set play" to none
      *
      * @param event The PlaySelection::Update event
      */

@@ -4,6 +4,8 @@ import logging
 import os
 import sys
 import threading
+import time
+import math
 
 import google.protobuf
 from google.protobuf.internal import api_implementation
@@ -183,6 +185,18 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Runs the simulation with sped-up time",
+    )
+    parser.add_argument(
+        "--headless",
+        action="store_true",
+        default=False,
+        help="Run in headless mode (without Thunderscope GUI)",
+    )
+    parser.add_argument(
+        "--training_mode",
+        action="store_true",
+        default=False,
+        help="Run in training mode",
     )
     parser.add_argument(
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
@@ -407,35 +421,29 @@ if __name__ == "__main__":
     #
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
-        tscope = Thunderscope(
-            config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size
-            ),
-            layout_path=args.layout,
+        tscope_config = config.configure_two_ai_gamecontroller_view(
+            args.visualization_buffer_size
         )
+        tscope = Thunderscope(config=tscope_config, layout_path=args.layout)
+
+        stop_event = threading.Event()
 
         def __ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
 
             :param tick_rate_ms: The tick rate of the simulation
-
             """
-            sync_simulation(
-                tscope,
-                0 if args.empty else DIV_B_NUM_ROBOTS,
-            )
-
             if args.ci_mode:
                 async_sim_ticker(
                     tick_rate_ms,
-                    tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                    tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
-                    tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
-                    tscope,
+                    tscope_config.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                    tscope_config.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                    tscope_config.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                    stop_event,
                 )
             else:
                 realtime_sim_ticker(
-                    tick_rate_ms, tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], tscope
+                    tick_rate_ms, tscope_config.proto_unix_io_map[ProtoUnixIOTypes.SIM], stop_event
                 )
 
         # Launch all binaries
@@ -471,23 +479,23 @@ if __name__ == "__main__":
             if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref:
-            tscope.register_refresh_function(gamecontroller.refresh)
-
             autoref_proto_unix_io = ProtoUnixIO()
 
-            blue_fs.setup_proto_unix_io(tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+            blue_fs.setup_proto_unix_io(
+                tscope_config.proto_unix_io_map[ProtoUnixIOTypes.BLUE]
+            )
             yellow_fs.setup_proto_unix_io(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+                tscope_config.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
             simulator.setup_proto_unix_io(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                tscope_config.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                tscope_config.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                tscope_config.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
                 autoref_proto_unix_io,
             )
             gamecontroller.setup_proto_unix_io(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                tscope_config.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                tscope_config.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
                 autoref_proto_unix_io,
             )
             if args.enable_autoref:
@@ -496,36 +504,41 @@ if __name__ == "__main__":
                 )
 
             # Start the simulator
+            sync_simulation(
+                tscope_config.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                0 if args.empty else DIV_B_NUM_ROBOTS,
+            )
             sim_ticker_thread = threading.Thread(
                 target=__ticker,
                 args=(DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,),
                 daemon=True,
             )
+            sim_ticker_thread.start()
+
+            tscope.register_refresh_function(gamecontroller.refresh)
 
             if args.enable_autoref and args.ci_mode:
-                # In CI mode, we want AI vs AI to end automatically after a given time (CI_DURATION_S). The exiter
-                # thread is passed an exit handler that will close the Thunderscope window
-                # This exit handler is necessary because Qt runs on the main thread, so tscope.show() is a blocking
-                # call so we need to somehow close it before doing our resource cleanup
-                exiter_thread = threading.Thread(
-                    target=exit_poller,
-                    args=(autoref, CI_DURATION_S, lambda: tscope.close()),
-                    daemon=True,
-                )
+                if args.headless:
+                    exit_poller(autoref, CI_DURATION_S, lambda: None)
+                else:
+                    # In CI mode, we want AI vs AI to end automatically after a given time (CI_DURATION_S). The exiter
+                    # thread is passed an exit handler that will close the Thunderscope window
+                    # This exit handler is necessary because Qt runs on the main thread, so tscope.show() is a blocking
+                    # call so we need to somehow close it before doing our resource cleanup
+                    exiter_thread = threading.Thread(
+                        target=exit_poller,
+                        args=(autoref, CI_DURATION_S, lambda: tscope.close()),
+                        daemon=True,
+                    )
+                    exiter_thread.start()
 
-                exiter_thread.start()  # start the exit countdown
-                sim_ticker_thread.start()  # start the simulation ticking
-
-                tscope.show()  # blocking!
-
-                # these resource cleanups occur after tscope.close() is called by the exiter_thread
-                exiter_thread.join()
-                sim_ticker_thread.join()
-
-                sys.exit(0)
+                    # Show Thunderscope GUI -- blocking!
+                    tscope.show()
             else:
-                sim_ticker_thread.start()  # start the simulation ticking
-                tscope.show()  # blocking!
+                # Show Thunderscope GUI -- blocking!
+                tscope.show()
 
-                # resource cleanup occurs after Thunderscope is closed by the user
-                sim_ticker_thread.join()
+            # Resource cleanup once Thunderscope is closed or exit_poller exits
+            stop_event.set()
+            exiter_thread.join()
+            sim_ticker_thread.join()

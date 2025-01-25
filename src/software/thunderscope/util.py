@@ -11,13 +11,14 @@ from software.thunderscope.time_provider import TimeProvider
 
 import queue
 import time
+import threading
 
 
 def exit_poller(
-    time_provider: TimeProvider,
-    exit_duration_s: float,
-    on_exit: Callable[[], None],
-    poll_duration_s: float = 0.5,
+        time_provider: TimeProvider,
+        exit_duration_s: float,
+        on_exit: Callable[[], None],
+        poll_duration_s: float = 0.5,
 ) -> NoReturn:
     """Calls the on_exit callback once the elapsed exit_duration has passed from the start of this function call,
     polling every poll_duration using system time
@@ -39,7 +40,7 @@ def async_sim_ticker(
     blue_proto_unix_io: ProtoUnixIO,
     yellow_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
-    tscope: Thunderscope,
+    stop_event: threading.Event,
     buffer_timeout_s: int = 1,
 ) -> None:
     """Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
@@ -48,7 +49,7 @@ def async_sim_ticker(
     :param blue_proto_unix_io:      ProtoUnixIO for the Blue FullSystem
     :param yellow_proto_unix_io:    ProtoUnixIO for the Yellow FullSystem
     :param sim_proto_unix_io:       ProtoUnixIO for the Simulation
-    :param tscope:                  Thunderscope instance that is tied to the simulation ticking
+    :param stop_event:              Event used to stop ticking the simulation
     :param buffer_timeout_s:        How long to wait for a response from the AI before assuming that the AI missed the
                                     SSL Vision packet
     """
@@ -62,7 +63,7 @@ def async_sim_ticker(
     blue_proto_unix_io.register_observer(PrimitiveSet, blue_primitive_set_buffer)
     yellow_proto_unix_io.register_observer(PrimitiveSet, yellow_primitive_set_buffer)
 
-    while tscope.is_open():
+    while not stop_event.is_set():
         # flush primitive set buffers before sending the next tick
         while (
             blue_primitive_set_buffer.get(block=False, return_cached=False) is not None
@@ -91,20 +92,20 @@ def async_sim_ticker(
 
 
 def realtime_sim_ticker(
-    tick_rate_ms: int, sim_proto_unix_io: ProtoUnixIO, tscope: Thunderscope
+    tick_rate_ms: int, sim_proto_unix_io: ProtoUnixIO, stop_event: threading.Event
 ) -> None:
     """Tick simulation in real-time. Requires Thunderscope to be open.
 
     :param tick_rate_ms:        the interval between consequent ticks (ms) and delay between sending Vision messages
     :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
-    :param tscope:              Thunderscope instance that is tied to the simulation ticking
+    :param stop_event:          Event used to stop ticking the simulation
     """
     simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
     sim_proto_unix_io.register_observer(SimulationState, simulation_state_buffer)
     per_tick_delay_s = tick_rate_ms * SECONDS_PER_MILLISECOND
 
     # Tick simulation if Thundersocpe is open
-    while tscope.is_open():
+    while not stop_event.is_set():
         simulation_state_message = simulation_state_buffer.get()
 
         if simulation_state_message.is_playing:
@@ -115,15 +116,14 @@ def realtime_sim_ticker(
 
 
 def sync_simulation(
-    tscope: Thunderscope, num_robots: int, timeout_s: float = 0.1
+    sim_proto_unix_io: ProtoUnixIO, num_robots: int, timeout_s: float = 0.1
 ) -> None:
     """Ensure that simulator has synchronized with the default world state.
 
-    :param tscope:              Thunderscope instance that is tied to this instance of the simulation
+    :param sim_proto_unix_io:   The ProtoUnixIO for the simulator
     :param num_robots:          Number of robots to initialize the simulator with
     :param timeout_s:           How long to wait before we retry our attempt to synchronize with the simulator
     """
-    sim_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM]
     world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
     sim_proto_unix_io.register_observer(
         WorldStateReceivedTrigger, world_state_received_buffer
@@ -143,7 +143,3 @@ def sync_simulation(
         else:
             # Received a response from the simulator
             break
-
-    # Wait for Thunderscope to launch
-    while not tscope.is_open():
-        time.sleep(timeout_s)
