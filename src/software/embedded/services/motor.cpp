@@ -172,7 +172,7 @@ void MotorService::setup()
     {
         LOG(INFO) << "Clearing RESET for " << MOTOR_NAMES[motor];
         tmc6100_writeInt(motor, TMC6100_GSTAT, 0x00000001);
-        cached_motor_faults_[motor] = MotorFaultIndicator();
+        cached_motor_faults_.insert({motor, MotorFaultIndicator(motor)});
         encoder_calibrated_[motor]  = false;
     }
 
@@ -214,7 +214,7 @@ void MotorService::setUpDriveMotor(uint8_t motor)
     tmc4671_setTargetVelocity(motor, 0);
 }
 
-MotorService::MotorFaultIndicator MotorService::checkDriverFault(uint8_t motor)
+void MotorService::checkDriverFault(uint8_t motor)
 {
     bool drive_enabled = true;
     std::unordered_set<TbotsProto::MotorFault> motor_faults;
@@ -329,7 +329,7 @@ MotorService::MotorFaultIndicator MotorService::checkDriverFault(uint8_t motor)
         drive_enabled = false;
     }
 
-    return MotorFaultIndicator(drive_enabled, motor_faults);
+    cached_motor_faults_.at(motor).update(drive_enabled, motor_faults);
 }
 
 TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_velocity_mps,
@@ -340,17 +340,17 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
 {
     TbotsProto::MotorStatus motor_status;
 
-    cached_motor_faults_[motor_fault_detector_] = checkDriverFault(motor_fault_detector_);
+    checkDriverFault(motor_fault_detector_);
 
     for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
         if (motor != DRIBBLER_MOTOR_CHIP_SELECT)
         {
             TbotsProto::DriveUnit drive_status;
-            drive_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
+            drive_status.set_enabled(cached_motor_faults_.at(motor).drive_enabled);
 
             for (const TbotsProto::MotorFault& fault :
-                 cached_motor_faults_[motor].motor_faults)
+                 cached_motor_faults_.at(motor).last_motor_faults)
             {
                 drive_status.add_motor_faults(fault);
             }
@@ -376,9 +376,9 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
         {
             TbotsProto::DribblerStatus dribbler_status;
             dribbler_status.set_dribbler_rpm(static_cast<float>(dribbler_rpm));
-            dribbler_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
+            dribbler_status.set_enabled(cached_motor_faults_.at(motor).drive_enabled);
             for (const TbotsProto::MotorFault& fault :
-                 cached_motor_faults_[motor].motor_faults)
+                 cached_motor_faults_.at(motor).last_motor_faults)
             {
                 dribbler_status.add_motor_faults(fault);
             }
@@ -597,10 +597,10 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 bool MotorService::requiresMotorReinit(uint8_t motor)
 {
     auto reset_search =
-        cached_motor_faults_[motor].motor_faults.find(TbotsProto::MotorFault::RESET);
+        cached_motor_faults_.at(motor).last_motor_faults.find(TbotsProto::MotorFault::RESET);
 
-    return !cached_motor_faults_[motor].drive_enabled ||
-           (reset_search != cached_motor_faults_[motor].motor_faults.end());
+    return !cached_motor_faults_.at(motor).drive_enabled ||
+           (reset_search != cached_motor_faults_.at(motor).last_motor_faults.end());
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,

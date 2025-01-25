@@ -120,25 +120,27 @@ class MotorService
     struct MotorFaultIndicator
     {
         bool drive_enabled;
-        std::unordered_set<TbotsProto::MotorFault> motor_faults;
+        std::unordered_set<TbotsProto::MotorFault> last_motor_faults;
+        const uint8_t motor_id;
+        int num_faults;
 
         /**
-         * Construct a default indicator of no faults and running motors.
+         * Construct a default indicator of no faults and running motors, with a motor id.
          */
-        MotorFaultIndicator() : drive_enabled(true), motor_faults() {}
+        MotorFaultIndicator(uint8_t id) : drive_enabled(true), last_motor_faults(), motor_id(id), num_faults(0){}
 
         /**
-         * Construct an indicator with faults and whether the motor is enabled.
+         * update drive enabled and the faults
          *
-         * @param drive_enabled true if the motor is enabled, false if disabled due to a
+         * * @param drive_enabled true if the motor is enabled, false if disabled due to a
          * motor fault
          * @param motor_faults  a set of faults associated with this motor
          */
-        MotorFaultIndicator(bool drive_enabled,
-                            std::unordered_set<TbotsProto::MotorFault>& motor_faults)
-            : drive_enabled(drive_enabled), motor_faults(motor_faults)
-        {
-        }
+         void update(bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults){
+             drive_enabled = enabled;
+             last_motor_faults = motor_faults;
+             num_faults++;
+         }
     };
 
     /**
@@ -149,7 +151,7 @@ class MotorService
      * @return a struct containing the motor faults and whether the motor was disabled due
      * to the fault
      */
-    struct MotorFaultIndicator checkDriverFault(uint8_t motor);
+    void checkDriverFault(uint8_t motor);
 
     /**
      * Sets up motor as drive motor controllers
