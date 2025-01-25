@@ -1,4 +1,3 @@
-#include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 #include <functional>
 #include <iostream>
@@ -12,7 +11,7 @@ class FunctionMemberObject
     explicit FunctionMemberObject(TestFunction func, std::shared_ptr<int> data)
         : func(func),
           coroutine_sequence(
-              boost::bind(&FunctionMemberObject::executeWrapper, this, _1, data))
+              std::bind(&FunctionMemberObject::executeWrapper, this, std::placeholders::_1, data))
     {
     }
 
@@ -46,7 +45,7 @@ class DataMemberObject
     explicit DataMemberObject(TestFunction func, std::shared_ptr<int> data)
         : data(data),
           coroutine_sequence(
-              boost::bind(&DataMemberObject::executeWrapper, this, _1, func))
+              std::bind(&DataMemberObject::executeWrapper, this, std::placeholders::_1, func))
     {
     }
 
@@ -78,7 +77,7 @@ class NoMemberObject
 {
    public:
     explicit NoMemberObject(TestFunction validation_function, std::shared_ptr<int> data)
-        : coroutine_sequence(boost::bind(&NoMemberObject::executeWrapper, this, _1, data,
+        : coroutine_sequence(std::bind(&NoMemberObject::executeWrapper, this, std::placeholders::_1, data,
                                          validation_function))
     {
     }
