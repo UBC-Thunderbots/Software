@@ -1,19 +1,21 @@
+import subprocess
+import logging
 import typer as Typer
 from rich import print
 from rich.live import Live
 from rich.table import Table
 from rich.console import Console
+from rich.logging import RichHandler
 from software.py_constants import *
 from typer_shell import make_typer_shell
-from software.embedded.constants.py_constants import (DEFAULT_PRIMITIVE_DURATION, ROBOT_MAX_ANG_SPEED_RAD_PER_S,
-                                                      ROBOT_MAX_SPEED_M_PER_S, MAX_FORCE_DRIBBLER_SPEED_RPM)
-from proto.import_all_protos import *
-import subprocess
 from functools import wraps
 from typing import List, Optional
 from typing_extensions import Annotated
 from embedded_communication import EmbeddedCommunication
-import logging
+from proto.import_all_protos import *
+from software.logger.logger import create_logger
+from software.embedded.constants.py_constants import (DEFAULT_PRIMITIVE_DURATION, ROBOT_MAX_ANG_SPEED_RAD_PER_S,
+                                                      ROBOT_MAX_SPEED_M_PER_S, MAX_FORCE_DRIBBLER_SPEED_RPM)
 
 
 class RobotDiagnosticsCLI:
@@ -23,16 +25,13 @@ class RobotDiagnosticsCLI:
         """Setup constructor for the Shell CLI
         :param embedded_communication: Communication object with open connection to robots for sending protos
         """
-        intro = """[bold gold]Welcome to the RobotDiagnostics CLI [/bold gold]
+        intro = """[bold yellow]Welcome to the RobotDiagnostics CLI [/bold yellow]
         
         Type [bold blue]help[/bold blue] for a list of commands. 
         Use [bold blue]--help[/bold blue] in commands for extra info. 
         If you ever have questions feel free to reach out!"""
-        self.app = make_typer_shell(
-            prompt="⚡ ",
-            launch=lambda x: print(intro),
-            intro="\n"
-        )
+
+        self.app = make_typer_shell(prompt="⚡ ", launch=lambda x: print(intro), intro="\n")
         self.app.command(short_help="Moves the robot")(self.move)
         self.app.command(short_help="Moves specific wheels of the robot")(self.move_wheel)
         self.app.command(short_help="Rotates the robot")(self.rotate)
@@ -52,6 +51,11 @@ class RobotDiagnosticsCLI:
 
         self.console = Console()
         self.easy_mode_enabled = False
+        self.logger = logging.getLogger("DiagnosticsCLI")
+        logging.basicConfig(
+            level=logging.INFO,
+            handlers=[RichHandler(rich_tracebacks=True, markup=True)]
+        )
 
     def catch_interrupt_exception(exit_code=1):
         """Decorator for handling keyboard exceptions and safely clearing cached primitives"""
@@ -63,12 +67,12 @@ class RobotDiagnosticsCLI:
                     self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
                     return func(self, *args, **kwargs)
                 except KeyboardInterrupt:
-                    logging.info("E-Stop Activated: Stopped Primitive Send")
+                    logging.info("[bold yellow] E-Stop Activated: Stopped Primitive Send [/bold yellow]")
                     self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
                     raise Typer.Exit(code=exit_code)
                 except Exception as e:
                     self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
-                    logging.info(f"Unknown Exception: {e}")
+                    logging.exception(f"Unknown Exception: {e}")
                     raise Typer.Exit(code=exit_code)
                 finally:
                     self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
@@ -209,8 +213,8 @@ class RobotDiagnosticsCLI:
                 primitive,
                 description)
         else:
-            print(description)
             self.embedded_communication.run_primitive_set(primitive)
+            print(description)
 
     @catch_interrupt_exception()
     def kick(self,
@@ -234,8 +238,8 @@ class RobotDiagnosticsCLI:
                 primitive,
                 description)
         else:
-            print(description)
             self.embedded_communication.run_primitive_set(primitive)
+            print(description)
 
     @catch_interrupt_exception()
     def dribble(self,

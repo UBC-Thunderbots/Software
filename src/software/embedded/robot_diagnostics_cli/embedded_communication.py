@@ -6,7 +6,6 @@ from rich.progress import track
 import software.python_bindings as tbots_cpp
 from software.py_constants import *
 import time
-import threading
 
 
 class EmbeddedCommunication:
@@ -36,15 +35,12 @@ class EmbeddedCommunication:
         self.estop_mode, self.estop_path = (
             get_estop_config(keyboard_estop=False, disable_communication=False))
 
-        self.send_estop_state_thread = threading.Thread(
-            target=self.__update_estop_state, daemon=True
-        )
-
         # Always in PHYSICAL_ESTOP mode within CLI
         try:
             self.estop_reader = tbots_cpp.ThreadedEstopReader(
                 self.estop_path, 115200
             )
+            self.__update_estop_state()
         except Exception as e:
             raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
 
@@ -88,15 +84,13 @@ class EmbeddedCommunication:
             self.should_send_stop = False
 
     def __update_estop_state(self) -> None:
-        """Asynchronously updates the current estop status proto. Always in physical estop mode."""
-        while True:
-            if self.estop_mode == EstopMode.DISABLE_ESTOP:
-                self.should_send_stop = False
-            elif self.estop_mode == EstopMode.PHYSICAL_ESTOP:
-                self.should_send_stop = not self.estop_reader.isEstopPlay()
-            else:
-                self.should_send_stop = True
-            time.sleep(0.1)
+        """Synchronously updates the current estop status proto. Always in physical estop mode."""
+        if self.estop_mode == EstopMode.DISABLE_ESTOP:
+            self.should_send_stop = False
+        elif self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+            self.should_send_stop = not self.estop_reader.isEstopPlay()
+        else:
+            self.should_send_stop = True
 
     def run_primitive_set(self, diagnostics_primitive: Primitive) -> None:
         """Wrapper class that forwards PrimitiveSet protos from diagnostics to the robots.
@@ -104,6 +98,7 @@ class EmbeddedCommunication:
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
         """
+        self.__update_estop_state()
         if self.should_send_stop:
             raise KeyboardInterrupt
         else:
@@ -139,7 +134,6 @@ class EmbeddedCommunication:
                 self.channel_id)) + "%" + f"{self.embedded_data.get_network_interface()}", PRIMITIVE_PORT, True
         )
 
-        self.send_estop_state_thread.start()
         return self
 
     def __exit__(self, type, value, traceback) -> None:
