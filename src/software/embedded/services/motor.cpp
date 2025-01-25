@@ -329,7 +329,8 @@ void MotorService::checkDriverFault(uint8_t motor)
         drive_enabled = false;
     }
 
-    cached_motor_faults_.at(motor).update(drive_enabled, motor_faults);
+        cached_motor_faults_.at(motor).update(drive_enabled, motor_faults);
+
 }
 
 TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_velocity_mps,

@@ -40,14 +40,13 @@ int main(int argc, char **argv)
 
     motor_service_ =
         std::make_unique<MotorService>(create2021RobotConstants(), THUNDERLOOP_HZ);
-
+    motor_service_->setup();
     // Testing Motor board SPI transfer
     for (uint8_t chip_select : CHIP_SELECT)
     {
         LOG(INFO) << "Checking motor: " << int(chip_select);
-
         // Check driver fault
-        if (!motor_service_->checkDriverFault(chip_select).drive_enabled)
+        if (motor_service_->getCachedMotorFaults().at(chip_select).num_critical_faults>0)
         {
             LOG(WARNING) << "Detected Motor Fault";
         }

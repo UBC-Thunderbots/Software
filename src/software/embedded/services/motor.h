@@ -122,12 +122,12 @@ class MotorService
         bool drive_enabled;
         std::unordered_set<TbotsProto::MotorFault> last_motor_faults;
         const uint8_t motor_id;
-        int num_faults;
+        int num_critical_faults;
 
         /**
          * Construct a default indicator of no faults and running motors, with a motor id.
          */
-        MotorFaultIndicator(uint8_t id) : drive_enabled(true), last_motor_faults(), motor_id(id), num_faults(0){}
+        MotorFaultIndicator(uint8_t id) : drive_enabled(true), last_motor_faults(), motor_id(id), num_critical_faults(0){}
 
         /**
          * update drive enabled and the faults
@@ -139,7 +139,9 @@ class MotorService
          void update(bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults){
              drive_enabled = enabled;
              last_motor_faults = motor_faults;
-             num_faults++;
+             if(!enabled){
+                 num_critical_faults++;
+             }
          }
     };
 
@@ -179,6 +181,10 @@ class MotorService
      * @return read value
      */
     int readIntFromTMC4671(uint8_t motor, uint8_t address);
+
+    std::unordered_map<int, MotorFaultIndicator> getCachedMotorFaults(){
+        return cached_motor_faults_;
+    }
 
    private:
     /**
@@ -350,6 +356,8 @@ class MotorService
      * @return true if the motor has returned a cached RESET fault, false otherwise
      */
     bool requiresMotorReinit(uint8_t motor);
+
+
 
     // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
     // pairs of the drive motor.
