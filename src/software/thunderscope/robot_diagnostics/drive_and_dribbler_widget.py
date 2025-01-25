@@ -293,7 +293,7 @@ class DriveAndDribblerWidget(QWidget):
     def __setup_drive_switch_radio(self) -> QGroupBox:
         """Create a radio button widget to switch between per-motor and velocity drive modes
 
-        :param title: vbox name
+        :returns: The group box of the radio button switch.
         """
         group_box = QGroupBox()
         vbox = QVBoxLayout()
