@@ -129,6 +129,7 @@ MotorService::~MotorService() {}
 
 void MotorService::setup()
 {
+    // Scrap this code and use the structure I defined. Parse through all motors and check for 3 faults on a single motor.
     const auto now                             = std::chrono::system_clock::now();
     long int total_duration_since_last_fault_s = 0;
     if (tracked_motor_fault_start_time_.has_value())

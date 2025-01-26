@@ -123,25 +123,53 @@ class MotorService
         std::unordered_set<TbotsProto::MotorFault> last_motor_faults;
         const uint8_t motor_id;
         int num_critical_faults;
+        std::optional<std::chrono::time_point<std::chrono::system_clock>> time_of_first_fault;
+        long int total_duration_since_last_fault_s;
 
         /**
          * Construct a default indicator of no faults and running motors, with a motor id.
          */
-        MotorFaultIndicator(uint8_t id) : drive_enabled(true), last_motor_faults(), motor_id(id), num_critical_faults(0){}
+        MotorFaultIndicator(uint8_t id)
+        : drive_enabled(true), last_motor_faults(), motor_id(id),
+          num_critical_faults(0), time_of_first_fault(std::nullopt),
+          total_duration_since_last_fault_s(0){}
 
         /**
-         * update drive enabled and the faults
+         * Update drive enabled, fault count, type of last fault, and time since the last fault
          *
-         * * @param drive_enabled true if the motor is enabled, false if disabled due to a
+         * @param enabled true if the motor is enabled, false if disabled due to a
          * motor fault
          * @param motor_faults  a set of faults associated with this motor
          */
-         void update(bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults){
-             drive_enabled = enabled;
-             last_motor_faults = motor_faults;
-             if(!enabled){
-                 num_critical_faults++;
-             }
+        void update(bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults)
+         {
+            const auto now = std::chrono::system_clock::now();
+            drive_enabled = enabled;
+            last_motor_faults = motor_faults;
+
+            if(time_of_first_fault.has_value()) {
+                total_duration_since_last_fault_s =
+                        std::chrono::duration_cast<std::chrono::seconds>(
+                                now - time_of_first_fault.value())
+                                .count();
+            }
+
+            if(time_of_first_fault.has_value() &&
+               total_duration_since_last_fault_s < MOTOR_FAULT_TIME_THRESHOLD_S)
+            {
+                if(!enabled)
+                {
+                    num_critical_faults++;
+                }
+            }
+            else
+            {
+                if(!enabled)
+                {
+                    time_of_first_fault = std::make_optional(now);
+                    num_critical_faults = 1;
+                }
+            }
          }
     };
 
