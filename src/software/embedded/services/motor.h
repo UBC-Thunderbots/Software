@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
@@ -15,6 +16,8 @@
 #include "software/embedded/platform.h"
 #include "software/physics/euclidean_to_wheel.h"
 
+
+#include "software/logger/logger.h"
 /**
  * A service that interacts with the motor.
  *
@@ -137,6 +140,7 @@ class MotorService
         /**
          * Update drive enabled, fault count, type of last fault, and time since the last fault
          *
+         *
          * @param enabled true if the motor is enabled, false if disabled due to a
          * motor fault
          * @param motor_faults  a set of faults associated with this motor
@@ -170,6 +174,21 @@ class MotorService
                     num_critical_faults = 1;
                 }
             }
+         }
+         /**
+          *  Remove motor_id from enabled_motors and log the removal, if it has failed too much.
+          *
+          *  @param motors a set of motors that are currently enabled
+          */
+          std::set<uint8_t> removeFaultyMotor(std::set<uint8_t> motors)
+         {
+             if(num_critical_faults > MOTOR_FAULT_THRESHOLD_COUNT) {
+                 LOG(WARNING) << "In the last " << total_duration_since_last_fault_s
+                              << "s, the motor board has reset " << num_critical_faults
+                              << " times. The motor is now disabled for safety";
+                 motors.erase(motor_id);
+             }
+             return motors;
          }
     };
 
@@ -455,6 +474,7 @@ class MotorService
 
     static const uint8_t NUM_DRIVE_MOTORS = 4;
     static const uint8_t NUM_MOTORS       = NUM_DRIVE_MOTORS + 1;
+    std::set<uint8_t> enabled_motors;
 
     static const int MOTOR_FAULT_TIME_THRESHOLD_S = 60;
     static const int MOTOR_FAULT_THRESHOLD_COUNT  = 3;

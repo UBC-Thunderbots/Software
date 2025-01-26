@@ -80,7 +80,8 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       motor_fault_detector_(0),
       dribbler_ramp_rpm_(0),
       tracked_motor_fault_start_time_(std::nullopt),
-      num_tracked_motor_resets_(0)
+      num_tracked_motor_resets_(0),
+      enabled_motors({0,1,2,3,4})
 {
     motorServiceInit(robot_constants, control_loop_frequency_hz);
 }
@@ -169,7 +170,7 @@ void MotorService::setup()
     reset_gpio_->setValue(GpioState::HIGH);
     usleep(MICROSECONDS_PER_MILLISECOND * 100);
 
-    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
+    for (uint8_t motor : enabled_motors)
     {
         LOG(INFO) << "Clearing RESET for " << MOTOR_NAMES[motor];
         tmc6100_writeInt(motor, TMC6100_GSTAT, 0x00000001);
@@ -330,7 +331,8 @@ void MotorService::checkDriverFault(uint8_t motor)
         drive_enabled = false;
     }
 
-        cached_motor_faults_.at(motor).update(drive_enabled, motor_faults);
+    cached_motor_faults_.at(motor).update(drive_enabled, motor_faults);
+    cached_motor_faults_.at(motor).removeFaultyMotor(enabled_motors);
 
 }
 
