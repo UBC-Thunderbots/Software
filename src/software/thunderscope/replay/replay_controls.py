@@ -185,7 +185,11 @@ class ReplayControls(QWidget):
         """Create bookmark visuals"""
         for timestamp in self.player.bookmark_indices:
             bookmark = BookmarkMarker(
-                timestamp, self.seek_absolute, self.replay_slider, self.replay_label, self
+                timestamp,
+                self.seek_absolute,
+                self.replay_slider,
+                self.replay_label,
+                self,
             )
             self.bookmarks_markers.append(bookmark)
 

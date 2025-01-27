@@ -52,4 +52,9 @@ class BookmarkMarker(QPushButton):
         slider_rect: QRect = self.slider.geometry()
         label_rect: QRect = self.label.geometry()
         max_val = self.slider.maximum() / MILLISECONDS_PER_SECOND
-        self.move(int(slider_rect.width() * self.value // max_val), label_rect.height() + slider_rect.height() + BookmarkMarker.MARKER_RADIUS // 2)
+        self.move(
+            int(slider_rect.width() * self.value // max_val),
+            label_rect.height()
+            + slider_rect.height()
+            + BookmarkMarker.MARKER_RADIUS // 2,
+        )
