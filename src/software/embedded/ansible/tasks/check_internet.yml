@@ -1,8 +1,7 @@
 ---
 - name: Check internet connection
   tags: check_internet
-  ansible.builtin.wait_for:
-    host: google.com
-    state: started
-    delay: "00"
-    timeout: 10
+  ansible.builtin.uri:
+    url: http://google.com
+  retries: 6
+  delay: 5
