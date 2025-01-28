@@ -173,8 +173,6 @@ Thunderloop::~Thunderloop() {}
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
     clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
 
-//    double loop_duration_seconds = 0.0;
-
     for (;;)
     {
         struct timespec time_since_prev_iter;
@@ -233,7 +231,7 @@ Thunderloop::~Thunderloop() {}
 
                 auto orientation_msg_iter = primitive_set_.robot_orientations().find((uint32_t) robot_id_);
                 if (orientation_msg_iter != primitive_set_.robot_orientations().end()) {
-                    robot_localizer_.rollbackVision(createAngle(orientation_msg_iter->second), 0.015);
+                    robot_localizer_.rollbackVision(createAngle(orientation_msg_iter->second), RTT_S);
                 }
 
 
@@ -313,8 +311,7 @@ Thunderloop::~Thunderloop() {}
             }
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
-//            LOG(INFO) << imu_service_->pollHeadingRate().value().toRadians();
-//            imu_service_->pollHeadingRate();
+
             struct timespec time_since_kicker_fired;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             ScopedTimespecTimer::timespecDiff(&current_time, &last_kicker_fired,
@@ -456,7 +453,7 @@ bool isPowerStable(std::ifstream& log_file)
     // power supply is indeed stable
     if (!log_file.is_open())
     {
-//        LOG(WARNING) << "Cannot dmesg log file. Do you have permission?";
+        LOG(WARNING) << "Cannot dmesg log file. Do you have permission?";
         return true;
     }
 

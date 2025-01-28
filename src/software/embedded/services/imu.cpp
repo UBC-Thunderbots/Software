@@ -78,12 +78,10 @@ ImuService::ImuService() {
     for (int i = 0; i < 100; i++) {
         double poll = pollHeadingRate()->toDegrees();
         sum += poll;
-        LOG(INFO) << poll;
         usleep(50000);
     }
     double avg = sum / 100;
     degrees_error_ = avg;
-    LOG(INFO) << degrees_error_;
 
 
 
@@ -97,19 +95,14 @@ std::optional<AngularVelocity> ImuService::pollHeadingRate() {
     if (ret < 0) {
         return std::nullopt;
     }
+    // Two separate registers for the Gyro output data.
     auto least_significant = int16_t(i2c_smbus_read_byte_data(file_descriptor_, 0x26));
     auto most_significant = int16_t(i2c_smbus_read_byte_data(file_descriptor_, 0x27));
+
 
     auto foo = (int16_t)(most_significant << 8);
     auto full_word = foo + least_significant;
 
     double degrees_per_sec = double(full_word) / double(SHRT_MAX) * IMU_FULL_SCALE_DPS;
-
-    measured_samples += 1;
-    measured_mean = (measured_mean * (measured_samples - 1) + degrees_per_sec) / measured_samples;
-
-    measured_variance = (measured_variance  * (measured_samples - 1) + pow(degrees_per_sec - measured_mean, 2)) / measured_samples;
-    std::cout << degrees_per_sec << std::endl;
-    LOG(CSV, "imuspeeds.csv") << degrees_per_sec << "\n";
     return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
 }
