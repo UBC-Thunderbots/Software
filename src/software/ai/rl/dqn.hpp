@@ -1,5 +1,8 @@
 #pragma once
 
+#include <filesystem>
+#include <sys/file.h>
+
 #include "software/ai/rl/replay/transition.hpp"
 #include "software/ai/rl/torch.h"
 
@@ -52,23 +55,27 @@ class DQN
                          torch::Tensor weights);
 
     /**
-     * Save the weights of the current network to a file.
+     * Save the weights of the current network to disk.
      *
-     * @param file_path the file to save the network weights to
+     * @param path the path to the directory where the network weights will be saved
      */
-    void save(const std::string& file_path) const;
+    void save(const std::string& path) const;
 
     /**
-     * Loads the weights from the given file into the current network and
+     * Loads the weights from the given directory into the current network and
      * target network.
      *
-     * @param file_path the file to load the network weights from
+     * @param path the path to the directory to load the network weights from
      */
-    void load(const std::string& file_path);
+    void load(const std::string& path);
 
    private:
     static constexpr int HIDDEN_LAYER_SIZE   = 128;
     static constexpr int CLIP_GRADIENT_VALUE = 100;
+
+    const std::string CURRENT_NET_FILE_NAME = "current_net.pt";
+    const std::string TARGET_NET_FILE_NAME = "target_net.pt";
+    const std::string LOCK_FILE_NAME = ".lock";
 
     /**
      * Helper for constructing a PyTorch feed-forward neural network for the DQN.
@@ -86,6 +93,8 @@ class DQN
     // Tau hyperparameter used in target network soft update rule
     float soft_update_tau_;
 
+    float save_update_tau_;
+
     torch::nn::Sequential current_net_;
     torch::nn::Sequential target_net_;
     torch::optim::AdamW optimizer_;
@@ -96,6 +105,7 @@ DQN<TState, TAction>::DQN(float learning_rate, float discount_rate, float soft_u
     : learning_rate_(learning_rate),
       discount_rate_(discount_rate),
       soft_update_tau_(soft_update_tau),
+      save_update_tau_(0.3f),
       current_net_(createNetwork()),
       target_net_(createNetwork()),
       optimizer_(current_net_->parameters(), {learning_rate_})
@@ -190,16 +200,64 @@ torch::Tensor DQN<TState, TAction>::update(
 }
 
 template <typename TState, typename TAction>
-void DQN<TState, TAction>::save(const std::string& file_path) const
+void DQN<TState, TAction>::save(const std::string& path) const
 {
-    torch::save(current_net_, file_path);
+    const std::string current_net_path = path + "/" + CURRENT_NET_FILE_NAME;
+    const std::string target_net_path = path + "/" + TARGET_NET_FILE_NAME;
+
+    if (!std::filesystem::is_directory(path))
+    {
+        std::filesystem::create_directory(path);
+    }
+
+    if (!std::filesystem::exists(current_net_path) ||
+        !std::filesystem::exists(target_net_path))
+    {
+        torch::save(current_net_, current_net_path);
+        torch::save(target_net_, target_net_path);
+        return;
+    }
+
+    const int fd = open(LOCK_FILE_NAME.c_str(), O_WRONLY | O_CREAT, 0666);
+    if (flock(fd, LOCK_EX))
+    {
+        torch::NoGradGuard no_grad;
+
+        torch::nn::Sequential loaded_current_net;
+        torch::nn::Sequential loaded_target_net;
+
+        torch::load(loaded_current_net, current_net_path);
+        torch::load(loaded_target_net, target_net_path);
+
+        const auto& current_params = current_net_->named_parameters();
+        const auto& target_params = target_net_->named_parameters();
+        const auto& loaded_current_params = loaded_current_net->named_parameters();
+        const auto& loaded_target_params = loaded_target_net->named_parameters();
+
+        for (const std::string& key : loaded_current_params.keys())
+        {
+            const torch::Tensor* current_param = current_params.find(key);
+            const torch::Tensor* target_param = target_params.find(key);
+            const torch::Tensor* loaded_current_param = loaded_current_params.find(key);
+            const torch::Tensor* loaded_target_param = loaded_target_params.find(key);
+            loaded_current_param->copy_(save_update_tau_ * current_param->clone() +
+                                   (1 - save_update_tau_) * *loaded_current_param);
+            loaded_target_param->copy_(save_update_tau_ * target_param->clone() +
+                                   (1 - save_update_tau_) * *loaded_target_param);
+        }
+
+        torch::save(loaded_current_net, current_net_path);
+        torch::save(loaded_target_net, target_net_path);
+    }
+
+    close(fd);
 }
 
 template <typename TState, typename TAction>
-void DQN<TState, TAction>::load(const std::string& file_path)
+void DQN<TState, TAction>::load(const std::string& path)
 {
-    torch::load(current_net_, file_path);
-    torch::load(target_net_, file_path);
+    torch::load(current_net_, path + "/" + CURRENT_NET_FILE_NAME);
+    torch::load(target_net_, path + "/" + TARGET_NET_FILE_NAME);
 }
 
 template <typename TState, typename TAction>

@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
+#include <filesystem>
+
 AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       dqn_(DQN_LEARNING_RATE, DQN_DISCOUNT_RATE, DQN_SOFT_UPDATE_TAU),
@@ -11,6 +13,11 @@ AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         skill_executors_[id] = AttackerSkillExecutor();
+    }
+
+    if (std::filesystem::is_directory(DQN_WEIGHTS_PATH))
+    {
+        dqn_.load(DQN_WEIGHTS_PATH);
     }
 }
 
@@ -99,6 +106,8 @@ void AttackerTactic::updateDQN(const WorldPtr& new_world, bool is_final)
         const torch::Tensor td_error = dqn_.update(transitions, weights);
         replay_buffer_.updatePriorities(indices, td_error);
     }
+
+    dqn_.save(DQN_WEIGHTS_PATH);
 }
 
 float AttackerTactic::computeReward(const World& old_world, const World& new_world)

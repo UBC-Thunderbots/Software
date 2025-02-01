@@ -105,6 +105,9 @@ class AttackerTactic : public Tactic
     static constexpr double EPSILON_END        = 0.05;
     static constexpr double EPSILON_DECAY_RATE = 1000;
 
+    // Path to directory storing DQN weights
+    const std::string DQN_WEIGHTS_PATH = "/tmp/tbots/dqn_weights";
+
     DQN<AttackerState, AttackerSkill> dqn_;
     PrioritizedReplayBuffer<AttackerState, AttackerSkill> replay_buffer_;
     EpsilonGreedyStrategy<AttackerSkill> epsilon_greedy_strategy_;
