@@ -519,7 +519,7 @@ if __name__ == "__main__":
 
             if args.enable_autoref and args.ci_mode:
                 if args.headless:
-                    exit_poller(autoref, CI_DURATION_S, lambda: None)
+                    exit_poller(autoref, CI_DURATION_S, stop_event, lambda: None)
                 else:
                     # In CI mode, we want AI vs AI to end automatically after a given time (CI_DURATION_S). The exiter
                     # thread is passed an exit handler that will close the Thunderscope window
@@ -527,18 +527,21 @@ if __name__ == "__main__":
                     # call so we need to somehow close it before doing our resource cleanup
                     exiter_thread = threading.Thread(
                         target=exit_poller,
-                        args=(autoref, CI_DURATION_S, lambda: tscope.close()),
+                        args=(autoref, CI_DURATION_S, stop_event, lambda: tscope.close()),
                         daemon=True,
                     )
                     exiter_thread.start()
 
                     # Show Thunderscope GUI -- blocking!
                     tscope.show()
+
+                    # Resource cleanup once Thunderscope is closed
+                    stop_event.set()
+                    exiter_thread.join()
             else:
                 # Show Thunderscope GUI -- blocking!
                 tscope.show()
 
-            # Resource cleanup once Thunderscope is closed or exit_poller exits
+            # Resource cleanup once Thunderscope is closed
             stop_event.set()
-            exiter_thread.join()
             sim_ticker_thread.join()

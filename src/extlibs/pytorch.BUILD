@@ -10,6 +10,7 @@ cc_library(
         "lib/libtorch.so",
         "lib/libtorch_cpu.so",
         "lib/libtorch_global_deps.so",
+        "lib/libgomp-98b21ff3.so.1"
     ],
     hdrs = glob(["include/**/*.h"]),
     includes = [

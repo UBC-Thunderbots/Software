@@ -17,6 +17,7 @@ import threading
 def exit_poller(
         time_provider: TimeProvider,
         exit_duration_s: float,
+        stop_event: threading.Event,
         on_exit: Callable[[], None],
         poll_duration_s: float = 0.5,
 ) -> NoReturn:
@@ -25,11 +26,12 @@ def exit_poller(
 
     :param time_provider:   used to compare all timestamps
     :param exit_duration_s: how long to poll from the start of this program before exiting
+    :param stop_event:      event which signals to stop polling and call on_exit
     :param on_exit:         callback once the exit_duration time has elapsed
     :param poll_duration_s: interval between polling the time_provider for the current timestamp
     """
     time_now_s = time_provider.time_provider()
-    while time_provider.time_provider() <= (time_now_s + exit_duration_s):
+    while not stop_event.is_set() and time_provider.time_provider() <= (time_now_s + exit_duration_s):
         time.sleep(poll_duration_s)
 
     on_exit()
