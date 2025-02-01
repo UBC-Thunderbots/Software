@@ -17,8 +17,8 @@ class EmbeddedData:
             decode_responses=True
         )
 
-    def get_robot_id(self) -> int:
-        return int(self.redis.get(ROBOT_ID_REDIS_KEY))
+    def get_robot_id(self) -> str:
+        return str(self.redis.get(ROBOT_ID_REDIS_KEY))
 
     def get_network_interface(self) -> str:
         return str(self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY))

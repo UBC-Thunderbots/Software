@@ -15,12 +15,17 @@ class EmbeddedCommunication:
         self.primitive_set_sender = None
         self.receive_robot_status = None
         self.embedded_data = EmbeddedData()
-        self.channel_id = self.embedded_data.get_robot_id()
-        self.robot_id = self.embedded_data.get_robot_id()
+        self.channel_id = int(self.embedded_data.get_robot_id())
+        self.robot_id = int(self.embedded_data.get_robot_id())
 
         self.sequence_number = 0
         self.command_duration_seconds = 2.0
         self.send_primitive_interval_s = 0.01
+
+        self.epoch_timestamp_seconds = 0
+        self.battery_voltage = 0
+        self.primitive_packet_loss_percentage = 0
+        self.primitive_executor_step_time_ms = 0
 
         # total primitives for this robots
         self.robot_primitives = {}

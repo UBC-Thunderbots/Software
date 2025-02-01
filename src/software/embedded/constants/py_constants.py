@@ -26,7 +26,7 @@ class EstopMode(IntEnum):
 # Paths to check for estop when running diagnostics
 ESTOP_PATH_1 = "/dev/ttyACM0"
 ESTOP_PATH_2 = "/dev/ttyUSB0"
-
+ESTOP_PATH_3 = "/dev/ttyUSB1"
 
 def get_estop_config(
         keyboard_estop: bool, disable_communication: bool
@@ -52,8 +52,8 @@ def get_estop_config(
         path = (
             ESTOP_PATH_1
             if os.path.exists(ESTOP_PATH_1)
-            else ESTOP_PATH_2
-            if os.path.exists(ESTOP_PATH_2)
+            else ESTOP_PATH_3
+            if os.path.exists(ESTOP_PATH_3)
             else None
         )
         if not path:

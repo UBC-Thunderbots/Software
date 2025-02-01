@@ -13,7 +13,6 @@ from typing import List, Optional
 from typing_extensions import Annotated
 from embedded_communication import EmbeddedCommunication
 from proto.import_all_protos import *
-from software.logger.logger import create_logger
 from software.embedded.constants.py_constants import (DEFAULT_PRIMITIVE_DURATION, ROBOT_MAX_ANG_SPEED_RAD_PER_S,
                                                       ROBOT_MAX_SPEED_M_PER_S, MAX_FORCE_DRIBBLER_SPEED_RPM)
 
@@ -43,15 +42,13 @@ class RobotDiagnosticsCLI:
         self.app.command(short_help="Prints Thunderloop Logs")(self.log)
         self.app.command(short_help="Prints Thunderloop Status")(self.status)
         self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
-
         # Communication object responsible for proto execution/transmission
         self.embedded_communication = embedded_communication
         # Data handler responsible for disk information
+
         self.embedded_data = self.embedded_communication.embedded_data
 
         self.console = Console()
-        self.easy_mode_enabled = False
-        self.logger = logging.getLogger("DiagnosticsCLI")
         logging.basicConfig(
             level=logging.INFO,
             handlers=[RichHandler(rich_tracebacks=True, markup=True)]
@@ -285,8 +282,7 @@ class RobotDiagnosticsCLI:
 
     def emote(self):
         # TODO: Add an emote function!
-        pass
-
+        return
 
 if __name__ == "__main__":
     with EmbeddedCommunication() as embedded_communication:
