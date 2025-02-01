@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@thunderscope_deps//:requirements.bzl", "requirement")
+
 py_library(
     name = "proto_configuration_widget",
     srcs = ["proto_configuration_widget.py"],
@@ -26,6 +28,7 @@ py_library(
     srcs = ["proto_parameter_tree_util.py"],
     deps = [
         ":common_widgets",
+        requirement("netifaces"),
     ],
 )
 

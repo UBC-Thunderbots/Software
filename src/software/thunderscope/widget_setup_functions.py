@@ -58,6 +58,7 @@ def setup_gl_widget(
     replay: bool = False,
     replay_log: os.PathLike = None,
     frame_swap_counter: Optional[FrameTimeCounter] = None,
+    send_sync_message: bool = False,
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -70,6 +71,7 @@ def setup_gl_widget(
     :param replay_log: The file path of the replay log
     :param frame_swap_counter: FrameTimeCounter to keep track of the time between
                                frame swaps in the GLWidget
+    :param send_sync_message: Whether to synchronize Thunderscope with a listener
     :return: The GLWidget
     """
     # Create ProtoPlayer if replay is enabled
@@ -210,6 +212,9 @@ def setup_parameter_widget(
         attr: Any, value: Any, updated_proto: ThunderbotsConfig
     ) -> None:
         proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
+        proto_unix_io.send_proto(
+            NetworkConfig, updated_proto.ai_config.ai_control_config.network_config
+        )
 
     return ProtoConfigurationWidget(
         on_change_callback, is_yellow=friendly_colour_yellow

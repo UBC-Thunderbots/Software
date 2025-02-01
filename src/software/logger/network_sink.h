@@ -17,17 +17,22 @@ class NetworkSink
 {
    public:
     /**
-     * Creates a NetworkSink that sends udp packets to the channel provided
+     * Creates a NetworkSink that sends UDP packets.
      *
-     * @param channel The channel to join, index of NETWORK_LOGGING_MULTICAST_CHANNELS in
-     * software/constants.h
-     * @param interface The interface to join the multicast group on (lo, eth0, enp3s0f1,
-     * etc.)
      * @param robot_id id of the robot sending the logs
      * @param enable_log_merging Whether to merge repeated log message or not
      */
-    NetworkSink(unsigned int channel, const std::string& interface, int robot_id,
-                bool enable_log_merging);
+    NetworkSink(int robot_id, bool enable_log_merging);
+
+    /**
+     * Replaces the underlying UDP sender with a new one. Intended to be used when a new
+     * Full-System node is connected.
+     *
+     * @param new_sender the new UDP sender to use
+     */
+    void replaceUdpSender(
+        std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> new_sender);
+
     /**
      * This function is called on every call to LOG(). It sends a RobotLog proto on the
      * network and merges repeated messages.
@@ -44,7 +49,10 @@ class NetworkSink
     void sendOneLogToNetwork(const g3::LogMessage& log);
 
    private:
-    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
     int robot_id;
     LogMerger log_merger;
+
+    std::mutex robot_log_sender_mutex;
+    std::optional<std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>>>
+        robot_log_sender;
 };
