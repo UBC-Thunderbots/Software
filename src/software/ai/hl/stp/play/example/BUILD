@@ -45,3 +45,19 @@ cc_test(
         "//software/test_util",
     ],
 )
+
+py_test(
+    name = "example_play_test_py",
+    main = "example_play_test.py",
+    srcs = ["example_play_test.py"],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests:speed_threshold_helpers",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
