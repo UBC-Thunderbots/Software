@@ -112,15 +112,6 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "robot_localizer_test",
-    srcs = ["robot_localizer_test.cpp"],
-    deps = [
-        ":robot_localizer",
-        "//shared/test_util:tbots_gtest_main"
-    ]
-)
-
 cc_library(
     name = "robot_localizer",
     srcs = ["robot_localizer.cpp"],

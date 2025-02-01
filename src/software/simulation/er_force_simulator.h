@@ -172,6 +172,13 @@ class ErForceSimulator
     getRobotIdToLocalVelocityMap(
         const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
 
+    /**
+     * Gets a map from robot id to orientation from repeated sim robots
+     *
+     * @param sim_robots Repeated er force sim robot protos
+     *
+     * @return a map from robot id to orientation
+     */
     std::map<RobotId, Angle>
     getRobotIdToOrientationMap(
             const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
