@@ -103,7 +103,7 @@ cc_test(
 
 cc_library(
     name = "kalman_filter",
-    srcs = [],
+    srcs = ["kalman_filter.cpp"],
     hdrs = ["kalman_filter.h"],
     deps = [
         "@eigen"
