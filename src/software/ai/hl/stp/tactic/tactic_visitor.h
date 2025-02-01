@@ -27,8 +27,8 @@ class HaltTactic;
 class StopTestTactic;
 class MoveGoalieToGoalLineTactic;
 class PrepareKickoffMoveTactic;
-class PlaceBallTactic;
-class PlaceBallMoveTactic;
+class BallPlacementDribbleTactic;
+class BallPlacementMoveTactic;
 class WallKickoffTactic;
 class AvoidInterferenceTactic;
 
@@ -69,8 +69,8 @@ class TacticVisitor
     virtual void visit(const StopTestTactic &tactic)             = 0;
     virtual void visit(const MoveGoalieToGoalLineTactic &tactic) = 0;
     virtual void visit(const PrepareKickoffMoveTactic &tactic)   = 0;
-    virtual void visit(const PlaceBallTactic &tactic)            = 0;
-    virtual void visit(const PlaceBallMoveTactic &tactic)        = 0;
+    virtual void visit(const BallPlacementDribbleTactic &tactic) = 0;
+    virtual void visit(const BallPlacementMoveTactic &tactic)    = 0;
     virtual void visit(const WallKickoffTactic &tactic)          = 0;
     virtual void visit(const AvoidInterferenceTactic &tactic)    = 0;
 };

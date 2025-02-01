@@ -507,7 +507,9 @@ int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
         case TbotsProto::DribblerMode::MAX_FORCE:
             return robot_constants.max_force_dribbler_speed_rpm;
         case TbotsProto::DribblerMode::OFF:
-            return 0;
+            return 0.0;
+        case TbotsProto::DribblerMode::RELEASE_BALL_SLOW:
+            return robot_constants.release_ball_dribbler_speed_rpm;
         default:
             LOG(WARNING) << "DribblerMode is invalid" << std::endl;
             return 0;
@@ -527,6 +529,12 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
                    STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND;
         case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
             return COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT:
+            return robot_constants.ball_placement_retreat_max_speed_m_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE:
+            return robot_constants.ball_placement_wall_max_speed_m_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::DRIBBLE:
+            return robot_constants.dribble_speed_m_per_s;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;
