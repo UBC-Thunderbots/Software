@@ -118,6 +118,8 @@ class AttackerTactic : public Tactic
 
     std::map<RobotId, AttackerSkillExecutor> skill_executors_;
 
+    float episode_reward_;
+
     AttackerSkillExecutor::ControlParams control_params_;
     TbotsProto::AiConfig ai_config_;
 };

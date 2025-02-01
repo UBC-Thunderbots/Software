@@ -19,6 +19,7 @@ assert protobuf_impl_type == "upb", (
 
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
+from proto.ssl_gc_common_pb2 import Division
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
@@ -515,6 +516,49 @@ if __name__ == "__main__":
             )
             sim_ticker_thread.start()
 
+            train_loop_thread = None
+            exiter_thread = None    
+
+            if args.training_mode:
+
+                def __train_loop():
+                    world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
+                    tscope_config.proto_unix_io_map[ProtoUnixIOTypes.BLUE].register_observer(
+                        World, world_buffer
+                    )
+
+                    last_time_ball_moved = None
+                    last_ball_position = None
+
+                    while not stop_event.is_set():
+                        world = world_buffer.get(block=True)
+                        if world:
+                            current_time = world.time_sent.epoch_timestamp_seconds
+                            if last_time_ball_moved is None:
+                                last_time_ball_moved = current_time
+
+                            ball_position = world.ball.current_state.global_position
+                            if last_ball_position is None:
+                                last_ball_position = ball_position
+
+                            ball_displacement = math.sqrt(
+                                (ball_position.x_meters - last_ball_position.x_meters) ** 2 +
+                                (ball_position.y_meters - last_ball_position.y_meters) ** 2
+                            )
+
+                            if ball_displacement > 0.2:
+                                last_ball_position = ball_position
+                                last_time_ball_moved = current_time
+
+                            if current_time - last_time_ball_moved > 30:
+                                stop_event.set()
+                                tscope.close()
+                            else:
+                                print(f"Ball stationary for: {current_time - last_time_ball_moved} seconds")
+                
+                train_loop_thread = threading.Thread(target=__train_loop, daemon=True)
+                train_loop_thread.start()
+
             tscope.register_refresh_function(gamecontroller.refresh)
 
             if args.enable_autoref and args.ci_mode:
@@ -534,10 +578,6 @@ if __name__ == "__main__":
 
                     # Show Thunderscope GUI -- blocking!
                     tscope.show()
-
-                    # Resource cleanup once Thunderscope is closed
-                    stop_event.set()
-                    exiter_thread.join()
             else:
                 # Show Thunderscope GUI -- blocking!
                 tscope.show()
@@ -545,3 +585,7 @@ if __name__ == "__main__":
             # Resource cleanup once Thunderscope is closed
             stop_event.set()
             sim_ticker_thread.join()
+            if train_loop_thread:
+                train_loop_thread.join()
+            if exiter_thread:
+                exiter_thread.join()
