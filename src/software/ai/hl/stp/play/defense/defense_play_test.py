@@ -19,6 +19,83 @@ from proto.ssl_gc_common_pb2 import Team
                 tbots_cpp.Point(-3, -0.5),
                 tbots_cpp.Point(-3, -1.5),
                 tbots_cpp.Point(-3, 1),
+                tbots_cpp.Point(-0.75, 0),
+            ],
+            [
+                tbots_cpp.Point(3, 0),
+                tbots_cpp.Point(1, -1),
+                tbots_cpp.Point(1, 0),
+                tbots_cpp.Point(2, -1.25),
+                tbots_cpp.Point(2, 1),
+            ],
+        )
+    ],
+)
+def test_defense_play_2(simulated_test_runner, blue_bots, yellow_bots):
+    def setup(*args):
+        # Starting point must be Point
+        ball_initial_pos = tbots_cpp.Point(0.93, 0)
+        # Placement point must be Vector2 to work with game controller
+        tbots_cpp.Point(-3, -2)
+
+        # Game Controller Setup
+        simulated_test_runner.gamecontroller.send_gc_command(
+            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        )
+        simulated_test_runner.gamecontroller.send_gc_command(
+            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+        )
+
+        # Force play override here
+        blue_play = Play()
+        blue_play.name = PlayName.DefensePlay
+
+     #   yellow_play = Play()
+      #  yellow_play.name = PlayName.BallPlacementPlay
+        params = AssignedTacticPlayControlParams()
+
+        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
+     #   simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            AssignedTacticPlayControlParams, params 
+        )
+
+        # Create world state
+        simulated_test_runner.simulator_proto_unix_io.send_proto(
+            WorldState,
+            create_world_state(
+                yellow_robot_locations=yellow_bots,
+                blue_robot_locations=blue_bots,
+                ball_location=ball_initial_pos,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
+
+    simulated_test_runner.run_test(
+        setup=setup,
+        params=[0, 1, 2, 3, 4],  # The aggregate test runs 5 times
+        inv_always_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[[]],
+        ag_always_validation_sequence_set=[
+            [
+                BallNeverEntersRegion(
+                    regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
+                )
+            ]
+        ],
+        ag_eventually_validation_sequence_set=[[]],
+        test_timeout_s=12,
+    )
+@pytest.mark.parametrize(
+    "blue_bots,yellow_bots",
+    [
+        (
+            [
+                tbots_cpp.Point(-3, 1.5),
+                tbots_cpp.Point(-3, 0.5),
+                tbots_cpp.Point(-3, -0.5),
+                tbots_cpp.Point(-3, -1.5),
+                tbots_cpp.Point(-3, 1),
                 tbots_cpp.Point(-3, 0.75),
             ],
             [
@@ -31,6 +108,7 @@ from proto.ssl_gc_common_pb2 import Team
         )
     ],
 )
+
 def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
     def setup(*args):
         # Starting point must be Point
@@ -82,7 +160,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
             ]
         ],
         ag_eventually_validation_sequence_set=[[]],
-        test_timeout_s=30,
+        test_timeout_s=6,
     )
 
 

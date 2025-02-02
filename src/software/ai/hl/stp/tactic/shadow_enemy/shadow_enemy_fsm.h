@@ -148,7 +148,8 @@ struct ShadowEnemyFSM
             // src_state + event [guard] / action = dest_state
             *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
             MoveFSM_S + Update_E[blockedShot_G] / goAndSteal_A = GoAndStealState_S,
-            MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = GoAndStealState_S,
+            MoveFSM_S + Update_E / blockShot_A, 
+            MoveFSM_S = GoAndStealState_S,
             BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
             BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,
             GoAndStealState_S + Update_E[enemyThreatHasBall_G && !contestedBall_G] / goAndSteal_A,

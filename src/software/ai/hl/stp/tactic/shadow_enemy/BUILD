@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "shadow_enemy_tactic",
     srcs = [
@@ -31,7 +33,7 @@ cc_test(
 )
 
 cc_test(
-    name = "shadow_enemy_tactic_test",
+    name = "shadow_enemy_tactic_cpp_test",
     srcs = ["shadow_enemy_tactic_test.cpp"],
     deps = [
         ":shadow_enemy_tactic",
@@ -43,5 +45,19 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "shadow_enemy_tactic_test",
+    srcs = ["shadow_enemy_tactic_test.py"],
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests:speed_threshold_helpers",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
