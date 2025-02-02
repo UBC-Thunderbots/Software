@@ -15,7 +15,7 @@ class EmbeddedCommunication:
         self.primitive_set_sender = None
         self.receive_robot_status = None
         self.embedded_data = EmbeddedData()
-        self.channel_id = int(self.embedded_data.get_robot_id())
+        self.channel_id = int(self.embedded_data.get_channel_id())
         self.robot_id = int(self.embedded_data.get_robot_id())
 
         self.sequence_number = 0
@@ -35,7 +35,6 @@ class EmbeddedCommunication:
 
         # initialising the estop
         self.estop_reader = None
-        self.estop_is_playing = False
         self.should_send_stop = False
         self.estop_mode, self.estop_path = (
             get_estop_config(keyboard_estop=False, disable_communication=False))
@@ -48,6 +47,9 @@ class EmbeddedCommunication:
             self.__update_estop_state()
         except Exception as e:
             raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
+
+    def epoch_time(self):
+        return self.epoch_timestamp_seconds
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Updates the dynamic information with the new RobotStatus message.
@@ -62,12 +64,11 @@ class EmbeddedCommunication:
         """Returns True if a proto should be sent
         :return: boolean
         """
-        return (self.estop_mode != EstopMode.DISABLE_ESTOP) and self.estop_is_playing
+        return (self.estop_mode != EstopMode.DISABLE_ESTOP) and not self.should_send_stop
 
     def send_primitive_set(self, primitive: Primitive) -> None:
         """Forward PrimitiveSet protos from diagnostics to the robots."""
         self.robot_primitives[self.robot_id] = primitive
-        # initialize total primitive set and send it
         primitive_set = PrimitiveSet(
             time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
             stay_away_from_ball=False,
@@ -138,7 +139,6 @@ class EmbeddedCommunication:
             str(getRobotMulticastChannel(
                 self.channel_id)) + "%" + f"{self.embedded_data.get_network_interface()}", PRIMITIVE_PORT, True
         )
-
         return self
 
     def __exit__(self, type, value, traceback) -> None:

@@ -28,7 +28,7 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 // signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
 {
-//    static MotorService* g_motor_service         = NULL;
+    static MotorService* g_motor_service         = NULL;
     static TbotsProto::RobotStatus* robot_status = NULL;
     static int channel_id;
     static std::string network_interface;
@@ -41,10 +41,10 @@ extern "C"
      */
     void tbotsExit(int signal_num)
     {
-//        if (g_motor_service)
-//        {
-//            g_motor_service->resetMotorBoard();
-//        }
+        if (g_motor_service)
+        {
+            g_motor_service->resetMotorBoard();
+        }
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
         // to log messages
@@ -114,22 +114,22 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
         PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
-//    LOG(INFO)
-//        << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
-//
-//    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-//    {
-//        return;
-//    }
-//
-//    power_service_ = std::make_unique<PowerService>();
-//    LOG(INFO)
-//        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
-//
-//    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
-//    g_motor_service = motor_service_.get();
-//    motor_service_->setup();
-//    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
+    LOG(INFO)
+        << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
+
+    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
+    {
+        return;
+    }
+
+    power_service_ = std::make_unique<PowerService>();
+    LOG(INFO)
+        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
+
+    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    g_motor_service = motor_service_.get();
+    motor_service_->setup();
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -281,7 +281,7 @@ void Thunderloop::runLoop()
                 getMilliseconds(poll_time));
 
             // Power Service: execute the power control command
-//            power_status_ = pollPowerService(poll_time);
+            power_status_ = pollPowerService(poll_time);
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
@@ -321,8 +321,8 @@ void Thunderloop::runLoop()
             }
 
             // Motor Service: execute the motor control command
-//            motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(),
-//                                             time_since_prev_iter);
+            motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(),
+                                             time_since_prev_iter);
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
@@ -335,8 +335,8 @@ void Thunderloop::runLoop()
             robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
             *(robot_status_.mutable_time_sent())             = time_sent_;
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
-//            *(robot_status_.mutable_motor_status())          = motor_status_.value();
-//            *(robot_status_.mutable_power_status())          = power_status_;
+            *(robot_status_.mutable_motor_status())          = motor_status_.value();
+            *(robot_status_.mutable_power_status())          = power_status_;
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
@@ -344,18 +344,18 @@ void Thunderloop::runLoop()
                 primitive_executor_status_;
 
             // Update Redis
-//            {
-//                ZoneNamedN(_tracy_redis, "Thunderloop: Commit to REDIS", true);
-//
-//                redis_client_->setNoCommit(
-//                    ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-//                    std::to_string(power_status_.battery_voltage()));
-//                redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
-//                                           std::to_string(power_status_.current_draw()));
-//                redis_client_->asyncCommit();
-//            }
+            {
+                ZoneNamedN(_tracy_redis, "Thunderloop: Commit to REDIS", true);
 
-//            updateErrorCodes();
+                redis_client_->setNoCommit(
+                    ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
+                    std::to_string(power_status_.battery_voltage()));
+                redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
+                                           std::to_string(power_status_.current_draw()));
+                redis_client_->asyncCommit();
+            }
+
+            updateErrorCodes();
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
