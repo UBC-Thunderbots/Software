@@ -156,6 +156,7 @@ void SensorFusion::updateWorld(
     for (auto &robot_status_msg : robot_status_msgs)
     {
         RobotId robot_id = robot_status_msg.robot_id();
+        TbotsProto::RobotCapabilitiesConfig capabilities_config = sensor_fusion_config.robot_capabilities_config();
         std::set<RobotCapability> unavailableCapabilities;
 
         for (const auto &error_code_msg : robot_status_msg.error_code())
@@ -170,6 +171,38 @@ void SensorFusion::updateWorld(
                 unavailableCapabilities.insert(RobotCapability::Dribble);
             }
         }
+
+        char digits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+        if (capabilities_config.broken_dribblers().find(digits[robot_id]) != std::string::npos)
+        {
+            unavailableCapabilities.insert(RobotCapability::Dribble);
+        }
+        else if (capabilities_config.broken_chippers().find(digits[robot_id]) != std::string::npos)
+        {
+            unavailableCapabilities.insert(RobotCapability::Chip);
+        }
+        else if (capabilities_config.broken_kickers().find(digits[robot_id]) != std::string::npos)
+        {
+            unavailableCapabilities.insert(RobotCapability::Kick);
+        }
+
+//        for (const auto &capability : sensor_fusion_config.robot_capabilities_config())
+//        {
+//            if (capability == TbotsProto::RobotCapabilitiesConfig::broken_dribblers())
+//            {
+//                // Parse through string and check if robot_id.id() is in it, if so, insert specific RobotCapability
+//            }
+//            else if (capability == TbotsProto::RobotCapabilitiesConfig::broken_chippers())
+//            {
+//                // placeholder
+//            }
+//            else if (capability == TbotsProto::RobotCapabilitiesConfig::broken_kickers())
+//            {
+//                // placeholder
+//            }
+//        }
+
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
         if (robot_status_msg.has_power_status() &&
