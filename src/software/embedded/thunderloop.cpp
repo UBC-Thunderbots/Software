@@ -222,7 +222,7 @@ void Thunderloop::runLoop()
             network_status_.set_ms_since_last_primitive_received(
                 getMilliseconds(time_since_last_primitive_received));
 
-            LOG(INFO) << "PRIMITIVE INFO: " << primitive_set_.DebugString();
+//            LOG(INFO) << "PRIMITIVE INFO: " << primitive_set_.DebugString();
             // If the primitive msg is new, update the internal buffer
             // and start the new primitive.
             if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
