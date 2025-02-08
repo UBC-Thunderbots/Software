@@ -61,22 +61,27 @@ struct AttackerFSM
     bool shouldKick(const Update& event);
 
 
+
     auto operator()()
     {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(PivotKickFSM)
+        DEFINE_SML_STATE(KeepAwayFSM)
         DEFINE_SML_STATE(DribbleFSM)
+
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(shouldKick)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, DribbleFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, KeepAwayFSM) //
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
-            DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A,
+            DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A = keepAwayFSM_S, // keep away action calls keepaway FSM
+            keepAwayFSM_S + Update_E / keepAway_A,
+            KeepAwayFSM_S = DribbleFSM_S,
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
