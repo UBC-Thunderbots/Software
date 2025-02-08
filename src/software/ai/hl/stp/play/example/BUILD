@@ -6,11 +6,19 @@ cc_library(
     name = "example_play",
     srcs = [
         "example_play.cpp",
+<<<<<<< Updated upstream
         "example_play_fsm.cpp",
     ],
     hdrs = [
         "example_play.h",
         "example_play_fsm.h",
+=======
+        "example_play_fsm.cpp"
+    ],
+    hdrs = [
+        "example_play.h",
+        "example_play_fsm.h"
+>>>>>>> Stashed changes
     ],
     deps = [
         "//shared:constants",
