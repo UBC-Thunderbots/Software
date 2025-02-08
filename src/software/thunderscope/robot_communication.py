@@ -1,17 +1,24 @@
-from __future__ import annotations
+from typing import Self, Type
 
-from software.py_constants import *
-from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.constants import IndividualRobotMode, EstopMode
-import software.python_bindings as tbots_cpp
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from proto.import_all_protos import *
-from typing import Type
 import threading
 import time
 import os
+import software.python_bindings as tbots_cpp
+
 from google.protobuf.message import Message
+from proto.import_all_protos import *
+from software.logger.logger import create_logger
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
+from software.py_constants import *
+from software.thunderscope.constants import (
+    ROBOT_COMMUNICATIONS_TIMEOUT_S,
+    IndividualRobotMode,
+    EstopMode,
+)
+
+logger = create_logger(__name__)
 
 
 class RobotCommunication:
@@ -20,61 +27,58 @@ class RobotCommunication:
     def __init__(
         self,
         current_proto_unix_io: ProtoUnixIO,
-        multicast_channel: str,
-        interface: str,
         estop_mode: EstopMode,
+        communication_manager: WifiCommunicationManager,
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
-        enable_radio: bool = False,
-        referee_port: int = SSL_REFEREE_PORT,
     ):
         """Initialize the communication with the robots
 
         :param current_proto_unix_io: the current proto unix io object
-        :param multicast_channel: The multicast channel to use
-        :param interface: The interface to use
         :param estop_mode: what estop mode we are running right now, of type EstopMode
+        :param communication_manager: Handles WiFi communication to the robots
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
-        :param enable_radio: Whether to use radio to send primitives to robots
-        :param referee_port: the referee port that we are using. If this is None, the default port is used
         """
-        self.referee_port = referee_port
-        self.receive_ssl_referee_proto = None
-        self.receive_ssl_wrapper = None
         self.sequence_number = 0
-        self.last_time = time.time()
         self.current_proto_unix_io = current_proto_unix_io
-        self.multicast_channel = str(multicast_channel)
-        self.interface = interface
         self.estop_mode = estop_mode
 
         self.estop_path = estop_path
         self.estop_buadrate = estop_baudrate
 
-        self.enable_radio = enable_radio
+        self.communication_manager = communication_manager
 
         self.running = False
 
-        self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
+        self.fullsystem_primitive_set_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
-        self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
-        self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
+        self.motor_control_primitive_buffer = ThreadSafeBuffer(1, MotorControl)
+        self.power_control_primitive_buffer = ThreadSafeBuffer(1, PowerControl)
 
-        self.robots_connected_to_fullsystem = set()
-        self.robots_connected_to_manual = set()
-        self.robots_to_be_disconnected = {}
+        # dynamic map of robot id to the individual control mode
+        self.robot_control_mode_map: dict[int, IndividualRobotMode] = {}
+
+        # static map of robot id to stop primitive
+        self.robot_stop_primitives_map: dict[int, StopPrimitive] = {}
+
+        # links robot id to the number of times to send a stop primitive
+        self.robot_stop_primitive_send_count: list[int] = [0] * MAX_ROBOT_IDS_PER_SIDE
 
         self.current_proto_unix_io.register_observer(
-            PrimitiveSet, self.primitive_buffer
+            PrimitiveSet, self.fullsystem_primitive_set_buffer
         )
 
         self.current_proto_unix_io.register_observer(
-            MotorControl, self.motor_control_diagnostics_buffer
+            MotorControl, self.motor_control_primitive_buffer
         )
+
         self.current_proto_unix_io.register_observer(
-            PowerControl, self.power_control_diagnostics_buffer
+            PowerControl, self.power_control_primitive_buffer
         )
+
+        # dynamic map of robot id to the individual control mode
+        self.robot_control_mode_map: dict[int, IndividualRobotMode] = {}
 
         self.send_estop_state_thread = threading.Thread(
             target=self.__send_estop_state, daemon=True
@@ -83,52 +87,34 @@ class RobotCommunication:
             target=self.__run_primitive_set, daemon=True
         )
 
+        # load control mode and stop primitive maps with default values
+        for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
+            self.robot_control_mode_map[robot_id] = IndividualRobotMode.NONE
+            self.robot_stop_primitives_map[robot_id] = Primitive(stop=StopPrimitive())
+
+        # TODO: (#3174): move estop state management out of robot_communication
+        self.estop_mode = estop_mode
+        self.estop_path = estop_path
+        self.estop_baudrate = estop_baudrate
+
         # initialising the estop
         # tries to access a plugged in estop. if not found, throws an exception
         # if using keyboard estop, skips this step
         self.estop_reader = None
         self.estop_is_playing = False
-        # when the estop has just been stopped,
-        # we want to send a stop primitive once to all currently connected robots
-        self.should_send_stop = False
 
         # only checks for estop if we are in physical estop mode
         if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
             try:
                 self.estop_reader = tbots_cpp.ThreadedEstopReader(
-                    self.estop_path, self.estop_buadrate
+                    self.estop_path, self.estop_baudrate
                 )
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
-    def setup_for_fullsystem(self) -> None:
-        """Sets up a listener for SSL vision and referee data, and connects
-        all robots to fullsystem as default
-        """
-        self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
-            SSL_VISION_ADDRESS,
-            SSL_VISION_PORT,
-            lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
-            True,
-        )
-
-        self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
-            SSL_REFEREE_ADDRESS,
-            self.referee_port,
-            lambda data: self.current_proto_unix_io.send_proto(Referee, data),
-            True,
-        )
-
         self.robots_connected_to_fullsystem = {
             robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
         }
-
-    def close_for_fullsystem(self) -> None:
-        if self.receive_ssl_wrapper:
-            self.receive_ssl_wrapper.close()
-
-        if self.receive_ssl_referee_proto:
-            self.receive_ssl_referee_proto.close()
 
     def toggle_keyboard_estop(self) -> None:
         """If keyboard estop is being used, toggles the estop state
@@ -136,8 +122,7 @@ class RobotCommunication:
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
             self.estop_is_playing = not self.estop_is_playing
-
-            print(
+            logger.debug(
                 "Keyboard Estop changed to "
                 + (
                     "\x1b[32mPLAY \x1b[0m"
@@ -146,24 +131,20 @@ class RobotCommunication:
                 )
             )
 
-    def toggle_robot_connection(self, mode: IndividualRobotMode, robot_id: int):
-        """Changes the input mode for a robot between None, Manual, or AI
-        If changing from anything to None, add robot to disconnected map
-        So we can send multiple stop primitives to make sure it stops
+    def toggle_individual_robot_control_mode(
+        self, robot_id: int, mode: IndividualRobotMode
+    ):
+        """Changes the input mode for a robot between NONE, MANUAL, or AI
+        If changing from MANUAL OR AI to NONE, add robot id to stop primitive
+        map so that multiple stop primitives are sent - safety number one priority
 
         :param mode: the mode of input for this robot's primitives
         :param robot_id: the id of the robot whose mode we're changing
         """
-        self.robots_connected_to_fullsystem.discard(robot_id)
-        self.robots_connected_to_manual.discard(robot_id)
-        self.robots_to_be_disconnected.pop(robot_id, None)
-
-        if mode == IndividualRobotMode.NONE:
-            self.robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
-        elif mode == IndividualRobotMode.MANUAL:
-            self.robots_connected_to_manual.add(robot_id)
-        elif mode == IndividualRobotMode.AI:
-            self.robots_connected_to_fullsystem.add(robot_id)
+        self.robot_control_mode_map[robot_id] = mode
+        self.robot_stop_primitive_send_count[robot_id] = (
+            NUM_TIMES_SEND_STOP if mode == IndividualRobotMode.NONE else 0
+        )
 
     def __send_estop_state(self) -> None:
         """Constant loop which sends the current estop status proto if estop is not disabled
@@ -177,32 +158,33 @@ class RobotCommunication:
                 if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
 
-                # Send stop primitive once when estop is paused
-                if previous_estop_is_playing and not self.estop_is_playing:
-                    self.should_send_stop = True
-                else:
-                    self.should_send_stop = False
-
-                previous_estop_is_playing = self.estop_is_playing
+                if not self.estop_is_playing:
+                    self.robot_stop_primitive_send_count = [
+                        NUM_TIMES_SEND_STOP
+                        for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+                    ]
 
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_is_playing)
                 )
                 time.sleep(0.1)
 
-    def __should_send_packet(self) -> bool:
-        """Returns True if the proto sending threads should send a proto
+    def __should_send_packet(self, robot_id) -> bool:
+        """Returns True if the proto should be sent to the robot with the given id
+
+        :param robot_id: the id of the robot to potentially send the proto to
 
         :return: boolean
         """
         return (
             self.estop_mode != EstopMode.DISABLE_ESTOP
             and self.estop_is_playing
-            and (self.robots_connected_to_fullsystem or self.robots_connected_to_manual)
+            and self.robot_control_mode_map[robot_id] != IndividualRobotMode.NONE
         )
 
     def __run_primitive_set(self) -> None:
-        """Forward PrimitiveSet protos from fullsystem to the robots.
+        """Forward PrimitiveSet protos from Fullsystem and MotorControl/PowerControl
+        protos from Robot Diagnostics to the robots.
 
         For AI protos, blocks for 10ms if no proto is available, and then returns a cached proto
 
@@ -211,72 +193,79 @@ class RobotCommunication:
 
         If the emergency stop is tripped, the PrimitiveSet will not be sent so
         that the robots timeout and stop.
-
-        NOTE: If disconnect_fullsystem_from_robots is called, then the packets
-        will not be forwarded to the robots.
-
-        send_override_primitive_set can be used to send a primitive set, which
-        is useful to dip in and out of robot diagnostics.
         """
         while self.running:
-            # total primitives for all robots
-            robot_primitives = {}
+            self.communication_manager.poll()
 
-            if self.robots_connected_to_fullsystem:
-                # Get the primitives
-                primitive_set = self.primitive_buffer.get(
-                    block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
+            # map of robot id to diagnostics/fullsystem primitive map
+            robot_primitives_map = {}
+
+            # get the most recent diagnostics primitive
+            motor_control = self.motor_control_primitive_buffer.get(block=False)
+            power_control = self.power_control_primitive_buffer.get(block=False)
+
+            diagnostics_primitive = Primitive(
+                direct_control=DirectControlPrimitive(
+                    motor_control=motor_control,
+                    power_control=power_control,
                 )
-
-                fullsystem_primitives = dict(primitive_set.robot_primitives)
-                for robot_id in fullsystem_primitives.keys():
-                    if robot_id in self.robots_connected_to_fullsystem:
-                        robot_primitives[robot_id] = fullsystem_primitives[robot_id]
-
-            # get the manual control primitive
-            diagnostics_primitive = DirectControlPrimitive(
-                motor_control=self.motor_control_diagnostics_buffer.get(block=False),
-                power_control=self.power_control_diagnostics_buffer.get(block=False),
             )
 
-            # diagnostics is running
-            if self.robots_connected_to_manual:
-                # for all robots connected to diagnostics, set their primitive
-                for robot_id in self.robots_connected_to_manual:
-                    robot_primitives[robot_id] = Primitive(
-                        direct_control=diagnostics_primitive
-                    )
+            # filter for diagnostics controlled robots
+            diagnostics_robots = list(
+                robot_id
+                for robot_id, mode in self.robot_control_mode_map.items()
+                if mode == IndividualRobotMode.MANUAL
+            )
+
+            # set diagnostics primitives for diagnostics robots
+            for robot_id in diagnostics_robots:
+                robot_primitives_map[robot_id] = diagnostics_primitive
+
+            # get the most recent fullsystem primitives
+            fullsystem_primitive_set = self.fullsystem_primitive_set_buffer.get(
+                block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
+            )
+
+            # filter for fullsystem controlled robots
+            fullsystem_robots = list(
+                robot_id
+                for robot_id, mode in self.robot_control_mode_map.items()
+                if mode == IndividualRobotMode.AI
+            )
+
+            # set fullsystem primitives for fullsystem robots
+            for robot_id in fullsystem_robots:
+                robot_primitives_map[robot_id] = (
+                    fullsystem_primitive_set.robot_primitives[robot_id]
+                )
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
-            for robot_id, num_times_to_stop in self.robots_to_be_disconnected.items():
-                if num_times_to_stop > 0:
-                    robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
-                    self.robots_to_be_disconnected[robot_id] = num_times_to_stop - 1
+            for robot_id, num_times_to_send_stop in enumerate(
+                self.robot_stop_primitive_send_count
+            ):
+                if num_times_to_send_stop > 0:
+                    robot_primitives_map[robot_id] = Primitive(stop=StopPrimitive())
+                    self.robot_stop_primitive_send_count[robot_id] = (
+                        num_times_to_send_stop - 1
+                    )
 
-            # initialize total primitive set and send it
-            primitive_set = PrimitiveSet(
-                time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
-                stay_away_from_ball=False,
-                robot_primitives=(
-                    robot_primitives
-                    if not self.should_send_stop
-                    else {
-                        robot_id: Primitive(stop=StopPrimitive())
-                        for robot_id in robot_primitives.keys()
-                    }
-                ),
-                sequence_number=self.sequence_number,
-            )
+            for robot_id, primitive in robot_primitives_map.items():
+                if not self.__should_send_packet(robot_id=robot_id):
+                    continue
+                primitive.sequence_number = self.sequence_number
+                primitive.time_sent.CopyFrom(
+                    Timestamp(epoch_timestamp_seconds=time.time())
+                )
+                self.communication_manager.send_primitive(
+                    robot_id=robot_id, primitive=primitive
+                )
 
             self.sequence_number += 1
 
-            if self.__should_send_packet() or self.should_send_stop:
-                self.send_primitive_set.send_proto(primitive_set)
-                self.should_send_stop = False
-
             # sleep if not running fullsystem
-            if not self.robots_connected_to_fullsystem:
+            if IndividualRobotMode.AI not in self.robot_control_mode_map.values():
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
@@ -288,60 +277,16 @@ class RobotCommunication:
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
 
-    def __enter__(self) -> RobotCommunication:
+    def __enter__(self) -> Self:
         """Enter RobotCommunication context manager. Setup multicast listeners
         for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
         """
-        # Create the multicast listeners
-        self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
-            self.multicast_channel + "%" + self.interface,
-            ROBOT_STATUS_PORT,
-            self.__receive_robot_status,
-            True,
-        )
-
-        self.receive_robot_log = tbots_cpp.RobotLogProtoListener(
-            self.multicast_channel + "%" + self.interface,
-            ROBOT_LOGS_PORT,
-            lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
-            True,
-        )
-
-        self.receive_robot_crash = tbots_cpp.RobotCrashProtoListener(
-            self.multicast_channel + "%" + self.interface,
-            ROBOT_CRASH_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
-            True,
-        )
-
-        # Create multicast senders
-        if self.enable_radio:
-            self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
-        else:
-            self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-                self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
-            )
-
         self.running = True
 
         self.send_estop_state_thread.start()
         self.run_primitive_set_thread.start()
 
         return self
-
-    def __receive_robot_status(self, robot_status: Message) -> None:
-        """Forwards the given robot status to the full system along with the round-trip time
-
-        :param robot_status: RobotStatus to forward to fullsystem
-        """
-        round_trip_time_seconds = time.time() - (
-            robot_status.adjusted_time_sent.epoch_timestamp_seconds
-        )
-        self.__forward_to_proto_unix_io(
-            RobotStatistic,
-            RobotStatistic(round_trip_time_seconds=round_trip_time_seconds),
-        )
-        self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
     def __exit__(self, type, value, traceback) -> None:
         """Exit RobotCommunication context manager
@@ -350,8 +295,4 @@ class RobotCommunication:
         """
         self.running = False
 
-        self.close_for_fullsystem()
-
-        self.receive_robot_log.close()
-        self.receive_robot_status.close()
         self.run_primitive_set_thread.join()

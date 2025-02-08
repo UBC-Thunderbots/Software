@@ -1,12 +1,12 @@
-
 #include "software/logger/plotjuggler_sink.h"
 
 #include <google/protobuf/util/json_util.h>
 
 #include "shared/constants.h"
 
-PlotJugglerSink::PlotJugglerSink()
-    : udp_sender(PLOTJUGGLER_GUI_DEFAULT_HOST, PLOTJUGGLER_GUI_DEFAULT_PORT, false)
+PlotJugglerSink::PlotJugglerSink(const std::string& interface)
+    : udp_sender(PLOTJUGGLER_GUI_DEFAULT_HOST, PLOTJUGGLER_GUI_DEFAULT_PORT, interface,
+                 false)
 {
 }
 

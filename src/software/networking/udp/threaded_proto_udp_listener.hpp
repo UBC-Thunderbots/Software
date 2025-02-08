@@ -15,15 +15,19 @@ class ThreadedProtoUdpListener
      * ReceiveProtoT packet received, the receive_callback will be called to perform any
      * operations desired by the caller.
      *
+     * @throws TbotsNetworkException if we detect an issue with setting up this listener
+     *
      * @param ip_address The ip address on which to listen for the given ReceiveProtoT
      * packets (IPv4 in dotted decimal or IPv6 in hex string) example IPv4: 192.168.0.2
-     *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
+     *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0
      * @param port The port on which to listen for ReceiveProtoT packets
+     * @param interface The interface on which to listen for ReceiveProtoT packets
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
      */
     ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port,
+                             const std::string& interface,
                              std::function<void(ReceiveProtoT)> receive_callback,
                              bool multicast);
 
@@ -31,9 +35,13 @@ class ThreadedProtoUdpListener
      * Creates a ThreadedProtoUdpListener that will listen for ReceiveProtoT packets
      * from the network on any local address with given port. For every ReceiveProtoT
      * packet received, the receive_callback will be called to perform any operations
-     * desired by the caller.
+     * desired by the caller. This constructor should not be used for multicast
+     * communication.
+     *
+     * @throws TbotsNetworkException if we detect an issue with setting up this listener
      *
      * @param port The port on which to listen for ReceiveProtoT packets
+     * @param interface The interface on which to listen for ReceiveProtoT packets
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
      */
@@ -45,6 +53,9 @@ class ThreadedProtoUdpListener
      */
     void close();
 
+    /**
+     * Destructor will close the socket and the IO services threads
+     */
     ~ThreadedProtoUdpListener();
 
 
@@ -61,9 +72,10 @@ class ThreadedProtoUdpListener
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
     const std::string& ip_address, const unsigned short port,
-    std::function<void(ReceiveProtoT)> receive_callback, bool multicast)
+    const std::string& interface, std::function<void(ReceiveProtoT)> receive_callback,
+    bool multicast)
     : io_service(),
-      udp_listener(io_service, ip_address, port, receive_callback, multicast)
+      udp_listener(io_service, ip_address, port, interface, receive_callback, multicast)
 {
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });

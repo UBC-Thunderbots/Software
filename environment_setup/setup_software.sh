@@ -108,6 +108,7 @@ virtualenv_opt_args=""
 if [[ $(lsb_release -rs) == "24.04" ]]; then
     host_software_packages+=(python3-pyqt6)
     host_software_packages+=(pyqt6-dev-tools)
+    host_software_packages+=(python3-pyqt6.qtsvg)
 
     virtualenv_opt_args="--system-site-packages"
 fi
@@ -209,5 +210,9 @@ sudo rm /usr/local/bin/platformio
 sudo ln -s ~/.platformio/penv/bin/platformio /usr/local/bin/platformio
 
 print_status_msg "Done PlatformIO Setup"
+
+print_status_msg "Set up ansible-lint"
+/opt/tbotspython/bin/ansible-galaxy collection install ansible.posix
+print_status_msg "Finished setting up ansible-lint"
 
 print_status_msg "Done Software Setup, please reboot for changes to take place"

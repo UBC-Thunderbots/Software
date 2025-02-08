@@ -18,6 +18,8 @@ from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+logger = logging.getLogger(__name__)
+
 
 class Gamecontroller:
     """Gamecontroller Context Manager"""
@@ -165,7 +167,6 @@ class Gamecontroller:
             systems.
 
             :param data: The referee command to send
-
             """
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
@@ -175,6 +176,7 @@ class Gamecontroller:
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP,
             self.referee_port,
+            "lo",
             __send_referee_command,
             True,
         )

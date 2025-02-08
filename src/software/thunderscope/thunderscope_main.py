@@ -20,6 +20,7 @@ from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -233,13 +234,8 @@ if __name__ == "__main__":
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
     if not args.run_blue and not args.run_yellow and args.launch_gc:
         parser.error(
-            "--launch_gc has to be run with --run_blue or --run_yellow argument"
+            "--launch_gc has to be ran with --run_blue or --run_yellow argument"
         )
-
-    # Sanity check that an interface was provided
-    if args.run_blue or args.run_yellow:
-        if args.interface is None:
-            parser.error("Must specify interface")
 
     ###########################################################################
     #                      Visualize CPP Tests                                #
@@ -334,16 +330,19 @@ if __name__ == "__main__":
             )
             if args.launch_gc
             else contextlib.nullcontext()
-        ) as gamecontroller, RobotCommunication(
+        ) as gamecontroller, WifiCommunicationManager(
             current_proto_unix_io=current_proto_unix_io,
             multicast_channel=getRobotMulticastChannel(args.channel),
+            should_setup_full_system=(args.run_blue or args.run_yellow),
             interface=args.interface,
-            estop_mode=estop_mode,
-            estop_path=estop_path,
-            enable_radio=args.enable_radio,
             referee_port=gamecontroller.get_referee_port()
             if gamecontroller
             else SSL_REFEREE_PORT,
+        ) as wifi_communication_manager, RobotCommunication(
+            current_proto_unix_io=current_proto_unix_io,
+            communication_manager=wifi_communication_manager,
+            estop_mode=estop_mode,
+            estop_path=estop_path,
         ) as robot_communication:
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
                 tscope.keyboard_estop_shortcut.activated.connect(
@@ -354,17 +353,15 @@ if __name__ == "__main__":
                 for tab in tscope_config.tabs:
                     if hasattr(tab, "widgets"):
                         robot_view_widget = tab.find_widget("Robot View")
-
-                        if robot_view_widget:
-                            robot_view_widget.control_mode_signal.connect(
-                                lambda mode,
-                                robot_id: robot_communication.toggle_robot_connection(
-                                    mode, robot_id
+                        if robot_view_widget is not None:
+                            robot_view_widget.individual_robot_control_mode_signal.connect(
+                                lambda robot_id,
+                                robot_mode: robot_communication.toggle_individual_robot_control_mode(
+                                    robot_id, robot_mode
                                 )
                             )
 
             if args.run_blue or args.run_yellow:
-                robot_communication.setup_for_fullsystem()
                 full_system_runtime_dir = (
                     args.blue_full_system_runtime_dir
                     if args.run_blue
@@ -422,7 +419,7 @@ if __name__ == "__main__":
 
             """
             sync_simulation(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                tscope,
                 0 if args.empty else DIV_B_NUM_ROBOTS,
             )
 
