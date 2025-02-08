@@ -40,6 +40,19 @@ void AttackerFSM::pivotKick(const Update& event,
     processEvent(PivotKickFSM::Update(control_params, event.common));
 }
 
+
+void AttackerFSM::keepAway(const Update& event,
+              boost::sml::back::process<KeepAwayFSM::Update> processEvent) {
+
+    KeepAwayFSM::ControlParams control_params{
+        .best_pass_so_far = event.control_params.best_pass_so_far
+    };
+
+    processEvent(KeepAwayFSM::Update(control_params, event.common));
+
+  }
+
+
 bool AttackerFSM::shouldKick(const Update& event)
 {
     return event.control_params.pass_committed || event.control_params.shot;

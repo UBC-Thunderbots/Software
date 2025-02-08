@@ -5,6 +5,7 @@
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
+#include "software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 
@@ -48,7 +49,7 @@ struct AttackerFSM
      * @param processEvent processes the DribbleFSM::Update
      */
     void keepAway(const Update& event,
-                  boost::sml::back::process<DribbleFSM::Update> processEvent);
+                  boost::sml::back::process<KeepAwayFSM::Update> processEvent);
 
     /**
      * Guard that checks if the ball should be kicked, which is when there's a nearby
@@ -79,8 +80,8 @@ struct AttackerFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
-            DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A = keepAwayFSM_S, // keep away action calls keepaway FSM
-            keepAwayFSM_S + Update_E / keepAway_A,
+            DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A = KeepAwayFSM_S, // keep away action calls keepaway FSM
+            KeepAwayFSM_S + Update_E / keepAway_A,
             KeepAwayFSM_S = DribbleFSM_S,
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);

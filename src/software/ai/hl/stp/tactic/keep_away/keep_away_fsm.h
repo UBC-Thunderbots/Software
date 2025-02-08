@@ -3,7 +3,7 @@
 //
 #pragma once
 
-//#include "proto/parameters.pb.h"
+#include "proto/parameters.pb.h"
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.cpp"
 
@@ -14,10 +14,11 @@ struct KeepAwayFSM
    *
    * @param ai_config The config to fetch parameters from
    */
-    explicit KeepAwayFSM();
+    explicit KeepAwayFSM(const TbotsProto::AiConfig& ai_config) : ai_config(ai_config) {};
 
     struct ControlParams
     {
+      std::optional<Pass> best_pass_so_far;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
