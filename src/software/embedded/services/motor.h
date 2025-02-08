@@ -34,6 +34,7 @@ class MotorService
     static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
     static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
     static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
+    static const uint8_t DRIBBLER_CHIP_SELECT = 4;
 
     /**
      * Service that interacts with the motor board.
@@ -115,6 +116,11 @@ class MotorService
      * Clears previous faults, configures the motor and checks encoder connections.
      */
     void setup();
+
+    /**
+     * Disables motors not in enabled_motors
+     */
+    void stopDisabledMotors();
 
     /**
      * Holds motor fault information for a particular motor and whether any fault has

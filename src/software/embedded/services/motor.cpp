@@ -131,6 +131,7 @@ MotorService::~MotorService() {}
 void MotorService::setup()
 {
     // Scrap this code and use the structure I defined. Parse through all motors and check for 3 faults on a single motor.
+    /*
     const auto now                             = std::chrono::system_clock::now();
     long int total_duration_since_last_fault_s = 0;
     if (tracked_motor_fault_start_time_.has_value())
@@ -159,7 +160,7 @@ void MotorService::setup()
         LOG(FATAL) << "In the last " << total_duration_since_last_fault_s
                    << "s, the motor board has reset " << num_tracked_motor_resets_
                    << " times. Thunderloop crashing for safety.";
-    }
+    } */
 
     prev_wheel_velocities_ = {0.0, 0.0, 0.0, 0.0};
 
@@ -190,6 +191,7 @@ void MotorService::setup()
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
     checkEncoderConnections();
+    stopDisabledMotors();
 
     // calibrate the encoders
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
@@ -205,6 +207,16 @@ void MotorService::setup()
     }
 
     is_initialized_ = true;
+}
+
+void MotorService::stopDisabledMotors(){
+    for (u_int8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
+    {
+        if (!enabled_motors.contains(motor))
+        {
+            tmc4671_switchToMotionMode(motor, TMC4671_MOTION_MODE_STOPPED);
+        }
+    }
 }
 
 void MotorService::setUpDriveMotor(uint8_t motor)
@@ -444,30 +456,61 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // Get current wheel electical RPM (don't account for pole pairs). We will use these
     // for robot status feedback We assume the motors have ramped to the expected RPM from
     // the previous iteration.
-    double front_right_velocity =
-        static_cast<double>(tmc4671ReadThenWriteValue(
-            FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-            TMC4671_PID_VELOCITY_TARGET, front_right_target_rpm)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    double front_left_velocity =
-        static_cast<double>(tmc4671ReadThenWriteValue(
-            FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-            TMC4671_PID_VELOCITY_TARGET, front_left_target_rpm)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    double back_right_velocity =
-        static_cast<double>(tmc4671ReadThenWriteValue(
-            BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-            TMC4671_PID_VELOCITY_TARGET, back_right_target_rpm)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    double back_left_velocity =
-        static_cast<double>(tmc4671ReadThenWriteValue(
-            BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-            TMC4671_PID_VELOCITY_TARGET, back_left_target_rpm)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    double dribbler_rpm = static_cast<double>(
-        tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-                                  TMC4671_PID_VELOCITY_TARGET, dribbler_ramp_rpm_));
+    double front_right_velocity;
+    double front_left_velocity;
+    double back_right_velocity;
+    double back_left_velocity;
+    double dribbler_rpm;
 
+    if (enabled_motors.contains(FRONT_RIGHT_MOTOR_CHIP_SELECT))
+    {
+        front_right_velocity =
+                static_cast<double>(tmc4671ReadThenWriteValue(
+                        FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                        TMC4671_PID_VELOCITY_TARGET, front_right_target_rpm)) *
+                MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    } else {
+        // TODO #3424: When a motor is disabled use three-wheel velocity calculations.
+        front_right_velocity = 0;
+    }
+    if (enabled_motors.contains(FRONT_LEFT_MOTOR_CHIP_SELECT))
+    {
+        front_left_velocity =
+                static_cast<double>(tmc4671ReadThenWriteValue(
+                        FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                        TMC4671_PID_VELOCITY_TARGET, front_left_target_rpm)) *
+                MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    } else {
+        front_left_velocity = 0;
+    }
+    if (enabled_motors.contains(BACK_RIGHT_MOTOR_CHIP_SELECT))
+    {
+        back_right_velocity =
+                static_cast<double>(tmc4671ReadThenWriteValue(
+                        BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                        TMC4671_PID_VELOCITY_TARGET, back_right_target_rpm)) *
+                MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    } else {
+        back_right_velocity = 0;
+    }
+    if (enabled_motors.contains(BACK_LEFT_MOTOR_CHIP_SELECT))
+    {
+        back_left_velocity =
+                static_cast<double>(tmc4671ReadThenWriteValue(
+                        BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                        TMC4671_PID_VELOCITY_TARGET, back_left_target_rpm)) *
+                MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    } else {
+        back_left_velocity = 0;
+    }
+    if (enabled_motors.contains(DRIBBLER_MOTOR_CHIP_SELECT))
+    {
+        dribbler_rpm = static_cast<double>(
+                tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                                          TMC4671_PID_VELOCITY_TARGET, dribbler_ramp_rpm_));
+    } else {
+        dribbler_rpm = 0;
+    }
     // Construct a MotorStatus object with the current velocities and dribbler rpm
     TbotsProto::MotorStatus motor_status =
         updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
@@ -475,6 +518,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
+    // TODO #3424: three wheel drive
     WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
                                              back_left_velocity, back_right_velocity};
 
@@ -1119,10 +1163,10 @@ void MotorService::checkEncoderConnections()
 {
     LOG(INFO) << "Starting encoder connection check!";
 
-    std::vector<bool> calibrated_motors(NUM_DRIVE_MOTORS, false);
-    std::vector<int> initial_velocities(NUM_DRIVE_MOTORS, 0);
+    std::vector<bool> calibrated_motors(enabled_motors.size(), false);
+    std::vector<int> initial_velocities(enabled_motors.size(), 0);
 
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+    for (u_int8_t motor : enabled_motors)
     {
         // read back current velocity
         initial_velocities[motor] = tmc4671_readInt(motor, TMC4671_ABN_DECODER_COUNT);
@@ -1150,7 +1194,7 @@ void MotorService::checkEncoderConnections()
                      [](bool calibration_status) { return !calibration_status; });
          ++num_iterations)
     {
-        for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+        for (uint8_t motor : enabled_motors)
         {
             if (calibrated_motors[motor])
             {
@@ -1172,7 +1216,7 @@ void MotorService::checkEncoderConnections()
     }
 
     bool calibrated = true;
-    for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
+    for (uint8_t motor : enabled_motors)
     {
         if (!calibrated_motors[motor])
         {
