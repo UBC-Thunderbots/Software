@@ -130,37 +130,7 @@ MotorService::~MotorService() {}
 
 void MotorService::setup()
 {
-    // Scrap this code and use the structure I defined. Parse through all motors and check for 3 faults on a single motor.
-    /*
-    const auto now                             = std::chrono::system_clock::now();
-    long int total_duration_since_last_fault_s = 0;
-    if (tracked_motor_fault_start_time_.has_value())
-    {
-        total_duration_since_last_fault_s =
-            std::chrono::duration_cast<std::chrono::seconds>(
-                now - tracked_motor_fault_start_time_.value())
-                .count();
-    }
 
-    if (tracked_motor_fault_start_time_.has_value() &&
-        total_duration_since_last_fault_s < MOTOR_FAULT_TIME_THRESHOLD_S)
-    {
-        num_tracked_motor_resets_++;
-    }
-    else
-    {
-        tracked_motor_fault_start_time_ = std::make_optional(now);
-        num_tracked_motor_resets_       = 1;
-    }
-
-
-    if (tracked_motor_fault_start_time_.has_value() &&
-        num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD_COUNT)
-    {
-        LOG(FATAL) << "In the last " << total_duration_since_last_fault_s
-                   << "s, the motor board has reset " << num_tracked_motor_resets_
-                   << " times. Thunderloop crashing for safety.";
-    } */
 
     prev_wheel_velocities_ = {0.0, 0.0, 0.0, 0.0};
 
