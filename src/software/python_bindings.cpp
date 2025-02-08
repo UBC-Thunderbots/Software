@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "proto/geometry.pb.h"
+#include "proto/ip_notification.pb.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/parameters.pb.h"
@@ -38,6 +39,7 @@
 #include "software/geom/vector.h"
 #include "software/math/math_functions.h"
 #include "software/networking/radio/threaded_proto_radio_sender.hpp"
+#include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/uart/boost_uart_communication.h"
@@ -65,8 +67,11 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoUdpSender";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<std::string, int, bool>())
-        .def("send_proto", &Class::sendProto);
+        .def(py::init<const std::string&, unsigned short, const std::string&, bool>())
+        .def("get_interface", &Class::getInterface)
+        .def("get_ip_address", &Class::getIpAddress)
+        .def("send_proto", &Class::sendProto, py::arg("message"),
+             py::arg("async") = false);
 }
 
 /**
@@ -99,7 +104,9 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool>())
+        .def(py::init<const std::string&, unsigned short, const std::string&,
+                      const std::function<void(T)>&, bool>())
+        .def(py::init<unsigned short, const std::function<void(T)>&>())
         .def("close", &Class::close);
 }
 
@@ -397,10 +404,14 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
     declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
     declareThreadedProtoUdpListener<TbotsProto::RobotCrash>(m, "RobotCrash");
+    declareThreadedProtoUdpListener<TbotsProto::IpNotification>(m, "RobotIpNotification");
 
     // Senders
-    declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
-    declareThreadedProtoRadioSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
+    declareThreadedProtoUdpSender<TbotsProto::Primitive>(m, "Primitive");
+    declareThreadedProtoRadioSender<TbotsProto::Primitive>(m, "Primitive");
+    declareThreadedProtoUdpSender<TbotsProto::IpNotification>(m, "FullsystemIpBroadcast");
+
+    py::register_exception<TbotsNetworkException>(m, "TbotsNetworkException");
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(
@@ -465,5 +476,6 @@ PYBIND11_MODULE(python_bindings, m)
         .value("STATUS_ERROR", EstopState::STATUS_ERROR)
         .export_values();
 
+    m.def("get_local_ip", &getLocalIp);
     m.def("sigmoid", &sigmoid);
 }
