@@ -1,7 +1,7 @@
 from software.thunderscope.binary_context_managers.full_system import ProtoUnixIO
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt.QtCore import QTimer, Qt
 from pyqtgraph.opengl import *
 
 from proto.import_all_protos import *
@@ -17,6 +17,8 @@ class GLDrawPolygonObstacleLayer(GLLayer):
     """A layer used to draw polygons that are going to represent obstacles for the trajectory planner
     to avoid.
     """
+
+    DOUBLE_CLICK_INTERVAL = 200
 
     def __init__(self, name: str, friendly_io: ProtoUnixIO) -> None:
         """Initialize this layer
@@ -37,6 +39,8 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         # used for keeping track and rendering multiple polygons
         self.rendering_polygons: ObservableList = ObservableList(self._graphics_changed)
 
+        self.can_double_click: bool = True
+
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Responding to key events that are going to push obstacles to the stack or add point
 
@@ -44,9 +48,6 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         if not self.visible():
             return
-
-        if event.key() == Qt.Key.Key_P:
-            self.push_polygon_to_list()
 
         if event.key() == Qt.Key.Key_C:
             self.clear_polygons()
@@ -81,35 +82,27 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         self.rendering_polygons.append(self.current_polygon)
         self.current_polygon = GLPolygon(parent_item=self, line_width=2)
-        self._send_to_fs()
 
     def _add_one_point(self, point: tuple[float, float]):
         """Adding one points to a polygon
 
         :param point: represent the point (x,y) that is added to the polygon
         """
-        # trying to create a line
         if len(self.points) < 2:
+            # creating a line segment
             self.points.append(point)
-            self.current_polygon.set_points(self.points)
-            return
-
-        # creating a triangle
-        if len(self.points) == 2:
+        elif len(self.points) == 2:
+            # creating a triangle
             start_point = self.points[0]
+            self.points.append(point)
+            self.points.append(start_point)
+        else:
+            # creating a general polygon
+            start_point = self.points[0]
+            self.points.pop()  # removing the start point since the last point is always the start point
 
             self.points.append(point)
             self.points.append(start_point)
-            self.current_polygon.set_points(self.points)
-            self._send_to_fs()
-            return
-
-        # creating a general polygon
-        start_point = self.points[0]
-        self.points.pop()  # removing the start point since the last point is always the start point
-
-        self.points.append(point)
-        self.points.append(start_point)
         self.current_polygon.set_points(self.points)
         self._send_to_fs()
 
@@ -131,6 +124,25 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             VirtualObstacles, VirtualObstacles(obstacles=obstacles)
         )
 
+    def create_single_click_callback(self, event: MouseInSceneEvent):
+        """Creating a single shot callback to handle single click
+
+        :param event: The mouse event when a scene is pressed
+        """
+
+        def _handle_single_click():
+            # This logic is somewhat non trivial. If we `can_double_click`, it indicates that
+            # a double-click hasn't occurred within the 200 ms time window after the first click.
+            # In other words, the user hasn't double-clicked,
+            # so we will now interpret the action as a single click.
+            if self.can_double_click:
+                point = event.point_in_scene
+                self._add_one_point((point.x(), point.y()))
+
+            self.can_double_click = False
+
+        return _handle_single_click
+
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Adding the point in scene
 
@@ -138,8 +150,20 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         if not self.visible():
             return
+        super().mouse_in_scene_pressed(event)
 
-        point = event.point_in_scene
-        self._add_one_point((point.x(), point.y()))
+        # handle double click
+        if self.can_double_click:
+            self.push_polygon_to_list()
+            self.can_double_click = False
+            return
+        else:
+            self.can_double_click = True
+            # handle single click
+            QTimer.singleShot(
+                self.DOUBLE_CLICK_INTERVAL, self.create_single_click_callback(event)
+            )
 
-        return super().mouse_in_scene_pressed(event)
+    def refresh_graphics(self) -> None:
+        """Refreshing graphics"""
+        return

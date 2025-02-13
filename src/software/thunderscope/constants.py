@@ -170,8 +170,8 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Ctrl + R:</code></b> Remove the current layout file and reset the layout<br><br>
     Layout file (on save) is located at {SAVED_LAYOUT_PATH}<br>
 
-    <b><code>p</code></b> Push the current obstacle to the obstacle stack. GLDrawPolygonObstalce layer must be enabled.<br><br>
-    <b><code>c</code></b> Clear the virtual obstacle stack GLDrawPolygonObstalce layer must be enabled. <br><br>
+    <b><code>Shift+Double Click</code></b> Push the current obstacle to the obstacle stack. FriendlyObstacleLayer must be enabled.<br><br>
+    <b><code>c</code></b> Clear the virtual obstacle stack FriendlyObstacleLayer must be enabled. <br><br>
 
 
     """

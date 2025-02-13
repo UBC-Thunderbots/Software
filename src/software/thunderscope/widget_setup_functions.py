@@ -135,7 +135,7 @@ def setup_gl_widget(
     trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
 
     draw_obstacle_layer = GLDrawPolygonObstacleLayer(
-        "Freehand Obstalce Layer", full_system_proto_unix_io
+        "Freehand Obstacle Layer", full_system_proto_unix_io
     )
 
     gl_widget.add_layer(draw_obstacle_layer, False)
@@ -153,6 +153,11 @@ def setup_gl_widget(
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
+
+    shift_button_toolbar = gl_widget.get_shift_button_toolbar()
+    shift_button_toolbar.enable_ball_placement_signal.connect(
+        world_layer.should_move_ball_slot
+    )
 
     # connect all sandbox controls if using sandbox mode
     if sandbox_mode:
