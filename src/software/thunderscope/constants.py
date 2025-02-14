@@ -185,6 +185,8 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     """
 )
 
+THUNDERSCOPE_UI_FONT_NAME = "Roboto"
+
 
 def is_field_message_empty(field: Field) -> bool:
     """Checks if a field message is empty
@@ -277,6 +279,7 @@ class Colors:
     ROBOT_MIDDLE_BLUE = QtGui.QColor(0, 0, 255, 255)
     PINK = QtGui.QColor(255, 0, 255)
     GREEN = QtGui.QColor(0, 255, 0)
+    RED = QtGui.QColor(255, 0, 0, 255)
 
     # Creates a default vision pattern lookup with the actual colors used on the robots
     VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(PINK, GREEN)

@@ -28,6 +28,7 @@ from software.thunderscope.gl.layers import (
     gl_cost_vis_layer,
     gl_trail_layer,
     gl_max_dribble_layer,
+    gl_referee_info_layer,
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
@@ -129,6 +130,9 @@ def setup_gl_widget(
     max_dribble_layer = gl_max_dribble_layer.GLMaxDribbleLayer(
         "Dribble Tracking", visualization_buffer_size
     )
+    referee_layer = gl_referee_info_layer.GLRefereeInfoLayer(
+        "Referee Info", visualization_buffer_size
+    )
 
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
@@ -142,6 +146,7 @@ def setup_gl_widget(
     gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, True)
     gl_widget.add_layer(max_dribble_layer, True)
+    gl_widget.add_layer(referee_layer)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
@@ -191,6 +196,9 @@ def setup_gl_widget(
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
         (DebugShapes, debug_shapes_layer.debug_shapes_buffer),
+        (Referee, referee_layer.referee_vis_buffer),
+        (BallPlacementVisualization, referee_layer.ball_placement_vis_buffer),
+        (World, referee_layer.world_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 
