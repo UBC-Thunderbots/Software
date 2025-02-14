@@ -3,12 +3,14 @@
 #include <mutex>
 
 #include "proto/parameters.pb.h"
+#include "proto/replay_bookmark.pb.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/sensor_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/validation.pb.h"
+#include "proto/world.pb.h"
 #include "software/backend/backend.h"
 #include "software/logger/proto_logger.h"
 #include "software/networking/unix/threaded_proto_unix_listener.hpp"
@@ -50,6 +52,8 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotLog>> robot_log_listener;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotCrash>>
         robot_crash_listener;
+    std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::ReplayBookmark>>
+        replay_bookmark_listener;
 
     // Outputs
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::World>> world_output;

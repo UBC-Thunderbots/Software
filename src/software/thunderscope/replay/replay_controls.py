@@ -1,7 +1,10 @@
 import time
+
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
 from functools import partial
+
+from software.thunderscope.replay.bookmark_marker import BookmarkMarker
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.common import common_widgets
 from software.py_constants import *
@@ -99,6 +102,9 @@ class ReplayControls(QWidget):
         self.controls_layout.addLayout(self.buttons_layout)
         self.setLayout(self.controls_layout)
 
+        self.bookmarks_markers = []
+        self.create_bookmarks()
+
     def __on_play_pause_clicked(self) -> None:
         """When the play/pause button is clicked, toggle play/pause and set the text"""
         self.player.toggle_play_pause()
@@ -174,6 +180,30 @@ class ReplayControls(QWidget):
         self.player.seek(absolute_time)
         if self.was_playing:
             self.player.play()
+
+    def create_bookmarks(self) -> None:
+        """Create bookmark visuals"""
+        for timestamp in self.player.bookmark_indices:
+            bookmark = BookmarkMarker(
+                timestamp,
+                self.seek_absolute,
+                self.replay_slider,
+                self.replay_label,
+                self,
+            )
+            self.bookmarks_markers.append(bookmark)
+
+    def update_bookmarks(self) -> None:
+        """Update positions of bookmark visuals"""
+        for marker in self.bookmarks_markers:
+            marker.update()
+
+    def resizeEvent(self, evt):
+        """Compute the positions of bookmark visuals when resizing.
+        :param evt: resize event
+        """
+        super().resizeEvent(evt)
+        self.update_bookmarks()
 
     def __on_save_clip_clicked(self) -> None:
         """When the button is clicked, save clip if current time is after the clip start time"""

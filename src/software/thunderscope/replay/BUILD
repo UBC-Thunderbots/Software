@@ -26,7 +26,15 @@ py_library(
     ],
     deps = [
         requirement("pyqtgraph"),
+        "bookmark_marker",
         ":proto_player",
+    ],
+)
+
+py_library(
+    name = "bookmark_marker",
+    srcs = [
+        "bookmark_marker.py",
     ],
 )
 

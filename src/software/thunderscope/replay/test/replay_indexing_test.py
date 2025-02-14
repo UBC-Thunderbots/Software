@@ -97,13 +97,13 @@ def test_for_building_index_on_valid_chunks():
     player = create_test_player()
 
     # generate chunk index file
-    player.build_chunk_index(player.log_folder_path)
+    player.load_or_build_index()
 
     # validate index with load index function
-    chunk_indices = player.load_chunk_index()
-    assert len(chunk_indices) == CHUNK_FILES_NUM
+    player.load_chunk_index()
+    assert len(player.chunks_indices) == CHUNK_FILES_NUM
     assert player.chunks_indices
-    for filename, start_timestamp in chunk_indices.items():
+    for filename, start_timestamp in player.chunks_indices.items():
         index_of_file = int(filename.replace(".replay", ""))
         assert math.isclose(start_timestamp, DURATION_PER_CHUNK * index_of_file)
 

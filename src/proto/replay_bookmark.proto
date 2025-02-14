@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+import "proto/tbots_timestamp_msg.proto";
+
+message ReplayBookmark
+{
+    Timestamp timestamp = 1;
+}
