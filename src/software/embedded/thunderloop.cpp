@@ -173,6 +173,20 @@ void Thunderloop::runLoop()
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
     clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
 
+    std::string thunderloop_hash, thunderloop_date_flashed;
+
+    std::ifstream hashFile("~/thunderbots_hashes/thunderloop.hash");
+    std::ifstream dateFile("~/thunderbots_hashes/thunderloop.date");
+
+    std::getline(hashFile, thunderloop_hash);
+    std::getline(dateFile, thunderloop_date_flashed);
+
+    hashFile.close();
+    dateFile.close();
+
+    robot_status_.set_thunderloop_version(thunderloop_hash);
+    robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
+
     for (;;)
     {
         struct timespec time_since_prev_iter;
