@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
@@ -15,6 +16,8 @@
 #include "software/embedded/platform.h"
 #include "software/physics/euclidean_to_wheel.h"
 
+
+#include "software/logger/logger.h"
 /**
  * A service that interacts with the motor.
  *
@@ -31,6 +34,7 @@ class MotorService
     static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
     static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
     static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
+    static const uint8_t DRIBBLER_CHIP_SELECT = 4;
 
     /**
      * Service that interacts with the motor board.
@@ -114,31 +118,84 @@ class MotorService
     void setup();
 
     /**
+     * Disables motors not in enabled_motors
+     */
+    void stopDisabledMotors();
+
+    /**
      * Holds motor fault information for a particular motor and whether any fault has
      * caused the motor to be disabled.
      */
     struct MotorFaultIndicator
     {
         bool drive_enabled;
-        std::unordered_set<TbotsProto::MotorFault> motor_faults;
+        std::unordered_set<TbotsProto::MotorFault> last_motor_faults;
+        const uint8_t motor_id;
+        int num_critical_faults;
+        std::optional<std::chrono::time_point<std::chrono::system_clock>> time_of_first_fault;
+        long int total_duration_since_last_fault_s;
 
         /**
-         * Construct a default indicator of no faults and running motors.
+         * Construct a default indicator of no faults and running motors, with a motor id.
          */
-        MotorFaultIndicator() : drive_enabled(true), motor_faults() {}
+        MotorFaultIndicator(uint8_t id)
+        : drive_enabled(true), last_motor_faults(), motor_id(id),
+          num_critical_faults(0), time_of_first_fault(std::nullopt),
+          total_duration_since_last_fault_s(0){}
 
         /**
-         * Construct an indicator with faults and whether the motor is enabled.
+         * Update drive enabled, fault count, type of last fault, and time since the last fault
          *
-         * @param drive_enabled true if the motor is enabled, false if disabled due to a
+         *
+         * @param enabled true if the motor is enabled, false if disabled due to a
          * motor fault
          * @param motor_faults  a set of faults associated with this motor
          */
-        MotorFaultIndicator(bool drive_enabled,
-                            std::unordered_set<TbotsProto::MotorFault>& motor_faults)
-            : drive_enabled(drive_enabled), motor_faults(motor_faults)
-        {
-        }
+        void update(bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults)
+         {
+            const auto now = std::chrono::system_clock::now();
+            drive_enabled = enabled;
+            last_motor_faults = motor_faults;
+
+            if(time_of_first_fault.has_value()) {
+                total_duration_since_last_fault_s =
+                        std::chrono::duration_cast<std::chrono::seconds>(
+                                now - time_of_first_fault.value())
+                                .count();
+            }
+
+            if(time_of_first_fault.has_value() &&
+               total_duration_since_last_fault_s < MOTOR_FAULT_TIME_THRESHOLD_S)
+            {
+                if(!enabled)
+                {
+                    num_critical_faults++;
+                }
+            }
+            else
+            {
+                if(!enabled)
+                {
+                    time_of_first_fault = std::make_optional(now);
+                    num_critical_faults = 1;
+                }
+            }
+         }
+         /**
+          *  Remove motor_id from enabled_motors and log the removal, if it has failed too much.
+          *
+          *  @param motors a set of motors that are currently enabled
+          */
+          std::set<uint8_t> removeFaultyMotor(std::set<uint8_t> motors)
+         {
+             if(num_critical_faults > MOTOR_FAULT_THRESHOLD_COUNT) {
+                 LOG(WARNING) << "In the last " << total_duration_since_last_fault_s
+                              << "s, the motor board has reset " << num_critical_faults
+                              << " times. The motor is now disabled for safety";
+                 motors.erase(motor_id);
+             }
+             return motors;
+         }
     };
 
     /**
@@ -149,7 +206,7 @@ class MotorService
      * @return a struct containing the motor faults and whether the motor was disabled due
      * to the fault
      */
-    struct MotorFaultIndicator checkDriverFault(uint8_t motor);
+    void checkDriverFault(uint8_t motor);
 
     /**
      * Sets up motor as drive motor controllers
@@ -177,6 +234,10 @@ class MotorService
      * @return read value
      */
     int readIntFromTMC4671(uint8_t motor, uint8_t address);
+
+    std::unordered_map<int, MotorFaultIndicator> getCachedMotorFaults(){
+        return cached_motor_faults_;
+    }
 
    private:
     /**
@@ -349,6 +410,8 @@ class MotorService
      */
     bool requiresMotorReinit(uint8_t motor);
 
+
+
     // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
     // pairs of the drive motor.
     //
@@ -417,6 +480,7 @@ class MotorService
 
     static const uint8_t NUM_DRIVE_MOTORS = 4;
     static const uint8_t NUM_MOTORS       = NUM_DRIVE_MOTORS + 1;
+    std::set<uint8_t> enabled_motors;
 
     static const int MOTOR_FAULT_TIME_THRESHOLD_S = 60;
     static const int MOTOR_FAULT_THRESHOLD_COUNT  = 3;
