@@ -248,3 +248,15 @@ Alternative (without entering redis repl):
 
 `redis-cli get <redis_key>` or `redis-cli set <redis_key> <value>`
 
+
+## GDB Server
+
+Sometime it would be nice to gdb into the robot to see the backtrace from a segfault. Run the following commands in order to launch gdb
+
+
+```
+./tbots.py run -d 
+gdb-multiarch -ex 'set arch aarch64' -ex 'file ./bazel-bin/software/embedded/thunderloop_main' -ex 'target remote 10.42.0.12:10000'
+```
+
+

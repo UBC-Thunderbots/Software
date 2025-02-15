@@ -1,0 +1,20 @@
+---
+- name: Run gdb server
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+    - name: Kill systemd server 
+      ansible.builtin.shell: "systemctl stop thunderloop"
+      become: true
+      become_method: ansible.builtin.sudo
+
+    - name: Sync Thunderloop
+      ansible.posix.synchronize:
+        src: ../../thunderloop_main
+        dest: ~/thunderbots_binaries/
+        copy_links: true
+
+    - name: Kill systemd server 
+      ansible.builtin.shell: "cd /home/robot/thunderbots_binaries && gdbserver localhost:10000 /home/robot/thunderbots_binaries/thunderloop_main"
+      become: true
+      become_method: ansible.builtin.sudo
