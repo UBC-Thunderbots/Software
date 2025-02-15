@@ -23,8 +23,7 @@ struct DribbleFSM
      * @param dribble_tactic_config The config to fetch parameters from
      */
     explicit DribbleFSM(TbotsProto::DribbleTacticConfig dribble_tactic_config)
-        : dribble_tactic_config(dribble_tactic_config),
-          continuous_dribbling_start_point(Point())
+        : dribble_tactic_config(dribble_tactic_config)
     {
     }
 
@@ -125,13 +124,6 @@ struct DribbleFSM
     void dribble(const Update &event);
 
     /**
-     * Start dribbling
-     *
-     * @param event DribbleFSM::Update
-     */
-    void startDribble(const Update &event);
-
-    /**
      * Action to lose possession of the ball
      *
      * @param event DribbleFSM::Update
@@ -189,21 +181,20 @@ struct DribbleFSM
         DEFINE_SML_GUARD(lostPossession)
         DEFINE_SML_GUARD(dribblingDone)
         DEFINE_SML_GUARD(shouldLoseBall)
-        DEFINE_SML_ACTION(startDribble)
         DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getPossession)
         DEFINE_SML_ACTION(dribble)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetPossession_S + Update_E[havePossession_G] / startDribble_A = Dribble_S,
+            *GetPossession_S + Update_E[havePossession_G] / dribble_A = Dribble_S,
             GetPossession_S + Update_E[!havePossession_G] / getPossession_A,
-            Dribble_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
             Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A      = LoseBall_S,
+            Dribble_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
             Dribble_S + Update_E[!dribblingDone_G] / dribble_A,
             Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
-            LoseBall_S + Update_E[!lostPossession_G] / loseBall_A,
-            LoseBall_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
+            LoseBall_S + Update_E[shouldLoseBall_G] / loseBall_A,
+            LoseBall_S + Update_E[!shouldLoseBall_G] / getPossession_A = GetPossession_S,
             X + Update_E[lostPossession_G] / getPossession_A          = GetPossession_S,
             X + Update_E[!dribblingDone_G] / dribble_A                = Dribble_S,
             X + Update_E / dribble_A                                  = X);
@@ -212,5 +203,4 @@ struct DribbleFSM
    private:
     // the dribble tactic config
     TbotsProto::DribbleTacticConfig dribble_tactic_config;
-    Point continuous_dribbling_start_point;
 };
