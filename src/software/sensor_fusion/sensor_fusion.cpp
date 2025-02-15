@@ -187,22 +187,6 @@ void SensorFusion::updateWorld(
             unavailableCapabilities.insert(RobotCapability::Kick);
         }
 
-//        for (const auto &capability : sensor_fusion_config.robot_capabilities_config())
-//        {
-//            if (capability == TbotsProto::RobotCapabilitiesConfig::broken_dribblers())
-//            {
-//                // Parse through string and check if robot_id.id() is in it, if so, insert specific RobotCapability
-//            }
-//            else if (capability == TbotsProto::RobotCapabilitiesConfig::broken_chippers())
-//            {
-//                // placeholder
-//            }
-//            else if (capability == TbotsProto::RobotCapabilitiesConfig::broken_kickers())
-//            {
-//                // placeholder
-//            }
-//        }
-
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
         if (robot_status_msg.has_power_status() &&

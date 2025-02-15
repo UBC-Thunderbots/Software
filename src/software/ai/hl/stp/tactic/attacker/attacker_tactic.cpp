@@ -7,7 +7,7 @@
 #include "software/world/ball.h"
 
 AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
-    : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
+    : Tactic({RobotCapability::Kick, RobotCapability::Move, RobotCapability::Dribble}),
       fsm_map(),
       best_pass_so_far(std::nullopt),
       pass_committed(false),
