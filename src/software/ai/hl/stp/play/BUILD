@@ -105,11 +105,6 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
-<<<<<<< HEAD
-        ":halt_play",
-=======
-        ":example_play",
->>>>>>> 23ff0f61c523d7aee00121b913e860825af523d8
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
         ":shoot_or_chip_play",
