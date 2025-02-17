@@ -6,14 +6,13 @@ import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.ball_moves_from_rest import *
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from software.simulated_tests.or_validation import OrValidation
 
-
-# TODO 3119 Fix KickoffEnemyPlay
-@pytest.mark.parametrize("is_friendly_test", [True, """False"""])
+@pytest.mark.parametrize("is_friendly_test", [True, False])
 def test_kickoff_play(simulated_test_runner, is_friendly_test):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
@@ -76,25 +75,14 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         ),
     )
 
-    # Always Validation: Check that robots are within centreCircle + friendlyHalf
+    # Always Validation
     always_validation_sequence_set = [[]]
-
-    # Checks that all robots are in friendly half + center circle
-    always_validation_sequence_set[0].append(
-        NumberOfRobotsAlwaysStaysInRegion(
-            regions=[
-                tbots_cpp.Field.createSSLDivisionBField().friendlyHalf(),
-                tbots_cpp.Field.createSSLDivisionBField().centerCircle(),
-            ],
-            req_robot_cnt=6,
-        )
-    )
-
     if is_friendly_test:
-        # Checks that either 0 or 1 robots are in centerCircle
+        # Checks that either 0 or 1 robots are in centerCircle OR ball moves from center point
         always_validation_sequence_set[0].append(
             OrValidation(
                 [
+                    BallAlwaysMovesFromRest(position=tbots_cpp.Point(0, 0), threshold=0.01),
                     NumberOfRobotsAlwaysStaysInRegion(
                         regions=[
                             tbots_cpp.Field.createSSLDivisionBField().centerCircle()
@@ -106,19 +94,60 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
                             tbots_cpp.Field.createSSLDivisionBField().centerCircle()
                         ],
                         req_robot_cnt=1,
-                    ),
+                    )
+                ]
+            )
+        )
+
+        # Checks that there are 6 friendly robots in friendlyHalf + centerCircle + friendlyGoal OR ball moves from center point
+        always_validation_sequence_set[0].append(
+            OrValidation(
+                [
+                    BallAlwaysMovesFromRest(position=tbots_cpp.Point(0, 0), threshold=0.01),
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=[
+                            tbots_cpp.Field.createSSLDivisionBField().friendlyHalf(),
+                            tbots_cpp.Field.createSSLDivisionBField().friendlyGoal(),
+                            tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+                        ],
+                        req_robot_cnt=6,
+                    )
                 ]
             )
         )
 
     else:
-        # Checks that 0 robots are in centerCircle
+        # Checks that 0 robots are in centerCircle OR ball moves from center point
         always_validation_sequence_set[0].append(
-            NumberOfRobotsAlwaysStaysInRegion(
-                regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
-                req_robot_cnt=0,
+            OrValidation(
+                [
+                    BallAlwaysMovesFromRest(position=tbots_cpp.Point(0, 0), threshold=0.01),
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=[
+                            tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+                        ],
+                        req_robot_cnt=0,
+                    )
+                ]
             )
         )
+
+        # Checks that there are 6 enemy robots in friendlyHalf + centerCircle + friendlyGoal OR ball moves from center point
+        # always_validation_sequence_set[0].append(
+        #     OrValidation(
+        #         [
+        #             BallAlwaysMovesFromRest(position=tbots_cpp.Point(0, 0), threshold=0.01),
+        #             NumberOfRobotsAlwaysStaysInRegion(
+        #                 regions=[
+        #                     tbots_cpp.Field.createSSLDivisionBField().friendlyHalf(),
+        #                     tbots_cpp.Field.createSSLDivisionBField().friendlyGoal(),
+        #                     tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+        #                 ],
+        #                 req_robot_cnt=6,
+        #             )
+        #         ]
+        #     )
+        # )
 
     eventually_validation_sequence_set = [[]]
 
