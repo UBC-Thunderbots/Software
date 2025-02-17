@@ -12,7 +12,9 @@ class OrValidation(Validation):
     def get_validation_status(self, world):
         for validation in self.validations:
             if validation.get_validation_status(world) == ValidationStatus.PASSING:
+                print(f"OR Validation PASSING {validation}")
                 return ValidationStatus.PASSING
+        print(f"OR Validation Failing: {validation}")
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world):
@@ -32,10 +34,4 @@ class OrValidation(Validation):
         return validation_geometry
 
     def get_validation_type(self, world):
-        validation_type_initial = self.validations[0].get_validation_type
-
-        for validation in self.validations:
-            validation_type = validation.get_validation_type
-            if validation_type != validation_type_initial:
-                raise TypeError("type of validation instances is not consistent")
-        return validation_type_initial
+        return ValidationType
