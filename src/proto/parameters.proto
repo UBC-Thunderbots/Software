@@ -409,12 +409,19 @@ message ShootOrPassPlayConfig
 
 message RobotCapabilitiesConfig
 {
-    // Comma-separated list of numbers of robots with broken dribblers
-    required string broken_dribblers = 1;
-    // Comma-separated list of numbers of robots with broken chippers
-    required string broken_chippers = 2;
-    // Comma-separated list of numbers of robots with broken kickers
-    required string broken_kickers = 3;
+    required BrokenRobots broken_dribblers = 1;
+    required BrokenRobots broken_chippers = 2;
+    required BrokenRobots broken_kickers = 3;
+}
+
+message BrokenRobots
+{
+    required bool robot_0 = 1;
+    required bool robot_1 = 2;
+    required bool robot_2 = 3;
+    required bool robot_3 = 4;
+    required bool robot_4 = 5;
+    required bool robot_5 = 6;
 }
 
 message SensorFusionConfig
