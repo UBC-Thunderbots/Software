@@ -15,7 +15,8 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       halt_tactics(),
       requires_goalie(requires_goalie),
-      tactic_sequence(std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1)),
+      tactic_sequence(
+          std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1)),
       world_ptr_(std::nullopt),
       obstacle_factory(ai_config.robot_navigation_obstacle_config())
 {

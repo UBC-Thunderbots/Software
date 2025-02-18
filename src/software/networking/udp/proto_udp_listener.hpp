@@ -156,8 +156,8 @@ void ProtoUdpListener<ReceiveProtoT>::startListen()
     socket_.async_receive_from(boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH),
                                sender_endpoint_,
                                std::bind(&ProtoUdpListener::handleDataReception, this,
-                                           boost::asio::placeholders::error,
-                                           boost::asio::placeholders::bytes_transferred));
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
 }
 
 template <class ReceiveProtoT>

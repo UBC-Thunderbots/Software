@@ -8,8 +8,8 @@ TerminatingFunctionValidator::TerminatingFunctionValidator(
        // otherwise the World inside the coroutine will not update properly when the
        // pointer is updated, and the wrong validation_function may be run.
       validation_sequence(
-          std::bind(&TerminatingFunctionValidator::executeAndCheckForSuccessWrapper,
-                      this, std::placeholders::_1, world, validation_function)),
+          std::bind(&TerminatingFunctionValidator::executeAndCheckForSuccessWrapper, this,
+                    std::placeholders::_1, world, validation_function)),
       current_error_message("")
 {
 }
