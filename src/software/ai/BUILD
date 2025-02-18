@@ -38,7 +38,6 @@ cc_library(
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/world",
-        "@boost//:bind",
     ],
 )
 

@@ -1,7 +1,5 @@
 #include "software/simulated_tests/validation/terminating_function_validator.h"
 
-#include <boost/bind.hpp>
-
 TerminatingFunctionValidator::TerminatingFunctionValidator(
     ValidationFunction validation_function,
     std::shared_ptr<World> world)

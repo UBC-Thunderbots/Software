@@ -1,7 +1,5 @@
-
 #include "threaded_estop_reader.h"
 
-#include <boost/bind/bind.hpp>
 #include <thread>
 #include <utility>
 

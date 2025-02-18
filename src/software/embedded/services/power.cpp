@@ -1,6 +1,5 @@
 #include "software/embedded/services/power.h"
 
-#include <boost/bind/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <cstdint>
 
