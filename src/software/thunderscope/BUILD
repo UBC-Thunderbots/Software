@@ -87,9 +87,11 @@ py_library(
         "//software/thunderscope/gl/layers:gl_attacker_layer",
         "//software/thunderscope/gl/layers:gl_cost_vis_layer",
         "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
+        "//software/thunderscope/gl/layers:gl_max_dribble_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
         "//software/thunderscope/gl/layers:gl_path_layer",
+        "//software/thunderscope/gl/layers:gl_referee_info_layer",
         "//software/thunderscope/gl/layers:gl_sandbox_world_layer",
         "//software/thunderscope/gl/layers:gl_simulator_layer",
         "//software/thunderscope/gl/layers:gl_tactic_layer",
@@ -166,8 +168,17 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
+        ":wifi_communication_manager",
         "//software/logger:py_logger",
         "//software/thunderscope:constants",
+    ],
+)
+
+py_library(
+    name = "wifi_communication_manager",
+    srcs = ["wifi_communication_manager.py"],
+    deps = [
+        requirement("colorama"),
     ],
 )
 
