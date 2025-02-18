@@ -159,6 +159,15 @@ void SensorFusion::updateWorld(
         TbotsProto::RobotCapabilitiesConfig capabilities_config = sensor_fusion_config.robot_capabilities_config();
         std::set<RobotCapability> unavailableCapabilities;
 
+        const google::protobuf::Reflection *broken_dribblers_reflection = capabilities_config.broken_dribblers().GetReflection();
+    	const google::protobuf::Descriptor *broken_dribblers_descriptor = capabilities_config.broken_dribblers().GetDescriptor();
+
+    	const google::protobuf::Reflection *broken_chippers_reflection = capabilities_config.broken_chippers().GetReflection();
+    	const google::protobuf::Descriptor *broken_chippers_descriptor = capabilities_config.broken_chippers().GetDescriptor();
+
+    	const google::protobuf::Reflection *broken_kickers_reflection = capabilities_config.broken_kickers().GetReflection();
+    	const google::protobuf::Descriptor *broken_kickers_descriptor = capabilities_config.broken_kickers().GetDescriptor();
+
         for (const auto &error_code_msg : robot_status_msg.error_code())
         {
             if (error_code_msg == TbotsProto::ErrorCode::HIGH_CAP)
@@ -172,87 +181,20 @@ void SensorFusion::updateWorld(
             }
         }
 
-        // idea time:
-        // we manually get each BrokenRobots object
-        // then we get the refelction of each of them
-        // then we get the FieldDescriptor of the field we need (we do this using the field descriptor for each BrokenRobots object)
-        // then we use GetBool on the relfection of each object given the FieldDescriptor of the field we need
-        // then we chilling
-
-		// move out of loop
-        const google::protobuf::Reflection *broken_dribblers_reflection = capabilities_config.broken_dribblers().GetReflection();
-        const google::protobuf::Descriptor *broken_dribblers_descriptor = capabilities_config.broken_dribblers().GetDescriptor();
-
-        const google::protobuf::Reflection *broken_chippers_reflection = capabilities_config.broken_chippers().GetReflection();
-        const google::protobuf::Descriptor *broken_chippers_descriptor = capabilities_config.broken_chippers().GetDescriptor();
-
-        const google::protobuf::Reflection *broken_kickers_reflection = capabilities_config.broken_kickers().GetReflection();
-        const google::protobuf::Descriptor *broken_kickers_descriptor = capabilities_config.broken_kickers().GetDescriptor();
-
-        // keep in loop
-        const google::protobuf::FieldDescriptor *broken_dribbler_id_descriptor = broken_dribblers_descriptor->field(robot_id);
-        if (broken_dribblers_reflection->GetBool(capabilities_config.broken_dribblers(), broken_dribbler_id_descriptor)) {
+        if (broken_dribblers_reflection->GetBool(capabilities_config.broken_dribblers(), broken_dribblers_descriptor->field(robot_id)))
+        {
             unavailableCapabilities.insert(RobotCapability::Dribble);
         }
 
-        const google::protobuf::FieldDescriptor *broken_chipper_id_descriptor = broken_chippers_descriptor->field(robot_id);
-        if (broken_chippers_reflection->GetBool(capabilities_config.broken_chippers(), broken_chipper_id_descriptor)) {
+        if (broken_chippers_reflection->GetBool(capabilities_config.broken_chippers(), broken_chippers_descriptor->field(robot_id)))
+        {
             unavailableCapabilities.insert(RobotCapability::Chip);
         }
 
-        const google::protobuf::FieldDescriptor *broken_kicker_id_descriptor = broken_kickers_descriptor->field(robot_id);
-        if (broken_kickers_reflection->GetBool(capabilities_config.broken_kickers(), broken_kicker_id_descriptor)) {
+        if (broken_kickers_reflection->GetBool(capabilities_config.broken_kickers(), broken_kickers_descriptor->field(robot_id)))
+        {
             unavailableCapabilities.insert(RobotCapability::Kick);
         }
-
-
-//        const google::protobuf::Descriptor *capabilities_config_descriptor = capabilities_config.GetDescriptor();
-//
-//        for (int i = 0; i < capabilities_config_descriptor->field_count(); i++)
-//        {
-//            const google::protobuf::FieldDescriptor *broken_type_field_descriptor = capabilities_config_descriptor->field(i);
-//            const google::protobuf::FieldDescriptor *broken_robot_field_descriptor = broken_type_field_descriptor->field(robot_id);
-//
-//            if (broken_type_field_descriptor->GetBool(broken_robot_field_descriptor))
-//            {
-//                switch (broken_type_field_descriptor->name())
-//            	{
-//                	case "broken_dribblers":
-//                        unavailableCapabilities.insert(RobotCapability::Dribble);
-//                    	break;
-//                	case "broken_chippers":
-//                	    unavailableCapabilities.insert(RobotCapability::Chip);
-//                	    break;
-//                	case "broken_kickers":
-//                	    unavailableCapabilities.insert(RobotCapability::Kick);
-//                	    break;
-//            	}
-//            }
-//        }
-
-
-//        for broken_capability in capabilities_config.fields:
-//            if broken_capability == capabilities_config.broken_dribblers():
-//                 //iterate through BrokenRobotIds and assign type beat
-//            else if broken_capability == capabilities_config.broken_dribblers():
-//               //iterate through BrokenRobotIds and assign type beat
-
-
-
-//        char digits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-//
-//        if (capabilities_config.broken_dribblers().find(digits[robot_id]) != std::string::npos)
-//        {
-//            unavailableCapabilities.insert(RobotCapability::Dribble);
-//        }
-//        else if (capabilities_config.broken_chippers().find(digits[robot_id]) != std::string::npos)
-//        {
-//            unavailableCapabilities.insert(RobotCapability::Chip);
-//        }
-//        else if (capabilities_config.broken_kickers().find(digits[robot_id]) != std::string::npos)
-//        {
-//            unavailableCapabilities.insert(RobotCapability::Kick);
-//        }
 
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
