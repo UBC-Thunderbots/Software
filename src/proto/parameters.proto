@@ -486,7 +486,7 @@ message SensorFusionConfig
         [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     // Object to represent which robots have broken dribblers, kickers, or chippers (updated via Thunderscope)
-    required RobotCapabilitiesConfig robot_capabilities_config = 14;
+    required RobotCapabilitiesConfig robot_capabilities_config = 15;
 }
 
 message EnemyBallPlacementPlayConfig
