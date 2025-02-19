@@ -1,8 +1,9 @@
 #pragma once
 
-#include <unistd.h>
-
 #include "software/embedded/gpio.h"
+
+#include <cstdint>
+#include <unistd.h>
 
 /**
  * GPIO with the character device interface
