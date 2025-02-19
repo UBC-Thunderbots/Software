@@ -125,7 +125,7 @@ def setup_gl_widget(
     )
 
     field_test_movement_layer = gl_movement_field_test_layer.GLMovementFieldTestLayer(
-        "Field Test Layer", full_system_proto_unix_io
+        "Field Movement Layer", full_system_proto_unix_io
     )
 
     simulator_layer = gl_simulator_layer.GLSimulatorLayer(
