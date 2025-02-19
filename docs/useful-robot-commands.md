@@ -254,9 +254,14 @@ Alternative (without entering redis repl):
 Sometime it would be nice to gdb into the robot to see the backtrace from a segfault. Run the following commands in order to launch gdb
 
 
-```
-./tbots.py run -d 
-gdb-multiarch -ex 'set arch aarch64' -ex 'file ./bazel-bin/software/embedded/thunderloop_main' -ex 'target remote 10.42.0.12:10000'
-```
+Prerequisite: a `gdb-server` must be installed locally on the robot! You must be in the `src` directory when running this!
 
 
+To run gdb-server type in the following command *in order* and in two different terminals. Note that when `./tbots.py run -d` is running, it is normal for the command to not exit. If it does exit, this mean that gdb-server has been unsuccessfully launched, tough luck.
+
+```
+./tbots.py run -d  <to do>
+gdb-multiarch -ex 'set arch aarch64' -ex 'file ./bazel-bin/software/embedded/thunderloop_main' -ex 'target remote <robot ip address>:10000'
+```
+
+Side effect: this will kill the systemd process!
