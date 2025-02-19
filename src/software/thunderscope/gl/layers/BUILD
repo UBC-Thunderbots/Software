@@ -159,10 +159,22 @@ py_library(
 )
 
 py_library(
-    name = "gl_movement_field_test_layer",
-    srcs = ["gl_movement_field_test_layer.py"],
+    name = "gl_max_dribble_layer",
+    srcs = ["gl_max_dribble_layer.py"],
     deps = [
         ":gl_layer",
-        "//software/thunderscope:proto_unix_io",
+        "//software/thunderscope:util",
+        "//software/thunderscope/gl/graphics:gl_polygon",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_referee_info_layer",
+    srcs = ["gl_referee_info_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_label",
+        requirement("pyqtgraph"),
     ],
 )

@@ -1,4 +1,7 @@
-from typing import Callable, NoReturn
+from typing import Callable, NoReturn, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from software.thunderscope.thunderscope import Thunderscope
 
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
@@ -6,11 +9,14 @@ from software.py_constants import SECONDS_PER_MILLISECOND
 from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.thunderscope import Thunderscope
+
 from software.thunderscope.time_provider import TimeProvider
 
 import queue
 import time
+
+from pyqtgraph.Qt import QtGui
+import software.python_bindings as tbots_cpp
 
 
 def exit_poller(
@@ -39,7 +45,7 @@ def async_sim_ticker(
     blue_proto_unix_io: ProtoUnixIO,
     yellow_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
-    tscope: Thunderscope,
+    tscope: "Thunderscope",
     buffer_timeout_s: int = 1,
 ) -> None:
     """Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
@@ -91,7 +97,7 @@ def async_sim_ticker(
 
 
 def realtime_sim_ticker(
-    tick_rate_ms: int, sim_proto_unix_io: ProtoUnixIO, tscope: Thunderscope
+    tick_rate_ms: int, sim_proto_unix_io: ProtoUnixIO, tscope: "Thunderscope"
 ) -> None:
     """Tick simulation in real-time. Requires Thunderscope to be open.
 
@@ -115,7 +121,7 @@ def realtime_sim_ticker(
 
 
 def sync_simulation(
-    tscope: Thunderscope, num_robots: int, timeout_s: float = 0.1
+    tscope: "Thunderscope", num_robots: int, timeout_s: float = 0.1
 ) -> None:
     """Ensure that simulator has synchronized with the default world state.
 
@@ -147,3 +153,45 @@ def sync_simulation(
     # Wait for Thunderscope to launch
     while not tscope.is_open():
         time.sleep(timeout_s)
+
+
+def color_from_gradient(
+    x: float,
+    t_range: list[float],
+    r_range: list[int],
+    g_range: list[int],
+    b_range: list[int],
+    a_range: list[int],
+):
+    """Returns a color interpolated from a gradient defined by the point along a sigmoid curve.
+    :param x: value to interpolate
+    :param t_range: the thresholds for each section in the gradient
+    :param r_range: the r values at each threshold
+    :param g_range: the g values at each threshold
+    :param b_range: the b values at each threshold
+    :param a_range: the a values at each threshold
+    :return: a color according to the gradient
+    """
+    if not (
+        len(t_range) == len(r_range) == len(g_range) == len(b_range) == len(a_range)
+    ):
+        return QtGui.QColor(255, 255, 255, 255)
+    else:
+        if x < t_range[0]:
+            return QtGui.QColor(r_range[0], g_range[0], b_range[0], a_range[0])
+        elif x > t_range[-1]:
+            return QtGui.QColor(r_range[-1], g_range[-1], b_range[-1], a_range[-1])
+        else:
+            for i in range(len(t_range) - 1):
+                if t_range[i] <= x < t_range[i + 1]:
+                    sig_val = tbots_cpp.sigmoid(
+                        x,
+                        (t_range[i] + t_range[i + 1]) / 2,
+                        t_range[i + 1] - t_range[i],
+                    )
+                    return QtGui.QColor(
+                        int(r_range[i] + (r_range[i + 1] - r_range[i]) * sig_val),
+                        int(g_range[i] + (g_range[i + 1] - g_range[i]) * sig_val),
+                        int(b_range[i] + (b_range[i + 1] - b_range[i]) * sig_val),
+                        int(a_range[i] + (a_range[i + 1] - a_range[i]) * sig_val),
+                    )
