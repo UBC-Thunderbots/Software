@@ -1,3 +1,6 @@
+evdev==1.7.0
 numpy==1.26.4
 protobuf==5.27.3
 pyqtgraph==0.13.7
+pyqtdarktheme-fork==2.3.2
+PyQt6-Qt6==6.6.1

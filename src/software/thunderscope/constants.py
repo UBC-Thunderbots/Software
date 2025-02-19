@@ -127,11 +127,23 @@ LAST_OPENED_LAYOUT_PATH = (
 
 SIMULATION_SPEEDS = [2, 1, 0.5, 0.2, 0.1, 0.05]
 
+ROBOT_NAMES_FROM_ID = {
+    0: "Pied Piper",
+    1: "Bruhbot",
+    2: "Snowbot",
+    3: "Robert",
+    4: "Swolebot",
+    5: "Killit",
+    6: "Aimbot",
+    7: "Ball-E",
+}
+
 THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     f"""
     <h3>General Controls</h3><br>
     
     <b><code>I:</code></b> Identify robots, toggle robot ID visibility<br>
+    <b><code>O:</code></b> Identify robots, toggle robot name visibility<br>
     <b><code>M:</code></b> Toggle measure mode<br>
     <b><code>S:</code></b> Toggle visibility of robot/ball speed visualization<br>
     <b><code>Ctrl + Space:</code></b> Stop AI vs AI simulation<br>
@@ -302,6 +314,32 @@ class TrailValues:
 
     DEFAULT_TRAIL_LENGTH = 20
     DEFAULT_TRAIL_SAMPLING_RATE = 0
+
+
+class DiagnosticsConstants:
+    """Constants for Robot Diagnostics"""
+
+    # Device names of the controllers supported for controlling robots
+    SUPPORTED_CONTROLLERS = {
+        "Microsoft Xbox One X pad",
+        "Microsoft X-Box One S pad",
+        "Microsoft Xbox 360 pad",
+    }
+
+    BUTTON_PRESSED_THRESHOLD = 0.5
+    DEADZONE_PERCENTAGE = 0.20
+
+    SPEED_SLOWDOWN_FACTOR = 0.25
+
+    DRIBBLER_RPM_STEPPER = 1000
+
+    KICK_POWER_STEPPER = 1
+    MIN_KICK_POWER = 1
+    MAX_KICK_POWER = 10
+
+    CHIP_DISTANCE_STEPPER = 0.5
+    MIN_CHIP_POWER = 0.5
+    MAX_CHIP_POWER = 5.0
 
 
 class ProtoConfigurationConstant:

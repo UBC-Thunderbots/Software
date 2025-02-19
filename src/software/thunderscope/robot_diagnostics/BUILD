@@ -24,11 +24,32 @@ py_library(
 )
 
 py_library(
-    name = "diagnostics_input_widget",
-    srcs = ["diagnostics_input_widget.py"],
+    name = "handheld_controller",
+    srcs = ["handheld_controller.py"],
+)
+
+py_library(
+    name = "handheld_controller_widget",
+    srcs = ["handheld_controller_widget.py"],
     deps = [
+        ":handheld_controller",
+        "//software/thunderscope:constants",
+        requirement("pyqtgraph"),
+        requirement("evdev"),
+    ],
+)
+
+py_library(
+    name = "diagnostics_widget",
+    srcs = ["diagnostics_widget.py"],
+    deps = [
+        "//software/logger:py_logger",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope:thunderscope_types",
+        "//software/thunderscope/robot_diagnostics:chicker",
+        "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
+        "//software/thunderscope/robot_diagnostics:handheld_controller_widget",
         requirement("pyqtgraph"),
     ],
 )

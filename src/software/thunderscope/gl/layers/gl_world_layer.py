@@ -16,6 +16,7 @@ from software.thunderscope.constants import (
     SIMULATION_SPEEDS,
     LINE_WIDTH,
     CustomGLOptions,
+    ROBOT_NAMES_FROM_ID,
 )
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -36,6 +37,8 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 
 class GLWorldLayer(GLLayer):
     """GLLayer that visualizes the world and vision data"""
+
+    TEXT_GRAPHICS_QFONT = QtGui.QFont("Roboto", 10, weight=700)
 
     def __init__(
         self,
@@ -73,6 +76,7 @@ class GLWorldLayer(GLLayer):
         self.accepted_keys = [
             Qt.Key.Key_Control,
             Qt.Key.Key_I,
+            Qt.Key.Key_O,
             Qt.Key.Key_Space,
             Qt.Key.Key_Shift,
             Qt.Key.Key_Up,
@@ -83,6 +87,7 @@ class GLWorldLayer(GLLayer):
 
         self.display_robot_ids = True
         self.display_speed_lines = True
+        self.display_robot_names = False
         self.is_playing = True
         self.simulation_speed = 1.0
 
@@ -132,7 +137,9 @@ class GLWorldLayer(GLLayer):
         self.friendly_robot_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_graphics = ObservableList(self._graphics_changed)
         self.friendly_robot_id_graphics = ObservableList(self._graphics_changed)
+        self.friendly_robot_name_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_id_graphics = ObservableList(self._graphics_changed)
+        self.enemy_robot_name_graphics = ObservableList(self._graphics_changed)
         self.breakbeam_graphics = ObservableList(self._graphics_changed)
         self.auto_kick_graphics = ObservableList(self._graphics_changed)
         self.auto_chip_graphics = ObservableList(self._graphics_changed)
@@ -158,6 +165,8 @@ class GLWorldLayer(GLLayer):
             self.display_robot_ids = not self.display_robot_ids
         elif event.key() == QtCore.Qt.Key.Key_S:
             self.display_speed_lines = not self.display_speed_lines
+        elif event.key() == QtCore.Qt.Key.Key_O:
+            self.display_robot_names = not self.display_robot_names
 
         # If user is holding ctrl + space, send a command to simulator to pause the gameplay
         if (
@@ -371,12 +380,16 @@ class GLWorldLayer(GLLayer):
             friendly_colour,
             self.friendly_robot_graphics,
             self.friendly_robot_id_graphics,
+            self.friendly_robot_name_graphics,
+            ROBOT_NAMES_FROM_ID,
         )
         self.__update_robot_graphics(
             self._cached_enemy_team,
             enemy_colour,
             self.enemy_robot_graphics,
             self.enemy_robot_id_graphics,
+            self.enemy_robot_name_graphics,
+            {},
         )
 
     def __update_field_graphics(self, field: Field) -> None:
@@ -453,6 +466,8 @@ class GLWorldLayer(GLLayer):
         color: QtGui.QColor,
         robot_graphics: ObservableList,
         robot_id_graphics: ObservableList,
+        robot_name_graphics: ObservableList,
+        robot_names: dict[int:str],
     ) -> None:
         """Update the GLGraphicsItems that display the robots
 
@@ -460,20 +475,30 @@ class GLWorldLayer(GLLayer):
         :param color: The color of the robots
         :param robot_graphics: The ObservableList containing the robot graphics for this team
         :param robot_id_graphics: The ObservableList containing the robot ID graphics for this team
+        :param robot_name_graphics: The ObservableList containing the robot Name graphics for this team.
+        :param robot_names: A dict mapping ids to names of robots
         """
         # Ensure we have the same number of graphics as robots
         robot_graphics.resize(len(robots), lambda: GLRobot())
         robot_id_graphics.resize(
             len(robots),
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 10, weight=700),
+                font=GLWorldLayer.TEXT_GRAPHICS_QFONT,
+                color=Colors.PRIMARY_TEXT_COLOR,
+            ),
+        )
+        robot_name_graphics.resize(
+            len(robots),
+            lambda: GLTextItem(
+                font=GLWorldLayer.TEXT_GRAPHICS_QFONT,
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
         )
 
-        for robot_graphic, robot_id_graphic, robot_id in zip(
+        for robot_graphic, robot_id_graphic, robot_name_graphic, robot_id in zip(
             robot_graphics,
             robot_id_graphics,
+            robot_name_graphics,
             robots.keys(),
         ):
             # update the robot graphic with the robot state
@@ -484,22 +509,50 @@ class GLWorldLayer(GLLayer):
             robot_graphic.setColor(color)
             robot_graphic.show()
 
-            if self.display_robot_ids:
-                robot_id_graphic.show()
-
-                robot_id_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
-
-                robot_id_graphic.setData(
-                    text=str(robot_id),
-                    pos=[
-                        pos_x - (ROBOT_MAX_RADIUS_METERS / 2),
+            self.__update_robot_label_graphic(
+                self.display_robot_ids,
+                robot_id_graphic,
+                str(robot_id),
+                (
+                    pos_x - (ROBOT_MAX_RADIUS_METERS / 2),
+                    pos_y,
+                    ROBOT_MAX_HEIGHT_METERS + 0.1,
+                ),
+            )
+            if robot_id in robot_names:
+                self.__update_robot_label_graphic(
+                    self.display_robot_names,
+                    robot_name_graphic,
+                    robot_names[robot_id],
+                    (
+                        pos_x - (ROBOT_MAX_RADIUS_METERS / 2) + 0.2,
                         pos_y,
                         ROBOT_MAX_HEIGHT_METERS + 0.1,
-                    ],
+                    ),
                 )
 
-            else:
-                robot_id_graphic.hide()
+    def __update_robot_label_graphic(
+        self,
+        toggle: bool,
+        label: GLTextItem,
+        text: str,
+        pos: tuple[float, float, float],
+    ) -> None:
+        """Updates the text labels (id and name) above a robot.
+
+        :param toggle: toggles display for the displayed text.
+        :param label: The label to change.
+        :param text: The text to display.
+        :param pos: The position of the text.
+        """
+        if toggle:
+            label.show()
+
+            label.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
+
+            label.setData(text=text, pos=list(pos))
+        else:
+            label.hide()
 
     def __update_robot_status_graphics(self) -> None:
         """Update the robot status graphics"""

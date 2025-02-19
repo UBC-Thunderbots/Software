@@ -41,14 +41,16 @@ extern "C"
      */
     void tbotsExit(int signal_num)
     {
-        g_motor_service->resetMotorBoard();
+        if (g_motor_service)
+        {
+            g_motor_service->resetMotorBoard();
+        }
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
         // to log messages
         std::cerr << "\n\n!!!\nReceived termination signal: "
                   << g3::signalToStr(signal_num) << std::endl;
-        std::cerr << "Thunderloop shutting down and motor board reset\n!!!\n"
-                  << std::endl;
+        std::cerr << "Thunderloop shutting down\n!!!\n" << std::endl;
 
         TbotsProto::RobotCrash crash_msg;
         auto dump = g3::internal::stackdump();
@@ -115,6 +117,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
+    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
+    {
+        return;
+    }
+
     power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
@@ -147,6 +154,7 @@ void Thunderloop::runLoop()
     struct timespec current_time;
     struct timespec last_chipper_fired;
     struct timespec last_kicker_fired;
+    struct timespec prev_iter_start_time;
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
@@ -165,11 +173,15 @@ void Thunderloop::runLoop()
     clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
-
-    double loop_duration_seconds = 0.0;
+    clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
 
     for (;;)
     {
+        struct timespec time_since_prev_iter;
+        clock_gettime(CLOCK_MONOTONIC, &current_time);
+        ScopedTimespecTimer::timespecDiff(&current_time, &prev_iter_start_time,
+                                          &time_since_prev_iter);
+        prev_iter_start_time = current_time;
         {
             // Wait until next shot
             //
@@ -268,16 +280,7 @@ void Thunderloop::runLoop()
                 getMilliseconds(poll_time));
 
             // Power Service: execute the power control command
-            {
-                ScopedTimespecTimer timer(&poll_time);
-
-                ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
-                           true);
-
-                power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
-                                         kick_constant_, chip_pulse_width_);
-            }
+            power_status_ = pollPowerService(poll_time);
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
@@ -317,14 +320,8 @@ void Thunderloop::runLoop()
             }
 
             // Motor Service: execute the motor control command
-            {
-                ScopedTimespecTimer timer(&poll_time);
-
-                ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
-
-                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
-                                                     loop_duration_seconds);
-            }
+            motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(),
+                                             time_since_prev_iter);
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
@@ -364,12 +361,8 @@ void Thunderloop::runLoop()
         thunderloop_status_.set_iteration_time_ms(loop_duration_ns /
                                                   NANOSECONDS_PER_MILLISECOND);
 
-        // Make sure the iteration can fit inside the period of the loop
-        loop_duration_seconds =
-            static_cast<double>(loop_duration_ns) * SECONDS_PER_NANOSECOND;
-
-        // Calculate next shot taking into account how long this iteration took
-        next_shot.tv_nsec += interval - static_cast<long int>(loop_duration_ns);
+        // Calculate next shot (which is an absolute time)
+        next_shot.tv_nsec += interval;
         timespecNorm(next_shot);
 
         FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
@@ -417,6 +410,39 @@ double Thunderloop::getCpuTemperature()
         LOG(WARNING) << "Could not open CPU temperature file";
         return 0.0;
     }
+}
+
+TbotsProto::MotorStatus Thunderloop::pollMotorService(
+    struct timespec& poll_time, const TbotsProto::MotorControl& motor_control,
+    const struct timespec& time_since_prev_iteration)
+{
+    ScopedTimespecTimer timer(&poll_time);
+
+    ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
+
+    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
+    {
+        return TbotsProto::MotorStatus();
+    }
+
+    double time_since_prev_iteration_s =
+        getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
+    return motor_service_->poll(motor_control, time_since_prev_iteration_s);
+}
+
+TbotsProto::PowerStatus Thunderloop::pollPowerService(struct timespec& poll_time)
+{
+    ScopedTimespecTimer timer(&poll_time);
+
+    ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
+
+    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
+    {
+        return TbotsProto::PowerStatus();
+    }
+
+    return power_service_->poll(direct_control_.power_control(), kick_coeff_,
+                                kick_constant_, chip_pulse_width_);
 }
 
 bool isPowerStable(std::ifstream& log_file)
