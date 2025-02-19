@@ -233,14 +233,10 @@ new_local_repository(
     path = "/usr/lib/llvm-6.0/",
 )
 
-http_archive(
+new_local_repository(
     name = "k8_jetson_nano_cross_compile_gcc",
     build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
-    sha256 = "73eed74e593e2267504efbcf3678918bb22409ab7afa3dc7c135d2c6790c2345",
-    strip_prefix = "gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu",
-    urls = [
-        "http://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz",
-    ],
+    path = "/opt/aarch64-tbots-linux-gnu/",
 )
 
 # tool used to flash firmware with bazel
