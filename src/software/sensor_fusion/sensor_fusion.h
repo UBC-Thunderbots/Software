@@ -31,6 +31,10 @@ class SensorFusion
 
     virtual ~SensorFusion() = default;
 
+    const static int BREAK_BEAM_TOLERANCE = 2;
+    void detectInjuredRobots(
+        const std::vector<TbotsProto::RobotStatus> &robot_status_msgs);
+
     /**
      * Processes a new SensorProto, which may update the latest representation of the
      * World
