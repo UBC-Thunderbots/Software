@@ -62,6 +62,7 @@ cc_library(
         ":primitive_executor",
         "//proto:tbots_cc_proto",
         "//software/embedded/redis",
+        "//software/embedded/redis:yaml_reader",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",

@@ -73,18 +73,18 @@ extern "C"
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
     // TODO (#2495): Set the friendly team colour
-    : redis_client_(
-          std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
+    : yaml_config_reader_(ROBOT_PATH_TO_YAML_CONFIG.c_str()),
       motor_status_(std::nullopt),
       robot_constants_(robot_constants),
-      robot_id_(std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY))),
-      channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
-      network_interface_(redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
+      robot_id_(yaml_config_reader_.getValueInt(ROBOT_ID_REDIS_KEY)),
+      channel_id_(yaml_config_reader_.getValueInt(ROBOT_MULTICAST_CHANNEL_REDIS_KEY)),
+      network_interface_(
+          yaml_config_reader_.getValueString(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
       loop_hz_(loop_hz),
-      kick_coeff_(std::stod(redis_client_->getSync(ROBOT_KICK_EXP_COEFF_REDIS_KEY))),
-      kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
+      kick_coeff_(yaml_config_reader_.getValueDouble(ROBOT_KICK_EXP_COEFF_REDIS_KEY)),
+      kick_constant_(yaml_config_reader_.getValueInt(ROBOT_KICK_CONSTANT_REDIS_KEY)),
       chip_pulse_width_(
-          std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
+          yaml_config_reader_.getValueInt(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
@@ -339,18 +339,6 @@ void Thunderloop::runLoop()
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
             *(robot_status_.mutable_primitive_executor_status()) =
                 primitive_executor_status_;
-
-            // Update Redis
-            {
-                ZoneNamedN(_tracy_redis, "Thunderloop: Commit to REDIS", true);
-
-                redis_client_->setNoCommit(
-                    ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-                    std::to_string(power_status_.battery_voltage()));
-                redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
-                                           std::to_string(power_status_.current_draw()));
-                redis_client_->asyncCommit();
-            }
 
             updateErrorCodes();
         }
