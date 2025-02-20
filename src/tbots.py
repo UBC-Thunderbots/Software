@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
     # Trigger an optimized build by default. Note that Thunderloop should always be
     # compiled with optimizations for best performance
-    if not args.no_optimized_build or args.flash_robots:
+    if not args.debug_build and (not args.no_optimized_build or args.flash_robots):
         command += ["--copt=-O3"]
 
     # Used for when flashing Jetsons
