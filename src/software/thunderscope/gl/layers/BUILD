@@ -168,3 +168,13 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_referee_info_layer",
+    srcs = ["gl_referee_info_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_label",
+        requirement("pyqtgraph"),
+    ],
+)
