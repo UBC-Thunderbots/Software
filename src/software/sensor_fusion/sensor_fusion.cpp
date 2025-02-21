@@ -103,7 +103,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
                       packet.detection().robots_yellow().size() != 0))
         {
             LOG(WARNING)
-                << "there are robots on the field, but no ball. It is highly likely that sensor fusion have filtered this out!";
+                << "there are robots on the field, but no ball. It is highly likely that sensor fusion hae filtered this out!";
         }
     }
 }
