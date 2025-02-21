@@ -78,6 +78,7 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
     }
 }
 
+
 void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 {
     if (packet.has_geometry())
@@ -95,7 +96,15 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
             // Process the geometry again
             updateWorld(packet.geometry());
         }
+
         updateWorld(packet.detection());
+
+        if (!ball && (packet.detection().robots_blue().size() != 0 ||
+                      packet.detection().robots_yellow().size() != 0))
+        {
+            LOG(WARNING)
+                << "there are robots on the field, but no ball. It is highly likely that sensor fusion have filtered this out!";
+        }
     }
 }
 
@@ -395,7 +404,9 @@ void SensorFusion::updateDribbleDisplacement()
 
     std::transform(ball_contacts_by_friendly_robots.begin(),
                    ball_contacts_by_friendly_robots.end(),
-                   std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
+                   std::back_inserter(dribble_displacements),
+                   [&](const auto &kv_pair)
+                   {
                        const Point contact_point = kv_pair.second;
                        return Segment(contact_point, ball->position());
                    });
