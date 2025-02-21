@@ -121,9 +121,3 @@ py_library(
         "//software/simulated_tests:simulated_test_fixture",
     ],
 )
-
-cc_binary(
-    name ="test", 
-    srcs = ["test.cpp"], 
-    deps = ["@yaml-cpp//:yaml-cpp"]
-)
