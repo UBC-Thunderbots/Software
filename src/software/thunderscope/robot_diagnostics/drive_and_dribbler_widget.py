@@ -25,41 +25,76 @@ class KeyboardMagic:
 
     def read_one_loop(self):
         for event in self.device.read_loop():
-            #motor_control.direct_velocity_control.velocity.x_component_meters = (
+            # motor_control.direct_velocity_control.velocity.x_component_meters = (
             #    -move_axis_x * self.constants.robot_max_speed_m_per_s * speed_factor
-            #)
+            # )
 
-            #motor_control.direct_velocity_control.velocity.y_component_meters = (
+            # motor_control.direct_velocity_control.velocity.y_component_meters = (
             #    -move_axis_y * self.constants.robot_max_speed_m_per_s * speed_factor
-            #)
-
-            if event.code == ecodes.KEY_A and event.value == 1:
-                self.motor_control.direct_velocity_control.velocity.x_component_meters = -3.0
-            elif event.code == ecodes.KEY_A and event.value == 0:
-                self.motor_control.direct_velocity_control.velocity.x_component_meters =0 
+            # )
 
             if event.code == ecodes.KEY_S and event.value == 1:
-                self.motor_control.direct_velocity_control.velocity.y_component_meters = -3.0
+                self.motor_control.direct_velocity_control.velocity.x_component_meters = (
+                    -3.0 / 2.0
+                )
             elif event.code == ecodes.KEY_S and event.value == 0:
-                self.motor_control.direct_velocity_control.velocity.y_component_meters =0 
-
-            if event.code == ecodes.KEY_W and event.value == 1:
-                self.motor_control.direct_velocity_control.velocity.y_component_meters = 3.0
-            elif event.code == ecodes.KEY_W and event.value == 0:
-                self.motor_control.direct_velocity_control.velocity.y_component_meters =0 
+                self.motor_control.direct_velocity_control.velocity.x_component_meters = (
+                    0
+                )
 
             if event.code == ecodes.KEY_D and event.value == 1:
-                self.motor_control.direct_velocity_control.velocity.x_component_meters = 3.0
+                self.motor_control.direct_velocity_control.velocity.y_component_meters = (
+                    -3.0 / 2.0
+                )
             elif event.code == ecodes.KEY_D and event.value == 0:
-                self.motor_control.direct_velocity_control.velocity.x_component_meters =0 
+                self.motor_control.direct_velocity_control.velocity.y_component_meters = (
+                    0
+                )
 
-            #if event.code == ecodes.KEY_Q and event.value == 1:
+            if event.code == ecodes.KEY_A and event.value == 1:
+                self.motor_control.direct_velocity_control.velocity.y_component_meters = (
+                    3.0 / 2.0
+                )
+            elif event.code == ecodes.KEY_A and event.value == 0:
+                self.motor_control.direct_velocity_control.velocity.y_component_meters = (
+                    0
+                )
+
+            if event.code == ecodes.KEY_W and event.value == 1:
+                self.motor_control.direct_velocity_control.velocity.x_component_meters = (
+                    3.0 / 2.0
+                )
+            elif event.code == ecodes.KEY_W and event.value == 0:
+                self.motor_control.direct_velocity_control.velocity.x_component_meters = (
+                    0
+                )
+
+            if event.code == ecodes.KEY_Q and event.value == 1:
+                self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                    10.0 / 2.0
+                )
+            elif event.code == ecodes.KEY_Q and event.value == 0:
+                self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                    0.0
+                )
+
+            if event.code == ecodes.KEY_E and event.value == 1:
+                self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                    -10.0 / 2.0
+                )
+            elif event.code == ecodes.KEY_E and event.value == 0:
+                self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                    0
+                )
+
+            # if event.code == ecodes.KEY_Q and event.value == 1:
             #    self.motor_control.direct_velocity_control.velocity.x_component_meters = 0
             #    self.motor_control.direct_velocity_control.velocity.y_component_meters = 0
-            #elif event.code == ecodes.KEY_Q and event.value == 0:
-            #    self.motor_control.direct_velocity_control.velocity.x_component_meters =0 
+            # elif event.code == ecodes.KEY_Q and event.value == 0:
+            #    self.motor_control.direct_velocity_control.velocity.x_component_meters =0
 
             self.drive_and_dribble_widget.override_slider_values(self.motor_control)
+
 
 class DriveAndDribblerWidget(QWidget):
     """This widget provides an interface for controlling our robots'
