@@ -215,4 +215,8 @@ sudo ln -s ~/.platformio/penv/bin/platformio /usr/local/bin/platformio
 
 print_status_msg "Done PlatformIO Setup"
 
+print_status_msg "Set up ansible-lint"
+/opt/tbotspython/bin/ansible-galaxy collection install ansible.posix
+print_status_msg "Finished setting up ansible-lint"
+
 print_status_msg "Done Software Setup, please reboot for changes to take place"
