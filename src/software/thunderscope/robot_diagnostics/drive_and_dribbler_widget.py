@@ -1,3 +1,4 @@
+from threading import Thread
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
@@ -7,6 +8,58 @@ import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.common import common_widgets
 
+import evdev
+from evdev import ecodes
+
+
+class KeyboardMagic:
+    def __init__(self, drive_and_dribble_widget):
+        self.drive_and_dribble_widget = drive_and_dribble_widget
+        self.device = evdev.InputDevice("/dev/input/event3")
+        self.thread = Thread(target=self.read_one_loop)
+        self.thread.start()
+
+        self.motor_control = MotorControl()
+        self.motor_control.direct_velocity_control.velocity.x_component_meters = 0
+        self.motor_control.direct_velocity_control.velocity.y_component_meters = 0
+
+    def read_one_loop(self):
+        for event in self.device.read_loop():
+            #motor_control.direct_velocity_control.velocity.x_component_meters = (
+            #    -move_axis_x * self.constants.robot_max_speed_m_per_s * speed_factor
+            #)
+
+            #motor_control.direct_velocity_control.velocity.y_component_meters = (
+            #    -move_axis_y * self.constants.robot_max_speed_m_per_s * speed_factor
+            #)
+
+            if event.code == ecodes.KEY_A and event.value == 1:
+                self.motor_control.direct_velocity_control.velocity.x_component_meters = -3.0
+            elif event.code == ecodes.KEY_A and event.value == 0:
+                self.motor_control.direct_velocity_control.velocity.x_component_meters =0 
+
+            if event.code == ecodes.KEY_S and event.value == 1:
+                self.motor_control.direct_velocity_control.velocity.y_component_meters = -3.0
+            elif event.code == ecodes.KEY_S and event.value == 0:
+                self.motor_control.direct_velocity_control.velocity.y_component_meters =0 
+
+            if event.code == ecodes.KEY_W and event.value == 1:
+                self.motor_control.direct_velocity_control.velocity.y_component_meters = 3.0
+            elif event.code == ecodes.KEY_W and event.value == 0:
+                self.motor_control.direct_velocity_control.velocity.y_component_meters =0 
+
+            if event.code == ecodes.KEY_D and event.value == 1:
+                self.motor_control.direct_velocity_control.velocity.x_component_meters = 3.0
+            elif event.code == ecodes.KEY_D and event.value == 0:
+                self.motor_control.direct_velocity_control.velocity.x_component_meters =0 
+
+            #if event.code == ecodes.KEY_Q and event.value == 1:
+            #    self.motor_control.direct_velocity_control.velocity.x_component_meters = 0
+            #    self.motor_control.direct_velocity_control.velocity.y_component_meters = 0
+            #elif event.code == ecodes.KEY_Q and event.value == 0:
+            #    self.motor_control.direct_velocity_control.velocity.x_component_meters =0 
+
+            self.drive_and_dribble_widget.override_slider_values(self.motor_control)
 
 class DriveAndDribblerWidget(QWidget):
     """This widget provides an interface for controlling our robots'
@@ -25,6 +78,7 @@ class DriveAndDribblerWidget(QWidget):
 
         self.proto_unix_io = proto_unix_io
 
+        self.keyboard_magic = KeyboardMagic(self)
         self.constants = tbots_cpp.create2021RobotConstants()
 
         self.enabled = True

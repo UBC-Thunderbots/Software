@@ -61,6 +61,7 @@ class HandheldControllerWidget(QWidget):
         self.handheld_controller = None
 
         for path in evdev.list_devices():
+            print(path)
             device = evdev.InputDevice(path)
             if device.name in DiagnosticsConstants.SUPPORTED_CONTROLLERS:
                 self.handheld_controller = HandheldController(path)
