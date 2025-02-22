@@ -10,10 +10,11 @@ import time
 
 class EmbeddedCommunication:
     """Communication class for sending/executing protos with the robots"""
+
     def __init__(self):
         """Establishes multicast connections and e-stop information"""
-        self.primitive_set_sender = None
-        self.receive_robot_status = None
+        self.primitive_set_sender: tbots_cpp.PrimitiveSender | None = None
+        self.receive_robot_status: tbots_cpp.RobotStatusProtolistener | None = None
         self.embedded_data = EmbeddedData()
         self.channel_id = int(self.embedded_data.get_channel_id())
         self.robot_id = int(self.embedded_data.get_robot_id())
@@ -21,11 +22,6 @@ class EmbeddedCommunication:
         self.sequence_number = 0
         self.command_duration_seconds = 2.0
         self.send_primitive_interval_s = 0.01
-
-        self.epoch_timestamp_seconds = 0
-        self.battery_voltage = 0
-        self.primitive_packet_loss_percentage = 0
-        self.primitive_executor_step_time_ms = 0
 
         # total primitives for this robots
         self.robot_primitives = {}
@@ -48,17 +44,14 @@ class EmbeddedCommunication:
         except Exception as e:
             raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
 
-    def epoch_time(self):
-        return self.epoch_timestamp_seconds
-
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Updates the dynamic information with the new RobotStatus message.
         :param robot_status: The incoming RobotStatus proto from the robot to read
         """
-        self.epoch_timestamp_seconds = robot_status.time_sent.epoch_timestamp_seconds
-        self.battery_voltage = robot_status.power_status.battery_voltage
-        self.primitive_packet_loss_percentage = robot_status.network_status.primitive_packet_loss_percentage
-        self.primitive_executor_step_time_ms = robot_status.thunderloop_status.primitive_executor_step_time_ms
+        self.embedded_data.epoch_timestamp_seconds = robot_status.time_sent.epoch_timestamp_seconds
+        self.embedded_data.battery_voltage = robot_status.power_status.battery_voltage
+        self.embedded_data.primitive_packet_loss_percentage = robot_status.network_status.primitive_packet_loss_percentage
+        self.embedded_data.primitive_executor_step_time_ms = robot_status.thunderloop_status.primitive_executor_step_time_ms
 
     def __should_send_packet(self) -> bool:
         """Returns True if a proto should be sent

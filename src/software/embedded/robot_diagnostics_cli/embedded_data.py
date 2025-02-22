@@ -16,6 +16,10 @@ class EmbeddedData:
             charset="utf-8",
             decode_responses=True
         )
+        self.epoch_timestamp_seconds = 0
+        self.battery_voltage = 0
+        self.primitive_packet_loss_percentage = 0
+        self.primitive_executor_step_time_ms = 0
 
     def get_robot_id(self) -> str:
         return str(self.redis.get(ROBOT_ID_REDIS_KEY))
@@ -52,6 +56,7 @@ class EmbeddedData:
         """
         return min(max(val, min_val), max_val)
 
+    # TODO-3435: Refactor Get Primitives
     def get_rotate_primitive(self, velocity: float) -> Primitive:
         """Prepares and returns the processed direct control primitive given a velocity
         :param velocity: Angular Velocity to rotate the robot
@@ -102,7 +107,7 @@ class EmbeddedData:
         if not auto:
             power_control_primitive.chicker.chip_distance_meters = distance
         else:
-            # TODO: Change this to a constant from somewhere else
+            # TODO-3436: Change this default to the correct constant once defined by ELEC
             power_control_primitive.chicker.auto_chip_or_kick.autochip_distance_meters = 1.5
         direct_control_primitive = DirectControlPrimitive(
             motor_control=MotorControl(),
@@ -124,7 +129,7 @@ class EmbeddedData:
         if not auto:
             power_control_primitive.chicker.kick_speed_m_per_s = speed
         else:
-            # TODO: Change this to a constant from somewhere else
+            # TODO-3436: Change this default to the correct constant once defined by ELEC
             power_control_primitive.chicker.auto_chip_or_kick.autokick_speed_m_per_s = 1.5
         direct_control_primitive = DirectControlPrimitive(
             motor_control=MotorControl(),

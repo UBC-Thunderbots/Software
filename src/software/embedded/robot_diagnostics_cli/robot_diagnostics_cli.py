@@ -92,9 +92,9 @@ class RobotDiagnosticsCLI:
 
         table.add_row(
             self.embedded_data.get_robot_id(),
-            f"{self.embedded_communication.battery_voltage}",
+            f"{self.embedded_data.battery_voltage}",
             status,
-            f"{self.embedded_communication.epoch_timestamp_seconds}"
+            f"{self.embedded_data.epoch_timestamp_seconds}"
         )
         return table
 
@@ -272,7 +272,7 @@ class RobotDiagnosticsCLI:
         :param velocity: Velocity to rotate the wheel
         :param duration_seconds: Duration to move
         """
-        # TODO: Confirm max speed for wheel rotation (it is currently net robot velocity)
+        # TODO-ult 3436: Confirm max speed for wheel rotation (it is currently net robot velocity)
         description = f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
@@ -281,7 +281,7 @@ class RobotDiagnosticsCLI:
         )
 
     def emote(self):
-        # TODO: Add an emote function!
+        # TODO-3434: Add an emote function!
         return
 
 if __name__ == "__main__":
