@@ -15,6 +15,10 @@
         dest: ~/thunderbots_binaries/
         copy_links: true
 
+    - name: Compute Thunderloop MD5 Hash
+      command: '/home/{{ ansible_user }}/hash_thunderloop_binary.sh'
+      register: result
+
     - name: Sync Thunderloop systemd file
       become_method: ansible.builtin.sudo
       become: true
