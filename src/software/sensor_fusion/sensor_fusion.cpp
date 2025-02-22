@@ -78,6 +78,11 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
     }
 }
 
+TbotsProto::SensorFusionConfig &SensorFusion::getConfig()
+{
+    return sensor_fusion_config;
+}
+
 void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 {
     if (packet.has_geometry())
@@ -158,17 +163,24 @@ void SensorFusion::updateWorld(
     for (auto &robot_status_msg : robot_status_msgs)
     {
         RobotId robot_id = robot_status_msg.robot_id();
-        TbotsProto::RobotCapabilitiesConfig capabilities_config = sensor_fusion_config.robot_capabilities_config();
+        TbotsProto::RobotCapabilitiesConfig capabilities_config =
+            sensor_fusion_config.robot_capabilities_config();
         std::set<RobotCapability> unavailableCapabilities;
 
-        const google::protobuf::Reflection *broken_dribblers_reflection = capabilities_config.broken_dribblers().GetReflection();
-    	const google::protobuf::Descriptor *broken_dribblers_descriptor = capabilities_config.broken_dribblers().GetDescriptor();
+        const google::protobuf::Reflection *broken_dribblers_reflection =
+            capabilities_config.broken_dribblers().GetReflection();
+    	const google::protobuf::Descriptor *broken_dribblers_descriptor =
+            capabilities_config.broken_dribblers().GetDescriptor();
 
-    	const google::protobuf::Reflection *broken_chippers_reflection = capabilities_config.broken_chippers().GetReflection();
-    	const google::protobuf::Descriptor *broken_chippers_descriptor = capabilities_config.broken_chippers().GetDescriptor();
+    	const google::protobuf::Reflection *broken_chippers_reflection =
+            capabilities_config.broken_chippers().GetReflection();
+    	const google::protobuf::Descriptor *broken_chippers_descriptor =
+            capabilities_config.broken_chippers().GetDescriptor();
 
-    	const google::protobuf::Reflection *broken_kickers_reflection = capabilities_config.broken_kickers().GetReflection();
-    	const google::protobuf::Descriptor *broken_kickers_descriptor = capabilities_config.broken_kickers().GetDescriptor();
+    	const google::protobuf::Reflection *broken_kickers_reflection =
+            capabilities_config.broken_kickers().GetReflection();
+    	const google::protobuf::Descriptor *broken_kickers_descriptor =
+            capabilities_config.broken_kickers().GetDescriptor();
 
         for (const auto &error_code_msg : robot_status_msg.error_code())
         {
@@ -183,17 +195,23 @@ void SensorFusion::updateWorld(
             }
         }
 
-        if (broken_dribblers_reflection->GetBool(capabilities_config.broken_dribblers(), broken_dribblers_descriptor->field(robot_id)))
+        if (broken_dribblers_reflection->GetBool(
+                capabilities_config.broken_dribblers(),
+                broken_dribblers_descriptor->field(robot_id)))
         {
             unavailableCapabilities.insert(RobotCapability::Dribble);
         }
 
-        if (broken_chippers_reflection->GetBool(capabilities_config.broken_chippers(), broken_chippers_descriptor->field(robot_id)))
+        if (broken_chippers_reflection->GetBool(
+                capabilities_config.broken_chippers(),
+                broken_chippers_descriptor->field(robot_id)))
         {
             unavailableCapabilities.insert(RobotCapability::Chip);
         }
 
-        if (broken_kickers_reflection->GetBool(capabilities_config.broken_kickers(), broken_kickers_descriptor->field(robot_id)))
+        if (broken_kickers_reflection->GetBool(
+                capabilities_config.broken_kickers(),
+                broken_kickers_descriptor->field(robot_id)))
         {
             unavailableCapabilities.insert(RobotCapability::Kick);
         }

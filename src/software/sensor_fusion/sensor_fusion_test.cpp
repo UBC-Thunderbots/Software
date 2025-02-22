@@ -1010,3 +1010,78 @@ TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
     // did it not use robot position
     EXPECT_TRUE(ball_position != robot_state.position());
 }
+
+TEST_F(SensorFusionTest,
+       test_unavailable_robot_capabilities_dribblers)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs()) = *robot_status_msg_id_1;
+
+    sensor_fusion.getConfig().mutable_robot_capabilities_config()
+        ->mutable_broken_dribblers()->set_robot_1(true);
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(1);
+
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+
+    EXPECT_TRUE(robot_unavailable_capabilities.contains(RobotCapability::Dribble));
+    EXPECT_FALSE(robot_unavailable_capabilities.contains(RobotCapability::Kick));
+    EXPECT_FALSE(robot_unavailable_capabilities.contains(RobotCapability::Chip));
+}
+
+TEST_F(SensorFusionTest,
+       test_unavailable_robot_capabilities_kickers)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs()) = *robot_status_msg_id_1;
+
+    sensor_fusion.getConfig().mutable_robot_capabilities_config()
+        ->mutable_broken_kickers()->set_robot_1(true);
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(1);
+
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+
+    EXPECT_FALSE(robot_unavailable_capabilities.contains(RobotCapability::Dribble));
+    EXPECT_TRUE(robot_unavailable_capabilities.contains(RobotCapability::Kick));
+    EXPECT_FALSE(robot_unavailable_capabilities.contains(RobotCapability::Chip));
+}
+
+TEST_F(SensorFusionTest,
+       test_unavailable_robot_capabilities_chippers)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs()) = *robot_status_msg_id_1;
+
+    sensor_fusion.getConfig().mutable_robot_capabilities_config()
+        ->mutable_broken_chippers()->set_robot_1(true);
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(1);
+
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+
+    EXPECT_FALSE(robot_unavailable_capabilities.contains(RobotCapability::Dribble));
+    EXPECT_FALSE(robot_unavailable_capabilities.contains(RobotCapability::Kick));
+    EXPECT_TRUE(robot_unavailable_capabilities.contains(RobotCapability::Chip));
+}

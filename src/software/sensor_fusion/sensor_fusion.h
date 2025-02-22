@@ -61,6 +61,13 @@ class SensorFusion
     // https://github.com/UBC-Thunderbots/Software/issues/3197
     static constexpr double DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION = 0.5;
 
+    /**
+     * Returns the SensorFusionConfig object
+     *
+     * @return the SensorFusionConfig object
+     */
+    TbotsProto::SensorFusionConfig &getConfig();
+
    private:
     /**
      * Updates relevant components of world based on a new data
