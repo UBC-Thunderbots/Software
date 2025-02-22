@@ -499,18 +499,6 @@ message EnemyBallPlacementPlayConfig
     ];
 }
 
-message NetworkConfig
-{
-    // The robot communication interface
-    required string robot_communication_interface = 1 [default = "lo"];
-
-    // The referee interface
-    required string referee_interface = 2 [default = "lo"];
-
-    // The vision interface
-    required string vision_interface = 3 [default = "lo"];
-}
-
 message DefensePlayConfig
 {
     message DefenderAssignmentConfig
@@ -646,6 +634,18 @@ message PossessionTrackerConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
+}
+
+message NetworkConfig
+{
+    // The robot communication interface
+    required string robot_communication_interface = 1 [default = "lo"];
+
+    // The referee interface
+    required string referee_interface = 2 [default = "lo"];
+
+    // The vision interface
+    required string vision_interface = 3 [default = "lo"];
 }
 
 message CreaseDefenderConfig
