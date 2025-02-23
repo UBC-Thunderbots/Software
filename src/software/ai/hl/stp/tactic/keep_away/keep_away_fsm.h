@@ -1,11 +1,8 @@
-//
-// Created by anniesun on 1/25/25.
-//
 #pragma once
 
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/keep_away.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.cpp"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
 struct KeepAwayFSM
 {
@@ -49,6 +46,5 @@ struct KeepAwayFSM
     }
 
     private:
-        // the attacker tactic config
-        //TbotsProto::AiConfig ai_config;
+        TbotsProto::AiConfig ai_config;
 };
