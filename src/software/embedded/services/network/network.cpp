@@ -153,6 +153,7 @@ void NetworkService::primitiveCallback(const TbotsProto::Primitive& input)
 {
     std::scoped_lock<std::mutex> lock(primitive_mutex);
     const uint64_t seq_num = input.sequence_number();
+    LOG(INFO) << "PRIMITIVE INFO: " << input.DebugString();
 
     logNewPrimitive(input);
 

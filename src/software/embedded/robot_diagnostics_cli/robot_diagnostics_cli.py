@@ -61,18 +61,18 @@ class RobotDiagnosticsCLI:
             @wraps(func)
             def wrapper(self, *args, **kwargs):
                 try:
-                    self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.send_primitive(Primitive(stop=StopPrimitive()))
                     return func(self, *args, **kwargs)
                 except KeyboardInterrupt:
                     logging.info("[bold yellow] E-Stop Activated: Stopped Primitive Send [/bold yellow]")
-                    self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.send_primitive(Primitive(stop=StopPrimitive()))
                     raise Typer.Exit(code=exit_code)
                 except Exception as e:
-                    self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.send_primitive(Primitive(stop=StopPrimitive()))
                     logging.exception(f"Unknown Exception: {e}")
                     raise Typer.Exit(code=exit_code)
                 finally:
-                    self.embedded_communication.send_primitive_set(Primitive(stop=StopPrimitive()))
+                    self.embedded_communication.send_primitive(Primitive(stop=StopPrimitive()))
 
             return wrapper
 
@@ -210,7 +210,7 @@ class RobotDiagnosticsCLI:
                 primitive,
                 description)
         else:
-            self.embedded_communication.run_primitive_set(primitive)
+            self.embedded_communication.run_primitive(primitive)
             print(description)
 
     @catch_interrupt_exception()
@@ -235,7 +235,7 @@ class RobotDiagnosticsCLI:
                 primitive,
                 description)
         else:
-            self.embedded_communication.run_primitive_set(primitive)
+            self.embedded_communication.run_primitive(primitive)
             print(description)
 
     @catch_interrupt_exception()
@@ -272,7 +272,7 @@ class RobotDiagnosticsCLI:
         :param velocity: Velocity to rotate the wheel
         :param duration_seconds: Duration to move
         """
-        # TODO-ult 3436: Confirm max speed for wheel rotation (it is currently net robot velocity)
+        # TODO (#3436): Confirm max speed for wheel rotation (it is currently net robot velocity)
         description = f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
@@ -281,7 +281,7 @@ class RobotDiagnosticsCLI:
         )
 
     def emote(self):
-        # TODO-3434: Add an emote function!
+        # TODO (#3434): Add an emote function!
         return
 
 if __name__ == "__main__":

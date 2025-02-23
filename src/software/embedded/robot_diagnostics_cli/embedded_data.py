@@ -56,7 +56,7 @@ class EmbeddedData:
         """
         return min(max(val, min_val), max_val)
 
-    # TODO-3435: Refactor Get Primitives
+    # TODO (#3435): Refactor Get Primitives
     def get_rotate_primitive(self, velocity: float) -> Primitive:
         """Prepares and returns the processed direct control primitive given a velocity
         :param velocity: Angular Velocity to rotate the robot
@@ -129,7 +129,7 @@ class EmbeddedData:
         if not auto:
             power_control_primitive.chicker.kick_speed_m_per_s = speed
         else:
-            # TODO-3436: Change this default to the correct constant once defined by ELEC
+            # TODO (#3436): Change this default to the correct constant once defined by ELEC
             power_control_primitive.chicker.auto_chip_or_kick.autokick_speed_m_per_s = 1.5
         direct_control_primitive = DirectControlPrimitive(
             motor_control=MotorControl(),
