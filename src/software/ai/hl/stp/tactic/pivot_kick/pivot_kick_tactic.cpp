@@ -10,7 +10,7 @@
 #include "software/logger/logger.h"
 
 PivotKickTactic::PivotKickTactic(TbotsProto::AiConfig ai_config)
-    : Tactic({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
+    : Tactic({RobotCapability::Move, RobotCapability::Kick,
               RobotCapability::Dribble}),
       fsm_map(),
       control_params(PivotKickFSM::ControlParams()),
