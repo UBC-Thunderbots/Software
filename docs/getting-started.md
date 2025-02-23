@@ -68,13 +68,13 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 We currently only support Linux, specifically Ubuntu.
 
-If you have a X86_64 machine, we support Ubuntu 20.04 LTS, Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
+If you have a X86_64 machine, we support Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
 
 If you have a ARM64 (also known as AARCH64) machine, we support Ubuntu 24.04 LTS.
 
 You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
 
-You can use Ubuntu 20.04 LTS, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+You can use Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ### Getting the Code
 
