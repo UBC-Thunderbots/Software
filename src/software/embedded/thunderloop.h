@@ -10,7 +10,7 @@
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/embedded/primitive_executor.h"
-#include "software/embedded/redis/redis_client.h"
+#include "software/embedded/redis/yaml_reader.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
@@ -63,7 +63,7 @@ class Thunderloop
     std::unique_ptr<PowerService> power_service_;
 
     // Clients
-    std::unique_ptr<RedisClient> redis_client_;
+    YAMLReader yaml_config_reader_;
 
    private:
     /*
