@@ -340,6 +340,10 @@ class DiagnosticsConstants:
     MIN_CHIP_POWER = 0.5
     MAX_CHIP_POWER = 5.0
 
+    PULSE_WIDTH_STEPPER = 1
+    MIN_PULSE_WIDTH = 1
+    MAX_PULSE_WIDTH = 20000
+
 
 class ProtoConfigurationConstant:
     DEFAULT_SAVE_DIRECTORY = "/opt/tbotspython/thunderbots_configuration_proto"
