@@ -264,14 +264,14 @@ class ChickerWidget(QWidget):
 
         common_widgets.disable_slider(self.kick_power_slider)
         common_widgets.disable_slider(self.chip_distance_slider)
-        common_widgets.enable_slider(self.pulse_width_slider)
+        common_widgets.disable_slider(self.pulse_width_slider)
         common_widgets.disable_button(self.no_auto_button)
         common_widgets.disable_button(self.auto_kick_button)
         common_widgets.disable_button(self.auto_chip_button)
         common_widgets.disable_button(self.kick_button)
         common_widgets.disable_button(self.chip_button)
-        common_widgets.enable_button(self.meters_per_second_button)
-        common_widgets.enable_button(self.pulse_width_button)
+        common_widgets.disable_button(self.meters_per_second_button)
+        common_widgets.disable_button(self.pulse_width_button)
 
     def override_slider_values(self, kick_power: int, chip_distance: float) -> None:
         """Set the widget's sliders to match the given values.
