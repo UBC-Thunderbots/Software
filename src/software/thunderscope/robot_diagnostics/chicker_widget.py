@@ -144,7 +144,7 @@ class ChickerWidget(QWidget):
             self.power_mode_buttons_box,
             self.power_mode_buttons,
         ) = common_widgets.create_radio(
-            ["Power (m/s)", "Power (Pulse Width)"], self.power_mode_buttons_group
+            ["Power (m/s or m)", "Power (Pulse Width)"], self.power_mode_buttons_group
         )
         self.power_mode_buttons_box.setTitle("Power Mode")
 
