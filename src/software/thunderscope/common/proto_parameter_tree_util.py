@@ -21,7 +21,7 @@ CUSTOM_PARAMETERS_OVERRIDE = {
 }
 
 
-def __create_int_parameter_writable(key:str, value:int, descriptor:FieldDescriptor):
+def __create_int_parameter_writable(key, value, descriptor):
     """Converts an int field of a proto to a NumericParameterItem with
     the min/max bounds set according to the provided ParameterRangeOptions
 

@@ -3,6 +3,7 @@ from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
 from software.thunderscope.common.common_widgets import set_table_data
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from google.protobuf.json_format import MessageToDict
 
 
 class RefereeInfoWidget(QWidget):
@@ -41,6 +42,11 @@ class RefereeInfoWidget(QWidget):
         if referee is None:
             return
 
+        referee_msg_dict = MessageToDict(referee)
+
+        if not referee_msg_dict:
+            return
+
         stage_time_left_s = (
             int(referee_msg_dict["stageTimeLeft"]) * SECONDS_PER_MICROSECOND
         )
@@ -48,11 +54,11 @@ class RefereeInfoWidget(QWidget):
             f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
             + f"Stage Time Left: {int(stage_time_left_s / SECONDS_PER_MINUTE):02d}"
             + f":{int(stage_time_left_s % SECONDS_PER_MINUTE):02d}\n"
-            + f"Stage: {referee.stage}\n"
+            + f"Stage: {referee_msg_dict['stage']}\n"
             + "Command: "
-            + referee.command
+            + referee_msg_dict["command"]
             + "\n"
-            + f"Blue Team on Positive Half: {referee.blueTeamOnPositiveHalf}\n"
+            + f"Blue Team on Positive Half: {referee_msg_dict['blueTeamOnPositiveHalf']}\n"
         )
         self.referee_info.setText(p)
 
@@ -60,7 +66,7 @@ class RefereeInfoWidget(QWidget):
         blue = []
         yellow = []
 
-        for team_info_name in referee.blue():
+        for team_info_name in referee_msg_dict["blue"]:
             if team_info_name == "timeouts":
                 team_info.append("remainingTimeouts")
             elif team_info_name == "goalkeeper":
@@ -68,7 +74,7 @@ class RefereeInfoWidget(QWidget):
             else:
                 team_info.append(team_info_name)
 
-        for team_info_name in referee.yellow():
+        for team_info_name in referee_msg_dict["yellow"]:
             if team_info_name in team_info:
                 continue
 
@@ -81,17 +87,17 @@ class RefereeInfoWidget(QWidget):
 
         for info in team_info:
             if info == "yellowCardTimes":
-                blue.append(self.parse_yellow_card_times(referee.blue))
-                yellow.append(self.parse_yellow_card_times(referee.yellow))
+                blue.append(self.parse_yellow_card_times(referee_msg_dict["blue"]))
+                yellow.append(self.parse_yellow_card_times(referee_msg_dict["yellow"]))
             elif info == "remainingTimeouts":
-                blue.append(referee.blue.timeouts)
-                yellow.append(referee.yellow().timeouts)
+                blue.append(referee_msg_dict["blue"]["timeouts"])
+                yellow.append(referee_msg_dict["yellow"]["timeouts"])
             elif info == "goalkeeperID":
-                blue.append(referee.blue.goalkeepers)
-                yellow.append(referee.yellow().goalkeeper)
+                blue.append(referee_msg_dict["blue"]["goalkeeper"])
+                yellow.append(referee_msg_dict["yellow"]["goalkeeper"])
             else:
-                blue.append(referee.blue.info)
-                yellow.append(referee.yellow.info)
+                blue.append(referee_msg_dict["blue"][info])
+                yellow.append(referee_msg_dict["yellow"][info])
 
         set_table_data(
             {
@@ -106,6 +112,7 @@ class RefereeInfoWidget(QWidget):
 
         self.referee_table.resizeColumnsToContents()
         self.referee_table.resizeRowsToContents()
+
 
     def parse_yellow_card_times(self, team_info: TeamInfo) -> str:
         """Parses yellow card times from a TeamInfo Protobuf dict as a string output.

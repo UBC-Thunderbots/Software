@@ -58,7 +58,7 @@ class PlayInfoWidget(QWidget):
         # setting table size dynamically
         self.play_table.setRowCount(num_rows)
 
-        for state in playinfo.play().playstate():
+        for state in playinfo.play.play_state:
             play_name.append(state)
 
         for robot_id in sorted(playinfo.robot_tactic_assignment):
