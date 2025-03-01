@@ -33,7 +33,7 @@ TEST(ThreadedEstopReaderTest, estop_tick_is_called_multiple_times)
 {
     std::unique_ptr<MockUart> mock_uart = std::make_unique<MockUart>();
 
-    int test_timeout_ms                 = 200;
+    int test_timeout_ms                 = 100;
     unsigned char arbitrary_garbage_val = 0b10111011;
     std::vector<unsigned char> play_ret_val(1, ESTOP_PLAY_MSG);
     std::vector<unsigned char> garbage_ret_val(1, arbitrary_garbage_val);
@@ -44,7 +44,7 @@ TEST(ThreadedEstopReaderTest, estop_tick_is_called_multiple_times)
     std::mutex m;
     std::unique_lock lock(m);
     std::condition_variable cv;
-    bool ready;
+    bool ready = false;
 
     EXPECT_CALL(*mock_uart_ptr, flushSerialPort(_)).WillRepeatedly(Return(true));
 

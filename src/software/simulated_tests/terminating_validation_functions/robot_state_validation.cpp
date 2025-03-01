@@ -8,7 +8,8 @@ void robotAtPosition(RobotId robot_id, std::shared_ptr<World> world_ptr,
 {
     auto robot_is_not_at_destination =
         [robot_id, destination, close_to_destination_threshold](
-            std::shared_ptr<World> world_ptr) -> std::optional<Point> {
+            std::shared_ptr<World> world_ptr) -> std::optional<Point>
+    {
         std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
         CHECK(robot_optional.has_value())
@@ -40,7 +41,8 @@ void robotAtOrientation(RobotId robot_id, std::shared_ptr<World> world_ptr,
 {
     auto robot_is_not_at_orientation =
         [robot_id, orientation, close_to_orientation_threshold](
-            std::shared_ptr<World> world_ptr) -> std::optional<Angle> {
+            std::shared_ptr<World> world_ptr) -> std::optional<Angle>
+    {
         std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
         CHECK(robot_optional.has_value())
@@ -74,7 +76,8 @@ void robotAtAngularVelocity(RobotId robot_id, std::shared_ptr<World> world_ptr,
 {
     auto robot_is_not_at_angular_velocity =
         [robot_id, angular_velocity, close_to_angular_velocity_threshold](
-            std::shared_ptr<World> world_ptr) -> std::optional<AngularVelocity> {
+            std::shared_ptr<World> world_ptr) -> std::optional<AngularVelocity>
+    {
         std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
         CHECK(robot_optional.has_value())

@@ -60,7 +60,7 @@ class ProtoLogger
      * Removing copy constructor and assignment operator to prevent accidental copying
      * of the ProtoLogger.
      */
-    ProtoLogger(const ProtoLogger&) = delete;
+    ProtoLogger(const ProtoLogger&)            = delete;
     ProtoLogger& operator=(const ProtoLogger&) = delete;
 
     ~ProtoLogger();

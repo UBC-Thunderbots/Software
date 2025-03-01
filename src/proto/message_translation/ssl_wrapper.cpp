@@ -24,9 +24,8 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
 std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
     const World& world, TeamColour friendly_team_colour)
 {
-    constexpr auto robot_to_robotstate_with_id_fn = [](const Robot& robot) {
-        return RobotStateWithId{.id = robot.id(), .robot_state = robot.currentState()};
-    };
+    constexpr auto robot_to_robotstate_with_id_fn = [](const Robot& robot)
+    { return RobotStateWithId{.id = robot.id(), .robot_state = robot.currentState()}; };
 
     std::vector<RobotStateWithId> friendly_robot_states;
     friendly_robot_states.reserve(world.friendlyTeam().numRobots());

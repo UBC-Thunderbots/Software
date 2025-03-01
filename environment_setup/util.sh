@@ -1,10 +1,11 @@
 install_autoref() {
     autoref_commit=b30660b78728c3ce159de8ae096181a1ec52e9ba
-    sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/${autoref_commit}.zip -O /tmp/tbots_download_cache/autoReferee.zip
+    wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/${autoref_commit}.zip -O /tmp/tbots_download_cache/autoReferee.zip
     unzip -q -o -d /tmp/tbots_download_cache/ /tmp/tbots_download_cache/autoReferee.zip
 
     /tmp/tbots_download_cache/AutoReferee-${autoref_commit}/./gradlew installDist -p /tmp/tbots_download_cache/AutoReferee-${autoref_commit} -Dorg.gradle.java.home=/opt/tbotspython/bin/jdk
     mv /tmp/tbots_download_cache/AutoReferee-${autoref_commit}/build/install/autoReferee /opt/tbotspython/
+    rm -rf /tmp/tbots_download_cache/autoReferee.zip /tmp/tbots_download_cache/AutoReferee-${autoref_commit}
 }
 
 install_bazel() {
@@ -20,13 +21,23 @@ install_bazel() {
 }
 
 install_clang_format() {
-    arch=$1
-    clang_format_file=clang+llvm-18.1.8-$arch-linux-gnu-ubuntu-18.04
-    download=https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/$clang-format-file.tar.xz
-    clang_format_path=/tmp/tbots_download_cache/$clang_format_file/bin/clang-format
+    download=https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/clang+llvm-19.1.7-aarch64-linux-gnu.tar.xz
+    clang_folder=clang+llvm-19.1.7-aarch64-linux-gnu
+
+    if is_x86 $1; then
+        download=https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/LLVM-19.1.7-Linux-X64.tar.xz
+        clang_folder=LLVM-19.1.7-Linux-X64
+    fi
+
     wget $download -O /tmp/tbots_download_cache/clang.tar.xz
-    tar -xf /tmp/tbots_download_cache/clang.tar.xz -C /tmp/tbots_download_cache/
+
+    # Temporarily need more space to extract the clang tarball
+    mkdir -p ~/.tbots
+    tar -xf /tmp/tbots_download_cache/clang.tar.xz -C ~/.tbots/
+
+    clang_format_path=~/.tbots/$clang_folder/bin/clang-format
     sudo cp $clang_format_path /opt/tbotspython/bin/clang-format
+    rm -rf ~/.tbots
 }
 
 install_cross_compiler() {
@@ -69,8 +80,7 @@ install_gamecontroller () {
     sudo chmod +x /opt/tbotspython/gamecontroller
 
     cd -
-    sudo rm -rf /tmp/tbots_download_cache/ssl-game-controller-3.12.3
-    sudo rm -rf /tmp/tbots_download_cache/go
+    sudo rm -rf /tmp/tbots_download_cache/ssl-game-controller-3.12.3 /tmp/tbots_download_cache/go /tmp/tbots_download_cache/go.tar.gz /tmp/tbots_download_cache/ssl-game-controller.zip
 }
 
 install_java () {
@@ -79,9 +89,10 @@ install_java () {
     if is_x86 $1; then
         java_download=https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz
     fi
-    sudo wget -N $java_download -O /tmp/tbots_download_cache/jdk-21.tar.gz
+    wget -N $java_download -O /tmp/tbots_download_cache/jdk-21.tar.gz
     tar -xzf /tmp/tbots_download_cache/jdk-21.tar.gz -C /opt/tbotspython/
     mv /opt/tbotspython/jdk-21* /opt/tbotspython/bin/jdk
+    rm /tmp/tbots_download_cache/jdk-21.tar.gz
 }
 
 is_x86() {
