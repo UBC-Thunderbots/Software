@@ -46,6 +46,8 @@ cc_binary(
         "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/networking/udp:threaded_proto_udp_listener",
+        "//software/networking/udp:threaded_proto_udp_sender",
+        "//software/world:robot_state",
         "@boost//:program_options",
     ],
 )
