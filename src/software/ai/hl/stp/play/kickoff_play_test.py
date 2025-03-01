@@ -133,21 +133,20 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         )
 
         # Checks that there are 6 enemy robots in friendlyHalf + centerCircle + friendlyGoal OR ball moves from center point
-        # always_validation_sequence_set[0].append(
-        #     OrValidation(
-        #         [
-        #             BallAlwaysMovesFromRest(position=tbots_cpp.Point(0, 0), threshold=0.01),
-        #             NumberOfRobotsAlwaysStaysInRegion(
-        #                 regions=[
-        #                     tbots_cpp.Field.createSSLDivisionBField().friendlyHalf(),
-        #                     tbots_cpp.Field.createSSLDivisionBField().friendlyGoal(),
-        #                     tbots_cpp.Field.createSSLDivisionBField().centerCircle()
-        #                 ],
-        #                 req_robot_cnt=6,
-        #             )
-        #         ]
-        #     )
-        # )
+        always_validation_sequence_set[0].append(
+            OrValidation(
+                [
+                    BallAlwaysMovesFromRest(position=tbots_cpp.Point(0, 0), threshold=0.01),
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=[
+                            tbots_cpp.Field.createSSLDivisionBField().friendlyHalf(),
+                            tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()
+                        ],
+                        req_robot_cnt=6,
+                    )
+                ]
+            )
+        )
 
     eventually_validation_sequence_set = [[]]
 

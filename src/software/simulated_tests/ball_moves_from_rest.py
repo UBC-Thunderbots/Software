@@ -37,7 +37,6 @@ class BallMovesFromRest(Validation):
         ).length() > self.threshold:
             validation_status = ValidationStatus.PASSING
 
-        print(f"V-Status: {validation_status, (self.initial_ball_position - current_ball_position).length()}")
         return validation_status
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
