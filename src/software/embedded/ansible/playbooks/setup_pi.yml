@@ -76,7 +76,7 @@
 
         - name: Unzip setup files
           ansible.builtin.unarchive:
-            src: ~/setup.ziprule
+            src: ~/setup.zip
             dest: ~/
             remote_src: true
 
@@ -109,7 +109,7 @@
           become_method: ansible.builtin.sudo
           ansible.builtin.copy:
             src: ../../linux_configs/pi/10-local.rules
-            dest: /etc/udev/rules.d
+            dest: /etc/udev/rules.d/
             mode: "0444"
 
     - name: Change hostname
