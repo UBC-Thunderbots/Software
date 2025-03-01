@@ -74,11 +74,22 @@ class ChickerWidget(QWidget):
         )
 
         (
-            self.pulse_width_slider_layout,
-            self.pulse_width_slider,
-            self.pulse_width_label,
+            self.kicker_pulse_width_slider_layout,
+            self.kicker_pulse_width_slider,
+            self.kicker_pulse_width_label,
         ) = common_widgets.create_slider(
-            "Power (Pulse Width)",
+            "Kicker Pulse Width",
+            DiagnosticsConstants.MIN_PULSE_WIDTH,
+            DiagnosticsConstants.MAX_PULSE_WIDTH,
+            DiagnosticsConstants.PULSE_WIDTH_STEPPER,
+        )
+
+        (
+            self.chipper_pulse_width_slider_layout,
+            self.chipper_pulse_width_slider,
+            self.chipper_pulse_width_label,
+        ) = common_widgets.create_slider(
+            "Chipper Pulse Width",
             DiagnosticsConstants.MIN_PULSE_WIDTH,
             DiagnosticsConstants.MAX_PULSE_WIDTH,
             DiagnosticsConstants.PULSE_WIDTH_STEPPER,
@@ -92,18 +103,23 @@ class ChickerWidget(QWidget):
             lambda new_value: self.chip_distance_label.setText(str(new_value))
         )
 
-        self.pulse_width_slider.valueChanged.connect(
-            lambda new_value: self.pulse_width_label.setText(str(new_value))
+        self.kicker_pulse_width_slider.valueChanged.connect(
+            lambda new_value: self.kicker_pulse_width_label.setText(str(new_value))
+        )
+
+        self.chipper_pulse_width_slider.valueChanged.connect(
+            lambda new_value: self.chipper_pulse_width_label.setText(str(new_value))
         )
 
         kick_chip_sliders_hbox_layout = QHBoxLayout()
         kick_chip_sliders_hbox_layout.addLayout(self.kick_power_slider_layout)
         kick_chip_sliders_hbox_layout.addLayout(self.chip_distance_slider_layout)
-        kick_chip_sliders_hbox_layout.addLayout(self.pulse_width_slider_layout)
+        kick_chip_sliders_hbox_layout.addLayout(self.kicker_pulse_width_slider_layout)
+        kick_chip_sliders_hbox_layout.addLayout(self.chipper_pulse_width_slider_layout)
 
         kick_chip_sliders_box = QGroupBox()
         kick_chip_sliders_box.setLayout(kick_chip_sliders_hbox_layout)
-        kick_chip_sliders_box.setTitle("Kick Power, Chip Distance, and Pulse Width")
+        kick_chip_sliders_box.setTitle("Kick Power, Chip Distance, and Pulse Widths")
 
         chicker_widget_vbox_layout.addWidget(kick_chip_sliders_box)
 
@@ -202,7 +218,8 @@ class ChickerWidget(QWidget):
         # Get slider values
         kick_power = self.kick_power_slider.value()
         chip_dist = self.chip_distance_slider.value()
-        pulse_width = self.pulse_width_slider.value()
+        kick_pulse_width = self.kicker_pulse_width_slider.value()
+        chip_pulse_width = self.chipper_pulse_width_slider.value()
 
         # Send kick, chip, autokick, or autochip primitive
         power_control = PowerControl()
@@ -217,13 +234,13 @@ class ChickerWidget(QWidget):
         elif command == ChickerCommandMode.AUTOCHIP:
             power_control.chicker.auto_chip_or_kick.autochip_distance_meters = chip_dist
         elif command == ChickerCommandMode.KICK_PULSE_WIDTH:
-            power_control.chicker.kick_pulse_width = pulse_width
+            power_control.chicker.kick_pulse_width = kick_pulse_width
         elif command == ChickerCommandMode.CHIP_PULSE_WIDTH:
-            power_control.chicker.chip_pulse_width = pulse_width
+            power_control.chicker.chip_pulse_width = chip_pulse_width
         elif command == ChickerCommandMode.AUTOKICK_PULSE_WIDTH:
-            power_control.chicker.auto_chip_or_kick.autokick_pulse_width = pulse_width
+            power_control.chicker.auto_chip_or_kick.autokick_pulse_width = kick_pulse_width
         elif command == ChickerCommandMode.AUTOCHIP_PULSE_WIDTH:
-            power_control.chicker.auto_chip_or_kick.autochip_pulse_width = pulse_width
+            power_control.chicker.auto_chip_or_kick.autochip_pulse_width = chip_pulse_width
 
         self.proto_unix_io.send_proto(PowerControl, power_control)
 
@@ -247,7 +264,8 @@ class ChickerWidget(QWidget):
 
         common_widgets.enable_slider(self.kick_power_slider)
         common_widgets.enable_slider(self.chip_distance_slider)
-        common_widgets.enable_slider(self.pulse_width_slider)
+        common_widgets.enable_slider(self.kicker_pulse_width_slider)
+        common_widgets.enable_slider(self.chipper_pulse_width_slider)
         common_widgets.enable_button(self.no_auto_button)
         common_widgets.enable_button(self.auto_kick_button)
         common_widgets.enable_button(self.auto_chip_button)
@@ -264,7 +282,8 @@ class ChickerWidget(QWidget):
 
         common_widgets.disable_slider(self.kick_power_slider)
         common_widgets.disable_slider(self.chip_distance_slider)
-        common_widgets.disable_slider(self.pulse_width_slider)
+        common_widgets.disable_slider(self.kicker_pulse_width_slider)
+        common_widgets.disable_slider(self.chipper_pulse_width_slider)
         common_widgets.disable_button(self.no_auto_button)
         common_widgets.disable_button(self.auto_kick_button)
         common_widgets.disable_button(self.auto_chip_button)
