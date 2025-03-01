@@ -236,7 +236,7 @@ new_local_repository(
 new_local_repository(
     name = "k8_jetson_nano_cross_compile_gcc",
     build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
-    path = "/opt/aarch64-tbots-linux-gnu/",
+    path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
 )
 
 # tool used to flash firmware with bazel

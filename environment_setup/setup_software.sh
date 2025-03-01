@@ -181,6 +181,10 @@ print_status_msg "Install clang-format"
 install_clang_format $arch
 print_status_msg "Done installing clang-format"
 
+print_status_msg "Setting up cross compiler for robot software"
+install_cross_compiler $arch
+print_status_msg "Done setting up cross compiler for robot software"
+
 print_status_msg "Setting Up PlatformIO"
 
 # setup platformio to compile arduino code

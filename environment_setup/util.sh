@@ -20,17 +20,25 @@ install_bazel() {
 }
 
 install_clang_format() {
-    download=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-aarch64-linux-gnu.tar.xz
-    clang_format_path=/tmp/tbots_download_cache/clang+llvm-10.0.0-aarch64-linux-gnu/bin/clang-format
-
-    if is_x86 $1; then
-        download=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz
-        clang_format_path=/tmp/tbots_download_cache/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clang-format
-    fi
-
+    arch=$1
+    clang_format_file=clang+llvm-18.1.8-$arch-linux-gnu-ubuntu-18.04
+    download=https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/$clang-format-file.tar.xz
+    clang_format_path=/tmp/tbots_download_cache/$clang_format_file/bin/clang-format
     wget $download -O /tmp/tbots_download_cache/clang.tar.xz
     tar -xf /tmp/tbots_download_cache/clang.tar.xz -C /tmp/tbots_download_cache/
     sudo cp $clang_format_path /opt/tbotspython/bin/clang-format
+}
+
+install_cross_compiler() {
+    file_name=aarch64-tbots-linux-gnu-for-aarch64
+    if is_x86 $1; then
+        file_name=aarch64-tbots-linux-gnu-for-x86
+    fi
+    full_file_name=$file_name.tar.xz
+    wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/tbots_compiler/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
+    tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
+    sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
+    rm /tmp/tbots_download_cache/$full_file_name
 }
 
 install_gamecontroller () {

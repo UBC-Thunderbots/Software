@@ -43,11 +43,20 @@ config_setting(
     values = {"cpu": "k8_jetson_nano_cross_compile"},
 )
 
+# Create a constraint for the glibc version to target the correct glibc version for the robot
+constraint_setting(name = "glibc_version")
+
+constraint_value(
+    name = "glibc_2_27",
+    constraint_setting = ":glibc_version",
+)
+
 platform(
     name = "robot",
     constraint_values = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
+        ":glibc_2_27",
     ],
 )
 
@@ -210,13 +219,10 @@ cc_toolchain_config_k8_jetson_nano_cross_compile(
 
 toolchain(
     name = "cc_toolchain_for_k8_jetson_nano_cross_compile",
-    exec_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
     target_compatible_with = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
+        ":glibc_2_27",
     ],
     toolchain = ":cc_toolchain_k8_jetson_nano_cross_compile",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
