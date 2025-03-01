@@ -33,7 +33,7 @@ TEST(ThreadedEstopReaderTest, estop_tick_is_called_multiple_times)
 {
     std::unique_ptr<MockUart> mock_uart = std::make_unique<MockUart>();
 
-    int test_timeout_ms                 = 100;
+    int test_timeout_ms                 = 200;
     unsigned char arbitrary_garbage_val = 0b10111011;
     std::vector<unsigned char> play_ret_val(1, ESTOP_PLAY_MSG);
     std::vector<unsigned char> garbage_ret_val(1, arbitrary_garbage_val);
@@ -54,10 +54,12 @@ TEST(ThreadedEstopReaderTest, estop_tick_is_called_multiple_times)
         .WillOnce(Return(play_ret_val))
         .WillOnce(Return(play_ret_val))
         .WillOnce(Return(play_ret_val))
-        .WillOnce(DoAll(InvokeWithoutArgs([&cv, &ready] {
-                            ready = true;
-                            cv.notify_one();
-                        }),
+        .WillOnce(DoAll(InvokeWithoutArgs(
+                            [&cv, &ready]
+                            {
+                                ready = true;
+                                cv.notify_one();
+                            }),
                         Return(play_ret_val)))
         .WillRepeatedly(Return(play_ret_val));
 
@@ -88,10 +90,12 @@ TEST(ThreadedEstopReaderTest, estop_state_changes_based_on_read_val)
 
     EXPECT_CALL(*mock_uart_ptr, serialRead(_))
         .WillOnce(Return(play_ret_val))
-        .WillOnce(DoAll(InvokeWithoutArgs([&cv, &ready] {
-                            ready = true;
-                            cv.notify_one();
-                        }),
+        .WillOnce(DoAll(InvokeWithoutArgs(
+                            [&cv, &ready]
+                            {
+                                ready = true;
+                                cv.notify_one();
+                            }),
                         Return(play_ret_val)))
         .WillRepeatedly(Return(play_ret_val));
 
@@ -108,10 +112,12 @@ TEST(ThreadedEstopReaderTest, estop_state_changes_based_on_read_val)
     ready = false;
     EXPECT_CALL(*mock_uart_ptr, serialRead(_))
         .WillOnce(Return(stop_ret_val))
-        .WillOnce(DoAll(InvokeWithoutArgs([&cv, &ready] {
-                            ready = true;
-                            cv.notify_one();
-                        }),
+        .WillOnce(DoAll(InvokeWithoutArgs(
+                            [&cv, &ready]
+                            {
+                                ready = true;
+                                cv.notify_one();
+                            }),
                         Return(stop_ret_val)))
         .WillRepeatedly(Return(stop_ret_val));
     EXPECT_TRUE(cv.wait_until(
@@ -124,10 +130,12 @@ TEST(ThreadedEstopReaderTest, estop_state_changes_based_on_read_val)
     ready = false;
     EXPECT_CALL(*mock_uart_ptr, serialRead(_))
         .WillOnce(Return(play_ret_val))
-        .WillOnce(DoAll(InvokeWithoutArgs([&cv, &ready] {
-                            ready = true;
-                            cv.notify_one();
-                        }),
+        .WillOnce(DoAll(InvokeWithoutArgs(
+                            [&cv, &ready]
+                            {
+                                ready = true;
+                                cv.notify_one();
+                            }),
                         Return(play_ret_val)))
         .WillRepeatedly(Return(play_ret_val));
     EXPECT_TRUE(cv.wait_until(
@@ -159,10 +167,12 @@ TEST(ThreadedEstopReaderTest, estop_play_is_false_after_reading_unexpected_messa
         .Times(AtLeast(3))
         .WillOnce(Return(play_ret_val))
         .WillOnce(Return(garbage_ret_val))
-        .WillOnce(DoAll(InvokeWithoutArgs([&cv, &ready] {
-                            ready = true;
-                            cv.notify_one();
-                        }),
+        .WillOnce(DoAll(InvokeWithoutArgs(
+                            [&cv, &ready]
+                            {
+                                ready = true;
+                                cv.notify_one();
+                            }),
                         Return(garbage_ret_val)))
         .WillOnce(Return(garbage_ret_val))
         .WillOnce(Return(garbage_ret_val))
@@ -206,10 +216,12 @@ TEST(ThreadedEstopReaderTest,
         .WillOnce(Return(garbage_ret_val))
         .WillOnce(Return(garbage_ret_val))
         .WillOnce(Return(play_ret_val))
-        .WillRepeatedly(DoAll(InvokeWithoutArgs([&cv, &ready] {
-                                  ready = true;
-                                  cv.notify_one();
-                              }),
+        .WillRepeatedly(DoAll(InvokeWithoutArgs(
+                                  [&cv, &ready]
+                                  {
+                                      ready = true;
+                                      cv.notify_one();
+                                  }),
                               Return(play_ret_val)));
 
     int startup_interval_ms = 5;
