@@ -248,7 +248,7 @@ void Thunderloop::runLoop()
                 primitive_ = new_primitive;
 
                 auto orientation_msg = primitive_.orientation();
-                robot_localizer_.rollbackVision(createAngle(orientation_msg), RTT_S);
+                robot_localizer_.rollbackVision(createAngle(orientation_msg), RTT_S / 2);
 
 
                 // Update primitive executor's primitive set

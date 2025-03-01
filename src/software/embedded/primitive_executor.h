@@ -98,12 +98,11 @@ class PrimitiveExecutor
     Duration time_step_;
     RobotId robot_id_;
 
-    // Estimated delay between a vision frame to AI processing to robot executing
-    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.05;
-
     // When driving, the robot will rotate the direction its driving away from its angular velocity, if this number is
     // higher, it will lean away more from the turn.
     static constexpr double LEAN_BIAS = 2;
+
+    static constexpr double ORENTATION_KP = 0.3;
 
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.

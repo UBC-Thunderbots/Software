@@ -203,7 +203,6 @@ void MotorService::setup()
     }
 
     is_initialized_ = true;
-    LOG(CSV, "velocity_logs.csv") << "front_right,front_left,back_left,back_right";
 }
 
 void MotorService::setUpDriveMotor(uint8_t motor)

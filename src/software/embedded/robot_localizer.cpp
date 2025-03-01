@@ -10,30 +10,30 @@ void RobotLocalizer::step(const AngularVelocity& targetAcceleration) {
     timespec diff = current_time_;
     ScopedTimespecTimer::timespecDiff(&current_time_, &last_step_, &diff);
     clock_gettime(CLOCK_MONOTONIC, &last_step_);
-    double deltaTimeSeconds = (double)diff.tv_sec + (double)diff.tv_nsec * SECONDS_PER_NANOSECOND;; // time since last step in seconds
-    FilterStep thisStep;
-    Predict thisPredict;
-    thisStep.birthday = current_time_;
-    thisStep.pre_mean = filter_.x;
-    thisStep.pre_covariance = filter_.P;
-    filter_.F << 1, deltaTimeSeconds, deltaTimeSeconds * deltaTimeSeconds * 0.5,
-            0, 1,                deltaTimeSeconds,
+    double delta_time_seconds = (double)diff.tv_sec + (double)diff.tv_nsec * SECONDS_PER_NANOSECOND;; // time since last step in seconds
+    FilterStep this_step;
+    Predict this_predict;
+    this_step.birthday = current_time_;
+    this_step.pre_mean = filter_.x;
+    this_step.pre_covariance = filter_.P;
+    filter_.F << 1, delta_time_seconds, delta_time_seconds * delta_time_seconds * 0.5,
+            0, 1,                delta_time_seconds,
             0, 0,                1;
-    double timeSquared = deltaTimeSeconds * deltaTimeSeconds;
-    double timeCubed = timeSquared * deltaTimeSeconds;
-    double timeFourth = timeCubed * deltaTimeSeconds;
-    filter_.Q << timeFourth/4, timeCubed/3,      timeSquared/2,
-                 timeCubed/3,  timeSquared,      deltaTimeSeconds,
-                 timeSquared/2,deltaTimeSeconds, 1;
+    double time_squared = delta_time_seconds * delta_time_seconds;
+    double time_cubed = time_squared * delta_time_seconds;
+    double time_fourth = time_cubed * delta_time_seconds;
+    filter_.Q << time_fourth / 4, time_cubed / 3, time_squared / 2,
+            time_cubed / 3,  time_squared,      delta_time_seconds,
+            time_squared / 2,delta_time_seconds, 1;
     filter_.Q *= process_noise_variance_;
     Eigen::Matrix<double, 1, 1> u;
-    u << targetAcceleration.toRadians() * deltaTimeSeconds; // change in angular velocity due to control input
-    thisPredict.F = filter_.F;
-    thisPredict.Q = filter_.Q;
-    thisPredict.B = filter_.B;
-    thisPredict.u = u;
-    thisStep.prediction = std::optional<Predict>(thisPredict);
-    history.push_front(thisStep);
+    u << targetAcceleration.toRadians() * delta_time_seconds; // change in angular velocity due to control input
+    this_predict.F = filter_.F;
+    this_predict.Q = filter_.Q;
+    this_predict.B = filter_.B;
+    this_predict.u = u;
+    this_step.prediction = std::optional<Predict>(this_predict);
+    history.push_front(this_step);
     filter_.predict(u);
 }
 
@@ -46,10 +46,10 @@ void RobotLocalizer::rollbackVision(const Angle& orientation, const double& ageS
     }
     auto it = history.begin();
     while (it != history.end()) {
-        timespec thisAge = current_time_;
-        ScopedTimespecTimer::timespecDiff(&current_time_, &it->birthday, &thisAge);
-        double thisAgeSeconds = (double)thisAge.tv_sec + (double)thisAge.tv_nsec * SECONDS_PER_NANOSECOND;
-        if (thisAgeSeconds >= ageSeconds) { // now iterator is right before the new update
+        timespec this_age = current_time_;
+        ScopedTimespecTimer::timespecDiff(&current_time_, &it->birthday, &this_age);
+        double this_age_seconds = (double)this_age.tv_sec + (double)this_age.tv_nsec * SECONDS_PER_NANOSECOND;
+        if (this_age_seconds >= ageSeconds) { // now iterator is right before the new update
             if (it == history.begin()) {
                 updateVision(orientation);
                 return;
@@ -100,41 +100,41 @@ void RobotLocalizer::updateVision(const Angle& orientation) {
 }
 
 void RobotLocalizer::updateEncoders(const AngularVelocity& angularVelocity) {
-    FilterStep thisStep;
-    Update thisUpdate;
+    FilterStep this_step;
+    Update this_update;
     clock_gettime(CLOCK_MONOTONIC, &current_time_);
-    thisStep.birthday = current_time_;
-    thisStep.pre_mean = filter_.x;
-    thisStep.pre_covariance = filter_.P;
+    this_step.birthday = current_time_;
+    this_step.pre_mean = filter_.x;
+    this_step.pre_covariance = filter_.P;
     filter_.H << 0, 0, 0,
                  0, 1, 0,
                  0, 0, 0,
                  0, 0, 0;
     Eigen::Matrix<double, 4, 1> z; // heading, angular velocity
     z << 0, angularVelocity.toRadians(), 0, 0;
-    thisUpdate.z = z;
-    thisUpdate.H = filter_.H;
-    thisStep.update = std::optional<Update>(thisUpdate);
-    history.push_front(thisStep);
+    this_update.z = z;
+    this_update.H = filter_.H;
+    this_step.update = std::optional<Update>(this_update);
+    history.push_front(this_step);
     filter_.update(z);
 }
 void RobotLocalizer::updateImu(const AngularVelocity& angularVelocity) {
-    FilterStep thisStep;
-    Update thisUpdate;
+    FilterStep this_step;
+    Update this_update;
     clock_gettime(CLOCK_MONOTONIC, &current_time_);
-    thisStep.birthday = current_time_;
-    thisStep.pre_mean = filter_.x;
-    thisStep.pre_covariance = filter_.P;
+    this_step.birthday = current_time_;
+    this_step.pre_mean = filter_.x;
+    this_step.pre_covariance = filter_.P;
     filter_.H << 0, 0, 0,
             0, 0, 0,
             0, 1, 0,
             0, 0, 0;
     Eigen::Matrix<double, 4, 1> z; // heading, angular velocity
     z << 0, 0, angularVelocity.toRadians(), 0;
-    thisUpdate.z = z;
-    thisUpdate.H = filter_.H;
-    thisStep.update = std::optional<Update>(thisUpdate);
-    history.push_front(thisStep);
+    this_update.z = z;
+    this_update.H = filter_.H;
+    this_step.update = std::optional<Update>(this_update);
+    history.push_front(this_step);
     filter_.update(z);
 }
 
@@ -151,22 +151,22 @@ double RobotLocalizer::getAngularAccelerationRadians() {
 }
 
 void RobotLocalizer::updateTargetAcceleration(const AngularVelocity& angularAcceleration) {
-    FilterStep thisStep;
-    Update thisUpdate;
+    FilterStep this_step;
+    Update this_update;
     clock_gettime(CLOCK_MONOTONIC, &current_time_);
-    thisStep.birthday = current_time_;
-    thisStep.pre_mean = filter_.x;
-    thisStep.pre_covariance = filter_.P;
+    this_step.birthday = current_time_;
+    this_step.pre_mean = filter_.x;
+    this_step.pre_covariance = filter_.P;
     filter_.H << 0, 0, 0,
                  0, 0, 0,
                  0, 0, 0,
                  0, 0, 1;
     Eigen::Matrix<double, 4, 1> z; // heading, angular velocity
     z << 0, 0, 0, angularAcceleration.toRadians();
-    thisUpdate.z = z;
-    thisUpdate.H = filter_.H;
-    thisStep.update = std::optional<Update>(thisUpdate);
-    history.push_front(thisStep);
+    this_update.z = z;
+    this_update.H = filter_.H;
+    this_step.update = std::optional<Update>(this_update);
+    history.push_front(this_step);
     filter_.update(z);
 }
 

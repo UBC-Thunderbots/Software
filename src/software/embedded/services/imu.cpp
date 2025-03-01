@@ -1,7 +1,3 @@
-//
-// Created by mkhl on 2024-11-13.
-//
-
 #include "imu.h"
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
@@ -51,22 +47,23 @@ __s32 i2c_smbus_write_byte_data(int file, __u8 command, __u8 value) {
 ImuService::ImuService() {
     initialized_ = false;
     // Establish connection to the IMU and verify that the who am I pin is correct.
-    file_descriptor_ = open("/dev/i2c-1", O_RDWR);
+    file_descriptor_ = open(IMU_DEVICE, O_RDWR);
     int ret = ioctl(file_descriptor_, I2C_SLAVE_FORCE, 0x6b);
     if (ret < 0) {
         return;
     }
-    if (i2c_smbus_read_byte_data(file_descriptor_, 0xf) != 108) {
+    if (i2c_smbus_read_byte_data(file_descriptor_, WHOAMI_REG) != 108) {
         return;
     }
     // Attempt to enable gyro and accelerometer, checking that writes are successful
-    i2c_smbus_write_byte_data(file_descriptor_, 0x10, 0b01000000);
-    if (i2c_smbus_read_byte_data(file_descriptor_, 0x10) != 0b01000000) { // write unsuccessful
+    // See lsm6dsl datasheet for how to set these registers.
+    i2c_smbus_write_byte_data(file_descriptor_, ACCEL_CONTROL_REG, 0b01000000);
+    if (i2c_smbus_read_byte_data(file_descriptor_, ACCEL_CONTROL_REG) != 0b01000000) { // write unsuccessful
         return;
     }
     // Set Gyroscope output data rate to 208 Hz, setting FS to 1000 dps (pg 61 of datasheet for lsm6dsl, pg 21)
-    i2c_smbus_write_byte_data(file_descriptor_, 0x11, 0b01011000);
-    if (i2c_smbus_read_byte_data(file_descriptor_, 0x11) != 0b01011000) { // write unsuccessful
+    i2c_smbus_write_byte_data(file_descriptor_, GYRO_CONTROL_REG, 0b01011000);
+    if (i2c_smbus_read_byte_data(file_descriptor_, GYRO_CONTROL_REG) != 0b01011000) { // write unsuccessful
         return;
     }
 
@@ -96,8 +93,8 @@ std::optional<AngularVelocity> ImuService::pollHeadingRate() {
         return std::nullopt;
     }
     // Two separate registers for the Gyro output data.
-    auto least_significant = int16_t(i2c_smbus_read_byte_data(file_descriptor_, 0x26));
-    auto most_significant = int16_t(i2c_smbus_read_byte_data(file_descriptor_, 0x27));
+    auto least_significant = int16_t(i2c_smbus_read_byte_data(file_descriptor_, YAW_LEAST_SIG_REG));
+    auto most_significant = int16_t(i2c_smbus_read_byte_data(file_descriptor_, YAW_MOST_SIG_REG));
 
 
     auto foo = (int16_t)(most_significant << 8);

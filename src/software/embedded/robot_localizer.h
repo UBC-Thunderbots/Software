@@ -21,10 +21,13 @@ public:
     process_noise_variance_(process_noise_variance),// assumes process noise is a discrete time wiener process
     history()
     {
+        // Set state covariance, this is mostly a tuned value. The digaonal is the variance of the Orientation, Ang Vel, and Ang Accel
         filter_.P << 30, 0,  0,
                      0,  4, 0,
                      0,  0,  5;
+        // Set control to state matrix, control space is a 1x1 matrix
         filter_.B << 0.0, 1, 0.0;
+        // Set measurement variance.
         filter_.R << vision_noise_variance, 0.0,                    0.0,                      0.0,
                      0.0,                   encoder_noise_variance, 0.0,                      0.0,
                      0.0,                   0.0,                    ImuService::IMU_VARIANCE, 0.0,

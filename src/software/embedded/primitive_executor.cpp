@@ -36,7 +36,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive &primitive_m
                                               orientation_, angular_velocity_, robot_constants_);
 
             time_since_linear_trajectory_creation_ =
-                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+                Duration::fromSeconds(RTT_S/2);
             time_since_angular_trajectory_creation_ =
                     Duration::fromSeconds(0);
         }
@@ -90,7 +90,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
     Angle orientation_to_destination =
         orientation_.minDiff(angular_trajectory_->getDestination());
     Angle error = orientation_.minSignedDiff(angular_trajectory_->getPosition(time_since_angular_trajectory_creation_.toSeconds()));
-    angular_velocity = angular_velocity + error * 0.3; // TODO: MOVE kP to a constant (per robot???)
+    angular_velocity = angular_velocity + error * ORENTATION_KP;
     if (orientation_to_destination.toDegrees() < 5)
     {
         angular_velocity *= orientation_to_destination.toDegrees() / 5;
