@@ -32,10 +32,10 @@ void BallPlacementPlayFSM::alignWall(const Update &event)
     pickoff_point =
         ball_pos - Vector::createFromAngle(pickoff_final_orientation).normalize(0.4);
     align_wall_tactic->updateControlParams(
-        pickoff_point, pickoff_final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
+        pickoff_point, pickoff_final_orientation, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
     tactics_to_run[0].emplace_back(align_wall_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -176,11 +176,11 @@ void BallPlacementPlayFSM::releaseBall(const Update &event)
 
 
         wait_tactic->updateControlParams(
-            nearest_robot->position(), nearest_robot->orientation(), 0.0,
+            nearest_robot->position(), nearest_robot->orientation(),
             TbotsProto::DribblerMode::RELEASE_BALL_SLOW,
             TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0},
             TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
         tactics_to_run[0].emplace_back(wait_tactic);
 
         event.common.set_tactics(tactics_to_run);

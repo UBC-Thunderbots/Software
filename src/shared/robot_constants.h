@@ -75,7 +75,7 @@ typedef struct RobotConstants
 
     // Speed at which to spin the dribbler to release the ball right in front of a
     // stationary robot [rpm]
-    float release_ball_dribbler_speed_rpm;
+    int release_ball_dribbler_speed_rpm;
 
     // The maximum acceleration achievable by our motors [m/s^2]
     float motor_max_acceleration_m_per_s_2;
@@ -86,7 +86,7 @@ typedef struct RobotConstants
     // The max speed at which we will pick the ball off the wall
     float ball_placement_wall_max_speed_m_per_s;
 
-    // The max speed at which we will retreat away from the ball after placing it [m/x]
+    // The max speed at which we will retreat away from the ball after placing it [m/s]
     float ball_placement_retreat_max_speed_m_per_s;
 
     // The max speed at which we dribble the ball
