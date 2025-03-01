@@ -6,7 +6,13 @@ from software.simulated_tests.validation import (
 
 class OrValidation(Validation):
     def __init__(self, validations):
-        """An or extension to the validation function"""
+        """An OR extension to the validation function"""
+        assert len(validations) > 0
+        validation_type_initial = validations[0].get_validation_type()
+        for validation in validations:
+            validation_type = validation.get_validation_type()
+            if validation_type != validation_type_initial:
+                raise TypeError("Type of validation instances is not consistent")
         self.validations = validations
 
     def get_validation_status(self, world):
