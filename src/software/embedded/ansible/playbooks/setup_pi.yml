@@ -76,7 +76,7 @@
 
         - name: Unzip setup files
           ansible.builtin.unarchive:
-            src: ~/setup.zip
+            src: ~/setup.ziprule
             dest: ~/
             remote_src: true
 
@@ -102,6 +102,14 @@
           ansible.builtin.copy:
             src: ../../linux_configs/pi/config.txt
             dest: /boot/firmware/
+            mode: "0444"
+
+        - name: Update udev configs to map connected devices
+          become: true
+          become_method: ansible.builtin.sudo
+          ansible.builtin.copy:
+            src: ../../linux_configs/pi/10-local.rules
+            dest: /etc/udev/rules.d
             mode: "0444"
 
     - name: Change hostname
