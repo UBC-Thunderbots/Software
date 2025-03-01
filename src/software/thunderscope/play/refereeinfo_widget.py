@@ -35,13 +35,10 @@ class RefereeInfoWidget(QWidget):
 
     def refresh(self) -> None:
         """Update the referee info widget with new referee information"""
-        referee = self.referee_buffer.get(block=False, return_cached=False).GetOptions()
+        referee = self.referee_buffer.get(block=False, return_cached=False)
 
         # Updating QTableWidget could be expensive, so we only update if there is new data
         if referee is None:
-            return
-
-        if not referee:
             return
 
         stage_time_left_s = (
@@ -51,11 +48,11 @@ class RefereeInfoWidget(QWidget):
             f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
             + f"Stage Time Left: {int(stage_time_left_s / SECONDS_PER_MINUTE):02d}"
             + f":{int(stage_time_left_s % SECONDS_PER_MINUTE):02d}\n"
-            + f"Stage: {referee.stage()}\n"
+            + f"Stage: {referee.stage}\n"
             + "Command: "
-            + referee.command()
+            + referee.command
             + "\n"
-            + f"Blue Team on Positive Half: {referee.blueTeamOnPositiveHalf()}\n"
+            + f"Blue Team on Positive Half: {referee.blueTeamOnPositiveHalf}\n"
         )
         self.referee_info.setText(p)
 
@@ -84,17 +81,17 @@ class RefereeInfoWidget(QWidget):
 
         for info in team_info:
             if info == "yellowCardTimes":
-                blue.append(self.parse_yellow_card_times(referee.blue()))
-                yellow.append(self.parse_yellow_card_times(referee.yellow()))
+                blue.append(self.parse_yellow_card_times(referee.blue))
+                yellow.append(self.parse_yellow_card_times(referee.yellow))
             elif info == "remainingTimeouts":
-                blue.append(referee.blue().timeouts())
-                yellow.append(referee.yellow().timeouts())
+                blue.append(referee.blue.timeouts)
+                yellow.append(referee.yellow().timeouts)
             elif info == "goalkeeperID":
-                blue.append(referee.blue().goalkeepers())
-                yellow.append(referee.yellow().goalkeeper())
+                blue.append(referee.blue.goalkeepers)
+                yellow.append(referee.yellow().goalkeeper)
             else:
-                blue.append(referee.blue().info())
-                yellow.append(referee.yellow().info())
+                blue.append(referee.blue.info)
+                yellow.append(referee.yellow.info)
 
         set_table_data(
             {

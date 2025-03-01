@@ -34,7 +34,7 @@ class PlayInfoWidget(QWidget):
 
     def refresh(self) -> None:
         """Update the play info widget with new play information"""
-        playinfo = self.playinfo_buffer.get(block=False, return_cached=False).GetOptions()
+        playinfo = self.playinfo_buffer.get(block=False, return_cached=False)
 
         # Updating QTableWidget could be expensive, so we only update if there is new data
         if playinfo is None or playinfo == self.last_playinfo:
@@ -47,12 +47,12 @@ class PlayInfoWidget(QWidget):
         tactic_names = []
         play_name = []
 
-        if "robotTacticAssignment" not in playinfo:
+        if not playinfo.robot_tactic_assignment:
             return
 
         num_rows = max(
-            len(playinfo.robotTacticAssignment()),
-            len(playinfo.play.playState()),
+            len(playinfo.robot_tactic_assignment),
+            len(playinfo.play.play_state),
         )
 
         # setting table size dynamically
@@ -61,15 +61,15 @@ class PlayInfoWidget(QWidget):
         for state in playinfo.play().playstate():
             play_name.append(state)
 
-        for robot_id in sorted(playinfo.robotTacticAssignment()):
-            robot_ids.append(robot_id)
-            tactic_fsm_states.append(
-                playinfo.robotTacticAssignment().robot_id().tacticFsmState()
-            )
-            tactic_names.append(
-                playinfo.robotTacticAssignment().robot_id().tacticName()
-            )
+        for robot_id in sorted(playinfo.robot_tactic_assignment):
+          robot_ids.append(robot_id)
+          tactic_fsm_states.append(
+              playinfo.robot_tactic_assignment[robot_id].tactic_fsm_state
+          )
 
+          tactic_names.append(
+              playinfo.robot_tactic_assignment[robot_id].tactic_name
+          )
         set_table_data(
             {
                 "Play": play_name,

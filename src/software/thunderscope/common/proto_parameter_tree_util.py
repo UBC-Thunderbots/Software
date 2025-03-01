@@ -3,7 +3,7 @@ from pyqtgraph import parametertree
 from thefuzz import fuzz
 from proto.import_all_protos import *
 
-def __create_int_parameter_writable(key, value, descriptor):
+def __create_int_parameter_writable(key:str, value:int, descriptor:FieldDescriptor):
     """Converts an int field of a proto to a NumericParameterItem with
     the min/max bounds set according to the provided ParameterRangeOptions
 
