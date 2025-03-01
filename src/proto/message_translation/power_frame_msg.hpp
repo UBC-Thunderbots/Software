@@ -171,13 +171,13 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             nanopb_control.chicker.chicker_command.kick_pulse_width =
-                static_cast<uint32_t>(google_control.chicker().kick_pulse_width());
+                static_cast<uint32_t>(power_control.chicker().kick_pulse_width());
             break;
         case TbotsProto::PowerControl::ChickerControl::kChipPulseWidth:
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             nanopb_control.chicker.chicker_command.chip_pulse_width =
-                static_cast<uint32_t>(google_control.chicker().chip_pulse_width());
+                static_cast<uint32_t>(power_control.chicker().chip_pulse_width());
             break;
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
             nanopb_control.chicker.which_chicker_command =
@@ -208,7 +208,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
                         .auto_chip_or_kick.autokick_pulse_width = static_cast<uint32_t>(
-                        google_control.chicker()
+                        power_control.chicker()
                                     .auto_chip_or_kick()
                                     .autokick_pulse_width());
                     break;
@@ -218,7 +218,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
                     .auto_chip_or_kick.autokick_pulse_width = static_cast<uint32_t>(
-                    google_control.chicker()
+                    power_control.chicker()
                                 .auto_chip_or_kick()
                                 .autochip_pulse_width());
                     break;
