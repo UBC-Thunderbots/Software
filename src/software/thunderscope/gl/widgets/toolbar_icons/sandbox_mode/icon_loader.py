@@ -18,6 +18,7 @@ class GLFieldToolbarIconLoader:
     RESET_ICON = None
     VIEW_ICON = None
     MEASURE_ICON = None
+    BOOKMARK_ICON = None
 
 
 def get_undo_icon(color: str) -> QtGui.QPixmap:
@@ -138,3 +139,18 @@ def get_measure_icon(color: str) -> QtGui.QPixmap:
         )
 
     return GLFieldToolbarIconLoader.MEASURE_ICON
+
+
+def get_bookmark_icon(color: str) -> QtGui.QPixmap:
+    """Loads the Bookmark icon pixmap as a GLFieldToolbarIconLoader attribute
+
+    :param color: the color the icon should be initialized with if not already created
+    :return: the icon pixmap
+    """
+    if not GLFieldToolbarIconLoader.BOOKMARK_ICON:
+        GLFieldToolbarIconLoader.BOOKMARK_ICON = get_icon(
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/bookmark.svg",
+            color,
+        )
+
+    return GLFieldToolbarIconLoader.BOOKMARK_ICON

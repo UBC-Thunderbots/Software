@@ -436,13 +436,13 @@ std::unique_ptr<Gpio> MotorService::setupGpio(const T& gpio_number,
                                               GpioDirection direction,
                                               GpioState initial_state)
 {
-    if constexpr (PLATFORM == Platform::RASP_PI)
+    if constexpr (PLATFORM == Platform::JETSON_NANO)
     {
-        return std::make_unique<GpioCharDev>(gpio_number, direction, initial_state,
-                                             "/dev/gpiochip4");
+        return std::make_unique<GpioSysfs>(gpio_number, direction, initial_state);
     }
     else
     {
-        return std::make_unique<GpioSysfs>(gpio_number, direction, initial_state);
+        return std::make_unique<GpioCharDev>(gpio_number, direction, initial_state,
+                                             "/dev/gpiochip4");
     }
 }
