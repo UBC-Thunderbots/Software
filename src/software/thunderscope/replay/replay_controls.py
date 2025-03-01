@@ -1,8 +1,10 @@
 import time
-import pyqtgraph as pg
+
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
 from functools import partial
+
+from software.thunderscope.replay.bookmark_marker import BookmarkMarker
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.common import common_widgets
 from software.py_constants import *
@@ -10,10 +12,9 @@ from software.py_constants import *
 
 class ReplayControls(QWidget):
     def __init__(self, player: ProtoPlayer) -> None:
-        """Setup the replay controls. 
+        """Setup the replay controls.
 
         :param player: The player to control.
-
         """
         QGroupBox.__init__(self)
 
@@ -27,7 +28,7 @@ class ReplayControls(QWidget):
         self.buttons_layout = QHBoxLayout()
 
         for button in [
-            ("⏮", partial(self.seek_absolute, 0)),
+            ("⏮\nStart", partial(self.seek_absolute, 0)),
             ("↶\n1 min", partial(self.seek_relative, -60)),
             ("↶\n10 s", partial(self.seek_relative, -10)),
             ("↶\n1 s", partial(self.seek_relative, -1)),
@@ -39,7 +40,7 @@ class ReplayControls(QWidget):
 
         # Set up play button
         self.play_pause = QPushButton()
-        self.play_pause.setText("⏸")
+        self.play_pause.setText("⏸\nPause")
         self.play_pause.clicked.connect(self.__on_play_pause_clicked)
         self.buttons_layout.addWidget(self.play_pause)
 
@@ -61,7 +62,7 @@ class ReplayControls(QWidget):
             ("↷\n1 s", partial(self.seek_relative, 1)),
             ("↷\n10 s", partial(self.seek_relative, 10)),
             ("↷\n1 min", partial(self.seek_relative, 60)),
-            ("⏭", partial(self.seek_absolute, self.player.end_time)),
+            ("⏭\nEnd", partial(self.seek_absolute, self.player.end_time)),
         ]:
             qbutton = QPushButton()
             qbutton.setText(button[0])
@@ -88,7 +89,7 @@ class ReplayControls(QWidget):
         ) = common_widgets.create_slider(
             text="",
             min_val=0,
-            max_val=self.player.end_time * MILLISECONDS_PER_SECOND,
+            max_val=int(self.player.end_time * MILLISECONDS_PER_SECOND),
             tick_spacing=1,
         )
 
@@ -101,34 +102,30 @@ class ReplayControls(QWidget):
         self.controls_layout.addLayout(self.buttons_layout)
         self.setLayout(self.controls_layout)
 
+        self.bookmarks_markers = []
+        self.create_bookmarks()
+
     def __on_play_pause_clicked(self) -> None:
-        """When the play/pause button is clicked, toggle play/pause and set the text
-        """
+        """When the play/pause button is clicked, toggle play/pause and set the text"""
         self.player.toggle_play_pause()
 
     def __on_replay_slider_released(self) -> None:
-        """When the slider is released, seek to the sliders location and
-        start playing.
-
-        """
+        """When the slider is released, seek to the sliders location and start playing."""
         self.player.seek(self.replay_slider.value() / MILLISECONDS_PER_SECOND)
         if self.was_playing:
             self.player.play()
         self.slider_pressed = False
 
     def __on_replay_slider_pressed(self) -> None:
-        """When the slider is pressed, pause the player so the slider
-        doesn't move away.
-
-        """
+        """When the slider is pressed, pause the player so the slider doesn't move away."""
         self.was_playing = self.player.is_playing
         self.player.pause()
         self.slider_pressed = True
 
     def __on_replay_slider_value_changed(self, value: int) -> None:
-        """When the slider value is changed, update the label to show the
-        current time.
+        """When the slider value is changed, update the label to show the current time.
 
+        :param value: time in seconds
         """
         current_time = time.strftime(
             "%H:%M:%S",
@@ -141,15 +138,13 @@ class ReplayControls(QWidget):
         self.replay_label.setText(f"{current_time} / {total_time}")
 
     def refresh(self) -> None:
-        """Refresh the slider to match the current time.
-
-        """
+        """Refresh the slider to match the current time."""
         if not self.slider_pressed:
             self.replay_slider.setValue(
-                self.player.current_packet_time * MILLISECONDS_PER_SECOND
+                int(self.player.current_packet_time * MILLISECONDS_PER_SECOND)
             )
 
-        self.play_pause.setText("⏸" if self.player.is_playing else "▶")
+        self.play_pause.setText("⏸\nPause" if self.player.is_playing else "▶\nPlay")
         self.save_clip.setText(
             "Save\nClip"
             if self.clipping and self.player.current_packet_time > self.clip_start
@@ -158,7 +153,8 @@ class ReplayControls(QWidget):
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """When a key is pressed, pause the player.
-        
+
+        :param event: an event whenever a key is pressed
         """
         if event.key() == QtCore.Qt.Key.Key_P:
             self.__on_play_pause_clicked()
@@ -167,7 +163,6 @@ class ReplayControls(QWidget):
         """Seeks time relative to current time
 
         :param relative_time The time relative to the current time to seek to
-
         """
         self.was_playing = self.player.is_playing
         self.player.pause()
@@ -179,7 +174,6 @@ class ReplayControls(QWidget):
         """Seeks to an absolute time
 
         :param absolute_time The absolute time to seek to
-
         """
         self.was_playing = self.player.is_playing
         self.player.pause()
@@ -187,9 +181,32 @@ class ReplayControls(QWidget):
         if self.was_playing:
             self.player.play()
 
-    def __on_save_clip_clicked(self) -> None:
-        """When the button is clicked, save clip if current time is after the clip start time
+    def create_bookmarks(self) -> None:
+        """Create bookmark visuals"""
+        for timestamp in self.player.bookmark_indices:
+            bookmark = BookmarkMarker(
+                timestamp,
+                self.seek_absolute,
+                self.replay_slider,
+                self.replay_label,
+                self,
+            )
+            self.bookmarks_markers.append(bookmark)
+
+    def update_bookmarks(self) -> None:
+        """Update positions of bookmark visuals"""
+        for marker in self.bookmarks_markers:
+            marker.update()
+
+    def resizeEvent(self, evt):
+        """Compute the positions of bookmark visuals when resizing.
+        :param evt: resize event
         """
+        super().resizeEvent(evt)
+        self.update_bookmarks()
+
+    def __on_save_clip_clicked(self) -> None:
+        """When the button is clicked, save clip if current time is after the clip start time"""
         if self.clipping and self.player.current_packet_time > self.clip_start:
             self.player.pause()
             end_time = self.player.current_packet_time

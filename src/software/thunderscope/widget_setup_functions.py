@@ -1,17 +1,16 @@
 import os
 
-from typing import List, Any
+from typing import Any, Optional
 
 from software.py_constants import *
 from proto.import_all_protos import *
-from software.thunderscope.common.fps_widget import FrameTimeWidget
+from software.thunderscope.common.fps_widget import FPSWidget
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.common.proto_plotter import ProtoPlotter
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_style import *
-from google.protobuf.message import Message
 
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget
@@ -28,8 +27,9 @@ from software.thunderscope.gl.layers import (
     gl_tactic_layer,
     gl_cost_vis_layer,
     gl_trail_layer,
+    gl_max_dribble_layer,
+    gl_referee_info_layer,
 )
-
 
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
@@ -38,17 +38,12 @@ from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
-from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
-from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
-    FullSystemConnectWidget,
-)
-from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
-    DriveAndDribblerWidget,
-)
+from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
+
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
@@ -63,7 +58,8 @@ def setup_gl_widget(
     sandbox_mode: bool = False,
     replay: bool = False,
     replay_log: os.PathLike = None,
-    bufferswap_counter: FrameTimeCounter = None,
+    frame_swap_counter: Optional[FrameTimeCounter] = None,
+    send_sync_message: bool = False,
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -74,20 +70,19 @@ def setup_gl_widget(
     :param sandbox_mode: if sandbox mode should be enabled
     :param replay: Whether replay mode is currently enabled
     :param replay_log: The file path of the replay log
-    :param bufferswap_counter: a counter used to keep track of the fps. This is used for the fps widget
-    :returns: The GLWidget
-
+    :param frame_swap_counter: FrameTimeCounter to keep track of the time between
+                               frame swaps in the GLWidget
+    :param send_sync_message: Whether to synchronize Thunderscope with a listener
+    :return: The GLWidget
     """
     # Create ProtoPlayer if replay is enabled
     player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
 
-    if bufferswap_counter == None:
-        bufferswap_counter = FrameTimeCounter()
     # Create widget
     gl_widget = GLWidget(
         proto_unix_io=full_system_proto_unix_io,
         friendly_color_yellow=friendly_colour_yellow,
-        bufferswap_counter=bufferswap_counter,
+        frame_swap_counter=frame_swap_counter,
         player=player,
         sandbox_mode=sandbox_mode,
     )
@@ -132,6 +127,12 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
     trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
+    max_dribble_layer = gl_max_dribble_layer.GLMaxDribbleLayer(
+        "Dribble Tracking", visualization_buffer_size
+    )
+    referee_layer = gl_referee_info_layer.GLRefereeInfoLayer(
+        "Referee Info", visualization_buffer_size
+    )
 
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
@@ -144,6 +145,8 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, True)
+    gl_widget.add_layer(max_dribble_layer, True)
+    gl_widget.add_layer(referee_layer)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
@@ -177,6 +180,7 @@ def setup_gl_widget(
     for arg in [
         (World, world_layer.world_buffer),
         (World, cost_vis_layer.world_buffer),
+        (World, max_dribble_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
         (ObstacleList, obstacle_layer.obstacles_list_buffer),
@@ -192,6 +196,9 @@ def setup_gl_widget(
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
         (DebugShapes, debug_shapes_layer.debug_shapes_buffer),
+        (Referee, referee_layer.referee_vis_buffer),
+        (BallPlacementVisualization, referee_layer.ball_placement_vis_buffer),
+        (World, referee_layer.world_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 
@@ -203,16 +210,19 @@ def setup_parameter_widget(
 ) -> ProtoConfigurationWidget:
     """Setup the parameter widget
 
-        :param proto_unix_io: The proto unix io object
-        :param friendly_colour_yellow:
-        :returns: The proto configuration widget
-
+    :param proto_unix_io: The proto unix io object
+    :param friendly_colour_yellow: Whether the parameter widget is editing the
+                                   yellow (true) or blue (false) team's configuration
+    :return: The proto configuration (parameter) widget
     """
 
     def on_change_callback(
         attr: Any, value: Any, updated_proto: ThunderbotsConfig
     ) -> None:
         proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
+        proto_unix_io.send_proto(
+            NetworkConfig, updated_proto.ai_config.ai_control_config.network_config
+        )
 
     return ProtoConfigurationWidget(
         on_change_callback, is_yellow=friendly_colour_yellow
@@ -223,8 +233,7 @@ def setup_log_widget(proto_unix_io: ProtoUnixIO) -> g3logWidget:
     """Setup the wiget that receives logs from full system
 
     :param proto_unix_io: The proto unix io object
-    :returns: The log widget
-
+    :return: The log widget
     """
     # Create widget
     logs = g3logWidget()
@@ -239,8 +248,7 @@ def setup_performance_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
     """Setup the performance plot
 
     :param proto_unix_io: The proto unix io object
-    :returns: The performance plot widget
-
+    :return: The performance plot widget
     """
 
     def extract_namedvalue_data(named_value_data):
@@ -263,36 +271,34 @@ def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
     """Setup the play info widget
 
     :param proto_unix_io: The proto unix io object
-    :returns: The play info widget
-
+    :return: The play info widget
     """
-
     play_info = PlayInfoWidget()
     proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
     return play_info
 
 
-def setup_fps_widget(bufferswap_counter, refresh_func_counter):
-    """setup fps widget
-    :param bufferswap_counter: a counter at the bufferswap
-    :param refresh_func_counter: a counter at the refresh function
-    :returns: a FPS Widget
-    """
+def setup_fps_widget(
+    frame_swap_counter: FrameTimeCounter, refresh_counter: FrameTimeCounter
+) -> FPSWidget:
+    """Setup fps widget
 
-    return FrameTimeWidget(bufferswap_counter, refresh_func_counter)
+    :param frame_swap_counter: a FrameTimeCounter for the GLWidget to track
+                               the time between frame swaps
+    :param refresh_counter: a FrameTimeCounter for the refresh function
+    :return: the FPS Widget
+    """
+    return FPSWidget(frame_swap_counter, refresh_counter)
 
 
 def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     """Setup the referee info widget
 
     :param proto_unix_io: The proto unix io object
-    :returns: The referee info widget
-
+    :return: The referee info widget
     """
-
     referee_info = RefereeInfoWidget()
     proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
-
     return referee_info
 
 
@@ -302,14 +308,15 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
 
 
 def setup_robot_view(
-    proto_unix_io: ProtoUnixIO, available_control_modes: List[IndividualRobotMode]
+    proto_unix_io: ProtoUnixIO, available_control_modes: list[IndividualRobotMode]
 ) -> RobotView:
     """Setup the robot view widget
+
     :param proto_unix_io: The proto unix io object for the full system
-    :param available_control_modes: the currently available input modes for the robots
+    :param available_control_modes: The currently available input modes for the robots
                                     according to what mode thunderscope is run in
 
-    :returns: the robot view widget
+    :return: The robot view widget
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
@@ -318,10 +325,10 @@ def setup_robot_view(
 
 
 def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorLog:
-    """
-    Setup the robot error log widget and connect its buffer to the proto unix io
+    """Setup the robot error log widget and connect its buffer to the proto unix io
+
     :param proto_unix_io: The proto unix io object for the full system
-    :return: the robot error log widget
+    :return: The robot error log widget
     """
     robot_error_log = RobotErrorLog()
     proto_unix_io.register_observer(RobotStatus, robot_error_log.robot_status_buffer)
@@ -330,50 +337,23 @@ def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorL
     return robot_error_log
 
 
-def setup_estop_view(proto_unix_io) -> EstopView:
+def setup_estop_view(proto_unix_io: ProtoUnixIO) -> EstopView:
     """Setup the estop view widget
 
     :param proto_unix_io: The proto unix io object for the full system
-    :returns: the estop widget
+    :return: The estop widget
     """
     estop_view = EstopView()
-
     proto_unix_io.register_observer(EstopState, estop_view.estop_state_buffer)
     return estop_view
 
 
-def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
-    """Setup the chicker widget for robot diagnostics
+def setup_diagnostics_widget(proto_unix_io: ProtoUnixIO) -> DiagnosticsWidget:
+    """Set up the diagnostics widget that provides an interface for manually
+    controlling our robots
 
-    :param proto_unix_io: The proto unix io object
-    :returns: The chicker widget
-
+    :param proto_unix_io: ProtoUnixIO for sending messages to the robot
+    :returns: the diagnostics widget
     """
-    chicker_widget = ChickerWidget(proto_unix_io)
-    return chicker_widget
-
-
-def setup_diagnostics_input_widget() -> FullSystemConnectWidget:
-    """
-    Sets up the diagnostics input widget
-
-    :returns: the diagnostics input widget
-    """
-
-    diagnostics_input_widget = FullSystemConnectWidget()
-
-    return diagnostics_input_widget
-
-
-def setup_drive_and_dribbler_widget(
-    proto_unix_io: ProtoUnixIO,
-) -> DriveAndDribblerWidget:
-    """Setup the drive and dribbler widget
-
-    :param proto_unix_io: The proto unix io object
-    :returns: The drive and dribbler widget
-
-    """
-    drive_and_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
-
-    return drive_and_dribbler_widget
+    diagnostics_widget = DiagnosticsWidget(proto_unix_io)
+    return diagnostics_widget

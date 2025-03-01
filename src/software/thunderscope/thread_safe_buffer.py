@@ -1,11 +1,10 @@
 import queue
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 from typing import Type, Optional
 from google.protobuf.message import Message
 
 
-class ThreadSafeBuffer(object):
-
+class ThreadSafeBuffer:
     MIN_DROPPED_BEFORE_LOG = 20
 
     """Multiple producer, multiple consumer buffer.
@@ -18,21 +17,18 @@ class ThreadSafeBuffer(object):
          put() │      │      │      │      │      │       │  get()
                └──────┴──────┴──────┴──────┴──────┴───────┘
                                            ThreadSafeBuffer
-
     """
 
     def __init__(
         self, buffer_size: int, protobuf_type: Type[Message], log_overrun: bool = False
     ) -> None:
-
         """A buffer to hold data to be consumed.
 
         :param buffer size: The size of the buffer.
         :param protobuf_type: To buffer
         :param log_overrun: False
-
         """
-        self.logger = createLogger(protobuf_type.DESCRIPTOR.name + " Buffer")
+        self.logger = create_logger(protobuf_type.DESCRIPTOR.name + " Buffer")
         self.queue = queue.Queue(buffer_size)
         self.protobuf_type = protobuf_type
         self.log_overrun = log_overrun
@@ -65,9 +61,7 @@ class ThreadSafeBuffer(object):
 
         :return: protobuf (cached if block is False and there is no data
                  in the buffer)
-
         """
-
         if (
             self.log_overrun
             and self.protos_dropped > self.last_logged_protos_dropped
@@ -89,7 +83,7 @@ class ThreadSafeBuffer(object):
         else:
             try:
                 self.cached_msg = self.queue.get_nowait()
-            except queue.Empty as empty:
+            except queue.Empty:
                 if not return_cached:
                     return None
 
@@ -102,7 +96,6 @@ class ThreadSafeBuffer(object):
         :param proto: The proto to place in the buffer
         :param block: Should block until there is space in the buffer
         :param timeout: If block is True, then wait for this many seconds
-
         """
         if block:
             self.queue.put(proto, block, timeout)
@@ -110,5 +103,5 @@ class ThreadSafeBuffer(object):
 
         try:
             self.queue.put_nowait(proto)
-        except queue.Full as full:
+        except queue.Full:
             self.protos_dropped += 1

@@ -2,6 +2,23 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
 from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
+import netifaces
+
+
+"""
+Instead of the using the generic parameter parsing, this constant can be used to define custom handlers for specific
+fields in the proto.
+
+To define a custom handler:
+    1. The key is the name of the field in the proto
+    2. The value is the function that will be called to parse the field. Make sure the function is callable from this
+       file
+"""
+CUSTOM_PARAMETERS_OVERRIDE = {
+    "robot_communication_interface": "__create_network_enum",
+    "referee_interface": "__create_network_enum",
+    "vision_interface": "__create_network_enum",
+}
 
 
 def __create_int_parameter_writable(key, value, descriptor):
@@ -13,9 +30,7 @@ def __create_int_parameter_writable(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
-
     # Extract the options from the descriptor, and store it
     # in the dictionary.
     options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
@@ -43,9 +58,7 @@ def __create_double_parameter_writable(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
-
     # Extract the options from the descriptor, and store it
     # in the dictionary.
     options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
@@ -60,7 +73,10 @@ def __create_double_parameter_writable(key, value, descriptor):
         "type": "float",
         "value": value,
         "default": value,
-        "limits": (min_max["min_double_value"], min_max["max_double_value"],),
+        "limits": (
+            min_max["min_double_value"],
+            min_max["max_double_value"],
+        ),
         "step": 0.01,
     }
 
@@ -73,7 +89,6 @@ def __create_enum_parameter(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
     options = []
 
@@ -97,7 +112,6 @@ def __create_bool_parameter(key, value, _):
     :param key: The name of the parameter
     :param value: The default value
     :param _: The proto descriptor, unused for bool
-
     """
     return {"name": key, "type": "bool", "value": value}
 
@@ -108,7 +122,6 @@ def __create_string_parameter_writable(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
     return {"name": key, "type": "text", "value": " "}
 
@@ -119,14 +132,26 @@ def __create_parameter_read_only(key, value, descriptor):
     :param key: The name of the parameter
     :param value: The default value
     :param descriptor: The proto descriptor
-
     """
     return {"name": key, "type": "str", "value": value, "readonly": True}
 
 
-def get_string_val(descriptor, value):
+def __create_network_enum(key, value, _):
+    """Lists all the network interfaces available on the system as enum options for the given parameter field.
+
+    :param key: The name of the parameter
+    :param value: The default value
     """
-    Converts the given value to a string depending on the descriptor type
+    network_interfaces = netifaces.interfaces()
+
+    return parametertree.parameterTypes.ListParameter(
+        name=key, default=None, value=value, limits=network_interfaces
+    )
+
+
+def get_string_val(descriptor, value):
+    """Converts the given value to a string depending on the descriptor type
+
     :param descriptor: the descriptor of the current value
     :param value: the value to convert
     :return: A string version of the value
@@ -157,12 +182,10 @@ def config_proto_to_field_list(
     :param read_only: Whether the parameters should be read only or writable
     :param search_term: The search filter
     :param search_filter_threshold: the search filter threshold
-
     """
     field_list = []
 
     for descriptor in message.DESCRIPTOR.fields:
-
         key = descriptor.name
         value = getattr(message, descriptor.name)
 
@@ -170,7 +193,13 @@ def config_proto_to_field_list(
             if fuzz.partial_ratio(search_term, key) < search_filter_threshold:
                 continue
 
-        if descriptor.type == descriptor.TYPE_MESSAGE:
+        if descriptor.name in CUSTOM_PARAMETERS_OVERRIDE.keys():
+            field_list.append(
+                eval(CUSTOM_PARAMETERS_OVERRIDE[descriptor.name])(
+                    key, value, descriptor
+                )
+            )
+        elif descriptor.type == descriptor.TYPE_MESSAGE:
             field_list.append(
                 {
                     "name": key,

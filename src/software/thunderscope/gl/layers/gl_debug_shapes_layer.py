@@ -6,7 +6,11 @@ from pyqtgraph.opengl import *
 
 from proto.visualization_pb2 import DebugShapes
 
-from software.thunderscope.constants import Colors, DepthValues
+from software.thunderscope.constants import (
+    Colors,
+    DepthValues,
+    THUNDERSCOPE_UI_FONT_NAME,
+)
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -26,7 +30,6 @@ class GLDebugShapesLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -90,7 +93,8 @@ class GLDebugShapesLayer(GLLayer):
         self.poly_shape_name_graphics.resize(
             len(poly_named_shapes),
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 8), color=Colors.DEBUG_SHAPES_COLOR
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+                color=Colors.DEBUG_SHAPES_COLOR,
             ),
         )
 
@@ -101,7 +105,8 @@ class GLDebugShapesLayer(GLLayer):
         self.circle_shape_name_graphics.resize(
             len(circle_named_shapes),
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 8), color=Colors.DEBUG_SHAPES_COLOR
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+                color=Colors.DEBUG_SHAPES_COLOR,
             ),
         )
 
@@ -112,7 +117,8 @@ class GLDebugShapesLayer(GLLayer):
         self.stadium_shape_name_graphics.resize(
             len(stadium_named_shapes),
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 8), color=Colors.DEBUG_SHAPES_COLOR
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+                color=Colors.DEBUG_SHAPES_COLOR,
             ),
         )
 
@@ -146,7 +152,8 @@ class GLDebugShapesLayer(GLLayer):
         ):
             circle_shape_graphic.set_radius(circle_shape.radius)
             circle_shape_graphic.set_position(
-                circle_shape.origin.x_meters, circle_shape.origin.y_meters,
+                circle_shape.origin.x_meters,
+                circle_shape.origin.y_meters,
             )
             circle_shape_text_graphic.setData(
                 text=name,

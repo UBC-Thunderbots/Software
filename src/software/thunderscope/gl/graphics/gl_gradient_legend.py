@@ -1,44 +1,42 @@
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from pyqtgraph.Qt import QtCore, QtGui
 
-from typing import Optional, Dict, Tuple
+from typing import Optional
 
 from software.thunderscope.gl.graphics.gl_painter import GLPainter
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, THUNDERSCOPE_UI_FONT_NAME
 
 
 class GLGradientLegend(GLPainter):
-    """Displays a color gradient rectangle along with text labels denoting 
+    """Displays a color gradient rectangle along with text labels denoting
     the value at specific points along the gradient.
 
     The graphic is a 2D static overlay painted over top the viewport.
-    
     """
 
     def __init__(
         self,
         parent_item: Optional[GLGraphicsItem] = None,
-        size: Tuple[int, int] = (10, 100),
-        offset: Tuple[int, int] = (0, 0),
+        size: tuple[int, int] = (10, 100),
+        offset: tuple[int, int] = (0, 0),
         gradient: QtGui.QLinearGradient = QtGui.QLinearGradient(),
-        labels: Dict[str, float] = {"1.0": 1, "0.0": 0},
+        labels: dict[str, float] = {"1.0": 1, "0.0": 0},
         title: Optional[str] = None,
     ) -> None:
         """Initialize the GLGradientLegend
-        
+
         :param parent_item: The parent item of the graphic
         :param size: The size (width, height) of the color bar in pixels
-        :param offset: The offset (x, y) from the viewport left and top edge 
-                       to use when positioning the legend. 
-                       If x is negative then the x offset is |x| pixels from 
+        :param offset: The offset (x, y) from the viewport left and top edge
+                       to use when positioning the legend.
+                       If x is negative then the x offset is |x| pixels from
                        the viewport right edge.
-                       If y is negative then the y offset is |y| pixels from 
+                       If y is negative then the y offset is |y| pixels from
                        the viewport bottom edge.
         :param gradient: The gradient to use in the color bar
         :param labels: The labels to appear next to the color bar at specified stops
                        Accepts a dict of {"label": stop} pairs where stop is in [0, 1]
         :param title: The optional title to display above the legend
-        
         """
         super().__init__(parent_item=parent_item)
 
@@ -49,8 +47,10 @@ class GLGradientLegend(GLPainter):
         self.title = title
 
         self.text_pen = QtGui.QPen(Colors.PRIMARY_TEXT_COLOR)
-        self.labels_font = QtGui.QFont("Roboto", 8)
-        self.title_font = QtGui.QFont("Roboto", 9, QtGui.QFont.Weight.Bold)
+        self.labels_font = QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8)
+        self.title_font = QtGui.QFont(
+            THUNDERSCOPE_UI_FONT_NAME, 9, QtGui.QFont.Weight.Bold
+        )
 
         self.add_draw_function(self.draw_gradient_legend)
 
@@ -58,10 +58,9 @@ class GLGradientLegend(GLPainter):
         self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect
     ) -> None:
         """Draw the gradient legend
-        
+
         :param painter: The QPainter to perform drawing operations with
-        :param viewport_rect: The QRect indicating the viewport dimensions 
-        
+        :param viewport_rect: The QRect indicating the viewport dimensions
         """
         # Determine max width of all labels
         label_width = 0
@@ -117,10 +116,12 @@ class GLGradientLegend(GLPainter):
         # Draw legend title
         if self.title:
             painter.setFont(self.title_font)
-            painter.drawText(QtCore.QPoint(x_left, y_top - label_height), self.title)
+            painter.drawText(
+                QtCore.QPoint(x_left, round(y_top - label_height)), self.title
+            )
 
-    def set_labels(self, labels: Dict[str, float]) -> None:
-        """ Update the labels appearing next to the color bar
+    def set_labels(self, labels: dict[str, float]) -> None:
+        """Update the labels appearing next to the color bar
 
         :param labels: The labels to appear next to the color bar at specified stops
                        Accepts a dict of {"label": stop} pairs where stop is in [0, 1]

@@ -3,8 +3,7 @@ from software.thunderscope.gl.widgets.icon_loader import get_icon
 
 
 class GLFieldToolbarIconLoader:
-    """
-    Stores icons for the GL Field Toolbar widget
+    """Stores icons for the GL Field Toolbar widget
 
     Since they are class level variables, they are initialized only once
     when they are first accessed
@@ -19,11 +18,11 @@ class GLFieldToolbarIconLoader:
     RESET_ICON = None
     VIEW_ICON = None
     MEASURE_ICON = None
+    BOOKMARK_ICON = None
 
 
 def get_undo_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Undo icon pixmap as a GLFieldToolbarIconLoader attribute
+    """Loads the Undo icon pixmap as a GLFieldToolbarIconLoader attribute
 
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
@@ -38,8 +37,7 @@ def get_undo_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_redo_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Redo icon pixmap as a GLFieldToolbarIconLoader attribute
+    """Loads the Redo icon pixmap as a GLFieldToolbarIconLoader attribute
 
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
@@ -54,8 +52,7 @@ def get_redo_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_pause_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Pause icon pixmap as a GLFieldToolbarIconLoader attribute
+    """Loads the Pause icon pixmap as a GLFieldToolbarIconLoader attribute
 
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
@@ -70,8 +67,7 @@ def get_pause_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_play_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Play icon pixmap as a GLFieldToolbarIconLoader attribute
+    """Loads the Play icon pixmap as a GLFieldToolbarIconLoader attribute
 
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
@@ -86,8 +82,7 @@ def get_play_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_help_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Help icon pixmap as a GLFieldToolbarIconLoader attribute
+    """Loads the Help icon pixmap as a GLFieldToolbarIconLoader attribute
 
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
@@ -102,8 +97,7 @@ def get_help_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_reset_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Reset icon pixmap as a GLFieldToolbarIconLoader attribute
+    """Loads the Reset icon pixmap as a GLFieldToolbarIconLoader attribute
 
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
@@ -118,8 +112,7 @@ def get_reset_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_view_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the View icon pixmap as a GLFieldToolbarIconLoader attribute
+    """Loads the View icon pixmap as a GLFieldToolbarIconLoader attribute
 
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
@@ -134,8 +127,7 @@ def get_view_icon(color: str) -> QtGui.QPixmap:
 
 
 def get_measure_icon(color: str) -> QtGui.QPixmap:
-    """
-    Loads the Measure icon pixmap as a GLFieldToolbarIconLoader attribute
+    """Loads the Measure icon pixmap as a GLFieldToolbarIconLoader attribute
 
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
@@ -147,3 +139,18 @@ def get_measure_icon(color: str) -> QtGui.QPixmap:
         )
 
     return GLFieldToolbarIconLoader.MEASURE_ICON
+
+
+def get_bookmark_icon(color: str) -> QtGui.QPixmap:
+    """Loads the Bookmark icon pixmap as a GLFieldToolbarIconLoader attribute
+
+    :param color: the color the icon should be initialized with if not already created
+    :return: the icon pixmap
+    """
+    if not GLFieldToolbarIconLoader.BOOKMARK_ICON:
+        GLFieldToolbarIconLoader.BOOKMARK_ICON = get_icon(
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/bookmark.svg",
+            color,
+        )
+
+    return GLFieldToolbarIconLoader.BOOKMARK_ICON

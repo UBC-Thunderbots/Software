@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import logging
 import time
@@ -11,9 +13,8 @@ from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import is_cmd_running
 
 
-class FullSystem(object):
-
-    """ Full System Binary Context Manager """
+class FullSystem:
+    """Full System Binary Context Manager"""
 
     def __init__(
         self,
@@ -32,7 +33,6 @@ class FullSystem(object):
         :param should_restart_on_crash: whether or not to restart the program after it has been crashed
         :param run_sudo: true if we should run full system under sudo
         :param running_in_realtime: True if we are running fullsystem in realtime, else False
-
         """
         self.full_system_runtime_dir = full_system_runtime_dir
         self.debug_full_system = debug_full_system
@@ -44,8 +44,8 @@ class FullSystem(object):
 
         self.thread = threading.Thread(target=self.__restart__, daemon=True)
 
-    def __enter__(self) -> "self":
-        """Enter the full_system context manager. 
+    def __enter__(self) -> FullSystem:
+        """Enter the full_system context manager.
 
         If the debug mode is enabled then the binary is _not_ run and the
         command to debug under gdb is printed. The  context manager will then
@@ -95,7 +95,6 @@ sudo bazel-bin/{self.full_system}
                     time.sleep(1)
 
         elif self.debug_full_system:
-
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
             if not is_cmd_running(
@@ -134,7 +133,7 @@ gdb --args bazel-bin/{self.full_system}
         return self
 
     def __restart__(self) -> None:
-        "Restarts full system."
+        """Restarts full system."""
         while self.should_restart_on_crash:
             if not is_cmd_running(
                 [
@@ -153,7 +152,6 @@ gdb --args bazel-bin/{self.full_system}
         :param type: The type of exception that was raised
         :param value: The exception that was raised
         :param traceback: The traceback of the exception
-
         """
         self.should_restart_on_crash = False
 
@@ -174,9 +172,7 @@ gdb --args bazel-bin/{self.full_system}
         """Helper to run full system and attach the appropriate unix senders/listeners
 
         :param proto_unix_io: The unix io to setup for this full_system instance
-
         """
-
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for proto_class in [
@@ -188,6 +184,7 @@ gdb --args bazel-bin/{self.full_system}
             PlayInfo,
             ObstacleList,
             DebugShapes,
+            BallPlacementVisualization,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,
@@ -219,5 +216,6 @@ gdb --args bazel-bin/{self.full_system}
             (VALIDATION_PROTO_SET_PATH, ValidationProtoSet),
             (ROBOT_LOG_PATH, RobotLog),
             (ROBOT_CRASH_PATH, RobotCrash),
+            (REPLAY_BOOKMARK_PATH, ReplayBookmark),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)

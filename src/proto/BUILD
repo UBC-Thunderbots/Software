@@ -11,10 +11,12 @@ proto_library(
         "game_state.proto",
         "geneva_slot.proto",
         "geometry.proto",
+        "ip_notification.proto",
         "parameters.proto",
         "play.proto",
         "power_frame_msg.proto",
         "primitive.proto",
+        "replay_bookmark.proto",
         "robot_crash_msg.proto",
         "robot_log_msg.proto",
         "robot_statistic.proto",
@@ -50,9 +52,11 @@ py_proto_library(
         "game_state.proto",
         "geneva_slot.proto",
         "geometry.proto",
+        "ip_notification.proto",
         "parameters.proto",
         "play.proto",
         "primitive.proto",
+        "replay_bookmark.proto",
         "robot_statistic.proto",
         "robot_status_msg.proto",
         "tactic.proto",
@@ -93,6 +97,7 @@ proto_library(
     deps = [
         "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:timestamp_proto",
+        "@com_google_protobuf//:wrappers_proto",
     ],
 )
 

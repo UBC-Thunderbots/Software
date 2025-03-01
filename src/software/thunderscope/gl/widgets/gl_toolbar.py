@@ -1,11 +1,10 @@
 import textwrap
-from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 
 
 class GLToolbar(QWidget):
-    """
-    Base class for a toolbar in our UI
+    """Base class for a toolbar in our UI
 
     Has a refresh method to update UI
     Has button colors / styles and initializes base formatting
@@ -15,8 +14,7 @@ class GLToolbar(QWidget):
     DISABLED_BUTTON_ICON_COLOR = "#969696"
 
     def __init__(self, parent: QWidget):
-        """
-        Sets the base formatting for a toolbar
+        """Sets the base formatting for a toolbar
 
         :param parent: the parent to overlay this toolbar over
         """
@@ -29,14 +27,12 @@ class GLToolbar(QWidget):
         self.setLayout(QHBoxLayout())
 
     def refresh(self) -> None:
-        """
-        Refreshes the UI (overridden by child classes)
-        """
+        """Refreshes the UI (overridden by child classes)"""
+        raise NotImplementedError("Subclasses must implement this method!")
 
     def get_button_style(self, is_enabled: bool = True) -> str:
-        """
-        Returns the stylesheet for a QPushButton based on if it's enabled or not
-        
+        """Returns the stylesheet for a QPushButton based on if it's enabled or not
+
         :param is_enabled: True if button is enabled, False if not
         :return: the corresponding stylesheet indicating the button state
         """

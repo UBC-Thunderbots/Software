@@ -7,7 +7,11 @@ from google.protobuf.json_format import MessageToDict
 
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.constants import Colors, DepthValues
+from software.thunderscope.constants import (
+    Colors,
+    DepthValues,
+    THUNDERSCOPE_UI_FONT_NAME,
+)
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
@@ -25,7 +29,6 @@ class GLTacticLayer(GLLayer):
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
-
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
@@ -38,7 +41,6 @@ class GLTacticLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         self.cached_world = self.world_buffer.get(block=False)
         play_info = self.play_info_buffer.get(block=False)
         play_info_dict = MessageToDict(play_info)
@@ -49,10 +51,9 @@ class GLTacticLayer(GLLayer):
 
     def __update_tactic_name_graphics(self, team: Team, play_info_dict) -> None:
         """Update the GLGraphicsItems that display tactic data
-        
+
         :param team: The team proto
         :param play_info_dict: The dictionary containing play/tactic info
-
         """
         tactic_assignments = play_info_dict["robotTacticAssignment"]
 
@@ -60,12 +61,14 @@ class GLTacticLayer(GLLayer):
         self.tactic_fsm_info_graphics.resize(
             len(team.team_robots),
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 8), color=Colors.SECONDARY_TEXT_COLOR
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+                color=Colors.SECONDARY_TEXT_COLOR,
             ),
         )
 
         for tactic_fsm_info_graphic, robot in zip(
-            self.tactic_fsm_info_graphics, team.team_robots,
+            self.tactic_fsm_info_graphics,
+            team.team_robots,
         ):
             tactic_fsm_info_graphic.setData(
                 text=textwrap.dedent(

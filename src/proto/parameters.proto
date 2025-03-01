@@ -31,7 +31,7 @@ message AiConfig
     required AiControlConfig ai_control_config                              = 1;
     required DribbleTacticConfig dribble_tactic_config                      = 2;
     required AttackerTacticConfig attacker_tactic_config                    = 3;
-    required CornerKickPlayConfig corner_kick_play_config                   = 4;
+    required FreeKickPlayConfig free_kick_play_config                       = 4;
     required PassingConfig passing_config                                   = 5;
     required GoalieTacticConfig goalie_tactic_config                        = 6;
     required EnemyCapabilityConfig enemy_capability_config                  = 7;
@@ -43,6 +43,7 @@ message AiConfig
     required AiParameterConfig ai_parameter_config                          = 13;
     required ReceiverTacticConfig receiver_tactic_config                    = 14;
     required CreaseDefenderConfig crease_defender_config                    = 15;
+    required PassDefenderConfig pass_defender_config                        = 16;
 }
 
 message AiControlConfig
@@ -52,6 +53,9 @@ message AiControlConfig
 
     // Override the existing play with the Play enum provided
     required PlayName override_ai_play = 2 [default = UseAiSelection];
+
+    // Interfaces for various network listeners
+    required NetworkConfig network_config = 3;
 }
 
 message AiParameterConfig
@@ -98,11 +102,11 @@ message ReceiverTacticConfig
     ];
 }
 
-message CornerKickPlayConfig
+message FreeKickPlayConfig
 {
     // The maximum time that we will wait before committing to a pass
     required double max_time_commit_to_pass_seconds = 1
-        [default = 3.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 5.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 8.0];
 }
 
 
@@ -468,6 +472,11 @@ message SensorFusionConfig
 
     // Possession tracker for determining which team has possession of the ball
     required PossessionTrackerConfig possession_tracker_config = 13;
+
+    // Max distance between the ball and front of the robot for the robot to be
+    // considered touching the ball (in m)
+    required double touching_ball_threshold_meters = 14
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message EnemyBallPlacementPlayConfig
@@ -624,30 +633,56 @@ message PossessionTrackerConfig
     ];
 }
 
+message NetworkConfig
+{
+    // The robot communication interface
+    required string robot_communication_interface = 1 [default = "lo"];
+
+    // The referee interface
+    required string referee_interface = 2 [default = "lo"];
+
+    // The vision interface
+    required string vision_interface = 3 [default = "lo"];
+}
+
 message CreaseDefenderConfig
 {
-    /*
-    Max ratio between distances (crease defender and ball) / (nearest enemy and ball) for
-    pass defender to chase ball.
-    Threshold = 1.0 results in crease defenders chasing the ball even if the ball is
-    equidistant to nearest enemy.
-    Threshold < 1.0 results in crease defenders chasing the ball only when it is at least
-    (threshold) percent closer to our bot than the nearest enemy.
-    ┌──────────────────────────────────────────┐
-    | Pass   | <────> Ball <───────────> Enemy |
-    |       ()         x                  ()   |
-    └──────────────────────────────────────────┘
-     */
-    required double max_get_ball_ratio_threshold = 1
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-    // Max distance that the crease defenders will try and get possession of a ball
-    required double max_get_ball_radius_m = 2
-        [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
-    // Max speed of ball that crease defenders will try and get possession
-    required double max_ball_speed_to_get_m_per_s = 3
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
     // The additional buffer length for each side of the goal
     // to determine if crease defender chipping is "towards goal"
     required double goal_post_offset_chipping = 4
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+    // Unique steal config for crease defenders
+    required DefenderStealConfig defender_steal_config = 1;
+}
+
+message PassDefenderConfig
+{
+    // Unique steal config for pass defenders
+    required DefenderStealConfig defender_steal_config = 1;
+}
+
+message DefenderStealConfig
+{
+    /*
+    Max ratio between distances (defender and ball) / (nearest enemy and ball) for
+    defender to chase ball.
+    Threshold = 1.0 results in defenders chasing the ball even if the ball is equidistant
+    to nearest enemy. Threshold < 1.0 results in defenders chasing the ball only when it
+    is at least (threshold)% closer to our bot than the nearest enemy.
+    ┌──────────────────────────────────────────┐
+    | Defender <────> Ball <───────────> Enemy |
+    |    ()            x                  ()   |
+    └──────────────────────────────────────────┘
+     */
+    required double max_get_ball_ratio_threshold = 1 [
+        default                   = 0.3,
+        (bounds).min_double_value = 0.01,
+        (bounds).max_double_value = 1.0
+    ];
+    // Max distance that the defender will try and get possession of a ball
+    required double max_get_ball_radius_m = 2
+        [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Max speed of ball that pass defender will try and get possession
+    required double max_ball_speed_to_get_m_per_s = 3
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
 }

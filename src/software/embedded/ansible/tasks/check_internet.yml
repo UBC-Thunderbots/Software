@@ -1,0 +1,7 @@
+---
+- name: Check internet connection
+  tags: check_internet
+  ansible.builtin.uri:
+    url: http://google.com
+  retries: 6
+  delay: 5

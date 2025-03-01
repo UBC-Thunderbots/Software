@@ -52,12 +52,12 @@ class RNG
  */
 inline double RNG::uniform()
 {
-    return uniformInt() / 4294967296.0;
+    return static_cast<double>(uniformInt()) / 4294967296.0;
 }
 
 inline float RNG::uniformFloat(float min, float max)
 {
-    return min + (uniformInt() / 4294967296.0f) * (max - min);
+    return min + (static_cast<float>(uniformInt()) / 4294967296.0f) * (max - min);
 }
 
 /*!
@@ -68,7 +68,7 @@ inline float RNG::uniformFloat(float min, float max)
  */
 inline ErForceVector RNG::uniformVector()
 {
-    return ErForceVector(uniform(), uniform());
+    return ErForceVector(static_cast<float>(uniform()), static_cast<float>(uniform()));
 }
 
 /*!

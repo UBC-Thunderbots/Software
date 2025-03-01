@@ -7,7 +7,6 @@ from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
-    simulated_test_runner,
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -84,6 +83,10 @@ def ball_placement_play_setup(
         (tbots_cpp.Point(-4.7, 2.0), tbots_cpp.Point(0, 0.5)),
         # test when ball starting point is outside of the side lines
         (tbots_cpp.Point(-2.0, 3.2), tbots_cpp.Point(0, -0.5)),
+        # test when ball starting point is inside of enemy net
+        (tbots_cpp.Point(4.0, 0), tbots_cpp.Point(2.0, 2.0)),
+        # test when ball starting point is in friendly net
+        (tbots_cpp.Point(-4.0, 0), tbots_cpp.Point(-2.0, 2.0)),
     ],
 )
 def test_two_ai_ball_placement(

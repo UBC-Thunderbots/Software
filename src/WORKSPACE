@@ -18,12 +18,55 @@ rules_foreign_cc_dependencies()
 
 http_archive(
     name = "rules_python",
-    sha256 = "a30abdfc7126d497a7698c29c46ea9901c6392d6ed315171a6df5ce433aa4502",
-    strip_prefix = "rules_python-0.6.0",
-    url = "https://github.com/bazelbuild/rules_python/archive/0.6.0.tar.gz",
+    sha256 = "3b8b4cdc991bc9def8833d118e4c850f1b7498b3d65d5698eea92c3528b8cf2c",
+    strip_prefix = "rules_python-0.30.0",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.30.0/rules_python-0.30.0.tar.gz",
 )
 
-load("@rules_python//python:pip.bzl", "pip_install")
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+register_toolchains("//:py_toolchain")
+
+load("@rules_python//python:pip.bzl", "pip_parse")
+
+pip_parse(
+    name = "nanopb_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//extlibs:nanopb_requirements_lock.txt",
+)
+
+pip_parse(
+    name = "thunderscope_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/thunderscope:requirements_lock.txt",
+)
+
+pip_parse(
+    name = "ansible_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
+)
+
+pip_parse(
+    name = "simulated_tests_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/simulated_tests:requirements_lock.txt",
+)
+
+load("@nanopb_deps//:requirements.bzl", nanopb_install_deps = "install_deps")
+load("@thunderscope_deps//:requirements.bzl", thunderscope_install_deps = "install_deps")
+load("@ansible_deps//:requirements.bzl", ansible_install_deps = "install_deps")
+load("@simulated_tests_deps//:requirements.bzl", simulated_tests_install_deps = "install_deps")
+
+nanopb_install_deps()
+
+thunderscope_install_deps()
+
+ansible_install_deps()
+
+simulated_tests_install_deps()
 
 all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
 
@@ -61,9 +104,9 @@ http_archive(
 http_archive(
     name = "g3log",
     build_file = "@//extlibs:g3log.BUILD",
-    sha256 = "176fcf4e1634aba425549c32f76426d7976ab6973370785fd6b76986e9f7b20e",
-    strip_prefix = "g3log-1.3.3",
-    url = "https://github.com/KjellKod/g3log/archive/1.3.3.zip",
+    sha256 = "2177e6dfd86fa7465c44c8ef5c3b6ab98ffc94e1130355d6982f7d886cb7bec9",
+    strip_prefix = "g3log-2.4",
+    url = "https://github.com/KjellKod/g3log/archive/refs/tags/2.4.zip",
 )
 
 http_archive(
@@ -99,9 +142,9 @@ protobuf_deps()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
-    commit = "7332c6cf2afb2642f53bc23f9b4d9c1817318685",
+    commit = "58be4e7e851d19e9ba14ced7bdba6fc8895af1d3",
     remote = "https://github.com/nelhage/rules_boost",
-    shallow_since = "1606097530 -0500",
+    shallow_since = "1724946929 +0200",
 )
 
 git_repository(
@@ -171,25 +214,15 @@ git_repository(
     shallow_since = "1571237073 -0500",
 )
 
-# Qt bazel rules from https://github.com/justbuchanan/bazel_rules_qt
-git_repository(
-    name = "bazel_rules_qt",
-    commit = "7665177f47bf514176d5f8575a7334f030203e3d",
-    remote = "https://github.com/justbuchanan/bazel_rules_qt.git",
-    shallow_since = "1614109311 -0800",
-)
-
-# Right now qt5 is installed on the system using the setup_software.sh script
-# We assume we can find the headers in the "standard" path used in this rule
 new_local_repository(
-    name = "qt",
-    build_file = "@bazel_rules_qt//:qt.BUILD",
-    path = "/usr/include/x86_64-linux-gnu/qt5/",
+    name = "linux_k8_gcc",
+    build_file = "@//extlibs:linux_k8_gcc.BUILD",
+    path = "/",
 )
 
 new_local_repository(
-    name = "linux_gcc",
-    build_file = "@//extlibs:linux_gcc.BUILD",
+    name = "linux_aarch64_gcc",
+    build_file = "@//extlibs:linux_aarch64_gcc.BUILD",
     path = "/",
 )
 
@@ -201,8 +234,8 @@ new_local_repository(
 )
 
 http_archive(
-    name = "jetson_nano_gcc",
-    build_file = "@//extlibs:jetson_nano_gcc.BUILD",
+    name = "k8_jetson_nano_cross_compile_gcc",
+    build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
     sha256 = "73eed74e593e2267504efbcf3678918bb22409ab7afa3dc7c135d2c6790c2345",
     strip_prefix = "gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu",
     urls = [
@@ -273,45 +306,12 @@ new_git_repository(
     shallow_since = "1596403987 -0600",
 )
 
-git_repository(
-    name = "rules_python",
-    commit = "6f37aa9966f53e063c41b7509a386d53a9f156c3",
-    remote = "https://github.com/bazelbuild/rules_python.git",
-    shallow_since = "1617165164 +1100",
-)
-
 new_git_repository(
     name = "trinamic",
     build_file = "@//extlibs:trinamic.BUILD",
     commit = "0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
     remote = "https://github.com/trinamic/TMC-API.git",
     shallow_since = "1631132123 +0200",
-)
-
-register_toolchains("//:py_toolchain")
-
-pip_install(
-    name = "nanopb_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//extlibs:nanopb_requirements.txt",
-)
-
-pip_install(
-    name = "thunderscope_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//software/thunderscope:requirements.txt",
-)
-
-pip_install(
-    name = "ansible_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//software/jetson_nano/ansible:requirements.txt",
-)
-
-pip_install(
-    name = "simulated_tests_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    requirements = "//software/simulated_tests:requirements.txt",
 )
 
 # required to use `py_proto_library` from protobuf
@@ -338,9 +338,9 @@ http_archive(
 http_archive(
     name = "pybind11",
     build_file = "@pybind11_bazel//:pybind11.BUILD",
-    sha256 = "1c6e0141f7092867c5bf388bc3acdb2689ed49f59c3977651394c6c87ae88232",
-    strip_prefix = "pybind11-2.9.0",
-    urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.9.0.zip"],
+    sha256 = "411f77380c43798506b39ec594fc7f2b532a13c4db674fcf2b1ca344efaefb68",
+    strip_prefix = "pybind11-2.12.0",
+    urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.12.0.zip"],
 )
 
 load("@pybind11_bazel//:python_configure.bzl", "python_configure")
@@ -391,4 +391,10 @@ new_git_repository(
     commit = "37aff70dfa50cf6307b3fee6074d627dc2929143",
     remote = "https://github.com/wolfpld/tracy.git",
     shallow_since = "1697482622 +0200",
+)
+
+register_toolchains(
+    "//cc_toolchain:cc_toolchain_for_k8_jetson_nano_cross_compile",
+    "//cc_toolchain:cc_toolchain_for_k8",
+    "//cc_toolchain:cc_toolchain_for_aarch64",
 )
