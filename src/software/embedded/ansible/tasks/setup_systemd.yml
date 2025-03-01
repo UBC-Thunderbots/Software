@@ -18,6 +18,7 @@
     - name: Compute Thunderloop MD5 Hash
       ansible.builtin.command: "/home/{{ ansible_user }}/hash_thunderloop_binary.sh"
       register: result
+      changed_when: true
 
     - name: Sync Thunderloop systemd file
       become_method: ansible.builtin.sudo
