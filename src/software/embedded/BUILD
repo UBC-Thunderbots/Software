@@ -16,12 +16,20 @@ config_setting(
     },
 )
 
+config_setting(
+    name = "build_limited",
+    flag_values = {
+        ":host_platform": "LIMITED",
+    },
+)
+
 string_flag(
     name = "host_platform",
     build_setting_default = "PI",
     values = [
         "PI",
         "NANO",
+        "LIMITED",
     ],
 )
 

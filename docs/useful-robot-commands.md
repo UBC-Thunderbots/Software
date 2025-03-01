@@ -78,16 +78,20 @@ flowchart TD
 
 ## Wifi Disclaimer
 
-To use most of these commands you will either need to be on the tbots wifi network (no internet access) or on a wifi with internet access (shawopen, ubc wifi) and connected to the Jetson Nano through ethernet tethering. 
+To use most of these commands you will either need to be on the tbots wifi network (no internet access) or on a WiFi with internet access (`ubcvisitor`) and connected to the robot through ethernet tethering. Note that ethernet tethering doesn't work on `ubcsecure` or `eduroam`.
 
-The IP address of the robots on the tbots network is `192.168.0.20<robot_id>` so for robot id `1` the IP is `192.168.0.201`. If you are using ethernet tethering you will need to use a network utility (tshark, wireshark, arp) to determine the IP address.
+On the tbots network:
+- Jetson Nano robots will have an IP address of `192.168.0.20<robot_id>` so for robot id `1` the IP is `192.168.0.201`.
+- Raspberry Pi robots will have an IP address of `192.168.6.20<robot_id>` so for robot id `1` the IP is `192.168.6.201`. Occasionally, these robots may have an IP address of `192.168.5.20<robot_id>`.
+
+If you are not using the tbots network you will need to use a network utility (`tshark`, `wireshark`, `arp`) to determine the IP address.
 
 ## Miscellaneous Ansible Tasks & Options
 
 Individual miscellaneous tasks (ex reboot, shutdown, rtt test) can be run through the `misc.yml` playbook by specifying the corresponding tag.
 
-To view a list of supported arguments, run  
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano -- -h` 
+To view a list of supported arguments, run:
+`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot -h` 
 
 If desired, the `-ho`, `--hosts` argument can be replaced with `-p`, `--port`, defining a port to listen to for Announcements from hosts.
 
@@ -101,7 +105,7 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 * \<platform\> is the host platform on the robot (either `PI` or `NANO`)
 * <robot_ip> is the IP address of the robot
 * <robot_password> is the password of the `robot` user account
@@ -119,11 +123,11 @@ Example: Flashing robots 1, 4, and 7 that have a Raspberry Pi
 
 ## Flashing the powerboard
 
-This will flash powerloop, the current firmware in `software/power/`, onto the power board. It will prompt the user into setting the powerboard into bootloader mode by holding the boot button (left if looking from the back of the robot) and pressing the reset button (right if looking from the back of the robot), then releasing the reset button first, then the boot button. Once the board is flashed, pressing the reset button after to use the new firmware.  
+This will flash powerloop, the current firmware in `software/power/`, onto the power board. It will prompt the user into setting the powerboard into bootloader mode by holding the boot button (left if looking from the back of the robot) and pressing the reset button (right if looking from the back of the robot), then releasing the reset button first, then the boot button. Once the board is flashed, pressing the reset button after to use the new firmware.
 
 Looking from the back of the robot the reset and boot buttons are on right side of the battery holder on the lowest board with the reset being on the left and the boot on the right. <b>Warning it may kick/chip when pressed.</b>
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 ## Setting up the embedded host
 
@@ -133,11 +137,11 @@ This section refers to setting up the computer on the robot for the first time. 
 
 ### Jetson Nano
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:host_platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 ### Raspberry Pi
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:host_platform=PI -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=PI -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 ## Robot Diagnostics
 
@@ -164,7 +168,7 @@ Runs the robot auto test fixture on a robot through Ansible, which tests the mot
 
 From Software/src:
 
-`bazel run //software/embedded/ansible:run_ansible --//software/embedded:host_platform=<platform> --cpu=jetson_nano -- --playbook robot_auto_test_playbook.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --//software/embedded:host_platform=<platform> --platforms=//cc_toolchain:robot -- --playbook robot_auto_test_playbook.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 * replace the \<platform\> with the target platform for the robot (either `PI` or `NANO`)
 * replace the \<robot_ip\> with the actual ip address of the jetson nano for the ssh connection.
 * replace the <robot_password> with the actual password for the jetson nano for the ssh connection.

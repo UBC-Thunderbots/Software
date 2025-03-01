@@ -81,7 +81,7 @@ if __name__ == "__main__":
         "-pl",
         "--platform",
         type=str,
-        choices=["PI", "NANO"],
+        choices=["PI", "NANO", "LIMITED"],
         help="The platform to build Thunderloop for",
         action="store",
     )
@@ -162,12 +162,12 @@ if __name__ == "__main__":
 
     # Trigger an optimized build by default. Note that Thunderloop should always be
     # compiled with optimizations for best performance
-    if not args.no_optimized_build or args.flash_robots:
+    if not args.debug_build and (not args.no_optimized_build or args.flash_robots):
         command += ["--copt=-O3"]
 
     # Used for when flashing Jetsons
     if args.flash_robots:
-        command += ["--cpu=jetson_nano"]
+        command += ["--platforms=//cc_toolchain:robot"]
 
     # Select debug binaries to run
     if args.select_debug_binaries:
@@ -204,7 +204,7 @@ if __name__ == "__main__":
             sys.exit(1)
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        platform_ip = "0" if args.platform == "NANO" else "5"
+        platform_ip = "0" if args.platform == "NANO" else "6"
         bazel_arguments += [f"192.168.{platform_ip}.20{id}" for id in args.flash_robots]
         bazel_arguments += ["-pwd", args.pwd]
 

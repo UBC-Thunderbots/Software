@@ -2,9 +2,10 @@ syntax = "proto3";
 
 package TbotsProto;
 
+import "google/protobuf/descriptor.proto";
 import "proto/geometry.proto";
 import "proto/geneva_slot.proto";
-import "google/protobuf/descriptor.proto";
+import "proto/tbots_timestamp_msg.proto";
 
 extend google.protobuf.EnumValueOptions
 {
@@ -50,6 +51,8 @@ enum MotionConstraint
     ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
     // The friendly goal
     FRIENDLY_GOAL = 10;
+    // The enemy goal
+    ENEMY_GOAL = 11;
 }
 
 enum DribblerMode
@@ -107,6 +110,11 @@ message Primitive
     }
     Angle orientation = 4;
 
+    // Sequence number for the primitive
+    uint64 sequence_number = 7;
+
+    // Epoch timestamp when primitives were assigned
+    Timestamp time_sent = 6;
 }
 
 message MovePrimitive

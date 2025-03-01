@@ -1,10 +1,11 @@
+import time
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
-import functools
 import numpy as np
 from typing import Optional
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
@@ -23,6 +24,10 @@ from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.world_pb2 import SimulationState
+from proto.replay_bookmark_pb2 import ReplayBookmark
+from proto.tbots_timestamp_msg_pb2 import Timestamp
+
+from software.thunderscope.common.toast_msg_helper import success_toast
 
 
 class GLWidget(QWidget):
@@ -96,6 +101,8 @@ class GLWidget(QWidget):
             layers_menu=self.layers_menu,
             toolbars_menu=self.toolbars_menu,
             sandbox_mode=sandbox_mode,
+            replay_mode=player is not None,
+            on_add_bookmark=self.add_bookmark,
         )
 
         # Setup gamecontroller toolbar
@@ -122,6 +129,7 @@ class GLWidget(QWidget):
         self.layers = []
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
+        self.proto_unix_io = proto_unix_io
 
     def get_sim_control_toolbar(self):
         """Returns the simulation control toolbar"""
@@ -217,27 +225,19 @@ class GLWidget(QWidget):
         """
         self.layers.append(layer)
 
+        # Add the layer to the scene
+        self.gl_view_widget.addItem(layer)
+        layer.setVisible(visible)
+
         # Add the layer to the Layer menu
         (layer_checkbox, layer_action) = self.__setup_menu_checkbox(
             layer.name, self.layers_menu, visible
         )
         self.layers_menu_actions[layer.name] = layer_action
         self.layers_menu.addAction(layer_action)
-
-        # Add layer and its related layers to the scene
-        while layer:
-            self.gl_view_widget.addItem(layer)
-            layer.setVisible(visible)
-
-            # Connect visibility of all related layers to the same item
-            # in the layer menu
-            layer_checkbox.stateChanged.connect(
-                functools.partial(
-                    lambda l: l.setVisible(layer_checkbox.isChecked()), layer
-                )
-            )
-
-            layer = layer.related_layer
+        layer_checkbox.stateChanged.connect(
+            lambda: layer.setVisible(layer_checkbox.isChecked())
+        )
 
     def remove_layer(self, layer: GLLayer) -> None:
         """Remove a layer from this GLWidget
@@ -246,14 +246,12 @@ class GLWidget(QWidget):
         """
         self.layers.remove(layer)
 
+        # Remove the layer from the scene
+        self.gl_view_widget.removeItem(layer)
+
         # Remove the layer from the Layer menu
         layer_action = self.layers_menu_actions[layer.name]
         self.layers_menu.removeAction(layer_action)
-
-        # Remove layer its related layers from the scene
-        while layer:
-            self.gl_view_widget.removeItem(layer)
-            layer = layer.related_layer
 
     def refresh(self) -> None:
         """Trigger an update on all the layers"""
@@ -273,10 +271,8 @@ class GLWidget(QWidget):
         # Don't refresh the layers if the simulation is paused
         if simulation_state.is_playing:
             for layer in self.layers:
-                while layer:
-                    if layer.visible():
-                        layer.refresh_graphics()
-                    layer = layer.related_layer
+                if layer.visible():
+                    layer.refresh_graphics()
 
     def set_camera_view(self, camera_view: CameraView) -> None:
         """Set the camera position to a preset camera view
@@ -380,3 +376,12 @@ class GLWidget(QWidget):
             distance *= half_x_length_with_buffer
 
         return distance
+
+    def add_bookmark(self):
+        """Handler for clicking 'add bookmark' button"""
+        timestamp = time.time()
+        bookmark = ReplayBookmark(
+            timestamp=Timestamp(epoch_timestamp_seconds=timestamp)
+        )
+        self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
+        success_toast(self.parentWidget(), "Added bookmark!")

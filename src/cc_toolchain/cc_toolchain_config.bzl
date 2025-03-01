@@ -106,8 +106,24 @@ ALL_CPP_ACTIONS = [
 
 def make_builtin_include_directories():
     return [
-        "usr/include/"
+        "/usr/include/",
+        "/usr/local/include/",
+        "/usr/lib/gcc/c++/*/include/",
     ]
+
+def _make_common_toolpaths():
+    return {
+        "ar": "/usr/bin/ar",
+        "cpp": "/usr/bin/cpp",
+        "dwp": "/usr/bin/dwp",
+        "gcc": "wrapper/linux_gcc",
+        "gcov": "/usr/bin/gcov",
+        "ld": "/usr/bin/ld",
+        "nm": "/usr/bin/nm",
+        "objcopy": "/usr/bin/objcopy",
+        "objdump": "/usr/bin/objdump",
+        "strip": "/usr/bin/strip",
+    }
 
 def _make_common_features(ctx):
     result = {}
@@ -406,13 +422,11 @@ def _make_common_features(ctx):
     return result
 
 def _linux_gcc_impl(ctx):
-    host_system_name = "k8"
-
     action_configs = []
 
     tool_paths = [
         tool_path(name = name, path = path)
-        for name, path in ctx.attr.tool_paths.items()
+        for name, path in _make_common_toolpaths().items()
     ]
 
     common = _make_common_features(ctx)
@@ -565,7 +579,7 @@ def _linux_gcc_impl(ctx):
             artifact_name_patterns = [],
             cxx_builtin_include_directories = ctx.attr.builtin_include_directories,
             toolchain_identifier = ctx.attr.toolchain_identifier,
-            host_system_name = host_system_name,
+            host_system_name = ctx.attr.host_system_name,
             target_system_name = ctx.attr.target_system_name,
             target_cpu = ctx.attr.target_cpu,
             target_libc = "libc",
@@ -582,14 +596,14 @@ def _linux_gcc_impl(ctx):
         ),
     ]
 
-cc_toolchain_config_k8 = rule(
+cc_toolchain_config_fullsystem = rule(
     implementation = _linux_gcc_impl,
     attrs = {
         "builtin_include_directories": attr.string_list(),
-        "cpu": attr.string(mandatory = True, values = ["k8"]),
         "extra_features": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),
         "host_compiler_warnings": attr.string_list(),
+        "host_system_name": attr.string(),
         "host_unfiltered_compile_flags": attr.string_list(),
         "target_cpu": attr.string(),
         "target_system_name": attr.string(),
@@ -600,7 +614,7 @@ cc_toolchain_config_k8 = rule(
     executable = True,
 )
 
-def _jetson_nano_impl(ctx):
+def _k8_jetson_nano_cross_compile_impl(ctx):
     host_system_name = "k8"
 
     action_configs = []
@@ -671,28 +685,14 @@ def _jetson_nano_impl(ctx):
 
     supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
-    builtin_include_directories_feature = feature(
-            name = "builtin_include_directories",
-            flag_sets = [
-                flag_set(
-                    actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                    flag_groups = [flag_group(
-                        flags = [
-                            "-I{}".format(dir)
-                            for dir in ctx.attr.builtin_include_directories
-                        ],
-                    )],
-                ),
-            ],
-        )
-
     features = common.values() + [
         stdlib_feature,
         supports_pic_feature,
         common_feature,
         opt_feature,
-        builtin_include_directories_feature,
     ]
+
+    cxx_builtin_include_directories = ctx.attr.builtin_include_directories
 
     tool_paths = [
         tool_path(name = name, path = path)
@@ -708,7 +708,7 @@ def _jetson_nano_impl(ctx):
             features = features,
             action_configs = action_configs,
             artifact_name_patterns = [],
-            cxx_builtin_include_directories = ctx.attr.builtin_include_directories,
+            cxx_builtin_include_directories = cxx_builtin_include_directories,
             toolchain_identifier = ctx.attr.toolchain_identifier,
             host_system_name = host_system_name,
             target_system_name = ctx.attr.target_system_name,
@@ -727,12 +727,9 @@ def _jetson_nano_impl(ctx):
         ),
     ]
 
-cc_toolchain_config_jetson_nano = rule(
-    implementation = _jetson_nano_impl,
+cc_toolchain_config_k8_jetson_nano_cross_compile = rule(
+    implementation = _k8_jetson_nano_cross_compile_impl,
     attrs = {
-        "cpu": attr.string(mandatory = True, values = [
-            "jetson_nano",
-        ]),
         "builtin_include_directories": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),
         "host_compiler_warnings": attr.string_list(),

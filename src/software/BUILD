@@ -46,6 +46,8 @@ cc_binary(
         "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/networking/udp:threaded_proto_udp_listener",
+        "//software/networking/udp:threaded_proto_udp_sender",
+        "//software/world:robot_state",
         "@boost//:program_options",
     ],
 )
@@ -93,6 +95,7 @@ pybind_library(
         "//software/geom:segment",
         "//software/geom:vector",
         "//software/geom/algorithms",
+        "//software/math:math_functions",
         "//software/networking/radio:threaded_proto_radio_sender",
         "//software/networking/udp:threaded_proto_udp_listener",
         "//software/networking/udp:threaded_proto_udp_sender",
