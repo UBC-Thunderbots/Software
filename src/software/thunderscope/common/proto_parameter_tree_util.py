@@ -3,6 +3,7 @@ from pyqtgraph import parametertree
 from thefuzz import fuzz
 from proto.import_all_protos import *
 
+
 def __create_int_parameter_writable(key:str, value:int, descriptor:FieldDescriptor):
     """Converts an int field of a proto to a NumericParameterItem with
     the min/max bounds set according to the provided ParameterRangeOptions
@@ -18,7 +19,10 @@ def __create_int_parameter_writable(key:str, value:int, descriptor:FieldDescript
     options = descriptor.GetOptions()
 
     try:
-        minimum, maximum = options.Extensions[bounds].min_double_value, options.Extensions[bounds].max_double_value
+        minimum, maximum = (
+            options.Extensions[bounds].min_double_value,
+            options.Extensions[bounds].max_double_value,
+        )
     except KeyError:
         raise KeyError("{} missing ParameterRangeOptions".format(key))
 
@@ -46,7 +50,10 @@ def __create_double_parameter_writable(key, value, descriptor):
     options = descriptor.GetOptions()
 
     try:
-        minimum, maximum = options.Extensions[bounds].min_double_value, options.Extensions[bounds].max_double_value
+        minimum, maximum = (
+            options.Extensions[bounds].min_double_value,
+            options.Extensions[bounds].max_double_value,
+        )
     except KeyError:
         raise KeyError("{} missing ParameterRangeOptions".format(key))
 
