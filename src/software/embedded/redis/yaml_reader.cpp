@@ -9,17 +9,29 @@ YAMLReader::YAMLReader(const char* path_to_file) : node_(YAML::LoadFile(path_to_
 
 std::string YAMLReader::getValueString(const std::string& key) const
 {
-    return node_[key].as<std::string>();
+    const YAML::Node lookup = node_[key];
+    CHECK(!lookup.IsNull()) << "The key ( " << key << " ) you are trying to look up does not exist in YAML file!"; 
+
+    return lookup.as<std::string>();
 }
 
 int YAMLReader::getValueInt(const std::string& key) const
 {
-    return node_[key].as<int>();
+    const YAML::Node lookup = node_[key];
+    CHECK(!lookup.IsNull()) << "The key ( " << key << " ) you are trying to look up does not exist in YAML file!"; 
+
+    return lookup.as<int>();
 }
 
 double YAMLReader::getValueDouble(const std::string& key) const
 {
-    return node_[key].as<double>();
+    // To not give cryptic exception messages, because if the key doesn't exist
+    // an exception would just be thrown regardless!
+
+    const YAML::Node lookup = node_[key];
+    CHECK(!lookup.IsNull()) << "The key ( " << key << " ) you are trying to look up does not exist in YAML file!"; 
+
+    return lookup.as<double>();
 }
 
 void YAMLReader::checkContent()
