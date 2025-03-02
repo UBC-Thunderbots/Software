@@ -95,7 +95,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
 fi
 
 # Clear the download cache
-rm -rf /tmp/tbots_download_cache
+sudo rm -rf /tmp/tbots_download_cache
 mkdir /tmp/tbots_download_cache
 
 if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; then
