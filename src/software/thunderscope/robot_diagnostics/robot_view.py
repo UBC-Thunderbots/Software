@@ -62,7 +62,7 @@ class RobotViewComponent(QWidget):
         self.robot_status.toggle_visibility()
 
     def update(
-        self, robot_status: RobotStatus, robot_statistic : RobotStatistic
+        self, robot_status: RobotStatus, robot_statistic: RobotStatistic
     ) -> None:
         """Updates the Robot View Components with the new robot status message
         Updates the robot info widget and, if initialized, the robot status widget as well
@@ -71,12 +71,12 @@ class RobotViewComponent(QWidget):
         :param robot_statistic : robot statistic proto to update with new metrics
         """
         if robot_status is not None:
-            self.robot_info.update(robot_status, robot_statistic )
+            self.robot_info.update(robot_status, robot_statistic)
             if self.robot_status:
                 self.robot_status.update(robot_status)
 
-        if robot_statistic  is not None:
-            self.robot_info.update_rtt(robot_statistic )
+        if robot_statistic is not None:
+            self.robot_info.update_rtt(robot_statistic)
 
 
 class RobotView(QScrollArea):
@@ -125,20 +125,25 @@ class RobotView(QScrollArea):
         until the buffer is empty
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
-        robot_statistic  = self.robot_statistic_buffer.get(
+        robot_statistic = self.robot_statistic_buffer.get(
             block=False, return_cached=False
         )
 
-        if robot_status is not None and robot_statistic  is not None and robot_status.robot_id == robot_statistic .robot_id: #if both pieces of data are available
+        if (
+            robot_status is not None
+            and robot_statistic is not None
+            and robot_status.robot_id == robot_statistic.robot_id
+        ):  # if both pieces of data are available
             self.robot_view_widgets[robot_status.robot_id].update(
-                robot_status=robot_status, robot_statistic =robot_statistic 
+                robot_status=robot_status, robot_statistic=robot_statistic
             )
         else:
-            if robot_status is not None: 
+            if robot_status is not None:
                 self.robot_view_widgets[robot_status.robot_id].update(
-                    robot_status, robot_statistic =None,
+                    robot_status,
+                    robot_statistic=None,
                 )
-            if robot_statistic  is not None:
-                self.robot_view_widgets[robot_statistic .robot_id].update(
-                    robot_status=None, robot_statistic =robot_statistic 
+            if robot_statistic is not None:
+                self.robot_view_widgets[robot_statistic.robot_id].update(
+                    robot_status=None, robot_statistic=robot_statistic
                 )
