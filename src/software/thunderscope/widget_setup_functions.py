@@ -160,11 +160,6 @@ def setup_gl_widget(
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
 
-    shift_button_toolbar = gl_widget.get_shift_button_toolbar()
-    shift_button_toolbar.enable_ball_placement_signal.connect(
-        world_layer.should_move_ball_slot
-    )
-
     # connect all sandbox controls if using sandbox mode
     if sandbox_mode:
         simulation_control_toolbar.undo_button.clicked.connect(world_layer.undo)

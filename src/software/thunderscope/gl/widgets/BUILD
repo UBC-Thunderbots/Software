@@ -42,21 +42,3 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
-
-py_library(
-    name = "gl_multilayer_toolbar",
-    srcs = ["gl_multilayer_toolbar.py"],
-    deps = [
-        ":gl_toolbar",
-        requirement("pyqtgraph"),
-    ],
-)
-
-py_library(
-    name = "gl_shift_toolbar",
-    srcs = ["gl_shift_toolbar.py"],
-    deps = [
-        ":gl_toolbar",
-        requirement("pyqtgraph"),
-    ],
-)
