@@ -115,6 +115,19 @@ class EmbeddedData:
         )
         return Primitive(direct_control=direct_control_primitive)
 
+    def get_zero_power_control_prititive(self) -> Primitive:
+        power_control_primitive = PowerControl()
+        power_control_primitive.geneva_slot = Slot.CENTRE_RIGHT
+        return power_control_primitive
+
+    def get_zero_motor_control_primitive(self) -> Primitive:
+        """Creates"""
+        motor_control_primitive = MotorControl()
+        motor_control_primitive.direct_velocity_control.velocity.x_component_meters = 0
+        motor_control_primitive.direct_velocity_control.velocity.y_component_meters = 0
+        motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = 0
+        return motor_control_primitive
+
     def get_kick_primitive(self, auto: bool, speed: float) -> Primitive:
         """Prepares and returns the processed direct control primitive given a speed and state.
         :param auto: Determines whether auto-kick is enabled
@@ -125,14 +138,14 @@ class EmbeddedData:
             min_val=0,
             max_val=ROBOT_MAX_SPEED_M_PER_S
         )
-        power_control_primitive = PowerControl()
+        power_control_primitive = self.get_zero_power_control_prititive()
         if not auto:
             power_control_primitive.chicker.kick_speed_m_per_s = speed
         else:
             # TODO (#3436): Change this default to the correct constant once defined by ELEC
             power_control_primitive.chicker.auto_chip_or_kick.autokick_speed_m_per_s = 1.5
         direct_control_primitive = DirectControlPrimitive(
-            motor_control=MotorControl(),
+            motor_control=self.get_zero_motor_control_primitive(),
             power_control=power_control_primitive
         )
         return Primitive(direct_control=direct_control_primitive)
@@ -146,10 +159,7 @@ class EmbeddedData:
             min_val=MAX_FORCE_DRIBBLER_SPEED_RPM,
             max_val=-MAX_FORCE_DRIBBLER_SPEED_RPM
         )
-        motor_control_primitive = MotorControl()
-        motor_control_primitive.direct_velocity_control.velocity.x_component_meters = 0
-        motor_control_primitive.direct_velocity_control.velocity.y_component_meters = 0
-        motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = 0
+        motor_control_primitive = self.get_zero_motor_control_primitive()
         motor_control_primitive.dribbler_speed_rpm = int(velocity)
         direct_control_primitive = DirectControlPrimitive(
             motor_control=motor_control_primitive,

@@ -235,8 +235,17 @@ class RobotDiagnosticsCLI:
                 primitive,
                 description)
         else:
+            zero_direct_control_primitive = DirectControlPrimitive(
+                motor_control=self.embedded_data.get_zero_motor_control_primitive(),
+                power_control=self.embedded_data.get_zero_power_control_prititive()
+            )
             self.embedded_communication.run_primitive(primitive)
             print(description)
+            self.embedded_communication.run_primitive_over_time(
+                    1,
+                    Primitive(direct_control=zero_direct_control_primitive),
+                    "Recharging..."
+            )
 
     @catch_interrupt_exception()
     def dribble(self,
