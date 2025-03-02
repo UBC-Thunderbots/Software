@@ -15,9 +15,10 @@ void MoveFSM::updateMove(const Update &event)
 
 bool MoveFSM::moveDone(const Update &event)
 {
-    // only finish moving if not dribbling. Sometimes when dribbling we just want to hold
-    // the ball somewhere.
+    // Only finish moving if not dribbling/kicking/chipping. 
+    // Sometimes we just want to hold the ball somewhere when dribbling/kicking/chipping.
     return event.control_params.dribbler_mode == TbotsProto::DribblerMode::OFF &&
+           event.control_params.auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::OFF &&
            robotReachedDestination(event.common.robot, event.control_params.destination,
                                    event.control_params.final_orientation);
 }

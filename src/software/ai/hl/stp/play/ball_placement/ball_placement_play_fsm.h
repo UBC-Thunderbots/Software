@@ -6,7 +6,6 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
-#include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/closest_point.h"
 
@@ -159,8 +158,6 @@ struct BallPlacementPlayFSM
      */
     bool retreatDone(const Update& event);
 
-
-
     /**
      * Helper function for calculating the angle at which the robot must face towards to
      * pick up ball
@@ -179,8 +176,9 @@ struct BallPlacementPlayFSM
      * organize the robots away from the ball placing robot
      *
      * @param event the BallPlacementPlayFSM Update event
+     * @param num_tactics the number of MoveTactics to populate move_tactics with
      */
-    void setupMoveTactics(const Update& event);
+    void setupMoveTactics(const Update& event, unsigned int num_tactics);
 
     auto operator()()
     {
