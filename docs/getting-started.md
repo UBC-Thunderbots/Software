@@ -1,10 +1,5 @@
-Table of Contents                                                                                                                                                                            
-=================                                                                                                                                                                            
- <!-- 
-    NOTE: when creating or re-creating a table of contents like this, you can
-    save a LOT of time by using this tool: 
-    https://github.com/ekalinin/github-markdown-toc
--->
+Table of Contents
+=================
 
 * [Software Setup](#software-setup)
    * [Introduction](#introduction)
@@ -30,8 +25,8 @@ Table of Contents
    * [Profiling](#profiling)
       * [Callgrind](#callgrind)
       * [Tracy](#tracy)
-   * [Building for Jetson Nano](#building-for-jetson-nano)
-   * [Deploying to Jetson Nano](#deploying-to-jetson-nano)
+   * [Building for the robot](#building-for-the-robot)
+   * [Deploying Robot Software to the robot](#deploying-robot-software-to-the-robot)
    * [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
       * [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
       * [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
@@ -49,6 +44,14 @@ Table of Contents
    * [Example Workflow](#example-workflow)
    * [Testing](#testing)
 
+<!-- 
+    Created by https://github.com/ekalinin/github-markdown-toc
+
+    NOTE: when creating or re-creating a table of contents like this, you can
+    save a LOT of time by using this tool: 
+    https://github.com/ekalinin/github-markdown-toc
+-->
+
 # Software Setup
 
 ## Introduction
@@ -63,9 +66,15 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 ### Operating systems
 
-We currently only support Linux, specifically Ubuntu 20.04 LTS and Ubuntu 22.04 LTS. You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
+We currently only support Linux, specifically Ubuntu.
 
-You can use Ubuntu 20.04 LTS and Ubuntu 22.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+If you have a X86_64 machine, we support Ubuntu 20.04 LTS, Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
+
+If you have a ARM64 (also known as AARCH64) machine, we support Ubuntu 24.04 LTS.
+
+You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
+
+You can use Ubuntu 20.04 LTS, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ### Getting the Code
 
@@ -221,13 +230,11 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 
     - If we want to run it with real robots:
         - Open your terminal, `cd` into `Software/src` and run `ifconfig`.
-            - Pick the network interface you would like to use:
-                1. If you are running things locally, you can pick any interface that is not `lo`
-                2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
+            - Pick the network interface you would like to use. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
             - For example, on a sample machine, the output may look like this:
 
                 ```
-                enp0s5: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+                wlp3s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
                         ...
                         [omitted]
                         ...
@@ -238,22 +245,30 @@ Now that you're setup, if you can run it on the command line, you can run it in 
                         ...
                 ```
 
-            - An appropriate interface we could choose is `enp0s5`
+            - An appropriate interface we could choose is `wlp3s0`
+            - Hint: If you are using a wired connection, the interface will likely start with `e-`. If you are using a WiFi connection, the interface will likely start with `w-`.
         - If we are running the AI as "blue": `./tbots.py run thunderscope_main --interface=[interface_here] --run_blue`
         - If we are running the AI as "yellow": `./tbots.py run thunderscope_main --interface=[interface_here] --run_yellow`
         - `[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
-            - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=enp0s5 --run_blue`
+            - For instance, a call to run the AI as blue on WiFi could be: `./tbots.py run thunderscope_main --interface=wlp3s0 --run_blue`. This will start Thunderscope and set up communication with robots over the wifi interface. It will also listen for referee and vision messages on the same interface.
+        - **Note: You do not need to include the `--interface=[interface_here]` argument!** You can run Thunderscope without it and use the dynamic configuration widget to set the interfaces for communication to send and receive robot, vision and referee messages.
+            - If you choose to include `--interface=[interface_here]` argument, Thunderscope will listen for and send robot messages on this port as well as receive vision and referee messages.
+            - Using the dynamic configuration widget is recommended at Robocup. To reduce latencies, it is recommended to connect the robot router to the AI computer via ethernet and use a separate ethernet connection to receive vision and referee messages. In this configuration, Thunderscope will need to bind to two different interfaces, each likely starting with a "e-".
+            - If you have specified `--run_blue` or `--run_yellow`, navigate to the "Parameters" widget. In "ai_config" > "ai_control_config" > "network_config", you can set the appropriate interface using the dropdowns for robot, vision and referee message communication.
         - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
 2. Run AI along with Robot Diagnostics:
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
     - If we want to run with one AI and Diagnostics
-        - `./tbots.py run thunderscope_main [--run_blue | --run_yellow] --run_diagnostics` will start Thunderscope
+        - `./tbots.py run thunderscope_main [--run_blue | --run_yellow] --run_diagnostics --interface=[interface_here]` will start Thunderscope
             - `[--run_blue | --run_yellow]` indicate which FullSystem to run
             - `--run_diagnostics` indicates if diagnostics should be loaded as well
         - Initially, the robots are all connected to the AI and only receive input from it
         - To change the input source for the robot, use the drop-down menu of that robot to change it between None, AI, and Manual
         - None means the robots are receiving no commands
         - More info about Manual control below
+        - `--interface=[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
+            - For instance, a call to run the AI as blue on WiFi could be: `./tbots.py run thunderscope_main --interface=wlp3s0 --run_blue --run_diagnostics`
+            - The `--interface` flag is optional. If you do not include it, you can set the interface in the dynamic configuration widget. See above for how to set the interface in the dynamic configuration widget.
 3. Run only Diagnostics
     - To run just Diagnostics
         - `./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
@@ -339,17 +354,47 @@ Tracy also samples call stacks. If the profiled binary is run with root permissi
 
     ./tbots.py run thunderscope_main --tracy --sudo
 
-## Building for Jetson Nano 
+## Building for the robot
 
-To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain for Jetson Nano. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
+To build for the robot computer, build the target with the `--platforms=//cc_toolchain:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//cc_toolchain:robot //software/geom/...`.
 
-## Deploying to Jetson Nano 
+## Deploying Robot Software to the robot
 
-We use ansible to automatically update software running on the Jetson Nano. [More info here.](useful-robot-commands.md#flashing-the-nano) 
+We use Ansible to automatically update software running on the robot. [More info here.](useful-robot-commands.md#flashing-the-robots-compute-module) 
 
 To update binaries on a working robot, you can run:
 
-`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
+`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+
+Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), and `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
+
+## Testing Robot Software locally
+
+It is possible to run Thunderloop without having a fully-working robot. Using this mode is useful when testing features that don't require the power board or motors.
+
+1. To run Thunderloop locally on your computer
+    1. First, you must ensure that `redis` is installed. Installation instructions can be found [here](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-linux/). The result of these installation directions will likely enable `redis-server` as a service that starts on boot. You may want to run `sudo systemctl disable redis-server` to prevent this.
+    2. Next, run the command `redis-server` in a terminal.
+    3. Set up the following required REDIS constants by running the following commands in the terminal:
+        - `redis-cli set /robot_id "{robot_id}"` where `{robot_id}` is the robot's ID (e.g. `1`, `2`, etc.)
+        - `redis-cli set /network_interface "{network_interface}"` where `{network_interface}` is one of the interfaces listed by `ip a`.
+        - `redis-cli set /channel_id "{channel_id}"` where `{channel_id}` is the channel id of the robot (e.g. `1`, `2`, etc.)
+        - `redis-cli set /kick_coeff "{kick_coeff}"` where `{kick_coeff}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+        - `redis-cli set /kick_constant "{kick_constant}"` where `{kick_constant}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+        - `redis-cli set /chip_pulse_width "{chip_pulse_width}"` where `{chip_pulse_width}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+    4. Now, run Thunderloop with the following command:
+        - `bazel run //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED`
+
+2. If you have a robot PC that doesn't have proper communication with the power or motor board, you can still run Thunderloop in a limited capacity to test software features (eg. networking).
+    1. First, build the Thunderloop binary:
+        - `bazel build //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED --platforms=//cc_toolchain:robot`
+    2. Find the `<robot_ip>` of the robot you want to run Thunderloop on. This guide may help you find the IP address of the robot: [Useful Robot Commands](useful-robot-commands.md#Wifi-Disclaimer).
+    3. Copy the binary to the robot:
+        - `scp bazel-bin/software/embedded/thunderloop_main robot@<robot_ip>:/home/robot/thunderloop_main`
+    4. SSH into the robot using the following command:
+        - `ssh robot@<robot_ip>`
+    5. Run the Thunderloop binary on the robot:
+        - `sudo ./thunderloop_main`
 
 ## Setting up Virtual Robocup 2021
 
@@ -358,15 +403,6 @@ To update binaries on a working robot, you can run:
 1. Fork the [SSL-Simulation-Setup](https://github.com/RoboCup-SSL/ssl-simulation-setup) repository.  
 2. Clone it.
 3. Follow these [instructions](https://github.com/RoboCup-SSL/ssl-simulation-setup/blob/master/Readme.md) to set up and run the repository.
-
-### Pushing a Dockerfile to dockerhub
-
-After editing the dockerfile, build the image and push it to dockerhub with the following steps
-
-1. To build the image, make sure that you are in the same directory as your image, and then run `docker build -t ubcthunderbots/<image name>[:tag] .` Make sure that your chosen image name matches a repository in dockerhub. Here's an example with the Robocup 2021 setup image: `docker build -t ubcthunderbots/tbots-software-env:0.0.1`
-2. Now, push your image to dockerhub. Get the credentials for the Thunderbots dockerhub account from a software lead.
-   1. Log into the docker account with `docker login`. You will be prompted for a username and password
-   2. Now, push this image by its name: `docker push ubcthunderbots/<image name>[:tag]`
 
 # Workflow
 

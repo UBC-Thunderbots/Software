@@ -6,9 +6,9 @@ from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
 
 from software.simulated_tests.simulated_test_fixture import *
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 
-logger = createLogger(__name__)
+logger = create_logger(__name__)
 
 
 def test_pivot_kick(field_test_runner):
@@ -38,10 +38,10 @@ def test_pivot_kick(field_test_runner):
         eventually_validation_sequence_set=[[]],
         test_timeout_s=15,
     )
-    # Send a stop tactic after the test finishes
-    stop_tactic = StopTactic()
+    # Send a halt tactic after the test finishes
+    halt_tactic = HaltTactic()
     params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
+    params.assigned_tactics[id].stop.CopyFrom(halt_tactic)
 
 
 if __name__ == "__main__":

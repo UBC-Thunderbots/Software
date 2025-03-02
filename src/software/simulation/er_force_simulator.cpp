@@ -3,8 +3,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/text_format.h>
 
-#include <QtCore/QFile>
-#include <QtCore/QString>
 #include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
@@ -34,7 +32,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       yellow_robot_with_ball(std::nullopt),
       ramping(ramping)
 {
-    QString full_filename = CONFIG_DIRECTORY;
+    std::string full_filename = CONFIG_DIRECTORY;
 
     if (field_type == TbotsProto::FieldType::DIV_A)
     {
@@ -46,19 +44,19 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
         full_filename = full_filename + CONFIG_FILE + "B.txt";
     }
 
-    QFile file(full_filename);
-    if (!file.open(QFile::ReadOnly))
+    std::ifstream config_file(full_filename);
+    if (!config_file)
     {
-        LOG(FATAL) << "Could not open configuration file " << full_filename.toStdString()
-                   << std::endl;
+        LOG(FATAL) << "Could not open configuration file " << full_filename;
     }
 
-    QString str = file.readAll();
-    file.close();
+    // Read in the config file
+    std::stringstream config_ss;
+    config_ss << config_file.rdbuf();
+    std::string config_str = config_ss.str();
 
-    std::string s = qPrintable(str);
     google::protobuf::TextFormat::Parser parser;
-    parser.ParseFromString(s, &er_force_sim_setup);
+    parser.ParseFromString(config_str, &er_force_sim_setup);
     er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
     auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
@@ -354,7 +352,7 @@ void ErForceSimulator::setRobotPrimitive(
     if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
-        primitive_executor->updatePrimitiveSet(primitive_set_msg);
+        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
         primitive_executor->updateVelocity(local_velocity, angular_velocity);
     }
     else

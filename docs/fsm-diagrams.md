@@ -130,6 +130,19 @@ ChipState --> Terminate:::terminate : [chipDone]
 
 ```
 
+## [HaltPlayFSM](/src/software/ai/hl/stp/play/halt_play/halt_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> HaltState
+HaltState --> HaltState : <i>updateStop</i>
+Terminate:::terminate --> Terminate:::terminate : <i>updateStop</i>
+
+```
+
 ## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
 
 ```mermaid
@@ -314,6 +327,21 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [HaltFSM](/src/software/ai/hl/stp/tactic/halt/halt_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StopState
+StopState --> StopState : [!stopDone]\n<i>updateStop</i>
+StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+
+```
+
 ## [KickFSM](/src/software/ai/hl/stp/tactic/kick/kick_fsm.h)
 
 ```mermaid
@@ -438,21 +466,6 @@ StealAndChipState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPas
 Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
-
-```
-
-## [StopFSM](/src/software/ai/hl/stp/tactic/stop/stop_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> StopState
-StopState --> StopState : [!stopDone]\n<i>updateStop</i>
-StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 
 ```
 

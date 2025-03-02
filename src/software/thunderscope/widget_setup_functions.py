@@ -27,8 +27,9 @@ from software.thunderscope.gl.layers import (
     gl_tactic_layer,
     gl_cost_vis_layer,
     gl_trail_layer,
+    gl_max_dribble_layer,
+    gl_referee_info_layer,
 )
-
 
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
@@ -37,17 +38,12 @@ from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
-from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
-from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
-    DiagnosticsInputWidget,
-)
-from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
-    DriveAndDribblerWidget,
-)
+from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
+
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
@@ -63,6 +59,7 @@ def setup_gl_widget(
     replay: bool = False,
     replay_log: os.PathLike = None,
     frame_swap_counter: Optional[FrameTimeCounter] = None,
+    send_sync_message: bool = False,
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -75,6 +72,7 @@ def setup_gl_widget(
     :param replay_log: The file path of the replay log
     :param frame_swap_counter: FrameTimeCounter to keep track of the time between
                                frame swaps in the GLWidget
+    :param send_sync_message: Whether to synchronize Thunderscope with a listener
     :return: The GLWidget
     """
     # Create ProtoPlayer if replay is enabled
@@ -129,6 +127,12 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
     trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
+    max_dribble_layer = gl_max_dribble_layer.GLMaxDribbleLayer(
+        "Dribble Tracking", visualization_buffer_size
+    )
+    referee_layer = gl_referee_info_layer.GLRefereeInfoLayer(
+        "Referee Info", visualization_buffer_size
+    )
 
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
@@ -141,6 +145,8 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, True)
+    gl_widget.add_layer(max_dribble_layer, True)
+    gl_widget.add_layer(referee_layer)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
@@ -174,6 +180,7 @@ def setup_gl_widget(
     for arg in [
         (World, world_layer.world_buffer),
         (World, cost_vis_layer.world_buffer),
+        (World, max_dribble_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
         (ObstacleList, obstacle_layer.obstacles_list_buffer),
@@ -189,6 +196,9 @@ def setup_gl_widget(
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
         (DebugShapes, debug_shapes_layer.debug_shapes_buffer),
+        (Referee, referee_layer.referee_vis_buffer),
+        (BallPlacementVisualization, referee_layer.ball_placement_vis_buffer),
+        (World, referee_layer.world_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 
@@ -210,6 +220,9 @@ def setup_parameter_widget(
         attr: Any, value: Any, updated_proto: ThunderbotsConfig
     ) -> None:
         proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
+        proto_unix_io.send_proto(
+            NetworkConfig, updated_proto.ai_config.ai_control_config.network_config
+        )
 
     return ProtoConfigurationWidget(
         on_change_callback, is_yellow=friendly_colour_yellow
@@ -324,7 +337,7 @@ def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorL
     return robot_error_log
 
 
-def setup_estop_view(proto_unix_io) -> EstopView:
+def setup_estop_view(proto_unix_io: ProtoUnixIO) -> EstopView:
     """Setup the estop view widget
 
     :param proto_unix_io: The proto unix io object for the full system
@@ -335,32 +348,12 @@ def setup_estop_view(proto_unix_io) -> EstopView:
     return estop_view
 
 
-def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
-    """Setup the chicker widget for robot diagnostics
+def setup_diagnostics_widget(proto_unix_io: ProtoUnixIO) -> DiagnosticsWidget:
+    """Set up the diagnostics widget that provides an interface for manually
+    controlling our robots
 
-    :param proto_unix_io: The proto unix io object
-    :return: The chicker widget
+    :param proto_unix_io: ProtoUnixIO for sending messages to the robot
+    :returns: the diagnostics widget
     """
-    chicker_widget = ChickerWidget(proto_unix_io)
-    return chicker_widget
-
-
-def setup_diagnostics_input_widget() -> DiagnosticsInputWidget:
-    """Sets up the diagnostics input widget
-
-    :return: The diagnostics input widget
-    """
-    diagnostics_input_widget = DiagnosticsInputWidget()
-    return diagnostics_input_widget
-
-
-def setup_drive_and_dribbler_widget(
-    proto_unix_io: ProtoUnixIO,
-) -> DriveAndDribblerWidget:
-    """Setup the drive and dribbler widget
-
-    :param proto_unix_io: The proto unix io object
-    :return: The drive and dribbler widget
-    """
-    drive_and_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
-    return drive_and_dribbler_widget
+    diagnostics_widget = DiagnosticsWidget(proto_unix_io)
+    return diagnostics_widget

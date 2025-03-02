@@ -68,7 +68,7 @@ namespace
             std::make_tuple(std::make_shared<AttackerTactic>(ai_config),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(std::make_shared<StopTactic>(),
+            std::make_tuple(std::make_shared<HaltTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),
             std::make_tuple(
@@ -88,16 +88,19 @@ namespace
         {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
          TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
          TbotsProto::MotionConstraint::FRIENDLY_GOAL,
+         TbotsProto::MotionConstraint::ENEMY_GOAL,
          TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     auto gamestart_or_us_motion_constraints = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
          TbotsProto::MotionConstraint::FRIENDLY_GOAL,
+         TbotsProto::MotionConstraint::ENEMY_GOAL,
          TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     auto kickoff_motion_constraints = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
          TbotsProto::MotionConstraint::FRIENDLY_GOAL,
+         TbotsProto::MotionConstraint::ENEMY_GOAL,
          TbotsProto::MotionConstraint::CENTER_CIRCLE,
          TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
          TbotsProto::MotionConstraint::ENEMY_HALF});
@@ -105,17 +108,20 @@ namespace
     auto our_penalty_motion_constraints = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
          TbotsProto::MotionConstraint::FRIENDLY_GOAL,
+         TbotsProto::MotionConstraint::ENEMY_GOAL,
          TbotsProto::MotionConstraint::ENEMY_HALF});
 
     auto them_penalty_motion_constraints = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
          TbotsProto::MotionConstraint::FRIENDLY_GOAL,
+         TbotsProto::MotionConstraint::ENEMY_GOAL,
          TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
          TbotsProto::MotionConstraint::FRIENDLY_HALF});
 
     auto them_ball_placement = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
          TbotsProto::MotionConstraint::FRIENDLY_GOAL,
+         TbotsProto::MotionConstraint::ENEMY_GOAL,
          TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
          TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE});
 }  // namespace

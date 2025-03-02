@@ -13,7 +13,8 @@ from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
 from google.protobuf.message import Message
-from typing import Callable, Type
+from typing import Callable, Type, List
+import pickle
 
 
 class ProtoPlayer:
@@ -43,8 +44,14 @@ class ProtoPlayer:
     """
 
     PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
+    CHUNK_INDEX_FILENAME = "chunks.index"
+    BOOKMARK_INDEX_FILENAME = "bookmarks.index"
+    CHUNK_INDEX_FILE_VERSION = 1
+    BOOKMARK_INDEX_FILE_VERSION = 1
 
-    def __init__(self, log_folder_path: str, proto_unix_io: ProtoUnixIO) -> None:
+    def __init__(
+        self, log_folder_path: os.PathLike, proto_unix_io: ProtoUnixIO
+    ) -> None:
         """Creates a proto player that plays back all protos
 
         :param log_folder_path: The path to the log file.
@@ -76,6 +83,11 @@ class ProtoPlayer:
             self.sorted_chunks[0]
         )
 
+        # build or load index for chunks
+        self.bookmark_indices = list()
+        self.chunks_indices = dict()
+        self.load_or_build_index()
+
         # We can get the total runtime of the log from the last entry in the last chunk
         self.end_time = self.find_actual_endtime()
 
@@ -93,14 +105,14 @@ class ProtoPlayer:
         self.error_bit_flag = ProtoPlayerFlags.NO_ERROR_FLAG
 
     @staticmethod
-    def sort_and_get_replay_files(log_folder_path):
+    def sort_and_get_replay_files(log_folder_path: os.PathLike):
         """Sorting the replay files
 
         :param log_folder_path: the path to the folder that we are going to be sorting!
         :return: the sorted replay files
         """
         # Load up all replay files in the log folder
-        replay_files = glob.glob(log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
+        replay_files = glob.glob(f"{log_folder_path}/*.{REPLAY_FILE_EXTENSION}")
 
         if len(replay_files) == 0:
             raise ValueError(
@@ -109,7 +121,7 @@ class ProtoPlayer:
             )
 
         # Sort the files by their chunk index
-        def __sort_replay_chunks(file_path: str):
+        def __sort_replay_chunks(file_path: os.PathLike):
             head, tail = os.path.split(file_path)
             replay_index, _ = tail.split(".")
             return int(replay_index)
@@ -129,6 +141,169 @@ class ProtoPlayer:
             return False
         except Exception:
             return True
+
+    def handle_log_line_for_chunk(self, **kwargs) -> None:
+        """Find the time stamp of the first proto event in the replay file.
+        :param kwargs: a dictionary contains all the information about a line in the replay log.
+            e.g. {
+                "protobuf_type": type of proto
+                "timestamp": timestamp when the proto is logged
+                "data": data of the proto message
+                "line_no": line number
+                "chunk_name": file name of the chunk
+            }
+        """
+        if kwargs["line_no"] == 0:
+            self.chunks_indices[os.path.basename(kwargs["chunk_name"])] = kwargs[
+                "timestamp"
+            ]
+
+    def handle_log_line_for_bookmark(self, **kwargs) -> None:
+        """Filter out bookmark protos in the replay log
+        :param kwargs: a dictionary contains all the information about a line in the replay log.
+            e.g. {
+                "protobuf_type": type of proto
+                "timestamp": timestamp when the proto is logged
+                "data": data of the proto message
+                "line_no": line number
+                "chunk_name": file name of the chunk
+            }
+        """
+        if kwargs["protobuf_type"] == ReplayBookmark:
+            self.bookmark_indices.append(kwargs["timestamp"])
+
+    def finish_preprocess_replay_file(self) -> None:
+        """Finish off pre-processing and save all the pre-processing result to disk"""
+        # save chunk indices
+        if self.chunks_indices:
+            try:
+                with open(
+                    os.path.join(
+                        self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME
+                    ),
+                    "w",
+                ) as index_file:
+                    index_file.write(
+                        f"Version: {ProtoPlayer.CHUNK_INDEX_FILE_VERSION}, "
+                        f"Generated on {time.time():.0f}\n"
+                    )
+                    for filename, start_timestamp in self.chunks_indices.items():
+                        index_file.write(f"{start_timestamp}, {filename}\n")
+                logging.info("Created chunk index file successfully.")
+            except Exception as e:
+                logging.warning(
+                    f"Failed to build chunk index for {self.log_folder_path}: {e}"
+                )
+        else:
+            logging.warning(
+                f"Failed to build chunk index for {self.log_folder_path} : No chunk data."
+            )
+
+        # save bookmark indices
+        if self.bookmark_indices:
+            with open(
+                os.path.join(self.log_folder_path, ProtoPlayer.BOOKMARK_INDEX_FILENAME),
+                "wb",
+            ) as bookmark_file:
+                pickle.dump(self.bookmark_indices, bookmark_file)
+                logging.info("Created bookmark index file successfully.")
+        else:
+            logging.warning(
+                f"Failed to build bookmark index for {self.log_folder_path} : No bookmark data found."
+            )
+
+    def preprocess_replay_file(self, handlers: List[Callable[[...], None]]) -> None:
+        """Start preprocessing replay files and build index according to the provided handlers
+
+        :param handlers: handler functions that will be applied to each line of the replay log.
+                This function will be provided following parameters
+                 (self: ProtoPlayer, line_no: int, chunk_name:str, timestamp: float,
+                    protobuf_type: Type[Message], data: Message).
+        """
+        for chunk_name in self.sorted_chunks:
+            chunk_data = ProtoPlayer.load_replay_chunk(chunk_name, self.version)
+            if chunk_data:
+                start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(
+                    chunk_data[0], self.version
+                )
+                for line_no, data in enumerate(chunk_data):
+                    timestamp, protobuf_type, data = ProtoPlayer.unpack_log_entry(
+                        data, self.version
+                    )
+                    for handler in handlers:
+                        handler(
+                            line_no=line_no,
+                            chunk_name=chunk_name,
+                            timestamp=timestamp,
+                            protobuf_type=protobuf_type,
+                            data=data,
+                        )
+        self.finish_preprocess_replay_file()
+
+    def is_chunk_indexed(self) -> bool:
+        """Returns true if the chunk index is already built.
+
+        :return: if the chunk index file exists
+        """
+        return os.path.exists(
+            os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME)
+        )
+
+    def is_bookmark_indexed(self) -> bool:
+        """Returns true if the bookmark index is already built.
+        :return: if the bookmark index exists
+        """
+        return os.path.exists(
+            os.path.join(self.log_folder_path, ProtoPlayer.BOOKMARK_INDEX_FILENAME)
+        )
+
+    def load_chunk_index(self) -> None:
+        """Loads the chunk index file."""
+        try:
+            with open(
+                os.path.join(self.log_folder_path, ProtoPlayer.CHUNK_INDEX_FILENAME),
+                "r",
+            ) as index_file:
+                # skip the first timestamp line
+                index_file.readline()
+
+                for line in index_file:
+                    start_timestamp, chunk_name = line.split(",")
+                    start_timestamp = float(start_timestamp)
+                    chunk_name = chunk_name.strip()
+                    self.chunks_indices[chunk_name] = start_timestamp
+            logging.info("Pre-existing chunk index file found and loaded.")
+        except Exception as e:
+            logging.warning(f"An Exception occurred when loading chunk index file {e}")
+
+    def load_bookmark_index(self) -> None:
+        """Loads the bookmark file"""
+        try:
+            with open(
+                os.path.join(self.log_folder_path, ProtoPlayer.BOOKMARK_INDEX_FILENAME),
+                "rb",
+            ) as bookmark_file:
+                self.bookmark_indices = pickle.load(bookmark_file)
+                logging.info("Pre-existing chunk bookmark file found and loaded.")
+        except Exception as e:
+            logging.warning(f"An Exception occurred when loading bookmark file {e}")
+
+    def load_or_build_index(self):
+        """Load bookmark index and chunk index. If none is found, build first then load."""
+        # handler_list contains all the tasks to do when pre-processing the log data
+        handler_list = list()
+        if not self.is_chunk_indexed():
+            handler_list.append(self.handle_log_line_for_chunk)
+        else:
+            self.load_chunk_index()
+
+        if not self.is_bookmark_indexed():
+            handler_list.append(self.handle_log_line_for_bookmark)
+        else:
+            self.load_bookmark_index()
+
+        if handler_list:
+            self.preprocess_replay_file(handler_list)
 
     def is_proto_player_playing(self) -> bool:
         """Return whether or not the proto player is being played.
@@ -163,7 +338,7 @@ class ProtoPlayer:
         return 0.0
 
     @staticmethod
-    def load_replay_chunk(replay_chunk_path: str, version: int) -> list:
+    def load_replay_chunk(replay_chunk_path: os.PathLike, version: int) -> list:
         """Reads a replay chunk.
 
         :param replay_chunk_path: The path to the replay chunk.
@@ -202,7 +377,7 @@ class ProtoPlayer:
         return cached_data
 
     @staticmethod
-    def get_replay_chunk_format_version(replay_chunk_path: str) -> int:
+    def get_replay_chunk_format_version(replay_chunk_path: os.PathLike) -> int:
         """Reads a replay chunk.
 
         :param replay_chunk_path: The path to the replay chunk.
@@ -329,6 +504,7 @@ class ProtoPlayer:
                     self.current_entry_index += 1
                     if self.current_packet_time >= end_time:
                         logging.info("Clip saved!")
+                        self.build_chunk_index(directory)
                         return
                 # Load the next chunk
                 self.current_chunk_index += 1
@@ -418,14 +594,24 @@ class ProtoPlayer:
         # Let's binary search through the chunks to find the chunk that starts
         # with a timestamp less than (but closest to) the seek_time we want
         # to seek to.
-        def __bisect_chunks_by_timestamp(chunk: str) -> None:
-            chunk = ProtoPlayer.load_replay_chunk(chunk, self.version)
-            start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk[0], self.version)
-            return start_timestamp
+        def __get_timestamp_for_chunk(chunk: str) -> float:
+            if self.chunks_indices and os.path.basename(chunk) in self.chunks_indices:
+                return self.chunks_indices[os.path.basename(chunk)]
+            else:
+                logging.warning(
+                    "Use old algorithm to jump, which might result in lagging "
+                    + f"Please try deleting {ProtoPlayer.CHUNK_INDEX_FILENAME} in the replay file folder"
+                    + " and re-run Thunderscope to enable the indexing for faster speed!"
+                )
+                chunk = ProtoPlayer.load_replay_chunk(chunk, self.version)
+                start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(
+                    chunk[0], self.version
+                )
+                return start_timestamp
 
         with self.replay_controls_mutex:
             self.current_chunk_index = ProtoPlayer.binary_search(
-                self.sorted_chunks, seek_time, key=__bisect_chunks_by_timestamp
+                self.sorted_chunks, seek_time, key=__get_timestamp_for_chunk
             )
 
         # Let's binary search through the entries in the chunk to find the closest

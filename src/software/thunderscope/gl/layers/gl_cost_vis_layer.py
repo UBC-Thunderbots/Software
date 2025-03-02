@@ -24,9 +24,9 @@ class GLCostVisOverlayLayer(GLLayer):
     def __init__(self, cost_vis_layer: GLCostVisLayer) -> None:
         """Initialize the GLCostVisOverlayLayer
 
-        :param cost_vis_layer: The GLCostVisLayer this overlay layer is related to
+        :param cost_vis_layer: The GLCostVisLayer to set as the parent of this layer
         """
-        super().__init__("GLCostVisOverlayLayer")
+        super().__init__("GLCostVisOverlayLayer", parent_item=cost_vis_layer)
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
 
         self.cost_vis_layer = cost_vis_layer
@@ -82,7 +82,7 @@ class GLCostVisLayer(GLLayer):
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.BENEATH_BACKGROUND_DEPTH)
-        self.related_layer = GLCostVisOverlayLayer(self)
+        self.cost_vis_overlay_layer = GLCostVisOverlayLayer(self)
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.cost_visualization_buffer = ThreadSafeBuffer(
@@ -106,6 +106,8 @@ class GLCostVisLayer(GLLayer):
             cost_vis = self.cost_visualization_buffer.queue.get_nowait()
         except queue.Empty:
             cost_vis = None
+
+        self.cost_vis_overlay_layer.refresh_graphics()
 
         if not cost_vis:
             cost_vis = self.cached_cost_vis

@@ -1,0 +1,20 @@
+---
+- name: Set up systemd WiFi 5 interface name rule
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.builtin.copy:
+    src: ../../linux_configs/systemd/10-persistent-wifi5-net.link
+    dest: /etc/systemd/network/
+    mode: "0644"
+  tags:
+    - setup_wifi_interface
+
+- name: Set up systemd WiFi 6 interface name rule
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.builtin.copy:
+    src: ../../linux_configs/systemd/10-persistent-wifi6-net.link
+    dest: /etc/systemd/network/
+    mode: "0644"
+  tags:
+    - setup_wifi_interface

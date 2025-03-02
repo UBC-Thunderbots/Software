@@ -1,0 +1,17 @@
+---
+- name: Set user hostname
+  become: true
+  become_method: ansible.builtin.sudo
+  tags:
+    - set_hostname
+  when: new_hostname is defined
+  block:
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ new_hostname }}"
+    - name: Update /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: ^(127\.0\.1\.1\s*)
+        backrefs: true
+        line: "\\1{{ new_hostname }}"
