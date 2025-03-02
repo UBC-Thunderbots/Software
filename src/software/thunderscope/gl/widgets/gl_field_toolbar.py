@@ -32,6 +32,8 @@ class GLFieldToolbar(GLToolbar):
         layers_menu: QMenu,
         toolbars_menu: QMenu,
         sandbox_mode: bool = False,
+        replay_mode: bool = False,
+        on_add_bookmark=Callable[[], None],
     ):
         """Set up the toolbar with these buttons:
 
@@ -42,6 +44,7 @@ class GLFieldToolbar(GLToolbar):
         - Help
         - Measure Mode Toggle
         - Camera View Select menu
+        - Add bookmark
 
         :param parent: the parent to overlay this toolbar over
         :param on_camera_view_change: the callback function for when the camera view is changed
@@ -49,6 +52,8 @@ class GLFieldToolbar(GLToolbar):
         :param layers_menu: the QMenu for the layers menu selection
         :param toolbars_menu: the QMenu for the toolbars menu selection
         :param sandbox_mode: if sandbox mode should be enabled
+        :param replay_mode: if replay mode is enabled
+        :param on_add_bookmark: the callback function when adding a bookmark
         """
         super(GLFieldToolbar, self).__init__(parent=parent)
 
@@ -118,6 +123,15 @@ class GLFieldToolbar(GLToolbar):
         self.toolbars_button.setMenu(toolbars_menu)
         self.toolbars_button.setStyleSheet(GLToolbar.get_button_style())
 
+        if not replay_mode:
+            self.bookmark_button = QPushButton()
+            self.bookmark_button.setIcon(
+                icons.get_bookmark_icon(self.BUTTON_ICON_COLOR)
+            )
+            self.bookmark_button.setShortcut("b")
+            self.bookmark_button.setStyleSheet(self.get_button_style())
+            self.bookmark_button.clicked.connect(on_add_bookmark)
+
         # Setup simulation speed button and menu
         self.sim_speed_menu = QMenu()
         self.sim_speed_button = QPushButton()
@@ -165,9 +179,13 @@ class GLFieldToolbar(GLToolbar):
             self.layout().addWidget(self.undo_button)
             self.layout().addWidget(self.pause_button)
             self.layout().addWidget(self.redo_button)
+
         self.layout().addWidget(self.help_button)
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)
+
+        if not replay_mode:
+            self.layout().addWidget(self.bookmark_button)
 
     def refresh(self) -> None:
         """Refreshes the UI for all the toolbar icons and updates toolbar position"""

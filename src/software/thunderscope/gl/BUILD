@@ -7,6 +7,7 @@ py_library(
     srcs = ["gl_widget.py"],
     deps = [
         "//software/thunderscope:proto_unix_io",
+        "//software/thunderscope/common:toast_msg_helper",
         "//software/thunderscope/gl/helpers:extended_gl_view_widget",
         "//software/thunderscope/gl/layers:gl_layer",
         "//software/thunderscope/gl/layers:gl_measure_layer",

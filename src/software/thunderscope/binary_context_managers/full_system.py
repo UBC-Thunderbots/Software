@@ -218,5 +218,6 @@ gdb --args bazel-bin/{self.full_system}
             (ROBOT_LOG_PATH, RobotLog),
             (ROBOT_CRASH_PATH, RobotCrash),
             (VIRTUAL_OBSTACLES_UNIX_PATH, VirtualObstacles),
+            (REPLAY_BOOKMARK_PATH, ReplayBookmark),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)

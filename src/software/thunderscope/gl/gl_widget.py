@@ -1,3 +1,5 @@
+import time
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
@@ -24,6 +26,10 @@ from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.world_pb2 import SimulationState
+from proto.replay_bookmark_pb2 import ReplayBookmark
+from proto.tbots_timestamp_msg_pb2 import Timestamp
+
+from software.thunderscope.common.toast_msg_helper import success_toast
 
 
 class GLWidget(QWidget):
@@ -106,6 +112,8 @@ class GLWidget(QWidget):
             layers_menu=self.layers_menu,
             toolbars_menu=self.toolbars_menu,
             sandbox_mode=sandbox_mode,
+            replay_mode=player is not None,
+            on_add_bookmark=self.add_bookmark,
         )
 
          
@@ -137,6 +145,7 @@ class GLWidget(QWidget):
         self.layers = []
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
+        self.proto_unix_io = proto_unix_io
 
     def get_shift_button_toolbar(self):
         """Get the ShiftButtonToolbar"""
@@ -387,3 +396,12 @@ class GLWidget(QWidget):
             distance *= half_x_length_with_buffer
 
         return distance
+
+    def add_bookmark(self):
+        """Handler for clicking 'add bookmark' button"""
+        timestamp = time.time()
+        bookmark = ReplayBookmark(
+            timestamp=Timestamp(epoch_timestamp_seconds=timestamp)
+        )
+        self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
+        success_toast(self.parentWidget(), "Added bookmark!")
