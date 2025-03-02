@@ -182,11 +182,15 @@ void MotorService::setup()
 void MotorService::stopDisabledMotors(){
     for (u_int8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
-        if (!enabled_motors.contains(motor))
+        if (!motorInEnabledList(motor))
         {
             tmc4671_switchToMotionMode(motor, TMC4671_MOTION_MODE_STOPPED);
         }
     }
+}
+
+bool MotorService::motorInEnabledList(u_int8_t motor){
+    return enabled_motors.find(motor) != enabled_motors.end();
 }
 
 void MotorService::setUpDriveMotor(uint8_t motor)
@@ -381,10 +385,11 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
         static_cast<float>(back_left_velocity_mps));
     motor_status.mutable_back_right()->set_wheel_velocity(
         static_cast<float>(back_right_velocity_mps));
-
-    motor_fault_detector_ =
-        static_cast<uint8_t>((motor_fault_detector_ + 1) % NUM_MOTORS);
-
+    do {
+        motor_fault_detector_ =
+                static_cast<uint8_t>((motor_fault_detector_ + 1) % NUM_MOTORS);
+    } while (!motorInEnabledList(motor_fault_detector_));
+    stopDisabledMotors();
     return motor_status;
 }
 
@@ -402,7 +407,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
 
     // checks if any motor has reset, sends a log message if so
-    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
+    for (uint8_t motor : enabled_motors)
     {
         if (requiresMotorReinit(motor))
         {
@@ -432,7 +437,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     double back_left_velocity;
     double dribbler_rpm;
 
-    if (enabled_motors.contains(FRONT_RIGHT_MOTOR_CHIP_SELECT))
+    if (motorInEnabledList(FRONT_RIGHT_MOTOR_CHIP_SELECT))
     {
         front_right_velocity =
                 static_cast<double>(tmc4671ReadThenWriteValue(
@@ -443,7 +448,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         // TODO #3424: When a motor is disabled use three-wheel velocity calculations.
         front_right_velocity = 0;
     }
-    if (enabled_motors.contains(FRONT_LEFT_MOTOR_CHIP_SELECT))
+    if (motorInEnabledList(FRONT_LEFT_MOTOR_CHIP_SELECT))
     {
         front_left_velocity =
                 static_cast<double>(tmc4671ReadThenWriteValue(
@@ -453,7 +458,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     } else {
         front_left_velocity = 0;
     }
-    if (enabled_motors.contains(BACK_RIGHT_MOTOR_CHIP_SELECT))
+    if (motorInEnabledList(BACK_RIGHT_MOTOR_CHIP_SELECT))
     {
         back_right_velocity =
                 static_cast<double>(tmc4671ReadThenWriteValue(
@@ -463,7 +468,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     } else {
         back_right_velocity = 0;
     }
-    if (enabled_motors.contains(BACK_LEFT_MOTOR_CHIP_SELECT))
+    if (motorInEnabledList(BACK_LEFT_MOTOR_CHIP_SELECT))
     {
         back_left_velocity =
                 static_cast<double>(tmc4671ReadThenWriteValue(
@@ -473,7 +478,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     } else {
         back_left_velocity = 0;
     }
-    if (enabled_motors.contains(DRIBBLER_MOTOR_CHIP_SELECT))
+    if (motorInEnabledList(DRIBBLER_MOTOR_CHIP_SELECT))
     {
         dribbler_rpm = static_cast<double>(
                 tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
@@ -1138,6 +1143,9 @@ void MotorService::checkEncoderConnections()
 
     for (u_int8_t motor : enabled_motors)
     {
+        if (motor == DRIBBLER_MOTOR_CHIP_SELECT){
+            continue;
+        }
         // read back current velocity
         initial_velocities[motor] = tmc4671_readInt(motor, TMC4671_ABN_DECODER_COUNT);
 
@@ -1188,7 +1196,7 @@ void MotorService::checkEncoderConnections()
     bool calibrated = true;
     for (uint8_t motor : enabled_motors)
     {
-        if (!calibrated_motors[motor])
+        if (!calibrated_motors[motor] && motor != DRIBBLER_MOTOR_CHIP_SELECT)
         {
             calibrated = false;
             LOG(WARNING) << "Encoder calibration check failure. " << MOTOR_NAMES[motor]

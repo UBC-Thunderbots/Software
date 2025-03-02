@@ -34,7 +34,6 @@ class MotorService
     static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
     static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
     static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
-    static const uint8_t DRIBBLER_CHIP_SELECT = 4;
 
     /**
      * Service that interacts with the motor board.
@@ -157,6 +156,7 @@ class MotorService
             drive_enabled = enabled;
             last_motor_faults = motor_faults;
 
+
             if(time_of_first_fault.has_value()) {
                 total_duration_since_last_fault_s =
                         std::chrono::duration_cast<std::chrono::seconds>(
@@ -186,15 +186,16 @@ class MotorService
           *
           *  @param motors a set of motors that are currently enabled
           */
-          std::set<uint8_t> removeFaultyMotor(std::set<uint8_t> motors)
+         void
+         removeFaultyMotor(std::set<uint8_t>& motors)
          {
+
              if(num_critical_faults > MOTOR_FAULT_THRESHOLD_COUNT) {
                  LOG(WARNING) << "In the last " << total_duration_since_last_fault_s
                               << "s, the motor board has reset " << num_critical_faults
-                              << " times. The motor is now disabled for safety";
+                              << " times. The motor " << int(motor_id) << " is now disabled for safety";
                  motors.erase(motor_id);
              }
-             return motors;
          }
     };
 
@@ -410,7 +411,12 @@ class MotorService
      */
     bool requiresMotorReinit(uint8_t motor);
 
-
+    /**
+     * Checks if motor is in enabled_motors
+     * @param motor motor to check
+     * @return true if motor in enabled_motors, false otherwise
+     */
+    bool motorInEnabledList(u_int8_t motor);
 
     // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
     // pairs of the drive motor.
@@ -493,6 +499,9 @@ class MotorService
     // Motor names (indexed with chip select above)
     static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
                                                   "front_right", "dribbler"};
+
+
+    const std::optional<std::chrono::time_point<std::chrono::system_clock>> testingStartTime = std::make_optional(std::chrono::system_clock::now());
 };
 
 template <typename T>
