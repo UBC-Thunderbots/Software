@@ -3,8 +3,6 @@ from pyqtgraph.opengl import *
 
 import textwrap
 
-from google.protobuf.json_format import MessageToDict
-
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import (
@@ -42,20 +40,17 @@ class GLTacticLayer(GLLayer):
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         self.cached_world = self.world_buffer.get(block=False)
-        play_info = self.play_info_buffer.get(block=False)
-        play_info_dict = MessageToDict(play_info)
+        play_info = self.play_info_buffer.get(block=False).bounds()
 
-        self.__update_tactic_name_graphics(
-            self.cached_world.friendly_team, play_info_dict
-        )
+        self.__update_tactic_name_graphics(self.cached_world.friendly_team, play_info)
 
-    def __update_tactic_name_graphics(self, team: Team, play_info_dict) -> None:
+    def __update_tactic_name_graphics(self, team: Team, play_info) -> None:
         """Update the GLGraphicsItems that display tactic data
 
         :param team: The team proto
-        :param play_info_dict: The dictionary containing play/tactic info
+        :param play_info: The dictionary containing play/tactic info
         """
-        tactic_assignments = play_info_dict["robotTacticAssignment"]
+        tactic_assignments = play_info.robot_tactic_assignment()
 
         # Ensure we have the same number of graphics as robots
         self.tactic_fsm_info_graphics.resize(
