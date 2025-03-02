@@ -150,6 +150,10 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         if not self.visible():
             return
+        
+        if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier | Qt.KeyboardModifier.AltModifier:
+            return
+
         super().mouse_in_scene_pressed(event)
 
         # handle double click
