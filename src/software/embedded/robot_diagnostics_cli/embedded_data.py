@@ -143,10 +143,13 @@ class EmbeddedData:
         """
         velocity = self.__clamp(
             val=velocity,
-            min_val=-MAX_FORCE_DRIBBLER_SPEED_RPM,
-            max_val=MAX_FORCE_DRIBBLER_SPEED_RPM
+            min_val=MAX_FORCE_DRIBBLER_SPEED_RPM,
+            max_val=-MAX_FORCE_DRIBBLER_SPEED_RPM
         )
         motor_control_primitive = MotorControl()
+        motor_control_primitive.direct_velocity_control.velocity.x_component_meters = 0
+        motor_control_primitive.direct_velocity_control.velocity.y_component_meters = 0
+        motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = 0
         motor_control_primitive.dribbler_speed_rpm = int(velocity)
         direct_control_primitive = DirectControlPrimitive(
             motor_control=motor_control_primitive,

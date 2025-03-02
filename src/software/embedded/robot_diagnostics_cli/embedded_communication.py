@@ -73,6 +73,7 @@ class EmbeddedCommunication:
     def send_primitive(self, primitive: Primitive) -> None:
         """Forward PrimitiveSet protos from diagnostics to the robots."""
         primitive.sequence_number = self.sequence_number
+        primitive.time_sent.epoch_timestamp_seconds=time.time()
         self.sequence_number += 1
 
         if self.__should_send_packet() or self.should_send_stop:
@@ -135,7 +136,7 @@ class EmbeddedCommunication:
 
         # Unicast Sender
         self.primitive_sender = tbots_cpp.PrimitiveProtoUdpSender(
-            "10.42.0.53",
+            EmbeddedCommunication.LOCALHOST_IP,
             PRIMITIVE_PORT,
             self.embedded_data.get_network_interface(),
             False
