@@ -42,8 +42,7 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
     {
         return enemy_threat_opt.value().has_ball;
     };
-    LOG(WARNING) << "Enemy threat not initialized for robot " << event.common.robot.id()
-                 << "\n";
+
     return false;
 }
 
