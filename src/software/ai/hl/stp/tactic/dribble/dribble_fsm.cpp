@@ -155,8 +155,10 @@ void DribbleFSM::dribble(const Update &event)
 void DribbleFSM::loseBall(const Update &event)
 {
     Point ball_position = event.common.world_ptr->ball().position();
-    auto face_ball_orientation =
+
+    Angle face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
+
     Point away_from_ball_position = robotPositionToFaceBall(
         ball_position, face_ball_orientation,
         dribble_tactic_config.lose_ball_possession_threshold() * 2);
@@ -166,14 +168,7 @@ void DribbleFSM::loseBall(const Update &event)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5}));
-}
-
-void DribbleFSM::startDribble(const Update &event)
-{
-    // update continuous_dribbling_start_point once we start dribbling
-    continuous_dribbling_start_point = event.common.world_ptr->ball().position();
-    dribble(event);
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
 bool DribbleFSM::havePossession(const Update &event)
@@ -210,8 +205,8 @@ bool DribbleFSM::dribblingDone(const Update &event)
 
 bool DribbleFSM::shouldLoseBall(const Update &event)
 {
-    Point ball_position = event.common.world_ptr->ball().position();
+    std::optional<Segment> dribble_displacement = event.common.world_ptr->getDribbleDisplacement();
     return (!event.control_params.allow_excessive_dribbling &&
-            !comparePoints(ball_position, continuous_dribbling_start_point,
-                           dribble_tactic_config.max_continuous_dribbling_distance()));
+            dribble_displacement.has_value() &&
+            dribble_displacement->length() >= dribble_tactic_config.max_continuous_dribbling_distance());
 }
