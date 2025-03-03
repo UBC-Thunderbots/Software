@@ -4,6 +4,7 @@ filegroup(
     name = "pi_files",
     data = [
         "config.txt",
+        "10-local.rules",
         "setup.zip",
     ],
 )
