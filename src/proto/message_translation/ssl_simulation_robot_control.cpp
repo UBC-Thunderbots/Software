@@ -90,12 +90,14 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
         }
         case TbotsProto::PowerControl::ChickerControl::kKickPulseWidth:
         {
-            LOG(FATAL) << "Kicker control using pulse widths is not supported in simulation";
+            LOG(FATAL)
+                << "Kicker control using pulse widths is not supported in simulation";
             break;
         }
         case TbotsProto::PowerControl::ChickerControl::kChipPulseWidth:
         {
-            LOG(FATAL) << "Chiper control using pulse widths is not supported in simulation";
+            LOG(FATAL)
+                << "Chiper control using pulse widths is not supported in simulation";
             break;
         }
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
@@ -139,12 +141,14 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
                 }
                 case TbotsProto::AutoChipOrKick::kAutokickPulseWidth:
                 {
-                    LOG(FATAL) << "Autokick control using pulse widths is not supported in simulation";
+                    LOG(FATAL)
+                        << "Autokick control using pulse widths is not supported in simulation";
                     break;
                 }
                 case TbotsProto::AutoChipOrKick::kAutochipPulseWidth:
                 {
-                    LOG(FATAL) << "Autochip control using pulse widths is not supported in simulation";
+                    LOG(FATAL)
+                        << "Autochip control using pulse widths is not supported in simulation";
                     break;
                 }
                 case TbotsProto::AutoChipOrKick::AUTO_CHIP_OR_KICK_NOT_SET:

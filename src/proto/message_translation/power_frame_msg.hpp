@@ -207,20 +207,20 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         .which_auto_chip_or_kick =
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
-                        .auto_chip_or_kick.autokick_pulse_width = static_cast<uint32_t>(
-                        power_control.chicker()
-                                    .auto_chip_or_kick()
-                                    .autokick_pulse_width());
+                        .auto_chip_or_kick.autokick_pulse_width =
+                        static_cast<uint32_t>(power_control.chicker()
+                                                  .auto_chip_or_kick()
+                                                  .autokick_pulse_width());
                     break;
                 case TbotsProto::AutoChipOrKick::kAutochipPulseWidth:
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
                         .which_auto_chip_or_kick =
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
-                    .auto_chip_or_kick.autokick_pulse_width = static_cast<uint32_t>(
-                    power_control.chicker()
-                                .auto_chip_or_kick()
-                                .autochip_pulse_width());
+                        .auto_chip_or_kick.autokick_pulse_width =
+                        static_cast<uint32_t>(power_control.chicker()
+                                                  .auto_chip_or_kick()
+                                                  .autochip_pulse_width());
                     break;
                 default:
                     break;

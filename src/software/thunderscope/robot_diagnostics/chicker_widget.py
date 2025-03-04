@@ -174,13 +174,15 @@ class ChickerWidget(QWidget):
         self.kick_button.clicked.connect(
             lambda: self.send_command_and_timeout(
                 lambda: ChickerCommandMode.KICK_PULSE_WIDTH
-                    if self.pulse_width_button.isChecked() else ChickerCommandMode.KICK
+                if self.pulse_width_button.isChecked()
+                else ChickerCommandMode.KICK
             )
         )
         self.chip_button.clicked.connect(
             lambda: self.send_command_and_timeout(
                 lambda: ChickerCommandMode.CHIP_PULSE_WIDTH
-                    if self.pulse_width_button.isChecked() else ChickerCommandMode.CHIP
+                if self.pulse_width_button.isChecked()
+                else ChickerCommandMode.CHIP
             )
         )
 
@@ -238,15 +240,22 @@ class ChickerWidget(QWidget):
         elif command == ChickerCommandMode.CHIP_PULSE_WIDTH:
             power_control.chicker.chip_pulse_width = chip_pulse_width
         elif command == ChickerCommandMode.AUTOKICK_PULSE_WIDTH:
-            power_control.chicker.auto_chip_or_kick.autokick_pulse_width = kick_pulse_width
+            power_control.chicker.auto_chip_or_kick.autokick_pulse_width = (
+                kick_pulse_width
+            )
         elif command == ChickerCommandMode.AUTOCHIP_PULSE_WIDTH:
-            power_control.chicker.auto_chip_or_kick.autochip_pulse_width = chip_pulse_width
+            power_control.chicker.auto_chip_or_kick.autochip_pulse_width = (
+                chip_pulse_width
+            )
 
         self.proto_unix_io.send_proto(PowerControl, power_control)
 
-        if (command == ChickerCommandMode.KICK or command == ChickerCommandMode.CHIP
+        if (
+            command == ChickerCommandMode.KICK
+            or command == ChickerCommandMode.CHIP
             or command == ChickerCommandMode.KICK_PULSE_WIDTH
-            or command == ChickerCommandMode.CHIP_PULSE_WIDTH):
+            or command == ChickerCommandMode.CHIP_PULSE_WIDTH
+        ):
             # We need to send an empty message to the PowerControl proto buffer to prevent the
             # spamming of kick/chip commands. This is because if no new messages are received in the
             # buffer, the last sent message will be repeatedly resent to the robot, which we don't
