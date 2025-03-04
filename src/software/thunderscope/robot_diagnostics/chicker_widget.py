@@ -169,8 +169,6 @@ class ChickerWidget(QWidget):
 
         self.meters_per_second_button.setChecked(True)
 
-
-
         self.kick_button.clicked.connect(
             lambda: self.send_command_and_timeout(
                 lambda: ChickerCommandMode.KICK_PULSE_WIDTH
