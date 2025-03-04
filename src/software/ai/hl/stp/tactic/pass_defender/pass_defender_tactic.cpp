@@ -5,7 +5,7 @@
 #include "software/logger/logger.h"
 
 PassDefenderTactic::PassDefenderTactic(TbotsProto::AiConfig ai_config)
-    : Tactic({RobotCapability::Move, RobotCapability::Kick}),
+    : Tactic({RobotCapability::Move}),
       fsm_map(),
       control_params(PassDefenderFSM::ControlParams()),
       ai_config(ai_config)
