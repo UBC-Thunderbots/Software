@@ -414,8 +414,8 @@ message ShootOrPassPlayConfig
 message RobotCapabilitiesConfig
 {
     required BrokenRobots broken_dribblers = 1;
-    required BrokenRobots broken_chippers = 2;
-    required BrokenRobots broken_kickers = 3;
+    required BrokenRobots broken_chippers  = 2;
+    required BrokenRobots broken_kickers   = 3;
 }
 
 message BrokenRobots
@@ -485,7 +485,8 @@ message SensorFusionConfig
     required double touching_ball_threshold_meters = 14
         [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
-    // Object to represent which robots have broken dribblers, kickers, or chippers (updated via Thunderscope)
+    // Object to represent which robots have broken dribblers, kickers, or chippers
+    // (updated via Thunderscope)
     required RobotCapabilitiesConfig robot_capabilities_config = 15;
 }
 
