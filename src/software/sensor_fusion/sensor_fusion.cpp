@@ -169,17 +169,17 @@ void SensorFusion::updateWorld(
 
         const google::protobuf::Reflection *broken_dribblers_reflection =
             capabilities_config.broken_dribblers().GetReflection();
-    	const google::protobuf::Descriptor *broken_dribblers_descriptor =
+        const google::protobuf::Descriptor *broken_dribblers_descriptor =
             capabilities_config.broken_dribblers().GetDescriptor();
 
-    	const google::protobuf::Reflection *broken_chippers_reflection =
+        const google::protobuf::Reflection *broken_chippers_reflection =
             capabilities_config.broken_chippers().GetReflection();
-    	const google::protobuf::Descriptor *broken_chippers_descriptor =
+        const google::protobuf::Descriptor *broken_chippers_descriptor =
             capabilities_config.broken_chippers().GetDescriptor();
 
-    	const google::protobuf::Reflection *broken_kickers_reflection =
+        const google::protobuf::Reflection *broken_kickers_reflection =
             capabilities_config.broken_kickers().GetReflection();
-    	const google::protobuf::Descriptor *broken_kickers_descriptor =
+        const google::protobuf::Descriptor *broken_kickers_descriptor =
             capabilities_config.broken_kickers().GetDescriptor();
 
         for (const auto &error_code_msg : robot_status_msg.error_code())
