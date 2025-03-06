@@ -2,19 +2,23 @@ import math
 import redis
 from software.py_constants import *
 from proto.import_all_protos import *
-from software.embedded.constants.py_constants import (ROBOT_MAX_ANG_SPEED_RAD_PER_S, ROBOT_MAX_SPEED_M_PER_S,
-                                                      MAX_FORCE_DRIBBLER_SPEED_RPM)
+from software.embedded.constants.py_constants import (
+    ROBOT_MAX_ANG_SPEED_RAD_PER_S,
+    ROBOT_MAX_SPEED_M_PER_S,
+    MAX_FORCE_DRIBBLER_SPEED_RPM,
+)
 
 
 class EmbeddedData:
     """Model class responsible for interfacing with onboard disk data on the robot"""
+
     def __init__(self) -> None:
         # Initializes the redis cache connection
         self.redis = redis.StrictRedis(
             host=REDIS_DEFAULT_HOST,
             port=REDIS_DEFAULT_PORT,
             charset="utf-8",
-            decode_responses=True
+            decode_responses=True,
         )
         self.epoch_timestamp_seconds = 0
         self.battery_voltage = 0
@@ -62,15 +66,12 @@ class EmbeddedData:
         :param velocity: Angular Velocity to rotate the robot
         """
         velocity = self.__clamp(
-            velocity,
-            -ROBOT_MAX_ANG_SPEED_RAD_PER_S,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_S
+            velocity, -ROBOT_MAX_ANG_SPEED_RAD_PER_S, ROBOT_MAX_ANG_SPEED_RAD_PER_S
         )
         motor_control_primitive = MotorControl()
         motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = velocity
         direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive,
-            power_control=PowerControl()
+            motor_control=motor_control_primitive, power_control=PowerControl()
         )
         return Primitive(direct_control=direct_control_primitive)
 
@@ -79,17 +80,16 @@ class EmbeddedData:
         :param angle: Angle to move the robot at in degrees
         :param speed: Speed to move the robot at in m/s
         """
-        speed = self.__clamp(
-            val=speed,
-            min_val=0,
-            max_val=ROBOT_MAX_SPEED_M_PER_S
-        )
+        speed = self.__clamp(val=speed, min_val=0, max_val=ROBOT_MAX_SPEED_M_PER_S)
         motor_control_primitive = MotorControl()
-        motor_control_primitive.direct_velocity_control.velocity.x_component_meters = speed * math.cos(angle)
-        motor_control_primitive.direct_velocity_control.velocity.y_component_meters = speed * math.sin(angle)
+        motor_control_primitive.direct_velocity_control.velocity.x_component_meters = (
+            speed * math.cos(angle)
+        )
+        motor_control_primitive.direct_velocity_control.velocity.y_component_meters = (
+            speed * math.sin(angle)
+        )
         direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive,
-            power_control=PowerControl()
+            motor_control=motor_control_primitive, power_control=PowerControl()
         )
         return Primitive(direct_control=direct_control_primitive)
 
@@ -99,9 +99,7 @@ class EmbeddedData:
         :param distance: Distance to chip the "ball"
         """
         distance = self.__clamp(
-            val=distance,
-            min_val=0,
-            max_val=ROBOT_MAX_SPEED_M_PER_S
+            val=distance, min_val=0, max_val=ROBOT_MAX_SPEED_M_PER_S
         )
         power_control_primitive = PowerControl()
         if not auto:
@@ -110,8 +108,7 @@ class EmbeddedData:
             # TODO-3436: Change this default to the correct constant once defined by ELEC
             power_control_primitive.chicker.auto_chip_or_kick.autochip_distance_meters = 1.5
         direct_control_primitive = DirectControlPrimitive(
-            motor_control=MotorControl(),
-            power_control=power_control_primitive
+            motor_control=MotorControl(), power_control=power_control_primitive
         )
         return Primitive(direct_control=direct_control_primitive)
 
@@ -133,20 +130,18 @@ class EmbeddedData:
         :param auto: Determines whether auto-kick is enabled
         :param speed: Speed to kick the "ball" at
         """
-        speed = self.__clamp(
-            val=speed,
-            min_val=0,
-            max_val=ROBOT_MAX_SPEED_M_PER_S
-        )
+        speed = self.__clamp(val=speed, min_val=0, max_val=ROBOT_MAX_SPEED_M_PER_S)
         power_control_primitive = self.get_zero_power_control_prititive()
         if not auto:
             power_control_primitive.chicker.kick_speed_m_per_s = speed
         else:
             # TODO (#3436): Change this default to the correct constant once defined by ELEC
-            power_control_primitive.chicker.auto_chip_or_kick.autokick_speed_m_per_s = 1.5
+            power_control_primitive.chicker.auto_chip_or_kick.autokick_speed_m_per_s = (
+                1.5
+            )
         direct_control_primitive = DirectControlPrimitive(
             motor_control=self.get_zero_motor_control_primitive(),
-            power_control=power_control_primitive
+            power_control=power_control_primitive,
         )
         return Primitive(direct_control=direct_control_primitive)
 
@@ -157,13 +152,12 @@ class EmbeddedData:
         velocity = self.__clamp(
             val=velocity,
             min_val=MAX_FORCE_DRIBBLER_SPEED_RPM,
-            max_val=-MAX_FORCE_DRIBBLER_SPEED_RPM
+            max_val=-MAX_FORCE_DRIBBLER_SPEED_RPM,
         )
         motor_control_primitive = self.get_zero_motor_control_primitive()
         motor_control_primitive.dribbler_speed_rpm = int(velocity)
         direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive,
-            power_control=PowerControl()
+            motor_control=motor_control_primitive, power_control=PowerControl()
         )
         return Primitive(direct_control=direct_control_primitive)
 
@@ -177,19 +171,26 @@ class EmbeddedData:
         velocity = self.__clamp(
             val=velocity,
             min_val=-ROBOT_MAX_SPEED_M_PER_S,
-            max_val=ROBOT_MAX_SPEED_M_PER_S
+            max_val=ROBOT_MAX_SPEED_M_PER_S,
         )
 
         for wheel in wheels:
             wheel_velocity_map[wheel] = velocity
         motor_control_primitive = MotorControl()
-        motor_control_primitive.direct_per_wheel_control.front_left_wheel_velocity = wheel_velocity_map[1]
-        motor_control_primitive.direct_per_wheel_control.back_left_wheel_velocity = wheel_velocity_map[2]
-        motor_control_primitive.direct_per_wheel_control.front_right_wheel_velocity = wheel_velocity_map[3]
-        motor_control_primitive.direct_per_wheel_control.back_right_wheel_velocity = wheel_velocity_map[4]
+        motor_control_primitive.direct_per_wheel_control.front_left_wheel_velocity = (
+            wheel_velocity_map[1]
+        )
+        motor_control_primitive.direct_per_wheel_control.back_left_wheel_velocity = (
+            wheel_velocity_map[2]
+        )
+        motor_control_primitive.direct_per_wheel_control.front_right_wheel_velocity = (
+            wheel_velocity_map[3]
+        )
+        motor_control_primitive.direct_per_wheel_control.back_right_wheel_velocity = (
+            wheel_velocity_map[4]
+        )
 
         direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive,
-            power_control=PowerControl()
+            motor_control=motor_control_primitive, power_control=PowerControl()
         )
         return Primitive(direct_control=direct_control_primitive)
