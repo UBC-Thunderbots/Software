@@ -205,8 +205,10 @@ bool DribbleFSM::dribblingDone(const Update &event)
 
 bool DribbleFSM::shouldLoseBall(const Update &event)
 {
-    std::optional<Segment> dribble_displacement = event.common.world_ptr->getDribbleDisplacement();
+    std::optional<Segment> dribble_displacement =
+        event.common.world_ptr->getDribbleDisplacement();
     return (!event.control_params.allow_excessive_dribbling &&
             dribble_displacement.has_value() &&
-            dribble_displacement->length() >= dribble_tactic_config.max_continuous_dribbling_distance());
+            dribble_displacement->length() >=
+                dribble_tactic_config.max_continuous_dribbling_distance());
 }

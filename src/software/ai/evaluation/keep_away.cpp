@@ -27,9 +27,9 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
                                     field_bounds.yMax() - FIELD_SIZE_REDUCTION_M);
     Rectangle reduced_field_bounds = Rectangle(reduced_bottom_left, reduced_top_right);
 
-    Point initial_keepaway_point = world.ball().position();
+    Point initial_keepaway_point                      = world.ball().position();
     const std::optional<Segment> dribble_displacement = world.getDribbleDisplacement();
-    if (dribble_displacement.has_value()) 
+    if (dribble_displacement.has_value())
     {
         initial_keepaway_point = dribble_displacement->getStart();
     }

@@ -195,9 +195,9 @@ struct DribbleFSM
             Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
             LoseBall_S + Update_E[shouldLoseBall_G] / loseBall_A,
             LoseBall_S + Update_E[!shouldLoseBall_G] / getPossession_A = GetPossession_S,
-            X + Update_E[lostPossession_G] / getPossession_A          = GetPossession_S,
-            X + Update_E[!dribblingDone_G] / dribble_A                = Dribble_S,
-            X + Update_E / dribble_A                                  = X);
+            X + Update_E[lostPossession_G] / getPossession_A           = GetPossession_S,
+            X + Update_E[!dribblingDone_G] / dribble_A                 = Dribble_S,
+            X + Update_E / dribble_A                                   = X);
     }
 
    private:
