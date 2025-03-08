@@ -14,8 +14,8 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInScen
 
 
 class GLDrawPolygonObstacleLayer(GLLayer):
-    """A layer used to draw polygons that are going to represent obstacles for the trajectory planner
-    to avoid.
+    """A layer used to draw polygons representing virtual obstacles for the 
+    trajectory planner to avoid.
     """
 
     DOUBLE_CLICK_INTERVAL = 200
@@ -28,18 +28,17 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         super().__init__(name)
 
-        self.friendly_io: ProtoUnixIO = friendly_io
+        self.friendly_io = friendly_io
 
-        self.current_polygon: GLPolygon = GLPolygon(parent_item=self, line_width=2)
-        # Tuple[float, float] represents a point (x,y)
+        self.current_polygon = GLPolygon(parent_item=self, line_width=2)
         self.points: List[Tuple[float, float]] = []
 
         self.obstacles: List[Obstacle] = []
 
         # used for keeping track and rendering multiple polygons
-        self.rendering_polygons: ObservableList = ObservableList(self._graphics_changed)
+        self.rendering_polygons = ObservableList(self._graphics_changed)
 
-        self.can_double_click: bool = True
+        self.can_double_click = True
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Responding to key events that are going to push obstacles to the stack or add point
@@ -59,7 +58,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         for polygon in self.rendering_polygons:
             polygon.hide()
-        self.rendering_polygons.resize(0, lambda: {})
+        self.rendering_polygons.clear()
         self.current_polygon.hide()
         self.current_polygon = GLPolygon(parent_item=self, line_width=2)
 
@@ -133,8 +132,8 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         def _handle_single_click():
             # This logic is somewhat non trivial. If we `can_double_click`, it indicates that
             # a double-click hasn't occurred within the 200 ms time window after the first click.
-            # In other words, the user hasn't double-clicked,
-            # so we will now interpret the action as a single click.
+            # In other words, the user hasn't double-clicked, so we will now interpret the action 
+            # as a single click.
             if self.can_double_click:
                 point = event.point_in_scene
                 self._add_one_point((point.x(), point.y()))
@@ -154,13 +153,10 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier | Qt.KeyboardModifier.AltModifier:
             return
 
-        super().mouse_in_scene_pressed(event)
-
         # handle double click
         if self.can_double_click:
             self.push_polygon_to_list()
             self.can_double_click = False
-            return
         else:
             self.can_double_click = True
             # handle single click

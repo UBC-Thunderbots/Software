@@ -187,7 +187,7 @@ void MovePrimitive::updateObstacles(
         obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
     obstacles = field_obstacles;
 
-    // adding virtual obstalces
+    // Adding virtual obstacles
     auto virtual_obstacles = world.getVirtualObstacles().obstacles();
     for (TbotsProto::Obstacle &obstacle : virtual_obstacles)
     {
