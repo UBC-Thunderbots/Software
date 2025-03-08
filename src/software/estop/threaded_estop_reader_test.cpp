@@ -44,7 +44,7 @@ TEST(ThreadedEstopReaderTest, estop_tick_is_called_multiple_times)
     std::mutex m;
     std::unique_lock lock(m);
     std::condition_variable cv;
-    bool ready;
+    bool ready = false;
 
     EXPECT_CALL(*mock_uart_ptr, flushSerialPort(_)).WillRepeatedly(Return(true));
 
