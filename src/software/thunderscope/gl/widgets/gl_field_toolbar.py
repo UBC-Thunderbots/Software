@@ -1,8 +1,4 @@
-from typing import Callable, List
-from PyQt6.QtCore import Qt
-from numpy import who
-from pyqtgraph.Qt import QtCore
-from PyQt6.QtGui import QShortcut
+from typing import Callable
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
@@ -240,4 +236,3 @@ class GLFieldToolbar(GLToolbar):
         :param callback: the callback function to update the simulation speed
         """
         self.speed_callback = callback
-

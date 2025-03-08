@@ -233,8 +233,8 @@ class GLWorldLayer(GLLayer):
         if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             return
 
-        self.point_in_scene_picked = (
-            self._invert_position_if_defending_negative_half(event.point_in_scene)
+        self.point_in_scene_picked = self._invert_position_if_defending_negative_half(
+            event.point_in_scene
         )
 
         # Send a command to the simulator to move the ball to the picked point

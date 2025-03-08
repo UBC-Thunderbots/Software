@@ -14,7 +14,7 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInScen
 
 
 class GLDrawPolygonObstacleLayer(GLLayer):
-    """A layer used to draw polygons representing virtual obstacles for the 
+    """A layer used to draw polygons representing virtual obstacles for the
     trajectory planner to avoid.
     """
 
@@ -132,7 +132,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         def _handle_single_click():
             # This logic is somewhat non trivial. If we `can_double_click`, it indicates that
             # a double-click hasn't occurred within the 200 ms time window after the first click.
-            # In other words, the user hasn't double-clicked, so we will now interpret the action 
+            # In other words, the user hasn't double-clicked, so we will now interpret the action
             # as a single click.
             if self.can_double_click:
                 point = event.point_in_scene
@@ -149,8 +149,11 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         """
         if not self.visible():
             return
-        
-        if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier | Qt.KeyboardModifier.AltModifier:
+
+        if (
+            not event.mouse_event.modifiers()
+            == Qt.KeyboardModifier.ShiftModifier | Qt.KeyboardModifier.AltModifier
+        ):
             return
 
         # handle double click
