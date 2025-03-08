@@ -46,7 +46,8 @@ int main(int argc, char **argv)
     {
         LOG(INFO) << "Checking motor: " << int(chip_select);
         // Check driver fault
-        if (motor_service_->getCachedMotorFaults().at(chip_select).num_critical_faults>0)
+        if (motor_service_->getCachedMotorFaults().at(chip_select).num_critical_faults >
+            0)
         {
             LOG(WARNING) << "Detected Motor Fault";
         }
