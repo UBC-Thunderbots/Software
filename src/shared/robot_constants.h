@@ -92,8 +92,6 @@ typedef struct RobotConstants
     // The max speed at which we dribble the ball
     float dribble_speed_m_per_s;
 
-
-
     // The maximum acceleration achievable by our robots [m/s^2]
     float robot_max_acceleration_m_per_s_2;
 

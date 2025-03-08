@@ -9,14 +9,8 @@
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/closest_point.h"
 
-using Zones = std::unordered_set<EighteenZoneId>;
-
 struct BallPlacementPlayFSM
 {
-    double BACK_AWAY_FROM_CORNER_EXTRA_M               = 0.9;
-    double BACK_AWAY_FROM_WALL_M                       = ROBOT_MAX_RADIUS_METERS * 5.5;
-    double MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS = ROBOT_MAX_RADIUS_METERS * 4.0;
-
     class StartState;
     class PickOffWallState;
     class AlignWallState;
@@ -32,22 +26,22 @@ struct BallPlacementPlayFSM
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Creates a ball placement play FSM
+     * Creates a BallPlacementPlayFSM
      *
      * @param ai_config the play config for this play FSM
      */
     explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
 
     /**
-     * Action that has the robot align with the wall in order to pick the ball off of it.
+     * Action that has the robot align with the wall in order to pick the ball off of it
      *
      * @param event the BallPlacementPlayFSM Update event
      */
     void alignWall(const Update& event);
 
     /**
-     * The transition action into picking the ball off the wall, set the target
-     * destination.
+     * Sets the target wall pickoff destination.
+     * This action is called one time before transitioning into PickOffWallState.
      *
      * @param event the BallPlacementPlayFSM Update event
      */
@@ -78,7 +72,8 @@ struct BallPlacementPlayFSM
     void placeBall(const Update& event);
 
     /**
-     * Action that waits stationary 5 seconds for the dribbler to stop spinning
+     * Action that records the time at which the ReleaseBallState was entered so that
+     * we can wait for an appropriate amount of time for the dribbler to stop spinning
      *
      * @param event the BallPlacementPlayFSM Update event
      */
@@ -112,14 +107,16 @@ struct BallPlacementPlayFSM
      * Guard on whether the robot is aligned with the ball and placement point
      *
      * @param event the BallPlacementPlayFSM Update event
+     *
      * @return whether the robot is in position to begin placing the ball
      */
     bool alignDone(const Update& event);
 
     /**
-     * Guard on wether the robot is in position to pick the ball off the wall
+     * Guard on whether the robot is in position to pick the ball off the wall
      *
      * @param event the BallPlacementPlayFSM Update event
+     *
      * @return whether the robot is in position to begin picking the ball off the wall
      */
     bool wallAlignDone(const Update& event);
@@ -145,35 +142,42 @@ struct BallPlacementPlayFSM
     bool ballPlaced(const Update& event);
 
     /**
-     * Guard on whether the robot has waited sufficiently
+     * Guard on whether the robot has waited sufficiently for the dribbler to stop
+     * spinning
+     *
      * @param event the BallPlacementPlayFSM Update event
+     *
      * @return whether the robot has waited for 3 seconds
      */
     bool waitDone(const Update& event);
 
     /**
      * Guard on whether the robot has retreated outside of the required range
+     *
      * @param event the BallPlacementPlayFSM Update event
+     *
      * @return whether the robot has retreated outside of the required range
      */
     bool retreatDone(const Update& event);
 
     /**
-     * Helper function for calculating the angle at which the robot must face towards to
-     * pick up ball
+     * Calculates the angle at which the robot must face towards and the location
+     * the robot should dribble the ball to in order to pick the ball off the wall
      *
-     * @param ball_pos the ball position to use when calculating the kick angle
+     * @param ball_pos the current ball position
      * @param field_lines the field lines of the playing area
      *
      * @return the kick angle
      */
-    std::pair<Angle, Point> calculateWallPickOffLocation(const Point& ball_pos,
-                                                         const Rectangle& field_lines,
-                                                         double max_dist);
+    std::pair<Angle, Point> calculateWallPickOffDest(const Point& ball_pos,
+                                                     const Rectangle& field_lines);
 
     /**
-     * Helper function that populates the move_tactics field with MoveTactics that
-     * organize the robots away from the ball placing robot
+     * Populates the move_tactics field with MoveTactics that organize the robots away
+     * from the ball placing robot
+     *
+     * Non goalie and non ball placing robots line up along a line just outside the
+     * friendly defense area and wait for ball placement to finish
      *
      * @param event the BallPlacementPlayFSM Update event
      * @param num_tactics the number of MoveTactics to populate move_tactics with
@@ -214,31 +218,33 @@ struct BallPlacementPlayFSM
             // src_state + event [guard] / action = dest_state
             *StartState_S + Update_E[!shouldPickOffWall_G] / alignPlacement_A =
                 AlignPlacementState_S,
-            StartState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
+            StartState_S + Update_E[shouldPickOffWall_G] / alignWall_A = AlignWallState_S,
 
-            AlignWallState_S + Update_E[!wallAlignDone_G && shouldPickOffWall_G] /
-                                   alignWall_A = AlignWallState_S,
-            AlignWallState_S + Update_E[wallAlignDone_G] / setPickOffDest_A =
-                PickOffWallState_S,
-            AlignWallState_S + Update_E[!shouldPickOffWall_G] = AlignPlacementState_S,
+            AlignWallState_S +
+                Update_E[!wallAlignDone_G && shouldPickOffWall_G] / alignWall_A,
+            AlignWallState_S + Update_E[wallAlignDone_G] /
+                                   (setPickOffDest_A, pickOffWall_A) = PickOffWallState_S,
+            AlignWallState_S + Update_E[!shouldPickOffWall_G] / alignPlacement_A =
+                AlignPlacementState_S,
 
-            PickOffWallState_S + Update_E[!wallPickOffDone_G] / pickOffWall_A =
-                PickOffWallState_S,
+            PickOffWallState_S + Update_E[!wallPickOffDone_G] / pickOffWall_A,
             PickOffWallState_S + Update_E[wallPickOffDone_G] / startWait_A =
                 ReleaseBallState_S,
 
-            AlignPlacementState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
+            AlignPlacementState_S + Update_E[shouldPickOffWall_G] / alignWall_A =
+                AlignWallState_S,
             AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A =
                 AlignPlacementState_S,
-            AlignPlacementState_S + Update_E[alignDone_G] = PlaceBallState_S,
+            AlignPlacementState_S + Update_E[alignDone_G] / placeBall_A =
+                PlaceBallState_S,
 
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = ReleaseBallState_S,
 
             ReleaseBallState_S + Update_E[!waitDone_G && ballPlaced_G] / releaseBall_A =
                 ReleaseBallState_S,
-            ReleaseBallState_S + Update_E[!ballPlaced_G] = StartState_S,
-            ReleaseBallState_S + Update_E[waitDone_G]    = RetreatState_S,
+            ReleaseBallState_S + Update_E[!ballPlaced_G]          = StartState_S,
+            ReleaseBallState_S + Update_E[waitDone_G] / retreat_A = RetreatState_S,
 
             RetreatState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
             RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatState_S,
@@ -247,6 +253,7 @@ struct BallPlacementPlayFSM
 
    private:
     TbotsProto::AiConfig ai_config;
+
     std::shared_ptr<BallPlacementMoveTactic> align_wall_tactic;
     std::shared_ptr<BallPlacementDribbleTactic> pickoff_wall_tactic;
     std::shared_ptr<BallPlacementDribbleTactic> place_ball_tactic;
@@ -254,12 +261,21 @@ struct BallPlacementPlayFSM
     std::shared_ptr<MoveTactic> retreat_tactic;
     std::shared_ptr<MoveTactic> wait_tactic;
     std::vector<std::shared_ptr<BallPlacementMoveTactic>> move_tactics;
+
     Point setup_point;
     Point pickoff_point;
     Point pickoff_destination;
     Angle pickoff_final_orientation;
     Timestamp start_time;
-    constexpr static double const RETREAT_DISTANCE_METERS         = 0.6;
-    constexpr static double const PLACEMENT_DIST_THRESHOLD_METERS = 0.15;
-    constexpr static double const BALL_IS_PLACED_WAIT_S           = 2.0;
+
+    static constexpr double BACK_AWAY_FROM_CORNER_EXTRA_M = 0.9;
+    static constexpr double BACK_AWAY_FROM_WALL_M         = ROBOT_MAX_RADIUS_METERS * 5.5;
+    static constexpr double MIN_DISTANCE_FROM_WALL_FOR_ALIGN_M =
+        ROBOT_MAX_RADIUS_METERS * 4;
+    static constexpr double RETREAT_DISTANCE_M         = 0.6;
+    static constexpr double PLACEMENT_DIST_THRESHOLD_M = 0.15;
+    static constexpr double WAITING_LINE_OFFSET_M      = ROBOT_MAX_RADIUS_METERS * 3;
+    static constexpr double BALL_IS_PLACED_WAIT_S      = 2.0;
+    static constexpr double ALIGNMENT_VECTOR_LENGTH_FACTOR =
+        ROBOT_MAX_RADIUS_METERS * 2.5;
 };
