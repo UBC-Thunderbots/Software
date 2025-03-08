@@ -113,7 +113,6 @@ class RefereeInfoWidget(QWidget):
         self.referee_table.resizeColumnsToContents()
         self.referee_table.resizeRowsToContents()
 
-
     def parse_yellow_card_times(self, team_info: TeamInfo) -> str:
         """Parses yellow card times from a TeamInfo Protobuf dict as a string output.
 

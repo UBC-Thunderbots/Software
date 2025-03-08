@@ -62,14 +62,12 @@ class PlayInfoWidget(QWidget):
             play_name.append(state)
 
         for robot_id in sorted(playinfo.robot_tactic_assignment):
-          robot_ids.append(robot_id)
-          tactic_fsm_states.append(
-              playinfo.robot_tactic_assignment[robot_id].tactic_fsm_state
-          )
+            robot_ids.append(robot_id)
+            tactic_fsm_states.append(
+                playinfo.robot_tactic_assignment[robot_id].tactic_fsm_state
+            )
 
-          tactic_names.append(
-              playinfo.robot_tactic_assignment[robot_id].tactic_name
-          )
+            tactic_names.append(playinfo.robot_tactic_assignment[robot_id].tactic_name)
         set_table_data(
             {
                 "Play": play_name,
