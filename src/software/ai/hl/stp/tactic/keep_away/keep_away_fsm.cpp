@@ -1,9 +1,4 @@
-//
-// Created by anniesun on 1/25/25.
-//
 #include "software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h"
-
-
 
 void KeepAwayFSM::keepAway(const Update& event,
                            boost::sml::back::process<DribbleFSM::Update> processEvent)
@@ -48,7 +43,6 @@ void KeepAwayFSM::keepAway(const Update& event,
     control_params = {.dribble_destination       = keepaway_dribble_dest,
                       .final_dribble_orientation = final_dribble_orientation,
                       .allow_excessive_dribbling = false};
-
 
     processEvent(DribbleFSM::Update(control_params, event.common));
 }

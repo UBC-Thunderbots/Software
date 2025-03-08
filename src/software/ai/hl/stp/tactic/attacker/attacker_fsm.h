@@ -75,12 +75,11 @@ struct AttackerFSM
 
         DEFINE_SML_GUARD(shouldKick)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, KeepAwayFSM) //
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, KeepAwayFSM)
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest_state
             *DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
-            DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A = KeepAwayFSM_S, // keep away action calls keepaway FSM
+            DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A = KeepAwayFSM_S,
             KeepAwayFSM_S + Update_E / keepAway_A,
             KeepAwayFSM_S = DribbleFSM_S,
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
@@ -88,6 +87,5 @@ struct AttackerFSM
     }
 
    private:
-    // the attacker tactic config
     TbotsProto::AiConfig ai_config;
 };
