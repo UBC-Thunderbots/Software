@@ -489,7 +489,7 @@ class MotorService
     std::set<uint8_t> enabled_motors;
 
     static const int MOTOR_FAULT_TIME_THRESHOLD_S = 60;
-    static const int MOTOR_FAULT_THRESHOLD_COUNT  = 3;
+    static const int MOTOR_FAULT_THRESHOLD_COUNT  = 4;
 
     // SPI Trinamic Motor Driver Paths (indexed with chip select above)
     static constexpr const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1",
@@ -500,8 +500,6 @@ class MotorService
     static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
                                                   "front_right", "dribbler"};
 
-
-    const std::optional<std::chrono::time_point<std::chrono::system_clock>> testingStartTime = std::make_optional(std::chrono::system_clock::now());
 };
 
 template <typename T>
