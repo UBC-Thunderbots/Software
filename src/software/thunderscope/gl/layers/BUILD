@@ -155,7 +155,7 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
-    ]
+    ],
 )
 
 py_library(
@@ -167,7 +167,7 @@ py_library(
         "//software/thunderscope:util",
         "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
-    ]
+    ],
 )
 
 py_library(
