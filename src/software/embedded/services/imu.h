@@ -34,7 +34,7 @@ private:
     static constexpr double IMU_FULL_SCALE_DPS = 1000.0;
 
     // Device path for the IMU
-    static constexpr char *IMU_DEVICE = "/dev/i2c-1";
+    inline static const std::string IMU_DEVICE = "/dev/i2c-1";
 
     // Various i2c registers.
     static const uint8_t WHOAMI_REG = 0xf;

@@ -30,16 +30,14 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive &primitive_m
     {
         trajectory_path_ = createTrajectoryPathFromParams(
             current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
-
         angular_trajectory_ =
             createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
                                               orientation_, angular_velocity_, robot_constants_);
 
-            time_since_linear_trajectory_creation_ =
+        time_since_linear_trajectory_creation_ =
                 Duration::fromSeconds(RTT_S/2);
-            time_since_angular_trajectory_creation_ =
+        time_since_angular_trajectory_creation_ =
                     Duration::fromSeconds(0);
-        }
     }
 }
 

@@ -47,7 +47,7 @@ __s32 i2c_smbus_write_byte_data(int file, __u8 command, __u8 value) {
 ImuService::ImuService() {
     initialized_ = false;
     // Establish connection to the IMU and verify that the who am I pin is correct.
-    file_descriptor_ = open(IMU_DEVICE, O_RDWR);
+    file_descriptor_ = open(IMU_DEVICE.c_str(), O_RDWR);
     int ret = ioctl(file_descriptor_, I2C_SLAVE_FORCE, 0x6b);
     if (ret < 0) {
         return;
