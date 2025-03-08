@@ -19,9 +19,9 @@ py_binary(
         ":robot_diagnostics_cli.py",
     ],
     data = [
+        "//proto:import_all_protos",
         "//software:py_constants.so",
         "//software:python_bindings.so",
-        "//proto:import_all_protos",
         "//software/embedded/constants:py_constants",
         "//software/thunderscope:thread_safe_buffer",
     ],
@@ -40,8 +40,8 @@ pkg_tar(
     name = "robot_diagnostics_cli_tar",
     srcs = [
         ":robot_diagnostics_cli_pkg",
-        ],
-    extension = "tar.gz"
+    ],
+    extension = "tar.gz",
 )
 
 pkg_executable(

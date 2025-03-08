@@ -22,7 +22,7 @@ EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
 
     constexpr auto enum_values = reflective_enum::values<EighteenZoneId>();
     std::copy(enum_values.begin(), enum_values.end(), std::back_inserter(zones_));
-    field_lines_               = std::make_shared<Rectangle>(field.fieldLines());
+    field_lines_ = std::make_shared<Rectangle>(field.fieldLines());
 }
 
 const Rectangle& EighteenZonePitchDivision::getZone(EighteenZoneId zone_id) const

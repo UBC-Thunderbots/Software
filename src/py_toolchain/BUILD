@@ -23,8 +23,6 @@ toolchain(
 
 toolchain(
     name = "py_cc_toolchain_for_host_x86_64",
-    toolchain = ":py_cc_toolchain_for_host_x86_64_data",
-    toolchain_type = "@rules_python//python/cc:toolchain_type",
     exec_compatible_with = [
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
@@ -33,6 +31,8 @@ toolchain(
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
+    toolchain = ":py_cc_toolchain_for_host_x86_64_data",
+    toolchain_type = "@rules_python//python/cc:toolchain_type",
 )
 
 py_cc_toolchain(
@@ -57,8 +57,6 @@ cc_library(
 
 toolchain(
     name = "k8_jetson_nano_cross_compile_py_cc_toolchain",
-    toolchain = ":k8_jetson_nano_cross_compile_py_cc_toolchain_data",
-    toolchain_type = "@rules_python//python/cc:toolchain_type",
     exec_compatible_with = [
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
@@ -67,4 +65,6 @@ toolchain(
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
     ],
+    toolchain = ":k8_jetson_nano_cross_compile_py_cc_toolchain_data",
+    toolchain_type = "@rules_python//python/cc:toolchain_type",
 )

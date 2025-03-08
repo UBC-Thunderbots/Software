@@ -25,9 +25,9 @@ py_binary(
         "//software/embedded/linux_configs/pi:pi_files",
         "//software/embedded/linux_configs/systemd:systemd_files",
         "//software/embedded/redis",
+        "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli_tar",
         "//software/embedded/services:robot_auto_test",
         "//software/power:powerloop_tar",
-        "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli_tar",
     ],
     deps = [
         requirement("ansible"),

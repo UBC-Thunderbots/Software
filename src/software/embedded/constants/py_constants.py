@@ -27,8 +27,9 @@ class EstopMode(IntEnum):
 ESTOP_PATH_1 = "/dev/ttyACM0"
 ESTOP_PATH_2 = "/dev/EstopUSB"
 
+
 def get_estop_config(
-        keyboard_estop: bool, disable_communication: bool
+    keyboard_estop: bool, disable_communication: bool
 ) -> tuple[EstopMode, os.PathLike]:
     """Based on the estop mode argument provided, gets the corresponding
     estop mode and estop path (defined for physical estop mode only)

@@ -1,7 +1,7 @@
 from proto.import_all_protos import *
 from embedded_data import EmbeddedData
 from google.protobuf.message import Message
-from software.embedded.constants.py_constants import (get_estop_config, EstopMode)
+from software.embedded.constants.py_constants import get_estop_config, EstopMode
 from rich.progress import track
 from threading import Thread
 import software.python_bindings as tbots_cpp
@@ -11,6 +11,7 @@ import time
 
 class EmbeddedCommunication:
     """Communication class for sending/executing protos with the robots"""
+
     BROADCAST_HZ = 1.0
     LOCALHOST_IP = "127.0.0.1"
 
@@ -43,14 +44,13 @@ class EmbeddedCommunication:
         # initialising the estop
         self.estop_reader = None
         self.should_send_stop = False
-        self.estop_mode, self.estop_path = (
-            get_estop_config(keyboard_estop=False, disable_communication=False))
+        self.estop_mode, self.estop_path = get_estop_config(
+            keyboard_estop=False, disable_communication=False
+        )
 
         # Always in PHYSICAL_ESTOP mode within CLI
         try:
-            self.estop_reader = tbots_cpp.ThreadedEstopReader(
-                self.estop_path, 115200
-            )
+            self.estop_reader = tbots_cpp.ThreadedEstopReader(self.estop_path, 115200)
             self.__update_estop_state()
         except Exception as e:
             raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
@@ -59,21 +59,29 @@ class EmbeddedCommunication:
         """Updates the dynamic information with the new RobotStatus message.
         :param robot_status: The incoming RobotStatus proto from the robot to read
         """
-        self.embedded_data.epoch_timestamp_seconds = robot_status.time_sent.epoch_timestamp_seconds
+        self.embedded_data.epoch_timestamp_seconds = (
+            robot_status.time_sent.epoch_timestamp_seconds
+        )
         self.embedded_data.battery_voltage = robot_status.power_status.battery_voltage
-        self.embedded_data.primitive_packet_loss_percentage = robot_status.network_status.primitive_packet_loss_percentage
-        self.embedded_data.primitive_executor_step_time_ms = robot_status.thunderloop_status.primitive_executor_step_time_ms
+        self.embedded_data.primitive_packet_loss_percentage = (
+            robot_status.network_status.primitive_packet_loss_percentage
+        )
+        self.embedded_data.primitive_executor_step_time_ms = (
+            robot_status.thunderloop_status.primitive_executor_step_time_ms
+        )
 
     def __should_send_packet(self) -> bool:
         """Returns True if a proto should be sent
         :return: boolean
         """
-        return (self.estop_mode != EstopMode.DISABLE_ESTOP) and not self.should_send_stop
+        return (
+            self.estop_mode != EstopMode.DISABLE_ESTOP
+        ) and not self.should_send_stop
 
     def send_primitive(self, primitive: Primitive) -> None:
         """Forward PrimitiveSet protos from diagnostics to the robots."""
         primitive.sequence_number = self.sequence_number
-        primitive.time_sent.epoch_timestamp_seconds=time.time()
+        primitive.time_sent.epoch_timestamp_seconds = time.time()
         self.sequence_number += 1
 
         if self.__should_send_packet() or self.should_send_stop:
@@ -101,22 +109,25 @@ class EmbeddedCommunication:
         else:
             self.send_primitive(diagnostics_primitive)
 
-    def run_primitive_over_time(self, duration_seconds: float, primitive_set: Primitive, description: str) -> None:
+    def run_primitive_over_time(
+        self, duration_seconds: float, primitive_set: Primitive, description: str
+    ) -> None:
         """Executes a primitive set synchronously for the specified amount of time in the console.
         :param duration_seconds: Duration to execute in seconds
         :param primitive_set: Primitive set to execute
         :param description: The UI description to display in the console
         """
-        for _ in track(range(int(duration_seconds / self.send_primitive_interval_s)),
-                       description=description):
+        for _ in track(
+            range(int(duration_seconds / self.send_primitive_interval_s)),
+            description=description,
+        ):
             self.run_primitive(primitive_set)
             time.sleep(self.send_primitive_interval_s)
 
     def __broadcast_fullsystem_ip(self) -> None:
         while self.running:
             self.fullsystem_ip_broadcaster.send_proto(
-                IpNotification(ip_address=EmbeddedCommunication.LOCALHOST_IP),
-                True
+                IpNotification(ip_address=EmbeddedCommunication.LOCALHOST_IP), True
             )
             time.sleep(1.0 / EmbeddedCommunication.BROADCAST_HZ)
 
@@ -130,8 +141,7 @@ class EmbeddedCommunication:
 
         # Unicast Receiver
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
-            ROBOT_STATUS_PORT,
-            self.__receive_robot_status
+            ROBOT_STATUS_PORT, self.__receive_robot_status
         )
 
         # Unicast Sender
@@ -139,7 +149,7 @@ class EmbeddedCommunication:
             EmbeddedCommunication.LOCALHOST_IP,
             PRIMITIVE_PORT,
             self.embedded_data.get_network_interface(),
-            False
+            False,
         )
         return self
 
