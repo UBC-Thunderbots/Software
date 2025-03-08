@@ -260,7 +260,8 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const AngularVelocity& initial_velocity, const RobotConstants& robot_constants);
 
 /**
- * Generate an angular trajectory path given angular trajectory proto parameters with an overridden starting orientation
+ * Generate an angular trajectory path given angular trajectory proto parameters with an
+ * overridden starting orientation
  *
  * @param params angular trajectory Path
  * @param start_angle Initial angle to use for the trajectory
@@ -269,8 +270,8 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
  * @return Generate angular trajectory
  */
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
-        const TbotsProto::TrajectoryParamsAngular1D& params, const Angle& start_angle,
-        const AngularVelocity& initial_velocity, const RobotConstants& robot_constants);
+    const TbotsProto::TrajectoryParamsAngular1D& params, const Angle& start_angle,
+    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants);
 
 /**
  * Convert dribbler mode to dribbler speed

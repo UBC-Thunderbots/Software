@@ -9,7 +9,8 @@
 #include "software/geom/vector.h"
 
 EuclideanToWheel::EuclideanToWheel(const RobotConstants_t& robot_constants)
-    : robot_center_to_wheel_m_(robot_constants.robot_center_to_wheel_center_m), robot_constants_(robot_constants)
+    : robot_center_to_wheel_m_(robot_constants.robot_center_to_wheel_center_m),
+      robot_constants_(robot_constants)
 {
     // Phi, the angle between the hemisphere line of the robot and the front wheel axles
     // [rads]

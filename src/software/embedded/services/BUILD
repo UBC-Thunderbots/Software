@@ -29,10 +29,10 @@ cc_library(
     hdrs = ["imu.h"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//software/logger",
         "//software/geom:angular_velocity",
+        "//software/logger",
         "@eigen",
-        "@usr//:libi2c"
+        "@usr//:libi2c",
     ],
 )
 

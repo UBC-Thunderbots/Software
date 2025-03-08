@@ -366,10 +366,9 @@ maybe(
 
 new_local_repository(
     name = "usr",
+    build_file = "@//extlibs:libi2c.BUILD",
     path = "/usr",
-    build_file = "@//extlibs:libi2c.BUILD"
 )
-
 
 load("@rules_third_party//libraries:bullet.bzl", "bullet")
 

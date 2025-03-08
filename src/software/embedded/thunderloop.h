@@ -11,13 +11,13 @@
 #include "shared/constants.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/redis/redis_client.h"
-#include "software/embedded/services/motor.h"
+#include "software/embedded/robot_localizer.h"
 #include "software/embedded/services/imu.h"
+#include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
-#include "software/embedded/robot_localizer.h"
 
 class Thunderloop
 {

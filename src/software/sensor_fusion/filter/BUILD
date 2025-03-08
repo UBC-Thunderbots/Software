@@ -105,10 +105,10 @@ cc_library(
     name = "kalman_filter",
     srcs = [],
     hdrs = ["kalman_filter.h"],
-    deps = [
-        "@eigen"
-    ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    deps = [
+        "@eigen",
+    ],
 )

@@ -87,7 +87,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_),
-      robot_localizer_(0.5, 0.01*0.01, 0.5*0.5, 0.1*0.1)
+      robot_localizer_(0.5, 0.01 * 0.01, 0.5 * 0.5, 0.1 * 0.1)
 {
     waitForNetworkUp();
 
@@ -269,23 +269,22 @@ void Thunderloop::runLoop()
             robot_localizer_.step(AngularVelocity::zero());
             auto imu_poll = imu_service_->pollHeadingRate();
 
-            if (imu_poll.has_value()) {
+            if (imu_poll.has_value())
+            {
                 robot_localizer_.updateImu(imu_poll.value());
             }
 
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
-                robot_localizer_.updateEncoders(createAngularVelocity(status.angular_velocity()));
+                robot_localizer_.updateEncoders(
+                    createAngularVelocity(status.angular_velocity()));
 
                 // step the robot localizer
 
-                primitive_executor_.updateState(
-                        createVector(status.local_velocity()),
-                        robot_localizer_.getAngularVelocity(),
-                        robot_localizer_.getOrientation());
-
-
+                primitive_executor_.updateState(createVector(status.local_velocity()),
+                                                robot_localizer_.getAngularVelocity(),
+                                                robot_localizer_.getOrientation());
             }
 
             // Timeout Overrides for Primitives

@@ -61,9 +61,10 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
+        "//software/embedded:robot_localizer",
         "//software/embedded/redis",
-        "//software/embedded/services:motor",
         "//software/embedded/services:imu",
+        "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",
         "//software/logger:network_logger",
@@ -71,7 +72,6 @@ cc_library(
         "//software/util/scoped_timespec_timer",
         "//software/world:team",
         "@tracy",
-        "//software/embedded:robot_localizer"
     ],
 )
 
@@ -126,12 +126,12 @@ cc_library(
     hdrs = ["robot_localizer.h"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//software/sensor_fusion/filter:kalman_filter",
+        "//software:constants",
+        "//software/embedded/services:imu",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
-        "//software:constants",
+        "//software/sensor_fusion/filter:kalman_filter",
         "//software/util/scoped_timespec_timer",
-        "//software/embedded/services:imu",
-        "@eigen"
-    ]
+        "@eigen",
+    ],
 )

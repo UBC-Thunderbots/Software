@@ -42,8 +42,7 @@ class PrimitiveExecutor
      * @param orientation The current orientation of the robot
      */
     void updateState(const Vector &local_velocity,
-                     const AngularVelocity &angular_velocity,
-                     const Angle &orientation);
+                     const AngularVelocity &angular_velocity, const Angle &orientation);
 
     /**
      * Set the robot id
@@ -98,8 +97,8 @@ class PrimitiveExecutor
     Duration time_step_;
     RobotId robot_id_;
 
-    // When driving, the robot will rotate the direction its driving away from its angular velocity, if this number is
-    // higher, it will lean away more from the turn.
+    // When driving, the robot will rotate the direction its driving away from its angular
+    // velocity, if this number is higher, it will lean away more from the turn.
     static constexpr double LEAN_BIAS = 2;
 
     static constexpr double ORENTATION_KP = 0.3;

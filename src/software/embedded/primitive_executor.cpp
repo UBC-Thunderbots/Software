@@ -30,14 +30,12 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive &primitive_m
     {
         trajectory_path_ = createTrajectoryPathFromParams(
             current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
-        angular_trajectory_ =
-            createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
-                                              orientation_, angular_velocity_, robot_constants_);
+        angular_trajectory_ = createAngularTrajectoryFromParams(
+            current_primitive_.move().w_traj_params(), orientation_, angular_velocity_,
+            robot_constants_);
 
-        time_since_linear_trajectory_creation_ =
-                Duration::fromSeconds(RTT_S/2);
-        time_since_angular_trajectory_creation_ =
-                    Duration::fromSeconds(0);
+        time_since_linear_trajectory_creation_  = Duration::fromSeconds(RTT_S / 2);
+        time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
     }
 }
 
@@ -51,9 +49,10 @@ void PrimitiveExecutor::updateState(const Vector &local_velocity,
                                     const Angle &orientation)
 {
     orientation_ = orientation.clamp();
-    Vector actual_global_velocity = localToGlobalVelocity(local_velocity, orientation.clamp());
-    velocity_                     = actual_global_velocity;
-    angular_velocity_             = angular_velocity;
+    Vector actual_global_velocity =
+        localToGlobalVelocity(local_velocity, orientation.clamp());
+    velocity_         = actual_global_velocity;
+    angular_velocity_ = angular_velocity;
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()
@@ -73,21 +72,27 @@ Vector PrimitiveExecutor::getTargetLinearVelocity()
     }
     return local_velocity;
 }
-AngularVelocity PrimitiveExecutor::getTargetAngularAcceleration() {
-    if (angular_trajectory_.has_value()) {
-        return angular_trajectory_->getAcceleration(time_since_angular_trajectory_creation_.toSeconds());
-    } else {
+AngularVelocity PrimitiveExecutor::getTargetAngularAcceleration()
+{
+    if (angular_trajectory_.has_value())
+    {
+        return angular_trajectory_->getAcceleration(
+            time_since_angular_trajectory_creation_.toSeconds());
+    }
+    else
+    {
         return Angle::zero();
     }
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 {
-    AngularVelocity angular_velocity =
-        angular_trajectory_->getVelocity(time_since_angular_trajectory_creation_.toSeconds());
+    AngularVelocity angular_velocity = angular_trajectory_->getVelocity(
+        time_since_angular_trajectory_creation_.toSeconds());
     Angle orientation_to_destination =
         orientation_.minDiff(angular_trajectory_->getDestination());
-    Angle error = orientation_.minSignedDiff(angular_trajectory_->getPosition(time_since_angular_trajectory_creation_.toSeconds()));
+    Angle error      = orientation_.minSignedDiff(angular_trajectory_->getPosition(
+        time_since_angular_trajectory_creation_.toSeconds()));
     angular_velocity = angular_velocity + error * ORENTATION_KP;
     if (orientation_to_destination.toDegrees() < 5)
     {
@@ -134,7 +139,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 return output;
             }
 
-            Vector local_velocity            = getTargetLinearVelocity();
+            Vector local_velocity                   = getTargetLinearVelocity();
             AngularVelocity target_angular_velocity = getTargetAngularVelocity();
 
             auto output = createDirectControlPrimitive(

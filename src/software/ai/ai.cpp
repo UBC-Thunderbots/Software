@@ -2,10 +2,10 @@
 
 #include <Tracy.hpp>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/play/halt_play/halt_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/tracy/tracy_constants.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 
 Ai::Ai(const TbotsProto::AiConfig& ai_config)
@@ -83,8 +83,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const WorldPtr& worl
                                            [this](InterPlayCommunication comm) {
                                                inter_play_communication = std::move(comm);
                                            });
-
-
     }
     else
     {
@@ -93,8 +91,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const WorldPtr& worl
                                               inter_play_communication = std::move(comm);
                                           });
     }
-    for(auto const &robot: world_ptr->friendlyTeam().getAllRobots()) {
-        (*primitive_set->mutable_robot_orientations())[robot.id()] = *createAngleProto(robot.orientation());
+    for (auto const& robot : world_ptr->friendlyTeam().getAllRobots())
+    {
+        (*primitive_set->mutable_robot_orientations())[robot.id()] =
+            *createAngleProto(robot.orientation());
     }
     FrameMarkEnd(TracyConstants::AI_FRAME_MARKER);
 

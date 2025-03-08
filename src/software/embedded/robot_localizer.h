@@ -2,40 +2,46 @@
 
 #include <Eigen/Dense>
 #include <deque>
+
+#include "proto/world.pb.h"
+#include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/sensor_fusion/filter/kalman_filter.h"
-#include "proto/world.pb.h"
 #include "time.h"
-#include "software/embedded/services/imu.h"
 
 /**
- * This class implements the KalmanFilter class to track robot orientation. It keeps a rolling history of the robot's state, so when vision updates come in, the filter can roll back and recompute with them.
+ * This class implements the KalmanFilter class to track robot orientation. It keeps a
+ * rolling history of the robot's state, so when vision updates come in, the filter can
+ * roll back and recompute with them.
  *
- * For information on the math and design of kalman filters, see relevant links in kalman_filter.h
+ * For information on the math and design of kalman filters, see relevant links in
+ * kalman_filter.h
  */
-class RobotLocalizer {
-public:
-    RobotLocalizer(double process_noise_variance, double vision_noise_variance, double encoder_noise_variance, double target_angular_acceleration_variance):
-    filter_(),
-    process_noise_variance_(process_noise_variance),// assumes process noise is a discrete time wiener process
-    history()
+class RobotLocalizer
+{
+   public:
+    RobotLocalizer(double process_noise_variance, double vision_noise_variance,
+                   double encoder_noise_variance,
+                   double target_angular_acceleration_variance)
+        : filter_(),
+          process_noise_variance_(
+              process_noise_variance),  // assumes process noise is a discrete time wiener
+                                        // process
+          history()
     {
-        // Set state covariance, this is mostly a tuned value. The digaonal is the variance of the Orientation, Ang Vel, and Ang Accel
-        filter_.P << 30, 0,  0,
-                     0,  4, 0,
-                     0,  0,  5;
+        // Set state covariance, this is mostly a tuned value. The digaonal is the
+        // variance of the Orientation, Ang Vel, and Ang Accel
+        filter_.P << 30, 0, 0, 0, 4, 0, 0, 0, 5;
         // Set control to state matrix, control space is a 1x1 matrix
         filter_.B << 0.0, 1, 0.0;
         // Set measurement variance.
-        filter_.R << vision_noise_variance, 0.0,                    0.0,                      0.0,
-                     0.0,                   encoder_noise_variance, 0.0,                      0.0,
-                     0.0,                   0.0,                    ImuService::IMU_VARIANCE, 0.0,
-                     0.0,                   0.0,                    0.0,                      target_angular_acceleration_variance;
+        filter_.R << vision_noise_variance, 0.0, 0.0, 0.0, 0.0, encoder_noise_variance,
+            0.0, 0.0, 0.0, 0.0, ImuService::IMU_VARIANCE, 0.0, 0.0, 0.0, 0.0,
+            target_angular_acceleration_variance;
         filter_.x = Eigen::Matrix<double, 3, 1>(0.0, 0.0, 0.0);
         clock_gettime(CLOCK_MONOTONIC, &current_time_);
         clock_gettime(CLOCK_MONOTONIC, &last_step_);
-
     }
 
     void step(const AngularVelocity& targetAcceleration);
@@ -89,30 +95,32 @@ public:
      */
     double getAngularAccelerationRadians();
 
-private:
+   private:
     /**
      * Structures for storing history of filter states.
      */
-    struct Predict {
+    struct Predict
+    {
         Eigen::Matrix<double, 3, 3> F;
         Eigen::Matrix<double, 3, 3> Q;
         Eigen::Matrix<double, 3, 1> B;
         Eigen::Matrix<double, 1, 1> u;
     };
-    struct Update {
+    struct Update
+    {
         Eigen::Matrix<double, 4, 3> H;
         Eigen::Matrix<double, 4, 1> z;
     };
-    struct FilterStep {
+    struct FilterStep
+    {
         Eigen::Matrix<double, 3, 1> pre_mean;
         Eigen::Matrix<double, 3, 3> pre_covariance;
         std::optional<Predict> prediction;
         std::optional<Update> update;
-        timespec birthday; // time at which step was executed
+        timespec birthday;  // time at which step was executed
     };
-    // The kalman filter has two main vectors, currently we are tracking in 3 dimensions and measuring in 4.
-    // State space vector:
-    // x = [
+    // The kalman filter has two main vectors, currently we are tracking in 3 dimensions
+    // and measuring in 4. State space vector: x = [
     //    Orientation,
     //    Angular velocity,
     //    Angular acceleration
@@ -132,5 +140,5 @@ private:
     timespec current_time_;
     timespec last_step_;
 
-    std::deque<FilterStep> history; // where 1st entry = newest
+    std::deque<FilterStep> history;  // where 1st entry = newest
 };
