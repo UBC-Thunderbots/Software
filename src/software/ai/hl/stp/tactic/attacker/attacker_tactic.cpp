@@ -17,7 +17,8 @@ AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()), KeepAwayFSM(ai_config), AttackerFSM(ai_config));
+            DribbleFSM(ai_config.dribble_tactic_config()), KeepAwayFSM(ai_config),
+            AttackerFSM(ai_config));
     }
 }
 
@@ -44,7 +45,8 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()), KeepAwayFSM(ai_config), AttackerFSM(ai_config));
+            DribbleFSM(ai_config.dribble_tactic_config()), KeepAwayFSM(ai_config),
+            AttackerFSM(ai_config));
     }
 
     std::optional<Shot> shot = calcBestShotOnGoal(
