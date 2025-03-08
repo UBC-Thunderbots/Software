@@ -42,7 +42,7 @@ If you are not using Windows 11 or the latest version of Windows 10 and would pr
 3. Now, let's install Ubuntu.
     - Download the WSL2 kernel from [here](https://docs.microsoft.com/en-us/windows/wsl/wsl2-kernel).
     - Open a PowerShell window and run command `wsl --set-default-version 2` to use WSL2 by default.
-    - Install Ubuntu 20.04 LTS, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS from the Microsoft Store.
+    - Install Ubuntu 22.04 LTS or Ubuntu 24.04 LTS from the Microsoft Store.
     - Open the Ubuntu app in the Start menu. It will open a command prompt and ask you to create a new UNIX username and password for your WSL2 Ubuntu installation. 
 
 ### X Server Setup

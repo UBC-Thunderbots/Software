@@ -99,13 +99,33 @@ class Thunderloop
     void updateErrorCodes();
 
     /**
+     * Poll the motor service.
+     *
+     * @param poll_time Populates the time taken to poll the service
+     * @param motor_control Control message for the motors
+     * @param time_since_prev_iteration Stores the time difference since the last call
+     */
+    TbotsProto::MotorStatus pollMotorService(
+        struct timespec &poll_time, const TbotsProto::MotorControl &motor_control,
+        const struct timespec &time_since_prev_iteration);
+
+    /**
+     * Poll the power service
+     *
+     * @param poll_time Populates the time taken to poll the service
+     *
+     * @return The polled power status message
+     */
+    TbotsProto::PowerStatus pollPowerService(struct timespec &poll_time);
+
+    /**
      * Wait for networking communication to be established. This function is blocking.
      */
     void waitForNetworkUp();
 
 
     // Input Msg Buffers
-    TbotsProto::PrimitiveSet primitive_set_;
+    TbotsProto::World world_;
     TbotsProto::Primitive primitive_;
     TbotsProto::DirectControlPrimitive direct_control_;
 

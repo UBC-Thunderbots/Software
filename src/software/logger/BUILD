@@ -33,12 +33,16 @@ cc_library(
 
 cc_library(
     name = "network_logger",
+    srcs = [
+        "network_logger.cpp",
+    ],
     hdrs = [
         "network_logger.h",
     ],
     deps = [
         ":coloured_cout_sink",
         ":network_sink",
+        "//software/world:robot_state",
         "@g3log",
         "@g3sinks",
     ],
