@@ -1,8 +1,7 @@
 ---
-
-- name: check internet connection
+- name: Check internet connection
   tags: check_internet
-  uri:
-    url: "https://google.com"
-    timeout: 30
-    status_code: 200
+  ansible.builtin.uri:
+    url: http://google.com
+  retries: 6
+  delay: 5
