@@ -228,7 +228,7 @@ class World final
 
 
     /**
-     * A a list of virtual obstacles
+     * Set the list of virtual obstacles
      *
      * @param virtual_obstacles a list of the virtual_obstacles
      */
