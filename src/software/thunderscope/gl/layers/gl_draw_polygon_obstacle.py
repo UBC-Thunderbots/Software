@@ -60,6 +60,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             polygon.hide()
         self.rendering_polygons.clear()
         self.current_polygon.hide()
+        self.current_polygon.setParent(None)
         self.current_polygon = GLPolygon(parent_item=self, line_width=2)
 
         self._send_to_fs()
