@@ -21,8 +21,7 @@ static inline PriorityTacticVector makeTimeoutFormation(WorldPtr world)
 
     // making a t like formation
     std::for_each(timeoout_formation_points.begin(), timeoout_formation_points.end(),
-                  [&](Point point)
-                  {
+                  [&](Point point) {
                       std::shared_ptr<MoveTactic> move_tactic =
                           std::make_shared<MoveTactic>();
                       move_tactic->updateControlParams(point, Angle::zero());
