@@ -102,7 +102,8 @@ void FreeKickPlayFSM::setReceiverAndDefenderTactics(
     {
         defense_play->updateTactics(PlayUpdate(
             event.common.world_ptr, num_defenders,
-            [&tactics_to_run](PriorityTacticVector new_tactics) {
+            [&tactics_to_run](PriorityTacticVector new_tactics)
+            {
                 for (const auto &tactic_vector : new_tactics)
                 {
                     tactics_to_run.push_back(tactic_vector);

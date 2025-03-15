@@ -42,7 +42,8 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield)
+        {
             // We check if the robot reaches the desired orientation, at the
             // desired position before checking if the ball has been received.
             //
@@ -132,7 +133,8 @@ TEST_P(ReceiverTacticTestOneTouch, test_one_touch)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield)
+        {
             // We just care if we scored!
             friendlyScored(world_ptr, yield);
         }};

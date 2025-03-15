@@ -38,9 +38,8 @@ bool CreaseDefenderFSM::isAnyEnemyInZone(const Update& event, const Stadium& zon
 {
     std::vector<Robot> enemy_robots = event.common.world_ptr->enemyTeam().getAllRobots();
     return std::any_of(enemy_robots.begin(), enemy_robots.end(),
-                       [zone, enemy_robots](const Robot& robot) {
-                           return contains(zone, robot.position());
-                       });
+                       [zone, enemy_robots](const Robot& robot)
+                       { return contains(zone, robot.position()); });
 }
 
 void CreaseDefenderFSM::blockThreat(
@@ -168,7 +167,7 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
     auto front_segment = Segment(inflated_defense_area.posXPosYCorner(),
                                  inflated_defense_area.posXNegYCorner());
     auto left_segment  = Segment(inflated_defense_area.posXPosYCorner(),
-                                inflated_defense_area.negXPosYCorner());
+                                 inflated_defense_area.negXPosYCorner());
     auto right_segment = Segment(inflated_defense_area.posXNegYCorner(),
                                  inflated_defense_area.negXNegYCorner());
     std::vector<Point> front_intersections = intersection(ray, front_segment);

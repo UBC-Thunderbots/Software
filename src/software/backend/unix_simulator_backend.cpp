@@ -20,9 +20,8 @@ UnixSimulatorBackend::UnixSimulatorBackend(
         [&](TbotsProto::RobotStatus& msg) { receiveRobotStatus(msg); }, proto_logger));
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
-        runtime_dir + SSL_WRAPPER_PATH,
-        [&](SSLProto::SSL_WrapperPacket& msg) { receiveSSLWrapperPacket(msg); },
-        proto_logger));
+        runtime_dir + SSL_WRAPPER_PATH, [&](SSLProto::SSL_WrapperPacket& msg)
+        { receiveSSLWrapperPacket(msg); }, proto_logger));
 
     ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
         runtime_dir + SSL_REFEREE_PATH,

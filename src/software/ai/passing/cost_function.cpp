@@ -138,9 +138,8 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
     }
     std::vector<double> enemy_intercept_risks(enemy_robots.size());
     std::transform(enemy_robots.begin(), enemy_robots.end(),
-                   enemy_intercept_risks.begin(), [&](const Robot& robot) {
-                       return calculateInterceptRisk(robot, pass, passing_config);
-                   });
+                   enemy_intercept_risks.begin(), [&](const Robot& robot)
+                   { return calculateInterceptRisk(robot, pass, passing_config); });
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 

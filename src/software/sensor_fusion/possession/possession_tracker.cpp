@@ -48,9 +48,8 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
         auto enemy_team_robots = enemy_team.getAllRobotsExceptGoalie();
         auto num_enemies_in_friendly_half =
             std::count_if(enemy_team_robots.begin(), enemy_team_robots.end(),
-                          [&field](const auto &enemy) {
-                              return field.pointInFriendlyHalf(enemy.position());
-                          });
+                          [&field](const auto &enemy)
+                          { return field.pointInFriendlyHalf(enemy.position()); });
 
         if (field.pointInFriendlyHalf(ball.position()) ||
             num_enemies_in_friendly_half > 0)

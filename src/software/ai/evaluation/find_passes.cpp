@@ -24,9 +24,8 @@ std::vector<Robot> findOpenFriendlyRobots(const Team& friendly_team,
     for (const Robot& friendly : friendly_team.getAllRobots())
     {
         if (std::all_of(obstacles.begin(), obstacles.end(),
-                        [friendly](const Circle enemy_circle) {
-                            return !contains(enemy_circle, friendly.position());
-                        }))
+                        [friendly](const Circle enemy_circle)
+                        { return !contains(enemy_circle, friendly.position()); }))
         {
             open_robots.push_back(friendly);
         }
@@ -56,9 +55,8 @@ AllPasses findAllPasses(const Robot& robot, const Team& friendly_team,
         obstacles.erase(remove(obstacles.begin(), obstacles.end(), obstacle));
         Segment possible_pass = Segment(robot.position(), open_robot.position());
         if (std::any_of(obstacles.begin(), obstacles.end(),
-                        [possible_pass](const Circle obstacle) {
-                            return intersects(possible_pass, obstacle);
-                        }))
+                        [possible_pass](const Circle obstacle)
+                        { return intersects(possible_pass, obstacle); }))
         {
             indirect_passes.push_back(open_robot);
         }

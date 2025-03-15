@@ -38,7 +38,8 @@ TEST_F(MoveTacticTest, test_move_across_field)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -81,7 +82,8 @@ TEST_F(MoveTacticTest, test_autochip_move)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -114,8 +116,8 @@ TEST_F(MoveTacticTest, test_autokick_move)
                                   AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
-         field.enemyDefenseArea().negXNegYCorner(),
-         field.enemyDefenseArea().negXPosYCorner()});
+            field.enemyDefenseArea().negXNegYCorner(),
+            field.enemyDefenseArea().negXPosYCorner()});
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(
@@ -127,7 +129,8 @@ TEST_F(MoveTacticTest, test_autokick_move)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -170,7 +173,8 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(1 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);
@@ -217,7 +221,8 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(-4 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);

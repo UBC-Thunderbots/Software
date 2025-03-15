@@ -57,7 +57,8 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [behind_ball_region](std::shared_ptr<World> world_ptr,
-                             ValidationCoroutine::push_type& yield) {
+                             ValidationCoroutine::push_type& yield)
+        {
             robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, world_ptr->field().friendlyGoalCenter(), 0.05,
                             yield);
@@ -137,7 +138,8 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 10 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(10))
             {
                 yield("simulated penalty kick goalie test not finished!");
@@ -145,9 +147,8 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            enemyNeverScores(world_ptr, yield);
-        }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { enemyNeverScores(world_ptr, yield); }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
