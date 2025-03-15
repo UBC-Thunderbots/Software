@@ -46,7 +46,7 @@ install_cross_compiler() {
         file_name=aarch64-tbots-linux-gnu-for-x86
     fi
     full_file_name=$file_name.tar.xz
-    wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/tbots_compiler/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
+    wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
     tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
     sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
     rm /tmp/tbots_download_cache/$full_file_name
