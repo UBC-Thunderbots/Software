@@ -177,3 +177,29 @@ jobs:
           name: yellow-ai-vs-ai-proto-logs
           path: |
             /tmp/tbots/yellow/proto_*
+
+  common-commands:
+    strategy:
+      matrix:
+        commands:
+          - bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --run_blue --run_diagnostics --interface lo --keyboard_estop --ci_mode
+          - bazel run --run_under="xvfb-run" //software/ai/hl/stp/tactic/goalie:goalie_tactic_test -- --enable_thunderscope
+
+    name: Sanity Check on Common Commands
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Environment Setup
+        run: |
+         "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+
+      - name: Build Thunderscope
+        run: |
+          cd src
+          bazel build //software/thunderscope:thunderscope_main
+
+      - name: Check Common Commands
+        run: |
+          cd src
+          ../scripts/safe_run.sh ${{ matrix.commands }}
