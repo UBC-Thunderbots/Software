@@ -14,22 +14,23 @@ LOG_FILE=$(mktemp)
 "$@" &> "$LOG_FILE" &
 CMD_PID=$!
 
+echo "Process Running in Wrapper with Timeout $TIME_LIMIT ..."
+
 # Time the process
 SECONDS=0
 while kill -0 $CMD_PID 2>/dev/null; do
     # Check if time is up
     if [ $SECONDS -ge $TIME_LIMIT ]; then
         echo "Time limit reached, stopping process: $CMD_PID"
-        kill $CMD_PID
+        kill -SIGINT $CMD_PID
         wait $CMD_PID
         exit 0  # Upon time out and no error, returns 0 status code
     fi
 
     # Check if the log contains Traceback
     if grep -q "$ERROR_PATTERN" "$LOG_FILE"; then
-	cat $LOG_FILE
         echo "[Error detected] Potential error found in command output!"
-        kill $CMD_PID
+        kill -SIGINT $CMD_PID
         wait $CMD_PID
         exit 1
     fi
@@ -37,6 +38,7 @@ while kill -0 $CMD_PID 2>/dev/null; do
     sleep 1  # Run this loop once per second
 done
 
+cat $LOG_FILE
 # Get the exit code of the process
 wait $CMD_PID
 EXIT_CODE=$?

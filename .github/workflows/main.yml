@@ -184,8 +184,9 @@ jobs:
       fail-fast: false
       matrix:
         commands:
-          - bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main -- --run_blue --run_diagnostics --interface lo --keyboard_estop --ci_mode
-          - bazel run --run_under="xvfb-run" //software/ai/hl/stp/tactic/goalie:goalie_tactic_test -- --enable_thunderscope
+          - ../scripts/safe_run.sh bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main -- --run_blue --run_diagnostics --interface lo --keyboard_estop --ci_mode
+          - ../scripts/safe_run.sh bazel run --run_under="xvfb-run" //software/ai/hl/stp/tactic/goalie:goalie_tactic_test -- --enable_thunderscope
+          - ../scripts/safe_run.sh bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main -- --enable_autoref --ci_mode && ../scripts/safe_run.sh bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main -- blue_log="$(find /tmp/tbots/blue -maxdepth 1 -type d -name 'proto_*' -printf '/tmp/tbots/blue/%f\n' 2>/dev/null | head -n1)"
 
     name: Sanity Check on Common Commands
     runs-on: ubuntu-20.04
@@ -200,9 +201,9 @@ jobs:
         run: |
           cd src
           bazel build //software/thunderscope:thunderscope_main
-
+ 
       - name: Check Common Commands
         run: |
           cd src
-          ../scripts/safe_run.sh ${{ matrix.commands }}
+          ${{ matrix.commands }}
 
