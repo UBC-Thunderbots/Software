@@ -1,9 +1,9 @@
-from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
 from software.thunderscope.common.common_widgets import set_table_data
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from google.protobuf.json_format import MessageToDict
 
 
 class RefereeInfoWidget(QWidget):
