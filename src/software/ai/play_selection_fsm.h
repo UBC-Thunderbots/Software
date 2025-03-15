@@ -102,7 +102,7 @@ struct PlaySelectionFSM
             Halt_S + Update_E[gameStateTimeout_G] / setupTimeoutPlay_A  = Timeout_S,
 
             // Timeout Eventes
-            Timeout_S + Update_E[gameStateTimeout_G] / setupTimeoutPlay_A     = Timeout_S,
+            Timeout_S + Update_E[gameStateTimeout_G] / setupTimeoutPlay_A  = Timeout_S,
             Timeout_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
             Timeout_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
             Timeout_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
@@ -119,6 +119,7 @@ struct PlaySelectionFSM
             Playing_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
             Playing_S + Update_E[gameStateStopped_G] / setupStopPlay_A     = Stop_S,
             Playing_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            Playing_S + Update_E[gameStateTimeout_G] / setupTimeoutPlay_A  = Timeout_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play
@@ -129,6 +130,7 @@ struct PlaySelectionFSM
             SetPlay_S + Update_E[gameStatePlaying_G] /
                             (resetSetPlay_A, setupOffensePlay_A) = Playing_S,
             SetPlay_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A,
+            SetPlay_S + Update_E[gameStateTimeout_G] / setupTimeoutPlay_A = Timeout_S,
 
             X + Update_E = X);
     }

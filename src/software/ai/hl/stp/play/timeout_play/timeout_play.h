@@ -5,8 +5,8 @@
 #include "software/ai/hl/stp/play/timeout_play/timeout_play_fsm.h"
 
 /**
- * A Play that stops all the robots on the field. This is primarily used to obey the
- * referee "Halt" command, as well as a fallback for when we don't have a play assigned.
+ *  A play that represents timeout formation. This would make the format
+ *  make a t like formation
  */
 class TimeoutPlay : public Play
 {

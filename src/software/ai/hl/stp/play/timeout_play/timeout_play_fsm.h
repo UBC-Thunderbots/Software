@@ -17,14 +17,15 @@ struct TimeoutPlayFSM
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Creates a Halt Play FSM
+     * Creates a TimeoutPlay FSM
      *
      * @param ai_config the play config for this FSM
      */
     explicit TimeoutPlayFSM(TbotsProto::AiConfig ai_config);
 
     /**
-     *Action to make the robot make a T like formation in half time
+     * Action to make the robot make a T like formation in half time
+     *
      * @param event the TimeoutPlayFSM event
      */
     void updateTimeout(const Update& event);
