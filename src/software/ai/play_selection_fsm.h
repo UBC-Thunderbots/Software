@@ -11,6 +11,7 @@ struct PlaySelectionFSM
     class Stop;
     class SetPlay;
     class OverridePlay;
+    class Timeout;
 
     struct Update
     {
@@ -44,6 +45,7 @@ struct PlaySelectionFSM
     bool gameStateHalted(const Update& event);
     bool gameStatePlaying(const Update& event);
     bool gameStateSetupRestart(const Update& event);
+    bool gameStateTimeout(const Update& event);
 
     /**
      * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay, or OffensePlay
@@ -55,6 +57,7 @@ struct PlaySelectionFSM
     void setupStopPlay(const Update& event);
     void setupHaltPlay(const Update& event);
     void setupOffensePlay(const Update& event);
+    void setupTimeoutPlay(const Update& event);
 
     /**
      * Action to reset the current SetPlay to none
@@ -71,11 +74,13 @@ struct PlaySelectionFSM
         DEFINE_SML_STATE(Halt)
         DEFINE_SML_STATE(Playing)
         DEFINE_SML_STATE(Stop)
+        DEFINE_SML_STATE(Timeout)
 
         DEFINE_SML_GUARD(gameStateStopped)
         DEFINE_SML_GUARD(gameStateHalted)
         DEFINE_SML_GUARD(gameStatePlaying)
         DEFINE_SML_GUARD(gameStateSetupRestart)
+        DEFINE_SML_GUARD(gameStateTimeout)
 
         DEFINE_SML_EVENT(Update)
 
@@ -84,6 +89,7 @@ struct PlaySelectionFSM
         DEFINE_SML_ACTION(setupHaltPlay)
         DEFINE_SML_ACTION(setupOffensePlay)
         DEFINE_SML_ACTION(resetSetPlay)
+        DEFINE_SML_ACTION(setupTimeoutPlay)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -93,12 +99,20 @@ struct PlaySelectionFSM
             *Halt_S + Update_E[gameStateStopped_G] / setupStopPlay_A    = Stop_S,
             Halt_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
             Halt_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            Halt_S + Update_E[gameStateTimeout_G] / setupTimeoutPlay_A  = Timeout_S,
+
+            // Timeout Eventes
+            Timeout_S + Update_E[gameStateTimeout_G] / setupTimeoutPlay_A     = Timeout_S,
+            Timeout_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
+            Timeout_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
+            Timeout_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play
             Stop_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
             Stop_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
             Stop_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            Stop_S + Update_E[gameStateTimeout_G] / setupTimeoutPlay_A  = Timeout_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play

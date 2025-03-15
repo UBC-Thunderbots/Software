@@ -11,6 +11,7 @@
 #include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
 #include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
 #include "software/ai/hl/stp/play/stop_play.h"
+#include "software/ai/hl/stp/play/timeout_play/timeout_play.h"
 
 
 PlaySelectionFSM::PlaySelectionFSM(TbotsProto::AiConfig ai_config)
@@ -31,6 +32,13 @@ bool PlaySelectionFSM::gameStateHalted(const Update& event)
 bool PlaySelectionFSM::gameStatePlaying(const Update& event)
 {
     return event.game_state.isPlaying();
+}
+
+bool PlaySelectionFSM::gameStateTimeout(const Update& event)
+{
+    RefereeCommand command = event.game_state.getRefereeCommand();
+    return command == RefereeCommand::TIMEOUT_US ||
+           command == RefereeCommand::TIMEOUT_THEM;
 }
 
 bool PlaySelectionFSM::gameStateSetupRestart(const Update& event)
@@ -120,6 +128,11 @@ void PlaySelectionFSM::setupHaltPlay(const Update& event)
 void PlaySelectionFSM::setupOffensePlay(const Update& event)
 {
     event.set_current_play(std::make_unique<OffensePlay>(ai_config));
+}
+
+void PlaySelectionFSM::setupTimeoutPlay(const Update& event)
+{
+    event.set_current_play(std::make_unique<TimeoutPlay>(ai_config));
 }
 
 void PlaySelectionFSM::resetSetPlay(const Update& event)
