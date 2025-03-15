@@ -43,9 +43,10 @@ static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
 static const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
-static const short unsigned int ROBOT_STATUS_PORT = 42071;
-static const short unsigned int ROBOT_LOGS_PORT   = 42072;
-static const short unsigned int ROBOT_CRASH_PORT  = 42074;
+static const short unsigned int ROBOT_STATUS_PORT      = 42071;
+static const short unsigned int ROBOT_LOGS_PORT        = 42072;
+static const short unsigned int ROBOT_CRASH_PORT       = 42074;
+static const short unsigned int NETWORK_COMM_TEST_PORT = 42075;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
@@ -151,6 +152,10 @@ static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
 // The total number of possible robot ids between two teams
 static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 
+// How many robots are allowed in each division
+static const unsigned int DIV_A_NUM_ROBOTS = 11;
+static const unsigned int DIV_B_NUM_ROBOTS = 6;
+
 // The maximum time in seconds given to Full System to cleanly exit the process.
 static const double MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC = 0.5;
 
@@ -172,9 +177,6 @@ static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND;
-// How many robots are allowed in each division
-static const unsigned DIV_A_NUM_ROBOTS = 11;
-static const unsigned DIV_B_NUM_ROBOTS = 6;
 
 // Kick Spd to Pulse Width Safety Constraint Constants
 

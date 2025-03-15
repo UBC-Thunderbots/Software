@@ -1,4 +1,5 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
+#include "software/geom/algorithms/distance.h"
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
@@ -38,12 +39,36 @@ Point ShadowEnemyFSM::findBlockShotPoint(const Robot &robot, const Field &field,
 bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
 {
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
-    if (enemy_threat_opt.has_value())
-    {
-        return enemy_threat_opt.value().has_ball;
-    };
 
+    if(enemy_threat_opt.has_value()){
+bool near_ball = distance(event.common.world_ptr->ball().position(), enemy_threat_opt.value().robot.position()) < 0.22;
+
+        return near_ball;
+    
+    }
     return false;
+}
+
+bool ShadowEnemyFSM::blockedShot(const Update &event){
+
+    auto ball_position = event.common.world_ptr->ball().position();
+    Ray shot_block_direction(ball_position, event.common.robot.position() - ball_position);  
+    Segment goalLine(event.common.world_ptr->field().friendlyGoal().posXNegYCorner(), 
+        event.common.world_ptr->field().friendlyGoal().posXPosYCorner());
+ 
+    bool ball_blocked = intersects(goalLine, shot_block_direction);
+    return ball_blocked;
+
+}
+
+
+bool ShadowEnemyFSM::contestedBall(const Update &event)
+{
+//OK so basically you need to change thresholds for how close
+////in robot.h there is a isneardribbler function u can use instead of this breakbeams stuff
+    bool robot_contesting = distance(event.common.world_ptr->ball().position(), event.common.robot.position()) < 0.08;
+
+    return robot_contesting;
 }
 
 void ShadowEnemyFSM::blockPass(const Update &event)
@@ -110,7 +135,7 @@ void ShadowEnemyFSM::blockShot(const Update &event,
     processEvent(MoveFSM::Update(control_params, event.common));
 }
 
-void ShadowEnemyFSM::stealAndChip(const Update &event)
+void ShadowEnemyFSM::goAndSteal(const Update &event)
 {
     auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
@@ -121,5 +146,21 @@ void ShadowEnemyFSM::stealAndChip(const Update &event)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
+}
+
+void ShadowEnemyFSM::stealAndPull(const Update &event)
+{
+    auto ball_position = event.common.world_ptr->ball().position();
+    auto face_ball_orientation =
+        (ball_position - event.common.robot.position()).orientation();
+    auto pull_to_here = 
+        (event.common.robot.position() - ball_position) * 2 + ball_position;
+
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, pull_to_here, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
 }

@@ -71,7 +71,10 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DefenseState
-DefenseState --> DefenseState : <i>defendAgainstThreats</i>
+DefenseState --> AggressiveDefenseState : [shouldDefendAggressively]\n<i>shadowAndBlockShots</i>
+DefenseState --> DefenseState : <i>blockShots</i>
+AggressiveDefenseState --> DefenseState : [!shouldDefendAggressively]\n<i>blockShots</i>
+AggressiveDefenseState --> AggressiveDefenseState : <i>shadowAndBlockShots</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -314,6 +317,21 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [HaltFSM](/src/software/ai/hl/stp/tactic/halt/halt_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StopState
+StopState --> StopState : [!stopDone]\n<i>updateStop</i>
+StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+
+```
+
 ## [KickFSM](/src/software/ai/hl/stp/tactic/kick/kick_fsm.h)
 
 ```mermaid
@@ -438,21 +456,6 @@ StealAndChipState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPas
 Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
-
-```
-
-## [StopFSM](/src/software/ai/hl/stp/tactic/stop/stop_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> StopState
-StopState --> StopState : [!stopDone]\n<i>updateStop</i>
-StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 
 ```
 

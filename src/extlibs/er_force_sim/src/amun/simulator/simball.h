@@ -23,78 +23,83 @@
 
 #include <btBulletDynamicsCommon.h>
 
-#include <QtCore/QObject>
-
+#include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/protobuf/command.pb.h"
-#include "extlibs/er_force_sim/src/protobuf/sslsim.h"
+#include "extlibs/er_force_sim/src/protobuf/world.pb.h"
+#include "proto/ssl_vision_detection.pb.h"
 #include "shared/constants.h"
-#include "simfield.h"
-
-class RNG;
-namespace SSLProto
-{
-    class SSL_DetectionBall;
-}
 
 namespace camun
 {
     namespace simulator
     {
         class SimBall;
-        enum class ErrorSource;
     }  // namespace simulator
 }  // namespace camun
 
-class camun::simulator::SimBall : public QObject
+class camun::simulator::SimBall
 {
-    Q_OBJECT
    public:
-    SimBall(RNG *rng, btDiscreteDynamicsWorld *world);
+    SimBall(std::shared_ptr<btDiscreteDynamicsWorld> world);
     ~SimBall();
-    SimBall(const SimBall &) = delete;
-    SimBall &operator=(const SimBall &) = delete;
-
-   signals:
-    void sendSSLSimError(const SSLSimError &error, ErrorSource s);
 
    public:
     /**
-     * processes velocity and forces to be applied on the ball
-     * @param robot_collision whether the ball collides with a robot in this simulation
-     * tick
+     * Processes velocity and forces to be applied on the ball
+     *
+     * @param robot_collision whether the ball collides with a robot in
+     * this simulation tick
      */
     void begin(bool robot_collision);
-    bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
+
+    bool update(SSLProto::SSL_DetectionBall &ball, float stddev, float stddevArea,
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
                 float visibilityThreshold, btVector3 positionOffset);
+
     void move(const sslsim::TeleportBall &ball);
+
     void kick(const btVector3 &power);
-    // returns the ball position projected onto the floor (z component is not included)
+
+    /**
+     * Returns the ball's position projected onto the floor (z component is not included)
+     *
+     * @return the ball position
+     */
     btVector3 position() const;
+
+    /**
+     * Returns the ball's linear velocity
+     *
+     * @return the ball velocity
+     */
     btVector3 speed() const;
-    void writeBallState(world::SimBall *ball) const;
+
+    void writeBallState(world::SimBall &ball) const;
+
     void restoreState(const world::SimBall &ball);
+
     btRigidBody *body() const
     {
-        return m_body;
+        return m_body.get();
     }
+
     bool isInvalid() const;
 
     // can be used to add ball mis-detections
-    bool addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, float stddev,
+    bool addDetection(SSLProto::SSL_DetectionBall &ball, btVector3 pos, float stddev,
                       float stddevArea, const btVector3 &cameraPosition,
                       bool enableInvisibleBall, float visibilityThreshold,
                       btVector3 positionOffset);
 
    private:
-    RNG *m_rng;
-    btDiscreteDynamicsWorld *m_world;
-    btCollisionShape *m_sphere;
-    btRigidBody *m_body;
-    btMotionState *m_motionState;
+    RNG m_rng;
+    std::shared_ptr<btDiscreteDynamicsWorld> m_world;
+    std::unique_ptr<btCollisionShape> m_sphere;
+    std::unique_ptr<btRigidBody> m_body;
+    std::unique_ptr<btMotionState> m_motionState;
     sslsim::TeleportBall m_move;
-    double rolling_speed;
-    bool set_transition_speed;
+    double m_rolling_speed;
+    bool m_set_transition_speed;
 
     enum BallState
     {
@@ -103,7 +108,8 @@ class camun::simulator::SimBall : public QObject
         SLIDING,
         ROLLING
     };
-    BallState current_ball_state;
+
+    BallState m_current_ball_state;
 };
 
 #endif  // SIMBALL_H

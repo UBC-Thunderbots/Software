@@ -11,9 +11,9 @@ from software.thunderscope.thunderscope_types import (
     WidgetStretchData,
 )
 import pyqtgraph
+import qdarktheme
 import signal
 import os
-import qdarktheme
 
 
 @dataclass
@@ -252,24 +252,12 @@ def configure_base_diagnostics(
             anchor="Logs",
         ),
         TScopeWidget(
-            name="Drive and Dribbler",
-            widget=setup_drive_and_dribbler_widget(
+            name="Diagnostics",
+            widget=setup_diagnostics_widget(
                 **{"proto_unix_io": diagnostics_proto_unix_io}
             ),
             anchor="Logs",
             position=WidgetPosition.RIGHT,
-        ),
-        TScopeWidget(
-            name="Chicker",
-            widget=setup_chicker_widget(**{"proto_unix_io": diagnostics_proto_unix_io}),
-            anchor="Drive and Dribbler",
-            position=WidgetPosition.BELOW,
-        ),
-        TScopeWidget(
-            name="Manual Control Input",
-            widget=setup_diagnostics_input_widget(),
-            anchor="Chicker",
-            position=WidgetPosition.TOP,
         ),
     ] + extra_widgets
 
@@ -475,6 +463,7 @@ def configure_replay_view(
     initialize_application()
 
     if blue_replay_log:
+        blue_refresh_func_counter = FrameTimeCounter()
         proto_unix_io_map[ProtoUnixIOTypes.BLUE] = ProtoUnixIO()
         tabs.append(
             TScopeTab(
@@ -486,12 +475,16 @@ def configure_replay_view(
                     replay=True,
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
+                    extra_widgets = [configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.BLUE])],
+                    frame_swap_counter=FrameTimeCounter(),
+                    refresh_counter=blue_refresh_func_counter,
                 ),
+                refresh_counter=blue_refresh_func_counter,
             )
         )
 
     if yellow_replay_log:
+        yellow_refresh_func_counter = FrameTimeCounter()
         proto_unix_io_map[ProtoUnixIOTypes.YELLOW] = ProtoUnixIO()
         tabs.append(
             TScopeTab(
@@ -505,8 +498,11 @@ def configure_replay_view(
                     replay=True,
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
+                    extra_widgets = [configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])],
+                    frame_swap_counter=FrameTimeCounter(),
+                    refresh_counter=yellow_refresh_func_counter,
                 ),
+                refresh_counter=yellow_refresh_func_counter,
             )
         )
 

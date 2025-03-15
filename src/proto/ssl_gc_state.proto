@@ -33,17 +33,17 @@ message Foul
 message Command
 {
     required Type type     = 1;
-    optional Team for_team = 2;
+    required Team for_team = 2;
 
     enum Type
     {
-        UNKNOWN        = 0;
-        HALT           = 1;
-        STOP           = 2;
-        NORMAL_START   = 3;
-        FORCE_START    = 4;
-        DIRECT         = 5;
-        INDIRECT       = 6;
+        UNKNOWN      = 0;
+        HALT         = 1;
+        STOP         = 2;
+        NORMAL_START = 3;
+        FORCE_START  = 4;
+        DIRECT       = 5;
+        reserved 6;  // INDIRECT
         KICKOFF        = 7;
         PENALTY        = 8;
         TIMEOUT        = 9;
@@ -80,10 +80,13 @@ message Proposal
 
 message ProposalGroup
 {
-    // List of proposals in this group
+    // Unique ID of this group
+    optional string id = 4;
+    // The proposals in this group
     repeated Proposal proposals = 1;
     // Whether the proposal group was accepted
     optional bool accepted = 2;
+    reserved 3;  // uint32 id
 }
 
 message TeamInfo
@@ -105,6 +108,9 @@ message TeamInfo
     optional google.protobuf.Timestamp requests_timeout_since          = 15;
     optional google.protobuf.Timestamp requests_emergency_stop_since   = 16;
     optional int32 challenge_flags                                     = 17;
+    optional bool bot_substitution_allowed                             = 18;
+    optional int32 bot_substitutions_left                              = 19;
+    optional google.protobuf.Duration bot_substitution_time_left       = 20;
 }
 
 message State
@@ -122,7 +128,18 @@ message State
     repeated GameEvent game_events                                  = 13;
     repeated ProposalGroup proposal_groups                          = 14;
     optional Division division                                      = 15;
-    optional bool auto_continue                                     = 16;
-    optional Team first_kickoff_team                                = 17;
-    optional MatchType match_type                                   = 18;
+    reserved 16;
+    optional Team first_kickoff_team                       = 17;
+    optional MatchType match_type                          = 18;
+    optional google.protobuf.Timestamp ready_continue_time = 20;
+    optional ShootoutState shootout_state                  = 21;
+    optional string status_message                         = 22;
+    // The maximum number of bots per team (overwrites the division config)
+    optional int32 max_bots_per_team = 23;
+}
+
+message ShootoutState
+{
+    optional Team next_team               = 1;
+    map<string, int32> number_of_attempts = 2;
 }
