@@ -209,9 +209,9 @@ new_git_repository(
 # yaml cpp parser for dynamic parameters test
 git_repository(
     name = "yaml-cpp",
-    commit = "f531f8a8c3f8ca0923f9219c72fcca511555f824",
+    commit = "39f737443b05e4135e697cb91c2b7b18095acd53",
     remote = "https://github.com/jbeder/yaml-cpp.git",
-    shallow_since = "1571237073 -0500",
+    shallow_since = "1737756090 -0600"
 )
 
 new_local_repository(
