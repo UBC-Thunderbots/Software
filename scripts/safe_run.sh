@@ -27,7 +27,7 @@ while kill -0 $CMD_PID 2>/dev/null; do
 
     # Check if the log contains Traceback
     if grep -q "$ERROR_PATTERN" "$LOG_FILE"; then
-	echo $LOG_FILE
+	cat $LOG_FILE
         echo "[Error detected] Potential error found in command output!"
         kill $CMD_PID
         wait $CMD_PID
