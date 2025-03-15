@@ -365,7 +365,7 @@ TEST_F(STPTacticAssignmentTest,
 
     // The destination of the move_tactic is relatively close to the robot positions, so
     // the cost of assigning any robot to the move_tactic should be less than the
-    // halt_tactics
+    // stop_tactics
     move_tactic_1->updateControlParams(Point(0, 0), Angle::zero(),
                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 

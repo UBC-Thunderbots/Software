@@ -69,4 +69,5 @@ class DefensePlayFSMBase
     TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
     std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;
+    std::vector<std::shared_ptr<ShadowEnemyTactic>> shadowers;
 };
