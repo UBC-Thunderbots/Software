@@ -42,16 +42,9 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
     if(enemy_threat_opt.has_value()){
 bool near_ball = distance(event.common.world_ptr->ball().position(), enemy_threat_opt.value().robot.position()) < 0.22;
 
-      if(near_ball){
-      }else{
-    LOG(WARNING) << " not robot "<< enemy_threat_opt.value().robot.id() << " "<<distance(event.common.world_ptr->ball().position(), enemy_threat_opt.value().robot.position())<<"\n";
-
-      }
         return near_ball;
     
     }
-    LOG(WARNING) << "Enemy threat not initialized for robot " << event.common.robot.id()
-                 << "\n";
     return false;
 }
 
@@ -72,14 +65,7 @@ bool ShadowEnemyFSM::contestedBall(const Update &event)
 {
 //OK so basically you need to change thresholds for how close
 ////in robot.h there is a isneardribbler function u can use instead of this breakbeams stuff
-//in constans.h there is a BALL_TO_FRONT thing change the constant added to that to see if its near
     bool robot_contesting = distance(event.common.world_ptr->ball().position(), event.common.robot.position()) < 0.08;
-
-      if(robot_contesting){
-        LOG(WARNING) << event.common.world_ptr->getMostRecentTimestamp() << "contested" << distance(event.common.world_ptr->ball().position(), event.common.robot.position()) << std::endl;
-      }else {
-      }
-
 
     return robot_contesting;
 }
@@ -93,7 +79,6 @@ void ShadowEnemyFSM::blockPass(const Update &event)
 
     // If no enemy_threat is found, the robot will default to blocking
     // the possible shot on net
-      LOG(WARNING) << "blockkkked"<< std::endl;
 
     Point position_to_block =
         ball_position +
@@ -154,7 +139,6 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
     auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
-    LOG(WARNING) << " we boutta stealing "<<  "\n";
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, ball_position, face_ball_orientation,
@@ -171,7 +155,6 @@ void ShadowEnemyFSM::stealAndPull(const Update &event)
         (ball_position - event.common.robot.position()).orientation();
     auto pull_to_here = 
         (event.common.robot.position() - ball_position) * 2 + ball_position;
-    LOG(WARNING) << " we stealing "<<  "\n";
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, pull_to_here, face_ball_orientation,

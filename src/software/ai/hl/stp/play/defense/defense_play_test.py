@@ -5,6 +5,9 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.friendly_has_ball_possession import (
+    FriendlyEventuallyHasBallPossession,
+)
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
@@ -31,7 +34,7 @@ from proto.ssl_gc_common_pb2 import Team
         )
     ],
 )
-def test_defense_play_2(simulated_test_runner, blue_bots, yellow_bots):
+def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
     def setup(*args):
         # Starting point must be Point
         ball_initial_pos = tbots_cpp.Point(0.93, 0)
@@ -159,7 +162,11 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
                 )
             ]
         ],
-        ag_eventually_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=[
+            [
+                FriendlyEventuallyHasBallPossession(tolerance=0.05)
+            ]
+        ],
         test_timeout_s=6,
     )
 
