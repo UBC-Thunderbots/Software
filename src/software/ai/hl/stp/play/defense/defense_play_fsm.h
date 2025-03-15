@@ -5,8 +5,8 @@
 #include "software/ai/hl/stp/play/defense/defense_play_base.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/logger/logger.h"
 
 struct DefensePlayFSM : public DefensePlayFSMBase
@@ -20,10 +20,10 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      */
     explicit DefensePlayFSM(TbotsProto::AiConfig ai_config);
 
-    //Where to shadow 
-     const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 3;
+    // Where to shadow
+    const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 3;
 
-     /**
+    /**
      * Guard to check whether we should be defending more aggressively
      *
      * @param event the FSM event
@@ -67,8 +67,8 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     void updateShadowers(const Update& event,
                          const std::vector<EnemyThreat>& threats_to_shadow);
 
-    
-     /**
+
+    /**
      * Helper function to set up shadow enemy tactic vector members
      *
      * @param num_shadowers the number of shadow enemy tactics to set
@@ -85,7 +85,7 @@ struct DefensePlayFSM : public DefensePlayFSMBase
 
 
     auto operator()()
-  {
+    {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(DefenseState)
@@ -100,15 +100,14 @@ struct DefensePlayFSM : public DefensePlayFSMBase
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-    
-        *DefenseState_S + Update_E[shouldDefendAggressively_G] /
+
+            *DefenseState_S + Update_E[shouldDefendAggressively_G] /
                                   shadowAndBlockShots_A = AggressiveDefenseState_S,
-        DefenseState_S + Update_E / blockShots_A    = DefenseState_S,
-        AggressiveDefenseState_S +
+            DefenseState_S + Update_E / blockShots_A    = DefenseState_S,
+            AggressiveDefenseState_S +
                 Update_E[!shouldDefendAggressively_G] / blockShots_A = DefenseState_S,
             AggressiveDefenseState_S + Update_E / shadowAndBlockShots_A =
                 AggressiveDefenseState_S,
             X + Update_E = X);
-
     }
 };

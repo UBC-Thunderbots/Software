@@ -119,7 +119,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
 <<<<<<< HEAD
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::GoAndStealChipState>));
 
-    // Shadower is now near the shadowee                                           
+    // Shadower is now near the shadowee
     // Robot should try and steal and pull the ball                                
 =======
 
@@ -127,10 +127,10 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     // Shadower is now near the shadowee
     // Robot should try and steal and pull the ball 
 >>>>>>> tmp
-    shadower.updateState(                                                          
-        RobotState(Point(0, -1.97), Vector(),                                      
-               (world->ball().position() - position_to_block).orientation(),   
-               AngularVelocity::zero()),                                       
+    shadower.updateState(
+        RobotState(Point(0, -1.97), Vector(),
+                   (world->ball().position() - position_to_block).orientation(),
+                   AngularVelocity::zero()),                                       
 <<<<<<< HEAD
         Timestamp::fromSeconds(0));                                                
 =======

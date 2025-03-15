@@ -25,7 +25,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
             tbots_cpp.Point(0.6, 0),
             tbots_cpp.Vector(0.1, 0),
             tbots_cpp.Angle.fromRadians(3.14),
-            tbots_cpp.Point(1,0),
+            tbots_cpp.Point(1, 0),
         ),
     ],
 )
@@ -47,7 +47,6 @@ def test_shadow_grab(
                 yellow_robot_locations=[yellow_bots],
                 ball_location=ball_initial_pos,
                 ball_velocity=ball_initial_velocity,
-
             ),
         )
 
@@ -56,7 +55,6 @@ def test_shadow_grab(
 
         params.assigned_tactics[0].shadow_enemy.CopyFrom(
             ShadowEnemyTactic(
-                
                 shadow_distance=0.0,
             )
         )
@@ -70,11 +68,11 @@ def test_shadow_grab(
 
         params.assigned_tactics[0].dribble.CopyFrom(
             DribbleTactic(
-
-        dribble_destination = tbots_cpp.createPointProto(blue_final_destination),
-        final_dribble_orientation = tbots_cpp.createAngleProto(attacker_direction),
-        allow_excessive_dribbling = False,
-
+                dribble_destination=tbots_cpp.createPointProto(blue_final_destination),
+                final_dribble_orientation=tbots_cpp.createAngleProto(
+                    attacker_direction
+                ),
+                allow_excessive_dribbling=False,
             )
         )
 

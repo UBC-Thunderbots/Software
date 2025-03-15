@@ -2,7 +2,6 @@
 
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
-
 #include "software/logger/logger.h"
 
 
@@ -13,8 +12,7 @@ DefensePlayFSM::DefensePlayFSM(TbotsProto::AiConfig ai_config)
 
 bool DefensePlayFSM::shouldDefendAggressively(const Update& event)
 {
-   
-  return true;
+    return true;
 }
 
 void DefensePlayFSM::blockShots(const Update& event)
@@ -36,11 +34,10 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
         event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
 
 
- updateCreaseAndPassDefenders(event, enemy_threats);
+    updateCreaseAndPassDefenders(event, enemy_threats);
 
     if (pass_defenders.size() > 0)
     {
-
         pass_defenders.erase(pass_defenders.begin());
         updateShadowers(event, {enemy_threats.front()});
     }
@@ -53,7 +50,7 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
 {
     auto assignments = getAllDefenderAssignments(
         enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
-    
+
         ai_config.defense_play_config().defender_assignment_config());
 
     if (assignments.size() == 0)
@@ -106,7 +103,6 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
     setAlignment(event, crease_defender_assignments, TbotsProto::BallStealMode::STEAL);
     updatePassDefenderControlParams(pass_defender_assignments,
                                     TbotsProto::BallStealMode::STEAL);
-
 }
 
 void DefensePlayFSM::updateShadowers(const Update& event,

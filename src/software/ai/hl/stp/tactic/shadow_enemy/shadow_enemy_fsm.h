@@ -70,7 +70,7 @@ struct ShadowEnemyFSM
      * @return if the ball has been have_possession
      */
     bool enemyThreatHasBall(const Update &event);
-    
+
     /**
      * Guard that checks if we may have contested the ball
      *
@@ -114,7 +114,7 @@ struct ShadowEnemyFSM
      * @param event ShadowEnemyFSM::Update
      */
     void goAndSteal(const Update &event);
-    
+
     /**
      * Action to pull the ball
      *
@@ -132,7 +132,7 @@ struct ShadowEnemyFSM
         DEFINE_SML_STATE(BlockPassState)
         DEFINE_SML_STATE(GoAndStealState)
         DEFINE_SML_STATE(StealAndPullState)
-        
+
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(enemyThreatHasBall)
@@ -148,12 +148,13 @@ struct ShadowEnemyFSM
             // src_state + event [guard] / action = dest_state
             *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
             MoveFSM_S + Update_E[blockedShot_G] / goAndSteal_A = GoAndStealState_S,
-            MoveFSM_S + Update_E / blockShot_A, 
-            MoveFSM_S = GoAndStealState_S,
+            MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = GoAndStealState_S,
             BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
             BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,
-            GoAndStealState_S + Update_E[enemyThreatHasBall_G && !contestedBall_G] / goAndSteal_A,
-            GoAndStealState_S + Update_E[enemyThreatHasBall_G && contestedBall_G] / goAndSteal_A = StealAndPullState_S,
+            GoAndStealState_S +
+                Update_E[enemyThreatHasBall_G && !contestedBall_G] / goAndSteal_A,
+            GoAndStealState_S + Update_E[enemyThreatHasBall_G && contestedBall_G] /
+                                    goAndSteal_A = StealAndPullState_S,
             GoAndStealState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,
             StealAndPullState_S + Update_E[enemyThreatHasBall_G] / stealAndPull_A,
             StealAndPullState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,

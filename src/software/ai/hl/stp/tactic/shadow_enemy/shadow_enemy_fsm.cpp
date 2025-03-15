@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
-#include "software/geom/algorithms/distance.h"
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/geom/algorithms/distance.h"
 
 Point ShadowEnemyFSM::findBlockPassPoint(const Point &ball_position,
                                          const Robot &shadowee,
@@ -40,33 +40,36 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
 {
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
 
-    if(enemy_threat_opt.has_value()){
-bool near_ball = distance(event.common.world_ptr->ball().position(), enemy_threat_opt.value().robot.position()) < 0.22;
+    if (enemy_threat_opt.has_value())
+    {
+        bool near_ball = distance(event.common.world_ptr->ball().position(),
+                                  enemy_threat_opt.value().robot.position()) < 0.22;
 
         return near_ball;
-    
     }
     return false;
 }
 
-bool ShadowEnemyFSM::blockedShot(const Update &event){
-
+bool ShadowEnemyFSM::blockedShot(const Update &event)
+{
     auto ball_position = event.common.world_ptr->ball().position();
-    Ray shot_block_direction(ball_position, event.common.robot.position() - ball_position);  
-    Segment goalLine(event.common.world_ptr->field().friendlyGoal().posXNegYCorner(), 
-        event.common.world_ptr->field().friendlyGoal().posXPosYCorner());
- 
+    Ray shot_block_direction(ball_position,
+                             event.common.robot.position() - ball_position);
+    Segment goalLine(event.common.world_ptr->field().friendlyGoal().posXNegYCorner(),
+                     event.common.world_ptr->field().friendlyGoal().posXPosYCorner());
+
     bool ball_blocked = intersects(goalLine, shot_block_direction);
     return ball_blocked;
-
 }
 
 
 bool ShadowEnemyFSM::contestedBall(const Update &event)
 {
-//OK so basically you need to change thresholds for how close
-////in robot.h there is a isneardribbler function u can use instead of this breakbeams stuff
-    bool robot_contesting = distance(event.common.world_ptr->ball().position(), event.common.robot.position()) < 0.08;
+    // OK so basically you need to change thresholds for how close
+    ////in robot.h there is a isneardribbler function u can use instead of this breakbeams
+    ///stuff
+    bool robot_contesting = distance(event.common.world_ptr->ball().position(),
+                                     event.common.robot.position()) < 0.08;
 
     return robot_contesting;
 }
@@ -154,7 +157,7 @@ void ShadowEnemyFSM::stealAndPull(const Update &event)
     auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
-    auto pull_to_here = 
+    auto pull_to_here =
         (event.common.robot.position() - ball_position) * 2 + ball_position;
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
