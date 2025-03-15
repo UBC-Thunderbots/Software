@@ -226,7 +226,6 @@ class World final
      */
     const std::optional<Segment>& getDribbleDisplacement() const;
 
-
     /**
      * Set the list of virtual obstacles
      *

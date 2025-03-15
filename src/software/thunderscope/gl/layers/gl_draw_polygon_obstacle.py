@@ -19,7 +19,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
     trajectory planner to avoid.
     """
 
-    DOUBLE_CLICK_INTERVAL = 200
+    DOUBLE_CLICK_INTERVAL_MS = 200
 
     def __init__(self, name: str, friendly_io: ProtoUnixIO) -> None:
         """Initialize this layer
@@ -40,7 +40,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         # The current polygon being edited (not visible yet)
         self.current_polygon = GLPolygon(parent_item=self, line_width=2)
         
-        self.can_double_click = True
+        self.can_double_click = False
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Responding to key events that are going to push obstacles to the stack or add point
@@ -140,7 +140,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             self.can_double_click = True
             # handle single click
             QTimer.singleShot(
-                self.DOUBLE_CLICK_INTERVAL, self.__create_single_click_callback(event)
+                self.DOUBLE_CLICK_INTERVAL_MS, self.__create_single_click_callback(event)
             )
 
     def refresh_graphics(self) -> None:

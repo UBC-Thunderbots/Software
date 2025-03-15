@@ -139,14 +139,14 @@ def setup_gl_widget(
     )
 
     draw_obstacle_layer = GLDrawPolygonObstacleLayer(
-        "Freehand Obstacle Layer", full_system_proto_unix_io
+        "Draw Obstacle Layer", full_system_proto_unix_io
     )
 
-    gl_widget.add_layer(draw_obstacle_layer, False)
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(path_layer)
     gl_widget.add_layer(obstacle_layer)
+    gl_widget.add_layer(draw_obstacle_layer, False)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(attacker_layer)
     gl_widget.add_layer(cost_vis_layer, True)

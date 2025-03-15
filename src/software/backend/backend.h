@@ -36,10 +36,10 @@ class Backend : public Subject<SensorProto>,
     void receiveSensorProto(SensorProto sensor_msg);
 
     /**
-     * Callback function that receive a list of new virtual obstacles from
-     * Subject<VirtualObstacles>
+     * Callback function that receives a list of new virtual obstacles to send
+     * to Observers
      *
-     * @param new_obstacles_list a new obstacles list we are having
+     * @param new_obstacles_list the received virtual obstacles list
      */
     void receiveObstacleList(TbotsProto::VirtualObstacles new_obstacle_list);
 };

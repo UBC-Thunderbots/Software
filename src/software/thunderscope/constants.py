@@ -183,10 +183,9 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Ctrl + R:</code></b> Remove the current layout file and reset the layout<br><br>
     Layout file (on save) is located at {SAVED_LAYOUT_PATH}<br>
 
-    <b><code>Shift+Alt+Double Click</code></b> Push the current obstacle to the obstacle stack. FriendlyObstacleLayer must be enabled.<br><br>
-    <b><code>Shift+Alt+Single Click</code></b> Append a point to the current virtual obstacle. <br><br>
-    <b><code>c</code></b> Clear the virtual obstacle stack FriendlyObstacleLayer must be enabled. <br><br>
-
+    <b><code>Shift+Alt+Double Click</code></b> Complete the current virtual obstacle. The Draw Obstacle Layer must be enabled.<br><br>
+    <b><code>Shift+Alt+Single Click</code></b> Add a point to the current virtual obstacle. The Draw Obstacle Layer must be enabled.<br><br>
+    <b><code>c</code></b> Clear all virtual obstacles. The Draw Obstacle Layer must be enabled.<br><br>
 
     """
 )
