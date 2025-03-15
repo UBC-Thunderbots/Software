@@ -180,9 +180,11 @@ jobs:
 
   common-commands:
     strategy:
+      # TODO: set fail-fast to true in production.
+      fail-fast: false
       matrix:
         commands:
-          - bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --run_blue --run_diagnostics --interface lo --keyboard_estop --ci_mode
+          - bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main -- --run_blue --run_diagnostics --interface lo --keyboard_estop --ci_mode
           - bazel run --run_under="xvfb-run" //software/ai/hl/stp/tactic/goalie:goalie_tactic_test -- --enable_thunderscope
 
     name: Sanity Check on Common Commands

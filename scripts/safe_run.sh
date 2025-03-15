@@ -2,7 +2,7 @@
 
 # Timeout in seconds
 # When the time is up and no error was shown, this test will pass 
-TIME_LIMIT=60 # 1 minute
+TIME_LIMIT=120 # 2 minutes
 
 # Match Python traceback
 ERROR_PATTERN="Traceback (most recent call last):"
