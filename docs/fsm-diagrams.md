@@ -11,16 +11,24 @@ direction LR
 Halt --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Halt --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
 Halt --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Halt --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
+Timeout --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
+Timeout --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
+Timeout --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
+Timeout --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Stop --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Stop --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
 Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Stop --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
 Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Playing --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
 SetPlay --> Halt : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
 SetPlay --> Stop : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
 SetPlay --> Playing : [gameStatePlaying]\n<i>resetSetPlay, setupOffensePlay</i>
 SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+SetPlay --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -138,10 +146,7 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> HaltState
-HaltState --> HaltState : [shouldEnterHalt]\n<i>updateStop</i>
-HaltState --> TimeoutState : [shouldEnterTimeout]\n<i>updateTimeout</i>
-TimeoutState --> HaltState : [shouldEnterHalt]\n<i>updateStop</i>
-TimeoutState --> TimeoutState : [shouldEnterTimeout]\n<i>updateTimeout</i>
+HaltState --> HaltState : <i>updateStop</i>
 Terminate:::terminate --> Terminate:::terminate : <i>updateStop</i>
 
 ```
