@@ -116,38 +116,23 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
-<<<<<<< HEAD
-    EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::GoAndStealChipState>));
-
-    // Shadower is now near the shadowee
-    // Robot should try and steal and pull the ball                                
-=======
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::GoAndStealState>));
     // Shadower is now near the shadowee
     // Robot should try and steal and pull the ball 
->>>>>>> tmp
     shadower.updateState(
         RobotState(Point(0, -1.97), Vector(),
                    (world->ball().position() - position_to_block).orientation(),
                    AngularVelocity::zero()),                                       
-<<<<<<< HEAD
-        Timestamp::fromSeconds(0));                                                
-=======
         Timestamp::fromSeconds(0));     
 
 
->>>>>>> tmp
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::StealAndPullState>));
 
-<<<<<<< HEAD
-    // Either the ball has been stolen by our robot or at least the       
-=======
     // Either the ball has been stolen by our robot or at least the  
->>>>>>> tmp
     // enemy threat has kicked the ball
     // Tactic is done
     enemy_threat.has_ball = false;
