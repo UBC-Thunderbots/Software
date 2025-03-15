@@ -14,6 +14,7 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInScen
 
 from typing import Callable
 
+
 class GLDrawPolygonObstacleLayer(GLLayer):
     """A layer used to draw polygons representing virtual obstacles for the
     trajectory planner to avoid.
@@ -39,7 +40,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         # The current polygon being edited (not visible yet)
         self.current_polygon = GLPolygon(parent_item=self, line_width=2)
-        
+
         self.can_double_click = False
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -60,7 +61,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         self.rendering_polygons.clear()
         self.current_polygon.setParentItem(None)
-        
+
         self.__send_to_fullsystem()
 
     def __push_polygon_to_list(self):
@@ -81,7 +82,9 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         :param point: represent the point (x,y) that is added to the polygon
         """
         self.points.append(point)
-        self.current_polygon.set_points([(point.x_meters, point.y_meters) for point in self.points])
+        self.current_polygon.set_points(
+            [(point.x_meters, point.y_meters) for point in self.points]
+        )
         self.__send_to_fullsystem()
 
     def __send_to_fullsystem(self) -> None:
@@ -98,7 +101,9 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             VirtualObstacles, VirtualObstacles(obstacles=obstacles)
         )
 
-    def __create_single_click_callback(self, event: MouseInSceneEvent) -> Callable[[], None]:
+    def __create_single_click_callback(
+        self, event: MouseInSceneEvent
+    ) -> Callable[[], None]:
         """Creating a single shot callback to handle single click
 
         :param event: The mouse event when a scene is pressed
