@@ -42,8 +42,7 @@ struct TimeoutPlayFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *TimeoutState_S + Update_E / updateTimeout_A = TimeoutState_S,
-            X + Update_E / updateTimeout_A               = X
-            );
+            X + Update_E / updateTimeout_A               = X);
     }
 
    private:

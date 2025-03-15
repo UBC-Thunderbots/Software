@@ -138,7 +138,10 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> HaltState
-HaltState --> HaltState : <i>updateStop</i>
+HaltState --> HaltState : [shouldEnterHalt]\n<i>updateStop</i>
+HaltState --> TimeoutState : [shouldEnterTimeout]\n<i>updateTimeout</i>
+TimeoutState --> HaltState : [shouldEnterHalt]\n<i>updateStop</i>
+TimeoutState --> TimeoutState : [shouldEnterTimeout]\n<i>updateTimeout</i>
 Terminate:::terminate --> Terminate:::terminate : <i>updateStop</i>
 
 ```
@@ -206,6 +209,19 @@ TakePassState --> AttemptShotState : [shouldAbortPass]\n<i>startLookingForPass</
 TakePassState --> TakePassState : [!passCompleted]\n<i>takePass</i>
 TakePassState --> Terminate:::terminate : [passCompleted]\n<i>takePass</i>
 Terminate:::terminate --> AttemptShotState : <i>startLookingForPass</i>
+
+```
+
+## [TimeoutPlayFSM](/src/software/ai/hl/stp/play/timeout_play/timeout_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> TimeoutState
+TimeoutState --> TimeoutState : <i>updateTimeout</i>
+Terminate:::terminate --> Terminate:::terminate : <i>updateTimeout</i>
 
 ```
 
