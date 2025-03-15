@@ -67,7 +67,7 @@ bool ShadowEnemyFSM::contestedBall(const Update &event)
 {
     // OK so basically you need to change thresholds for how close
     ////in robot.h there is a isneardribbler function u can use instead of this breakbeams
-    ///stuff
+    /// stuff
     bool robot_contesting = distance(event.common.world_ptr->ball().position(),
                                      event.common.robot.position()) < 0.08;
 

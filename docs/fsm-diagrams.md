@@ -460,12 +460,16 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> MoveFSM
 MoveFSM --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
+MoveFSM --> GoAndStealState : [blockedShot]\n<i>goAndSteal</i>
 MoveFSM --> MoveFSM : <i>blockShot</i>
-MoveFSM --> StealAndChipState
+MoveFSM --> GoAndStealState
 BlockPassState --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 BlockPassState --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
-StealAndChipState --> StealAndChipState : [enemyThreatHasBall]\n<i>stealAndChip</i>
-StealAndChipState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPass</i>
+GoAndStealState --> GoAndStealState : [enemyThreatHasBall && !contestedBall]\n<i>goAndSteal</i>
+GoAndStealState --> StealAndPullState : [enemyThreatHasBall && contestedBall]\n<i>goAndSteal</i>
+GoAndStealState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPass</i>
+StealAndPullState --> StealAndPullState : [enemyThreatHasBall]\n<i>stealAndPull</i>
+StealAndPullState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
