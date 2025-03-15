@@ -78,6 +78,7 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
     }
 }
 
+
 void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 {
     if (packet.has_geometry())
@@ -95,7 +96,15 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
             // Process the geometry again
             updateWorld(packet.geometry());
         }
+
         updateWorld(packet.detection());
+
+        if (!ball && (packet.detection().robots_blue().size() != 0 ||
+                      packet.detection().robots_yellow().size() != 0))
+        {
+            LOG(WARNING)
+                << "There are robots on the field, but no ball. It is highly likely that sensor fusion has filtered the ball out!";
+        }
     }
 }
 
