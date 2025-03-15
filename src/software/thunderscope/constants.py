@@ -146,6 +146,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>O:</code></b> Identify robots, toggle robot name visibility<br>
     <b><code>M:</code></b> Toggle measure mode<br>
     <b><code>S:</code></b> Toggle visibility of robot/ball speed visualization<br>
+    <b><code>B:</code></b> Add a bookmark<br>
     <b><code>Ctrl + Space:</code></b> Stop AI vs AI simulation<br>
     <b><code>Ctrl + Up:</code></b> Increment simulation speed<br>
     <b><code>Ctrl + Down:</code></b> Decrement simulation speed<br>
@@ -184,6 +185,8 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 
     """
 )
+
+THUNDERSCOPE_UI_FONT_NAME = "Roboto"
 
 
 def is_field_message_empty(field: Field) -> bool:
@@ -277,6 +280,7 @@ class Colors:
     ROBOT_MIDDLE_BLUE = QtGui.QColor(0, 0, 255, 255)
     PINK = QtGui.QColor(255, 0, 255)
     GREEN = QtGui.QColor(0, 255, 0)
+    RED = QtGui.QColor(255, 0, 0, 255)
 
     # Creates a default vision pattern lookup with the actual colors used on the robots
     VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(PINK, GREEN)
