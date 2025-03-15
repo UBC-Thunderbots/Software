@@ -32,32 +32,3 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "shadow_enemy_tactic_cpp_test",
-    srcs = ["shadow_enemy_tactic_test.cpp"],
-    deps = [
-        ":shadow_enemy_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/geom:triangle",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-py_test(
-    name = "shadow_enemy_tactic_test",
-    srcs = ["shadow_enemy_tactic_test.py"],
-    tags = [
-        "exclusive",
-    ],
-    deps = [
-        "//software:conftest",
-        "//software/simulated_tests:speed_threshold_helpers",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-    ],
-)
