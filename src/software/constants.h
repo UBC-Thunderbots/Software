@@ -43,15 +43,15 @@ static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
     2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
 
 // Redis Keys
-const std::string ROBOT_ID_REDIS_KEY                = "/robot_id";
-const std::string ROBOT_MULTICAST_CHANNEL_REDIS_KEY = "/channel_id";
-const std::string ROBOT_NETWORK_INTERFACE_REDIS_KEY = "/network_interface";
-const std::string ROBOT_KICK_CONSTANT_REDIS_KEY     = "/kick_constant";
-const std::string ROBOT_KICK_EXP_COEFF_REDIS_KEY    = "/kick_coeff";
-const std::string ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY  = "/chip_pulse_width";
-const std::string ROBOT_CURRENT_DRAW_REDIS_KEY      = "/current_draw";
-const std::string ROBOT_BATTERY_VOLTAGE_REDIS_KEY   = "/battery_voltage";
-const std::string ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY = "/cap_voltage";
+const std::string ROBOT_ID_REDIS_KEY                = "robot_id";
+const std::string ROBOT_MULTICAST_CHANNEL_REDIS_KEY = "channel_id";
+const std::string ROBOT_NETWORK_INTERFACE_REDIS_KEY = "network_interface";
+const std::string ROBOT_KICK_CONSTANT_REDIS_KEY     = "kick_constant";
+const std::string ROBOT_KICK_EXP_COEFF_REDIS_KEY    = "kick_coeff";
+const std::string ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY  = "chip_pulse_width";
+const std::string ROBOT_CURRENT_DRAW_REDIS_KEY      = "current_draw";
+const std::string ROBOT_BATTERY_VOLTAGE_REDIS_KEY   = "battery_voltage";
+const std::string ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY = "cap_voltage";
 
 const std::string ROBOT_PATH_TO_YAML_CONFIG = "/home/robot/thunderbot_binaries/config.yaml";
 

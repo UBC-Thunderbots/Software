@@ -24,7 +24,7 @@ cc_test(
 )
 
 cc_library(
-    name = "yaml_reader",
+    name = "yaml",
     srcs = [
         "yaml_reader.cpp",
     ],
