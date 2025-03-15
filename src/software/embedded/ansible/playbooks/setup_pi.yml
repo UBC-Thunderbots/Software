@@ -104,6 +104,14 @@
             dest: /boot/firmware/
             mode: "0444"
 
+        - name: Update udev configs to map connected devices
+          become: true
+          become_method: ansible.builtin.sudo
+          ansible.builtin.copy:
+            src: ../../linux_configs/pi/10-local.rules
+            dest: /etc/udev/rules.d/
+            mode: "0444"
+
     - name: Change hostname
       tags: update_hostname
       ansible.builtin.import_tasks:
