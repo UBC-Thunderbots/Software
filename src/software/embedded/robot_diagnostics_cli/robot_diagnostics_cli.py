@@ -53,7 +53,6 @@ class RobotDiagnosticsCLI:
         # Communication object responsible for proto execution/transmission
         self.embedded_communication = embedded_communication
         # Data handler responsible for disk information
-
         self.embedded_data = self.embedded_communication.embedded_data
 
         self.console = Console()
