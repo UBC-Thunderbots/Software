@@ -11,7 +11,8 @@ from software.embedded.constants.py_constants import (
 
 class EmbeddedData:
     """Model class responsible for interfacing with onboard disk data on the robot.
-    This class manages static data on the robot as well as the operations necessary with mutating data for use"""
+    This class manages static data on the robot as well as the operations necessary with mutating data for use
+    """
 
     def __init__(self) -> None:
         # Initializes the redis cache connection

@@ -11,7 +11,8 @@ import time
 
 class EmbeddedCommunication:
     """Communication class for sending/executing protos with the robots.
-    This class handles all interfacing with dynamically changing data during runtime"""
+    This class handles all interfacing with dynamically changing data during runtime
+    """
 
     BROADCAST_HZ = 1.0
     LOCALHOST_IP = "127.0.0.1"

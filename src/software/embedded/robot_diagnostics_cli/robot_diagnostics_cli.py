@@ -64,7 +64,8 @@ class RobotDiagnosticsCLI:
     def catch_interrupt_exception(exit_code=1):
         """Decorator for handling keyboard exceptions and safely clearing cached primitives.
         This special function allows us to generalize catching repeated expected Errors without
-        try-catches in every function"""
+        try-catches in every function
+        """
 
         def decorator(func):
             @wraps(func)
