@@ -30,7 +30,7 @@ ESTOP_PATH_2 = "/dev/EstopUSB"
 
 def get_estop_config(
     keyboard_estop: bool, disable_communication: bool
-) -> tuple[EstopMode, os.PathLike]:
+) -> tuple[EstopMode, os.PathLike | None]:
     """Based on the estop mode argument provided, gets the corresponding
     estop mode and estop path (defined for physical estop mode only)
     Defaults to Physical estop if the given args are both False

@@ -10,7 +10,8 @@ from software.embedded.constants.py_constants import (
 
 
 class EmbeddedData:
-    """Model class responsible for interfacing with onboard disk data on the robot"""
+    """Model class responsible for interfacing with onboard disk data on the robot.
+    This class manages static data on the robot as well as the operations necessary with mutating data for use"""
 
     def __init__(self) -> None:
         # Initializes the redis cache connection
@@ -112,13 +113,14 @@ class EmbeddedData:
         )
         return Primitive(direct_control=direct_control_primitive)
 
-    def get_zero_power_control_prititive(self) -> Primitive:
+    def get_zero_power_control_primitive(self) -> Primitive:
+        """Creates a PowerControl primitive with zeroed/default base values"""
         power_control_primitive = PowerControl()
         power_control_primitive.geneva_slot = Slot.CENTRE_RIGHT
         return power_control_primitive
 
     def get_zero_motor_control_primitive(self) -> Primitive:
-        """Creates"""
+        """Creates a MotorControl primitive with zeroed/default base values"""
         motor_control_primitive = MotorControl()
         motor_control_primitive.direct_velocity_control.velocity.x_component_meters = 0
         motor_control_primitive.direct_velocity_control.velocity.y_component_meters = 0
@@ -131,7 +133,7 @@ class EmbeddedData:
         :param speed: Speed to kick the "ball" at
         """
         speed = self.__clamp(val=speed, min_val=0, max_val=ROBOT_MAX_SPEED_M_PER_S)
-        power_control_primitive = self.get_zero_power_control_prititive()
+        power_control_primitive = self.get_zero_power_control_primitive()
         if not auto:
             power_control_primitive.chicker.kick_speed_m_per_s = speed
         else:

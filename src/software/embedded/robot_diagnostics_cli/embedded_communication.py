@@ -10,7 +10,8 @@ import time
 
 
 class EmbeddedCommunication:
-    """Communication class for sending/executing protos with the robots"""
+    """Communication class for sending/executing protos with the robots.
+    This class handles all interfacing with dynamically changing data during runtime"""
 
     BROADCAST_HZ = 1.0
     LOCALHOST_IP = "127.0.0.1"
@@ -26,12 +27,6 @@ class EmbeddedCommunication:
         self.sequence_number = 0
         self.command_duration_seconds = 2.0
         self.send_primitive_interval_s = 0.01
-
-        # total primitives for this robots
-        self.robot_primitives = {}
-        self.running = True
-        # Set the primitive of the local robot
-        self.robot_primitives[self.robot_id] = Primitive(stop=StopPrimitive())
 
         # Localhost IP Broadcaster
         self.fullsystem_ip_broadcaster = tbots_cpp.FullsystemIpBroadcastProtoUdpSender(
@@ -71,15 +66,15 @@ class EmbeddedCommunication:
         )
 
     def __should_send_packet(self) -> bool:
-        """Returns True if a proto should be sent
-        :return: boolean
+        """Returns whether we should send a packet or not
+        :return: True if a proto should be sent, False otherwise
         """
         return (
             self.estop_mode != EstopMode.DISABLE_ESTOP
         ) and not self.should_send_stop
 
     def send_primitive(self, primitive: Primitive) -> None:
-        """Forward PrimitiveSet protos from diagnostics to the robots."""
+        """Forward Primitive protos from diagnostics to the robots."""
         primitive.sequence_number = self.sequence_number
         primitive.time_sent.epoch_timestamp_seconds = time.time()
         self.sequence_number += 1
@@ -98,9 +93,9 @@ class EmbeddedCommunication:
             self.should_send_stop = True
 
     def run_primitive(self, diagnostics_primitive: Primitive) -> None:
-        """Wrapper class that forwards PrimitiveSet protos from diagnostics to the robots.
+        """Wrapper class that forwards Primitive protos from diagnostics to the robots.
 
-        If the emergency stop is tripped, the PrimitiveSet will not be sent so
+        If the emergency stop is tripped, the Primitive will not be sent so
         that the robots timeout and stop.
         """
         self.__update_estop_state()
@@ -110,18 +105,18 @@ class EmbeddedCommunication:
             self.send_primitive(diagnostics_primitive)
 
     def run_primitive_over_time(
-        self, duration_seconds: float, primitive_set: Primitive, description: str
+        self, duration_seconds: float, primitive: Primitive, description: str
     ) -> None:
-        """Executes a primitive set synchronously for the specified amount of time in the console.
+        """Executes a primitive synchronously for the specified amount of time in the console.
         :param duration_seconds: Duration to execute in seconds
-        :param primitive_set: Primitive set to execute
+        :param primitive: Primitive to execute
         :param description: The UI description to display in the console
         """
         for _ in track(
             range(int(duration_seconds / self.send_primitive_interval_s)),
             description=description,
         ):
-            self.run_primitive(primitive_set)
+            self.run_primitive(primitive)
             time.sleep(self.send_primitive_interval_s)
 
     def __broadcast_fullsystem_ip(self) -> None:
@@ -133,7 +128,7 @@ class EmbeddedCommunication:
 
     def __enter__(self) -> EmbeddedData:
         """Enter RobotDiagnosticsCLI context manager. Setup multicast listeners
-        for RobotStatus msgs, and multicast sender for PrimitiveSet
+        for RobotStatus msgs, and multicast sender for Primitives
         """
         # Broadcast IP
         self.broadcast_ip = Thread(target=self.__broadcast_fullsystem_ip, daemon=True)

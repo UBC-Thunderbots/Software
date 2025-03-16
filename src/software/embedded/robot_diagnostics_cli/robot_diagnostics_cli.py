@@ -62,7 +62,9 @@ class RobotDiagnosticsCLI:
         )
 
     def catch_interrupt_exception(exit_code=1):
-        """Decorator for handling keyboard exceptions and safely clearing cached primitives"""
+        """Decorator for handling keyboard exceptions and safely clearing cached primitives.
+        This special function allows us to generalize catching repeated expected Errors without
+        try-catches in every function"""
 
         def decorator(func):
             @wraps(func)
@@ -315,7 +317,7 @@ class RobotDiagnosticsCLI:
         else:
             zero_direct_control_primitive = DirectControlPrimitive(
                 motor_control=self.embedded_data.get_zero_motor_control_primitive(),
-                power_control=self.embedded_data.get_zero_power_control_prititive(),
+                power_control=self.embedded_data.get_zero_power_control_primitive(),
             )
             self.embedded_communication.run_primitive(primitive)
             print(description)
