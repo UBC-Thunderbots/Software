@@ -292,7 +292,7 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, robot_status: RobotStatus, round_trip_time: RobotStatistic):
+    def update(self, robot_status: RobotStatus, robot_statistic: RobotStatistic):
         """Receives parts of a RobotStatus message
 
         Saves the current time as the last robot status time
@@ -300,13 +300,13 @@ class RobotInfo(QWidget):
         Then sets a timer callback to disconnect the robot if needed
 
         :param robot_status: The robot status message for this robot
-        :param round_trip_time: The round trip time proto for this robot's message
+        :param robot_statistic: The round trip time proto for this robot's message
         """
         self.time_of_last_robot_status = time.time()
 
         self.robot_model.setPixmap(self.color_vision_pattern)
 
-        self.__update_ui(robot_status, round_trip_time)
+        self.__update_ui(robot_status, robot_statistic)
 
         QtCore.QTimer.singleShot(int(DISCONNECT_DURATION_MS), self.disconnect_robot)
 
@@ -338,7 +338,7 @@ class RobotInfo(QWidget):
         )
 
     def __update_ui(
-        self, robot_status: RobotStatus, round_trip_time: RobotStatistic
+        self, robot_status: RobotStatus, robot_statistic: RobotStatistic
     ) -> None:
         """Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
@@ -349,13 +349,13 @@ class RobotInfo(QWidget):
             - If the robot is stopped or running
 
         :param robot_status: The robot status message for this robot
-        :param round_trip_time: The round trip time message for this robot
+        :param robot_statistic: The round trip time message for this robot
         """
         motor_status = robot_status.motor_status
         power_status = robot_status.power_status
         network_status = robot_status.network_status
         primitive_executor_status = robot_status.primitive_executor_status
-        rtt_time_seconds = round_trip_time.round_trip_time_seconds
+        rtt_time_seconds = robot_statistic.round_trip_time_seconds
 
         self.__update_stop_primitive(primitive_executor_status.running_primitive)
 

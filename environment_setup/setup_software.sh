@@ -104,6 +104,11 @@ if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; t
     sudo mv /tmp/tbots_download_cache/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
 
+if [[ $(lsb_release -rs) == "22.04" ]]; then
+    # This is required for clang-format
+    host_software_packages+=(libtinfo5)
+fi
+
 virtualenv_opt_args=""
 if [[ $(lsb_release -rs) == "24.04" ]]; then
     host_software_packages+=(python3-pyqt6)
@@ -180,6 +185,10 @@ print_status_msg "Done Installing Bazel"
 print_status_msg "Install clang-format"
 install_clang_format $arch
 print_status_msg "Done installing clang-format"
+
+print_status_msg "Setting Up Python Development Headers"
+install_python_dev_cross_compile_headers $arch
+print_status_msg "Done Setting Up Python Development Headers"
 
 print_status_msg "Setting Up PlatformIO"
 

@@ -14,7 +14,7 @@ concurrency:
 jobs:
   formatting-check:
     name: Formatting and FSM diagram generation with pre-commit-ci-lite
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.event.pull_request.draft == false
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
@@ -27,9 +27,9 @@ jobs:
       - name: Install pip
         run: curl -sS https://bootstrap.pypa.io/get-pip.py | python
 
-      - uses: pre-commit/action@v3.0.0
+      - uses: pre-commit/action@v3.0.1
 
-      - uses: pre-commit-ci/lite-action@v1.0.1
+      - uses: pre-commit-ci/lite-action@v1.1.0
         name: Run pre-commit-ci-lite
         if: always()
 
