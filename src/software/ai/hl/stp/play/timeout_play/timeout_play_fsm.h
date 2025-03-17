@@ -47,4 +47,6 @@ struct TimeoutPlayFSM
     }
 
    private:
+
+    PriorityTacticVector makeTimeoutFormation(WorldPtr world);
 };

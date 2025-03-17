@@ -18,6 +18,8 @@ class TimeoutPlay : public Play
     void updateTactics(const PlayUpdate &play_update) override;
 
    private:
+    PriorityTacticVector makeTimeoutFormation(WorldPtr world);
+
     FSM<TimeoutPlayFSM> fsm;
     TimeoutPlayFSM::ControlParams control_params;
 };

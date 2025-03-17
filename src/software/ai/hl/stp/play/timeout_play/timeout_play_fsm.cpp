@@ -2,31 +2,31 @@
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 
-static inline PriorityTacticVector makeTimeoutFormation(WorldPtr world)
+PriorityTacticVector TimeoutPlayFSM::makeTimeoutFormation(WorldPtr world)
 {
     TacticVector tactic = {};
 
     double half_field_length_x = world->field().xLength() / 2.0;
-    double x_grain             = half_field_length_x / 4;
+    double formation_spacing_x             = half_field_length_x / 4;
 
     double half_field_legnth_y = world->field().yLength() / 2.0;
-    double y_grain             = half_field_legnth_y / 4;
+    double formation_spacing_y             = half_field_legnth_y / 4;
 
-    std::vector<Point> timeoout_formation_points = {Point(-x_grain, 0),
-                                                    Point(-x_grain * 2, 0),
-                                                    Point(-x_grain * 3, 0),
-                                                    Point(-x_grain * 2, -y_grain),
-                                                    Point(-x_grain * 2, -y_grain * 2),
-                                                    Point(-x_grain * 2, -y_grain * 3)};
+    std::vector<Point> formation_points = {Point(-formation_spacing_x, 0),
+                                                    Point(-formation_spacing_x * 2, 0),
+                                                    Point(-formation_spacing_x * 3, 0),
+                                                    Point(-formation_spacing_x * 2, -formation_spacing_y),
+                                                    Point(-formation_spacing_x * 2, -formation_spacing_y * 2),
+                                                    Point(-formation_spacing_x * 2, -formation_spacing_y * 3)};
 
-    // making a t like formation
-    std::for_each(timeoout_formation_points.begin(), timeoout_formation_points.end(),
-                  [&](Point point) {
+    for(const Point& point: formation_points){
                       std::shared_ptr<MoveTactic> move_tactic =
                           std::make_shared<MoveTactic>();
                       move_tactic->updateControlParams(point, Angle::zero());
                       tactic.push_back(move_tactic);
-                  });
+        
+
+    }
 
     return {tactic};
 }

@@ -104,6 +104,7 @@ struct PlaySelectionFSM
             // Timeout Eventes
             Timeout_S + Update_E[gameStateTimeout_G] / setupTimeoutPlay_A  = Timeout_S,
             Timeout_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
+            Timeout_S + Update_E[gameStateStopped_G] / setupStopPlay_A     = Stop_S,
             Timeout_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
             Timeout_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
 
