@@ -61,7 +61,7 @@ class GLPolygon(GLShape):
         if not self.points:
             return
 
-        vertices = [(point[0], point[1], 0) for point in self.points]
+        vertices = [(point[0], point[1], 0) for point in self.points + [self.points[0]]]
         self.setData(pos=vertices)
 
         if self.fill_graphic:
