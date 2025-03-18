@@ -130,7 +130,7 @@ void DribbleFSM::getPossession(const Update &event)
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, intercept_position, face_ball_orientation,
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        event.control_params.max_speed_get_possession,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
@@ -146,7 +146,7 @@ void DribbleFSM::dribble(const Update &event)
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, target_destination, target_orientation,
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        event.control_params.max_speed_dribble,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
@@ -163,7 +163,7 @@ void DribbleFSM::loseBall(const Update &event)
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, away_from_ball_position, face_ball_orientation,
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        event.control_params.max_speed_get_possession,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5}));
