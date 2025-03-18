@@ -145,7 +145,8 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             self.can_double_click = True
             # handle single click
             QTimer.singleShot(
-                self.DOUBLE_CLICK_INTERVAL_MS, self.__create_single_click_callback(event)
+                self.DOUBLE_CLICK_INTERVAL_MS,
+                self.__create_single_click_callback(event),
             )
 
     def refresh_graphics(self) -> None:
