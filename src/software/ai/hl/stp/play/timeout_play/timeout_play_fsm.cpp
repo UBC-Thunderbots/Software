@@ -9,7 +9,7 @@ static inline PriorityTacticVector makeTimeoutFormation(WorldPtr world)
     double half_field_length_x = world->field().xLength() / 2.0;
     double x_grain             = half_field_length_x / 4;
 
-    double half_field_legnth_y = world->field().yLength() / 2.0;
+    double half_field_length_y = world->field().yLength() / 2.0;
     double y_grain             = half_field_legnth_y / 4;
 
     std::vector<Point> timeoout_formation_points = {Point(-x_grain, 0),
