@@ -1,19 +1,24 @@
 # Code Style Guide
 
-## Table of Contents
-* [Names and Variables](#names-and-variables)
-* [Comments](#comments)
-* [Headers](#headers)
-* [Includes](#includes)
-* [Namespaces](#namespaces)
-* [Exceptions](#exceptions)
-* [Tests](#tests)
-* [Getter And Setter Functions](#getter-and-setter-functions)
-* [Static Creators](#static-creators)
-* [Spelling](#spelling)
-* [Miscellaneous](#miscellaneous)
-* [Protobuf](#protobuf)
+### Table of Contents
 
+<!--TOC-->
+
+- [Table of Contents](#table-of-contents)
+- [Names and Variables](#names-and-variables)
+- [Comments](#comments)
+- [Headers](#headers)
+- [Includes](#includes)
+- [Namespaces](#namespaces)
+- [Exceptions](#exceptions)
+- [Tests](#tests)
+- [Getter And Setter Functions](#getter-and-setter-functions)
+- [Static Creators](#static-creators)
+- [Spelling](#spelling)
+- [Miscellaneous](#miscellaneous)
+- [Protobuf](#protobuf)
+
+<!--TOC-->
 
 Our C++ coding style is based off of [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html). We use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to enforce most of the nit-picky parts of the style, such as brackets and alignment, so this document highlights the important rules to follow that clang-format cannot enforce.
 
