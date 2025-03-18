@@ -242,7 +242,7 @@ std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::followGradi
                 (1 - std::pow(past_squared_gradient_decay_rate, 2));
         }
 
-        // Step each param in the direction of the gradient using the operator
+        // step each param in the direction of the gradient using the operator
         // given to this function
         for (unsigned int i = 0; i < NUM_PARAMS; i++)
         {
