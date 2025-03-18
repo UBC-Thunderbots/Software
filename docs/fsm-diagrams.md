@@ -14,6 +14,7 @@ Halt --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Halt --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
 Timeout --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
 Timeout --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
+Timeout --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Timeout --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
 Timeout --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Stop --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
