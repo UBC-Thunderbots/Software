@@ -6,6 +6,7 @@ py_library(
     name = "icon_loader",
     srcs = ["icon_loader.py"],
     data = [
+        ":bookmark.svg",
         ":help.svg",
         ":measure.svg",
         ":pause.svg",
