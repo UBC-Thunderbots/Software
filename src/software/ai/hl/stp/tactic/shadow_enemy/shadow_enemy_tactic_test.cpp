@@ -57,8 +57,8 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass)
     setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
+        [tactic](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // As the shadowee is located at (0,-2) and the enemy robot that
             // has the ball is located at (0,2), we would like to block the pass
             // with a shadow distance of 2
@@ -104,7 +104,8 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ball)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
-                                 ValidationCoroutine::push_type& yield) {
+                                 ValidationCoroutine::push_type& yield)
+        {
             // As the shadowee is located at (0,-2) and the ball is located at (3,0),
             // we would like to block the pass with a shadow distance of 1.5
             Vector pass       = Point(3, 0) - shadowee.position();
@@ -149,7 +150,8 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield)
+        {
             // We compose a triangle consisting of the friendly goal posts
             // and the ball position. If our robot is in this triangle, then
             // it is blocking a possible shot on net
@@ -159,7 +161,8 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
             robotInPolygon(shotTriangle, 1, world_ptr, yield);
         },
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield)
+        {
             // As our friendly robot tries to steal and chip the ball,
             // it should chip the ball in the same direction is it
             // heading towards the ball
@@ -200,8 +203,8 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
     setTactic(0, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
+        [tactic](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // We compose a triangle consisting of the friendly goal posts
             // and the ball position. If our robot is in this triangle, then
             // it is blocking a possible shot on net

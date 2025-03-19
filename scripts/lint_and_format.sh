@@ -36,7 +36,7 @@ function run_clang_format () {
     # clang-format as arguments
     # We remove the last -o flag from the extension string
     find $CURR_DIR/../src/ ${EXTENSION_STRING::-2}  \
-        | xargs -I{} -n1000 $CLANG_BIN -i -style=file
+        | xargs -I{} -n1000 $CLANG_BIN -i -style=file:$CURR_DIR/../.clang-format
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to run clang-format over all files!***\n\n"

@@ -14,9 +14,8 @@ namespace TestUtil
         for (Point& p : all_points)
         {
             auto compare_based_on_distance_to_p = [p](const Point& a,
-                                                      const Point& b) -> bool {
-                return distance(a, p) < distance(b, p);
-            };
+                                                      const Point& b) -> bool
+            { return distance(a, p) < distance(b, p); };
 
             std::vector<Point> all_points_copy = all_points;
             all_points_copy.erase(

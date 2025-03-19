@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 
 #include "software/ai/navigator/trajectory/trajectory.hpp"
 

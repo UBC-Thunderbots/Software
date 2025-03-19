@@ -29,8 +29,9 @@ TEST(NonTerminatingFunctionValidatorTest, test_yielding_error_message)
 {
     // This validation_functions uses exceptions as a way for the test to observe it's
     // internal state The exception will not be reached until the 3rd function call
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
+    ValidationFunction validation_function =
+        [](std::shared_ptr<World> world, ValidationCoroutine::push_type& yield)
+    {
         yield("This is an error message 1");
         yield("This is an error message 2");
     };
@@ -46,8 +47,9 @@ TEST(NonTerminatingFunctionValidatorTest, test_yielding_error_message)
 TEST(NonTerminatingFunctionValidatorTest,
      test_world_updated_correctly_between_validation_function_restarts)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
+    ValidationFunction validation_function =
+        [](std::shared_ptr<World> world, ValidationCoroutine::push_type& yield)
+    {
         if (world->ball().position() != Point(1, 1))
         {
             yield("Ball not at (1,1)");

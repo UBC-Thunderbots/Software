@@ -1,5 +1,6 @@
 #pragma once
 #include <g3log/logmessage.hpp>
+#include <optional>
 #include <string>
 
 #include "proto/visualization.pb.h"
