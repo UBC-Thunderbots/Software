@@ -347,9 +347,7 @@ class RobotInfo(QWidget):
             f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
         )
 
-    def __update_ui(
-        self
-    ) -> None:
+    def __update_ui(self) -> None:
         """Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
             - Whether breakbeam is tripped
