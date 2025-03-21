@@ -155,12 +155,15 @@ class ColorProgressBar(QProgressBar):
             [255, 200, 0],
             [0, 170, 180],
             [0, 0, 0],
-            [255, 255, 255]
+            [255, 255, 255],
         )
 
         # Extract color into CSS form.
         super(ColorProgressBar, self).setStyleSheet(
-            "QProgressBar::chunk" "{" f"background: rgb({color.red()}, {color.green()}, {color.blue()})" "}"
+            "QProgressBar::chunk"
+            "{"
+            f"background: rgb({color.red()}, {color.green()}, {color.blue()})"
+            "}"
         )
 
     def getPercentage(self):

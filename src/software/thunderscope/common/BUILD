@@ -60,4 +60,3 @@ py_library(
         requirement("pyqt-toast-notification"),
     ],
 )
-
