@@ -41,3 +41,11 @@ py_library(
         ":frametime_counter",
     ],
 )
+
+py_library(
+    name = "util",
+    srcs = ["util.py"],
+    deps = [
+        ":util",
+    ],
+)
