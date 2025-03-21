@@ -251,7 +251,7 @@ Alternative (without entering redis repl):
 
 ## GDB Server
 
-Sometime it would be nice to gdb into the robot to see the backtrace from a segfault. Run the following commands in order to launch gdb
+Sometimes it would be nice to gdb into the robot to see the backtrace from a segfault. Run the following commands in order to launch gdb
 
 
 Prerequisite: a `gdb-server` must be installed locally on the robot! You must be in the `src` directory when running this!
