@@ -1,5 +1,4 @@
 from proto.play_info_msg_pb2 import PlayInfo
-from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.common.common_widgets import set_table_data
@@ -43,36 +42,32 @@ class PlayInfoWidget(QWidget):
 
         self.last_playinfo = playinfo
 
-        play_info_dict = MessageToDict(playinfo)
-
         robot_ids = []
         tactic_fsm_states = []
         tactic_names = []
         play_name = []
 
-        if "robotTacticAssignment" not in play_info_dict:
+        if not playinfo.robot_tactic_assignment:
             return
 
         num_rows = max(
-            len(play_info_dict["robotTacticAssignment"]),
-            len(play_info_dict["play"]["playState"]),
+            len(playinfo.robot_tactic_assignment),
+            len(playinfo.play.play_state),
         )
 
         # setting table size dynamically
         self.play_table.setRowCount(num_rows)
 
-        for state in play_info_dict["play"]["playState"]:
+        for state in playinfo.play.play_state:
             play_name.append(state)
 
-        for robot_id in sorted(play_info_dict["robotTacticAssignment"]):
+        for robot_id in sorted(playinfo.robot_tactic_assignment):
             robot_ids.append(robot_id)
             tactic_fsm_states.append(
-                play_info_dict["robotTacticAssignment"][robot_id]["tacticFsmState"]
-            )
-            tactic_names.append(
-                play_info_dict["robotTacticAssignment"][robot_id]["tacticName"]
+                playinfo.robot_tactic_assignment[robot_id].tactic_fsm_state
             )
 
+            tactic_names.append(playinfo.robot_tactic_assignment[robot_id].tactic_name)
         set_table_data(
             {
                 "Play": play_name,
