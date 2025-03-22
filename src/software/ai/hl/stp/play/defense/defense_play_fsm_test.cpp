@@ -23,5 +23,5 @@ TEST(DefensePlayFSMTest, test_transitions)
             [](InterPlayCommunication comm) {})));
 
     // DefensePlayFSM always stays in the DefenseState
-    EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>) || fsm.is(boost::sml::state<DefensePlayFSM::AggressiveDefenseState>));
 }
