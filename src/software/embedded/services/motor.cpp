@@ -468,47 +468,11 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     double back_left_velocity;
     double dribbler_rpm;
 
-    if (motorInEnabledList(FRONT_RIGHT_MOTOR_CHIP_SELECT))
-    {
-        front_right_velocity =
-                static_cast<double>(tmc4671ReadThenWriteValue(
-                        FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-                        TMC4671_PID_VELOCITY_TARGET, front_right_target_rpm)) *
-                MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    } else {
-        // TODO #3424: When a motor is disabled use three-wheel velocity calculations.
-        front_right_velocity = 0;
-    }
-    if (motorInEnabledList(FRONT_LEFT_MOTOR_CHIP_SELECT))
-    {
-        front_left_velocity =
-                static_cast<double>(tmc4671ReadThenWriteValue(
-                        FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-                        TMC4671_PID_VELOCITY_TARGET, front_left_target_rpm)) *
-                MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    } else {
-        front_left_velocity = 0;
-    }
-    if (motorInEnabledList(BACK_RIGHT_MOTOR_CHIP_SELECT))
-    {
-        back_right_velocity =
-                static_cast<double>(tmc4671ReadThenWriteValue(
-                        BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-                        TMC4671_PID_VELOCITY_TARGET, back_right_target_rpm)) *
-                MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    } else {
-        back_right_velocity = 0;
-    }
-    if (motorInEnabledList(BACK_LEFT_MOTOR_CHIP_SELECT))
-    {
-        back_left_velocity =
-                static_cast<double>(tmc4671ReadThenWriteValue(
-                        BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-                        TMC4671_PID_VELOCITY_TARGET, back_left_target_rpm)) *
-                MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-    } else {
-        back_left_velocity = 0;
-    }
+    readThenWriteTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, front_right_velocity, front_right_target_rpm);
+    readThenWriteTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, front_left_velocity, front_left_target_rpm);
+    readThenWriteTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, back_right_velocity, back_right_target_rpm);
+    readThenWriteTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, back_left_velocity, back_left_target_rpm);
+
     if (motorInEnabledList(DRIBBLER_MOTOR_CHIP_SELECT))
     {
         dribbler_rpm = static_cast<double>(
@@ -646,6 +610,20 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_dribbler()->set_dribbler_rpm(float(dribbler_ramp_rpm_));
 
     return motor_status;
+}
+
+void MotorService::readThenWriteTargetVelocity(uint8_t motor_chip, double& velocity, int target) {
+    if (motorInEnabledList(motor_chip))
+    {
+        velocity =
+                static_cast<double>(tmc4671ReadThenWriteValue(
+                        motor_chip, TMC4671_PID_VELOCITY_ACTUAL,
+                        TMC4671_PID_VELOCITY_TARGET, target)) *
+                MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+    } else {
+        // TODO #3424: When a motor is disabled use three-wheel velocity calculations.
+        velocity = 0;
+    }
 }
 
 bool MotorService::requiresMotorReinit(uint8_t motor)
