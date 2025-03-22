@@ -148,14 +148,16 @@ class MotorService
          * motor fault
          * @param motor_faults  a set of faults associated with this motor
          */
-        void update(bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults);
+        void update(bool enabled,
+                    std::unordered_set<TbotsProto::MotorFault>& motor_faults);
 
-         /**
-          *  Remove motor_id from enabled_motors and log the removal, if it has failed too much.
-          *
-          *  @param motors a set of motors that are currently enabled
-          */
-         void removeFaultyMotor(std::set<uint8_t>& motors);
+        /**
+         *  Remove motor_id from enabled_motors and log the removal, if it has failed too
+         * much.
+         *
+         *  @param motors a set of motors that are currently enabled
+         */
+        void removeFaultyMotor(std::set<uint8_t>& motors);
     };
 
     /**
