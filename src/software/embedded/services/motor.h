@@ -145,58 +145,18 @@ class MotorService
         /**
          * Update drive enabled, fault count, type of last fault, and time since the last fault
          *
-         *
          * @param enabled true if the motor is enabled, false if disabled due to a
          * motor fault
          * @param motor_faults  a set of faults associated with this motor
          */
-        void update(bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults)
-         {
-            const auto now = std::chrono::system_clock::now();
-            drive_enabled = enabled;
-            last_motor_faults = motor_faults;
+        void update(bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults);
 
-
-            if(time_of_first_fault.has_value()) {
-                total_duration_since_last_fault_s =
-                        std::chrono::duration_cast<std::chrono::seconds>(
-                                now - time_of_first_fault.value())
-                                .count();
-            }
-
-            if(time_of_first_fault.has_value() &&
-               total_duration_since_last_fault_s < MOTOR_FAULT_TIME_THRESHOLD_S)
-            {
-                if(!enabled)
-                {
-                    num_critical_faults++;
-                }
-            }
-            else
-            {
-                if(!enabled)
-                {
-                    time_of_first_fault = std::make_optional(now);
-                    num_critical_faults = 1;
-                }
-            }
-         }
          /**
           *  Remove motor_id from enabled_motors and log the removal, if it has failed too much.
           *
           *  @param motors a set of motors that are currently enabled
           */
-         void
-         removeFaultyMotor(std::set<uint8_t>& motors)
-         {
-
-             if(num_critical_faults > MOTOR_FAULT_THRESHOLD_COUNT) {
-                 LOG(WARNING) << "In the last " << total_duration_since_last_fault_s
-                              << "s, the motor board has reset " << num_critical_faults
-                              << " times. The motor " << int(motor_id) << " is now disabled for safety";
-                 motors.erase(motor_id);
-             }
-         }
+         void removeFaultyMotor(std::set<uint8_t>& motors);
     };
 
     /**
@@ -236,9 +196,6 @@ class MotorService
      */
     int readIntFromTMC4671(uint8_t motor, uint8_t address);
 
-    std::unordered_map<int, MotorFaultIndicator> getCachedMotorFaults(){
-        return cached_motor_faults_;
-    }
 
    private:
     /**
@@ -477,10 +434,6 @@ class MotorService
     static const int NUM_CALIBRATION_ATTEMPTS = 10;
 
     int dribbler_ramp_rpm_;
-
-    std::optional<std::chrono::time_point<std::chrono::system_clock>>
-        tracked_motor_fault_start_time_;
-    int num_tracked_motor_resets_;
 
     static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
 

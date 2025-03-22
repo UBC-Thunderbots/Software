@@ -79,12 +79,44 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       euclidean_to_four_wheel_(robot_constants),
       motor_fault_detector_(0),
       dribbler_ramp_rpm_(0),
-      tracked_motor_fault_start_time_(std::nullopt),
-      num_tracked_motor_resets_(0),
       enabled_motors({0,1,2,3,4})
 {
     motorServiceInit(robot_constants, control_loop_frequency_hz);
 }
+
+void MotorService::MotorFaultIndicator::update(bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults) {
+    const auto now = std::chrono::system_clock::now();
+    drive_enabled = enabled;
+    last_motor_faults = motor_faults;
+
+
+    if(time_of_first_fault.has_value()) {
+        total_duration_since_last_fault_s =
+                std::chrono::duration_cast<std::chrono::seconds>(
+                        now - time_of_first_fault.value())
+                        .count();
+    }
+    if(!enabled) {
+        if (time_of_first_fault.has_value() &&
+            total_duration_since_last_fault_s < MOTOR_FAULT_TIME_THRESHOLD_S) {
+            num_critical_faults++;
+        } else {
+            time_of_first_fault = std::make_optional(now);
+            num_critical_faults = 1;
+        }
+    }
+}
+
+void MotorService::MotorFaultIndicator::removeFaultyMotor(std::set<uint8_t> &motors) {
+
+    if(num_critical_faults > MOTOR_FAULT_THRESHOLD_COUNT) {
+        LOG(WARNING) << "In the last " << total_duration_since_last_fault_s
+                     << "s, the motor board has reset " << num_critical_faults
+                     << " times. The motor " << int(motor_id) << " is now disabled for safety";
+        motors.erase(motor_id);
+    }
+}
+
 
 void MotorService::motorServiceInit(const RobotConstants_t& robot_constants,
                                     int control_loop_frequency_hz)
