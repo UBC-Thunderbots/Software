@@ -59,15 +59,6 @@ class MotorService
                                  double time_elapsed_since_last_poll_s);
 
     /**
-     * Write the target velocity to the given motor, if the motor is enabled
-     *
-     * @param motor_chip the chip to write to
-     * @param velocity the current velocity of the motor
-     * @param target target rpm
-     */
-     void readThenWriteToEnabledMotor(uint8_t motor_chip, double& velocity, int target);
-
-    /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins
      * appropriately and calls readWriteByte. See C++ implementation file for more info
      *
@@ -383,6 +374,15 @@ class MotorService
      * Disables broken motors
      */
     void stopDisabledMotors();
+
+    /**
+     * Write the target velocity to the given motor, if the motor is enabled
+     *
+     * @param motor_chip the chip to write to
+     * @param velocity the current velocity of the motor
+     * @param target target rpm
+     */
+    void readThenWriteToEnabledMotor(uint8_t motor_chip, double& velocity, int target);
 
     // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
     // pairs of the drive motor.
