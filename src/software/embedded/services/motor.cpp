@@ -421,7 +421,6 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
         motor_fault_detector_ =
                 static_cast<uint8_t>((motor_fault_detector_ + 1) % NUM_MOTORS);
     } while (!motorInEnabledList(motor_fault_detector_));
-    stopDisabledMotors();
     return motor_status;
 }
 
@@ -522,7 +521,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     TbotsProto::MotorStatus motor_status =
         updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
                           back_right_velocity, dribbler_rpm);
-
+    stopDisabledMotors();
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
     // TODO #3424: three wheel drive
