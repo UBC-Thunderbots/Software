@@ -65,7 +65,7 @@ class MotorService
      * @param velocity the current velocity of the motor
      * @param target target rpm
      */
-     void readThenWriteTargetVelocity(uint8_t motor_chip, double& velocity, int target);
+     void readThenWriteToEnabledMotor(uint8_t motor_chip, double& velocity, int target);
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins

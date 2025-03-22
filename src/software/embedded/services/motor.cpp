@@ -468,10 +468,10 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     double back_left_velocity;
     double dribbler_rpm;
 
-    readThenWriteTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, front_right_velocity, front_right_target_rpm);
-    readThenWriteTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, front_left_velocity, front_left_target_rpm);
-    readThenWriteTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT, back_right_velocity, back_right_target_rpm);
-    readThenWriteTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT, back_left_velocity, back_left_target_rpm);
+    readThenWriteToEnabledMotor(FRONT_RIGHT_MOTOR_CHIP_SELECT, front_right_velocity, front_right_target_rpm);
+    readThenWriteToEnabledMotor(FRONT_LEFT_MOTOR_CHIP_SELECT, front_left_velocity, front_left_target_rpm);
+    readThenWriteToEnabledMotor(BACK_RIGHT_MOTOR_CHIP_SELECT, back_right_velocity, back_right_target_rpm);
+    readThenWriteToEnabledMotor(BACK_LEFT_MOTOR_CHIP_SELECT, back_left_velocity, back_left_target_rpm);
 
     if (motorInEnabledList(DRIBBLER_MOTOR_CHIP_SELECT))
     {
@@ -612,7 +612,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     return motor_status;
 }
 
-void MotorService::readThenWriteTargetVelocity(uint8_t motor_chip, double& velocity, int target) {
+void MotorService::readThenWriteToEnabledMotor(uint8_t motor_chip, double& velocity, int target) {
     if (motorInEnabledList(motor_chip))
     {
         velocity =
