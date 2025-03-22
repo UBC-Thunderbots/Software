@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 
-
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
@@ -14,10 +13,8 @@
 #include "software/embedded/gpio_char_dev.h"
 #include "software/embedded/gpio_sysfs.h"
 #include "software/embedded/platform.h"
-#include "software/physics/euclidean_to_wheel.h"
-
-
 #include "software/logger/logger.h"
+#include "software/physics/euclidean_to_wheel.h"
 /**
  * A service that interacts with the motor.
  *
@@ -126,19 +123,26 @@ class MotorService
         std::unordered_set<TbotsProto::MotorFault> last_motor_faults;
         const uint8_t motor_id;
         int num_critical_faults;
-        std::optional<std::chrono::time_point<std::chrono::system_clock>> time_of_first_fault;
+        std::optional<std::chrono::time_point<std::chrono::system_clock>>
+            time_of_first_fault;
         long int total_duration_since_last_fault_s;
 
         /**
          * Construct a default indicator of no faults and running motors, with a motor id.
          */
         MotorFaultIndicator(uint8_t id)
-        : drive_enabled(true), last_motor_faults(), motor_id(id),
-          num_critical_faults(0), time_of_first_fault(std::nullopt),
-          total_duration_since_last_fault_s(0){}
+            : drive_enabled(true),
+              last_motor_faults(),
+              motor_id(id),
+              num_critical_faults(0),
+              time_of_first_fault(std::nullopt),
+              total_duration_since_last_fault_s(0)
+        {
+        }
 
         /**
-         * Update drive enabled, fault count, type of last fault, and time since the last fault
+         * Update drive enabled, fault count, type of last fault, and time since the last
+         * fault
          *
          * @param enabled true if the motor is enabled, false if disabled due to a
          * motor fault
@@ -461,7 +465,6 @@ class MotorService
     // Motor names (indexed with chip select above)
     static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
                                                   "front_right", "dribbler"};
-
 };
 
 template <typename T>
