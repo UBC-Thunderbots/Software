@@ -1153,6 +1153,7 @@ void MotorService::checkEncoderConnections()
     for (u_int8_t motor : enabled_motors)
     {
         if (motor == DRIBBLER_MOTOR_CHIP_SELECT){
+            // Dribblers don't use an encoder.
             continue;
         }
         // read back current velocity

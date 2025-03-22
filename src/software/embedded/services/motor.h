@@ -126,11 +126,6 @@ class MotorService
     void setup();
 
     /**
-     * Disables motors not in enabled_motors
-     */
-    void stopDisabledMotors();
-
-    /**
      * Holds motor fault information for a particular motor and whether any fault has
      * caused the motor to be disabled.
      */
@@ -383,6 +378,11 @@ class MotorService
      * @return true if motor in enabled_motors, false otherwise
      */
     bool motorInEnabledList(u_int8_t motor);
+
+    /**
+     * Disables broken motors
+     */
+    void stopDisabledMotors();
 
     // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
     // pairs of the drive motor.
