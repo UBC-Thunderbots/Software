@@ -31,4 +31,3 @@ cc_test(
         "//software/test_util",
     ],
 )
-
