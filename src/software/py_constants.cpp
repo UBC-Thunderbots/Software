@@ -72,14 +72,16 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("WORLD_STATE_RECEIVED_TRIGGER_PATH") = WORLD_STATE_RECEIVED_TRIGGER_PATH;
 
     // Multicast Channels
-    m.def("getRobotMulticastChannel", [](py::args& args) {
-        if (args.size() != 1)
-        {
-            throw std::runtime_error("must provide channel number only");
-        }
+    m.def("getRobotMulticastChannel",
+          [](py::args& args)
+          {
+              if (args.size() != 1)
+              {
+                  throw std::runtime_error("must provide channel number only");
+              }
 
-        return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
-    });
+              return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
+          });
 
     // Ports
     m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
@@ -139,14 +141,6 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("MAX_ROBOT_IDS_PER_SIDE") = MAX_ROBOT_IDS_PER_SIDE;
     m.attr("DIV_A_NUM_ROBOTS")       = DIV_A_NUM_ROBOTS;
     m.attr("DIV_B_NUM_ROBOTS")       = DIV_B_NUM_ROBOTS;
-
-    // Redis Keys
-    m.attr("ROBOT_ID_REDIS_KEY")                = ROBOT_ID_REDIS_KEY;
-    m.attr("ROBOT_MULTICAST_CHANNEL_REDIS_KEY") = ROBOT_MULTICAST_CHANNEL_REDIS_KEY;
-    m.attr("ROBOT_NETWORK_INTERFACE_REDIS_KEY") = ROBOT_NETWORK_INTERFACE_REDIS_KEY;
-    m.attr("ROBOT_BATTERY_VOLTAGE_REDIS_KEY")   = ROBOT_BATTERY_VOLTAGE_REDIS_KEY;
-    m.attr("ROBOT_CURRENT_DRAW_REDIS_KEY")      = ROBOT_CURRENT_DRAW_REDIS_KEY;
-    m.attr("CAPACITOR_VOLTAGE_REDIS_KEY")       = ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY;
 
     // Robot power constants
     m.attr("MIN_CAPACITOR_VOLTAGE")   = MIN_CAPACITOR_VOLTAGE;

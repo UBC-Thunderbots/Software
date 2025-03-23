@@ -21,7 +21,7 @@ TEST(YamlReadertest, test_can_read_basic_config)
     file << file_content;
     file.close();
 
-    YAMLReader reader("/tmp/testing.yaml");
+    YamlReader reader("/tmp/testing.yaml");
 
     ASSERT_EQ(reader.getValueDouble("kick_constant"), 1.2);
     ASSERT_EQ(reader.getValueDouble("kick_coeff"), 1.1);

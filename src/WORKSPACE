@@ -79,15 +79,6 @@ http_archive(
 )
 
 http_archive(
-    name = "cpp_redis",
-    sha256 = "12a6fc86ba4ca3d4537a3eee82c094f385b8e03e283c664c976f16d421f17f7d",
-    strip_prefix = "cpp_redis-fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa",
-    urls = [
-        "https://github.com/cpp-redis/cpp_redis/archive/fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa.zip",
-    ],
-)
-
-http_archive(
     name = "tacopie",
     sha256 = "bbdebecdb68d5f9eb64170217000daf844e0aee18b8c4d3dd373d07efd9f7316",
     strip_prefix = "tacopie-master",

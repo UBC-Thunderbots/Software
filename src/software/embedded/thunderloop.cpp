@@ -76,15 +76,14 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     : yaml_config_reader_(ROBOT_PATH_TO_YAML_CONFIG.c_str()),
       motor_status_(std::nullopt),
       robot_constants_(robot_constants),
-      robot_id_(yaml_config_reader_.getValueInt(ROBOT_ID_REDIS_KEY)),
-      channel_id_(yaml_config_reader_.getValueInt(ROBOT_MULTICAST_CHANNEL_REDIS_KEY)),
+      robot_id_(yaml_config_reader_.getValueInt(ROBOT_ID_YAML_KEY)),
+      channel_id_(yaml_config_reader_.getValueInt(ROBOT_MULTICAST_CHANNEL_YAML_KEY)),
       network_interface_(
-          yaml_config_reader_.getValueString(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
+          yaml_config_reader_.getValueString(ROBOT_NETWORK_INTERFACE_YAML_KEY)),
       loop_hz_(loop_hz),
-      kick_coeff_(yaml_config_reader_.getValueDouble(ROBOT_KICK_EXP_COEFF_REDIS_KEY)),
-      kick_constant_(yaml_config_reader_.getValueInt(ROBOT_KICK_CONSTANT_REDIS_KEY)),
-      chip_pulse_width_(
-          yaml_config_reader_.getValueInt(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY)),
+      kick_coeff_(yaml_config_reader_.getValueDouble(ROBOT_KICK_EXP_COEFF_YAML_KEY)),
+      kick_constant_(yaml_config_reader_.getValueInt(ROBOT_KICK_CONSTANT_YAML_KEY)),
+      chip_pulse_width_(yaml_config_reader_.getValueInt(ROBOT_CHIP_PULSE_WIDTH_YAML_KEY)),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
@@ -134,8 +133,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
               << ", and NETWORK INTERFACE: " << network_interface_;
-    LOG(INFO)
-        << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
+    LOG(INFO) << "THUNDERLOOP: to update Thunderloop configuration, change yaml store in"
+              << ROBOT_PATH_TO_YAML_CONFIG << " and restart Thunderloop";
 }
 
 Thunderloop::~Thunderloop() {}

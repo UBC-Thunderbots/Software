@@ -10,10 +10,10 @@
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/embedded/primitive_executor.h"
-#include "software/embedded/yaml/yaml_reader.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
+#include "software/embedded/yaml/yaml_reader.h"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
@@ -63,7 +63,7 @@ class Thunderloop
     std::unique_ptr<PowerService> power_service_;
 
     // Clients
-    YAMLReader yaml_config_reader_;
+    YamlReader yaml_config_reader_;
 
    private:
     /*
