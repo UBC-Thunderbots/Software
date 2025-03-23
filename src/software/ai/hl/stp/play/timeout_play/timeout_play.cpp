@@ -3,9 +3,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 TimeoutPlay::TimeoutPlay(TbotsProto::AiConfig config)
-    : Play(config, false /*requires_goalie*/),
-      fsm(TimeoutPlayFSM()),
-      control_params()
+    : Play(config, false /*requires_goalie*/), fsm(TimeoutPlayFSM()), control_params()
 {
 }
 

@@ -33,11 +33,11 @@ class TimeoutPlay : public Play
 
    private:
     /*
-       * Making timeout formation
-       *
-       * @param word the world where the field is in
-       * @returns   a tactic vector representing the timeout formation 
-       */
+     * Making timeout formation
+     *
+     * @param word the world where the field is in
+     * @returns   a tactic vector representing the timeout formation
+     */
     PriorityTacticVector makeTimeoutFormation(WorldPtr world);
 
     FSM<TimeoutPlayFSM> fsm;
