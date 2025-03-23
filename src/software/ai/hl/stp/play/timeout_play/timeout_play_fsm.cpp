@@ -4,7 +4,7 @@
 
 PriorityTacticVector TimeoutPlayFSM::makeTimeoutFormation(WorldPtr world)
 {
-    TacticVector tactic = {};
+    TacticVector tactics = {};
 
     double half_field_length_x = world->field().xLength() / 2.0;
     double formation_spacing_x = half_field_length_x / 4;
@@ -24,10 +24,10 @@ PriorityTacticVector TimeoutPlayFSM::makeTimeoutFormation(WorldPtr world)
     {
         std::shared_ptr<MoveTactic> move_tactic = std::make_shared<MoveTactic>();
         move_tactic->updateControlParams(point, Angle::zero());
-        tactic.push_back(move_tactic);
+        tactics.push_back(move_tactic);
     }
 
-    return {tactic};
+    return {tactics};
 }
 
 void TimeoutPlayFSM::updateTimeout(const Update& event)
