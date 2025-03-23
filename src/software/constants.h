@@ -54,7 +54,7 @@ const std::string ROBOT_BATTERY_VOLTAGE_YAML_KEY   = "battery_voltage";
 const std::string ROBOT_CAPACITOR_VOLTAGE_YAML_KEY = "cap_voltage";
 
 const std::string ROBOT_PATH_TO_YAML_CONFIG =
-    "/home/robot/thunderbot_binaries/config.yaml";
+    "/home/robot/thunderbots_binaries/config.yml";
 
 const std::string SSL_VISION_ADDRESS          = "224.5.23.2";
 static constexpr unsigned int SSL_VISION_PORT = 10020;

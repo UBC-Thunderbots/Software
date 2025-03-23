@@ -17,11 +17,11 @@ TEST(YamlReadertest, test_can_read_basic_config)
 
     // writing to file
     std::ofstream file;
-    file.open("/tmp/testing.yaml");
+    file.open("/tmp/testing.yml");
     file << file_content;
     file.close();
 
-    YamlReader reader("/tmp/testing.yaml");
+    YamlReader reader("/tmp/testing.yml");
 
     ASSERT_EQ(reader.getValueDouble("kick_constant"), 1.2);
     ASSERT_EQ(reader.getValueDouble("kick_coeff"), 1.1);
@@ -31,5 +31,5 @@ TEST(YamlReadertest, test_can_read_basic_config)
     ASSERT_EQ(reader.getValueInt("channel_id"), 2);
 
     // cleanup
-    std::remove("/tmp/testing.yaml");
+    std::remove("/tmp/testing.yml");
 }

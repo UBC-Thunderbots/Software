@@ -61,9 +61,9 @@ flowchart TD
                                               `service thunderloop restart`)
     tloop_status --> |Running| tloop_logs(Check Thunderloop logs for errors
                                           `journalctl -fu thunderloop -n 300`)
-    tloop_logs --> |No Errors| check_yaml(Is field network_interface in the yaml file located in /home/robot/thunderbots_binaries/config.yaml wlan0 or tbots? And is the field channel_id 0?)
+    tloop_logs --> |No Errors| check_yaml(Is field network_interface in the yaml file located in /home/robot/thunderbots_binaries/config.yml wlan0 or tbots? And is the field channel_id 0?)
     tloop_logs --> |Contains Errors| rip2("Fix errors or check errors with a lead")
-    check_yaml --> |No| update_yaml("Update yaml by changing the following field in the yaml file located in /home/robot/thunderbot_binaries/config.yaml:
+    check_yaml --> |No| update_yaml("Update yaml by changing the following field in the yaml file located in /home/robot/thunderbot_binaries/config.yml:
                                       1. The 'network_interface' should be set to 'wlan0'` (for Nanos) OR the `network_interface' should be set to 'tbots' (for Pis)
                                       2. Both Pi and Nano must set the field 'channel_id' to 0")
     check_yaml --> |Yes| rip3(Check with a lead)
@@ -225,5 +225,5 @@ Pressing the reset button once will send a status msg over its connected port. T
 
 ## Yaml
 
-To change the parameters on the robot, one can alter the filed located in `/home/robot/thunderbot_binaries/config.yaml`.
+To change the parameters on the robot, one can alter the filed located in `/home/robot/thunderbots_binaries/config.yml`.
 

@@ -10,6 +10,7 @@
       - start
     binary_paths:
       thunderloop: ../../thunderloop_main
+      config: ../playbooks/config.yml
 
   tasks:
     - name: Log Robot ID
@@ -53,6 +54,18 @@
           register: result
 
         - name: Sync Binaries
+          ansible.posix.synchronize:
+            src: "{{ binary_paths[service_name] }}"
+            dest: ~/thunderbots_binaries/
+            recursive: true
+            copy_links: true
+          with_items: "{{ services }}"
+          loop_control:
+            loop_var: service_name
+          when: "'sync' in actions"
+          tags: always
+
+        - name: Sync Yaml Config
           ansible.posix.synchronize:
             src: "{{ binary_paths[service_name] }}"
             dest: ~/thunderbots_binaries/

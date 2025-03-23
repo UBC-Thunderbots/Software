@@ -1,0 +1,7 @@
+# These are config for the robots and not ansible play scripts 
+robot_id:             1
+channel_id:           0
+network_interface:    "wlan0"
+kick_coeff:           0.275
+kick_constant:        500
+chip_pulse_width:     20000
