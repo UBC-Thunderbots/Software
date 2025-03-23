@@ -61,8 +61,7 @@ flowchart TD
                                               `service thunderloop restart`)
     tloop_status --> |Running| tloop_logs(Check Thunderloop logs for errors
                                           `journalctl -fu thunderloop -n 300`)
-    tloop_logs --> |No Errors| check_yaml(Is field 'network_interface` in the yaml file located in /home/robot/thunderbots_binaries/config.yaml 'wlan0' or 'tbots'?
-    And is the field `channel_id` 0?)
+    tloop_logs --> |No Errors| check_yaml(Is field network_interface in the yaml file located in /home/robot/thunderbots_binaries/config.yaml wlan0 or tbots? And is the field channel_id 0?)
     tloop_logs --> |Contains Errors| rip2("Fix errors or check errors with a lead")
     check_yaml --> |No| update_yaml("Update yaml by changing the following field in the yaml file located in /home/robot/thunderbot_binaries/config.yaml:
                                       1. The 'network_interface' should be set to 'wlan0'` (for Nanos) OR the `network_interface' should be set to 'tbots' (for Pis)
