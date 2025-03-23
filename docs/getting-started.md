@@ -373,6 +373,7 @@ Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), 
 It is possible to run Thunderloop without having a fully-working robot. Using this mode is useful when testing features that don't require the power board or motors.
 
 1. To run Thunderloop locally on your computer
+    1. You must alter the variable `ROBOT_PATH_TO_YAML_CONFIG` located in `constants.h` to point to a valid yaml configuration for thunderloop.
     1. Now, run Thunderloop with the following command:
         - `bazel run //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED`
 
