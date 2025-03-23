@@ -35,7 +35,7 @@ void TimeoutPlayFSM::updateTimeout(const Update& event)
     event.common.set_tactics(makeTimeoutFormation(event.common.world_ptr));
 }
 
-TimeoutPlayFSM::TimeoutPlayFSM(TbotsProto::AiConfig ai_config)
+TimeoutPlayFSM::TimeoutPlayFSM()
 {
     // timeout here
 }

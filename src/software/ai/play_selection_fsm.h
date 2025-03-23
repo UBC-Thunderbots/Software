@@ -35,7 +35,7 @@ struct PlaySelectionFSM
     explicit PlaySelectionFSM(TbotsProto::AiConfig ai_config);
 
     /**
-     * Guards for whether the game state is stopped, halted, playing, or in set up
+     * Guards for whether the game state is stopped, halted, playing, timeout, or in set up
      *
      * @param event The PlaySelection::Update event
      *

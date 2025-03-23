@@ -21,7 +21,7 @@ struct TimeoutPlayFSM
      *
      * @param ai_config the play config for this FSM
      */
-    explicit TimeoutPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit TimeoutPlayFSM();
 
     /**
      * Action to make the robot make a T like formation in half time
@@ -47,5 +47,11 @@ struct TimeoutPlayFSM
     }
 
    private:
+    /*
+     * Make timeout formation
+     *
+     * @param world the world where the field is at
+     * @returns a priority tactic vector
+     */
     PriorityTacticVector makeTimeoutFormation(WorldPtr world);
 };

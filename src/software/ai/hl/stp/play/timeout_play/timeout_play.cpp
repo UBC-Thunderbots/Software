@@ -4,7 +4,7 @@
 
 TimeoutPlay::TimeoutPlay(TbotsProto::AiConfig config)
     : Play(config, false /*requires_goalie*/),
-      fsm(TimeoutPlayFSM(config)),
+      fsm(TimeoutPlayFSM()),
       control_params()
 {
 }
