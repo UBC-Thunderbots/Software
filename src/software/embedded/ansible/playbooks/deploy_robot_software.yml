@@ -11,6 +11,8 @@
     binary_paths:
       thunderloop: ../../thunderloop_main
       config: ../playbooks/config.yml
+    archive_paths:
+      robot_diagnostics_cli_tar: ../../robot_diagnostics_cli/robot_diagnostics_cli_tar.tar.gz
 
   tasks:
     - name: Log Robot ID
@@ -76,6 +78,33 @@
             loop_var: service_name
           when: "'sync' in actions"
           tags: always
+
+        - name: Sync Archived Binaries
+          with_items: "{{ archive_paths }}"
+          loop_control:
+            loop_var: archive_name
+          ansible.posix.synchronize:
+            src: "{{ archive_paths[archive_name] }}"
+            dest: ~/thunderbots_binaries/
+            recursive: true
+            copy_links: true
+          tags: always
+
+        - name: Unarchiving Binaries
+          with_items: "{{ archive_paths }}"
+          loop_control:
+            loop_var: archive_name
+          ansible.builtin.unarchive:
+            src: "~/thunderbots_binaries/{{ archive_name }}.tar.gz"
+            dest: ~/thunderbots_binaries/
+            remote_src: true
+
+        - name: Create Link to Diagnostics CLI
+          ansible.builtin.file:
+            src: /home/robot/thunderbots_binaries/robot_diagnostics_cli
+            dest: /home/robot/tbots_cli
+            state: link
+            force: true
 
         - name: Start Services
           become: true

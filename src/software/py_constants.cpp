@@ -142,6 +142,7 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("DIV_A_NUM_ROBOTS")       = DIV_A_NUM_ROBOTS;
     m.attr("DIV_B_NUM_ROBOTS")       = DIV_B_NUM_ROBOTS;
 
+
     // Robot power constants
     m.attr("MIN_CAPACITOR_VOLTAGE")   = MIN_CAPACITOR_VOLTAGE;
     m.attr("MAX_CAPACITOR_VOLTAGE")   = MAX_CAPACITOR_VOLTAGE;
