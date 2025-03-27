@@ -17,7 +17,7 @@ from software.python_bindings import *
 from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
+from threading import Thread
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +29,7 @@ class Gamecontroller:
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(
-        self, suppress_logs: bool = False, use_conventional_port: bool = False
+        self, suppress_logs: bool = False, use_conventional_port: bool = False, simulator_proto_unix_io: ProtoUnixIO = None
     ) -> None:
         """Run Gamecontroller
 
@@ -54,6 +54,16 @@ class Gamecontroller:
             buffer_size=2, protobuf_type=ManualGCCommand
         )
 
+        self.simulator_proto_unix_io = simulator_proto_unix_io
+        self.blue_team_world_buffer = ThreadSafeBuffer(
+            buffer_size=50, protobuf_type=World
+        )
+        self.referee_buffer = ThreadSafeBuffer(buffer_size=10, protobuf_type=Referee)
+        self.previous_max_blue_robots = 0
+        self.previous_max_yellow_robots = 0
+        self.latest_world = None
+        self.is_running = False
+
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
         We want a getter function that returns the port we are using.
@@ -71,6 +81,10 @@ class Gamecontroller:
 
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
+
+        self.is_running = True
+        self.world_thread = Thread(target=self.get_latest_world, daemon=True)
+        self.world_thread.start()
 
         if self.suppress_logs:
             with open(os.devnull, "w") as fp:
@@ -95,9 +109,16 @@ class Gamecontroller:
         """
         self.gamecontroller_proc.terminate()
         self.gamecontroller_proc.wait()
-
+        self.is_running = False
+        self.world_thread.join()
         self.ci_socket.close()
 
+    def get_latest_world(self) -> World:
+        while self.is_running:
+            self.latest_world = self.blue_team_world_buffer.get(
+                block=False, return_cached=True
+            )
+            time.sleep(0.1)
     def refresh(self):
         """Gets any manual gamecontroller commands from the buffer and executes them"""
         manual_command = self.command_override_buffer.get(return_cached=False)
@@ -118,6 +139,74 @@ class Gamecontroller:
                 ),
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
+        referee = self.referee_buffer.get(block=False, return_cached=False)
+        while referee is not None:
+            self.handle_referee(referee)
+            print(f"blue: {referee.blue.max_allowed_bots }|||| yellow: {referee.yellow.max_allowed_bots}")
+            referee = self.referee_buffer.get(block=False, return_cached=False)
+            print("####GETTING BUFFER")
+
+
+    def handle_referee(self, referee: Referee) -> None:
+        """
+        Updates the world state based on the referee message
+        :param referee: the referee protobuf message
+        """
+        # Check that we are running with the simulator and have access to its
+        # proto unix io
+        if self.simulator_proto_unix_io is None:
+            return
+
+        max_allowed_bots_yellow = referee.yellow.max_allowed_bots
+        max_allowed_bots_blue = referee.blue.max_allowed_bots
+        self.previous_max_blue_robots = max_allowed_bots_blue
+        self.previous_max_yellow_robots = max_allowed_bots_yellow
+
+        # Convert the latest blue world into a WorldState we can send to the simulator
+        # latest_blue_world = self.blue_team_world_buffer.get(
+        #     block=False, return_cached=True
+        # )
+
+        latest_blue_world = self.latest_world
+
+        if (len(latest_blue_world.friendly_team.team_robots) <= max_allowed_bots_blue and
+                len(latest_blue_world.enemy_team.team_robots) <= max_allowed_bots_yellow):
+            # should we re-add these bots?
+            return
+
+        world_state = WorldState()
+        # Set robot velocities to zero to avoid any drift
+        for robot in latest_blue_world.friendly_team.team_robots:
+            if max_allowed_bots_blue == 0:
+                break
+
+            world_state.blue_robots[robot.id].CopyFrom(robot.current_state)
+            velocity = world_state.yellow_robots[robot.id].global_velocity
+            velocity.x_component_meters = 0
+            velocity.y_component_meters = 0
+            max_allowed_bots_blue -= 1
+
+        for robot in latest_blue_world.enemy_team.team_robots:
+            if max_allowed_bots_yellow == 0:
+                break
+
+            world_state.yellow_robots[robot.id].CopyFrom(robot.current_state)
+            velocity = world_state.yellow_robots[robot.id].global_velocity
+            velocity.x_component_meters = 0
+            velocity.y_component_meters = 0
+            max_allowed_bots_yellow -= 1
+
+        # Check if we need to invert the world state
+        if referee.blue_team_on_positive_half:
+            for robot in itertools.chain(
+                    world_state.blue_robots, world_state.yellow_robots
+            ):
+                robot.current_state.global_position.x_meters *= -1
+                robot.current_state.global_position.y_meters *= -1
+                robot.current_state.global_orientation.radians += math.pi
+
+        # Send out updated world state
+        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
     def is_valid_port(self, port):
         """Determine whether or not a given port is valid
@@ -168,6 +257,7 @@ class Gamecontroller:
 
             :param data: The referee command to send
             """
+            self.referee_buffer.put(data, block=False)
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
             if autoref_proto_unix_io is not None:
@@ -186,6 +276,9 @@ class Gamecontroller:
         )
         yellow_full_system_proto_unix_io.register_observer(
             ManualGCCommand, self.command_override_buffer
+        )
+        blue_full_system_proto_unix_io.register_observer(
+            World, self.blue_team_world_buffer
         )
 
     def send_gc_command(
