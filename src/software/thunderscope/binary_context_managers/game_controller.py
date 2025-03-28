@@ -115,10 +115,12 @@ class Gamecontroller:
 
     def get_latest_world(self) -> World:
         while self.is_running:
-            self.latest_world = self.blue_team_world_buffer.get(
-                block=False, return_cached=True
+            world = self.blue_team_world_buffer.get(
+                block=False, return_cached=False
             )
-            time.sleep(0.1)
+            self.latest_world = world if world is not None else self.latest_world
+            time.sleep(10)
+
     def refresh(self):
         """Gets any manual gamecontroller commands from the buffer and executes them"""
         manual_command = self.command_override_buffer.get(return_cached=False)
@@ -140,12 +142,12 @@ class Gamecontroller:
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
         referee = self.referee_buffer.get(block=False, return_cached=False)
-        while referee is not None:
-            self.handle_referee(referee)
+        while referee is not None and (self.previous_max_yellow_robots != referee.yellow.max_allowed_bots
+                                       or self.previous_max_blue_robots != referee.blue.max_allowed_bots):
             print(f"blue: {referee.blue.max_allowed_bots }|||| yellow: {referee.yellow.max_allowed_bots}")
+            self.handle_referee(referee)
             referee = self.referee_buffer.get(block=False, return_cached=False)
             print("####GETTING BUFFER")
-
 
     def handle_referee(self, referee: Referee) -> None:
         """
@@ -172,8 +174,9 @@ class Gamecontroller:
         if (len(latest_blue_world.friendly_team.team_robots) <= max_allowed_bots_blue and
                 len(latest_blue_world.enemy_team.team_robots) <= max_allowed_bots_yellow):
             # should we re-add these bots?
+            print("doing failed")
             return
-
+        print("doing smt")
         world_state = WorldState()
         # Set robot velocities to zero to avoid any drift
         for robot in latest_blue_world.friendly_team.team_robots:
