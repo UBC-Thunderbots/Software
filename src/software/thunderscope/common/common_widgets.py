@@ -2,6 +2,7 @@ from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 from software.py_constants import *
+from software.thunderscope.util import color_from_gradient
 
 
 class FloatSlider(QSlider):
@@ -147,23 +148,23 @@ class ColorProgressBar(QProgressBar):
         """
         super(ColorProgressBar, self).setValue(int(value * self.decimals))
 
-        # clamp percent to make sure it's between 0% and 100%
         percent = self.getPercentage()
+        color = color_from_gradient(
+            percent,
+            [0, 0.5, 1],
+            [255, 200, 0],
+            [0, 170, 180],
+            [0, 0, 0],
+            [255, 255, 255],
+        )
 
-        if percent < 0.5:
-            super(ColorProgressBar, self).setStyleSheet(
-                "QProgressBar::chunk"
-                "{"
-                f"background: rgb(255, {255 * (2 * percent)}, 0)"
-                "}"
-            )
-        else:
-            super(ColorProgressBar, self).setStyleSheet(
-                "QProgressBar::chunk"
-                "{"
-                f"background: rgb({255 * 2 * (1 - percent)}, 255, 0)"
-                "}"
-            )
+        # Extract color into CSS form.
+        super(ColorProgressBar, self).setStyleSheet(
+            "QProgressBar::chunk"
+            "{"
+            f"background: rgb({color.red()}, {color.green()}, {color.blue()})"
+            "}"
+        )
 
     def getPercentage(self):
         """Gets the current percentage between 0 and 1 from the current value
@@ -173,9 +174,7 @@ class ColorProgressBar(QProgressBar):
             1,
             max(
                 0,
-                int(
-                    (self.value() - self.minimum()) / (self.maximum() - self.minimum())
-                ),
+                (self.value() - self.minimum()) / (self.maximum() - self.minimum()),
             ),
         )
 
