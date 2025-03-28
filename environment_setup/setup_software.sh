@@ -95,7 +95,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
 fi
 
 # Clear the download cache
-rm -rf /tmp/tbots_download_cache
+sudo rm -rf /tmp/tbots_download_cache
 mkdir /tmp/tbots_download_cache
 
 if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; then
@@ -185,6 +185,10 @@ print_status_msg "Done Installing Bazel"
 print_status_msg "Install clang-format"
 install_clang_format $arch
 print_status_msg "Done installing clang-format"
+
+print_status_msg "Setting up cross compiler for robot software"
+install_cross_compiler $arch
+print_status_msg "Done setting up cross compiler for robot software"
 
 print_status_msg "Setting Up Python Development Headers"
 install_python_dev_cross_compile_headers $arch

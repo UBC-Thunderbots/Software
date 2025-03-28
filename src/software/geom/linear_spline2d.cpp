@@ -26,11 +26,13 @@ const Point LinearSpline2d::getValueAt(double val) const
     else
     {
         // Note: this could be more performant with binary search
-        auto seg_it = std::find_if(
-            segments.begin(), segments.end(), [clamped_val](const SplineSegment2d& sseg) {
-                return (clamped_val >= sseg.getParametrizationStartVal() &&
-                        clamped_val <= sseg.getParametrizationEndVal());
-            });
+        auto seg_it =
+            std::find_if(segments.begin(), segments.end(),
+                         [clamped_val](const SplineSegment2d& sseg)
+                         {
+                             return (clamped_val >= sseg.getParametrizationStartVal() &&
+                                     clamped_val <= sseg.getParametrizationEndVal());
+                         });
 
         if (seg_it == segments.end())
         {

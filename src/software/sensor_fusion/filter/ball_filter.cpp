@@ -340,7 +340,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
             if (ball_regression_line)
             {
                 current_position  = closestPoint(current_detection.position,
-                                                ball_regression_line.value());
+                                                 ball_regression_line.value());
                 previous_position = closestPoint(previous_detection.position,
                                                  ball_regression_line.value());
             }

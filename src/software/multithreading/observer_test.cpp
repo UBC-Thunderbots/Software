@@ -79,12 +79,14 @@ TEST(Observer, receiveValue_value_not_yet_available)
 
     // Create a separate thread to grab the value for us
     std::optional<int> result = std::nullopt;
-    std::thread receive_value_thread([&]() {
-        while (!result)
+    std::thread receive_value_thread(
+        [&]()
         {
-            result = test_observer.getMostRecentValueFromBufferWrapper();
-        }
-    });
+            while (!result)
+            {
+                result = test_observer.getMostRecentValueFromBufferWrapper();
+            }
+        });
 
     // Send the value over
     test_observer.receiveValue(202);

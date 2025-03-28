@@ -22,9 +22,9 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
     // boundaries
     const auto& field_bounds       = world.field().fieldLines();
     Point reduced_bottom_left      = Point(field_bounds.xMin() + FIELD_SIZE_REDUCTION_M,
-                                      field_bounds.yMin() + FIELD_SIZE_REDUCTION_M);
+                                           field_bounds.yMin() + FIELD_SIZE_REDUCTION_M);
     Point reduced_top_right        = Point(field_bounds.xMax() - FIELD_SIZE_REDUCTION_M,
-                                    field_bounds.yMax() - FIELD_SIZE_REDUCTION_M);
+                                           field_bounds.yMax() - FIELD_SIZE_REDUCTION_M);
     Rectangle reduced_field_bounds = Rectangle(reduced_bottom_left, reduced_top_right);
 
     Point initial_keepaway_point                      = world.ball().position();
@@ -35,7 +35,8 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
     }
 
     // the position rating function we want to maximize
-    const auto keepaway_point_cost = [&](const std::array<double, 2>& passer_pt_array) {
+    const auto keepaway_point_cost = [&](const std::array<double, 2>& passer_pt_array)
+    {
         Point passer_pt(std::get<0>(passer_pt_array), std::get<1>(passer_pt_array));
         return rateKeepAwayPosition(passer_pt, world, best_pass_so_far,
                                     reduced_field_bounds, passing_config);
@@ -57,7 +58,8 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
             field_line_segments.size());
         std::transform(field_line_segments.begin(), field_line_segments.end(),
                        closest_points_and_distances.begin(),
-                       [keepaway_target_point](const Segment& seg) {
+                       [keepaway_target_point](const Segment& seg)
+                       {
                            auto closest_point = closestPoint(keepaway_target_point, seg);
                            return std::make_pair(
                                closest_point,
@@ -65,7 +67,8 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
                        });
         const auto& closest_field_line_seg_and_dist = *std::min_element(
             closest_points_and_distances.begin(), closest_points_and_distances.end(),
-            [](const auto& lhs_point_and_dist, const auto& rhs_point_and_dist) {
+            [](const auto& lhs_point_and_dist, const auto& rhs_point_and_dist)
+            {
                 // compare the distances
                 return lhs_point_and_dist.second < rhs_point_and_dist.second;
             });

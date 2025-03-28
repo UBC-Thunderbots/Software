@@ -42,7 +42,8 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield)
+        {
             // We check if the robot reaches the desired orientation, at the
             // desired position before checking if the ball has been kicked.
             //

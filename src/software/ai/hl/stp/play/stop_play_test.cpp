@@ -21,7 +21,8 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
     std::vector<ValidationFunction> initStopPlayRules()
     {
         return {
-            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+            {
                 // Wait 2 seconds for robots that start too close to the ball to move away
                 if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(8))
                 {
