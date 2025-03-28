@@ -199,6 +199,7 @@ class RobotCommunication:
 
             # map of robot id to diagnostics/fullsystem primitive map
             robot_primitives_map = {}
+            robot_orientations_map = {}
 
             # get the most recent diagnostics primitive
             motor_control = self.motor_control_primitive_buffer.get(block=False)
@@ -239,6 +240,9 @@ class RobotCommunication:
                 robot_primitives_map[robot_id] = (
                     fullsystem_primitive_set.robot_primitives[robot_id]
                 )
+                robot_orientations_map[robot_id] = (
+                    fullsystem_primitive_set.robot_orientations[robot_id]
+                )
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
@@ -258,6 +262,7 @@ class RobotCommunication:
                 primitive.time_sent.CopyFrom(
                     Timestamp(epoch_timestamp_seconds=time.time())
                 )
+                primitive.orientation.CopyFrom(robot_orientations_map[robot_id])
                 self.communication_manager.send_primitive(
                     robot_id=robot_id, primitive=primitive
                 )
