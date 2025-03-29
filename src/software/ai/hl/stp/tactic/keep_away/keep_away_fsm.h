@@ -21,11 +21,11 @@ struct KeepAwayFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-    * Action that updates the DribbleFSM to keep the ball away
-    *
-    * @param event KeepAwayFSM::Update event
-    * @param processEvent processes the DribbleFSM::Update
-    */
+     * Action that updates the DribbleFSM to keep the ball away
+     *
+     * @param event KeepAwayFSM::Update event
+     * @param processEvent processes the DribbleFSM::Update
+     */
     void keepAway(const Update& event,
                   boost::sml::back::process<DribbleFSM::Update> processEvent);
 
