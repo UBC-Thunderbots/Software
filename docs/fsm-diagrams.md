@@ -218,7 +218,9 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleFSM
 DribbleFSM --> PivotKickFSM : [shouldKick]\n<i>pivotKick</i>
-DribbleFSM --> DribbleFSM : [!shouldKick]\n<i>keepAway</i>
+DribbleFSM --> KeepAwayFSM : [!shouldKick]\n<i>keepAway</i>
+KeepAwayFSM --> KeepAwayFSM : <i>keepAway</i>
+KeepAwayFSM --> DribbleFSM
 PivotKickFSM --> PivotKickFSM : <i>pivotKick</i>
 PivotKickFSM --> Terminate:::terminate
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
@@ -339,6 +341,20 @@ StopState --> StopState : [!stopDone]\n<i>updateStop</i>
 StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
 Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+
+```
+
+## [KeepAwayFSM](/src/software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> DribbleFSM
+DribbleFSM --> DribbleFSM : <i>keepAway</i>
+DribbleFSM --> Terminate:::terminate
+Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
 
