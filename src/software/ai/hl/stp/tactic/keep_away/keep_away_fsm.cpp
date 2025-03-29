@@ -18,7 +18,7 @@ void KeepAwayFSM::keepAway(const Update& event,
     else
     {
         // we didn't get a best_pass_so_far, so we will be using the default pass.
-        LOG(INFO) << "Attacker FSM has no best pass so far, using default pass "
+        LOG(INFO) << "KeepAwayFSM has no best pass so far, using default pass "
                   << "to enemy goal center.";
     }
 

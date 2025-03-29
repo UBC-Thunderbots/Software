@@ -43,10 +43,10 @@ struct AttackerFSM
                    boost::sml::back::process<PivotKickFSM::Update> processEvent);
 
     /**
-     * Action that updates the DribbleFSM to keep the ball away
+     * Action that updates the KeepAwayFSM to keep the ball away
      *
      * @param event AttackerFSM::Update event
-     * @param processEvent processes the DribbleFSM::Update
+     * @param processEvent processes the KeepAwayFSM::Update
      */
     void keepAway(const Update& event,
                   boost::sml::back::process<KeepAwayFSM::Update> processEvent);
@@ -60,8 +60,6 @@ struct AttackerFSM
      * @return if the ball should be kicked
      */
     bool shouldKick(const Update& event);
-
-
 
     auto operator()()
     {
@@ -80,6 +78,7 @@ struct AttackerFSM
         return make_transition_table(
             *DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
             DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A  = KeepAwayFSM_S,
+            KeepAwayFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
             KeepAwayFSM_S + Update_E / keepAway_A, KeepAwayFSM_S    = DribbleFSM_S,
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
