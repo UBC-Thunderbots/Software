@@ -196,6 +196,13 @@ class MotorService
      */
     int readIntFromTMC4671(uint8_t motor, uint8_t address);
 
+    /*
+     * Get the motor faults encountered so far.
+     *
+     * @return the mapping of motors to the object describing their faults.
+     */
+    std::unordered_map<int, MotorFaultIndicator> getCachedMotorFaults();
+
 
    private:
     /**
