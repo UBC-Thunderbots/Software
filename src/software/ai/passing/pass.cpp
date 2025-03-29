@@ -94,7 +94,7 @@ double Pass::getPassSpeed(const Point& ball_position, const Point& pass_destinat
     // Simplify and rearrange for initial velocity x:
     // x = sqrt((vf^2 - 2rD) / (c^2 - rc^2/s + r/s))
     Vector pass_distance          = Vector(pass_destination.x() - ball_position.x(),
-                                  pass_destination.y() - ball_position.y());
+                                           pass_destination.y() - ball_position.y());
     double pass_distance_length_m = pass_distance.length();
 
     // calculating the constant value used in determining pass speed

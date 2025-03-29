@@ -15,6 +15,9 @@ build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitiv
 # Warn variable length arrays only when compiling cpp
 build --per_file_copt=.*\.cpp@-Wvla
 
+# Boost 1.84 uses old concept syntax that is not compatible with C++20
+build --cxxopt=-DBOOST_ASIO_DISABLE_CONCEPTS
+
 # Automatically set the CPU environment based on the `--cpu` flag as per our
 # defined CPU environments
 build --auto_cpu_environment_group=//cc_toolchain:cpus

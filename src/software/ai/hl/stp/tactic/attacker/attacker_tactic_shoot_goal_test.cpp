@@ -46,8 +46,8 @@ TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
     setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
+        [tactic](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic not done");
