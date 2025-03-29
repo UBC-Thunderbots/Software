@@ -26,7 +26,7 @@ class ThreadSafeBuffer:
 
         :param buffer size: The size of the buffer.
         :param protobuf_type: To buffer
-        :param log_overrun: False
+        :param log_overrun: If True, warns when we lose protos during `put` operations
         """
         self.logger = create_logger(protobuf_type.DESCRIPTOR.name + " Buffer")
         self.buffer = queue.Queue(buffer_size)

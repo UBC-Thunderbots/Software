@@ -63,9 +63,9 @@ class g3logWidget(QWidget):
     def refresh(self) -> None:
         """Update the log widget with another log message"""
         # Need to make sure the message is new before logging it
-        try:
-            log = self.log_buffer.buffer.get_nowait()
-        except queue.Empty:
+
+        log = self.log_buffer.get(block=False, return_cached=False)
+        if log is None:
             return
 
         # Checks whether this type of log is enabled from checkboxes
