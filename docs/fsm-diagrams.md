@@ -219,6 +219,7 @@ direction LR
 [*] --> DribbleFSM
 DribbleFSM --> PivotKickFSM : [shouldKick]\n<i>pivotKick</i>
 DribbleFSM --> KeepAwayFSM : [!shouldKick]\n<i>keepAway</i>
+KeepAwayFSM --> PivotKickFSM : [shouldKick]\n<i>pivotKick</i>
 KeepAwayFSM --> KeepAwayFSM : <i>keepAway</i>
 KeepAwayFSM --> DribbleFSM
 PivotKickFSM --> PivotKickFSM : <i>pivotKick</i>
