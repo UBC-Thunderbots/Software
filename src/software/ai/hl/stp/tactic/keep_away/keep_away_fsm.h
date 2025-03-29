@@ -23,7 +23,7 @@ struct KeepAwayFSM
     /**
     * Action that updates the DribbleFSM to keep the ball away
     *
-    * @param event AttackerFSM::Update event
+    * @param event KeepAwayFSM::Update event
     * @param processEvent processes the DribbleFSM::Update
     */
     void keepAway(const Update& event,
