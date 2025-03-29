@@ -1,13 +1,13 @@
-import queue
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from collections import deque
 from software.logger.logger import create_logger
 from typing import Type, Optional
 from google.protobuf.message import Message
+from typing import override
 
 
-class ThreadSafeBuffer:
-    MIN_DROPPED_BEFORE_LOG = 20
-
-    """Multiple producer, multiple consumer buffer.
+class ThreadSafeCircularBuffer(ThreadSafeBuffer):
+    """Multiple producer, multiple consumer buffer. See: ThreadSafeBuffer
 
                │              buffer_size                 │
                ├──────────────────────────────────────────┤
@@ -16,11 +16,11 @@ class ThreadSafeBuffer:
                ┌──────┬──────┬──────┬──────┬──────┬───────┐
          put() │      │      │      │      │      │       │  get()
                └──────┴──────┴──────┴──────┴──────┴───────┘
-                                           ThreadSafeBuffer
+                                    ThreadSafeCircularBuffer
     """
 
     def __init__(
-        self, buffer_size: int, protobuf_type: Type[Message], log_overrun: bool = False
+            self, buffer_size: int, protobuf_type: Type[Message], log_overrun: bool = False
     ) -> None:
         """A buffer to hold data to be consumed.
 
@@ -28,18 +28,14 @@ class ThreadSafeBuffer:
         :param protobuf_type: To buffer
         :param log_overrun: False
         """
-        self.logger = create_logger(protobuf_type.DESCRIPTOR.name + " Buffer")
-        self.buffer = queue.Queue(buffer_size)
-        self.protobuf_type = protobuf_type
+        super().__init__(buffer_size, protobuf_type)
         self.log_overrun = log_overrun
-        self.cached_msg = protobuf_type()
-        self.protos_dropped = 0
-        self.last_logged_protos_dropped = 0
-        self.empty_exception = queue.Empty
-        self.full_exception = queue.Full
+        self.buffer = deque(maxlen=buffer_size)
+        self.empty_exception = IndexError
 
+    @override
     def get(
-        self, block: bool = False, timeout: float = None, return_cached: bool = True
+            self, block: bool = False, timeout: float = None, return_cached: bool = True
     ) -> Optional[Message]:
         """Get data from the buffer.
 
@@ -60,37 +56,21 @@ class ThreadSafeBuffer:
                         throwing an error or returning cached
         :param return_cached: If buffer is empty, decides whether to
                               return cached value (True) or return None / throw an error (false)
-
         :return: protobuf (cached if block is False and there is no data
                  in the buffer)
         """
-        if (
-            self.log_overrun
-            and self.protos_dropped > self.last_logged_protos_dropped
-            and self.protos_dropped > self.MIN_DROPPED_BEFORE_LOG
-        ):
-            self.logger.warn(
-                "packets dropped; thunderscope did not show {} protos".format(
-                    self.protos_dropped
-                )
-            )
-            self.last_logged_protos_dropped = self.protos_dropped
-
-        if block:
-            try:
-                self.cached_msg = self.buffer.get(timeout=timeout)
-            except self.empty_exception as empty:
-                if not return_cached:
-                    raise empty
-        else:
-            try:
-                self.cached_msg = self.buffer.get_nowait()
-            except self.empty_exception:
-                if not return_cached:
+        try:
+            self.cached_msg = self.buffer.popleft()
+        except self.empty_exception:
+            if not return_cached:
+                if block:
+                    raise super().empty_exception
+                else:
                     return None
 
         return self.cached_msg
 
+    @override
     def put(self, proto: Message, block: bool = False, timeout: float = None) -> None:
         """Put data into the buffer. If the buffer is full, then
         the proto will be logged.
@@ -99,15 +79,12 @@ class ThreadSafeBuffer:
         :param block: Should block until there is space in the buffer
         :param timeout: If block is True, then wait for this many seconds
         """
-        if block:
-            self.buffer.put(proto, block, timeout)
-            return
-
-        try:
-            self.buffer.put_nowait(proto)
-        except self.full_exception:
+        if len(self.buffer) == self.buffer.maxlen:
             self.protos_dropped += 1
+        self.buffer.append(proto)
 
+    @override
     def size(self) -> int:
         """Returns the number of objects in the buffer"""
-        return self.buffer.qsize()
+        return len(self.buffer)
+    

@@ -103,7 +103,7 @@ class GLCostVisLayer(GLLayer):
         field = self.cached_world.field
 
         try:
-            cost_vis = self.cost_visualization_buffer.queue.get_nowait()
+            cost_vis = self.cost_visualization_buffer.buffer.get_nowait()
         except queue.Empty:
             cost_vis = None
 

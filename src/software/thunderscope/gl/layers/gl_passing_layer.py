@@ -42,7 +42,7 @@ class GLPassingLayer(GLLayer):
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         try:
-            pass_vis = self.pass_visualization_buffer.queue.get_nowait()
+            pass_vis = self.pass_visualization_buffer.buffer.get_nowait()
         except queue.Empty:
             pass_vis = None
 

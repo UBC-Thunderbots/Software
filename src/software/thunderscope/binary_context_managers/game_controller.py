@@ -17,9 +17,10 @@ from software.python_bindings import *
 from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.common.thread_safe_circular_buffer import ThreadSafeCircularBuffer
 from threading import Thread
 logger = logging.getLogger(__name__)
-
+import itertools
 
 class Gamecontroller:
     """Gamecontroller Context Manager"""
@@ -55,10 +56,10 @@ class Gamecontroller:
         )
 
         self.simulator_proto_unix_io = simulator_proto_unix_io
-        self.blue_team_world_buffer = ThreadSafeBuffer(
-            buffer_size=50, protobuf_type=World
+        self.blue_team_world_buffer = ThreadSafeCircularBuffer(
+            buffer_size=1, protobuf_type=World
         )
-        self.referee_buffer = ThreadSafeBuffer(buffer_size=10, protobuf_type=Referee)
+        # self.referee_buffer = ThreadSafeBuffer(buffer_size=10, protobuf_type=Referee)
         self.previous_max_blue_robots = 0
         self.previous_max_yellow_robots = 0
         self.latest_world = None
@@ -115,11 +116,11 @@ class Gamecontroller:
 
     def get_latest_world(self) -> World:
         while self.is_running:
-            world = self.blue_team_world_buffer.get(
-                block=False, return_cached=False
+            self.latest_world = self.blue_team_world_buffer.get(
+                block=False, return_cached=True
             )
-            self.latest_world = world if world is not None else self.latest_world
-            time.sleep(10)
+            # print(len(self.latest_world.friendly_team.team_robots))
+            time.sleep(0.1)
 
     def refresh(self):
         """Gets any manual gamecontroller commands from the buffer and executes them"""
@@ -141,13 +142,13 @@ class Gamecontroller:
                 ),
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
-        referee = self.referee_buffer.get(block=False, return_cached=False)
-        while referee is not None and (self.previous_max_yellow_robots != referee.yellow.max_allowed_bots
-                                       or self.previous_max_blue_robots != referee.blue.max_allowed_bots):
-            print(f"blue: {referee.blue.max_allowed_bots }|||| yellow: {referee.yellow.max_allowed_bots}")
-            self.handle_referee(referee)
-            referee = self.referee_buffer.get(block=False, return_cached=False)
-            print("####GETTING BUFFER")
+        # referee = self.referee_buffer.get(block=False, return_cached=False)
+        # while referee is not None and (self.previous_max_yellow_robots != referee.yellow.max_allowed_bots
+        #                                or self.previous_max_blue_robots != referee.blue.max_allowed_bots):
+        #     print(f"blue: {referee.blue.max_allowed_bots }|||| yellow: {referee.yellow.max_allowed_bots}")
+        #     self.handle_referee(referee)
+        #     referee = self.referee_buffer.get(block=False, return_cached=False)
+        #     print("####GETTING BUFFER")
 
     def handle_referee(self, referee: Referee) -> None:
         """
@@ -169,17 +170,18 @@ class Gamecontroller:
         #     block=False, return_cached=True
         # )
 
-        latest_blue_world = self.latest_world
-
-        if (len(latest_blue_world.friendly_team.team_robots) <= max_allowed_bots_blue and
-                len(latest_blue_world.enemy_team.team_robots) <= max_allowed_bots_yellow):
+        # latest_blue_world = self.latest_world
+        print(len(self.latest_world.friendly_team.team_robots))
+        if (len(self.latest_world.friendly_team.team_robots) <= max_allowed_bots_blue and
+                len(self.latest_world.enemy_team.team_robots) <= max_allowed_bots_yellow):
             # should we re-add these bots?
             print("doing failed")
             return
-        print("doing smt")
+        print(f"max blue: {referee.blue.max_allowed_bots }|||| max yellow: {referee.yellow.max_allowed_bots}")
+
         world_state = WorldState()
         # Set robot velocities to zero to avoid any drift
-        for robot in latest_blue_world.friendly_team.team_robots:
+        for robot in self.latest_world.friendly_team.team_robots:
             if max_allowed_bots_blue == 0:
                 break
 
@@ -189,7 +191,7 @@ class Gamecontroller:
             velocity.y_component_meters = 0
             max_allowed_bots_blue -= 1
 
-        for robot in latest_blue_world.enemy_team.team_robots:
+        for robot in self.latest_world.enemy_team.team_robots:
             if max_allowed_bots_yellow == 0:
                 break
 
@@ -198,14 +200,14 @@ class Gamecontroller:
             velocity.x_component_meters = 0
             velocity.y_component_meters = 0
             max_allowed_bots_yellow -= 1
-
+        print(f"blue new: {len(world_state.blue_robots)}|||| yellow new: {len(world_state.yellow_robots)}")
         # Check if we need to invert the world state
         if referee.blue_team_on_positive_half:
             for robot in itertools.chain(
                     world_state.blue_robots, world_state.yellow_robots
             ):
                 robot.current_state.global_position.x_meters *= -1
-                robot.current_state.global_position.y_meters *= -1
+                # robot.current_state.global_position.y_meters *= -1
                 robot.current_state.global_orientation.radians += math.pi
 
         # Send out updated world state
@@ -260,7 +262,9 @@ class Gamecontroller:
 
             :param data: The referee command to send
             """
-            self.referee_buffer.put(data, block=False)
+            # self.referee_buffer.put(data, block=False)
+            self.handle_referee(data)
+            print(f"BLUE INFO {data.blue}")
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
             if autoref_proto_unix_io is not None:

@@ -64,7 +64,7 @@ class g3logWidget(QWidget):
         """Update the log widget with another log message"""
         # Need to make sure the message is new before logging it
         try:
-            log = self.log_buffer.queue.get_nowait()
+            log = self.log_buffer.buffer.get_nowait()
         except queue.Empty:
             return
 
