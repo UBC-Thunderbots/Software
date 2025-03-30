@@ -40,7 +40,8 @@ TEST_P(KickTacticTest, kick_test)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [angle_to_kick_at, tactic](std::shared_ptr<World> world_ptr,
-                                   ValidationCoroutine::push_type& yield) {
+                                   ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic did not complete!");

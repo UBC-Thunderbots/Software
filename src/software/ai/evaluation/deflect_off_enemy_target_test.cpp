@@ -10,7 +10,7 @@ TEST(DeflectOffEnemyTargetTest, deflectOffEnemyTarget_test)
     Robot friendly_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromMilliseconds(0));
     Robot enemy_robot    = Robot(0, Point(-3, 0), Vector(0, 0), Angle::zero(),
-                              AngularVelocity::zero(), Timestamp::fromMilliseconds(0));
+                                 AngularVelocity::zero(), Timestamp::fromMilliseconds(0));
     std::vector<Robot> friendly_robots;
     std::vector<Robot> enemy_robots;
     friendly_robots.emplace_back(friendly_robot);

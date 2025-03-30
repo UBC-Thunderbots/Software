@@ -29,7 +29,8 @@ TEST_P(BallOcclusionTest, test_ball_occlusion)
     setAiPlay(TbotsProto::PlayName::HaltPlay);
     setRefereeCommand(RefereeCommand::HALT, RefereeCommand::HALT);
     std::vector<ValidationFunction> terminating_validating_function = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
                 yield("Timestamp not at 9.5s");

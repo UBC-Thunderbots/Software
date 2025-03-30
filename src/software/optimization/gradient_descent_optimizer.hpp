@@ -176,9 +176,9 @@ std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::maximize(
     std::function<double(std::array<double, NUM_PARAMS>)> objective_function,
     std::array<double, NUM_PARAMS> initial_value, unsigned int num_iters)
 {
-    return followGradient(
-        objective_function, initial_value, num_iters,
-        [](double curr_value, double step) { return curr_value + step; });
+    return followGradient(objective_function, initial_value, num_iters,
+                          [](double curr_value, double step)
+                          { return curr_value + step; });
 }
 
 template <size_t NUM_PARAMS>
@@ -186,9 +186,9 @@ std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::minimize(
     std::function<double(std::array<double, NUM_PARAMS>)> objective_function,
     std::array<double, NUM_PARAMS> initial_value, unsigned int num_iters)
 {
-    return followGradient(
-        objective_function, initial_value, num_iters,
-        [](double curr_value, double step) { return curr_value - step; });
+    return followGradient(objective_function, initial_value, num_iters,
+                          [](double curr_value, double step)
+                          { return curr_value - step; });
 }
 
 template <size_t NUM_PARAMS>

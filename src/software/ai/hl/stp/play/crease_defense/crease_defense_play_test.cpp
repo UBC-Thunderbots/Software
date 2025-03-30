@@ -46,7 +46,8 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
 

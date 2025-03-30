@@ -72,14 +72,16 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("WORLD_STATE_RECEIVED_TRIGGER_PATH") = WORLD_STATE_RECEIVED_TRIGGER_PATH;
 
     // Multicast Channels
-    m.def("getRobotMulticastChannel", [](py::args& args) {
-        if (args.size() != 1)
-        {
-            throw std::runtime_error("must provide channel number only");
-        }
+    m.def("getRobotMulticastChannel",
+          [](py::args& args)
+          {
+              if (args.size() != 1)
+              {
+                  throw std::runtime_error("must provide channel number only");
+              }
 
-        return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
-    });
+              return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
+          });
 
     // Ports
     m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;

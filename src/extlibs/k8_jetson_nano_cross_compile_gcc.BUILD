@@ -7,20 +7,20 @@ filegroup(
 
 filegroup(
     name = "gcc",
-    srcs = ["bin/aarch64-linux-gnu-gcc"],
+    srcs = ["bin/aarch64-tbots-linux-gnu-gcc"],
 )
 
 filegroup(
     name = "cpp",
-    srcs = ["bin/aarch64-linux-gnu-cpp"],
+    srcs = ["bin/aarch64-tbots-linux-gnu-cpp"],
 )
 
 filegroup(
     name = "objcopy",
-    srcs = ["bin/aarch64-linux-gnu-objcopy"],
+    srcs = ["bin/aarch64-tbots-linux-gnu-objcopy"],
 )
 
 filegroup(
     name = "gdb",
-    srcs = ["bin/aarch64-linux-gnu-gdb"],
+    srcs = ["bin/aarch64-tbots-linux-gnu-gdb"],
 )

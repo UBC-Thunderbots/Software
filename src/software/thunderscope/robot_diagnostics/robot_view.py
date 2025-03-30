@@ -71,7 +71,7 @@ class RobotViewComponent(QWidget):
         :param robot_statistic : robot statistic proto to update with new metrics
         """
         if robot_status is not None:
-            self.robot_info.update(robot_status, robot_statistic)
+            self.robot_info.update_robot_status(robot_status)
             if self.robot_status:
                 self.robot_status.update(robot_status)
 

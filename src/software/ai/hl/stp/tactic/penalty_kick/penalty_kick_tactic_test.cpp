@@ -41,12 +41,10 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         ballInPlay,
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            ballNeverMovesBackward(world_ptr, yield);
-        },
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
-        }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { ballNeverMovesBackward(world_ptr, yield); },
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { robotNotExcessivelyDribbling(shooter_id, world_ptr, yield); }};
 
     runTest(field_type, ball, {shooter}, {enemy_robot}, terminating_validation_functions,
             non_terminating_validation_functions, Duration::fromSeconds(10));
@@ -65,12 +63,10 @@ TEST_F(PenaltyKickTacticTest, DISABLED_penalty_no_goalie)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         ballInPlay,
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            ballNeverMovesBackward(world_ptr, yield);
-        },
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
-        }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { ballNeverMovesBackward(world_ptr, yield); },
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { robotNotExcessivelyDribbling(shooter_id, world_ptr, yield); }};
 
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(0, -2.5)});
 
