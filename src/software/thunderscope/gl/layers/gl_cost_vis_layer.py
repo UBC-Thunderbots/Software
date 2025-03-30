@@ -4,7 +4,6 @@ from pyqtgraph.opengl import *
 import pyqtgraph as pg
 
 import time
-import queue
 import numpy as np
 
 from proto.world_pb2 import World

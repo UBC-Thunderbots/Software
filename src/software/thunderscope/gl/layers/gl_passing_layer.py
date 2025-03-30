@@ -1,7 +1,6 @@
 from pyqtgraph.opengl import *
 
 import time
-import queue
 
 
 from proto.visualization_pb2 import PassVisualization

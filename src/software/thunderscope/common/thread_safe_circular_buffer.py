@@ -1,6 +1,5 @@
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from collections import deque
-from software.logger.logger import create_logger
 from typing import Type, Optional
 from google.protobuf.message import Message
 from typing import override
@@ -9,18 +8,18 @@ from typing import override
 class ThreadSafeCircularBuffer(ThreadSafeBuffer):
     """Multiple producer, multiple consumer buffer. See: ThreadSafeBuffer
 
-               │              buffer_size                 │
-               ├──────────────────────────────────────────┤
-               │                                          │
+          │              buffer_size                 │
+          ├──────────────────────────────────────────┤
+          │                                          │
 
-               ┌──────┬──────┬──────┬──────┬──────┬───────┐
-         put() │      │      │      │      │      │       │  get()
-               └──────┴──────┴──────┴──────┴──────┴───────┘
-                                    ThreadSafeCircularBuffer
+          ┌──────┬──────┬──────┬──────┬──────┬───────┐
+    put() │      │      │      │      │      │       │  get()
+          └──────┴──────┴──────┴──────┴──────┴───────┘
+                               ThreadSafeCircularBuffer
     """
 
     def __init__(
-            self, buffer_size: int, protobuf_type: Type[Message], log_overrun: bool = False
+        self, buffer_size: int, protobuf_type: Type[Message], log_overrun: bool = False
     ) -> None:
         """A circular buffer to hold data to be consumed.
 
@@ -35,7 +34,7 @@ class ThreadSafeCircularBuffer(ThreadSafeBuffer):
 
     @override
     def get(
-            self, block: bool = False, timeout: float = None, return_cached: bool = True
+        self, block: bool = False, timeout: float = None, return_cached: bool = True
     ) -> Optional[Message]:
         """Get data from the buffer immediately.
 
@@ -49,9 +48,9 @@ class ThreadSafeCircularBuffer(ThreadSafeBuffer):
         :return: protobuf (cached if there is no data in the buffer and return_cached is True)
         """
         if (
-                self.log_overrun
-                and self.protos_dropped > self.last_logged_protos_dropped
-                and self.protos_dropped > self.MIN_DROPPED_BEFORE_LOG
+            self.log_overrun
+            and self.protos_dropped > self.last_logged_protos_dropped
+            and self.protos_dropped > self.MIN_DROPPED_BEFORE_LOG
         ):
             self.logger.warn(
                 "packets dropped; thunderscope did not show {} protos".format(
