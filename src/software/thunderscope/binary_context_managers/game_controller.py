@@ -61,8 +61,8 @@ class Gamecontroller:
             buffer_size=1, protobuf_type=World
         )
         self.latest_world = None
-        self.blue_removed_robot_ids: Queue[int] = queue.Queue()
-        self.yellow_removed_robot_ids: Queue[int] = queue.Queue()
+        self.blue_removed_robot_ids = queue.Queue()
+        self.yellow_removed_robot_ids = queue.Queue()
 
 
     def get_referee_port(self) -> int:
@@ -129,19 +129,32 @@ class Gamecontroller:
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
-    def __update_robot_count(self, robot_states, team: Team,
-                             max_robots: int, removed_robot_ids: Queue[int], latest_world: World, is_friendly: bool):
-        # build the robot state
-        place_pos_y_meters = latest_world.field.field_y_length - latest_world.field.boundary_buffer_size
+    @staticmethod
+    def __update_robot_count(
+            robot_states,
+            team: Team,
+            max_robots: int,
+            removed_robot_ids: queue.Queue[int],
+            field_edge_y_meters: float) -> None:
+        """Static method for updating the number of robots in the world state (i.e. robot_states) for a given Team.
+        This method is team & side agnostic.
+        
+        :param robot_states: WorldState <Robot ID, RobotState> map protobuf to be updated.
+        :param team: the Team of robots currently in play
+        :param max_robots: The number of robots we should have on the field. Must be >= 0
+        :param removed_robot_ids: The robots (IDs) which have been removed already and can safely be re-added
+        :param field_edge_y_meters: Places new robots at this y position along the centerline
+        :return:
+        """
+
+        # build the robot state for placing robots at the edge of field
         place_state = RobotState(
             global_position=Point(
                 x_meters=0,
-                y_meters=place_pos_y_meters if is_friendly else -place_pos_y_meters,
-            ),
-            global_orientation=Angle(radians=0),
+                y_meters=field_edge_y_meters
+            )
         )
-
-        # Set robot velocities to zero to avoid any drift
+        # Remove robots, as we have too many. Set robot velocities to zero to avoid any drift
         for count, robot in enumerate(team.team_robots, start=1):
             if count <= max_robots:
                 robot_states[robot.id].CopyFrom(robot.current_state)
@@ -150,9 +163,15 @@ class Gamecontroller:
                 velocity.y_component_meters = 0
             else:
                 removed_robot_ids.put(robot.id)
-
-        for _ in range(max_robots - len(team.team_robots)):
-            robot_states[removed_robot_ids.get(block=False)].CopyFrom(place_state)
+        # Add robots, since we are missing some
+        robots_diff: int = max_robots - len(team.team_robots)
+        if robots_diff <= 0:
+            return
+        for _ in range(robots_diff):
+            try:
+                robot_states[removed_robot_ids.get_nowait()].CopyFrom(place_state)
+            except queue.Empty:
+                return
 
     def handle_referee(self, referee: Referee) -> None:
         """
@@ -164,54 +183,27 @@ class Gamecontroller:
         if self.simulator_proto_unix_io is None:
             return
 
+        # Convert the latest blue world into a WorldState we can send to the simulator and update the robots
         self.latest_world = self.blue_team_world_buffer.get(
             block=False, return_cached=True
         )
 
-        max_allowed_bots_yellow = referee.yellow.max_allowed_bots
-        max_allowed_bots_blue = referee.blue.max_allowed_bots
+        max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
+        max_allowed_bots_blue: int = referee.blue.max_allowed_bots
+        # Ignore if nothing needs to be updated
         if (len(self.latest_world.friendly_team.team_robots) == max_allowed_bots_blue and
                 len(self.latest_world.enemy_team.team_robots) == max_allowed_bots_yellow):
             return
 
-        # Convert the latest blue world into a WorldState we can send to the simulator and update the robots
+        # Populate a blank WorldState with new updated robot information
         world_state = WorldState()
-        #
-        # # build the robot state
-        # robot_state = RobotState(
-        #     global_position=Point(
-        #         x_meters=0,
-        #         y_meters=self.latest_world.field.field_y_length,
-        #     ),
-        #     global_orientation=Angle(radians=0),
-        # )
-        #
-        # # Set robot velocities to zero to avoid any drift
-        # for blue_count, robot in enumerate(self.latest_world.friendly_team.team_robots, start=1):
-        #     if blue_count <= max_allowed_bots_blue:
-        #         world_state.blue_robots[robot.id].CopyFrom(robot.current_state)
-        #         velocity = world_state.blue_robots[robot.id].global_velocity
-        #         velocity.x_component_meters = 0
-        #         velocity.y_component_meters = 0
-        #     else:
-        #         self.blue_removed_robot_ids.put(robot.id)
-        #
-        # for _ in range(max_allowed_bots_blue - len(self.latest_world.friendly_team.team_robots)):
-        #     world_state.blue_robots[self.blue_removed_robot_ids.get(block=False)].CopyFrom(robot_state)
+        field_edge_y_meters: Final[int] = (
+                self.latest_world.field.field_y_length - self.latest_world.field.boundary_buffer_size)
+
         self.__update_robot_count(world_state.blue_robots, self.latest_world.friendly_team, max_allowed_bots_blue,
-                                  self.blue_removed_robot_ids, self.latest_world, True)
+                                  self.blue_removed_robot_ids, field_edge_y_meters)
         self.__update_robot_count(world_state.yellow_robots, self.latest_world.enemy_team, max_allowed_bots_yellow,
-                                  self.yellow_removed_robot_ids, self.latest_world, False)
-        # for yellow_count, robot in enumerate(self.latest_world.enemy_team.team_robots, start=1):
-        #     if yellow_count <= max_allowed_bots_yellow:
-        #         world_state.yellow_robots[robot.id].CopyFrom(robot.current_state)
-        #         velocity = world_state.yellow_robots[robot.id].global_velocity
-        #         velocity.x_component_meters = 0
-        #         velocity.y_component_meters = 0
-        #     else:
-        #         self.yellow_removed_robot_ids.put(robot.id)
-        # for _ in range(max_allowed_bots_yellow - len(self.latest_world.enemy_team.team_robots)):
-        #     world_state.yellow_robots[self.yellow_removed_robot_ids.get(block=False)].CopyFrom(robot_state)
+                                  self.yellow_removed_robot_ids, -field_edge_y_meters)
 
         # Check if we need to invert the world state
         if referee.blue_team_on_positive_half:
@@ -219,6 +211,7 @@ class Gamecontroller:
                     world_state.blue_robots, world_state.yellow_robots
             ):
                 robot.current_state.global_position.x_meters *= -1
+                robot.current_state.global_position.y_meters *= -1
                 robot.current_state.global_orientation.radians += math.pi
 
         # Send out updated world state
