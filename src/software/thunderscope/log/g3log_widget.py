@@ -1,5 +1,4 @@
 from pyqtgraph.Qt.QtWidgets import *
-import queue
 from software.py_constants import *
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel

@@ -18,10 +18,13 @@ from software.python_bindings import *
 from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.common.thread_safe_circular_buffer import ThreadSafeCircularBuffer
-from threading import Thread
+from software.thunderscope.common.thread_safe_circular_buffer import (
+    ThreadSafeCircularBuffer,
+)
+
 logger = logging.getLogger(__name__)
 import itertools
+
 
 class Gamecontroller:
     """Gamecontroller Context Manager"""
@@ -31,7 +34,10 @@ class Gamecontroller:
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(
-        self, suppress_logs: bool = False, use_conventional_port: bool = False, simulator_proto_unix_io: ProtoUnixIO = None
+        self,
+        suppress_logs: bool = False,
+        use_conventional_port: bool = False,
+        simulator_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
         """Run Gamecontroller
 
@@ -63,7 +69,6 @@ class Gamecontroller:
         self.latest_world = None
         self.blue_removed_robot_ids = queue.Queue()
         self.yellow_removed_robot_ids = queue.Queue()
-
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -131,14 +136,15 @@ class Gamecontroller:
 
     @staticmethod
     def __update_robot_count(
-            robot_states,
-            team: Team,
-            max_robots: int,
-            removed_robot_ids: queue.Queue[int],
-            field_edge_y_meters: float) -> None:
+        robot_states,
+        team: Team,
+        max_robots: int,
+        removed_robot_ids: queue.Queue[int],
+        field_edge_y_meters: float,
+    ) -> None:
         """Static method for updating the number of robots in the world state (i.e. robot_states) for a given Team.
         This method is team & side agnostic.
-        
+
         :param robot_states: WorldState <Robot ID, RobotState> map protobuf to be updated.
         :param team: the Team of robots currently in play
         :param max_robots: The number of robots we should have on the field. Must be >= 0
@@ -146,13 +152,9 @@ class Gamecontroller:
         :param field_edge_y_meters: Places new robots at this y position along the centerline
         :return:
         """
-
         # build the robot state for placing robots at the edge of field
         place_state = RobotState(
-            global_position=Point(
-                x_meters=0,
-                y_meters=field_edge_y_meters
-            )
+            global_position=Point(x_meters=0, y_meters=field_edge_y_meters)
         )
         # Remove robots, as we have too many. Set robot velocities to zero to avoid any drift
         for count, robot in enumerate(team.team_robots, start=1):
@@ -174,8 +176,7 @@ class Gamecontroller:
                 return
 
     def handle_referee(self, referee: Referee) -> None:
-        """
-        Updates the world state based on the referee message
+        """Updates the world state based on the referee message
         :param referee: the referee protobuf message
         """
         # Check that we are running with the simulator and have access to its
@@ -191,24 +192,38 @@ class Gamecontroller:
         max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
         max_allowed_bots_blue: int = referee.blue.max_allowed_bots
         # Ignore if nothing needs to be updated
-        if (len(self.latest_world.friendly_team.team_robots) == max_allowed_bots_blue and
-                len(self.latest_world.enemy_team.team_robots) == max_allowed_bots_yellow):
+        if (
+            len(self.latest_world.friendly_team.team_robots) == max_allowed_bots_blue
+            and len(self.latest_world.enemy_team.team_robots) == max_allowed_bots_yellow
+        ):
             return
 
         # Populate a blank WorldState with new updated robot information
         world_state = WorldState()
         field_edge_y_meters: Final[int] = (
-                self.latest_world.field.field_y_length - self.latest_world.field.boundary_buffer_size)
+            self.latest_world.field.field_y_length
+            - self.latest_world.field.boundary_buffer_size
+        )
 
-        self.__update_robot_count(world_state.blue_robots, self.latest_world.friendly_team, max_allowed_bots_blue,
-                                  self.blue_removed_robot_ids, field_edge_y_meters)
-        self.__update_robot_count(world_state.yellow_robots, self.latest_world.enemy_team, max_allowed_bots_yellow,
-                                  self.yellow_removed_robot_ids, -field_edge_y_meters)
+        self.__update_robot_count(
+            world_state.blue_robots,
+            self.latest_world.friendly_team,
+            max_allowed_bots_blue,
+            self.blue_removed_robot_ids,
+            field_edge_y_meters,
+        )
+        self.__update_robot_count(
+            world_state.yellow_robots,
+            self.latest_world.enemy_team,
+            max_allowed_bots_yellow,
+            self.yellow_removed_robot_ids,
+            -field_edge_y_meters,
+        )
 
         # Check if we need to invert the world state
         if referee.blue_team_on_positive_half:
             for robot in itertools.chain(
-                    world_state.blue_robots, world_state.yellow_robots
+                world_state.blue_robots, world_state.yellow_robots
             ):
                 robot.current_state.global_position.x_meters *= -1
                 robot.current_state.global_position.y_meters *= -1
