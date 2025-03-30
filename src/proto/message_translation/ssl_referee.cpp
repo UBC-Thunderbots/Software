@@ -2,6 +2,14 @@
 
 #include "shared/constants.h"
 
+// this set contains an ongoing list of deprecated SSLProto::Referee_Commands
+const static std::unordered_set<SSLProto::Referee::Command> deprecated_commands = {
+        SSLProto::Referee_Command_GOAL_YELLOW,
+        SSLProto::Referee_Command_GOAL_BLUE,
+        SSLProto::Referee_Command_INDIRECT_FREE_YELLOW,
+        SSLProto::Referee_Command_INDIRECT_FREE_BLUE,
+        };
+
 // this maps a protobuf SSLProto::Referee_Command enum to its equivalent internal type
 // this map is used when we are on the blue team
 const static std::unordered_map<SSLProto::Referee::Command, RefereeCommand>
@@ -62,6 +70,7 @@ const static std::unordered_map<SSLProto::Referee::Command, RefereeCommand>
 RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
                                     TeamColour team_colour)
 {
+    if (deprecated_commands.contains(packet.command())) return RefereeCommand::HALT;
     if (team_colour == TeamColour::YELLOW)
     {
         return yellow_team_command_map.at(packet.command());

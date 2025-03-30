@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import queue
 import random
 import logging
 import os
@@ -59,11 +60,10 @@ class Gamecontroller:
         self.blue_team_world_buffer = ThreadSafeCircularBuffer(
             buffer_size=1, protobuf_type=World
         )
-        # self.referee_buffer = ThreadSafeBuffer(buffer_size=10, protobuf_type=Referee)
-        self.previous_max_blue_robots = 0
-        self.previous_max_yellow_robots = 0
         self.latest_world = None
-        self.is_running = False
+        self.blue_removed_robot_ids: Queue[int] = queue.Queue()
+        self.yellow_removed_robot_ids: Queue[int] = queue.Queue()
+
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -82,10 +82,6 @@ class Gamecontroller:
 
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
-
-        self.is_running = True
-        self.world_thread = Thread(target=self.get_latest_world, daemon=True)
-        # self.world_thread.start()
 
         if self.suppress_logs:
             with open(os.devnull, "w") as fp:
@@ -110,16 +106,7 @@ class Gamecontroller:
         """
         self.gamecontroller_proc.terminate()
         self.gamecontroller_proc.wait()
-        self.is_running = False
-        self.world_thread.join()
         self.ci_socket.close()
-
-    def get_latest_world(self) -> World:
-        while self.is_running:
-            self.latest_world = self.blue_team_world_buffer.get(
-                block=False, return_cached=True
-            )
-            time.sleep(0.1)
 
     def refresh(self):
         """Gets any manual gamecontroller commands from the buffer and executes them"""
@@ -142,6 +129,31 @@ class Gamecontroller:
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
+    def __update_robot_count(self, robot_states, team: Team,
+                             max_robots: int, removed_robot_ids: Queue[int], latest_world: World, is_friendly: bool):
+        # build the robot state
+        place_pos_y_meters = latest_world.field.field_y_length - latest_world.field.boundary_buffer_size
+        place_state = RobotState(
+            global_position=Point(
+                x_meters=0,
+                y_meters=place_pos_y_meters if is_friendly else -place_pos_y_meters,
+            ),
+            global_orientation=Angle(radians=0),
+        )
+
+        # Set robot velocities to zero to avoid any drift
+        for count, robot in enumerate(team.team_robots, start=1):
+            if count <= max_robots:
+                robot_states[robot.id].CopyFrom(robot.current_state)
+                velocity = robot_states[robot.id].global_velocity
+                velocity.x_component_meters = 0
+                velocity.y_component_meters = 0
+            else:
+                removed_robot_ids.put(robot.id)
+
+        for _ in range(max_robots - len(team.team_robots)):
+            robot_states[removed_robot_ids.get(block=False)].CopyFrom(place_state)
+
     def handle_referee(self, referee: Referee) -> None:
         """
         Updates the world state based on the referee message
@@ -152,38 +164,54 @@ class Gamecontroller:
         if self.simulator_proto_unix_io is None:
             return
 
+        self.latest_world = self.blue_team_world_buffer.get(
+            block=False, return_cached=True
+        )
+
         max_allowed_bots_yellow = referee.yellow.max_allowed_bots
         max_allowed_bots_blue = referee.blue.max_allowed_bots
-        self.previous_max_blue_robots = max_allowed_bots_blue
-        self.previous_max_yellow_robots = max_allowed_bots_yellow
-
-        # Convert the latest blue world into a WorldState we can send to the simulator
-
-        if (len(self.latest_world.friendly_team.team_robots) <= max_allowed_bots_blue and
-                len(self.latest_world.enemy_team.team_robots) <= max_allowed_bots_yellow):
+        if (len(self.latest_world.friendly_team.team_robots) == max_allowed_bots_blue and
+                len(self.latest_world.enemy_team.team_robots) == max_allowed_bots_yellow):
             return
 
+        # Convert the latest blue world into a WorldState we can send to the simulator and update the robots
         world_state = WorldState()
-        # Set robot velocities to zero to avoid any drift
-        for robot in self.latest_world.friendly_team.team_robots:
-            if max_allowed_bots_blue == 0:
-                break
-
-            world_state.blue_robots[robot.id].CopyFrom(robot.current_state)
-            velocity = world_state.yellow_robots[robot.id].global_velocity
-            velocity.x_component_meters = 0
-            velocity.y_component_meters = 0
-            max_allowed_bots_blue -= 1
-
-        for robot in self.latest_world.enemy_team.team_robots:
-            if max_allowed_bots_yellow == 0:
-                break
-
-            world_state.yellow_robots[robot.id].CopyFrom(robot.current_state)
-            velocity = world_state.yellow_robots[robot.id].global_velocity
-            velocity.x_component_meters = 0
-            velocity.y_component_meters = 0
-            max_allowed_bots_yellow -= 1
+        #
+        # # build the robot state
+        # robot_state = RobotState(
+        #     global_position=Point(
+        #         x_meters=0,
+        #         y_meters=self.latest_world.field.field_y_length,
+        #     ),
+        #     global_orientation=Angle(radians=0),
+        # )
+        #
+        # # Set robot velocities to zero to avoid any drift
+        # for blue_count, robot in enumerate(self.latest_world.friendly_team.team_robots, start=1):
+        #     if blue_count <= max_allowed_bots_blue:
+        #         world_state.blue_robots[robot.id].CopyFrom(robot.current_state)
+        #         velocity = world_state.blue_robots[robot.id].global_velocity
+        #         velocity.x_component_meters = 0
+        #         velocity.y_component_meters = 0
+        #     else:
+        #         self.blue_removed_robot_ids.put(robot.id)
+        #
+        # for _ in range(max_allowed_bots_blue - len(self.latest_world.friendly_team.team_robots)):
+        #     world_state.blue_robots[self.blue_removed_robot_ids.get(block=False)].CopyFrom(robot_state)
+        self.__update_robot_count(world_state.blue_robots, self.latest_world.friendly_team, max_allowed_bots_blue,
+                                  self.blue_removed_robot_ids, self.latest_world, True)
+        self.__update_robot_count(world_state.yellow_robots, self.latest_world.enemy_team, max_allowed_bots_yellow,
+                                  self.yellow_removed_robot_ids, self.latest_world, False)
+        # for yellow_count, robot in enumerate(self.latest_world.enemy_team.team_robots, start=1):
+        #     if yellow_count <= max_allowed_bots_yellow:
+        #         world_state.yellow_robots[robot.id].CopyFrom(robot.current_state)
+        #         velocity = world_state.yellow_robots[robot.id].global_velocity
+        #         velocity.x_component_meters = 0
+        #         velocity.y_component_meters = 0
+        #     else:
+        #         self.yellow_removed_robot_ids.put(robot.id)
+        # for _ in range(max_allowed_bots_yellow - len(self.latest_world.enemy_team.team_robots)):
+        #     world_state.yellow_robots[self.yellow_removed_robot_ids.get(block=False)].CopyFrom(robot_state)
 
         # Check if we need to invert the world state
         if referee.blue_team_on_positive_half:
@@ -245,9 +273,6 @@ class Gamecontroller:
 
             :param data: The referee command to send
             """
-            self.latest_world = self.blue_team_world_buffer.get(
-                block=False, return_cached=True
-            )
             self.handle_referee(data)
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
