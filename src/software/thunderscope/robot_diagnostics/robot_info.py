@@ -358,11 +358,11 @@ class RobotInfo(QWidget):
         """
         if not self.last_robot_status or not self.last_robot_statistic:
             return
-        motor_status = robot_status.motor_status
-        power_status = robot_status.power_status
-        network_status = robot_status.network_status
-        primitive_executor_status = robot_status.primitive_executor_status
-        rtt_time_seconds = robot_statistic.round_trip_time_seconds
+        motor_status = self.last_robot_status.motor_status
+        power_status = self.last_robot_status.power_status
+        network_status = self.last_robot_status.network_status
+        primitive_executor_status = self.last_robot_status.primitive_executor_status
+        rtt_time_seconds = self.last_robot_statistic.round_trip_time_seconds
 
         self.__update_stop_primitive(primitive_executor_status.running_primitive)
 
