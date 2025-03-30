@@ -19,7 +19,6 @@ from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common.thread_safe_circular_buffer import ThreadSafeCircularBuffer
-from threading import Thread
 logger = logging.getLogger(__name__)
 import itertools
 
