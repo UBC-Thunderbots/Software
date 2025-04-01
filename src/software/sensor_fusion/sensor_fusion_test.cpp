@@ -25,8 +25,8 @@ class SensorFusionTest : public ::testing::Test
           robot_status_msg_dribble_motor_hot(initDribbleMotorHotErrorCode()),
           robot_status_msg_multiple_error_codes(initMultipleErrorCode()),
           robot_status_msg_no_error_code(initNoErrorCode()),
-          referee_indirect_yellow(initRefereeIndirectYellow()),
-          referee_indirect_blue(initRefereeIndirectBlue()),
+          referee_direct_yellow(initRefereeDirectYellow()),
+          referee_direct_blue(initRefereeDirectBlue()),
           referee_normal_start(initRefereeNormalStart()),
           referee_ball_placement_yellow(initRefereeBallPlacementYellow()),
           referee_ball_placement_blue(initRefereeBallPlacementBlue()),
@@ -49,8 +49,8 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_dribble_motor_hot;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_multiple_error_codes;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_no_error_code;
-    std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
-    std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
+    std::unique_ptr<SSLProto::Referee> referee_direct_yellow;
+    std::unique_ptr<SSLProto::Referee> referee_direct_blue;
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
     std::unique_ptr<SSLProto::Referee> referee_ball_placement_yellow;
     std::unique_ptr<SSLProto::Referee> referee_ball_placement_blue;
@@ -282,17 +282,17 @@ class SensorFusionTest : public ::testing::Test
         return robot_msg;
     }
 
-    std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()
+    std::unique_ptr<SSLProto::Referee> initRefereeDirectYellow()
     {
         auto ref_msg = std::make_unique<SSLProto::Referee>();
-        ref_msg->set_command(SSLProto::Referee_Command_INDIRECT_FREE_YELLOW);
+        ref_msg->set_command(SSLProto::Referee_Command_DIRECT_FREE_YELLOW);
         return ref_msg;
     }
 
-    std::unique_ptr<SSLProto::Referee> initRefereeIndirectBlue()
+    std::unique_ptr<SSLProto::Referee> initRefereeDirectBlue()
     {
         auto ref_msg = std::make_unique<SSLProto::Referee>();
-        ref_msg->set_command(SSLProto::Referee_Command_INDIRECT_FREE_BLUE);
+        ref_msg->set_command(SSLProto::Referee_Command_DIRECT_FREE_BLUE);
         return ref_msg;
     }
 
@@ -545,7 +545,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time
 TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 {
     GameState expected_1;
-    expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
+    expected_1.updateRefereeCommand(RefereeCommand::DIRECT_FREE_US);
 
     GameState expected_2 = expected_1;
     expected_2.updateRefereeCommand(RefereeCommand::NORMAL_START);
@@ -555,7 +555,7 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_yellow;
+    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_direct_yellow;
     sensor_fusion.processSensorProto(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
@@ -570,7 +570,7 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 TEST_F(SensorFusionTest, test_referee_blue_then_normal)
 {
     GameState expected_1;
-    expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_THEM);
+    expected_1.updateRefereeCommand(RefereeCommand::DIRECT_FREE_THEM);
 
     GameState expected_2 = expected_1;
     expected_2.updateRefereeCommand(RefereeCommand::NORMAL_START);
@@ -580,7 +580,7 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_blue;
+    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_direct_blue;
     sensor_fusion.processSensorProto(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());

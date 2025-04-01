@@ -4,7 +4,6 @@ from pyqtgraph.opengl import *
 import pyqtgraph as pg
 
 import time
-import queue
 import numpy as np
 
 from proto.world_pb2 import World
@@ -101,11 +100,7 @@ class GLCostVisLayer(GLLayer):
         """Update graphics in this layer"""
         self.cached_world = self.world_buffer.get(block=False)
         field = self.cached_world.field
-
-        try:
-            cost_vis = self.cost_visualization_buffer.queue.get_nowait()
-        except queue.Empty:
-            cost_vis = None
+        cost_vis = self.cost_visualization_buffer.get(block=False, return_cached=False)
 
         self.cost_vis_overlay_layer.refresh_graphics()
 
