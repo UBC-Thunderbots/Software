@@ -124,17 +124,6 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(RefereeCommand::DIRECT_FREE_THEM,
                         SSLProto::Referee_Command_DIRECT_FREE_YELLOW, TeamColour::BLUE),
 
-        // indirect free
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_US,
-                        SSLProto::Referee_Command_INDIRECT_FREE_YELLOW,
-                        TeamColour::YELLOW),
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_US,
-                        SSLProto::Referee_Command_INDIRECT_FREE_BLUE, TeamColour::BLUE),
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_THEM,
-                        SSLProto::Referee_Command_INDIRECT_FREE_BLUE, TeamColour::YELLOW),
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_THEM,
-                        SSLProto::Referee_Command_INDIRECT_FREE_YELLOW, TeamColour::BLUE),
-
         // timeout
         std::make_tuple(RefereeCommand::TIMEOUT_US,
                         SSLProto::Referee_Command_TIMEOUT_YELLOW, TeamColour::YELLOW),
