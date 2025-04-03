@@ -196,7 +196,6 @@ class RobotCommunication:
         """
         while self.running:
             self.communication_manager.poll()
-
             # map of robot id to diagnostics/fullsystem primitive map
             robot_primitives_map = {}
             robot_orientations_map = {}
@@ -209,7 +208,8 @@ class RobotCommunication:
                 direct_control=DirectControlPrimitive(
                     motor_control=motor_control,
                     power_control=power_control,
-                )
+                ),
+                orientation=Angle(radians=0)
             )
 
             # filter for diagnostics controlled robots
@@ -222,6 +222,7 @@ class RobotCommunication:
             # set diagnostics primitives for diagnostics robots
             for robot_id in diagnostics_robots:
                 robot_primitives_map[robot_id] = diagnostics_primitive
+                robot_orientations_map[robot_id] = Angle(radians=0)
 
             # get the most recent fullsystem primitives
             fullsystem_primitive_set = self.fullsystem_primitive_set_buffer.get(
