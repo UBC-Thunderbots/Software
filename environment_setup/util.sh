@@ -46,7 +46,7 @@ install_cross_compiler() {
         file_name=aarch64-tbots-linux-gnu-for-x86
     fi
     full_file_name=$file_name.tar.xz
-    wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/tbots_compiler/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
+    wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
     tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
     sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
     rm /tmp/tbots_download_cache/$full_file_name
@@ -93,6 +93,31 @@ install_java () {
     tar -xzf /tmp/tbots_download_cache/jdk-21.tar.gz -C /opt/tbotspython/
     mv /opt/tbotspython/jdk-21* /opt/tbotspython/bin/jdk
     rm /tmp/tbots_download_cache/jdk-21.tar.gz
+}
+
+install_python_dev_cross_compile_headers() {
+    if is_x86 $1; then
+        mkdir -p /opt/tbotspython/cross_compile_headers
+        wget -N https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz -O /tmp/tbots_download_cache/python-3.12.0.tar.xz
+        tar -xf /tmp/tbots_download_cache/python-3.12.0.tar.xz -C /tmp/tbots_download_cache/
+        cd /tmp/tbots_download_cache/Python-3.12.0
+
+        # The configuration is taken from the examples provided in https://docs.python.org/3.12/using/configure.html
+        echo ac_cv_buggy_getaddrinfo=no > config.site-aarch64
+        echo ac_cv_file__dev_ptmx=yes >> config.site-aarch64
+        echo ac_cv_file__dev_ptc=no >> config.site-aarch64
+        CONFIG_SITE=config.site-aarch64 ./configure \
+            --build=x86_64-pc-linux-gnu \
+            --host=aarch64-unknown-linux-gnu \
+            -with-build-python=/usr/bin/python3.12 \
+            --enable-optimizations \
+            --prefix=/opt/tbotspython/cross_compile_headers > /dev/null
+        make inclinstall -j$(nproc) > /dev/null
+
+        cd -
+        rm -rf /tmp/tbots_download_cache/Python-3.12.0
+        rm -rf /tmp/tbots_download_cache/python-3.12.0.tar.xz
+    fi
 }
 
 is_x86() {

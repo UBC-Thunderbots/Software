@@ -5,7 +5,11 @@ import math
 import numpy as np
 
 from software.py_constants import *
-from software.thunderscope.constants import Colors, DepthValues
+from software.thunderscope.constants import (
+    Colors,
+    DepthValues,
+    THUNDERSCOPE_UI_FONT_NAME,
+)
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
@@ -80,7 +84,7 @@ class GLMeasureLayer(GLLayer):
 
             self.measurement_text_graphics.append(
                 GLTextItem(
-                    font=QtGui.QFont("Roboto", 8),
+                    font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                     color=Colors.PRIMARY_TEXT_COLOR,
                     text=f"{distance:.2f} m",
                     pos=np.array([midpoint.x(), midpoint.y(), 0]),
@@ -111,7 +115,7 @@ class GLMeasureLayer(GLLayer):
 
             self.measurement_text_graphics.append(
                 GLTextItem(
-                    font=QtGui.QFont("Roboto", 8),
+                    font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                     color=Colors.PRIMARY_TEXT_COLOR,
                     text=f"{angle:.1f}°",
                     pos=np.array([placement_point.x(), placement_point.y(), 0]),
@@ -142,7 +146,7 @@ class GLMeasureLayer(GLLayer):
         if not self.cursor_coords_graphic:
             self.cursor_coords_graphic = GLTextItem(
                 parentItem=self,
-                font=QtGui.QFont("Roboto", 10),
+                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 10),
                 color=Colors.PRIMARY_TEXT_COLOR,
             )
 
