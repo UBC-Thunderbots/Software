@@ -10,7 +10,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Team team                    = Team(Duration::fromSeconds(1));
     Robot shooting_robot         = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateFriendlyTeamState(team);
 
@@ -31,7 +31,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Team team                    = Team(Duration::fromSeconds(1));
     Robot shooting_robot         = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateFriendlyTeamState(team);
 
@@ -218,7 +218,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_best_shot_top_segmen
 
     Point shooting_robot_pos = Point(-3.641, 0.113);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateEnemyTeamState(team);
 
@@ -247,7 +247,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_best_shot_top_segment)
 
     Point shooting_robot_pos = Point(3.641, 0.113);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateFriendlyTeamState(team);
 
@@ -276,7 +276,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_best_shot_middle_seg
 
     Point shooting_robot_pos = Point(-3.641, 0.113);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateEnemyTeamState(team);
 
@@ -305,7 +305,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_best_shot_middle_segmen
 
     Point shooting_robot_pos = Point(3.641, 0.113);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateFriendlyTeamState(team);
 
@@ -334,7 +334,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_best_shot_bottom_seg
 
     Point shooting_robot_pos = Point(-3.641, 0.113);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateEnemyTeamState(team);
 
@@ -362,7 +362,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_best_shot_bottom_segmen
 
     Point shooting_robot_pos = Point(3.641, 0.113);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateFriendlyTeamState(team);
 
@@ -390,7 +390,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_overlapping_obstacle
 
     Point shooting_robot_pos = Point(-3.44615, 0.0102564);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateEnemyTeamState(team);
 
@@ -419,7 +419,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_overlapping_obstacles)
 
     Point shooting_robot_pos = Point(3.44615, 0.0102564);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateFriendlyTeamState(team);
 
@@ -448,7 +448,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_negative_y_ball_plac
 
     Point shooting_robot_pos = Point(-3.50769, -1.00513);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateEnemyTeamState(team);
 
@@ -476,7 +476,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_negative_y_ball_placeme
 
     Point shooting_robot_pos = Point(3.50769, -1.00513);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateFriendlyTeamState(team);
 
@@ -504,7 +504,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_positive_y_ball_plac
 
     Point shooting_robot_pos = Point(-3.49744, 0.984615);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateEnemyTeamState(team);
 
@@ -532,7 +532,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_positive_y_ball_placeme
 
     Point shooting_robot_pos = Point(3.49744, 0.984615);
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateFriendlyTeamState(team);
 
@@ -560,7 +560,7 @@ TEST(CalcBestShotTest, calc_best_shot_out_of_field_bounds)
     Point shooting_robot_pos = Point(world->field().enemyCornerPos().x() + 2,
                                      world->field().enemyCornerPos().y());
     Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world->updateFriendlyTeamState(team);
 

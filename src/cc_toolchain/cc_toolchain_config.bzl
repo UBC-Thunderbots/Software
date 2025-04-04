@@ -671,7 +671,7 @@ def _k8_jetson_nano_cross_compile_impl(ctx):
         name = "common",
         implies = [
             "build-id",
-            "c++17",
+            "c++2a",
             "colour",
             "determinism",
             "frame-pointer",
