@@ -3,16 +3,21 @@ import sys
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_enters_region import NumberOfRobotsEventuallyExitsRegion, NumberOfRobotsEventuallyEntersRegion
+from software.simulated_tests.robot_enters_region import (
+    NumberOfRobotsEventuallyExitsRegion,
+    NumberOfRobotsEventuallyEntersRegion,
+)
 from software.simulated_tests.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.play_pb2 import Play, PlayName
 
+
 # TODO issue  #2599 - Remove Duration parameter from test
 # @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_example_play(simulated_test_runner):
-    ball_initial_pos = tbots_cpp.Point(0,0)
+    ball_initial_pos = tbots_cpp.Point(0, 0)
+
     def setup(*args):
         # Setup Bots
         blue_bots = [
@@ -30,11 +35,11 @@ def test_example_play(simulated_test_runner):
             tbots_cpp.Point(1, -2.5),
             tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
             tbots_cpp.Field.createSSLDivisionBField()
-                .enemyDefenseArea()
-                .negXNegYCorner(),
+            .enemyDefenseArea()
+            .negXNegYCorner(),
             tbots_cpp.Field.createSSLDivisionBField()
-                .enemyDefenseArea()
-                .negXPosYCorner(),
+            .enemyDefenseArea()
+            .negXPosYCorner(),
         ]
 
         # Force play override here
@@ -60,8 +65,6 @@ def test_example_play(simulated_test_runner):
             gc_command=Command.Type.DIRECT, team=Team.BLUE
         )
 
-
-
         # Create world state
         simulated_test_runner.simulator_proto_unix_io.send_proto(
             WorldState,
@@ -78,13 +81,16 @@ def test_example_play(simulated_test_runner):
         setup=setup,
         params=[0],
         inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[[NumberOfRobotsEventuallyEntersRegion(
-            region=tbots_cpp.Circle(ball_initial_pos, 1.1),
-            req_robot_cnt=6
-        ), NumberOfRobotsEventuallyExitsRegion(
-            region=tbots_cpp.Circle(ball_initial_pos, 0.9),
-            req_robot_cnt=6
-        )]],
+        inv_eventually_validation_sequence_set=[
+            [
+                NumberOfRobotsEventuallyEntersRegion(
+                    region=tbots_cpp.Circle(ball_initial_pos, 1.1), req_robot_cnt=6
+                ),
+                NumberOfRobotsEventuallyExitsRegion(
+                    region=tbots_cpp.Circle(ball_initial_pos, 0.9), req_robot_cnt=6
+                ),
+            ]
+        ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=10,
