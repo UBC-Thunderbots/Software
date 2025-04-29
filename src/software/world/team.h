@@ -276,7 +276,7 @@ class Team
 
     // The robot id of the goalie for this team
     std::optional<unsigned int> goalie_id_;
-        std::vector<Robot> injured_robots;
+    std::vector<Robot> injured_robots;
 
     // The duration for which a Robot must not have been updated for before
     // being removed from this team.
