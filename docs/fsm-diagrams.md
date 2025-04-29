@@ -106,6 +106,19 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [ExamplePlayFSM](/src/software/ai/hl/stp/play/example/example_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> MoveState
+MoveState --> MoveState : <i>moveToPosition</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
 ## [FreeKickPlayFSM](/src/software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h)
 
 ```mermaid
