@@ -3,18 +3,17 @@ import sys
 import pytest
 
 import software.python_bindings as tbots_cpp
+from software.simulated_tests.robot_enters_region import NumberOfRobotsEventuallyExitsRegion, NumberOfRobotsEventuallyEntersRegion
 from software.simulated_tests.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-
+from proto.play_pb2 import Play, PlayName
 
 # TODO issue  #2599 - Remove Duration parameter from test
 # @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_example_play(simulated_test_runner):
+    ball_initial_pos = tbots_cpp.Point(0,0)
     def setup(*args):
-        # starting point must be Point
-        ball_initial_pos = tbots_cpp.Point(0, 0)
-
         # Setup Bots
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
@@ -38,20 +37,30 @@ def test_example_play(simulated_test_runner):
                 .negXPosYCorner(),
         ]
 
+        # Force play override here
+        blue_play = Play()
+        blue_play.name = PlayName.ExamplePlay
+
+        yellow_play = Play()
+        yellow_play.name = PlayName.HaltPlay
+
+        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
+
         # Game Controller Setup
         simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
         simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
+            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+        )
+        simulated_test_runner.gamecontroller.send_gc_command(
+            gc_command=Command.Type.DIRECT, team=Team.BLUE
         )
 
-        # Structure for a delayed call is tuple (delay in seconds, command, team)
-        (3, Command.Type.HALT, Team.BLUE)
-        (3, Command.Type.HALT, Team.YELLOW)
 
-        # No plays to override. AI does whatever for 3 seconds before HALT CMD
-        # is issued
 
         # Create world state
         simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -69,13 +78,15 @@ def test_example_play(simulated_test_runner):
         setup=setup,
         params=[0],
         inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1e-3)]
-        ],
+        inv_eventually_validation_sequence_set=[[NumberOfRobotsEventuallyEntersRegion(
+            region=tbots_cpp.Circle(ball_initial_pos, 1.1),
+            req_robot_cnt=6
+        ), NumberOfRobotsEventuallyExitsRegion(
+            region=tbots_cpp.Circle(ball_initial_pos, 0.9),
+            req_robot_cnt=6
+        )]],
         ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1e-3)]
-        ],
+        ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
 
