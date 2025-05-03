@@ -221,7 +221,7 @@ TEST(PenaltyKickFSMTest, enemy_goalie_left_shot_right)
 
     Point enemy_goalie_pos = Point(world->field().enemyGoalCenter().x(), 0.2);
     Robot enemy_goalie     = Robot(0, enemy_goalie_pos, Vector(0, 0), Angle::half(),
-                               AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     Point shot_position = PenaltyKickFSM::evaluateNextShotPosition(
         std::optional<Robot>(enemy_goalie), world->field());
@@ -238,7 +238,7 @@ TEST(PenaltyKickFSMTest, enemy_goalie_right_shot_left)
 
     Point enemy_goalie_pos = Point(world->field().enemyGoalCenter().x(), -0.2);
     Robot enemy_goalie     = Robot(0, enemy_goalie_pos, Vector(0, 0), Angle::half(),
-                               AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     Point shot_position = PenaltyKickFSM::evaluateNextShotPosition(
         std::optional<Robot>(enemy_goalie), world->field());

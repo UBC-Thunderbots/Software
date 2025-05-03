@@ -67,9 +67,8 @@ TEST_P(DribbleTacticPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 

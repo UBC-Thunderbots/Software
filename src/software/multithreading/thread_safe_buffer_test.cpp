@@ -47,12 +47,14 @@ TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_
     std::optional<int> result = std::nullopt;
 
     // This "popLeastRecentlyAddedValue" call should block until something is "pushed"
-    std::thread puller_thread([&]() {
-        while (!result)
+    std::thread puller_thread(
+        [&]()
         {
-            result = buffer.popLeastRecentlyAddedValue(Duration::fromSeconds(0.1));
-        }
-    });
+            while (!result)
+            {
+                result = buffer.popLeastRecentlyAddedValue(Duration::fromSeconds(0.1));
+            }
+        });
 
     buffer.push(84);
 
@@ -73,13 +75,15 @@ TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_
     std::optional<int> result = std::nullopt;
 
     // This "popLeastRecentlyAddedValue" call should block until something is "pushed"
-    std::thread puller_thread([&]() {
-        while (!result)
+    std::thread puller_thread(
+        [&]()
         {
-            // should find values already in the buffer
-            result = buffer.popLeastRecentlyAddedValue(Duration::fromSeconds(2));
-        }
-    });
+            while (!result)
+            {
+                // should find values already in the buffer
+                result = buffer.popLeastRecentlyAddedValue(Duration::fromSeconds(2));
+            }
+        });
 
     // this push should be too late to affect the previous call
     std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -135,12 +139,14 @@ TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_buffer_i
     std::optional<int> result = std::nullopt;
 
     // This "popLeastRecentlyAddedValue" call should block until something is "pushed"
-    std::thread puller_thread([&]() {
-        while (!result)
+    std::thread puller_thread(
+        [&]()
         {
-            result = buffer.popMostRecentlyAddedValue(Duration::fromSeconds(0.1));
-        }
-    });
+            while (!result)
+            {
+                result = buffer.popMostRecentlyAddedValue(Duration::fromSeconds(0.1));
+            }
+        });
 
     buffer.push(84);
 
