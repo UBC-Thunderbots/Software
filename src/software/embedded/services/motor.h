@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "proto/robot_status_msg.pb.h"
@@ -9,9 +10,11 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/constants/constants.h"
-#include "software/embedded/gpio.h"
-#include "software/embedded/gpio_char_dev.h"
-#include "software/embedded/gpio_sysfs.h"
+#include "software/embedded/gpio/gpio.h"
+#include "software/embedded/gpio/gpio_char_dev.h"
+#include "software/embedded/gpio/gpio_sysfs.h"
+#include "software/embedded/motor_controller/motor_controller.h"
+#include "software/embedded/motor_controller/motor_fault_indicator.h"
 #include "software/embedded/platform.h"
 #include "software/physics/euclidean_to_wheel.h"
 
@@ -67,23 +70,6 @@ class MotorService
     uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
     uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
 
-    /*
-     * For FOC to work, the controller needs to know the electical angle of the rotor
-     * relative to the mechanical angle of the rotor. In an incremental-encoder-only
-     * setup, we can energize the motor coils so that the rotor locks itself along
-     * one of its pole-pairs, allowing us to reset the encoder.
-     *
-     * WARNING: Do not try to spin the motor without initializing the encoder!
-     *          The motor can overheat if the TMC4671 doesn't auto shut-off.
-     *
-     *          There are some safety checks to ensure that the encoder is
-     *          initialized, do not tamper with them. You have been warned.
-     *
-     * @param motor The motor to initialize the encoder for
-     */
-    void startEncoderCalibration(uint8_t motor);
-    void endEncoderCalibration(uint8_t motor);
-
     /**
      * Spin the motor in openloop mode (safe to run before encoder initialization)
      *
@@ -112,34 +98,6 @@ class MotorService
      * Clears previous faults, configures the motor and checks encoder connections.
      */
     void setup();
-
-    /**
-     * Holds motor fault information for a particular motor and whether any fault has
-     * caused the motor to be disabled.
-     */
-    struct MotorFaultIndicator
-    {
-        bool drive_enabled;
-        std::unordered_set<TbotsProto::MotorFault> motor_faults;
-
-        /**
-         * Construct a default indicator of no faults and running motors.
-         */
-        MotorFaultIndicator() : drive_enabled(true), motor_faults() {}
-
-        /**
-         * Construct an indicator with faults and whether the motor is enabled.
-         *
-         * @param drive_enabled true if the motor is enabled, false if disabled due to a
-         * motor fault
-         * @param motor_faults  a set of faults associated with this motor
-         */
-        MotorFaultIndicator(bool drive_enabled,
-                            std::unordered_set<TbotsProto::MotorFault>& motor_faults)
-            : drive_enabled(drive_enabled), motor_faults(motor_faults)
-        {
-        }
-    };
 
     /**
      * Log the driver fault in a human readable log msg
@@ -188,68 +146,6 @@ class MotorService
     void motorServiceInit(const RobotConstants_t& robot_constants,
                           int control_loop_frequency_hz);
 
-    /**
-     * Calls the configuration functions below in the right sequence
-     *
-     * @param motor The motor setup the driver/controller for
-     * @param dribbler If true, configures the motor to be a dribbler
-     */
-    void startDriver(uint8_t motor);
-    void startController(uint8_t motor, bool dribbler);
-
-    /**
-     * Configuration settings
-     *
-     * These values were determined by reading the datasheets and user manual
-     * here: https://www.trinamic.com/support/eval-kits/details/tmc4671-tmc6100-bob/
-     *
-     * If you are planning to change these settings, I highly recommend that you
-     * plug the motor + encoder pair in the TMC-IDE and use the TMC4671 EVAL
-     * with the TMC6100 EVAL to get the motor spinning.
-     *
-     * Then using the exported registers as a baseline, you can use the
-     * runOpenLoopCalibrationRoutine and plot the generated csvs. These csvs capture the
-     * data for encoder calibration and adc configuration, the two most important steps
-     * for the motor to work. Page 143 (title Setup Guidelines) of the TMC4671 is very
-     * useful.
-     *
-     * @param motor The motor to configure (the same value as the chip select)
-     */
-    void configurePWM(uint8_t motor);
-    void configureDribblerPI(uint8_t motor);
-    void configureDrivePI(uint8_t motor);
-    void configureADC(uint8_t motor);
-    void configureEncoder(uint8_t motor);
-    void configureHall(uint8_t motor);
-
-    /**
-     * A lot of initialization parameters are necessary to function. Even if
-     * there is a single bit error, we can risk frying the motor driver or
-     * controller.
-     *
-     * The following functions can be used to setup initialization params
-     * that _must_ be set to continue. A failed call will crash the program
-     *
-     * @param motor Which motor to talk to (in our case, the chip select)
-     * @param address The address to send data to
-     * @param value The value to write
-     *
-     */
-    void writeToControllerOrDieTrying(uint8_t motor, uint8_t address, int32_t value);
-    void writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int32_t value);
-
-    /**
-     * Trigger an SPI transfer over an open SPI connection
-     *
-     * @param fd The SPI File Descriptor to transfer data over
-     * @param tx The tx buffer, data to send out
-     * @param rx The rx buffer, will be updated with data from the full-duplex transfer
-     * @param len The length of the tx and rx buffer
-     * @param spi_speed The speed to run spi at
-     *
-     */
-    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len,
-                     uint32_t spi_speed);
 
     /**
      * Performs two back to back SPI transactions, first a read and then a write.
@@ -325,6 +221,8 @@ class MotorService
                                               double back_right_velocity_mps,
                                               double dribbler_rpm);
 
+    std::unique_ptr<MotorController> setupMotorController();
+
     /**
      * Helper function to setup a GPIO pin. Selects the appropriate GPIO implementation
      * based on the host platform.
@@ -347,7 +245,7 @@ class MotorService
      *
      * @return true if the motor has returned a cached RESET fault, false otherwise
      */
-    bool requiresMotorReinit(uint8_t motor);
+    bool requiresMotorReinit(const MotorIndex& motor);
 
     // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
     // pairs of the drive motor.
@@ -358,41 +256,17 @@ class MotorService
     static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS =
         1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
+    // Controller for communicating with the motor board
+    std::unique_ptr<MotorController> motor_controller_;
+
     // to check if the motors have been calibrated
     bool is_initialized_ = false;
-
-    // Select between driver and controller gpio
-    std::unique_ptr<Gpio> spi_demux_select_0_;
-    std::unique_ptr<Gpio> spi_demux_select_1_;
-
-    // Enable driver gpio
-    std::unique_ptr<Gpio> driver_control_enable_gpio_;
-    std::unique_ptr<Gpio> reset_gpio_;
-
-    // Transfer Buffers for spiTransfer
-    uint8_t tx_[5] = {0};
-    uint8_t rx_[5] = {0};
-
-    // Transfer Buffers for readThenWriteSpiTransfer
-    uint8_t write_tx_[5] = {0};
-    uint8_t read_tx_[5]  = {0};
-    uint8_t read_rx_[5]  = {0};
-
-    // Transfer State
-    bool transfer_started_  = false;
-    bool currently_writing_ = false;
-    bool currently_reading_ = false;
-    uint8_t position_       = 0;
-
-    // SPI File Descriptors
-    std::unordered_map<int, int> file_descriptors_;
 
     RobotConstants_t robot_constants_;
 
     // Drive Motors
     EuclideanToWheel euclidean_to_four_wheel_;
-    std::unordered_map<int, bool> encoder_calibrated_;
-    std::unordered_map<int, MotorFaultIndicator> cached_motor_faults_;
+    std::unordered_map<MotorIndex, MotorFaultIndicator> cached_motor_faults_;
 
     // Previous wheel velocities
     WheelSpace_t prev_wheel_velocities_;
@@ -403,7 +277,7 @@ class MotorService
     int back_right_target_rpm  = 0;
 
     // the motor cs id to check for motor faults
-    uint8_t motor_fault_detector_;
+    MotorIndex motor_fault_detector_;
 
     static const int NUM_CALIBRATION_ATTEMPTS = 10;
 
@@ -420,29 +294,4 @@ class MotorService
 
     static const int MOTOR_FAULT_TIME_THRESHOLD_S = 60;
     static const int MOTOR_FAULT_THRESHOLD_COUNT  = 3;
-
-    // SPI Trinamic Motor Driver Paths (indexed with chip select above)
-    static constexpr const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1",
-                                                "/dev/spidev0.2", "/dev/spidev0.3",
-                                                "/dev/spidev0.4"};
-
-    // Motor names (indexed with chip select above)
-    static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
-                                                  "front_right", "dribbler"};
 };
-
-template <typename T>
-std::unique_ptr<Gpio> MotorService::setupGpio(const T& gpio_number,
-                                              GpioDirection direction,
-                                              GpioState initial_state)
-{
-    if constexpr (PLATFORM == Platform::JETSON_NANO)
-    {
-        return std::make_unique<GpioSysfs>(gpio_number, direction, initial_state);
-    }
-    else
-    {
-        return std::make_unique<GpioCharDev>(gpio_number, direction, initial_state,
-                                             "/dev/gpiochip4");
-    }
-}

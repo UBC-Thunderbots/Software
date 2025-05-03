@@ -55,6 +55,15 @@ cc_library(
 )
 
 cc_library(
+    name = "spi_utils",
+    srcs = ["spi_utils.cpp"],
+    hdrs = ["spi_utils.h"],
+    deps = [
+        "//software/logger",
+    ],
+)
+
+cc_library(
     name = "thunderloop",
     srcs = ["thunderloop.cpp"],
     hdrs = ["thunderloop.h"],
@@ -70,24 +79,6 @@ cc_library(
         "//software/util/scoped_timespec_timer",
         "//software/world:team",
         "@tracy",
-    ],
-)
-
-cc_library(
-    name = "gpio",
-    srcs = [
-        "gpio_char_dev.cpp",
-        "gpio_sysfs.cpp",
-    ],
-    hdrs = [
-        "gpio.h",
-        "gpio_char_dev.h",
-        "gpio_sysfs.h",
-    ],
-    deps = [
-        "//software/logger",
-        "//software/logger:network_logger",
-        "//software/util/make_enum",
     ],
 )
 
