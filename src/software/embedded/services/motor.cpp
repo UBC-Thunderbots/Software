@@ -45,7 +45,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
 MotorService::~MotorService() {}
 
-void MotorService::resetMotorBoard()
+void MotorService::reset()
 {
     motor_controller_->reset();
 }
@@ -118,51 +118,50 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
     cached_motor_faults_[motor_fault_detector_] =
         motor_controller_->checkDriverFault(motor_fault_detector_);
 
-    for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
-        for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    {
+        if (motor != MotorIndex::DRIBBLER)
         {
-            if (motor != MotorIndex::DRIBBLER)
+            TbotsProto::DriveUnit drive_status;
+            drive_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
+
+            for (const TbotsProto::MotorFault& fault :
+                 cached_motor_faults_[motor].motor_faults)
             {
-                TbotsProto::DriveUnit drive_status;
-                drive_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
-
-                for (const TbotsProto::MotorFault& fault :
-                     cached_motor_faults_[motor].motor_faults)
-                {
-                    drive_status.add_motor_faults(fault);
-                }
-
-                if (motor == MotorIndex::FRONT_LEFT)
-                {
-                    *(motor_status.mutable_front_left()) = drive_status;
-                }
-                if (motor == MotorIndex::FRONT_RIGHT)
-                {
-                    *(motor_status.mutable_front_right()) = drive_status;
-                }
-                if (motor == MotorIndex::BACK_RIGHT)
-                {
-                    *(motor_status.mutable_back_right()) = drive_status;
-                }
-                if (motor == MotorIndex::BACK_LEFT)
-                {
-                    *(motor_status.mutable_back_left()) = drive_status;
-                }
+                drive_status.add_motor_faults(fault);
             }
-            else
-            {
-                TbotsProto::DribblerStatus dribbler_status;
-                dribbler_status.set_dribbler_rpm(static_cast<float>(dribbler_rpm));
-                dribbler_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
-                for (const TbotsProto::MotorFault& fault :
-                     cached_motor_faults_[motor].motor_faults)
-                {
-                    dribbler_status.add_motor_faults(fault);
-                }
 
-                *(motor_status.mutable_dribbler()) = dribbler_status;
+            if (motor == MotorIndex::FRONT_LEFT)
+            {
+                *(motor_status.mutable_front_left()) = drive_status;
+            }
+            if (motor == MotorIndex::FRONT_RIGHT)
+            {
+                *(motor_status.mutable_front_right()) = drive_status;
+            }
+            if (motor == MotorIndex::BACK_RIGHT)
+            {
+                *(motor_status.mutable_back_right()) = drive_status;
+            }
+            if (motor == MotorIndex::BACK_LEFT)
+            {
+                *(motor_status.mutable_back_left()) = drive_status;
             }
         }
+        else
+        {
+            TbotsProto::DribblerStatus dribbler_status;
+            dribbler_status.set_dribbler_rpm(static_cast<float>(dribbler_rpm));
+            dribbler_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
+            for (const TbotsProto::MotorFault& fault :
+                 cached_motor_faults_[motor].motor_faults)
+            {
+                dribbler_status.add_motor_faults(fault);
+            }
+
+            *(motor_status.mutable_dribbler()) = dribbler_status;
+        }
+    }
 
     motor_status.mutable_front_left()->set_wheel_velocity(
         static_cast<float>(front_left_velocity_mps));

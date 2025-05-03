@@ -12,6 +12,14 @@ class MotorController
 
     virtual void reset() = 0;
 
+    /**
+     * Log the driver fault in a human readable log msg
+     *
+     * @param motor The motor to log the status for
+     *
+     * @return a struct containing the motor faults and whether the motor was disabled due
+     * to the fault
+     */
     virtual MotorFaultIndicator checkDriverFault(const MotorIndex& motor) = 0;
 
     virtual double readThenWriteVelocity(const MotorIndex& motor,

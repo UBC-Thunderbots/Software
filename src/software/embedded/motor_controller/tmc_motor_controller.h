@@ -123,40 +123,50 @@ class TmcMotorController : public MotorController
     void configureEncoder(const MotorIndex& motor);
     void configureHall(const MotorIndex& motor);
 
-    // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
-    // the same SPI interface. So when we bind the API, we can use the same
-    // readWriteByte function, provided that the chip select pin is turning on
-    // the right chip.
-    //
-    // Each TMC4671 controller, TMC6100 driver and encoder group have their chip
-    // selects coming in from a demux (see diagram below). The demux is controlled
-    // by two bits {spi_demux_select_0, spi_demux_select_1}. If the bits are
-    // 10 the TMC4671 is selected, when the select bits are 01 the TMC6100 is
-    // selected and when they are 11 the encoder is selected. 00 disconnects all
-    // 3 chips.
-    //
-    //
-    //                                      FRONT LEFT MOTOR
-    //                                 CONTROLLER + DRIVER + ENCODER
-    //
-    //                    ┌───────┐        ┌───────────────┐
-    //                    │       │        │               │
-    //                    │  2:4  │  10    │  ┌─────────┐  │
-    //                    │       ├────────┼──►TMC4671  │  │  B0
-    //     FRONT_LEFT_CS  │ DEMUX │        │  └─────────┘  │
-    //     ───────────────►       │        │               │
-    //                    │       │  01    │  ┌─────────┐  │
-    //                    │       ├────────┼──►TMC6100  │  │  B1
-    //                    │       │        │  └─────────┘  │
-    //                    │       │        │               │
-    //                    │       │  11    │  ┌─────────┐  │
-    //                    │       ├────────┼──►ENCODER  │  │  B2
-    //                    │       │        │  └─────────┘  │
-    //                    └───▲───┘        │               │
-    //                        │            └───────────────┘
-    //                        │
-    //                spi_demux_sel_0 & 1
-    //
+    /**
+     * Trinamic API binding, sets spi_demux_select_0|1 pins appropriately and
+     * calls readWriteByte.
+     *
+     * Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
+     * the same SPI interface. So when we bind the API, we can use the same
+     * readWriteByte function, provided that the chip select pin is turning on
+     * the right chip.
+     *
+     * Each TMC4671 controller, TMC6100 driver and encoder group have their chip
+     * selects coming in from a demux (see diagram below). The demux is controlled
+     * by two bits {spi_demux_select_0, spi_demux_select_1}. If the bits are
+     * 10 the TMC4671 is selected, when the select bits are 01 the TMC6100 is
+     * selected and when they are 11 the encoder is selected. 00 disconnects all
+     * 3 chips.
+     *
+     *
+     *                                      FRONT LEFT MOTOR
+     *                                 CONTROLLER + DRIVER + ENCODER
+     *
+     *                    ┌───────┐        ┌───────────────┐
+     *                    │       │        │               │
+     *                    │  2:4  │  10    │  ┌─────────┐  │
+     *                    │       ├────────┼──►TMC4671  │  │  B0
+     *     FRONT_LEFT_CS  │ DEMUX │        │  └─────────┘  │
+     *     ───────────────►       │        │               │
+     *                    │       │  01    │  ┌─────────┐  │
+     *                    │       ├────────┼──►TMC6100  │  │  B1
+     *                    │       │        │  └─────────┘  │
+     *                    │       │        │               │
+     *                    │       │  11    │  ┌─────────┐  │
+     *                    │       ├────────┼──►ENCODER  │  │  B2
+     *                    │       │        │  └─────────┘  │
+     *                    └───▲───┘        │               │
+     *                        │            └───────────────┘
+     *                        │
+     *                spi_demux_sel_0 & 1
+     *
+     *
+     * @param motor Which motor to talk to (in our case, the chip select)
+     * @param data The data to send
+     * @param last_transfer The last transfer of uint8_t data for this transaction.
+     * @return A byte read from the trinamic chip
+     */
     uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
     uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
 
@@ -191,9 +201,9 @@ class TmcMotorController : public MotorController
     void endEncoderCalibration(const MotorIndex& motor);
 
     /**
-     * Spin each motor of the NUM_DRIVE_MOTORS in open loop mode to check if the encoder
-     * is responding as expected. Allows us to do a basic test of whether the encoder is
-     * physically connected to the motor board.
+     * Spin each drive motor in open loop mode to check if the encoder
+     * is responding as expected. Allows us to do a basic test of whether
+     * the encoder is physically connected to the motor board.
      *
      * Leaves the motors connected in MOTION_MODE_VELOCITY
      */
@@ -255,10 +265,6 @@ class TmcMotorController : public MotorController
     static constexpr uint32_t MAX_SPI_SPEED_HZ  = 2000000;  // 2 Mhz
     static constexpr uint8_t SPI_BITS           = 8;
     static constexpr uint32_t SPI_MODE          = 0x3u;
-
-    // Motor names (indexed with chip select above)
-    static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
-                                                  "front_right", "dribbler"};
 
     // SPI File Descriptors mapping from Chip Select -> File Descriptor
     std::array<int, reflective_enum::size<MotorIndex>()> file_descriptors_;
