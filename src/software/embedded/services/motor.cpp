@@ -45,11 +45,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
 MotorService::~MotorService() {}
 
-void MotorService::reset()
-{
-    motor_controller_->reset();
-}
-
 void MotorService::setup()
 {
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
@@ -78,7 +73,6 @@ void MotorService::setup()
         num_tracked_motor_resets_       = 1;
     }
 
-
     if (tracked_motor_fault_start_time_.has_value() &&
         num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD_COUNT)
     {
@@ -89,10 +83,14 @@ void MotorService::setup()
 
     prev_wheel_velocities_ = {0.0, 0.0, 0.0, 0.0};
 
-    // Clear faults by resetting all the chips on the motor board
-    motor_controller_->reset();
+    motor_controller_->setup();
 
     is_initialized_ = true;
+}
+
+void MotorService::reset()
+{
+    motor_controller_->reset();
 }
 
 std::unique_ptr<MotorController> MotorService::setupMotorController()
@@ -139,13 +137,13 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
             {
                 *(motor_status.mutable_front_right()) = drive_status;
             }
-            if (motor == MotorIndex::BACK_RIGHT)
-            {
-                *(motor_status.mutable_back_right()) = drive_status;
-            }
             if (motor == MotorIndex::BACK_LEFT)
             {
                 *(motor_status.mutable_back_left()) = drive_status;
+            }
+            if (motor == MotorIndex::BACK_RIGHT)
+            {
+                *(motor_status.mutable_back_right()) = drive_status;
             }
         }
         else

@@ -15,6 +15,8 @@ class TmcMotorController : public MotorController
 
     MotorControllerStatus earlyPoll() override;
 
+    void setup() override;
+
     void reset() override;
 
     MotorFaultIndicator checkDriverFault(const MotorIndex& motor) override;
@@ -76,11 +78,6 @@ class TmcMotorController : public MotorController
     void writeToControllerOrDieTrying(const MotorIndex& motor, uint8_t address,
                                       int32_t value);
     void writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int32_t value);
-
-    /**
-     * Clears previous faults, configures the motor and checks encoder connections.
-     */
-    void setup();
 
     /**
      * Sets up motor as drive motor controllers
@@ -237,9 +234,9 @@ class TmcMotorController : public MotorController
 
     // SPI Chip Selects
     static constexpr uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-    static constexpr uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
     static constexpr uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
     static constexpr uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
+    static constexpr uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
     static constexpr uint8_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
 
     // SPI Trinamic Motor Driver Paths

@@ -24,16 +24,16 @@ extern "C"
     //
     // The motor service exclusively calls the trinamic API which triggers these
     // functions. The motor service will set this variable in the constructor.
-    static TmcMotorController* g_motor = NULL;
+    static TmcMotorController* g_motor_controller = NULL;
 
     uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer)
     {
-        return g_motor->tmc4671ReadWriteByte(motor, data, last_transfer);
+        return g_motor_controller->tmc4671ReadWriteByte(motor, data, last_transfer);
     }
 
     uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer)
     {
-        return g_motor->tmc6100ReadWriteByte(motor, data, last_transfer);
+        return g_motor_controller->tmc6100ReadWriteByte(motor, data, last_transfer);
     }
 }
 
@@ -52,6 +52,9 @@ TmcMotorController::TmcMotorController()
     openSpiFileDescriptor(MotorIndex::BACK_LEFT);
     openSpiFileDescriptor(MotorIndex::BACK_RIGHT);
     openSpiFileDescriptor(MotorIndex::DRIBBLER);
+
+    // Make this instance available to the static functions above
+    g_motor_controller = this;
 }
 
 MotorControllerStatus TmcMotorController::earlyPoll()
@@ -155,6 +158,7 @@ void TmcMotorController::setup()
     checkDriverFault(MotorIndex::DRIBBLER);
     startController(MotorIndex::DRIBBLER, true);
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
+
     checkEncoderConnections();
 
     // calibrate the encoders
@@ -602,6 +606,8 @@ void TmcMotorController::checkEncoderConnections()
 
     for (const MotorIndex& motor : driveMotors())
     {
+        calibrated_motors[motor] = false;
+
         // read back current velocity
         initial_velocities[motor] =
             tmc4671_readInt(CHIP_SELECTS.at(motor), TMC4671_ABN_DECODER_COUNT);

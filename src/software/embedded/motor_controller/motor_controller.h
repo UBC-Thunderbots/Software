@@ -10,6 +10,8 @@ class MotorController
    public:
     virtual MotorControllerStatus earlyPoll() = 0;
 
+    virtual void setup() = 0;
+
     virtual void reset() = 0;
 
     /**
