@@ -55,9 +55,8 @@ bool ShadowEnemyFSM::blockedShot(const Update &event)
     auto ball_position = event.common.world_ptr->ball().position();
     Ray shot_block_direction(ball_position,
                              event.common.robot.position() - ball_position);
-    Segment goalLine(event.common.world_ptr->field().friendlyGoal().posXNegYCorner(),
-                     event.common.world_ptr->field().friendlyGoal().posXPosYCorner());
-
+    Segment goalLine(event.common.world_ptr->field().friendlyGoal().negXNegYCorner(),
+                     event.common.world_ptr->field().friendlyGoal().negXPosYCorner()); 
     bool ball_blocked = intersects(goalLine, shot_block_direction);
     return ball_blocked;
 }
