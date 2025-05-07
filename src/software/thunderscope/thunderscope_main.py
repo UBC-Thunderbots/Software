@@ -455,7 +455,8 @@ if __name__ == "__main__":
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
         ) as yellow_fs, Gamecontroller(
-            suppress_logs=(not args.verbose)
+            suppress_logs=(not args.verbose),
+            simulator_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
