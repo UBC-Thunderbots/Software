@@ -89,17 +89,17 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
     def __send_to_fullsystem(self) -> None:
         """Sending a list of virtual obstacles to full system"""
-        obstacles = self.obstacles.copy()
-
         # only send to full system when the points form a valid polygon
         if len(self.points) >= 3:
+            obstacles = self.obstacles.copy()
+
             polygon = Polygon(points=self.points.copy())
             obstacle = Obstacle(polygon=polygon)
             obstacles.append(obstacle)
 
-        self.friendly_io.send_proto(
-            VirtualObstacles, VirtualObstacles(obstacles=obstacles)
-        )
+            self.friendly_io.send_proto(
+                VirtualObstacles, VirtualObstacles(obstacles=obstacles)
+            )
 
     def __create_single_click_callback(
         self, event: MouseInSceneEvent
