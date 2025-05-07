@@ -15,7 +15,8 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       // Store a small buffer of previous referee commands so we can filter out noise
       referee_command_history_(REFEREE_COMMAND_BUFFER_SIZE),
       referee_stage_history_(REFEREE_COMMAND_BUFFER_SIZE),
-      team_with_possession_(TeamPossession::FRIENDLY_TEAM)
+      team_with_possession_(TeamPossession::FRIENDLY_TEAM),
+      virtual_obstacles_()
 {
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
@@ -173,6 +174,17 @@ TeamPossession World::getTeamWithPossession() const
 {
     return team_with_possession_;
 }
+
+void World::setVirtualObstacles(const TbotsProto::VirtualObstacles &virtual_obstacles)
+{
+    virtual_obstacles_ = virtual_obstacles;
+}
+
+TbotsProto::VirtualObstacles World::getVirtualObstacles() const
+{
+    return virtual_obstacles_;
+}
+
 void World::setDribbleDisplacement(const std::optional<Segment> &displacement)
 {
     dribble_displacement_ = displacement;

@@ -15,6 +15,7 @@
  * "Subject". Please see the implementation of those classes for details.
  */
 class Backend : public Subject<SensorProto>,
+                public Subject<TbotsProto::VirtualObstacles>,
                 public FirstInFirstOutThreadedObserver<World>,
                 public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
@@ -33,4 +34,12 @@ class Backend : public Subject<SensorProto>,
     void receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg);
     void receiveSSLReferee(SSLProto::Referee msg);
     void receiveSensorProto(SensorProto sensor_msg);
+
+    /**
+     * Callback function that receives a list of new virtual obstacles to send
+     * to Observers
+     *
+     * @param new_obstacles_list the received virtual obstacles list
+     */
+    void receiveObstacleList(TbotsProto::VirtualObstacles new_obstacle_list);
 };
