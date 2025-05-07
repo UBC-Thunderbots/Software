@@ -57,7 +57,8 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
     std::vector<Robot> enemy_team_robots;
     std::transform(enemy_robots.begin(), enemy_robots.end(),
                    std::back_inserter(enemy_team_robots),
-                   [](const RobotStateWithId& robot_state) {
+                   [](const RobotStateWithId& robot_state)
+                   {
                        return Robot(robot_state.id, robot_state.robot_state,
                                     Timestamp::fromSeconds(0));
                    });
@@ -70,7 +71,8 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
         // test the proximity risk every CHECK_SCORE_INTERVAL time and make sure
         // it doesn't get substantially worse compared to the last check
         // and that it is an improvement compared to the starting state
-        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (ignore_score_checks)
             {
                 yield("");
@@ -116,7 +118,8 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
         // test the ratePassEnemyRisk every CHECK_SCORE_INTERVAL time and make sure
         // it doesn't get substantially worse compared to the last check
         // and that it is an improvement compared to the starting state
-        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (ignore_score_checks)
             {
                 yield("");
@@ -163,10 +166,10 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
                 }
             }
         },
-        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotNotExcessivelyDribbling(1, world_ptr, yield);
-        },
-        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { robotNotExcessivelyDribbling(1, world_ptr, yield); },
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // test that the ball is always in the field boundaries
             if (!contains(world_ptr->field().fieldLines(), world_ptr->ball().position()))
             {

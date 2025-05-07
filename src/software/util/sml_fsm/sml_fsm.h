@@ -54,10 +54,9 @@ using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
  * @param SUB_FSM The sub fsm to update
  */
 #define DEFINE_SML_SUB_FSM_UPDATE_ACTION(FUNCTION, SUB_FSM)                              \
-    const auto FUNCTION##_A = [this](auto event,                                         \
-                                     back::process<SUB_FSM::Update> processEvent) {      \
-        FUNCTION(event, processEvent);                                                   \
-    };
+    const auto FUNCTION##_A =                                                            \
+        [this](auto event, back::process<SUB_FSM::Update> processEvent)                  \
+    { FUNCTION(event, processEvent); };
 
 /**
  * Strips extraneous information such as boost::sml template information to return
@@ -81,10 +80,12 @@ template <typename SM>
 std::string getCurrentStateName(const SM& state_machine)
 {
     std::string name;
-    state_machine.visit_current_states([&name](const auto& state) {
-        name = stripFSMState(TYPENAME(
-            boost::sml::back::policies::get_state_name_t<std::decay_t<decltype(state)>>));
-    });
+    state_machine.visit_current_states(
+        [&name](const auto& state)
+        {
+            name = stripFSMState(TYPENAME(boost::sml::back::policies::get_state_name_t<
+                                          std::decay_t<decltype(state)>>));
+        });
     return name;
 }
 
@@ -122,20 +123,22 @@ template <typename SSM, typename SM>
 std::string getCurrentSubStateName(const SM& state_machine)
 {
     std::string name;
-    state_machine.template visit_current_states<SSM>([&name,
-                                                      &state_machine](const auto& state) {
-        name               = stripFSMState(TYPENAME(
-            boost::sml::back::policies::get_state_name_t<std::decay_t<decltype(state)>>));
-        using state_repr_t = std::decay_t<decltype(state)>;
-        using state_t      = typename state_repr_t::type;
-        if constexpr (is_sub_state_machine<state_t>::value)
+    state_machine.template visit_current_states<SSM>(
+        [&name, &state_machine](const auto& state)
         {
-            using state_machine_t = typename state_machine_impl<state_t>::type;
-            name += ".";
-            name += getCurrentSubStateName<decltype(boost::sml::state<state_machine_t>)>(
-                state_machine);
-        }
-    });
+            name = stripFSMState(TYPENAME(boost::sml::back::policies::get_state_name_t<
+                                          std::decay_t<decltype(state)>>));
+            using state_repr_t = std::decay_t<decltype(state)>;
+            using state_t      = typename state_repr_t::type;
+            if constexpr (is_sub_state_machine<state_t>::value)
+            {
+                using state_machine_t = typename state_machine_impl<state_t>::type;
+                name += ".";
+                name +=
+                    getCurrentSubStateName<decltype(boost::sml::state<state_machine_t>)>(
+                        state_machine);
+            }
+        });
     return name;
 }
 
@@ -151,17 +154,20 @@ template <typename SM>
 std::string getCurrentFullStateName(const SM& state_machine)
 {
     std::string name;
-    state_machine.visit_current_states([&name, &state_machine](const auto& state) {
-        name += getCurrentStateName(state_machine);
-        using state_repr_t = std::decay_t<decltype(state)>;
-        using state_t      = typename state_repr_t::type;
-        if constexpr (is_sub_state_machine<state_t>::value)
+    state_machine.visit_current_states(
+        [&name, &state_machine](const auto& state)
         {
-            using state_machine_t = typename state_machine_impl<state_t>::type;
-            name += ".";
-            name += getCurrentSubStateName<decltype(boost::sml::state<state_machine_t>)>(
-                state_machine);
-        }
-    });
+            name += getCurrentStateName(state_machine);
+            using state_repr_t = std::decay_t<decltype(state)>;
+            using state_t      = typename state_repr_t::type;
+            if constexpr (is_sub_state_machine<state_t>::value)
+            {
+                using state_machine_t = typename state_machine_impl<state_t>::type;
+                name += ".";
+                name +=
+                    getCurrentSubStateName<decltype(boost::sml::state<state_machine_t>)>(
+                        state_machine);
+            }
+        });
     return name;
 }

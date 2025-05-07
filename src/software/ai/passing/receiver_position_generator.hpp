@@ -180,7 +180,8 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     updateBestReceiverPositions(best_receiving_positions, world, pass_origin, top_zones,
                                 receiver_config.num_additional_samples_per_top_zone());
     std::sort(top_zones.begin(), top_zones.end(),
-              [&](const ZoneEnum &z1, const ZoneEnum &z2) {
+              [&](const ZoneEnum &z1, const ZoneEnum &z2)
+              {
                   return best_receiving_positions.find(z1)->second.rating >
                          best_receiving_positions.find(z2)->second.rating;
               });
@@ -278,7 +279,8 @@ std::vector<ZoneEnum> ReceiverPositionGenerator<ZoneEnum>::getTopZones(
     // Sort the zones based on initial ratings
     auto all_zones = pitch_division_->getAllZoneIds();
     std::sort(all_zones.begin(), all_zones.end(),
-              [&](const ZoneEnum &z1, const ZoneEnum &z2) {
+              [&](const ZoneEnum &z1, const ZoneEnum &z2)
+              {
                   return best_receiving_positions.find(z1)->second.rating >
                          best_receiving_positions.find(z2)->second.rating;
               });
@@ -297,8 +299,10 @@ std::vector<ZoneEnum> ReceiverPositionGenerator<ZoneEnum>::getTopZones(
 
         // Check that none of the previously selected top zones are close to the current
         // candidate zone
-        bool no_prev_receivers_close =
-            std::none_of(top_zones.begin(), top_zones.end(), [&](const ZoneEnum &zone) {
+        bool no_prev_receivers_close = std::none_of(
+            top_zones.begin(), top_zones.end(),
+            [&](const ZoneEnum &zone)
+            {
                 return curr_pass_angle.minDiff(best_receiving_positions.find(zone)
                                                    ->second.pass.passerOrientation()) <
                        min_angle_diff_between_receivers;
@@ -310,7 +314,8 @@ std::vector<ZoneEnum> ReceiverPositionGenerator<ZoneEnum>::getTopZones(
             no_prev_receivers_close &&
             std::none_of(
                 existing_receiver_positions.begin(), existing_receiver_positions.end(),
-                [&](const Point &existing_receiver_position) {
+                [&](const Point &existing_receiver_position)
+                {
                     return curr_pass_angle.minDiff(
                                (existing_receiver_position - pass_origin).orientation()) <
                            min_angle_diff_between_receivers;

@@ -122,7 +122,7 @@ TEST(FindOpenCirclesTest, test_find_open_circle_points_outside_of_box_one_in_box
     Rectangle rectangle(Point(-1, -1), Point(1, 1));
 
     std::vector<Point> points         = {Point(-2, -1), Point(3, -2), Point(-1.1, -1.1),
-                                 Point(0.9, 0.9)};
+                                         Point(0.9, 0.9)};
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
     ASSERT_EQ(4, empty_circles.size());
