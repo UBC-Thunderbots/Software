@@ -268,14 +268,14 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> GetPossession
-GetPossession --> Dribble : [havePossession]\n<i>startDribble</i>
+GetPossession --> Dribble : [havePossession]\n<i>dribble</i>
 GetPossession --> GetPossession : [!havePossession]\n<i>getPossession</i>
-Dribble --> GetPossession : [lostPossession]\n<i>getPossession</i>
 Dribble --> LoseBall : [shouldLoseBall]\n<i>loseBall</i>
+Dribble --> GetPossession : [lostPossession]\n<i>getPossession</i>
 Dribble --> Dribble : [!dribblingDone]\n<i>dribble</i>
 Dribble --> Terminate:::terminate : [dribblingDone]\n<i>dribble</i>
-LoseBall --> LoseBall : [!lostPossession]\n<i>loseBall</i>
-LoseBall --> GetPossession : [lostPossession]\n<i>getPossession</i>
+LoseBall --> LoseBall : [shouldLoseBall]\n<i>loseBall</i>
+LoseBall --> GetPossession : [!shouldLoseBall]\n<i>getPossession</i>
 Terminate:::terminate --> GetPossession : [lostPossession]\n<i>getPossession</i>
 Terminate:::terminate --> Dribble : [!dribblingDone]\n<i>dribble</i>
 Terminate:::terminate --> Terminate:::terminate : <i>dribble</i>

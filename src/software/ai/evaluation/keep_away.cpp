@@ -27,6 +27,13 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
                                            field_bounds.yMax() - FIELD_SIZE_REDUCTION_M);
     Rectangle reduced_field_bounds = Rectangle(reduced_bottom_left, reduced_top_right);
 
+    Point initial_keepaway_point                      = world.ball().position();
+    const std::optional<Segment> dribble_displacement = world.getDribbleDisplacement();
+    if (dribble_displacement.has_value())
+    {
+        initial_keepaway_point = dribble_displacement->getStart();
+    }
+
     // the position rating function we want to maximize
     const auto keepaway_point_cost = [&](const std::array<double, 2>& passer_pt_array)
     {
@@ -37,7 +44,7 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
     GradientDescentOptimizer<2> optimizer{PARAM_WEIGHTS};
     auto passer_pt_array = optimizer.maximize(
         keepaway_point_cost,
-        std::array<double, 2>{world.ball().position().x(), world.ball().position().y()},
+        std::array<double, 2>{initial_keepaway_point.x(), initial_keepaway_point.y()},
         GRADIENT_STEPS_PER_ITER);
     Point keepaway_target_point(std::get<0>(passer_pt_array),
                                 std::get<1>(passer_pt_array));
