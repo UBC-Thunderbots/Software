@@ -643,10 +643,11 @@ void MotorService::readThenWriteToEnabledMotor(uint8_t motor_chip, double& veloc
         velocity = 0;
     }
 }
-std::unordered_map<int, MotorService::MotorFaultIndicator> MotorService::getCachedMotorFaults()
-    {
-        return cached_motor_faults_;
-    }
+std::unordered_map<int, MotorService::MotorFaultIndicator>
+MotorService::getCachedMotorFaults()
+{
+    return cached_motor_faults_;
+}
 
 bool MotorService::requiresMotorReinit(uint8_t motor)
 {
