@@ -1,4 +1,7 @@
-# Editing the Docs
+@page editing_the_docs Editing the Docs 
+
+[TOC]
+
 A quick guide for editing and updating our documentation.
 
 Most text can easily be edited with your favourite text editor, or directly in GitHub itself. There's really nothing special here.
