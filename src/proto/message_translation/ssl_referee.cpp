@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 
-RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
+RefereeCommand ssl_referee::createRefereeCommand(const SSLProto::Referee &packet,
                                     TeamColour team_colour)
 {
     if (team_colour == TeamColour::YELLOW)
@@ -15,7 +15,7 @@ RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
     }
 }
 
-RefereeStage createRefereeStage(const SSLProto::Referee &packet)
+RefereeStage ssl_referee::createRefereeStage(const SSLProto::Referee &packet)
 {
     return referee_stage_map.at(packet.stage());
 }

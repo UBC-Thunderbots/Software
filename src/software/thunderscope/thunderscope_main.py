@@ -456,7 +456,6 @@ if __name__ == "__main__":
             running_in_realtime=(not args.ci_mode),
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose),
-            simulator_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -486,9 +485,10 @@ if __name__ == "__main__":
                 autoref_proto_unix_io,
             )
             gamecontroller.setup_proto_unix_io(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
-                autoref_proto_unix_io,
+                blue_full_system_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                yellow_full_system_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                autoref_proto_unix_io=autoref_proto_unix_io,
+                simulator_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
             )
             if args.enable_autoref:
                 autoref.setup_ssl_wrapper_packets(

@@ -6,8 +6,12 @@
 #include "software/world/team_types.h"
 
 
-// this maps a protobuf SSLProto::Referee_Command enum to its equivalent internal type
-// this map is used when we are on the blue team
+namespace ssl_referee {
+
+/**
+ * @brief this maps a protobuf SSLProto::Referee_Command enum to its equivalent internal type
+ * @note this map is used when we are on the blue team
+ */
 inline const static std::unordered_map<SSLProto::Referee::Command, RefereeCommand>
         blue_team_command_map = {
         {SSLProto::Referee_Command_HALT,                   RefereeCommand::HALT},
@@ -27,7 +31,9 @@ inline const static std::unordered_map<SSLProto::Referee::Command, RefereeComman
         {SSLProto::Referee_Command_BALL_PLACEMENT_BLUE,    RefereeCommand::BALL_PLACEMENT_US},
         {SSLProto::Referee_Command_BALL_PLACEMENT_YELLOW,  RefereeCommand::BALL_PLACEMENT_THEM}};
 
-// this set contains an ongoing list of deprecated SSLProto::Referee_Commands
+/**
+ * @brief this set contains an ongoing list of deprecated SSLProto::Referee_Commands
+ */
 inline const static std::unordered_set<SSLProto::Referee::Command> deprecated_commands = {
         SSLProto::Referee_Command_GOAL_YELLOW,
         SSLProto::Referee_Command_GOAL_BLUE,
@@ -35,8 +41,10 @@ inline const static std::unordered_set<SSLProto::Referee::Command> deprecated_co
         SSLProto::Referee_Command_INDIRECT_FREE_BLUE,
 };
 
-// this maps a protobuf SSLProto::Referee_Command enum to its equivalent internal type
-// this map is used when we are on the yellow team
+/**
+ * @brief this maps a protobuf SSLProto::Referee_Command enum to its equivalent internal type
+ * @note this map is used when we are on the yellow team
+ */
 inline const static std::unordered_map<SSLProto::Referee::Command, RefereeCommand>
         yellow_team_command_map = {
         {SSLProto::Referee_Command_HALT,                   RefereeCommand::HALT},
@@ -57,28 +65,30 @@ inline const static std::unordered_map<SSLProto::Referee::Command, RefereeComman
         {SSLProto::Referee_Command_BALL_PLACEMENT_YELLOW,  RefereeCommand::BALL_PLACEMENT_US}};
 
 
-// this maps a protobuf SSLProto::Referee_Stage enum to its RefereeStage equivalent
+/**
+ * @brief this maps a protobuf SSLProto::Referee_Stage enum to its RefereeStage equivalent
+ */
 inline const static std::unordered_map<SSLProto::Referee::Stage, RefereeStage>
         referee_stage_map = {
         {SSLProto::Referee_Stage_NORMAL_FIRST_HALF_PRE,
                                                      RefereeStage::NORMAL_FIRST_HALF_PRE},
-        {SSLProto::Referee_Stage_NORMAL_FIRST_HALF, RefereeStage::NORMAL_FIRST_HALF},
-        {SSLProto::Referee_Stage_NORMAL_HALF_TIME, RefereeStage::NORMAL_HALF_TIME},
+        {SSLProto::Referee_Stage_NORMAL_FIRST_HALF,  RefereeStage::NORMAL_FIRST_HALF},
+        {SSLProto::Referee_Stage_NORMAL_HALF_TIME,   RefereeStage::NORMAL_HALF_TIME},
         {SSLProto::Referee_Stage_NORMAL_SECOND_HALF_PRE,
                                                      RefereeStage::NORMAL_SECOND_HALF_PRE},
         {SSLProto::Referee_Stage_NORMAL_SECOND_HALF, RefereeStage::NORMAL_SECOND_HALF},
-        {SSLProto::Referee_Stage_EXTRA_TIME_BREAK, RefereeStage::EXTRA_TIME_BREAK},
+        {SSLProto::Referee_Stage_EXTRA_TIME_BREAK,   RefereeStage::EXTRA_TIME_BREAK},
         {SSLProto::Referee_Stage_EXTRA_FIRST_HALF_PRE,
                                                      RefereeStage::EXTRA_FIRST_HALF_PRE},
-        {SSLProto::Referee_Stage_EXTRA_FIRST_HALF, RefereeStage::EXTRA_FIRST_HALF},
-        {SSLProto::Referee_Stage_EXTRA_HALF_TIME, RefereeStage::EXTRA_HALF_TIME},
+        {SSLProto::Referee_Stage_EXTRA_FIRST_HALF,   RefereeStage::EXTRA_FIRST_HALF},
+        {SSLProto::Referee_Stage_EXTRA_HALF_TIME,    RefereeStage::EXTRA_HALF_TIME},
         {SSLProto::Referee_Stage_EXTRA_SECOND_HALF_PRE,
                                                      RefereeStage::EXTRA_SECOND_HALF_PRE},
-        {SSLProto::Referee_Stage_EXTRA_SECOND_HALF, RefereeStage::EXTRA_SECOND_HALF},
+        {SSLProto::Referee_Stage_EXTRA_SECOND_HALF,  RefereeStage::EXTRA_SECOND_HALF},
         {SSLProto::Referee_Stage_PENALTY_SHOOTOUT_BREAK,
                                                      RefereeStage::PENALTY_SHOOTOUT_BREAK},
-        {SSLProto::Referee_Stage_PENALTY_SHOOTOUT, RefereeStage::PENALTY_SHOOTOUT},
-        {SSLProto::Referee_Stage_POST_GAME, RefereeStage::POST_GAME}};
+        {SSLProto::Referee_Stage_PENALTY_SHOOTOUT,   RefereeStage::PENALTY_SHOOTOUT},
+        {SSLProto::Referee_Stage_POST_GAME,          RefereeStage::POST_GAME}};
 
 /**
  * Converts a SSLProto::Referee packet into a RefereeCommand for the GameController
@@ -110,4 +120,4 @@ RefereeStage createRefereeStage(const SSLProto::Referee &packet);
  * @return ball placement point if found
  */
 std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet);
-
+}

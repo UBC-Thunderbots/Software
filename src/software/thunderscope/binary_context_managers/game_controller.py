@@ -37,7 +37,6 @@ class Gamecontroller:
         self,
         suppress_logs: bool = False,
         use_conventional_port: bool = False,
-        simulator_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
         """Run Gamecontroller
 
@@ -62,7 +61,7 @@ class Gamecontroller:
             buffer_size=2, protobuf_type=ManualGCCommand
         )
 
-        self.simulator_proto_unix_io = simulator_proto_unix_io
+        self.simulator_proto_unix_io = None
         self.blue_team_world_buffer = ThreadSafeCircularBuffer(
             buffer_size=1, protobuf_type=World
         )
@@ -267,12 +266,14 @@ class Gamecontroller:
         blue_full_system_proto_unix_io: ProtoUnixIO,
         yellow_full_system_proto_unix_io: ProtoUnixIO,
         autoref_proto_unix_io: ProtoUnixIO = None,
+        simulator_proto_unix_io: ProtoUnixIO = None
     ) -> None:
         """Setup gamecontroller io
 
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
         :param autoref_proto_unix_io: The proto unix io for the autoref
+        :param simulator_proto_unix_io: The socket for the Gamecontroller to interact with the simulator
         """
 
         def __send_referee_command(data: Referee) -> None:
@@ -304,6 +305,7 @@ class Gamecontroller:
         blue_full_system_proto_unix_io.register_observer(
             World, self.blue_team_world_buffer
         )
+        self.simulator_proto_unix_io = simulator_proto_unix_io
 
     def send_gc_command(
         self,

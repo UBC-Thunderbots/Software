@@ -50,7 +50,7 @@ IncludeBlocks: Regroup
 IndentCaseLabels: 'true'
 IndentWidth: '4'
 MaxEmptyLinesToKeep: '3'
-NamespaceIndentation: All
+NamespaceIndentation: None
 ReflowComments: 'true'
 SortIncludes: 'true'
 Standard: Cpp11
