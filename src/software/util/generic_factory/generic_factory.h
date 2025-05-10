@@ -117,9 +117,8 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate, ConfigTyp
     {
         // TODO (Issue #1142): Change to use a function instead of a static variable
         auto generic_creator =
-            [](const ConfigType config) -> std::unique_ptr<TypeToCreate> {
-            return std::make_unique<T>(config);
-        };
+            [](const ConfigType config) -> std::unique_ptr<TypeToCreate>
+        { return std::make_unique<T>(config); };
         GenericFactory<IndexType, TypeToCreate, ConfigType>::registerCreator(
             TYPENAME(T), generic_creator);
     }

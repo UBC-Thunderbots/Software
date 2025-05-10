@@ -17,7 +17,8 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     // This is the objective function that we want to minimize, finding the
     // shortest duration in the future at which we can feasibly intercept the
     // ball
-    auto objective_function = [&](std::array<double, 1> x) {
+    auto objective_function = [&](std::array<double, 1> x)
+    {
         // We take the absolute value here because a negative time makes no sense
         double duration = std::abs(x.at(0));
 

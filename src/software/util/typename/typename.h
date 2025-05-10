@@ -3,6 +3,8 @@
 #include <cxxabi.h>
 
 #include <memory>
+#include <string>
+
 
 /**
  * Demangles typeid name
