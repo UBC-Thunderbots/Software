@@ -37,8 +37,8 @@ def __create_int_parameter_writable(key, value, descriptor):
 
     try:
         minimum, maximum = (
-            options.Extensions[bounds].min_double_value,
-            options.Extensions[bounds].max_double_value,
+            options.Extensions[bounds].min_int_value,
+            options.Extensions[bounds].max_int_value,
         )
     except KeyError:
         raise KeyError("{} missing ParameterRangeOptions".format(key))
