@@ -1,12 +1,6 @@
-# Software Setup on Windows Subsystem for Linux
+@page software_setup_on_windows_subsystem_for_linux Software Setup on Windows Subsystem for Linux
 
-## Table of Contents
-
-* [Table Of Contents](#table-of-contents)
-* [Introduction](#introduction)
-* [WSLg Setup (Windows 11 - Recommended)](#wslg-setup-(windows-11---recommended))
-* [WSL2 Setup (windows 10)](#wsl2-setup-(windows-10))
-    * [X Server Setup](#x-server-setup)
+[TOC]
 
 
 ## Introduction

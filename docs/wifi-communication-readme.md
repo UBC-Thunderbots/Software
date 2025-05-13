@@ -1,4 +1,6 @@
-# WiFi Communication README
+@page wifi_communication_readme WiFi Communication
+
+[TOC]
 
 ## Lessons Learned So Far
 1. For optimal performance, make sure that any packets sent over the network are below MTU size (1500 bytes). Packets larger than MTU size require multiple transmissions for a single send event and multiple retransmissions in the case of packet loss. Overall, these packets contribute to greater utilization of the network and increased latency.
