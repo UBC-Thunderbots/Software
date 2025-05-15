@@ -52,6 +52,7 @@ int main(int argc, char** argv)
     {
         bool help                   = false;
         std::string runtime_dir     = "/tmp/tbots";
+        std::string log_name        = std::string();
         bool friendly_colour_yellow = false;
         bool ci                     = false;
     };
@@ -64,6 +65,9 @@ int main(int argc, char** argv)
     desc.add_options()("runtime_dir",
                        boost::program_options::value<std::string>(&args.runtime_dir),
                        "The directory to output logs and setup unix sockets.");
+    desc.add_options()("log_name",
+                       boost::program_options::value<std::string>(&args.log_name),
+                       "The directory name to contain proto logs.");
     desc.add_options()("friendly_colour_yellow",
                        boost::program_options::bool_switch(&args.friendly_colour_yellow),
                        "If false, friendly colour is blue");
@@ -107,8 +111,18 @@ int main(int argc, char** argv)
             // timestamp once the backend is set up
             time_provider = []() { return 0; };
         }
-        proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, time_provider,
+
+        if (args.log_name.empty())
+        {
+            proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, time_provider,
                                                      args.friendly_colour_yellow);
+        }
+        else
+        {
+            proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, time_provider,
+                                                    args.friendly_colour_yellow, args.log_name);
+        }
+
         LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger);
         TbotsProto::ThunderbotsConfig tbots_proto;
 

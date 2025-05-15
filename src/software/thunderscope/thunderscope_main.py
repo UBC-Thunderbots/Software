@@ -75,6 +75,14 @@ if __name__ == "__main__":
         default="/tmp/tbots/yellow",
     )
 
+    # Proto log folder name
+    parser.add_argument(
+        "--log_name",
+        type=str,
+        help="proto log folder name to save to",
+        default=None,
+    )
+
     # Debugging
     parser.add_argument(
         "--debug_blue_full_system",
@@ -374,6 +382,7 @@ if __name__ == "__main__":
                     friendly_colour_yellow=friendly_colour_yellow,
                     should_restart_on_crash=True,
                     run_sudo=args.sudo,
+                    log_name=args.log_name
                 ) as full_system:
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
@@ -447,6 +456,7 @@ if __name__ == "__main__":
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
+            log_name=args.log_name,
         ) as blue_fs, FullSystem(
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
@@ -454,6 +464,7 @@ if __name__ == "__main__":
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
+            log_name=args.log_name,
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose)
         ) as gamecontroller, (
