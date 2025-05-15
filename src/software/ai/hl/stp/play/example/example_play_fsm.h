@@ -7,9 +7,8 @@
 #include "software/logger/logger.h"
 
 /**
- * An example Play that moves the robots in a circle around the ball
+ * An example play that moves the robots in a circle around the ball
  */
-
 struct ExamplePlayFSM
 {
     class MoveState;
@@ -22,7 +21,6 @@ struct ExamplePlayFSM
 
     /**
      * Creates an example play FSM
-     *
      */
     explicit ExamplePlayFSM();
 
@@ -46,7 +44,6 @@ struct ExamplePlayFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *MoveState_S + Update_E / moveToPosition_A = MoveState_S,
-
             X + Update_E = X);
     }
 

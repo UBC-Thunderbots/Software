@@ -13,8 +13,6 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.play_pb2 import Play, PlayName
 
 
-# TODO issue  #2599 - Remove Duration parameter from test
-# @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_example_play(simulated_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
