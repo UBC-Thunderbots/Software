@@ -27,7 +27,12 @@ load("@rules_python//python:repositories.bzl", "py_repositories")
 
 py_repositories()
 
-register_toolchains("//:py_toolchain")
+register_toolchains("//py_toolchain:py_toolchain")
+
+register_toolchains(
+    "//py_toolchain:k8_jetson_nano_cross_compile_py_cc_toolchain",
+    "//py_toolchain:py_cc_toolchain_for_host_x86_64",
+)
 
 load("@rules_python//python:pip.bzl", "pip_parse")
 
@@ -55,10 +60,17 @@ pip_parse(
     requirements_lock = "//software/simulated_tests:requirements_lock.txt",
 )
 
+pip_parse(
+    name = "robot_diagnostics_cli_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
+)
+
 load("@nanopb_deps//:requirements.bzl", nanopb_install_deps = "install_deps")
 load("@thunderscope_deps//:requirements.bzl", thunderscope_install_deps = "install_deps")
 load("@ansible_deps//:requirements.bzl", ansible_install_deps = "install_deps")
 load("@simulated_tests_deps//:requirements.bzl", simulated_tests_install_deps = "install_deps")
+load("@robot_diagnostics_cli_deps//:requirements.bzl", robot_diagnostics_cli_install_deps = "install_deps")
 
 nanopb_install_deps()
 
@@ -67,6 +79,8 @@ thunderscope_install_deps()
 ansible_install_deps()
 
 simulated_tests_install_deps()
+
+robot_diagnostics_cli_install_deps()
 
 all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
 
@@ -233,14 +247,10 @@ new_local_repository(
     path = "/usr/lib/llvm-6.0/",
 )
 
-http_archive(
+new_local_repository(
     name = "k8_jetson_nano_cross_compile_gcc",
     build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
-    sha256 = "73eed74e593e2267504efbcf3678918bb22409ab7afa3dc7c135d2c6790c2345",
-    strip_prefix = "gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu",
-    urls = [
-        "http://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz",
-    ],
+    path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
 )
 
 # tool used to flash firmware with bazel
@@ -274,6 +284,20 @@ load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_depe
 go_rules_dependencies()
 
 go_register_toolchains()
+
+http_archive(
+    name = "rules_pkg",
+    sha256 = "d20c951960ed77cb7b341c2a59488534e494d5ad1d30c4818c736d57772a9fef",
+    strip_prefix = "rules_pkg-1.0.1/pkg",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/1.0.1/rules_pkg-1.0.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/1.0.1/rules_pkg-1.0.1.tar.gz",
+    ],
+)
+
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+
+rules_pkg_dependencies()
 
 # Needed for bazel buildifier
 http_archive(
@@ -329,31 +353,24 @@ bind(
 
 http_archive(
     name = "pybind11_bazel",
-    sha256 = "9c2919136d7c3b4a4c4a4c0ac5eb97c101c5f59c417e4f1abe70c370b1590b73",
-    strip_prefix = "pybind11_bazel-2e5f4a6beece3b92d2f87744f305eb52b6852aa9",
-    urls = ["https://github.com/pybind/pybind11_bazel/archive/2e5f4a6beece3b92d2f87744f305eb52b6852aa9.zip"],
+    sha256 = "9df284330336958c837fb70dc34c0a6254dac52a5c983b3373a8c2bbb79ac35e",
+    strip_prefix = "pybind11_bazel-2.13.6",
+    urls = ["https://github.com/pybind/pybind11_bazel/releases/download/v2.13.6/pybind11_bazel-2.13.6.zip"],
 )
 
 # We still require the pybind library.
 http_archive(
     name = "pybind11",
-    build_file = "@pybind11_bazel//:pybind11.BUILD",
+    build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
     sha256 = "411f77380c43798506b39ec594fc7f2b532a13c4db674fcf2b1ca344efaefb68",
     strip_prefix = "pybind11-2.12.0",
     urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.12.0.zip"],
 )
 
-load("@pybind11_bazel//:python_configure.bzl", "python_configure")
-
-python_configure(
-    name = "local_config_python",
-    python_version = "3",
-)
-
 # These headers are used by pybind11
 bind(
     name = "python_headers",
-    actual = "@local_config_python//:python_headers",
+    actual = "@rules_python//python/cc:current_py_cc_headers",
 )
 
 maybe(
@@ -397,4 +414,16 @@ register_toolchains(
     "//cc_toolchain:cc_toolchain_for_k8_jetson_nano_cross_compile",
     "//cc_toolchain:cc_toolchain_for_k8",
     "//cc_toolchain:cc_toolchain_for_aarch64",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_for_host_x86_64",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/usr/include/python3.12/",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_for_k8_jetson_nano_cross_compile",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
 )

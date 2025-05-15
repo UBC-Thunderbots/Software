@@ -20,9 +20,8 @@ UnixSimulatorBackend::UnixSimulatorBackend(
         [&](TbotsProto::RobotStatus& msg) { receiveRobotStatus(msg); }, proto_logger));
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
-        runtime_dir + SSL_WRAPPER_PATH,
-        [&](SSLProto::SSL_WrapperPacket& msg) { receiveSSLWrapperPacket(msg); },
-        proto_logger));
+        runtime_dir + SSL_WRAPPER_PATH, [&](SSLProto::SSL_WrapperPacket& msg)
+        { receiveSSLWrapperPacket(msg); }, proto_logger));
 
     ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
         runtime_dir + SSL_REFEREE_PATH,
@@ -50,6 +49,11 @@ UnixSimulatorBackend::UnixSimulatorBackend(
 
     robot_crash_listener.reset(new ThreadedProtoUnixListener<TbotsProto::RobotCrash>(
         runtime_dir + ROBOT_CRASH_PATH, [](TbotsProto::RobotCrash& v) {}, proto_logger));
+
+    replay_bookmark_listener.reset(
+        new ThreadedProtoUnixListener<TbotsProto::ReplayBookmark>(
+            runtime_dir + REPLAY_BOOKMARK_PATH, [](TbotsProto::ReplayBookmark& v) {},
+            proto_logger));
 
     // Protobuf Outputs
     world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(

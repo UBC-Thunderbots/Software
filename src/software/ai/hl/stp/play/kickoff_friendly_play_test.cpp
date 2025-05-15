@@ -38,7 +38,8 @@ TEST_F(KickoffFriendlyPlayTest, DISABLED_test_kickoff_friendly_play)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // Robot 4 is the only robot allowed to be in the center circle and start
             // the kickoff
             robotInCenterCircle(world_ptr, yield);
@@ -56,7 +57,8 @@ TEST_F(KickoffFriendlyPlayTest, DISABLED_test_kickoff_friendly_play)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             for (RobotId robot_id : {0, 1, 2, 3, 5})
             {
                 {

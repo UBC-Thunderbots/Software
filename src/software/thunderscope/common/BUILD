@@ -44,3 +44,16 @@ py_library(
         ":frametime_counter",
     ],
 )
+
+py_library(
+    name = "util",
+    srcs = ["//software/thunderscope:util.py"],
+)
+
+py_library(
+    name = "toast_msg_helper",
+    srcs = ["toast_msg_helper.py"],
+    deps = [
+        requirement("pyqt-toast-notification"),
+    ],
+)

@@ -270,6 +270,7 @@ if __name__ == "__main__":
             {"proto_class": PrimitiveSet},
             {"proto_class": World},
             {"proto_class": PlayInfo},
+            {"proto_class": BallPlacementVisualization},
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir, from_log_visualize=True, **arg

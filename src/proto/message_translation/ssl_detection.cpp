@@ -98,7 +98,7 @@ std::vector<BallDetection> createBallDetections(
             // Convert all data to meters and radians
             BallDetection ball_detection{
                 .position             = Point(ball.x() * METERS_PER_MILLIMETER,
-                                  ball.y() * METERS_PER_MILLIMETER),
+                                              ball.y() * METERS_PER_MILLIMETER),
                 .distance_from_ground = ball.z() * METERS_PER_MILLIMETER,
                 .timestamp            = Timestamp::fromSeconds(detection.t_capture()),
                 .confidence           = ball.confidence()};
@@ -136,7 +136,7 @@ std::vector<RobotDetection> createTeamDetection(
             RobotDetection robot_detection{
                 .id          = ssl_robot_detection.robot_id(),
                 .position    = Point(ssl_robot_detection.x() * METERS_PER_MILLIMETER,
-                                  ssl_robot_detection.y() * METERS_PER_MILLIMETER),
+                                     ssl_robot_detection.y() * METERS_PER_MILLIMETER),
                 .orientation = Angle::fromRadians(ssl_robot_detection.orientation()),
                 .confidence  = ssl_robot_detection.confidence(),
                 .timestamp   = Timestamp::fromSeconds(detection.t_capture())};

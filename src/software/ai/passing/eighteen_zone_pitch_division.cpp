@@ -38,9 +38,8 @@ EighteenZoneId EighteenZonePitchDivision::getZoneId(const Point& position) const
     }
 
     auto zone_id = *std::find_if(zones_.begin(), zones_.end(),
-                                 [this, position](const EighteenZoneId& id) {
-                                     return contains(getZone(id), position);
-                                 });
+                                 [this, position](const EighteenZoneId& id)
+                                 { return contains(getZone(id), position); });
     return zone_id;
 }
 
