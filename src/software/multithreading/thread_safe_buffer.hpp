@@ -169,7 +169,9 @@ std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(
 {
     std::unique_lock<std::mutex> buffer_lock(buffer_mutex);
     received_new_value.wait_for(
-        buffer_lock, std::chrono::duration<float>(max_wait_time.toSeconds()), [this] {
+        buffer_lock, std::chrono::duration<float>(max_wait_time.toSeconds()),
+        [this]
+        {
             std::scoped_lock destructor_called_lock(destructor_called_mutex);
             return !buffer.empty() || destructor_called;
         });

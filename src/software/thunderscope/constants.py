@@ -187,6 +187,10 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Shift+Alt+Single Click</code></b> Add a point to the current virtual obstacle. The Draw Obstacle Layer must be enabled.<br><br>
     <b><code>c</code></b> Clear all virtual obstacles. The Draw Obstacle Layer must be enabled.<br><br>
 
+    <h3>GL Field Movement Test Layer</h3>
+    <b><code>Shift+Alt+Control+Click</code></b> Select the robot that is going to be moved<br>
+    <b><code>Shift+Alt+Click</code></b>Move the selected robot to the clicked point<br>
+
     """
 )
 

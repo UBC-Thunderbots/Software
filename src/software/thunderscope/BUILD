@@ -89,6 +89,7 @@ py_library(
         "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
         "//software/thunderscope/gl/layers:gl_draw_polygon_obstacle",
         "//software/thunderscope/gl/layers:gl_max_dribble_layer",
+        "//software/thunderscope/gl/layers:gl_movement_field_test_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
         "//software/thunderscope/gl/layers:gl_path_layer",

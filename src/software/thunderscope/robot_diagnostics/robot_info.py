@@ -185,6 +185,10 @@ class RobotInfo(QWidget):
         self.layout.addLayout(self.status_layout)
         self.setLayout(self.layout)
 
+        # Last robot state
+        self.last_robot_status = None
+        self.last_robot_statistic = None
+
     def create_robot_status_expand_button(self) -> QPushButton:
         """Creates the button to expand / collapse the robot status view
 
@@ -292,23 +296,29 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, robot_status: RobotStatus, robot_statistic: RobotStatistic):
-        """Receives parts of a RobotStatus message
+    def update_robot_status(self, robot_status: RobotStatus):
+        """Receives a RobotStatus message
 
         Saves the current time as the last robot status time
         Sets the robot UI as connected and updates the UI
         Then sets a timer callback to disconnect the robot if needed
 
         :param robot_status: The robot status message for this robot
-        :param robot_statistic: The round trip time proto for this robot's message
         """
         self.time_of_last_robot_status = time.time()
 
         self.robot_model.setPixmap(self.color_vision_pattern)
 
-        self.__update_ui(robot_status, robot_statistic)
+        self.last_robot_status = robot_status
+
+        self.__update_ui()
 
         QtCore.QTimer.singleShot(int(DISCONNECT_DURATION_MS), self.disconnect_robot)
+
+    def update_rtt(self, robot_statistic: RobotStatistic):
+        self.last_robot_statistic = robot_statistic
+
+        self.__update_ui()
 
     def disconnect_robot(self) -> None:
         """Calculates the time between the last robot status and now
@@ -337,9 +347,7 @@ class RobotInfo(QWidget):
             f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
         )
 
-    def __update_ui(
-        self, robot_status: RobotStatus, robot_statistic: RobotStatistic
-    ) -> None:
+    def __update_ui(self) -> None:
         """Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
             - Whether breakbeam is tripped
@@ -347,10 +355,9 @@ class RobotInfo(QWidget):
             - Battery voltage, and warns if it's too low
             - If this robot has errors
             - If the robot is stopped or running
-
-        :param robot_status: The robot status message for this robot
-        :param robot_statistic: The round trip time message for this robot
         """
+        if not self.last_robot_status or not self.last_robot_statistic:
+            return
         motor_status = robot_status.motor_status
         power_status = robot_status.power_status
         network_status = robot_status.network_status
