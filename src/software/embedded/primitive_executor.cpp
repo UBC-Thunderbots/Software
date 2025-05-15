@@ -22,26 +22,20 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
 {
 }
 
-void PrimitiveExecutor::updatePrimitiveSet(
-    const TbotsProto::PrimitiveSet &primitive_set_msg)
+void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive &primitive_msg)
 {
-    auto primitive_set_msg_iter = primitive_set_msg.robot_primitives().find(robot_id_);
-    if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
+    current_primitive_ = primitive_msg;
+
+    if (current_primitive_.has_move())
     {
-        current_primitive_ = primitive_set_msg_iter->second;
+        trajectory_path_ = createTrajectoryPathFromParams(
+            current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
 
-        if (current_primitive_.has_move())
-        {
-            trajectory_path_ = createTrajectoryPathFromParams(
-                current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
+        angular_trajectory_ =
+            createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
+                                              angular_velocity_, robot_constants_);
 
-            angular_trajectory_ = createAngularTrajectoryFromParams(
-                current_primitive_.move().w_traj_params(), angular_velocity_,
-                robot_constants_);
-
-            time_since_trajectory_creation_ =
-                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
-        }
+        time_since_trajectory_creation_ = Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
     }
 }
 
@@ -105,7 +99,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kStop:
         {
             auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
-                                                     TbotsProto::AutoChipOrKick());
+                                                       TbotsProto::AutoChipOrKick());
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
             status.set_running_primitive(false);

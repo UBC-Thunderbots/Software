@@ -1,5 +1,6 @@
 #pragma once
 #include <g3log/logmessage.hpp>
+#include <optional>
 #include <string>
 
 #include "proto/visualization.pb.h"
@@ -16,8 +17,10 @@ class PlotJugglerSink
    public:
     /**
      * Creates a PlotJugglerSink that sends udp packets to the PlotJuggler server
+     *
+     * @param interface The interface to send Plotjuggler UDP packets on
      */
-    PlotJugglerSink();
+    PlotJugglerSink(const std::string& interface = "lo");
 
     ~PlotJugglerSink() = default;
 
@@ -30,6 +33,9 @@ class PlotJugglerSink
     void sendToPlotJuggler(g3::LogMessageMover log_entry);
 
    private:
+    // Any error that occurs during the creation of the UDP sender will be stored here
+    std::optional<std::string> error;
+
     ThreadedUdpSender udp_sender;
 };
 

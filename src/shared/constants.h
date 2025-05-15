@@ -43,10 +43,12 @@ static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
 static const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
-static const short unsigned int ROBOT_STATUS_PORT      = 42071;
-static const short unsigned int ROBOT_LOGS_PORT        = 42072;
-static const short unsigned int ROBOT_CRASH_PORT       = 42074;
-static const short unsigned int NETWORK_COMM_TEST_PORT = 42075;
+static constexpr short unsigned int ROBOT_STATUS_PORT                         = 42071;
+static constexpr short unsigned int ROBOT_LOGS_PORT                           = 42072;
+static constexpr short unsigned int ROBOT_CRASH_PORT                          = 42074;
+static constexpr short unsigned int NETWORK_COMM_TEST_PORT                    = 42075;
+static constexpr short unsigned int ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT = 42073;
+static constexpr short unsigned int FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT = 42076;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
@@ -78,6 +80,14 @@ static const double BALL_MAX_RADIUS_METERS = 0.0215;
 // According to the rules, 80% of the ball must be seen at all times. Robots may not
 // cover more than 20% of the ball
 static const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
+
+// The radius of a circle region where ball placement is acceptable (in meters).
+constexpr double BALL_PLACEMENT_TOLERANCE_RADIUS_METERS = 0.15;
+// The radius of the outer region where robots are not allowed to be during ball
+// placement (in meters)
+constexpr double BALL_PLACEMENT_ROBOT_AVOID_RADIUS_METERS = 0.5;
+// The time limit for ball placement in seconds
+constexpr int BALL_PLACEMENT_TIME_LIMIT_S = 30;
 
 // The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
 constexpr double BALL_MASS_KG = 0.004593;

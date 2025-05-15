@@ -53,6 +53,9 @@ message AiControlConfig
 
     // Override the existing play with the Play enum provided
     required PlayName override_ai_play = 2 [default = UseAiSelection];
+
+    // Interfaces for various network listeners
+    required NetworkConfig network_config = 3;
 }
 
 message AiParameterConfig
@@ -310,11 +313,8 @@ message DribbleTacticConfig
 {
     // If ball and front of robot are separated by this amount, then we've lost
     // possession (in m)
-    required double lose_ball_possession_threshold = 1 [
-        default                   = 0.04,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 1.0
-    ];
+    required double lose_ball_possession_threshold = 1
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     // Threshold to determine if the ball is at the destination determined
     // experimentally (in m)
@@ -331,11 +331,8 @@ message DribbleTacticConfig
 
     // Maximum distance to continuously dribble the ball,
     // slightly conservative to not break the 1 meter rule (in m)
-    required double max_continuous_dribbling_distance = 4 [
-        default                   = 0.78,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 2.0
-    ];
+    required double max_continuous_dribbling_distance = 4
+        [default = 0.8, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 
     // Robot speed at which the robot is done dribbling (in m/s)
     required double robot_dribbling_done_speed = 5
@@ -469,6 +466,11 @@ message SensorFusionConfig
 
     // Possession tracker for determining which team has possession of the ball
     required PossessionTrackerConfig possession_tracker_config = 13;
+
+    // Max distance between the ball and front of the robot for the robot to be
+    // considered touching the ball (in m)
+    required double touching_ball_threshold_meters = 14
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message EnemyBallPlacementPlayConfig
@@ -616,6 +618,18 @@ message PossessionTrackerConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
+}
+
+message NetworkConfig
+{
+    // The robot communication interface
+    required string robot_communication_interface = 1 [default = "lo"];
+
+    // The referee interface
+    required string referee_interface = 2 [default = "lo"];
+
+    // The vision interface
+    required string vision_interface = 3 [default = "lo"];
 }
 
 message CreaseDefenderConfig

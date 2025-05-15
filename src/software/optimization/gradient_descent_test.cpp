@@ -36,9 +36,8 @@ TEST(GradientDescentOptimizerTest, minimize_multi_valued_function)
     GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.05});
 
     // f = x^2 + 2*y^2 + 20
-    auto f = [](std::array<double, 2> x) {
-        return std::pow(x.at(0), 2) + 2 * std::pow(x.at(1), 2) + 20;
-    };
+    auto f = [](std::array<double, 2> x)
+    { return std::pow(x.at(0), 2) + 2 * std::pow(x.at(1), 2) + 20; };
 
     auto min = gradientDescentOptimizer.minimize(f, {1, -1}, 100);
 
@@ -54,9 +53,8 @@ TEST(GradientDescentOptimizerTest, minimize_multi_valued_function_with_offsets)
     GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.05});
 
     // f = (x+5)^2 + 2*(y-4)^2 + 20
-    auto f = [](std::array<double, 2> x) {
-        return std::pow(x.at(0) + 5, 2) + 2 * std::pow(x.at(1) - 4, 2) + 20;
-    };
+    auto f = [](std::array<double, 2> x)
+    { return std::pow(x.at(0) + 5, 2) + 2 * std::pow(x.at(1) - 4, 2) + 20; };
 
     auto min = gradientDescentOptimizer.minimize(f, {0, 0}, 150);
 

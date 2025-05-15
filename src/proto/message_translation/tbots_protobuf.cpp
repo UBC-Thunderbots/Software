@@ -14,7 +14,11 @@ std::unique_ptr<TbotsProto::World> createWorld(const World& world)
     *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBall(world.ball());
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
-
+    if (world.getDribbleDisplacement().has_value())
+    {
+        *(world_msg->mutable_dribble_displacement()) =
+            *createSegmentProto(world.getDribbleDisplacement().value());
+    }
     return world_msg;
 }
 
@@ -30,9 +34,14 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
     *(world_msg->mutable_ball())          = *createBall(world.ball());
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
     world_msg->set_sequence_number(sequence_number);
-
+    if (world.getDribbleDisplacement().has_value())
+    {
+        *(world_msg->mutable_dribble_displacement()) =
+            *createSegmentProto(world.getDribbleDisplacement().value());
+    }
     return world_msg;
 }
+
 
 std::unique_ptr<TbotsProto::Team> createTeam(const Team& team)
 {
@@ -40,9 +49,8 @@ std::unique_ptr<TbotsProto::Team> createTeam(const Team& team)
     auto team_msg      = std::make_unique<TbotsProto::Team>();
     const auto& robots = team.getAllRobots();
 
-    std::for_each(robots.begin(), robots.end(), [&](const Robot& robot) {
-        *(team_msg->add_team_robots()) = *createRobot(robot);
-    });
+    std::for_each(robots.begin(), robots.end(), [&](const Robot& robot)
+                  { *(team_msg->add_team_robots()) = *createRobot(robot); });
 
     auto goalie_id = team.getGoalieId();
     if (goalie_id.has_value())
