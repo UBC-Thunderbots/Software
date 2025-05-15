@@ -7,20 +7,6 @@ load("@simulated_tests_deps//:requirements.bzl", "requirement")
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
 cc_library(
-    name = "example_play",
-    srcs = ["example_play.cpp"],
-    hdrs = ["example_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "kickoff_enemy_play",
     srcs = ["kickoff_enemy_play.cpp"],
     hdrs = ["kickoff_enemy_play.h"],
@@ -119,7 +105,6 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
-        ":example_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
         ":shoot_or_chip_play",
@@ -129,6 +114,7 @@ cc_library(
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play/enemy_ball_placement:enemy_ball_placement_play",
         "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
+        "//software/ai/hl/stp/play/example:example_play",
         "//software/ai/hl/stp/play/free_kick:free_kick_play",
         "//software/ai/hl/stp/play/halt_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
@@ -139,20 +125,6 @@ cc_library(
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
-    ],
-)
-
-cc_test(
-    name = "example_play_test",
-    srcs = ["example_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:example_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )
 
