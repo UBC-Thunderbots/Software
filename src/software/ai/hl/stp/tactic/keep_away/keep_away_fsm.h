@@ -11,7 +11,7 @@ struct KeepAwayFSM
      *
      * @param ai_config The config to fetch parameters from
      */
-    explicit KeepAwayFSM(const TbotsProto::AiConfig& ai_config) : ai_config(ai_config){};
+    explicit KeepAwayFSM(const TbotsProto::AiConfig& ai_config) : ai_config(ai_config) {};
 
     struct ControlParams
     {
