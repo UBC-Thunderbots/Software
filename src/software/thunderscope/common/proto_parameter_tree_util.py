@@ -1,7 +1,24 @@
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
-from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
+from proto.import_all_protos import *
+import netifaces
+
+
+"""
+Instead of the using the generic parameter parsing, this constant can be used to define custom handlers for specific
+fields in the proto.
+
+To define a custom handler:
+    1. The key is the name of the field in the proto
+    2. The value is the function that will be called to parse the field. Make sure the function is callable from this
+       file
+"""
+CUSTOM_PARAMETERS_OVERRIDE = {
+    "robot_communication_interface": "__create_network_enum",
+    "referee_interface": "__create_network_enum",
+    "vision_interface": "__create_network_enum",
+}
 
 
 def __create_int_parameter_writable(key, value, descriptor):
@@ -16,10 +33,13 @@ def __create_int_parameter_writable(key, value, descriptor):
     """
     # Extract the options from the descriptor, and store it
     # in the dictionary.
-    options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
+    options = descriptor.GetOptions()
 
     try:
-        min_max = options["[TbotsProto.bounds]"]
+        minimum, maximum = (
+            options.Extensions[bounds].min_int_value,
+            options.Extensions[bounds].max_int_value,
+        )
     except KeyError:
         raise KeyError("{} missing ParameterRangeOptions".format(key))
 
@@ -28,7 +48,7 @@ def __create_int_parameter_writable(key, value, descriptor):
         "type": "int",
         "value": value,
         "default": value,
-        "limits": (int(min_max["min_int_value"]), int(min_max["max_int_value"])),
+        "limits": (int(minimum), int(maximum)),
         "step": 1,
     }
 
@@ -44,10 +64,13 @@ def __create_double_parameter_writable(key, value, descriptor):
     """
     # Extract the options from the descriptor, and store it
     # in the dictionary.
-    options = MessageToDict(descriptor.GetOptions(), preserving_proto_field_name=True)
+    options = descriptor.GetOptions()
 
     try:
-        min_max = options["[TbotsProto.bounds]"]
+        minimum, maximum = (
+            options.Extensions[bounds].min_double_value,
+            options.Extensions[bounds].max_double_value,
+        )
     except KeyError:
         raise KeyError("{} missing ParameterRangeOptions".format(key))
 
@@ -57,8 +80,8 @@ def __create_double_parameter_writable(key, value, descriptor):
         "value": value,
         "default": value,
         "limits": (
-            min_max["min_double_value"],
-            min_max["max_double_value"],
+            minimum,
+            maximum,
         ),
         "step": 0.01,
     }
@@ -119,6 +142,19 @@ def __create_parameter_read_only(key, value, descriptor):
     return {"name": key, "type": "str", "value": value, "readonly": True}
 
 
+def __create_network_enum(key, value, _):
+    """Lists all the network interfaces available on the system as enum options for the given parameter field.
+
+    :param key: The name of the parameter
+    :param value: The default value
+    """
+    network_interfaces = netifaces.interfaces()
+
+    return parametertree.parameterTypes.ListParameter(
+        name=key, default=None, value=value, limits=network_interfaces
+    )
+
+
 def get_string_val(descriptor, value):
     """Converts the given value to a string depending on the descriptor type
 
@@ -163,7 +199,13 @@ def config_proto_to_field_list(
             if fuzz.partial_ratio(search_term, key) < search_filter_threshold:
                 continue
 
-        if descriptor.type == descriptor.TYPE_MESSAGE:
+        if descriptor.name in CUSTOM_PARAMETERS_OVERRIDE.keys():
+            field_list.append(
+                eval(CUSTOM_PARAMETERS_OVERRIDE[descriptor.name])(
+                    key, value, descriptor
+                )
+            )
+        elif descriptor.type == descriptor.TYPE_MESSAGE:
             field_list.append(
                 {
                     "name": key,

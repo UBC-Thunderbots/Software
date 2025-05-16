@@ -23,8 +23,9 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_has_code_but_does_not_yield_reports_success)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
+    ValidationFunction validation_function =
+        [](std::shared_ptr<World> world, ValidationCoroutine::push_type& yield)
+    {
         int foo = 0;
         int bar = 3;
         int baz = foo + bar;
@@ -40,10 +41,9 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_yields_once_succeeds_on_the_second_execution)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        yield("Test message");
-    };
+    ValidationFunction validation_function =
+        [](std::shared_ptr<World> world, ValidationCoroutine::push_type& yield)
+    { yield("Test message"); };
 
     auto world = ::TestUtil::createBlankTestingWorld();
     TerminatingFunctionValidator function_validator(validation_function, world);
@@ -57,8 +57,9 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_yields_five_time_succeeds_on_the_sixth_execution)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
+    ValidationFunction validation_function =
+        [](std::shared_ptr<World> world, ValidationCoroutine::push_type& yield)
+    {
         yield("Test message");
         yield("Test message");
         yield("Test message");
@@ -83,8 +84,9 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_with_early_return_reports_success_after_return)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
+    ValidationFunction validation_function =
+        [](std::shared_ptr<World> world, ValidationCoroutine::push_type& yield)
+    {
         yield("First validation not done yet");
         return;
         yield("Second validation not done yet");
@@ -104,8 +106,9 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_with_single_loop_succeeds_after_loop_termination)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
+    ValidationFunction validation_function =
+        [](std::shared_ptr<World> world, ValidationCoroutine::push_type& yield)
+    {
         while (world->ball().position().x() < 0)
         {
             yield("The ball's x position is not less than 0");
@@ -140,8 +143,9 @@ TEST(TerminatingFunctionValidatorTest,
 {
     // This validation function will only pass if the ball's x-coordinate becomes positive
     // before the ball's y-coordinate becomes positive
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
+    ValidationFunction validation_function =
+        [](std::shared_ptr<World> world, ValidationCoroutine::push_type& yield)
+    {
         while (world->ball().position().x() < 0)
         {
             yield("The ball's x position is not less than 0");
@@ -180,8 +184,9 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_error_message)
 {
     // This shows an example of using GoogleTest statements within a validation function.
     // Just like regular unit tests, if the condition is not met the test will fail.
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
+    ValidationFunction validation_function =
+        [](std::shared_ptr<World> world, ValidationCoroutine::push_type& yield)
+    {
         while (world->gameState().isStopped())
         {
             yield("Test message");

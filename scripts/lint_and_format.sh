@@ -36,7 +36,7 @@ function run_clang_format () {
     # clang-format as arguments
     # We remove the last -o flag from the extension string
     find $CURR_DIR/../src/ ${EXTENSION_STRING::-2}  \
-        | xargs -I{} -n1000 $CLANG_BIN -i -style=file
+        | xargs -I{} -n1000 $CLANG_BIN -i -style=file:$CURR_DIR/../.clang-format
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to run clang-format over all files!***\n\n"
@@ -119,6 +119,18 @@ function run_eof_new_line(){
     fi
 }
 
+function run_ansible_lint(){
+    printf "Running ansible-lint...\n\n"
+
+    /opt/tbotspython/bin/ansible-lint $CURR_DIR/../src/software/embedded/ansible/**/*.yml --fix
+
+    if [[ "$?" != 0 ]]; then
+        printf "\n***Failed to lint and format Ansible files!***\n\n"
+        exit 1
+    fi
+}
+
+
 # Run formatting
 run_code_spell
 run_clang_format
@@ -126,5 +138,6 @@ run_bazel_formatting
 run_ruff
 run_eof_new_line
 run_git_diff_check
+run_ansible_lint
 
 exit 0
