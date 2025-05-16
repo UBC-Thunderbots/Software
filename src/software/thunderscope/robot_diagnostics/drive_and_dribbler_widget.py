@@ -122,8 +122,7 @@ class DriveAndDribblerWidget(QWidget):
             motor_control.direct_velocity_control.velocity.y_component_meters = (
                 self.y_velocity_slider.value()
             )
-            motor_control.direct_velocity_control.angular_velocity.radians_per_second =\
-                self.angular_velocity_slider.value()
+            motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.angular_velocity_slider.value()
         else:
             motor_control.direct_per_wheel_control.front_left_wheel_velocity = (
                 self.front_left_motor_slider.value()
@@ -208,8 +207,7 @@ class DriveAndDribblerWidget(QWidget):
         return group_box
 
     def __setup_per_motor_widgets(self) -> QGroupBox:
-        """
-        :returns: a QGroupBox containing sliders and controls for controlling individual
+        """:returns: a QGroupBox containing sliders and controls for controlling individual
         speed of the robot's motors.
         """
         (
