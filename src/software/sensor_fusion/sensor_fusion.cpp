@@ -40,6 +40,7 @@ std::optional<World> SensorFusion::getWorld() const
             new_world.updateRefereeStage(*referee_stage);
         }
 
+        new_world.setVirtualObstacles(virtual_obstacles_);
         return new_world;
     }
     else
@@ -511,4 +512,9 @@ void SensorFusion::resetWorldComponents()
     enemy_team_filter    = RobotTeamFilter();
     possession           = TeamPossession::FRIENDLY_TEAM;
     dribble_displacement = std::nullopt;
+}
+
+void SensorFusion::setVirtualObstacles(TbotsProto::VirtualObstacles virtual_obstacles)
+{
+    virtual_obstacles_ = virtual_obstacles;
 }

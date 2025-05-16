@@ -36,6 +36,7 @@ const std::string REPLAY_BOOKMARK_PATH                   = "/replay_bookmark";
 const std::string DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH  = "/dynamic_parameter_request";
 const std::string DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH = "/dynamic_parameter_response";
 const std::string WORLD_STATE_RECEIVED_TRIGGER_PATH = "/world_state_received_trigger";
+const std::string VIRTUAL_OBSTACLES_UNIX_PATH       = "/virtual_obstacles";
 
 const unsigned UNIX_BUFFER_SIZE = 20000;
 

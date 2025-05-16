@@ -148,6 +148,7 @@ int main(int argc, char** argv)
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(ai);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(sensor_fusion);
+        backend->Subject<TbotsProto::VirtualObstacles>::registerObserver(sensor_fusion);
 
         // Handle some of the signals that we manually send when we want to shut down full
         // system cleanly. SIGTERM is sent by Thunderscope to stop full system

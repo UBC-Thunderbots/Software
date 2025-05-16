@@ -7,6 +7,9 @@ from proto.import_all_protos import *
 from software.thunderscope.common.fps_widget import FPSWidget
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.common.proto_plotter import ProtoPlotter
+from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
+    GLDrawPolygonObstacleLayer,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
@@ -93,6 +96,7 @@ def setup_gl_widget(
         "Validation", visualization_buffer_size
     )
     path_layer = gl_path_layer.GLPathLayer("Paths", visualization_buffer_size)
+
     obstacle_layer = gl_obstacle_layer.GLObstacleLayer(
         "Obstacles", visualization_buffer_size
     )
@@ -138,10 +142,15 @@ def setup_gl_widget(
         "Referee Info", visualization_buffer_size
     )
 
+    draw_obstacle_layer = GLDrawPolygonObstacleLayer(
+        "Draw Obstacle Layer", full_system_proto_unix_io
+    )
+
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(path_layer)
     gl_widget.add_layer(obstacle_layer)
+    gl_widget.add_layer(draw_obstacle_layer, False)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(attacker_layer)
     gl_widget.add_layer(cost_vis_layer, True)
