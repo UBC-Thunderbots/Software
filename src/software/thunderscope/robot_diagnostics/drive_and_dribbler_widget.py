@@ -116,7 +116,6 @@ class DriveAndDribblerWidget(QWidget):
         motor_control = MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
         if self.control_mode == ControlMode.VELOCITY:
-            motor_control.ClearField("direct_per_wheel_control")
             motor_control.direct_velocity_control.velocity.x_component_meters = (
                 self.x_velocity_slider.value()
             )
@@ -126,7 +125,6 @@ class DriveAndDribblerWidget(QWidget):
             motor_control.direct_velocity_control.angular_velocity.radians_per_second =\
                 self.angular_velocity_slider.value()
         else:
-            motor_control.ClearField("direct_velocity_control")
             motor_control.direct_per_wheel_control.front_left_wheel_velocity = (
                 self.front_left_motor_slider.value()
             )
@@ -361,14 +359,18 @@ class DriveAndDribblerWidget(QWidget):
         self.__reset_motor_sliders()
         self.__reset_direct_sliders()
 
+        motor_control = MotorControl()
         if use_control_mode == ControlMode.VELOCITY:
             # Show the direct velocity widget
+            motor_control.ClearField("direct_per_wheel_control")
             self.direct_velocity_widget.setVisible(True)
             self.per_motor_widget.setVisible(False)
         else:
             # Show the per motor widget
+            motor_control.ClearField("direct_velocity_control")
             self.direct_velocity_widget.setVisible(False)
             self.per_motor_widget.setVisible(True)
+        self.proto_unix_io.send_proto(MotorControl, motor_control)
 
     def __reset_direct_sliders(self) -> None:
         """Reset the direct velocity sliders back to 0"""
