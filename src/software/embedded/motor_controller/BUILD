@@ -37,6 +37,7 @@ cc_library(
         ":motor_controller_status",
         ":motor_fault_indicator",
         ":motor_index",
+        ":stspin_constants",
         "//software/embedded:spi_utils",
         "//software/embedded/constants",
         "//software/embedded/gpio",
@@ -53,4 +54,9 @@ cc_library(
         ":motor_board",
         "//proto:tbots_cc_proto",
     ],
+)
+
+cc_library(
+    name = "stspin_constants",
+    hdrs = ["stspin_constants.h"],
 )
