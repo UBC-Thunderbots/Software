@@ -86,6 +86,7 @@ enum ErrorCode
 
 enum MotorFault
 {
+    /*********** TMC Faults ************/
     // Refer to Trinamic 6100 datasheet for precise definitions of motor faults.
     // https://trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC6100_datasheet_Rev1.00.pdf
     // (Section 5.1, p22-23)
@@ -104,6 +105,20 @@ enum MotorFault
     PHASE_W_SHORT_COUNTER_DETECTED = 12;
     PHASE_W_SHORT_TO_GND_DETECTED  = 13;
     PHASE_W_SHORT_TO_VS_DETECTED   = 14;
+
+    /*********** STSPIN Faults ************/
+    NO_FAULT     = 15;
+    DURATION     = 16;
+    OVER_VOLT    = 17;
+    UNDER_VOLT   = 18;
+    OVER_TEMP    = 19;
+    START_UP     = 20;
+    SPEED_FDBK   = 21;
+    OVER_CURR    = 22;
+    SW_ERROR     = 23;
+    SAMPLE_FAULT = 24;
+    OVERCURR_SW  = 25;
+    DP_FAULT     = 26;
 }
 
 message DriveUnit

@@ -82,7 +82,7 @@ class StSpinMotorController : public MotorController
         SW_ERROR     = 0x0080,
         SAMPLE_FAULT = 0x0100,
         OVERCURR_SW  = 0x0200,
-        DP_FAULT     = 0x0400,
+        DP_FAULT     = 0x0400
     };
 
     // Start-of-frame and end-of-frame markers

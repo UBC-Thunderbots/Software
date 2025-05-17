@@ -11,6 +11,7 @@ StSpinMotorController::StSpinMotorController()
 
 MotorControllerStatus StSpinMotorController::earlyPoll()
 {
+    // No encoders to calibrate, so just return OK
     return MotorControllerStatus::OK;
 }
 
@@ -18,15 +19,111 @@ void StSpinMotorController::setup()
 {
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
     {
+        sendFrame(motor, StSpinOpcode.ACK_FAULTS);
+    }
+
+    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    {
         sendFrame(motor, StSpinOpcode.START_MOTOR);
+        checkDriverFault(motor);
+        readThenWriteVelocity(motor, 0);
     }
 }
 
-void StSpinMotorController::reset() {}
+void StSpinMotorController::reset()
+{
+    immediatelyDisable();
+}
 
 MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& motor)
 {
-    return MotorFaultIndicator();
+    bool drive_enabled = true;
+    std::unordered_set<TbotsProto::MotorFault> motor_faults;
+
+    const uint16_t faults = sendAndReceiveFrame(motor, StSpinOpcode.GET_FAULT, 0);
+
+    if (faults != 0)
+    {
+        LOG(WARNING) << "======= Faults For Motor " << motor << "=======";
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::DURATION))
+    {
+        LOG(WARNING) << "DURATION: FOC rate too high";
+        motor_faults.insert(TbotsProto::MotorFault::DURATION);
+        drive_enabled = false;
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::OVER_VOLT))
+    {
+        LOG(WARNING) << "OVER_VOLT: Software overvoltage";
+        motor_faults.insert(TbotsProto::MotorFault::OVER_VOLT);
+        drive_enabled = false;
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::UNDER_VOLT))
+    {
+        LOG(WARNING) << "UNDER_VOLT: Software undervoltage";
+        motor_faults.insert(TbotsProto::MotorFault::UNDER_VOLT);
+        drive_enabled = false;
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::OVER_TEMP))
+    {
+        LOG(WARNING) << "OVER_TEMP: Software over temperature";
+        motor_faults.insert(TbotsProto::MotorFault::OVER_TEMP);
+        drive_enabled = false;
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::START_UP))
+    {
+        LOG(WARNING) << "START_UP: Start up failed";
+        motor_faults.insert(TbotsProto::MotorFault::START_UP);
+        drive_enabled = false;
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::SPEED_FDBK))
+    {
+        LOG(WARNING) << "SPEED_FDBK: Speed feedback fault";
+        motor_faults.insert(TbotsProto::MotorFault::SPEED_FDBK);
+        drive_enabled = false;
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::OVER_CURR))
+    {
+        LOG(WARNING) << "OVER_CURR: Software overcurrent";
+        motor_faults.insert(TbotsProto::MotorFault::OVER_CURR);
+        drive_enabled = false;
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::SW_ERROR))
+    {
+        LOG(WARNING) << "SW_ERROR: Software error";
+        motor_faults.insert(TbotsProto::MotorFault::SW_ERROR);
+        drive_enabled = false;
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::SAMPLE_FAULT))
+    {
+        LOG(WARNING) << "SAMPLE_FAULT: Sample fault for testing purposes";
+        motor_faults.insert(TbotsProto::MotorFault::SAMPLE_FAULT);
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::OVERCURR_SW))
+    {
+        LOG(INFO) << "OVERCURR_SW: Software overcurrent";
+        motor_faults.insert(TbotsProto::MotorFault::OVERCURR_SW);
+        drive_enabled = false;
+    }
+
+    if (faults & static_cast<uint16_t>(StSpinFaultCode::DP_FAULT))
+    {
+        LOG(WARNING) << "DP_FAULT: Driver protection fault";
+        motor_faults.insert(TbotsProto::MotorFault::DP_FAULT);
+        drive_enabled = false;
+    }
+
+    return MotorFaultIndicator(drive_enabled, motor_faults);
 }
 
 double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
@@ -47,7 +144,13 @@ double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
     return speed;
 }
 
-void StSpinMotorController::immediatelyDisable() {}
+void StSpinMotorController::immediatelyDisable()
+{
+    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    {
+        sendFrame(motor, StSpinOpcode.STOP_MOTOR);
+    }
+}
 
 void StSpinMotorController::openSpiFileDescriptor(const MotorIndex& motor)
 {
