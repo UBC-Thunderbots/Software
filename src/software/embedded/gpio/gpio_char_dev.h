@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unistd.h>
+
 #include <cstdint>
 
 #include "software/embedded/gpio/gpio.h"

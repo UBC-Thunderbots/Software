@@ -59,12 +59,10 @@ TmcMotorController::TmcMotorController()
 
 MotorControllerStatus TmcMotorController::earlyPoll()
 {
-    auto motors = driveMotors();
-    bool encoders_calibrated =
-        std::accumulate(motors.begin(), motors.end(), false,
-                        [&](const bool& acc, const MotorIndex& motor) {
-                            return acc || encoder_calibrated_[motor];
-                        });
+    auto motors              = driveMotors();
+    bool encoders_calibrated = std::accumulate(
+        motors.begin(), motors.end(), false, [&](const bool& acc, const MotorIndex& motor)
+        { return acc || encoder_calibrated_[motor]; });
 
     if (!encoders_calibrated)
     {
@@ -174,12 +172,10 @@ void TmcMotorController::setup()
         endEncoderCalibration(motor);
     }
 
-    auto motors = driveMotors();
-    bool has_encoders_calibrated =
-        std::accumulate(motors.begin(), motors.end(), false,
-                        [&](const bool& acc, const MotorIndex& motor) {
-                            return acc || encoder_calibrated_[motor];
-                        });
+    auto motors                  = driveMotors();
+    bool has_encoders_calibrated = std::accumulate(
+        motors.begin(), motors.end(), false, [&](const bool& acc, const MotorIndex& motor)
+        { return acc || encoder_calibrated_[motor]; });
     CHECK(has_encoders_calibrated)
         << "Running without encoder calibration can cause serious harm, exiting";
 }
@@ -631,10 +627,10 @@ void TmcMotorController::checkEncoderConnections()
 
     for (int num_iterations = 0;
          num_iterations < 10 &&
-         std::any_of(calibrated_motors.begin(), calibrated_motors.end(),
-                     [](std::pair<const MotorIndex, bool> calibration_status_pair) {
-                         return !calibration_status_pair.second;
-                     });
+         std::any_of(
+             calibrated_motors.begin(), calibrated_motors.end(),
+             [](std::pair<const MotorIndex, bool> calibration_status_pair)
+             { return !calibration_status_pair.second; });
          ++num_iterations)
     {
         for (const MotorIndex& motor : driveMotors())
