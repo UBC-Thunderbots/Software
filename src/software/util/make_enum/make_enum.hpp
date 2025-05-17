@@ -70,59 +70,59 @@
 
 namespace reflective_enum
 {
-    /**
-     * Type trait that checks whether T is a reflective enum, i.e. whether it
-     * was created using the MAKE_ENUM macro.
-     */
-    template <typename T>
-    struct is_reflective_enum : std::false_type
+/**
+ * Type trait that checks whether T is a reflective enum, i.e. whether it
+ * was created using the MAKE_ENUM macro.
+ */
+template <typename T>
+struct is_reflective_enum : std::false_type
+{
+};
+
+/**
+ * Returns the number of values in the reflective enum E.
+ *
+ * @return the number of values in the enum
+ */
+template <typename E>
+constexpr size_t size();
+
+/**
+ * Returns an array containing the values of the reflective enum E.
+ *
+ * @return an array with the values of the enum
+ */
+template <typename E>
+constexpr auto values();
+
+/**
+ * Returns an array contain the string representations of each value
+ * in the reflective enum E.
+ *
+ * @return an array with the names of the values in the enum
+ */
+template <typename E>
+constexpr auto valueNames();
+
+/**
+ * Returns the enum value with the given string representation.
+ *
+ * @param value_name the string representation of the enum value
+ *
+ * @return the enum value
+ */
+template <typename E>
+constexpr E fromName(const std::string value_name)
+{
+    constexpr size_t enum_size      = size<E>();
+    constexpr auto enum_value_names = valueNames<E>();
+    for (size_t i = 0; i < enum_size; ++i)
     {
-    };
-
-    /**
-     * Returns the number of values in the reflective enum E.
-     *
-     * @return the number of values in the enum
-     */
-    template <typename E>
-    constexpr size_t size();
-
-    /**
-     * Returns an array containing the values of the reflective enum E.
-     *
-     * @return an array with the values of the enum
-     */
-    template <typename E>
-    constexpr auto values();
-
-    /**
-     * Returns an array contain the string representations of each value
-     * in the reflective enum E.
-     *
-     * @return an array with the names of the values in the enum
-     */
-    template <typename E>
-    constexpr auto valueNames();
-
-    /**
-     * Returns the enum value with the given string representation.
-     *
-     * @param value_name the string representation of the enum value
-     *
-     * @return the enum value
-     */
-    template <typename E>
-    constexpr E fromName(const std::string value_name)
-    {
-        constexpr size_t enum_size      = size<E>();
-        constexpr auto enum_value_names = valueNames<E>();
-        for (size_t i = 0; i < enum_size; ++i)
+        if (enum_value_names.at(i) == value_name)
         {
-            if (enum_value_names.at(i) == value_name)
-            {
-                return static_cast<E>(i);
-            }
+            return static_cast<E>(i);
         }
-        throw std::invalid_argument(value_name + " cannot be converted to enum value");
     }
+    throw std::invalid_argument(value_name + " cannot be converted to enum value");
+}
 }  // namespace reflective_enum

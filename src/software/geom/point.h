@@ -228,13 +228,13 @@ bool operator!=(const Point &p, const Point &q);
 // https://prateekvjoshi.com/2014/06/05/using-hash-function-in-c-for-user-defined-classes/
 namespace std
 {
-    template <>
-    struct hash<Point> final
+template <>
+struct hash<Point> final
+{
+    size_t operator()(const Point &p) const
     {
-        size_t operator()(const Point &p) const
-        {
-            hash<double> h;
-            return h(p.x()) * 17 + h(p.y());
-        }
-    };
+        hash<double> h;
+        return h(p.x()) * 17 + h(p.y());
+    }
+};
 }  // namespace std
