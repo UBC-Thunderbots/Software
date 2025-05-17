@@ -17,49 +17,49 @@ class TestObserver : public Observer<int, FakeClock>
 
 namespace TestUtil
 {
-    /**
-     * Tests getDataReceivedPerSecond by filling the buffer
-     *
-     * @param test_observer The observer to test
-     * @param data_received_period_ms The period between receiving data in milliseconds
-     * @param number_of_messages number of messages to send to the buffer
-     *
-     * @return AssertionSuccess the observer returns the correct data received per second
-     */
-    ::testing::AssertionResult testGetDataReceivedPerSecondByFillingBuffer(
-        TestObserver test_observer, unsigned int data_received_period_ms,
-        unsigned int number_of_messages)
+/**
+ * Tests getDataReceivedPerSecond by filling the buffer
+ *
+ * @param test_observer The observer to test
+ * @param data_received_period_ms The period between receiving data in milliseconds
+ * @param number_of_messages number of messages to send to the buffer
+ *
+ * @return AssertionSuccess the observer returns the correct data received per second
+ */
+::testing::AssertionResult testGetDataReceivedPerSecondByFillingBuffer(
+    TestObserver test_observer, unsigned int data_received_period_ms,
+    unsigned int number_of_messages)
+{
+    auto wall_time_start = FakeClock::now();
+    for (unsigned int i = 0; i < number_of_messages; i++)
     {
-        auto wall_time_start = FakeClock::now();
-        for (unsigned int i = 0; i < number_of_messages; i++)
-        {
-            test_observer.receiveValue(i);
-            FakeClock::advance(std::chrono::milliseconds(data_received_period_ms));
-        }
-
-        auto wall_time_now = FakeClock::now();
-        double test_duration_s =
-            static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(
-                                    wall_time_now - wall_time_start)
-                                    .count()) *
-            SECONDS_PER_MILLISECOND;
-        double scaling_factor =
-            test_duration_s /
-            (data_received_period_ms * SECONDS_PER_MILLISECOND * number_of_messages);
-        double expected_actual_difference = std::abs(
-            test_observer.getDataReceivedPerSecond() -
-            1 / (data_received_period_ms * SECONDS_PER_MILLISECOND) * scaling_factor);
-        if (expected_actual_difference < 50)
-        {
-            return ::testing::AssertionSuccess();
-        }
-        else
-        {
-            return ::testing::AssertionFailure()
-                   << "The difference between expected and actual data received per seconds was "
-                   << expected_actual_difference;
-        }
+        test_observer.receiveValue(i);
+        FakeClock::advance(std::chrono::milliseconds(data_received_period_ms));
     }
+
+    auto wall_time_now = FakeClock::now();
+    double test_duration_s =
+        static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(
+                                wall_time_now - wall_time_start)
+                                .count()) *
+        SECONDS_PER_MILLISECOND;
+    double scaling_factor =
+        test_duration_s /
+        (data_received_period_ms * SECONDS_PER_MILLISECOND * number_of_messages);
+    double expected_actual_difference = std::abs(
+        test_observer.getDataReceivedPerSecond() -
+        1 / (data_received_period_ms * SECONDS_PER_MILLISECOND) * scaling_factor);
+    if (expected_actual_difference < 50)
+    {
+        return ::testing::AssertionSuccess();
+    }
+    else
+    {
+        return ::testing::AssertionFailure()
+               << "The difference between expected and actual data received per seconds was "
+               << expected_actual_difference;
+    }
+}
 };  // namespace TestUtil
 
 TEST(Observer, receiveValue_value_already_available)

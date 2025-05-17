@@ -125,7 +125,8 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     if (sensor_fusion_config.friendly_color_yellow())
     {
         if (!ssl_referee::deprecated_commands.contains(packet.command()))
-            game_state.updateRefereeCommand(ssl_referee::createRefereeCommand(packet, TeamColour::YELLOW));
+            game_state.updateRefereeCommand(
+                ssl_referee::createRefereeCommand(packet, TeamColour::YELLOW));
         friendly_goalie_id = packet.yellow().goalkeeper();
         enemy_goalie_id    = packet.blue().goalkeeper();
         if (packet.has_blue_team_on_positive_half())
@@ -136,7 +137,8 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     else
     {
         if (!ssl_referee::deprecated_commands.contains(packet.command()))
-            game_state.updateRefereeCommand(ssl_referee::createRefereeCommand(packet, TeamColour::BLUE));
+            game_state.updateRefereeCommand(
+                ssl_referee::createRefereeCommand(packet, TeamColour::BLUE));
         friendly_goalie_id = packet.blue().goalkeeper();
         enemy_goalie_id    = packet.yellow().goalkeeper();
         if (packet.has_blue_team_on_positive_half())

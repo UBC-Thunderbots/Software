@@ -266,7 +266,7 @@ class Gamecontroller:
         blue_full_system_proto_unix_io: ProtoUnixIO,
         yellow_full_system_proto_unix_io: ProtoUnixIO,
         autoref_proto_unix_io: ProtoUnixIO = None,
-        simulator_proto_unix_io: ProtoUnixIO = None
+        simulator_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
         """Setup gamecontroller io
 

@@ -485,8 +485,12 @@ if __name__ == "__main__":
                 autoref_proto_unix_io,
             )
             gamecontroller.setup_proto_unix_io(
-                blue_full_system_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                yellow_full_system_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                blue_full_system_proto_unix_io=tscope.proto_unix_io_map[
+                    ProtoUnixIOTypes.BLUE
+                ],
+                yellow_full_system_proto_unix_io=tscope.proto_unix_io_map[
+                    ProtoUnixIOTypes.YELLOW
+                ],
                 autoref_proto_unix_io=autoref_proto_unix_io,
                 simulator_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
             )

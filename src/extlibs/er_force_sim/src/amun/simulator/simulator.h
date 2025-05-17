@@ -40,11 +40,11 @@ const float FOCAL_LENGTH     = 390.f;
 
 namespace camun
 {
-    namespace simulator
-    {
-        class Simulator;
-        struct SimulatorData;
-    }  // namespace simulator
+namespace simulator
+{
+class Simulator;
+struct SimulatorData;
+}  // namespace simulator
 }  // namespace camun
 
 class camun::simulator::Simulator
