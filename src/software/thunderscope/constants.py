@@ -183,6 +183,14 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Ctrl + R:</code></b> Remove the current layout file and reset the layout<br><br>
     Layout file (on save) is located at {SAVED_LAYOUT_PATH}<br>
 
+    <b><code>Shift+Alt+Double Click</code></b> Complete the current virtual obstacle. The Draw Obstacle Layer must be enabled.<br><br>
+    <b><code>Shift+Alt+Single Click</code></b> Add a point to the current virtual obstacle. The Draw Obstacle Layer must be enabled.<br><br>
+    <b><code>c</code></b> Clear all virtual obstacles. The Draw Obstacle Layer must be enabled.<br><br>
+
+    <h3>GL Field Movement Test Layer</h3>
+    <b><code>Shift+Alt+Control+Click</code></b> Select the robot that is going to be moved<br>
+    <b><code>Shift+Alt+Click</code></b>Move the selected robot to the clicked point<br>
+
     """
 )
 

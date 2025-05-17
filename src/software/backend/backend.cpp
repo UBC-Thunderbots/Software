@@ -2,6 +2,8 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/sensor_msg.pb.h"
+#include "software/multithreading/subject.hpp"
+
 
 void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
 {
@@ -30,4 +32,9 @@ void Backend::receiveSSLReferee(SSLProto::Referee msg)
 void Backend::receiveSensorProto(SensorProto sensor_msg)
 {
     Subject<SensorProto>::sendValueToObservers(sensor_msg);
+}
+
+void Backend::receiveObstacleList(TbotsProto::VirtualObstacles new_obstacle_list)
+{
+    Subject<TbotsProto::VirtualObstacles>::sendValueToObservers(new_obstacle_list);
 }
