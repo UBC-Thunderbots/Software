@@ -348,12 +348,16 @@ PYBIND11_MODULE(python_bindings, m)
         .def("angularVelocity", &Robot::angularVelocity)
         .def("isNearDribbler", &Robot::isNearDribbler, py::arg("test_point"),
              py::arg("TOLERANCE") = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
-        .def("dribblerArea", &Robot::dribblerArea);
+        .def("dribblerArea", &Robot::dribblerArea)
+        .def("id", &Robot::id);
 
     py::class_<Team>(m, "Team")
+        .def(py::init<TbotsProto::Team>())
         .def(py::init<const std::vector<Robot>&>())
         .def("assignGoalie", &Team::assignGoalie)
-        .def("getAllRobots", &Team::getAllRobots);
+        .def("getAllRobots", &Team::getAllRobots)
+        .def("getNearestRobot",
+             py::overload_cast<const Point&>(&Team::getNearestRobot, py::const_));
 
     py::class_<Timestamp>(m, "Timestamp").def(py::init<>());
 

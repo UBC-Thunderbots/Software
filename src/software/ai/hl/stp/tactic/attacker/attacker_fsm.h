@@ -4,6 +4,7 @@
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
+#include "software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
@@ -42,13 +43,13 @@ struct AttackerFSM
                    boost::sml::back::process<PivotKickFSM::Update> processEvent);
 
     /**
-     * Action that updates the DribbleFSM to keep the ball away
+     * Action that updates the KeepAwayFSM to keep the ball away
      *
      * @param event AttackerFSM::Update event
-     * @param processEvent processes the DribbleFSM::Update
+     * @param processEvent processes the KeepAwayFSM::Update
      */
     void keepAway(const Update& event,
-                  boost::sml::back::process<DribbleFSM::Update> processEvent);
+                  boost::sml::back::process<KeepAwayFSM::Update> processEvent);
 
     /**
      * Guard that checks if the ball should be kicked, which is when there's a nearby
@@ -60,28 +61,29 @@ struct AttackerFSM
      */
     bool shouldKick(const Update& event);
 
-
     auto operator()()
     {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(PivotKickFSM)
+        DEFINE_SML_STATE(KeepAwayFSM)
         DEFINE_SML_STATE(DribbleFSM)
+
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(shouldKick)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, DribbleFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, KeepAwayFSM)
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest_state
             *DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
-            DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A,
+            DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A  = KeepAwayFSM_S,
+            KeepAwayFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
+            KeepAwayFSM_S + Update_E / keepAway_A, KeepAwayFSM_S    = DribbleFSM_S,
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 
    private:
-    // the attacker tactic config
     TbotsProto::AiConfig ai_config;
 };
