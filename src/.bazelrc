@@ -37,3 +37,12 @@ build --action_env=PYTHON_LIB_PATH=/opt/tbotspython/lib/python3.12
 # Enable the new cc_toolchain resolution strategy
 # #TODO(#3382): Delete when we upgrade to Bazel 7.0
 build --incompatible_enable_cc_toolchain_resolution
+
+# Enable Bzlmod for every Bazel command
+build --enable_runfiles
+common --enable_bzlmod
+common --lockfile_mode=update
+common --enable_platform_specific_config
+# build:windows --copt="/std:c++17"
+# common --skip_incompatible_explicit_targets
+# build:macos --cxxopt="--std=c++17"
