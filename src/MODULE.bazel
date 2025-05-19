@@ -3,6 +3,7 @@ module(
     version = "head",
     repo_name = "Thunderbots",
 )
+
 new_local_repository = use_repo_rule("@bazel//tools/build_defs/repo:local.bzl", "new_local_repository")
 
 bazel_dep(name = "googletest", version = "1.15.2")
@@ -18,16 +19,18 @@ bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
 bazel_dep(name = "nanopb", version = "0.4.9.1")
 bazel_dep(name = "yaml-cpp", version = "0.8.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
+bazel_dep(name = "pybind11_protobuf", version = "0.0.0-20250210-f02a2b7")
+bazel_dep(name = "rules_proto", version = "7.1.0")
 
 # Setup pybind11
 pybind11_configure = use_extension("@pybind11_bazel//:internal_configure.bzl", "internal_configure_extension")
 use_repo(pybind11_configure, "pybind11")
 
 # These headers are used by pybind11
-alias(
-    name = "python_headers",
-    actual = "@rules_python//python/cc:current_py_cc_headers",
-)
+#alias(
+#    name = "python_headers",
+#    actual = "@rules_python//python/cc:current_py_cc_headers",
+#)
 
 ##############################################
 # Register our Toolchains
@@ -61,41 +64,44 @@ new_local_repository(
 # Load PIP packages
 ##############################################
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     name = "nanopb_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements_lock = "//extlibs:nanopb_requirements_lock.txt",
 )
-
+use_repo(pip, "nanopb_deps")
 pip.parse(
     name = "thunderscope_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements_lock = "//software/thunderscope:requirements_lock.txt",
 )
-
+use_repo(pip, "thunderscope_deps")
 pip.parse(
     name = "ansible_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
 )
-
+use_repo(pip, "ansible_deps")
 pip.parse(
     name = "simulated_tests_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements_lock = "//software/simulated_tests:requirements_lock.txt",
 )
-
+use_repo(pip, "simulated_tests_deps")
 pip.parse(
     name = "robot_diagnostics_cli_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
 )
-###############################################
-# Setup non Bazel Central Registry dependencies
-###############################################
+use_repo(pip, "robot_diagnostics_cli_deps")
+
+###########################################################################
+# Setup non Bazel Central Registry dependencies & Non MODULE supported deps
+###########################################################################
 all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
+
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
@@ -123,42 +129,44 @@ http_archive(
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
 
+bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
+archive_override(
+    module_name = "rules_boost",
+    strip_prefix = "rules_boost-master",
+    url = "https://github.com/nelhage/rules_boost/archive/refs/heads/master.tar.gz",
+    # It is recommended to edit the above URL and the below sha256 to point to a specific version of this repository.
+    # integrity = "sha256-...",
+)
+
+non_module_boost_repositories = use_extension("@com_github_nelhage_rules_boost//:boost/repositories.bzl", "non_module_dependencies")
+use_repo(
+    non_module_boost_repositories,
+    "boost",
+)
+
 ##############################################
 # Repo-based dependencies
 ##############################################
-git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-git_repository(
-    name = "com_github_nelhage_rules_boost",
-    commit = "58be4e7e851d19e9ba14ced7bdba6fc8895af1d3",
-    remote = "https://github.com/nelhage/rules_boost",
-    shallow_since = "1724946929 +0200",
-)
-
-git_repository(
-    name = "pybind11_protobuf",
-    commit = "f20537c3285636716ed86a7ef96baa19a788c944",
-    remote = "https://github.com/pybind/pybind11_protobuf",
-)
-
 # tool used to flash firmware with bazel
-git_repository(
-    name = "platformio_rules",
-    commit = "882a88e4be94a3b0aadf8d694c012ffeec5eb32a",
-    remote = "http://github.com/mum4k/platformio_rules.git",
-    shallow_since = "1584297373 -0400",
+bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
+git_override(
+    module_name = "platformio_rules",
+    commit = "6f1b0fa48a90c2e113e293ed2953bb0963a14824",
+    remote = "https://github.com/Andrewyx/platformio_rules.git",
 )
 
-bazel_dep(name = "hedron_compile_commands", dev_dependency = True, version = "1.0.5")
+bazel_dep(name = "hedron_compile_commands", version = "1.0.5", dev_dependency = True)
 git_override(
     module_name = "hedron_compile_commands",
-    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
     commit = "4f28899228fb3ad0126897876f147ca15026151e",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
 )
 
 ##############################################
 #Add new git repos
 ##############################################
 new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+
 new_git_repository(
     name = "LTC4151",
     build_file = "@//extlibs:LTC4151.BUILD",
@@ -227,6 +235,7 @@ new_local_repository(
     build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
 )
+
 ##############################################
 # Workarounds and Fixes
 ##############################################
@@ -238,18 +247,19 @@ http_archive(
     url = "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55",
 )
 
-alias(
-    name = "six",
-    actual = "@six_archive//:six",
-)
+#alias(
+#    name = "six",
+#    actual = "@six_archive//:six",
+#)
 
-maybe = use_repo_rule("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-maybe(
-    git_repository,
-    name = "rules_third_party",
-    commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
-    remote = "https://github.com/DraconicEnt/rules_third_party.git",
-    shallow_since = "1620228587 -0400",
-)
-
-bullet = use_repo_rule("@rules_third_party//libraries:bullet.bzl", "bullet")
+#maybe = use_repo_rule("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+#
+#maybe(
+#    git_repository,
+#    name = "rules_third_party",
+#    commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
+#    remote = "https://github.com/DraconicEnt/rules_third_party.git",
+#    shallow_since = "1620228587 -0400",
+#)
+#
+#bullet = use_repo_rule("@rules_third_party//libraries:bullet.bzl", "bullet")
