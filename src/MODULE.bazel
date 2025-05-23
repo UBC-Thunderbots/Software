@@ -16,6 +16,7 @@ bazel_dep(name = "rules_python", version = "1.3.0")
 bazel_dep(name = "protobuf", version = "31.0")
 bazel_dep(name = "abseil-cpp", version = "20250512.0")
 bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
+bazel_dep(name = "zlib", version = "1.3.1.bcr.5")
 
 #bazel_dep(name = "nanopb", version = "0.4.9.1")
 bazel_dep(name = "yaml-cpp", version = "0.8.0")
@@ -137,6 +138,14 @@ http_archive(
     sha256 = "2177e6dfd86fa7465c44c8ef5c3b6ab98ffc94e1130355d6982f7d886cb7bec9",
     strip_prefix = "g3log-2.4",
     url = "https://github.com/KjellKod/g3log/archive/refs/tags/2.4.zip",
+)
+
+http_archive(
+    name = "g3sinks",
+    build_file = "@//extlibs:g3sinks.BUILD",
+    sha256 = "77632432de1ec456987c7d83c6eb163bb42f0eb9df6e0bdf63bcf7961c1f6c70",
+    strip_prefix = "g3sinks-1.1.3",
+    url = "https://github.com/KjellKod/g3sinks/archive/1.1.3.zip",
 )
 
 http_archive(

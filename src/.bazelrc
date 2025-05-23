@@ -48,3 +48,4 @@ common --enable_platform_specific_config
 # build:macos --cxxopt="--std=c++17"
 common --noincompatible_disallow_empty_glob
 common --incompatible_disallow_struct_provider_syntax=false
+common --enable_workspace
