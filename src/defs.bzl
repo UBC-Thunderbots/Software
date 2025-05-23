@@ -66,7 +66,7 @@ def _pkg_executable_impl(ctx):
     executable_symlink = PackageSymlinkInfo(
         attributes = {"mode": "0755"},
         destination = path,
-        source = "%s.runfiles/%s" % (path, _runfile_path(workspace_name, bin_executable)),
+        target = "%s.runfiles/%s" % (path, _runfile_path(workspace_name, bin_executable)),
     )
 
     pkg_filegroup_info = PackageFilegroupInfo(

@@ -179,7 +179,7 @@
 #boost_deps()
 #
 #new_git_repository(
-#    name = "eigen",
+#    name = "eigen" ,
 #    build_file = "@//extlibs:eigen.BUILD",
 #    commit = "6d829e766ff1b1ab867d93631163cbc63ed5798f",
 #    remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen.git",
