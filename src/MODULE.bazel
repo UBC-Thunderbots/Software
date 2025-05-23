@@ -4,7 +4,7 @@ module(
     repo_name = "Thunderbots",
 )
 
-new_local_repository = use_repo_rule("@bazel//tools/build_defs/repo:local.bzl", "new_local_repository")
+new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
 
 bazel_dep(name = "googletest", version = "1.15.2")
 bazel_dep(name = "platforms", version = "0.0.11")
@@ -16,7 +16,8 @@ bazel_dep(name = "rules_python", version = "1.3.0")
 bazel_dep(name = "protobuf", version = "31.0")
 bazel_dep(name = "abseil-cpp", version = "20250512.0")
 bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
-bazel_dep(name = "nanopb", version = "0.4.9.1")
+
+#bazel_dep(name = "nanopb", version = "0.4.9.1")
 bazel_dep(name = "yaml-cpp", version = "0.8.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
 bazel_dep(name = "pybind11_protobuf", version = "0.0.0-20250210-f02a2b7")
@@ -64,35 +65,44 @@ new_local_repository(
 # Load PIP packages
 ##############################################
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    is_default = True,
+    python_version = "3.12",
+)
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
-    name = "nanopb_deps",
+    hub_name = "nanopb_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
     requirements_lock = "//extlibs:nanopb_requirements_lock.txt",
 )
 use_repo(pip, "nanopb_deps")
 pip.parse(
-    name = "thunderscope_deps",
+    hub_name = "thunderscope_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
     requirements_lock = "//software/thunderscope:requirements_lock.txt",
 )
 use_repo(pip, "thunderscope_deps")
 pip.parse(
-    name = "ansible_deps",
+    hub_name = "ansible_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
     requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
 )
 use_repo(pip, "ansible_deps")
 pip.parse(
-    name = "simulated_tests_deps",
+    hub_name = "simulated_tests_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
     requirements_lock = "//software/simulated_tests:requirements_lock.txt",
 )
 use_repo(pip, "simulated_tests_deps")
 pip.parse(
-    name = "robot_diagnostics_cli_deps",
+    hub_name = "robot_diagnostics_cli_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
     requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
 )
 use_repo(pip, "robot_diagnostics_cli_deps")
@@ -103,6 +113,14 @@ use_repo(pip, "robot_diagnostics_cli_deps")
 all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Dep for cpp_redis
+http_archive(
+    name = "tacopie",
+    sha256 = "bbdebecdb68d5f9eb64170217000daf844e0aee18b8c4d3dd373d07efd9f7316",
+    strip_prefix = "tacopie-master",
+    url = "https://github.com/cylix/tacopie/archive/master.zip",
+)
 
 http_archive(
     name = "cpp_redis",
@@ -129,6 +147,16 @@ http_archive(
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
 
+http_archive(
+    name = "nanopb",
+    build_file = "@//extlibs:nanopb.BUILD",
+    sha256 = "e98dd6403ab8c5b271d32a6bc025e7e596bb181c7bc7e0492c5daa21fc44c940",
+    strip_prefix = "nanopb-0.3.9.4-linux-x86",
+    urls = [
+        "https://github.com/UBC-Thunderbots/Software-External-Dependencies/raw/main/nanopb-0.3.9.4-linux-x86.tar.gz",
+    ],
+)
+
 bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
 archive_override(
     module_name = "rules_boost",
@@ -151,7 +179,7 @@ use_repo(
 bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
 git_override(
     module_name = "platformio_rules",
-    commit = "6f1b0fa48a90c2e113e293ed2953bb0963a14824",
+    commit = "b998c783ce05a224ef726aa9775bd7c2d4121c29",
     remote = "https://github.com/Andrewyx/platformio_rules.git",
 )
 
@@ -208,6 +236,14 @@ new_git_repository(
     shallow_since = "1697482622 +0200",
 )
 
+new_git_repository(
+    name = "bullet",
+    build_file = "@//extlibs:bullet.BUILD",
+    commit = "272c7099d3ba8ac9e8c142e361e8d4cf5d91b8f2",
+    remote = "https://github.com/bulletphysics/bullet3.git",
+    shallow_since = "1606325146 -0800",
+)
+
 ##############################################
 # New local repos for our toolchains/compilers
 ##############################################
@@ -240,12 +276,12 @@ new_local_repository(
 # Workarounds and Fixes
 ##############################################
 # required to use `py_proto_library` from protobuf
-http_archive(
-    name = "six_archive",
-    build_file = "//extlibs:six.BUILD",
-    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
-    url = "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55",
-)
+#http_archive(
+#    name = "six_archive",
+#    build_file = "//extlibs:six.BUILD",
+#    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
+#    url = "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55",
+#)
 
 #alias(
 #    name = "six",
@@ -253,9 +289,19 @@ http_archive(
 #)
 
 #maybe = use_repo_rule("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+
+#git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 #
 #maybe(
 #    git_repository,
+#    name = "rules_third_party",
+#    commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
+#    remote = "https://github.com/DraconicEnt/rules_third_party.git",
+#    shallow_since = "1620228587 -0400",
+#)
+#
+#bullet = use_repo_rule("@rules_third_party//libraries:bullet.bzl", "bullet")
+#new_git_repository(
 #    name = "rules_third_party",
 #    commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
 #    remote = "https://github.com/DraconicEnt/rules_third_party.git",

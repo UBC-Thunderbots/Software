@@ -5,7 +5,7 @@ exports_files(["LICENSE.txt"])
 package(default_visibility = ["//visibility:public"])
 
 load("@nanopb_deps//:requirements.bzl", "requirement")
-load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
+load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
 load(
     "@platformio_rules//platformio:platformio.bzl",
     "platformio_library",
@@ -86,14 +86,14 @@ proto_library(
     name = "nanopb_options_proto",
     srcs = ["generator/nanopb/options.proto"],
     deps = [
-        "@com_google_protobuf//:descriptor_proto",
+        "@protobuf//:descriptor_proto",
     ],
 )
 
 py_proto_library(
     name = "nanopb_options_py_proto",
-    srcs = ["generator/nanopb/options.proto"],
     deps = [
-        "@com_google_protobuf//:protobuf_python",
+        ":nanopb_options_proto",
+        "@protobuf//:protobuf_python",
     ],
 )

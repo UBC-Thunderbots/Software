@@ -1,5 +1,6 @@
-load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
+load("@platformio_rules//platformio:platformio.bzl", "PlatformIOLibraryInfo")
+load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 
 # The relative filename of the header file.
 _FILENAME = "lib/{dirname}/{filename}"
@@ -165,13 +166,19 @@ def _nanopb_proto_library_impl(ctx):
         command = "\n".join(commands),
     )
 
-    return struct(
-        transitive_zip_files = depset([ctx.outputs.zip]),
-        providers = [CcInfo(
+    # Collect the zip files produced by all transitive dependancies.
+    runfiles = ctx.runfiles(files = outputs)
+    return [
+        CcInfo(
             compilation_context = compilation_context,
             linking_context = linking_context,
-        )],
-    )
+        ),
+        PlatformIOLibraryInfo(
+            # Still provide basic PlatformIOLibraryInfo
+            default_runfiles = runfiles,
+            transitive_libdeps = [],
+        ),
+    ]
 
 nanopb_proto_library = rule(
     implementation = _nanopb_proto_library_impl,
@@ -197,7 +204,7 @@ nanopb_proto_library = rule(
         "protoc": attr.label(
             executable = True,
             cfg = "host",
-            default = Label("@com_google_protobuf//:protoc"),
+            default = Label("@protobuf//:protoc"),
         ),
         "_cc_toolchain": attr.label(
             default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),
@@ -205,6 +212,7 @@ nanopb_proto_library = rule(
     },
     provides = [
         CcInfo,
+        PlatformIOLibraryInfo,
     ],
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
     fragments = ["cpp"],

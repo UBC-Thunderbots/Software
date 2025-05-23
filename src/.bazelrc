@@ -46,3 +46,5 @@ common --enable_platform_specific_config
 # build:windows --copt="/std:c++17"
 # common --skip_incompatible_explicit_targets
 # build:macos --cxxopt="--std=c++17"
+common --noincompatible_disallow_empty_glob
+common --incompatible_disallow_struct_provider_syntax=false

@@ -23,6 +23,6 @@ cc_library(
     deps = [
         "//software/logger",
         "@boost//:program_options",
-        "@gtest",
+        "@googletest//:gtest",
     ],
 )

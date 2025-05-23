@@ -1,4 +1,4 @@
-load("@rules_pkg//:providers.bzl", "PackageFilegroupInfo", "PackageFilesInfo", "PackageSymlinkInfo")
+load("@rules_pkg//pkg:providers.bzl", "PackageFilegroupInfo", "PackageFilesInfo", "PackageSymlinkInfo")
 
 # No idea how this works, refer to:
 # https://gist.github.com/pauldraper/7bc811ffbef6d3f3d4a4bb01afa9808f

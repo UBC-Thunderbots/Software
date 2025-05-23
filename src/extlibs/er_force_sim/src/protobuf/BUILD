@@ -1,7 +1,7 @@
-package(default_visibility = ["//visibility:public"])
-
+load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
+
+package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "protobuf_proto_lib",
@@ -11,9 +11,9 @@ proto_library(
     visibility = ["//visibility:private"],
     deps = [
         "//proto:ssl_proto",
-        "@com_google_protobuf//:any_proto",
-        "@com_google_protobuf//:duration_proto",
-        "@com_google_protobuf//:timestamp_proto",
+        "@protobuf//:any_proto",
+        "@protobuf//:duration_proto",
+        "@protobuf//:timestamp_proto",
     ],
 )
 
@@ -22,14 +22,18 @@ cc_proto_library(
     deps = [":protobuf_proto_lib"],
 )
 
-py_proto_library(
-    name = "erforce_py_proto",
+proto_library(
+    name = "erforce_proto",
     srcs = glob([
         "*.proto",
     ]),
+)
+
+py_proto_library(
+    name = "erforce_py_proto",
     deps = [
-        "//proto:software_py_proto",
-        "@com_google_protobuf//:protobuf_python",
+        ":erforce_proto",
+        "//proto:software_proto",
     ],
 )
 
