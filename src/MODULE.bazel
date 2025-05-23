@@ -15,7 +15,9 @@ bazel_dep(name = "rules_foreign_cc", version = "0.14.0")
 bazel_dep(name = "rules_python", version = "1.3.0")
 bazel_dep(name = "protobuf", version = "31.0")
 bazel_dep(name = "abseil-cpp", version = "20250512.0")
-bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
+# For some reason, ARM machines do not download "eigen" from Bazel Central Registry successfully
+# This is because checksum mismatch: https://github.com/bazelbuild/bazel-central-registry/issues/4633
+# bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.5")
 
 #bazel_dep(name = "nanopb", version = "0.4.9.1")
@@ -279,6 +281,14 @@ new_local_repository(
     name = "k8_jetson_nano_cross_compile_gcc",
     build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
+)
+
+new_git_repository(
+   name = "eigen",
+   build_file = "@//extlibs:eigen.BUILD",
+   commit = "d81aa18f4dc56264b2cd7e2f230807d776a2d385",
+   remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen.git",
+   shallow_since = "1694679508 +0000",
 )
 
 ##############################################
