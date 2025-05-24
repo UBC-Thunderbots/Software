@@ -1,5 +1,5 @@
-load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_python//python:proto.bzl", "py_proto_library")
 load("//proto:nanopb.bzl", "nanopb_proto_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -29,7 +29,7 @@ proto_library(
         "world.proto",
     ],
     deps = [
-        "@nanopb//:nanopb_options_proto",
+        "@nanopb//:nanopb_proto",
         "@protobuf//:descriptor_proto",
     ],
 )
@@ -179,8 +179,9 @@ proto_library(
     srcs = [
         "manual_gc_command.proto",
         "play_info_msg.proto",
-        "robot_crash_msg.proto",
+        #        "robot_crash_msg.proto",
         "robot_log_msg.proto",
+        #        "robot_status_msg.proto",
         "sensor_msg.proto",
         "ssl_autoref_ci.proto",
         "ssl_gc_api.proto",
@@ -198,6 +199,12 @@ proto_library(
         "ssl_vision_geometry.proto",
         "ssl_vision_wrapper.proto",
         "ssl_vision_wrapper_tracked.proto",
+        "tbots_timestamp_msg.proto",
+    ],
+    deps = [
+        "@protobuf//:duration_proto",
+        "@protobuf//:timestamp_proto",
+        "@protobuf//:wrappers_proto",
     ],
 )
 

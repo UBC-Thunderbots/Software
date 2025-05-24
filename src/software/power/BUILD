@@ -53,7 +53,7 @@ platformio_library(
         ":geneva",
         ":pins",
         "//proto:tbots_nanopb_proto",
-        "@nanopb//:nanopb_platformio",
+        #        "@nanopb//:nanopb_platformio",
     ],
 )
 
@@ -79,7 +79,7 @@ platformio_project(
         "//proto:tbots_nanopb_proto",
         "//shared:constants_platformio",
         "//shared/uart_framing:uart_framing_platformio",
-        "@nanopb//:nanopb_platformio",
+        #        "@nanopb//:nanopb_platformio",
     ],
 )
 

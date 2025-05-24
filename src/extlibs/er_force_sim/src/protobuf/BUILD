@@ -1,5 +1,5 @@
-load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_python//python:proto.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -27,13 +27,16 @@ proto_library(
     srcs = glob([
         "*.proto",
     ]),
+    deps = [
+        "//proto:software_proto",
+        "@protobuf//:any_proto",
+    ],
 )
 
 py_proto_library(
     name = "erforce_py_proto",
     deps = [
         ":erforce_proto",
-        "//proto:software_proto",
     ],
 )
 

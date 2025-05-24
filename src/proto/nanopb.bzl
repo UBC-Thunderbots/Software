@@ -194,12 +194,12 @@ nanopb_proto_library = rule(
         ),
         "nanopb_libs": attr.label_list(
             providers = [CcInfo],
-            default = [Label("@nanopb//:nanopb_header")],
+            default = [Label("@nanopb//:nanopb")],
         ),
         "nanopb_generator": attr.label(
             executable = True,
             cfg = "host",
-            default = Label("@nanopb//:nanopb_generator"),
+            default = Label("@nanopb//:protoc-gen-nanopb"),
         ),
         "protoc": attr.label(
             executable = True,
@@ -207,7 +207,7 @@ nanopb_proto_library = rule(
             default = Label("@protobuf//:protoc"),
         ),
         "_cc_toolchain": attr.label(
-            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),
+            default = Label("//cc_toolchain:toolchain"),
         ),
     },
     provides = [
