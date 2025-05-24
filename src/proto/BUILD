@@ -5,6 +5,14 @@ load("//proto:nanopb.bzl", "nanopb_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 proto_library(
+    name = "shared_proto_lib",
+    srcs = [
+        "robot_crash_msg.proto",
+        "robot_log_msg.proto",
+    ],
+)
+
+proto_library(
     name = "tbots_proto",
     srcs = [
         "ball.proto",
@@ -17,8 +25,6 @@ proto_library(
         "power_frame_msg.proto",
         "primitive.proto",
         "replay_bookmark.proto",
-        "robot_crash_msg.proto",
-        "robot_log_msg.proto",
         "robot_statistic.proto",
         "robot_status_msg.proto",
         "tactic.proto",
@@ -31,6 +37,7 @@ proto_library(
     deps = [
         "@nanopb//:nanopb_options_proto",
         "@protobuf//:descriptor_proto",
+        "shared_proto_lib",
     ],
 )
 
@@ -179,8 +186,6 @@ proto_library(
     srcs = [
         "manual_gc_command.proto",
         "play_info_msg.proto",
-        "robot_crash_msg.proto",
-        "robot_log_msg.proto",
         "sensor_msg.proto",
         "ssl_autoref_ci.proto",
         "ssl_gc_api.proto",
@@ -199,6 +204,9 @@ proto_library(
         "ssl_vision_wrapper.proto",
         "ssl_vision_wrapper_tracked.proto",
     ],
+    deps = [
+        "shared_proto_lib",
+    ]
 )
 
 py_proto_library(
