@@ -1,3 +1,8 @@
+#alias(
+#    name = "six",
+#    actual = "@six_archive//:six",
+#)
+
 genrule(
     name = "copy_six",
     srcs = ["six-1.10.0/six.py"],
