@@ -20,6 +20,7 @@ typedef struct FilteredRobotData_t
     Angle orientation;
     AngularVelocity angular_velocity;
     Timestamp timestamp;
+    bool breakbeam_tripped;
 } FilteredRobotData;
 
 class RobotFilter
