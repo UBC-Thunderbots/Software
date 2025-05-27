@@ -1,13 +1,13 @@
-package(default_visibility = ["//visibility:public"])
-
-# building the platformio_project will compile the Arduino code, running the platform_io project will flash the PICO
-# more information can be found here: https://github.com/mum4k/platformio_rules/blob/master/docs/platformio_doc.md
-
 load(
     "@platformio_rules//platformio:platformio.bzl",
     "platformio_library",
     "platformio_project",
 )
+
+package(default_visibility = ["//visibility:public"])
+
+# building the platformio_project will compile the Arduino code, running the platform_io project will flash the PICO
+# more information can be found here: https://github.com/mum4k/platformio_rules/blob/master/docs/platformio_doc.md
 
 platformio_library(
     name = "chicker",
@@ -53,7 +53,7 @@ platformio_library(
         ":geneva",
         ":pins",
         "//proto:tbots_nanopb_proto",
-        "@nanopb//:nanopb_platformio",
+        #        "@nanopb//:nanopb_platformio",
     ],
 )
 
@@ -79,7 +79,7 @@ platformio_project(
         "//proto:tbots_nanopb_proto",
         "//shared:constants_platformio",
         "//shared/uart_framing:uart_framing_platformio",
-        "@nanopb//:nanopb_platformio",
+        #        "@nanopb//:nanopb_platformio",
     ],
 )
 
