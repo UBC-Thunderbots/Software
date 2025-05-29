@@ -22,7 +22,7 @@ toolchain(
 )
 
 toolchain(
-    name = "py_cc_toolchain_for_host_x86_64",
+    name = "py_cc_toolchain_host_x86_64",
     exec_compatible_with = [
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
@@ -31,13 +31,27 @@ toolchain(
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
-    toolchain = ":py_cc_toolchain_for_host_x86_64_data",
+    toolchain = ":py_cc_toolchain_host_data",
+    toolchain_type = "@rules_python//python/cc:toolchain_type",
+)
+
+toolchain(
+    name = "py_cc_toolchain_host_aarch64",
+    exec_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+    toolchain = ":py_cc_toolchain_host_data",
     toolchain_type = "@rules_python//python/cc:toolchain_type",
 )
 
 py_cc_toolchain(
-    name = "py_cc_toolchain_for_host_x86_64_data",
-    headers = "@py_cc_toolchain_for_host_x86_64//:headers",
+    name = "py_cc_toolchain_host_data",
+    headers = "@py_cc_toolchain_host//:headers",
     libs = ":empty",
     python_version = "3.12",
 )
