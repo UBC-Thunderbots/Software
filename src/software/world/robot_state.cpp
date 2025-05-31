@@ -11,6 +11,17 @@ RobotState::RobotState(const Point &position, const Vector &velocity,
 {
 }
 
+RobotState::RobotState(const Point &position, const Vector &velocity,
+                       const Angle &orientation, const AngularVelocity &angular_velocity)
+    : position_(position),
+      velocity_(velocity),
+      orientation_(orientation),
+      angular_velocity_(angular_velocity),
+      breakbeam_tripped_(false)
+{
+}
+
+
 RobotState::RobotState(const TbotsProto::RobotState &robot_state_proto)
     : position_(Point(robot_state_proto.global_position().x_meters(),
                       robot_state_proto.global_position().y_meters())),
