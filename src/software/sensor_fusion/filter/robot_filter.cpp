@@ -1,4 +1,5 @@
 #include "software/sensor_fusion/filter/robot_filter.h"
+#include "software/logger/logger.h"
 
 RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state),
@@ -25,7 +26,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
                                     .velocity          = Vector(0, 0),
                                     .orientation       = Angle::fromRadians(0),
                                     .angular_velocity  = AngularVelocity::fromRadians(0),
-                                    .timestamp         = Timestamp().fromSeconds(0)
+                                    .timestamp         = Timestamp().fromSeconds(0),
                                     .breakbeam_tripped = false};
 
     for (const RobotDetection &robot_data : new_robot_data)
@@ -92,6 +93,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
              current_robot_state.timestamp().toSeconds());
 
         // update current_robot_state
+        LOG(INFO)<< filtered_data.breakbeam_tripped;
         this->current_robot_state =
             Robot(this->getRobotId(), filtered_data.position, filtered_data.velocity,
                   filtered_data.orientation, filtered_data.angular_velocity,
