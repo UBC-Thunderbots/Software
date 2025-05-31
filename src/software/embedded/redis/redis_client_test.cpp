@@ -17,7 +17,8 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_test)
     cpp_redis::client client;
     client.connect(
         REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT,
-        [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
+        [](const std::string &host, std::size_t port, cpp_redis::connect_state status)
+        {
             if (status == cpp_redis::connect_state::dropped)
             {
                 std::cout << "client disconnected from " << host << ":" << port
@@ -25,23 +26,25 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_test)
             }
         });
 
-    client.set("A", "1", [](cpp_redis::reply &reply) {
-        std::cout << "Setting A to 1: " << reply << std::endl;
-    });
+    client.set("A", "1", [](cpp_redis::reply &reply)
+               { std::cout << "Setting A to 1: " << reply << std::endl; });
 
-    client.get("A", [](cpp_redis::reply &reply) {
-        std::cout << "Getting A: " << reply << std::endl;
-        ASSERT_EQ(atoi(reply.as_string().c_str()), 1);
-    });
+    client.get("A",
+               [](cpp_redis::reply &reply)
+               {
+                   std::cout << "Getting A: " << reply << std::endl;
+                   ASSERT_EQ(atoi(reply.as_string().c_str()), 1);
+               });
 
-    client.set("A", "2", [](cpp_redis::reply &reply) {
-        std::cout << "Setting A to 2: " << reply << std::endl;
-    });
+    client.set("A", "2", [](cpp_redis::reply &reply)
+               { std::cout << "Setting A to 2: " << reply << std::endl; });
 
-    client.get("A", [](cpp_redis::reply &reply) {
-        std::cout << "Getting A: " << reply << std::endl;
-        ASSERT_EQ(atoi(reply.as_string().c_str()), 2);
-    });
+    client.get("A",
+               [](cpp_redis::reply &reply)
+               {
+                   std::cout << "Getting A: " << reply << std::endl;
+                   ASSERT_EQ(atoi(reply.as_string().c_str()), 2);
+               });
     client.sync_commit();
 }
 
@@ -50,7 +53,8 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_and_set_speed_test)
     cpp_redis::client client;
     client.connect(
         REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT,
-        [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
+        [](const std::string &host, std::size_t port, cpp_redis::connect_state status)
+        {
             if (status == cpp_redis::connect_state::dropped)
             {
                 std::cout << "client disconnected from " << host << ":" << port
@@ -64,15 +68,13 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_and_set_speed_test)
     {
         client.set("A", "1", [](cpp_redis::reply &reply) {});
 
-        client.get("A", [](cpp_redis::reply &reply) {
-            ASSERT_EQ(atoi(reply.as_string().c_str()), 1);
-        });
+        client.get("A", [](cpp_redis::reply &reply)
+                   { ASSERT_EQ(atoi(reply.as_string().c_str()), 1); });
 
         client.set("A", "2", [](cpp_redis::reply &reply) {});
 
-        client.get("A", [](cpp_redis::reply &reply) {
-            ASSERT_EQ(atoi(reply.as_string().c_str()), 2);
-        });
+        client.get("A", [](cpp_redis::reply &reply)
+                   { ASSERT_EQ(atoi(reply.as_string().c_str()), 2); });
     }
     auto end                                      = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
@@ -90,7 +92,8 @@ TEST(RedisImplTests, DISABLED_redis_client_get_and_set_impl_test)
     cpp_redis::client client;
     client.connect(
         REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT,
-        [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
+        [](const std::string &host, std::size_t port, cpp_redis::connect_state status)
+        {
             if (status == cpp_redis::connect_state::dropped)
             {
                 std::cout << "client disconnected from " << host << ":" << port

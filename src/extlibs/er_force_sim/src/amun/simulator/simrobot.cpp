@@ -235,7 +235,8 @@ void SimRobot::begin(SimBall &ball, double time)
         stopDribbling();
     }
 
-    auto sendPartialCoordError = [this](const std::string &msg) {
+    auto sendPartialCoordError = [this](const std::string &msg)
+    {
         std::cerr << "Partial coordinates are not implemented yet" << msg << std::endl;
         if (!m_move.has_by_force() || !m_move.by_force())
         {
@@ -428,7 +429,8 @@ void SimRobot::begin(SimBall &ball, double time)
             power = std::clamp(m_sslCommand.kick_speed(), 0.05f, maxShootSpeed);
         }
 
-        const auto getSpeedCompensation = [&]() -> float {
+        const auto getSpeedCompensation = [&]() -> float
+        {
             if (m_sslCommand.kick_angle() == 0)
             {
                 return 0.0f;

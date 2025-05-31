@@ -1,7 +1,5 @@
 #include "software/simulated_tests/validation/terminating_function_validator.h"
 
-#include <boost/bind.hpp>
-
 TerminatingFunctionValidator::TerminatingFunctionValidator(
     ValidationFunction validation_function,
     std::shared_ptr<World> world)
@@ -10,8 +8,8 @@ TerminatingFunctionValidator::TerminatingFunctionValidator(
        // otherwise the World inside the coroutine will not update properly when the
        // pointer is updated, and the wrong validation_function may be run.
       validation_sequence(
-          boost::bind(&TerminatingFunctionValidator::executeAndCheckForSuccessWrapper,
-                      this, _1, world, validation_function)),
+          std::bind(&TerminatingFunctionValidator::executeAndCheckForSuccessWrapper, this,
+                    std::placeholders::_1, world, validation_function)),
       current_error_message("")
 {
 }

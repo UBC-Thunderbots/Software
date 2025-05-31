@@ -95,13 +95,18 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
 fi
 
 # Clear the download cache
-rm -rf /tmp/tbots_download_cache
+sudo rm -rf /tmp/tbots_download_cache
 mkdir /tmp/tbots_download_cache
 
 if [[ $(lsb_release -rs) == "22.04" ]] || [[ $(lsb_release -rs) == "24.04" ]]; then
     # This is required because a Braille TTY device that Linux provides a driver for conflicts with the ESP32
     wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/tbots_download_cache/85-brltty.rules
     sudo mv /tmp/tbots_download_cache/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
+fi
+
+if [[ $(lsb_release -rs) == "22.04" ]]; then
+    # This is required for clang-format
+    host_software_packages+=(libtinfo5)
 fi
 
 virtualenv_opt_args=""
@@ -180,6 +185,14 @@ print_status_msg "Done Installing Bazel"
 print_status_msg "Install clang-format"
 install_clang_format $arch
 print_status_msg "Done installing clang-format"
+
+print_status_msg "Setting up cross compiler for robot software"
+install_cross_compiler $arch
+print_status_msg "Done setting up cross compiler for robot software"
+
+print_status_msg "Setting Up Python Development Headers"
+install_python_dev_cross_compile_headers $arch
+print_status_msg "Done Setting Up Python Development Headers"
 
 print_status_msg "Setting Up PlatformIO"
 
