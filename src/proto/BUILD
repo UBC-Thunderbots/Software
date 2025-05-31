@@ -226,6 +226,16 @@ proto_library(
     ],
 )
 
+proto_library(
+    name = "estop_state_proto",
+    srcs = ["estop_state.proto"],
+)
+
+py_proto_library(
+    name = "estop_state_py_proto",
+    deps = ["estop_state_proto"],
+)
+
 py_proto_library(
     name = "software_py_proto",
     deps = [
