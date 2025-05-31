@@ -25,7 +25,7 @@ std::ostream& operator<<(std::ostream& os,
 
     google::protobuf::util::JsonPrintOptions options;
     options.add_whitespace                = false;
-    options.always_print_primitive_fields = true;
+    options.always_print_fields_with_no_presence = true;
     options.preserve_proto_field_names    = true;
 
     MessageToJsonString(plotjuggler_value, &json_string, options);
