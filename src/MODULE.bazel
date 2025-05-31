@@ -16,9 +16,7 @@ bazel_dep(name = "rules_python", version = "1.3.0")
 bazel_dep(name = "protobuf", version = "31.1")
 bazel_dep(name = "abseil-cpp", version = "20250512.0")
 
-# For some reason, ARM machines do not download "eigen" from Bazel Central Registry successfully
-# This is because checksum mismatch: https://github.com/bazelbuild/bazel-central-registry/issues/4633
-# bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
+bazel_dep(name = "eigen", version = "3.4.0.bcr.3")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.5")
 bazel_dep(name = "nanopb", version = "0.4.9.1")
 bazel_dep(name = "toolchains_protoc", version = "0.4.1")
@@ -75,13 +73,6 @@ python.toolchain(
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 
-#pip.parse(
-#    hub_name = "nanopb_deps",
-#    python_interpreter = "/opt/tbotspython/bin/python",
-#    python_version = "3.12",
-#    requirements_lock = "//extlibs:nanopb_requirements_lock.txt",
-#)
-#use_repo(pip, "nanopb_deps")
 pip.parse(
     hub_name = "thunderscope_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
@@ -89,6 +80,7 @@ pip.parse(
     requirements_lock = "//software/thunderscope:requirements_lock.txt",
 )
 use_repo(pip, "thunderscope_deps")
+
 pip.parse(
     hub_name = "ansible_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
@@ -96,6 +88,7 @@ pip.parse(
     requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
 )
 use_repo(pip, "ansible_deps")
+
 pip.parse(
     hub_name = "simulated_tests_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
@@ -103,6 +96,7 @@ pip.parse(
     requirements_lock = "//software/simulated_tests:requirements_lock.txt",
 )
 use_repo(pip, "simulated_tests_deps")
+
 pip.parse(
     hub_name = "robot_diagnostics_cli_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
@@ -158,16 +152,6 @@ http_archive(
     strip_prefix = "cpp-base64-2.rc.08",
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
-
-#http_archive(
-#    name = "nanopb",
-#    build_file = "@//extlibs:nanopb.BUILD",
-#    sha256 = "e98dd6403ab8c5b271d32a6bc025e7e596bb181c7bc7e0492c5daa21fc44c940",
-#    strip_prefix = "nanopb-0.3.9.4-linux-x86",
-#    urls = [
-#        "https://github.com/UBC-Thunderbots/Software-External-Dependencies/raw/main/nanopb-0.3.9.4-linux-x86.tar.gz",
-#    ],
-#)
 
 http_archive(
     name = "six_archive",
@@ -289,14 +273,6 @@ new_local_repository(
     name = "k8_jetson_nano_cross_compile_gcc",
     build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
-)
-
-new_git_repository(
-    name = "eigen",
-    build_file = "@//extlibs:eigen.BUILD",
-    commit = "d81aa18f4dc56264b2cd7e2f230807d776a2d385",
-    remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen.git",
-    shallow_since = "1694679508 +0000",
 )
 
 ##############################################
