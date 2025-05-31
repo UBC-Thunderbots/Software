@@ -233,6 +233,20 @@ py_proto_library(
     ],
 )
 
+py_proto_library(
+    name = "visualization_py_proto",
+    deps = [
+        ":visualization_proto",
+    ],
+)
+
+py_proto_library(
+    name = "validation_py_proto",
+    deps = [
+        ":validation_proto",
+    ],
+)
+
 py_library(
     name = "import_all_protos",
     srcs = [
