@@ -5,7 +5,6 @@
 #include "shared/constants.h"
 #include "software/embedded/spi_utils.h"
 #include "software/logger/logger.h"
-#include "stspin_constants.h"
 
 StSpinMotorController::StSpinMotorController()
     : driver_control_enable_gpio_(
@@ -210,16 +209,6 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     //  To receive data for GET operations, it is expected that we send a master frame
     //  with 2 dummy DATA bytes in order to clock out the 2 DATA bytes from the incoming
     //  slave frame.
-    //
-    //  However, we first have to align the frame. We send null bytes until we receive the
-    //  frame aligned bit (0xC2).
-
-    uint8_t align_rx = 0;
-    uint8_t align_tx = 0;
-
-    while (align_rx != StSpinOpcode::FRAME_ALIGN) {
-        spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx_static, fr_alg, FRAME_MAX_LEN, SPI_SPEED_HZ);
-    }
 
     uint8_t tx[FRAME_MAX_LEN] = {0};
     uint8_t rx[FRAME_MAX_LEN] = {0};
@@ -239,13 +228,6 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
 
 void StSpinMotorController::sendFrame(const MotorIndex& motor, const StSpinOpcode opcode)
 {
-    uint8_t align_rx = 0;
-    uint8_t align_tx = 0;
-
-    while (align_rx != StSpinOpcode::FRAME_ALIGN) {
-        spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx_static, fr_alg, FRAME_MAX_LEN, SPI_SPEED_HZ);
-    }
-
     uint8_t tx[FRAME_MIN_LEN] = {0};
     uint8_t rx[FRAME_MIN_LEN] = {0};
 

@@ -19,7 +19,6 @@ enum class StSpinOpcode
     GET_CURRENT   = 0b00100001,
     ACK           = 0b11000000,
     NACK          = 0b11000001,
-    FRAME_ALIGN   = 0b11000010,
     SPI_ERROR     = 0b11100000
 };
 
