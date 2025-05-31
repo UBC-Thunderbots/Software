@@ -31,10 +31,10 @@
 
 namespace camun
 {
-    namespace simulator
-    {
-        class SimBall;
-    }  // namespace simulator
+namespace simulator
+{
+class SimBall;
+}  // namespace simulator
 }  // namespace camun
 
 class camun::simulator::SimBall

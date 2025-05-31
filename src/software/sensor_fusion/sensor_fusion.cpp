@@ -124,7 +124,9 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
     if (sensor_fusion_config.friendly_color_yellow())
     {
-        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
+        if (!ssl_referee::deprecated_commands.contains(packet.command()))
+            game_state.updateRefereeCommand(
+                ssl_referee::createRefereeCommand(packet, TeamColour::YELLOW));
         friendly_goalie_id = packet.yellow().goalkeeper();
         enemy_goalie_id    = packet.blue().goalkeeper();
         if (packet.has_blue_team_on_positive_half())
@@ -134,7 +136,9 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     }
     else
     {
-        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
+        if (!ssl_referee::deprecated_commands.contains(packet.command()))
+            game_state.updateRefereeCommand(
+                ssl_referee::createRefereeCommand(packet, TeamColour::BLUE));
         friendly_goalie_id = packet.blue().goalkeeper();
         enemy_goalie_id    = packet.yellow().goalkeeper();
         if (packet.has_blue_team_on_positive_half())
@@ -159,7 +163,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         }
     }
 
-    referee_stage = createRefereeStage(packet);
+    referee_stage = ssl_referee::createRefereeStage(packet);
 }
 
 void SensorFusion::updateWorld(
@@ -433,7 +437,7 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
 
 std::optional<Point> SensorFusion::getBallPlacementPoint(const SSLProto::Referee &packet)
 {
-    std::optional<Point> point_opt = ::getBallPlacementPoint(packet);
+    std::optional<Point> point_opt = ssl_referee::getBallPlacementPoint(packet);
 
     if (!point_opt)
     {

@@ -101,7 +101,7 @@ class GLValidationLayer(GLLayer):
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         # Consume the validation set buffer
-        for _ in range(self.validation_set_buffer.queue.qsize()):
+        for _ in range(self.validation_set_buffer.size()):
             self.validation_set = self.validation_set_buffer.get()
 
             if self.validation_set.validation_type == ValidationType.ALWAYS:

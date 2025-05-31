@@ -118,35 +118,35 @@ void convertFromSSlGeometry(const SSLProto::SSL_GeometryFieldSize &g,
 
 namespace proto_geom_internal
 {
-    static void fieldAddLine(SSLProto::SSL_GeometryFieldSize *field, std::string name,
-                             float x1, float y1, float x2, float y2,
-                             const world::Geometry &geometry)
-    {
-        SSLProto::SSL_FieldLineSegment *line = field->add_field_lines();
-        line->set_name(std::move(name));
-        SSLProto::Vector2f *p1 = line->mutable_p1();
-        p1->set_x(x1);
-        p1->set_y(y1);
-        SSLProto::Vector2f *p2 = line->mutable_p2();
-        p2->set_x(x2);
-        p2->set_y(y2);
-        line->set_thickness(geometry.line_width() * 1000.0f);
-    }
+static void fieldAddLine(SSLProto::SSL_GeometryFieldSize *field, std::string name,
+                         float x1, float y1, float x2, float y2,
+                         const world::Geometry &geometry)
+{
+    SSLProto::SSL_FieldLineSegment *line = field->add_field_lines();
+    line->set_name(std::move(name));
+    SSLProto::Vector2f *p1 = line->mutable_p1();
+    p1->set_x(x1);
+    p1->set_y(y1);
+    SSLProto::Vector2f *p2 = line->mutable_p2();
+    p2->set_x(x2);
+    p2->set_y(y2);
+    line->set_thickness(geometry.line_width() * 1000.0f);
+}
 
-    static void fieldAddCircularArc(SSLProto::SSL_GeometryFieldSize *field,
-                                    std::string name, float x, float y, float radius,
-                                    float a1, float a2, const world::Geometry &geometry)
-    {
-        SSLProto::SSL_FieldCircularArc *arc = field->add_field_arcs();
-        arc->set_name(name);
-        SSLProto::Vector2f *center = arc->mutable_center();
-        center->set_x(x);
-        center->set_y(y);
-        arc->set_radius(radius);
-        arc->set_a1(a1);
-        arc->set_a2(a2);
-        arc->set_thickness(geometry.line_width() * 1000.0f);
-    }
+static void fieldAddCircularArc(SSLProto::SSL_GeometryFieldSize *field, std::string name,
+                                float x, float y, float radius, float a1, float a2,
+                                const world::Geometry &geometry)
+{
+    SSLProto::SSL_FieldCircularArc *arc = field->add_field_arcs();
+    arc->set_name(name);
+    SSLProto::Vector2f *center = arc->mutable_center();
+    center->set_x(x);
+    center->set_y(y);
+    arc->set_radius(radius);
+    arc->set_a1(a1);
+    arc->set_a2(a2);
+    arc->set_thickness(geometry.line_width() * 1000.0f);
+}
 }  // namespace proto_geom_internal
 
 using namespace proto_geom_internal;

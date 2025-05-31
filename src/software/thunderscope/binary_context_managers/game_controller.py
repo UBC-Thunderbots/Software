@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import queue
 import random
 import logging
 import os
@@ -17,8 +18,12 @@ from software.python_bindings import *
 from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.common.thread_safe_circular_buffer import (
+    ThreadSafeCircularBuffer,
+)
 
 logger = logging.getLogger(__name__)
+import itertools
 
 
 class Gamecontroller:
@@ -29,7 +34,9 @@ class Gamecontroller:
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(
-        self, suppress_logs: bool = False, use_conventional_port: bool = False
+        self,
+        suppress_logs: bool = False,
+        use_conventional_port: bool = False,
     ) -> None:
         """Run Gamecontroller
 
@@ -53,6 +60,14 @@ class Gamecontroller:
         self.command_override_buffer = ThreadSafeBuffer(
             buffer_size=2, protobuf_type=ManualGCCommand
         )
+
+        self.simulator_proto_unix_io = None
+        self.blue_team_world_buffer = ThreadSafeCircularBuffer(
+            buffer_size=1, protobuf_type=World
+        )
+        self.latest_world = None
+        self.blue_removed_robot_ids = queue.Queue()
+        self.yellow_removed_robot_ids = queue.Queue()
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -95,7 +110,6 @@ class Gamecontroller:
         """
         self.gamecontroller_proc.terminate()
         self.gamecontroller_proc.wait()
-
         self.ci_socket.close()
 
     def refresh(self):
@@ -118,6 +132,104 @@ class Gamecontroller:
                 ),
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
+
+    @staticmethod
+    def __update_robot_count(
+        robot_states,
+        team: Team,
+        max_robots: int,
+        removed_robot_ids: queue.Queue[int],
+        field_edge_y_meters: float,
+    ) -> None:
+        """Static method for updating the number of robots in the world state (i.e. robot_states) for a given Team.
+        This method is team & side agnostic.
+
+        :param robot_states: WorldState <Robot ID, RobotState> map protobuf to be updated.
+        :param team: the Team of robots currently in play
+        :param max_robots: The number of robots we should have on the field. Must be >= 0
+        :param removed_robot_ids: The robots (IDs) which have been removed already and can safely be re-added
+        :param field_edge_y_meters: Places new robots at this y position along the centerline
+        :return:
+        """
+        # build the robot state for placing robots at the edge of field
+        place_state = RobotState(
+            global_position=Point(x_meters=0, y_meters=field_edge_y_meters)
+        )
+        # Remove robots, as we have too many. Set robot velocities to zero to avoid any drift
+        for count, robot in enumerate(team.team_robots, start=1):
+            if count <= max_robots:
+                robot_states[robot.id].CopyFrom(robot.current_state)
+                velocity = robot_states[robot.id].global_velocity
+                velocity.x_component_meters = 0
+                velocity.y_component_meters = 0
+            else:
+                removed_robot_ids.put(robot.id)
+        # Add robots, since we are missing some
+        robots_diff: int = max_robots - len(team.team_robots)
+        if robots_diff <= 0:
+            return
+        for _ in range(robots_diff):
+            try:
+                robot_states[removed_robot_ids.get_nowait()].CopyFrom(place_state)
+            except queue.Empty:
+                return
+
+    def handle_referee(self, referee: Referee) -> None:
+        """Updates the world state based on the referee message
+        :param referee: the referee protobuf message
+        """
+        # Check that we are running with the simulator and have access to its
+        # proto unix io
+        if self.simulator_proto_unix_io is None:
+            return
+
+        # Convert the latest blue world into a WorldState we can send to the simulator and update the robots
+        self.latest_world = self.blue_team_world_buffer.get(
+            block=False, return_cached=True
+        )
+
+        max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
+        max_allowed_bots_blue: int = referee.blue.max_allowed_bots
+        # Ignore if nothing needs to be updated
+        if (
+            len(self.latest_world.friendly_team.team_robots) == max_allowed_bots_blue
+            and len(self.latest_world.enemy_team.team_robots) == max_allowed_bots_yellow
+        ):
+            return
+
+        # Populate a blank WorldState with new updated robot information
+        world_state = WorldState()
+        field_edge_y_meters: Final[int] = (
+            self.latest_world.field.field_y_length
+            - self.latest_world.field.boundary_buffer_size
+        )
+
+        self.__update_robot_count(
+            world_state.blue_robots,
+            self.latest_world.friendly_team,
+            max_allowed_bots_blue,
+            self.blue_removed_robot_ids,
+            field_edge_y_meters,
+        )
+        self.__update_robot_count(
+            world_state.yellow_robots,
+            self.latest_world.enemy_team,
+            max_allowed_bots_yellow,
+            self.yellow_removed_robot_ids,
+            -field_edge_y_meters,
+        )
+
+        # Check if we need to invert the world state
+        if referee.blue_team_on_positive_half:
+            for robot in itertools.chain(
+                world_state.blue_robots, world_state.yellow_robots
+            ):
+                robot.current_state.global_position.x_meters *= -1
+                robot.current_state.global_position.y_meters *= -1
+                robot.current_state.global_orientation.radians += math.pi
+
+        # Send out updated world state
+        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
     def is_valid_port(self, port):
         """Determine whether or not a given port is valid
@@ -154,12 +266,14 @@ class Gamecontroller:
         blue_full_system_proto_unix_io: ProtoUnixIO,
         yellow_full_system_proto_unix_io: ProtoUnixIO,
         autoref_proto_unix_io: ProtoUnixIO = None,
+        simulator_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
         """Setup gamecontroller io
 
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
         :param autoref_proto_unix_io: The proto unix io for the autoref
+        :param simulator_proto_unix_io: The socket for the Gamecontroller to interact with the simulator
         """
 
         def __send_referee_command(data: Referee) -> None:
@@ -168,6 +282,7 @@ class Gamecontroller:
 
             :param data: The referee command to send
             """
+            self.handle_referee(data)
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
             if autoref_proto_unix_io is not None:
@@ -187,6 +302,10 @@ class Gamecontroller:
         yellow_full_system_proto_unix_io.register_observer(
             ManualGCCommand, self.command_override_buffer
         )
+        blue_full_system_proto_unix_io.register_observer(
+            World, self.blue_team_world_buffer
+        )
+        self.simulator_proto_unix_io = simulator_proto_unix_io
 
     def send_gc_command(
         self,
