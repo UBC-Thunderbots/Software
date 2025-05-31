@@ -1,6 +1,8 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@platformio_rules//platformio:platformio.bzl", "PlatformIOLibraryInfo")
-load("@rules_proto//proto:defs.bzl", "ProtoInfo")
+
+#load("@rules_proto//proto:defs.bzl", "ProtoInfo")
+load("@protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
 
 # The relative filename of the header file.
 _FILENAME = "lib/{dirname}/{filename}"

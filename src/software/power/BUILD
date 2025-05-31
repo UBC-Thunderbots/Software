@@ -13,14 +13,14 @@ platformio_library(
     name = "chicker",
     src = "chicker.cpp",
     hdr = "chicker.h",
-    deps = [":pins"],
+    lib_deps = [":pins"],
 )
 
 platformio_library(
     name = "geneva",
     src = "geneva.cpp",
     hdr = "geneva.h",
-    deps = [
+    lib_deps = [
         ":pins",
         "//proto:tbots_nanopb_proto",
     ],
@@ -30,14 +30,14 @@ platformio_library(
     name = "charger",
     src = "charger.cpp",
     hdr = "charger.h",
-    deps = [":pins"],
+    lib_deps = [":pins"],
 )
 
 platformio_library(
     name = "power_monitor",
     src = "power_monitor.cpp",
     hdr = "power_monitor.h",
-    deps = [
+    lib_deps = [
         ":pins",
         "@LTC4151//:LTC4151_platformio",
     ],
@@ -47,7 +47,7 @@ platformio_library(
     name = "control_executor",
     src = "control_executor.cpp",
     hdr = "control_executor.h",
-    deps = [
+    lib_deps = [
         ":charger",
         ":chicker",
         ":geneva",
@@ -68,6 +68,9 @@ platformio_project(
     board = "pico32",
     build_flags = ["-DPB_FIELD_16BIT=1"],  #Makes platformio use 16 bit numbers for size
     framework = "arduino",
+    lib_deps = [
+        "//proto:tbots_nanopb_proto",
+    ],
     platform = "espressif32",
     deps = [
         ":charger",
@@ -76,7 +79,6 @@ platformio_project(
         ":geneva",
         ":pins",
         ":power_monitor",
-        "//proto:tbots_nanopb_proto",
         "//shared:constants_platformio",
         "//shared/uart_framing:uart_framing_platformio",
         #        "@nanopb//:nanopb_platformio",

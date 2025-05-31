@@ -1,34 +1,54 @@
-load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@rules_python//python:proto.bzl", "py_proto_library")
-load("//proto:nanopb.bzl", "nanopb_proto_library")
+load("@nanopb//extra/bazel:nanopb_cc_proto_library.bzl", "cc_nanopb_proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+#load("//proto:nanopb.bzl", "nanopb_proto_library")
+
+load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
+
+proto_library(
+    name = "geneva_proto",
+    srcs = [
+        "geneva_slot.proto",
+    ],
+)
+
+proto_library(
+    name = "robot_proto",
+    srcs = [
+        "geometry.proto",
+        "robot_crash_msg.proto",
+        "robot_log_msg.proto",
+        "robot_status_msg.proto",
+        "tbots_timestamp_msg.proto",
+    ],
+    deps = [
+        "geneva_proto",
+        "@nanopb//:nanopb_proto",
+    ],
+)
 
 proto_library(
     name = "tbots_proto",
     srcs = [
         "ball.proto",
         "game_state.proto",
-        "geneva_slot.proto",
-        "geometry.proto",
         "ip_notification.proto",
         "parameters.proto",
         "play.proto",
         "power_frame_msg.proto",
         "primitive.proto",
         "replay_bookmark.proto",
-        "robot_crash_msg.proto",
-        "robot_log_msg.proto",
         "robot_statistic.proto",
-        "robot_status_msg.proto",
         "tactic.proto",
         "tbots_software_msgs.proto",
-        "tbots_timestamp_msg.proto",
         "team.proto",
         "vision.proto",
         "world.proto",
     ],
     deps = [
+        "geneva_proto",
+        "robot_proto",
         "@nanopb//:nanopb_proto",
         "@protobuf//:descriptor_proto",
     ],
@@ -39,9 +59,9 @@ cc_proto_library(
     deps = [":tbots_proto"],
 )
 
-nanopb_proto_library(
+cc_nanopb_proto_library(
     name = "tbots_nanopb_proto",
-    deps = [":tbots_proto"],
+    protos = [":tbots_proto"],
 )
 
 py_proto_library(
@@ -115,6 +135,7 @@ proto_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
+        "robot_proto",
         ":ssl_proto",
         ":tbots_proto",
     ],
@@ -179,9 +200,6 @@ proto_library(
     srcs = [
         "manual_gc_command.proto",
         "play_info_msg.proto",
-        #        "robot_crash_msg.proto",
-        "robot_log_msg.proto",
-        #        "robot_status_msg.proto",
         "sensor_msg.proto",
         "ssl_autoref_ci.proto",
         "ssl_gc_api.proto",
@@ -199,9 +217,9 @@ proto_library(
         "ssl_vision_geometry.proto",
         "ssl_vision_wrapper.proto",
         "ssl_vision_wrapper_tracked.proto",
-        "tbots_timestamp_msg.proto",
     ],
     deps = [
+        ":tbots_proto",
         "@protobuf//:duration_proto",
         "@protobuf//:timestamp_proto",
         "@protobuf//:wrappers_proto",
@@ -212,7 +230,6 @@ py_proto_library(
     name = "software_py_proto",
     deps = [
         ":software_proto",
-        ":tbots_proto",
     ],
 )
 
