@@ -24,7 +24,7 @@ bool DefenderFSMBase::ballNearbyWithoutThreat(
         world_ptr->enemyTeam().getNearestRobot(robot_position);
 
     if (nearest_friendly_to_ball.has_value() &&
-             robot.id() != nearest_friendly_to_ball.value().id())
+        robot.id() != nearest_friendly_to_ball.value().id())
     {
         // Do nothing if this robot is not the closest to the ball. Resolves issue of
         // multiple simultaneous steals

@@ -14,7 +14,8 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
         event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
 
-    auto defender_assignment_config = ai_config.defense_play_config().defender_assignment_config();
+    auto defender_assignment_config =
+        ai_config.defense_play_config().defender_assignment_config();
     auto assignments = getAllDefenderAssignments(
         enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
         defender_assignment_config);
@@ -24,7 +25,8 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         return;
     }
 
-    unsigned int max_num_crease_defenders = defender_assignment_config.max_num_crease_defenders();
+    unsigned int max_num_crease_defenders =
+        defender_assignment_config.max_num_crease_defenders();
 
     // Choose which defender assignments to assign defenders to based on number
     // of tactics available to set
