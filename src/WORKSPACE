@@ -31,7 +31,8 @@ register_toolchains("//py_toolchain:py_toolchain")
 
 register_toolchains(
     "//py_toolchain:k8_jetson_nano_cross_compile_py_cc_toolchain",
-    "//py_toolchain:py_cc_toolchain_for_host_x86_64",
+    "//py_toolchain:py_cc_toolchain_host_x86_64",
+    "//py_toolchain:py_cc_toolchain_host_aarch64",
 )
 
 load("@rules_python//python:pip.bzl", "pip_parse")
@@ -417,7 +418,7 @@ register_toolchains(
 )
 
 new_local_repository(
-    name = "py_cc_toolchain_for_host_x86_64",
+    name = "py_cc_toolchain_host",
     build_file = "@//extlibs:py_cc_toolchain.BUILD",
     path = "/usr/include/python3.12/",
 )
