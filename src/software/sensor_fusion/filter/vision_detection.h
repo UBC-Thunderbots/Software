@@ -17,7 +17,6 @@ struct RobotDetection
     Angle orientation;
     double confidence;
     Timestamp timestamp;
-    bool breakbeam_tripped;
 
     bool operator<(const RobotDetection &r) const
     {

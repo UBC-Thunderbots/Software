@@ -124,8 +124,7 @@ class SensorFusion
      * @param Detection to invert
      *
      *@return inverted Detection
-     */
-    RobotDetection invert(RobotDetection robot_detection) const;
+     */ RobotDetection invert(RobotDetection robot_detection) const;
     BallDetection invert(BallDetection ball_detection) const;
 
     /**

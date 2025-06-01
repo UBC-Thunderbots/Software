@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
 
+#include "software/logger/logger.h"
+
 void AttackerFSM::pivotKick(const Update& event,
                             boost::sml::back::process<PivotKickFSM::Update> processEvent)
 {
@@ -47,6 +49,7 @@ void AttackerFSM::keepAway(const Update& event,
     KeepAwayFSM::ControlParams control_params{.best_pass_so_far =
                                                   event.control_params.best_pass_so_far};
 
+    
     processEvent(KeepAwayFSM::Update(control_params, event.common));
 }
 

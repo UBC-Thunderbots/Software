@@ -17,7 +17,8 @@ RobotFilter::RobotFilter(RobotDetection current_robot_state,
 }
 
 std::optional<Robot> RobotFilter::getFilteredData(
-    const std::vector<RobotDetection> &new_robot_data)
+    const std::vector<RobotDetection> &new_robot_data,
+    const std::optional<RobotId> breakbeam_tripped_id)
 {
     int data_num               = 0;
     Timestamp latest_timestamp = Timestamp().fromSeconds(0);
@@ -26,8 +27,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
                                     .velocity          = Vector(0, 0),
                                     .orientation       = Angle::fromRadians(0),
                                     .angular_velocity  = AngularVelocity::fromRadians(0),
-                                    .timestamp         = Timestamp().fromSeconds(0),
-                                    .breakbeam_tripped = false};
+                                    .timestamp         = Timestamp().fromSeconds(0)};
 
     for (const RobotDetection &robot_data : new_robot_data)
     {
@@ -40,8 +40,6 @@ std::optional<Robot> RobotFilter::getFilteredData(
             filtered_data.orientation =
                 filtered_data.orientation + robot_data.orientation;
         
-            filtered_data.breakbeam_tripped = robot_data.breakbeam_tripped;
-
             filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
                 filtered_data.timestamp.toMilliseconds() +
                 robot_data.timestamp.toMilliseconds());
@@ -93,11 +91,10 @@ std::optional<Robot> RobotFilter::getFilteredData(
              current_robot_state.timestamp().toSeconds());
 
         // update current_robot_state
-        LOG(INFO)<< filtered_data.breakbeam_tripped;
         this->current_robot_state =
             Robot(this->getRobotId(), filtered_data.position, filtered_data.velocity,
                   filtered_data.orientation, filtered_data.angular_velocity,
-                  filtered_data.timestamp, filtered_data.breakbeam_tripped);
+                  filtered_data.timestamp, this->getRobotId()==breakbeam_tripped_id);
 
         return std::make_optional(this->current_robot_state);
     }
