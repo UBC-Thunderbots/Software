@@ -4,7 +4,9 @@ module(
     repo_name = "Thunderbots",
 )
 
-new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
+##############################################################
+# Import Dependencies available in the Bazel Central Registry
+##############################################################
 
 bazel_dep(name = "googletest", version = "1.15.2")
 bazel_dep(name = "platforms", version = "0.0.11")
@@ -23,7 +25,7 @@ bazel_dep(name = "yaml-cpp", version = "0.8.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
 bazel_dep(name = "pybind11_protobuf", version = "0.0.0-20250210-f02a2b7")
 
-# Setup pybind11
+# Configure pybind11 since it is special!
 pybind11_configure = use_extension("@pybind11_bazel//:internal_configure.bzl", "internal_configure_extension")
 use_repo(pybind11_configure, "pybind11")
 
@@ -43,20 +45,8 @@ register_toolchains(
     "//cc_toolchain:cc_toolchain_for_aarch64",
 )
 
-new_local_repository(
-    name = "py_cc_toolchain_for_host_x86_64",
-    build_file = "@//extlibs:py_cc_toolchain.BUILD",
-    path = "/usr/include/python3.12/",
-)
-
-new_local_repository(
-    name = "py_cc_toolchain_for_k8_jetson_nano_cross_compile",
-    build_file = "@//extlibs:py_cc_toolchain.BUILD",
-    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
-)
-
 ##############################################
-# Load PIP packages
+# Load PIP packages and our Requirements
 ##############################################
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
@@ -102,10 +92,7 @@ use_repo(pip, "robot_diagnostics_cli_deps")
 # across your system. This is a special feature of http_archive and archive_override
 # According to the new Bzlmod specifications, we should always prefer archive_override
 # over http_archive as they are literally the same under the hood
-# Lastly, NEVER use
 ###########################################################################
-all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
-
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # Dep for cpp_redis
@@ -116,6 +103,7 @@ http_archive(
     url = "https://github.com/cylix/tacopie/archive/master.zip",
 )
 
+# Used for on-robot value storage - deprecation soon
 http_archive(
     name = "cpp_redis",
     sha256 = "12a6fc86ba4ca3d4537a3eee82c094f385b8e03e283c664c976f16d421f17f7d",
@@ -124,6 +112,14 @@ http_archive(
         "https://github.com/cpp-redis/cpp_redis/archive/fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa.zip",
     ],
 )
+
+# Required to use `py_proto_library` from protobuf. Uncomment this is failing
+#http_archive(
+#    name = "six_archive",
+#    build_file = "//extlibs:six.BUILD",
+#    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
+#    url = "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55",
+#)
 
 http_archive(
     name = "g3log",
@@ -147,13 +143,6 @@ http_archive(
     sha256 = "5e5366919938b834ca95fec4c2a80ad0c002872175d43226c933d25e40572883",
     strip_prefix = "cpp-base64-2.rc.08",
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
-)
-
-http_archive(
-    name = "six_archive",
-    build_file = "//extlibs:six.BUILD",
-    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
-    url = "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55",
 )
 
 bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
@@ -245,6 +234,8 @@ new_git_repository(
 ##############################################
 # New local repos for our toolchains/compilers
 ##############################################
+new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
+
 new_local_repository(
     name = "linux_k8_gcc",
     build_file = "@//extlibs:linux_k8_gcc.BUILD",
@@ -268,6 +259,18 @@ new_local_repository(
     name = "k8_jetson_nano_cross_compile_gcc",
     build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_for_host_x86_64",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/usr/include/python3.12/",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_for_k8_jetson_nano_cross_compile",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
 )
 
 ##############################################
