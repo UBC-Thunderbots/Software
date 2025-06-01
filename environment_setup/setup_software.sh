@@ -45,6 +45,7 @@ fi
 # (sorted alphabetically)
 host_software_packages=(
     cmake # Needed to build some of our dependencies
+    clang-format-14 # Used to format C++ code
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
