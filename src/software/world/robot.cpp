@@ -91,6 +91,11 @@ Angle Robot::orientation() const
     return current_state_.orientation();
 }
 
+bool Robot::breakbeamTripped() const
+{
+    return current_state_.breakbeamTripped();
+}
+
 AngularVelocity Robot::angularVelocity() const
 {
     return current_state_.angularVelocity();

@@ -91,10 +91,16 @@ std::optional<Robot> RobotFilter::getFilteredData(
              current_robot_state.timestamp().toSeconds());
 
         // update current_robot_state
+        bool breakbeam_tripped=false;
+        
+        if(breakbeam_tripped_id.has_value()){
+            breakbeam_tripped=breakbeam_tripped_id.value()==this->getRobotId();
+        }
+
         this->current_robot_state =
             Robot(this->getRobotId(), filtered_data.position, filtered_data.velocity,
                   filtered_data.orientation, filtered_data.angular_velocity,
-                  filtered_data.timestamp, this->getRobotId()==breakbeam_tripped_id);
+                  filtered_data.timestamp, breakbeam_tripped);
 
         return std::make_optional(this->current_robot_state);
     }

@@ -115,6 +115,13 @@ class Robot
      */
     Angle orientation() const;
 
+    /*
+    *
+    *
+    *
+    */
+    bool breakbeamTripped() const;
+
     /**
      * Returns the current angular velocity of the robot
      *
