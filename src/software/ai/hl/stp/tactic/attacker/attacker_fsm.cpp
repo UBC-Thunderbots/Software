@@ -49,7 +49,7 @@ void AttackerFSM::keepAway(const Update& event,
     KeepAwayFSM::ControlParams control_params{.best_pass_so_far =
                                                   event.control_params.best_pass_so_far};
 
-    
+    //LOG(INFO)<< event.common.robot.breakbeamTripped() <<event.common.robot.position()<< event.common.robot.id();
     processEvent(KeepAwayFSM::Update(control_params, event.common));
 }
 

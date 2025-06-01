@@ -29,7 +29,7 @@ Team RobotTeamFilter::getFilteredData(
     std::vector<Robot> new_filtered_robot_data;
     for (auto it = robot_filters.begin(); it != robot_filters.end(); it++)
     {
-        auto data = it->second.getFilteredData(new_robot_detections);
+        auto data = it->second.getFilteredData(new_robot_detections, breakbeam_tripped_id);
         if (data)
         {
             new_filtered_robot_data.emplace_back(*data);
