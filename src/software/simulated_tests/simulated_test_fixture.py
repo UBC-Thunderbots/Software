@@ -472,7 +472,14 @@ def pytest_main(file):
 
     :param file: The test file to run
     """
-    args = load_command_line_arguments()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--test_filter",
+        action="store",
+        default="",
+    )
+    args, _ = parser.parse_known_args()
+
     # Run the test, -s disables all capturing at -vv increases verbosity
     # -W ignore::DeprecationWarning ignores deprecation warnings that spam the output
     sys.exit(
