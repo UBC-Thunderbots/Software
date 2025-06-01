@@ -1,5 +1,4 @@
 #include "software/sensor_fusion/filter/robot_filter.h"
-#include "software/logger/logger.h"
 
 RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state),
@@ -90,13 +89,14 @@ std::optional<Robot> RobotFilter::getFilteredData(
             (filtered_data.timestamp.toSeconds() -
              current_robot_state.timestamp().toSeconds());
 
-        // update current_robot_state
+        //find breakbeam_status
         bool breakbeam_tripped=false;
-        
+
         if(breakbeam_tripped_id.has_value()){
             breakbeam_tripped=breakbeam_tripped_id.value()==this->getRobotId();
         }
 
+        // update current_robot_state
         this->current_robot_state =
             Robot(this->getRobotId(), filtered_data.position, filtered_data.velocity,
                   filtered_data.orientation, filtered_data.angular_velocity,
