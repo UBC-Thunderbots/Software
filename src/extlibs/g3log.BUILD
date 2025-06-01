@@ -11,7 +11,8 @@ genrule(
     outs = ["include/g3log/generated_definitions.hpp"],
     cmd = "\n".join([
         # Run cmake, silencing both stdout (">") and stderr ("2>")
-        "cmake external/+_repo_rules2+g3log",
+        "ls -a external",
+        "cmake external/+_repo_rules+g3log",
         # Copy the generated header to the location bazel expects it
         "mv include/g3log/generated_definitions.hpp $@",
     ]),
