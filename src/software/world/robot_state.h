@@ -31,22 +31,8 @@ class RobotState
     explicit RobotState(const Point &position, const Vector &velocity,
                         const Angle &orientation,
                         const AngularVelocity &angular_velocity,
-                        const bool breakbeam_tripped);
+                        const bool breakbeam_tripped=false);
     
-                        /**
-     * Creates a new robot state with the given position, velocity, orientation, angular
-     * velocity, and timestamp
-     *
-     * @param position The position of the robot, with coordinates in metres
-     * @param velocity The velocity of the robot, in metres per second
-     * @param orientation The orientation of the robot
-     * @param angular_velocity The angular velocity of the robot
-     * @param breakbeam_tripped The breakbeam status of the robot
-     */
-    explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation,
-                        const AngularVelocity &angular_velocity);
-
     /**
      * Creates a new robot state based on the TbotsProto::RobotState protobuf
      * representation

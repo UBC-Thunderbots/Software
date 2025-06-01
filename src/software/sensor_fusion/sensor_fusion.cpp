@@ -259,7 +259,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         }
     }
 
-
     if (friendly_team_is_yellow)
     {
         friendly_team = createFriendlyTeam(yellow_team);
@@ -359,20 +358,9 @@ std::optional<Ball> SensorFusion::createBall(
 
 Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
 {
-
-    //insert breakbeam status
-    if(friendly_robot_id_with_ball_in_dribbler.value()){
-        for (auto &detection : robot_detections)
-        {
-            if(friendly_robot_id_with_ball_in_dribbler==detection.id){
-                detection.breakbeam_tripped=true;
-            }else{
-                detection.breakbeam_tripped=false;
-            }
-        }   
-    }
     Team new_friendly_team =
-        friendly_team_filter.getFilteredData(friendly_team, robot_detections);
+        friendly_team_filter.getFilteredData(friendly_team, robot_detections,
+        friendly_robot_id_with_ball_in_dribbler);
     return new_friendly_team;
 }
 
@@ -440,7 +428,8 @@ void SensorFusion::updateDribbleDisplacement()
 
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
-    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
+    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections,
+        friendly_robot_id_with_ball_in_dribbler);
     return new_enemy_team;
 }
 

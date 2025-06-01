@@ -139,8 +139,7 @@ std::vector<RobotDetection> createTeamDetection(
                                      ssl_robot_detection.y() * METERS_PER_MILLIMETER),
                 .orientation = Angle::fromRadians(ssl_robot_detection.orientation()),
                 .confidence  = ssl_robot_detection.confidence(),
-                .timestamp   = Timestamp::fromSeconds(detection.t_capture()),
-                .breakbeam_tripped = false};
+                .timestamp   = Timestamp::fromSeconds(detection.t_capture())};
 
             bool ignore_robot = ignore_invalid_camera_data &&
                                 (min_valid_x > robot_detection.position.x() ||

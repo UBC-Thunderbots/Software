@@ -32,28 +32,7 @@ class Robot
     explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
                    const Timestamp &timestamp,
-                   const bool breakbeam_tripped,
-                   const std::set<RobotCapability> &unavailable_capabilities =
-                       std::set<RobotCapability>(),
-                   const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
-
-    /**
-     * Creates a new robot given robot data
-     *
-     * @param id The id of the robot to create
-     * @param position the new position of the robot. Coordinates are in metres.
-     * @param velocity the new velocity of the robot, in metres / second.
-     * @param orientation the new orientation of the robot, in Radians.
-     * @param angular_velocity the new angular velocity of the robot, in Radians
-     * per second
-     * @param timestamp The timestamp at which the robot was observed to be in the given
-     * state
-     * @param unavailable_capabilities The set of unavailable capabilities for this robot
-     * @param robot_constants The robot constants for this robot
-     */
-    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
-                   const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp,
+                   bool breakbeam_tripped=false,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>(),
                    const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
