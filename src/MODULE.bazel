@@ -30,12 +30,6 @@ bazel_dep(name = "pybind11_protobuf", version = "0.0.0-20250210-f02a2b7")
 pybind11_configure = use_extension("@pybind11_bazel//:internal_configure.bzl", "internal_configure_extension")
 use_repo(pybind11_configure, "pybind11")
 
-# These headers are used by pybind11
-#alias(
-#    name = "python_headers",
-#    actual = "@rules_python//python/cc:current_py_cc_headers",
-#)
-
 ##############################################
 # Register our Toolchains
 ##############################################
@@ -74,14 +68,6 @@ python.toolchain(
 )
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
-
-#pip.parse(
-#    hub_name = "nanopb_deps",
-#    python_interpreter = "/opt/tbotspython/bin/python",
-#    python_version = "3.12",
-#    requirements_lock = "//extlibs:nanopb_requirements_lock.txt",
-#)
-#use_repo(pip, "nanopb_deps")
 pip.parse(
     hub_name = "thunderscope_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
@@ -113,6 +99,13 @@ use_repo(pip, "robot_diagnostics_cli_deps")
 
 ###########################################################################
 # Setup non Bazel Central Registry dependencies & Non MODULE supported deps
+###########################################################################
+# HTTP Archives Background:
+# The below files are special repos as they are stored in the bazel REPO cache
+# across your system. This is a special feature of http_archive and archive_override
+# According to the new Bzlmod specifications, we should always prefer archive_override
+# over http_archive as they are literally the same under the hood
+# Lastly, NEVER use
 ###########################################################################
 all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
 
@@ -159,16 +152,6 @@ http_archive(
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
 
-#http_archive(
-#    name = "nanopb",
-#    build_file = "@//extlibs:nanopb.BUILD",
-#    sha256 = "e98dd6403ab8c5b271d32a6bc025e7e596bb181c7bc7e0492c5daa21fc44c940",
-#    strip_prefix = "nanopb-0.3.9.4-linux-x86",
-#    urls = [
-#        "https://github.com/UBC-Thunderbots/Software-External-Dependencies/raw/main/nanopb-0.3.9.4-linux-x86.tar.gz",
-#    ],
-#)
-
 http_archive(
     name = "six_archive",
     build_file = "//extlibs:six.BUILD",
@@ -179,10 +162,10 @@ http_archive(
 bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
 archive_override(
     module_name = "rules_boost",
-    strip_prefix = "rules_boost-master",
-    url = "https://github.com/nelhage/rules_boost/archive/refs/heads/master.tar.gz",
-    # It is recommended to edit the above URL and the below sha256 to point to a specific version of this repository.
-    # integrity = "sha256-...",
+    # Made with: shasum -a 256  rules_boost-2a003f812e9a13b970e4100d96856b09ee13a582.tar.gz
+    sha256 = "f3125bbcb4adb5863980562d6092f2c07571cc9b2d4510e3b7f829fd43b44607",
+    strip_prefix = "rules_boost-2a003f812e9a13b970e4100d96856b09ee13a582",
+    url = "https://github.com/nelhage/rules_boost/archive/2a003f812e9a13b970e4100d96856b09ee13a582.tar.gz",
 )
 
 non_module_boost_repositories = use_extension("@com_github_nelhage_rules_boost//:boost/repositories.bzl", "non_module_dependencies")
@@ -191,26 +174,25 @@ use_repo(
     "boost",
 )
 
-##############################################
-# Repo-based dependencies
-##############################################
-# tool used to flash firmware with bazel
-bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
-git_override(
-    module_name = "platformio_rules",
-    commit = "b998c783ce05a224ef726aa9775bd7c2d4121c29",
-    remote = "https://github.com/Andrewyx/platformio_rules.git",
-)
-
 bazel_dep(name = "hedron_compile_commands", version = "1.0.5", dev_dependency = True)
-git_override(
+archive_override(
     module_name = "hedron_compile_commands",
-    commit = "4f28899228fb3ad0126897876f147ca15026151e",
-    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
+    sha256 = "658122cfb1f25be76ea212b00f5eb047d8e2adc8bcf923b918461f2b1e37cdf2",
+    strip_prefix = "bazel-compile-commands-extractor-4f28899228fb3ad0126897876f147ca15026151e",
+    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/4f28899228fb3ad0126897876f147ca15026151e.tar.gz",
+)
+
+bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
+archive_override(
+    module_name = "platformio_rules",
+    sha256 = "5736292989829a54728ffd429202a8b7f6ac57e8b4e0cf9a07394f3d5f719919",
+    strip_prefix = "platformio_rules-b998c783ce05a224ef726aa9775bd7c2d4121c29",
+    url = "https://github.com/Andrewyx/platformio_rules/archive/b998c783ce05a224ef726aa9775bd7c2d4121c29.tar.gz",
 )
 
 ##############################################
-#Add new git repos
+# Add new git repos (these cannot be used offline)
+# All of this SHOULD BE NUKED for archive_override
 ##############################################
 new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
@@ -300,39 +282,5 @@ new_git_repository(
 )
 
 ##############################################
-# Workarounds and Fixes
+# Workarounds and Fixes Below (hacks)
 ##############################################
-# required to use `py_proto_library` from protobuf
-#http_archive(
-#    name = "six_archive",
-#    build_file = "//extlibs:six.BUILD",
-#    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
-#    url = "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55",
-#)
-
-#alias(
-#    name = "six",
-#    actual = "@six_archive//:six",
-#)
-
-#maybe = use_repo_rule("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-
-#git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-#
-#maybe(
-#    git_repository,
-#    name = "rules_third_party",
-#    commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
-#    remote = "https://github.com/DraconicEnt/rules_third_party.git",
-#    shallow_since = "1620228587 -0400",
-#)
-#
-#bullet = use_repo_rule("@rules_third_party//libraries:bullet.bzl", "bullet")
-#new_git_repository(
-#    name = "rules_third_party",
-#    commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
-#    remote = "https://github.com/DraconicEnt/rules_third_party.git",
-#    shallow_since = "1620228587 -0400",
-#)
-#
-#bullet = use_repo_rule("@rules_third_party//libraries:bullet.bzl", "bullet")
