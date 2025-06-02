@@ -358,9 +358,8 @@ std::optional<Ball> SensorFusion::createBall(
 
 Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
 {
-    Team new_friendly_team =
-        friendly_team_filter.getFilteredData(friendly_team, robot_detections,
-        friendly_robot_id_with_ball_in_dribbler);
+    Team new_friendly_team = friendly_team_filter.getFilteredData(
+        friendly_team, robot_detections, friendly_robot_id_with_ball_in_dribbler);
     return new_friendly_team;
 }
 
@@ -428,8 +427,8 @@ void SensorFusion::updateDribbleDisplacement()
 
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
-    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections,
-        friendly_robot_id_with_ball_in_dribbler);
+    Team new_enemy_team = enemy_team_filter.getFilteredData(
+        enemy_team, robot_detections, friendly_robot_id_with_ball_in_dribbler);
     return new_enemy_team;
 }
 
