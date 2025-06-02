@@ -18,6 +18,19 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
 {
 }
 
+Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
+             const Angle &orientation, const AngularVelocity &angular_velocity,
+             const Timestamp &timestamp,
+             const std::set<RobotCapability> &unavailable_capabilities,
+             const RobotConstants_t &robot_constants)
+    : id_(id),
+      current_state_(position, velocity, orientation, angular_velocity, false),
+      timestamp_(timestamp),
+      unavailable_capabilities_(unavailable_capabilities),
+      robot_constants_(robot_constants)
+{
+}
+
 Robot::Robot(RobotId id, const RobotState &initial_state, const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities,
              const RobotConstants_t &robot_constants)
