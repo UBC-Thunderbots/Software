@@ -31,8 +31,7 @@ class Robot
      */
     explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp,
-                   bool breakbeam_tripped=false,
+                   const Timestamp &timestamp, bool breakbeam_tripped = false,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>(),
                    const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
@@ -116,10 +115,10 @@ class Robot
     Angle orientation() const;
 
     /*
-    *
-    *
-    *
-    */
+     *
+     *
+     *
+     */
     bool breakbeamTripped() const;
 
     /**
