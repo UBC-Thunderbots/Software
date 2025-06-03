@@ -21,12 +21,12 @@ std::optional<Robot> RobotFilter::getFilteredData(
 {
     int data_num               = 0;
     Timestamp latest_timestamp = Timestamp().fromSeconds(0);
-    FilteredRobotData filtered_data{.id                = this->getRobotId(),
-                                    .position          = Point(0, 0),
-                                    .velocity          = Vector(0, 0),
-                                    .orientation       = Angle::fromRadians(0),
-                                    .angular_velocity  = AngularVelocity::fromRadians(0),
-                                    .timestamp         = Timestamp().fromSeconds(0)};
+    FilteredRobotData filtered_data{.id               = this->getRobotId(),
+                                    .position         = Point(0, 0),
+                                    .velocity         = Vector(0, 0),
+                                    .orientation      = Angle::fromRadians(0),
+                                    .angular_velocity = AngularVelocity::fromRadians(0),
+                                    .timestamp        = Timestamp().fromSeconds(0)};
 
     for (const RobotDetection &robot_data : new_robot_data)
     {
@@ -38,7 +38,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
                 filtered_data.position + robot_data.position.toVector();
             filtered_data.orientation =
                 filtered_data.orientation + robot_data.orientation;
-        
+
             filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
                 filtered_data.timestamp.toMilliseconds() +
                 robot_data.timestamp.toMilliseconds());

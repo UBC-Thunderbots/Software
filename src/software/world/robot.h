@@ -31,13 +31,12 @@ class Robot
      */
     explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp,
-                   bool breakbeam_tripped=false,
+                   const Timestamp &timestamp, bool breakbeam_tripped = false,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>(),
                    const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
-    
-     /**
+
+    /**
      * Creates a new robot given robot data
      *
      * @param id The id of the robot to create
@@ -54,7 +53,7 @@ class Robot
     explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
                    const Timestamp &timestamp,
-                   const std::set<RobotCapability> &unavailable_capabilities, 
+                   const std::set<RobotCapability> &unavailable_capabilities,
                    const RobotConstants_t &robot_constants);
 
 
@@ -137,10 +136,10 @@ class Robot
     Angle orientation() const;
 
     /*
-    *
-    *
-    *
-    */
+     *
+     *
+     *
+     */
     bool breakbeamTripped() const;
 
     /**
