@@ -272,7 +272,7 @@ TEST_F(RobotTest, get_unavailable_capabilities)
 
     Robot robot =
         Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-              AngularVelocity::fromDegrees(25), current_time, unavailable_capabilities);
+              AngularVelocity::fromDegrees(25), current_time, false, unavailable_capabilities);
 
     EXPECT_EQ(unavailable_capabilities, robot.getUnavailableCapabilities());
 }
@@ -286,7 +286,7 @@ TEST_F(RobotTest, get_available_capabilities)
 
     Robot robot =
         Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-              AngularVelocity::fromDegrees(25), current_time, unavailable_capabilities);
+              AngularVelocity::fromDegrees(25), current_time, false, unavailable_capabilities);
 
     // available capabilities = all capabilities - unavailable capabilities
     std::set<RobotCapability> all_capabilities = allRobotCapabilities();

@@ -90,11 +90,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
              current_robot_state.timestamp().toSeconds());
 
         //find breakbeam_status
-        bool breakbeam_tripped=false;
-
-        if(breakbeam_tripped_id.has_value()){
-            breakbeam_tripped=breakbeam_tripped_id.value()==this->getRobotId();
-        }
+        bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
 
         // update current_robot_state
         this->current_robot_state =
