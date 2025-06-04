@@ -127,6 +127,7 @@ void DribbleFSM::getPossession(const Update &event)
         findInterceptionPoint(event.common.robot, event.common.world_ptr->ball(),
                               event.common.world_ptr->field()) +
         Vector::createFromAngle(face_ball_orientation).normalize(0.05);
+
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, intercept_position, face_ball_orientation,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
