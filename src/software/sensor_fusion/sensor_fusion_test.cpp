@@ -1010,3 +1010,138 @@ TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
     // did it not use robot position
     EXPECT_TRUE(ball_position != robot_state.position());
 }
+
+TEST_F(SensorFusionTest, breakbeam_in_robot_test)
+{
+    // The following code test this thing: if the breakbeam is triggered
+    // will that be accessible through the robot
+    SensorProto sensor_msg;
+
+    // creating ssl vision
+    const uint32_t camera_id    = 0;
+
+    //We make two frames because the robot with the breakbeam
+    //get updated after the world gets updated
+    const uint32_t frame_number = 40391;
+    const uint32_t frame_number_2 = 40392;
+    Timestamp time              = Timestamp::fromSeconds(12.1);
+    Timestamp time_2              = Timestamp::fromSeconds(12.2);
+
+    Point ball_position_ssl(0.75, 0.75);
+    Vector velocity(0, 0);
+    ball_state = BallState{ball_position_ssl, velocity};
+
+    yellow_robot_states.clear();
+    blue_robot_states.clear();
+
+    RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::fromRadians(2),
+                           AngularVelocity::zero());
+    RobotStateWithId robot_id = {2, robot_state};
+    yellow_robot_states.push_back(robot_id);
+
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
+        createSSLDetectionFrame(camera_id, time, frame_number, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+    
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame_2 =
+        createSSLDetectionFrame(camera_id, time_2, frame_number_2, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+
+    // creating robot status
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(2);
+
+    auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+    power_status_msg->set_breakbeam_tripped(true);
+    *(robot_msg->mutable_power_status()) = *power_status_msg;
+
+    // create ssl wrapper packet
+    auto geometry_data = initSSLDivBGeomData();
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
+    auto ssl_wrapper_packet_2 =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame_2));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
+    sensor_fusion.processSensorProto(sensor_msg);
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
+    
+
+    std::optional<World> current_world = sensor_fusion.getWorld();
+    bool breakbeam_tripped = current_world.value().friendlyTeam().getRobotById(2)->breakbeamTripped();
+
+    // is the breakbeam_tripped on the robot 
+    EXPECT_TRUE(breakbeam_tripped == true);
+
+}
+
+
+TEST_F(SensorFusionTest, breakbeam_not_in_robot_test)
+{
+    // The following code test this thing: if the breakbeam is triggered
+    // will that be accessible through the robot
+    SensorProto sensor_msg;
+
+    // creating ssl vision
+    const uint32_t camera_id    = 0;
+
+    //We make two frames because the robot with the breakbeam
+    //get updated after the world gets updated
+    const uint32_t frame_number = 40391;
+    const uint32_t frame_number_2 = 40392;
+    Timestamp time              = Timestamp::fromSeconds(12.1);
+    Timestamp time_2              = Timestamp::fromSeconds(12.2);
+
+    Point ball_position_ssl(0.75, 0.75);
+    Vector velocity(0, 0);
+    ball_state = BallState{ball_position_ssl, velocity};
+
+    yellow_robot_states.clear();
+    blue_robot_states.clear();
+
+    RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::fromRadians(2),
+                           AngularVelocity::zero());
+    RobotStateWithId robot_id = {2, robot_state};
+    yellow_robot_states.push_back(robot_id);
+
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
+        createSSLDetectionFrame(camera_id, time, frame_number, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+    
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame_2 =
+        createSSLDetectionFrame(camera_id, time_2, frame_number_2, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+
+    // creating robot status
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(2);
+
+    auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+    power_status_msg->set_breakbeam_tripped(false);
+    *(robot_msg->mutable_power_status()) = *power_status_msg;
+
+    // create ssl wrapper packet
+    auto geometry_data = initSSLDivBGeomData();
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
+    auto ssl_wrapper_packet_2 =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame_2));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
+    sensor_fusion.processSensorProto(sensor_msg);
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
+    
+
+    std::optional<World> current_world = sensor_fusion.getWorld();
+    bool breakbeam_tripped = current_world.value().friendlyTeam().getRobotById(2)->breakbeamTripped();
+
+    // is the break_beam correct
+    EXPECT_TRUE(breakbeam_tripped == false);
+
+}

@@ -26,6 +26,7 @@ class Robot
      * per second
      * @param timestamp The timestamp at which the robot was observed to be in the given
      * state
+     * @param breakbeam_tripped The new status of the breakbeam
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      * @param robot_constants The robot constants for this robot
      */
@@ -135,10 +136,10 @@ class Robot
      */
     Angle orientation() const;
 
-    /*
+    /**
+     * Returns the current breakbeam status of the robot
      *
-     *
-     *
+     * @return the current breakbeam status of the robot
      */
     bool breakbeamTripped() const;
 

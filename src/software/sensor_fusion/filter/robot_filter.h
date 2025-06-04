@@ -44,11 +44,13 @@ class RobotFilter
      * The data does not all have to be for a particular Robot, the filter will only use
      * the new Robot data that matches the robot id the filter was constructed with.
      *
+     * @param breakbeam_tripped_id The id of the robot with the tripped breakbeam
+     *
      * @return The filtered data for the robot
      */
     std::optional<Robot> getFilteredData(
         const std::vector<RobotDetection>& new_robot_data,
-        const std::optional<RobotId> = std::nullopt);
+        const std::optional<RobotId> breakbeam_tripped_id = std::nullopt);
 
     /**
      * Returns the id of the Robot that this filter is filtering for

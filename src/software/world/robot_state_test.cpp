@@ -43,6 +43,13 @@ TEST(RobotStateTest, get_angular_velocity)
     EXPECT_EQ(AngularVelocity::half(), state.angularVelocity());
 }
 
+TEST(RobotStateTest, get_breakbeam_status)
+{
+    RobotState state(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
+                     AngularVelocity::half(), false);
+    EXPECT_EQ(false, state.breakbeamTripped());
+}
+
 TEST(RobotStateTest, compare_identical_states)
 {
     RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
@@ -92,3 +99,4 @@ TEST(RobotStateTest, compare_states_with_different_angular_velocity)
     EXPECT_FALSE(state_1 == state_2);
     EXPECT_TRUE(state_1 != state_2);
 }
+
