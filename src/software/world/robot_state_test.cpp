@@ -99,4 +99,3 @@ TEST(RobotStateTest, compare_states_with_different_angular_velocity)
     EXPECT_FALSE(state_1 == state_2);
     EXPECT_TRUE(state_1 != state_2);
 }
-
