@@ -427,8 +427,8 @@ void SensorFusion::updateDribbleDisplacement()
 
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
-    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections,
-        false);
+    Team new_enemy_team =
+        enemy_team_filter.getFilteredData(enemy_team, robot_detections, false);
     return new_enemy_team;
 }
 
