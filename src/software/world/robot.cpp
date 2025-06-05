@@ -128,7 +128,9 @@ bool Robot::isNearDribbler(const Point &test_point, double TOLERANCE) const
         // check that ball is in a 90-degree cone in front of the robot
         auto ball_to_robot_angle =
             orientation().minDiff(vector_to_test_point.orientation());
-        return (ball_to_robot_angle < Angle::fromDegrees(45.0));
+        bool vision_confirm_ball = (ball_to_robot_angle < Angle::fromDegrees(45.0));
+        bool breakbeam = this->breakbeamTripped();
+        return breakbeam || vision_confirm_ball;
     }
 }
 

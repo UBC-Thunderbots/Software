@@ -247,6 +247,16 @@ TEST(RobotIsNearDribblerTest, ball_near_dribbler_ball_to_side_of_robot)
     EXPECT_FALSE(robot.isNearDribbler(ball_position));
 }
 
+TEST(RobotIsNearDribblerTest, ball_near_dribbler_according_to_breakbeam)
+{
+    Point ball_position = Point(0.07, 0);
+    Timestamp timestamp = Timestamp::fromSeconds(0);
+
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::half(), AngularVelocity::zero(),
+                        timestamp, true);
+    EXPECT_TRUE(robot.isNearDribbler(ball_position));
+}
+
 TEST(RobotIsNearDribblerTest, ball_near_dribbler_robot_moving_ball_in_dribbler)
 {
     Point ball_position = Point(0.07, 0);
