@@ -129,7 +129,7 @@ bool Robot::isNearDribbler(const Point &test_point, double TOLERANCE) const
         auto ball_to_robot_angle =
             orientation().minDiff(vector_to_test_point.orientation());
         bool vision_confirm_ball = (ball_to_robot_angle < Angle::fromDegrees(45.0));
-        bool breakbeam = this->breakbeamTripped();
+        bool breakbeam           = this->breakbeamTripped();
         return breakbeam || vision_confirm_ball;
     }
 }
