@@ -1029,8 +1029,7 @@ TEST_F(SensorFusionTest, breakbeam_in_robot_test)
     yellow_robot_states.push_back(robot_id);
 
 
-    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
-        initDetectionFrame();
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame = initDetectionFrame();
     std::unique_ptr<SSLProto::SSL_DetectionFrame> frame_2 =
         initDetectionFrameWithFutureTime();
     // creating robot status
@@ -1078,8 +1077,7 @@ TEST_F(SensorFusionTest, breakbeam_not_in_robot_test)
     RobotStateWithId robot_id = {2, robot_state};
     yellow_robot_states.push_back(robot_id);
 
-    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
-        initDetectionFrame();
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame = initDetectionFrame();
     std::unique_ptr<SSLProto::SSL_DetectionFrame> frame_2 =
         initDetectionFrameWithFutureTime();
     // creating robot status
