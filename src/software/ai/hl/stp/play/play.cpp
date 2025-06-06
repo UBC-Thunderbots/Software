@@ -6,6 +6,7 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
@@ -99,9 +100,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         ZoneNamedN(_tracy_tactics, "Play: Get Tactics from Play", true);
 
         updateTactics(PlayUpdate(
-            world_ptr, num_tactics, [&priority_tactics](PriorityTacticVector new_tactics)
-            { priority_tactics = std::move(new_tactics); }, inter_play_communication,
-            set_inter_play_communication_fun));
+            world_ptr, num_tactics,
+            [&priority_tactics](PriorityTacticVector new_tactics) {
+                priority_tactics = std::move(new_tactics);
+            },
+            inter_play_communication, set_inter_play_communication_fun));
     }
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
@@ -114,6 +117,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
     std::optional<Robot> goalie_robot = world_ptr->friendlyTeam().goalie();
     std::vector<Robot> robots         = world_ptr->friendlyTeam().getAllRobots();
+    std::vector<Robot> injured_robots = world_ptr->friendlyTeam().getInjuredRobots();
 
     if (requires_goalie)
     {
@@ -160,6 +164,50 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         else
         {
             LOG(WARNING) << "No goalie ID set!" << std::endl;
+        }
+    }
+
+    /* substitute injured robots when the game is in play */
+    if (injured_robots.size() > 0)
+    {
+        std::map<RobotId, TrajectoryPath> robot_trajectories = {};
+        unsigned int num_injured = (unsigned int)injured_robots.size();
+        num_tactics -= num_injured;
+
+        // substitution tactic is just a move tactic to a decided location
+        std::shared_ptr<MoveTactic> auto_sub_tactic = std::make_shared<MoveTactic>();
+
+        // move to middle of court and to positive y boundary and stop
+        auto_sub_tactic->updateControlParams(
+            Point(0, world_ptr->field().totalYLength() / 2), Angle::zero(),
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
+
+        for (auto robot : injured_robots)
+        {
+            // assign robot to auto_sub tactic
+            tactic_robot_id_assignment.emplace(auto_sub_tactic, robot.id());
+
+            auto motion_constraints =
+                buildMotionConstraintSet(world_ptr->gameState(), *auto_sub_tactic);
+            auto primitives = auto_sub_tactic->get(world_ptr);
+            CHECK(primitives.contains(robot.id()))
+                << "Couldn't find a primitive for robot id " << robot.id();
+
+            auto primitive_proto = primitives[robot.id()]->generatePrimitiveProtoMessage(
+                *world_ptr, motion_constraints, robot_trajectories, obstacle_factory);
+
+            if (!primitive_proto.second)
+            {
+                LOG(WARNING)
+                    << "trying to substitute robot but cannot generate primitive ";
+            }
+
+            // remove substitution robot from robot list
+            robots.erase(std::remove(robots.begin(), robots.end(), robot), robots.end());
+
+            primitives_to_run->mutable_robot_primitives()->insert(
+                google::protobuf::MapPair(robot.id(), *(primitive_proto.second)));
         }
     }
 

@@ -1010,3 +1010,289 @@ TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
     // did it not use robot position
     EXPECT_TRUE(ball_position != robot_state.position());
 }
+
+TEST_F(SensorFusionTest, test_detect_injured_robots_with_no_error)
+{
+    /* create a list of robot status messages */
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    for (int i = 0; i < 3; i++)
+    {
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(i);
+        robot_msg->add_error_code(TbotsProto::NO_ERROR);
+        robot_status_msgs.push_back(*robot_msg);
+    }
+
+    SensorProto sensor_msg;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    /* call detect error on a list of normal robots */
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    /* test to see if any robots gets added to injured_robots */
+    std::vector<Robot> injured_robots =
+        sensor_fusion.getWorld().value().friendlyTeam().getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 0);
+}
+
+TEST_F(SensorFusionTest, test_detect_one_injured_robot_with_high_cap)
+{
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(1);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::HIGH_CAP);
+    robot_status_msgs.push_back(*robot_msg);
+
+    auto robot_msg2 = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg2->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg2->set_robot_id(2);
+    robot_status_msgs.push_back(*robot_msg2);
+
+    SensorProto sensor_msg;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    std::vector<Robot> injured_robots =
+        sensor_fusion.getWorld().value().friendlyTeam().getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 1);
+
+    if (injured_robots.size() == 1)
+    {
+        EXPECT_EQ(injured_robots[0].id(), 1);
+    }
+}
+
+TEST_F(SensorFusionTest, test_detect_multiple_injured_robots)
+{
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(1);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::HIGH_CAP);
+    robot_status_msgs.push_back(*robot_msg);
+
+    auto robot_msg2 = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg2->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
+    robot_msg2->set_robot_id(2);
+    robot_status_msgs.push_back(*robot_msg2);
+
+    SensorProto sensor_msg;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    std::vector<Robot> injured_robots =
+        sensor_fusion.getWorld().value().friendlyTeam().getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 2);
+
+    if (injured_robots.size() == 2)
+    {
+        EXPECT_EQ(injured_robots[0].id(), 1);
+        EXPECT_EQ(injured_robots[1].id(), 2);
+    }
+}
+
+TEST_F(SensorFusionTest, test_detect_breakbeam_tripped)
+{
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(1);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg->mutable_power_status()->set_breakbeam_tripped(true);
+    robot_status_msgs.push_back(*robot_msg);
+
+    auto robot_msg2 = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg2->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg2->set_robot_id(2);
+    robot_status_msgs.push_back(*robot_msg2);
+
+    ball_state = BallState(Point(3, 3), Vector(0, 0));
+
+    SensorProto sensor_msg;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    std::vector<Robot> injured_robots =
+        sensor_fusion.getWorld().value().friendlyTeam().getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 1);
+
+    if (injured_robots.size() == 1)
+    {
+        EXPECT_EQ(injured_robots[0].id(), 1);
+    }
+}
+
+TEST_F(SensorFusionTest, test_detect_front_right_motor_fault)
+{
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(1);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg->mutable_motor_status()->mutable_front_right()->add_motor_faults(
+        TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE);
+    robot_status_msgs.push_back(*robot_msg);
+
+    auto robot_msg2 = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg2->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg2->set_robot_id(2);
+    robot_status_msgs.push_back(*robot_msg2);
+
+    SensorProto sensor_msg;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    std::vector<Robot> injured_robots =
+        sensor_fusion.getWorld().value().friendlyTeam().getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 1);
+
+    if (injured_robots.size() == 1)
+    {
+        EXPECT_EQ(injured_robots[0].id(), 1);
+    }
+}
+
+TEST_F(SensorFusionTest, test_detect_front_left_motor_fault)
+{
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(1);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg->mutable_motor_status()->mutable_front_left()->add_motor_faults(
+        TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING);
+    robot_status_msgs.push_back(*robot_msg);
+
+    auto robot_msg2 = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg2->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg2->set_robot_id(2);
+    robot_status_msgs.push_back(*robot_msg2);
+
+    SensorProto sensor_msg;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    std::vector<Robot> injured_robots =
+        sensor_fusion.getWorld().value().friendlyTeam().getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 1);
+
+    if (injured_robots.size() == 1)
+    {
+        EXPECT_EQ(injured_robots[0].id(), 1);
+    }
+}
+
+TEST_F(SensorFusionTest, test_detect_back_right_motor_fault)
+{
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(1);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg->mutable_motor_status()->mutable_front_right()->add_motor_faults(
+        TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE);
+    robot_status_msgs.push_back(*robot_msg);
+
+    auto robot_msg2 = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg2->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg2->set_robot_id(2);
+    robot_msg2->mutable_motor_status()->mutable_back_right()->add_motor_faults(
+        TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE);
+    robot_status_msgs.push_back(*robot_msg2);
+
+    SensorProto sensor_msg;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    std::vector<Robot> injured_robots =
+        sensor_fusion.getWorld().value().friendlyTeam().getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 2);
+
+    if (injured_robots.size() == 2)
+    {
+        EXPECT_EQ(injured_robots[0].id(), 1);
+        EXPECT_EQ(injured_robots[1].id(), 2);
+    }
+}
+
+TEST_F(SensorFusionTest, test_detect_back_left_motor_fault)
+{
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(1);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg->mutable_motor_status()->mutable_front_left()->add_motor_faults(
+        TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING);
+    robot_status_msgs.push_back(*robot_msg);
+
+    auto robot_msg2 = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg2->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    robot_msg2->set_robot_id(2);
+    robot_msg2->mutable_motor_status()->mutable_back_left()->add_motor_faults(
+        TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING);
+    robot_status_msgs.push_back(*robot_msg2);
+
+    SensorProto sensor_msg;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    std::vector<Robot> injured_robots =
+        sensor_fusion.getWorld().value().friendlyTeam().getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 2);
+
+    if (injured_robots.size() == 2)
+    {
+        EXPECT_EQ(injured_robots[0].id(), 1);
+        EXPECT_EQ(injured_robots[1].id(), 2);
+    }
+}
