@@ -12,10 +12,10 @@
 // compilation if included in too many places
 namespace boost::polygon
 {
-    template <typename T>
-    class voronoi_diagram_traits;
-    template <typename T, typename TRAITS>
-    class voronoi_diagram;
+template <typename T>
+class voronoi_diagram_traits;
+template <typename T, typename TRAITS>
+class voronoi_diagram;
 }  // namespace boost::polygon
 
 class VoronoiDiagram
