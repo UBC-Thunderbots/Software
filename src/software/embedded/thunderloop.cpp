@@ -44,7 +44,7 @@ extern "C"
     {
         if (g_motor_service)
         {
-            g_motor_service->resetMotorBoard();
+            g_motor_service->reset();
         }
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
