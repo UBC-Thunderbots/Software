@@ -385,7 +385,7 @@ class AggregateTestRunner(SimulatedTestRunner):
 
 
 def load_command_line_arguments():
-    """Load from command line arguments using argpase
+    """Load in command-line arguments using argparse
 
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
