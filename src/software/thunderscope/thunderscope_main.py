@@ -25,9 +25,7 @@ from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import (
-    CI_DURATION_S,
-)
+from software.thunderscope.constants import CI_DURATION_S, IndividualRobotMode
 from software.thunderscope.util import *
 
 from software.thunderscope.binary_context_managers.full_system import FullSystem
@@ -350,16 +348,28 @@ if __name__ == "__main__":
                     robot_communication.toggle_keyboard_estop
                 )
 
-            if args.run_diagnostics:
-                for tab in tscope_config.tabs:
-                    if hasattr(tab, "widgets"):
-                        robot_view_widget = tab.find_widget("Robot View")
-                        if robot_view_widget is not None:
-                            robot_view_widget.individual_robot_control_mode_signal.connect(
-                                lambda robot_id,
-                                robot_mode: robot_communication.toggle_individual_robot_control_mode(
-                                    robot_id, robot_mode
-                                )
+            # Connect robot control mode combo box in Robot View widget to RobotCommunication
+            for tab in tscope_config.tabs:
+                if hasattr(tab, "widgets"):
+                    robot_view_widget = tab.find_widget("Robot View")
+                    if robot_view_widget is not None:
+                        robot_view_widget.individual_robot_control_mode_signal.connect(
+                            lambda robot_id,
+                            robot_mode: robot_communication.toggle_individual_robot_control_mode(
+                                robot_id, robot_mode
+                            )
+                        )
+
+                        # Set mode for robot in RobotCommunication to initial value of combo box
+                        for (
+                            robot_view_component
+                        ) in robot_view_widget.robot_view_widgets:
+                            robot_info = robot_view_component.robot_info
+                            robot_communication.toggle_individual_robot_control_mode(
+                                robot_info.robot_id,
+                                IndividualRobotMode(
+                                    robot_info.control_mode_menu.currentIndex()
+                                ),
                             )
 
             if args.run_blue or args.run_yellow:

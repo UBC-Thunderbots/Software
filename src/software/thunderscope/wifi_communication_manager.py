@@ -227,7 +227,7 @@ class WifiCommunicationManager:
                     SSL_REFEREE_ADDRESS,
                     self.referee_port,
                     referee_interface,
-                    lambda data: self.__forward_to_proto_unix_io(SSL_Referee, data),
+                    lambda data: self.__forward_to_proto_unix_io(Referee, data),
                     True,
                 )
                 self.current_network_config.referee_interface = referee_interface
