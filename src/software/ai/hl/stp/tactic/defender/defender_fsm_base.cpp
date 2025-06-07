@@ -44,8 +44,7 @@ bool DefenderFSMBase::ballNearbyWithoutThreat(
 
     bool ball_is_near_friendly =
         ball_distance_to_friendly <
-        ball_distance_to_enemy *
-            (1.0 - defender_steal_config.max_get_ball_ratio_threshold());
+        ball_distance_to_enemy * defender_steal_config.max_get_ball_ratio_threshold();
     bool ball_is_within_max_range =
         ball_distance_to_friendly <= defender_steal_config.max_get_ball_radius_m();
     bool ball_is_slow = world_ptr->ball().velocity().length() <=
