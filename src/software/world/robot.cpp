@@ -122,7 +122,7 @@ bool Robot::isNearDribbler(const Point &test_point, double TOLERANCE) const
     Vector vector_to_test_point = test_point - position();
     if (vector_to_test_point.length() > POSSESSION_THRESHOLD_METERS)
     {
-        return breakbeam || false;
+        return breakbeam;
     }
     else
     {
