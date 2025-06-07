@@ -6,11 +6,25 @@
 
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
+             const Timestamp &timestamp, bool breakbeam_tripped,
+             const std::set<RobotCapability> &unavailable_capabilities,
+             const RobotConstants_t &robot_constants)
+    : id_(id),
+      current_state_(position, velocity, orientation, angular_velocity,
+                     breakbeam_tripped),
+      timestamp_(timestamp),
+      unavailable_capabilities_(unavailable_capabilities),
+      robot_constants_(robot_constants)
+{
+}
+
+Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
+             const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities,
              const RobotConstants_t &robot_constants)
     : id_(id),
-      current_state_(position, velocity, orientation, angular_velocity),
+      current_state_(position, velocity, orientation, angular_velocity, false),
       timestamp_(timestamp),
       unavailable_capabilities_(unavailable_capabilities),
       robot_constants_(robot_constants)
@@ -90,6 +104,11 @@ Angle Robot::orientation() const
     return current_state_.orientation();
 }
 
+bool Robot::breakbeamTripped() const
+{
+    return current_state_.breakbeamTripped();
+}
+
 AngularVelocity Robot::angularVelocity() const
 {
     return current_state_.angularVelocity();
@@ -99,17 +118,19 @@ bool Robot::isNearDribbler(const Point &test_point, double TOLERANCE) const
 {
     const double POSSESSION_THRESHOLD_METERS = DIST_TO_FRONT_OF_ROBOT_METERS + TOLERANCE;
 
+    bool breakbeam              = this->breakbeamTripped();
     Vector vector_to_test_point = test_point - position();
     if (vector_to_test_point.length() > POSSESSION_THRESHOLD_METERS)
     {
-        return false;
+        return breakbeam;
     }
     else
     {
         // check that ball is in a 90-degree cone in front of the robot
         auto ball_to_robot_angle =
             orientation().minDiff(vector_to_test_point.orientation());
-        return (ball_to_robot_angle < Angle::fromDegrees(45.0));
+        bool vision_confirm_ball = (ball_to_robot_angle < Angle::fromDegrees(45.0));
+        return breakbeam || vision_confirm_ball;
     }
 }
 
