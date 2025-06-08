@@ -73,7 +73,6 @@ class TScopeTab:
                                 to the refresh function
         """
         self.name = name
-        self.widgets = widgets
 
         # Mapping of widget names to widget objects
         self.widgets_map: dict[str, TScopeWidget] = {}
@@ -87,7 +86,7 @@ class TScopeTab:
 
         # first widget is initial anchor widget
         # all other widgets will be positioned relative to this one
-        for widget in self.widgets:
+        for widget in widgets:
             self.add_one_widget(widget)
 
         self.refresh_counter = (
@@ -131,12 +130,3 @@ class TScopeTab:
             # only refresh widget inside the dock that are visible
             if widget_data.has_refresh_func and widget_data.widget.isVisible():
                 widget_data.widget.refresh()
-
-    def find_widget(self, widget_name: str) -> Optional[TScopeWidget]:
-        """Finds and returns the widget object corresponding to the given name, if exists
-        If not, returns None
-
-        :param widget_name: the name of the widget
-        """
-        widget_data = self.widgets_map.get(widget_name, None)
-        return widget_data.widget if widget_data else None
