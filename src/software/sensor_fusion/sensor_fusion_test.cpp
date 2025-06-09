@@ -1040,19 +1040,21 @@ TEST_F(SensorFusionTest, breakbeam_in_robot_test)
     power_status_msg->set_breakbeam_tripped(true);
     *(robot_msg->mutable_power_status()) = *power_status_msg;
 
-    // create ssl wrapper packet
     auto geometry_data = initSSLDivBGeomData();
+
+    // use frame 1 to create sensor_msg
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
-    auto ssl_wrapper_packet_2 =
-        createSSLWrapperPacket(std::move(geometry_data), std::move(frame_2));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+    sensor_fusion.processSensorProto(sensor_msg);
 
-    sensor_fusion.processSensorProto(sensor_msg);
+    // use frame 2 that is at a future time to give sensor fusion
+    // a chance to use the breakbeam id it got from the previous sensor proto
+    auto ssl_wrapper_packet_2 =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame_2));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
     sensor_fusion.processSensorProto(sensor_msg);
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
 
 
     std::optional<World> current_world = sensor_fusion.getWorld();
@@ -1090,17 +1092,21 @@ TEST_F(SensorFusionTest, breakbeam_not_in_robot_test)
 
     // create ssl wrapper packet
     auto geometry_data = initSSLDivBGeomData();
+
+
+    // use frame 1 to create sensor_msg
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
-    auto ssl_wrapper_packet_2 =
-        createSSLWrapperPacket(std::move(geometry_data), std::move(frame_2));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+    sensor_fusion.processSensorProto(sensor_msg);
 
-    sensor_fusion.processSensorProto(sensor_msg);
+    // use frame 2 that is at a future time to give sensor fusion
+    // a chance to use the breakbeam id it got from the previous sensor proto
+    auto ssl_wrapper_packet_2 =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame_2));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
     sensor_fusion.processSensorProto(sensor_msg);
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
 
 
     std::optional<World> current_world = sensor_fusion.getWorld();
