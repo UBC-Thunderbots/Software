@@ -409,9 +409,7 @@ void SensorFusion::updateDribbleDisplacement()
 
     std::transform(ball_contacts_by_friendly_robots.begin(),
                    ball_contacts_by_friendly_robots.end(),
-                   std::back_inserter(dribble_displacements),
-                   [&](const auto &kv_pair)
-                   {
+                   std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
                        const Point contact_point = kv_pair.second;
                        return Segment(contact_point, ball->position());
                    });
@@ -521,4 +519,94 @@ void SensorFusion::resetWorldComponents()
 void SensorFusion::setVirtualObstacles(TbotsProto::VirtualObstacles virtual_obstacles)
 {
     virtual_obstacles_ = virtual_obstacles;
+}
+
+// This detects injured robots, but isn't called anywhere?
+void SensorFusion::detectInjuredRobots(
+    const std::vector<TbotsProto::RobotStatus> &robot_status_msgs)
+{
+    /* potential improvement: add short circuit logic when an error is detected */
+
+    std::vector<RobotId> injured_robot_ids;
+
+    for (auto &robot_status_msg : robot_status_msgs)
+    {
+        RobotId robot_id = robot_status_msg.robot_id();
+        bool has_error   = false;
+
+        // Note: each check is not continuing when the robot is identified as injured
+
+        /* checking if the robot status include an fatal error code */
+        for (const auto &error_code_msg : robot_status_msg.error_code())
+        {
+            if (error_code_msg != TbotsProto::ErrorCode::NO_ERROR)
+            {
+                has_error = true;
+                break;
+            }
+        }
+
+        if (!has_error)
+        {
+            /* checking for motor status in all 4 drive unit */
+            auto motor_status_msgs = robot_status_msg.motor_status();
+
+            std::vector<TbotsProto::DriveUnit> drive_unit_msgs;
+            drive_unit_msgs.push_back(motor_status_msgs.front_left());
+            drive_unit_msgs.push_back(motor_status_msgs.front_right());
+            drive_unit_msgs.push_back(motor_status_msgs.back_left());
+            drive_unit_msgs.push_back(motor_status_msgs.back_right());
+
+            for (auto drive_unit_msg : drive_unit_msgs)
+            {
+                auto motor_faults = drive_unit_msg.motor_faults();
+                /* currently only substituting for driver overtemperature or its
+                 * prewarning */
+                for (auto motor_fault : motor_faults)
+                {
+                    if (motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE ||
+                        motor_fault ==
+                            TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING)
+                    {
+                        has_error = true;
+                    }
+                }
+            }
+        }
+
+        /* break beam check */
+        if (!has_error && ball.has_value())
+        {
+            auto power_status_msg = robot_status_msg.power_status();
+            if (power_status_msg.breakbeam_tripped())
+            {
+                auto robot = friendly_team.getRobotById(robot_id);
+                auto dist_vector =
+                    new Vector(ball.value().position().x() - robot->position().x(),
+                               ball.value().position().y() - robot->position().y());
+
+                /* check if the robot has the ball, reference distance 2m */
+                if (dist_vector->length() > BREAK_BEAM_TOLERANCE)
+                {
+                    has_error = true;
+                }
+            }
+        }
+
+        if (has_error)
+        {
+            injured_robot_ids.push_back(robot_id);
+        }
+    }
+
+    std::vector<Robot> injured_robots;
+    for (auto id : injured_robot_ids)
+    {
+        if (friendly_team.getRobotById(id).has_value())
+        {
+            injured_robots.push_back(friendly_team.getRobotById(id).value());
+        }
+    }
+
+    friendly_team.setInjuredRobots(injured_robots);
 }
