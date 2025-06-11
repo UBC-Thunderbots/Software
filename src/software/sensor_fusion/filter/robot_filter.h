@@ -45,7 +45,7 @@ class RobotFilter
      * the new Robot data that matches the robot id the filter was constructed with.
      *
      * @param breakbeam_tripped_id The id of the robot with the tripped breakbeam
-     * according to sensor fusion
+     * according to sensor fusion filtering logic (or none if no robot has a tripped beam). 
      *
      * @return The filtered data for the robot
      */
