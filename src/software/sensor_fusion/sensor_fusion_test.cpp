@@ -1071,14 +1071,6 @@ TEST_F(SensorFusionTest, breakbeam_not_in_robot_test)
     // Check that breakbeam status is false when propagated to the Robot
     SensorProto sensor_msg;
 
-    yellow_robot_states.clear();
-    blue_robot_states.clear();
-
-    RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::fromRadians(2),
-                           AngularVelocity::zero());
-    RobotStateWithId robot_id = {2, robot_state};
-    yellow_robot_states.push_back(robot_id);
-
     std::unique_ptr<SSLProto::SSL_DetectionFrame> frame = initDetectionFrame();
     std::unique_ptr<SSLProto::SSL_DetectionFrame> frame_2 =
         initDetectionFrameWithFutureTime();
