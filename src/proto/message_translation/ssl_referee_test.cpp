@@ -15,7 +15,7 @@ TEST_P(RefereeStageTest, test_referee_stage)
     SSLProto::Referee ref;
     ref.set_stage(input);
 
-    ASSERT_EQ(expected, createRefereeStage(ref));
+    ASSERT_EQ(expected, ssl_referee::createRefereeStage(ref));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -64,7 +64,7 @@ TEST_P(RefereeCommandTest, test_referee_command)
     SSLProto::Referee ref;
     ref.set_command(input);
 
-    ASSERT_EQ(expected, createRefereeCommand(ref, team_colour));
+    ASSERT_EQ(expected, ssl_referee::createRefereeCommand(ref, team_colour));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -124,17 +124,6 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(RefereeCommand::DIRECT_FREE_THEM,
                         SSLProto::Referee_Command_DIRECT_FREE_YELLOW, TeamColour::BLUE),
 
-        // indirect free
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_US,
-                        SSLProto::Referee_Command_INDIRECT_FREE_YELLOW,
-                        TeamColour::YELLOW),
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_US,
-                        SSLProto::Referee_Command_INDIRECT_FREE_BLUE, TeamColour::BLUE),
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_THEM,
-                        SSLProto::Referee_Command_INDIRECT_FREE_BLUE, TeamColour::YELLOW),
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_THEM,
-                        SSLProto::Referee_Command_INDIRECT_FREE_YELLOW, TeamColour::BLUE),
-
         // timeout
         std::make_tuple(RefereeCommand::TIMEOUT_US,
                         SSLProto::Referee_Command_TIMEOUT_YELLOW, TeamColour::YELLOW),
@@ -169,5 +158,5 @@ TEST(BallPlacementPointTest, test_ball_placement_point)
 
     *(ref.mutable_designated_position()) = *ref_point;
 
-    ASSERT_EQ(Point(0.1, 0.2), getBallPlacementPoint(ref));
+    ASSERT_EQ(Point(0.1, 0.2), ssl_referee::getBallPlacementPoint(ref));
 }

@@ -3,6 +3,7 @@
 
 #include <boost/circular_buffer.hpp>
 
+#include "proto/visualization.pb.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/game_state.h"
@@ -225,6 +226,19 @@ class World final
      */
     const std::optional<Segment>& getDribbleDisplacement() const;
 
+    /**
+     * Set the list of virtual obstacles
+     *
+     * @param virtual_obstacles a list of the virtual_obstacles
+     */
+    void setVirtualObstacles(const TbotsProto::VirtualObstacles& virtual_obstacles);
+
+    /**
+     * Get a list of virtual obstacles
+     *
+     * @return a list of virtual obstacles
+     */
+    TbotsProto::VirtualObstacles getVirtualObstacles() const;
 
    private:
     /**
@@ -250,6 +264,9 @@ class World final
     boost::circular_buffer<RefereeStage> referee_stage_history_;
     // which team has possession of the ball
     TeamPossession team_with_possession_;
+
+    // Virtual Obstacles for the Trajectory Planner
+    TbotsProto::VirtualObstacles virtual_obstacles_;
 };
 
 using WorldPtr = std::shared_ptr<const World>;

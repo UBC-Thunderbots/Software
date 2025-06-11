@@ -9,17 +9,17 @@
 
 namespace TestUtil
 {
-    /**
-     * The struct represents the relevant aggregate functions used in testing
-     */
-    struct AggregateFunctions
+/**
+ * The struct represents the relevant aggregate functions used in testing
+ */
+struct AggregateFunctions
+{
+    double average, maximum, minimum;
+    AggregateFunctions()
     {
-        double average, maximum, minimum;
-        AggregateFunctions()
-        {
-            average = 0;
-            maximum = 0;
-            minimum = DBL_MAX;
-        }
-    };
+        average = 0;
+        maximum = 0;
+        minimum = DBL_MAX;
+    }
+};
 };  // namespace TestUtil
