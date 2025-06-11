@@ -43,7 +43,6 @@ void logFromNetworking(TbotsProto::RobotLog log)
 
 int main(int argc, char **argv)
 {
-    // load command line arguments
     struct CommandLineArgs
     {
         bool help                         = false;
