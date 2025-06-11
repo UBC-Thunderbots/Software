@@ -400,6 +400,7 @@ def field_test_runner():
             layout_path=None,
         )
 
+        # Set control mode for all robots to AI so that packets are sent to the robots
         for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             rc_friendly.toggle_individual_robot_control_mode(
                 robot_id,
