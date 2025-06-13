@@ -385,7 +385,7 @@ class AggregateTestRunner(SimulatedTestRunner):
 
 
 def load_command_line_arguments(allow_unrecognized: bool = False):
-    """Load from command line arguments using argpase
+    """Load in command-line arguments using argparse
 
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
@@ -533,8 +533,9 @@ def simulated_test_runner():
                 ProtoUnixIO(),
             )
             gamecontroller.setup_proto_unix_io(
-                blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io,
+                blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                simulator_proto_unix_io=simulator_proto_unix_io,
             )
 
             # If we want to run thunderscope, inject the proto unix ios

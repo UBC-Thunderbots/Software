@@ -99,6 +99,14 @@ function run_code_spell(){
     fi
 }
 
+function run_md_toc() {
+    printf "Adding table of contents to Markdown files...\n\n"
+    for file in $CURR_DIR/../docs/*.md
+    do
+      /opt/tbotspython/bin/python3 -m md_toc --in-place --no-list-coherence --skip-lines 1 github $file
+    done
+}
+
 function run_git_diff_check(){
     printf "Checking for merge conflict markers...\n\n"
     cd $CURR_DIR && git -c "core.whitespace=-trailing-space" --no-pager diff --check
@@ -136,6 +144,7 @@ run_code_spell
 run_clang_format
 run_bazel_formatting
 run_ruff
+run_md_toc
 run_eof_new_line
 run_git_diff_check
 run_ansible_lint

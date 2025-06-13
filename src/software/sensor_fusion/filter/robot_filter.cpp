@@ -16,7 +16,8 @@ RobotFilter::RobotFilter(RobotDetection current_robot_state,
 }
 
 std::optional<Robot> RobotFilter::getFilteredData(
-    const std::vector<RobotDetection> &new_robot_data)
+    const std::vector<RobotDetection> &new_robot_data,
+    const std::optional<RobotId> breakbeam_tripped_id)
 {
     int data_num               = 0;
     Timestamp latest_timestamp = Timestamp().fromSeconds(0);
@@ -88,11 +89,14 @@ std::optional<Robot> RobotFilter::getFilteredData(
             (filtered_data.timestamp.toSeconds() -
              current_robot_state.timestamp().toSeconds());
 
+        // find breakbeam_status
+        bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
+
         // update current_robot_state
         this->current_robot_state =
             Robot(this->getRobotId(), filtered_data.position, filtered_data.velocity,
                   filtered_data.orientation, filtered_data.angular_velocity,
-                  filtered_data.timestamp);
+                  filtered_data.timestamp, breakbeam_tripped);
 
         return std::make_optional(this->current_robot_state);
     }
