@@ -37,6 +37,22 @@ ProtoLogger::ProtoLogger(const std::string& log_path,
     log_thread_ = std::thread(&ProtoLogger::logProtobufs, this);
 }
 
+ProtoLogger::ProtoLogger(const std::string& log_path,
+                         std::function<double()> time_provider,
+                         const bool friendly_colour_yellow,
+                         const std::string& log_name)
+     : log_path_(log_path),
+       time_provider_(time_provider),
+       friendly_colour_yellow_(friendly_colour_yellow),
+       stop_logging_(false),
+       buffer_(PROTOBUF_BUFFER_SIZE, true)
+{
+    start_time_ = time_provider_();
+    log_folder_ = log_path_ + "/" + log_name + "/";
+    std::experimental::filesystem::create_directories(log_folder_);
+    log_thread_ = std::thread(&ProtoLogger::logProtobufs, this);
+}
+
 ProtoLogger::~ProtoLogger()
 {
     flushAndStopLogging();
