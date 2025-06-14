@@ -33,7 +33,6 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
         event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
         event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
 
-
     updateCreaseAndPassDefenders(event, enemy_threats);
 
     if (pass_defenders.size() > 0)
@@ -58,6 +57,9 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
         return;
     }
 
+    unsigned int max_num_crease_defenders =
+        defender_assignment_config.max_num_crease_defenders();
+
     // Choose which defender assignments to assign defenders to based on number
     // of tactics available to set
     std::vector<DefenderAssignment> crease_defender_assignments;
@@ -77,17 +79,19 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
             defender_assignment = assignments.front();
         }
 
-        if (defender_assignment.type == CREASE_DEFENDER)
+        if (defender_assignment.type == CREASE_DEFENDER && max_num_crease_defenders > 0)
         {
             crease_defender_assignments.emplace_back(defender_assignment);
+            max_num_crease_defenders--;
 
             // If we have at least two available defenders, two defenders should
             // be assigned to the highest scoring crease defender assignment to better
             // block the shot cone of the most threatening enemy
-            if (i == 0 && event.common.num_tactics >= 2)
+            if (i == 0 && event.common.num_tactics >= 2 && max_num_crease_defenders > 0)
             {
                 crease_defender_assignments.emplace_back(defender_assignment);
                 i++;
+                max_num_crease_defenders--;
             }
         }
         else

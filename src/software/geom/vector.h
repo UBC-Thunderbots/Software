@@ -357,13 +357,13 @@ bool operator!=(const Vector &u, const Vector &v);
 // https://prateekvjoshi.com/2014/06/05/using-hash-function-in-c-for-user-defined-classes/
 namespace std
 {
-    template <>
-    struct hash<Vector> final
+template <>
+struct hash<Vector> final
+{
+    size_t operator()(const Vector &v) const
     {
-        size_t operator()(const Vector &v) const
-        {
-            hash<double> h;
-            return h(v.x()) * 17 + h(v.y());
-        }
-    };
+        hash<double> h;
+        return h(v.x()) * 17 + h(v.y());
+    }
+};
 }  // namespace std

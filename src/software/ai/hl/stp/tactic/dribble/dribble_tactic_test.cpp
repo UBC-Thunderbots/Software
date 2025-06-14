@@ -64,9 +64,8 @@ TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -87,9 +86,8 @@ TEST_F(DribbleTacticTest, test_stopped_ball)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -110,9 +108,8 @@ TEST_F(DribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -135,14 +132,16 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, tactic](std::shared_ptr<World> world_ptr,
-                                            ValidationCoroutine::push_type& yield) {
+                                            ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             checkPossession(tactic, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
@@ -166,7 +165,8 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_orientation, tactic](std::shared_ptr<World> world_ptr,
-                                            ValidationCoroutine::push_type& yield) {
+                                            ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
                                yield);
@@ -195,7 +195,8 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
-            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
@@ -204,7 +205,8 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
@@ -228,7 +230,8 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
-            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
@@ -237,7 +240,8 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
@@ -262,7 +266,8 @@ TEST_F(DribbleTacticTest,
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
-            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
@@ -297,7 +302,8 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
-            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
@@ -306,7 +312,8 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
@@ -332,12 +339,12 @@ TEST_F(DribbleTacticTest, test_robot_not_bumping_ball_when_turning_around)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (distance(world_ptr->ball().position(), initial_ball_state.position()) >
                    0.05)
             {

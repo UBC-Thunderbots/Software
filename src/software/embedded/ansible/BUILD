@@ -3,7 +3,6 @@ package(default_visibility = ["//visibility:public"])
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@ansible_deps//:requirements.bzl", "requirement")
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 
 compile_pip_requirements(
     name = "requirements",
@@ -26,6 +25,7 @@ py_binary(
         "//software/embedded/linux_configs/pi:pi_files",
         "//software/embedded/linux_configs/systemd:systemd_files",
         "//software/embedded/redis",
+        "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli_tar",
         "//software/embedded/services:robot_auto_test",
         "//software/power:powerloop_tar",
     ],

@@ -43,7 +43,6 @@ void logFromNetworking(TbotsProto::RobotLog log)
 
 int main(int argc, char **argv)
 {
-    // load command line arguments
     struct CommandLineArgs
     {
         bool help                         = false;
@@ -95,7 +94,8 @@ int main(int argc, char **argv)
     }
 
     // Only show logs from robots in the selected_ids list, unless it is empty
-    auto robot_log_callback = [args](TbotsProto::RobotLog log) {
+    auto robot_log_callback = [args](TbotsProto::RobotLog log)
+    {
         if (!args.selected_ids.empty() &&
             std::find(args.selected_ids.begin(), args.selected_ids.end(),
                       log.robot_id()) == args.selected_ids.end())

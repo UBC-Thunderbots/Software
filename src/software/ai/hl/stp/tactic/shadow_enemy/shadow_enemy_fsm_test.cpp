@@ -8,7 +8,7 @@ TEST(ShadowEnemyFSMTest, test_findBlockPassPoint)
 {
     Point ball_position    = Point(0, 2);
     Robot shadowee         = Robot(0, Point(0, -2), Vector(0, 0), Angle::half(),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
     double shadow_distance = 2;
     Point block_pass_point =
         ShadowEnemyFSM::findBlockPassPoint(ball_position, shadowee, shadow_distance);
@@ -25,7 +25,7 @@ TEST(ShadowEnemyFSMTest, test_findBlockPassPoint)
 
     ball_position   = Point(2, 0);
     shadowee        = Robot(0, Point(-2, 0), Vector(0, 0), Angle::half(),
-                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                            AngularVelocity::zero(), Timestamp::fromSeconds(0));
     shadow_distance = 0.25;
     block_pass_point =
         ShadowEnemyFSM::findBlockPassPoint(ball_position, shadowee, shadow_distance);
@@ -35,9 +35,9 @@ TEST(ShadowEnemyFSMTest, test_findBlockPassPoint)
 TEST(ShadowEnemyFSMTest, test_findBlockShotPoint)
 {
     Robot shadower    = Robot(0, Point(0, 1), Vector(0, 0), Angle::half(),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot shadowee    = Robot(0, Point(2, 0), Vector(0, 0), Angle::half(),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Field field       = Field::createSSLDivisionBField();
     Team friendlyTeam = Team(Duration::fromSeconds(1));
     friendlyTeam.updateRobots({shadower});

@@ -4,8 +4,9 @@
 RedisClient::RedisClient(std::string host, size_t port)
     : subscriber_(), client_(), host_(host), port_(port)
 {
-    auto connection_callback = [](const std::string &host, std::size_t port,
-                                  cpp_redis::connect_state status) {
+    auto connection_callback =
+        [](const std::string &host, std::size_t port, cpp_redis::connect_state status)
+    {
         if (status == cpp_redis::connect_state::dropped)
         {
             LOG(WARNING) << "Redis subscriber_ connection dropped";
@@ -36,10 +37,10 @@ RedisClient::RedisClient(std::string host, size_t port)
     // subscribe to key 'set' event within the keyspace
     // adds key and its value to the key value set
     subscriber_.subscribe("__keyevent@0__:set",
-                          [this](const std::string &channel, const std::string &key) {
-                              client_.get(key, [this, key](cpp_redis::reply &value) {
-                                  key_value_set_[key] = value.as_string();
-                              });
+                          [this](const std::string &channel, const std::string &key)
+                          {
+                              client_.get(key, [this, key](cpp_redis::reply &value)
+                                          { key_value_set_[key] = value.as_string(); });
                               client_.commit();
                           });
     subscriber_.commit();

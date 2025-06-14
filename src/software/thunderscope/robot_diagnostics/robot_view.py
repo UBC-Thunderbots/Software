@@ -71,7 +71,7 @@ class RobotViewComponent(QWidget):
         :param robot_statistic : robot statistic proto to update with new metrics
         """
         if robot_status is not None:
-            self.robot_info.update(robot_status, robot_statistic)
+            self.robot_info.update_robot_status(robot_status)
             if self.robot_status:
                 self.robot_status.update(robot_status)
 
@@ -101,14 +101,14 @@ class RobotView(QScrollArea):
 
         self.layout = QVBoxLayout()
 
-        self.robot_view_widgets = []
+        self.components = []
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
-            robot_view_widget = RobotViewComponent(
+            component = RobotViewComponent(
                 id, available_control_modes, self.individual_robot_control_mode_signal
             )
-            self.robot_view_widgets.append(robot_view_widget)
-            self.layout.addWidget(robot_view_widget)
+            self.components.append(component)
+            self.layout.addWidget(component)
 
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller
@@ -134,16 +134,16 @@ class RobotView(QScrollArea):
             and robot_statistic is not None
             and robot_status.robot_id == robot_statistic.robot_id
         ):  # if both pieces of data are available
-            self.robot_view_widgets[robot_status.robot_id].update(
+            self.components[robot_status.robot_id].update(
                 robot_status=robot_status, robot_statistic=robot_statistic
             )
         else:
             if robot_status is not None:
-                self.robot_view_widgets[robot_status.robot_id].update(
+                self.components[robot_status.robot_id].update(
                     robot_status,
                     robot_statistic=None,
                 )
             if robot_statistic is not None:
-                self.robot_view_widgets[robot_statistic.robot_id].update(
+                self.components[robot_statistic.robot_id].update(
                     robot_status=None, robot_statistic=robot_statistic
                 )

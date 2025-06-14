@@ -15,7 +15,8 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       halt_tactics(),
       requires_goalie(requires_goalie),
-      tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
+      tactic_sequence(
+          std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1)),
       world_ptr_(std::nullopt),
       obstacle_factory(ai_config.robot_navigation_obstacle_config())
 {
@@ -42,7 +43,7 @@ PriorityTacticVector Play::getTactics(const WorldPtr &world_ptr)
     {
         // Make a new tactic_sequence
         tactic_sequence = TacticCoroutine::pull_type(
-            boost::bind(&Play::getNextTacticsWrapper, this, _1));
+            std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1));
         // Run the coroutine. This will call the bound getNextTactics function
         tactic_sequence();
     }
@@ -61,7 +62,7 @@ PriorityTacticVector Play::getTactics(const WorldPtr &world_ptr)
     {
         // Make a new tactic_sequence
         tactic_sequence = TacticCoroutine::pull_type(
-            boost::bind(&Play::getNextTacticsWrapper, this, _1));
+            std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1));
         // Run the coroutine. This will call the bound getNextTactics function
         tactic_sequence();
         if (tactic_sequence)
@@ -98,11 +99,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         ZoneNamedN(_tracy_tactics, "Play: Get Tactics from Play", true);
 
         updateTactics(PlayUpdate(
-            world_ptr, num_tactics,
-            [&priority_tactics](PriorityTacticVector new_tactics) {
-                priority_tactics = std::move(new_tactics);
-            },
-            inter_play_communication, set_inter_play_communication_fun));
+            world_ptr, num_tactics, [&priority_tactics](PriorityTacticVector new_tactics)
+            { priority_tactics = std::move(new_tactics); }, inter_play_communication,
+            set_inter_play_communication_fun));
     }
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
@@ -385,10 +384,10 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 primitives_to_run->mutable_robot_primitives()->insert(
                     {robot_id, *primitive_proto});
                 remaining_robots.erase(
-                    std::remove_if(remaining_robots.begin(), remaining_robots.end(),
-                                   [robots_to_assign, row](const Robot &robot) {
-                                       return robot.id() == robots_to_assign.at(row).id();
-                                   }),
+                    std::remove_if(
+                        remaining_robots.begin(), remaining_robots.end(),
+                        [robots_to_assign, row](const Robot &robot)
+                        { return robot.id() == robots_to_assign.at(row).id(); }),
                     remaining_robots.end());
 
                 primitives[robot_id]->getVisualizationProtos(obstacle_list,
