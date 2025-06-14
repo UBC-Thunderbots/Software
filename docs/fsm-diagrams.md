@@ -11,16 +11,25 @@ direction LR
 Halt --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Halt --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
 Halt --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Halt --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
+Timeout --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
+Timeout --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
+Timeout --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
+Timeout --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
+Timeout --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Stop --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Stop --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
 Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Stop --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
 Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Playing --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
 SetPlay --> Halt : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
 SetPlay --> Stop : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
 SetPlay --> Playing : [gameStatePlaying]\n<i>resetSetPlay, setupOffensePlay</i>
 SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+SetPlay --> Timeout : [gameStateTimeout]\n<i>setupTimeoutPlay</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -219,6 +228,19 @@ TakePassState --> AttemptShotState : [shouldAbortPass]\n<i>startLookingForPass</
 TakePassState --> TakePassState : [!passCompleted]\n<i>takePass</i>
 TakePassState --> Terminate:::terminate : [passCompleted]\n<i>takePass</i>
 Terminate:::terminate --> AttemptShotState : <i>startLookingForPass</i>
+
+```
+
+## [TimeoutPlayFSM](/src/software/ai/hl/stp/play/timeout_play/timeout_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> TimeoutState
+TimeoutState --> TimeoutState : <i>updateTimeout</i>
+Terminate:::terminate --> Terminate:::terminate : <i>updateTimeout</i>
 
 ```
 
