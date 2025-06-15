@@ -167,9 +167,11 @@ class ChickerWidget(QWidget):
         self.meters_per_second_button = self.power_mode_buttons[0]
         self.pulse_width_button = self.power_mode_buttons[1]
 
+        self.meters_per_second_button.clicked.connect(self.hide_pulse_width_show_power)
+        self.pulse_width_button.clicked.connect(self.hide_power_show_pulse_width)
+
         self.meters_per_second_button.setChecked(True)
-
-
+        self.hide_pulse_width_show_power()
 
         self.kick_button.clicked.connect(
             lambda: self.send_command_and_timeout(
@@ -188,6 +190,32 @@ class ChickerWidget(QWidget):
 
         chicker_widget_vbox_layout.addWidget(self.auto_kick_chip_buttons_box)
         chicker_widget_vbox_layout.addWidget(self.power_mode_buttons_box)
+
+    def hide_pulse_width_show_power(self):
+        for i in range(self.kicker_pulse_width_slider_layout.count()):
+            self.kicker_pulse_width_slider_layout.itemAt(i).widget().hide()
+
+        for i in range(self.chipper_pulse_width_slider_layout.count()):
+            self.chipper_pulse_width_slider_layout.itemAt(i).widget().hide()
+
+        for i in range(self.kick_power_slider_layout.count()):
+            self.kick_power_slider_layout.itemAt(i).widget().show()
+
+        for i in range(self.chip_distance_slider_layout.count()):
+            self.chip_distance_slider_layout.itemAt(i).widget().show()
+
+    def hide_power_show_pulse_width(self):
+        for i in range(self.kick_power_slider_layout.count()):
+            self.kick_power_slider_layout.itemAt(i).widget().hide()
+
+        for i in range(self.chip_distance_slider_layout.count()):
+            self.chip_distance_slider_layout.itemAt(i).widget().hide()
+
+        for i in range(self.kicker_pulse_width_slider_layout.count()):
+            self.kicker_pulse_width_slider_layout.itemAt(i).widget().show()
+
+        for i in range(self.chipper_pulse_width_slider_layout.count()):
+            self.chipper_pulse_width_slider_layout.itemAt(i).widget().show()
 
     def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
         """If the kick/chip buttons are enabled and unlocked, send a kick/chip command
