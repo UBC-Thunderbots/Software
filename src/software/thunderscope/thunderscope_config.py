@@ -459,11 +459,7 @@ def configure_replay_view(
                     replay=True,
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_robot_view_fullsystem(
-                            proto_unix_io_map[ProtoUnixIOTypes.BLUE]
-                        )
-                    ],
+                    extra_widgets=[],
                     frame_swap_counter=FrameTimeCounter(),
                     refresh_counter=blue_refresh_func_counter,
                 ),
@@ -486,11 +482,7 @@ def configure_replay_view(
                     replay=True,
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_robot_view_fullsystem(
-                            proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
-                        )
-                    ],
+                    extra_widgets=[],
                     frame_swap_counter=FrameTimeCounter(),
                     refresh_counter=yellow_refresh_func_counter,
                 ),

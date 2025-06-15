@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 
 #include <gtest/gtest.h>
+#include "software/logger/logger.h"   
 
 #include "software/test_util/test_util.h"
 
@@ -84,6 +85,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
+
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::BlockPassState>));
 
     // Shadowee now has the ball, our robot should move to block the shot
@@ -118,13 +120,10 @@ TEST(ShadowEnemyFSMTest, test_transitions)
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::GoAndStealState>));
-    // Shadower is now near the shadowee
+    // Shadower is now has the breakbeam tripped
     // Robot should try and steal and pull the ball
-    shadower.updateState(
-        RobotState(Point(0, -1.97), Vector(),
-                   (world->ball().position() - position_to_block).orientation(),
-                   AngularVelocity::zero()),
-        Timestamp::fromSeconds(0));
+    shadower = Robot(2, Point(0, -1.97), Vector(), Angle(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0), true);
 
 
     fsm.process_event(ShadowEnemyFSM::Update(

@@ -528,7 +528,7 @@ message DefensePlayConfig
 
         // The max number of crease defender can be created at a moment
         required uint32 max_num_crease_defenders = 6
-            [default = 1, (bounds).min_int_value = 1, (bounds).max_int_value = 3];
+            [default = 3, (bounds).min_int_value = 1, (bounds).max_int_value = 3];
     }
 
     // The distance at which a threat is considered "immediate" if there is only 1

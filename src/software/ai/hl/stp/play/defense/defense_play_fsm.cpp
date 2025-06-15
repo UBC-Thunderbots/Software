@@ -47,11 +47,11 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
 void DefensePlayFSM::updateCreaseAndPassDefenders(
     const Update& event, const std::vector<EnemyThreat>& enemy_threats)
 {
+    auto defender_assignment_config =
+        ai_config.defense_play_config().defender_assignment_config();
     auto assignments = getAllDefenderAssignments(
         enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
-
-        ai_config.defense_play_config().defender_assignment_config());
-
+        defender_assignment_config);
     if (assignments.size() == 0)
     {
         return;

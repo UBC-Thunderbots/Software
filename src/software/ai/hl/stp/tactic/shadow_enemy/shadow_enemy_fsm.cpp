@@ -42,11 +42,13 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
 
     if (enemy_threat_opt.has_value())
     {
+        const double ENEMY_NEAR_BALL_DIST = 0.22;
         bool near_ball = distance(event.common.world_ptr->ball().position(),
-                                  enemy_threat_opt.value().robot.position()) < 0.22;
+                                  enemy_threat_opt.value().robot.position()) < ENEMY_NEAR_BALL_DIST;
 
         return near_ball;
     }
+    
     return false;
 }
 
@@ -64,13 +66,7 @@ bool ShadowEnemyFSM::blockedShot(const Update &event)
 
 bool ShadowEnemyFSM::contestedBall(const Update &event)
 {
-    // OK so basically you need to change thresholds for how close
-    ////in robot.h there is a isneardribbler function u can use instead of this breakbeams
-    /// stuff
-    bool robot_contesting = distance(event.common.world_ptr->ball().position(),
-                                     event.common.robot.position()) < 0.08;
-
-    return robot_contesting;
+    return event.common.robot.breakbeamTripped();
 }
 
 void ShadowEnemyFSM::blockPass(const Update &event)
@@ -156,8 +152,9 @@ void ShadowEnemyFSM::stealAndPull(const Update &event)
     auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
-    auto pull_to_here =
-        (event.common.robot.position() - ball_position) * 2 + ball_position;
+    
+    auto direction_to_pull = (event.common.robot.position() - ball_position).normalize();
+    auto pull_to_here = direction_to_pull + event.common.robot.position();
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, pull_to_here, face_ball_orientation,
