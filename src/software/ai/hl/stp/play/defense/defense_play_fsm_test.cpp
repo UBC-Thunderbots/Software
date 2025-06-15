@@ -14,6 +14,9 @@ TEST(DefensePlayFSMTest, test_transitions)
 
     FSM<DefensePlayFSM> fsm(DefensePlayFSM{ai_config});
     EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>));
+    // DefensePlayFSM always stays in the DefenseState
+    ::TestUtil::setEnemyRobotPositions(world, {Point(0, 0), Point(-1, 0), Point(-2, 0)},
+                                          Timestamp::fromSeconds(0));
 
     fsm.process_event(DefensePlayFSM::Update(
         DefensePlayFSM::ControlParams{
@@ -22,7 +25,6 @@ TEST(DefensePlayFSMTest, test_transitions)
             world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
-    // DefensePlayFSM always stays in the DefenseState
-    EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>) ||
-                fsm.is(boost::sml::state<DefensePlayFSM::AggressiveDefenseState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>) /*||
+                fsm.is(boost::sml::state<DefensePlayFSM::AggressiveDefenseState>)*/);
 }
