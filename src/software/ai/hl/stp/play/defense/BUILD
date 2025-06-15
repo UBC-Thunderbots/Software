@@ -23,6 +23,7 @@ cc_library(
         "//software/ai/hl/stp/play/defense:defense_play_base",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
+        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/logger",
         "//software/util/generic_factory",
         "@sml",
