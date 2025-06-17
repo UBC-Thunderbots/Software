@@ -2,6 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/distance.h"
+#include "shared/constants.h"
 
 Point ShadowEnemyFSM::findBlockPassPoint(const Point &ball_position,
                                          const Robot &shadowee,
@@ -135,16 +136,39 @@ void ShadowEnemyFSM::blockShot(const Update &event,
 
 void ShadowEnemyFSM::goAndSteal(const Update &event)
 {
+    
     auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
 
-    event.common.set_primitive(std::make_unique<MovePrimitive>(
-        event.common.robot, ball_position, face_ball_orientation,
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
+    std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
+    bool go_for_ball=true;
+    auto goal_direction = event.common.world_ptr->field().friendlyGoalCenter() - ball_position; 
+
+    if (enemy_threat_opt.has_value())
+    {
+        auto enemy_angle = Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
+        
+        //Here we check if the enemy is facing the goal if not we just shadow
+        go_for_ball=enemy_angle.dot(goal_direction)>0;
+    }
+
+    if(go_for_ball){
+        event.common.set_primitive(std::make_unique<MovePrimitive>(
+            event.common.robot, ball_position, face_ball_orientation,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
+    }else{
+        auto shadow_ball_position = enemy_threat_opt.value().robot.position() + goal_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS); 
+        event.common.set_primitive(std::make_unique<MovePrimitive>(
+            event.common.robot, shadow_ball_position, face_ball_orientation,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
+    }
 }
 
 void ShadowEnemyFSM::stealAndPull(const Update &event)
