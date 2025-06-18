@@ -9,12 +9,11 @@ install_autoref() {
 }
 
 install_bazel() {
-    download=https://github.com/bazelbuild/bazel/releases/download/8.2.1/bazel-8.2.1-linux-arm64
+    download=https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazelisk-linux-arm64
 
     if is_x86 $1; then
-        download=https://github.com/bazelbuild/bazel/releases/download/8.2.1/bazel-8.2.1-linux-x86_64
+        download=https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-linux-amd64
     fi
-
     wget -nc $download -O /tmp/tbots_download_cache/bazel
     sudo mv /tmp/tbots_download_cache/bazel /usr/bin/bazel
     sudo chmod +x /usr/bin/bazel
