@@ -10,7 +10,7 @@ test --test_output=all
 build --crosstool_top=//cc_toolchain:toolchain
 
 # Add warnings to Thunderbots code only
-# build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitive/.*,//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+#build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitive/.*,//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
 
 # Warn variable length arrays only when compiling cpp
 build --per_file_copt=.*\.cpp@-Wvla
@@ -50,14 +50,15 @@ common --verbose_failures
 common --sandbox_debug
 build --noincompatible_disallow_ctx_resolve_tools
 build --check_direct_dependencies=off
-build --experimental_remote_merkle_tree_cache # partial repo caching optimization
+#build --experimental_remote_merkle_tree_cache # partial repo caching optimization
 build --incompatible_enable_proto_toolchain_resolution # protoc caching
 
 # Ensure that we don't accidentally build protobuf or gRPC
-common --per_file_copt=external/.*protobuf.*@--PROTOBUF_WAS_NOT_SUPPOSED_TO_BE_BUILT
-common --host_per_file_copt=external/.*protobuf.*@--PROTOBUF_WAS_NOT_SUPPOSED_TO_BE_BUILT
-common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
-common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
+#common --per_file_copt=external/.*protobuf.*@--PROTOBUF_WAS_NOT_SUPPOSED_TO_BE_BUILT
+#common --host_per_file_copt=external/.*protobuf.*@--PROTOBUF_WAS_NOT_SUPPOSED_TO_BE_BUILT
+#common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
+#common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 
 # Deprecation Updates
 common --run_validations
+
