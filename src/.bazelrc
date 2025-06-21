@@ -26,10 +26,10 @@ build --action_env=PYTHON_LIB_PATH=/opt/tbotspython/lib/python3.12
 
 # Automatically set the CPU environment based on the `--cpu` flag as per our
 # defined CPU environments
-build --auto_cpu_environment_group=//cc_toolchain:cpus
+build --auto_cpu_environment_group=//toolchains/cc:cpus
 
 # Use Our Custom Toolchain
-build --crosstool_top=//cc_toolchain:toolchain
+build --crosstool_top=//toolchains/cc:toolchain
 
 ################# Build Optimizations #################
 

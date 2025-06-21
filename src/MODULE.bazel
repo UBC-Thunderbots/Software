@@ -246,17 +246,17 @@ register_toolchains("@toolchains_protoc_hub//:all")
 # Declared toolchains should be created with the 'toolchain' rule and should not have dependencies that themselves require toolchains.
 register_toolchains("//toolchains/proto:all")
 
-register_toolchains("//py_toolchain:py_toolchain")
+register_toolchains("//toolchains/python:py_toolchain")
 
 register_toolchains(
-    "//py_toolchain:k8_jetson_nano_cross_compile_py_cc_toolchain",
-    "//py_toolchain:py_cc_toolchain_for_host_x86_64",
+    "//toolchains/python:k8_jetson_nano_cross_compile_py_cc_toolchain",
+    "//toolchains/python:py_cc_toolchain_for_host_x86_64",
 )
 
 register_toolchains(
-    "//cc_toolchain:cc_toolchain_for_k8_jetson_nano_cross_compile",
-    "//cc_toolchain:cc_toolchain_for_k8",
-    "//cc_toolchain:cc_toolchain_for_aarch64",
+    "//toolchains/cc:cc_toolchain_for_k8_jetson_nano_cross_compile",
+    "//toolchains/cc:cc_toolchain_for_k8",
+    "//toolchains/cc:cc_toolchain_for_aarch64",
 )
 
 ##############################################
