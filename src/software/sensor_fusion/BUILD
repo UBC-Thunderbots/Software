@@ -15,7 +15,6 @@ cc_library(
         "//software/sensor_fusion/filter:vision_detection",
         "//software/sensor_fusion/possession:possession_tracker",
         "//software/world",
-        "@protobuf//:differencer",
     ],
 )
 
@@ -39,5 +38,6 @@ cc_library(
         ":sensor_fusion",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "@protobuf//:differencer",
     ],
 )

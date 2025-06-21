@@ -1,28 +1,18 @@
-
-# We rely on all symbols being included when linking for our implementation of
-# the "factory" design pattern.
-build --incompatible_remove_legacy_whole_archive=False
+################## Base Bazel Configs ##################
+common --enable_bzlmod
+common --lockfile_mode=update
+common --noincompatible_disallow_empty_glob # Allow globs to be empty without failing
+common --incompatible_disallow_struct_provider_syntax=false
 
 # We want bazel to output the results of our gtests
 test --test_output=all
 
-# Use Our Custom Toolchain
-build --crosstool_top=//cc_toolchain:toolchain
+################## Bazel Debug Configs ##################
 
-# Add warnings to Thunderbots code only
-#build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitive/.*,//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+common --verbose_failures
+common --sandbox_debug
 
-# Warn variable length arrays only when compiling cpp
-build --per_file_copt=.*\.cpp@-Wvla
-
-# Automatically set the CPU environment based on the `--cpu` flag as per our
-# defined CPU environments
-build --auto_cpu_environment_group=//cc_toolchain:cpus
-
-# Use a local directory as a remote cache. This shares artifacts when switching
-# between git branches or workspaces for the same project.
-# See https://docs.bazel.build/versions/master/remote-caching.html#disk-cache
-build --disk_cache=~/.cache/thunderbots_bazel_disk_cache
+################ Machine Configurations ################
 
 # The XDR_RUNTIME_DIR and DISPLAY environment variables must be passed to the tests
 # so that our GUIs can be enabled for simulated tests. This is needed for Qt
@@ -34,22 +24,20 @@ build --test_env=DISPLAY
 build --action_env=PYTHON_BIN_PATH=/opt/tbotspython/bin/python3.12
 build --action_env=PYTHON_LIB_PATH=/opt/tbotspython/lib/python3.12
 
-# Enable the new cc_toolchain resolution strategy
-# #TODO(#3382): Delete when we upgrade to Bazel 7.0
-# build --incompatible_enable_cc_toolchain_resolution
+# Automatically set the CPU environment based on the `--cpu` flag as per our
+# defined CPU environments
+build --auto_cpu_environment_group=//cc_toolchain:cpus
 
-# Enable Bzlmod for every Bazel command new bazel 8 args
-build --enable_runfiles
-common --enable_bzlmod
-common --lockfile_mode=update
-common --enable_platform_specific_config
-build --cxxopt="-std=c++20"
-common --noincompatible_disallow_empty_glob
-common --incompatible_disallow_struct_provider_syntax=false
-common --verbose_failures
-common --sandbox_debug
-build --noincompatible_disallow_ctx_resolve_tools
-build --check_direct_dependencies=off
+# Use Our Custom Toolchain
+build --crosstool_top=//cc_toolchain:toolchain
+
+################# Build Optimizations #################
+
+# Use a local directory as a remote cache. This shares artifacts when switching
+# between git branches or workspaces for the same project.
+# See https://docs.bazel.build/versions/master/remote-caching.html#disk-cache
+build --disk_cache=~/.cache/thunderbots_bazel_disk_cache
+
 build --experimental_remote_merkle_tree_cache # partial repo caching optimization
 build --incompatible_enable_proto_toolchain_resolution # protoc caching
 
@@ -59,6 +47,26 @@ build --incompatible_enable_proto_toolchain_resolution # protoc caching
 common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 
-# Deprecation Updates
-common --run_validations
+################# Build Configurations #################
+# Lock C++ version
+build --cxxopt="-std=c++20"
+# Warn variable length arrays only when compiling cpp
+build --per_file_copt=.*\.cpp@-Wvla
+
+# Enable runfiles symlink tree
+build --enable_runfiles
+
+# Allow usage of platform specific .bazelrc configs (e.g. build:linux, common:windows, etc)
+common --enable_platform_specific_config
+
+# We rely on all symbols being included when linking for our implementation of
+# the "factory" design pattern.
+build --incompatible_remove_legacy_whole_archive=False
+
+# Add warnings to Thunderbots code only
+#build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitive/.*,//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+
+############## External Deps Compatibility ##############
+build --noincompatible_disallow_ctx_resolve_tools
+build --check_direct_dependencies=off
 

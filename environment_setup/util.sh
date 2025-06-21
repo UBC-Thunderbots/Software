@@ -9,7 +9,7 @@ install_autoref() {
 }
 
 install_bazel() {
-    download=https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazelisk-linux-arm64
+    download=https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-linux-arm64 
 
     if is_x86 $1; then
         download=https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-linux-amd64
