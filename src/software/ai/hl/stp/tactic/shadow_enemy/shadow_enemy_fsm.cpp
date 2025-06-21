@@ -61,7 +61,9 @@ bool ShadowEnemyFSM::blockedShot(const Update &event)
     Segment goalLine(event.common.world_ptr->field().friendlyGoal().negXNegYCorner(),
                      event.common.world_ptr->field().friendlyGoal().negXPosYCorner());
     bool ball_blocked = intersects(goalLine, shot_block_direction);
-    return ball_blocked;
+    const double NEAR_PRESS = 0.3;
+    bool is_close = distance(event.common.robot.position(),ball_position)<NEAR_PRESS;
+    return (ball_blocked&is_close)|true;
 }
 
 
@@ -144,10 +146,11 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
     bool go_for_ball=true;
     auto goal_direction = event.common.world_ptr->field().friendlyGoalCenter() - ball_position; 
-
+    auto enemy_angle = Vector();
+    
     if (enemy_threat_opt.has_value())
     {
-        auto enemy_angle = Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
+        enemy_angle = Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
         
         //Here we check if the enemy is facing the goal if not we just shadow
         go_for_ball=enemy_angle.dot(goal_direction)>0;
@@ -161,7 +164,9 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
     }else{
-        auto shadow_ball_position = enemy_threat_opt.value().robot.position() + goal_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS); 
+        enemy_angle = Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
+        auto shadow_ball_position = enemy_threat_opt.value().robot.position()+(goal_direction.normalize(ROBOT_MAX_RADIUS_METERS*4.0)); 
+
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, shadow_ball_position, face_ball_orientation,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
@@ -169,6 +174,7 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
     }
+
 }
 
 void ShadowEnemyFSM::stealAndPull(const Update &event)

@@ -15,26 +15,15 @@ bool DefensePlayFSM::shouldDefendAggressively(const Update& event)
     //If there is more attackers ahead of the ball than there
     //is our own defenders we probably shouldn't press
     //this can be replaced with smarter or stricter logic though
-
-    int attackers=0;
     
-    for (const Robot &robot : event.common.world_ptr->enemyTeam().getAllRobots())       
-    {                                                                  
-        if(robot.position().x()<event.common.world_ptr->ball().position().x()){
-            attackers++;
-        }
-    }
 
-    int defenders=0;
+    auto attackers = std::count_if(event.common.world_ptr->enemyTeam().getAllRobots().begin(), event.common.world_ptr->enemyTeam().getAllRobots().end(), [event](const Robot& robot) {
+    return robot.position().x() < event.common.world_ptr->ball().position().x();});
 
-    for (const Robot &robot : event.common.world_ptr->friendlyTeam().getAllRobots())       
-    {                                                                  
-        if(robot.position().x()<event.common.world_ptr->ball().position().x()){
-            defenders++;
-        }
-    }
+    auto defenders = std::count_if(event.common.world_ptr->friendlyTeam().getAllRobots().begin(), event.common.world_ptr->friendlyTeam().getAllRobots().end(), [event](const Robot& robot) {
+    return robot.position().x() < event.common.world_ptr->ball().position().x();});
 
-    return defenders >= attackers;
+    return defenders > attackers;
 }
 
 void DefensePlayFSM::blockShots(const Update& event)
