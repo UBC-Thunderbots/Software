@@ -57,3 +57,11 @@ py_library(
         requirement("pyqt-toast-notification"),
     ],
 )
+
+py_library(
+    name = "thread_safe_circular_buffer",
+    srcs = ["thread_safe_circular_buffer.py"],
+    deps = [
+        "//software/thunderscope:thread_safe_buffer",
+    ],
+)

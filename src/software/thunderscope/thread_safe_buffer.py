@@ -26,15 +26,17 @@ class ThreadSafeBuffer:
 
         :param buffer size: The size of the buffer.
         :param protobuf_type: To buffer
-        :param log_overrun: False
+        :param log_overrun: If True, warns when we lose protos during `put` operations
         """
         self.logger = create_logger(protobuf_type.DESCRIPTOR.name + " Buffer")
-        self.queue = queue.Queue(buffer_size)
+        self.buffer = queue.Queue(buffer_size)
         self.protobuf_type = protobuf_type
         self.log_overrun = log_overrun
         self.cached_msg = protobuf_type()
         self.protos_dropped = 0
         self.last_logged_protos_dropped = 0
+        self.empty_exception = queue.Empty
+        self.full_exception = queue.Full
 
     def get(
         self, block: bool = False, timeout: float = None, return_cached: bool = True
@@ -56,7 +58,7 @@ class ThreadSafeBuffer:
                       comes through, or returned the cached msg if return_cached = True
         :param timeout: If block is True, then wait for this many seconds before
                         throwing an error or returning cached
-        :param return_cached: If queue is empty, decides whether to
+        :param return_cached: If buffer is empty, decides whether to
                               return cached value (True) or return None / throw an error (false)
 
         :return: protobuf (cached if block is False and there is no data
@@ -76,14 +78,14 @@ class ThreadSafeBuffer:
 
         if block:
             try:
-                self.cached_msg = self.queue.get(timeout=timeout)
-            except queue.Empty as empty:
+                self.cached_msg = self.buffer.get(timeout=timeout)
+            except self.empty_exception as empty:
                 if not return_cached:
                     raise empty
         else:
             try:
-                self.cached_msg = self.queue.get_nowait()
-            except queue.Empty:
+                self.cached_msg = self.buffer.get_nowait()
+            except self.empty_exception:
                 if not return_cached:
                     return None
 
@@ -98,10 +100,14 @@ class ThreadSafeBuffer:
         :param timeout: If block is True, then wait for this many seconds
         """
         if block:
-            self.queue.put(proto, block, timeout)
+            self.buffer.put(proto, block, timeout)
             return
 
         try:
-            self.queue.put_nowait(proto)
-        except queue.Full:
+            self.buffer.put_nowait(proto)
+        except self.full_exception:
             self.protos_dropped += 1
+
+    def size(self) -> int:
+        """Returns the number of objects in the buffer"""
+        return self.buffer.qsize()

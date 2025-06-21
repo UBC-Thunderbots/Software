@@ -1,0 +1,430 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+
+http_archive(
+    name = "rules_foreign_cc",
+    sha256 = "33a5690733c5cc2ede39cb62ebf89e751f2448e27f20c8b2fbbc7d136b166804",
+    strip_prefix = "rules_foreign_cc-0.5.1",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.5.1.tar.gz",
+)
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+
+# This sets up some common toolchains for building targets. For more details, please see
+# https://bazelbuild.github.io/rules_foreign_cc/0.5.1/flatten.html#rules_foreign_cc_dependencies
+rules_foreign_cc_dependencies()
+
+http_archive(
+    name = "rules_python",
+    sha256 = "3b8b4cdc991bc9def8833d118e4c850f1b7498b3d65d5698eea92c3528b8cf2c",
+    strip_prefix = "rules_python-0.30.0",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.30.0/rules_python-0.30.0.tar.gz",
+)
+
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+register_toolchains("//py_toolchain:py_toolchain")
+
+register_toolchains(
+    "//py_toolchain:k8_jetson_nano_cross_compile_py_cc_toolchain",
+    "//py_toolchain:py_cc_toolchain_host_x86_64",
+    "//py_toolchain:py_cc_toolchain_host_aarch64",
+)
+
+load("@rules_python//python:pip.bzl", "pip_parse")
+
+pip_parse(
+    name = "nanopb_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//extlibs:nanopb_requirements_lock.txt",
+)
+
+pip_parse(
+    name = "thunderscope_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/thunderscope:requirements_lock.txt",
+)
+
+pip_parse(
+    name = "ansible_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
+)
+
+pip_parse(
+    name = "simulated_tests_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/simulated_tests:requirements_lock.txt",
+)
+
+pip_parse(
+    name = "robot_diagnostics_cli_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
+)
+
+load("@nanopb_deps//:requirements.bzl", nanopb_install_deps = "install_deps")
+load("@thunderscope_deps//:requirements.bzl", thunderscope_install_deps = "install_deps")
+load("@ansible_deps//:requirements.bzl", ansible_install_deps = "install_deps")
+load("@simulated_tests_deps//:requirements.bzl", simulated_tests_install_deps = "install_deps")
+load("@robot_diagnostics_cli_deps//:requirements.bzl", robot_diagnostics_cli_install_deps = "install_deps")
+
+nanopb_install_deps()
+
+thunderscope_install_deps()
+
+ansible_install_deps()
+
+simulated_tests_install_deps()
+
+robot_diagnostics_cli_install_deps()
+
+all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
+
+http_archive(
+    name = "rapidcheck",
+    build_file_content = all_contents,
+    sha256 = "93f73c2c39ff91fd3a265b87b429ed266631c2425d9287d4548b149b99168736",
+    strip_prefix = "rapidcheck-7acca63b8e834a74fd47fe8fbf17668d22cc6331",
+    urls = ["https://github.com/emil-e/rapidcheck/archive/7acca63b8e834a74fd47fe8fbf17668d22cc6331.zip"],
+)
+
+http_archive(
+    name = "cpp_redis",
+    sha256 = "12a6fc86ba4ca3d4537a3eee82c094f385b8e03e283c664c976f16d421f17f7d",
+    strip_prefix = "cpp_redis-fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa",
+    urls = [
+        "https://github.com/cpp-redis/cpp_redis/archive/fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa.zip",
+    ],
+)
+
+http_archive(
+    name = "tacopie",
+    sha256 = "bbdebecdb68d5f9eb64170217000daf844e0aee18b8c4d3dd373d07efd9f7316",
+    strip_prefix = "tacopie-master",
+    url = "https://github.com/cylix/tacopie/archive/master.zip",
+)
+
+http_archive(
+    name = "gtest",
+    sha256 = "927827c183d01734cc5cfef85e0ff3f5a92ffe6188e0d18e909c5efebf28a0c7",
+    strip_prefix = "googletest-release-1.8.1",
+    url = "https://github.com/google/googletest/archive/release-1.8.1.zip",
+)
+
+http_archive(
+    name = "g3log",
+    build_file = "@//extlibs:g3log.BUILD",
+    sha256 = "2177e6dfd86fa7465c44c8ef5c3b6ab98ffc94e1130355d6982f7d886cb7bec9",
+    strip_prefix = "g3log-2.4",
+    url = "https://github.com/KjellKod/g3log/archive/refs/tags/2.4.zip",
+)
+
+http_archive(
+    name = "g3sinks",
+    build_file = "@//extlibs:g3sinks.BUILD",
+    sha256 = "77632432de1ec456987c7d83c6eb163bb42f0eb9df6e0bdf63bcf7961c1f6c70",
+    strip_prefix = "g3sinks-1.1.3",
+    url = "https://github.com/KjellKod/g3sinks/archive/1.1.3.zip",
+)
+
+http_archive(
+    name = "base64",
+    build_file = "@//extlibs:base64.BUILD",
+    sha256 = "5e5366919938b834ca95fec4c2a80ad0c002872175d43226c933d25e40572883",
+    strip_prefix = "cpp-base64-2.rc.08",
+    url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
+)
+
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "com_google_protobuf",
+    commit = "21027a27c4c2ec1000859ccbcfff46d83b16e1ed",
+    # We need this patch to properly add generated dependencies to the protoc
+    # compiler. It also fixes an issue with the python imports.
+    remote = "https://github.com/protocolbuffers/protobuf",
+    shallow_since = "1650589240 +0000",
+)
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
+
+git_repository(
+    name = "com_github_nelhage_rules_boost",
+    commit = "58be4e7e851d19e9ba14ced7bdba6fc8895af1d3",
+    remote = "https://github.com/nelhage/rules_boost",
+    shallow_since = "1724946929 +0200",
+)
+
+git_repository(
+    name = "pybind11_protobuf",
+    commit = "f20537c3285636716ed86a7ef96baa19a788c944",
+    remote = "https://github.com/pybind/pybind11_protobuf",
+)
+
+# Used by pybind11 proto autocasters
+http_archive(
+    name = "com_google_absl",
+    sha256 = "dcf71b9cba8dc0ca9940c4b316a0c796be8fab42b070bb6b7cab62b48f0e66c4",  # SHARED_ABSL_SHA
+    strip_prefix = "abseil-cpp-20211102.0",
+    urls = [
+        "https://github.com/abseil/abseil-cpp/archive/refs/tags/20211102.0.tar.gz",
+    ],
+)
+
+load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+
+boost_deps()
+
+new_git_repository(
+    name = "eigen",
+    build_file = "@//extlibs:eigen.BUILD",
+    commit = "6d829e766ff1b1ab867d93631163cbc63ed5798f",
+    remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen.git",
+    shallow_since = "1694679508 +0000",
+)
+
+# nanopb: lightweight protobuf library used on the STM32. The build file in the
+# repo does not build the proto compiler (protoc) as a target, and is really complicated
+# to set it up as a protobuf plugin due to lack of bazel support. So we use the archive
+# which has both the headers and compiled protoc w/ the c support baked in.
+
+http_archive(
+    name = "nanopb",
+    build_file = "@//extlibs:nanopb.BUILD",
+    sha256 = "e98dd6403ab8c5b271d32a6bc025e7e596bb181c7bc7e0492c5daa21fc44c940",
+    strip_prefix = "nanopb-0.3.9.4-linux-x86",
+    urls = [
+        "https://github.com/UBC-Thunderbots/Software-External-Dependencies/raw/main/nanopb-0.3.9.4-linux-x86.tar.gz",
+    ],
+)
+
+new_git_repository(
+    name = "LTC4151",
+    build_file = "@//extlibs:LTC4151.BUILD",
+    commit = "729952f10bcdcf359877b6f728565c17a8f17423",
+    remote = "https://github.com/kerrydwong/LTC4151.git",
+    shallow_since = "1397951678 -0400",
+)
+
+new_git_repository(
+    name = "munkres_cpp",
+    build_file = "@//extlibs:munkres_cpp.BUILD",
+    commit = "61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
+    remote = "https://github.com/saebyn/munkres-cpp.git",
+    shallow_since = "1479502661 -0800",
+)
+
+# yaml cpp parser for dynamic parameters test
+git_repository(
+    name = "yaml-cpp",
+    commit = "f531f8a8c3f8ca0923f9219c72fcca511555f824",
+    remote = "https://github.com/jbeder/yaml-cpp.git",
+    shallow_since = "1571237073 -0500",
+)
+
+new_local_repository(
+    name = "linux_k8_gcc",
+    build_file = "@//extlibs:linux_k8_gcc.BUILD",
+    path = "/",
+)
+
+new_local_repository(
+    name = "linux_aarch64_gcc",
+    build_file = "@//extlibs:linux_aarch64_gcc.BUILD",
+    path = "/",
+)
+
+# libclang-dev is installed into the system through setup_software.sh
+new_local_repository(
+    name = "libclang",
+    build_file = "@//extlibs:libclang.BUILD",
+    path = "/usr/lib/llvm-6.0/",
+)
+
+new_local_repository(
+    name = "k8_jetson_nano_cross_compile_gcc",
+    build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
+    path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
+)
+
+# tool used to flash firmware with bazel
+git_repository(
+    name = "platformio_rules",
+    commit = "882a88e4be94a3b0aadf8d694c012ffeec5eb32a",
+    remote = "http://github.com/mum4k/platformio_rules.git",
+    shallow_since = "1584297373 -0400",
+)
+
+# Developer tools for working with bazel
+git_repository(
+    name = "bazel_buildtools",
+    commit = "41a45edb9184de83dd29e2791bd995fbb73ea141",
+    remote = "git@github.com:bazelbuild/buildtools.git",
+)
+
+# Needed for bazel buildifier: it is written in Go and hence needs rules_go to
+# be built.
+http_archive(
+    name = "io_bazel_rules_go",
+    sha256 = "b27e55d2dcc9e6020e17614ae6e0374818a3e3ce6f2024036e688ada24110444",
+    urls = [
+        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/v0.21.0/rules_go-v0.21.0.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.21.0/rules_go-v0.21.0.tar.gz",
+    ],
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
+go_rules_dependencies()
+
+go_register_toolchains()
+
+http_archive(
+    name = "rules_pkg",
+    sha256 = "d20c951960ed77cb7b341c2a59488534e494d5ad1d30c4818c736d57772a9fef",
+    strip_prefix = "rules_pkg-1.0.1/pkg",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/1.0.1/rules_pkg-1.0.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/1.0.1/rules_pkg-1.0.1.tar.gz",
+    ],
+)
+
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+
+rules_pkg_dependencies()
+
+# Needed for bazel buildifier
+http_archive(
+    name = "bazel_gazelle",
+    sha256 = "be9296bfd64882e3c08e3283c58fcb461fa6dd3c171764fcc4cf322f60615a9b",
+    urls = [
+        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/0.18.1/bazel-gazelle-0.18.1.tar.gz",
+        "https://github.com/bazelbuild/bazel-gazelle/releases/download/0.18.1/bazel-gazelle-0.18.1.tar.gz",
+    ],
+)
+
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+
+gazelle_dependencies()
+
+# Bazel buildtools, provide us with the bazel formatter ("buildifier")
+http_archive(
+    name = "com_github_bazelbuild_buildtools",
+    sha256 = "46ead728d66d48969f8ae3b88f2fd10fddfc80dd7903fb8b5bff9c568f0ebf25",
+    strip_prefix = "buildtools-9e63c6f02e63adaab63e21a3a8feb75f4f7503cb",
+    url = "https://github.com/bazelbuild/buildtools/archive/9e63c6f02e63adaab63e21a3a8feb75f4f7503cb.zip",
+)
+
+# State Machine Library
+new_git_repository(
+    name = "sml",
+    build_file = "@//extlibs:sml.BUILD",
+    commit = "07a503cc3f18de2b861ea15d8357d3b3c0c978d6",  # Version `1.1.3`
+    remote = "https://github.com/boost-ext/sml.git",
+    shallow_since = "1596403987 -0600",
+)
+
+new_git_repository(
+    name = "trinamic",
+    build_file = "@//extlibs:trinamic.BUILD",
+    commit = "0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
+    remote = "https://github.com/trinamic/TMC-API.git",
+    shallow_since = "1631132123 +0200",
+)
+
+# required to use `py_proto_library` from protobuf
+http_archive(
+    name = "six_archive",
+    build_file = "//extlibs:six.BUILD",
+    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
+    url = "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55",
+)
+
+bind(
+    name = "six",
+    actual = "@six_archive//:six",
+)
+
+http_archive(
+    name = "pybind11_bazel",
+    sha256 = "9df284330336958c837fb70dc34c0a6254dac52a5c983b3373a8c2bbb79ac35e",
+    strip_prefix = "pybind11_bazel-2.13.6",
+    urls = ["https://github.com/pybind/pybind11_bazel/releases/download/v2.13.6/pybind11_bazel-2.13.6.zip"],
+)
+
+# We still require the pybind library.
+http_archive(
+    name = "pybind11",
+    build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
+    sha256 = "411f77380c43798506b39ec594fc7f2b532a13c4db674fcf2b1ca344efaefb68",
+    strip_prefix = "pybind11-2.12.0",
+    urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.12.0.zip"],
+)
+
+# These headers are used by pybind11
+bind(
+    name = "python_headers",
+    actual = "@rules_python//python/cc:current_py_cc_headers",
+)
+
+maybe(
+    git_repository,
+    name = "rules_third_party",
+    commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
+    remote = "https://github.com/DraconicEnt/rules_third_party.git",
+    shallow_since = "1620228587 -0400",
+)
+
+load("@rules_third_party//libraries:bullet.bzl", "bullet")
+
+# Adds commit 272c7099d3ba8ac9e8c142e361e8d4cf5d91b8f2 of
+# https://github.com/bulletphysics/bullet3 to the WORKSPACE
+bullet()
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Hedron's Compile Commands Extractor for Bazel
+# https://github.com/hedronvision/bazel-compile-commands-extractor
+git_repository(
+    name = "hedron_compile_commands",
+    commit = "084957eaa1bf6e2bd031f50b1f5d04c89273103a",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
+    shallow_since = "1640414663 -0800",
+)
+
+load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
+
+hedron_compile_commands_setup()
+
+new_git_repository(
+    name = "tracy",
+    build_file = "@//extlibs:tracy.BUILD",
+    commit = "37aff70dfa50cf6307b3fee6074d627dc2929143",
+    remote = "https://github.com/wolfpld/tracy.git",
+    shallow_since = "1697482622 +0200",
+)
+
+register_toolchains(
+    "//cc_toolchain:cc_toolchain_for_k8_jetson_nano_cross_compile",
+    "//cc_toolchain:cc_toolchain_for_k8",
+    "//cc_toolchain:cc_toolchain_for_aarch64",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_host",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/usr/include/python3.12/",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_for_k8_jetson_nano_cross_compile",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
+)
