@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pass_defender_tactic",
@@ -30,7 +30,7 @@ cc_test(
     deps = [
         ":pass_defender_tactic",
         "//software/test_util",
-        "@gtest//:gtest_main",
+        "@googletest//:gtest_main",
     ],
 )
 
