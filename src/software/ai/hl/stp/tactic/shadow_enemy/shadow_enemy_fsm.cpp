@@ -43,12 +43,13 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
 
     if (enemy_threat_opt.has_value())
     {
-        bool near_ball = distance(event.common.world_ptr->ball().position(),
-                                  enemy_threat_opt.value().robot.position()) < ENEMY_NEAR_BALL_DIST;
+        bool near_ball =
+            distance(event.common.world_ptr->ball().position(),
+                     enemy_threat_opt.value().robot.position()) < ENEMY_NEAR_BALL_DIST;
 
         return near_ball;
     }
-    
+
     return false;
 }
 
@@ -181,9 +182,9 @@ void ShadowEnemyFSM::stealAndPull(const Update &event)
     auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
-    
+
     auto direction_to_pull = (event.common.robot.position() - ball_position).normalize();
-    auto pull_to_here = direction_to_pull + event.common.robot.position();
+    auto pull_to_here      = direction_to_pull + event.common.robot.position();
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, pull_to_here, face_ball_orientation,

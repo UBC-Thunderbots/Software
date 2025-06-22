@@ -16,7 +16,6 @@ bool DefensePlayFSM::shouldDefendAggressively(const Update& event)
     //is our own defenders we probably shouldn't press
     //this can be replaced with smarter or stricter logic though
     
-
     auto attackers = std::count_if(event.common.world_ptr->enemyTeam().getAllRobots().begin(), event.common.world_ptr->enemyTeam().getAllRobots().end(), [event](const Robot& robot) {
     return robot.position().x() < event.common.world_ptr->ball().position().x();});
 
