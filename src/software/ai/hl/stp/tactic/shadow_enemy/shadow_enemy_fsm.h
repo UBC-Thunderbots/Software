@@ -30,6 +30,15 @@ struct ShadowEnemyFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    //Here we define roughly how close the enemy needs to be to the ball to be considered
+    //as possessing the ball, this was determined experimentally in the simulator where
+    //it was determined that vision often mistake the ball to be further away from the 
+    //enemy than it actually is, leading the robot to overcommit to stealing the ball
+    const double ENEMY_NEAR_BALL_DIST = 0.22;
+
+    //This is just checking whether it the defender is within a reasonable distance 
+    //to start pressing the robot
+    const double NEAR_PRESS = 0.5;
 
     /**
      * Calculates the point to block the pass to the robot we are shadowing

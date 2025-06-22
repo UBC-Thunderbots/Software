@@ -43,7 +43,6 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
 
     if (enemy_threat_opt.has_value())
     {
-        const double ENEMY_NEAR_BALL_DIST = 0.22;
         bool near_ball = distance(event.common.world_ptr->ball().position(),
                                   enemy_threat_opt.value().robot.position()) < ENEMY_NEAR_BALL_DIST;
 
@@ -61,9 +60,9 @@ bool ShadowEnemyFSM::blockedShot(const Update &event)
     Segment goalLine(event.common.world_ptr->field().friendlyGoal().negXNegYCorner(),
                      event.common.world_ptr->field().friendlyGoal().negXPosYCorner());
     bool ball_blocked = intersects(goalLine, shot_block_direction);
-    const double NEAR_PRESS = 0.3;
     bool is_close = distance(event.common.robot.position(),ball_position)<NEAR_PRESS;
-    return (ball_blocked&is_close)|true;
+
+    return (ball_blocked&is_close);
 }
 
 
@@ -153,7 +152,7 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
         enemy_angle = Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
         
         //Here we check if the enemy is facing the goal if not we just shadow
-        go_for_ball=enemy_angle.dot(goal_direction)>0;
+        go_for_ball=std::acos((enemy_angle.normalize()).dot(goal_direction.normalize()))<M_PI/4;
     }
 
     if(go_for_ball){
@@ -165,7 +164,7 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
     }else{
         enemy_angle = Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
-        auto shadow_ball_position = enemy_threat_opt.value().robot.position()+(goal_direction.normalize(ROBOT_MAX_RADIUS_METERS*4.0)); 
+        auto shadow_ball_position = enemy_threat_opt.value().robot.position()+(goal_direction.normalize(event.control_params.shadow_distance)); 
 
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, shadow_ball_position, face_ball_orientation,

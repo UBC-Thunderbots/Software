@@ -21,7 +21,7 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     explicit DefensePlayFSM(TbotsProto::AiConfig ai_config);
 
     // Where to shadow
-    const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 3;
+    const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 4;
 
     /**
      * Guard to check whether we should be defending more aggressively
