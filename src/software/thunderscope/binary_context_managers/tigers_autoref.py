@@ -236,10 +236,16 @@ class TigersAutoref(TimeProvider):
         if self.suppress_logs:
             with open(os.devnull, "w") as fp:
                 self.tigers_autoref_proc = Popen(
-                    autoref_cmd.split(" "), stdout=fp, stderr=fp, env=env, cwd=self.AUTOREF_DIR
+                    autoref_cmd.split(" "),
+                    stdout=fp,
+                    stderr=fp,
+                    env=env,
+                    cwd=self.AUTOREF_DIR,
                 )
         else:
-            self.tigers_autoref_proc = Popen(autoref_cmd.split(" "), env=env, cwd=self.AUTOREF_DIR)
+            self.tigers_autoref_proc = Popen(
+                autoref_cmd.split(" "), env=env, cwd=self.AUTOREF_DIR
+            )
 
     def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO) -> None:
         """Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the
