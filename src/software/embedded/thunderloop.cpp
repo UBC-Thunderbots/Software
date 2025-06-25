@@ -82,8 +82,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
           yaml_config_reader_.getValue<std::string>(ROBOT_NETWORK_INTERFACE_YAML_KEY)),
       loop_hz_(loop_hz),
       kick_coeff_(yaml_config_reader_.getValue<double>(ROBOT_KICK_EXP_COEFF_YAML_KEY)),
-      kick_constant_(yaml_config_reader_.getValue<int>(ROBOT_KICK_CONSTANT_YAML_KEY)),
-      chip_pulse_width_(yaml_config_reader_.getValue<int>(ROBOT_CHIP_PULSE_WIDTH_YAML_KEY)),
+      kick_constant_(yaml_config_reader_.getValue<double>(ROBOT_KICK_CONSTANT_YAML_KEY)),
+      chip_pulse_width_(yaml_config_reader_.getValue<double>(ROBOT_CHIP_PULSE_WIDTH_YAML_KEY)),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {

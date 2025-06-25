@@ -1,13 +1,16 @@
 #include "software/logger/logger.h"
-#include "yaml_reader.h"
+#include "software/embedded/platform.h"
+#include "software/embedded/constants/constants.h"
+#include "yaml_reader.hpp"
 
-YamlReader::YamlReader(const char* path_to_file) : node_(YAML::LoadFile(path_to_file)) {}
 
-template<typename T> 
-T YamlReader::getValue(const std::string& key) const {
-    CHECK(!node_.IsNull())
-        << "The key ( " << key
-        << " ) you are trying to look up does not exist in YAML file!";
+YamlReader::YamlReader(const char* path_to_file)
+    : node_(loadNode(path_to_file)) { }
 
-    return node_.as<T>();
+YAML::Node YamlReader::loadNode(const char* path_to_file){
+    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
+        return YAML::Load(default_yaml); 
+    
+
+    return YAML::LoadFile(path_to_file); 
 }

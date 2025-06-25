@@ -31,7 +31,7 @@ class PowerService
      * @return the latest power status
      */
     TbotsProto::PowerStatus poll(const TbotsProto::PowerControl& control,
-                                 double kick_coeff, int kick_constant, int chip_constant);
+                                 double kick_coeff, double kick_constant, double chip_constant);
 
     /**
      * Handler method called every time the timer expires a new read is requested

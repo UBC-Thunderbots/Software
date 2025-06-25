@@ -1,4 +1,4 @@
-#include "software/embedded/yaml/yaml_reader.h"
+#include "software/embedded/yaml/yaml_reader.hpp"
 
 #include <gtest/gtest.h>
 

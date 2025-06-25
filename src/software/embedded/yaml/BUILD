@@ -6,11 +6,12 @@ cc_library(
         "yaml_reader.cpp",
     ],
     hdrs = [
-        "yaml_reader.h",
+        "yaml_reader.hpp",
     ],
     deps = [
         "@yaml-cpp//:yaml-cpp",
         "//software/logger",
+        "//software/embedded/constants",
     ],
 )
 

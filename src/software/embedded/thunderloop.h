@@ -13,7 +13,7 @@
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
-#include "software/embedded/yaml/yaml_reader.h"
+#include "software/embedded/yaml/yaml_reader.hpp"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
@@ -151,8 +151,8 @@ class Thunderloop
 
     // Calibrated power service constants
     double kick_coeff_;
-    int kick_constant_;
-    int chip_pulse_width_;
+    double kick_constant_;
+    double chip_pulse_width_;
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;

@@ -374,7 +374,7 @@ It is possible to run Thunderloop without having a fully-working robot. Using th
 
 1. To run Thunderloop locally on your computer
     1. You must alter the variable `ROBOT_PATH_TO_YAML_CONFIG` located in `constants.h` to point to a valid yaml configuration for thunderloop.
-    1. Now, run Thunderloop with the following command:
+    2. Now, run Thunderloop with the following command:
         - `bazel run //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED`
 
 2. If you have a robot PC that doesn't have proper communication with the power or motor board, you can still run Thunderloop in a limited capacity to test software features (eg. networking).

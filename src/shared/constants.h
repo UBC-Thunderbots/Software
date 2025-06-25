@@ -185,7 +185,7 @@ static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND
 
 // Kick Spd to Pulse Width Safety Constraint Constants
 
-static const int MAX_KICK_CONSTANT       = 850;
+static const double MAX_KICK_CONSTANT       = 850;
 static const double MAX_KICK_COEFFICIENT = 0.4;
 
 // Arduino
