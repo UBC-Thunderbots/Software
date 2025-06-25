@@ -49,8 +49,6 @@ class RobotCommunication:
 
         self.communication_manager = communication_manager
 
-        self.running = False
-
         self.fullsystem_primitive_set_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
         self.motor_control_primitive_buffer = ThreadSafeBuffer(1, MotorControl)
