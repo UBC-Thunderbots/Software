@@ -17,7 +17,6 @@ py_binary(
     ],
     data = [
         ":playbooks",
-        #        ":scripts",
         ":tasks",
         "//software/embedded:setup_robot_software_deps",
         "//software/embedded:thunderloop_main",
@@ -40,13 +39,6 @@ filegroup(
         "playbooks/**/*.yml",
     ]),
 )
-
-#filegroup(
-#    name = "scripts",
-#    data = glob([
-#        "scripts/**/*.py",
-#    ]),
-#)
 
 filegroup(
     name = "tasks",

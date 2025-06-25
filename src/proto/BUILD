@@ -1,6 +1,7 @@
 load("@nanopb//extra/bazel:nanopb_cc_proto_library.bzl", "cc_nanopb_proto_library")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
+load("//starlark/nanopb:nanopb.bzl", "nanopb_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -57,10 +58,14 @@ cc_proto_library(
     deps = [":tbots_proto"],
 )
 
-cc_nanopb_proto_library(
+nanopb_proto_library(
     name = "tbots_nanopb_proto",
-    protos = [":tbots_proto"],
+    deps = [":tbots_proto"],
 )
+#cc_nanopb_proto_library(
+#    name = "tbots_nanopb_proto",
+#    deps = [":tbots_proto"],
+#)
 
 py_proto_library(
     name = "tbots_py_proto",

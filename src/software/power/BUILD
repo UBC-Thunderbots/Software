@@ -67,9 +67,9 @@ platformio_project(
     board = "pico32",
     build_flags = ["-DPB_FIELD_16BIT=1"],  #Makes platformio use 16 bit numbers for size
     framework = "arduino",
-    lib_deps = [
-        "//proto:tbots_nanopb_proto",
-    ],
+    #    lib_deps = [
+    #        "//proto:tbots_nanopb_proto",
+    #    ],
     platform = "espressif32",
     deps = [
         ":charger",
@@ -78,6 +78,7 @@ platformio_project(
         ":geneva",
         ":pins",
         ":power_monitor",
+        "//proto:tbots_nanopb_proto",
         "//shared:constants_platformio",
         "//shared/uart_framing:uart_framing_platformio",
     ],
