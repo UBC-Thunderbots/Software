@@ -31,7 +31,6 @@ class EmbeddedCommunication:
         self.running = True
 
         # Localhost IP Broadcaster
-        print("the network interface is: ", self.embedded_data.get_network_interface())
         self.fullsystem_ip_broadcaster = tbots_cpp.FullsystemIpBroadcastProtoUdpSender(
             getRobotMulticastChannel(int(self.embedded_data.get_channel_id())),
             FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,

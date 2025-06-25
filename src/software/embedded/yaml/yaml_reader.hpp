@@ -52,6 +52,5 @@ private:
         chip_pulse_width : 1.3
     )";
 
-    
     YAML::Node node_;
 };

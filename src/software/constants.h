@@ -52,10 +52,8 @@ const std::string ROBOT_KICK_EXP_COEFF_YAML_KEY    = "kick_coeff";
 const std::string ROBOT_CHIP_PULSE_WIDTH_YAML_KEY  = "chip_pulse_width";
 
 
-// const std::string robot_path_to_yaml_config =
-//     "/home/robot/thunderbots_binaries/config.yml";
 const std::string ROBOT_PATH_TO_YAML_CONFIG =
-    "/tmp/test.yaml";
+    "/home/robot/config.yml";
 
 const std::string SSL_VISION_ADDRESS          = "224.5.23.2";
 static constexpr unsigned int SSL_VISION_PORT = 10020;

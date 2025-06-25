@@ -224,5 +224,5 @@ Pressing the reset button once will send a status msg over its connected port. T
 
 ## YAML
 
-To change the parameters on the robot, please modify: `/home/robot/thunderbots_binaries/config.yml`.
+To change the parameters on the robot, please modify: `/home/robot/config.yml`.
 
