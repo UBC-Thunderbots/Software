@@ -40,6 +40,7 @@ std::optional<World> SensorFusion::getWorld() const
             new_world.updateRefereeStage(*referee_stage);
         }
 
+        new_world.setVirtualObstacles(virtual_obstacles_);
         return new_world;
     }
     else
@@ -123,7 +124,9 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
     if (sensor_fusion_config.friendly_color_yellow())
     {
-        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
+        if (!ssl_referee::deprecated_commands.contains(packet.command()))
+            game_state.updateRefereeCommand(
+                ssl_referee::createRefereeCommand(packet, TeamColour::YELLOW));
         friendly_goalie_id = packet.yellow().goalkeeper();
         enemy_goalie_id    = packet.blue().goalkeeper();
         if (packet.has_blue_team_on_positive_half())
@@ -133,7 +136,9 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     }
     else
     {
-        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
+        if (!ssl_referee::deprecated_commands.contains(packet.command()))
+            game_state.updateRefereeCommand(
+                ssl_referee::createRefereeCommand(packet, TeamColour::BLUE));
         friendly_goalie_id = packet.blue().goalkeeper();
         enemy_goalie_id    = packet.yellow().goalkeeper();
         if (packet.has_blue_team_on_positive_half())
@@ -158,7 +163,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         }
     }
 
-    referee_stage = createRefereeStage(packet);
+    referee_stage = ssl_referee::createRefereeStage(packet);
 }
 
 void SensorFusion::updateWorld(
@@ -404,7 +409,9 @@ void SensorFusion::updateDribbleDisplacement()
 
     std::transform(ball_contacts_by_friendly_robots.begin(),
                    ball_contacts_by_friendly_robots.end(),
-                   std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
+                   std::back_inserter(dribble_displacements),
+                   [&](const auto &kv_pair)
+                   {
                        const Point contact_point = kv_pair.second;
                        return Segment(contact_point, ball->position());
                    });
@@ -430,7 +437,7 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
 
 std::optional<Point> SensorFusion::getBallPlacementPoint(const SSLProto::Referee &packet)
 {
-    std::optional<Point> point_opt = ::getBallPlacementPoint(packet);
+    std::optional<Point> point_opt = ssl_referee::getBallPlacementPoint(packet);
 
     if (!point_opt)
     {
@@ -509,4 +516,9 @@ void SensorFusion::resetWorldComponents()
     enemy_team_filter    = RobotTeamFilter();
     possession           = TeamPossession::FRIENDLY_TEAM;
     dribble_displacement = std::nullopt;
+}
+
+void SensorFusion::setVirtualObstacles(TbotsProto::VirtualObstacles virtual_obstacles)
+{
+    virtual_obstacles_ = virtual_obstacles;
 }

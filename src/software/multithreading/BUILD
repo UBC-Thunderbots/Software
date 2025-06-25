@@ -54,7 +54,6 @@ cc_library(
         ":observer",
         ":thread_safe_buffer",
         "//software/time:duration",
-        "@boost//:bind",
     ],
 )
 

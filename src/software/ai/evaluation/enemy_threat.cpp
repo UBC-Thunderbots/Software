@@ -35,7 +35,8 @@ std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPa
             // robots
             bool pass_blocked =
                 std::any_of(obstacles.begin(), obstacles.end(),
-                            [passer, receiver](const Robot &obstacle) {
+                            [passer, receiver](const Robot &obstacle)
+                            {
                                 return intersects(
                                     Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
                                     Segment(passer.position(), receiver.position()));
@@ -146,7 +147,8 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
         // Remove any receivers from the unvisited robots, since they have
         // now been visited
         unvisited_robots.erase(remove_if(unvisited_robots.begin(), unvisited_robots.end(),
-                                         [&](auto x) {
+                                         [&](auto x)
+                                         {
                                              return find(all_receivers.begin(),
                                                          all_receivers.end(),
                                                          x) != all_receivers.end();
@@ -164,7 +166,8 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats)
 {
     // A lambda function that implements the '<' operator for the EnemyThreat struct
     // so it can be sorted. Lower threats are "less than" higher threats.
-    auto enemyThreatLessThanComparator = [](const EnemyThreat &a, const EnemyThreat &b) {
+    auto enemyThreatLessThanComparator = [](const EnemyThreat &a, const EnemyThreat &b)
+    {
         // Robots with the ball are more threatening than robots without the ball, and
         // robots with the ball are the most threatening since they can shoot or move
         // the ball towards our net

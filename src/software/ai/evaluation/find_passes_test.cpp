@@ -30,7 +30,7 @@ TEST(FindPasses, find_all_passes_with_no_enemies)
 
     AllPasses all_passes = findAllPasses(initial_robot, friendly_team, enemy_team);
     std::vector<Robot> expected_direct_passes   = {friendly_robot_1, friendly_robot_2,
-                                                 friendly_robot_3, friendly_robot_4};
+                                                   friendly_robot_3, friendly_robot_4};
     std::vector<Robot> expected_indirect_passes = {};
     EXPECT_EQ(expected_direct_passes, all_passes.direct_passes);
     EXPECT_EQ(expected_indirect_passes, all_passes.indirect_passes);
@@ -66,7 +66,7 @@ TEST(FindPasses, find_all_passes_with_one_enemy)
     AllPasses all_passes = findAllPasses(initial_robot, friendly_team, enemy_team);
 
     std::vector<Robot> expected_direct_passes   = {friendly_robot_2, friendly_robot_3,
-                                                 friendly_robot_4};
+                                                   friendly_robot_4};
     std::vector<Robot> expected_indirect_passes = {friendly_robot_1};
     EXPECT_EQ(expected_direct_passes, all_passes.direct_passes);
     EXPECT_EQ(expected_indirect_passes, all_passes.indirect_passes);
@@ -103,7 +103,7 @@ TEST(FindPasses, find_all_passes_with_one_enemy_not_directly_in_path)
 
 
     std::vector<Robot> expected_direct_passes   = {friendly_robot_2, friendly_robot_3,
-                                                 friendly_robot_4};
+                                                   friendly_robot_4};
     std::vector<Robot> expected_indirect_passes = {friendly_robot_1};
     EXPECT_EQ(expected_direct_passes, all_passes.direct_passes);
     EXPECT_EQ(expected_indirect_passes, all_passes.indirect_passes);

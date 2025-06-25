@@ -39,3 +39,8 @@ void ThreadedSensorFusion::onValueReceived(SensorProto sensor_msg)
         }
     }
 }
+
+void ThreadedSensorFusion::onValueReceived(TbotsProto::VirtualObstacles virtual_obstacles)
+{
+    sensor_fusion.setVirtualObstacles(virtual_obstacles);
+}
