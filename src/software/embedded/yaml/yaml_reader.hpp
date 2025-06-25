@@ -45,8 +45,8 @@ private:
 
     inline static const std::string default_yaml = R"(
         robot_id : 1
-        channel_id : 2
-        network_interface : eno1
+        channel_id : 0 
+        network_interface : enp2s0
         kick_coeff : 1.1
         kick_constant : 1.2
         chip_pulse_width : 1.3

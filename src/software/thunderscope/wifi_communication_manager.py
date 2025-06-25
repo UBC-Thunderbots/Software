@@ -319,6 +319,7 @@ class WifiCommunicationManager:
             )
         )
 
+        logger.info(f"interface: {robot_communication_interface} port: {FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT} channel: {self.multicast_channel}")
         fullsystem_ip_broadcaster = setup_network_resource(
             lambda: tbots_cpp.FullsystemIpBroadcastProtoUdpSender(
                 self.multicast_channel,

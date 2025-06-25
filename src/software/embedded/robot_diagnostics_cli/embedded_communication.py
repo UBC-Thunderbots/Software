@@ -17,7 +17,7 @@ class EmbeddedCommunication:
     BROADCAST_HZ = 1.0
     LOCALHOST_IP = "127.0.0.1"
 
-    def __init__(self):
+    def __init__(self, disable_estop=True):
         """Establishes multicast connections and e-stop information"""
         self.primitive_sender: tbots_cpp.PrimitiveSender | None = None
         self.receive_robot_status: tbots_cpp.RobotStatusProtolistener | None = None
@@ -28,8 +28,10 @@ class EmbeddedCommunication:
         self.sequence_number = 0
         self.command_duration_seconds = 2.0
         self.send_primitive_interval_s = 0.01
+        self.running = True
 
         # Localhost IP Broadcaster
+        print("the network interface is: ", self.embedded_data.get_network_interface())
         self.fullsystem_ip_broadcaster = tbots_cpp.FullsystemIpBroadcastProtoUdpSender(
             getRobotMulticastChannel(int(self.embedded_data.get_channel_id())),
             FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
@@ -37,19 +39,26 @@ class EmbeddedCommunication:
             True,
         )
 
-        # initialising the estop
-        self.estop_reader = None
-        self.should_send_stop = False
+
+        # if we disable ESTOP, fake a always on state  
+        self.disable_estop = disable_estop
+        if disable_estop:
+            self.estop_mode = EstopMode.PHYSICAL_ESTOP
+            self.estop_path = "/a_placeholder_estop_path"
+            self.should_send_stop = False
+            return
+
         self.estop_mode, self.estop_path = get_estop_config(
             keyboard_estop=False, disable_communication=False
         )
 
-        # Always in PHYSICAL_ESTOP mode within CLI
+        # Always in PHYSICAL_ESTOP mode within CLI if we don't disable estop
         try:
             self.estop_reader = tbots_cpp.ThreadedEstopReader(self.estop_path, 115200)
             self.__update_estop_state()
         except Exception as e:
             raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
+
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Updates the dynamic information with the new RobotStatus message.
@@ -85,7 +94,12 @@ class EmbeddedCommunication:
             self.should_send_stop = False
 
     def __update_estop_state(self) -> None:
-        """Synchronously updates the current estop status proto. Always in physical estop mode."""
+        """Synchronously updates the current estop status proto. Always in physical estop mode unless estop is disabled."""
+        # if we have disable estop, then we always shoudl send
+        if self.disable_estop: 
+            self.should_send_stop = False
+            return
+
         if self.estop_mode == EstopMode.DISABLE_ESTOP:
             self.should_send_stop = False
         elif self.estop_mode == EstopMode.PHYSICAL_ESTOP:

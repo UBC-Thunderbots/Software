@@ -83,7 +83,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       loop_hz_(loop_hz),
       kick_coeff_(yaml_config_reader_.getValue<double>(ROBOT_KICK_EXP_COEFF_YAML_KEY)),
       kick_constant_(yaml_config_reader_.getValue<double>(ROBOT_KICK_CONSTANT_YAML_KEY)),
-      chip_pulse_width_(yaml_config_reader_.getValue<double>(ROBOT_CHIP_PULSE_WIDTH_YAML_KEY)),
+      chip_pulse_width_(
+          yaml_config_reader_.getValue<double>(ROBOT_CHIP_PULSE_WIDTH_YAML_KEY)),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
@@ -503,6 +504,8 @@ void Thunderloop::waitForNetworkUp()
     std::unique_ptr<ThreadedUdpSender> network_tester;
     try
     {
+            LOG(INFO) << "channel: " << ROBOT_MULTICAST_CHANNELS.at(channel_id_)
+                << " test port: " <<  NETWORK_COMM_TEST_PORT << " network interface: " << network_interface_;
         network_tester = std::make_unique<ThreadedUdpSender>(
             std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), NETWORK_COMM_TEST_PORT,
             network_interface_, true);
@@ -512,6 +515,7 @@ void Thunderloop::waitForNetworkUp()
         LOG(FATAL) << "Thunderloop cannot connect to the network. Error: " << e.what();
     }
 
+    return;
     // Send an empty packet on the specific network interface to
     // ensure wifi is connected. Keeps trying until successful
     while (true)
