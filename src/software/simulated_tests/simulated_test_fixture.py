@@ -384,11 +384,13 @@ class AggregateTestRunner(SimulatedTestRunner):
         assert failed_tests == 0
 
 
-def load_command_line_arguments():
-    """Load from command line arguments using argpase
+def load_command_line_arguments(allow_unrecognized: bool = False):
+    """Load in command-line arguments using argparse
 
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
+
+    :param allow_unrecognized: if true, does not raise an error for unrecognized arguments
     """
     parser = argparse.ArgumentParser(description="Run simulated pytests")
     parser.add_argument(
@@ -464,7 +466,7 @@ def load_command_line_arguments():
         default=False,
         help="Use realism in the simulator",
     )
-    return parser.parse_args()
+    return parser.parse_known_args()[0] if allow_unrecognized else parser.parse_args()
 
 
 def pytest_main(file):
@@ -472,7 +474,8 @@ def pytest_main(file):
 
     :param file: The test file to run
     """
-    args = load_command_line_arguments()
+    args = load_command_line_arguments(allow_unrecognized=True)
+
     # Run the test, -s disables all capturing at -vv increases verbosity
     # -W ignore::DeprecationWarning ignores deprecation warnings that spam the output
     sys.exit(

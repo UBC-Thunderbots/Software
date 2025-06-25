@@ -28,7 +28,7 @@ class RobotTest : public ::testing::Test
 TEST_F(RobotTest, construct_with_all_params)
 {
     Robot robot = Robot(3, Point(1, 1), Vector(-0.3, 0), Angle::fromRadians(2.2),
-                        AngularVelocity::fromRadians(-0.6), current_time);
+                        AngularVelocity::fromRadians(-0.6), current_time, false);
 
     EXPECT_EQ(3, robot.id());
     EXPECT_EQ(Point(1, 1), robot.position());
@@ -36,6 +36,7 @@ TEST_F(RobotTest, construct_with_all_params)
     EXPECT_EQ(Angle::fromRadians(2.2), robot.orientation());
     EXPECT_EQ(AngularVelocity::fromRadians(-0.6), robot.angularVelocity());
     EXPECT_EQ(current_time, robot.timestamp());
+    EXPECT_EQ(false, robot.breakbeamTripped());
 }
 
 TEST_F(RobotTest, construct_with_initial_state)
@@ -53,12 +54,28 @@ TEST_F(RobotTest, construct_with_initial_state)
     EXPECT_EQ(current_time, robot.timestamp());
 }
 
+TEST_F(RobotTest, construct_with_initial_state_breakbeam)
+{
+    Robot robot = Robot(3,
+                        RobotState(Point(1, 1), Vector(-0.3, 0), Angle::fromRadians(2.2),
+                                   AngularVelocity::fromRadians(-0.6), true),
+                        current_time);
+
+    EXPECT_EQ(3, robot.id());
+    EXPECT_EQ(Point(1, 1), robot.position());
+    EXPECT_EQ(Vector(-0.3, 0), robot.velocity());
+    EXPECT_EQ(Angle::fromRadians(2.2), robot.orientation());
+    EXPECT_EQ(AngularVelocity::fromRadians(-0.6), robot.angularVelocity());
+    EXPECT_EQ(current_time, robot.timestamp());
+    EXPECT_EQ(true, robot.breakbeamTripped());
+}
+
 TEST_F(RobotTest, construct_with_protobuf)
 {
     Robot original_robot =
         Robot(3,
               RobotState(Point(1, 1), Vector(-0.3, 0), Angle::fromRadians(2.2),
-                         AngularVelocity::fromRadians(-0.6)),
+                         AngularVelocity::fromRadians(-0.6), false),
               current_time,
               std::set<RobotCapability>{RobotCapability::Chip, RobotCapability::Move,
                                         RobotCapability::Kick, RobotCapability::Dribble});
@@ -230,6 +247,16 @@ TEST(RobotIsNearDribblerTest, ball_near_dribbler_ball_to_side_of_robot)
     EXPECT_FALSE(robot.isNearDribbler(ball_position));
 }
 
+TEST(RobotIsNearDribblerTest, ball_near_dribbler_according_to_breakbeam)
+{
+    Point ball_position = Point(0.07, 0);
+    Timestamp timestamp = Timestamp::fromSeconds(0);
+
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::half(), AngularVelocity::zero(),
+                        timestamp, true);
+    EXPECT_TRUE(robot.isNearDribbler(ball_position));
+}
+
 TEST(RobotIsNearDribblerTest, ball_near_dribbler_robot_moving_ball_in_dribbler)
 {
     Point ball_position = Point(0.07, 0);
@@ -270,9 +297,9 @@ TEST_F(RobotTest, get_unavailable_capabilities)
         RobotCapability::Chip,
     };
 
-    Robot robot =
-        Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-              AngularVelocity::fromDegrees(25), current_time, unavailable_capabilities);
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+                        AngularVelocity::fromDegrees(25), current_time, false,
+                        unavailable_capabilities);
 
     EXPECT_EQ(unavailable_capabilities, robot.getUnavailableCapabilities());
 }
@@ -284,9 +311,9 @@ TEST_F(RobotTest, get_available_capabilities)
         RobotCapability::Chip,
     };
 
-    Robot robot =
-        Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-              AngularVelocity::fromDegrees(25), current_time, unavailable_capabilities);
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+                        AngularVelocity::fromDegrees(25), current_time, false,
+                        unavailable_capabilities);
 
     // available capabilities = all capabilities - unavailable capabilities
     std::set<RobotCapability> all_capabilities = allRobotCapabilities();
