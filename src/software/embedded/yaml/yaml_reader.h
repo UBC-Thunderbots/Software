@@ -22,24 +22,14 @@ class YamlReader
      * @param key the key we are looking for
      * @return the value of the field
      */
-    std::string getValueString(const std::string& key) const;
 
-    /*
-     * Get the field as an int
-     *
-     * @param key the key we are looking for
-     * @return the value of the field
-     */
-    int getValueInt(const std::string& key) const;
-
-    /*
-     * Get the field as a double
-     *
-     * @param key the key we are looking for
-     * @return the value of the field
-     */
-    double getValueDouble(const std::string& key) const;
+    template<typename T> 
+    T getValue(const std::string& key) const;
 
    private:
     YAML::Node node_;
 };
+
+extern template int YamlReader::getValue<int>(const std::string& key) const;  
+extern template std::string YamlReader::getValue<std::string>(const std::string& key) const;  
+extern template double YamlReader::getValue<double>(const std::string& key) const;  
