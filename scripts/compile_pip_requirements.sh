@@ -15,7 +15,6 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BAZEL_ROOT_DIR="$CURR_DIR/../src"
 
 cd $BAZEL_ROOT_DIR
-bazel run //extlibs:nanopb_requirements.update
 bazel run //software/thunderscope:requirements.update
 bazel run //software/embedded/ansible:requirements.update
 bazel run //software/simulated_tests:requirements.update
