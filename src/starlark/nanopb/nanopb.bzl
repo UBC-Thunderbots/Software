@@ -56,56 +56,25 @@ def _nanopb_proto_library_impl(ctx):
     all_proto_src_files = []
 
     for proto_file in all_proto_files.to_list():
-        # Generate the `.pb` files using the protobuf compiler
-        pb_file_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb"
-        pb_file = ctx.actions.declare_file(pb_file_name)
         proto_compile_args = []
-
-        #
-        #        # Create the arguments for the proto compiler to compile the proto file,
-        #        # adding all the transitive include directories
-        #        proto_compile_args = ["-o", pb_file.path, proto_file.path]
         for path in all_proto_include_dirs.to_list():
             proto_compile_args += ["-I=%s" % path]
-
-        #
-        #        ctx.actions.run(
-        #            inputs = all_proto_files,
-        #            outputs = [pb_file],
-        #            arguments = proto_compile_args,
-        #            executable = ctx.executable.protoc,
-        #            mnemonic = "ProtoCompile",
-        #            use_default_shell_env = True,
-        #        )
-        #
-        #        # Generate the equivalent C code using Nanopb
         h_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb.h"
         c_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb.c"
+
         c_out = ctx.actions.declare_file(c_out_name)
         h_out = ctx.actions.declare_file(h_out_name)
 
-        #
-        #        ctx.actions.run_shell(
-        #            tools = [ctx.executable.nanopb_generator],
-        #            inputs = [pb_file],
-        #            outputs = [c_out, h_out],
-        #            mnemonic = "NanopbGeneration",
-        #            command = "%s -e .nanopb %s" % (ctx.executable.nanopb_generator.path, pb_file.path),
-        #        )
-        #        all_proto_src_files.append(c_out)
-        #        all_proto_hdr_files.append(h_out)
-
         proto_compile_args += ["--plugin=protoc-gen-nanopb=%s" % (ctx.executable.nanopb_generator.path)]
-        proto_compile_args += ["--nanopb_out=%s %s" % (generation_folder_name[:-1], proto_file.path)]
+        proto_compile_args += ["--nanopb_out=%s %s" % (generated_folder_abs_path, proto_file.path)]
 
-        #        proto_compile_args += ["--@nanopb//:nanopb_extension=%s" % ".nanopb"]
-        #        print(c_out_name)
-        #        print(proto_file.path)
         cmd = [ctx.executable.protoc.path] + proto_compile_args
         cmd_str = " ".join(cmd)
-        print(cmd_str)
         ctx.actions.run_shell(
-            tools = [ctx.executable.nanopb_generator],
+            tools = [
+                ctx.executable.protoc,
+                ctx.executable.nanopb_generator,
+            ],
             inputs = all_proto_files,
             outputs = [c_out, h_out],
             mnemonic = "NanopbGeneration",
@@ -120,41 +89,6 @@ def _nanopb_proto_library_impl(ctx):
         ctx = ctx,
         cc_toolchain = cc_toolchain,
     )
-
-    # Get the compilation and linking contexts from all nanopb srcs
-    #    nanopb_compilation_contexts = [
-    #        label[CcInfo].compilation_context
-    #        for label in ctx.attr.nanopb_libs
-    #        if label[CcInfo].compilation_context != None
-    #    ]
-    #    nanopb_linking_contexts = [
-    #        label[CcInfo].linking_context
-    #        for label in ctx.attr.nanopb_libs
-    #        if label[CcInfo].linking_context != None
-    #    ]
-    #
-    #    (compilation_context, compilation_outputs) = cc_common.compile(
-    #        name = "compile_nanopb_outputs",
-    #        actions = ctx.actions,
-    #        feature_configuration = feature_configuration,
-    #        cc_toolchain = cc_toolchain,
-    #        srcs = all_proto_src_files,
-    #        public_hdrs = all_proto_hdr_files,
-    #        includes = [
-    #            generated_folder_abs_path,
-    #        ] + [generated_folder_abs_path + dir for dir in all_proto_include_dirs.to_list()],
-    #        compilation_contexts = nanopb_compilation_contexts,
-    #    )
-    #
-    #    (linking_context, linking_outputs) = \
-    #        cc_common.create_linking_context_from_compilation_outputs(
-    #            name = "link_nanopb_outputs",
-    #            compilation_outputs = compilation_outputs,
-    #            actions = ctx.actions,
-    #            feature_configuration = feature_configuration,
-    #            cc_toolchain = cc_toolchain,
-    #            linking_contexts = nanopb_linking_contexts,
-    #        )
 
     # platformio_* bazel rules require a provider named transitive_zip_files and an output zip file
     # these contain all files needed for compilation with platformio.
@@ -201,10 +135,10 @@ def _nanopb_proto_library_impl(ctx):
         command = "\n".join(commands),
     )
     runfiles = ctx.runfiles(files = [zip_file])
-    return PlatformIOLibraryInfo(
+    return [DefaultInfo(files = depset([zip_file])), PlatformIOLibraryInfo(
         default_runfiles = runfiles,
         transitive_libdeps = [],
-    )
+    )]
 
 nanopb_proto_library = rule(
     implementation = _nanopb_proto_library_impl,

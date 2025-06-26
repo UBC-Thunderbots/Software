@@ -8,7 +8,7 @@ package(default_visibility = ["//visibility:public"])
 platformio_library(
     name = "uart_framing_platformio",
     hdr = "uart_framing.hpp",
-    lib_deps = ["//proto/message_translation:power_frame_msg_platformio"],
+    deps = ["//proto/message_translation:power_frame_msg_platformio"],
 )
 
 cc_library(
