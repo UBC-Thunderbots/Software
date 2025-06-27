@@ -54,6 +54,18 @@ class ProtoLogger
                          std::function<double()> time_provider,
                          bool friendly_colour_yellow);
 
+    /**
+     * Constructor
+     * @param log_path The path to the directory where the logs will be saved
+     * @param time_provider A function that returns the current time in seconds
+     * @param friendly_colour_yellow Whether the friendly team is yellow or not
+     * @param log_name The name of the log directory
+     */
+    explicit ProtoLogger(const std::string& log_path,
+                         std::function<double()> time_provider,
+                         const bool friendly_colour_yellow,
+                         const std::string& log_name);
+
     ProtoLogger() = delete;
 
     /**
