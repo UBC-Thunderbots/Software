@@ -140,7 +140,17 @@ http_archive(
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+http_archive(
+    name = "bazel_embedded",
+    sha256 = "91a78efbb0f94479fe9ca2912aced712be9e7028325bada9a73e7d325427b404",
+    url = "https://github.com/bazelembedded/bazel-embedded/archive/cf5b240d510313b3383e0cdb550eb9f32be7244e.zip",
+    strip_prefix = "bazel-embedded-cf5b240d510313b3383e0cdb550eb9f32be7244e",
+)
+
+
+load("@bazel_embedded//:bazel_embedded_deps.bzl", "bazel_embedded_deps")
+
+bazel_embedded_deps()
 
 git_repository(
     name = "com_google_protobuf",
