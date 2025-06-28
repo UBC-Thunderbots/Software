@@ -84,16 +84,52 @@ def _nanopb_proto_library_impl(ctx):
         all_proto_src_files.append(c_out)
         all_proto_hdr_files.append(h_out)
 
-    cc_toolchain = find_cpp_toolchain(ctx)
-    feature_configuration = cc_common.configure_features(
-        ctx = ctx,
-        cc_toolchain = cc_toolchain,
-    )
+    #    cc_toolchain = find_cpp_toolchain(ctx)
+    #    feature_configuration = cc_common.configure_features(
+    #        ctx = ctx,
+    #        cc_toolchain = cc_toolchain,
+    #    )
+
+    # Get the compilation and linking contexts from all nanopb srcs
+    #    nanopb_compilation_contexts = [
+    #        label[CcInfo].compilation_context
+    #        for label in ctx.attr.nanopb_libs
+    #        if label[CcInfo].compilation_context != None
+    #    ]
+    #    nanopb_linking_contexts = [
+    #        label[CcInfo].linking_context
+    #        for label in ctx.attr.nanopb_libs
+    #        if label[CcInfo].linking_context != None
+    #    ]
+    #
+    #    (compilation_context, compilation_outputs) = cc_common.compile(
+    #        name = "compile_nanopb_outputs",
+    #        actions = ctx.actions,
+    #        feature_configuration = feature_configuration,
+    #        cc_toolchain = cc_toolchain,
+    #        srcs = all_proto_src_files,
+    #        public_hdrs = all_proto_hdr_files,
+    #        includes = [
+    #            generated_folder_abs_path,
+    #        ] + [generated_folder_abs_path + dir for dir in all_proto_include_dirs.to_list()],
+    #        compilation_contexts = nanopb_compilation_contexts,
+    #    )
+    #
+    #    (linking_context, linking_outputs) = \
+    #        cc_common.create_linking_context_from_compilation_outputs(
+    #            name = "link_nanopb_outputs",
+    #            compilation_outputs = compilation_outputs,
+    #            actions = ctx.actions,
+    #            feature_configuration = feature_configuration,
+    #            cc_toolchain = cc_toolchain,
+    #            linking_contexts = nanopb_linking_contexts,
+    #        )
 
     # platformio_* bazel rules require a provider named transitive_zip_files and an output zip file
     # these contain all files needed for compilation with platformio.
     name = ctx.label.name
     commands = []
+
     inputs = all_proto_hdr_files + all_proto_src_files
     outputs = []
 
@@ -123,6 +159,21 @@ def _nanopb_proto_library_impl(ctx):
             destination = file.path,
         ))
 
+    #    for label in ctx.attr.nanopb_libs:
+    #        print(label[CcInfo].compilation_context.headers.to_list())
+    #        all_proto_hdr_files.extend(label[CcInfo].compilation_context.headers.to_list())
+
+    #    for label in ctx.attr.nanopb_libs:
+    #        for dep_file in label[CcInfo].compilation_context.headers.to_list():
+    #            file = ctx.actions.declare_file(
+    #                _FILENAME.format(dirname = name, filename = dep_file.basename),
+    #            )
+    #            outputs.append(file)
+    #            commands.append(_COPY_COMMAND.format(
+    #                source = dep_file.path,
+    #                destination = file.path,
+    #            ))
+
     zip_file = ctx.actions.declare_file("%s.zip" % name)
     outputs.append(zip_file)
     commands.append(_ZIP_COMMAND.format(
@@ -135,10 +186,21 @@ def _nanopb_proto_library_impl(ctx):
         command = "\n".join(commands),
     )
     runfiles = ctx.runfiles(files = [zip_file])
-    return [DefaultInfo(files = depset([zip_file])), PlatformIOLibraryInfo(
-        default_runfiles = runfiles,
-        transitive_libdeps = [],
-    )]
+    transitive_libdeps = []
+    if PlatformIOLibraryInfo in dep:
+        runfiles.merge_all(dep[PlatformIOLibraryInfo].runfiles)
+        transitive_libdeps.extend(dep[PlatformIOLibraryInfo].transitive_libdeps)
+    return [
+        DefaultInfo(files = depset([zip_file])),
+        PlatformIOLibraryInfo(
+            default_runfiles = runfiles,
+            transitive_libdeps = transitive_libdeps,
+        ),
+        #        CcInfo(
+        #            compilation_context = compilation_context,
+        #            linking_context = linking_context,
+        #        ),
+    ]
 
 nanopb_proto_library = rule(
     implementation = _nanopb_proto_library_impl,
@@ -168,6 +230,7 @@ nanopb_proto_library = rule(
         ),
     },
     provides = [
+        DefaultInfo,
         PlatformIOLibraryInfo,
     ],
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],

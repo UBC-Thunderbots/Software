@@ -3,7 +3,7 @@
 #include <array>
 
 #include "pins.h"
-#include "proto/tbots_nanopb_proto_nanopb_gen/proto/geneva_slot.pb.h"
+#include "proto/geneva_slot.pb.h"
 
 /**
  * Represents the geneva motor on the power board

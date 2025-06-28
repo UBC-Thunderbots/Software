@@ -11,7 +11,7 @@
 #include "proto/message_translation/power_frame_msg.hpp"
 extern "C"
 {
-#include "proto/power_frame_msg.nanopb.h"
+#include "proto/power_frame_msg.pb.h"
 }
 #endif  // PLATFORMIO_BUILD
 
