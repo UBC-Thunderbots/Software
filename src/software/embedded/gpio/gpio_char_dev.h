@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-#include "software/embedded/gpio.h"
+#include "software/embedded/gpio/gpio.h"
 
 /**
  * GPIO with the character device interface
