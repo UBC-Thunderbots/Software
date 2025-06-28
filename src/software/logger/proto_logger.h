@@ -86,8 +86,8 @@ class ProtoLogger
     {
         static_assert(std::is_base_of<google::protobuf::Message, ProtoType>::value,
                       "ProtoType has to be a protobuf message type");
-
-        saveSerializedProto(ProtoType::GetDescriptor()->full_name(), serialized_proto);
+        std::string str(ProtoType::GetDescriptor()->full_name());
+        saveSerializedProto(str, serialized_proto);
     };
 
     /**

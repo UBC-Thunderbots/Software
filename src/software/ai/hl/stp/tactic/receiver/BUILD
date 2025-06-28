@@ -29,7 +29,7 @@ cc_test(
     deps = [
         ":receiver_tactic",
         "//software/test_util",
-        "@gtest//:gtest_main",
+        "@googletest//:gtest_main",
     ],
 )
 

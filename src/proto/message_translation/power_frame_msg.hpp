@@ -2,7 +2,7 @@
 
 #include <pb_decode.h>
 #include <pb_encode.h>
-#include <proto/power_frame_msg.nanopb.h>
+#include <proto/power_frame_msg.pb.h>
 
 #include <cmath>
 #include <cstdint>
@@ -11,7 +11,7 @@
 #include <vector>
 
 #ifdef PLATFORMIO_BUILD
-#include <proto/power_frame_msg.nanopb.h>
+#include <proto/power_frame_msg.pb.h>
 #else  // PLATFORMIO_BUILD
 #include "proto/power_frame_msg.pb.h"
 #include "proto/primitive.pb.h"
@@ -20,7 +20,7 @@
 
 extern "C"
 {
-#include "proto/power_frame_msg.nanopb.h"
+#include "proto/power_frame_msg.pb.h"
 }
 #endif  // PLATFORMIO_BUILD
 
