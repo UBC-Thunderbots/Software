@@ -192,6 +192,7 @@ class ChickerWidget(QWidget):
         chicker_widget_vbox_layout.addWidget(self.power_mode_buttons_box)
 
     def hide_pulse_width_show_power(self):
+        """Replace the pulse_width kicker/chipper sliders with the m/s and m ones"""
         for i in range(self.kicker_pulse_width_slider_layout.count()):
             self.kicker_pulse_width_slider_layout.itemAt(i).widget().hide()
 
@@ -205,6 +206,7 @@ class ChickerWidget(QWidget):
             self.chip_distance_slider_layout.itemAt(i).widget().show()
 
     def hide_power_show_pulse_width(self):
+        """Replace the m/s and m kicker/chipper sliders with the pulse_width ones"""
         for i in range(self.kick_power_slider_layout.count()):
             self.kick_power_slider_layout.itemAt(i).widget().hide()
 
