@@ -68,12 +68,12 @@ TEST(ShadowEnemyFSMTest, test_findBlockShotPoint)
 
 TEST(ShadowEnemyFSMTest, test_transitions)
 {
-    Robot enemy                  = ::TestUtil::createRobotAtPos(Point(0, 2));
-    Robot shadowee               = ::TestUtil::createRobotAtPos(Point(0, -2));
+    Robot enemy                  = ::TestUtil::createRobotAtPos(Point(1, 0));
+    Robot shadowee               = ::TestUtil::createRobotAtPos(Point(2, 0));
     Robot shadower               = ::TestUtil::createRobotAtPos(Point(-2, 0));
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
-    EnemyThreat enemy_threat{shadowee,     false, Angle::zero(), std::nullopt,
+    ::TestUtil::setBallPosition(world, Point(1, 0), Timestamp::fromSeconds(0));
+    EnemyThreat enemy_threat{shadowee,     true, Angle::zero(), std::nullopt,
                              std::nullopt, 1,     enemy};
     FSM<ShadowEnemyFSM> fsm;
 
@@ -86,12 +86,13 @@ TEST(ShadowEnemyFSMTest, test_transitions)
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
 
+
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::BlockPassState>));
 
     // Shadowee now has the ball, our robot should move to block the shot
     // Robot should be trying to block possible shot on our net
     enemy_threat.has_ball = true;
-    ::TestUtil::setBallPosition(world, Point(0, -2), Timestamp::fromSeconds(0));
+    ::TestUtil::setBallPosition(world, Point(2, 0), Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
@@ -106,7 +107,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // Shadowee still has possession of the ball and robot has arrived at block shot
-    // position Robot should try to steal and chip the ball
+    // position Robot should try to steal the ball
     Point position_to_block = ShadowEnemyFSM::findBlockShotPoint(
         shadower, world->field(), world->friendlyTeam(), world->enemyTeam(), shadowee,
         0.5);

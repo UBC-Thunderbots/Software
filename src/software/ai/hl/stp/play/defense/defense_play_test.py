@@ -83,7 +83,9 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
                 )
             ]
         ],
-        ag_eventually_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=[
+            [FriendlyEventuallyHasBallPossession(tolerance=0.05)]
+        ],
         test_timeout_s=12,
     )
 
