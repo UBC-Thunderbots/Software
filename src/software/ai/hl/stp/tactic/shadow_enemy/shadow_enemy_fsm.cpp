@@ -215,9 +215,9 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
  */
 
     if(go_for_ball){
-    
 
-    //Here if we see have an enemy_threat we trust that it has the ball
+    //Here if we see have an enemy_threat and it's facing the nets
+    //we trust that it has the ball
     //and go for it's face
         if(enemy_threat_opt.has_value())
             {
@@ -238,6 +238,8 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
         }
     
     }else{
+
+    //If the enemy is facing away from the net we shadow them
         enemy_angle = Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
         Point shadow_ball_position = enemy_threat_opt.value().robot.position()+(goal_direction.normalize(event.control_params.shadow_distance)); 
 
