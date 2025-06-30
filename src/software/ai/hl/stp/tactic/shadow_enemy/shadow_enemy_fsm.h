@@ -11,18 +11,18 @@
 struct ShadowEnemyFSM
 {
    private:
-    //Here we define roughly how close the enemy needs to be to the ball to be considered
-    //as possessing the ball, this was determined experimentally in the simulator where
-    //it was determined that vision often mistake the ball to be further away from the 
-    //enemy than it actually is, leading the robot to overcommit to stealing the ball
+    // Here we define roughly how close the enemy needs to be to the ball to be considered
+    // as possessing the ball, this was determined experimentally in the simulator where
+    // it was determined that vision often mistake the ball to be further away from the
+    // enemy than it actually is, leading the robot to overcommit to stealing the ball
     static constexpr double ENEMY_NEAR_BALL_DIST_M = 0.22;
 
-    //This is just checking whether it the defender is within a reasonable distance 
-    //to start pressing the robot
-    static constexpr double NEAR_PRESS_M = 0.8; 
+    // This is just checking whether it the defender is within a reasonable distance
+    // to start pressing the robot
+    static constexpr double NEAR_PRESS_M = 0.8;
 
-    //Angle that enemy has to be facing the net within to consider going for the ball
-    static constexpr double ENEMY_FACE_RADIANS = M_PI / 4.0; 
+    // Angle that enemy has to be facing the net within to consider going for the ball
+    static constexpr double ENEMY_FACE_RADIANS = M_PI / 4.0;
 
    public:
     class BlockPassState;
@@ -171,4 +171,3 @@ struct ShadowEnemyFSM
             X + Update_E / SET_STOP_PRIMITIVE_ACTION          = X);
     }
 };
-    

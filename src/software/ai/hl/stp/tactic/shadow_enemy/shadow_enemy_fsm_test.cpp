@@ -74,7 +74,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setBallPosition(world, Point(1, 0), Timestamp::fromSeconds(0));
     EnemyThreat enemy_threat{shadowee,     true, Angle::zero(), std::nullopt,
-                             std::nullopt, 1,     enemy};
+                             std::nullopt, 1,    enemy};
     FSM<ShadowEnemyFSM> fsm;
 
     // Start in MoveFSM
