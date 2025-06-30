@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/distance.h"
-#include "shared/constants.h"
 
 Point ShadowEnemyFSM::findBlockPassPoint(const Point &ball_position,
                                          const Robot &shadowee,
@@ -64,7 +64,7 @@ bool ShadowEnemyFSM::blockedShot(const Update &event)
     bool ball_blocked = intersects(goalLine, shot_block_direction);
     bool is_close = distance(event.common.robot.position(),ball_position) < NEAR_PRESS_M;
 
-    return (ball_blocked&is_close);
+    return (ball_blocked & is_close);
 }
 
 
@@ -216,7 +216,7 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
 
     if(go_for_ball){
 
-    //Here if we see have an enemy_threat and it's facing the nets
+    //Here if we see have an enemy_threat and it's facing the net
     //we trust that it has the ball
     //and go for it's face
         if(enemy_threat_opt.has_value())
@@ -250,7 +250,6 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
     }
-
 }
 
 void ShadowEnemyFSM::stealAndPull(const Update &event)

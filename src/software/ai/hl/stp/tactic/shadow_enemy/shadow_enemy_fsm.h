@@ -44,7 +44,6 @@ struct ShadowEnemyFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-
     /**
      * Calculates the point to block the pass to the robot we are shadowing
      *
