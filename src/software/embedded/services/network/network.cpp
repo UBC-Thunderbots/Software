@@ -16,6 +16,7 @@ NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_ad
 {
     try
     {
+        LOG(INFO) << "the ip address is: " << ip_address << " ip notificaiton port: " << full_system_to_robot_ip_notification_port << " interface: " << interface << "\n";
         fullsystem_to_robot_ip_listener =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
                 ip_address, full_system_to_robot_ip_notification_port, interface,

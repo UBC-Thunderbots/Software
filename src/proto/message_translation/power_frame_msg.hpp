@@ -120,7 +120,7 @@ TbotsProto_PowerStatus inline createNanoPbPowerStatus(
  * @param speed Speed of the desired kick in m/s
  * @return Width of pulse
  */
-inline uint32_t calculateChickerPulseWidth(int kick_constant, double kick_coefficient,
+inline uint32_t calculateChickerPulseWidth(double kick_constant, double kick_coefficient,
                                            float speed)
 {
     return static_cast<uint32_t>(kick_constant * std::exp(kick_coefficient * speed));
@@ -141,8 +141,8 @@ inline uint32_t calculateChickerPulseWidth(int kick_constant, double kick_coeffi
  * @return a nanopb power control msg matching provided protobuf
  */
 TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
-    const TbotsProto::PowerControl& power_control, double kick_coeff, int kick_constant,
-    int chip_pulse_width)
+    const TbotsProto::PowerControl& power_control, double kick_coeff, double kick_constant,
+    double chip_pulse_width)
 {
     TbotsProto_PowerPulseControl nanopb_control =
         TbotsProto_PowerPulseControl_init_default;

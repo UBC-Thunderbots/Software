@@ -21,7 +21,7 @@
 - [On Robot Commands](#on-robot-commands)
   - [Systemd Services](#systemd-services)
   - [Debugging Uart](#debugging-uart)
-  - [Redis](#redis)
+  - [YAML](#yaml)
 
 <!--TOC-->
 
@@ -31,10 +31,7 @@
 title: Robot Debugging Steps
 ---
 flowchart TD
-    ssh("Can you SSH into the robot? 
-        `ssh robot@192.168.0.20RobotID` (for Nanos) OR `ssh robot@192.168.5.20RobotID` (for Pis) OR `ssh robot@robot_name.local`
-        e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.5.203` (for Pis) or `ssh robot@robert.local`
-        for a robot called robert with robot id 3")
+    ssh("Can you SSH into the robot?")
     ssh ---> |Yes| tloop_status
     ssh --> |No - Second Try| monitor("Connect Jetson or Pi to an external monitor and check wifi connection or SSH using an ethernet cable")
     ssh --> |No - First Try| restart(Restart robot)
@@ -58,19 +55,18 @@ flowchart TD
                   
     subgraph ssh_graph [Commands running on the robot]
     tloop_status(Check if Thunderloop is running? 
-                               `service thunderloop status`)
+                               'service thunderloop status')
     tloop_status --> |Inactive| tloop_restart(Restart Thunderloop service
-                                              `service thunderloop restart`)
+                                              'service thunderloop restart')
     tloop_status --> |Running| tloop_logs(Check Thunderloop logs for errors
                                           `journalctl -fu thunderloop -n 300`)
-    tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface` return 'wlan0' or 'tbots', 
-    and does `redis-cli get /channel_id` return '0'?)
+    tloop_logs --> |No Errors| check_yaml(Is field network_interface in the yaml file located in /home/robot/config.yml wlan0 or tbots? And is the field channel_id 0?)
     tloop_logs --> |Contains Errors| rip2("Fix errors or check errors with a lead")
-    check_redis --> |No| update_redis("Update Redis constants by running:
-                                      `redis-cli set /network_interface 'wlan0'` (for Nanos) OR `redis-cli set /network_interface 'tbots'` (for Pis)
-                                      `redis-cli set /channel_id '0'`")
-    check_redis --> |Yes| rip3(Check with a lead)
-    update_redis --> tloop_restart
+    check_yaml --> |No| update_yaml("Update yaml by changing the following field in the yaml file located in /home/robot/thunderbot_binaries/config.yml:
+                                      1. The 'network_interface' should be set to 'wlan0' (for Nanos) OR the `network_interface' should be set to 'tbots' (for Pis)
+                                      2. Both Pi and Nano must set the field 'channel_id' to 0")
+    check_yaml --> |Yes| rip3(Check with a lead)
+    update_yaml --> tloop_restart
     tloop_restart --> tloop_status
     end
 ```
@@ -226,27 +222,7 @@ Powerloop uart communication is encoded so you can't read it from screen and wil
 
 Pressing the reset button once will send a status msg over its connected port. This is useful for sanity checking.
 
-## Redis
+## YAML
 
-Current redis keys that are used are available in `software/constants.h`.  Official Documentation [here](https://redis.io/docs/manual/cli/).
-
-<b>Values should be strings. For example `set \ROBOT_ID "0"`</b>
-
-Redis repl can be accessed through the following command.
-
-`redis-cli`
-
-Other common commands (once inside redis repl):
-
-`get <redis_key>`
-
-`set <redis_key> <value>`
-
-To Exit:
-
-`quit`
-
-Alternative (without entering redis repl):
-
-`redis-cli get <redis_key>` or `redis-cli set <redis_key> <value>`
+To change the parameters on the robot, please modify: `/home/robot/config.yml`.
 

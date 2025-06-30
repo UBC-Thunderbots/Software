@@ -1,5 +1,5 @@
 import math
-import redis
+import yaml
 from software.py_constants import *
 from proto.import_all_protos import *
 from software.embedded.constants.py_constants import (
@@ -16,43 +16,29 @@ class EmbeddedData:
 
     def __init__(self) -> None:
         # Initializes the redis cache connection
-        self.redis = redis.StrictRedis(
-            host=REDIS_DEFAULT_HOST,
-            port=REDIS_DEFAULT_PORT,
-            charset="utf-8",
-            decode_responses=True,
-        )
+        self.yaml_reader = yaml.safe_load(open(ROBOT_PATH_TO_YAML_CONFIG, "r"))
         self.epoch_timestamp_seconds = 0
         self.battery_voltage = 0
         self.primitive_packet_loss_percentage = 0
         self.primitive_executor_step_time_ms = 0
 
     def get_robot_id(self) -> str:
-        return str(self.redis.get(ROBOT_ID_REDIS_KEY))
+        return str(self.yaml_reader[ROBOT_ID_YAML_KEY])
 
     def get_network_interface(self) -> str:
-        return str(self.redis.get(ROBOT_NETWORK_INTERFACE_REDIS_KEY))
+        return str(self.yaml_reader[ROBOT_NETWORK_INTERFACE_YAML_KEY])
 
     def get_channel_id(self) -> str:
-        return str(self.redis.get(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))
+        return str(self.yaml_reader[ROBOT_MULTICAST_CHANNEL_YAML_KEY])
 
     def get_kick_constant(self) -> str:
-        return str(self.redis.get(ROBOT_KICK_CONSTANT_REDIS_KEY))
+        return str(self.yaml_reader[ROBOT_KICK_CONSTANT_YAML_KEY])
 
     def get_kick_coeff(self) -> str:
-        return str(self.redis.get(ROBOT_KICK_EXP_COEFF_REDIS_KEY))
+        return str(self.yaml_reader[ROBOT_KICK_EXP_COEFF_YAML_KEY])
 
     def get_chip_pulse_width(self) -> str:
-        return str(self.redis.get(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))
-
-    def get_current_draw(self) -> str:
-        return str(self.redis.get(ROBOT_CURRENT_DRAW_REDIS_KEY))
-
-    def get_battery_volt(self) -> str:
-        return str(self.redis.get(ROBOT_BATTERY_VOLTAGE_REDIS_KEY))
-
-    def get_cap_volt(self) -> str:
-        return str(self.redis.get(ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY))
+        return str(self.yaml_reader[ROBOT_CHIP_PULSE_WIDTH_YAML_KEY])
 
     def __clamp(self, val: float, min_val: float, max_val: float) -> float:
         """Simple Math Clamp function (Faster than numpy & fewer dependencies)
