@@ -208,7 +208,7 @@ void GoalieFSM::panic(const Update &event)
                 finished = true;
 
             }
-            final_speed+=0.2;
+            final_speed+= GOALIE_STEP_SPEED_M_PER_S;
             if(final_speed > max_speed){
                 finished = true;
             }
