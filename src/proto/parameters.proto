@@ -44,6 +44,16 @@ message AiConfig
     required ReceiverTacticConfig receiver_tactic_config                    = 14;
     required CreaseDefenderConfig crease_defender_config                    = 15;
     required PassDefenderConfig pass_defender_config                        = 16;
+    required RobotSubstitutionConfig robot_substitution_config              = 17;
+}
+
+message RobotSubstitutionConfig
+{
+  // The side where robot substitution would occur
+  required bool substitute_at_positive_y = 1 [default = true];
+
+  // Maximum number of robot that can be substituted
+  required uint32 maximum_robot_substituion_count = 2 [default = 2];
 }
 
 message AiControlConfig

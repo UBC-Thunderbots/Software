@@ -277,3 +277,14 @@ py_test(
         requirement("pytest"),
     ],
 )
+
+cc_test(
+    name = "robot_substitution_play_test",
+    srcs = ["robot_substitution_play_test.cpp"],
+    deps = [
+        "//software/test_util",
+        "//software/ai/hl/stp/play/offense:offense_play",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/play:play_factory"
+    ],
+)

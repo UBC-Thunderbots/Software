@@ -23,3 +23,14 @@ cc_library(
     ],
     alwayslink = True,
 )
+
+cc_library(
+    name = "robot_substitution_test",
+    srcs = ["robot_substitution_test.cpp"],
+    deps = [
+        "//software/ai/hl/stp/play",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/util/generic_factory",
+    ],
+    alwayslink = True,
+)

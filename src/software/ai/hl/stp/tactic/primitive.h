@@ -15,6 +15,9 @@ class Primitive
      */
     virtual ~Primitive() = default;
 
+    typedef std::pair<std::optional<TrajectoryPath>,
+                      std::unique_ptr<TbotsProto::Primitive>> PrimitiveProtoPair;
+
     /**
      * Gets the primitive proto message
      *
@@ -24,9 +27,7 @@ class Primitive
      * @param obstacle_factory Obstacle factory to use for generating obstacles
      * @return A pair of the found trajectory (optional) and the primitive proto message
      */
-    virtual std::pair<std::optional<TrajectoryPath>,
-                      std::unique_ptr<TbotsProto::Primitive>>
-    generatePrimitiveProtoMessage(
+    virtual PrimitiveProtoPair generatePrimitiveProtoMessage(
         const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const std::map<RobotId, TrajectoryPath> &robot_trajectories,

@@ -251,7 +251,7 @@ class Team
      *
      * @return a list of injured robots
      */
-    std::vector<Robot> getInjuredRobots() const;
+    const std::vector<Robot>& getInjuredRobots() const;
 
    private:
     /**

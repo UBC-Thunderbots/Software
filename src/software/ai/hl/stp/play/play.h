@@ -98,6 +98,23 @@ class Play
     virtual void updateTactics(const PlayUpdate& play_update);
 
    private:
+    // For the implementation of `trySubstituteInjuredRobots`
+    struct RobotSubstituionParam{
+        Robot robot;
+        std::unique_ptr<TbotsProto::Primitive> primitive;
+        std::shared_ptr<MoveTactic> sub_tactic;
+    };
+
+    /**
+      * Try to do a automatic robot substitution based on the current world.
+      * Remove the substituted robot from robots
+      *
+      * @param world_ptr: the current world_ptr with the robot
+      * @param robots substituted robots are removed from this list. There is side effect
+      * @return a list of `RobotSubstituionParam` that is going to be applied 
+      */
+    std::vector<RobotSubstituionParam> trySubstituteInjuredRobots(const WorldPtr& world_ptr);
+
     /**
      * Assigns the given tactics to as many of the given robots
      *
