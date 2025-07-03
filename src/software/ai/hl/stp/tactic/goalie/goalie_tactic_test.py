@@ -31,9 +31,15 @@ from proto.ssl_gc_common_pb2 import Team
         (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 1), tbots_cpp.Point(-4.5, 0)),
         # test ball very fast get saved
         (
-            tbots_cpp.Point(-2.25, 0),
-            tbots_cpp.Vector(-5, 1),
+            tbots_cpp.Point(-2.5, 0),
+            tbots_cpp.Vector(-4.8, 1.1),
             tbots_cpp.Point(-4.5, 0),
+        ),
+        # test ball very fast with the goalie out of position saved
+        (
+            tbots_cpp.Point(-2, 0),
+            tbots_cpp.Vector(-5.5, 1),
+            tbots_cpp.Point(-4.5, -0.1),
         ),
         # ball slow inside friendly defense area
         (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 0)),
