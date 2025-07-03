@@ -184,24 +184,32 @@ void GoalieFSM::panic(const Update &event)
         (event.common.world_ptr->ball().position() - goalie_pos).orientation();
 
     Point save_pos = goalie_pos; 
+    //First we are trying to determine how much time do we have to reach the ball
     Duration ball_intercept_time =
         Duration::fromSeconds((event.common.world_ptr->ball().position()-save_pos).length()/
         (std::max(0.1,event.common.world_ptr->ball().velocity().length())));
+
     if(event.common.robot.getTimeToPosition(goalie_pos)>ball_intercept_time){
         Point new_destination = save_pos; 
-        double final_speed= 0.1;
+        double final_speed=  GOALIE_STEP_SPEED_M_PER_S;
         bool finished = false;
         double max_speed =event.common.robot.robotConstants().robot_max_speed_m_per_s; 
         double max_acc =event.common.robot.robotConstants().robot_max_acceleration_m_per_s_2; 
         while(!finished){
             Vector final_velocity = (new_destination - event.common.robot.position()).normalize(final_speed);
+
+            //What's happening here is we are using v_o^2=2*d*a to determine the extra distance the goalie
+            //will be forced to travel if they intercept the ball with final_speed and then immediately
+            //decelerate
             double extra_length = (final_speed*final_speed)/(2.0*max_acc);
             new_destination =
                 save_pos+final_velocity.normalize(extra_length);
-            
             if(event.common.world_ptr->field().pointInFriendlyDefenseArea(new_destination)){
+                
                 goalie_pos=new_destination;
                 if(event.common.robot.getTimeToPosition(save_pos, final_velocity)<ball_intercept_time){
+                    //If we found that the robot can make it before the ball we consider the while loop
+                    //finished
                     finished = true;
                 }           
             }else{
