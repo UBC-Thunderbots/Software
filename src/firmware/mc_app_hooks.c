@@ -20,7 +20,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "mc_type.h"
+#include "firmware/mcsdk/mc_type.h"
 #include "mc_app_hooks.h"
 
 /** @addtogroup MCSDK

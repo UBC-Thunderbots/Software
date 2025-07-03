@@ -3,7 +3,7 @@ cc_binary(
     srcs = ["main.c"],
     deps = [
         ":mdv6_firmware",
-    ]
+    ],
 )
 
 cc_library(
@@ -17,7 +17,6 @@ cc_library(
         "mc_math.c",
         "mc_parameters.c",
         "mc_tasks.c",
-        "motorcontrol.c",
         "pwm_curr_fdbk.c",
         "r1_ps_pwm_curr_fdbk.c",
         "register_interface.c",
@@ -25,9 +24,9 @@ cc_library(
         "stm32f0xx_hal_msp.c",
         "stm32f0xx_it.c",
         "stm32f0xx_mc_it.c",
-        "system_stm32f0xx.c",
     ],
     hdrs = [
+     "main.h",
      "mc_api.h",
      "mc_app_hooks.h",
      "mc_config.h",
@@ -35,9 +34,7 @@ cc_library(
      "mc_interface.h",
      "mc_math.h",
      "mc_parameters.h",
-     "mc_stm_types.h",
      "mc_tasks.h",
-     "motorcontrol.h",
      "parameters_conversion.h",
      "parameters_conversion_f0xx.h",
      "pmsm_motor_parameters.h",
@@ -45,7 +42,10 @@ cc_library(
      "r1_ps_pwm_curr_fdbk.h",
      "register_interface.h",
      "regular_conversion_manager.h",
-     "stm32f0xx_hal_conf.h",
      "stm32f0xx_it.h",
-    ]
+    ],
+    deps = [
+        "//firmware/mcsdk:mcsdk",
+        "//firmware/stm32f0xx:stm32f0xx",
+    ],
 )

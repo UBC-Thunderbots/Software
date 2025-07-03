@@ -27,7 +27,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "mc_type.h"
+#include "mcsdk/mc_type.h"
 #include "regular_conversion_manager.h"
 #include "mc_config.h"
 

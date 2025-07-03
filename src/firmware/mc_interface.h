@@ -29,7 +29,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Includes ------------------------------------------------------------------*/
-#include "mc_type.h"
+#include "firmware/mcsdk/mc_type.h"
 #include "pwm_curr_fdbk.h"
 #include "speed_torq_ctrl.h"
 /** @addtogroup MCSDK

@@ -25,7 +25,7 @@
 #define MC_MATH_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "mc_type.h"
+#include "mcsdk/mc_type.h"
 
 /** @addtogroup MCSDK
   * @{

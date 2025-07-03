@@ -19,7 +19,7 @@
   ******************************************************************************
   */
 
-#include "mc_type.h"
+#include "firmware/mcsdk/mc_type.h"
 #include "mc_configuration_registers.h"
 #include "register_interface.h"
 #include "parameters_conversion.h"

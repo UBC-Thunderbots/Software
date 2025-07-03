@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "mcsdk",
     srcs = [
@@ -58,6 +60,7 @@ cc_library(
         "ics_dd_pwmncurrfdbk.h",
         "inrush_current_limiter.h",
         "max_torque_per_ampere.h",
+        "mc_stm_types.h",
         "mc_type.h",
         "mcp.h",
         "mcpa.h",
@@ -92,5 +95,8 @@ cc_library(
         "usart_aspep_driver.h",
         "virtual_bus_voltage_sensor.h",
         "virtual_speed_sensor.h",
-    ]
+    ],
+    deps = [
+        "//firmware/stm32f0xx:stm32f0xx",
+    ],
 )

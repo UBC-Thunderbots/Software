@@ -53,7 +53,7 @@ extern "C" {
   */
 /*#define MISRA_C_2004_BUILD*/
 
-#include <mc_stm_types.h>
+#include "mc_stm_types.h"
 
 /* char definition to match Misra Dir 4.6 typedefs that indicate size and
  * signedness should be used in place ofthe basic numerical types */

@@ -21,7 +21,7 @@
 #ifndef MC_CONFIG_H
 #define MC_CONFIG_H
 
-#include "pid_regulator.h"
+#include "firmware/mcsdk/pid_regulator.h"
 #include "speed_torq_ctrl.h"
 #include "virtual_speed_sensor.h"
 #include "ntc_temperature_sensor.h"

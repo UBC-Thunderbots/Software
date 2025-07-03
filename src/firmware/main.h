@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_hal.h"
+#include "firmware/stm32f0xx/stm32f0xx_hal.h"
 #include "motorcontrol.h"
 
 /* Private includes ----------------------------------------------------------*/
