@@ -211,19 +211,19 @@ void GoalieFSM::panic(const Update &event)
                     //If we found that the robot can make it before the ball we consider the while loop
                     //finished
                     finished = true;
-                }           
-            }else{
-                finished = true;
-
+                }
             }
-            final_speed+= GOALIE_STEP_SPEED_M_PER_S;
-            if(final_speed > max_speed){
+            else
+            {
                 finished = true;
             }
-            final_velocity = final_velocity.normalize(final_speed); 
-        }                   
-
-
+            final_speed += GOALIE_STEP_SPEED_M_PER_S;
+            if (final_speed > max_speed)
+            {
+                finished = true;
+            }
+            final_velocity = final_velocity.normalize(final_speed);
+        }
     }
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
