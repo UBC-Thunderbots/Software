@@ -66,6 +66,6 @@ struct MoveFSM
             *MoveState_S + Update_E[!moveDone_G] / updateMove_A = MoveState_S,
             MoveState_S + Update_E[moveDone_G] / updateMove_A   = X,
             X + Update_E[!moveDone_G] / updateMove_A            = MoveState_S,
-            X + Update_E / updateMove_A                         = X);
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION            = X);
     }
 };
