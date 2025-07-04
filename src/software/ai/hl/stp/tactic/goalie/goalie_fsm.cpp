@@ -187,7 +187,7 @@ void GoalieFSM::panic(const Update &event)
     // First we are trying to determine how much time do we have to reach the ball
     Duration ball_intercept_time = Duration::fromSeconds(
         (event.common.world_ptr->ball().position() - save_pos).length() /
-        (std::max(std::numeric_limits<double>::epsilon, event.common.world_ptr->ball().velocity().length())));
+        (std::max(std::numeric_limits<double>::epsilon(), event.common.world_ptr->ball().velocity().length())));
 
     if (event.common.robot.getTimeToPosition(goalie_pos) > ball_intercept_time)
     {
