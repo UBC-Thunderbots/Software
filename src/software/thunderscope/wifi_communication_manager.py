@@ -21,8 +21,11 @@ DISCONNECTED = "DISCONNECTED"
 
 logger = create_logger(name=__name__, log_level=logging.DEBUG)
 
-with open('robot_ip_config.yml', 'r') as file:
-    robot_ip = list(yaml.safe_load(file).get('ip', {}).values())[:MAX_ROBOT_IDS_PER_SIDE]
+with open("robot_ip_config.yml", "r") as file:
+    robot_ip = list(yaml.safe_load(file).get("ip", {}).values())[
+        :MAX_ROBOT_IDS_PER_SIDE
+    ]
+
 
 class WifiCommunicationManager:
     """Manages WiFi communication between different modules of the system."""
