@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 extern "C"
 {
-#include "proto/robot_status_msg.nanopb.h"
+#include "proto/robot_status_msg.pb.h"
 }
 
 class CobsEncodingTest : public ::testing::TestWithParam<
