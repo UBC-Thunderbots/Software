@@ -14,11 +14,15 @@ import logging
 from threading import Lock, Thread
 import time
 
+import yaml
+
 DISCONNECTED = "DISCONNECTED"
 """A constant to represent a disconnected interface"""
 
 logger = create_logger(name=__name__, log_level=logging.DEBUG)
 
+with open('robot_ip_config.yml', 'r') as file:
+    robot_ip = list(yaml.safe_load(file).get('ip', {}).values())[:MAX_ROBOT_IDS_PER_SIDE]
 
 class WifiCommunicationManager:
     """Manages WiFi communication between different modules of the system."""
@@ -43,12 +47,12 @@ class WifiCommunicationManager:
         """
         ## Robot IP address tracking ##
         self.robot_ip_addresses: list[tuple[Lock, str | None]] = [
-            (Lock(), None) for _ in range(MAX_ROBOT_IDS_PER_SIDE)
+            (Lock(), None) for ip in robot_ip
         ]
 
         ## Senders and listeners ##
         self.primitive_senders: list[tuple[Lock, tbots_cpp.PrimitiveSender | None]] = [
-            (Lock(), None) for _ in range(MAX_ROBOT_IDS_PER_SIDE)
+            (Lock(), None) for ip in robot_ip
         ]
         self.receive_robot_status: tbots_cpp.RobotStatusProtolistener | None = None
         self.receive_robot_log: tbots_cpp.RobotLogProtolistener | None = None
