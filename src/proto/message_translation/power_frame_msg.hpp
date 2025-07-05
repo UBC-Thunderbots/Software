@@ -46,16 +46,16 @@ std::vector<uint8_t> serializeToVector(const T& data)
         fields = TbotsProto_PowerFrame_fields;
         size   = TbotsProto_PowerFrame_size;
     }
-    // else if (std::is_same<T, TbotsProto_PowerPulseControl>::value)
-    // {
-    //     fields = TbotsProto_PowerPulseControl_fields;
-    //     size   = TbotsProto_PowerPulseControl_size;
-    // }
-    // else if (std::is_same<T, TbotsProto_PowerStatus>::value)
-    // {
-    //     fields = TbotsProto_PowerStatus_fields;
-    //     size   = TbotsProto_PowerStatus_size;
-    // }
+    else if (std::is_same<T, TbotsProto_PowerPulseControl>::value)
+    {
+        fields = TbotsProto_PowerPulseControl_fields;
+        size   = TbotsProto_PowerPulseControl_size;
+    }
+    else if (std::is_same<T, TbotsProto_PowerStatus>::value)
+    {
+        fields = TbotsProto_PowerStatus_fields;
+        size   = TbotsProto_PowerStatus_size;
+    }
     else
     {
         throw std::runtime_error("Unexpected type as argument");

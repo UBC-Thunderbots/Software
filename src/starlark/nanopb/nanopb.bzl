@@ -152,7 +152,7 @@ def _nanopb_proto_library_impl(ctx):
         dir = _PROTO_DIR.format(path = name)
         if "nanopb.pb." in src_file.basename:
             dir = "bazel-out/k8-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
-        elif "descriptor.pb" in hdr_file.basename:
+        elif "descriptor.pb" in src_file.basename:
             dir = "bazel-out/k8-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
         file = ctx.actions.declare_file(
             _FILENAME.format(dirname = dir, filename = src_file.basename),
