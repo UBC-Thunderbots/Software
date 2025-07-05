@@ -216,10 +216,10 @@ bool inline unmarshalUartPacket(const std::vector<uint8_t>& data,
     frame = TbotsProto_PowerFrame_init_default;
     pb_istream_t stream =
         pb_istream_from_buffer(static_cast<uint8_t*>(decoded.data()), decoded.size());
-    if (!pb_decode(&stream, TbotsProto_PowerFrame_fields, &frame))
-    {
-        return false;
-    }
+    // if (!pb_decode(&stream, TbotsProto_PowerFrame_fields, &frame))
+    // {
+    //     return false;
+    // }
     return verifyLengthAndCrc(frame);
 }
 /**

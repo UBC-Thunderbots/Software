@@ -2,7 +2,6 @@
 
 #include <pb_decode.h>
 #include <pb_encode.h>
-#include <proto/power_frame_msg.pb.h>
 
 #include <cmath>
 #include <cstdint>
@@ -18,18 +17,17 @@
 #include "proto/primitive/primitive_types.h"
 #include "shared/constants.h"
 
-extern "C"
-{
+extern "C" {
 #include "proto/power_frame_msg.pb.h"
 }
 #endif  // PLATFORMIO_BUILD
 
 // The nanopb generated size isn't c++ compatible so we redefine it here
-// TODO(#2592): Remove with upgrade to nanopb
-#undef TbotsProto_PowerFrame_size
-#define TbotsProto_PowerFrame_size                                                       \
-    std::max(TbotsProto_PowerPulseControl_size, TbotsProto_PowerStatus_size) +           \
-        2 * sizeof(uint32_t) + sizeof(uint16_t)
+// // TODO(#2592): Remove with upgrade to nanopb
+// #undef TbotsProto_PowerFrame_size
+// #define TbotsProto_PowerFrame_size                                                       \
+//     std::max(TbotsProto_PowerPulseControl_size, TbotsProto_PowerStatus_size) +           \
+//         2 * sizeof(uint32_t) + sizeof(uint16_t)
 
 
 /**
@@ -41,23 +39,23 @@ extern "C"
 template <typename T>
 std::vector<uint8_t> serializeToVector(const T& data)
 {
-    const pb_field_t* fields;
+    const pb_msgdesc_s * fields;
     int size;
     if (std::is_same<T, TbotsProto_PowerFrame>::value)
     {
         fields = TbotsProto_PowerFrame_fields;
         size   = TbotsProto_PowerFrame_size;
     }
-    else if (std::is_same<T, TbotsProto_PowerPulseControl>::value)
-    {
-        fields = TbotsProto_PowerPulseControl_fields;
-        size   = TbotsProto_PowerPulseControl_size;
-    }
-    else if (std::is_same<T, TbotsProto_PowerStatus>::value)
-    {
-        fields = TbotsProto_PowerStatus_fields;
-        size   = TbotsProto_PowerStatus_size;
-    }
+    // else if (std::is_same<T, TbotsProto_PowerPulseControl>::value)
+    // {
+    //     fields = TbotsProto_PowerPulseControl_fields;
+    //     size   = TbotsProto_PowerPulseControl_size;
+    // }
+    // else if (std::is_same<T, TbotsProto_PowerStatus>::value)
+    // {
+    //     fields = TbotsProto_PowerStatus_fields;
+    //     size   = TbotsProto_PowerStatus_size;
+    // }
     else
     {
         throw std::runtime_error("Unexpected type as argument");

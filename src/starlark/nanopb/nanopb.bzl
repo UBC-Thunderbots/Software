@@ -58,7 +58,7 @@ def _nanopb_proto_library_impl(ctx):
     for proto_file in all_proto_files.to_list():
         proto_compile_args = []
         for path in all_proto_include_dirs.to_list():
-            proto_compile_args += ["-I=%s" % path]
+            proto_compile_args += ["-I%s" % path]
         h_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb.h"
         c_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb.c"
 
@@ -66,7 +66,7 @@ def _nanopb_proto_library_impl(ctx):
         h_out = ctx.actions.declare_file(h_out_name)
 
         proto_compile_args += ["--plugin=protoc-gen-nanopb=%s" % (ctx.executable.nanopb_generator.path)]
-        proto_compile_args += ["--nanopb_out=%s %s" % (generated_folder_abs_path, proto_file.path)]
+        proto_compile_args += ["--nanopb_out=--cpp-descriptors:%s %s" % (generated_folder_abs_path, proto_file.path)]
 
         cmd = [ctx.executable.protoc.path] + proto_compile_args
         cmd_str = " ".join(cmd)
@@ -135,8 +135,10 @@ def _nanopb_proto_library_impl(ctx):
 
     for hdr_file in all_proto_hdr_files:
         dir = _PROTO_DIR.format(path = name)
-        if "options.nanopb." in hdr_file.basename:
-            dir = _OPTIONS_DIR.format(path = name)
+        if "nanopb.pb." in hdr_file.basename:
+            dir = "bazel-out/k8-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
+        elif "descriptor.pb" in hdr_file.basename:
+            dir = "bazel-out/k8-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
         file = ctx.actions.declare_file(
             _FILENAME.format(dirname = dir, filename = hdr_file.basename),
         )
@@ -148,8 +150,10 @@ def _nanopb_proto_library_impl(ctx):
 
     for src_file in all_proto_src_files:
         dir = _PROTO_DIR.format(path = name)
-        if "options.nanopb." in src_file.basename:
-            dir = _OPTIONS_DIR.format(path = name)
+        if "nanopb.pb." in src_file.basename:
+            dir = "bazel-out/k8-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
+        elif "descriptor.pb" in hdr_file.basename:
+            dir = "bazel-out/k8-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
         file = ctx.actions.declare_file(
             _FILENAME.format(dirname = dir, filename = src_file.basename),
         )
@@ -158,21 +162,6 @@ def _nanopb_proto_library_impl(ctx):
             source = src_file.path,
             destination = file.path,
         ))
-
-    #    for label in ctx.attr.nanopb_libs:
-    #        print(label[CcInfo].compilation_context.headers.to_list())
-    #        all_proto_hdr_files.extend(label[CcInfo].compilation_context.headers.to_list())
-
-    #    for label in ctx.attr.nanopb_libs:
-    #        for dep_file in label[CcInfo].compilation_context.headers.to_list():
-    #            file = ctx.actions.declare_file(
-    #                _FILENAME.format(dirname = name, filename = dep_file.basename),
-    #            )
-    #            outputs.append(file)
-    #            commands.append(_COPY_COMMAND.format(
-    #                source = dep_file.path,
-    #                destination = file.path,
-    #            ))
 
     zip_file = ctx.actions.declare_file("%s.zip" % name)
     outputs.append(zip_file)
@@ -187,9 +176,11 @@ def _nanopb_proto_library_impl(ctx):
     )
     runfiles = ctx.runfiles(files = [zip_file])
     transitive_libdeps = []
-    if PlatformIOLibraryInfo in dep:
-        runfiles.merge_all(dep[PlatformIOLibraryInfo].runfiles)
-        transitive_libdeps.extend(dep[PlatformIOLibraryInfo].transitive_libdeps)
+    for dep in ctx.attr.deps:
+        if PlatformIOLibraryInfo in dep:
+            print(dep[PlatformIOLibraryInfo].runfiles)
+            runfiles.merge_all(dep[PlatformIOLibraryInfo].runfiles)
+            transitive_libdeps.extend(dep[PlatformIOLibraryInfo].transitive_libdeps)
     return [
         DefaultInfo(files = depset([zip_file])),
         PlatformIOLibraryInfo(
@@ -232,6 +223,7 @@ nanopb_proto_library = rule(
     provides = [
         DefaultInfo,
         PlatformIOLibraryInfo,
+        #        CcInfo,
     ],
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
     fragments = ["cpp"],
