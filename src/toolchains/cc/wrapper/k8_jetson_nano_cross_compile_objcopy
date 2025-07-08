@@ -1,3 +1,3 @@
 #!/bin/bash --norc
 
-exec external/k8_jetson_nano_cross_compile_gcc/bin/aarch64-tbots-linux-gnu-objcopy "$@"
+exec external/+_repo_rules3+k8_jetson_nano_cross_compile_gcc/bin/aarch64-tbots-linux-gnu-objcopy "$@"

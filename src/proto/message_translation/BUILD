@@ -199,9 +199,6 @@ cc_test(
 platformio_library(
     name = "power_frame_msg_platformio",
     hdr = "power_frame_msg.hpp",
-    deps = [
-        "//proto:tbots_nanopb_proto",
-    ],
 )
 
 cc_library(

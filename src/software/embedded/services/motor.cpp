@@ -26,10 +26,10 @@
 
 extern "C"
 {
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Register.h"
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
-#include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
+#include "external/+_repo_rules2+trinamic/tmc/ic/TMC4671/TMC4671.h"
+#include "external/+_repo_rules2+trinamic/tmc/ic/TMC4671/TMC4671_Register.h"
+#include "external/+_repo_rules2+trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
+#include "external/+_repo_rules2+trinamic/tmc/ic/TMC6100/TMC6100.h"
 }
 
 // SPI Configs
