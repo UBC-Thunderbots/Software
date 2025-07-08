@@ -171,4 +171,3 @@ struct ShadowEnemyFSM
     //Angle that enemy has to be facing the net within to consider going for the ball
     static constexpr double ENEMY_FACE_RADIANS = M_PI / 4.0; 
 };
-    

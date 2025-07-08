@@ -39,9 +39,8 @@ Point ShadowEnemyFSM::findBlockShotPoint(const Robot &robot, const Field &field,
 
 bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
 {
-
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
-        
+
     if (enemy_threat_opt.has_value())
     {
         bool near_ball =
@@ -84,7 +83,7 @@ bool ShadowEnemyFSM::blockedShot(const Update &event)
     Segment goalLine(event.common.world_ptr->field().friendlyGoal().negXNegYCorner(),
                      event.common.world_ptr->field().friendlyGoal().negXPosYCorner());
     bool ball_blocked = intersects(goalLine, shot_block_direction);
-    bool is_close = distance(event.common.robot.position(),ball_position) < NEAR_PRESS_M;
+    bool is_close = distance(event.common.robot.position(), ball_position) < NEAR_PRESS_M;
 
 
 
@@ -172,7 +171,7 @@ void ShadowEnemyFSM::blockShot(const Update &event,
  *                          ++   Shadow defender will attempt to take
  *                          ++   the ball since the enemy is facing
  *                                the net
- *                                
+ *
  *
  *                       +--------------------+
  *                       |                    |
@@ -200,69 +199,78 @@ void ShadowEnemyFSM::blockShot(const Update &event,
  */
 void ShadowEnemyFSM::goAndSteal(const Update &event)
 {
-    
     Point ball_position = event.common.world_ptr->ball().position();
     Angle face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
 
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
-    bool go_for_ball=true;
-    Vector goal_direction = event.common.world_ptr->field().friendlyGoalCenter() - ball_position; 
+    bool go_for_ball                            = true;
+    Vector goal_direction =
+        event.common.world_ptr->field().friendlyGoalCenter() - ball_position;
     Vector enemy_angle = Vector();
-    
+
 
     Point enemy_face = Point();
     if (enemy_threat_opt.has_value())
     {
-        enemy_angle = Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
-        enemy_face = enemy_threat_opt.value().robot.position()+enemy_angle.normalize(DIST_TO_FRONT_OF_ROBOT_METERS);
-        face_ball_orientation = (enemy_face-event.common.robot.position()).orientation();
-        //Here we check if the enemy is facing the goal if not we just shadow
-        go_for_ball=std::acos((enemy_angle.normalize()).dot(goal_direction.normalize())) < ENEMY_FACE_RADIANS;
+        enemy_angle =
+            Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
+        enemy_face = enemy_threat_opt.value().robot.position() +
+                     enemy_angle.normalize(DIST_TO_FRONT_OF_ROBOT_METERS);
+        face_ball_orientation =
+            (enemy_face - event.common.robot.position()).orientation();
+        // Here we check if the enemy is facing the goal if not we just shadow
+        go_for_ball =
+            std::acos((enemy_angle.normalize()).dot(goal_direction.normalize())) <
+            ENEMY_FACE_RADIANS;
     }
 
+    /*
+     *              Go for ball is checking if the ball is within a certain angle
+     *              of the net
+     *                                XX   <-- Enemy that is facing the net
+     *                                XX
+     *                              /  O  \<-- Ball
+     *                             /        \
+     *                       +----/----------\----+
+     *                       |   /             \  |
+     *                       |  /       ++      \ |
+     *                       | /        ++    <--\Goalie
+     *+----------------------+---------++---------+------------------+
+     */
 
-/*
- *              Go for ball is checking if the ball is within a certain angle
- *              of the net
- *                                XX   <-- Enemy that is not facing the net
- *                                XX
- *                              /  O  \<-- Ball
- *                             /        \
- *                       +----/----------\----+
- *                       |   /             \  |
- *                       |  /       ++      \ |
- *                       | /        ++    <--\Goalie
- *+----------------------+---------++---------+------------------+
- */
-    if(go_for_ball){
-
-    //Here if we see have an enemy_threat and it's facing the net
-    //we trust that it has the ball
-    //and go for it's face
-        if(enemy_threat_opt.has_value())
-            {
-        event.common.set_primitive(std::make_unique<MovePrimitive>(
-            event.common.robot, enemy_face, face_ball_orientation,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
-
-            }else{
-        event.common.set_primitive(std::make_unique<MovePrimitive>(
-            event.common.robot, ball_position, face_ball_orientation,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
+    if (go_for_ball)
+    {
+        // Here if we see have an enemy_threat and it's facing the net
+        // we trust that it has the ball
+        // and go for it's face
+        if (enemy_threat_opt.has_value())
+        {
+            event.common.set_primitive(std::make_unique<MovePrimitive>(
+                event.common.robot, enemy_face, face_ball_orientation,
+                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+                TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
         }
-    
-    }else{
-
-    //If the enemy is facing away from the net we shadow them
-        enemy_angle = Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
-        Point shadow_ball_position = enemy_threat_opt.value().robot.position()+(goal_direction.normalize(event.control_params.shadow_distance)); 
+        else
+        {
+            event.common.set_primitive(std::make_unique<MovePrimitive>(
+                event.common.robot, ball_position, face_ball_orientation,
+                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+                TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
+        }
+    }
+    else
+    {
+        // If the enemy is facing away from the net we shadow them
+        enemy_angle =
+            Vector::createFromAngle(enemy_threat_opt.value().robot.orientation());
+        Point shadow_ball_position =
+            enemy_threat_opt.value().robot.position() +
+            (goal_direction.normalize(event.control_params.shadow_distance));
 
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, shadow_ball_position, face_ball_orientation,
@@ -279,8 +287,9 @@ void ShadowEnemyFSM::stealAndPull(const Update &event)
     Angle face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
 
-    Vector direction_to_pull = (event.common.robot.position() - ball_position).normalize();
-    Point pull_to_here      = direction_to_pull + event.common.robot.position();
+    Vector direction_to_pull =
+        (event.common.robot.position() - ball_position).normalize();
+    Point pull_to_here = direction_to_pull + event.common.robot.position();
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, pull_to_here, face_ball_orientation,
