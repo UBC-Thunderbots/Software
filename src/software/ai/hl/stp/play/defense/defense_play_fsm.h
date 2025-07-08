@@ -108,7 +108,7 @@ struct DefensePlayFSM : public DefensePlayFSMBase
             X + Update_E = X);
     }
 
-    private:
+   private:
     // Where to shadow, gathered experimentally after seeing
     // how far is far enough that the robot couldn't get dribbled past
     static constexpr double ROBOT_SHADOWING_DISTANCE_METERS = 0.36;

@@ -56,7 +56,7 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
 
 
 /**
- * Here we are checking if the ray going starting from the ball going through 
+ * Here we are checking if the ray going starting from the ball going through
  * the shadow defender is intersecting with the goal if this is the case
  * we will now attempt to steal the ball as we are not jeoparadizing a shot on net
  *
@@ -65,7 +65,7 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
  *                 O  <-- Ball
  *                  \
  *                   ++   <--- Shadow defender
- *                   ++ 
+ *                   ++
  *                      \
  *                       \
  *                        \
