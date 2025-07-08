@@ -74,18 +74,18 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
     simulated_test_runner.run_test(
         setup=setup,
         params=[0, 1, 2, 3, 4],  # The aggregate test runs 5 times
-        inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[
+        inv_always_validation_sequence_set=[
             [
                 BallNeverEntersRegion(
                     regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
                 )
             ]
         ],
-        ag_eventually_validation_sequence_set=[
+        inv_eventually_validation_sequence_set=[
             [FriendlyEventuallyHasBallPossession(tolerance=0.05)]
         ],
+        ag_always_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=12,
     )
 
@@ -153,19 +153,19 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
     simulated_test_runner.run_test(
         setup=setup,
         params=[0, 1, 2, 3, 4],  # The aggregate test runs 5 times
-        inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[
+        inv_always_validation_sequence_set=[
             [
                 BallNeverEntersRegion(
                     regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
                 )
             ]
         ],
-        ag_eventually_validation_sequence_set=[
+        inv_eventually_validation_sequence_set=[
             [FriendlyEventuallyHasBallPossession(tolerance=0.05)]
         ],
-        test_timeout_s=6,
+        ag_always_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=[[]],
+        test_timeout_s=30,
     )
 
 

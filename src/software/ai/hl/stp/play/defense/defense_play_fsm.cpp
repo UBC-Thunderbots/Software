@@ -13,8 +13,7 @@ DefensePlayFSM::DefensePlayFSM(TbotsProto::AiConfig ai_config)
 bool DefensePlayFSM::shouldDefendAggressively(const Update& event)
 {
     // If there is more attackers ahead of the ball than there
-    // is our own defenders we probably shouldn't press
-    // this can be replaced with smarter or stricter logic though
+    // are our own defenders we won't press
 
     auto attackers = std::count_if(
         event.common.world_ptr->enemyTeam().getAllRobots().begin(),

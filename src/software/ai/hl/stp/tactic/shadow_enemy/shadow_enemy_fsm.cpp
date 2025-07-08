@@ -54,6 +54,28 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
     return false;
 }
 
+
+
+/**
+ * Here we are checking if the ray going starting from the ball going through 
+ * the shadow defender is intersecting with the goal if this is the case
+ * we will now attempt to steal the ball as we are not jeoparadizing a shot on net
+ *
+ *               XX   <-- Enemy
+ *               XX
+ *                 O  <-- Ball
+ *                  \
+ *                   ++   <--- Shadow defender
+ *                   ++ 
+ *                      \
+ *                       \
+ *                        \
+ *                       +-\------------------+
+ *                       |  \                 |
+ *                       |   \     ++         |
+ *                       |    \    ++    <-- Goalie
+ *+----------------------+----|----------|----+------------------+
+ */
 bool ShadowEnemyFSM::blockedShot(const Update &event)
 {
     Point ball_position = event.common.world_ptr->ball().position();
@@ -63,6 +85,8 @@ bool ShadowEnemyFSM::blockedShot(const Update &event)
                      event.common.world_ptr->field().friendlyGoal().negXPosYCorner());
     bool ball_blocked = intersects(goalLine, shot_block_direction);
     bool is_close = distance(event.common.robot.position(),ball_position) < NEAR_PRESS_M;
+
+
 
     return (ball_blocked & is_close);
 }
@@ -174,8 +198,6 @@ void ShadowEnemyFSM::blockShot(const Update &event,
  *                       |         ++    <-- Goalie
  *+----------------------+---------++---------+------------------+
  */
-
-
 void ShadowEnemyFSM::goAndSteal(const Update &event)
 {
     
@@ -213,7 +235,6 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
  *                       | /        ++    <--\Goalie
  *+----------------------+---------++---------+------------------+
  */
-
     if(go_for_ball){
 
     //Here if we see have an enemy_threat and it's facing the net

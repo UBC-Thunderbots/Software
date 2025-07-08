@@ -107,7 +107,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // Shadowee still has possession of the ball and robot has arrived at block shot
-    // position Robot should try to steal the ball
+    // position, robot should try to steal the ball
     Point position_to_block = ShadowEnemyFSM::findBlockShotPoint(
         shadower, world->field(), world->friendlyTeam(), world->enemyTeam(), shadowee,
         0.5);

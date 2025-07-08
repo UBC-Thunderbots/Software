@@ -20,9 +20,6 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      */
     explicit DefensePlayFSM(TbotsProto::AiConfig ai_config);
 
-    // Where to shadow
-    const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 4;
-
     /**
      * Guard to check whether we should be defending more aggressively
      *
@@ -110,4 +107,9 @@ struct DefensePlayFSM : public DefensePlayFSMBase
                 AggressiveDefenseState_S,
             X + Update_E = X);
     }
+
+    private:
+    // Where to shadow, gathered experimentally after seeing
+    // how far is far enough that the robot couldn't get dribbled past
+    static constexpr double ROBOT_SHADOWING_DISTANCE_METERS = 0.36;
 };
