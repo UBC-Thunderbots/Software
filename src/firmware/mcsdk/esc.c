@@ -20,8 +20,8 @@
 
 
 /* Includes ------------------------------------------------------------------*/
-#include "motorcontrol.h"
-#include "esc.h"
+#include "firmware/mcsdk/esc.h"
+#include "firmware/motorcontrol/motorcontrol.h"
 
 /* Define --------------------------------------------------------------------*/
 

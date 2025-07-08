@@ -98,5 +98,6 @@ cc_library(
     ],
     deps = [
         "//firmware/stm32f0xx:stm32f0xx",
+        "//firmware/motorcontrol:motorcontrol",
     ],
 )

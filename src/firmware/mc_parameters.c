@@ -22,7 +22,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 //cstat -MISRAC2012-Rule-21.1
-#include "main.h" //cstat !MISRAC2012-Rule-21.1
+#include "firmware/motorcontrol/main.h" //cstat !MISRAC2012-Rule-21.1
 //cstat +MISRAC2012-Rule-21.1
 #include "parameters_conversion.h"
 

@@ -25,7 +25,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "pwm_curr_fdbk.h"
+#include "firmware/mcsdk/pwm_curr_fdbk.h"
 #include "mc_math.h"
 #include "mc_type.h"
 

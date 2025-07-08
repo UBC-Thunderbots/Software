@@ -194,7 +194,7 @@
 #endif /* HAL_RCC_MODULE_ENABLED */
 
 #ifdef HAL_GPIO_MODULE_ENABLED
- #include "stm32f0xx_hal_gpio.h"
+ #include "firmware/stm32f0xx/stm32f0xx_hal_gpio.h"
 #endif /* HAL_GPIO_MODULE_ENABLED */
 
 #ifdef HAL_EXTI_MODULE_ENABLED

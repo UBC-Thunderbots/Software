@@ -28,7 +28,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Includes ------------------------------------------------------------------*/
-#include "pwm_curr_fdbk.h"
+#include "firmware/mcsdk/pwm_curr_fdbk.h"
 
 /** @addtogroup MCSDK
   * @{

@@ -22,7 +22,7 @@
 #ifndef MOTORCONTROL_H
 #define MOTORCONTROL_H
 
-#include "mc_config.h"
+#include "firmware/mc_config.h"
 #include "parameters_conversion.h"
 #include "mc_api.h"
 

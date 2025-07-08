@@ -29,6 +29,7 @@
 
 #define MCTL_SYNC_NOT_EXPECTED 1
 
+#include <cstdint>
 
 typedef struct MCTL_Handle MCTL_Handle_t; //cstat !MISRAC2012-Rule-2.4
 typedef bool (* MCTL_GetBuf)(MCTL_Handle_t *pHandle, void **buffer, uint8_t syncAsync);

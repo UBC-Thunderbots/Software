@@ -8,4 +8,7 @@ cc_library(
     hdrs = [
         "motorcontrol.h",
     ],
+    deps = [
+        "//firmware/stm32f0xx:stm32f0xx",
+    ],
 )

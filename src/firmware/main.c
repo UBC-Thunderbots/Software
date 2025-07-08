@@ -17,7 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "firmware/motorcontrol/main.h"
 #include "open_loop.h"
 
 /* Private includes ----------------------------------------------------------*/

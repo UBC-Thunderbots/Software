@@ -21,7 +21,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 //cstat -MISRAC2012-Rule-21.1
-#include "main.h"
+#include "firmware/motorcontrol/main.h"
 //cstat +MISRAC2012-Rule-21.1
 #include "mc_type.h"
 #include "mc_math.h"
