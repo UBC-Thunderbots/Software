@@ -114,7 +114,7 @@ void MotorService::MotorFaultIndicator::update(
     }
 }
 
-void MotorService::MotorFaultIndicator::removeFaultyMotor(std::set<uint8_t>& motors)
+void MotorService::MotorFaultIndicator::removeMotorIfFaulty(std::set<uint8_t>& motors)
 {
     if (num_critical_faults > MOTOR_FAULT_THRESHOLD_COUNT)
     {
@@ -359,7 +359,7 @@ void MotorService::checkDriverFault(uint8_t motor)
     }
 
     cached_motor_faults_.at(motor).update(drive_enabled, motor_faults);
-    cached_motor_faults_.at(motor).removeFaultyMotor(enabled_motors);
+    cached_motor_faults_.at(motor).removeMotorIfFaulty(enabled_motors);
 }
 
 TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_velocity_mps,
