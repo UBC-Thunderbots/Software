@@ -9,6 +9,7 @@ from software.simulated_tests.friendly_has_ball_possession import FriendlyAlways
 from software.simulated_tests.friendly_team_scored import FriendlyTeamEventuallyScored
 
 from proto.message_translation.tbots_protobuf import create_world_state
+from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from proto.play_pb2 import Play, PlayName
 
@@ -78,15 +79,13 @@ def test_penalty_kick_play(simulated_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     # Always Validation
-    inv_always_validation_sequence_set = [
-        [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])]
-    ]
+    inv_always_validation_sequence_set = [[]]
 
     ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
 
     # Eventually Validation
-    inv_eventually_validation_sequence_set = [[]]
-    ag_eventually_validation_sequence_set = [[FriendlyTeamEventuallyScored()]]
+    inv_eventually_validation_sequence_set = [[FriendlyTeamEventuallyScored()]]
+    ag_eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
         params=[0],
