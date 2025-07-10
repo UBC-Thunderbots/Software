@@ -1,5 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
 # We force linking for all plays so that the static variables required for the
 # "factory" design pattern to work are linked in
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
@@ -38,7 +39,7 @@ cc_test(
 )
 
 cc_test(
-    name = "penalty_kick_play_test",
+    name = "penalty_kick_play_cpp_test",
     srcs = ["penalty_kick_play_test.cpp"],
     deps = [
         ":penalty_kick_play",
@@ -50,5 +51,16 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "penalty_kick_play_test",
+    srcs = ["penalty_kick_play_test.py"],
+    tags = ["exclusive"],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
