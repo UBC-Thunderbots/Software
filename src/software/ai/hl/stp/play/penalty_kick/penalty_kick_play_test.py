@@ -4,8 +4,7 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 
-from software.simulated_tests.ball_enters_region import BallAlwaysStaysInRegion, BallEventuallyEntersRegion
-from software.simulated_tests.friendly_has_ball_possession import FriendlyAlwaysHasBallPossession
+from software.simulated_tests.ball_enters_region import BallEventuallyEntersRegion
 from software.simulated_tests.friendly_has_ball_possession import (
     FriendlyAlwaysHasBallPossession,
 )
@@ -87,8 +86,12 @@ def test_penalty_kick_play(simulated_test_runner):
     ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
 
     # Eventually Validation
-    inv_eventually_validation_sequence_set = [[FriendlyTeamEventuallyScored(),
-                                               BallEventuallyEntersRegion(regions=[field.enemyDefenseArea()])]]
+    inv_eventually_validation_sequence_set = [
+        [
+            FriendlyTeamEventuallyScored(),
+            BallEventuallyEntersRegion(regions=[field.enemyDefenseArea()]),
+        ]
+    ]
     ag_eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
