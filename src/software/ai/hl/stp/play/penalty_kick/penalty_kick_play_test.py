@@ -4,8 +4,9 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 
-from software.simulated_tests.ball_enters_region import BallAlwaysStaysInRegion
-from software.simulated_tests.friendly_has_ball_possession import FriendlyAlwaysHasBallPossession
+from software.simulated_tests.friendly_has_ball_possession import (
+    FriendlyAlwaysHasBallPossession,
+)
 from software.simulated_tests.friendly_team_scored import FriendlyTeamEventuallyScored
 
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -13,8 +14,9 @@ from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from proto.play_pb2 import Play, PlayName
 
+
 def test_penalty_kick_play(simulated_test_runner):
-    ball_initial_pos = tbots_cpp.Point(0,0)
+    ball_initial_pos = tbots_cpp.Point(0, 0)
 
     def setup(*args):
         # Setup Bots
@@ -39,7 +41,6 @@ def test_penalty_kick_play(simulated_test_runner):
             .enemyDefenseArea()
             .negXPosYCorner(),
         ]
-
 
         # Force play override here
         blue_play = Play()
@@ -96,6 +97,7 @@ def test_penalty_kick_play(simulated_test_runner):
         ag_always_validation_sequence_set=ag_always_validation_sequence_set,
         test_timeout_s=15,
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
