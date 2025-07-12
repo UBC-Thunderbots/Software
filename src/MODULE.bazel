@@ -176,14 +176,6 @@ archive_override(
     url = "https://github.com/Andrewyx/platformio_rules/archive/b998c783ce05a224ef726aa9775bd7c2d4121c29.tar.gz",
 )
 
-#bazel_dep(name = "nanopb", repo_name = "nanopb")
-#archive_override(
-#    module_name = "nanopb",
-#    sha256 = "b1ed779c3acce44705c64a90499e0daefae37d5faa7bb6d15370d0cbed3f5be6",
-#    strip_prefix = "nanopb-4380dd9e947e6f40e1f31f9eaeda7994ac1872ae",
-#    url = "https://github.com/nanopb/nanopb/archive/4380dd9e947e6f40e1f31f9eaeda7994ac1872ae.tar.gz",
-#)
-
 # This is overridden despite being in BCR since it contains protoc v31.1. We can remove this once BCR updates
 archive_override(
     module_name = "toolchains_protoc",

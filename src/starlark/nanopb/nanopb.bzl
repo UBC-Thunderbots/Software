@@ -115,6 +115,8 @@ def _nanopb_proto_library_impl(ctx):
         compilation_contexts = nanopb_compilation_contexts,
     )
 
+    print(nanopb_linking_contexts)
+
     (linking_context, linking_outputs) = \
         cc_common.create_linking_context_from_compilation_outputs(
             name = "link_nanopb_outputs",
@@ -204,7 +206,7 @@ nanopb_proto_library = rule(
         ),
         "nanopb_libs": attr.label_list(
             providers = [CcInfo],
-            default = [Label("@nanopb//:nanopb")],
+            default = [Label("@nanopb//:gf")],
         ),
         "nanopb_generator": attr.label(
             executable = True,
