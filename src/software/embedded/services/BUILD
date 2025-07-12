@@ -32,7 +32,6 @@ cc_library(
         "//software/geom:angular_velocity",
         "//software/logger",
         "@eigen",
-        "@usr//:libi2c",
     ],
 )
 

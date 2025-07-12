@@ -347,7 +347,7 @@ void ErForceSimulator::setRobotPrimitive(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
     const TbotsProto::World& world_msg, const Vector& local_velocity,
-    const AngularVelocity angular_velocity, const Angle& orientation)
+    const AngularVelocity& angular_velocity, const Angle& orientation)
 {
     // Set to NEG_X because the world msg in this simulator is normalized
     // correctly

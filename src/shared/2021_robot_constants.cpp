@@ -33,7 +33,11 @@ RobotConstants_t create2021RobotConstants(void)
         .robot_max_ang_speed_rad_per_s          = 11.0f,
         .robot_max_ang_acceleration_rad_per_s_2 = 6.0f,
 
-        .wheel_radius_meters                = 0.03f,
-        .wheel_rotations_per_motor_rotation = 17.0f / 60.0f};
+        .wheel_radius_meters                       = 0.03f,
+        .wheel_rotations_per_motor_rotation        = 17.0f / 60.0f,
+        .kalman_process_noise_variance_rad_per_s_4 = 0.5f,
+        .kalman_vision_noise_variance_rad_2        = 0.01f * 0.01f,
+        .kalman_encoder_noise_variance_rad_per_s_2 = 0.5f * 0.5f,
+        .kalman_target_angular_velocity_variance_rad_per_sec_2 = 0.1f * 0.1f};
     return robot_constants;
 }

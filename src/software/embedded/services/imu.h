@@ -35,7 +35,7 @@ class ImuService
     // acceleration = x / SHRT_MAX * ACCELEROMETER_FULL_SCALE_G
     static constexpr double ACCELEROMETER_FULL_SCALE_G = 2.0;
     // If this is changed, the IMU config needs to be different.
-    // The full scale of the imu, that is, for imu output a, angular velocity in DPS = a /
+    // The full scale of the IMU, that is, for IMU output a, angular velocity in DPS = a /
     // SHRT_MAX * IMU_FULL_SCALE_DPS
     static constexpr double IMU_FULL_SCALE_DPS = 1000.0;
 

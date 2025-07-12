@@ -87,7 +87,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_),
-      robot_localizer_(0.5, 0.01 * 0.01, 0.5 * 0.5, 0.1 * 0.1)
+      robot_localizer_(
+              robot_constants.kalman_process_noise_variance_rad_per_s_4,
+              robot_constants.kalman_vision_noise_variance_rad_2,
+              robot_constants.kalman_encoder_noise_variance_rad_per_s_2,
+              robot_constants.kalman_target_angular_velocity_variance_rad_per_sec_2)
 {
     waitForNetworkUp();
 

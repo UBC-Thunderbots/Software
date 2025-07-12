@@ -382,12 +382,6 @@ maybe(
     shallow_since = "1620228587 -0400",
 )
 
-new_local_repository(
-    name = "usr",
-    build_file = "@//extlibs:libi2c.BUILD",
-    path = "/usr",
-)
-
 load("@rules_third_party//libraries:bullet.bzl", "bullet")
 
 # Adds commit 272c7099d3ba8ac9e8c142e361e8d4cf5d91b8f2 of

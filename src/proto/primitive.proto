@@ -108,10 +108,10 @@ message Primitive
         StopPrimitive stop                    = 2;
         DirectControlPrimitive direct_control = 3;
     }
-    Angle orientation = 4;
+    Angle orientation = 7;
 
     // Sequence number for the primitive
-    uint64 sequence_number = 7;
+    uint64 sequence_number = 4;
 
     // Epoch timestamp when primitives were assigned
     Timestamp time_sent = 6;

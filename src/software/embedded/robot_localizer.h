@@ -7,7 +7,7 @@
 #include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
-#include "software/sensor_fusion/filter/kalman_filter.h"
+#include "software/sensor_fusion/filter/kalman_filter.hpp"
 #include "time.h"
 
 /**
@@ -21,61 +21,60 @@
 class RobotLocalizer
 {
    public:
+    /**
+     * Creates a new robot localizer. The variances given determine how much we trust each source of feedback
+     *
+     * @param process_noise_variance
+     * @param vision_noise_variance
+     * @param encoder_noise_variance
+     * @param target_angular_acceleration_variance
+     */
     RobotLocalizer(double process_noise_variance, double vision_noise_variance,
                    double encoder_noise_variance,
-                   double target_angular_acceleration_variance)
-        : filter_(),
-          process_noise_variance_(
-              process_noise_variance),  // assumes process noise is a discrete time wiener
-                                        // process
-          history()
-    {
-        // Set state covariance, this is mostly a tuned value. The digaonal is the
-        // variance of the Orientation, Ang Vel, and Ang Accel
-        filter_.P << 30, 0, 0, 0, 4, 0, 0, 0, 5;
-        // Set control to state matrix, control space is a 1x1 matrix
-        filter_.B << 0.0, 1, 0.0;
-        // Set measurement variance.
-        filter_.R << vision_noise_variance, 0.0, 0.0, 0.0, 0.0, encoder_noise_variance,
-            0.0, 0.0, 0.0, 0.0, ImuService::IMU_VARIANCE, 0.0, 0.0, 0.0, 0.0,
-            target_angular_acceleration_variance;
-        filter_.x = Eigen::Matrix<double, 3, 1>(0.0, 0.0, 0.0);
-        clock_gettime(CLOCK_MONOTONIC, &current_time_);
-        clock_gettime(CLOCK_MONOTONIC, &last_step_);
-    }
+                   double target_angular_acceleration_variance);
 
-    void step(const AngularVelocity& targetAcceleration);
+    /**
+     * Innovates the state according to the time since the last time this function was called.
+     *
+     * @param target_acceleration The target acceleration the robot is trying to attain right now.
+     */
+    void step(const AngularVelocity& target_acceleration);
 
-    /** Update the orientation from vision based on an old reading.
+    /**
+     * Update the orientation from vision based on an old reading.
      *
      * @param orientation Vision reading of the orientation of the robot in world space
-     * @param ageSeconds Age in seconds of the vision snapshot (time since it was taken)
+     * @param age_seconds Age in seconds of the vision snapshot (time since it was taken)
      */
-    void rollbackVision(const Angle& orientation, const double& ageSeconds);
+    void rollbackVision(const Angle& orientation, const double& age_seconds);
 
-    /** Update the orientation from vision.
+    /**
+     * Update the orientation from vision.
      *
      * @param orientation Vision reading of the orientation of the robot in world space
      */
     void updateVision(const Angle& orientation);
 
-    /** Update the angular velocity from encoders.
+    /**
+     * Update the angular velocity from encoders.
      *
-     * @param angularVelocity angular velocity of the robot
+     * @param angular_velocity angular velocity of the robot
      */
-    void updateEncoders(const AngularVelocity& angularVelocity);
+    void updateEncoders(const AngularVelocity& angular_velocity);
 
-    /** Update the angular velocity from IMU.
+    /**
+     * Update the angular velocity from IMU.
      *
-     * @param angularVelocity angular velocity of the robot
+     * @param angular_velocity angular velocity of the robot
      */
-    void updateImu(const AngularVelocity& angularVelocity);
+    void updateImu(const AngularVelocity& angular_velocity);
 
-    /** Update the target acceleration.
+    /**
+     * Update the target acceleration.
      *
-     * @param angularAcceleration Target angular acceleration of the robot.
+     * @param angular_acceleration Target angular acceleration of the robot.
      */
-    void updateTargetAcceleration(const AngularVelocity& angularAcceleration);
+    void updateTargetAcceleration(const AngularVelocity& angular_acceleration);
 
     /**
      * Gets estimated orientation of the robot.

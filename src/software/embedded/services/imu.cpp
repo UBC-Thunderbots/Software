@@ -3,7 +3,6 @@
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
-#include <linux/ioctl.h>
 #include <sys/ioctl.h>
 
 #include "software/logger/logger.h"

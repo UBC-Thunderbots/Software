@@ -153,13 +153,14 @@ class ErForceSimulator
      * @param world_msg The world message
      * @param local_velocity The local velocity
      * @param angular_velocity The angular velocity
+     * @param orientation the current orientation of the robot
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
         const TbotsProto::World& world_msg, const Vector& local_velocity,
-        const AngularVelocity angular_velocity, const Angle& orientation);
+        const AngularVelocity& angular_velocity, const Angle& orientation);
 
     /**
      * Gets a map from robot id to local and angular velocity from repeated sim robots
