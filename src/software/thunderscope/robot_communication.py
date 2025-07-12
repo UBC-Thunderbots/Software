@@ -209,7 +209,7 @@ class RobotCommunication:
                     motor_control=motor_control,
                     power_control=power_control,
                 ),
-                orientation=Angle(radians=0)
+                orientation=Angle(radians=0),
             )
 
             # filter for diagnostics controlled robots
