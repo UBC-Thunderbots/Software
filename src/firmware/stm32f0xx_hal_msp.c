@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "firmware/motorcontrol/main.h"
+#include "firmware/main.h"
 
 /* USER CODE BEGIN Includes */
 

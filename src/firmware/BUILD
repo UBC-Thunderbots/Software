@@ -1,9 +1,26 @@
+package(default_visibility = ["//visibility:public"])
+
 cc_binary(
     name = "mdv6_firmware_main",
     srcs = ["main.c"],
     deps = [
         ":mdv6_firmware",
+        ":mdv6_main_hooks",
     ],
+)
+
+cc_library(
+    name = "mc_config",
+    srcs = ["mc_config.c"],
+    hdrs = ["mc_config.h"],
+    deps = [
+        ":mdv6_main_hooks",
+    ],
+)
+
+cc_library(
+    name = "mdv6_main_hooks",
+    hdrs = ["main.h"],
 )
 
 cc_library(
@@ -11,7 +28,6 @@ cc_library(
     srcs = [
         "mc_api.c",
         "mc_app_hooks.c",
-        "mc_config.c",
         "mc_configuration_registers.c",
         "mc_interface.c",
         "mc_math.c",
@@ -26,10 +42,8 @@ cc_library(
         "stm32f0xx_mc_it.c",
     ],
     hdrs = [
-     "main.h",
      "mc_api.h",
      "mc_app_hooks.h",
-     "mc_config.h",
      "mc_configuration_registers.h",
      "mc_interface.h",
      "mc_math.h",

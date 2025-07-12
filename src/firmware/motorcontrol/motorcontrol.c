@@ -18,7 +18,7 @@
   * @ingroup MCInterface
   */
 //cstat -MISRAC2012-Rule-21.1
-#include "main.h"
+#include "firmware/main.h"
 //cstat +MISRAC2012-Rule-21.1
 #include "mc_interface.h"
 #include "mc_tasks.h"

@@ -28,7 +28,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "firmware/stm32f0xx/stm32f0xx_hal.h"
-#include "motorcontrol.h"
+#include "firmware/motorcontrol/motorcontrol.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */

@@ -7,11 +7,11 @@
 # before we build
 genrule(
     name = "g3log_cmake",
-    srcs = glob(["**/*"]),
     outs = ["include/g3log/generated_definitions.hpp"],
+    srcs = glob(["**/*.cpp"]),
     cmd = "\n".join([
         # Run cmake, silencing both stdout (">") and stderr ("2>")
-        "cmake external/g3log > /dev/null 2> /dev/null",
+        "cmake $(location @g3log)",
         # Copy the generated header to the location bazel expects it
         "mv include/g3log/generated_definitions.hpp $@",
     ]),
