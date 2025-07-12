@@ -15,12 +15,16 @@ cc_library(
     hdrs = ["mc_config.h"],
     deps = [
         ":mdv6_main_hooks",
+        "//firmware/mcsdk:pid_regulator",
     ],
 )
 
 cc_library(
     name = "mdv6_main_hooks",
     hdrs = ["main.h"],
+    deps = [
+        "//firmware/stm32f0xx:stm32f0xx",
+    ],
 )
 
 cc_library(
@@ -59,6 +63,7 @@ cc_library(
      "stm32f0xx_it.h",
     ],
     deps = [
+        "//firmware/mcsdk:mc_type",
         "//firmware/mcsdk:mcsdk",
         "//firmware/motorcontrol:motorcontrol",
         "//firmware/stm32f0xx:stm32f0xx",

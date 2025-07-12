@@ -23,7 +23,7 @@
 #ifndef MC_CONFIGURATION_REGISTERS_H
 #define MC_CONFIGURATION_REGISTERS_H
 
-#include "mc_type.h"
+#include "firmware/mcsdk/mc_type.h"
 
 typedef struct
 {

@@ -30,7 +30,7 @@
 #define PIDREGULATOR_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "mc_type.h"
+#include "firmware/mcsdk/mc_type.h"
 
 /** @addtogroup MCSDK
   * @{

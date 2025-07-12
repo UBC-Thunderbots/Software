@@ -1,6 +1,23 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "pid_regulator",
+    srcs = ["pid_regulator.c"],
+    hdrs = ["pid_regulator.h"],
+    deps = [
+        ":mc_type",
+    ]
+)
+
+cc_library(
+    name = "mc_type",
+    hdrs = [
+        "mc_stm_types.h",
+        "mc_type.h",
+    ],
+)
+
+cc_library(
     name = "mcsdk",
     srcs = [
         "bus_voltage_sensor.c",
@@ -22,7 +39,6 @@ cc_library(
         "mp_hall_tuning.c",
         "ntc_temperature_sensor.c",
         "open_loop.c",
-        "pid_regulator.c",
         "potentiometer.c",
         "pqd_motor_power_measurement.c",
         "pwm_common.c",
@@ -60,8 +76,6 @@ cc_library(
         "ics_dd_pwmncurrfdbk.h",
         "inrush_current_limiter.h",
         "max_torque_per_ampere.h",
-        "mc_stm_types.h",
-        "mc_type.h",
         "mcp.h",
         "mcpa.h",
         "mcptl.h",
@@ -70,7 +84,6 @@ cc_library(
         "mp_self_com_ctrl.h",
         "ntc_temperature_sensor.h",
         "open_loop.h",
-        "pid_regulator.h",
         "potentiometer.h",
         "pqd_motor_power_measurement.h",
         "pwm_common.h",
@@ -97,6 +110,7 @@ cc_library(
         "virtual_speed_sensor.h",
     ],
     deps = [
+        ":mc_type",
         "//firmware/stm32f0xx:stm32f0xx",
         "//firmware/motorcontrol:motorcontrol",
     ],
