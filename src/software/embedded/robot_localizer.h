@@ -22,7 +22,8 @@ class RobotLocalizer
 {
    public:
     /**
-     * Creates a new robot localizer. The variances given determine how much we trust each source of feedback
+     * Creates a new robot localizer. The variances given determine how much we trust each
+     * source of feedback
      *
      * @param process_noise_variance
      * @param vision_noise_variance
@@ -34,9 +35,11 @@ class RobotLocalizer
                    double target_angular_acceleration_variance);
 
     /**
-     * Innovates the state according to the time since the last time this function was called.
+     * Innovates the state according to the time since the last time this function was
+     * called.
      *
-     * @param target_acceleration The target acceleration the robot is trying to attain right now.
+     * @param target_acceleration The target acceleration the robot is trying to attain
+     * right now.
      */
     void step(const AngularVelocity& target_acceleration);
 

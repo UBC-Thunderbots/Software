@@ -30,10 +30,8 @@ class KalmanFilter
      * @param R Initial measurement noise covariance
      */
     KalmanFilter(Eigen::Matrix<double, DimX, 1> x, Eigen::Matrix<double, DimX, DimX> P,
-                 Eigen::Matrix<double, DimX, DimX> F,
-                 Eigen::Matrix<double, DimX, DimX> Q,
-                 Eigen::Matrix<double, DimX, DimU> B,
-                 Eigen::Matrix<double, DimY, DimX> H,
+                 Eigen::Matrix<double, DimX, DimX> F, Eigen::Matrix<double, DimX, DimX> Q,
+                 Eigen::Matrix<double, DimX, DimU> B, Eigen::Matrix<double, DimY, DimX> H,
                  Eigen::Matrix<double, DimY, DimY> R)
         : x(x), P(P), F(F), Q(Q), B(B), H(H), R(R)
     {
@@ -70,7 +68,7 @@ class KalmanFilter
      */
     void update(Eigen::Matrix<double, DimY, 1> z)
     {
-        Eigen::Matrix<double, DimY, 1> y       = z - H * x;  // residual
+        Eigen::Matrix<double, DimY, 1> y      = z - H * x;  // residual
         Eigen::Matrix<double, DimY, DimY> sum = H * P * H.transpose() + R;
         Eigen::Matrix<double, DimY, DimY> newSum =
             sum.unaryExpr([](double l) { return (fabs(l) < 1.0e-20) ? 0. : l; });
@@ -79,7 +77,7 @@ class KalmanFilter
             (H.transpose() *
              newSum.completeOrthogonalDecomposition().pseudoInverse());  // Kalman gain
         Eigen::Matrix<double, DimX, 1> newX = x + K * y;
-        x                                    = newX;
+        x                                   = newX;
         // Joseph equation is more stable than  P = (I-KH)P since the latter is
         // susceptible to floating point errors ruining symmetry
         Eigen::Matrix<double, DimX, DimX> posteriorCov =
@@ -87,7 +85,7 @@ class KalmanFilter
         P = posteriorCov * P * posteriorCov.transpose() + K * R * K.transpose();
     }
 
-    Eigen::Matrix<double, DimX, 1> x;      // State
+    Eigen::Matrix<double, DimX, 1> x;     // State
     Eigen::Matrix<double, DimX, DimX> P;  // State covariance
     Eigen::Matrix<double, DimX, DimX> F;  // Process model
     Eigen::Matrix<double, DimX, DimX> Q;  // Process covariance

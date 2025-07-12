@@ -12,7 +12,8 @@ void RobotLocalizer::step(const AngularVelocity& target_acceleration)
     ScopedTimespecTimer::timespecDiff(&current_time_, &last_step_, &diff);
     clock_gettime(CLOCK_MONOTONIC, &last_step_);
     double delta_time_seconds =
-        static_cast<double>(diff.tv_sec) + static_cast<double>(diff.tv_nsec) * SECONDS_PER_NANOSECOND;
+        static_cast<double>(diff.tv_sec) +
+        static_cast<double>(diff.tv_nsec) * SECONDS_PER_NANOSECOND;
     ;  // time since last step in seconds
     FilterStep this_step;
     Predict this_predict;
@@ -29,7 +30,7 @@ void RobotLocalizer::step(const AngularVelocity& target_acceleration)
     filter_.Q *= process_noise_variance_;
     Eigen::Matrix<double, 1, 1> u;
     u << target_acceleration.toRadians() *
-         delta_time_seconds;  // change in angular velocity due to control input
+             delta_time_seconds;  // change in angular velocity due to control input
     this_predict.F       = filter_.F;
     this_predict.Q       = filter_.Q;
     this_predict.B       = filter_.B;
@@ -55,7 +56,8 @@ void RobotLocalizer::rollbackVision(const Angle& orientation, const double& age_
         timespec this_age = current_time_;
         ScopedTimespecTimer::timespecDiff(&current_time_, &it->birthday, &this_age);
         double this_age_seconds =
-            static_cast<double>(this_age.tv_sec) + static_cast<double>(this_age.tv_nsec) * SECONDS_PER_NANOSECOND;
+            static_cast<double>(this_age.tv_sec) +
+            static_cast<double>(this_age.tv_nsec) * SECONDS_PER_NANOSECOND;
         if (this_age_seconds >= age_seconds)
         {  // now iterator is right before the new update
             if (it == history.begin())
@@ -180,23 +182,24 @@ void RobotLocalizer::updateTargetAcceleration(const AngularVelocity& angular_acc
     filter_.update(z);
 }
 
-RobotLocalizer::RobotLocalizer(double process_noise_variance, double vision_noise_variance,
-                               double encoder_noise_variance, double target_angular_acceleration_variance)
-        : filter_(),
-          process_noise_variance_(
-                  process_noise_variance),  // assumes process noise is a discrete time wiener
-        // process
-          history()
+RobotLocalizer::RobotLocalizer(double process_noise_variance,
+                               double vision_noise_variance,
+                               double encoder_noise_variance,
+                               double target_angular_acceleration_variance)
+    : filter_(),
+      process_noise_variance_(process_noise_variance),  // assumes process noise is a
+                                                        // discrete time wiener process
+      history()
 {
     // Set state covariance, this is mostly a tuned value. The digaonal is the
-    // variance of the Orientation, Ang Vel, and Ang Accel
+    // variance of the Orientation, And Vel, and And Accel
     filter_.P << 30, 0, 0, 0, 4, 0, 0, 0, 5;
     // Set control to state matrix, control space is a 1x1 matrix
     filter_.B << 0.0, 1, 0.0;
     // Set measurement variance.
-    filter_.R << vision_noise_variance, 0.0, 0.0, 0.0, 0.0, encoder_noise_variance,
-            0.0, 0.0, 0.0, 0.0, ImuService::IMU_VARIANCE, 0.0, 0.0, 0.0, 0.0,
-            target_angular_acceleration_variance;
+    filter_.R << vision_noise_variance, 0.0, 0.0, 0.0, 0.0, encoder_noise_variance, 0.0,
+        0.0, 0.0, 0.0, ImuService::IMU_VARIANCE, 0.0, 0.0, 0.0, 0.0,
+        target_angular_acceleration_variance;
     filter_.x = Eigen::Matrix<double, 3, 1>(0.0, 0.0, 0.0);
     clock_gettime(CLOCK_MONOTONIC, &current_time_);
     clock_gettime(CLOCK_MONOTONIC, &last_step_);
