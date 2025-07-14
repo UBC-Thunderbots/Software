@@ -38,7 +38,6 @@ cc_test(
     ],
 )
 
-
 py_test(
     name = "penalty_kick_play_test",
     srcs = ["penalty_kick_play_test.py"],
