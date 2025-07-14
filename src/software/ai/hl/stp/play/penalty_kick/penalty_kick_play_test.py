@@ -5,6 +5,7 @@ import pytest
 import software.python_bindings as tbots_cpp
 
 from software.simulated_tests.ball_enters_region import BallAlwaysStaysInRegion, BallEventuallyEntersRegion
+from software.simulated_tests.ball_moves_forward import BallAlwaysMovesForward
 from software.simulated_tests.friendly_has_ball_possession import FriendlyAlwaysHasBallPossession
 from software.simulated_tests.friendly_has_ball_possession import (
     FriendlyAlwaysHasBallPossession,
@@ -48,7 +49,6 @@ def test_penalty_kick_play(simulated_test_runner):
         blue_play = Play()
         blue_play.name = PlayName.PenaltyKickPlay
 
-        # Not sure if this should be penalty kick enemy play or halt play
         yellow_play = Play()
         yellow_play.name = PlayName.PenaltyKickEnemyPlay
 
@@ -82,7 +82,7 @@ def test_penalty_kick_play(simulated_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     # Always Validation
-    inv_always_validation_sequence_set = [[]]
+    inv_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession(), BallAlwaysMovesForward()]]
 
     ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
 
