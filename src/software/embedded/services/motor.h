@@ -450,8 +450,6 @@ class MotorService
     int back_left_target_rpm   = 0;
     int back_right_target_rpm  = 0;
 
-    // the motor cs id to check for motor faults
-    uint8_t motor_fault_detector_;
 
     static const int NUM_CALIBRATION_ATTEMPTS = 10;
 

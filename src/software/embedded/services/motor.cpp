@@ -77,7 +77,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
           setupGpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH)),
       robot_constants_(robot_constants),
       euclidean_to_four_wheel_(robot_constants),
-      motor_fault_detector_(0),
       dribbler_ramp_rpm_(0),
       enabled_motors({0, 1, 2, 3, 4})
 {
@@ -370,8 +369,6 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
 {
     TbotsProto::MotorStatus motor_status;
 
-    checkDriverFault(motor_fault_detector_);
-
     for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
     {
         if (motor != DRIBBLER_MOTOR_CHIP_SELECT)
@@ -425,11 +422,6 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
         static_cast<float>(back_left_velocity_mps));
     motor_status.mutable_back_right()->set_wheel_velocity(
         static_cast<float>(back_right_velocity_mps));
-    do
-    {
-        motor_fault_detector_ =
-            static_cast<uint8_t>((motor_fault_detector_ + 1) % NUM_MOTORS);
-    } while (!motorInEnabledList(motor_fault_detector_));
     return motor_status;
 }
 
@@ -496,10 +488,16 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     {
         dribbler_rpm = 0;
     }
+    // Check motors for faults
+    for (uint8_t motor_to_scan : enabled_motors) {
+        checkDriverFault(motor_to_scan);
+    }
+
     // Construct a MotorStatus object with the current velocities and dribbler rpm
     TbotsProto::MotorStatus motor_status =
         updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
                           back_right_velocity, dribbler_rpm);
+
     stopDisabledMotors();
     // This order needs to match euclidean_to_four_wheel converters order
     // We also want to work in the meters per second space rather than electrical RPMs
