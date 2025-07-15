@@ -166,8 +166,6 @@ class MotorService
      *
      * @param motor The motor to log the status for
      *
-     * @return a struct containing the motor faults and whether the motor was disabled due
-     * to the fault
      */
     void checkDriverFault(uint8_t motor);
 
