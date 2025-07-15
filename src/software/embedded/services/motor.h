@@ -131,15 +131,7 @@ class MotorService
         /**
          * Construct a default indicator of no faults and running motors, with a motor id.
          */
-        MotorFaultIndicator(uint8_t id)
-            : drive_enabled(true),
-              last_motor_faults(),
-              motor_id(id),
-              num_critical_faults(0),
-              time_of_first_fault(std::nullopt),
-              total_duration_since_last_fault_s(0)
-        {
-        }
+        MotorFaultIndicator(uint8_t id);
 
         /**
          * Update drive enabled, fault count, type of last fault, and time since the last

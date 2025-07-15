@@ -83,6 +83,16 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     motorServiceInit(robot_constants, control_loop_frequency_hz);
 }
 
+MotorService::MotorFaultIndicator::MotorFaultIndicator(uint8_t id)
+    : drive_enabled(true),
+    last_motor_faults(),
+    motor_id(id),
+    num_critical_faults(0),
+    time_of_first_fault(std::nullopt),
+    total_duration_since_last_fault_s(0)
+{
+}
+
 void MotorService::MotorFaultIndicator::update(
     bool enabled, std::unordered_set<TbotsProto::MotorFault>& motor_faults)
 {
