@@ -383,7 +383,7 @@ class MotorService
      * @param motor motor to check
      * @return true if motor in enabled_motors, false otherwise
      */
-    bool motorInEnabledList(u_int8_t motor);
+    bool motorInEnabledList(uint8_t motor);
 
     /**
      * Disables broken motors
