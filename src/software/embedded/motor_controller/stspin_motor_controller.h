@@ -36,30 +36,25 @@ class StSpinMotorController : public MotorController
     /**
      * Transmits a frame to the given motor and receives a frame back over SPI.
      *
+     * Note: to receive data for GET operations, it is expected that we send a
+     * second frame (e.g. a NOOP) after the initial frame requesting the GET.
+     * The data in the second frame received will contain the response to the
+     * GET request.
+     *
      * @param motor the motor to send the frame to
      * @param opcode the opcode to include in the transmitted frame
      * @param data the data to include in the transmitted frame
      * @return the data in the frame received from the motor
      */
     int16_t sendAndReceiveFrame(const MotorIndex& motor, const StSpinOpcode opcode,
-                                const int16_t data);
-
-    /**
-     * Transmits a frame to the given motor over SPI without expecting any data
-     * back in response.
-     *
-     * @param motor the motor to send the frame to
-     * @param opcode the opcode to include in the transmitted frame
-     */
-    void sendFrame(const MotorIndex& motor, const StSpinOpcode opcode);
+                                const int16_t data = 0);
 
     // Start-of-frame and end-of-frame markers
     static constexpr uint8_t FRAME_SOF = 0x73;
     static constexpr uint8_t FRAME_EOF = 0x45;
 
     // Length of frame (in number of bytes)
-    static constexpr unsigned int FRAME_MIN_LEN = 4;
-    static constexpr unsigned int FRAME_MAX_LEN = FRAME_MIN_LEN + 2;
+    static constexpr unsigned int FRAME_LEN = 6;
 
     // SPI Chip Selects
     static constexpr uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;

@@ -35,12 +35,12 @@ void StSpinMotorController::setup()
 
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
     {
-        sendFrame(motor, StSpinOpcode::ACK_FAULTS);
+        sendAndReceiveFrame(motor, StSpinOpcode::ACK_FAULTS);
     }
 
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
     {
-        sendFrame(motor, StSpinOpcode::START_MOTOR);
+        sendAndReceiveFrame(motor, StSpinOpcode::START_MOTOR);
         checkDriverFault(motor);
         readThenWriteVelocity(motor, 0);
     }
@@ -56,7 +56,11 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
     bool drive_enabled = true;
     std::unordered_set<TbotsProto::MotorFault> motor_faults;
 
-    const uint16_t faults = sendAndReceiveFrame(motor, StSpinOpcode::GET_FAULT, 0);
+    sendAndReceiveFrame(motor, StSpinOpcode::GET_FAULT);
+
+    // We must send a SPI_NOOP in order to clock out the response
+    // to the GET_FAULT request.
+    const uint16_t faults = sendAndReceiveFrame(motor, StSpinOpcode::SPI_NOOP);
 
     if (faults != 0)
     {
@@ -145,10 +149,12 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
 double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
                                                     const int& target_velocity)
 {
-    const int16_t speed = sendAndReceiveFrame(motor, StSpinOpcode::GET_SPEED, 0);
+    sendAndReceiveFrame(motor, StSpinOpcode::GET_SPEED);
 
     // SET_SPEEDRAMP expects the target motor speed to be in register ax.
-    sendAndReceiveFrame(motor, StSpinOpcode::MOV_AX,
+    // Also, the frame we receive here contains the response to the GET_SPEED
+    // request made in the previous frame.
+    const int16_t current_velocity = sendAndReceiveFrame(motor, StSpinOpcode::MOV_AX,
                         static_cast<int16_t>(target_velocity));
 
     // SET_SPEEDRAMP expects the ramp time in millis to be in register bx.
@@ -156,9 +162,9 @@ double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
     // set the target speed without ramping (hence we set reg bx to 0).
     sendAndReceiveFrame(motor, StSpinOpcode::MOV_BX, 0);
 
-    sendFrame(motor, StSpinOpcode::SET_SPEEDRAMP);
+    sendAndReceiveFrame(motor, StSpinOpcode::SET_SPEEDRAMP);
 
-    return speed;
+    return current_velocity;
 }
 
 void StSpinMotorController::immediatelyDisable()
@@ -192,7 +198,7 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
                                                    const StSpinOpcode opcode,
                                                    const int16_t data)
 {
-    //  A full frame is 6 bytes long and has the following format:
+    //  A frame is 6 bytes long and has the following format:
     //
     //  +-------+--------+---------------+-------+-------+
     //  |  SOF  | OPCODE |     DATA      |  CRC  |  EOF  |
@@ -200,18 +206,13 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     //      0       1        2       3       4       5
     //
     //  For slave frames, OPCODE will be either an ACK or NACK acknowledging
-    //  receival of the master frame.
+    //  receival of the last master frame.
     //
     //  The byte order of DATA is big endian; therefore the MSB is transmitted first.
-    //  DATA may be omitted if the operation has no data to transmit/receive, making
-    //  the frame only 4 bytes long.
-    //
-    //  To receive data for GET operations, it is expected that we send a master frame
-    //  with 2 dummy DATA bytes in order to clock out the 2 DATA bytes from the incoming
-    //  slave frame.
+    //  DATA may be ignored if the operation has no data to transmit/receive.
 
-    uint8_t tx[FRAME_MAX_LEN] = {0};
-    uint8_t rx[FRAME_MAX_LEN] = {0};
+    uint8_t tx[FRAME_LEN] = {0};
+    uint8_t rx[FRAME_LEN] = {0};
 
     tx[0] = FRAME_SOF;
     tx[1] = static_cast<uint8_t>(opcode);
@@ -220,22 +221,8 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     tx[4] = 0;  // CRC; to be implemented later
     tx[5] = FRAME_EOF;
 
-    spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_MAX_LEN,
+    spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_LEN,
                 SPI_SPEED_HZ);
 
     return static_cast<int16_t>((static_cast<uint16_t>(rx[2]) << 8) | rx[3]);
-}
-
-void StSpinMotorController::sendFrame(const MotorIndex& motor, const StSpinOpcode opcode)
-{
-    uint8_t tx[FRAME_MIN_LEN] = {0};
-    uint8_t rx[FRAME_MIN_LEN] = {0};
-
-    tx[0] = FRAME_SOF;
-    tx[1] = static_cast<uint8_t>(opcode);
-    tx[2] = 0;  // CRC; to be implemented later
-    tx[3] = FRAME_EOF;
-
-    spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_MIN_LEN,
-                SPI_SPEED_HZ);
 }
