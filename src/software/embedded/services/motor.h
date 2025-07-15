@@ -156,7 +156,8 @@ class MotorService
          *  If a motor has failed repeatedly, remove the associated motor_id
          *  from enabled_motors and log the removal.
          *
-         *  @param motors a set of motors that are currently enabled. May be modified by this function.
+         *  @param motors a set of motors that are currently enabled. May be modified by
+         * this function.
          */
         void removeMotorIfFaulty(std::set<uint8_t>& motors);
     };
@@ -380,7 +381,7 @@ class MotorService
      * @param motor motor to check
      * @return true if motor in enabled_motors, false otherwise
      */
-    bool motorInEnabledList(u_int8_t motor);
+    bool motorInEnabledList(uint8_t motor);
 
     /**
      * Disables broken motors
