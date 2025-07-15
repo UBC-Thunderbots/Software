@@ -1171,7 +1171,7 @@ void MotorService::checkEncoderConnections()
     std::vector<bool> calibrated_motors(NUM_DRIVE_MOTORS, false);
     std::vector<int> initial_velocities(NUM_DRIVE_MOTORS, 0);
 
-    for (u_int8_t motor : enabled_motors)
+    for (uint8_t motor : enabled_motors)
     {
         if (motor == DRIBBLER_MOTOR_CHIP_SELECT)
         {
