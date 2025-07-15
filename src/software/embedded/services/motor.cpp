@@ -85,11 +85,11 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
 MotorService::MotorFaultIndicator::MotorFaultIndicator(uint8_t id)
     : drive_enabled(true),
-    last_motor_faults(),
-    motor_id(id),
-    num_critical_faults(0),
-    time_of_first_fault(std::nullopt),
-    total_duration_since_last_fault_s(0)
+      last_motor_faults(),
+      motor_id(id),
+      num_critical_faults(0),
+      time_of_first_fault(std::nullopt),
+      total_duration_since_last_fault_s(0)
 {
 }
 
@@ -499,7 +499,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         dribbler_rpm = 0;
     }
     // Check motors for faults
-    for (uint8_t motor_to_scan : enabled_motors) {
+    for (uint8_t motor_to_scan : enabled_motors)
+    {
         checkDriverFault(motor_to_scan);
     }
 
