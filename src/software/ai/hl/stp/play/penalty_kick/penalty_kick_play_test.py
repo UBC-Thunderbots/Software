@@ -83,9 +83,9 @@ def test_penalty_kick_play(simulated_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     # Always Validation
-    inv_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession(), BallAlwaysMovesForward()]]
+    inv_always_validation_sequence_set = [[]]
 
-    ag_always_validation_sequence_set = [[]]
+    ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession(), BallAlwaysMovesForward(ball_initial_pos)]]
 
     # Eventually Validation
     inv_eventually_validation_sequence_set = [
