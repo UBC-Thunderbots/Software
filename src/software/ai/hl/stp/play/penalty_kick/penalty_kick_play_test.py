@@ -5,9 +5,8 @@ import pytest
 import software.python_bindings as tbots_cpp
 
 
-from software.simulated_tests.ball_enters_region import BallAlwaysStaysInRegion, BallEventuallyEntersRegion
+from software.simulated_tests.ball_enters_region import BallEventuallyEntersRegion
 from software.simulated_tests.ball_moves_forward import BallAlwaysMovesForward
-from software.simulated_tests.friendly_has_ball_possession import FriendlyAlwaysHasBallPossession
 from software.simulated_tests.friendly_has_ball_possession import (
     FriendlyAlwaysHasBallPossession,
 )
