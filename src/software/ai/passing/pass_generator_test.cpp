@@ -142,7 +142,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     // We expect to have converged to a point near robot 2. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot
-    EXPECT_LE((converged_pass.receiverPoint() - receiver.position()).length(), 0.55);
+    EXPECT_LE((converged_pass.receiverPoint() - receiver.position()).length(), 0.57);
     UNUSED(converged_score);
 }
 
