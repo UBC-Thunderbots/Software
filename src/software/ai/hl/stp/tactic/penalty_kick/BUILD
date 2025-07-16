@@ -48,3 +48,18 @@ cc_test(
         "//software/world",
     ],
 )
+
+py_test(
+    name = "penalty_kick_tactic_test",
+    srcs = [
+        "penalty_kick_tactic_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
