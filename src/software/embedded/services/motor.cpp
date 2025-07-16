@@ -1,31 +1,10 @@
 #include "software/embedded/services/motor.h"
 
-#include <errno.h>
-#include <fcntl.h>
-#include <getopt.h>
-#include <limits.h>
-#include <linux/ioctl.h>
-#include <linux/spi/spidev.h>
-#include <linux/types.h>
-#include <malloc.h>
-#include <pthread.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>      // Needed for mlockall()
-#include <sys/resource.h>  // needed for getrusage
-#include <sys/time.h>      // needed for getrusage
-#include <unistd.h>        // needed for sysconf(int name);
-
-#include <bitset>
-
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/embedded/motor_controller/motor_board.h"
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
 #include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/logger/logger.h"
-#include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 
 static const uint32_t NUM_RETRIES_SPI = 3;
 

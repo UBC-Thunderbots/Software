@@ -3,7 +3,6 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <optional>
-#include <string>
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
