@@ -103,7 +103,7 @@ class PrimitiveExecutor
     // velocity, if this number is higher, it will lean away more from the turn.
     static constexpr double LEAN_BIAS = 2;
 
-    static constexpr double ORENTATION_KP = 0.3;
+    static constexpr double ORIENTATION_KP = 0.3;
 
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.

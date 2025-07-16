@@ -229,4 +229,4 @@ static const unsigned NUM_GENEVA_ANGLES = 5;
 // Jetson Nano Constants
 static const double MAX_JETSON_TEMP_C = 97;
 
-static const double RTT_S = 0.03;
+static constexpr double RTT_S = 0.03;

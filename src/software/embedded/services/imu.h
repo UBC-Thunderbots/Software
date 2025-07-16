@@ -7,11 +7,16 @@
 #include "software/geom/angular_velocity.h"
 
 /**
- * Handles low level IMU i2c communication, and some minor offset filtering.
+ * Handles low level IMU I2C communication, and some minor offset filtering.
  */
 class ImuService
 {
    public:
+    /**
+     * Constructs and initializes a new IMU service object.
+     *
+     * If successfully initialized, will try to do a simple calibration of the IMU.
+     */
     ImuService();
 
     /**

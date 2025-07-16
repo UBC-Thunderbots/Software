@@ -32,58 +32,25 @@ class KalmanFilter
     KalmanFilter(Eigen::Matrix<double, DimX, 1> x, Eigen::Matrix<double, DimX, DimX> P,
                  Eigen::Matrix<double, DimX, DimX> F, Eigen::Matrix<double, DimX, DimX> Q,
                  Eigen::Matrix<double, DimX, DimU> B, Eigen::Matrix<double, DimY, DimX> H,
-                 Eigen::Matrix<double, DimY, DimY> R)
-        : x(x), P(P), F(F), Q(Q), B(B), H(H), R(R)
-    {
-    }
+                 Eigen::Matrix<double, DimY, DimY> R);
 
     /**
      * Creates kalman filter with all matrices and vectors set to zero.
      */
-    KalmanFilter()
-        : x(Eigen::Matrix<double, DimX, 1>().setZero()),
-          P(Eigen::Matrix<double, DimX, DimX>().setZero()),
-          F(Eigen::Matrix<double, DimX, DimX>().setZero()),
-          Q(Eigen::Matrix<double, DimX, DimX>().setZero()),
-          B(Eigen::Matrix<double, DimX, DimU>().setZero()),
-          H(Eigen::Matrix<double, DimY, DimX>().setZero()),
-          R(Eigen::Matrix<double, DimY, DimY>().setZero())
-    {
-    }
+    KalmanFilter();
 
     /**
      * Uses state model to innovate next state, taking into account expected behaviour
      * from control input.
      * @param u Control inputs
      */
-    void predict(Eigen::Matrix<double, DimU, 1> u)
-    {
-        x = F * x + B * u;
-        P = F * P * F.transpose() + Q;
-    }
+    void predict(Eigen::Matrix<double, DimU, 1> u);
 
     /**
      * Incorporates measurement to state.
      * @param z Measurement
      */
-    void update(Eigen::Matrix<double, DimY, 1> z)
-    {
-        Eigen::Matrix<double, DimY, 1> y      = z - H * x;  // residual
-        Eigen::Matrix<double, DimY, DimY> sum = H * P * H.transpose() + R;
-        Eigen::Matrix<double, DimY, DimY> newSum =
-            sum.unaryExpr([](double l) { return (fabs(l) < 1.0e-20) ? 0. : l; });
-        Eigen::Matrix<double, DimX, DimY> K =
-            P *
-            (H.transpose() *
-             newSum.completeOrthogonalDecomposition().pseudoInverse());  // Kalman gain
-        Eigen::Matrix<double, DimX, 1> newX = x + K * y;
-        x                                   = newX;
-        // Joseph equation is more stable than  P = (I-KH)P since the latter is
-        // susceptible to floating point errors ruining symmetry
-        Eigen::Matrix<double, DimX, DimX> posteriorCov =
-            Eigen::Matrix<double, DimX, DimX>::Identity() - K * H;
-        P = posteriorCov * P * posteriorCov.transpose() + K * R * K.transpose();
-    }
+    void update(Eigen::Matrix<double, DimY, 1> z);
 
     Eigen::Matrix<double, DimX, 1> x;     // State
     Eigen::Matrix<double, DimX, DimX> P;  // State covariance
@@ -93,3 +60,51 @@ class KalmanFilter
     Eigen::Matrix<double, DimY, DimX> H;  // Converts state to measurement space
     Eigen::Matrix<double, DimY, DimY> R;  // Measurement noise covariance
 };
+
+template <int DimX, int DimY, int DimU>
+KalmanFilter<DimX, DimY, DimU>::KalmanFilter()
+        : x(Eigen::Matrix<double, DimX, 1>().setZero()),
+          P(Eigen::Matrix<double, DimX, DimX>().setZero()),
+          F(Eigen::Matrix<double, DimX, DimX>().setZero()),
+          Q(Eigen::Matrix<double, DimX, DimX>().setZero()),
+          B(Eigen::Matrix<double, DimX, DimU>().setZero()),
+          H(Eigen::Matrix<double, DimY, DimX>().setZero()),
+          R(Eigen::Matrix<double, DimY, DimY>().setZero())
+{
+}
+
+template <int DimX, int DimY, int DimU>
+KalmanFilter<DimX, DimY, DimU>::KalmanFilter(Eigen::Matrix<double, DimX, 1> x, Eigen::Matrix<double, DimX, DimX> P,
+                                           Eigen::Matrix<double, DimX, DimX> F, Eigen::Matrix<double, DimX, DimX> Q,
+                                           Eigen::Matrix<double, DimX, DimU> B, Eigen::Matrix<double, DimY, DimX> H,
+                                           Eigen::Matrix<double, DimY, DimY> R)
+        : x(x), P(P), F(F), Q(Q), B(B), H(H), R(R)
+{
+}
+
+template <int DimX, int DimY, int DimU>
+void KalmanFilter<DimX, DimY, DimU>::predict(Eigen::Matrix<double, DimU, 1> u)
+{
+    x = F * x + B * u;
+    P = F * P * F.transpose() + Q;
+}
+
+template <int DimX, int DimY, int DimU>
+void KalmanFilter<DimX, DimY, DimU>::update(Eigen::Matrix<double, DimY, 1> z)
+{
+    Eigen::Matrix<double, DimY, 1> y      = z - H * x;  // residual
+    Eigen::Matrix<double, DimY, DimY> sum = H * P * H.transpose() + R;
+    Eigen::Matrix<double, DimY, DimY> newSum =
+            sum.unaryExpr([](double l) { return (fabs(l) < 1.0e-20) ? 0. : l; });
+    Eigen::Matrix<double, DimX, DimY> K =
+            P *
+            (H.transpose() *
+             newSum.completeOrthogonalDecomposition().pseudoInverse());  // Kalman gain
+    Eigen::Matrix<double, DimX, 1> newX = x + K * y;
+    x                                   = newX;
+    // Joseph equation is more stable than  P = (I-KH)P since the latter is
+    // susceptible to floating point errors ruining symmetry
+    Eigen::Matrix<double, DimX, DimX> posteriorCov =
+            Eigen::Matrix<double, DimX, DimX>::Identity() - K * H;
+    P = posteriorCov * P * posteriorCov.transpose() + K * R * K.transpose();
+}

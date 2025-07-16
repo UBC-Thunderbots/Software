@@ -45,18 +45,19 @@ __s32 i2c_smbus_write_byte_data(int file, __u8 command, __u8 value)
     return i2c_smbus_access(file, I2C_SMBUS_WRITE, command, I2C_SMBUS_BYTE_DATA, &data);
 }
 
-ImuService::ImuService()
+ImuService::ImuService() : initialized_(false)
 {
-    initialized_ = false;
     // Establish connection to the IMU and verify that the who am I pin is correct.
     file_descriptor_ = open(IMU_DEVICE.c_str(), O_RDWR);
     int ret          = ioctl(file_descriptor_, I2C_SLAVE_FORCE, 0x6b);
     if (ret < 0)
     {
+        LOG(WARNING) << "Failed to initialize the IMU: failed to establish i2c connection.";
         return;
     }
     if (i2c_smbus_read_byte_data(file_descriptor_, WHOAMI_REG) != 108)
     {
+        LOG(WARNING) << "Failed to initialize the IMU: WHOAMI register " << WHOAMI_REG << " read incorrectly.";
         return;
     }
     // Attempt to enable gyro and accelerometer, checking that writes are successful
@@ -64,6 +65,7 @@ ImuService::ImuService()
     i2c_smbus_write_byte_data(file_descriptor_, ACCEL_CONTROL_REG, 0b01000000);
     if (i2c_smbus_read_byte_data(file_descriptor_, ACCEL_CONTROL_REG) != 0b01000000)
     {  // write unsuccessful
+        LOG(WARNING) << "Failed to initialize the IMU: writing to accelerometer config register " << ACCEL_CONTROL_REG << " unsuccessful";
         return;
     }
     // Set Gyroscope output data rate to 208 Hz, setting FS to 1000 dps (pg 61 of
@@ -71,6 +73,7 @@ ImuService::ImuService()
     i2c_smbus_write_byte_data(file_descriptor_, GYRO_CONTROL_REG, 0b01011000);
     if (i2c_smbus_read_byte_data(file_descriptor_, GYRO_CONTROL_REG) != 0b01011000)
     {  // write unsuccessful
+        LOG(WARNING) << "Failed to initialize the IMU: writing to gyroscope config register " << ACCEL_CONTROL_REG << " unsuccessful";
         return;
     }
 
