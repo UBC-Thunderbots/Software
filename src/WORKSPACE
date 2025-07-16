@@ -139,6 +139,13 @@ http_archive(
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
 
+http_archive(
+    name = "cppcrc",
+    build_file = "@//extlibs:cppcrc.BUILD",
+    strip_prefix = "cppcrc-6360eee1c8966d32b2552ce156b135ec6a3235f1",
+    url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
+)
+
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(

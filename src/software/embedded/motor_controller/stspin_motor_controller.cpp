@@ -2,9 +2,14 @@
 
 #include <linux/spi/spidev.h>
 
+#include "cppcrc.h"
 #include "shared/constants.h"
 #include "software/embedded/spi_utils.h"
 #include "software/logger/logger.h"
+
+// AUTOSAR variant of CRC-8
+// (https://reveng.sourceforge.io/crc-catalogue/all.htm#crc.cat.crc-8-autosar)
+using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
 StSpinMotorController::StSpinMotorController()
     : driver_control_enable_gpio_(
@@ -154,8 +159,8 @@ double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
     // SET_SPEEDRAMP expects the target motor speed to be in register ax.
     // Also, the frame we receive here contains the response to the GET_SPEED
     // request made in the previous frame.
-    const int16_t current_velocity = sendAndReceiveFrame(motor, StSpinOpcode::MOV_AX,
-                        static_cast<int16_t>(target_velocity));
+    const int16_t current_velocity = sendAndReceiveFrame(
+        motor, StSpinOpcode::MOV_AX, static_cast<int16_t>(target_velocity));
 
     // SET_SPEEDRAMP expects the ramp time in millis to be in register bx.
     // We do speed ramping ourselves in MotorService, so we just want to
@@ -218,8 +223,10 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     tx[1] = static_cast<uint8_t>(opcode);
     tx[2] = static_cast<uint8_t>(0xFF & (data >> 8));
     tx[3] = static_cast<uint8_t>(0xFF & data);
-    tx[4] = 0;  // CRC; to be implemented later
     tx[5] = FRAME_EOF;
+
+    const uint8_t message[] = {tx[1], tx[2], tx[3]};
+    tx[4]                   = Crc8Autosar::calc(message, sizeof(message));
 
     spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_LEN,
                 SPI_SPEED_HZ);

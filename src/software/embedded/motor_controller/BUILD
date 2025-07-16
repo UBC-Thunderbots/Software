@@ -42,6 +42,7 @@ cc_library(
         "//software/embedded/constants",
         "//software/embedded/gpio",
         "//software/logger",
+        "@cppcrc",
         "@trinamic",
     ],
 )

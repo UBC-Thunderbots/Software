@@ -81,8 +81,8 @@ class StSpinMotorController : public MotorController
     };
 
     // SPI Configs
-    static constexpr uint32_t SPI_SPEED_HZ     = 8000000;  // 8 Mhz
-    static constexpr uint32_t MAX_SPI_SPEED_HZ = 32000000;  // 32 Mhz
+    static constexpr uint32_t SPI_SPEED_HZ     = 1000000;  // 1 Mhz
+    static constexpr uint32_t MAX_SPI_SPEED_HZ = 2000000;  // 2 Mhz
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;
 
