@@ -40,7 +40,7 @@ class GLTacticLayer(GLLayer):
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         self.cached_world = self.world_buffer.get(block=False)
-        play_info = self.play_info_buffer.get(block=False).bounds()
+        play_info = self.play_info_buffer.get(block=False)
 
         self.__update_tactic_name_graphics(self.cached_world.friendly_team, play_info)
 
@@ -50,7 +50,7 @@ class GLTacticLayer(GLLayer):
         :param team: The team proto
         :param play_info: The dictionary containing play/tactic info
         """
-        tactic_assignments = play_info.robot_tactic_assignment()
+        tactic_assignments = play_info.robot_tactic_assignment
 
         # Ensure we have the same number of graphics as robots
         self.tactic_fsm_info_graphics.resize(
@@ -68,8 +68,8 @@ class GLTacticLayer(GLLayer):
             tactic_fsm_info_graphic.setData(
                 text=textwrap.dedent(
                     f"""
-                    {tactic_assignments[str(robot.id)]["tacticName"]} - 
-                    {tactic_assignments[str(robot.id)]["tacticFsmState"]}
+                    {tactic_assignments[robot.id].tactic_name} - 
+                    {tactic_assignments[robot.id].tactic_fsm_state}
                     """
                 ),
                 pos=[

@@ -50,7 +50,9 @@ cc_library(
         "//software/ai/navigator/trajectory:trajectory_path",
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
-        "//software/world",
+        "//software/time:duration",
+        "//software/world:robot_state",
+        "//software/world:team_colour",
     ],
 )
 
@@ -70,7 +72,6 @@ cc_library(
         "//software/logger:network_logger",
         "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",
-        "//software/world:team",
         "@tracy",
     ],
 )

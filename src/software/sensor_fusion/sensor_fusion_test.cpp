@@ -25,8 +25,8 @@ class SensorFusionTest : public ::testing::Test
           robot_status_msg_dribble_motor_hot(initDribbleMotorHotErrorCode()),
           robot_status_msg_multiple_error_codes(initMultipleErrorCode()),
           robot_status_msg_no_error_code(initNoErrorCode()),
-          referee_indirect_yellow(initRefereeIndirectYellow()),
-          referee_indirect_blue(initRefereeIndirectBlue()),
+          referee_direct_yellow(initRefereeDirectYellow()),
+          referee_direct_blue(initRefereeDirectBlue()),
           referee_normal_start(initRefereeNormalStart()),
           referee_ball_placement_yellow(initRefereeBallPlacementYellow()),
           referee_ball_placement_blue(initRefereeBallPlacementBlue()),
@@ -49,8 +49,8 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_dribble_motor_hot;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_multiple_error_codes;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_no_error_code;
-    std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
-    std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
+    std::unique_ptr<SSLProto::Referee> referee_direct_yellow;
+    std::unique_ptr<SSLProto::Referee> referee_direct_blue;
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
     std::unique_ptr<SSLProto::Referee> referee_ball_placement_yellow;
     std::unique_ptr<SSLProto::Referee> referee_ball_placement_blue;
@@ -282,17 +282,17 @@ class SensorFusionTest : public ::testing::Test
         return robot_msg;
     }
 
-    std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()
+    std::unique_ptr<SSLProto::Referee> initRefereeDirectYellow()
     {
         auto ref_msg = std::make_unique<SSLProto::Referee>();
-        ref_msg->set_command(SSLProto::Referee_Command_INDIRECT_FREE_YELLOW);
+        ref_msg->set_command(SSLProto::Referee_Command_DIRECT_FREE_YELLOW);
         return ref_msg;
     }
 
-    std::unique_ptr<SSLProto::Referee> initRefereeIndirectBlue()
+    std::unique_ptr<SSLProto::Referee> initRefereeDirectBlue()
     {
         auto ref_msg = std::make_unique<SSLProto::Referee>();
-        ref_msg->set_command(SSLProto::Referee_Command_INDIRECT_FREE_BLUE);
+        ref_msg->set_command(SSLProto::Referee_Command_DIRECT_FREE_BLUE);
         return ref_msg;
     }
 
@@ -545,7 +545,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time
 TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 {
     GameState expected_1;
-    expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
+    expected_1.updateRefereeCommand(RefereeCommand::DIRECT_FREE_US);
 
     GameState expected_2 = expected_1;
     expected_2.updateRefereeCommand(RefereeCommand::NORMAL_START);
@@ -555,7 +555,7 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_yellow;
+    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_direct_yellow;
     sensor_fusion.processSensorProto(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
@@ -570,7 +570,7 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 TEST_F(SensorFusionTest, test_referee_blue_then_normal)
 {
     GameState expected_1;
-    expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_THEM);
+    expected_1.updateRefereeCommand(RefereeCommand::DIRECT_FREE_THEM);
 
     GameState expected_2 = expected_1;
     expected_2.updateRefereeCommand(RefereeCommand::NORMAL_START);
@@ -580,7 +580,7 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_blue;
+    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_direct_blue;
     sensor_fusion.processSensorProto(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
@@ -1009,4 +1009,89 @@ TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
 
     // did it not use robot position
     EXPECT_TRUE(ball_position != robot_state.position());
+}
+
+TEST_F(SensorFusionTest, breakbeam_in_robot_test)
+{
+    // Check that breakbeam status is propagated to the Robot
+    SensorProto sensor_msg;
+
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame = initDetectionFrame();
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame_2 =
+        initDetectionFrameWithFutureTime();
+    // creating robot status
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(2);
+
+    auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+    power_status_msg->set_breakbeam_tripped(true);
+    *(robot_msg->mutable_power_status()) = *power_status_msg;
+
+    auto geometry_data = initSSLDivBGeomData();
+
+    // use frame 1 to create sensor_msg
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    // use frame 2 that is at a future time to give sensor fusion
+    // a chance to use the breakbeam id it got from the previous sensor proto
+    auto ssl_wrapper_packet_2 =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame_2));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+
+    std::optional<World> current_world = sensor_fusion.getWorld();
+    bool breakbeam_tripped =
+        current_world.value().friendlyTeam().getRobotById(2)->breakbeamTripped();
+
+    // is the breakbeam_tripped on the robot
+    EXPECT_TRUE(breakbeam_tripped);
+}
+
+
+TEST_F(SensorFusionTest, breakbeam_not_in_robot_test)
+{
+    // Check that breakbeam status is false when propagated to the Robot
+    SensorProto sensor_msg;
+
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame = initDetectionFrame();
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame_2 =
+        initDetectionFrameWithFutureTime();
+    // creating robot status
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(2);
+
+    auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+    power_status_msg->set_breakbeam_tripped(false);
+    *(robot_msg->mutable_power_status()) = *power_status_msg;
+
+    // create ssl wrapper packet
+    auto geometry_data = initSSLDivBGeomData();
+
+
+    // use frame 1 to create sensor_msg
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    // use frame 2 that is at a future time to give sensor fusion
+    // a chance to use the breakbeam id it got from the previous sensor proto
+    auto ssl_wrapper_packet_2 =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame_2));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_2;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+
+    std::optional<World> current_world = sensor_fusion.getWorld();
+    bool breakbeam_tripped =
+        current_world.value().friendlyTeam().getRobotById(2)->breakbeamTripped();
+
+    // is the break_beam correct
+    EXPECT_FALSE(breakbeam_tripped);
 }
