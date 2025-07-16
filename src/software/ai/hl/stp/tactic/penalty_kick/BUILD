@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "penalty_kick_tactic",
     srcs = [
@@ -34,7 +36,7 @@ cc_test(
 )
 
 cc_test(
-    name = "penalty_kick_tactic_test",
+    name = "penalty_kick_tactic_test_cpp",
     srcs = ["penalty_kick_tactic_test.cpp"],
     deps = [
         ":penalty_kick_tactic",
@@ -59,6 +61,7 @@ py_test(
         "exclusive",
     ],
     deps = [
+        "//software:conftest",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],
