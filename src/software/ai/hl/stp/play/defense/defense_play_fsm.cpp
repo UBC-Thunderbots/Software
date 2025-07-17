@@ -139,7 +139,7 @@ void DefensePlayFSM::updateShadowers(const Update& event,
 
 void DefensePlayFSM::setUpShadowers(int num_shadowers)
 {
-    if (num_shadowers == (int)shadowers.size())
+    if (num_shadowers == static_cast<int>(shadowers.size()))
     {
         return;
     }
