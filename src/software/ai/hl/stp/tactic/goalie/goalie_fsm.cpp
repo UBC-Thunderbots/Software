@@ -229,7 +229,6 @@ void GoalieFSM::panic(const Update &event)
             {
                 finished = true;
             }
-            final_velocity = final_velocity.normalize(final_speed);
         }
     }
 
