@@ -2,7 +2,11 @@
 
 #include <linux/spi/spidev.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
 #include "cppcrc.h"
+#pragma GCC diagnostic pop
+
 #include "shared/constants.h"
 #include "software/embedded/spi_utils.h"
 #include "software/logger/logger.h"
