@@ -59,7 +59,7 @@ public:
 
     virtual auto operator()() = 0;
 
-private:
+protected:
     // Former constructors took what they needed from ai_config and stored it locally.
     // Now, we store ai_config as a pointer and use it to update as needed.
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
