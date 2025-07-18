@@ -65,24 +65,6 @@ private:
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 };
 
-/**
- * The Update struct is the only event that a tactic fsm should respond to and it is
- * composed of the following structs:
- *
- * ControlParams - uniquely defined by each tactic to control the FSM
- * TacticUpdate - common struct that contains Robot, World, and SetPrimitiveCallback
- */
-#define DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                       \
-    struct Update                                                                        \
-    {                                                                                    \
-        Update(const ControlParams &control_params, const TacticUpdate &common)          \
-            : control_params(control_params), common(common)                             \
-        {                                                                                \
-        }                                                                                \
-        ControlParams control_params;                                                    \
-        TacticUpdate common;                                                             \
-    };
-
 #define DEFINE_TACTIC_DONE_AND_GET_FSM_STATE                                             \
     bool done() const override                                                           \
     {                                                                                    \
