@@ -28,7 +28,7 @@ struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
     /**
      * Constructor for AttackerFSM
      *
-     * @param attacker_tactic_config The config to fetch parameters from
+     * @param ai_config_ptr Shared pointer to ai_config
      */
     explicit AttackerFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<AttackerFSMControlParams>(ai_config_ptr) {}
 
