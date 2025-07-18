@@ -9,29 +9,28 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 
-struct AttackerFSM
+struct AttackerFSMControlParams
 {
+    // The best pass so far
+    std::optional<Pass> best_pass_so_far = std::nullopt;
+    // whether we have committed to the pass and will be taking it
+    bool pass_committed = false;
+    // The shot to take
+    std::optional<Shot> shot = std::nullopt;
+    // The point the robot will chip towards if it is unable to shoot and is in danger
+    // of losing the ball to an enemy
+    std::optional<Point> chip_target;
+};
+
+struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
+{
+    using Update = TacticFSM<AttackerFSMControlParams>::Update;
     /**
      * Constructor for AttackerFSM
      *
      * @param attacker_tactic_config The config to fetch parameters from
      */
-    explicit AttackerFSM(const TbotsProto::AiConfig& ai_config) : ai_config(ai_config) {}
-
-    struct ControlParams
-    {
-        // The best pass so far
-        std::optional<Pass> best_pass_so_far = std::nullopt;
-        // whether we have committed to the pass and will be taking it
-        bool pass_committed = false;
-        // The shot to take
-        std::optional<Shot> shot = std::nullopt;
-        // The point the robot will chip towards if it is unable to shoot and is in danger
-        // of losing the ball to an enemy
-        std::optional<Point> chip_target;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    explicit AttackerFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<AttackerFSMControlParams>(ai_config_ptr) {}
 
     /**
      * Action that updates the PivotKickFSM to shoot or pass
@@ -83,7 +82,4 @@ struct AttackerFSM
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
-
-   private:
-    TbotsProto::AiConfig ai_config;
 };
