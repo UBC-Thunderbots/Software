@@ -4,10 +4,25 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/logger/logger.h"
 
-struct DefenderFSMBase
+struct DefenderFSMBaseControlParams{};
+
+struct DefenderFSMBase : TacticFSM<DefenderFSMBaseControlParams>
 {
+    using Update = TacticFSM<DefenderFSMBaseControlParams>::Update;
+
+    /**
+     * Constructor for DefenderFSMBase
+     *
+     * @param ai_config_ptr shared ptr to ai_config
+     */
+    explicit DefenderFSMBase(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<DefenderFSMBaseControlParams>(ai_config_ptr)
+    {
+    }
+
     /**
      * Guard that determines whether it is appropriate to steal the ball for FSMs
      *
@@ -27,7 +42,7 @@ struct DefenderFSMBase
     /**
      * This is the Action that prepares for getting possession of the ball with FSMs
      * @param tactic_update the Defender's Update event
-     * @param processEvent processes the DribbleFSM::Update
+     * @param processEvent processes the TacticFSM<DribbleFSMControlParams>::Update
      */
     static void prepareGetPossession(
         const TacticUpdate& tactic_update,
