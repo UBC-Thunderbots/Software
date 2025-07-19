@@ -28,8 +28,8 @@
 #endif /* __cplusplus */
 
 /* Includes ------------------------------------------------------------------*/
-#include "potentiometer.h"
-#include "mc_interface.h"
+#include "firmware/mc_interface.h"
+#include "firmware/mcsdk/potentiometer.h"
 
 
 /** @addtogroup MCSDK

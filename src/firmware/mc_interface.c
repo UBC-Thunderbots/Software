@@ -22,10 +22,10 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "mc_math.h"
-#include "speed_torq_ctrl.h"
-#include "mc_interface.h"
-#include "motorcontrol.h"
+#include "firmware/mc_math.h"
+#include "firmware/mc_interface.h"
+#include "firmware/mcsdk/speed_torq_ctrl.h"
+#include "firmware/motorcontrol.h"
 
 #define ROUNDING_OFF
 

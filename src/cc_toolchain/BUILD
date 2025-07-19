@@ -4,6 +4,7 @@ load(
     ":cc_toolchain_config.bzl",
     "cc_toolchain_config_fullsystem",
     "cc_toolchain_config_k8_jetson_nano_cross_compile",
+    "cc_toolchain_config_stm32",
     "make_builtin_include_directories",
 )
 
@@ -57,6 +58,14 @@ platform(
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
         ":glibc_2_27",
+    ],
+)
+
+platform(
+    name = "motor_board",
+    constraint_values = [
+        "@platforms//cpu:armv6-m",
+        "@platforms//os:none",
     ],
 )
 
@@ -194,6 +203,23 @@ cc_toolchain(
     toolchain_identifier = "gcc-k8-jetson-nano-cross-compile",
 )
 
+cc_toolchain_config_stm32(
+    name = "gcc-arm-none-abi",
+    builtin_include_directories = [
+        "/usr/lib/gcc/arm-none-eabi/13.2.1/include/"
+    ],
+    tool_paths = {
+        "ar": "/usr/bin/arm-none-eabi-ar",
+        "gcc": "/usr/bin/arm-none-eabi-gcc",
+        "cpp": "/usr/bin/arm-none-eabi-cpp",
+        "ld": "/usr/bin/arm-none-eabi-ld",
+        "nm": "/usr/bin/arm-none-eabi-nm",
+        "objdump": "/usr/bin/arm-none-eabi-objdump",
+        "strip": "/usr/bin/arm-none-eabi-strip",
+    },
+    toolchain_identifier = "gcc-stm32",
+)
+
 cc_toolchain(
     name = "cc_toolchain_stm32",
     all_files = ":empty",
@@ -205,7 +231,7 @@ cc_toolchain(
     objcopy_files = ":empty",
     strip_files = ":empty",
     supports_param_files = True,
-    toolchain_config = ":empty",
+    toolchain_config = ":gcc-arm-none-abi",
     toolchain_identifier = "stm32_gcc",
 )
 
@@ -273,8 +299,8 @@ toolchain(
 
 toolchain(
     name = "cc_toolchain_for_stm32",
-    exec_compatible_with = [
-        "@platforms//cpu:arm",
+    target_compatible_with = [
+        "@platforms//cpu:armv6-m",
         "@platforms//os:none",
     ],
     toolchain = ":cc_toolchain_stm32",

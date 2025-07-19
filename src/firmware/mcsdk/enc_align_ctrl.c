@@ -22,6 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "enc_align_ctrl.h"
 #include "mc_type.h"
+#include "firmware/common_defs.h"
 
 /** @addtogroup MCSDK
   * @{

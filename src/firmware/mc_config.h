@@ -21,25 +21,25 @@
 #ifndef MC_CONFIG_H
 #define MC_CONFIG_H
 
+#include "firmware/mc_interface.h"
 #include "firmware/mcsdk/pid_regulator.h"
 #include "firmware/mcsdk/speed_torq_ctrl.h"
-#include "virtual_speed_sensor.h"
-#include "ntc_temperature_sensor.h"
-#include "revup_ctrl.h"
-#include "pwm_curr_fdbk.h"
-#include "mc_interface.h"
-#include "mc_configuration_registers.h"
-#include "r_divider_bus_voltage_sensor.h"
-#include "virtual_bus_voltage_sensor.h"
-#include "pqd_motor_power_measurement.h"
+#include "firmware/mcsdk/virtual_speed_sensor.h"
+#include "firmware/mcsdk/ntc_temperature_sensor.h"
+#include "firmware/mcsdk/revup_ctrl.h"
+#include "firmware/mcsdk/pwm_curr_fdbk.h"
+#include "firmware/mcsdk/mc_configuration_registers.h"
+#include "firmware/mcsdk/r_divider_bus_voltage_sensor.h"
+#include "firmware/mcsdk/virtual_bus_voltage_sensor.h"
+#include "firmware/mcsdk/pqd_motor_power_measurement.h"
 
-#include "r1_ps_pwm_curr_fdbk.h"
+#include "firmware/r1_ps_pwm_curr_fdbk.h"
 
-#include "encoder_speed_pos_fdbk.h"
-#include "enc_align_ctrl.h"
+#include "firmware/encoder_speed_pos_fdbk.h"
+#include "firmware/enc_align_ctrl.h"
 
-#include "ramp_ext_mngr.h"
-#include "circle_limitation.h"
+#include "firmware/ramp_ext_mngr.h"
+#include "firmware/circle_limitation.h"
 
 /* USER CODE BEGIN Additional include */
 

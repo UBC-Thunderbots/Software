@@ -19,11 +19,12 @@
   ******************************************************************************
   */
 
-#include "mc_type.h"
+#include "firmware/mcsdk/mc_type.h"
+#include "firmware/mcp.h"
+#include "firmware/register_interface.h"
+#include "firmware/mcpa.h"
+
 #include "string.h"
-#include "mcp.h"
-#include "register_interface.h"
-#include "mcpa.h"
 
 uint32_t GLOBAL_TIMESTAMP = 0;
 static void MCPA_stopDataLog (MCPA_Handle_t *pHandle);

@@ -28,8 +28,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Includes ------------------------------------------------------------------*/
-#include "regular_conversion_manager.h"
-#include "bus_voltage_sensor.h"
+#include "firmware/regular_conversion_manager.h"
+#include "firmware/bus_voltage_sensor.h"
 
 /** @addtogroup MCSDK
   * @{

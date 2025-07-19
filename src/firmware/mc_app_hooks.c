@@ -20,6 +20,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#include "firmware/common_defs.h"
 #include "firmware/mcsdk/mc_type.h"
 #include "mc_app_hooks.h"
 

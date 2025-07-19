@@ -28,8 +28,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Includes ------------------------------------------------------------------*/
-#include "speed_torq_ctrl.h"
-#include "regular_conversion_manager.h"
+#include "firmware/speed_torq_ctrl.h"
+#include "firmware/regular_conversion_manager.h"
 
 /** @addtogroup MCSDK
   * @{

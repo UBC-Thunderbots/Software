@@ -25,6 +25,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "pwm_common.h"
 
+#include "firmware/common_defs.h"
+
 /** @addtogroup MCSDK
   * @{
   */

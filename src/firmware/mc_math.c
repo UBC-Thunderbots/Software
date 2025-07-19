@@ -19,8 +19,8 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include "mc_math.h"
-#include "mc_type.h"
+#include "firmware/mc_math.h"
+#include "firmware/mcsdk/mc_type.h"
 
 /** @addtogroup MCSDK
   * @{

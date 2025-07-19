@@ -30,8 +30,8 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "firmware/mcsdk/mc_type.h"
-#include "pwm_curr_fdbk.h"
-#include "speed_torq_ctrl.h"
+#include "firmware/mcsdk/pwm_curr_fdbk.h"
+#include "firmware/mcsdk/speed_torq_ctrl.h"
 /** @addtogroup MCSDK
   * @{
   */

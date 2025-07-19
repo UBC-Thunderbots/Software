@@ -29,6 +29,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "bus_voltage_sensor.h"
+#include "firmware/common_defs.h"
 
 
 /** @addtogroup MCSDK

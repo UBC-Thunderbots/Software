@@ -23,8 +23,8 @@
 #ifndef MC_API_H
 #define MC_API_H
 
-#include "mc_type.h"
-#include "mc_interface.h"
+#include "firmware/mc_interface.h"
+#include "firmware/mcsdk/mc_type.h"
 
 #ifdef __cplusplus
  extern "C" {

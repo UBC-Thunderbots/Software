@@ -21,6 +21,7 @@
   */
   
 /* Includes ------------------------------------------------------------------*/
+#include "firmware/common_defs.h"
 #include "open_loop.h"
 
 /** @addtogroup MCSDK

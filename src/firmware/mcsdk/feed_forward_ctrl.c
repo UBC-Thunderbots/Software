@@ -47,14 +47,14 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "feed_forward_ctrl.h"
+#include "firmware/mcsdk/feed_forward_ctrl.h"
 #include <stddef.h>
 
-#include "mc_type.h"
-#include "bus_voltage_sensor.h"
-#include "speed_pos_fdbk.h"
-#include "speed_torq_ctrl.h"
-#include "r_divider_bus_voltage_sensor.h"
+#include "firmware/mcsdk/mc_type.h"
+#include "firmware/bus_voltage_sensor.h"
+#include "firmware/speed_pos_fdbk.h"
+#include "firmware/speed_torq_ctrl.h"
+#include "firmware/r_divider_bus_voltage_sensor.h"
 
 /** @addtogroup MCSDK
   * @{

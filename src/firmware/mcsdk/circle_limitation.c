@@ -21,9 +21,11 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "circle_limitation.h"
-#include "mc_math.h"
-#include "mc_type.h"
+#include "firmware/mcsdk/circle_limitation.h"
+
+#include "firmware/common_defs.h"
+#include "firmware/mc_math.h"
+#include "firmware/mcsdk/mc_type.h"
 
 /** @addtogroup MCSDK
   * @{

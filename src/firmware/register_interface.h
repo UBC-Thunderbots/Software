@@ -22,7 +22,7 @@
 
 #ifndef REGISTER_INTERFACE_H
 #define REGISTER_INTERFACE_H
-#include "mcp.h"
+#include "firmware/mcsdk/mcp.h"
 
 /*
    MCP_ID definition :

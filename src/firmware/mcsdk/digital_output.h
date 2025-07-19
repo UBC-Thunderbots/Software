@@ -28,7 +28,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Includes ------------------------------------------------------------------*/
-#include "mc_type.h"
+#include "firmware/common_defs.h"
+#include "firmware/mcsdk/mc_type.h"
 
 /** @addtogroup MCSDK
   * @{

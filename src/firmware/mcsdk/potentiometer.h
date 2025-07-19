@@ -28,8 +28,8 @@
 #endif /* __cplusplus */
 
 /* Includes ------------------------------------------------------------------*/
-#include "mc_type.h"
-#include "regular_conversion_manager.h"
+#include "firmware/mcsdk/mc_type.h"
+#include "firmware/regular_conversion_manager.h"
 
 /** @addtogroup MCSDK
   * @{
