@@ -8,7 +8,6 @@ import os
 import pytest
 from proto.import_all_protos import *
 
-from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import *
 from software.simulated_tests import validation
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
