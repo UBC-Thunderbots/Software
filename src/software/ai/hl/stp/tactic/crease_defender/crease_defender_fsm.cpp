@@ -50,7 +50,7 @@ void CreaseDefenderFSM::blockThreat(
     Angle robot_orientation = event.common.robot.orientation();
     // Use a slightly larger inflation factor to avoid the crease defenders from sitting
     double robot_obstacle_inflation_factor =
-        robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5;
+        ai_config_ptr->robot_navigation_obstacle_config().robot_obstacle_inflation_factor() + 0.5;
     double robot_radius_expansion_amount =
         ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
     Rectangle inflated_defense_area =
@@ -112,7 +112,7 @@ void CreaseDefenderFSM::blockThreat(
 
     AutoChipOrKick auto_chip_or_kick{AutoChipOrKickMode::OFF, 0};
     auto goal_post_offset_vector =
-        Vector(0, crease_defender_config.goal_post_offset_chipping());
+        Vector(0, ai_config_ptr->crease_defender_config().goal_post_offset_chipping());
     auto goal_line_segment =
         Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner() +
                     goal_post_offset_vector,
@@ -203,7 +203,7 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
     return ball_on_friendly_side && DefenderFSMBase::ballNearbyWithoutThreat(
                                         event.common.world_ptr, event.common.robot,
                                         event.control_params.ball_steal_mode,
-                                        crease_defender_config.defender_steal_config());
+                                        ai_config_ptr->crease_defender_config().defender_steal_config());
 }
 
 void CreaseDefenderFSM::prepareGetPossession(
