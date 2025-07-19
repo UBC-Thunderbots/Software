@@ -97,6 +97,8 @@
   #include "firmware/stm32f0xx/stm32f0xx_ll_dma.h"
   #include "firmware/stm32f0xx/stm32f0xx_ll_comp.h"
 
+  #include <stddef.h>
+
 __STATIC_INLINE void LL_DMA_ClearFlag_TC(DMA_TypeDef *DMAx, uint32_t Channel)
 {
   if (NULL == DMAx)

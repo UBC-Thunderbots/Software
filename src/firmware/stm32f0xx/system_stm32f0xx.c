@@ -43,7 +43,7 @@
   * @{
   */
 
-#include "stm32f0xx.h"
+#include "firmware/stm32f0xx/stm32f0xx.h"
 
 /**
   * @}

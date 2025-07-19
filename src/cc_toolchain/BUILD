@@ -194,6 +194,21 @@ cc_toolchain(
     toolchain_identifier = "gcc-k8-jetson-nano-cross-compile",
 )
 
+cc_toolchain(
+    name = "cc_toolchain_stm32",
+    all_files = ":empty",
+    ar_files = ":empty",
+    as_files = ":empty",
+    compiler_files = ":empty",
+    dwp_files = ":empty",
+    linker_files = ":empty",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    supports_param_files = True,
+    toolchain_config = ":empty",
+    toolchain_identifier = "stm32_gcc",
+)
+
 cc_toolchain_config_k8_jetson_nano_cross_compile(
     name = "gcc_k8_jetson_nano_cross_compile",
     builtin_include_directories = [
