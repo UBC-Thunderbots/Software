@@ -8,7 +8,8 @@ import os
 import pytest
 from proto.import_all_protos import *
 
-
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.networking.ssl_proto_communication import *
 from software.simulated_tests import validation
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
@@ -130,7 +131,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
-                    self.gamecontroller.send_ci_input(cmd, team)
+                    self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
                     # remove command from the list
                     ci_cmd_with_delay.remove((delay, cmd, team))
 
@@ -233,6 +234,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         test_timeout_s=3,
         tick_duration_s=0.0166,
         index=0,
+        ci_cmd_with_delay=[],
         run_till_end=True,
         **kwargs,
     ):
@@ -244,6 +246,13 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param tick_duration_s: length of a tick
         :param index: index of the current test. default is 0 (invariant test)
                       values can be passed in during aggregate testing for different timeout durations
+        :param ci_cmd_with_delay: A list consisting of a duration, and a
+                        tuple forming a ci command
+                        {
+                            (time, command, team),
+                            (time, command, team),
+                            ...
+                        }
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
@@ -271,7 +280,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                     eventually_validation_sequence_set,
                     test_timeout_duration,
                     tick_duration_s,
-                    [],
+                    ci_cmd_with_delay,
                     run_till_end,
                 ],
             )
@@ -289,6 +298,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 eventually_validation_sequence_set,
                 test_timeout_duration,
                 tick_duration_s,
+                ci_cmd_with_delay=ci_cmd_with_delay,
                 run_till_end=run_till_end,
             )
 
