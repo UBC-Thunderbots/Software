@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
-#include "software/logger/logger.h"      
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/logger/logger.h"
 
 bool PassDefenderFSM::passStarted(const Update& event)
 {
@@ -70,26 +70,30 @@ void PassDefenderFSM::interceptBall(const Update& event)
             // that the defender can move to and intercept the pass
             intercept_position = closestPoint(
                 robot_position, Line(ball.position(), ball.position() + ball.velocity()));
-            
-            //Here we are using v_f^2=v_0^2+2*a*d to calculate the final
-            //speed and after that the average speed
-            double ball_vel=(event.common.world_ptr->ball().velocity().length());
-            double ball_dis=(event.common.world_ptr->ball().position() - intercept_position).length();
-            double final_vel=sqrt(ball_vel*ball_vel+2*ball_dis*BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED);
-            double avg_vel = (final_vel+ball_vel)/2.0;
+
+            // Here we are using v_f^2=v_0^2+2*a*d to calculate the final
+            // speed and after that the average speed
+            double ball_vel = (event.common.world_ptr->ball().velocity().length());
+            double ball_dis =
+                (event.common.world_ptr->ball().position() - intercept_position).length();
+            double final_vel =
+                sqrt(ball_vel * ball_vel +
+                     2 * ball_dis *
+                         BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED);
+            double avg_vel               = (final_vel + ball_vel) / 2.0;
             Duration ball_intercept_time = Duration::fromSeconds(
-                 ball_dis /
-                (std::max(std::numeric_limits<double>::epsilon(),
-                          avg_vel)));
-            
-            //Here we check if we can make it in time to the position and stop in time
-            //otherwise we will attempt to overshoot the position and intercept it 
-            if (event.common.robot.getTimeToPosition(intercept_position) > ball_intercept_time)
+                ball_dis / (std::max(std::numeric_limits<double>::epsilon(), avg_vel)));
+
+            // Here we check if we can make it in time to the position and stop in time
+            // otherwise we will attempt to overshoot the position and intercept it
+            if (event.common.robot.getTimeToPosition(intercept_position) >
+                ball_intercept_time)
             {
                 Point new_destination = intercept_position;
                 double final_speed    = DEFENDER_STEP_SPEED_M_PER_S;
                 bool finished         = false;
-                double max_speed = event.common.robot.robotConstants().robot_max_speed_m_per_s;
+                double max_speed =
+                    event.common.robot.robotConstants().robot_max_speed_m_per_s;
                 double max_acc =
                     event.common.robot.robotConstants().robot_max_acceleration_m_per_s_2;
                 Point possible_intercept_pos = intercept_position;
@@ -97,23 +101,28 @@ void PassDefenderFSM::interceptBall(const Update& event)
                 while (!finished)
                 {
                     Vector final_velocity =
-                        (new_destination - event.common.robot.position()).normalize(final_speed);
+                        (new_destination - event.common.robot.position())
+                            .normalize(final_speed);
 
-                    // What's happening here is we are using v_o^2=2*d*a to determine the extra
-                    // distance the defender will be forced to travel if they intercept the ball
-                    // with final_speed and then immediately decelerate
+                    // What's happening here is we are using v_o^2=2*d*a to determine the
+                    // extra distance the defender will be forced to travel if they
+                    // intercept the ball with final_speed and then immediately decelerate
                     double extra_length = (final_speed * final_speed) / (2.0 * max_acc);
-                    new_destination     = possible_intercept_pos + final_velocity.normalize(extra_length);
+                    new_destination =
+                        possible_intercept_pos + final_velocity.normalize(extra_length);
                     if (!event.common.world_ptr->field().pointInFriendlyDefenseArea(
-                            new_destination)&&contains(event.common.world_ptr->field().fieldBoundary(), new_destination))
+                            new_destination) &&
+                        contains(event.common.world_ptr->field().fieldBoundary(),
+                                 new_destination))
                     {
-                        if (event.common.robot.getTimeToPosition(possible_intercept_pos, final_velocity) <
+                        if (event.common.robot.getTimeToPosition(possible_intercept_pos,
+                                                                 final_velocity) <
                             ball_intercept_time)
                         {
-                            // If we found that the robot can make it before the ball we consider
-                            // the while loop finished
+                            // If we found that the robot can make it before the ball we
+                            // consider the while loop finished
                             intercept_position = new_destination;
-                            finished = true;
+                            finished           = true;
                         }
                     }
                     else
@@ -123,12 +132,11 @@ void PassDefenderFSM::interceptBall(const Update& event)
                     final_speed += DEFENDER_STEP_SPEED_M_PER_S;
                     if (final_speed > max_speed)
                     {
-                        //Couldn't find a speed possible to intercept
+                        // Couldn't find a speed possible to intercept
                         finished = true;
                     }
                 }
             }
-
         }
 
         auto face_ball_orientation = (ball.position() - robot_position).orientation();
