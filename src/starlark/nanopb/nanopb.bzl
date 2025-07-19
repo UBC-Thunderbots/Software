@@ -1,11 +1,23 @@
-load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
+load("@platformio_rules//platformio:platformio.bzl", "PlatformIOLibraryInfo")
+# This file is heavily referencing platformio.bzl from rules_platformio project
+# https://github.com/mum4k/platformio_rules
+
+# This rule is an adapter between proto_library + nanopb for the platformio_library
+# There is a similar rule: cc_nanopb_proto_library from nanopb natively which does something similar
+# However, platformio_rules do not support cc_library due to the way cross compiling works in platformio for
+# embedded systems (cc_library compiles srcs to .so/.a files which is not supported the same way by platformio).
+
+load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 
 # The relative filename of the header file.
 _FILENAME = "lib/{dirname}/{filename}"
 
 _PROTO_DIR = "{path}/proto"
 _OPTIONS_DIR = "{path}/generator/nanopb"
+
+# Command that makes a directory
+_MAKE_DIR_COMMAND = "mkdir -p {dirname}"
 
 # Command that copies the source to the destination.
 _COPY_COMMAND = "cp {source} {destination}"
@@ -44,37 +56,29 @@ def _nanopb_proto_library_impl(ctx):
     all_proto_src_files = []
 
     for proto_file in all_proto_files.to_list():
-        # Generate the `.pb` files using the protobuf compiler
-        pb_file_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb"
-        pb_file = ctx.actions.declare_file(pb_file_name)
-
-        # Create the arguments for the proto compiler to compile the proto file,
-        # adding all the transitive include directories
-        proto_compile_args = ["-o", pb_file.path, proto_file.path]
+        proto_compile_args = []
         for path in all_proto_include_dirs.to_list():
             proto_compile_args += ["-I%s" % path]
+        h_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb.h"
+        c_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb.c"
 
-        ctx.actions.run(
-            inputs = all_proto_files,
-            outputs = [pb_file],
-            arguments = proto_compile_args,
-            executable = ctx.executable.protoc,
-            mnemonic = "ProtoCompile",
-            use_default_shell_env = True,
-        )
-
-        # Generate the equivalent C code using Nanopb
-        h_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".nanopb.h"
-        c_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".nanopb.c"
         c_out = ctx.actions.declare_file(c_out_name)
         h_out = ctx.actions.declare_file(h_out_name)
 
+        proto_compile_args += ["--plugin=protoc-gen-nanopb=%s" % (ctx.executable.nanopb_generator.path)]
+        proto_compile_args += ["--nanopb_out=--cpp-descriptors:%s %s" % (generated_folder_abs_path, proto_file.path)]
+
+        cmd = [ctx.executable.protoc.path] + proto_compile_args
+        cmd_str = " ".join(cmd)
         ctx.actions.run_shell(
-            tools = [ctx.executable.nanopb_generator],
-            inputs = [pb_file],
+            tools = [
+                ctx.executable.protoc,
+                ctx.executable.nanopb_generator,
+            ],
+            inputs = all_proto_files,
             outputs = [c_out, h_out],
             mnemonic = "NanopbGeneration",
-            command = "%s -e .nanopb %s" % (ctx.executable.nanopb_generator.path, pb_file.path),
+            command = cmd_str,
         )
 
         all_proto_src_files.append(c_out)
@@ -86,7 +90,7 @@ def _nanopb_proto_library_impl(ctx):
         cc_toolchain = cc_toolchain,
     )
 
-    # Get the compilation and linking contexts from all nanopb srcs
+    #     Get the compilation and linking contexts from all nanopb srcs
     nanopb_compilation_contexts = [
         label[CcInfo].compilation_context
         for label in ctx.attr.nanopb_libs
@@ -111,6 +115,8 @@ def _nanopb_proto_library_impl(ctx):
         compilation_contexts = nanopb_compilation_contexts,
     )
 
+    print(nanopb_linking_contexts)
+
     (linking_context, linking_outputs) = \
         cc_common.create_linking_context_from_compilation_outputs(
             name = "link_nanopb_outputs",
@@ -125,13 +131,16 @@ def _nanopb_proto_library_impl(ctx):
     # these contain all files needed for compilation with platformio.
     name = ctx.label.name
     commands = []
+
     inputs = all_proto_hdr_files + all_proto_src_files
     outputs = []
 
     for hdr_file in all_proto_hdr_files:
         dir = _PROTO_DIR.format(path = name)
-        if "options.nanopb." in hdr_file.basename:
-            dir = _OPTIONS_DIR.format(path = name)
+        if "nanopb.pb." in hdr_file.basename:
+            dir = "bazel-out/k8-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
+        elif "descriptor.pb" in hdr_file.basename:
+            dir = "bazel-out/k8-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
         file = ctx.actions.declare_file(
             _FILENAME.format(dirname = dir, filename = hdr_file.basename),
         )
@@ -143,8 +152,10 @@ def _nanopb_proto_library_impl(ctx):
 
     for src_file in all_proto_src_files:
         dir = _PROTO_DIR.format(path = name)
-        if "options.nanopb." in src_file.basename:
-            dir = _OPTIONS_DIR.format(path = name)
+        if "nanopb.pb." in src_file.basename:
+            dir = "bazel-out/k8-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
+        elif "descriptor.pb" in src_file.basename:
+            dir = "bazel-out/k8-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
         file = ctx.actions.declare_file(
             _FILENAME.format(dirname = dir, filename = src_file.basename),
         )
@@ -154,30 +165,38 @@ def _nanopb_proto_library_impl(ctx):
             destination = file.path,
         ))
 
-    outputs.append(ctx.outputs.zip)
+    zip_file = ctx.actions.declare_file("%s.zip" % name)
+    outputs.append(zip_file)
     commands.append(_ZIP_COMMAND.format(
-        output_dir = ctx.outputs.zip.dirname,
-        zip_filename = ctx.outputs.zip.basename,
+        output_dir = zip_file.dirname,
+        zip_filename = zip_file.basename,
     ))
     ctx.actions.run_shell(
         inputs = inputs,
         outputs = outputs,
         command = "\n".join(commands),
     )
-
-    return struct(
-        transitive_zip_files = depset([ctx.outputs.zip]),
-        providers = [CcInfo(
+    runfiles = ctx.runfiles(files = [zip_file])
+    transitive_libdeps = []
+    for dep in ctx.attr.deps:
+        if PlatformIOLibraryInfo in dep:
+            print(dep[PlatformIOLibraryInfo].runfiles)
+            runfiles.merge_all(dep[PlatformIOLibraryInfo].runfiles)
+            transitive_libdeps.extend(dep[PlatformIOLibraryInfo].transitive_libdeps)
+    return [
+        DefaultInfo(files = depset([zip_file])),
+        PlatformIOLibraryInfo(
+            default_runfiles = runfiles,
+            transitive_libdeps = transitive_libdeps,
+        ),
+        CcInfo(
             compilation_context = compilation_context,
             linking_context = linking_context,
-        )],
-    )
+        ),
+    ]
 
 nanopb_proto_library = rule(
     implementation = _nanopb_proto_library_impl,
-    outputs = {
-        "zip": "%{name}.zip",  #output needed to be included in platformio_library
-    },
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
@@ -187,23 +206,25 @@ nanopb_proto_library = rule(
         ),
         "nanopb_libs": attr.label_list(
             providers = [CcInfo],
-            default = [Label("@nanopb//:nanopb_header")],
+            default = [Label("@nanopb//:gf")],
         ),
         "nanopb_generator": attr.label(
             executable = True,
             cfg = "host",
-            default = Label("@nanopb//:nanopb_generator"),
+            default = Label("@nanopb//:protoc-gen-nanopb"),
         ),
         "protoc": attr.label(
             executable = True,
             cfg = "host",
-            default = Label("@com_google_protobuf//:protoc"),
+            default = Label("@protobuf//:protoc"),
         ),
         "_cc_toolchain": attr.label(
             default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),
         ),
     },
     provides = [
+        DefaultInfo,
+        PlatformIOLibraryInfo,
         CcInfo,
     ],
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],

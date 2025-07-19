@@ -1,6 +1,7 @@
 #include "software/logger/coloured_cout_sink.h"
 
 #include "software/logger/custom_logging_levels.h"
+#include "g3log/loglevels.hpp"
 
 ColouredCoutSink::ColouredCoutSink(bool print_detailed, bool reduce_repetition)
     : print_detailed(print_detailed),
@@ -75,7 +76,7 @@ void ColouredCoutSink::displaySingleLog(g3::LogMessage &log)
     auto colour = colourToString(getColour(level));
 
     if (level.value == VISUALIZE.value || level.value == CSV.value ||
-        level.value == PLOTJUGGLER.value)
+        level.value == PLOTJUGGLER.value || level.value == G3LOG_DEBUG.value)
     {
         // Don't log anything that calls LOG(VISUALIZE) and LOG(CSV)
         return;

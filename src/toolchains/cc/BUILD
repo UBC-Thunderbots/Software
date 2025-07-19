@@ -1,11 +1,11 @@
-package(default_visibility = ["//visibility:public"])
-
 load(
     ":cc_toolchain_config.bzl",
     "cc_toolchain_config_fullsystem",
     "cc_toolchain_config_k8_jetson_nano_cross_compile",
     "make_builtin_include_directories",
 )
+
+package(default_visibility = ["//visibility:public"])
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
@@ -197,10 +197,10 @@ cc_toolchain(
 cc_toolchain_config_k8_jetson_nano_cross_compile(
     name = "gcc_k8_jetson_nano_cross_compile",
     builtin_include_directories = [
-        "external/k8_jetson_nano_cross_compile_gcc/include/",
-        "external/k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/include/",
-        "external/k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/libc/lib/",
-        "external/k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/libc/usr/include/",
+        "external/+_repo_rules3+k8_jetson_nano_cross_compile_gcc/include/",
+        "external/+_repo_rules3+k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/include/",
+        "external/+_repo_rules3+k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/libc/lib/",
+        "external/+_repo_rules3+k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/libc/usr/include/",
     ],
     tool_paths = {
         "ar": "wrapper/k8_jetson_nano_cross_compile_ar",
