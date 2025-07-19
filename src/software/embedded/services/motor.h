@@ -14,8 +14,8 @@
 #include "software/embedded/gpio_char_dev.h"
 #include "software/embedded/gpio_sysfs.h"
 #include "software/embedded/platform.h"
+#include "software/logger/logger.h"
 #include "software/physics/euclidean_to_wheel.h"
-
 /**
  * A service that interacts with the motor.
  *
@@ -121,25 +121,37 @@ class MotorService
     struct MotorFaultIndicator
     {
         bool drive_enabled;
-        std::unordered_set<TbotsProto::MotorFault> motor_faults;
+        std::unordered_set<TbotsProto::MotorFault> last_motor_faults;
+        const uint8_t motor_id;
+        int num_critical_faults;
+        std::optional<std::chrono::time_point<std::chrono::system_clock>>
+            time_of_first_fault;
+        long int total_duration_since_last_fault_s;
 
         /**
-         * Construct a default indicator of no faults and running motors.
+         * Construct a default indicator of no faults and running motors, with a motor id.
          */
-        MotorFaultIndicator() : drive_enabled(true), motor_faults() {}
+        MotorFaultIndicator(uint8_t id);
 
         /**
-         * Construct an indicator with faults and whether the motor is enabled.
+         * Update drive enabled, fault count, type of last fault, and time since the last
+         * fault
          *
-         * @param drive_enabled true if the motor is enabled, false if disabled due to a
+         * @param enabled true if the motor is enabled, false if disabled due to a
          * motor fault
          * @param motor_faults  a set of faults associated with this motor
          */
-        MotorFaultIndicator(bool drive_enabled,
-                            std::unordered_set<TbotsProto::MotorFault>& motor_faults)
-            : drive_enabled(drive_enabled), motor_faults(motor_faults)
-        {
-        }
+        void update(bool enabled,
+                    std::unordered_set<TbotsProto::MotorFault>& motor_faults);
+
+        /**
+         *  If a motor has failed repeatedly, remove the associated motor_id
+         *  from enabled_motors and log the removal.
+         *
+         *  @param motors a set of motors that are currently enabled. May be modified by
+         * this function.
+         */
+        void removeMotorIfFaulty(std::set<uint8_t>& motors);
     };
 
     /**
@@ -147,10 +159,8 @@ class MotorService
      *
      * @param motor The motor to log the status for
      *
-     * @return a struct containing the motor faults and whether the motor was disabled due
-     * to the fault
      */
-    struct MotorFaultIndicator checkDriverFault(uint8_t motor);
+    void checkDriverFault(uint8_t motor);
 
     /**
      * Sets up motor as drive motor controllers
@@ -178,6 +188,14 @@ class MotorService
      * @return read value
      */
     int readIntFromTMC4671(uint8_t motor, uint8_t address);
+
+    /*
+     * Get the motor faults encountered so far.
+     *
+     * @return the mapping of motors to the object describing their faults.
+     */
+    std::unordered_map<int, MotorFaultIndicator> getCachedMotorFaults();
+
 
    private:
     /**
@@ -350,6 +368,28 @@ class MotorService
      */
     bool requiresMotorReinit(uint8_t motor);
 
+    /**
+     * Checks if motor is in enabled_motors
+     * @param motor motor to check
+     * @return true if motor in enabled_motors, false otherwise
+     */
+    bool motorInEnabledList(uint8_t motor);
+
+    /**
+     * Disables broken motors
+     */
+    void stopDisabledMotors();
+
+    /**
+     * Write the target velocity to the given motor, if the motor is enabled
+     *
+     * @param motor_chip the chip to write to
+     * @param target target rpm
+     *
+     * @return the current velocity of the motor
+     */
+    double readThenWriteToEnabledMotor(uint8_t motor_chip, int target);
+
     // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
     // pairs of the drive motor.
     //
@@ -410,17 +450,14 @@ class MotorService
 
     int dribbler_ramp_rpm_;
 
-    std::optional<std::chrono::time_point<std::chrono::system_clock>>
-        tracked_motor_fault_start_time_;
-    int num_tracked_motor_resets_;
-
     static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
 
     static const uint8_t NUM_DRIVE_MOTORS = 4;
     static const uint8_t NUM_MOTORS       = NUM_DRIVE_MOTORS + 1;
+    std::set<uint8_t> enabled_motors;
 
     static const int MOTOR_FAULT_TIME_THRESHOLD_S = 60;
-    static const int MOTOR_FAULT_THRESHOLD_COUNT  = 3;
+    static const int MOTOR_FAULT_THRESHOLD_COUNT  = 4;
 
     // SPI Trinamic Motor Driver Paths (indexed with chip select above)
     static constexpr const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1",
