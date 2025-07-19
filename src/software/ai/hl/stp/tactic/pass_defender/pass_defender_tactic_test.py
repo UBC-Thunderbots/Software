@@ -217,6 +217,14 @@ def test_avoid_intercept_scenario(
             tbots_cpp.Point(-0.8, 0),
             True,
         ),
+        # Intercept faster diagonal pass, steal
+        (
+            tbots_cpp.Point(0, 0),
+            tbots_cpp.Vector(-4, -2),
+            tbots_cpp.Point(-3, -0.25),
+            tbots_cpp.Point(1, 0),
+            True,
+        ),
         # Enemy too close, no steal
         (
             tbots_cpp.Point(0, 0),

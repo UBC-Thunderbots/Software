@@ -139,5 +139,8 @@ struct PassDefenderFSM : public DefenderFSMBase
 
    private:
     Angle pass_orientation;
+    // The step amount between speeds we check that the defender is observed to
+    // go at during the interception
+    static constexpr double DEFENDER_STEP_SPEED_M_PER_S = 0.2;
     TbotsProto::PassDefenderConfig pass_defender_config;
 };
