@@ -475,14 +475,14 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // Get current wheel electical RPM (don't account for pole pairs). We will use these
     // for robot status feedback We assume the motors have ramped to the expected RPM from
     // the previous iteration.
-    double front_right_velocity = readThenWriteToEnabledMotor(FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                                                             front_right_target_rpm);
-    double front_left_velocity = readThenWriteToEnabledMotor(FRONT_LEFT_MOTOR_CHIP_SELECT,
-                                                                 front_left_target_rpm);
-    double back_right_velocity = readThenWriteToEnabledMotor(BACK_RIGHT_MOTOR_CHIP_SELECT,
-                                                                 back_right_target_rpm);
-    double back_left_velocity = readThenWriteToEnabledMotor(BACK_LEFT_MOTOR_CHIP_SELECT,
-                                                               back_left_target_rpm);
+    double front_right_velocity = readThenWriteToEnabledMotor(
+        FRONT_RIGHT_MOTOR_CHIP_SELECT, front_right_target_rpm);
+    double front_left_velocity =
+        readThenWriteToEnabledMotor(FRONT_LEFT_MOTOR_CHIP_SELECT, front_left_target_rpm);
+    double back_right_velocity =
+        readThenWriteToEnabledMotor(BACK_RIGHT_MOTOR_CHIP_SELECT, back_right_target_rpm);
+    double back_left_velocity =
+        readThenWriteToEnabledMotor(BACK_LEFT_MOTOR_CHIP_SELECT, back_left_target_rpm);
     double dribbler_rpm;
 
     if (motorInEnabledList(DRIBBLER_MOTOR_CHIP_SELECT))
@@ -506,7 +506,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     do
     {
         motor_fault_detector_ =
-                static_cast<uint8_t>((motor_fault_detector_ + 1) % NUM_MOTORS);
+            static_cast<uint8_t>((motor_fault_detector_ + 1) % NUM_MOTORS);
     } while (!motorInEnabledList(motor_fault_detector_));
 
     stopDisabledMotors();
@@ -636,8 +636,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     return motor_status;
 }
 
-double MotorService::readThenWriteToEnabledMotor(uint8_t motor_chip,
-                                               int target)
+double MotorService::readThenWriteToEnabledMotor(uint8_t motor_chip, int target)
 {
     double velocity;
     if (motorInEnabledList(motor_chip))
