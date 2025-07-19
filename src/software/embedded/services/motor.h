@@ -384,10 +384,11 @@ class MotorService
      * Write the target velocity to the given motor, if the motor is enabled
      *
      * @param motor_chip the chip to write to
-     * @param velocity the current velocity of the motor
      * @param target target rpm
+     *
+     * @return the current velocity of the motor
      */
-    void readThenWriteToEnabledMotor(uint8_t motor_chip, double& velocity, int target);
+    double readThenWriteToEnabledMotor(uint8_t motor_chip, int target);
 
     // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
     // pairs of the drive motor.
