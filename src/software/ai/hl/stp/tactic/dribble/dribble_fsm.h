@@ -10,9 +10,21 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 
-struct DribbleFSM
+struct DribbleFSMControlParams
+{
+    // The destination for dribbling the ball
+    std::optional<Point> dribble_destination;
+    // The final orientation to face the ball when finishing dribbling
+    std::optional<Angle> final_dribble_orientation;
+    // whether to allow excessive dribbling, i.e. more than 1 metre at a time
+    bool allow_excessive_dribbling;
+};
+
+struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
 {
    public:
+    using Update = TacticFSM<DribbleFSMControlParams>::Update;
+
     class GetPossession;
     class Dribble;
     class LoseBall;
@@ -20,24 +32,13 @@ struct DribbleFSM
     /**
      * Constructor for DribbleFSM
      *
-     * @param dribble_tactic_config The config to fetch parameters from
+     * @param ai_config_ptr shared ptr to ai_config
      */
-    explicit DribbleFSM(TbotsProto::DribbleTacticConfig dribble_tactic_config)
-        : dribble_tactic_config(dribble_tactic_config)
+    explicit DribbleFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<DribbleFSMControlParams>(ai_config_ptr)
     {
     }
 
-    struct ControlParams
-    {
-        // The destination for dribbling the ball
-        std::optional<Point> dribble_destination;
-        // The final orientation to face the ball when finishing dribbling
-        std::optional<Angle> final_dribble_orientation;
-        // whether to allow excessive dribbling, i.e. more than 1 metre at a time
-        bool allow_excessive_dribbling;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -199,8 +200,4 @@ struct DribbleFSM
             X + Update_E[!dribblingDone_G] / dribble_A                 = Dribble_S,
             X + Update_E / dribble_A                                   = X);
     }
-
-   private:
-    // the dribble tactic config
-    TbotsProto::DribbleTacticConfig dribble_tactic_config;
 };
