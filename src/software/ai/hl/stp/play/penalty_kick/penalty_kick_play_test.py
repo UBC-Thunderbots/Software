@@ -17,18 +17,21 @@ from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from proto.play_pb2 import Play, PlayName
 
+from software.simulated_tests.robot_enters_region import NumberOfRobotsEventuallyExitsRegion, \
+    NumberOfRobotsEventuallyEntersRegion
 
-def test_penalty_kick_play(simulated_test_runner):
-    ball_initial_pos = tbots_cpp.Point(0, 0)
+
+def test_penalty_kick_play_setup(simulated_test_runner):
+    ball_initial_pos = tbots_cpp.Point(-1.5, 0)
 
     def setup(*args):
         # Setup Bots
         blue_bots = [
-            tbots_cpp.Point(-3, 2.5),
-            tbots_cpp.Point(-3, 1.5),
-            tbots_cpp.Point(-3, 0.5),
-            tbots_cpp.Point(-3, -0.5),
-            tbots_cpp.Point(-3, -1.5),
+            tbots_cpp.Point(3, 2.5),
+            tbots_cpp.Point(2, 1.5),
+            tbots_cpp.Point(-1, 0.5),
+            tbots_cpp.Point(1, -0.5),
+            tbots_cpp.Point(0, -1.5),
             tbots_cpp.Point(-3, -2.5),
         ]
 
@@ -61,11 +64,103 @@ def test_penalty_kick_play(simulated_test_runner):
         simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
+
         simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.NORMAL_START, team=Team.BLUE
         )
+
         simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.PENALTY, team=Team.BLUE
+        )
+
+
+        # Create world state
+        simulated_test_runner.simulator_proto_unix_io.send_proto(
+            WorldState,
+            create_world_state(
+                yellow_robot_locations=yellow_bots,
+                blue_robot_locations=blue_bots,
+                ball_location=ball_initial_pos,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
+
+    field = tbots_cpp.Field.createSSLDivisionBField()
+
+    # Always Validation
+    inv_always_validation_sequence_set = [[]]
+
+    ag_always_validation_sequence_set = [[]]
+
+    # Eventually Validation
+    inv_eventually_validation_sequence_set = [
+        [
+            NumberOfRobotsEventuallyEntersRegion(region=tbots_cpp.Rectangle(tbots_cpp.Point(-4.5,-3),tbots_cpp.Point(-2.5,3)), req_robot_cnt=5),
+            NumberOfRobotsEventuallyEntersRegion(region=tbots_cpp.Circle(ball_initial_pos,0.5), req_robot_cnt=1),
+        ]
+    ]
+    ag_eventually_validation_sequence_set = [[]]
+
+    simulated_test_runner.run_test(
+        params=[0],
+        setup=setup,
+        inv_eventually_validation_sequence_set=inv_eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=inv_always_validation_sequence_set,
+        ag_eventually_validation_sequence_set=ag_eventually_validation_sequence_set,
+        ag_always_validation_sequence_set=ag_always_validation_sequence_set,
+        test_timeout_s=15,
+    )
+
+def test_penalty_kick_play_kick(simulated_test_runner):
+    ball_initial_pos = tbots_cpp.Point(-1.5, 0)
+
+    def setup(*args):
+        # Setup Bots
+        blue_bots = [
+            tbots_cpp.Point(-3, 2.5),
+            tbots_cpp.Point(-3, 1.5),
+            tbots_cpp.Point(-3, 0.5),
+            tbots_cpp.Point(-3, -0.5),
+            tbots_cpp.Point(-3, -1.5),
+            tbots_cpp.Point(-3, -2.5),
+        ]
+
+        yellow_bots = [
+            tbots_cpp.Point(-2.5, 0),
+            tbots_cpp.Point(-2.5, 1.5),
+            tbots_cpp.Point(-2.5, -1.5),
+            tbots_cpp.Point(-2.5, 2.5),
+            tbots_cpp.Point(-2.5, -2.5),
+            tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+
+        ]
+
+        # Force play override here
+        blue_play = Play()
+        blue_play.name = PlayName.PenaltyKickPlay
+
+        yellow_play = Play()
+        yellow_play.name = PlayName.PenaltyKickEnemyPlay
+
+        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
+
+        # Game Controller Setup
+        simulated_test_runner.gamecontroller.send_gc_command(
+            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        )
+
+        simulated_test_runner.gamecontroller.send_gc_command(
+            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+        )
+
+        simulated_test_runner.gamecontroller.send_gc_command(
+            gc_command=Command.Type.PENALTY, team=Team.BLUE
+        )
+        simulated_test_runner.gamecontroller.send_gc_command(
+            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
         )
 
         # Create world state
