@@ -40,7 +40,7 @@ struct PassDefenderFSM : public DefenderFSMBase
 
     // The maximum angle difference to determine if ball has been kicked in
     // the approximate direction of the defender
-    static constexpr Angle MAX_PASS_ANGLE_DIFFERENCE = Angle::fromDegrees(30);
+    static constexpr Angle MAX_PASS_ANGLE_DIFFERENCE = Angle::fromDegrees(35);
 
     // The minimum angle difference between a ball's trajectory and
     // pass_orientation for which we can consider a pass to be deflected

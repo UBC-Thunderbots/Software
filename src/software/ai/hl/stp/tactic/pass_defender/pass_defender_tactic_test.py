@@ -209,6 +209,14 @@ def test_avoid_intercept_scenario(
             tbots_cpp.Point(2.2, 0),
             True,
         ),
+        # Intercept faster pass angled away from defender, steal
+        (
+            tbots_cpp.Point(2, 0),
+            tbots_cpp.Vector(-4, 0),
+            tbots_cpp.Point(-2, 1.25),
+            tbots_cpp.Point(2.2, 0),
+            True,
+        ),
         # Intercept diagonal pass, steal
         (
             tbots_cpp.Point(-1, -3),
@@ -219,9 +227,9 @@ def test_avoid_intercept_scenario(
         ),
         # Intercept faster diagonal pass, steal
         (
-            tbots_cpp.Point(0, 0),
-            tbots_cpp.Vector(-4, -2),
-            tbots_cpp.Point(-3, -0.25),
+            tbots_cpp.Point(0.75, 0),
+            tbots_cpp.Vector(-3.5, -2),
+            tbots_cpp.Point(-3, 0),
             tbots_cpp.Point(1, 0),
             True,
         ),
