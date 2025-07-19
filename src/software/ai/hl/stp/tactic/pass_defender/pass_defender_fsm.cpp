@@ -112,7 +112,6 @@ void PassDefenderFSM::interceptBall(const Update& event)
                         {
                             // If we found that the robot can make it before the ball we consider
                             // the while loop finished
-                            LOG(INFO) << final_speed;
                             intercept_position = new_destination;
                             finished = true;
                         }
@@ -125,7 +124,6 @@ void PassDefenderFSM::interceptBall(const Update& event)
                     if (final_speed > max_speed)
                     {
                         //Couldn't find a speed possible to intercept
-                        LOG(INFO) <<"sry";
                         finished = true;
                     }
                 }
