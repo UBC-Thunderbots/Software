@@ -4,35 +4,39 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/triangle.h"
 
-struct GetBehindBallFSM
+struct GetBehindBallFSMControlParams
 {
-   public:
+    // The location where the chick will be taken, i.e. where we expect the ball to be
+    // when we chip or kick it
+    Point ball_location;
+    // The direction the Robot will chick in
+    Angle chick_direction;
+};
+
+struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
+{
+    public:
+    using Update = TacticFSM<GetBehindBallFSMControlParams>::Update;
     class GetBehindBallState;
 
-    struct ControlParams
-    {
-        // The location where the chick will be taken, i.e. where we expect the ball to be
-        // when we chip or kick it
-        Point ball_location;
-        // The direction the Robot will chick in
-        Angle chick_direction;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
-    GetBehindBallFSM();
+    /**
+     * Constructor for GetBehindBallFSM
+     *
+     * @param ai_config_ptr Shared pointer to ai_config
+     */
+    explicit GetBehindBallFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr){};
 
     /**
      * Action that updates the MovePrimitive
      *
-     * @param event GetBehindBallFSM::Update event
+     * @param event TacticFSM<GetBehindBallFSMControlParams>::Update event
      */
     void updateMove(const Update& event);
 
     /**
      * Guard that checks if the robot is behind the ball
      *
-     * @param event GetBehindBallFSM::Update event
+     * @param event TacticFSM<GetBehindBallFSMControlParams>::Update event
      *
      * @return if the robot is behind the ball
      */
