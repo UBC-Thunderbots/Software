@@ -21,7 +21,7 @@ def test_penalty_kick_no_goalie(simulated_test_runner):
         create_world_state(
             yellow_robot_locations=[],
             blue_robot_locations=[tbots_cpp.Point(-3, 0)],
-            ball_location=tbots_cpp.Point(0, 0),
+            ball_location=tbots_cpp.Point(-1.5, 0),
             ball_velocity=tbots_cpp.Vector(0, 0),
         ),
     )
