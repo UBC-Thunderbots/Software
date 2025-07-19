@@ -5,8 +5,7 @@
 #include "software/math/math_functions.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(
-    const Ball &ball, const Field &field,
-    TbotsProto::GoalieTacticConfig goalie_tactic_config)
+    const Ball &ball, const Field &field)
 {
     // Check if the ball is in the region where it will be at a sharp
     // angle to the goal -- if so, goalie should snap to goalposts
@@ -40,7 +39,7 @@ Point GoalieFSM::getGoaliePositionToBlock(
     }
 
     // Default to conservative depth when ball is at opposite end of field
-    double depth = goalie_tactic_config.conservative_depth_meters();
+    double depth = ai_config_ptr->goalie_tactic_config().conservative_depth_meters();
 
     if (field.pointInFriendlyHalf(ball.position()))
     {
@@ -48,8 +47,8 @@ Point GoalieFSM::getGoaliePositionToBlock(
         // from playing aggressively out far to a deeper conservative depth
         depth = normalizeValueToRange(ball.position().x(), snap_to_post_region_x,
                                       field.centerPoint().x(),
-                                      goalie_tactic_config.conservative_depth_meters(),
-                                      goalie_tactic_config.aggressive_depth_meters());
+                                      ai_config_ptr->goalie_tactic_config().conservative_depth_meters(),
+                                      ai_config_ptr->goalie_tactic_config().aggressive_depth_meters());
     }
 
     Vector goalie_direction_vector =
@@ -85,18 +84,18 @@ Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
 }
 
 Point GoalieFSM::findGoodChipTarget(
-    const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
+    const World &world)
 {
     // Default chip target is the enemy goal
     Point chip_target = world.field().enemyGoalCenter();
 
     // Avoid chipping out of field or towards friendly corners by restraining the
     // chip target to the region in front of the friendly defense area
-    Vector inset(goalie_tactic_config.chip_target_area_inset_meters(),
-                 -goalie_tactic_config.chip_target_area_inset_meters());
+    Vector inset(ai_config_ptr->goalie_tactic_config().chip_target_area_inset_meters(),
+                 -ai_config_ptr->goalie_tactic_config().chip_target_area_inset_meters());
     Vector offset_from_goal_line(
         world.field().defenseAreaXLength() +
-            goalie_tactic_config.min_chip_distance_from_crease_meters(),
+                ai_config_ptr->goalie_tactic_config().min_chip_distance_from_crease_meters(),
         0);
     Rectangle chip_target_area =
         Rectangle(world.field().friendlyCornerPos() + offset_from_goal_line + inset,
@@ -121,7 +120,7 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
                              ballInInflatedDefenseArea(event);
 
     // goalie should only evacuate crease if there are no enemy robots nearby
-    double safe_distance_multiplier = goalie_tactic_config.safe_distance_multiplier();
+    double safe_distance_multiplier = ai_config_ptr->goalie_tactic_config().safe_distance_multiplier();
     std::optional<Robot> nearest_enemy_robot =
         event.common.world_ptr->enemyTeam().getNearestRobot(ball.position());
     bool safe_to_evacuate = true;
@@ -135,7 +134,7 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
                            goalie_distance_to_ball;
     }
 
-    double ball_velocity_threshold = goalie_tactic_config.ball_speed_panic();
+    double ball_velocity_threshold = ai_config_ptr->goalie_tactic_config().ball_speed_panic();
     bool ball_is_stagnant          = ball.velocity().length() < ball_velocity_threshold;
 
     return ball_in_dead_zone && ball_is_stagnant && safe_to_evacuate;
@@ -143,7 +142,7 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
 
 bool GoalieFSM::shouldPanic(const Update &event)
 {
-    double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
+    double ball_speed_panic = ai_config_ptr->goalie_tactic_config().ball_speed_panic();
     std::vector<Point> intersections =
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(
             event.common.world_ptr->ball(), event.common.world_ptr->field());
@@ -153,7 +152,7 @@ bool GoalieFSM::shouldPanic(const Update &event)
 
 bool GoalieFSM::shouldPivotChip(const Update &event)
 {
-    double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
+    double ball_speed_panic = ai_config_ptr->goalie_tactic_config().ball_speed_panic();
     return event.common.world_ptr->ball().velocity().length() <= ball_speed_panic &&
            event.common.world_ptr->field().pointInFriendlyDefenseArea(
                event.common.world_ptr->ball().position());
@@ -161,7 +160,7 @@ bool GoalieFSM::shouldPivotChip(const Update &event)
 
 bool GoalieFSM::panicDone(const Update &event)
 {
-    double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
+    double ball_speed_panic = ai_config_ptr->goalie_tactic_config().ball_speed_panic();
     std::vector<Point> intersections =
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(
             event.common.world_ptr->ball(), event.common.world_ptr->field());
@@ -201,7 +200,7 @@ void GoalieFSM::updatePivotKick(
     Point chip_origin =
         Point(chip_origin_x, event.common.world_ptr->ball().position().y());
 
-    Point chip_target = findGoodChipTarget(*event.common.world_ptr, goalie_tactic_config);
+    Point chip_target = findGoodChipTarget(*event.common.world_ptr);
     Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{
@@ -219,7 +218,7 @@ void GoalieFSM::positionToBlock(const Update &event)
 {
     Point goalie_pos =
         getGoaliePositionToBlock(event.common.world_ptr->ball(),
-                                 event.common.world_ptr->field(), goalie_tactic_config);
+                                 event.common.world_ptr->field());
     Angle goalie_orientation =
         (event.common.world_ptr->ball().position() - goalie_pos).orientation();
 
