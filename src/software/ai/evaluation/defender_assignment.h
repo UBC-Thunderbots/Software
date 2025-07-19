@@ -10,7 +10,8 @@
 enum DefenderAssignmentType
 {
     CREASE_DEFENDER,
-    PASS_DEFENDER
+    PASS_DEFENDER,
+    SHADOW_ENEMY
 };
 
 // This struct stores the concept of a defender assignment, which describes
