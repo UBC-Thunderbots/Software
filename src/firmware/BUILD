@@ -15,6 +15,10 @@ cc_binary(
     deps = [
         ":mdv6_firmware",
     ],
+    exec_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:none",
+    ],
 )
 
 cc_library(

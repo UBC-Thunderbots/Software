@@ -425,6 +425,7 @@ register_toolchains(
     "//cc_toolchain:cc_toolchain_for_k8_jetson_nano_cross_compile",
     "//cc_toolchain:cc_toolchain_for_k8",
     "//cc_toolchain:cc_toolchain_for_aarch64",
+    "//cc_toolchain:cc_toolchain_stm32",
 )
 
 new_local_repository(

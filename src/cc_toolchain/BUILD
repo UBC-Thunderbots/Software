@@ -270,3 +270,13 @@ toolchain(
     toolchain = ":cc_toolchain_linux_aarch64_gcc",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
+
+toolchain(
+    name = "cc_toolchain_for_stm32",
+    exec_compatible_with = [
+        "@platforms//cpu:arm",
+        "@platforms//os:none",
+    ],
+    toolchain = ":cc_toolchain_stm32",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
