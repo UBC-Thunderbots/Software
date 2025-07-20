@@ -197,11 +197,11 @@ cc_toolchain(
 cc_toolchain_config_k8_jetson_nano_cross_compile(
     name = "gcc_k8_jetson_nano_cross_compile",
     builtin_include_directories = [
-        "external/+_repo_rules3+k8_jetson_nano_cross_compile_gcc/include/",
-        "external/+_repo_rules3+k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/include/",
-        "external/+_repo_rules3+k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/libc/lib/",
-        "external/+_repo_rules3+k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/libc/usr/include/",
-    ],
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/include/",
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/sysroot/usr/include/",
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/lib/gcc/aarch64-tbots-linux-gnu/8.5.0/include/",
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/lib/gcc/aarch64-tbots-linux-gnu/8.5.0/include-fixed",
+    ] + make_builtin_include_directories(),
     tool_paths = {
         "ar": "wrapper/k8_jetson_nano_cross_compile_ar",
         "cpp": "wrapper/k8_jetson_nano_cross_compile_cpp",
