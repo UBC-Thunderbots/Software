@@ -4,21 +4,21 @@
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
-struct KeepAwayFSM
+struct KeepAwayFSMControlParams
 {
+    std::optional<Pass> best_pass_so_far;
+};
+
+struct KeepAwayFSM : TacticFSM<KeepAwayFSMControlParams>
+{
+    using update = TacticFSM<KeepAwayFSMControlParams>::Update;
+
     /**
      * Constructor for KeepAwayFSM
      *
-     * @param ai_config The config to fetch parameters from
+     * @param ai_config_ptr The config to fetch parameters from
      */
-    explicit KeepAwayFSM(const TbotsProto::AiConfig& ai_config) : ai_config(ai_config) {};
-
-    struct ControlParams
-    {
-        std::optional<Pass> best_pass_so_far;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    explicit KeepAwayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<KeepAwayFSMControlParams>(ai_config_ptr) {}
 
     /**
      * Action that updates the DribbleFSM to keep the ball away
@@ -40,7 +40,4 @@ struct KeepAwayFSM
                                      DribbleFSM_S                             = X,
                                      X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
-
-   private:
-    TbotsProto::AiConfig ai_config;
 };
