@@ -5,7 +5,7 @@
 DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
       fsm_map(),
-      control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
+      control_params{DribbleFSMControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,
                                                .allow_excessive_dribbling = false}},
       ai_config(ai_config)

@@ -8,7 +8,7 @@ TEST(GetBehindBallFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    GetBehindBallFSM::ControlParams control_params{.ball_location   = Point(2, 3),
+    GetBehindBallFSMControlParams control_params{.ball_location   = Point(2, 3),
                                                    .chick_direction = Angle::quarter()};
 
     FSM<GetBehindBallFSM> fsm{GetBehindBallFSM()};
@@ -32,7 +32,7 @@ TEST(GetBehindBallFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // destination updated so robot needs to move to new destination
-    control_params = GetBehindBallFSM::ControlParams{.ball_location   = Point(-2, 1),
+    control_params = GetBehindBallFSMControlParams{.ball_location   = Point(-2, 1),
                                                      .chick_direction = Angle::quarter()};
     fsm.process_event(GetBehindBallFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));

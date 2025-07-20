@@ -40,6 +40,6 @@ class ReceiverTactic : public Tactic
 
     std::map<RobotId, std::unique_ptr<FSM<ReceiverFSM>>> fsm_map;
 
-    ReceiverFSM::ControlParams control_params;
+    ReceiverFSMControlParams control_params;
     TbotsProto::ReceiverTacticConfig receiver_config;
 };

@@ -6,7 +6,7 @@
 void PivotKickFSM::getPossessionAndPivot(
     const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
-    DribbleFSM::ControlParams control_params{
+    DribbleFSMControlParams control_params{
         .dribble_destination       = event.control_params.kick_origin,
         .final_dribble_orientation = event.control_params.kick_direction,
         .allow_excessive_dribbling = false};

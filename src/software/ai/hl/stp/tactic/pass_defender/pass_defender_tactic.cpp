@@ -7,7 +7,7 @@
 PassDefenderTactic::PassDefenderTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Kick}),
       fsm_map(),
-      control_params(PassDefenderFSM::ControlParams()),
+      control_params(PassDefenderFSMControlParams()),
       ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)

@@ -8,7 +8,7 @@ TEST(PivotKickFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    PivotKickFSM::ControlParams control_params{
+    PivotKickFSMControlParams control_params{
         .kick_origin       = Point(-2, 1.5),
         .kick_direction    = Angle::threeQuarter(),
         .auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK, 1.2}};

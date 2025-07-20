@@ -62,6 +62,6 @@ class CreaseDefenderTactic : public Tactic
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
     std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
-    CreaseDefenderFSM::ControlParams control_params;
+    CreaseDefenderFSMControlParams control_params;
     TbotsProto::AiConfig ai_config;
 };

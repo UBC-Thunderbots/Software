@@ -17,7 +17,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
                             DribbleFSM(ai_config.dribble_tactic_config()),
                             GetBehindBallFSM()};
 
-    PenaltyKickFSM::ControlParams control_params{};
+    PenaltyKickFSMControlParams control_params{};
 
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));

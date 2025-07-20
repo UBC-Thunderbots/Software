@@ -119,7 +119,7 @@ const Point PenaltyKickFSM::evaluateNextShotPosition(std::optional<Robot> enemy_
 void PenaltyKickFSM::shoot(const Update &event,
                            boost::sml::back::process<KickFSM::Update> processEvent)
 {
-    KickFSM::ControlParams control_params{
+    KickFSMControlParams control_params{
         .kick_origin                  = event.common.world_ptr->ball().position(),
         .kick_direction               = shot_angle,
         .kick_speed_meters_per_second = PENALTY_KICK_SHOT_SPEED};
@@ -137,7 +137,7 @@ void PenaltyKickFSM::updateApproachKeeper(
         (next_shot_position - event.common.world_ptr->ball().position()).orientation();
     Point position = field.enemyGoalCenter() + Vector(-field.defenseAreaXLength(), 0);
 
-    DribbleFSM::ControlParams control_params{
+    DribbleFSMControlParams control_params{
         .dribble_destination       = std::optional<Point>(position),
         .final_dribble_orientation = std::optional<Angle>(Angle::zero()),
         .allow_excessive_dribbling = false};
@@ -152,7 +152,7 @@ void PenaltyKickFSM::adjustOrientationForShot(
         evaluateNextShotPosition(enemy_goalie, event.common.world_ptr->field());
     Point final_position = event.common.world_ptr->ball().position();
     shot_angle           = (next_shot_position - final_position).orientation();
-    DribbleFSM::ControlParams control_params{
+    DribbleFSMControlParams control_params{
         .dribble_destination       = std::optional<Point>(final_position),
         .final_dribble_orientation = std::optional<Angle>(shot_angle),
         .allow_excessive_dribbling = false};

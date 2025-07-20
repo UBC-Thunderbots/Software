@@ -63,7 +63,7 @@ class MoveTactic : public Tactic
 
     std::map<RobotId, std::unique_ptr<FSM<MoveFSM>>> fsm_map;
 
-    MoveFSM::ControlParams control_params;
+    MoveFSMControlParams control_params;
 };
 
 // Creates duplicates of MoveTactic for various situations

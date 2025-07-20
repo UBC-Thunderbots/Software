@@ -35,5 +35,5 @@ class ShadowEnemyTactic : public Tactic
 
     std::map<RobotId, std::unique_ptr<FSM<ShadowEnemyFSM>>> fsm_map;
 
-    ShadowEnemyFSM::ControlParams control_params;
+    ShadowEnemyFSMControlParams control_params;
 };

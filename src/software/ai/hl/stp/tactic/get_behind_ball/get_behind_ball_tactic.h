@@ -32,5 +32,5 @@ class GetBehindBallTactic : public Tactic
 
     std::map<RobotId, std::unique_ptr<FSM<GetBehindBallFSM>>> fsm_map;
 
-    GetBehindBallFSM::ControlParams control_params;
+    GetBehindBallFSMControlParams control_params;
 };

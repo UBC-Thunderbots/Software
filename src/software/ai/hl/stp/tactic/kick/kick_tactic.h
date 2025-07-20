@@ -50,5 +50,5 @@ class KickTactic : public Tactic
     std::map<RobotId, std::unique_ptr<FSM<KickFSM>>> fsm_map;
 
     // Tactic parameters
-    KickFSM::ControlParams control_params;
+    KickFSMControlParams control_params;
 };

@@ -39,6 +39,6 @@ class PassDefenderTactic : public Tactic
 
     std::map<RobotId, std::unique_ptr<FSM<PassDefenderFSM>>> fsm_map;
 
-    PassDefenderFSM::ControlParams control_params;
+    PassDefenderFSMControlParams control_params;
     TbotsProto::AiConfig ai_config;
 };

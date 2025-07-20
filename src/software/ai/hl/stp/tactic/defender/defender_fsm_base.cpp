@@ -60,7 +60,7 @@ void DefenderFSMBase::prepareGetPossession(
     Point ball_position     = tactic_update.world_ptr->ball().position();
     Point enemy_goal_center = tactic_update.world_ptr->field().enemyGoal().centre();
     auto ball_to_net_vector = Vector(enemy_goal_center - ball_position);
-    DribbleFSM::ControlParams control_params{
+    DribbleFSMControlParams control_params{
         .dribble_destination       = ball_position,
         .final_dribble_orientation = ball_to_net_vector.orientation(),
         .allow_excessive_dribbling = false};

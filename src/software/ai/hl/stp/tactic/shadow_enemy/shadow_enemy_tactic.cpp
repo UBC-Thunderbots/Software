@@ -3,7 +3,7 @@
 ShadowEnemyTactic::ShadowEnemyTactic()
     : Tactic({RobotCapability::Move, RobotCapability::Kick}),
       fsm_map(),
-      control_params{ShadowEnemyFSM::ControlParams{.enemy_threat    = std::nullopt,
+      control_params{ShadowEnemyFSMControlParams{.enemy_threat    = std::nullopt,
                                                    .shadow_distance = 0}}
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)

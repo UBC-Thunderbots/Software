@@ -9,7 +9,7 @@
 ReceiverTactic::ReceiverTactic(const TbotsProto::ReceiverTacticConfig& receiver_config)
     : Tactic({RobotCapability::Move}),
       fsm_map(),
-      control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
+      control_params({ReceiverFSMControlParams{.pass                   = std::nullopt,
                                                  .disable_one_touch_shot = false}}),
       receiver_config(receiver_config)
 {

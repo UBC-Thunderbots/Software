@@ -13,7 +13,7 @@ PivotKickTactic::PivotKickTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
               RobotCapability::Dribble}),
       fsm_map(),
-      control_params(PivotKickFSM::ControlParams()),
+      control_params(PivotKickFSMControlParams()),
       ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)

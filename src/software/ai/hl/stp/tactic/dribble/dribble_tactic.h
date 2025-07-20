@@ -45,7 +45,7 @@ class DribbleTactic : public Tactic
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     std::map<RobotId, std::unique_ptr<FSM<DribbleFSM>>> fsm_map;
-    DribbleFSM::ControlParams control_params;
+    DribbleFSMControlParams control_params;
     TbotsProto::AiConfig ai_config;
 };
 
