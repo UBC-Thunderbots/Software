@@ -5,23 +5,28 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 
-struct PivotKickFSM
+struct PivotKickFSMControlParams
 {
+    // The location where the kick will be taken from
+    Point kick_origin;
+    // The direction the Robot will kick in
+    Angle kick_direction;
+    // How the robot will chip or kick the ball
+    AutoChipOrKick auto_chip_or_kick;
+};
+
+struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
+{
+    using Update = TacticFSM<PivotKickFSMControlParams>::Update;
     class KickState;
     class StartState;
 
-    struct ControlParams
-    {
-        // The location where the kick will be taken from
-        Point kick_origin;
-        // The direction the Robot will kick in
-        Angle kick_direction;
-        // How the robot will chip or kick the ball
-        AutoChipOrKick auto_chip_or_kick;
-    };
-
-    // this struct defines the only event that the PivotKickFSM responds to
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    /**
+     * Constructor for PivotKickFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+     explicit PivotKickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<PivotKickFSMControlParams>(ai_config_ptr) {}
 
     /**
      * Action that updates the DribbleFSM to get possession of the ball and pivot
