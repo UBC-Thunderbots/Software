@@ -84,9 +84,9 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 
         double shot_open_angle = best_shot_opt.value().getOpenAngle().toDegrees();
         double min_one_touch_open_angle =
-            receiver_tactic_config.min_open_angle_for_one_touch_deg();
+            ai_config_ptr->receiver_tactic_config().min_open_angle_for_one_touch_deg();
         double max_one_touch_deflection_angle =
-            receiver_tactic_config.max_deflection_for_one_touch_deg();
+            ai_config_ptr->receiver_tactic_config().max_deflection_for_one_touch_deg();
 
         // If we have a shot with a sufficiently large enough opening, and the
         // deflection angle that is reasonable, we should one-touch kick the ball
@@ -104,7 +104,7 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
     return !event.control_params.disable_one_touch_shot &&
-           receiver_tactic_config.enable_one_touch_kick() &&
+           ai_config_ptr->receiver_tactic_config().enable_one_touch_kick() &&
            (findFeasibleShot(*event.common.world_ptr, event.common.robot) !=
             std::nullopt);
 }
