@@ -47,7 +47,7 @@ class ChipTactic : public Tactic
     std::map<RobotId, std::unique_ptr<FSM<ChipFSM>>> fsm_map;
 
     // Tactic parameters
-    ChipFSM::ControlParams control_params;
+    ChipFSMControlParams control_params;
 };
 
 // Creates a new tactic called KickoffChipTactic that is a duplicate of ChipTactic
