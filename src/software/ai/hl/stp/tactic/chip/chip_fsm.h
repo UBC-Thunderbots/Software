@@ -3,22 +3,29 @@
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
-struct ChipFSM
+struct ChipFSMControlParams
+{
+    // The location where the chip will be taken from
+    Point chip_origin;
+    // The direction the Robot will chip in
+    Angle chip_direction;
+    // The distance the robot will chip to
+    double chip_distance_meters;
+};
+
+struct ChipFSM : TacticFSM<ChipFSMControlParams>
 {
    public:
+    using Update = TacticFSM<ChipFSMControlParams>::Update;
+
     class ChipState;
 
-    struct ControlParams
-    {
-        // The location where the chip will be taken from
-        Point chip_origin;
-        // The direction the Robot will chip in
-        Angle chip_direction;
-        // The distance the robot will chip to
-        double chip_distance_meters;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    /**
+     * Constructor for ChipFSM
+     *
+     * @param ai_config_ptr Shared pointer to ai_config
+     */
+    explicit ChipFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<ChipFSMControlParams>(ai_config_ptr) {}
 
     /**
      * Action that updates the MovePrimitive
