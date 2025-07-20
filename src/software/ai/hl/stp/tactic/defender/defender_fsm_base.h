@@ -42,7 +42,7 @@ struct DefenderFSMBase : TacticFSM<DefenderFSMBaseControlParams>
     /**
      * This is the Action that prepares for getting possession of the ball with FSMs
      * @param tactic_update the Defender's Update event
-     * @param processEvent processes the TacticFSM<DribbleFSMControlParams>::Update
+     * @param processEvent processes the DribbleFSM::Update
      */
     static void prepareGetPossession(
         const TacticUpdate& tactic_update,
