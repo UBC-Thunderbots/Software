@@ -29,14 +29,14 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
     /**
      * Action that updates the MovePrimitive
      *
-     * @param event TacticFSM<GetBehindBallFSMControlParams>::Update event
+     * @param event GetBehindBallFSM::Update event
      */
     void updateMove(const Update& event);
 
     /**
      * Guard that checks if the robot is behind the ball
      *
-     * @param event TacticFSM<GetBehindBallFSMControlParams>::Update event
+     * @param event GetBehindBallFSM::Update event
      *
      * @return if the robot is behind the ball
      */
