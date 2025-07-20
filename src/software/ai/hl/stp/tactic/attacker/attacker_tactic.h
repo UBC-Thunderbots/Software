@@ -53,7 +53,7 @@ class AttackerTactic : public Tactic
      * @param control_params The control parameters to visualize
      */
     void visualizeControlParams(const World& world,
-                                const AttackerFSM::ControlParams& control_params);
+                                const AttackerFSMControlParams& control_params);
 
     std::map<RobotId, std::unique_ptr<FSM<AttackerFSM>>> fsm_map;
 

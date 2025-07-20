@@ -61,7 +61,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
         shot = std::nullopt;
     }
 
-    AttackerFSM::ControlParams control_params{.best_pass_so_far = best_pass_so_far,
+    AttackerFSMControlParams control_params{.best_pass_so_far = best_pass_so_far,
                                               .pass_committed   = pass_committed,
                                               .shot             = shot,
                                               .chip_target      = chip_target};
@@ -73,7 +73,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 }
 
 void AttackerTactic::visualizeControlParams(
-    const World& world, const AttackerFSM::ControlParams& control_params)
+    const World& world, const AttackerFSMControlParams& control_params)
 {
     TbotsProto::AttackerVisualization pass_visualization_msg;
 
