@@ -51,7 +51,6 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * ball and the friendly goal
      * @param ball the ball to position the goalie relative to
      * @param field the field to position the goalie on
-     * @param goalie_tactic_config the goalie tactic config
      *
      * @return the position that the goalie should move to
      */
@@ -101,7 +100,7 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * and has a clear path to the goal, if both are true then the goalie should panic
      * and move to block the ball
      *
-     * @param event TacticFSM<GoalieFSMControlParams>::Update
+     * @param event GoalieFSM::Update
      *
      * @return if the goalie should panic
      */
@@ -114,7 +113,7 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * inside the defense area, if true then the goalie should dribble and chip the
      * ball
      *
-     * @param event TacticFSM<GoalieFSMControlParams>::Update
+     * @param event GoalieFSM::Update
      *
      * @return if the goalie should pivot chip the ball
      */
@@ -125,7 +124,7 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * or has no intersections with the friendly goal, if true then the goalie
      * should stop panicking
      *
-     * @param event TacticFSM<GoalieFSMControlParams>::Update
+     * @param event GoalieFSM::Update
      *
      * @return if the goalie should stop panicking
      */
