@@ -8,18 +8,20 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 
-struct PenaltyKickFSM
+struct PenaltyKickFSMControlParams
 {
+};
+
+struct PenaltyKickFSM : TacticFSM<PenaltyKickFSMControlParams>
+{
+    using Update = TacticFSM<PenaltyKickFSMControlParams>::Update;
     /**
      * Constructor for DribbleFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    PenaltyKickFSM();
+    explicit PenaltyKickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<PenaltyKickFSMControlParams>(ai_config_ptr), complete_approach(std::nullopt), shot_angle() {}
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Helper function that determines whether the shooter robot has a viable shot on net.
@@ -140,7 +142,6 @@ struct PenaltyKickFSM
     static const inline Duration PENALTY_FINISH_APPROACH_TIMEOUT =
         Duration::fromSeconds(4);
 
-   private:
     std::optional<Timestamp> complete_approach;
     Angle shot_angle;
 };
