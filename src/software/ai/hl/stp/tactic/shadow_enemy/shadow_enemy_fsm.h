@@ -7,27 +7,33 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
-struct ShadowEnemyFSM
+// this struct defines the unique control parameters that the ShadowEnemyFSM requires
+// in its update
+struct ShadowEnemyFSMControlParams
+{
+    // The Enemy Threat indicating which enemy to shadow
+    std::optional<EnemyThreat> enemy_threat;
+
+    // How far from the enemy the robot will position itself to shadow. If the enemy
+    // threat has the ball, it will position itself to block the shot on goal.
+    // Otherwise it will try to block the pass to the enemy threat.
+    double shadow_distance;
+};
+
+
+struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
 {
    public:
+    using Update = TacticFSM<ShadowEnemyFSMControlParams>::Update;
     class BlockPassState;
     class StealAndChipState;
 
-    // this struct defines the unique control parameters that the ShadowEnemyFSM requires
-    // in its update
-    struct ControlParams
-    {
-        // The Enemy Threat indicating which enemy to shadow
-        std::optional<EnemyThreat> enemy_threat;
-
-        // How far from the enemy the robot will position itself to shadow. If the enemy
-        // threat has the ball, it will position itself to block the shot on goal.
-        // Otherwise it will try to block the pass to the enemy threat.
-        double shadow_distance;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
+    /**
+     * Constructor for ShadowEnemyFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit ShadowEnemyFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr) {}
 
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
