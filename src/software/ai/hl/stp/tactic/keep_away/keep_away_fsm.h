@@ -11,7 +11,7 @@ struct KeepAwayFSMControlParams
 
 struct KeepAwayFSM : TacticFSM<KeepAwayFSMControlParams>
 {
-    using update = TacticFSM<KeepAwayFSMControlParams>::Update;
+    using Update = TacticFSM<KeepAwayFSMControlParams>::Update;
 
     /**
      * Constructor for KeepAwayFSM
