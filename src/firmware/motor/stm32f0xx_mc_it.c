@@ -27,7 +27,7 @@
 #include "firmware/motor/parameters_conversion.h"
 #include "firmware/motor/motorcontrol.h"
 #include "firmware/motor/stm32f0xx/stm32f0xx_hal.h"
-#include "firmware/motor/stm32f0xx.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx.h"
 
 /* USER CODE BEGIN Includes */
 

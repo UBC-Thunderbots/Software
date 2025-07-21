@@ -20,7 +20,9 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "ntc_temperature_sensor.h"
+#include "firmware/motor/mcsdk/ntc_temperature_sensor.h"
+
+#include "firmware/motor/common_defs.h"
 
 /** @addtogroup MCSDK
   * @{

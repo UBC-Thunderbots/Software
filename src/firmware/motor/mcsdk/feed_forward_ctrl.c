@@ -51,7 +51,7 @@
 
 #include "firmware/motor/mcsdk/mc_type.h"
 #include "firmware/motor/mcsdk/bus_voltage_sensor.h"
-#include "firmware/motor/speed_pos_fdbk.h"
+#include "firmware/motor/mcsdk/speed_pos_fdbk.h"
 #include "firmware/motor/speed_torq_ctrl.h"
 #include "firmware/motor/r_divider_bus_voltage_sensor.h"
 

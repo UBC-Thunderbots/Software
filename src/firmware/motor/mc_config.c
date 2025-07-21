@@ -20,10 +20,10 @@
 //cstat -MISRAC2012-Rule-21.1
 #include "firmware/motor/main.h" //cstat !MISRAC2012-Rule-21.1
 //cstat +MISRAC2012-Rule-21.1
-#include "firmware/motor/mc_type.h"
-#include "firmware/motor/parameters_conversion.h"
 #include "firmware/motor/mc_parameters.h"
 #include "firmware/motor/mc_config.h"
+#include "firmware/motor/mcsdk/mc_type.h"
+#include "firmware/motor/parameters_conversion.h"
 
 /* USER CODE BEGIN Additional include */
 
@@ -32,7 +32,7 @@
 #define FREQ_RATIO 1                /* Dummy value for single drive */
 #define FREQ_RELATION HIGHEST_FREQ  /* Dummy value for single drive */
 
-#include "pqd_motor_power_measurement.h"
+#include "firmware/motor/mcsdk/pqd_motor_power_measurement.h"
 
 /* USER CODE BEGIN Additional define */
 

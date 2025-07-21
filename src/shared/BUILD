@@ -20,6 +20,16 @@ cc_library(
 )
 
 cc_library(
+    name = "crc",
+    srcs = [
+        "crc.c",
+    ],
+    hdrs = [
+        "crc.h",
+    ],
+)
+
+cc_library(
     name = "robot_constants",
     srcs = [
         "2021_robot_constants.cpp",

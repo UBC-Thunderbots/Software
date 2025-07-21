@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -26,7 +26,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -39,37 +38,24 @@ extern "C" {
   * @{
   */
 
-/**
-  * @define MISRA_C_2004_BUILD
-  * @brief Used to build the library with MISRA C support
-  *
-  * Uncomment #define MISRA_C_2004_BUILD to build the library including
-  * "stm32fxxx_MisraCompliance.h" instead of "stm32fxxx.h".
-  *
-  * This will build the library in 'strict ISO/ANSI C' and in
-  * compliance with MISRA C 2004 rules (check project options).
-  *
-  * @note Do not use this flag with the current version of the SDK.
-  */
-/*#define MISRA_C_2004_BUILD*/
-
-#include "mc_stm_types.h"
+#include "firmware/motor/mcsdk/mc_stm_types.h"
 
 /* char definition to match Misra Dir 4.6 typedefs that indicate size and
  * signedness should be used in place ofthe basic numerical types */
 typedef int8_t          char_t;
-typedef uint8_t         uchar_t;
 
 #ifndef _MATH
 typedef float           float_t;
 #endif
 
-
 /** @name Macros to use bit banding capability */
 /** @{ */
-#define BB_REG_BIT_SET(regAddr,bit_number) *(uint32_t *) (0x42000000+(((uint32_t)regAddr - 0x40000000 )<<5) + (bit_number <<2)) = (uint32_t)(0x1u)
-#define BB_REG_BIT_CLR(regAddr,bit_number) (*(uint32_t *) (0x42000000+(((uint32_t)regAddr - 0x40000000)<<5) + (bit_number <<2)) = (uint32_t)(0x0u))
-#define BB_REG_BIT_READ(regAddr,bit_number) (*(uint32_t *) (0x42000000+(((uint32_t)regAddr - 0x40000000)<<5) + (bit_number <<2)) )
+#define BB_REG_BIT_SET(regAddr,bit_number) *(uint32_t *) (0x42000000+(((uint32_t)regAddr - 0x40000000 )<<5)\
+                                           + (bit_number <<2)) = (uint32_t)(0x1u)
+#define BB_REG_BIT_CLR(regAddr,bit_number) (*(uint32_t *) (0x42000000+(((uint32_t)regAddr - 0x40000000)<<5)\
+                                           + (bit_number <<2)) = (uint32_t)(0x0u))
+#define BB_REG_BIT_READ(regAddr,bit_number) (*(uint32_t *) (0x42000000+(((uint32_t)regAddr - 0x40000000)<<5)\
+                                           + (bit_number <<2)) )
 /** @} */
 
 /** @brief Not initialized pointer */
@@ -82,22 +68,24 @@ typedef float           float_t;
 #define M_NONE  (uint8_t)(0xFF) /*!< None motor.*/
 /** @} */
 
-/** 
- * @anchor fault_codes 
+/**
+ * @anchor fault_codes
  * @name Fault codes
- * The symbols below define the codes associated to the faults that the 
+ * The symbols below define the codes associated to the faults that the
  * Motor Control subsystem can raise.
  * @{ */
-#define  MC_NO_ERROR     ((uint16_t)0x0000) /**< @brief No error.*/
-#define  MC_NO_FAULTS    ((uint16_t)0x0000) /**< @brief No error.*/
-#define  MC_DURATION     ((uint16_t)0x0001) /**< @brief Error: FOC rate to high.*/
-#define  MC_OVER_VOLT    ((uint16_t)0x0002) /**< @brief Error: Software over voltage.*/
-#define  MC_UNDER_VOLT   ((uint16_t)0x0004) /**< @brief Error: Software under voltage.*/
-#define  MC_OVER_TEMP    ((uint16_t)0x0008) /**< @brief Error: Software over temperature.*/
-#define  MC_START_UP     ((uint16_t)0x0010) /**< @brief Error: Startup failed.*/
-#define  MC_SPEED_FDBK   ((uint16_t)0x0020) /**< @brief Error: Speed feedback.*/
-#define  MC_BREAK_IN     ((uint16_t)0x0040) /**< @brief Error: Emergency input (Over current).*/
-#define  MC_SW_ERROR     ((uint16_t)0x0080) /**< @brief Software Error.*/
+#define  MC_NO_ERROR     ((uint16_t)0x0000) /**< @brief No error. */
+#define  MC_NO_FAULTS    ((uint16_t)0x0000) /**< @brief No error. */
+#define  MC_DURATION     ((uint16_t)0x0001) /**< @brief Error: FOC rate to high. */
+#define  MC_OVER_VOLT    ((uint16_t)0x0002) /**< @brief Error: Software over voltage. */
+#define  MC_UNDER_VOLT   ((uint16_t)0x0004) /**< @brief Error: Software under voltage. */
+#define  MC_OVER_TEMP    ((uint16_t)0x0008) /**< @brief Error: Software over temperature. */
+#define  MC_START_UP     ((uint16_t)0x0010) /**< @brief Error: Startup failed. */
+#define  MC_SPEED_FDBK   ((uint16_t)0x0020) /**< @brief Error: Speed feedback. */
+#define  MC_OVER_CURR    ((uint16_t)0x0040) /**< @brief Error: Emergency input (Over current). */
+#define  MC_SW_ERROR     ((uint16_t)0x0080) /**< @brief Software Error. */
+#define  MC_DP_FAULT     ((uint16_t)0x0400) /**< @brief Error Driver protection fault. */
+
 /** @}*/
 
 /** @name Dual motor Frequency comparison definition */
@@ -109,6 +97,17 @@ typedef float           float_t;
 #define HIGHEST_FREQ 1U
 #define LOWEST_FREQ  2U
 /** @} */
+
+/** @name Error codes */
+/** @{ */
+#define MC_SUCCESS                          ((uint32_t)(0u))    /**< Success. The function executed successfully. */
+#define MC_WRONG_STATE_ERROR                ((uint32_t)(1u))    /**< The state machine of the motor is not in a suitable state. */
+#define MC_NO_POLARIZATION_OFFSETS_ERROR    ((uint32_t)(2u))    /**< Polarization offsets are needed but missing */
+
+/** @} */
+
+/** @brief Return type of API functions that return a status */
+typedef uint32_t MC_RetStatus_t;
 
 /**
   * @brief union type definition for u32 to Float conversion and vice versa
@@ -168,16 +167,16 @@ typedef struct
 } alphabeta_t;
 
 /* ACIM definitions start */
-typedef struct 
+typedef struct
 {
   float fS_Component1;
   float fS_Component2;
 } Signal_Components;
 
-/** 
-  * @brief  Two components type definition 
+/**
+  * @brief  Two components type definition
   */
-typedef struct 
+typedef struct
 {
   int16_t qVec_Component1;
   int16_t qVec_Component2;
@@ -185,17 +184,8 @@ typedef struct
 /* ACIM definitions end */
 
 /**
-  * @brief  ADConv_t type definition, it is used by PWMC_ADC_SetSamplingTime method of PWMnCurrFdbk class for user defined A/D regular conversions
-  */
-typedef struct
-{
-  uint8_t Channel;   /*!< Integer channel number, from 0 to 15 */
-  uint8_t SamplTime; /*!< Sampling time selection, ADC_SampleTime_nCycles5*/
-} ADConv_t;
-
-/**
-  * @brief  SensorType_t type definition, it's used in BusVoltageSensor and TemperatureSensor component parameters structures
-  *       to specify whether the sensor is real or emulated by SW
+  * @brief  SensorType_t type definition, it's used in BusVoltageSensor and TemperatureSensor component parameters
+  *         structures to specify whether the sensor is real or emulated by SW.
   */
 typedef enum
 {
@@ -203,8 +193,8 @@ typedef enum
 } SensorType_t;
 
 /**
-  * @brief  DOutputState_t type definition, it's used by DOUT_SetOutputState method of DigitalOutput class to specify the
-  *     required output state
+  * @brief  DOutputState_t type definition, it's used by DOUT_SetOutputState method of DigitalOutput class to specify
+  *         the required output state.
   */
 typedef enum
 {
@@ -212,35 +202,42 @@ typedef enum
 } DOutputState_t;
 
 /**
-  * @brief  DrivingMode_t type definition, it's used by 
-  *         Bemf_ADC class to specify the driving mode type
+  * @brief  DrivingMode_t type definition, it's used by Bemf_ADC class to specify the driving mode type.
   */
 typedef enum
 {
-  VM, /**< @brief Voltage mode.*/
-  CM   /**< @brief Current mode.*/
+  VM,  /**< @brief Voltage mode. */
+  CM   /**< @brief Current mode. */
 } DrivingMode_t;
 
 /**
-  * @brief  Specifies the control modality of the motor
+  * @brief  Specifies the control modality of the motor.
   */
 typedef enum
 {
-  MCM_OBSERVING_MODE = 0,       /**< @brief not used */
-  MCM_OPEN_LOOP_VOLTAGE_MODE,   /**< @brief Open loop, duty cycle set as reference */
-  MCM_OPEN_LOOP_CURRENT_MODE,   /**< @brief Open loop, q & d currents set as reference */
+  MCM_OBSERVING_MODE = 0,       /**< @brief All transistors are opened in order to let the motor spin freely and
+                                  *   observe Bemf thanks to phase voltage measurements.
+                                  *
+                                  * Only relevant when HSO is used.
+                                  */
+  MCM_OPEN_LOOP_VOLTAGE_MODE,   /**< @brief Open loop, duty cycle set as reference. */
+  MCM_OPEN_LOOP_CURRENT_MODE,   /**< @brief Open loop, q & d currents set as reference. */
   MCM_SPEED_MODE,               /**< @brief Closed loop, Speed mode.*/
   MCM_TORQUE_MODE,              /**< @brief Closed loop, Torque mode.*/
-  MCM_PROFILING_MODE,           /**< @brief not used */
-  MCM_SHORTED_MODE,             /**< @brief not used */
-  MCM_POSITION_MODE,            /**< @brief Closed loop, sensored position control mode */
-  MCM_MODE_NUM                  /**< @brief Number of modes in enum */
+  MCM_PROFILING_MODE,           /**< @brief FW is configured to execute the motor profiler feature.
+                                  *
+                                  * Only relevant when HSO is used.
+                                  */
+  MCM_SHORTED_MODE,             /**< @brief Low sides are turned on.
+                                  *
+                                  * Only relevant when HSO is used.
+                                  */
+  MCM_POSITION_MODE,            /**< @brief Closed loop, sensored position control mode. */
+  MCM_MODE_NUM                  /**< @brief Number of modes in enum. */
 } MC_ControlMode_t;
 
-
-
 /**
-  * @brief Structure type definition for feed-forward constants tuning
+  * @brief Structure type definition for feed-forward constants tuning.
   */
 typedef struct
 {
@@ -261,7 +258,7 @@ typedef struct
 } PolarizationOffsets_t;
 
 /**
-  * @brief  Current references source type, internal or external to FOCDriveClass
+  * @brief  Current references source type, internal or external to FOCDriveClass.
   */
 typedef enum
 {
@@ -269,52 +266,88 @@ typedef enum
 } CurrRefSource_t ;
 
 /**
-  * @brief  FOC variables structure
+  * @brief  FOC variables structure.
   */
 typedef struct
 {  //cstat !MISRAC2012-Dir-4.8
 
-  ab_t Iab;                     /**< @brief Stator current on stator reference frame abc */
-  alphabeta_t Ialphabeta;       /**< @brief Stator current on stator reference frame alfa-beta*/
-  qd_t IqdHF;                   /**< @brief Stator current on stator reference frame alfa-beta*/
-  qd_t Iqd;                     /**< @brief Stator current on rotor reference frame qd */
-  qd_t Iqdref;                  /**< @brief Stator current on rotor reference frame qd */
-  int16_t UserIdref;            /**< @brief User value for the Idref stator current */
-  qd_t Vqd;                     /**< @brief Phase voltage on rotor reference frame qd */
-  alphabeta_t Valphabeta;       /**< @brief Phase voltage on stator reference frame alpha-beta*/
-  int16_t hTeref;               /**< @brief Reference torque */
-  int16_t hElAngle;             /**< @brief Electrical angle used for reference frame transformation  */
-  uint16_t hCodeError;          /**< @brief Error Code */
+  ab_t Iab;                     /**< @brief Stator current on stator reference frame abc.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  alphabeta_t Ialphabeta;       /**< @brief Stator current on stator reference frame alfa-beta.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  qd_t IqdHF;                   /**< @brief Stator current on stator reference frame alfa-beta.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  qd_t Iqd;                     /**< @brief Stator current on rotor reference frame qd.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  qd_t Iqdref;                  /**< @brief Stator current on rotor reference frame qd.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  int16_t UserIdref;            /**< @brief User value for the Idref stator current.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  qd_t Vqd;                     /**< @brief Phase voltage on rotor reference frame qd.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  alphabeta_t Valphabeta;       /**< @brief Phase voltage on stator reference frame alpha-beta.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  int16_t hTeref;               /**< @brief Reference torque.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  int16_t hElAngle;             /**< @brief Electrical angle used for reference frame transformation.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
+  uint16_t hCodeError;          /**< @brief Error Code.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
   CurrRefSource_t bDriveInput;  /**< @brief Specifies whether the current reference source must be
-                                  *         #INTERNAL or #EXTERNAL*/
+                                  *         #INTERNAL or #EXTERNAL.
+                                  *
+                                  * @note This field does not exists if HSO is used.
+                                  */
 } FOCVars_t, *pFOCVars_t;
 
 /**
-  * @brief  6step variables structure
+  * @brief  6step variables structure.
   */
 typedef struct
 {
-  uint16_t DutyCycleRef;              /**< @brief Reference speed */
-  uint16_t hCodeError;         /**< @brief error message */
-  CurrRefSource_t bDriveInput; /**< @brief It specifies whether the current reference source must be
-                                 *         #INTERNAL or #EXTERNAL*/
+  uint16_t DutyCycleRef;        /**< @brief Reference speed. */
+  uint16_t hCodeError;          /**< @brief error message. */
+  CurrRefSource_t bDriveInput;  /**< @brief It specifies whether the current reference source must be
+                                 *          #INTERNAL or #EXTERNAL. */
   int16_t qElAngle;
 } SixStepVars_t, *pSixStepVars_t;
 
 /**
-  * @brief  Low side or enabling signal definition
+  * @brief  Low side or enabling signal definition.
   */
 
 typedef enum
 {
-  LS_DISABLED  = 0x0U,    /**< @brief Low side signals and enabling signals always off.
-                                         It is equivalent to DISABLED. */
-  LS_PWM_TIMER = 0x1U,  /**< @brief Low side PWM signals are generated by timer. It is
-                                         equivalent to ENABLED. */
-  ES_GPIO   = 0x2U             /**< @brief Enabling signals are managed by GPIOs (L6230 mode).*/
+  LS_DISABLED  = 0x0U,   /**< @brief Low side signals and enabling signals always off.
+                                     It is equivalent to DISABLED. */
+  LS_PWM_TIMER = 0x1U,   /**< @brief Low side PWM signals are generated by timer.
+                                     It is equivalent to ENABLED. */
+  ES_GPIO   = 0x2U       /**< @brief Enabling signals are managed by GPIOs (L6230 mode). */
 } LowSideOutputsFunction_t;
 
-/** @name UserInterface related exported definitions */
+/** @name UserInterface related exported definitions. */
 /** @{ */
 #define OPT_NONE    0x00 /**< @brief No UI option selected. */
 #define OPT_COM     0x02 /**< @brief Bit field indicating that the UI uses serial communication. */
@@ -342,14 +375,14 @@ typedef enum
 #define PFC_SW_MAIN_VOLT    0x0020U /**< @brief PFC mains voltage error. */
 /** @} */
 
-/** @name Definitions exported for the DAC channel used as reference for protection */
+/** @name Definitions exported for the DAC channel used as reference for protection. */
 /** @{ */
-#define AO_DISABLED 0x00U /**< @brief Analog output disabled.*/
-#define AO_DEBUG    0x01U /**< @brief Analog output debug.*/
-#define VREF_OCPM1  0x02U /**< @brief Voltage reference for over current protection of motor 1.*/
-#define VREF_OCPM2  0x03U /**< @brief Voltage reference for over current protection of motor 2.*/
-#define VREF_OCPM12 0x04U /**< @brief Voltage reference for over current protection of both motors.*/
-#define VREF_OVPM12 0x05U /**< @brief Voltage reference for over voltage protection of both motors.*/
+#define AO_DISABLED 0x00U /**< @brief Analog output disabled. */
+#define AO_DEBUG    0x01U /**< @brief Analog output debug. */
+#define VREF_OCPM1  0x02U /**< @brief Voltage reference for over current protection of motor 1. */
+#define VREF_OCPM2  0x03U /**< @brief Voltage reference for over current protection of motor 2. */
+#define VREF_OCPM12 0x04U /**< @brief Voltage reference for over current protection of both motors. */
+#define VREF_OVPM12 0x05U /**< @brief Voltage reference for over voltage protection of both motors. */
 /** @} */
 
 /** @name ADC channel number definitions */
@@ -373,6 +406,10 @@ typedef enum
 #define MC_ADC_CHANNEL_16    16
 #define MC_ADC_CHANNEL_17    17
 #define MC_ADC_CHANNEL_18    18
+#define MC_ADC_CHANNEL_19    19
+#define MC_ADC_CHANNEL_20    20
+#define MC_ADC_CHANNEL_21    21
+#define MC_ADC_CHANNEL_22    22
 /** @} */
 
 /** @name Utility macros definitions */
@@ -394,4 +431,5 @@ typedef enum
 #endif /* __cpluplus */
 
 #endif /* MC_TYPE_H */
-/******************* (C) COPYRIGHT 2022 STMicroelectronics *****END OF FILE****/
+/******************* (C) COPYRIGHT 2024 STMicroelectronics *****END OF FILE****/
+

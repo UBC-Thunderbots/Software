@@ -28,7 +28,7 @@
 #include "firmware/motor/mcsdk/encoder_speed_pos_fdbk.h"
 
 #include "firmware/motor/common_defs.h"
-#include "firmware/motor/mc_type.h"
+#include "firmware/motor/mcsdk/mc_type.h"
 
 /** @addtogroup MCSDK
   * @{

@@ -23,13 +23,13 @@
 //cstat -MISRAC2012-Rule-21.1
 #include "firmware/motor/main.h"
 //cstat +MISRAC2012-Rule-21.1
-#include "firmware/motor/mc_type.h"
 #include "firmware/motor/mc_math.h"
+#include "firmware/motor/mcsdk/digital_output.h"
+#include "firmware/motor/mcsdk/mc_type.h"
+#include "firmware/motor/mcsdk/pwm_common.h"
 #include "firmware/motor/motorcontrol.h"
 #include "firmware/motor/regular_conversion_manager.h"
 #include "firmware/motor/mc_interface.h"
-#include "firmware/motor/digital_output.h"
-#include "firmware/motor/pwm_common.h"
 
 #include "mc_tasks.h"
 #include "parameters_conversion.h"

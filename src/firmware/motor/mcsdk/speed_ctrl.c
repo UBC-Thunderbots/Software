@@ -20,10 +20,11 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "speed_ctrl.h"
-#include "speed_pos_fdbk.h"
+#include "firmware/motor/mcsdk/speed_ctrl.h"
 
-#include "mc_type.h"
+#include "firmware/motor/common_defs.h"
+#include "firmware/motor/mcsdk/mc_type.h"
+#include "firmware/motor/mcsdk/speed_pos_fdbk.h"
 
 #define CHECK_BOUNDARY
 

@@ -8,7 +8,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -28,9 +28,9 @@
  ************************/
 
 /***************** MOTOR ELECTRICAL PARAMETERS  ******************************/
-#define POLE_PAIR_NUM          8 /* Number of motor pole pairs */
-#define RS                     0.94 /* Stator resistance , ohm*/
-#define LS                     0.000363 /* Stator inductance, H
+#define POLE_PAIR_NUM           8 /* Number of motor pole pairs */
+#define RS                      0.64 /* Stator resistance , ohm*/
+#define LS                      0.00027 /* Stator inductance, H
                                                  For I-PMSM it is equal to Lq */
 
 /* When using Id = 0, NOMINAL_CURRENT is utilized to saturate the output of the
@@ -41,10 +41,12 @@
                                    *Amplifying network gain)/(MCU supply voltage/2)
 */
 
-#define NOMINAL_CURRENT         4165
-#define MOTOR_MAX_SPEED_RPM     10000 /*!< Maximum rated speed  */
+#define MOTOR_MAX_SPEED_RPM     4840 /*!< Maximum rated speed  */
 #define MOTOR_VOLTAGE_CONSTANT  3.8 /*!< Volts RMS ph-ph /kRPM */
-#define ID_DEMAG                -4165 /*!< Demagnetization current */
+#define NOMINAL_CURRENT_A       9.5
+
+#define ID_DEMAG_A              -9.5 /*!< Demagnetization current */
+
 /***************** MOTOR SENSORS PARAMETERS  ******************************/
 /* Motor sensors parameters are always generated but really meaningful only
    if the corresponding sensor is actually present in the motor         */
@@ -62,8 +64,8 @@
                                                  signal H1 and the maximum of
                                                  the Bemf induced on phase A */
 /*** Quadrature encoder ***/
-#define M1_ENCODER_PPR             1024  /*!< Number of pulses per
+#define M1_ENCODER_PPR          400  /*!< Number of pulses per
                                             revolution */
 
 #endif /* PMSM_MOTOR_PARAMETERS_H */
-/******************* (C) COPYRIGHT 2022 STMicroelectronics *****END OF FILE****/
+/******************* (C) COPYRIGHT 2024 STMicroelectronics *****END OF FILE****/

@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -30,7 +30,6 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "mc_type.h"
 
-
 /* Exported defines ------------------------------------------------------------*/
 
 #define SECTOR_1  0U
@@ -40,7 +39,7 @@ extern "C" {
 #define SECTOR_5  4U
 #define SECTOR_6  5U
 /*  @brief Used in calculation of Ia, Ib and Ic
-  * 
+  *
   * See function PWMC_CalcPhaseCurrentsEst
   */
 #define SQRT3FACTOR ((uint16_t)0xDDB4) /* = (16384 * 1.732051 * 2)*/
@@ -118,16 +117,6 @@ typedef void (*PWMC_SetOcpRefVolt_Cb_t)(PWMC_Handle_t *pHandle, uint16_t hDACVre
 typedef uint16_t (*PWMC_SetSampPointSectX_Cb_t)(PWMC_Handle_t *pHandle);
 
 /**
-  * @brief Pointer on the function provided by the PMWC component instance to check if an over current
-  *        condition has occured.
-  *
-  * This type is needed because the actual function to use can change at run-time
-  * (See PWMC_Handle::pFctIsOverCurrentOccurred).
-  *
-  */
-typedef uint16_t (*PWMC_OverCurr_Cb_t)(PWMC_Handle_t *pHandle);
-
-/**
   * @brief Pointer on the function provided by the PMWC component instance to set the PWM duty cycle
   *        in RL detection mode.
   *
@@ -174,8 +163,6 @@ struct PWMC_Handle
   pFctTurnOnLowSides;                        /**< Pointer on the function the component instance uses to turn low sides on. */
   PWMC_SetSampPointSectX_Cb_t
   pFctSetADCSampPointSectX;                  /**< Pointer on the function the component instance uses to set the ADC sampling point. */
-  PWMC_OverCurr_Cb_t
-  pFctIsOverCurrentOccurred;                 /**< Pointer on the fct the component instance uses to return the over current status. */
   PWMC_SetOcpRefVolt_Cb_t
   pFctOCPSetReferenceVoltage;                /**< Pointer on the fct the component instance uses to set the over current ref voltage. */
   PWMC_Generic_Cb_t
@@ -185,13 +172,21 @@ struct PWMC_Handle
   PWMC_RLDetectSetDuty_Cb_t
   pFctRLDetectionModeSetDuty;                /**< Pointer on the fct the component instance uses to set the PWM duty cycle in RL
                                                   detection mode. */
+  PWMC_Generic_Cb_t
+  pFctRLTurnOnLowSidesAndStart;              /**< Pointer on the function the component instance uses to turn on low side and start. */
   PWMC_SetOffsetCalib_Cb_t
   pFctSetOffsetCalib;                        /**< Pointer on the fct the component instance uses to set the calibrated offsets. */
   PWMC_GetOffsetCalib_Cb_t
   pFctGetOffsetCalib;                        /**< Pointer on the fct the component instance uses to get the calibrated offsets. */
   /** @} */
-  int32_t   LPFIqBuf;                                  /**< LPF buffer for @f$ I_q @f$. */
-  int32_t   LPFIdBuf;                                  /**< LPF buffer for @f$ I_d @f$. */
+  int32_t   LPFIqBuf;                        /**< Low Pass Filter buffer used for averaged @f$ I_q @f$ value computation. */
+  int32_t   LPFIdBuf;                        /**< Low Pass Filter Buffer used for averaged @f$ I_d @f$ value computation. */
+  GPIO_TypeDef * pwm_en_u_port;                        /*!< Channel 1N (low side) GPIO output */
+  GPIO_TypeDef * pwm_en_v_port;                        /*!< Channel 2N (low side) GPIO output*/
+  GPIO_TypeDef * pwm_en_w_port;                        /*!< Channel 3N (low side)  GPIO output */
+  uint16_t pwm_en_u_pin;                               /*!< Channel 1N (low side) GPIO output pin. */
+  uint16_t pwm_en_v_pin;                               /*!< Channel 2N (low side) GPIO output pin. */
+  uint16_t pwm_en_w_pin;                               /*!< Channel 3N (low side)  GPIO output pin. */
   uint16_t  hT_Sqrt3;                                  /**< Constant used by PWM algorithm (@f$\sqrt{3}@f$). */
   uint16_t  CntPhA;                                    /**< PWM Duty cycle for phase A. */
   uint16_t  CntPhB;                                    /**< PWM Duty cycle for phase B. */
@@ -203,32 +198,36 @@ struct PWMC_Handle
   uint16_t  HighDutyStored;                            /**< Discontinuous PWM Store current Highest Duty for recovering.  */
   uint16_t  OffCalibrWaitTimeCounter;                  /**< Counter to wait fixed time before motor
                                                             current measurement offset calibration. */
-  int16_t   Ia;                                        /**< Last @f$I_{A}@f$ measurement. */
-  int16_t   Ib;                                        /**< Last @f$I_{B}@f$ measurement. */
-  int16_t   Ic;                                        /**< Last @f$I_{C}@f$ measurement. */
-  int16_t   IaEst;                                     /**< @f$I_{A}@f$ estimated. */
-  int16_t   IbEst;                                     /**< @f$I_{B}@f$ estimated. */
-  int16_t   IcEst;                                     /**< @f$I_{C}@f$ estimated. */
-  int16_t   LPFIqd_const;                              /**< Low pass filter constant. */
-  uint16_t  DTTest;                                    /**< Reserved. */
+  int16_t   Ia;                                        /**< Last @f$I_{a}@f$ measurement. */
+  int16_t   Ib;                                        /**< Last @f$I_{b}@f$ measurement. */
+  int16_t   Ic;                                        /**< Last @f$I_{c}@f$ measurement. */
+  int16_t   IaEst;                           /**< Estimated @f$I_{a}@f$ based on averaged @f$ I_q @f$,@f$ I_d @f$ values and used when @f$I_{a}@f$ current is not available. */
+  int16_t   IbEst;                           /**< Estimated @f$I_{b}@f$ based on averaged @f$ I_q @f$,@f$ I_d @f$ values and used when @f$I_{b}@f$ current is not available. */
+  int16_t   IcEst;                           /**< Estimated @f$I_{c}@f$ based on averaged @f$ I_q @f$,@f$ I_d @f$ values and used when @f$I_{c}@f$ current is not available. */
+  int16_t   LPFIqd_const;                              /**< Low pass filter constant (averaging coeficient). */
   uint16_t PWMperiod;                                  /**< PWM period expressed in timer clock cycles unit:
                                                          *  @f$hPWMPeriod = TimerFreq_{CLK} / F_{PWM}@f$    */
-   uint16_t DTCompCnt;                                 /**< Half of Dead time expressed
-                                                         *  in timer clock cycles unit:
-                                                         *  @f$hDTCompCnt = (DT_s \cdot TimerFreq_{CLK})/2@f$ */
+  uint16_t DTCompCnt;                                  /**< Half of Dead time expressed
+                                                          *  in timer clock cycles unit:
+                                                          *  @f$hDTCompCnt = (DT_s \cdot TimerFreq_{CLK})/2@f$ */
   uint16_t  Ton;                                       /**< Reserved. */
   uint16_t  Toff;                                      /**< Reserved. */
-
   uint8_t   Motor;                                     /**< Motor reference number. */
   uint8_t   AlignFlag;                                 /**< Phase current 0 is reliable, 1 is not. */
   uint8_t   Sector;                                    /**< Space vector sector number. */
+  LowSideOutputsFunction_t LowSideOutputs;             /*!< Low side or enabling signals generation method are defined here. */
   bool TurnOnLowSidesAction;                           /**< True if TurnOnLowSides action is active,
                                                             false otherwise. */
-  bool      DPWM_Mode;                                 /**< Discontinuous PWM mode activation. */															  
+  bool      DPWM_Mode;                                 /**< Discontinuous PWM mode activation. */
   bool      RLDetectionMode;                           /**< True if enabled, false if disabled. */
   bool offsetCalibStatus;                              /**< True if offset calibration completed, false otherwise. */
+  bool OverCurrentFlag;         /* This flag is set when an overcurrent occurs.*/
+  bool OverVoltageFlag;         /* This flag is set when an overvoltage occurs.*/
+  bool driverProtectionFlag;     /* This flag is set when a driver protection occurs.*/
+  bool BrakeActionLock;         /* This flag is set to avoid that brake action is interrupted.*/
   volatile  bool      useEstCurrent;                   /**< Estimated current flag. */
 
+  bool SingleShuntTopology;                            /*!< This flag is set when Single Shunt topology is used */
 };
 
 /**
@@ -239,10 +238,6 @@ typedef enum
   CRC_START, /**< Initializes the current reading calibration. */
   CRC_EXEC   /**< Executes the current reading calibration. */
 } CRCAction_t;
-
-
-/* Returns the phase current of the motor as read by the ADC (in s16A unit). */
-void PWMC_GetPhaseCurrents(PWMC_Handle_t *pHandle, ab_t *Iab);
 
 /* Converts input voltages @f$ V_{\alpha} @f$ and @f$ V_{\beta} @f$ into PWM duty cycles
  * and feed them to the inverter. */
@@ -269,15 +264,20 @@ void PWMC_SetOffsetCalib(PWMC_Handle_t *pHandle, PolarizationOffsets_t *offsets)
  * of single shunt only phase A is relevant. */
 void PWMC_GetOffsetCalib(PWMC_Handle_t *pHandle, PolarizationOffsets_t *offsets);
 
+/* Manages HW overcurrent protection. */
+void *PWMC_OCP_Handler(PWMC_Handle_t *pHandle);
 
-/* Checks if an overcurrent has occured since the last call to this function. */
-uint16_t PWMC_CheckOverCurrent(PWMC_Handle_t *pHandle);
+/* Manages driver protection. */
+void *PWMC_DP_Handler(PWMC_Handle_t *pHandle);
+
+/* Manages HW overvoltage protection. */
+void *PWMC_OVP_Handler(PWMC_Handle_t *pHandle, TIM_TypeDef *TIMx);
+
+/* Checks if a fault (OCP, DP or OVP) occurred since last call. */
+uint16_t PWMC_IsFaultOccurred(PWMC_Handle_t *pHandle);
 
 /* Sets the over current threshold through the DAC reference voltage. */
 void PWMC_OCPSetReferenceVoltage(PWMC_Handle_t *pHandle, uint16_t hDACVref);
-
-/* Retrieves the satus of TurnOnLowSides action. */
-bool PWMC_GetTurnOnLowSidesAction(const PWMC_Handle_t *pHandle);
 
 /* Enables Discontinuous PWM mode using the @p pHandle PWMC component. */
 void PWMC_DPWM_ModeEnable(PWMC_Handle_t *pHandle);
@@ -297,8 +297,8 @@ void PWMC_RLDetectionModeDisable(PWMC_Handle_t *pHandle);
 /* Sets the PWM duty cycle to apply in the RL Detection mode. */
 uint16_t PWMC_RLDetectionModeSetDuty(PWMC_Handle_t *pHandle, uint16_t hDuty);
 
-/* Sets the aligned motor flag. */
-void PWMC_SetAlignFlag(PWMC_Handle_t *pHandle, uint8_t flag);
+/* Turns on low sides switches and starts ADC triggerin. */
+void PWMC_RLTurnOnLowSidesAndStart(PWMC_Handle_t *pHandle);
 
 /* Sets the Callback that the PWMC component shall invoke to get phases current. */
 void PWMC_RegisterGetPhaseCurrentsCallBack(PWMC_GetPhaseCurr_Cb_t pCallBack, PWMC_Handle_t *pHandle);
@@ -318,9 +318,6 @@ void PWMC_RegisterTurnOnLowSidesCallBack(PWMC_TurnOnLowSides_Cb_t pCallBack, PWM
 /* Sets the Callback that the PWMC component shall invoke to compute ADC sampling point. */
 void PWMC_RegisterSampPointSectXCallBack(PWMC_SetSampPointSectX_Cb_t pCallBack, PWMC_Handle_t *pHandle);
 
-/* Sets the Callback that the PWMC component shall invoke to check the overcurrent status. */
-void PWMC_RegisterIsOverCurrentOccurredCallBack(PWMC_OverCurr_Cb_t pCallBack, PWMC_Handle_t *pHandle);
-
 /* Sets the Callback that the PWMC component shall invoke to set the reference voltage for the overcurrent
   * protection. */
 void PWMC_RegisterOCPSetRefVoltageCallBack(PWMC_SetOcpRefVolt_Cb_t pCallBack, PWMC_Handle_t *pHandle);
@@ -334,7 +331,6 @@ void PWMC_RegisterRLDetectionModeDisableCallBack(PWMC_Generic_Cb_t pCallBack, PW
 /* Sets the Callback that the PWMC component shall invoke to set the duty cycle for the R/L detection mode */
 void PWMC_RegisterRLDetectionModeSetDutyCallBack(PWMC_RLDetectSetDuty_Cb_t pCallBack, PWMC_Handle_t *pHandle);
 
-
 /* Used to clear variables in CPWMC. */
 void PWMC_Clear(PWMC_Handle_t *pHandle);
 
@@ -346,21 +342,83 @@ void PWMC_CalcPhaseCurrentsEst(PWMC_Handle_t *pHandle, qd_t Iqd, int16_t hElAngl
 uint16_t PWMC_SetPhaseVoltage_OVM(PWMC_Handle_t *pHandle, alphabeta_t Valfa_beta);
 
 /**
+  * @brief Returns the phase current of the motor as read by the ADC (in s16A unit).
+  *
+  * Returns the current values of phases A & B. Phase C current
+  * can be deduced thanks to the formula:
+  *
+  * @f[
+  * I_{C} = -I_{A} - I_{B}
+  * @f]
+  *
+  * @param  pHandle: Handler of the current instance of the PWM component.
+  * @param  Iab: Pointer to the structure that will receive motor current
+  *         of phases A & B in ElectricalValue format.
+  */
+//cstat !MISRAC2012-Rule-8.13 !RED-func-no-effect
+static inline void PWMC_GetPhaseCurrents(PWMC_Handle_t *pHandle, ab_t *Iab)
+{
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  if (MC_NULL == pHandle)
+  {
+    /* Nothing to do */
+  }
+  else
+  {
+#endif
+    pHandle->pFctGetPhaseCurrents(pHandle, Iab);
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  }
+#endif
+}
+
+/**
+  * @brief  Retrieves the satus of TurnOnLowSides action.
+  *
+  * @param  pHandle: Handler of the current instance of the PWMC component.
+  * @retval bool State of TurnOnLowSides action:
+  *         **true** if TurnOnLowSides action is active, **false** otherwise.
+  */
+static inline bool PWMC_GetTurnOnLowSidesAction(const PWMC_Handle_t *pHandle)
+{
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  return ((MC_NULL == pHandle) ? false : pHandle->TurnOnLowSidesAction);
+#else
+  return (pHandle->TurnOnLowSidesAction);
+#endif
+}
+
+/**
+  * @brief  Sets the aligned motor flag.
+  *
+  * @param  pHandle: Handler of the current instance of the PWMC component.
+  * @param  flag: Value to be applied as an 8 bit unsigned integer.
+  *				  1: motor is in aligned stage.
+  *               2: motor is not in aligned stage.
+  */
+static inline void PWMC_SetAlignFlag(PWMC_Handle_t *pHandle, uint8_t flag)
+{
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  if (MC_NULL ==  pHandle)
+  {
+    /* Nothing to do */
+  }
+  else
+  {
+#endif
+    pHandle->AlignFlag = flag;
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  }
+#endif
+}
+
+/**
   * @}
   */
 
 /**
   * @}
   */
- 
-/* Executes a regular conversion using the first ADC used for current reading.
- * The function is not re-entrant (it cannot executed twice at the same time).
- * Returns 0xFFFF in case of conversion error. */
-uint16_t PWMC_ExecRegularConv(PWMC_Handle_t *pHandle, uint8_t bChannel);
-
-/* Sets the specified sampling time for the specified ADC channel on the first ADC used for current
- * reading. Must be called once for each channel utilized by user. */
-void PWMC_ADC_SetSamplingTime(PWMC_Handle_t *pHandle, ADConv_t ADConv_struct);
 
 #ifdef __cplusplus
 }
@@ -368,4 +426,4 @@ void PWMC_ADC_SetSamplingTime(PWMC_Handle_t *pHandle, ADConv_t ADConv_struct);
 
 #endif /* PWMNCURRFDBK_H */
 
-/******************* (C) COPYRIGHT 2022 STMicroelectronics *****END OF FILE****/
+/******************* (C) COPYRIGHT 2024 STMicroelectronics *****END OF FILE****/

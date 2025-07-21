@@ -21,11 +21,11 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "software/motor/mcsdk/flux_weakening_ctrl.h"
+#include "firmware/motor/mcsdk/flux_weakening_ctrl.h"
 
-#include "software/motor/mc_math.h"
-#include "software/motor/mc_type.h"
-#include "software/motor/pid_regulator.h"
+#include "firmware/motor/mc_math.h"
+#include "firmware/motor/mcsdk/mc_type.h"
+#include "firmware/motor/pid_regulator.h"
 
 /** @addtogroup MCSDK
   * @{

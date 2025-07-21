@@ -51,7 +51,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "firmware/motor/max_torque_per_ampere.h"
+#include "firmware/motor/mcsdk/max_torque_per_ampere.h"
 
 #include "firmware/motor/common_defs.h"
 

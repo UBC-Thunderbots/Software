@@ -26,6 +26,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "firmware/motor/mcsdk/pwm_common_sixstep.h"
 
+#include "firmware/motor/common_defs.h"
+
 /** @addtogroup MCSDK
   * @{
   */

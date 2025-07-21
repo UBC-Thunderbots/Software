@@ -20,7 +20,9 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "ramp_ext_mngr.h"
+#include "firmware/motor/mcsdk/ramp_ext_mngr.h"
+
+#include "firmware/motor/common_defs.h"
 
 /** @addtogroup MCSDK
   * @{

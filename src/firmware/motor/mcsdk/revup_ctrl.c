@@ -50,7 +50,9 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "revup_ctrl.h"
+#include "firmware/motor/mcsdk/revup_ctrl.h"
+
+#include "firmware/motor/common_defs.h"
 
 /** @addtogroup MCSDK
   * @{
