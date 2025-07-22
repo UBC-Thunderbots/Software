@@ -20,36 +20,8 @@ class KickTactic : public Tactic<KickFSM>
      */
     explicit KickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
-    /**
-     * Updates the params for this tactic that cannot be derived from the world
-     *
-     * @param kick_origin The location where the kick will be taken
-     * @param kick_direction The direction the Robot will kick in
-     * @param kick_speed_meters_per_second The speed of how fast the Robot
-     * will kick the ball in meters per second
-     */
-    void updateControlParams(const Point& kick_origin, const Angle& kick_direction,
-                             double kick_speed_meters_per_second);
-
-    /**
-     * Updates the control parameters for this KickTactic.
-     *
-     * @param kick_origin The location where the kick will be taken
-     * @param kick_direction The direction the Robot will kick in
-     * @param kick_speed_meters_per_second The speed of how fast the Robot
-     * will kick the ball in meters per second
-     */
-    void updateControlParams(const Point& kick_origin, const Point& kick_target,
-                             double kick_speed_meters_per_second);
-
     void accept(TacticVisitor& visitor) const override;
-
 
    private:
     std::unique_ptr<FSM<KickFSM>> fsm_init() override;
-
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    // Tactic parameters
-    KickFSMControlParams control_params;
 };
