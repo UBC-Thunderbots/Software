@@ -24,7 +24,12 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
      *
      * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit GetBehindBallFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr){};
+    explicit GetBehindBallFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr),
+      control_params{.ball_location = Point(0, 0),
+                     .chick_direction = Angle::zero()}
+    {
+    };
 
     /**
      * Action that updates the MovePrimitive
@@ -41,6 +46,14 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
      * @return if the robot is behind the ball
      */
     bool behindBall(const Update& event);
+
+    /**
+     * Updates the control parameters for this GetBehindBallTactic.
+     *
+     * @param ball_location The location of the ball when it will be chipped or kicked
+     * @param chick_direction The direction to kick or chip
+     */
+    void updateControlParams(const Point& ball_location, Angle chick_direction);
 
     auto operator()()
     {
@@ -60,4 +73,6 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
             X + Update_E[!behindBall_G] / updateMove_A = GetBehindBallState_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION   = X);
     }
+protected:
+    GetBehindBallFSMControlParams control_params;
 };
