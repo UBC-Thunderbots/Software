@@ -84,6 +84,22 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMCo
     void blockThreat(const Update& event,
                      boost::sml::back::process<MoveFSM::Update> processEvent);
 
+    /**
+     * Update control params for this tactic
+     *
+     * @param enemy_threat_origin The origin of the enemy threat
+     * @param alignment The alignment for this crease defender
+     * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param ball_steal_mode The mode of ball stealing to follow
+     */
+    void updateControlParams(
+            const Point &enemy_threat_origin,
+            const TbotsProto::CreaseDefenderAlignment &alignment,
+            TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::BallStealMode ball_steal_mode = TbotsProto::BallStealMode::STEAL);
+
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -107,6 +123,8 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMCo
                 DribbleFSM_S,
             X + Update_E / blockThreat_A = MoveFSM_S);
     }
+    protected:
+    CreaseDefenderFSMControlParams control_params;
 
    private:
     static constexpr double DETECT_THREAT_AHEAD_SHAPE_LENGTH_M = 1;
