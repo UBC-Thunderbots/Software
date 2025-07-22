@@ -57,33 +57,13 @@ public:
 
     explicit TacticFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): ai_config_ptr(ai_config_ptr){}
 
-    //virtual auto operator()() = 0;
-
 protected:
     // Former constructors took what they needed from ai_config and stored it locally.
     // Now, we store ai_config as a pointer and use it to update as needed.
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 };
 
-#define DEFINE_TACTIC_DONE_AND_GET_FSM_STATE                                             \
-    bool done() const override                                                           \
-    {                                                                                    \
-        bool is_done = false;                                                            \
-        if (last_execution_robot.has_value())                                            \
-        {                                                                                \
-            is_done = fsm_map.at(last_execution_robot.value())->is(boost::sml::X);       \
-        }                                                                                \
-        return is_done;                                                                  \
-    }                                                                                    \
-                                                                                         \
-    std::string getFSMState() const override                                             \
-    {                                                                                    \
-        std::string state_str = "";                                                      \
-        if (last_execution_robot.has_value())                                            \
-            state_str =                                                                  \
-                getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));      \
-        return state_str;                                                                \
-    }
+
 
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
     [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }
