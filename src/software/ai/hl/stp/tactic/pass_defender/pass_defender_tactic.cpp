@@ -4,17 +4,14 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
-PassDefenderTactic::PassDefenderTactic(TbotsProto::AiConfig ai_config)
-    : Tactic({RobotCapability::Move, RobotCapability::Kick}),
-      fsm_map(),
-      control_params(PassDefenderFSMControlParams()),
-      ai_config(ai_config)
+PassDefenderTactic::PassDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<PassDefenderFSM>({RobotCapability::Move, RobotCapability::Kick}, ai_config_ptr),
+      control_params(PassDefenderFSMControlParams())
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<PassDefenderFSM>>(
-            PassDefenderFSM(ai_config), DribbleFSM(ai_config.dribble_tactic_config()));
-    }
+}
+
+std::unique_ptr<FSM<PassDefenderFSM>> PassDefenderTactic::fsm_init() {
+    return std::make_unique<FSM<PassDefenderFSM>>(PassDefenderFSM(ai_config_ptr), DribbleFSM(ai_config_ptr));
 }
 
 void PassDefenderTactic::accept(TacticVisitor &visitor) const
@@ -34,8 +31,7 @@ void PassDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PassDefenderFSM>>(
-            PassDefenderFSM(ai_config), DribbleFSM(ai_config.dribble_tactic_config()));
+        fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(PassDefenderFSM::Update(control_params, tactic_update));

@@ -11,15 +11,15 @@
  * an active enemy pass is directed towards the defender.
  *
  */
-class PassDefenderTactic : public Tactic
+class PassDefenderTactic : public Tactic<PassDefenderFSM>
 {
    public:
     /**
      * Creates a new PassDefenderTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PassDefenderTactic(TbotsProto::AiConfig ai_config);
+    explicit PassDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Update control params for this tactic
@@ -32,13 +32,11 @@ class PassDefenderTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
+    std::unique_ptr<FSM<PassDefenderFSM>> fsm_init() override;
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    std::map<RobotId, std::unique_ptr<FSM<PassDefenderFSM>>> fsm_map;
-
     PassDefenderFSMControlParams control_params;
-    TbotsProto::AiConfig ai_config;
+
 };
