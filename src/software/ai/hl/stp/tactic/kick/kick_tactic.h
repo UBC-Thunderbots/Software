@@ -10,13 +10,15 @@
  * kick the ball to the kick target.
  */
 
-class KickTactic : public Tactic
+class KickTactic : public Tactic<KickFSM>
 {
    public:
     /**
      * Creates a new KickTactic
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit KickTactic();
+    explicit KickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the params for this tactic that cannot be derived from the world
@@ -42,12 +44,11 @@ class KickTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+    std::unique_ptr<FSM<KickFSM>> fsm_init() override;
 
-    std::map<RobotId, std::unique_ptr<FSM<KickFSM>>> fsm_map;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     // Tactic parameters
     KickFSMControlParams control_params;

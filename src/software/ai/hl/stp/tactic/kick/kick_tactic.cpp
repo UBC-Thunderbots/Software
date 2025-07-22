@@ -2,13 +2,13 @@
 
 #include <algorithm>
 
-KickTactic::KickTactic()
-    : Tactic({RobotCapability::Kick, RobotCapability::Move}), fsm_map()
+KickTactic::KickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : Tactic<KickFSM>({RobotCapability::Kick, RobotCapability::Move} ai_config_ptr)
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<KickFSM>>(GetBehindBallFSM());
-    }
+}
+
+std::unique_ptr<FSM<KickFSM>> KickTactic::fsm_init() {
+    return std::make_unique<FSM<KickFSM>>(KickFSM(ai_config_ptr), GetBehindBallFSM(ai_config_ptr));
 }
 
 void KickTactic::updateControlParams(const Point &kick_origin,
@@ -36,8 +36,7 @@ void KickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_f
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<KickFSM>>(GetBehindBallFSM());
+        fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(KickFSM::Update(control_params, tactic_update));
