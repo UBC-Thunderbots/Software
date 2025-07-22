@@ -29,7 +29,7 @@
 
 #include "firmware/motor/common_defs.h"
 #include "firmware/motor/mcsdk/speed_pos_fdbk.h"
-#include "firmware/motor/pid_regulator.h"
+#include "firmware/motor/mcsdk/pid_regulator.h"
 
 /** @addtogroup MCSDK
   * @{
