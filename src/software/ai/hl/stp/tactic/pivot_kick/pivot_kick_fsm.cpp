@@ -39,3 +39,12 @@ bool PivotKickFSM::ballKicked(const Update& event)
             event.common.world_ptr->ball().position(), ROBOT_MAX_RADIUS_METERS);
     }
 }
+
+void PivotKickTactic::updateControlParams(const Point &kick_origin,
+                                          const Angle &kick_direction,
+                                          AutoChipOrKick auto_chip_or_kick)
+{
+    control_params.kick_origin       = kick_origin;
+    control_params.kick_direction    = kick_direction;
+    control_params.auto_chip_or_kick = auto_chip_or_kick;
+}

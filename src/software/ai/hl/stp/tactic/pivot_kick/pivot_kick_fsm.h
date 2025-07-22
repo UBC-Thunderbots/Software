@@ -26,7 +26,11 @@ struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-     explicit PivotKickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<PivotKickFSMControlParams>(ai_config_ptr) {}
+     explicit PivotKickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+     : TacticFSM<PivotKickFSMControlParams>(ai_config_ptr),
+       control_params(PivotKickFSMControlParams())
+       {
+       }
 
     /**
      * Action that updates the DribbleFSM to get possession of the ball and pivot
@@ -53,6 +57,16 @@ struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
      */
     bool ballKicked(const Update& event);
 
+    /**
+     * Update control params for this tactic
+     *
+     * @param kick_origin The location where the kick will be taken
+     * @param kick_direction The direction the Robot will kick in
+     * @param auto_chip_or_kick The command to autochip or autokick
+     */
+    void updateControlParams(const Point& kick_origin, const Angle& kick_direction,
+                             AutoChipOrKick auto_chip_or_kick);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -74,4 +88,6 @@ struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
             KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                         = X);
     }
+protected:
+    PivotKickFSMControlParams control_params;
 };
