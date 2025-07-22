@@ -7,20 +7,17 @@
  * The HaltTactic will stop the robot from moving. The robot will actively try and brake
  * to come to a halt.
  */
-class HaltTactic : public Tactic
+class HaltTactic : public Tactic<HaltFSM>
 {
    public:
     /**
      * Creates a new HaltTactic
      */
-    explicit HaltTactic();
+    explicit HaltTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     void accept(TacticVisitor& visitor) const override;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    std::map<RobotId, std::unique_ptr<FSM<HaltFSM>>> fsm_map;
 };
