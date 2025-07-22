@@ -17,7 +17,7 @@ Tactic<TacticFsm>::Tactic(const std::set<RobotCapability> &capability_reqs_, std
 }
 
 template<class TacticFsm>
-virtual std::unique_ptr<FSM<TacticFsm>> Tactic<TacticFsm>::fsm_init() {
+std::unique_ptr<FSM<TacticFsm>> Tactic<TacticFsm>::fsm_init() {
     return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr));
 }
 
@@ -89,7 +89,7 @@ std::map<RobotId, std::shared_ptr<Primitive>> Tactic<TacticFsm>::get(const World
 }
 
 template<class TacticFsm>
-virtual void Tactic<TacticFsm>::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+void Tactic<TacticFsm>::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
     if (reset_fsm)
     {
