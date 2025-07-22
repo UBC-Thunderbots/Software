@@ -11,27 +11,25 @@
  * This tactic is for a robot performing a penalty kick.
  */
 
-class PenaltyKickTactic : public Tactic
+class PenaltyKickTactic : public Tactic<PenaltyKickFSM>
 {
    public:
     /**
      * Creates a new PenaltyKickTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PenaltyKickTactic(TbotsProto::AiConfig ai_config);
+    explicit PenaltyKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     PenaltyKickTactic() = delete;
 
     void updateControlParams();
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
     void accept(TacticVisitor &visitor) const override;
 
    private:
+    std::unique_ptr<FSM<PenaltyKickFSM>> fsm_init() override;
+
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
-    std::map<RobotId, std::unique_ptr<FSM<PenaltyKickFSM>>> fsm_map;
-    TbotsProto::AiConfig ai_config;
 };

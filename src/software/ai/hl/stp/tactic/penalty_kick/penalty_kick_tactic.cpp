@@ -1,16 +1,14 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 
-PenaltyKickTactic::PenaltyKickTactic(TbotsProto::AiConfig ai_config)
-    : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm_map(),
-      ai_config(ai_config)
+PenaltyKickTactic::PenaltyKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<PenaltyKickFSM>({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}, ai_config_ptr)
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<PenaltyKickFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()), PenaltyKickFSM(),
-            GetBehindBallFSM());
-    }
+}
+
+std::unique_ptr<FSM<PenaltyKickFSM>> PenaltyKickTactic::fsm_init() {
+    return std::make_unique<FSM<PenaltyKickFSM>>(
+            DribbleFSM(ai_config_ptr), PenaltyKickFSM(ai_config_ptr),
+            GetBehindBallFSM(ai_config_ptr));
 }
 
 void PenaltyKickTactic::updateControlParams() {}
@@ -24,9 +22,7 @@ void PenaltyKickTactic::updatePrimitive(const TacticUpdate& tactic_update, bool 
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PenaltyKickFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()), PenaltyKickFSM(),
-            GetBehindBallFSM());
+        fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(PenaltyKickFSM::Update({}, tactic_update));
