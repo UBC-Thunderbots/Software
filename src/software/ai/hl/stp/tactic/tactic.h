@@ -35,6 +35,7 @@
  * Tactics are stateful, and use Primitives to implement their behaviour. They also
  * make heavy use of our Evaluation functions in order to help them make decisions.
  */
+template<class Tactic_FSM>
 class Tactic
 {
    public:
@@ -43,7 +44,7 @@ class Tactic
      *
      * @param capability_reqs_ The capability requirements for running this tactic
      */
-    explicit Tactic(const std::set<RobotCapability> &capability_reqs_);
+    explicit Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     Tactic() = delete;
 
@@ -52,14 +53,14 @@ class Tactic
      *
      * @return true if the Tactic is done and false otherwise
      */
-    virtual bool done() const = 0;
+    bool done() const;
 
     /**
      * Gets the FSM state of the tactic
      *
      * @return the FSM state
      */
-    virtual std::string getFSMState() const = 0;
+    std::string getFSMState() const;
 
     /**
      * robot hardware capability requirements of the tactic.
@@ -103,6 +104,10 @@ class Tactic
 
    protected:
     std::optional<RobotId> last_execution_robot;
+
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
+
+    std::map<RobotId, std::unique_ptr<FSM<Tactic_FSM>>> fsm_map;
 
    private:
     std::shared_ptr<Primitive> primitive;
