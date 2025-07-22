@@ -278,3 +278,8 @@ void GoalieFSM::retrieveFromDeadZone(
     // update the dribble fsm
     processEvent(DribbleFSM::Update(control_params, event.common));
 }
+
+void GoalieFSM::updateControlParams(bool should_move_to_goal_line)
+{
+    control_params.should_move_to_goal_line = should_move_to_goal_line;
+}

@@ -43,7 +43,8 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
                         : TacticFSM<GoalieFSMControlParams>(ai_config_ptr),
                           max_allowed_speed_mode(max_allowed_speed_mode),
                           robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
-                                  ai_config_ptr->robot_navigation_obstacle_config().robot_obstacle_inflation_factor())
+                                  ai_config_ptr->robot_navigation_obstacle_config().robot_obstacle_inflation_factor()),
+                          control_params{.should_move_to_goal_line = false}
                                 {
                                 }
     /**
@@ -185,6 +186,8 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      */
     bool ballInInflatedDefenseArea(const Update &event);
 
+    void updateControlParams(bool should_move_to_goal_line);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -243,6 +246,8 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
                 PositionToBlock_S,
             X + Update_E = X);
     }
+protected:
+    GoalieFSMControlParams control_params;
 
    private:
     static constexpr double BALL_RETRIEVED_THRESHOLD = 0.2;
