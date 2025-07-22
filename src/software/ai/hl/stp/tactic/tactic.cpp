@@ -6,18 +6,23 @@
 #include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
-template<class Tactic_FSM>
-Tactic<Tactic_FSM>::Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+template<class TacticFsm>
+Tactic<TacticFsm>::Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_), ai_config_ptr(ai_config_ptr), fsm_map()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<Tactic_FSM>>();
+        fsm_map[id] = fsm_init();
     }
 }
 
-template<class Tactic_FSM>
-bool Tactic<Tactic_FSM>::done() const
+template<class TacticFsm>
+virtual std::unique_ptr<FSM<TacticFsm>> Tactic<TacticFsm>::fsm_init() {
+    return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr));
+}
+
+template<class TacticFsm>
+bool Tactic<TacticFsm>::done() const
     {
         bool is_done = false;
         if (last_execution_robot.has_value())
@@ -27,8 +32,8 @@ bool Tactic<Tactic_FSM>::done() const
         return is_done;
     }
 
-template<class Tactic_FSM>
-std::string Tactic<Tactic_FSM>::getFSMState() const
+template<class TacticFsm>
+std::string Tactic<TacticFsm>::getFSMState() const
 {
     std::string state_str = "";
     if (last_execution_robot.has_value())
@@ -37,26 +42,26 @@ std::string Tactic<Tactic_FSM>::getFSMState() const
     return state_str;
 }
 
-template<class Tactic_FSM>
-const std::set<RobotCapability> &Tactic<Tactic_FSM>::robotCapabilityRequirements() const
+template<class TacticFsm>
+const std::set<RobotCapability> &Tactic<TacticFsm>::robotCapabilityRequirements() const
 {
     return capability_reqs;
 }
 
-template<class Tactic_FSM>
-std::set<RobotCapability> &Tactic<Tactic_FSM>::mutableRobotCapabilityRequirements()
+template<class TacticFsm>
+std::set<RobotCapability> &Tactic<TacticFsm>::mutableRobotCapabilityRequirements()
 {
     return capability_reqs;
 }
 
-template<class Tactic_FSM>
-void Tactic<Tactic_FSM>::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
+template<class TacticFsm>
+void Tactic<TacticFsm>::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
 {
     this->last_execution_robot = last_execution_robot;
 }
 
-template<class Tactic_FSM>
-std::map<RobotId, std::shared_ptr<Primitive>> Tactic<Tactic_FSM>::get(const WorldPtr &world_ptr)
+template<class TacticFsm>
+std::map<RobotId, std::shared_ptr<Primitive>> Tactic<TacticFsm>::get(const WorldPtr &world_ptr)
 {
     TbotsProto::RobotNavigationObstacleConfig obstacle_config;
     std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
@@ -81,4 +86,15 @@ std::map<RobotId, std::shared_ptr<Primitive>> Tactic<Tactic_FSM>::get(const Worl
     }
 
     return primitives_map;
+}
+
+template<class TacticFsm>
+virtual void Tactic<TacticFsm>::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = fsm_init();
+    }
+    fsm_map.at(tactic_update.robot.id())
+            ->process_event(TacticFsm::Update(control_params, tactic_update));
 }

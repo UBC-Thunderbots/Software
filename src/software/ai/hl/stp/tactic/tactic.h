@@ -35,7 +35,7 @@
  * Tactics are stateful, and use Primitives to implement their behaviour. They also
  * make heavy use of our Evaluation functions in order to help them make decisions.
  */
-template<class Tactic_FSM>
+template<class TacticFsm>
 class Tactic
 {
    public:
@@ -107,18 +107,25 @@ class Tactic
 
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 
-    std::map<RobotId, std::unique_ptr<FSM<Tactic_FSM>>> fsm_map;
+    std::map<RobotId, std::unique_ptr<FSM<TacticFsm>>> fsm_map;
 
    private:
+    /** Function to initialize the FSM. By default initializes the template FSM. Some FSMs may override if they initialize sub-FSMs.
+     *
+     * @return a pointer to the created FSM.
+     */
+    virtual std::unique_ptr<FSM<TacticFsm>> fsm_init();
+
     std::shared_ptr<Primitive> primitive;
 
     /**
      * Updates the primitive ptr with the new primitive
+     * NEED TO REFACTOR CONTROL PARAMS?
      *
      * @param tactic_update The tactic_update struct that contains all the information for
      * updating the primitive
      */
-    virtual void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) = 0;
+    virtual void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm);
 
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;
