@@ -23,13 +23,7 @@ class PenaltyKickTactic : public Tactic<PenaltyKickFSM>
 
     PenaltyKickTactic() = delete;
 
-    void updateControlParams();
-
     void accept(TacticVisitor &visitor) const override;
-
    private:
     std::unique_ptr<FSM<PenaltyKickFSM>> fsm_init() override;
-
-    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
 };
