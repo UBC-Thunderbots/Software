@@ -57,7 +57,7 @@ public:
 
     explicit TacticFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): ai_config_ptr(ai_config_ptr){}
 
-    virtual auto operator()() = 0;
+    //virtual auto operator()() = 0;
 
 protected:
     // Former constructors took what they needed from ai_config and stored it locally.
