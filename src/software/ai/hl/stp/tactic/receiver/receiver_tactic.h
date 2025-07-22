@@ -12,14 +12,15 @@
  * Note that this tactic does not take into account the time the pass should occur at,
  * it simply tries to move to the best position to receive the pass as possible
  */
-class ReceiverTactic : public Tactic
+class ReceiverTactic : public Tactic<ReceiverFSM>
 {
    public:
     /**
      * Creates a new ReceiverTactic
-     * @param receiver_config The config to fetch parameters from
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ReceiverTactic(const TbotsProto::ReceiverTacticConfig& receiver_config);
+    explicit ReceiverTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the control parameters for this ReceiverTactic.
@@ -33,13 +34,9 @@ class ReceiverTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    std::map<RobotId, std::unique_ptr<FSM<ReceiverFSM>>> fsm_map;
-
     ReceiverFSMControlParams control_params;
-    TbotsProto::ReceiverTacticConfig receiver_config;
 };

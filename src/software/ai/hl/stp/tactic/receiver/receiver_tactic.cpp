@@ -6,17 +6,11 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
-ReceiverTactic::ReceiverTactic(const TbotsProto::ReceiverTacticConfig& receiver_config)
-    : Tactic({RobotCapability::Move}),
-      fsm_map(),
+ReceiverTactic::ReceiverTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<ReceiverFSM>({RobotCapability::Move}, ai_config_ptr),
       control_params({ReceiverFSMControlParams{.pass                   = std::nullopt,
-                                                 .disable_one_touch_shot = false}}),
-      receiver_config(receiver_config)
+                                                 .disable_one_touch_shot = false}})
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM(receiver_config));
-    }
 }
 
 void ReceiverTactic::updateControlParams(std::optional<Pass> updated_pass,
@@ -36,8 +30,7 @@ void ReceiverTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM(receiver_config));
+        fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(ReceiverFSM::Update(control_params, tactic_update));
