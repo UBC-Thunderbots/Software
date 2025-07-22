@@ -2,19 +2,12 @@
 
 #include <algorithm>
 
-DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
-    : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm_map(),
+DribbleTactic::DribbleTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<DribbleFSM>({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}, ai_config_ptr),
       control_params{DribbleFSMControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,
                                                .allow_excessive_dribbling = false}},
-      ai_config(ai_config)
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<DribbleFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()));
-    }
 }
 
 void DribbleTactic::updateControlParams(std::optional<Point> dribble_destination,
@@ -35,8 +28,8 @@ void DribbleTactic::updatePrimitive(const TacticUpdate &tactic_update, bool rese
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<DribbleFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()));
+        // This won't compile, but I'll leave it since I plan to refactor updatePrimitive anyway.
+        fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(DribbleFSM::Update(control_params, tactic_update));
