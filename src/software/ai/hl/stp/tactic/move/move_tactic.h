@@ -7,13 +7,13 @@
  * The MoveTactic will move the assigned robot to the given destination and arrive
  * with the specified final orientation and speed
  */
-class MoveTactic : public Tactic
+class MoveTactic : public Tactic<MoveFSM>
 {
    public:
     /**
      * Creates a new MoveTactic
      */
-    explicit MoveTactic();
+    explicit MoveTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the params assuming that the max allowed speed mode is the physical limits
@@ -56,12 +56,9 @@ class MoveTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<MoveFSM>>> fsm_map;
 
     MoveFSMControlParams control_params;
 };

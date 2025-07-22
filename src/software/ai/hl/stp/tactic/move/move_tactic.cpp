@@ -2,9 +2,8 @@
 
 #include <algorithm>
 
-MoveTactic::MoveTactic()
-    : Tactic({RobotCapability::Move}),
-      fsm_map(),
+MoveTactic::MoveTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<MoveFSM>({RobotCapability::Move}, ai_config_ptr),
       control_params{
           .destination             = Point(),
           .final_orientation       = Angle::zero(),
@@ -14,10 +13,6 @@ MoveTactic::MoveTactic()
           .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
           .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE}
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<MoveFSM>>();
-    }
 }
 
 void MoveTactic::updateControlParams(
@@ -55,7 +50,7 @@ void MoveTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_f
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<MoveFSM>>();
+        fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(MoveFSM::Update(control_params, tactic_update));
