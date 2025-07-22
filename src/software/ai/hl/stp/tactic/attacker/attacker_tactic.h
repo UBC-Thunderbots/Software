@@ -11,15 +11,15 @@
  * Note that this tactic does not take into account the time the pass should occur at,
  * it simply tries to move to the best position to take the pass as fast as possible
  */
-class AttackerTactic : public Tactic
+class AttackerTactic : public Tactic<AttackerFSM>
 {
    public:
     /**
      * Creates a new AttackerTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit AttackerTactic(TbotsProto::AiConfig ai_config);
+    explicit AttackerTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     AttackerTactic() = delete;
 
@@ -40,10 +40,8 @@ class AttackerTactic : public Tactic
     void updateControlParams(std::optional<Point> chip_target);
 
     void accept(TacticVisitor& visitor) const override;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
    private:
+    std::unique_ptr<FSM<AttackerFSM>> fsm_init() override;
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     /**
@@ -52,19 +50,7 @@ class AttackerTactic : public Tactic
      * @param world Current state of the world
      * @param control_params The control parameters to visualize
      */
-    void visualizeControlParams(const World& world,
-                                const AttackerFSMControlParams& control_params);
+    void visualizeControlParams(const World& world);
 
-    std::map<RobotId, std::unique_ptr<FSM<AttackerFSM>>> fsm_map;
-
-    // The pass to execute
-    std::optional<Pass> best_pass_so_far;
-    // whether we have committed to the above pass
-    bool pass_committed;
-    // The point the robot will chip towards if it is unable to shoot and is in danger
-    // of losing the ball to an enemy
-    std::optional<Point> chip_target;
-
-    // AI config
-    TbotsProto::AiConfig ai_config;
+    AttackerFSMControlParams control_params;
 };
