@@ -27,19 +27,17 @@
  *                       |         ++    <-- Goalie
  *+----------------------+---------++---------+------------------+
  */
-class CreaseDefenderTactic : public Tactic
+class CreaseDefenderTactic : public Tactic<CreaseDefenderFSM>
 {
    public:
     /**
      * Creates a new CreaseDefenderTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit CreaseDefenderTactic(TbotsProto::AiConfig ai_config);
+    explicit CreaseDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     CreaseDefenderTactic() = delete;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
     /**
      * Update control params for this tactic
@@ -59,9 +57,7 @@ class CreaseDefenderTactic : public Tactic
     void accept(TacticVisitor &visitor) const override;
 
    private:
+    std::unique_ptr<FSM<CreaseDefenderFSM>> fsm_init() override;
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
     CreaseDefenderFSMControlParams control_params;
-    TbotsProto::AiConfig ai_config;
 };
