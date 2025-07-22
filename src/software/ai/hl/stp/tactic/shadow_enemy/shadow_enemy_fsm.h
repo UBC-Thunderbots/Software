@@ -33,7 +33,12 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ShadowEnemyFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr) {}
+    explicit ShadowEnemyFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr),
+    control_params{.enemy_threat    = std::nullopt,
+                   .shadow_distance = 0}
+    {
+    }
 
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
@@ -101,6 +106,17 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
      */
     void stealAndChip(const Update &event);
 
+    /**
+     * Updates the control parameters for this ShadowEnemyTactic
+     *
+     * @param enemy_threat The EnemyThreat indicating which enemy to shadow
+     * @param shadow_distance How far from the enemy the robot will shadow. This is the
+     * distance between the center of the enemy robot and the center of the robot
+     * shadowing it
+     */
+    void updateControlParams(std::optional<EnemyThreat> enemy_threat,
+                             double shadow_distance);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -127,4 +143,6 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
             X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION          = X);
     }
+protected:
+    ShadowEnemyFSMControlParams control_params;
 };

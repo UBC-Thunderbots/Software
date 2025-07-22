@@ -20,21 +20,5 @@ class ShadowEnemyTactic : public Tactic<ShadowEnemyFSM>
      */
     explicit ShadowEnemyTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
-    /**
-     * Updates the control parameters for this ShadowEnemyTactic
-     *
-     * @param enemy_threat The EnemyThreat indicating which enemy to shadow
-     * @param shadow_distance How far from the enemy the robot will shadow. This is the
-     * distance between the center of the enemy robot and the center of the robot
-     * shadowing it
-     */
-    void updateControlParams(std::optional<EnemyThreat> enemy_threat,
-                             double shadow_distance);
-
     void accept(TacticVisitor &visitor) const override;
-
-   private:
-    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
-    ShadowEnemyFSMControlParams control_params;
 };
