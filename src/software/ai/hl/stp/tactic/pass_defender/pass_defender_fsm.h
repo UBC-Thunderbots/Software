@@ -29,7 +29,12 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-     explicit PassDefenderFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<PassDefenderFSMControlParams>(ai_config_ptr), DefenderFSMBase(ai_config_ptr) {}
+     explicit PassDefenderFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+     : TacticFSM<PassDefenderFSMControlParams>(ai_config_ptr),
+             DefenderFSMBase(ai_config_ptr),
+             control_params(PassDefenderFSMControlParams())
+         {
+         }
 
     // The minimum speed of the ball for it to be considered a pass
     static constexpr double MIN_PASS_SPEED = 0.5;
@@ -98,6 +103,15 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
                               boost::sml::back::process<DribbleFSM::Update> processEvent);
 
 
+    /**
+     * Update control params for this tactic
+     *
+     * @param position_to_block_from The location on the field to block enemy passes from
+     * @param ball_steal_mode The pass defender's aggressiveness towards the ball
+     */
+    void updateControlParams(const Point& position_to_block_from,
+                             TbotsProto::BallStealMode ball_steal_mode);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -132,6 +146,8 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
             InterceptBallState_S + Update_E / interceptBall_A,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
+protected:
+    PassDefenderFSMControlParams control_params;
 
    private:
     // Initialized when a pass is started and used when a pass is deflected
