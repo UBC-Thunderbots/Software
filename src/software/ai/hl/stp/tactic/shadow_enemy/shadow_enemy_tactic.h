@@ -10,10 +10,15 @@
  * EnemyThreat. It will choose to either block the enemy's shot on net or the pass it
  * would receive from another enemy.
  */
-class ShadowEnemyTactic : public Tactic
+class ShadowEnemyTactic : public Tactic<ShadowEnemyFSM>
 {
    public:
-    explicit ShadowEnemyTactic();
+    /**
+     * Constructor for ShadowEnemyTactic
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit ShadowEnemyTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the control parameters for this ShadowEnemyTactic
@@ -28,12 +33,8 @@ class ShadowEnemyTactic : public Tactic
 
     void accept(TacticVisitor &visitor) const override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
    private:
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<ShadowEnemyFSM>>> fsm_map;
 
     ShadowEnemyFSMControlParams control_params;
 };

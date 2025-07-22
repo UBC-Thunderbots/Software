@@ -1,15 +1,10 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 
-ShadowEnemyTactic::ShadowEnemyTactic()
-    : Tactic({RobotCapability::Move, RobotCapability::Kick}),
-      fsm_map(),
+ShadowEnemyTactic::ShadowEnemyTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<ShadowEnemyFSM>({RobotCapability::Move, RobotCapability::Kick}, ai_config_ptr),
       control_params{ShadowEnemyFSMControlParams{.enemy_threat    = std::nullopt,
                                                    .shadow_distance = 0}}
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<ShadowEnemyFSM>>();
-    }
 }
 
 void ShadowEnemyTactic::updateControlParams(std::optional<EnemyThreat> enemy_threat,
@@ -28,7 +23,7 @@ void ShadowEnemyTactic::updatePrimitive(const TacticUpdate &tactic_update, bool 
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<ShadowEnemyFSM>>();
+        fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(ShadowEnemyFSM::Update(control_params, tactic_update));
