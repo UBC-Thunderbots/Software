@@ -6,19 +6,17 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/segment.h"
 
-class PivotKickTactic : public Tactic
+class PivotKickTactic : public Tactic<PivotKickFSM>
 {
    public:
     /**
      * Creates a new PivotKickTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PivotKickTactic(TbotsProto::AiConfig ai_config);
+    explicit PivotKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     PivotKickTactic() = delete;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
     /**
      * Update control params for this tactic
@@ -33,12 +31,12 @@ class PivotKickTactic : public Tactic
     void accept(TacticVisitor& visitor) const override;
 
    private:
+    std::unique_ptr<FSM<PivotKickFSM>> fsm_init() override;
+
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    std::map<RobotId, std::unique_ptr<FSM<PivotKickFSM>>> fsm_map;
-
     PivotKickFSMControlParams control_params;
-    TbotsProto::AiConfig ai_config;
+
 };
 
 COPY_TACTIC(WallKickoffTactic, PivotKickTactic)
