@@ -35,7 +35,11 @@ struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
      * @param ai_config_ptr shared ptr to ai_config
      */
     explicit DribbleFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<DribbleFSMControlParams>(ai_config_ptr)
+        : TacticFSM<DribbleFSMControlParams>(ai_config_ptr),
+          control_params{
+              .dribble_destination       = std::nullopt,
+              .final_dribble_orientation = std::nullopt,
+              .allow_excessive_dribbling = false}
     {
     }
 

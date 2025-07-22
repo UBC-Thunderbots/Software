@@ -37,7 +37,15 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMCo
      *
      * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit CreaseDefenderFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<CreaseDefenderFSMControlParams>(ai_config_ptr), DefenderFSMBase(ai_config_ptr) {}
+    explicit CreaseDefenderFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    :   TacticFSM<CreaseDefenderFSMControlParams>(ai_config_ptr),
+        DefenderFSMBase(ai_config_ptr),
+        control_params{.enemy_threat_origin = Point(0, 0),
+                 .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::CENTRE,
+                 .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                 .ball_steal_mode = TbotsProto::BallStealMode::STEAL}
+      {
+      }
 
 
     /**
