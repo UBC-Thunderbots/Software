@@ -3,13 +3,13 @@
 #include <algorithm>
 
 
-ChipTactic::ChipTactic()
-    : Tactic({RobotCapability::Chip, RobotCapability::Move}), fsm_map()
+ChipTactic::ChipTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<ChipFSM>({RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr)
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<ChipFSM>>(GetBehindBallFSM());
-    }
+}
+
+std::unique_ptr<FSM<ChipFSM>> ChipTactic::fsm_init() {
+    return std::make_unique<FSM<ChipFSM>>(GetBehindBallFSM(ai_config_ptr), ChipFSM(ai_config_ptr));
 }
 
 void ChipTactic::updateControlParams(const Point &chip_origin,
@@ -36,8 +36,7 @@ void ChipTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_f
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<ChipFSM>>(GetBehindBallFSM());
+        fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(ChipFSM::Update(control_params, tactic_update));

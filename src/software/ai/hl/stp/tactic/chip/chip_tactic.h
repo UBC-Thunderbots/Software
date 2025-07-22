@@ -10,13 +10,15 @@
  * chip the ball to the chip target.
  */
 
-class ChipTactic : public Tactic
+class ChipTactic : public Tactic<ChipFSM>
 {
    public:
     /**
      * Creates a new ChipTactic
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ChipTactic();
+    explicit ChipTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the params for this tactic that cannot be derived from the world
@@ -39,12 +41,10 @@ class ChipTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
    private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+    std::unique_ptr<FSM<ChipFSM>> fsm_init() override;
 
-    std::map<RobotId, std::unique_ptr<FSM<ChipFSM>>> fsm_map;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     // Tactic parameters
     ChipFSMControlParams control_params;
