@@ -23,25 +23,10 @@ class AttackerTactic : public Tactic<AttackerFSM>
 
     AttackerTactic() = delete;
 
-    /**
-     * Updates the control parameters for this AttackerTactic.
-     *
-     * @param updated_pass The pass to perform
-     */
-    void updateControlParams(const Pass& best_pass_so_far, bool pass_committed);
-
-    /**
-     * Updates the control parameters for this AttackerTactic
-     *
-     * @param chip_target An optional point that the robot will chip towards when it is
-     * unable to shoot and is in danger of losing the ball to an enemy. If this value is
-     * not provided, the point defaults to the enemy goal
-     */
-    void updateControlParams(std::optional<Point> chip_target);
-
     void accept(TacticVisitor& visitor) const override;
    private:
     std::unique_ptr<FSM<AttackerFSM>> fsm_init() override;
+
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     /**
@@ -51,6 +36,4 @@ class AttackerTactic : public Tactic<AttackerFSM>
      * @param control_params The control parameters to visualize
      */
     void visualizeControlParams(const World& world);
-
-    AttackerFSMControlParams control_params;
 };

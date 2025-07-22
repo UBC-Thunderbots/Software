@@ -60,6 +60,22 @@ struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
      */
     bool shouldKick(const Update& event);
 
+    /**
+     * Updates the control parameters for this AttackerTactic.
+     *
+     * @param updated_pass The pass to perform
+     */
+    void updateControlParams(const Pass& best_pass_so_far, bool pass_committed);
+
+    /**
+     * Updates the control parameters for this AttackerTactic
+     *
+     * @param chip_target An optional point that the robot will chip towards when it is
+     * unable to shoot and is in danger of losing the ball to an enemy. If this value is
+     * not provided, the point defaults to the enemy goal
+     */
+    void updateControlParams(std::optional<Point> chip_target);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -82,4 +98,7 @@ struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
+
+    protected:
+    AttackerFSMControlParams control_params;
 };
