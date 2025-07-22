@@ -32,26 +32,26 @@ struct TacticUpdate
 
 /*
  * A general FSM class with some utilities.
- * T_FSM_CTP should be a structure containing the control parameters for the FSM being built.
+ * TFsmControlParams should be a structure containing the control parameters for the FSM being built.
  */
-template<class T_FSM_CTP>
+template<class TFsmControlParams>
 class TacticFSM
 {
 public:
     /**
-     * The Update struct is the only event that a tactic fsm should respond to and it is
+     * The Update struct is the only event that a tactic FSM should respond to and it is
      * composed of the following structs:
      *
-     * T_FSM_CTP - uniquely defined by each tactic to control the FSM
+     * TFsmControlParams - uniquely defined by each tactic to control the FSM
      * TacticUpdate - common struct that contains Robot, World, and SetPrimitiveCallback
      */
     struct Update
     {
-        Update(const T_FSM_CTP &control_params, const TacticUpdate &common)
+        Update(const TFsmControlParams &control_params, const TacticUpdate &common)
                 : control_params(control_params), common(common)
         {
         }
-        T_FSM_CTP control_params;
+        TFsmControlParams control_params;
         TacticUpdate common;
     };
 
