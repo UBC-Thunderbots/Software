@@ -207,3 +207,12 @@ bool ReceiverFSM::strayPass(const Update& event)
 
     return stray_pass;
 }
+
+void ReceiverFSM::updateControlParams(std::optional<Pass> updated_pass,
+                                         bool disable_one_touch_shot)
+{
+    // Update the control parameters stored by this Tactic
+    control_params.pass                   = updated_pass;
+    control_params.disable_one_touch_shot = disable_one_touch_shot;
+}
+
