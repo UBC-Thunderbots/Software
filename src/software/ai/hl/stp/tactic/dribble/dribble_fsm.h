@@ -170,6 +170,20 @@ struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
      */
     bool shouldLoseBall(const Update &event);
 
+    /**
+     * Updates control params for optionally moving the ball to a dribble destination and
+     * with the robot at a final dribble orientation
+     *
+     * @param dribble_destination The destination for dribbling the ball
+     * @param final_dribble_orientation The final orientation to face the ball when
+     * finishing dribbling
+     * @param allow_excessive_dribbling Whether to allow excessive dribbling, i.e. more
+     * than 1 metre at a time
+     */
+    void updateControlParams(std::optional<Point> dribble_destination,
+                             std::optional<Angle> final_dribble_orientation,
+                             bool allow_excessive_dribbling = false);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -200,4 +214,6 @@ struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
             X + Update_E[!dribblingDone_G] / dribble_A                 = Dribble_S,
             X + Update_E / dribble_A                                   = X);
     }
+    protected:
+    DribbleFSMControlParams control_params;
 };
