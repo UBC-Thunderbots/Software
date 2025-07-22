@@ -35,7 +35,18 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit MoveFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<MoveFSMControlParams>(ai_config_ptr) {}
+    explicit MoveFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<MoveFSMControlParams>(ai_config_ptr),
+        control_params{
+                .destination             = Point(),
+                .final_orientation       = Angle::zero(),
+                .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+                .ball_collision_type     = TbotsProto::BallCollisionType::AVOID,
+                .auto_chip_or_kick       = {AutoChipOrKickMode::OFF, 0},
+                .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE}
+                {
+                }
 
     /**
      * This is an Action that sets the primitive to a move primitive corresponding to the
@@ -54,6 +65,45 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
      */
     bool moveDone(const Update &event);
 
+
+    /**
+     * Updates the params assuming that the max allowed speed mode is the physical limits
+     *
+     * @param destination The destination to move to (in global coordinates)
+     * @param final_orientation The final orientation the robot should have at
+     * the destination
+     * @param dribbler_mode The dribbler mode
+     * @param ball_collision_type how to navigate around the ball
+     * @param auto_chip_or_kick The command to autochip or autokick
+     * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param obstacle_avoidance_mode How safe we should be when avoiding obstacles,
+     * particularly enemy robots
+     */
+    void updateControlParams(
+            Point destination, Angle final_orientation,
+            TbotsProto::DribblerMode dribbler_mode = TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType ball_collision_type =
+            TbotsProto::BallCollisionType::AVOID,
+            AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode =
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
+
+    /**
+     * Updates the params assuming that the dribbler and chicker and while avoiding the
+     * ball
+     *
+     * @param destination The destination to move to (in global coordinates)
+     * @param final_orientation The final orientation the robot should have at
+     * the destination
+     * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param obstacle_avoidance_mode How safe we should be when avoiding obstacles,
+     * particularly enemy robots
+     */
+    void updateControlParams(Point destination, Angle final_orientation,
+                             TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+                             TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode);
     auto operator()()
     {
         using namespace boost::sml;
@@ -73,4 +123,6 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
             X + Update_E[!moveDone_G] / updateMove_A            = MoveState_S,
             X + Update_E / updateMove_A                         = X);
     }
+protected:
+    MoveFSMControlParams control_params;
 };
