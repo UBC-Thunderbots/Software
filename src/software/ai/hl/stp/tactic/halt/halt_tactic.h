@@ -16,8 +16,4 @@ class HaltTactic : public Tactic<HaltFSM>
     explicit HaltTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     void accept(TacticVisitor& visitor) const override;
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
 };

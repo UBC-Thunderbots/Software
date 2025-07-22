@@ -17,7 +17,7 @@ struct HaltFSM : TacticFSM<HaltFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit HaltFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<HaltFSMControlParams>(ai_config_ptr) {}
+    explicit HaltFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<HaltFSMControlParams>(ai_config_ptr), control_params() {}
 
     /**
      * Action to set the StopPrimitive
@@ -51,4 +51,6 @@ struct HaltFSM : TacticFSM<HaltFSMControlParams>
             X + Update_E[!stopDone_G] / updateStop_A            = StopState_S,
             X + Update_E[stopDone_G] / updateStop_A             = X);
     }
+protected:
+    HaltFSMControlParams control_params;
 };
