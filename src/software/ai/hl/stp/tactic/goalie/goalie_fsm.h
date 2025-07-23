@@ -48,7 +48,6 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
                           max_allowed_speed_mode(max_allowed_speed_mode),
                           robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
                                   ai_config_ptr->robot_navigation_obstacle_config().robot_obstacle_inflation_factor())
-
                                 {
                                 }
     /**
@@ -190,13 +189,6 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * @param event GoalieFSM::Update event
      */
     bool ballInInflatedDefenseArea(const Update &event);
-
-    /**
-     * Update the control parameters for GoalieFSM
-     *
-     * @param should_move_to_goal_line true if the goalie should move to the goal line, false otherwise
-     */
-    void updateControlParams(bool should_move_to_goal_line);
 
     auto operator()()
     {
