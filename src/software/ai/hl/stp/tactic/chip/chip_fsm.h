@@ -67,25 +67,6 @@ struct ChipFSM : TacticFSM<ChipFSMControlParams>
      */
     bool shouldRealignWithBall(const Update &event);
 
-    /**
-     * Updates the params for ChipFSM that cannot be derived from the world
-     *
-     * @param chip_origin The location where the chip will be taken
-     * @param chip_direction The direction the Robot will chip in
-     * @param chip_distance_meters The distance between the starting location
-     * of the chip and the location of the first bounce
-     */
-    void updateControlParams(const Point& chip_origin, const Angle& chip_direction,
-                             double chip_distance_meters);
-
-    /**
-     * Updates the control parameters for ChipFSM
-     *
-     * @param chip_origin The location where the chip will be taken
-     * @param chip_direction The direction the Robot will chip in
-     */
-    void updateControlParams(const Point& chip_origin, const Point& chip_target);
-
     auto operator()()
     {
         using namespace boost::sml;
