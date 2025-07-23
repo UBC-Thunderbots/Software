@@ -212,12 +212,3 @@ bool DribbleFSM::shouldLoseBall(const Update &event)
             dribble_displacement->length() >=
                     ai_config_ptr->dribble_tactic_config().max_continuous_dribbling_distance());
 }
-
-void DribbleFSM::updateControlParams(std::optional<Point> dribble_destination,
-                                        std::optional<Angle> final_dribble_orientation,
-                                        bool allow_excessive_dribbling)
-{
-    control_params.dribble_destination       = dribble_destination;
-    control_params.final_dribble_orientation = final_dribble_orientation;
-    control_params.allow_excessive_dribbling = allow_excessive_dribbling;
-}
