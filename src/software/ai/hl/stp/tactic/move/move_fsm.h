@@ -27,7 +27,7 @@ struct MoveFSMControlParams
     dribbler_mode(TbotsProto::DribblerMode::OFF),
     ball_collision_type(TbotsProto::BallCollisionType::AVOID),
     auto_chip_or_kick({AutoChipOrKickMode::OFF,0}),
-    max_allowed_speed_mode(TbotsProto::MaxAloowedSpeedMode::PHYSICAL_LIMIT),
+    max_allowed_speed_mode(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT),
     obstacle_avoidance_mode(TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE){};
 };
 
