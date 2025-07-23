@@ -4,6 +4,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/ai/evaluation/intercept.h"
 
 bool PassDefenderFSM::passStarted(const Update& event)
 {
@@ -86,47 +87,11 @@ void PassDefenderFSM::interceptBall(const Update& event)
             //otherwise we will attempt to overshoot the position and intercept it 
             if (event.common.robot.getTimeToPosition(intercept_position) > ball_intercept_time)
             {
-                Point new_destination = intercept_position;
-                double final_speed    = DEFENDER_STEP_SPEED_M_PER_S;
-                bool finished         = false;
-                double max_speed = event.common.robot.robotConstants().robot_max_speed_m_per_s;
-                double max_acc =
-                    event.common.robot.robotConstants().robot_max_acceleration_m_per_s_2;
-                Point possible_intercept_pos = intercept_position;
 
-                while (!finished)
-                {
-                    Vector final_velocity =
-                        (new_destination - event.common.robot.position()).normalize(final_speed);
+                intercept_position = findOvershootInterceptPosition(event.common.robot, intercept_position, 
+                                               event.common.world_ptr->field(),
+                                               ball_intercept_time, DEFENDER_STEP_SPEED_M_PER_S, false);
 
-                    // What's happening here is we are using v_o^2=2*d*a to determine the extra
-                    // distance the defender will be forced to travel if they intercept the ball
-                    // with final_speed and then immediately decelerate
-                    double extra_length = (final_speed * final_speed) / (2.0 * max_acc);
-                    new_destination     = possible_intercept_pos + final_velocity.normalize(extra_length);
-                    if (!event.common.world_ptr->field().pointInFriendlyDefenseArea(
-                            new_destination)&&contains(event.common.world_ptr->field().fieldBoundary(), new_destination))
-                    {
-                        if (event.common.robot.getTimeToPosition(possible_intercept_pos, final_velocity) <
-                            ball_intercept_time)
-                        {
-                            // If we found that the robot can make it before the ball we consider
-                            // the while loop finished
-                            intercept_position = new_destination;
-                            finished = true;
-                        }
-                    }
-                    else
-                    {
-                        finished = true;
-                    }
-                    final_speed += DEFENDER_STEP_SPEED_M_PER_S;
-                    if (final_speed > max_speed)
-                    {
-                        //Couldn't find a speed possible to intercept
-                        finished = true;
-                    }
-                }
             }
 
         }
