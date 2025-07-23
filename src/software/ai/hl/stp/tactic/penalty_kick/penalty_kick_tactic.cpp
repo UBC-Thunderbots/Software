@@ -12,8 +12,19 @@ std::unique_ptr<FSM<PenaltyKickFSM>> PenaltyKickTactic::fsm_init() {
             GetBehindBallFSM(ai_config_ptr));
 }
 
+void PenaltyKickTactic::updateControlParams() {}
+
 void PenaltyKickTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
+void PenaltyKickTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = fsm_init();
+    }
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(PenaltyKickFSM::Update({}, tactic_update));
+}
