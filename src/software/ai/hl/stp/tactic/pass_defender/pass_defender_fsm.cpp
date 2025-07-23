@@ -3,11 +3,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
-<<<<<<< HEAD
 #include "software/ai/evaluation/intercept.h"
-=======
-#include "software/logger/logger.h"
->>>>>>> 8ddf5a82227b62f2766ee93b6bd59b0169058248
 
 bool PassDefenderFSM::passStarted(const Update& event)
 {
