@@ -89,9 +89,10 @@ void PassDefenderFSM::interceptBall(const Update& event)
             if (event.common.robot.getTimeToPosition(intercept_position) >
                 ball_intercept_time)
             {
-                intercept_position = findOvershootInterceptPosition(event.common.robot, intercept_position, 
-                                               event.common.world_ptr->field(),
-                                               ball_intercept_time, DEFENDER_STEP_SPEED_M_PER_S, false);
+                intercept_position = findOvershootInterceptPosition(
+                    event.common.robot, intercept_position,
+                    event.common.world_ptr->field(), ball_intercept_time,
+                    DEFENDER_STEP_SPEED_M_PER_S, false);
             }
         }
 
