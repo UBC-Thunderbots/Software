@@ -55,12 +55,6 @@ class MoveTactic : public Tactic<MoveFSM>
                              TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode);
 
     void accept(TacticVisitor& visitor) const override;
-
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    MoveFSMControlParams control_params;
 };
 
 // Creates duplicates of MoveTactic for various situations

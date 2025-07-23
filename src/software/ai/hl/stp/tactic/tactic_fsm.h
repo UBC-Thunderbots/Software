@@ -38,6 +38,7 @@ template<class TFsmControlParams>
 class TacticFSM
 {
 public:
+    using ControlParams = TFsmControlParams;
     /**
      * The Update struct is the only event that a tactic FSM should respond to and it is
      * composed of the following structs:
@@ -55,9 +56,7 @@ public:
         TacticUpdate common;
     };
 
-    explicit TacticFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): ai_config_ptr(ai_config_ptr), control_params(){}
-
-    TFsmControlParams control_params;
+    explicit TacticFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): ai_config_ptr(ai_config_ptr){}
 
 protected:
     // Former constructors took what they needed from ai_config and stored it locally.

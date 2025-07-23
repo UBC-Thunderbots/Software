@@ -1,9 +1,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<ShadowEnemyFSM>({RobotCapability::Move, RobotCapability::Kick}, ai_config_ptr),
-      control_params{ShadowEnemyFSMControlParams{.enemy_threat    = std::nullopt,
-                                                   .shadow_distance = 0}}
+    : Tactic<ShadowEnemyFSM>({RobotCapability::Move, RobotCapability::Kick}, ai_config_ptr)
 {
 }
 
@@ -17,14 +15,4 @@ void ShadowEnemyTactic::updateControlParams(std::optional<EnemyThreat> enemy_thr
 void ShadowEnemyTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
-}
-
-void ShadowEnemyTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
-{
-    if (reset_fsm)
-    {
-        fsm_map[tactic_update.robot.id()] = fsm_init();
-    }
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(ShadowEnemyFSM::Update(control_params, tactic_update));
 }

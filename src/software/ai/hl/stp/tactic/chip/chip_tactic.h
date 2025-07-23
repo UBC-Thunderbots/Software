@@ -43,11 +43,6 @@ class ChipTactic : public Tactic<ChipFSM>
 
    private:
     std::unique_ptr<FSM<ChipFSM>> fsm_init() override;
-
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    // Tactic parameters
-    ChipFSMControlParams control_params;
 };
 
 // Creates a new tactic called KickoffChipTactic that is a duplicate of ChipTactic

@@ -51,6 +51,4 @@ class AttackerTactic : public Tactic<AttackerFSM>
      * @param control_params The control parameters to visualize
      */
     void visualizeControlParams(const World& world);
-
-    AttackerFSMControlParams control_params;
 };

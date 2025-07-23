@@ -26,9 +26,4 @@ class GetBehindBallTactic : public Tactic<GetBehindBallFSM>
     void updateControlParams(const Point& ball_location, Angle chick_direction);
 
     void accept(TacticVisitor& visitor) const override;
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    GetBehindBallFSMControlParams control_params;
 };

@@ -32,11 +32,6 @@ class PassDefenderTactic : public Tactic<PassDefenderFSM>
 
     void accept(TacticVisitor& visitor) const override;
 
-
    private:
     std::unique_ptr<FSM<PassDefenderFSM>> fsm_init() override;
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    PassDefenderFSMControlParams control_params;
-
 };

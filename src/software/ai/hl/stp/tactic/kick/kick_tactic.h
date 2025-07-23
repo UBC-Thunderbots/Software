@@ -47,9 +47,4 @@ class KickTactic : public Tactic<KickFSM>
 
    private:
     std::unique_ptr<FSM<KickFSM>> fsm_init() override;
-
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    // Tactic parameters
-    KickFSMControlParams control_params;
 };

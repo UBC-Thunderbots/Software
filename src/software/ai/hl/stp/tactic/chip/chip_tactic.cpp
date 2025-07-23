@@ -31,13 +31,3 @@ void ChipTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
-
-void ChipTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
-{
-    if (reset_fsm)
-    {
-        fsm_map[tactic_update.robot.id()] = fsm_init();
-    }
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(ChipFSM::Update(control_params, tactic_update));
-}

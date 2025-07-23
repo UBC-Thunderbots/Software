@@ -8,7 +8,7 @@
 #include "software/util/typename/typename.h"
 template<class TacticFsm, class... SubFsms>
 Tactic<TacticFsm>::Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_), ai_config_ptr(ai_config_ptr), fsm_map()
+    : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_), ai_config_ptr(ai_config_ptr), fsm_map(), control_params()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
@@ -96,5 +96,5 @@ void Tactic<TacticFsm>::updatePrimitive(const TacticUpdate &tactic_update, bool 
         fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
-            ->process_event(TacticFsm::Update(TacticFsm::control_params, tactic_update));
+            ->process_event(TacticFsm::Update(control_params, tactic_update));
 }

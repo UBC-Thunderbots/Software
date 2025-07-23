@@ -31,13 +31,3 @@ void KickTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
-
-void KickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
-{
-    if (reset_fsm)
-    {
-        fsm_map[tactic_update.robot.id()] = fsm_init();
-    }
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(KickFSM::Update(control_params, tactic_update));
-}

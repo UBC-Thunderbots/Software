@@ -36,10 +36,5 @@ class GoalieTactic : public Tactic<GoalieFSM>
    private:
     std::unique_ptr<FSM<GoalieFSM>> fsm_init() override;
 
-    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
-
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
-
-    GoalieFSMControlParams control_params;
 };

@@ -11,8 +11,7 @@
 
 PivotKickTactic::PivotKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : Tactic<PivotKickFSM>({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
-              RobotCapability::Dribble}, ai_config_ptr),
-      control_params(PivotKickFSMControlParams())
+              RobotCapability::Dribble}, ai_config_ptr)
 {
 }
 
@@ -34,14 +33,4 @@ void PivotKickTactic::updateControlParams(const Point &kick_origin,
     control_params.kick_origin       = kick_origin;
     control_params.kick_direction    = kick_direction;
     control_params.auto_chip_or_kick = auto_chip_or_kick;
-}
-
-void PivotKickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
-{
-    if (reset_fsm)
-    {
-        fsm_map[tactic_update.robot.id()] = fsm_init();
-    }
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(PivotKickFSM::Update(control_params, tactic_update));
 }

@@ -105,9 +105,14 @@ class Tactic
    protected:
     std::optional<RobotId> last_execution_robot;
 
+    // Shared pointer to ai_config
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 
+    // The mapping of robots to their respective FSMs.
     std::map<RobotId, std::unique_ptr<FSM<TacticFsm>>> fsm_map;
+
+    // The parameters this tactic uses control its FSMs.
+    TacticFsm::ControlParams control_params;
 
    private:
     /** Function to initialize the FSM. By default initializes the template FSM. Some FSMs may override if they initialize sub-FSMs.

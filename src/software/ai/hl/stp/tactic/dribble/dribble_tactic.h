@@ -38,10 +38,6 @@ class DribbleTactic : public Tactic<DribbleFSM>
                              bool allow_excessive_dribbling = false);
 
     void accept(TacticVisitor& visitor) const override;
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-    DribbleFSMControlParams control_params;
 };
 
 COPY_TACTIC(PlaceBallTactic, DribbleTactic)

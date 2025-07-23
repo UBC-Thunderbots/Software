@@ -33,10 +33,4 @@ class ReceiverTactic : public Tactic<ReceiverFSM>
                              bool disable_one_touch_shot = false);
 
     void accept(TacticVisitor& visitor) const override;
-
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    ReceiverFSMControlParams control_params;
 };

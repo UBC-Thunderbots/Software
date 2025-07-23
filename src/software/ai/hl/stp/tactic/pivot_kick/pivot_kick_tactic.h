@@ -32,11 +32,6 @@ class PivotKickTactic : public Tactic<PivotKickFSM>
 
    private:
     std::unique_ptr<FSM<PivotKickFSM>> fsm_init() override;
-
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    PivotKickFSMControlParams control_params;
-
 };
 
 COPY_TACTIC(WallKickoffTactic, PivotKickTactic)

@@ -58,6 +58,4 @@ class CreaseDefenderTactic : public Tactic<CreaseDefenderFSM>
 
    private:
     std::unique_ptr<FSM<CreaseDefenderFSM>> fsm_init() override;
-    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-    CreaseDefenderFSMControlParams control_params;
 };

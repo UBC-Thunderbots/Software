@@ -32,9 +32,4 @@ class ShadowEnemyTactic : public Tactic<ShadowEnemyFSM>
                              double shadow_distance);
 
     void accept(TacticVisitor &visitor) const override;
-
-   private:
-    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
-    ShadowEnemyFSMControlParams control_params;
 };

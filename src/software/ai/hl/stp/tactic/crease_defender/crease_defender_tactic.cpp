@@ -10,10 +10,7 @@
 #include "software/logger/logger.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<CreaseDefenderFSM>({RobotCapability::Move}, ai_config_ptr),
-      control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
-                      TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                      TbotsProto::BallStealMode::STEAL}),
+    : Tactic<CreaseDefenderFSM>({RobotCapability::Move}, ai_config_ptr)
 {
 }
 
@@ -38,13 +35,3 @@ void CreaseDefenderTactic::updateControlParams(
     control_params.ball_steal_mode           = ball_steal_mode;
 }
 
-void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
-                                           bool reset_fsm)
-{
-    if (reset_fsm)
-    {
-        fsm_map[tactic_update.robot.id()] = fsm_init();
-    }
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
-}
