@@ -34,7 +34,7 @@ struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
      *
      * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit AttackerFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<AttackerFSMControlParams>(ai_config_ptr){}
+    explicit AttackerFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<AttackerFSMControlParams>(ai_config_ptr) {}
 
     /**
      * Action that updates the PivotKickFSM to shoot or pass

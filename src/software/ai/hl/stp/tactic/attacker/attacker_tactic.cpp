@@ -7,7 +7,12 @@
 #include "software/world/ball.h"
 
 AttackerTactic::AttackerTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<AttackerFSM>({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr)
+    : Tactic<AttackerFSM>({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr),
+      control_params{
+    .best_pass_so_far = std::nullopt,
+    .pass_committed = false,
+    .shot = std::nullopt,
+    .chip_target = std::nullopt}
 {
 }
 

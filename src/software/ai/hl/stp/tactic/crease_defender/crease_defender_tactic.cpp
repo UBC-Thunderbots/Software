@@ -10,7 +10,10 @@
 #include "software/logger/logger.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<CreaseDefenderFSM>({RobotCapability::Move}, ai_config_ptr)
+    : Tactic<CreaseDefenderFSM>({RobotCapability::Move}, ai_config_ptr),
+      control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
+                      TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                      TbotsProto::BallStealMode::STEAL}),
 {
 }
 
