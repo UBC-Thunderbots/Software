@@ -23,6 +23,19 @@ std::unique_ptr<FSM<AttackerFSM>> AttackerTactic::fsm_init() {
                 AttackerFSM(ai_config_ptr));
 }
 
+void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
+                                         bool pass_committed)
+{
+    // Update the control parameters stored by this Tactic
+    control_params.best_pass_so_far = best_pass_so_far;
+    control_params.pass_committed = pass_committed;
+}
+
+void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
+{
+    control_params.chip_target = chip_target;
+}
+
 void AttackerTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);

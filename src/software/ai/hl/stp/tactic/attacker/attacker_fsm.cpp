@@ -55,16 +55,3 @@ bool AttackerFSM::shouldKick(const Update& event)
 {
     return event.control_params.pass_committed || event.control_params.shot;
 }
-
-void AttackerFSM::updateControlParams(const Pass& best_pass_so_far,
-                                         bool pass_committed)
-{
-    // Update the control parameters stored by this Tactic
-    control_params.best_pass_so_far = best_pass_so_far;
-    control_params.pass_committed = pass_committed;
-}
-
-void AttackerFSM::updateControlParams(std::optional<Point> chip_target)
-{
-    control_params.chip_target = chip_target;
-}
