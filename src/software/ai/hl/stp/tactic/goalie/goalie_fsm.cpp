@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
 #include "software/ai/evaluation/find_open_areas.h"
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/math/math_functions.h"
-#include "software/ai/evaluation/intercept.h"
 
 
 Point GoalieFSM::getGoaliePositionToBlock(
@@ -193,9 +193,9 @@ void GoalieFSM::panic(const Update &event)
 
     if (event.common.robot.getTimeToPosition(goalie_pos) > ball_intercept_time)
     {
-        goalie_pos = findOvershootInterceptPosition(event.common.robot, goalie_pos, 
-                                       event.common.world_ptr->field(),
-                                       ball_intercept_time, GOALIE_STEP_SPEED_M_PER_S, true);
+        goalie_pos = findOvershootInterceptPosition(
+            event.common.robot, goalie_pos, event.common.world_ptr->field(),
+            ball_intercept_time, GOALIE_STEP_SPEED_M_PER_S, true);
     }
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(

@@ -96,24 +96,22 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
  * @param base_position The ideal intercept point without overshoot.
  * @param ball_intercept_time Time the ball will take to reach the base position.
  * @param step_speed Speed increment for each overshoot iteration.
- * @param restrict_to_defense_area Whether to restrict overshoot to the friendly defense area.
- * @return The best reachable intercept point (possibly overshot), or base_position if no improvement.
+ * @param restrict_to_defense_area Whether to restrict overshoot to the friendly defense
+ * area.
+ * @return The best reachable intercept point (possibly overshot), or base_position if no
+ * improvement.
  */
-Point findOvershootInterceptPosition(
-    const Robot& robot,
-    const Point intercept_position,
-    const Field& field,
-    Duration ball_intercept_time,
-    double step_speed,
-    bool restrict_to_defense_area)
+Point findOvershootInterceptPosition(const Robot &robot, const Point intercept_position,
+                                     const Field &field, Duration ball_intercept_time,
+                                     double step_speed, bool restrict_to_defense_area)
 {
     Point new_destination = intercept_position;
-    Point base_position = intercept_position;
-    Point best_position    = intercept_position;
-    double final_speed     = step_speed;
-    bool finished          = false;
-    double max_speed       = robot.robotConstants().robot_max_speed_m_per_s;
-    double max_acc         = robot.robotConstants().robot_max_acceleration_m_per_s_2;
+    Point base_position   = intercept_position;
+    Point best_position   = intercept_position;
+    double final_speed    = step_speed;
+    bool finished         = false;
+    double max_speed      = robot.robotConstants().robot_max_speed_m_per_s;
+    double max_acc        = robot.robotConstants().robot_max_acceleration_m_per_s_2;
 
     while (!finished)
     {
@@ -121,18 +119,20 @@ Point findOvershootInterceptPosition(
             (new_destination - robot.position()).normalize(final_speed);
 
         double extra_length = (final_speed * final_speed) / (2.0 * max_acc);
-        new_destination      = base_position + final_velocity.normalize(extra_length);
+        new_destination     = base_position + final_velocity.normalize(extra_length);
 
-        bool in_bounds = contains(field.fieldBoundary(), new_destination);
+        bool in_bounds  = contains(field.fieldBoundary(), new_destination);
         bool in_defense = field.pointInFriendlyDefenseArea(new_destination);
 
         if ((!restrict_to_defense_area ^ in_defense) && in_bounds)
         {
-            if(restrict_to_defense_area){
+            if (restrict_to_defense_area)
+            {
                 best_position = new_destination;
             }
 
-            if (robot.getTimeToPosition(base_position, final_velocity) < ball_intercept_time)
+            if (robot.getTimeToPosition(base_position, final_velocity) <
+                ball_intercept_time)
             {
                 best_position = new_destination;
                 finished      = true;

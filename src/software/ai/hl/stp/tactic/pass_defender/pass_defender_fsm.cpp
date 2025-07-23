@@ -5,11 +5,13 @@
 #include "software/geom/algorithms/closest_point.h"
 <<<<<<< HEAD
 #include "software/ai/evaluation/intercept.h"
-=======
+    == == ==
+    =
 #include "software/logger/logger.h"
->>>>>>> 8ddf5a82227b62f2766ee93b6bd59b0169058248
+        >>>>>>> 8ddf5a82227b62f2766ee93b6bd59b0169058248
 
-bool PassDefenderFSM::passStarted(const Update& event)
+        bool
+        PassDefenderFSM::passStarted(const Update& event)
 {
     auto ball_position = event.common.world_ptr->ball().position();
     Vector ball_receiver_point_vector(
@@ -93,9 +95,10 @@ void PassDefenderFSM::interceptBall(const Update& event)
             if (event.common.robot.getTimeToPosition(intercept_position) >
                 ball_intercept_time)
             {
-                intercept_position = findOvershootInterceptPosition(event.common.robot, intercept_position, 
-                                               event.common.world_ptr->field(),
-                                               ball_intercept_time, DEFENDER_STEP_SPEED_M_PER_S, false);
+                intercept_position = findOvershootInterceptPosition(
+                    event.common.robot, intercept_position,
+                    event.common.world_ptr->field(), ball_intercept_time,
+                    DEFENDER_STEP_SPEED_M_PER_S, false);
             }
         }
 
