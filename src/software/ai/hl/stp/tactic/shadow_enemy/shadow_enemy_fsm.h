@@ -106,17 +106,6 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
      */
     void stealAndChip(const Update &event);
 
-    /**
-     * Updates the control parameters for ShadowEnemyFSM
-     *
-     * @param enemy_threat The EnemyThreat indicating which enemy to shadow
-     * @param shadow_distance How far from the enemy the robot will shadow. This is the
-     * distance between the center of the enemy robot and the center of the robot
-     * shadowing it
-     */
-    void updateControlParams(std::optional<EnemyThreat> enemy_threat,
-                             double shadow_distance);
-
     auto operator()()
     {
         using namespace boost::sml;

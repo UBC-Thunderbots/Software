@@ -124,10 +124,3 @@ void ShadowEnemyFSM::stealAndChip(const Update &event)
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }
-
-void ShadowEnemyFSM::updateControlParams(std::optional<EnemyThreat> enemy_threat,
-                                            double shadow_distance)
-{
-    control_params.enemy_threat    = enemy_threat;
-    control_params.shadow_distance = shadow_distance;
-}

@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 Tactic<TacticFsm>::Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_), ai_config_ptr(ai_config_ptr), fsm_map()
 {
@@ -16,12 +16,12 @@ Tactic<TacticFsm>::Tactic(const std::set<RobotCapability> &capability_reqs_, std
     }
 }
 
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 std::unique_ptr<FSM<TacticFsm>> Tactic<TacticFsm>::fsm_init() {
     return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr));
 }
 
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 bool Tactic<TacticFsm>::done() const
     {
         bool is_done = false;
@@ -32,7 +32,7 @@ bool Tactic<TacticFsm>::done() const
         return is_done;
     }
 
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 std::string Tactic<TacticFsm>::getFSMState() const
 {
     std::string state_str = "";
@@ -42,25 +42,25 @@ std::string Tactic<TacticFsm>::getFSMState() const
     return state_str;
 }
 
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 const std::set<RobotCapability> &Tactic<TacticFsm>::robotCapabilityRequirements() const
 {
     return capability_reqs;
 }
 
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 std::set<RobotCapability> &Tactic<TacticFsm>::mutableRobotCapabilityRequirements()
 {
     return capability_reqs;
 }
 
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 void Tactic<TacticFsm>::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
 {
     this->last_execution_robot = last_execution_robot;
 }
 
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 std::map<RobotId, std::shared_ptr<Primitive>> Tactic<TacticFsm>::get(const WorldPtr &world_ptr)
 {
     TbotsProto::RobotNavigationObstacleConfig obstacle_config;
@@ -88,7 +88,7 @@ std::map<RobotId, std::shared_ptr<Primitive>> Tactic<TacticFsm>::get(const World
     return primitives_map;
 }
 
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 void Tactic<TacticFsm>::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
     if (reset_fsm)

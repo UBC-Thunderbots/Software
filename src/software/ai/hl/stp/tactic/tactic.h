@@ -35,7 +35,7 @@
  * Tactics are stateful, and use Primitives to implement their behaviour. They also
  * make heavy use of our Evaluation functions in order to help them make decisions.
  */
-template<class TacticFsm>
+template<class TacticFsm, class... SubFsms>
 class Tactic
 {
    public:
