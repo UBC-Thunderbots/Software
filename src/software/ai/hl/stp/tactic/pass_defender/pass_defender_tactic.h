@@ -21,8 +21,22 @@ class PassDefenderTactic : public Tactic<PassDefenderFSM>
      */
     explicit PassDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
+    /**
+     * Update control params for this tactic
+     *
+     * @param position_to_block_from The location on the field to block enemy passes from
+     * @param ball_steal_mode The pass defender's aggressiveness towards the ball
+     */
+    void updateControlParams(const Point& position_to_block_from,
+                             TbotsProto::BallStealMode ball_steal_mode);
+
     void accept(TacticVisitor& visitor) const override;
+
 
    private:
     std::unique_ptr<FSM<PassDefenderFSM>> fsm_init() override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+
+    PassDefenderFSMControlParams control_params;
+
 };

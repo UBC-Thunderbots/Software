@@ -106,15 +106,6 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
                               boost::sml::back::process<DribbleFSM::Update> processEvent);
 
 
-    /**
-     * Update control params for PassDefenderFSM
-     *
-     * @param position_to_block_from The location on the field to block enemy passes from
-     * @param ball_steal_mode The pass defender's aggressiveness towards the ball
-     */
-    void updateControlParams(const Point& position_to_block_from,
-                             TbotsProto::BallStealMode ball_steal_mode);
-
     auto operator()()
     {
         using namespace boost::sml;
@@ -149,7 +140,6 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
             InterceptBallState_S + Update_E / interceptBall_A,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
-
 
    private:
     // Initialized when a pass is started and used when a pass is deflected
