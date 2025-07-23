@@ -49,14 +49,6 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
      */
     bool behindBall(const Update& event);
 
-    /**
-     * Updates the control parameters for GetBehindBallFSM.
-     *
-     * @param ball_location The location of the ball when it will be chipped or kicked
-     * @param chick_direction The direction to kick or chip
-     */
-    void updateControlParams(const Point& ball_location, Angle chick_direction);
-
     auto operator()()
     {
         using namespace boost::sml;

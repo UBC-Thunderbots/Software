@@ -17,5 +17,18 @@ class GetBehindBallTactic : public Tactic<GetBehindBallFSM>
      */
     explicit GetBehindBallTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
+    /**
+     * Updates the control parameters for this GetBehindBallTactic.
+     *
+     * @param ball_location The location of the ball when it will be chipped or kicked
+     * @param chick_direction The direction to kick or chip
+     */
+    void updateControlParams(const Point& ball_location, Angle chick_direction);
+
     void accept(TacticVisitor& visitor) const override;
+
+   private:
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+
+    GetBehindBallFSMControlParams control_params;
 };
