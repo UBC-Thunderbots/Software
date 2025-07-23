@@ -40,7 +40,7 @@ bool PivotKickFSM::ballKicked(const Update& event)
     }
 }
 
-void PivotKickFSM::updateControlParams(const Point &kick_origin,
+void PivotKickTactic::updateControlParams(const Point &kick_origin,
                                           const Angle &kick_direction,
                                           AutoChipOrKick auto_chip_or_kick)
 {

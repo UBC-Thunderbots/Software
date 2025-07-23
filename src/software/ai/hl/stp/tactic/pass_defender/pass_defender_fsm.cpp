@@ -120,7 +120,7 @@ void PassDefenderFSM::prepareGetPossession(
     DefenderFSMBase::prepareGetPossession(event.common, processEvent);
 }
 
-void PassDefenderFSM::updateControlParams(const Point &position_to_block_from,
+void PassDefenderTactic::updateControlParams(const Point &position_to_block_from,
                                              TbotsProto::BallStealMode ball_steal_mode)
 {
     control_params.position_to_block_from = position_to_block_from;
