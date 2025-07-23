@@ -10,13 +10,17 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 
+/**
+ * The control parameters for updating ReceiverFSM
+ */
 struct ReceiverFSMControlParams
 {
     // The pass to receive
-    std::optional<Pass> pass = std::nullopt;
+    std::optional<Pass> pass;
 
     // If set to true, we will only receive and dribble
-    bool disable_one_touch_shot = false;
+    bool disable_one_touch_shot;
+    ReceiverFSMControlParams() : pass(std::nullopt), disable_one_touch_shot(false){};
 };
 
 struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
@@ -29,10 +33,7 @@ struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
      explicit ReceiverFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-     : TacticFSM<ReceiverFSMControlParams>(ai_config_ptr),
-       control_params{
-               .pass                   = std::nullopt,
-               .disable_one_touch_shot = false}
+     : TacticFSM<ReceiverFSMControlParams>(ai_config_ptr)
                {
                }
 
@@ -145,7 +146,7 @@ struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
     bool strayPass(const Update& event);
 
     /**
-     * Updates the control parameters for this ReceiverTactic.
+     * Updates the control parameters for ReceiverFSM.
      *
      * @param updated_pass The pass this tactic should try to receive
      * @param disable_one_touch_shot If set to true, the receiver will not perform a
@@ -188,6 +189,4 @@ struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
             OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
     }
-protected:
-    ReceiverFSMControlParams control_params;
 };

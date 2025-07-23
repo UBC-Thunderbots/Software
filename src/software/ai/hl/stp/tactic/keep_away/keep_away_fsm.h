@@ -4,9 +4,13 @@
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
+/**
+ * The control parameters for updating KeepAwayFSM
+ */
 struct KeepAwayFSMControlParams
 {
     std::optional<Pass> best_pass_so_far;
+    KeepAwayFSMControlParams() : best_pass_so_far(std::nullopt){};
 };
 
 struct KeepAwayFSM : TacticFSM<KeepAwayFSMControlParams>

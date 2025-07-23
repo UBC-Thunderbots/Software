@@ -96,5 +96,5 @@ void Tactic<TacticFsm>::updatePrimitive(const TacticUpdate &tactic_update, bool 
         fsm_map[tactic_update.robot.id()] = fsm_init();
     }
     fsm_map.at(tactic_update.robot.id())
-            ->process_event(TacticFsm::Update(control_params, tactic_update));
+            ->process_event(TacticFsm::Update(TacticFsm::control_params, tactic_update));
 }

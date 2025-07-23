@@ -11,9 +11,10 @@ AttackerTactic::AttackerTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_p
 {
 }
 
-AttackerTactic::fsm_init() {
+std::unique_ptr<FSM<AttackerFSM>> AttackerTactic::fsm_init() {
     return std::make_unique<FSM<AttackerFSM>>(
-                DribbleFSM(ai_config_ptr), KeepAwayFSM(ai_config_ptr),
+                DribbleFSM(ai_config_ptr),
+                KeepAwayFSM(ai_config_ptr),
                 AttackerFSM(ai_config_ptr));
 }
 
@@ -24,6 +25,7 @@ void AttackerTactic::accept(TacticVisitor& visitor) const
 
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
+
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = fsm_init();
@@ -48,6 +50,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
 void AttackerTactic::visualizeControlParams(const World& world)
 {
+
     TbotsProto::AttackerVisualization pass_visualization_msg;
 
     if (control_params.best_pass_so_far.has_value())

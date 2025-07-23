@@ -13,8 +13,9 @@
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
 
-// this struct defines the unique control parameters that the CreaseDefenderFSM
-// requires in its update
+/**
+ * The control parameters for updating CreaseDefenderFSM
+ */
 struct CreaseDefenderFSMControlParams
 {
     // The origin point of the enemy threat
@@ -25,6 +26,13 @@ struct CreaseDefenderFSMControlParams
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     // The crease defender's aggressiveness towards the ball
     TbotsProto::BallStealMode ball_steal_mode;
+    CreaseDefenderFSMControlParams()
+    : enemy_threat_origin(Point(0,0)),
+    crease_defender_alignment(TbotsProto::CreaseDefenderAlignment::CENTRE),
+    max_allowed_speed_mode(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT),
+    ball_steal_mode(TbotsProto::BallStealMode::STEAL)
+            {
+            };
 };
 
 struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMControlParams>
@@ -38,12 +46,8 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMCo
      * @param ai_config_ptr Shared pointer to ai_config
      */
     explicit CreaseDefenderFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    :   TacticFSM<CreaseDefenderFSMControlParams>(ai_config_ptr),
-        DefenderFSMBase(ai_config_ptr),
-        control_params{.enemy_threat_origin = Point(0, 0),
-                 .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::CENTRE,
-                 .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                 .ball_steal_mode = TbotsProto::BallStealMode::STEAL}
+    :   DefenderFSMBase(),
+        TacticFSM<CreaseDefenderFSMControlParams>(ai_config_ptr)
       {
       }
 
@@ -93,7 +97,7 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMCo
                      boost::sml::back::process<MoveFSM::Update> processEvent);
 
     /**
-     * Update control params for this tactic
+     * Update control params for CreaseDefenderFSM
      *
      * @param enemy_threat_origin The origin of the enemy threat
      * @param alignment The alignment for this crease defender
@@ -131,8 +135,6 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMCo
                 DribbleFSM_S,
             X + Update_E / blockThreat_A = MoveFSM_S);
     }
-    protected:
-    CreaseDefenderFSMControlParams control_params;
 
    private:
     static constexpr double DETECT_THREAT_AHEAD_SHAPE_LENGTH_M = 1;

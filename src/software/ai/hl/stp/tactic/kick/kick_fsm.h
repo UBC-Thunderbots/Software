@@ -1,9 +1,12 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
+#include "software/geom/point.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
-
+/**
+ * The control parameters for updating KickFSM
+ */
 struct KickFSMControlParams
 {
     // The location where the kick will be taken from
@@ -12,6 +15,7 @@ struct KickFSMControlParams
     Angle kick_direction;
     // How fast the Robot will kick the ball in meters per second
     double kick_speed_meters_per_second;
+    KickFSMControlParams() : kick_origin(Point(0,0)), kick_direction(Angle::zero()), kick_speed_meters_per_second(0){};
 };
 
 
@@ -64,7 +68,7 @@ struct KickFSM : TacticFSM<KickFSMControlParams>
     bool shouldRealignWithBall(const Update &event);
 
     /**
-     * Updates the params for this tactic that cannot be derived from the world
+     * Updates the params for this FSM that cannot be derived from the world
      *
      * @param kick_origin The location where the kick will be taken
      * @param kick_direction The direction the Robot will kick in
@@ -75,7 +79,7 @@ struct KickFSM : TacticFSM<KickFSMControlParams>
                              double kick_speed_meters_per_second);
 
     /**
-     * Updates the control parameters for this KickTactic.
+     * Updates the control parameters for KickFSM.
      *
      * @param kick_origin The location where the kick will be taken
      * @param kick_direction The direction the Robot will kick in
@@ -108,7 +112,4 @@ struct KickFSM : TacticFSM<KickFSMControlParams>
             KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
-protected:
-    // Tactic parameters
-    KickFSMControlParams control_params;
 };

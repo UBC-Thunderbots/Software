@@ -3,8 +3,12 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/geom/point.h"
 #include "software/logger/logger.h"
 
+/**
+ * The control parameters for updating PivotKickFSM
+ */
 struct PivotKickFSMControlParams
 {
     // The location where the kick will be taken from
@@ -13,6 +17,7 @@ struct PivotKickFSMControlParams
     Angle kick_direction;
     // How the robot will chip or kick the ball
     AutoChipOrKick auto_chip_or_kick;
+    PivotKickFSMControlParams() : kick_origin(Point(0,0)), kick_direction(Angle::zero()), AutoChipOrKick({AutoChipOrKickMode::OFF,0}) {};
 };
 
 struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
@@ -28,7 +33,6 @@ struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
      */
      explicit PivotKickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
      : TacticFSM<PivotKickFSMControlParams>(ai_config_ptr),
-       control_params(PivotKickFSMControlParams())
        {
        }
 
@@ -58,7 +62,7 @@ struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
     bool ballKicked(const Update& event);
 
     /**
-     * Update control params for this tactic
+     * Update control params for PivotKickFSM
      *
      * @param kick_origin The location where the kick will be taken
      * @param kick_direction The direction the Robot will kick in
@@ -88,6 +92,4 @@ struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
             KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                         = X);
     }
-protected:
-    PivotKickFSMControlParams control_params;
 };

@@ -10,6 +10,9 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 
+/**
+ * The control parameters for updating DribbleFSM
+ */
 struct DribbleFSMControlParams
 {
     // The destination for dribbling the ball
@@ -18,6 +21,10 @@ struct DribbleFSMControlParams
     std::optional<Angle> final_dribble_orientation;
     // whether to allow excessive dribbling, i.e. more than 1 metre at a time
     bool allow_excessive_dribbling;
+    DribbleFSMControlParams() : dribble_destination(std::nullopt),
+    final_dribble_orientation(std::nullopt),
+    allow_excessive_dribbling(false)
+    {};
 };
 
 struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
@@ -35,11 +42,7 @@ struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
      * @param ai_config_ptr shared ptr to ai_config
      */
     explicit DribbleFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<DribbleFSMControlParams>(ai_config_ptr),
-          control_params{
-              .dribble_destination       = std::nullopt,
-              .final_dribble_orientation = std::nullopt,
-              .allow_excessive_dribbling = false}
+        : TacticFSM<DribbleFSMControlParams>(ai_config_ptr)
     {
     }
 
@@ -218,6 +221,4 @@ struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
             X + Update_E[!dribblingDone_G] / dribble_A                 = Dribble_S,
             X + Update_E / dribble_A                                   = X);
     }
-    protected:
-    DribbleFSMControlParams control_params;
 };

@@ -1,8 +1,12 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
+#include "software/geom/point.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
+/**
+ * The control parameters for updating ChipFSM
+ */
 struct ChipFSMControlParams
 {
     // The location where the chip will be taken from
@@ -11,6 +15,7 @@ struct ChipFSMControlParams
     Angle chip_direction;
     // The distance the robot will chip to
     double chip_distance_meters;
+    ChipFSMControlParams() : chip_origin(Point(0,0)), chip_direction(Angle::zero()), chip_distance_meters(0){};
 };
 
 struct ChipFSM : TacticFSM<ChipFSMControlParams>
@@ -63,7 +68,7 @@ struct ChipFSM : TacticFSM<ChipFSMControlParams>
     bool shouldRealignWithBall(const Update &event);
 
     /**
-     * Updates the params for this tactic that cannot be derived from the world
+     * Updates the params for ChipFSM that cannot be derived from the world
      *
      * @param chip_origin The location where the chip will be taken
      * @param chip_direction The direction the Robot will chip in
@@ -74,7 +79,7 @@ struct ChipFSM : TacticFSM<ChipFSMControlParams>
                              double chip_distance_meters);
 
     /**
-     * Updates the control parameters for this ChipTactic.
+     * Updates the control parameters for ChipFSM
      *
      * @param chip_origin The location where the chip will be taken
      * @param chip_direction The direction the Robot will chip in
@@ -105,7 +110,4 @@ struct ChipFSM : TacticFSM<ChipFSMControlParams>
             ChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
-    protected:
-    // Tactic parameters
-    ChipFSMControlParams control_params;
 };

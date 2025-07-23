@@ -3,7 +3,7 @@
 #include <algorithm>
 
 KickTactic::KickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-        : Tactic<KickFSM>({RobotCapability::Kick, RobotCapability::Move} ai_config_ptr)
+        : Tactic<KickFSM>({RobotCapability::Kick, RobotCapability::Move}, ai_config_ptr)
 {
 }
 

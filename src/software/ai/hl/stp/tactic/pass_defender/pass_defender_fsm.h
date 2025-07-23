@@ -2,19 +2,23 @@
 
 #include "proto/tactic.pb.h"
 #include "shared/constants.h"
+#include "software/geom/point.h"
 #include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 
-// This struct defines the unique control parameters that the PassDefenderFSM requires
-// in its update
+
+/**
+ * The control parameters for updating PassDefenderFSM
+ */
 struct PassDefenderFSMControlParams
 {
     // The location on the field to block enemy passes from
     Point position_to_block_from;
     // The pass defender's aggressiveness towards the ball
     TbotsProto::BallStealMode ball_steal_mode;
+    PassDefenderFSMControlParams() : position_to_block_from(Point(0,0)), ball_steal_mode(TbotsProto::BallStealMode::STEAL){};
 };
 
 struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMControlParams>
@@ -30,9 +34,8 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
      * @param ai_config_ptr shared pointer to ai_config
      */
      explicit PassDefenderFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-     : TacticFSM<PassDefenderFSMControlParams>(ai_config_ptr),
-             DefenderFSMBase(ai_config_ptr),
-             control_params(PassDefenderFSMControlParams())
+     :       DefenderFSMBase(),
+             TacticFSM<PassDefenderFSMControlParams>(ai_config_ptr)
          {
          }
 
@@ -104,7 +107,7 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
 
 
     /**
-     * Update control params for this tactic
+     * Update control params for PassDefenderFSM
      *
      * @param position_to_block_from The location on the field to block enemy passes from
      * @param ball_steal_mode The pass defender's aggressiveness towards the ball
@@ -146,8 +149,7 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
             InterceptBallState_S + Update_E / interceptBall_A,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
-protected:
-    PassDefenderFSMControlParams control_params;
+
 
    private:
     // Initialized when a pass is started and used when a pass is deflected

@@ -42,7 +42,7 @@ public:
      * The Update struct is the only event that a tactic FSM should respond to and it is
      * composed of the following structs:
      *
-     * TFsmControlParams - uniquely defined by each tactic to control the FSM
+     * TFsmControlParams - uniquely defined parameters for each FSM
      * TacticUpdate - common struct that contains Robot, World, and SetPrimitiveCallback
      */
     struct Update
@@ -55,15 +55,16 @@ public:
         TacticUpdate common;
     };
 
-    explicit TacticFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): ai_config_ptr(ai_config_ptr){}
+    explicit TacticFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): ai_config_ptr(ai_config_ptr), control_params(){}
+
+    TFsmControlParams control_params;
 
 protected:
     // Former constructors took what they needed from ai_config and stored it locally.
     // Now, we store ai_config as a pointer and use it to update as needed.
+    // This ensures that everything gets the update as needed.
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 };
-
-
 
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
     [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }

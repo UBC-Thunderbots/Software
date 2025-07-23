@@ -13,9 +13,13 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
 
+/**
+ * The control parameters for updating GoalieFSM
+ */
 struct GoalieFSMControlParams
 {
     bool should_move_to_goal_line;
+    GoalieFSMControlParams() : should_move_to_goal_line(false){};
 };
 
 struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
@@ -43,8 +47,8 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
                         : TacticFSM<GoalieFSMControlParams>(ai_config_ptr),
                           max_allowed_speed_mode(max_allowed_speed_mode),
                           robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
-                                  ai_config_ptr->robot_navigation_obstacle_config().robot_obstacle_inflation_factor()),
-                          control_params{.should_move_to_goal_line = false}
+                                  ai_config_ptr->robot_navigation_obstacle_config().robot_obstacle_inflation_factor())
+
                                 {
                                 }
     /**
@@ -52,11 +56,12 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * ball and the friendly goal
      * @param ball the ball to position the goalie relative to
      * @param field the field to position the goalie on
+     * @param goalie_tactic_config the goalie tactic config
      *
      * @return the position that the goalie should move to
      */
     static Point getGoaliePositionToBlock(
-        const Ball &ball, const Field &field);
+        const Ball &ball, const Field &field, TbotsProto::GoalieTacticConfig goalie_tactic_config);
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment
@@ -85,7 +90,7 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * @return a point on the field that is a good place to chip to
      */
     static Point findGoodChipTarget(
-        const World &world);
+        const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
 
     /**
      * Guard that checks if the goalie should leave the crease the intercept the ball
@@ -186,6 +191,11 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      */
     bool ballInInflatedDefenseArea(const Update &event);
 
+    /**
+     * Update the control parameters for GoalieFSM
+     *
+     * @param should_move_to_goal_line true if the goalie should move to the goal line, false otherwise
+     */
     void updateControlParams(bool should_move_to_goal_line);
 
     auto operator()()
@@ -246,8 +256,6 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
                 PositionToBlock_S,
             X + Update_E = X);
     }
-protected:
-    GoalieFSMControlParams control_params;
 
    private:
     static constexpr double BALL_RETRIEVED_THRESHOLD = 0.2;

@@ -16,8 +16,9 @@ PivotKickTactic::PivotKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config
 }
 
 std::unique_ptr<FSM<PivotKickFSM>> PivotKickTactic::fsm_init() {
-    return std::make_unique<FSM<PivotKickFSM>>(PivotKickFSM(ai_config_ptr),
-        DribbleFSM(ai_config_ptr));
+    return std::make_unique<FSM<PivotKickFSM>>(
+            PivotKickFSM(ai_config_ptr),
+            DribbleFSM(ai_config_ptr));
 }
 
 void PivotKickTactic::accept(TacticVisitor &visitor) const

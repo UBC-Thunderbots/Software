@@ -7,8 +7,9 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
-// this struct defines the unique control parameters that the ShadowEnemyFSM requires
-// in its update
+/**
+ * The control parameters for updating ShadowEnemyFSM
+ */
 struct ShadowEnemyFSMControlParams
 {
     // The Enemy Threat indicating which enemy to shadow
@@ -18,6 +19,7 @@ struct ShadowEnemyFSMControlParams
     // threat has the ball, it will position itself to block the shot on goal.
     // Otherwise it will try to block the pass to the enemy threat.
     double shadow_distance;
+    ShadowEnemyFSMControlParams() : enemy_threat(std::nullopt), shadow_distance(0){};
 };
 
 
@@ -34,9 +36,7 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit ShadowEnemyFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr),
-    control_params{.enemy_threat    = std::nullopt,
-                   .shadow_distance = 0}
+    : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr)
     {
     }
 
@@ -107,7 +107,7 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
     void stealAndChip(const Update &event);
 
     /**
-     * Updates the control parameters for this ShadowEnemyTactic
+     * Updates the control parameters for ShadowEnemyFSM
      *
      * @param enemy_threat The EnemyThreat indicating which enemy to shadow
      * @param shadow_distance How far from the enemy the robot will shadow. This is the
@@ -143,6 +143,4 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
             X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION          = X);
     }
-protected:
-    ShadowEnemyFSMControlParams control_params;
 };

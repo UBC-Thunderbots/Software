@@ -7,7 +7,8 @@ PenaltyKickTactic::PenaltyKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_co
 
 std::unique_ptr<FSM<PenaltyKickFSM>> PenaltyKickTactic::fsm_init() {
     return std::make_unique<FSM<PenaltyKickFSM>>(
-            DribbleFSM(ai_config_ptr), PenaltyKickFSM(ai_config_ptr),
+            DribbleFSM(ai_config_ptr),
+            PenaltyKickFSM(ai_config_ptr),
             GetBehindBallFSM(ai_config_ptr));
 }
 

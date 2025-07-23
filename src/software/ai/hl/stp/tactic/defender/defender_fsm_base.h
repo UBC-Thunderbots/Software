@@ -7,21 +7,26 @@
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/logger/logger.h"
 
-struct DefenderFSMBaseControlParams{};
+// CODE COMMENTED OUT BECAUSE I'M NOT SURE IF I CAN DO THIS (it should be fine?)
 
-struct DefenderFSMBase : TacticFSM<DefenderFSMBaseControlParams>
+/**
+ * The control parameters for DefenderBaseFSM (there aren't any)
+ */
+// struct DefenderFSMBaseControlParams{};
+
+struct DefenderFSMBase // : TacticFSM<DefenderFSMBaseControlParams>
 {
-    using Update = TacticFSM<DefenderFSMBaseControlParams>::Update;
-
-    /**
-     * Constructor for DefenderFSMBase
-     *
-     * @param ai_config_ptr shared ptr to ai_config
-     */
-    explicit DefenderFSMBase(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticFSM<DefenderFSMBaseControlParams>(ai_config_ptr)
-    {
-    }
+//    using Update = TacticFSM<DefenderFSMBaseControlParams>::Update;
+//
+//    /**
+//     * Constructor for DefenderFSMBase
+//     *
+//     * @param ai_config_ptr shared ptr to ai_config
+//     */
+//    explicit DefenderFSMBase(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+//    : TacticFSM<DefenderFSMBaseControlParams>(ai_config_ptr)
+//    {
+//    }
 
     /**
      * Guard that determines whether it is appropriate to steal the ball for FSMs

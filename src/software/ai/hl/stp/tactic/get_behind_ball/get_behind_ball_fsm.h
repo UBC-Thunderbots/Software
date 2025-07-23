@@ -4,6 +4,9 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/triangle.h"
 
+/**
+ * The control parameters for updating GetBehindBallFSM
+ */
 struct GetBehindBallFSMControlParams
 {
     // The location where the chick will be taken, i.e. where we expect the ball to be
@@ -11,6 +14,7 @@ struct GetBehindBallFSMControlParams
     Point ball_location;
     // The direction the Robot will chick in
     Angle chick_direction;
+    GetBehindBallFSMControlParams(): ball_location(Point(0,0)), chick_direction(Angle::zero()){};
 };
 
 struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
@@ -25,9 +29,7 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
      * @param ai_config_ptr Shared pointer to ai_config
      */
     explicit GetBehindBallFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr),
-      control_params{.ball_location = Point(0, 0),
-                     .chick_direction = Angle::zero()}
+    : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr)
     {
     };
 
@@ -48,7 +50,7 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
     bool behindBall(const Update& event);
 
     /**
-     * Updates the control parameters for this GetBehindBallTactic.
+     * Updates the control parameters for GetBehindBallFSM.
      *
      * @param ball_location The location of the ball when it will be chipped or kicked
      * @param chick_direction The direction to kick or chip
@@ -73,6 +75,4 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
             X + Update_E[!behindBall_G] / updateMove_A = GetBehindBallState_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION   = X);
     }
-protected:
-    GetBehindBallFSMControlParams control_params;
 };

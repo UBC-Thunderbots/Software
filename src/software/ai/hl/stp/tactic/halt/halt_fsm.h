@@ -2,8 +2,12 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 
+/**
+ * The control parameters for updating HaltFSM (there aren't any)
+ */
 struct HaltFSMControlParams
 {
+    HaltFSMControlParams(){};
 };
 
 struct HaltFSM : TacticFSM<HaltFSMControlParams>
@@ -17,7 +21,7 @@ struct HaltFSM : TacticFSM<HaltFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit HaltFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<HaltFSMControlParams>(ai_config_ptr), control_params() {}
+    explicit HaltFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<HaltFSMControlParams>(ai_config_ptr){}
 
     /**
      * Action to set the StopPrimitive
@@ -51,6 +55,4 @@ struct HaltFSM : TacticFSM<HaltFSMControlParams>
             X + Update_E[!stopDone_G] / updateStop_A            = StopState_S,
             X + Update_E[stopDone_G] / updateStop_A             = X);
     }
-protected:
-    HaltFSMControlParams control_params;
 };

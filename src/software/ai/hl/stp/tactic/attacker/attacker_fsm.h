@@ -9,17 +9,21 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 
+/**
+ * The control parameters for updating AttackerFSM
+ */
 struct AttackerFSMControlParams
 {
     // The best pass so far
-    std::optional<Pass> best_pass_so_far = std::nullopt;
+    std::optional<Pass> best_pass_so_far;
     // whether we have committed to the pass and will be taking it
-    bool pass_committed = false;
+    bool pass_committed;
     // The shot to take
-    std::optional<Shot> shot = std::nullopt;
+    std::optional<Shot> shot;
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
+    AttackerFSMControlParams() : best_pass_so_far(std::nullopt), pass_committed(false), shot(std::nullopt), chip_target(std::nullopt){};
 };
 
 struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
@@ -30,12 +34,7 @@ struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
      *
      * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit AttackerFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<AttackerFSMControlParams>(ai_config_ptr),
-            control_params{
-        .best_pass_so_far = std::nullopt,
-        .pass_committed = false,
-        .shot = std::nullopt,
-        .chip_target = std::nullopt}{}
+    explicit AttackerFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<AttackerFSMControlParams>(ai_config_ptr){}
 
     /**
      * Action that updates the PivotKickFSM to shoot or pass
@@ -66,14 +65,14 @@ struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
     bool shouldKick(const Update& event);
 
     /**
-     * Updates the control parameters for this AttackerTactic.
+     * Updates the control parameters for AttackerFSM.
      *
      * @param updated_pass The pass to perform
      */
     void updateControlParams(const Pass& best_pass_so_far, bool pass_committed);
 
     /**
-     * Updates the control parameters for this AttackerTactic
+     * Updates the control parameters for this AttackerFSM
      *
      * @param chip_target An optional point that the robot will chip towards when it is
      * unable to shoot and is in danger of losing the ball to an enemy. If this value is
@@ -103,7 +102,4 @@ struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
-
-    protected:
-    AttackerFSMControlParams control_params;
 };

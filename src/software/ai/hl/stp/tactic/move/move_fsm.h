@@ -1,9 +1,11 @@
 #pragma once
 
+#include "software/geom/point.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
-// this struct defines the unique control parameters that the MoveFSM requires in its
-// update
+/**
+ * The control parameters for updating MoveFSM
+ */
 struct MoveFSMControlParams
 {
     // The point the robot is trying to move to
@@ -20,6 +22,13 @@ struct MoveFSMControlParams
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     // The obstacle avoidance mode
     TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
+    MoveFSMControlParams() : destination(Point()),
+    final_orientation(Angle::zero()),
+    dribbler_mode(TbotsProto::DribblerMode::OFF),
+    ball_collision_type(TbotsProto::BallCollisionType::AVOID),
+    auto_chip_or_kick({AutoChipOrKickMode::OFF,0}),
+    max_allowed_speed_mode(TbotsProto::MaxAloowedSpeedMode::PHYSICAL_LIMIT),
+    obstacle_avoidance_mode(TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE){};
 };
 
 struct MoveFSM : TacticFSM<MoveFSMControlParams>
@@ -36,15 +45,7 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit MoveFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticFSM<MoveFSMControlParams>(ai_config_ptr),
-        control_params{
-                .destination             = Point(),
-                .final_orientation       = Angle::zero(),
-                .dribbler_mode           = TbotsProto::DribblerMode::OFF,
-                .ball_collision_type     = TbotsProto::BallCollisionType::AVOID,
-                .auto_chip_or_kick       = {AutoChipOrKickMode::OFF, 0},
-                .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE}
+    : TacticFSM<MoveFSMControlParams>(ai_config_ptr)
                 {
                 }
 
@@ -123,6 +124,4 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
             X + Update_E[!moveDone_G] / updateMove_A            = MoveState_S,
             X + Update_E / updateMove_A                         = X);
     }
-protected:
-    MoveFSMControlParams control_params;
 };
