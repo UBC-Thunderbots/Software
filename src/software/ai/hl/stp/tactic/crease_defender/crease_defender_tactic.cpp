@@ -26,4 +26,25 @@ void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
+void CreaseDefenderTactic::updateControlParams(
+    const Point &enemy_threat_origin,
+    const TbotsProto::CreaseDefenderAlignment &alignment,
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+    TbotsProto::BallStealMode ball_steal_mode)
+{
+    control_params.enemy_threat_origin       = enemy_threat_origin;
+    control_params.crease_defender_alignment = alignment;
+    control_params.max_allowed_speed_mode    = max_allowed_speed_mode;
+    control_params.ball_steal_mode           = ball_steal_mode;
+}
 
+void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
+                                           bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = fsm_init();
+    }
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
+}
