@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
-#include "software/ai/evaluation/intercept.h"
 
 bool PassDefenderFSM::passStarted(const Update& event)
 {
