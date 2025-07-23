@@ -67,27 +67,7 @@ struct KickFSM : TacticFSM<KickFSMControlParams>
      */
     bool shouldRealignWithBall(const Update &event);
 
-    /**
-     * Updates the params for this FSM that cannot be derived from the world
-     *
-     * @param kick_origin The location where the kick will be taken
-     * @param kick_direction The direction the Robot will kick in
-     * @param kick_speed_meters_per_second The speed of how fast the Robot
-     * will kick the ball in meters per second
-     */
-    void updateControlParams(const Point& kick_origin, const Angle& kick_direction,
-                             double kick_speed_meters_per_second);
 
-    /**
-     * Updates the control parameters for KickFSM.
-     *
-     * @param kick_origin The location where the kick will be taken
-     * @param kick_direction The direction the Robot will kick in
-     * @param kick_speed_meters_per_second The speed of how fast the Robot
-     * will kick the ball in meters per second
-     */
-    void updateControlParams(const Point& kick_origin, const Point& kick_target,
-                             double kick_speed_meters_per_second);
     auto operator()()
     {
         using namespace boost::sml;

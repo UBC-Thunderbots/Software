@@ -49,19 +49,3 @@ bool KickFSM::shouldRealignWithBall(const Update &event)
     return !isRobotReadyToChick(robot, event.control_params.kick_origin,
                                 event.control_params.kick_direction);
 }
-
-void KickFSM::updateControlParams(const Point &kick_origin,
-                                     const Angle &kick_direction,
-                                     double kick_speed_meters_per_second)
-{
-    control_params.kick_origin                  = kick_origin;
-    control_params.kick_direction               = kick_direction;
-    control_params.kick_speed_meters_per_second = kick_speed_meters_per_second;
-}
-
-void KickFSM::updateControlParams(const Point &kick_origin, const Point &kick_target,
-                                     double kick_speed_meters_per_second)
-{
-    updateControlParams(kick_origin, (kick_target - kick_origin).orientation(),
-                        kick_speed_meters_per_second);
-}
