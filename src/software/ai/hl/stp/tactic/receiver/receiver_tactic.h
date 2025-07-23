@@ -22,5 +22,21 @@ class ReceiverTactic : public Tactic<ReceiverFSM>
      */
     explicit ReceiverTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
+    /**
+     * Updates the control parameters for this ReceiverTactic.
+     *
+     * @param updated_pass The pass this tactic should try to receive
+     * @param disable_one_touch_shot If set to true, the receiver will not perform a
+     * one-touch The robot will simply receive and dribble.
+     */
+    void updateControlParams(std::optional<Pass> updated_pass,
+                             bool disable_one_touch_shot = false);
+
     void accept(TacticVisitor& visitor) const override;
+
+
+   private:
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+
+    ReceiverFSMControlParams control_params;
 };

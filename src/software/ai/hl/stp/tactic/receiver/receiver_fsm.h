@@ -145,16 +145,6 @@ struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
      */
     bool strayPass(const Update& event);
 
-    /**
-     * Updates the control parameters for ReceiverFSM.
-     *
-     * @param updated_pass The pass this tactic should try to receive
-     * @param disable_one_touch_shot If set to true, the receiver will not perform a
-     * one-touch The robot will simply receive and dribble.
-     */
-    void updateControlParams(std::optional<Pass> updated_pass,
-                             bool disable_one_touch_shot = false);
-
     auto operator()()
     {
         using namespace boost::sml;
