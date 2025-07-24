@@ -10,7 +10,7 @@
  * chip the ball to the chip target.
  */
 
-class ChipTactic : public Tactic<ChipFSM>
+class ChipTactic : public Tactic<ChipFSM, GetBehindBallFSM>
 {
    public:
     /**
@@ -40,9 +40,6 @@ class ChipTactic : public Tactic<ChipFSM>
     void updateControlParams(const Point& chip_origin, const Point& chip_target);
 
     void accept(TacticVisitor& visitor) const override;
-
-   private:
-    std::unique_ptr<FSM<ChipFSM>> fsm_init() override;
 };
 
 // Creates a new tactic called KickoffChipTactic that is a duplicate of ChipTactic

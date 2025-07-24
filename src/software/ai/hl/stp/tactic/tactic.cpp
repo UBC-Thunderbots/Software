@@ -6,23 +6,23 @@
 #include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
-template<class TacticFsm, class... SubFsms>
-Tactic<TacticFsm>::Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+template<class TacticFsm, class... TacticSubFsms>
+Tactic<TacticFsm, TacticSubFsms...>::Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_), ai_config_ptr(ai_config_ptr), fsm_map(), control_params()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = fsm_init();
+        fsm_map[id] = fsmInit();
     }
 }
 
-template<class TacticFsm, class... SubFsms>
-std::unique_ptr<FSM<TacticFsm>> Tactic<TacticFsm>::fsm_init() {
-    return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr));
+template<class TacticFsm, class... TacticSubFsms>
+std::unique_ptr<FSM<TacticFsm>> Tactic<TacticFsm, TacticSubFsms...>::fsmInit() {
+    return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr), TacticSubFsms(ai_config_ptr)...);
 }
 
-template<class TacticFsm, class... SubFsms>
-bool Tactic<TacticFsm>::done() const
+template<class TacticFsm, class... TacticSubFsms>
+bool Tactic<TacticFsm, TacticSubFsms...>::done() const
     {
         bool is_done = false;
         if (last_execution_robot.has_value())
@@ -32,8 +32,8 @@ bool Tactic<TacticFsm>::done() const
         return is_done;
     }
 
-template<class TacticFsm, class... SubFsms>
-std::string Tactic<TacticFsm>::getFSMState() const
+template<class TacticFsm, class... TacticSubFsms>
+std::string Tactic<TacticFsm, TacticSubFsms...>::getFSMState() const
 {
     std::string state_str = "";
     if (last_execution_robot.has_value())
@@ -42,26 +42,26 @@ std::string Tactic<TacticFsm>::getFSMState() const
     return state_str;
 }
 
-template<class TacticFsm, class... SubFsms>
-const std::set<RobotCapability> &Tactic<TacticFsm>::robotCapabilityRequirements() const
+template<class TacticFsm, class... TacticSubFsms>
+const std::set<RobotCapability> &Tactic<TacticFsm, TacticSubFsms...>::robotCapabilityRequirements() const
 {
     return capability_reqs;
 }
 
-template<class TacticFsm, class... SubFsms>
-std::set<RobotCapability> &Tactic<TacticFsm>::mutableRobotCapabilityRequirements()
+template<class TacticFsm, class... TacticSubFsms>
+std::set<RobotCapability> &Tactic<TacticFsm, TacticSubFsms...>::mutableRobotCapabilityRequirements()
 {
     return capability_reqs;
 }
 
-template<class TacticFsm, class... SubFsms>
-void Tactic<TacticFsm>::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
+template<class TacticFsm, class... TacticSubFsms>
+void Tactic<TacticFsm, TacticSubFsms...>::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
 {
     this->last_execution_robot = last_execution_robot;
 }
 
-template<class TacticFsm, class... SubFsms>
-std::map<RobotId, std::shared_ptr<Primitive>> Tactic<TacticFsm>::get(const WorldPtr &world_ptr)
+template<class TacticFsm, class... TacticSubFsms>
+std::map<RobotId, std::shared_ptr<Primitive>> Tactic<TacticFsm, TacticSubFsms...>::get(const WorldPtr &world_ptr)
 {
     TbotsProto::RobotNavigationObstacleConfig obstacle_config;
     std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
@@ -88,12 +88,12 @@ std::map<RobotId, std::shared_ptr<Primitive>> Tactic<TacticFsm>::get(const World
     return primitives_map;
 }
 
-template<class TacticFsm, class... SubFsms>
-void Tactic<TacticFsm>::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+template<class TacticFsm, class... TacticSubFsms>
+void Tactic<TacticFsm, TacticSubFsms...>::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = fsm_init();
+        fsm_map[tactic_update.robot.id()] = fsmInit();
     }
     fsm_map.at(tactic_update.robot.id())
             ->process_event(TacticFsm::Update(control_params, tactic_update));

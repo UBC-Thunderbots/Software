@@ -5,12 +5,8 @@
 #include "software/logger/logger.h"
 
 PassDefenderTactic::PassDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<PassDefenderFSM>({RobotCapability::Move, RobotCapability::Kick}, ai_config_ptr)
+    : Tactic<PassDefenderFSM, DribbleFSM>({RobotCapability::Move, RobotCapability::Kick}, ai_config_ptr)
 {
-}
-
-std::unique_ptr<FSM<PassDefenderFSM>> PassDefenderTactic::fsm_init() {
-    return std::make_unique<FSM<PassDefenderFSM>>(PassDefenderFSM(ai_config_ptr), DribbleFSM(ai_config_ptr));
 }
 
 void PassDefenderTactic::accept(TacticVisitor &visitor) const

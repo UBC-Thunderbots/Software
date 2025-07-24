@@ -10,7 +10,7 @@
  * kick the ball to the kick target.
  */
 
-class KickTactic : public Tactic<KickFSM>
+class KickTactic : public Tactic<KickFSM, GetBehindBallFSM>
 {
    public:
     /**
@@ -43,8 +43,4 @@ class KickTactic : public Tactic<KickFSM>
                              double kick_speed_meters_per_second);
 
     void accept(TacticVisitor& visitor) const override;
-
-
-   private:
-    std::unique_ptr<FSM<KickFSM>> fsm_init() override;
 };

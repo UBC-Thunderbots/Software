@@ -11,7 +11,7 @@
  * Note that this tactic does not take into account the time the pass should occur at,
  * it simply tries to move to the best position to take the pass as fast as possible
  */
-class AttackerTactic : public Tactic<AttackerFSM>
+class AttackerTactic : public Tactic<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>
 {
    public:
     /**
@@ -41,7 +41,6 @@ class AttackerTactic : public Tactic<AttackerFSM>
 
     void accept(TacticVisitor& visitor) const override;
    private:
-    std::unique_ptr<FSM<AttackerFSM>> fsm_init() override;
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     /**

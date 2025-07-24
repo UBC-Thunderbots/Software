@@ -10,15 +10,9 @@
 #include "software/logger/logger.h"
 
 PivotKickTactic::PivotKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<PivotKickFSM>({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
+    : Tactic<PivotKickFSM, DribbleFSM>({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
               RobotCapability::Dribble}, ai_config_ptr)
 {
-}
-
-std::unique_ptr<FSM<PivotKickFSM>> PivotKickTactic::fsm_init() {
-    return std::make_unique<FSM<PivotKickFSM>>(
-            PivotKickFSM(ai_config_ptr),
-            DribbleFSM(ai_config_ptr));
 }
 
 void PivotKickTactic::accept(TacticVisitor &visitor) const

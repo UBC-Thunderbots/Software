@@ -3,12 +3,8 @@
 #include <algorithm>
 
 KickTactic::KickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-        : Tactic<KickFSM>({RobotCapability::Kick, RobotCapability::Move}, ai_config_ptr)
+        : Tactic<KickFSM, GetBehindBallFSM>({RobotCapability::Kick, RobotCapability::Move}, ai_config_ptr)
 {
-}
-
-std::unique_ptr<FSM<KickFSM>> KickTactic::fsm_init() {
-    return std::make_unique<FSM<KickFSM>>(KickFSM(ai_config_ptr), GetBehindBallFSM(ai_config_ptr));
 }
 
 void KickTactic::updateControlParams(const Point &kick_origin,

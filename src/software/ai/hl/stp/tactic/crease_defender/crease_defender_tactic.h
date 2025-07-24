@@ -27,7 +27,7 @@
  *                       |         ++    <-- Goalie
  *+----------------------+---------++---------+------------------+
  */
-class CreaseDefenderTactic : public Tactic<CreaseDefenderFSM>
+class CreaseDefenderTactic : public Tactic<CreaseDefenderFSM, DribbleFSM, MoveFSM>
 {
    public:
     /**
@@ -55,7 +55,4 @@ class CreaseDefenderTactic : public Tactic<CreaseDefenderFSM>
         TbotsProto::BallStealMode ball_steal_mode = TbotsProto::BallStealMode::STEAL);
 
     void accept(TacticVisitor &visitor) const override;
-
-   private:
-    std::unique_ptr<FSM<CreaseDefenderFSM>> fsm_init() override;
 };

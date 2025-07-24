@@ -35,7 +35,7 @@
  * Tactics are stateful, and use Primitives to implement their behaviour. They also
  * make heavy use of our Evaluation functions in order to help them make decisions.
  */
-template<class TacticFsm, class... SubFsms>
+template<class TacticFsm, class... TacticSubFsms>
 class Tactic
 {
    public:
@@ -114,12 +114,13 @@ class Tactic
     // The parameters this tactic uses control its FSMs.
     TacticFsm::ControlParams control_params;
 
+    virtual std::unique_ptr<FSM<TacticFsm>> fsmInit();
+
    private:
     /** Function to initialize the FSM. By default initializes the template FSM. Some FSMs may override if they initialize sub-FSMs.
      *
      * @return a pointer to the created FSM.
      */
-    virtual std::unique_ptr<FSM<TacticFsm>> fsm_init();
 
     std::shared_ptr<Primitive> primitive;
 

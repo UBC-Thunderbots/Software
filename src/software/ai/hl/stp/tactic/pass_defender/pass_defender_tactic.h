@@ -11,7 +11,7 @@
  * an active enemy pass is directed towards the defender.
  *
  */
-class PassDefenderTactic : public Tactic<PassDefenderFSM>
+class PassDefenderTactic : public Tactic<PassDefenderFSM, DribbleFSM>
 {
    public:
     /**
@@ -32,6 +32,4 @@ class PassDefenderTactic : public Tactic<PassDefenderFSM>
 
     void accept(TacticVisitor& visitor) const override;
 
-   private:
-    std::unique_ptr<FSM<PassDefenderFSM>> fsm_init() override;
 };

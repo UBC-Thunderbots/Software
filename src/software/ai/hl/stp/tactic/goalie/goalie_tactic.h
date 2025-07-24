@@ -14,7 +14,7 @@
  * distance either way to intercept a potential straight shot into the net.
  *
  */
-class GoalieTactic : public Tactic<GoalieFSM>
+class GoalieTactic : public Tactic<GoalieFSM, PivotKickFSM, DribbleFSM>
 {
    public:
     /**
@@ -23,18 +23,17 @@ class GoalieTactic : public Tactic<GoalieFSM>
      * @param ai_config_ptr shared pointer to ai_config
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
-                          TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
-                              TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    explicit GoalieTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     GoalieTactic() = delete;
+
+    //TODO: make sure the calling function uses this instead
+    void updateMaxSpeedMode(TbotsProto::MaxAllowedSpeedMode new_speed_mode);
 
     void updateControlParams(bool should_move_to_goal_line);
 
     void accept(TacticVisitor &visitor) const override;
 
    private:
-    std::unique_ptr<FSM<GoalieFSM>> fsm_init() override;
-
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
 };

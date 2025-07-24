@@ -7,15 +7,8 @@
 #include "software/world/ball.h"
 
 AttackerTactic::AttackerTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<AttackerFSM>({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr)
+    : Tactic<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr)
 {
-}
-
-std::unique_ptr<FSM<AttackerFSM>> AttackerTactic::fsm_init() {
-    return std::make_unique<FSM<AttackerFSM>>(
-                DribbleFSM(ai_config_ptr),
-                KeepAwayFSM(ai_config_ptr),
-                AttackerFSM(ai_config_ptr));
 }
 
 void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
@@ -41,7 +34,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = fsm_init();
+        fsm_map[tactic_update.robot.id()] = fsmInit();
     }
 
     control_params.shot = calcBestShotOnGoal(

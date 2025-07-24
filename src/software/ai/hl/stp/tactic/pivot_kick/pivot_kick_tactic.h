@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/segment.h"
 
-class PivotKickTactic : public Tactic<PivotKickFSM>
+class PivotKickTactic : public Tactic<PivotKickFSM, DribbleFSM>
 {
    public:
     /**
@@ -29,9 +29,6 @@ class PivotKickTactic : public Tactic<PivotKickFSM>
                              AutoChipOrKick auto_chip_or_kick);
 
     void accept(TacticVisitor& visitor) const override;
-
-   private:
-    std::unique_ptr<FSM<PivotKickFSM>> fsm_init() override;
 };
 
 COPY_TACTIC(WallKickoffTactic, PivotKickTactic)

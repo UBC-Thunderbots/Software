@@ -10,12 +10,8 @@
 #include "software/logger/logger.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<CreaseDefenderFSM>({RobotCapability::Move}, ai_config_ptr)
+    : Tactic<CreaseDefenderFSM, DribbleFSM, MoveFSM>({RobotCapability::Move}, ai_config_ptr)
 {
-}
-
-std::unique_ptr<FSM<CreaseDefenderFSM>> CreaseDefenderTactic::fsm_init() {
-    return std::make_unique<FSM<CreaseDefenderFSM>>(CreaseDefenderFSM(ai_config_ptr), DribbleFSM(ai_config_ptr));
 }
 
 void CreaseDefenderTactic::accept(TacticVisitor &visitor) const

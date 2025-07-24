@@ -11,7 +11,7 @@
  * This tactic is for a robot performing a penalty kick.
  */
 
-class PenaltyKickTactic : public Tactic<PenaltyKickFSM>
+class PenaltyKickTactic : public Tactic<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>
 {
    public:
     /**
@@ -26,7 +26,4 @@ class PenaltyKickTactic : public Tactic<PenaltyKickFSM>
     void updateControlParams();
 
     void accept(TacticVisitor &visitor) const override;
-
-   private:
-    std::unique_ptr<FSM<PenaltyKickFSM>> fsm_init() override;
 };

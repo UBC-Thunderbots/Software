@@ -4,17 +4,14 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
 
-GoalieTactic::GoalieTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
-                           TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
-    : Tactic<GoalieFSM>({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}, ai_config_ptr),
-      max_allowed_speed_mode(max_allowed_speed_mode)
+GoalieTactic::GoalieTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<GoalieFSM, PivotKickFSM, DribbleFSM>({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}, ai_config_ptr),
+      max_allowed_speed_mode(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT)
 {
 }
 
-std::unique_ptr<FSM<GoalieFSM>> GoalieTactic::fsm_init() {
-    return std::make_unique<FSM<GoalieFSM>>(
-            DribbleFSM(ai_config_ptr),
-            GoalieFSM(ai_config_ptr, max_allowed_speed_mode));
+void GoalieTactic::updateMaxSpeedMode(TbotsProto::MaxAllowedSpeedMode new_speed_mode) {
+    max_allowed_speed_mode = new_speed_mode;
 }
 
 void GoalieTactic::updateControlParams(bool should_move_to_goal_line)
