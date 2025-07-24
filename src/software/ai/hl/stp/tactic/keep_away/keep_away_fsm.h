@@ -10,7 +10,6 @@
 struct KeepAwayFSMControlParams
 {
     std::optional<Pass> best_pass_so_far;
-    KeepAwayFSMControlParams() : best_pass_so_far(std::nullopt){};
 };
 
 struct KeepAwayFSM : TacticFSM<KeepAwayFSMControlParams>

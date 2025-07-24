@@ -21,10 +21,6 @@ struct DribbleFSMControlParams
     std::optional<Angle> final_dribble_orientation;
     // whether to allow excessive dribbling, i.e. more than 1 metre at a time
     bool allow_excessive_dribbling;
-    DribbleFSMControlParams() : dribble_destination(std::nullopt),
-    final_dribble_orientation(std::nullopt),
-    allow_excessive_dribbling(false)
-    {};
 };
 
 struct DribbleFSM : TacticFSM<DribbleFSMControlParams>

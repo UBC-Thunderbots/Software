@@ -14,7 +14,6 @@ struct GetBehindBallFSMControlParams
     Point ball_location;
     // The direction the Robot will chick in
     Angle chick_direction;
-    GetBehindBallFSMControlParams(): ball_location(Point(0,0)), chick_direction(Angle::zero()){};
 };
 
 struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>

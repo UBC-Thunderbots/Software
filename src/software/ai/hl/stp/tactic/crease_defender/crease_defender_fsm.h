@@ -26,13 +26,6 @@ struct CreaseDefenderFSMControlParams
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     // The crease defender's aggressiveness towards the ball
     TbotsProto::BallStealMode ball_steal_mode;
-    CreaseDefenderFSMControlParams()
-    : enemy_threat_origin(Point(0,0)),
-    crease_defender_alignment(TbotsProto::CreaseDefenderAlignment::CENTRE),
-    max_allowed_speed_mode(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT),
-    ball_steal_mode(TbotsProto::BallStealMode::STEAL)
-            {
-            };
 };
 
 struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMControlParams>

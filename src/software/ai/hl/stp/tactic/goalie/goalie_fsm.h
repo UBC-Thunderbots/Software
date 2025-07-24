@@ -19,7 +19,6 @@
 struct GoalieFSMControlParams
 {
     bool should_move_to_goal_line;
-    GoalieFSMControlParams() : should_move_to_goal_line(false){};
 };
 
 struct GoalieFSM : TacticFSM<GoalieFSMControlParams>

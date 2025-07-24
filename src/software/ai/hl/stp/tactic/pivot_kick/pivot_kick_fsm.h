@@ -17,7 +17,6 @@ struct PivotKickFSMControlParams
     Angle kick_direction;
     // How the robot will chip or kick the ball
     AutoChipOrKick auto_chip_or_kick;
-    PivotKickFSMControlParams() : kick_origin(Point(0,0)), kick_direction(Angle::zero()), AutoChipOrKick({AutoChipOrKickMode::OFF,0}) {};
 };
 
 struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
@@ -32,7 +31,7 @@ struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
      explicit PivotKickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-     : TacticFSM<PivotKickFSMControlParams>(ai_config_ptr),
+     : TacticFSM<PivotKickFSMControlParams>(ai_config_ptr)
        {
        }
 

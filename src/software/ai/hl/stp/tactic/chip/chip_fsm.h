@@ -15,7 +15,6 @@ struct ChipFSMControlParams
     Angle chip_direction;
     // The distance the robot will chip to
     double chip_distance_meters;
-    ChipFSMControlParams() : chip_origin(Point(0,0)), chip_direction(Angle::zero()), chip_distance_meters(0){};
 };
 
 struct ChipFSM : TacticFSM<ChipFSMControlParams>

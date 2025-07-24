@@ -13,7 +13,6 @@
  */
 struct PenaltyKickFSMControlParams
 {
-    PenaltyKickFSMControlParams(){};
 };
 
 struct PenaltyKickFSM : TacticFSM<PenaltyKickFSMControlParams>

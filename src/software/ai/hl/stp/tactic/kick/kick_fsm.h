@@ -15,7 +15,6 @@ struct KickFSMControlParams
     Angle kick_direction;
     // How fast the Robot will kick the ball in meters per second
     double kick_speed_meters_per_second;
-    KickFSMControlParams() : kick_origin(Point(0,0)), kick_direction(Angle::zero()), kick_speed_meters_per_second(0){};
 };
 
 

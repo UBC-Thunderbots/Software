@@ -19,7 +19,6 @@ struct ShadowEnemyFSMControlParams
     // threat has the ball, it will position itself to block the shot on goal.
     // Otherwise it will try to block the pass to the enemy threat.
     double shadow_distance;
-    ShadowEnemyFSMControlParams() : enemy_threat(std::nullopt), shadow_distance(0){};
 };
 
 

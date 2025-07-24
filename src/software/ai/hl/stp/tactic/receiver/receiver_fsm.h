@@ -20,7 +20,6 @@ struct ReceiverFSMControlParams
 
     // If set to true, we will only receive and dribble
     bool disable_one_touch_shot;
-    ReceiverFSMControlParams() : pass(std::nullopt), disable_one_touch_shot(false){};
 };
 
 struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>

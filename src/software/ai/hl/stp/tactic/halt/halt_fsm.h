@@ -7,7 +7,6 @@
  */
 struct HaltFSMControlParams
 {
-    HaltFSMControlParams(){};
 };
 
 struct HaltFSM : TacticFSM<HaltFSMControlParams>

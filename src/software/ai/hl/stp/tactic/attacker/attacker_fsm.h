@@ -23,7 +23,6 @@ struct AttackerFSMControlParams
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     std::optional<Point> chip_target;
-    AttackerFSMControlParams() : best_pass_so_far(std::nullopt), pass_committed(false), shot(std::nullopt), chip_target(std::nullopt){};
 };
 
 struct AttackerFSM : TacticFSM<AttackerFSMControlParams>

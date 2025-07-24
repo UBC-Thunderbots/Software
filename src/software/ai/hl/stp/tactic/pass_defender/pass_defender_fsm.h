@@ -18,7 +18,6 @@ struct PassDefenderFSMControlParams
     Point position_to_block_from;
     // The pass defender's aggressiveness towards the ball
     TbotsProto::BallStealMode ball_steal_mode;
-    PassDefenderFSMControlParams() : position_to_block_from(Point(0,0)), ball_steal_mode(TbotsProto::BallStealMode::STEAL){};
 };
 
 struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMControlParams>
