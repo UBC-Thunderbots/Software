@@ -7,7 +7,7 @@
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/logger/logger.h"
 
-struct DefenderFSMBase
+struct DefenderFSMBase {
 
     /**
      * Guard that determines whether it is appropriate to steal the ball for FSMs
