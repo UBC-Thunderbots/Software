@@ -102,6 +102,25 @@ def _nanopb_proto_library_impl(ctx):
         if label[CcInfo].linking_context != None
     ]
 
+    # Get include paths from Nanopb dependencies
+    nanopb_includes = []
+    for lib in ctx.attr.nanopb_libs:
+        cc_info = lib[CcInfo]
+        compilation_context = cc_info.compilation_context
+
+        # Collect all include paths
+        # nanopb_includes.extend(compilation_context.system_includes.to_list())
+        nanopb_includes.extend(compilation_context.includes.to_list())
+        nanopb_includes.extend(compilation_context.quote_includes.to_list())
+
+    # If no includes found, use default Nanopb path
+    if not nanopb_includes:
+        nanopb_includes = ["external/nanopb"]
+
+    # Create compiler flags
+    copts = ["-I{}".format(include) for include in depset(nanopb_includes).to_list()]
+    copts += ["-D PB_FIELD_32BIT"]
+
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = "compile_nanopb_outputs",
         actions = ctx.actions,
@@ -113,6 +132,7 @@ def _nanopb_proto_library_impl(ctx):
             generated_folder_abs_path,
         ] + [generated_folder_abs_path + dir for dir in all_proto_include_dirs.to_list()],
         compilation_contexts = nanopb_compilation_contexts,
+        user_compile_flags = copts,
     )
 
     print(nanopb_linking_contexts)
