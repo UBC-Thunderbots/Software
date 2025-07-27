@@ -85,7 +85,10 @@ platformio_project(
 genrule(
     name = "powerloop_tar",
     outs = ["powerloop.tar.gz"],
-    cmd = "tar -chf $@ $(BINDIR)/../../host/bin/software/power/.* &> /dev/null",
+    cmd = """
+        TARGET_DIR=$$(dirname $(location :powerloop_main))
+        tar -chf $@ "$$TARGET_DIR/powerloop_main_workdir/.pio" &> /dev/null
+    """,
     local = True,
     tools = [":powerloop_main"],
 )
