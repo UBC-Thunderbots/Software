@@ -1,11 +1,11 @@
-package(default_visibility = ["//visibility:public"])
-
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@protobuf//:protobuf_deps.bzl", "protobuf_deps")
 load("@robot_diagnostics_cli_deps//:requirements.bzl", "requirement")
-load("@rules_python//python:pip.bzl", "compile_pip_requirements")
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("//:defs.bzl", "pkg_executable")
+
+package(default_visibility = ["//visibility:public"])
 
 compile_pip_requirements(
     name = "requirements",

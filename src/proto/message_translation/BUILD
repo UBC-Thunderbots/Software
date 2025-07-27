@@ -1,9 +1,9 @@
-package(default_visibility = ["//visibility:public"])
-
 load(
     "@platformio_rules//platformio:platformio.bzl",
     "platformio_library",
 )
+
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "tbots_protobuf",
