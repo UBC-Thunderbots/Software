@@ -17,7 +17,7 @@ TbotsProto::AiConfig ai_config;
 
 // vector of tuples of Tactic, MotionConstraints that should be removed,
 // MotionConstraints that should be added
-std::vector<std::tuple<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>,
+std::vector<std::tuple<std::shared_ptr<TacticInterface>, std::set<TbotsProto::MotionConstraint>,
                        std::set<TbotsProto::MotionConstraint>>>
     test_vector = {
         std::make_tuple(std::make_shared<MoveTactic>(),

@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
+#include "software/ai/hl/stp/tactic/tactic_interface.h"
 #include "software/world/world.h"
 
 /**
@@ -36,7 +37,7 @@
  * make heavy use of our Evaluation functions in order to help them make decisions.
  */
 template<class TacticFsm, class... TacticSubFsms>
-class Tactic
+class Tactic : TacticInterface
 {
    public:
     /**

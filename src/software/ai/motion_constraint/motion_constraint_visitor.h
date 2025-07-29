@@ -56,7 +56,7 @@ class MotionConstraintVisitor : public TacticVisitor
      * @return set of MotionConstraints
      */
     std::set<TbotsProto::MotionConstraint> getUpdatedMotionConstraints(
-        const Tactic &tactic,
+        const TacticInterface &tactic,
         const std::set<TbotsProto::MotionConstraint> &existing_motion_constraints);
 
    private:

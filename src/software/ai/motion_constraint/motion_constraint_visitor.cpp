@@ -111,7 +111,7 @@ void MotionConstraintVisitor::visit(const PassDefenderTactic &tactic) {}
 
 std::set<TbotsProto::MotionConstraint>
 MotionConstraintVisitor::getUpdatedMotionConstraints(
-    const Tactic &tactic,
+    const TacticInterface &tactic,
     const std::set<TbotsProto::MotionConstraint> &existing_motion_constraints)
 {
     current_motion_constraints = existing_motion_constraints;

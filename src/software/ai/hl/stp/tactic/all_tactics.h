@@ -15,3 +15,4 @@
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_interface.h"

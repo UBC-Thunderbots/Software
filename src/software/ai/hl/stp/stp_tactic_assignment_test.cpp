@@ -36,7 +36,7 @@ class STPTacticAssignmentTest : public ::testing::Test
      */
     bool allTacticsAssigned(
         ConstTacticVector tactics,
-        std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment)
+        std::map<std::shared_ptr<const TacticInterface>, Robot> robot_tactic_assignment)
     {
         bool all_tactics_have_robot_assigned = true;
 

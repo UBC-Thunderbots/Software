@@ -5,9 +5,9 @@
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
 
-using TacticVector              = std::vector<std::shared_ptr<Tactic>>;
+using TacticVector              = std::vector<std::shared_ptr<TacticInterface>>;
 using PriorityTacticVector      = std::vector<TacticVector>;
-using ConstTacticVector         = std::vector<std::shared_ptr<const Tactic>>;
+using ConstTacticVector         = std::vector<std::shared_ptr<const TacticInterface>>;
 using ConstPriorityTacticVector = std::vector<ConstTacticVector>;
 
 // Struct used to communicate between plays

@@ -42,13 +42,13 @@ void SimulatedErForceSimPlayTestFixture::setAiPlay(std::unique_ptr<Play> play)
 }
 
 void SimulatedErForceSimPlayTestFixture::setTactic(RobotId id,
-                                                   std::shared_ptr<Tactic> tactic)
+                                                   std::shared_ptr<TacticInterface> tactic)
 {
     setTactic(id, tactic, {});
 }
 
 void SimulatedErForceSimPlayTestFixture::setTactic(
-    RobotId id, std::shared_ptr<Tactic> tactic,
+    RobotId id, std::shared_ptr<TacticInterface> tactic,
     std::set<TbotsProto::MotionConstraint> motion_constraints)
 {
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
