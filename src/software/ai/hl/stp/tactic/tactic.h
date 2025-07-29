@@ -35,6 +35,9 @@
  *
  * Tactics are stateful, and use Primitives to implement their behaviour. They also
  * make heavy use of our Evaluation functions in order to help them make decisions.
+ *
+ * @tparam TacticFsm The Tactic FSM to base this tactic off of (e.g. AttackerTactic needs AttackerFSM)
+ * @tparam TacticSubFsms the sub FSMs this tactic uses (e.g. AttackerTactic needs DribbleFSM as a sub FSM)
  */
 template<class TacticFsm, class... TacticSubFsms>
 class Tactic : TacticInterface

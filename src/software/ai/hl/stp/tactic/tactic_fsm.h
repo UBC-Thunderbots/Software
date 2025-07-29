@@ -30,9 +30,10 @@ struct TacticUpdate
     SetPrimitiveCallback set_primitive;
 };
 
-/*
+/**
  * A general FSM class with some utilities.
- * TFsmControlParams should be a structure containing the control parameters for the FSM being built.
+ * 
+ * @tparam TFsmControlParams the control parameters for the FSM being built.
  */
 template<class TFsmControlParams>
 class TacticFSM
