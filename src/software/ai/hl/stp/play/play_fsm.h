@@ -47,6 +47,39 @@ struct PlayUpdate
 };
 
 /**
+ * A general FSM class with some utilities for plays.
+ *
+ * @tparam PFsmControlParams the control parameters for the FSM being built.
+ */
+template<class PFsmControlParams>
+class PlayFSM
+{
+public:
+    using ControlParams = PFsmControlParams;
+
+    /**
+     * The Update struct is the only event that a play FSM should respond to and it is
+     * composed of the following structs:
+     *
+     * ControlParams - uniquely defined by each play to control the FSM
+     * PlayUpdate - common struct that contains World and SetTacticsCallback
+     */
+    struct Update
+    {
+        Update(const ControlParams& control_params, const PlayUpdate& common)
+            : control_params(control_params), common(common)
+        {
+        }
+        ControlParams control_params;
+        PlayUpdate common;
+    };
+
+     explicit PlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): ai_config_ptr(ai_config_ptr){}
+
+protected:
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
+};
+/**
  * The Update struct is the only event that a play FSM should respond to and it is
  * composed of the following structs:
  *

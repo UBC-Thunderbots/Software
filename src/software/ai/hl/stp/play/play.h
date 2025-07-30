@@ -35,10 +35,10 @@ class Play
     /**
      * Creates a new Play
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
+    explicit Play(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr, bool requires_goalie);
 
     /**
      * Gets Primitives from the Play given the the world, and inter-play communication
@@ -73,7 +73,7 @@ class Play
 
    protected:
     // The Play configuration
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;

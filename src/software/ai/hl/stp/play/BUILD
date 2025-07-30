@@ -83,10 +83,12 @@ cc_library(
 
 cc_library(
     name = "play",
-    srcs = ["play.cpp"],
+    srcs = ["play.cpp",
+            "play_base.cpp",],
     hdrs = [
         "play.h",
         "play_fsm.h",
+        "play_base.h",
     ],
     deps = [
         "//software/ai/hl/stp/tactic",

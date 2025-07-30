@@ -40,7 +40,7 @@
  * @tparam TacticSubFsms the sub FSMs this tactic uses (e.g. AttackerTactic needs DribbleFSM as a sub FSM)
  */
 template<class TacticFsm, class... TacticSubFsms>
-class Tactic : TacticInterface
+class Tactic : public TacticInterface
 {
    public:
     /**
