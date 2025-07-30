@@ -7,7 +7,7 @@
 
 class TacticInterface {
 public:
-    Tactic() = delete;
+    TacticInterface() = delete;
 
     /**
      * Returns true if the Tactic is done and false otherwise.
@@ -61,5 +61,5 @@ public:
      */
     virtual void accept(TacticVisitor &visitor) const = 0;
 
-    virtual ~Tactic() = default;
+    virtual ~TacticInterface() = default;
 };
