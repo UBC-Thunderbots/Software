@@ -46,10 +46,6 @@ def test_halt_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
-        # Structure for a delayed call is tuple (delay in seconds, command, team)
-        (3, Command.Type.HALT, Team.BLUE)
-        (3, Command.Type.HALT, Team.YELLOW)
-
         # No plays to override. AI does whatever for 3 seconds before HALT CMD
         # is issued
 
@@ -75,6 +71,10 @@ def test_halt_play(simulated_test_runner):
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [RobotSpeedEventuallyBelowThreshold(1e-3)]
+        ],
+        ci_cmd_with_delay=[
+            (3, Command.Type.HALT, Team.BLUE),
+            (3, Command.Type.HALT, Team.YELLOW),
         ],
         test_timeout_s=10,
     )
