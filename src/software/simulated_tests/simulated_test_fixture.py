@@ -8,7 +8,6 @@ import os
 import pytest
 from proto.import_all_protos import *
 
-from software.networking.ssl_proto_communication import *
 from software.simulated_tests import validation
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
