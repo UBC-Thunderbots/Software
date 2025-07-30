@@ -31,8 +31,8 @@ struct TacticUpdate
 };
 
 /**
- * A general FSM class with some utilities.
- * 
+ * A general FSM class with some utilities for tactics.
+ *
  * @tparam TFsmControlParams the control parameters for the FSM being built.
  */
 template<class TFsmControlParams>
