@@ -6,8 +6,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 ScoringFromContestedPossessionPlay::ScoringFromContestedPossessionPlay(
-    TbotsProto::AiConfig config)
-    : Play(config, false)
+        std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Play(ai_config_ptr, false)
 {
 }
 
@@ -15,9 +15,9 @@ void ScoringFromContestedPossessionPlay::getNextTactics(TacticCoroutine::push_ty
                                                         const WorldPtr &world_ptr)
 {
     std::shared_ptr<DribbleTactic> dribble_tactic =
-        std::make_shared<DribbleTactic>(ai_config);
+        std::make_shared<DribbleTactic>(ai_config_ptr);
     dribble_tactic->updateControlParams(std::nullopt, std::nullopt, true);
-    std::shared_ptr<MoveTactic> move_tactic = std::make_shared<MoveTactic>();
+    std::shared_ptr<MoveTactic> move_tactic = std::make_shared<MoveTactic>(ai_config_ptr);
 
     do
     {
@@ -39,5 +39,5 @@ void ScoringFromContestedPossessionPlay::getNextTactics(TacticCoroutine::push_ty
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, ScoringFromContestedPossessionPlay,
-                       TbotsProto::AiConfig>
+                       std::shared_ptr<TbotsProto::AiConfig>>
     factory;
