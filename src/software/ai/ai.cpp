@@ -32,7 +32,7 @@ void Ai::overridePlay(std::unique_ptr<Play> play)
 void Ai::overridePlayFromProto(TbotsProto::Play play_proto)
 {
     current_override_play_proto = play_proto;
-    overridePlay(std::move(createPlay(play_proto, *ai_config_ptr)));
+    overridePlay(std::move(createPlay(play_proto, ai_config_ptr)));
 }
 
 void Ai::updateAiConfig()
@@ -46,7 +46,7 @@ void Ai::checkAiConfig()
     {
         ai_config_changed = false;
 
-        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{*ai_config_ptr});
+        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr});
 
         auto current_override = ai_config_ptr->ai_control_config().override_ai_play();
         if (current_override != TbotsProto::PlayName::UseAiSelection)

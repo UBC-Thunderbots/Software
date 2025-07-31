@@ -29,14 +29,14 @@ void ThreadedAi::overrideTactics(
 {
     std::scoped_lock lock(ai_mutex);
 
-    auto play = std::make_unique<AssignedTacticsPlay>(*ai_config_ptr);
-    std::map<RobotId, std::shared_ptr<TacticBase>> tactic_assignment_map;
+    auto play = std::make_unique<AssignedTacticsPlay>(ai_config_ptr);
+    std::map<RobotId, std::shared_ptr<TacticInterface>> tactic_assignment_map;
 
     // override to stop primitive
     for (auto& assigned_tactic : assigned_tactic_play_control_params.assigned_tactics())
     {
         tactic_assignment_map[assigned_tactic.first] =
-            createTactic(assigned_tactic.second, *ai_config_ptr);
+            createTactic(assigned_tactic.second, ai_config_ptr);
     }
 
     play->updateControlParams(tactic_assignment_map);

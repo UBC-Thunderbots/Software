@@ -12,38 +12,38 @@
  * @return a pointer to the tactic
  */
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::Tactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::AttackerTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::ChipTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::CreaseDefenderTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::DribbleTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::GetBehindBallTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::GoalieTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::KickTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(
     const TbotsProto::MoveGoalieToGoalLineTactic &tactic_proto,
-    TbotsProto::AiConfig ai_config);
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::MoveTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::PassDefenderTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::PenaltyKickTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::PivotKickTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::ReceiverTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::ShadowEnemyTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<TacticInterface> createTactic(const TbotsProto::HaltTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config);
+                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
 /**
  * Creates the corresponding C++ struct/class from a proto
