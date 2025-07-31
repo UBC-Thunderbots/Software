@@ -6,26 +6,27 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/logger/logger.h"
 
-struct CreaseDefensePlayFSM
+/**
+ * Control parameters for crease defense play
+ */
+struct CreaseDefensePlayControlParams
+{
+    // The origin point of the enemy threat
+    Point enemy_threat_origin;
+    // The maximum allowed speed mode
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+};
+
+struct CreaseDefensePlayFSM : PlayFSM<CreaseDefensePlayControlParams>
 {
     class DefenseState;
-
-    struct ControlParams
-    {
-        // The origin point of the enemy threat
-        Point enemy_threat_origin;
-        // The maximum allowed speed mode
-        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Creates a crease defense play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit CreaseDefensePlayFSM(TbotsProto::AiConfig ai_config);
+    explicit CreaseDefensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to defend the defense area
@@ -58,6 +59,5 @@ struct CreaseDefensePlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
 };
