@@ -4,14 +4,14 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-HaltTestPlay::HaltTestPlay(TbotsProto::AiConfig config) : Play(config, false) {}
+HaltTestPlay::HaltTestPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : Play(ai_config_ptr, false) {}
 
 void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                   const WorldPtr &world_ptr)
 {
-    auto halt_test_tactic_1 = std::make_shared<HaltTactic>();
-    auto halt_test_tactic_2 = std::make_shared<HaltTactic>();
-    auto halt_test_tactic_3 = std::make_shared<HaltTactic>();
+    auto halt_test_tactic_1 = std::make_shared<HaltTactic>(ai_config_ptr);
+    auto halt_test_tactic_2 = std::make_shared<HaltTactic>(ai_config_ptr);
+    auto halt_test_tactic_3 = std::make_shared<HaltTactic>(ai_config_ptr);
 
     do
     {
@@ -20,4 +20,4 @@ void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltTestPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, HaltTestPlay, std::shared_ptr<TbotsProto::AiConfig>> factory;

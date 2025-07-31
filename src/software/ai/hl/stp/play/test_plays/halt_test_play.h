@@ -14,11 +14,13 @@
 class HaltTestPlay : public Play
 {
    public:
-    HaltTestPlay(TbotsProto::AiConfig config);
+    /**
+     * Constructor for HaltTestPlay
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    HaltTestPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
-
-   private:
-    TbotsProto::AiConfig ai_config;
 };

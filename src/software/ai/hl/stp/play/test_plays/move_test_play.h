@@ -15,11 +15,14 @@
 class MoveTestPlay : public Play
 {
    public:
-    MoveTestPlay(TbotsProto::AiConfig config);
+    /**
+     * Constructor for MoveTestPlay
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    MoveTestPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
 
-   private:
-    TbotsProto::AiConfig ai_config;
 };
