@@ -8,23 +8,22 @@
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play.h"
 #include "software/logger/logger.h"
 
-struct OffensePlayFSM
+/**
+ * Control Parameters for Offense Play
+ */
+struct OffensePlayControlParams {};
+
+struct OffensePlayFSM : PlayFSM<OffensePlayControlParams>
 {
     class OffensiveState;
     class DefensiveState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
     /**
      * Creates an offense play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit OffensePlayFSM(TbotsProto::AiConfig ai_config);
+    explicit OffensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Guard to check whether the enemy team has possession of the ball
@@ -85,7 +84,6 @@ struct OffensePlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<ShootOrPassPlay> shoot_or_pass_play;
     std::shared_ptr<DefensePlay> defense_play;
 };
