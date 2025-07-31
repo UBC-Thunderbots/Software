@@ -1,11 +1,11 @@
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 
-BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
-      pivot_kick_tactic(std::make_shared<WallKickoffTactic>(ai_config)),
-      place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config)),
-      align_placement_tactic(std::make_shared<PlaceBallMoveTactic>()),
-      retreat_tactic(std::make_shared<MoveTactic>()),
+BallPlacementPlayFSM::BallPlacementPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) :
+    PlayFSM<BallPlacementPlayControlParams>(ai_config_ptr),
+      pivot_kick_tactic(std::make_shared<WallKickoffTactic>(ai_config_ptr)),
+      place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config_ptr)),
+      align_placement_tactic(std::make_shared<PlaceBallMoveTactic>(ai_config_ptr)),
+      retreat_tactic(std::make_shared<MoveTactic>(ai_config_ptr)),
       move_tactics(std::vector<std::shared_ptr<PlaceBallMoveTactic>>())
 {
 }
@@ -180,7 +180,7 @@ bool BallPlacementPlayFSM::kickDone(const Update &event)
 {
     const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_is_kicked_m_per_s_threshold =
-        this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
+        this->ai_config_ptr->ai_parameter_config().ball_is_kicked_m_per_s_threshold();
     return ball_velocity > ball_is_kicked_m_per_s_threshold;
 }
 
@@ -197,7 +197,7 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
         return comparePoints(ball_pos, placement_point.value(),
                              PLACEMENT_DIST_THRESHOLD_METERS) &&
                event.common.world_ptr->ball().velocity().length() <
-                   this->ai_config.ai_parameter_config()
+                   this->ai_config_ptr->ai_parameter_config()
                        .ball_is_kicked_m_per_s_threshold();
     }
     else
@@ -283,7 +283,7 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
 
     move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(num_move_tactics);
     std::generate(move_tactics.begin(), move_tactics.end(),
-                  [this]() { return std::make_shared<PlaceBallMoveTactic>(); });
+                  [this]() { return std::make_shared<PlaceBallMoveTactic>(this->ai_config_ptr); });
 
     // non goalie and non ball placing robots line up along a line just outside the
     // friendly defense area to wait for ball placement to finish
