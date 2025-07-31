@@ -28,6 +28,11 @@ class GoalieTactic : public Tactic<GoalieFSM, PivotKickFSM, DribbleFSM>
     GoalieTactic() = delete;
 
     //TODO: make sure the calling function uses this instead
+    /**
+     * Updates the current goalie speed mode.
+     * Modifies max_allowed_speed_mode
+     * @param new_speed_mode the new speed mode to use.
+     */
     void updateMaxSpeedMode(TbotsProto::MaxAllowedSpeedMode new_speed_mode);
 
     void updateControlParams(bool should_move_to_goal_line);
