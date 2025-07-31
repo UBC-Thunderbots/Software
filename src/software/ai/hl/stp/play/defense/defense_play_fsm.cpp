@@ -3,8 +3,8 @@
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
 
-DefensePlayFSM::DefensePlayFSM(TbotsProto::AiConfig ai_config)
-    : DefensePlayFSMBase::DefensePlayFSMBase(ai_config)
+DefensePlayFSM::DefensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : DefensePlayFSMBase::DefensePlayFSMBase(ai_config_ptr)
 {
 }
 
@@ -15,7 +15,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
 
     auto defender_assignment_config =
-        ai_config.defense_play_config().defender_assignment_config();
+        ai_config_ptr->defense_play_config().defender_assignment_config();
     auto assignments = getAllDefenderAssignments(
         enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
         defender_assignment_config);

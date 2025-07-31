@@ -15,9 +15,9 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     /**
      * Creates a defense play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit DefensePlayFSM(TbotsProto::AiConfig ai_config);
+    explicit DefensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to identify all immediate enemy threats and assign
