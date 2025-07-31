@@ -3,10 +3,8 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(TbotsProto::AiConfig config)
-    : Play(config, true),
-      fsm{PenaltyKickEnemyPlayFSM{config}},
-      control_params{.goalie_tactic = goalie_tactic}
+PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : PlayBase<PenaltyKickEnemyPlayFSM>(ai_config_ptr, true)
 {
 }
 
@@ -30,5 +28,5 @@ std::vector<std::string> PenaltyKickEnemyPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, std::shared_ptr<TbotsProto::AiConfig>>
     factory;
