@@ -1,9 +1,11 @@
 #include "software/ai/hl/stp/play/example/example_play_fsm.h"
 
-ExamplePlayFSM::ExamplePlayFSM() : move_tactics(DIV_A_NUM_ROBOTS)
+ExamplePlayFSM::ExamplePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+: PlayFSM<ExamplePlayControlParams>(ai_config_ptr),
+        move_tactics(DIV_A_NUM_ROBOTS)
 {
     std::generate(move_tactics.begin(), move_tactics.end(),
-                  []() { return std::make_shared<MoveTactic>(); });
+                  [ai_config_ptr]() { return std::make_shared<MoveTactic>(ai_config_ptr); });
 }
 
 void ExamplePlayFSM::moveToPosition(const Update &event)

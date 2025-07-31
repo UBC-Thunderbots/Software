@@ -7,22 +7,25 @@
 #include "software/logger/logger.h"
 
 /**
+ * Control parameters for Example Play
+ */
+struct ExamplePlayControlParams
+{
+};
+
+/**
  * An example play that moves the robots in a circle around the ball
  */
-struct ExamplePlayFSM
+struct ExamplePlayFSM : PlayFSM<ExamplePlayControlParams>
 {
     class MoveState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
     /**
      * Creates an example play FSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ExamplePlayFSM();
+    explicit ExamplePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that moves the robots to certain positions around the ball
