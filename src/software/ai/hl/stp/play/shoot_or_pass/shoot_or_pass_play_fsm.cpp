@@ -3,17 +3,17 @@
 #include <Tracy.hpp>
 #include <algorithm>
 
-ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
-    : ai_config(ai_config),
-      attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
+ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM<ShootOrPassPlayControlParams>(ai_config_ptr),
+      attacker_tactic(std::make_shared<AttackerTactic>(ai_config_ptr)),
       receiver_tactic(
-          std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config())),
+          std::make_shared<ReceiverTactic>(ai_config_ptr)),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
           std::make_shared<const EighteenZonePitchDivision>(
               Field::createSSLDivisionBField()),
-          ai_config.passing_config())),
-      pass_generator(ai_config.passing_config()),
+          ai_config_ptr->passing_config())),
+      pass_generator(ai_config_ptr->passing_config()),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
@@ -35,7 +35,7 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
             std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
         std::generate(offensive_positioning_tactics.begin(),
                       offensive_positioning_tactics.end(),
-                      []() { return std::make_shared<MoveTactic>(); });
+                      [this]() { return std::make_shared<MoveTactic>(ai_config_ptr); });
     }
 
     std::vector<Point> best_receiving_positions =
@@ -94,11 +94,11 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         // looking for "perfect" passes (with a score of min_perfect_pass_score) and
         // decreasing this threshold over time (to abs_min_pass_score)
         double abs_min_pass_score =
-            ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+            ai_config_ptr->shoot_or_pass_play_config().abs_min_pass_score();
         double min_perfect_pass_score =
-            ai_config.shoot_or_pass_play_config().min_perfect_pass_score();
+            ai_config_ptr->shoot_or_pass_play_config().min_perfect_pass_score();
         double pass_score_ramp_down_duration =
-            ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
+            ai_config_ptr->shoot_or_pass_play_config().pass_score_ramp_down_duration();
 
         time_since_commit_stage_start = event.common.world_ptr->getMostRecentTimestamp() -
                                         pass_optimization_start_time;
@@ -112,9 +112,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
-    attacker_tactic = std::make_shared<AttackerTactic>(ai_config);
+    attacker_tactic = std::make_shared<AttackerTactic>(ai_config_ptr);
     receiver_tactic =
-        std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config());
+        std::make_shared<ReceiverTactic>(ai_config_ptr);
     pass_optimization_start_time = event.common.world_ptr->getMostRecentTimestamp();
     lookForPass(event);
 }
@@ -167,7 +167,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
     const auto ball_velocity  = event.common.world_ptr->ball().velocity().length();
-    const auto min_pass_speed = this->ai_config.passing_config().min_pass_speed_m_per_s();
+    const auto min_pass_speed = this->ai_config_ptr->passing_config().min_pass_speed_m_per_s();
 
     return (ball_velocity < min_pass_speed) &&
            (best_pass_and_score_so_far.rating > min_pass_score_threshold);
@@ -179,9 +179,9 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     {
         best_pass_and_score_so_far.rating =
             ratePass(*event.common.world_ptr, best_pass_and_score_so_far.pass,
-                     ai_config.passing_config());
+                     ai_config_ptr->passing_config());
         double abs_min_pass_score =
-            ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+            ai_config_ptr->shoot_or_pass_play_config().abs_min_pass_score();
         if (best_pass_and_score_so_far.rating < abs_min_pass_score)
         {
             return true;
@@ -191,7 +191,7 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     const auto passer_point   = best_pass_and_score_so_far.pass.passerPoint();
     const auto receiver_point = best_pass_and_score_so_far.pass.receiverPoint();
     const auto short_pass_threshold =
-        this->ai_config.shoot_or_pass_play_config().short_pass_threshold();
+        this->ai_config_ptr->shoot_or_pass_play_config().short_pass_threshold();
 
     const auto pass_area_polygon =
         Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5);
@@ -212,9 +212,9 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     // ball
     const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_shot_threshold =
-        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+        this->ai_config_ptr->shoot_or_pass_play_config().ball_shot_threshold();
     const auto min_distance_to_pass =
-        this->ai_config.shoot_or_pass_play_config().min_distance_to_pass();
+        this->ai_config_ptr->shoot_or_pass_play_config().min_distance_to_pass();
 
     return (ball_velocity < ball_shot_threshold) &&
            ((ball_position - passer_point).length() > min_distance_to_pass);
@@ -232,7 +232,7 @@ bool ShootOrPassPlayFSM::tookShot(const Update& event)
     const auto ball_position = event.common.world_ptr->ball().position();
     const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_shot_threshold =
-        this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
+        this->ai_config_ptr->shoot_or_pass_play_config().ball_shot_threshold();
 
     const auto enemy_goal_top_post = event.common.world_ptr->field().enemyGoalpostPos();
     const auto enemy_goal_bot_post = event.common.world_ptr->field().enemyGoalpostNeg();

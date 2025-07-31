@@ -13,27 +13,25 @@
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
+/**
+ * Control Parameters for Shoot Or Pass Play
+ */
+ struct ShootOrPassPlayControlParams{};
+
 using Zones = std::unordered_set<EighteenZoneId>;
 
-struct ShootOrPassPlayFSM
+struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayControlParams>
 {
     class AttemptShotState;
     class TakePassState;
     class StartState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
-
     /**
      * Creates a shoot or pass play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config);
+    explicit ShootOrPassPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the offensive positioning tactics
@@ -141,7 +139,6 @@ struct ShootOrPassPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
