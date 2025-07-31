@@ -1,25 +1,25 @@
 #include "software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h"
 
-EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
-      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(ai_config),
-                               std::make_shared<CreaseDefenderTactic>(ai_config)}),
+EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM<EnemyBallPlacementPlayControlParams>(ai_config_ptr),
+      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(ai_config_ptr),
+                               std::make_shared<CreaseDefenderTactic>(ai_config_ptr)}),
       avoid_interference_tactics({
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
-          std::make_shared<AvoidInterferenceTactic>(),
+          std::make_shared<AvoidInterferenceTactic>(ai_config_ptr),
+          std::make_shared<AvoidInterferenceTactic>(ai_config_ptr),
+          std::make_shared<AvoidInterferenceTactic>(ai_config_ptr),
+          std::make_shared<AvoidInterferenceTactic>(ai_config_ptr),
+          std::make_shared<AvoidInterferenceTactic>(ai_config_ptr),
+          std::make_shared<AvoidInterferenceTactic>(ai_config_ptr),
       }),
       move_tactics({
-          std::make_shared<MoveTactic>(),
-          std::make_shared<MoveTactic>(),
-          std::make_shared<MoveTactic>(),
+          std::make_shared<MoveTactic>(ai_config_ptr),
+          std::make_shared<MoveTactic>(ai_config_ptr),
+          std::make_shared<MoveTactic>(ai_config_ptr),
       }),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
+      goalie_tactic(std::make_shared<GoalieTactic>(ai_config_ptr)),
       distance_to_keep_meters(
-          ai_config.enemy_ball_placement_play_config().distance_to_keep_meters()),
+          ai_config_ptr->enemy_ball_placement_play_config().distance_to_keep_meters()),
       nearly_placed_threshold_meters(0.5)
 {
 }
