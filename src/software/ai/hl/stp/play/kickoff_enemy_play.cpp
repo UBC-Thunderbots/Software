@@ -9,7 +9,7 @@
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffEnemyPlay::KickoffEnemyPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : Play(ai_config_ptr, true) {}
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       const WorldPtr &world_ptr)
@@ -17,7 +17,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>()};
+        std::make_shared<ShadowEnemyTactic>(ai_config_ptr), std::make_shared<ShadowEnemyTactic>(ai_config_ptr)};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -63,9 +63,9 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
     // these move tactics will be used to go to those positions
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>()};
+        std::make_shared<MoveTactic>(ai_config_ptr), std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr), std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr)};
 
     // created an enemy_team for mutation
     Team enemy_team = world_ptr->enemyTeam();
@@ -148,4 +148,4 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffEnemyPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, KickoffEnemyPlay, std::shared_ptr<TbotsProto::AiConfig>> factory;

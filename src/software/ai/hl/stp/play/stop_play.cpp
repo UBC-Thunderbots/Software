@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-StopPlay::StopPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+StopPlay::StopPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : Play(ai_config_ptr, true) {}
 
 void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
                               const WorldPtr &world_ptr)
@@ -42,13 +42,14 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
         TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND;
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>()};
+        std::make_shared<MoveTactic>(ai_config_ptr), std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr)};
 
-    goalie_tactic = std::make_shared<GoalieTactic>(ai_config, stop_mode);
+    goalie_tactic = std::make_shared<GoalieTactic>(ai_config_ptr);
+    goalie_tactic->updateMaxSpeedMode(stop_mode);
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(ai_config),
-        std::make_shared<CreaseDefenderTactic>(ai_config),
+        std::make_shared<CreaseDefenderTactic>(ai_config_ptr),
+        std::make_shared<CreaseDefenderTactic>(ai_config_ptr),
     };
 
     do
@@ -109,4 +110,4 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, StopPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, StopPlay, std::shared_ptr<TbotsProto::AiConfig>> factory;
