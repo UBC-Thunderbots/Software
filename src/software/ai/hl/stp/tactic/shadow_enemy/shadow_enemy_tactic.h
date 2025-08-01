@@ -3,6 +3,7 @@
 
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
+#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
@@ -10,7 +11,7 @@
  * EnemyThreat. It will choose to either block the enemy's shot on net or the pass it
  * would receive from another enemy.
  */
-class ShadowEnemyTactic : public Tactic<ShadowEnemyFSM>
+class ShadowEnemyTactic : public Tactic<ShadowEnemyFSM, MoveFSM>
 {
    public:
     /**

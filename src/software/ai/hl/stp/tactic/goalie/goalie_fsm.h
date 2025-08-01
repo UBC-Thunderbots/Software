@@ -42,7 +42,7 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      *  @param max_allowed_speed_mode The maximum allowed speed mode
      */
      explicit GoalieFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
-                        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
+                        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT)
                         : TacticFSM<GoalieFSMControlParams>(ai_config_ptr),
                           max_allowed_speed_mode(max_allowed_speed_mode),
                           robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
