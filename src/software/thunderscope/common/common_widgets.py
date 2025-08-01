@@ -2,6 +2,7 @@ from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 from software.py_constants import *
+from software.thunderscope.util import color_from_gradient
 
 
 class FloatSlider(QSlider):
@@ -63,15 +64,15 @@ class ColorQLabel(QLabel):
     def __init__(
         self,
         label_text: str,
-        initial_value: str,
+        initial_value: float,
         min_val: float = 0,
         max_val: float = 100,
     ):
         """Initializes the ColorQLabel with the given label, min and max bounds
         Or 0 and 100 as default
 
-        :param label_text: the text displayed within this label as a string.
-        :param initial_value: the initial string value of the label
+        :param label_text: the text displayed within this label as a string
+        :param initial_value: the initial value of the label
         :param min_val: the minimum value of the label color (no color)
         :param max_val: the maxmimum value of the label color (100% red)
         """
@@ -80,17 +81,15 @@ class ColorQLabel(QLabel):
         self.min = min_val
         self.max = max_val
         self.label_text = label_text
-        self.initial_value = initial_value
 
-        self.setText(label_text + initial_value)
-        self.__update_background_color(0)
+        self.set_float_val(initial_value)
 
     def set_float_val(self, val: float) -> None:
         """Sets the current value of the label to the given float value
 
         :param val: the new float value
         """
-        self.setText(f"{self.label_text}{val:02d}")
+        self.setText(f"{self.label_text} {val:d}")
         self.__update_background_color(val)
 
     def __update_background_color(self, val: float) -> None:
@@ -147,23 +146,23 @@ class ColorProgressBar(QProgressBar):
         """
         super(ColorProgressBar, self).setValue(int(value * self.decimals))
 
-        # clamp percent to make sure it's between 0% and 100%
         percent = self.getPercentage()
+        color = color_from_gradient(
+            percent,
+            [0, 0.5, 1],
+            [255, 200, 0],
+            [0, 170, 180],
+            [0, 0, 0],
+            [255, 255, 255],
+        )
 
-        if percent < 0.5:
-            super(ColorProgressBar, self).setStyleSheet(
-                "QProgressBar::chunk"
-                "{"
-                f"background: rgb(255, {255 * (2 * percent)}, 0)"
-                "}"
-            )
-        else:
-            super(ColorProgressBar, self).setStyleSheet(
-                "QProgressBar::chunk"
-                "{"
-                f"background: rgb({255 * 2 * (1 - percent)}, 255, 0)"
-                "}"
-            )
+        # Extract color into CSS form.
+        super(ColorProgressBar, self).setStyleSheet(
+            "QProgressBar::chunk"
+            "{"
+            f"background: rgb({color.red()}, {color.green()}, {color.blue()})"
+            "}"
+        )
 
     def getPercentage(self):
         """Gets the current percentage between 0 and 1 from the current value
@@ -173,9 +172,7 @@ class ColorProgressBar(QProgressBar):
             1,
             max(
                 0,
-                int(
-                    (self.value() - self.minimum()) / (self.maximum() - self.minimum())
-                ),
+                (self.value() - self.minimum()) / (self.maximum() - self.minimum()),
             ),
         )
 

@@ -8,6 +8,7 @@ PYBIND11_MODULE(py_constants, m)
 {
     m.attr("BALL_MAX_SPEED_METERS_PER_SECOND") = BALL_MAX_SPEED_METERS_PER_SECOND;
     m.attr("ROBOT_MAX_HEIGHT_METERS")          = ROBOT_MAX_HEIGHT_METERS;
+    m.attr("VIRTUAL_OBSTACLES_UNIX_PATH")      = VIRTUAL_OBSTACLES_UNIX_PATH;
     m.attr("ROBOT_MAX_RADIUS_METERS")          = ROBOT_MAX_RADIUS_METERS;
     m.attr("ROBOT_MAX_HEIGHT_MILLIMETERS") =
         ROBOT_MAX_HEIGHT_METERS * MILLIMETERS_PER_METER;
@@ -72,14 +73,16 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("WORLD_STATE_RECEIVED_TRIGGER_PATH") = WORLD_STATE_RECEIVED_TRIGGER_PATH;
 
     // Multicast Channels
-    m.def("getRobotMulticastChannel", [](py::args& args) {
-        if (args.size() != 1)
-        {
-            throw std::runtime_error("must provide channel number only");
-        }
+    m.def("getRobotMulticastChannel",
+          [](py::args& args)
+          {
+              if (args.size() != 1)
+              {
+                  throw std::runtime_error("must provide channel number only");
+              }
 
-        return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
-    });
+              return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
+          });
 
     // Ports
     m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
@@ -140,13 +143,18 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("DIV_A_NUM_ROBOTS")       = DIV_A_NUM_ROBOTS;
     m.attr("DIV_B_NUM_ROBOTS")       = DIV_B_NUM_ROBOTS;
 
-    // Redis Keys
+    // Redis Keys, Ports, & Host
     m.attr("ROBOT_ID_REDIS_KEY")                = ROBOT_ID_REDIS_KEY;
     m.attr("ROBOT_MULTICAST_CHANNEL_REDIS_KEY") = ROBOT_MULTICAST_CHANNEL_REDIS_KEY;
     m.attr("ROBOT_NETWORK_INTERFACE_REDIS_KEY") = ROBOT_NETWORK_INTERFACE_REDIS_KEY;
-    m.attr("ROBOT_BATTERY_VOLTAGE_REDIS_KEY")   = ROBOT_BATTERY_VOLTAGE_REDIS_KEY;
+    m.attr("ROBOT_KICK_CONSTANT_REDIS_KEY")     = ROBOT_KICK_CONSTANT_REDIS_KEY;
+    m.attr("ROBOT_KICK_EXP_COEFF_REDIS_KEY")    = ROBOT_KICK_EXP_COEFF_REDIS_KEY;
+    m.attr("ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY")  = ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY;
     m.attr("ROBOT_CURRENT_DRAW_REDIS_KEY")      = ROBOT_CURRENT_DRAW_REDIS_KEY;
-    m.attr("CAPACITOR_VOLTAGE_REDIS_KEY")       = ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY;
+    m.attr("ROBOT_BATTERY_VOLTAGE_REDIS_KEY")   = ROBOT_BATTERY_VOLTAGE_REDIS_KEY;
+    m.attr("ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY") = ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY;
+    m.attr("REDIS_DEFAULT_HOST")                = REDIS_DEFAULT_HOST;
+    m.attr("REDIS_DEFAULT_PORT")                = REDIS_DEFAULT_PORT;
 
     // Robot power constants
     m.attr("MIN_CAPACITOR_VOLTAGE")   = MIN_CAPACITOR_VOLTAGE;

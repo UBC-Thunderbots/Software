@@ -27,13 +27,14 @@ class MotorFaultView(QWidget):
         super().__init__()
         self.layout = QHBoxLayout()
 
-        self.enabled = None
+        self.enabled = False
         self.fault_count = 0
         self.motor_faults = {
             "Front Left": None,
             "Front Right": None,
             "Back Left": None,
             "Back Right": None,
+            "Dribbler": None,
         }
         self.motor_fault_tooltip = ""
 
@@ -133,7 +134,7 @@ class MotorFaultView(QWidget):
             - if all motors are still enabled, color is yellow and text is "Warning"
             - if any motor is disabled, color is red and text is "Error"
         """
-        if self.enabled is None:
+        if not self.enabled:
             self.motor_fault_display.setStyleSheet("background: grey; color: white;")
             self.motor_fault_display.setText("No Signal")
         else:
@@ -152,6 +153,14 @@ class MotorFaultView(QWidget):
                 self.motor_fault_display.setText("No Fault")
 
                 self.fault_count_label.hide()
+
+    def reset_ui(self) -> None:
+        """Resets the UI to the default uninitialized state
+        (widget will indicate that it has not received a signal yet)
+        """
+        self.motor_fault_tooltip = ""
+        self.enabled = False
+        self.update_ui()
 
     def refresh(self, motor_status: MotorStatus, enum_descriptor: Any) -> None:
         """Converts the given message into a map of motor name to its fault info

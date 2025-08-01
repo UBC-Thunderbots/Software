@@ -33,10 +33,10 @@
 
 namespace camun
 {
-    namespace simulator
-    {
-        class SimRobot;
-    }  // namespace simulator
+namespace simulator
+{
+class SimRobot;
+}  // namespace simulator
 }  // namespace camun
 
 class camun::simulator::SimRobot

@@ -100,9 +100,10 @@ class RobotInfo(QWidget):
         self.battery_progress_bar = common_widgets.ColorProgressBar(
             MIN_BATTERY_VOLTAGE - self.BATTERY_MIN_OFFSET, MAX_BATTERY_VOLTAGE
         )
+
         # Battery Voltage Label
         self.battery_label = QLabel()
-        self.battery_label.setText("NAN")
+
         # Label changes when voltage bar level changes
         self.battery_progress_bar.floatValueChanged.connect(
             lambda float_val: self.battery_label.setText("%.2fV" % float_val)
@@ -110,20 +111,19 @@ class RobotInfo(QWidget):
 
         # Stop primitive received indicator
         self.stop_primitive_label = QLabel()
-        self.stop_primitive_label.setText("NA")
         self.stats_layout.addWidget(self.stop_primitive_label)
 
         # Primitive loss rate label
         self.primitive_loss_rate_label = common_widgets.ColorQLabel(
             label_text="P%",
-            initial_value="NA",
+            initial_value=0,
             max_val=MAX_ACCEPTABLE_PACKET_LOSS_PERCENT,
         )
 
         # Primitive round-trip time label and queue
         self.primitive_rtt_label = common_widgets.ColorQLabel(
             label_text="RTT:",
-            initial_value="NA",
+            initial_value=0,
             max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
             min_val=MIN_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
         )
@@ -141,17 +141,21 @@ class RobotInfo(QWidget):
 
         # Control mode dropdown
         self.control_mode_layout = QHBoxLayout()
-        self.control_mode_menu = self.create_control_mode_menu(available_control_modes)
+        self.control_mode_menu = self.__create_control_mode_menu(
+            available_control_modes
+        )
 
-        # Robot Status expand button
-        self.robot_status_expand = self.create_robot_status_expand_button()
+        # Button to expand/collapse the robot status view
+        self.expand_robot_status_button = QPushButton()
+        self.expand_robot_status_button.setCheckable(True)
+        self.expand_robot_status_button.setText("INFO")
 
         # motor fault visualisation for the 4 wheel motors
         self.motor_fault_view = MotorFaultView()
 
         self.control_mode_layout.addWidget(self.motor_fault_view)
         self.control_mode_layout.addWidget(self.control_mode_menu)
-        self.control_mode_layout.addWidget(self.robot_status_expand)
+        self.control_mode_layout.addWidget(self.expand_robot_status_button)
 
         self.status_layout.addLayout(self.control_mode_layout)
 
@@ -160,10 +164,10 @@ class RobotInfo(QWidget):
         self.robot_model_layout.setContentsMargins(0, 5, 5, 0)
 
         # Vision Pattern
-        self.color_vision_pattern = self.create_vision_pattern(
+        self.color_vision_pattern = self.__create_vision_pattern(
             Colors.ROBOT_MIDDLE_BLUE, ROBOT_RADIUS, True
         )
-        self.bw_vision_pattern = self.create_vision_pattern(
+        self.bw_vision_pattern = self.__create_vision_pattern(
             Colors.BW_ROBOT_MIDDLE_BLUE, ROBOT_RADIUS, False
         )
 
@@ -185,17 +189,37 @@ class RobotInfo(QWidget):
         self.layout.addLayout(self.status_layout)
         self.setLayout(self.layout)
 
-    def create_robot_status_expand_button(self) -> QPushButton:
-        """Creates the button to expand / collapse the robot status view
+        # Last robot state
+        self.last_robot_status = None
+        self.last_robot_statistic = None
 
-        :return: QPushButton object
+    def update_robot_status(self, robot_status: RobotStatus):
+        """Receives a RobotStatus message and updates the UI to reflect the new data
+
+        :param robot_status: The latest RobotStatus message for this robot
         """
-        button = QPushButton()
-        button.setCheckable(True)
-        button.setText("INFO")
-        return button
+        self.time_of_last_robot_status = time.time()
+        self.last_robot_status = robot_status
 
-    def create_control_mode_menu(
+        self.robot_model.setPixmap(self.color_vision_pattern)
+        self.__update_ui()
+
+        # We should check in after DISCONNECT_DURATION_MS and see whether we've
+        # received any new RobotStatus messages within the time that passed.
+        # If not, then the robot probably disconnected.
+        QtCore.QTimer.singleShot(
+            int(DISCONNECT_DURATION_MS), self.__check_for_disconnection
+        )
+
+    def update_robot_statistic(self, robot_statistic: RobotStatistic):
+        """Receives a RobotStatistic message and updates the UI to reflect the new data
+
+        :param robot_statistic: The latest RobotStatistic message for this robot
+        """
+        self.last_robot_statistic = robot_statistic
+        self.__update_ui()
+
+    def __create_control_mode_menu(
         self, available_control_modes: list[IndividualRobotMode]
     ) -> QComboBox:
         """Creates the drop down menu to select the input for each robot
@@ -221,15 +245,14 @@ class RobotInfo(QWidget):
             )
 
         control_mode_menu.currentIndexChanged.connect(
-            lambda mode,
-            robot_id=self.robot_id: self.individual_robot_control_mode_signal.emit(
-                robot_id, IndividualRobotMode(mode)
+            lambda mode: self.individual_robot_control_mode_signal.emit(
+                self.robot_id, IndividualRobotMode(mode)
             )
         )
 
         return control_mode_menu
 
-    def create_vision_pattern(
+    def __create_vision_pattern(
         self, team_colour: QtGui.QColor, radius: int, connected: bool
     ) -> QtGui.QPixmap:
         """Given a robot id, team color and radius, draw the vision
@@ -292,54 +315,45 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, robot_status: RobotStatus, round_trip_time: RobotStatistic):
-        """Receives parts of a RobotStatus message
-
-        Saves the current time as the last robot status time
-        Sets the robot UI as connected and updates the UI
-        Then sets a timer callback to disconnect the robot if needed
-
-        :param robot_status: The robot status message for this robot
-        :param round_trip_time: The round trip time proto for this robot's message
+    def __check_for_disconnection(self) -> None:
+        """Calculates the time between the last robot status received and now.
+        If more than our threshold, assume the robot disconnected and reset the UI.
         """
-        self.time_of_last_robot_status = time.time()
-
-        self.robot_model.setPixmap(self.color_vision_pattern)
-
-        self.__update_ui(robot_status, round_trip_time)
-
-        QtCore.QTimer.singleShot(int(DISCONNECT_DURATION_MS), self.disconnect_robot)
-
-    def disconnect_robot(self) -> None:
-        """Calculates the time between the last robot status and now
-        If more than our threshold, resets UI
-        """
-        time_since_last_robot_status = time.time() - self.time_of_last_robot_status
         if (
-            time_since_last_robot_status
-            > DISCONNECT_DURATION_MS * SECONDS_PER_MILLISECOND
+            time.time() - self.time_of_last_robot_status
+            >= DISCONNECT_DURATION_MS * SECONDS_PER_MILLISECOND
         ):
             self.__reset_ui()
 
     def __reset_ui(self) -> None:
         """Resets the UI to the default, uninitialized values"""
+        self.__update_stop_primitive(None)
+
         self.robot_model.setPixmap(self.bw_vision_pattern)
 
+        self.primitive_loss_rate_label.set_float_val(0)
+        self.primitive_rtt_label.set_float_val(0)
         self.breakbeam_label.update_breakbeam_status(None)
+        self.battery_progress_bar.setValue(self.battery_progress_bar.minimum())
+        self.motor_fault_view.reset_ui()
 
-    def __update_stop_primitive(self, is_running: bool) -> None:
+    def __update_stop_primitive(self, is_running: bool | None) -> None:
         """Updates the stop primitive label based on the current running state
 
-        :param is_running: if the robot is running currently
+        :param is_running: true if the robot is running currently, false if the
+                           robot is stopped, or None if the robot is disconnected
+                           and there is no primitive executor status
         """
-        self.stop_primitive_label.setText("RUN" if is_running else "STOP")
-        self.stop_primitive_label.setStyleSheet(
-            f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
-        )
+        if is_running is None:
+            self.stop_primitive_label.setVisible(False)
+        else:
+            self.stop_primitive_label.setVisible(True)
+            self.stop_primitive_label.setText("RUN" if is_running else "STOP")
+            self.stop_primitive_label.setStyleSheet(
+                f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
+            )
 
-    def __update_ui(
-        self, robot_status: RobotStatus, round_trip_time: RobotStatistic
-    ) -> None:
+    def __update_ui(self) -> None:
         """Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
             - Whether breakbeam is tripped
@@ -347,15 +361,15 @@ class RobotInfo(QWidget):
             - Battery voltage, and warns if it's too low
             - If this robot has errors
             - If the robot is stopped or running
-
-        :param robot_status: The robot status message for this robot
-        :param round_trip_time: The round trip time message for this robot
         """
-        motor_status = robot_status.motor_status
-        power_status = robot_status.power_status
-        network_status = robot_status.network_status
-        primitive_executor_status = robot_status.primitive_executor_status
-        rtt_time_seconds = round_trip_time.round_trip_time_seconds
+        if not self.last_robot_status or not self.last_robot_statistic:
+            return
+
+        motor_status = self.last_robot_status.motor_status
+        power_status = self.last_robot_status.power_status
+        network_status = self.last_robot_status.network_status
+        primitive_executor_status = self.last_robot_status.primitive_executor_status
+        rtt_time_seconds = self.last_robot_statistic.round_trip_time_seconds
 
         self.__update_stop_primitive(primitive_executor_status.running_primitive)
 
@@ -368,6 +382,7 @@ class RobotInfo(QWidget):
                 rtt_time_seconds * MILLISECONDS_PER_SECOND
             )
         )
+
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
 
         self.motor_fault_view.refresh(

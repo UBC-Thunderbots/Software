@@ -25,11 +25,10 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
     // on the triangle that this vertex was created from
 
     // Filters out points that are outside of the bounding box
-    points.erase(std::remove_if(points.begin(), points.end(),
-                                [&bounding_box](const Point &p) {
-                                    return !contains(bounding_box, p);
-                                }),
-                 points.end());
+    points.erase(
+        std::remove_if(points.begin(), points.end(), [&bounding_box](const Point &p)
+                       { return !contains(bounding_box, p); }),
+        points.end());
 
     std::vector<Circle> empty_circles;
 
@@ -127,7 +126,8 @@ std::optional<Point> findClosestPoint(const Point &origin_point,
     {
         closest_point =
             *std::min_element(test_points.begin(), test_points.end(),
-                              [&](const Point &test_point1, const Point &test_point2) {
+                              [&](const Point &test_point1, const Point &test_point2)
+                              {
                                   return (origin_point - test_point1).lengthSquared() <
                                          (origin_point - test_point2).lengthSquared();
                               });

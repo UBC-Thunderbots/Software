@@ -313,11 +313,8 @@ message DribbleTacticConfig
 {
     // If ball and front of robot are separated by this amount, then we've lost
     // possession (in m)
-    required double lose_ball_possession_threshold = 1 [
-        default                   = 0.04,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 1.0
-    ];
+    required double lose_ball_possession_threshold = 1
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     // Threshold to determine if the ball is at the destination determined
     // experimentally (in m)
@@ -334,11 +331,8 @@ message DribbleTacticConfig
 
     // Maximum distance to continuously dribble the ball,
     // slightly conservative to not break the 1 meter rule (in m)
-    required double max_continuous_dribbling_distance = 4 [
-        default                   = 0.78,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 2.0
-    ];
+    required double max_continuous_dribbling_distance = 4
+        [default = 0.8, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 
     // Robot speed at which the robot is done dribbling (in m/s)
     required double robot_dribbling_done_speed = 5
@@ -531,6 +525,10 @@ message DefensePlayConfig
             (bounds).min_double_value = 0.0,
             (bounds).max_double_value = 10.0
         ];
+
+        // The max number of crease defender can be created at a moment
+        required uint32 max_num_crease_defenders = 6
+            [default = 2, (bounds).min_int_value = 1, (bounds).max_int_value = 3];
     }
 
     // The distance at which a threat is considered "immediate" if there is only 1
@@ -640,12 +638,13 @@ message NetworkConfig
 
 message CreaseDefenderConfig
 {
+    // Unique steal config for crease defenders
+    required DefenderStealConfig defender_steal_config = 1;
+
     // The additional buffer length for each side of the goal
     // to determine if crease defender chipping is "towards goal"
     required double goal_post_offset_chipping = 4
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
-    // Unique steal config for crease defenders
-    required DefenderStealConfig defender_steal_config = 1;
 }
 
 message PassDefenderConfig

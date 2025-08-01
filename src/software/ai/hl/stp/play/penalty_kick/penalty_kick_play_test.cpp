@@ -38,13 +38,15 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
     RobotId shooter_id                                               = 5;
     std::vector<ValidationFunction> terminating_validation_functions = {
         [shooter_id](std::shared_ptr<World> world_ptr,
-                     ValidationCoroutine::push_type& yield) {
+                     ValidationCoroutine::push_type& yield)
+        {
             robotAtPosition(shooter_id, world_ptr,
                             world_ptr->field().friendlyPenaltyMark(), 0.3, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // making sure that the robot doesn't move the ball while the penalty is
             // setting up
             ASSERT_TRUE(
@@ -52,7 +54,8 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
                                                world_ptr->ball().position(), 1e-6));
         },
         [shooter_id](std::shared_ptr<World> world_ptr,
-                     ValidationCoroutine::push_type& yield) {
+                     ValidationCoroutine::push_type& yield)
+        {
             // Wait 2 seconds for robots to start moving adequately far away from the ball
             if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(2))
             {
@@ -95,17 +98,14 @@ TEST_F(PenaltyKickPlayTest, DISABLED_test_penalty_kick_take)
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         ballInPlay,
         [shooter_id](std::shared_ptr<World> world_ptr,
-                     ValidationCoroutine::push_type& yield) {
-            ballNeverMovesBackward(world_ptr, yield);
-        },
+                     ValidationCoroutine::push_type& yield)
+        { ballNeverMovesBackward(world_ptr, yield); },
         [shooter_id](std::shared_ptr<World> world_ptr,
-                     ValidationCoroutine::push_type& yield) {
-            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
-        },
+                     ValidationCoroutine::push_type& yield)
+        { robotNotExcessivelyDribbling(shooter_id, world_ptr, yield); },
         [shooter_id](std::shared_ptr<World> world_ptr,
-                     ValidationCoroutine::push_type& yield) {
-            robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
-        }};
+                     ValidationCoroutine::push_type& yield)
+        { robotsAvoidBall(1, {shooter_id}, world_ptr, yield); }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,

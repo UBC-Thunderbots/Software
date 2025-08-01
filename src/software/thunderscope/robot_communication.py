@@ -1,11 +1,10 @@
-from typing import Self, Type
+from typing import Self
 
 import threading
 import time
 import os
 import software.python_bindings as tbots_cpp
 
-from google.protobuf.message import Message
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -267,15 +266,6 @@ class RobotCommunication:
             # sleep if not running fullsystem
             if IndividualRobotMode.AI not in self.robot_control_mode_map.values():
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
-
-    def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
-        """Forwards to proto unix IO iff running is true
-
-        :param data: the data to be passed through
-        :param type: the proto type
-        """
-        if self.running:
-            self.current_proto_unix_io.send_proto(type, data)
 
     def __enter__(self) -> Self:
         """Enter RobotCommunication context manager. Setup multicast listeners

@@ -39,6 +39,9 @@ class TigersAutoref(TimeProvider):
     BUFFER_TIMEOUT = 10
     NEXT_PACKET_DELAY = 1.0 / 30  # 30 Hz
 
+    AUTOREF_DIR = "/opt/tbotspython/autoReferee"
+    AUTOREF_JAVA_HOME = "/opt/tbotspython/bin/jdk"
+
     def __init__(
         self,
         gc: Gamecontroller,
@@ -220,8 +223,10 @@ class TigersAutoref(TimeProvider):
 
     def _start_autoref(self) -> None:
         """Starts the TigersAutoref binary."""
-        autoref_cmd = "software/autoref/run_autoref"
+        env = os.environ.copy()
+        env["JAVA_HOME"] = self.AUTOREF_JAVA_HOME
 
+        autoref_cmd = "bin/autoReferee -a"
         if not self.show_gui:
             autoref_cmd += " -hl"
 
@@ -231,10 +236,16 @@ class TigersAutoref(TimeProvider):
         if self.suppress_logs:
             with open(os.devnull, "w") as fp:
                 self.tigers_autoref_proc = Popen(
-                    autoref_cmd.split(" "), stdout=fp, stderr=fp
+                    autoref_cmd.split(" "),
+                    stdout=fp,
+                    stderr=fp,
+                    env=env,
+                    cwd=self.AUTOREF_DIR,
                 )
         else:
-            self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
+            self.tigers_autoref_proc = Popen(
+                autoref_cmd.split(" "), env=env, cwd=self.AUTOREF_DIR
+            )
 
     def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO) -> None:
         """Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the
@@ -246,13 +257,12 @@ class TigersAutoref(TimeProvider):
         autoref_proto_unix_io.register_observer(Referee, self.referee_buffer)
 
     def __exit__(self, type, value, traceback) -> None:
+        self.end_autoref = True
         if self.tigers_autoref_proc:
             self.tigers_autoref_proc.terminate()
             self.tigers_autoref_proc.wait()
 
             self.auto_ref_proc_thread.join()
-
-        self.end_autoref = True
         self.auto_ref_wrapper_thread.join()
 
         logging.info("[TigersAutoref] Process exited")
