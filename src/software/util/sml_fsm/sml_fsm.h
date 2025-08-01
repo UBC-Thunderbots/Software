@@ -3,9 +3,48 @@
 #include <functional>
 #include <include/boost/sml.hpp>
 #include <queue>
+#include "proto/play_info_msg.pb.h"
+#include "software/logger/logger.h"
 
 #include "software/util/typename/typename.h"
-#include "software/util/sml_fsm/fsm_logger.h"
+
+/*
+ * This struct declares a logger to log the FSM State Changes
+ * https://boost-ext.github.io/sml/examples.html#logging
+ */
+
+struct FSMLogger {
+    template <class SM, class TEvent>
+    void log_process_event(const TEvent&)
+    {
+//    printf("[%s][process_event] %s\n", sml::aux::get_type_name<SM>(), sml::aux::get_type_name<TEvent>());
+        LOG(INFO) << "Event Processed";
+    }
+
+    template <class SM, class TGuard, class TEvent>
+    void log_guard(const TGuard&, const TEvent&, bool result)
+    {
+    //        printf("[%s][guard] %s %s %s\n", sml::aux::get_type_name<SM>(), sml::aux::get_type_name<TGuard>(),
+//               sml::aux::get_type_name<TEvent>(), (result ? "[OK]" : "[Reject]"));
+    LOG(INFO) << "Guard Processed";
+}
+
+    template <class SM, class TAction, class TEvent>
+    void log_action(const TAction&, const TEvent&)
+    {
+        //        printf("[%s][action] %s %s\n", sml::aux::get_type_name<SM>(), sml::aux::get_type_name<TAction>(),
+        //               sml::aux::get_type_name<TEvent>());
+        LOG(INFO) << "Action Processed";
+    }
+
+
+    template <class SM, class TSrcState, class TDstState>
+    void log_state_change(const TSrcState& src, const TDstState& dst)
+    {
+//        printf("[%s][transition] %s -> %s\n", sml::aux::get_type_name<SM>(), src.c_str(), dst.c_str());
+        LOG(INFO) << "State Change Processed";
+    }
+};
 
 /**
  * The Tactic FSM framework uses the [SML library](https://github.com/boost-ext/sml), and
@@ -15,7 +54,7 @@
 
 // An alias for an FSM
 template <class T>
-using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
+using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>, boost::sml::logger<FSMLogger>>;
 
 /**
  * Defines an SML state wrapper around a class/struct
