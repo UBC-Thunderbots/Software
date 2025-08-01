@@ -19,12 +19,14 @@ public:
      */
     explicit PlayBase(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr, bool requires_goalie)
             : Play(ai_config_ptr, requires_goalie),
-              fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}...},
+              logger(),
+              fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}..., logger},
               control_params(){}
 
     void updateTactics(const PlayUpdate &play_update) override =0;
 
 protected:
+    FSMLogger logger;
     FSM<PlayFsm> fsm;
     PlayFsm::ControlParams control_params;
 };

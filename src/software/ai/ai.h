@@ -66,6 +66,7 @@ class Ai final
     void checkAiConfig();
 
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
+    FSMLogger logger;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;
