@@ -84,7 +84,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             OrValidation(
                 [
                     BallAlwaysMovesFromRest(
-                        position=tbots_cpp.Point(0, 0), threshold=0.01
+                        position=tbots_cpp.Point(0, 0), threshold=0.05
                     ),
                     NumberOfRobotsAlwaysStaysInRegion(
                         regions=[
@@ -107,7 +107,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             OrValidation(
                 [
                     BallAlwaysMovesFromRest(
-                        position=tbots_cpp.Point(0, 0), threshold=0.01
+                        position=tbots_cpp.Point(0, 0), threshold=0.05
                     ),
                     NumberOfRobotsAlwaysStaysInRegion(
                         regions=[
@@ -127,7 +127,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             OrValidation(
                 [
                     BallAlwaysMovesFromRest(
-                        position=tbots_cpp.Point(0, 0), threshold=0.01
+                        position=tbots_cpp.Point(0, 0), threshold=0.05
                     ),
                     NumberOfRobotsAlwaysStaysInRegion(
                         regions=[
@@ -144,7 +144,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             OrValidation(
                 [
                     BallAlwaysMovesFromRest(
-                        position=tbots_cpp.Point(0, 0), threshold=0.01
+                        position=tbots_cpp.Point(0, 0), threshold=0.05
                     ),
                     NumberOfRobotsAlwaysStaysInRegion(
                         regions=[
