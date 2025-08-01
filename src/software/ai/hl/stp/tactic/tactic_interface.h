@@ -7,8 +7,6 @@
 
 class TacticInterface {
 public:
-    TacticInterface() = delete;
-
     /**
      * Returns true if the Tactic is done and false otherwise.
      *

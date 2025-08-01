@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Tracy.hpp>
+
 #include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
@@ -50,7 +52,7 @@ class Tactic : public TacticInterface
      * @param capability_reqs_ The capability requirements for running this tactic
      */
     explicit Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_), ai_config_ptr(ai_config_ptr), fsm_map(), control_params()
+    : last_execution_robot(std::nullopt), ai_config_ptr(ai_config_ptr), fsm_map(), control_params(), capability_reqs(capability_reqs_)
     {
         for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
         {
@@ -200,7 +202,7 @@ class Tactic : public TacticInterface
             fsm_map[tactic_update.robot.id()] = fsmInit();
         }
         fsm_map.at(tactic_update.robot.id())
-                ->process_event(TacticFsm::Update(control_params, tactic_update));
+                ->process_event(typename TacticFsm::Update(control_params, tactic_update));
     }
 
 
