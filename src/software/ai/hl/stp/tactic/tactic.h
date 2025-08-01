@@ -43,12 +43,20 @@ template<class TacticFsm, class... TacticSubFsms>
 class Tactic : public TacticInterface
 {
    public:
+    // Function definitions must be moved to the header file to be compiled as a single translation unit for template classes.
     /**
      * Creates a new Tactic. The Tactic will initially have no Robot assigned to it.
      *
      * @param capability_reqs_ The capability requirements for running this tactic
      */
-    explicit Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_), ai_config_ptr(ai_config_ptr), fsm_map(), control_params()
+    {
+        for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+        {
+            fsm_map[id] = fsmInit();
+        }
+    }
 
     Tactic() = delete;
 
@@ -57,28 +65,49 @@ class Tactic : public TacticInterface
      *
      * @return true if the Tactic is done and false otherwise
      */
-    bool done() const;
+    bool done() const
+    {
+        bool is_done = false;
+        if (last_execution_robot.has_value())
+        {
+            is_done = fsm_map.at(last_execution_robot.value())->is(boost::sml::X);
+        }
+        return is_done;
+    }
 
     /**
      * Gets the FSM state of the tactic
      *
      * @return the FSM state
      */
-    std::string getFSMState() const;
+    std::string getFSMState() const
+    {
+        std::string state_str = "";
+        if (last_execution_robot.has_value())
+            state_str =
+                    getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));
+        return state_str;
+    }
 
     /**
      * robot hardware capability requirements of the tactic.
      *
      * @return the robot capability requirements
      */
-    const std::set<RobotCapability> &robotCapabilityRequirements() const;
+    const std::set<RobotCapability> &robotCapabilityRequirements() const
+    {
+        return capability_reqs;
+    }
 
     /**
      * Mutable robot hardware capability requirements of the tactic.
      *
      * @return the Mutable robot hardware capability requirements of the tactic
      */
-    std::set<RobotCapability> &mutableRobotCapabilityRequirements();
+    std::set<RobotCapability> &mutableRobotCapabilityRequirements()
+    {
+        return capability_reqs;
+    }
 
     /**
      * Updates the last execution robot
@@ -86,7 +115,10 @@ class Tactic : public TacticInterface
      * @param last_execution_robot The robot id of the robot that last executed the
      * primitive for this tactic
      */
-    void setLastExecutionRobot(std::optional<RobotId> last_execution_robot);
+    void setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
+    {
+        this->last_execution_robot = last_execution_robot;
+    }
 
     /**
      * Updates and returns a set of primitives for all friendly robots from this tactic
@@ -95,7 +127,32 @@ class Tactic : public TacticInterface
      *
      * @return the next primitive
      */
-    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr);
+    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr)
+    {
+        TbotsProto::RobotNavigationObstacleConfig obstacle_config;
+        std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
+
+        {
+            ZoneNamedN(_tracy_tactic_set_primitive, "Tactic: Get primitives for each robot",
+                       true);
+
+            for (const auto &robot : world_ptr->friendlyTeam().getAllRobots())
+            {
+                updatePrimitive(TacticUpdate(robot, world_ptr,
+                                             [this](std::shared_ptr<Primitive> new_primitive)
+                                             { primitive = std::move(new_primitive); }),
+                                !last_execution_robot.has_value() ||
+                                last_execution_robot.value() != robot.id());
+
+                CHECK(primitive != nullptr)
+                        << "Primitive for " << objectTypeName(*this) << " in state "
+                        << getFSMState() << " was not set" << std::endl;
+                primitives_map[robot.id()] = std::move(primitive);
+            }
+        }
+
+        return primitives_map;
+    }
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself
@@ -118,7 +175,9 @@ class Tactic : public TacticInterface
     // The parameters this tactic uses control its FSMs.
     TacticFsm::ControlParams control_params;
 
-    virtual std::unique_ptr<FSM<TacticFsm>> fsmInit();
+    virtual std::unique_ptr<FSM<TacticFsm>> fsmInit() {
+        return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr), TacticSubFsms(ai_config_ptr)...);
+    }
 
    private:
     /** Function to initialize the FSM. By default initializes the template FSM. Some FSMs may override if they initialize sub-FSMs.
@@ -130,12 +189,20 @@ class Tactic : public TacticInterface
 
     /**
      * Updates the primitive ptr with the new primitive
-     * NEED TO REFACTOR CONTROL PARAMS?
      *
      * @param tactic_update The tactic_update struct that contains all the information for
      * updating the primitive
      */
-    virtual void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm);
+    virtual void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+    {
+        if (reset_fsm)
+        {
+            fsm_map[tactic_update.robot.id()] = fsmInit();
+        }
+        fsm_map.at(tactic_update.robot.id())
+                ->process_event(TacticFsm::Update(control_params, tactic_update));
+    }
+
 
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;

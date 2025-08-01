@@ -83,8 +83,7 @@ cc_library(
 
 cc_library(
     name = "play",
-    srcs = ["play.cpp",
-            "play_base.cpp",],
+    srcs = ["play.cpp"],
     hdrs = [
         "play.h",
         "play_fsm.h",
