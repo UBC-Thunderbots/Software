@@ -36,7 +36,7 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
     setEnemyGoalie(0);
 
     std::unique_ptr<CreaseDefensePlay> play =
-        std::make_unique<CreaseDefensePlay>(getAiConfig());
+        std::make_unique<CreaseDefensePlay>(std::make_shared<TbotsProto::AiConfig>(getAiConfig()));
     play->updateControlParams(Point(1, 3));
 
     setAiPlay(std::move(play));
