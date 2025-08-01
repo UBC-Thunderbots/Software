@@ -48,7 +48,6 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
 
-    TbotsProto::AiConfig ai_config;
 };
 
 // TODO (#2573): re-enable once fixed
@@ -61,7 +60,7 @@ TEST_P(DribbleTacticPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, -2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic = std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(1, tactic, {TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
 

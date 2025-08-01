@@ -16,9 +16,9 @@ TEST(PassDefenderFSMTest, test_transitions)
     PassDefenderFSMControlParams control_params{
         .position_to_block_from = Point(-2, 0),
         .ball_steal_mode        = TbotsProto::BallStealMode::STEAL};
-    TbotsProto::AiConfig ai_config;
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM(ai_config),
-                             DribbleFSM(ai_config.dribble_tactic_config())};
+
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(std::make_shared<TbotsProto::AiConfig>()),
+                             DribbleFSM(std::make_shared<TbotsProto::AiConfig>())};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
@@ -79,10 +79,9 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
     PassDefenderFSMControlParams control_params{
         .position_to_block_from = Point(-2, 0),
         .ball_steal_mode        = TbotsProto::BallStealMode::STEAL};
-    TbotsProto::AiConfig ai_config;
 
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM(ai_config),
-                             DribbleFSM(ai_config.dribble_tactic_config())};
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(std::make_shared<TbotsProto::AiConfig>()),
+                             DribbleFSM(std::make_shared<TbotsProto::AiConfig>())};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));

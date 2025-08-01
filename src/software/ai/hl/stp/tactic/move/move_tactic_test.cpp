@@ -32,7 +32,7 @@ TEST_F(MoveTacticTest, test_move_across_field)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(destination, Angle::zero());
     setTactic(1, tactic);
 
@@ -72,7 +72,7 @@ TEST_F(MoveTacticTest, test_autochip_move)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(destination, Angle::zero(), TbotsProto::DribblerMode::OFF,
                                 TbotsProto::BallCollisionType::ALLOW,
                                 {AutoChipOrKickMode::AUTOCHIP, 2.0},
@@ -119,7 +119,7 @@ TEST_F(MoveTacticTest, test_autokick_move)
             field.enemyDefenseArea().negXNegYCorner(),
             field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(
         destination, Angle::threeQuarter(), TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOKICK, 3.0},
@@ -163,7 +163,7 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
                                   AngularVelocity::quarter())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(destination, Angle::zero(), TbotsProto::DribblerMode::OFF,
                                 TbotsProto::BallCollisionType::ALLOW,
                                 {AutoChipOrKickMode::OFF, 0.0},
@@ -211,7 +211,7 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
                                   AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(destination, Angle::half(), TbotsProto::DribblerMode::OFF,
                                 TbotsProto::BallCollisionType::ALLOW,
                                 {AutoChipOrKickMode::OFF, 0.0},

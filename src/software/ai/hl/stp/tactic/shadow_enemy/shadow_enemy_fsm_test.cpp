@@ -74,7 +74,8 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
     EnemyThreat enemy_threat{shadowee,     false, Angle::zero(), std::nullopt,
                              std::nullopt, 1,     enemy};
-    FSM<ShadowEnemyFSM> fsm;
+    FSM<ShadowEnemyFSM> fsm{ShadowEnemyFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            MoveFSM(std::make_shared<TbotsProto::AiConfig>())};
 
     // Start in MoveFSM
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
