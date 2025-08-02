@@ -20,14 +20,6 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      */
     explicit DefensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
-    /**
-     * Guard to check whether we should be defending more aggressively
-     *
-     * @param event the FSM event
-     *
-     * @return whether we should be defending more aggressively
-     */
-    bool shouldDefendAggressively(const Update& event);
 
     /**
      * Guard to check whether we should be defending more aggressively
