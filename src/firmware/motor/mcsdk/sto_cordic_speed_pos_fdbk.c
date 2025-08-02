@@ -47,10 +47,11 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "sto_cordic_speed_pos_fdbk.h"
-#include "mc_math.h"
+#include "firmware/motor/mcsdk/sto_cordic_speed_pos_fdbk.h"
 
-#include "mc_type.h"
+#include "firmware/motor/common_defs.h"
+#include "firmware/motor/mc_math.h"
+#include "firmware/motor/mcsdk/mc_type.h"
 
 /** @addtogroup MCSDK
   * @{

@@ -615,10 +615,31 @@ cc_toolchain_config_fullsystem = rule(
 )
 
 def _stm32_gcc_impl(ctx):
+    cortex_feature = feature(
+        name = "cortex_cpu",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            "-mcpu=cortex-m0",
+                        ],
+                    ),
+                ],
+            )
+        ]
+    )
+
+    features = [
+        cortex_feature
+    ]
+
     return [
         cc_common.create_cc_toolchain_config_info(
             ctx = ctx,
-            features = [],
+            features = features,
             action_configs = [],
             artifact_name_patterns = [],
             cxx_builtin_include_directories = ctx.attr.builtin_include_directories,

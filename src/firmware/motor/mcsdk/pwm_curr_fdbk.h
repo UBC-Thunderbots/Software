@@ -28,7 +28,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Includes ------------------------------------------------------------------*/
-#include "mc_type.h"
+#include "firmware/motor/mcsdk/mc_type.h"
 
 /* Exported defines ------------------------------------------------------------*/
 

@@ -19,14 +19,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "firmware/motor/main.h"
 
+#include "firmware/motor/crc.h"
 #include "firmware/motor/firmware.h"
 #include "firmware/motor/mc_api.h"
 #include "firmware/motor/mc_interface.h"
-#include "firmware/motor/stm32_hal_legacy.h"
-#include "firmware/motor/stm32f031x6.h"
-#include "firmware/motor/stm32f0xx_hal_spi.h"
+#include "firmware/motor/stm32f0xx/legacy/stm32_hal_legacy.h"
+#include "firmware/motor/stm32f0xx/stm32f031x6.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_hal_spi.h"
 #include "firmware/motor/types.h"
-#include "shared/crc.h"
 
 #include <stdint.h>
 
@@ -56,8 +56,8 @@
 SPI_HandleTypeDef hspi1;
 
 int16_t ax = 0, bx = 0;
-volatile uint8_t TX_Buffer[FRAME_SIZE] = {0};
-volatile uint8_t RX_Buffer[FRAME_SIZE] = {0};
+uint8_t TX_Buffer[FRAME_SIZE] = {0};
+uint8_t RX_Buffer[FRAME_SIZE] = {0};
 
 volatile uint8_t new_data_received = 0;
 /* USER CODE END PV */

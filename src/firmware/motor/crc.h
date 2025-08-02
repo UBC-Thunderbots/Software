@@ -1,8 +1,8 @@
-#ifndef __CRC_H
-#define __CRC_H
+#pragma once
 
 #include <stdint.h>
-#include "types.h"
+
+#include "firmware/motor/types.h"
 
 /**
  * @brief the CRC-8/AUTOSAR poly.
@@ -43,5 +43,3 @@
  * It has poly 0x2F, initial value 0xFF, and is finally xor'd with 0xFF.
  */
 uint8_t crc_gen_checksum(enum OPCODES opcode, uint16_t data);
-
-#endif

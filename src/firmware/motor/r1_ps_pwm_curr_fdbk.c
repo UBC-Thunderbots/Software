@@ -27,6 +27,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "firmware/motor/r1_ps_pwm_curr_fdbk.h"
 
+#include "firmware/motor/common_defs.h"
 #include "firmware/motor/mcsdk/pwm_common.h"
 #include "firmware/motor/mcsdk/mc_type.h"
 

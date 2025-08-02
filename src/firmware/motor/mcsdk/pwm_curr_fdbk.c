@@ -12,7 +12,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -76,7 +76,7 @@
   */
 void PWMC_Clear(PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -89,7 +89,7 @@ void PWMC_Clear(PWMC_Handle_t *pHandle)
     pHandle->IcEst = 0;
     pHandle->LPFIdBuf = 0;
     pHandle->LPFIqBuf = 0;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -135,44 +135,6 @@ __weak void PWMC_GetOffsetCalib(PWMC_Handle_t *pHandle, PolarizationOffsets_t *o
 __attribute__( ( section ( ".ccmram" ) ) )
 #endif
 #endif
-/**
-  * @brief Returns the phase current of the motor as read by the ADC (in s16A unit).
-  *
-  * Returns the current values of phases A & B. Phase C current
-  * can be deduced thanks to the formula:
-  *
-  * @f[
-  * I_{C} = -I_{A} - I_{B}
-  * @f]
-  *
-  * @param  pHandle: Handler of the current instance of the PWM component.
-  * @param  Iab: Pointer to the structure that will receive motor current
-  *         of phases A & B in ElectricalValue format.
-  */
-//cstat !MISRAC2012-Rule-8.13 !RED-func-no-effect
-__weak void PWMC_GetPhaseCurrents(PWMC_Handle_t *pHandle, ab_t *Iab)
-{
-#ifdef NULL_PTR_PWR_CUR_FDB
-  if (MC_NULL == pHandle)
-  {
-    /* Nothing to do */
-  }
-  else
-  {
-#endif
-    pHandle->pFctGetPhaseCurrents(pHandle, Iab);
-#ifdef NULL_PTR_PWR_CUR_FDB
-  }
-#endif
-}
-
-#if defined (CCMRAM)
-#if defined (__ICCARM__)
-#pragma location = ".ccmram"
-#elif defined (__CC_ARM) || defined(__GNUC__)
-__attribute__( ( section ( ".ccmram" ) ) )
-#endif
-#endif
 
 /**
   * @brief  Converts input voltages @f$ V_{\alpha} @f$ and @f$ V_{\beta} @f$ into PWM duty cycles
@@ -196,7 +158,7 @@ __attribute__( ( section ( ".ccmram" ) ) )
 __weak uint16_t PWMC_SetPhaseVoltage(PWMC_Handle_t *pHandle, alphabeta_t Valfa_beta)
 {
   uint16_t returnValue;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     returnValue = 0U;
@@ -230,9 +192,18 @@ __weak uint16_t PWMC_SetPhaseVoltage(PWMC_Handle_t *pHandle, alphabeta_t Valfa_b
         wTimePhB = wTimePhA + (wZ / 131072);
         wTimePhC = wTimePhA - (wY / 131072) ;
 
-        pHandle->lowDuty = 1U;
-        pHandle->midDuty = 0U;
-        pHandle->highDuty = 2U;
+        if(true == pHandle->SingleShuntTopology)
+        {
+          pHandle->lowDuty = 1U;
+          pHandle->midDuty = 0U;
+          pHandle->highDuty = 2U;
+        }
+        else
+        {
+          pHandle->lowDuty = (uint16_t)wTimePhC;
+          pHandle->midDuty = (uint16_t)wTimePhA;
+          pHandle->highDuty = (uint16_t)wTimePhB;
+        }
       }
       else /* wZ >= 0 */
         if (wX <= 0)
@@ -242,9 +213,18 @@ __weak uint16_t PWMC_SetPhaseVoltage(PWMC_Handle_t *pHandle, alphabeta_t Valfa_b
           wTimePhB = wTimePhA + (wZ / 131072);
           wTimePhC = wTimePhB - (wX / 131072);
 
-          pHandle->lowDuty = 0U;
-          pHandle->midDuty = 1U;
-          pHandle->highDuty = 2U;
+          if(true == pHandle->SingleShuntTopology)
+          {
+            pHandle->lowDuty = 0U;
+            pHandle->midDuty = 1U;
+            pHandle->highDuty = 2U;
+          }
+          else
+          {
+          pHandle->lowDuty = (uint16_t)wTimePhC;
+          pHandle->midDuty = (uint16_t)wTimePhB;
+          pHandle->highDuty = (uint16_t)wTimePhA;
+        }
         }
         else /* wX > 0 */
         {
@@ -253,9 +233,18 @@ __weak uint16_t PWMC_SetPhaseVoltage(PWMC_Handle_t *pHandle, alphabeta_t Valfa_b
           wTimePhC = wTimePhA - (wY / 131072);
           wTimePhB = wTimePhC + (wX / 131072);
 
-          pHandle->lowDuty = 0U;
-          pHandle->midDuty = 2U;
-          pHandle->highDuty = 1U;
+          if(true == pHandle->SingleShuntTopology)
+          {
+            pHandle->lowDuty = 0U;
+            pHandle->midDuty = 2U;
+            pHandle->highDuty = 1U;
+          }
+          else
+          {
+          pHandle->lowDuty = (uint16_t)wTimePhB;
+          pHandle->midDuty = (uint16_t)wTimePhC;
+          pHandle->highDuty = (uint16_t)wTimePhA;
+        }
         }
     }
     else /* wY > 0 */
@@ -267,9 +256,18 @@ __weak uint16_t PWMC_SetPhaseVoltage(PWMC_Handle_t *pHandle, alphabeta_t Valfa_b
         wTimePhB = wTimePhA + (wZ / 131072);
         wTimePhC = wTimePhA - (wY / 131072);
 
-        pHandle->lowDuty = 2U;
-        pHandle->midDuty = 0U;
-        pHandle->highDuty = 1U;
+        if(true == pHandle->SingleShuntTopology)
+        {
+          pHandle->lowDuty = 2U;
+          pHandle->midDuty = 0U;
+          pHandle->highDuty = 1U;
+        }
+        else
+        {
+        pHandle->lowDuty = (uint16_t)wTimePhB;
+        pHandle->midDuty = (uint16_t)wTimePhA;
+        pHandle->highDuty = (uint16_t)wTimePhC;
+        }
       }
       else /* wZ < 0 */
         if ( wX <= 0 )
@@ -279,9 +277,18 @@ __weak uint16_t PWMC_SetPhaseVoltage(PWMC_Handle_t *pHandle, alphabeta_t Valfa_b
           wTimePhC = wTimePhA - (wY / 131072);
           wTimePhB = wTimePhC + (wX / 131072);
 
-          pHandle->lowDuty = 1U;
-          pHandle->midDuty = 2U;
-          pHandle->highDuty = 0U;
+          if(true == pHandle->SingleShuntTopology)
+          {
+            pHandle->lowDuty = 1U;
+            pHandle->midDuty = 2U;
+            pHandle->highDuty = 0U;
+          }
+          else
+          {
+            pHandle->lowDuty = (uint16_t)wTimePhA;
+            pHandle->midDuty = (uint16_t)wTimePhC;
+            pHandle->highDuty = (uint16_t)wTimePhB;
+        }
         }
         else /* wX > 0 */
         {
@@ -290,9 +297,18 @@ __weak uint16_t PWMC_SetPhaseVoltage(PWMC_Handle_t *pHandle, alphabeta_t Valfa_b
           wTimePhB = wTimePhA + (wZ / 131072);
           wTimePhC = wTimePhB - (wX / 131072);
 
-          pHandle->lowDuty = 2U;
-          pHandle->midDuty = 1U;
-          pHandle->highDuty = 0U;
+          if((pHandle->DPWM_Mode == true) || (pHandle->SingleShuntTopology == true))
+          {
+            pHandle->lowDuty = 2U;
+            pHandle->midDuty = 1U;
+            pHandle->highDuty = 0U;
+          }
+          else
+          {
+            pHandle->lowDuty = (uint16_t)wTimePhA;
+            pHandle->midDuty = (uint16_t)wTimePhB;
+            pHandle->highDuty = (uint16_t)wTimePhC;
+        }
         }
     }
 
@@ -300,38 +316,8 @@ __weak uint16_t PWMC_SetPhaseVoltage(PWMC_Handle_t *pHandle, alphabeta_t Valfa_b
     pHandle->CntPhB = (uint16_t)(MAX(wTimePhB, 0));
     pHandle->CntPhC = (uint16_t)(MAX(wTimePhC, 0));
 
-    if (1U == pHandle->DTTest)
-    {
-      /* Dead time compensation */
-      if (pHandle->Ia > 0)
-      {
-        pHandle->CntPhA += pHandle->DTCompCnt;
-      }
-      else
-      {
-        pHandle->CntPhA -= pHandle->DTCompCnt;
-      }
-
-      if (pHandle->Ib > 0)
-      {
-        pHandle->CntPhB += pHandle->DTCompCnt;
-      }
-      else
-      {
-        pHandle->CntPhB -= pHandle->DTCompCnt;
-      }
-
-      if (pHandle->Ic > 0)
-      {
-        pHandle->CntPhC += pHandle->DTCompCnt;
-      }
-      else
-      {
-        pHandle->CntPhC -= pHandle->DTCompCnt;
-      }
-    }
     returnValue = pHandle->pFctSetADCSampPointSectX(pHandle);
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
   return (returnValue);
@@ -345,7 +331,7 @@ __weak uint16_t PWMC_SetPhaseVoltage(PWMC_Handle_t *pHandle, alphabeta_t Valfa_b
 //cstat !MISRAC2012-Rule-8.13 !RED-func-no-effect
 __weak void PWMC_SwitchOffPWM(PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -354,7 +340,7 @@ __weak void PWMC_SwitchOffPWM(PWMC_Handle_t *pHandle)
   {
 #endif
     pHandle->pFctSwitchOffPwm(pHandle);
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -367,7 +353,7 @@ __weak void PWMC_SwitchOffPWM(PWMC_Handle_t *pHandle)
 //cstat !MISRAC2012-Rule-8.13 !RED-func-no-effect
 __weak void PWMC_SwitchOnPWM(PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -376,7 +362,7 @@ __weak void PWMC_SwitchOnPWM(PWMC_Handle_t *pHandle)
   {
 #endif
     pHandle->pFctSwitchOnPwm(pHandle);
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -396,7 +382,7 @@ __weak void PWMC_SwitchOnPWM(PWMC_Handle_t *pHandle)
 __weak bool PWMC_CurrentReadingCalibr(PWMC_Handle_t *pHandle, CRCAction_t action)
 {
   bool retVal = false;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -430,7 +416,7 @@ __weak bool PWMC_CurrentReadingCalibr(PWMC_Handle_t *pHandle, CRCAction_t action
     {
       /* Nothing to do */
     }
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
   return (retVal);
@@ -457,7 +443,7 @@ __attribute__( ( section ( ".ccmram" ) ) )
 static inline int32_t PWMC_LowPassFilter(int32_t in, int32_t *out_buf, int32_t t)
 {
   int32_t x;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == out_buf)
   {
     x = 0;
@@ -474,7 +460,7 @@ static inline int32_t PWMC_LowPassFilter(int32_t in, int32_t *out_buf, int32_t t
     x = (*out_buf) / 32768;
 
 #endif
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
   return (x);
@@ -497,7 +483,7 @@ __attribute__( ( section ( ".ccmram" ) ) )
   */
 void PWMC_CalcPhaseCurrentsEst(PWMC_Handle_t *pHandle, qd_t Iqd, int16_t hElAngledpp)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -514,7 +500,7 @@ void PWMC_CalcPhaseCurrentsEst(PWMC_Handle_t *pHandle, qd_t Iqd, int16_t hElAngl
 
     ialpha_beta = MCM_Rev_Park(idq_ave, hElAngledpp);
 
-    /* reverse Clarke */
+    /* Reverse Clarke */
 
     /*Ia*/
     pHandle->IaEst = ialpha_beta.alpha;
@@ -527,12 +513,12 @@ void PWMC_CalcPhaseCurrentsEst(PWMC_Handle_t *pHandle, qd_t Iqd, int16_t hElAngl
     temp2 = (int32_t)(ialpha_beta.beta) * (int32_t)SQRT3FACTOR / 32768;
 #endif
 
-    /*Ib*/
+    /* Ib */
     pHandle->IbEst = (int16_t)(temp1 - temp2)/2;
 
-    /*Ic*/
+    /* Ic */
     pHandle->IcEst = (int16_t)(temp1 + temp2)/2;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -552,7 +538,7 @@ void PWMC_CalcPhaseCurrentsEst(PWMC_Handle_t *pHandle, qd_t Iqd, int16_t hElAngl
 //cstat !MISRAC2012-Rule-8.13 !RED-func-no-effect
 __weak void PWMC_TurnOnLowSides(PWMC_Handle_t *pHandle, uint32_t ticks)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -561,24 +547,183 @@ __weak void PWMC_TurnOnLowSides(PWMC_Handle_t *pHandle, uint32_t ticks)
   {
 #endif
     pHandle->pFctTurnOnLowSides(pHandle, ticks);
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
 
-/** @brief  Checks if an overcurrent has occured since the last call to this function.
-  *
-  *	@param  pHandle: Handler of the current instance of the PWM component.
-  * @retval #MC_BREAK_IN if an overcurrent has occurred since last call,
-  *         and #MC_NO_FAULTS otherwise.
-  */
-__weak uint16_t PWMC_CheckOverCurrent(PWMC_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
-{
-#ifdef NULL_PTR_PWR_CUR_FDB
-  return ((MC_NULL == pHandle) ? MC_NO_FAULTS : (uint16_t)pHandle->pFctIsOverCurrentOccurred(pHandle));
-#else
-  return ((uint16_t)pHandle->pFctIsOverCurrentOccurred(pHandle));
+#if defined (CCMRAM)
+#if defined (__ICCARM__)
+#pragma location = ".ccmram"
+#elif defined (__CC_ARM) || defined(__GNUC__)
+__attribute__((section(".ccmram")))
 #endif
+#endif
+/*
+  * @brief  Manages HW overcurrent protection.
+  *
+  * @param  pHandle: Handler of the current instance of the PWM component.
+  */
+__weak void *PWMC_OCP_Handler(PWMC_Handle_t *pHandle)
+{
+  void *tempPointer; //cstat !MISRAC2012-Rule-8.13
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  if (MC_NULL == pHandle)
+  {
+    tempPointer = MC_NULL;
+  }
+  else
+  {
+#endif
+    if (false == pHandle->BrakeActionLock)
+    {
+      if (ES_GPIO == pHandle->LowSideOutputs)
+      {
+        LL_GPIO_ResetOutputPin(pHandle->pwm_en_u_port, pHandle->pwm_en_u_pin);
+        LL_GPIO_ResetOutputPin(pHandle->pwm_en_v_port, pHandle->pwm_en_v_pin);
+        LL_GPIO_ResetOutputPin(pHandle->pwm_en_w_port, pHandle->pwm_en_w_pin);
+      }
+      else
+      {
+        /* Nothing to do */
+      }
+    }
+    else
+    {
+      /* Nothing to do */
+    }
+    pHandle->OverCurrentFlag = true;
+    tempPointer = &(pHandle->Motor);
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  }
+#endif
+  return (tempPointer);
+}
+
+#if defined (CCMRAM)
+#if defined (__ICCARM__)
+#pragma location = ".ccmram"
+#elif defined (__CC_ARM) || defined(__GNUC__)
+__attribute__((section(".ccmram")))
+#endif
+#endif
+/*
+  * @brief  manages driver protection.
+  *
+  * @param  pHandle: Handler of the current instance of the PWM component.
+  */
+__weak void *PWMC_DP_Handler(PWMC_Handle_t *pHandle)
+{
+  void *tempPointer; //cstat !MISRAC2012-Rule-8.13
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  if (MC_NULL == pHandle)
+  {
+    tempPointer = MC_NULL;
+  }
+  else
+  {
+#endif
+    if (false == pHandle->BrakeActionLock)
+    {
+      if (ES_GPIO == pHandle->LowSideOutputs)
+      {
+        LL_GPIO_ResetOutputPin(pHandle->pwm_en_u_port, pHandle->pwm_en_u_pin);
+        LL_GPIO_ResetOutputPin(pHandle->pwm_en_v_port, pHandle->pwm_en_v_pin);
+        LL_GPIO_ResetOutputPin(pHandle->pwm_en_w_port, pHandle->pwm_en_w_pin);
+      }
+      else
+      {
+        /* Nothing to do */
+      }
+    }
+    else
+    {
+      /* Nothing to do */
+    }
+    pHandle->driverProtectionFlag = true;
+    tempPointer = &(pHandle->Motor);
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  }
+#endif
+  return (tempPointer);
+}
+
+#if defined (CCMRAM)
+#if defined (__ICCARM__)
+#pragma location = ".ccmram"
+#elif defined (__CC_ARM) || defined(__GNUC__)
+__attribute__((section(".ccmram")))
+#endif
+#endif
+/*
+  * @brief  Manages HW overvoltage protection.
+  *
+  * @param  pHandle: Handler of the current instance of the PWM component.
+  *         TIMx: timer used for PWM generation
+  */
+__weak void *PWMC_OVP_Handler(PWMC_Handle_t *pHandle, TIM_TypeDef *TIMx)
+{
+  void *tempPointer; //cstat !MISRAC2012-Rule-8.13
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  if (MC_NULL == pHandle)
+  {
+    tempPointer = MC_NULL;
+  }
+  else
+  {
+#endif
+    TIMx->BDTR |= LL_TIM_OSSI_ENABLE;
+    pHandle->OverVoltageFlag = true;
+    pHandle->BrakeActionLock = true;
+    tempPointer = &(pHandle->Motor);
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  }
+#endif
+  return (tempPointer);
+}
+
+/*
+  * @brief  Checks if an overcurrent occurred since last call.
+  *
+  * @param  pHdl: Handler of the current instance of the PWM component.
+  * @retval uint16_t Returns #MC_OVER_CURR if an overcurrent has been
+  *                  detected since last method call, #MC_NO_FAULTS otherwise.
+  */
+__weak uint16_t PWMC_IsFaultOccurred(PWMC_Handle_t *pHandle)
+{
+  uint16_t retVal = MC_NO_FAULTS;
+
+  if (true == pHandle->OverVoltageFlag)
+  {
+    retVal = MC_OVER_VOLT;
+    pHandle->OverVoltageFlag = false;
+  }
+  else
+  {
+    /* Nothing to do */
+  }
+
+  if (true == pHandle->OverCurrentFlag)
+  {
+    retVal |= MC_OVER_CURR;
+    pHandle->OverCurrentFlag = false;
+  }
+  else
+  {
+    /* Nothing to do */
+  }
+
+  if (true == pHandle->driverProtectionFlag)
+  {
+    retVal |= MC_DP_FAULT;
+    pHandle->driverProtectionFlag = false;
+  }
+  else
+  {
+    /* Nothing to do */
+  }
+
+  return (retVal);
 }
 
 /**
@@ -592,7 +737,7 @@ __weak uint16_t PWMC_CheckOverCurrent(PWMC_Handle_t *pHandle) //cstat !MISRAC201
 //cstat !MISRAC2012-Rule-8.13 !RED-func-no-effect
 __weak void PWMC_OCPSetReferenceVoltage(PWMC_Handle_t *pHandle, uint16_t hDACVref)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if ((MC_NULL == pHandle) || (MC_NULL == pHandle->pFctOCPSetReferenceVoltage))
   {
     /* Nothing to do */
@@ -601,33 +746,17 @@ __weak void PWMC_OCPSetReferenceVoltage(PWMC_Handle_t *pHandle, uint16_t hDACVre
   {
 #endif
     pHandle->pFctOCPSetReferenceVoltage(pHandle, hDACVref);
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
-#endif
-}
-
-/**
-  * @brief  Retrieves the satus of TurnOnLowSides action.
-  *
-  * @param  pHandle: Handler of the current instance of the PWMC component.
-  * @retval bool State of TurnOnLowSides action:
-  *         **true** if TurnOnLowSides action is active, **false** otherwise.
-  */
-__weak bool PWMC_GetTurnOnLowSidesAction(const PWMC_Handle_t *pHandle)
-{
-#ifdef NULL_PTR_PWR_CUR_FDB
-  return ((MC_NULL == pHandle) ? false : pHandle->TurnOnLowSidesAction);
-#else
-  return (pHandle->TurnOnLowSidesAction);
 #endif
 }
 
 /** @brief Enables Discontinuous PWM mode using the @p pHandle PWMC component.
   *
   */
-__weak void PWMC_DPWM_ModeEnable( PWMC_Handle_t * pHandle )
+__weak void PWMC_DPWM_ModeEnable(PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL ==  pHandle)
   {
     /* Nothing to do */
@@ -636,7 +765,7 @@ __weak void PWMC_DPWM_ModeEnable( PWMC_Handle_t * pHandle )
   {
 #endif
     pHandle->DPWM_Mode = true;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -644,9 +773,9 @@ __weak void PWMC_DPWM_ModeEnable( PWMC_Handle_t * pHandle )
 /** @brief Disables Discontinuous PWM mode using the @p pHandle PWMC component.
   *
   */
-__weak void PWMC_DPWM_ModeDisable( PWMC_Handle_t * pHandle )
+__weak void PWMC_DPWM_ModeDisable(PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL ==  pHandle)
   {
     /* Nothing to do */
@@ -655,7 +784,7 @@ __weak void PWMC_DPWM_ModeDisable( PWMC_Handle_t * pHandle )
   {
 #endif
     pHandle->DPWM_Mode = false;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -664,9 +793,10 @@ __weak void PWMC_DPWM_ModeDisable( PWMC_Handle_t * pHandle )
   *
   * @retval true if DPWM Mode is enabled, **false** otherwise.
   */
-__weak bool PWMC_GetDPWM_Mode( PWMC_Handle_t * pHandle )
+//cstat !MISRAC2012-Rule-8.13
+__weak bool PWMC_GetDPWM_Mode(PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   return ((MC_NULL == pHandle) ? false : pHandle->DPWM_Mode);
 #else
   return (pHandle->DPWM_Mode);
@@ -679,7 +809,7 @@ __weak bool PWMC_GetDPWM_Mode( PWMC_Handle_t * pHandle )
 //cstat !MISRAC2012-Rule-8.13 !RED-func-no-effect
 __weak void PWMC_RLDetectionModeEnable(PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if ((MC_NULL == pHandle) || ( MC_NULL == pHandle->pFctRLDetectionModeEnable))
   {
     /* Nothing to do */
@@ -688,7 +818,7 @@ __weak void PWMC_RLDetectionModeEnable(PWMC_Handle_t *pHandle)
   {
 #endif
     pHandle->pFctRLDetectionModeEnable(pHandle);
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -699,7 +829,7 @@ __weak void PWMC_RLDetectionModeEnable(PWMC_Handle_t *pHandle)
 //cstat !MISRAC2012-Rule-8.13 !RED-func-no-effect
 __weak void PWMC_RLDetectionModeDisable(PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if ((MC_NULL == pHandle) || ( MC_NULL == pHandle->pFctRLDetectionModeDisable))
   {
     /* Nothing to do */
@@ -708,7 +838,7 @@ __weak void PWMC_RLDetectionModeDisable(PWMC_Handle_t *pHandle)
   {
 #endif
     pHandle->pFctRLDetectionModeDisable(pHandle);
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -723,7 +853,7 @@ __weak void PWMC_RLDetectionModeDisable(PWMC_Handle_t *pHandle)
   */
 __weak uint16_t PWMC_RLDetectionModeSetDuty(PWMC_Handle_t *pHandle, uint16_t hDuty) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
  uint16_t retVal = MC_DURATION;
 
  if ((MC_NULL == pHandle) || ( MC_NULL == pHandle->pFctRLDetectionModeSetDuty))
@@ -740,26 +870,22 @@ __weak uint16_t PWMC_RLDetectionModeSetDuty(PWMC_Handle_t *pHandle, uint16_t hDu
 #endif
 }
 
-/**
-  * @brief  Sets the aligned motor flag.
+/** @brief  Turns on low sides switches and starts ADC triggerin.
   *
-  * @param  pHandle: Handler of the current instance of the PWMC component.
-  * @param  flag: Value to be applied as an 8 bit unsigned integer.
-  *				  1: motor is in aligned stage.
-  *               2: motor is not in aligned stage.
   */
-void PWMC_SetAlignFlag(PWMC_Handle_t *pHandle, uint8_t flag)
+//cstat !MISRAC2012-Rule-8.13 !RED-func-no-effect
+__weak void PWMC_RLTurnOnLowSidesAndStart(PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
-  if (MC_NULL ==  pHandle)
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
+  if ((MC_NULL == pHandle) || ( MC_NULL == pHandle->pFctRLTurnOnLowSidesAndStart))
   {
     /* Nothing to do */
   }
   else
   {
 #endif
-    pHandle->AlignFlag = flag;
-#ifdef NULL_PTR_PWR_CUR_FDB
+    pHandle->pFctRLTurnOnLowSidesAndStart(pHandle);
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -772,7 +898,7 @@ void PWMC_SetAlignFlag(PWMC_Handle_t *pHandle, uint8_t flag)
  */
 __weak void PWMC_RegisterGetPhaseCurrentsCallBack(PWMC_GetPhaseCurr_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -781,7 +907,7 @@ __weak void PWMC_RegisterGetPhaseCurrentsCallBack(PWMC_GetPhaseCurr_Cb_t pCallBa
   {
 #endif
     pHandle->pFctGetPhaseCurrents = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -795,7 +921,7 @@ __weak void PWMC_RegisterGetPhaseCurrentsCallBack(PWMC_GetPhaseCurr_Cb_t pCallBa
  */
 __weak void PWMC_RegisterSwitchOffPwmCallBack(PWMC_Generic_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -804,7 +930,7 @@ __weak void PWMC_RegisterSwitchOffPwmCallBack(PWMC_Generic_Cb_t pCallBack, PWMC_
   {
 #endif
     pHandle->pFctSwitchOffPwm = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -818,7 +944,7 @@ __weak void PWMC_RegisterSwitchOffPwmCallBack(PWMC_Generic_Cb_t pCallBack, PWMC_
  */
 __weak void PWMC_RegisterSwitchonPwmCallBack(PWMC_Generic_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -827,7 +953,7 @@ __weak void PWMC_RegisterSwitchonPwmCallBack(PWMC_Generic_Cb_t pCallBack, PWMC_H
   {
 #endif
     pHandle->pFctSwitchOnPwm = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -841,7 +967,7 @@ __weak void PWMC_RegisterSwitchonPwmCallBack(PWMC_Generic_Cb_t pCallBack, PWMC_H
  */
 __weak void PWMC_RegisterReadingCalibrationCallBack(PWMC_Generic_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -850,7 +976,7 @@ __weak void PWMC_RegisterReadingCalibrationCallBack(PWMC_Generic_Cb_t pCallBack,
   {
 #endif
     pHandle->pFctCurrReadingCalib = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -863,7 +989,7 @@ __weak void PWMC_RegisterReadingCalibrationCallBack(PWMC_Generic_Cb_t pCallBack,
  */
 __weak void PWMC_RegisterTurnOnLowSidesCallBack(PWMC_TurnOnLowSides_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -872,7 +998,7 @@ __weak void PWMC_RegisterTurnOnLowSidesCallBack(PWMC_TurnOnLowSides_Cb_t pCallBa
   {
 #endif
     pHandle->pFctTurnOnLowSides = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -885,7 +1011,7 @@ __weak void PWMC_RegisterTurnOnLowSidesCallBack(PWMC_TurnOnLowSides_Cb_t pCallBa
  */
 __weak void PWMC_RegisterSampPointSectXCallBack(PWMC_SetSampPointSectX_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -894,29 +1020,7 @@ __weak void PWMC_RegisterSampPointSectXCallBack(PWMC_SetSampPointSectX_Cb_t pCal
   {
 #endif
     pHandle->pFctSetADCSampPointSectX = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
-  }
-#endif
-}
-
-/**
- * @brief Sets the Callback that the PWMC component shall invoke to check the overcurrent status.
- *
- * @param pCallBack: Pointer on the callback which checks the overcurrent state.
- * @param pHandle: Handler of the current instance of the PWMC component.
- */
-__weak void PWMC_RegisterIsOverCurrentOccurredCallBack(PWMC_OverCurr_Cb_t pCallBack, PWMC_Handle_t *pHandle)
-{
-#ifdef NULL_PTR_PWR_CUR_FDB
-  if (MC_NULL == pHandle)
-  {
-    /* Nothing to do */
-  }
-  else
-  {
-#endif
-    pHandle->pFctIsOverCurrentOccurred = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -930,7 +1034,7 @@ __weak void PWMC_RegisterIsOverCurrentOccurredCallBack(PWMC_OverCurr_Cb_t pCallB
  */
 __weak void PWMC_RegisterOCPSetRefVoltageCallBack(PWMC_SetOcpRefVolt_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -939,7 +1043,7 @@ __weak void PWMC_RegisterOCPSetRefVoltageCallBack(PWMC_SetOcpRefVolt_Cb_t pCallB
   {
 #endif
     pHandle->pFctOCPSetReferenceVoltage = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -952,7 +1056,7 @@ __weak void PWMC_RegisterOCPSetRefVoltageCallBack(PWMC_SetOcpRefVolt_Cb_t pCallB
  */
 __weak void PWMC_RegisterRLDetectionModeEnableCallBack(PWMC_Generic_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -961,7 +1065,7 @@ __weak void PWMC_RegisterRLDetectionModeEnableCallBack(PWMC_Generic_Cb_t pCallBa
   {
 #endif
     pHandle->pFctRLDetectionModeEnable = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -974,7 +1078,7 @@ __weak void PWMC_RegisterRLDetectionModeEnableCallBack(PWMC_Generic_Cb_t pCallBa
  */
 __weak void PWMC_RegisterRLDetectionModeDisableCallBack(PWMC_Generic_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -983,7 +1087,7 @@ __weak void PWMC_RegisterRLDetectionModeDisableCallBack(PWMC_Generic_Cb_t pCallB
   {
 #endif
     pHandle->pFctRLDetectionModeDisable = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -997,7 +1101,7 @@ __weak void PWMC_RegisterRLDetectionModeDisableCallBack(PWMC_Generic_Cb_t pCallB
  */
 __weak void PWMC_RegisterRLDetectionModeSetDutyCallBack(PWMC_RLDetectSetDuty_Cb_t pCallBack, PWMC_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -1006,7 +1110,7 @@ __weak void PWMC_RegisterRLDetectionModeSetDutyCallBack(PWMC_RLDetectSetDuty_Cb_
   {
 #endif
     pHandle->pFctRLDetectionModeSetDuty = pCallBack;
-#ifdef NULL_PTR_PWR_CUR_FDB
+#ifdef NULL_PTR_CHECK_PWR_CUR_FDB
   }
 #endif
 }
@@ -1019,4 +1123,4 @@ __weak void PWMC_RegisterRLDetectionModeSetDutyCallBack(PWMC_RLDetectSetDuty_Cb_
   * @}
   */
 
-/************************ (C) COPYRIGHT 2022 STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT 2024 STMicroelectronics *****END OF FILE****/

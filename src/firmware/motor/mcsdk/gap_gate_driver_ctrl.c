@@ -9,7 +9,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -22,9 +22,11 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "gap_gate_driver_ctrl.h"
+#include "firmware/motor/mcsdk/gap_gate_driver_ctrl.h"
 
-#include "mc_type.h"
+#include "firmware/motor/common_defs.h"
+#include "firmware/motor/mcsdk/mc_type.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_spi.h"
 
 /**
  *  @addtogroup MCSDK
@@ -908,5 +910,5 @@ void GAP_CS_Activate(GAP_Handle_t *pHandle_t)
   * @}
   */
 
-/************************ (C) COPYRIGHT 2022 STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT 2024 STMicroelectronics *****END OF FILE****/
 

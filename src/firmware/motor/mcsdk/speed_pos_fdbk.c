@@ -20,7 +20,9 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "speed_pos_fdbk.h"
+#include "firmware/motor/mcsdk/speed_pos_fdbk.h"
+
+#include "firmware/motor/common_defs.h"
 
 /** @addtogroup MCSDK
   * @{

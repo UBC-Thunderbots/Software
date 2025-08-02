@@ -31,8 +31,8 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "firmware/motor/mcsdk/mc_type.h"
 #include "firmware/motor/mcsdk/speed_ctrl.h"
-#include "firmware/motor/virtual_speed_sensor.h"
-#include "firmware/motor/bus_voltage_sensor.h"
+#include "firmware/motor/mcsdk/virtual_speed_sensor.h"
+#include "firmware/motor/mcsdk/bus_voltage_sensor.h"
 #include "firmware/motor/power_stage_parameters.h"
 
 /** @addtogroup MCSDK

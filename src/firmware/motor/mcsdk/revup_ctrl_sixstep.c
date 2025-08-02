@@ -48,7 +48,9 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "revup_ctrl_sixstep.h"
+#include "firmware/motor/mcsdk/revup_ctrl_sixstep.h"
+
+#include "firmware/motor/common_defs.h"
 
 /** @addtogroup MCSDK
   * @{

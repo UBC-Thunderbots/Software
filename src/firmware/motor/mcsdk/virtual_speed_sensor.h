@@ -27,7 +27,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Includes ------------------------------------------------------------------*/
-#include "speed_pos_fdbk.h"
+#include "firmware/motor/mcsdk/speed_pos_fdbk.h"
 
 /** @addtogroup MCSDK
   * @{

@@ -9,7 +9,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -22,11 +22,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 //cstat -MISRAC2012-Rule-21.1
-#include "firmware/motor/main.h" //cstat !MISRAC2012-Rule-21.1
+#include "main.h" //cstat !MISRAC2012-Rule-21.1
 //cstat +MISRAC2012-Rule-21.1
-#include "firmware/motor/parameters_conversion.h"
-
-#include "firmware/motor/r1_ps_pwm_curr_fdbk.h"
+#include "parameters_conversion.h"
+#include "r1_ps_pwm_curr_fdbk.h"
 
 /* USER CODE BEGIN Additional include */
 
@@ -38,45 +37,43 @@
 /**
   * @brief  Current sensor parameters Motor 1 - single shunt phase shift
   */
+//cstat !MISRAC2012-Rule-8.4
 const R1_Params_t R1_ParamsM1 =
 {
 /* Dual MC parameters --------------------------------------------------------*/
-  .FreqRatio       = FREQ_RATIO,
-  .IsHigherFreqTim = FREQ_RELATION,
+  .FreqRatio             = FREQ_RATIO,
+  .IsHigherFreqTim       = FREQ_RELATION,
 
 /* Current reading A/D Conversions initialization -----------------------------*/
-  .ADCx            = ADC1,
-  .IChannel       = MC_ADC_CHANNEL_5,
+  .ADCx                  = ADC1,
+  .IChannel              = 5,
   .ISamplingTime = LL_ADC_SAMPLINGTIME_7CYCLES_5,
+
 /* PWM generation parameters --------------------------------------------------*/
-  .RepetitionCounter = 1,
-  .TMin               = TMIN,
-  .TSample            = (uint16_t)(SAMPLING_TIME + TBEFORE),
-  .TIMx               = TIM1,
-  .DMAx               = DMA1,
-  .DMAChannelX        = LL_DMA_CHANNEL_5,
+  .RepetitionCounter     = REP_COUNTER,
+  .TMin                  = TMIN,
+  .TSample               = (uint16_t)(TBEFORE),
+  .TIMx                  = TIM1,
+  .DMAx                  = DMA1,
+  .DMAChannelX           = LL_DMA_CHANNEL_5,
   .DMASamplingPtChannelX = LL_DMA_CHANNEL_4,
-  .DMA_ADC_DR_ChannelX = LL_DMA_CHANNEL_1,
-  .hTADConv          = (uint16_t)((ADC_SAR_CYCLES+ADC_TRIG_CONV_LATENCY_CYCLES) * (ADV_TIM_CLK_MHz/ADC_CLK_MHz)),
-/* PWM Driving signals initialization ----------------------------------------*/
-  .LowSideOutputs = (LowSideOutputsFunction_t)LOW_SIDE_SIGNALS_ENABLING,
-  .pwm_en_u_port  = MC_NULL,
-  .pwm_en_u_pin   = (uint16_t) 0,
-  .pwm_en_v_port  = MC_NULL,
-  .pwm_en_v_pin   = (uint16_t) 0,
-  .pwm_en_w_port  = MC_NULL,
-  .pwm_en_w_pin   = (uint16_t) 0,
- .EmergencyStop = (FunctionalState) ENABLE,
+  .DMA_ADC_DR_ChannelX   = LL_DMA_CHANNEL_1,
+  .hTADConv              = (uint16_t)((ADC_SAR_CYCLES+ADC_TRIG_CONV_LATENCY_CYCLES) * (ADV_TIM_CLK_MHz/ADC_CLK_MHz)),
+
 /* Internal OPAMP common settings --------------------------------------------*/
-/* Internal COMP settings ----------------------------------------------------*/
 
-/* DAC settings --------------------------------------------------------------*/
+};
 
+ScaleParams_t scaleParams_M1 =
+{
+ .voltage = NOMINAL_BUS_VOLTAGE_V/(1.73205 * 32767), /* sqrt(3) = 1.73205 */
+ .current = CURRENT_CONV_FACTOR_INV,
+ .frequency = (1.15 * MAX_APPLICATION_SPEED_UNIT * U_RPM)/(32768* SPEED_UNIT)
 };
 
 /* USER CODE BEGIN Additional parameters */
 
 /* USER CODE END Additional parameters */
 
-/******************* (C) COPYRIGHT 2022 STMicroelectronics *****END OF FILE****/
+/******************* (C) COPYRIGHT 2024 STMicroelectronics *****END OF FILE****/
 

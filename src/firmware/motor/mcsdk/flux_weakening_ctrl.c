@@ -23,9 +23,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "firmware/motor/mcsdk/flux_weakening_ctrl.h"
 
+#include "firmware/motor/common_defs.h"
 #include "firmware/motor/mc_math.h"
 #include "firmware/motor/mcsdk/mc_type.h"
-#include "firmware/motor/pid_regulator.h"
+#include "firmware/motor/mcsdk/pid_regulator.h"
 
 /** @addtogroup MCSDK
   * @{

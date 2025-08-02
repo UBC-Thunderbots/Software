@@ -21,7 +21,9 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "virtual_speed_sensor.h"
+#include "firmware/motor/mcsdk/virtual_speed_sensor.h"
+
+#include "firmware/motor/common_defs.h"
 
 
 /** @addtogroup MCSDK

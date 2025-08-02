@@ -9,7 +9,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -34,10 +34,19 @@
   * @{
   */
 
+/** @addtogroup CAI
+  * @{
+  */
+
 /** @defgroup MCInterface Motor Control Interface
   * @brief MC Interface component of the Motor Control SDK
   *
-  * @todo Document the MC Interface "module".
+  *  This interface allows for performing basic operations on the motor driven by a
+  *  Motor Control SDK based application. With it, motors can be started and stopped, speed or
+  *  torque ramps can be programmed and executed and information on the state of the motor can
+  *  be retrieved, among others.
+  *
+  *  These functions aims at being the main interface used by an application to control the motor.
   *
   * @{
   */
@@ -48,61 +57,27 @@
 /* Functions -----------------------------------------------*/
 
 /**
-  * @brief  Initializes all the object variables, usually it has to be called
-  *         once right after object creation. It is also used to assign the
-  *         state machine object, the speed and torque controller, and the FOC
-  *         drive object to be used by MC Interface.
-  * @param  pHandle pointer on the component instance to initialize.
-  * @param  pSTM the state machine object used by the MCI.
-  * @param  pSTC the speed and torque controller used by the MCI.
-  * @param  pFOCVars pointer to FOC vars to be used by MCI.
-  * @retval none.
-  */
-__weak void MCI_Init(MCI_Handle_t *pHandle, SpeednTorqCtrl_Handle_t *pSTC, pFOCVars_t pFOCVars, PWMC_Handle_t *pPWMHandle )
-{
-#ifdef NULL_PTR_MC_INT
-  if (MC_NULL == pHandle)
-  {
-    /* Nothing to do */
-  }
-  else
-  {
-#endif
-    pHandle->pSTC = pSTC;
-    pHandle->pFOCVars = pFOCVars;
-    pHandle->pPWM = pPWMHandle;
-
-    /* Buffer related initialization */
-    pHandle->lastCommand = MCI_NOCOMMANDSYET;
-    pHandle->hFinalSpeed = 0;
-    pHandle->hFinalTorque = 0;
-    pHandle->hDurationms = 0;
-    pHandle->CommandState = MCI_BUFFER_EMPTY;
-    pHandle->DirectCommand = MCI_NO_COMMAND;
-    pHandle->State = IDLE;
-    pHandle->CurrentFaults = MC_NO_FAULTS;
-    pHandle->PastFaults = MC_NO_FAULTS;
-#ifdef NULL_PTR_MC_INT
-  }
-#endif
-}
-
-/**
-  * @brief  This is a buffered command to set a motor speed ramp. This commands
-  *         don't become active as soon as it is called but it will be executed
-  *         when the pSTM state is START_RUN or RUN. User can check the status
-  *         of the command calling the MCI_IsCommandAcknowledged method.
+  * @brief  Programs a motor speed ramp
+  *
   * @param  pHandle Pointer on the component instance to operate on.
-  * @param  hFinalSpeed is the value of mechanical rotor speed reference at the
+  * @param  hFinalSpeed The value of mechanical rotor speed reference at the
   *         end of the ramp expressed in the unit defined by #SPEED_UNIT.
-  * @param  hDurationms the duration of the ramp expressed in milliseconds. It
+  * @param  hDurationms The duration of the ramp expressed in milliseconds. It
   *         is possible to set 0 to perform an instantaneous change in the
   *         value.
-  * @retval none.
+  *
+  *  This command is executed immediately if the target motor's state machine is in
+  * the #RUN state. Otherwise, it is buffered and its execution is delayed until This
+  * state is reached.
+  *
+  * Users can check the status of the command by calling the MCI_IsCommandAcknowledged()
+  * function.
+  *
+  * @sa MCI_ExecSpeedRamp
   */
-__weak void MCI_ExecSpeedRamp(MCI_Handle_t *pHandle,  int16_t hFinalSpeed, uint16_t hDurationms)
+__weak void MCI_ExecSpeedRamp(MCI_Handle_t *pHandle, int16_t hFinalSpeed, uint16_t hDurationms)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -114,29 +89,34 @@ __weak void MCI_ExecSpeedRamp(MCI_Handle_t *pHandle,  int16_t hFinalSpeed, uint1
     pHandle->hFinalSpeed = hFinalSpeed;
     pHandle->hDurationms = hDurationms;
     pHandle->CommandState = MCI_COMMAND_NOT_ALREADY_EXECUTED;
-    pHandle->LastModalitySetByUser = MCM_SPEED_MODE;
 
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 }
 
 /**
-  * @brief  This is a buffered command to set a motor speed ramp. This commands
-  *         don't become active as soon as it is called but it will be executed
-  *         when the pSTM state is START_RUN or RUN. User can check the status
-  *         of the command calling the MCI_IsCommandAcknowledged method.
+  * @brief  Programs a motor speed ramp
+  *
   * @param  pHandle Pointer on the component instance to operate on.
   * @param  FinalSpeed is the value of mechanical rotor speed reference at the
-  *         end of the ramp expressed in rpm.
+  *         end of the ramp expressed in RPM.
   * @param  hDurationms the duration of the ramp expressed in milliseconds. It
   *         is possible to set 0 to perform an instantaneous change in the
   *         value.
-  * @retval none.
+  *
+  *  This command is executed immediately if the target motor's state machine is in
+  * the #RUN state. Otherwise, it is buffered and its execution is delayed until This
+  * state is reached.
+  *
+  * Users can check the status of the command by calling the MCI_IsCommandAcknowledged()
+  * function.
+  *
+  * @sa MCI_ExecSpeedRamp_F
   */
-__weak void MCI_ExecSpeedRamp_F( MCI_Handle_t * pHandle, const float FinalSpeed, uint16_t hDurationms )
+__weak void MCI_ExecSpeedRamp_F(MCI_Handle_t *pHandle, const float_t FinalSpeed, uint16_t hDurationms)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -144,21 +124,19 @@ __weak void MCI_ExecSpeedRamp_F( MCI_Handle_t * pHandle, const float FinalSpeed,
   else
   {
 #endif
-    int16_t hFinalSpeed = (int16_t) ((FinalSpeed * SPEED_UNIT) / U_RPM);
-    MCI_ExecSpeedRamp(pHandle, hFinalSpeed, hDurationms);
-#ifdef NULL_PTR_MC_INT
+    float_t hFinalSpeed = ((FinalSpeed * (float_t)SPEED_UNIT) / (float_t)U_RPM);
+    MCI_ExecSpeedRamp(pHandle, (int16_t)hFinalSpeed, hDurationms);
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 }
 
 /**
-  * @brief  This is a buffered command to set a motor torque ramp. This commands
-  *         don't become active as soon as it is called but it will be executed
-  *         when the pSTM state is START_RUN or RUN. User can check the status
-  *         of the command calling the MCI_IsCommandAcknowledged method.
+  * @brief  Programs a motor torque ramp
+  *
   * @param  pHandle Pointer on the component instance to work on.
   * @param  hFinalTorque is the value of motor torque reference at the end of
-  *         the ramp. This value represents actually the Iq current expressed in
+  *         the ramp. This value represents actually the $I_q$ current expressed in
   *         digit.
   *         To convert current expressed in Amps to current expressed in digit
   *         is possible to use the formula:
@@ -166,11 +144,19 @@ __weak void MCI_ExecSpeedRamp_F( MCI_Handle_t * pHandle, const float FinalSpeed,
   * @param  hDurationms the duration of the ramp expressed in milliseconds. It
   *         is possible to set 0 to perform an instantaneous change in the
   *         value.
-  * @retval none.
+  *
+  *  This command is executed immediately if the target motor's state machine is in
+  * the #RUN state. Otherwise, it is buffered and its execution is delayed until This
+  * state is reached.
+  *
+  * Users can check the status of the command by calling the MCI_IsCommandAcknowledged()
+  * function.
+  *
+  * @sa MCI_ExecTorqueRamp
   */
-__weak void MCI_ExecTorqueRamp(MCI_Handle_t *pHandle,  int16_t hFinalTorque, uint16_t hDurationms)
+__weak void MCI_ExecTorqueRamp(MCI_Handle_t *pHandle, int16_t hFinalTorque, uint16_t hDurationms)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -183,30 +169,36 @@ __weak void MCI_ExecTorqueRamp(MCI_Handle_t *pHandle,  int16_t hFinalTorque, uin
     pHandle->hDurationms = hDurationms;
     pHandle->CommandState = MCI_COMMAND_NOT_ALREADY_EXECUTED;
     pHandle->LastModalitySetByUser = MCM_TORQUE_MODE;
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 }
 
 /**
-  * @brief  This is a buffered command to set a motor torque ramp. This commands
-  *         don't become active as soon as it is called but it will be executed
-  *         when the pSTM state is START_RUN or RUN. User can check the status
-  *         of the command calling the MCI_IsCommandAcknowledged method.
+  * @brief  Programs a motor torque ramp
+  *
   * @param  pHandle Pointer on the component instance to work on.
   * @param  FinalTorque is the value of motor torque reference at the end of
-  *         the ramp. This value represents actually the Iq current expressed in
+  *         the ramp. This value represents actually the $I_q$ current expressed in
   *         Ampere.
   *         Here the formula for conversion from current in Ampere to digit:
   *           I(s16) = [i(Amp) * 65536 * Rshunt * Aop] / Vdd_micro.
   * @param  hDurationms the duration of the ramp expressed in milliseconds. It
   *         is possible to set 0 to perform an instantaneous change in the
   *         value.
-  * @retval none.
+  *
+  *  This command is executed immediately if the target motor's state machine is in
+  * the #RUN state. Otherwise, it is buffered and its execution is delayed until This
+  * state is reached.
+  *
+  * Users can check the status of the command by calling the MCI_IsCommandAcknowledged()
+  * function.
+  *
+  * @sa MCI_ExecTorqueRamp_F
   */
-__weak void MCI_ExecTorqueRamp_F( MCI_Handle_t * pHandle,  float FinalTorque, uint16_t hDurationms )
+__weak void MCI_ExecTorqueRamp_F(MCI_Handle_t *pHandle, const float_t FinalTorque, uint16_t hDurationms)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -214,27 +206,31 @@ __weak void MCI_ExecTorqueRamp_F( MCI_Handle_t * pHandle,  float FinalTorque, ui
   else
   {
 #endif
-    int16_t hFinalTorque = (int16_t) (FinalTorque * CURRENT_CONV_FACTOR);
-    MCI_ExecTorqueRamp(pHandle, hFinalTorque, hDurationms);
-#ifdef NULL_PTR_MC_INT
+    float_t hFinalTorque = (FinalTorque * (float_t)CURRENT_CONV_FACTOR);
+    MCI_ExecTorqueRamp(pHandle, (int16_t)hFinalTorque, hDurationms);
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 }
 
 /**
-  * @brief  This is a buffered command to set directly the motor current
-  *         references Iq and Id. This commands don't become active as soon as
-  *         it is called but it will be executed when the pSTM state is
-  *         START_RUN or RUN. User can check the status of the command calling
-  *         the MCI_IsCommandAcknowledged method.
+  * @brief  Sets the motor current references $I_q$ and $I_d$ directly.
+  *
   * @param  pHandle Pointer on the component instance to work on.
-  * @param  Iqdref current references on qd reference frame in qd_t
-  *         format.
-  * @retval none.
+  * @param  Iqdref current references on qd reference frame in qd_t format.
+  *
+  *  This command is executed immediately if the target motor's state machine is in
+  * the #RUN state. Otherwise, it is buffered and its execution is delayed until This
+  * state is reached.
+  *
+  * Users can check the status of the command by calling the MCI_IsCommandAcknowledged()
+  * function.
+
+  @sa MCI_SetCurrentReferences_F
   */
 __weak void MCI_SetCurrentReferences(MCI_Handle_t *pHandle, qd_t Iqdref)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -243,30 +239,47 @@ __weak void MCI_SetCurrentReferences(MCI_Handle_t *pHandle, qd_t Iqdref)
   {
 #endif
 
-    pHandle->lastCommand = MCI_CMD_SETCURRENTREFERENCES;
-    pHandle->Iqdref.q = Iqdref.q;
-    pHandle->Iqdref.d = Iqdref.d;
-    pHandle->CommandState = MCI_COMMAND_NOT_ALREADY_EXECUTED;
-    pHandle->LastModalitySetByUser = MCM_TORQUE_MODE;
-#ifdef NULL_PTR_MC_INT
+    MC_ControlMode_t mode;
+    mode = MCI_GetControlMode( pHandle );
+    if (mode == MCM_OPEN_LOOP_CURRENT_MODE)
+    {
+      pHandle->Iqdref.q = Iqdref.q;
+      pHandle->Iqdref.d = Iqdref.d;
+      pHandle->pFOCVars->Iqdref.q = Iqdref.q;
+      pHandle->pFOCVars->Iqdref.d = Iqdref.d;
+      pHandle->LastModalitySetByUser = mode;
+    }
+    else
+    {
+      pHandle->lastCommand = MCI_CMD_SETCURRENTREFERENCES;
+      pHandle->Iqdref.q = Iqdref.q;
+      pHandle->Iqdref.d = Iqdref.d;
+      pHandle->CommandState = MCI_COMMAND_NOT_ALREADY_EXECUTED;
+      pHandle->LastModalitySetByUser = MCM_TORQUE_MODE;
+    }
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 }
 
 /**
-  * @brief  This is a buffered command to set directly the motor current
-  *         references Iq and Id. This commands don't become active as soon as
-  *         it is called but it will be executed when the pSTM state is
-  *         START_RUN or RUN. User can check the status of the command calling
-  *         the MCI_IsCommandAcknowledged method.
-  * @param  pHandle Pointer on the component instance to work on.
-  * @param  Iqdref current (A) references on qd reference frame in qd_f_t format.
+  * @brief  Sets the motor current references $I_q$ and $I_d$ directly.
   *
-  * @retval none.
+  * @param  pHandle Pointer on the component instance to work on.
+  * @param  IqdRef current (A) references on qd reference frame in qd_f_t format.
+  *
+  *  This command is executed immediately if the target motor's state machine is in
+  * the #RUN state. Otherwise, it is buffered and its execution is delayed until This
+  * state is reached.
+  *
+  * Users can check the status of the command by calling the MCI_IsCommandAcknowledged()
+  * function.
+
+  @sa MCI_SetCurrentReferences
   */
-__weak void MCI_SetCurrentReferences_F( MCI_Handle_t * pHandle, qd_f_t IqdRef )
+__weak void MCI_SetCurrentReferences_F(MCI_Handle_t *pHandle, qd_f_t IqdRef)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -274,153 +287,221 @@ __weak void MCI_SetCurrentReferences_F( MCI_Handle_t * pHandle, qd_f_t IqdRef )
   else
   {
 #endif
-    qd_t Iqdref;
-    Iqdref.d = (int16_t) (IqdRef.d * CURRENT_CONV_FACTOR);
-    Iqdref.q = (int16_t) (IqdRef.q * CURRENT_CONV_FACTOR);
-    MCI_SetCurrentReferences(pHandle, Iqdref);
-#ifdef NULL_PTR_MC_INT
+    qd_t iqDrefTemp;
+    qd_f_t iqDrefTempf;
+    iqDrefTempf.d = (IqdRef.d * (float_t)CURRENT_CONV_FACTOR);
+    iqDrefTempf.q = (IqdRef.q * (float_t)CURRENT_CONV_FACTOR);
+    iqDrefTemp.d = (int16_t)(iqDrefTempf.d);
+    iqDrefTemp.q = (int16_t)(iqDrefTempf.q);
+    MCI_SetCurrentReferences(pHandle, iqDrefTemp);
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
+}
+/**
+  * @brief  Sets the target motor's control mode to Speed mode.
+  * @param  pHandle Pointer on the component instance to work on.
+  *
+  * @note This function is only available when the Open loop Debug feature is
+  * enabled at firmware generation time.
+  */
+__weak void MCI_SetSpeedMode(MCI_Handle_t *pHandle)
+{
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    /* Nothing to do */
+  }
+  else
+  {
+#endif
+    pHandle->pFOCVars->bDriveInput = INTERNAL;
+    STC_SetControlMode(pHandle->pSTC, MCM_SPEED_MODE);
+    pHandle->LastModalitySetByUser = MCM_SPEED_MODE;
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 }
 
 /**
-  * @brief  This is a buffered command to set directly the motor current
-  *         references Iq and Id. This commands don't become active as soon as
-  *         it is called but it will be executed when the pSTM state is
-  *         START_RUN or RUN. User can check the status of the command calling
-  *         the MCI_IsCommandAcknowledged method.
+  * @brief  Sets the target motor's control mode to Open loop Current mode.
   * @param  pHandle Pointer on the component instance to work on.
-  * @param  Iqdref current references on qd reference frame in qd_t
-  *         format.
-  * @retval none.
+  *
+  * @note This function is only available when the Open loop Debug feature is
+  * enabled at firmware generation time.
   */
-__weak void MCI_SetSpeedMode( MCI_Handle_t * pHandle )
-{
-  pHandle->pFOCVars->bDriveInput = INTERNAL;
-  STC_SetControlMode( pHandle->pSTC, MCM_SPEED_MODE );
-  pHandle->LastModalitySetByUser = MCM_SPEED_MODE;
-}
-
-/**
-  * @brief  This is a buffered command to set directly the motor current
-  *         references Iq and Id. This commands don't become active as soon as
-  *         it is called but it will be executed when the pSTM state is
-  *         START_RUN or RUN. User can check the status of the command calling
-  *         the MCI_IsCommandAcknowledged method.
-  * @param  pHandle Pointer on the component instance to work on.
-  * @param  Iqdref current references on qd reference frame in qd_t
-  *         format.
-  * @retval none.
-  */
-__weak void MCI_SetOpenLoopCurrent( MCI_Handle_t * pHandle )
+__weak void MCI_SetOpenLoopCurrentMode(MCI_Handle_t *pHandle)
 {
   pHandle->pFOCVars->bDriveInput = EXTERNAL;
-  STC_SetControlMode( pHandle->pSTC, MCM_OPEN_LOOP_CURRENT_MODE );
+  STC_SetControlMode(pHandle->pSTC, MCM_OPEN_LOOP_CURRENT_MODE);
   pHandle->LastModalitySetByUser = MCM_OPEN_LOOP_CURRENT_MODE;
 }
+/**
+  * @brief  Sets the target motor's control mode to Open loop Current mode.
+  * @param  pHandle Pointer on the component instance to work on.
+  *
+  * @note This function is only available when the Open loop Debug feature is
+  * enabled at firmware generation time.
+  *
+  * @deprecated This function is deprecated and should not be used anymore.
+  * It will be removed in a future version of the MCSDK. Use MCI_SetOpenLoopCurrentMode() instead.
+  */
+__weak void MCI_SetOpenLoopCurrent(MCI_Handle_t *pHandle)
+{
+  MCI_SetOpenLoopCurrentMode(pHandle);
+}
 
 /**
-  * @brief  This is a buffered command to set directly the motor current
-  *         references Iq and Id. This commands don't become active as soon as
-  *         it is called but it will be executed when the pSTM state is
-  *         START_RUN or RUN. User can check the status of the command calling
-  *         the MCI_IsCommandAcknowledged method.
+  * @brief  Sets the target motor's control mode to Open loop Voltage mode.
   * @param  pHandle Pointer on the component instance to work on.
-  * @param  Iqdref current references on qd reference frame in qd_t
-  *         format.
-  * @retval none.
+  *
+  * @note This function is only available when the Open loop Debug feature is
+  * enabled at firmware generation time.
   */
-__weak void MCI_SetOpenLoopVoltage( MCI_Handle_t * pHandle )
+__weak void MCI_SetOpenLoopVoltageMode(MCI_Handle_t *pHandle)
 {
   pHandle->pFOCVars->bDriveInput = EXTERNAL;
-  STC_SetControlMode( pHandle->pSTC, MCM_OPEN_LOOP_VOLTAGE_MODE );
+  STC_SetControlMode(pHandle->pSTC, MCM_OPEN_LOOP_VOLTAGE_MODE);
   pHandle->LastModalitySetByUser = MCM_OPEN_LOOP_VOLTAGE_MODE;
 }
 
 /**
-  * @brief  This is a user command used to begin the start-up procedure.
-  *         If the state machine is in IDLE state the command is executed
-  *         instantaneously otherwise the command is discarded. User must take
-  *         care of this possibility by checking the return value.
-  *         Before calling MCI_StartMotor it is mandatory to execute one of
-  *         these commands:\n
-  *         MCI_ExecSpeedRamp\n
-  *         MCI_ExecTorqueRamp\n
-  *         MCI_SetCurrentReferences\n
-  *         Otherwise the behavior in run state will be unpredictable.\n
-  *         <B>Note:</B> The MCI_StartMotor command is used just to begin the
-  *         start-up procedure moving the state machine from IDLE state to
-  *         IDLE_START. The command MCI_StartMotor is not blocking the execution
-  *         of project until the motor is really running; to do this, the user
-  *         have to check the state machine and verify that the RUN state (or
-  *         any other state) has been reached.
+  * @brief  Sets the target motor's control mode to Open loop Voltage mode.
   * @param  pHandle Pointer on the component instance to work on.
-  * @retval bool It returns true if the command is successfully executed
-  *         otherwise it return false.
+  *
+  * @note This function is only available when the Open loop Debug feature is
+  * enabled at firmware generation time.
+  *
+  * @deprecated This function is deprecated and should not be used anymore.
+  * It will be removed in a future version of the MCSDK. Use MCI_SetOpenLoopVoltageMode() instead.
   */
-__weak bool MCI_StartMotor(MCI_Handle_t *pHandle)
+__weak void MCI_SetOpenLoopVoltage(MCI_Handle_t *pHandle)
 {
-  bool RetVal;
-
-  if ((IDLE == MCI_GetSTMState(pHandle)) &&
-      (MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
-      (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
-  {
-    pHandle->DirectCommand = MCI_START;
-    pHandle->CommandState = MCI_COMMAND_NOT_ALREADY_EXECUTED;
-    RetVal = true;
-  }
-  else
-  {
-    /* reject the command as the condition are not met */
-    RetVal = false;
-  }
-
-  return (RetVal);
+  MCI_SetOpenLoopVoltageMode(pHandle);
 }
 
 /**
-  * @brief  This is a user command used to begin the start-up procedure with an
-  *          offset calibration even if it has been already done previously.
-  *         If the state machine is in IDLE state the command is executed
-  *         instantaneously otherwise the command is discarded. User must take
-  *         care of this possibility by checking the return value.
-  *         Before calling MCI_StartWithMeasurementOffset it is mandatory to execute
-  *         one of these commands:\n
-  *         MCI_ExecSpeedRamp\n
-  *         MCI_ExecTorqueRamp\n
-  *         MCI_SetCurrentReferences\n
-  *         Otherwise the behaviour in run state will be unpredictable.\n
-  *         <B>Note:</B> The MCI_StartWithMeasurementOffset command is used just to
-  *         begin the start-up procedure moving the state machine from IDLE state to
-  *         IDLE_START. The command MCI_StartWithMeasurementOffset is not blocking
-  *         the execution of project until the motor is really running; to do this,
-  *         the user have to check the state machine and verify that the RUN state (or
-  *         any other state) has been reached.
-  * @param  pHandle Pointer on the component instance to work on.
-  * @retval bool It returns true if the command is successfully executed
-  *         otherwise it return false.
+  * @brief  Initiates a motor startup procedure
+  *
+  * @param  pHandle Handle on the target motor interface structure
+  * @retval Returns true if the command is successfully executed;
+  *         returns false otherwise
+  *
+  *  If the state machine of target the motor is in #IDLE state the command is
+  * executed instantaneously otherwise it is discarded. Users can check
+  * the return value of the function to get its status. The state of the motor
+  * can be queried with the MCI_GetSTMState() function.
+  *
+  * Before calling MCI_StartMotor() it is mandatory to execute one of the
+  * following commands, in order to set a torque or a speed reference
+  * otherwise the behavior of the motor when it reaches the #RUN state will
+  * be unpredictable:
+  *  - MCI_ExecSpeedRamp
+  *  - MCI_ExecTorqueRamp
+  *  - MCI_SetCurrentReferences
+  *
+  * If the offsets of the current measurement circuitry offsets are not known yet,
+  * an offset calibration procedure is executed to measure them prior to acutally
+  * starting up the motor.
+  *
+  * @note The MCI_StartMotor command only triggers the execution of the start-up
+  * procedure (or eventually the offset calibration procedure) and returns
+  * immediately after. It is not blocking the execution of the application until
+  * the motor is indeed running in steady state. If the application needs to wait
+  * for the motor to be running in steady state, the application has to check the
+  * state machine of the motor and verify that the #RUN state has been reached.
+  * Note also that if the startup sequence fails the #RUN state may never be reached.
   */
-__weak bool MCI_StartWithMeasurementOffset(MCI_Handle_t* pHandle)
+__weak bool MCI_StartMotor(MCI_Handle_t *pHandle)
 {
-  bool RetVal;
-
-  if ((IDLE == MCI_GetSTMState(pHandle)) &&
-      (MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
-      (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
+  bool retVal = false;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
   {
-    pHandle->DirectCommand = MCI_START;
-    pHandle->CommandState = MCI_COMMAND_NOT_ALREADY_EXECUTED;
-    pHandle->pPWM->offsetCalibStatus = false;
-    RetVal = true;
+    /* Nothing to do */
   }
   else
   {
-    /* reject the command as the condition are not met */
-    RetVal = false;
+#endif
+    if ((IDLE == MCI_GetSTMState(pHandle)) &&
+        (MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
+        (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
+    {
+      pHandle->DirectCommand = MCI_START;
+      pHandle->CommandState = MCI_COMMAND_NOT_ALREADY_EXECUTED;
+      retVal = true;
+    }
+    else
+    {
+      /* Reject the command as the condition are not met */
+    }
+#ifdef NULL_PTR_CHECK_MC_INT
   }
+#endif
+  return (retVal);
+}
 
-  return (RetVal);
+/**
+  * @brief  Initiates a motor startup procedure preceded by an offset
+  *         calibration procedure
+  *
+  * @param  pHandle Handle on the target motor interface structure
+  * @retval Returns true if the command is successfully executed;
+  *         returns false otherwise
+  *
+  *  If the state machine of target the motor is in #IDLE state the command is
+  * executed instantaneously otherwise it is discarded. Users can check
+  * the return value of the function to get its status. The state of the motor
+  * can be queried with the MCI_GetSTMState() function.
+  *
+  * Before calling MCI_StartMotor() it is mandatory to execute one of the
+  * following commands, in order to set a torque or a speed reference
+  * otherwise the behavior of the motor when it reaches the #RUN state will
+  * be unpredictable:
+  *  - MCI_ExecSpeedRamp
+  *  - MCI_ExecTorqueRamp
+  *  - MCI_SetCurrentReferences
+  *
+  * Whether the current measurement circuitry offsets are known or not, an
+  * offset calibration procedure is executed to (re)measure them. Once it has
+  * completed, the start up procedure of the motor is executed.
+  *
+  * @note The MCI_StartMotor command only triggers the execution of the start-up
+  * procedure (or eventually the offset calibration procedure) and returns
+  * immediately after. It is not blocking the execution of the application until
+  * the motor is indeed running in steady state. If the application needs to wait
+  * for the motor to be running in steady state, the application has to check the
+  * state machine of the motor and verify that the #RUN state has been reached.
+  * Note also that if the startup sequence fails the #RUN state may never be reached.
+  */
+__weak bool MCI_StartWithPolarizationMotor(MCI_Handle_t* pHandle)
+{
+  bool retVal = false;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    /* Nothing to do */
+  }
+  else
+  {
+#endif
+    if ((IDLE == MCI_GetSTMState(pHandle)) &&
+        (MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
+        (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
+    {
+      pHandle->DirectCommand = MCI_START;
+      pHandle->CommandState = MCI_COMMAND_NOT_ALREADY_EXECUTED;
+      pHandle->pPWM->offsetCalibStatus = false;
+      retVal = true;
+  }
+  else
+  {
+    /* Reject the command as the condition are not met */
+  }
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
+  return (retVal);
 }
 
 /**
@@ -440,173 +521,244 @@ __weak bool MCI_StartWithMeasurementOffset(MCI_Handle_t* pHandle)
   */
 __weak bool MCI_StartOffsetMeasurments(MCI_Handle_t *pHandle)
 {
-  bool RetVal;
-
-  if ((IDLE == MCI_GetSTMState(pHandle)) &&
-      (MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
-      (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
+  bool retVal = false;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
   {
-    pHandle->DirectCommand = MCI_MEASURE_OFFSETS;
-    pHandle->pPWM->offsetCalibStatus = false;
-    RetVal = true;
+    /* Nothing to do */
   }
   else
   {
-    /* reject the command as the condition are not met */
-    RetVal = false;
+#endif
+    if ((IDLE == MCI_GetSTMState(pHandle)) &&
+        (MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
+        (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
+    {
+      pHandle->DirectCommand = MCI_MEASURE_OFFSETS;
+      pHandle->pPWM->offsetCalibStatus = false;
+      retVal = true;
+    }
+    else
+    {
+      /* Reject the command as the condition are not met */
+    }
+#ifdef NULL_PTR_CHECK_MC_INT
   }
-
-  return (RetVal);
+#endif
+  return (retVal);
 }
 
 /**
-  * @brief  This is a user command used to get the phase offset values.
-  *         User must take  care of this possibility by checking the return value.\n
-  *         <B>Note:</B> The MCI_GetCalibratedOffsetsMotor command is used to get the phase
-  *          offset values .
+  * @brief  Gets the phase current measurement offset values
+  *
+  * The offset values are written in the PolarizationOffsets structure provided that they
+  * have been previously provided for the Motor Control subsystem or measured by it.
+  *
+  * If the offset have not previously been provided to the Motor Control subsystem or
+  * if it has not measured them the function returns false and nothing is written in the
+  * PolarizationOffsets structure.
+  *
   * @param  pHandle Pointer on the component instance to work on.
-  * @param  pHandle Pointer on ploarization offset structure that conatains phase A, and C values.
-  * @retval bool It returns true if the command is successfully executed
-  *         otherwise it return false.
+  * @param  PolarizationOffsets Pointer on ploarization offset structure in which offsets will be written
+  * @retval returns true if the command is successfully executed; returns false otherwise.
   */
-__weak bool MCI_GetCalibratedOffsetsMotor(MCI_Handle_t* pHandle, PolarizationOffsets_t * PolarizationOffsets)
+__weak bool MCI_GetCalibratedOffsetsMotor(MCI_Handle_t *pHandle, PolarizationOffsets_t *PolarizationOffsets)
 {
-  bool RetVal;
-
-  if ( pHandle->pPWM->offsetCalibStatus == true )
+  bool retVal = false;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
   {
-    PWMC_GetOffsetCalib(pHandle->pPWM, PolarizationOffsets);
-    RetVal = true;
+    /* Nothing to do */
   }
   else
   {
-    RetVal = false;
+#endif
+    if (pHandle->pPWM->offsetCalibStatus == true)
+    {
+      PWMC_GetOffsetCalib(pHandle->pPWM, PolarizationOffsets);
+      retVal = true;
+    }
+    else
+    {
+      /* Reject the command as the condition are not met */
+    }
+#ifdef NULL_PTR_CHECK_MC_INT
   }
+#endif
 
-  return(RetVal);
+  return(retVal);
 }
 
 /**
-  * @brief  This is a user command used to set the phase offset values.
-  *         If the state machine is in IDLE state the command is executed
-  *         instantaneously otherwise the command is discarded. User must take
-  *         care of this possibility by checking the return value.\n
-  *         <B>Note:</B> The MCI_SetCalibratedOffsetsMotor command is used to set the phase
-  *          offset values . The command MCI_SetCalibratedOffsetsMotor is not blocking
-  *         the execution of project until the measurments are done; to do this, the user
-  *         have to check the state machine and verify that the IDLE state (or
-  *         any other state) has been reached.
+  * @brief  Sets the phase current measurement offset values
+  *
+  * If the state machine is in IDLE state the command is executed
+  * instantaneously otherwise the command is discarded. User must take
+  * care of this possibility by checking the return value.
+  *
+  * @note The MCI_SetCalibratedOffsetsMotor command is used to set the phase
+  *  offset values . The command MCI_SetCalibratedOffsetsMotor is not blocking
+  * the execution of project until the measurments are done; to do this, the user
+  * have to check the state machine and verify that the IDLE state (or
+  * any other state) has been reached.
+  *
   * @param  pHandle Pointer on the component instance to work on.
-  * @param  pHandle Pointer on ploarization offset structure that contains phase A, and C values.
-  * @retval bool It returns true if the command is successfully executed
+  * @param  PolarizationOffsets Pointer on ploarization offset structure that contains phase A,
+  *         and C values.
+  * @retval Returns true if the command is successfully executed
   *         otherwise it return false.
   */
-__weak bool MCI_SetCalibratedOffsetsMotor( MCI_Handle_t* pHandle, PolarizationOffsets_t * PolarizationOffsets)
+__weak bool MCI_SetCalibratedOffsetsMotor(MCI_Handle_t *pHandle, PolarizationOffsets_t *PolarizationOffsets)
 {
-  bool RetVal;
-
-  if ((IDLE == MCI_GetSTMState(pHandle)) &&
-      (MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
-      (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
+  bool retVal = false;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
   {
+    /* Nothing to do */
+  }
+  else
+  {
+#endif
+    if ((IDLE == MCI_GetSTMState(pHandle)) &&
+        (MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
+        (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
+    {
       PWMC_SetOffsetCalib(pHandle->pPWM, PolarizationOffsets);
       pHandle->pPWM->offsetCalibStatus = true;
-      RetVal = true;
+      retVal = true;
+    }
+    else
+    {
+      /* Reject the command as the condition are not met */
+    }
+#ifdef NULL_PTR_CHECK_MC_INT
   }
-
-    return(RetVal);
+#endif
+    return(retVal);
 }
 
 /**
-  * @brief  This is a user command used to begin the stop motor procedure.
-  *         If the state machine is in RUN or START states the command is
-  *         executed instantaneously otherwise the command is discarded. User
-  *         must take care of this possibility by checking the return value.\n
-  *         <B>Note:</B> The MCI_StopMotor command is used just to begin the
-  *         stop motor procedure moving the state machine to ANY_STOP.
-  *         The command MCI_StopMotor is not blocking the execution of project
-  *         until the motor is really stopped; to do this, the user have to
-  *         check the state machine and verify that the IDLE state has been
-  *         reached again.
+  * @brief Initiates the stop procedure for a motor
+  *
+  *  If the state machine is in any state but the #ICLWAIT, #IDLE, #FAULT_NOW and
+  * #FAULT_OVER states, the command is immediately executed. Otherwise, it is
+  * discarded. The Application can check the return value to know whether the
+  * command was executed or discarded.
+  *
+  * @note The MCI_StopMotor() command only triggers the stop motor procedure
+  * and then returns. It is not blocking the application until the motor is indeed
+  * stopped. To know if it has stopped, the application can query the motor's state
+  * machine and check if the #IDLE state has been reached.
+  *
   * @param  pHandle Pointer on the component instance to work on.
-  * @retval bool It returns true if the command is successfully executed
-  *         otherwise it return false.
+  * @retval returns true if the command is successfully executed, false otherwise.
   */
-__weak bool MCI_StopMotor(MCI_Handle_t * pHandle)
+__weak bool MCI_StopMotor(MCI_Handle_t *pHandle)
 {
-  bool RetVal;
-  bool status;
-  MCI_State_t State;
-
-  State = MCI_GetSTMState(pHandle);
-  if (IDLE == State  || ICLWAIT == State)
+  bool retVal = false;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
   {
-    status = false;
+    /* Nothing to do */
   }
   else
   {
-    status = true;
-  }
+#endif
+    bool status;
+    MCI_State_t State;
 
-  if ((MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
-      (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)) &&
-       status == true )
-  {
-    pHandle->DirectCommand = MCI_STOP;
-    RetVal = true;
-  }
-  else
-  {
-    /* reject the command as the condition are not met */
-    RetVal = false;
-  }
+    State = MCI_GetSTMState(pHandle);
+    if ((IDLE == State) || (ICLWAIT == State))
+    {
+      status = false;
+    }
+    else
+    {
+      status = true;
+    }
 
-  return (RetVal);
+    if ((MC_NO_FAULTS == MCI_GetOccurredFaults(pHandle)) &&
+        (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)) &&
+        (status == true))
+    {
+      pHandle->DirectCommand = MCI_STOP;
+      retVal = true;
+    }
+    else
+    {
+      /* Reject the command as the condition are not met */
+    }
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
+  return (retVal);
 }
 
 /**
-  * @brief  This is a user command used to indicate that the user has seen the
-  *         error condition. If is possible, the command is executed
-  *         instantaneously otherwise the command is discarded. User must take
-  *         care of this possibility by checking the return value.
-  * @param  pHandle Pointer on the component instance to work on.
-  * @retval bool It returns true if the command is successfully executed
-  *         otherwise it return false.
-  */
+ * @brief Acknowledges Motor Control faults that occurred on the target motor 1.
+ *
+ *  This function must be called before the motor can be started again when a fault
+ * condition has occured. It clears the faults status and resets the state machine
+ * of the target motor to the #IDLE state provided that there is no active fault
+ * condition anymore.
+ *
+ *  If the state machine of the target motor is in the #FAULT_OVER state, the function
+ * clears the list of past faults, transitions to the #IDLE state and returns true.
+ * Otherwise, it oes nothing and returns false.
+ *
+ * @param  pHandle Pointer on the target motor drive structure.
+ */
 __weak bool MCI_FaultAcknowledged(MCI_Handle_t *pHandle)
 {
-  bool RetVal;
-
-  if ((FAULT_OVER == MCI_GetSTMState(pHandle)) && (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
+  bool reVal = false;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
   {
-    pHandle->PastFaults = MC_NO_FAULTS;
-    pHandle->DirectCommand = MCI_ACK_FAULTS;
-    RetVal = true;
+    /* Nothing to do */
   }
   else
   {
-    /* reject the command as the conditions are not met */
-    RetVal = false;
+#endif
+    if ((FAULT_OVER == MCI_GetSTMState(pHandle)) && (MC_NO_FAULTS == MCI_GetCurrentFaults(pHandle)))
+    {
+      pHandle->PastFaults = MC_NO_FAULTS;
+      pHandle->DirectCommand = MCI_ACK_FAULTS;
+      reVal = true;
+    }
+    else
+    {
+      /* Reject the command as the conditions are not met */
+    }
+#ifdef NULL_PTR_CHECK_MC_INT
   }
-  return (RetVal);
+#endif
+  return (reVal);
 }
 
 /**
  * @brief It clocks both HW and SW faults processing and update the state
  *        machine accordingly with hSetErrors, hResetErrors and present state.
  *        Refer to State_t description for more information about fault states.
- * @param pHanlde pointer of type  STM_Handle_t
+ * @param pHandle pointer of type  STM_Handle_t
  * @param hSetErrors Bit field reporting faults currently present
  * @param hResetErrors Bit field reporting faults to be cleared
- * @retval State_t New state machine state after fault processing
  */
 __weak void MCI_FaultProcessing(MCI_Handle_t *pHandle, uint16_t hSetErrors, uint16_t hResetErrors)
 {
-  /* Set current errors */
-  pHandle->CurrentFaults = (pHandle->CurrentFaults | hSetErrors ) & (~hResetErrors);
-  pHandle->PastFaults |= hSetErrors;
-
-  return;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    /* Nothing to do */
+  }
+  else
+  {
+#endif
+    /* Set current errors */
+    pHandle->CurrentFaults = (pHandle->CurrentFaults | hSetErrors ) & (~hResetErrors);
+    pHandle->PastFaults |= hSetErrors;
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
 }
 
 /**
@@ -615,11 +767,10 @@ __weak void MCI_FaultProcessing(MCI_Handle_t *pHandle, uint16_t hSetErrors, uint
   *         and eventually to execute the buffered command if the condition
   *         occurs.
   * @param  pHandle Pointer on the component instance to work on.
-  * @retval none.
   */
 __weak void MCI_ExecBufferedCommands(MCI_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (NULL == pHandle)
   {
     /* Nothing to do */
@@ -636,6 +787,7 @@ __weak void MCI_ExecBufferedCommands(MCI_Handle_t *pHandle)
         {
           pHandle->pFOCVars->bDriveInput = INTERNAL;
           STC_SetControlMode(pHandle->pSTC, MCM_SPEED_MODE);
+          VSS_SetMecAcceleration( pHandle->pVSS, pHandle->hFinalSpeed, pHandle->hDurationms);
           commandHasBeenExecuted = STC_ExecRamp(pHandle->pSTC, pHandle->hFinalSpeed, pHandle->hDurationms);
           break;
         }
@@ -655,52 +807,71 @@ __weak void MCI_ExecBufferedCommands(MCI_Handle_t *pHandle)
           commandHasBeenExecuted = true;
           break;
         }
+
+        case MCI_CMD_SETOPENLOOPCURRENT:
+        {
+          pHandle->pFOCVars->bDriveInput = EXTERNAL;
+          VSS_SetMecAcceleration( pHandle->pVSS, pHandle->hFinalSpeed, pHandle->hDurationms);
+          commandHasBeenExecuted = true;
+          break;
+        }
+
+        case MCI_CMD_SETOPENLOOPVOLTAGE:
+        {
+          pHandle->pFOCVars->bDriveInput = EXTERNAL;
+          VSS_SetMecAcceleration( pHandle->pVSS, pHandle->hFinalSpeed, pHandle->hDurationms);
+          commandHasBeenExecuted = true;
+          break;
+        }
+
         default:
           break;
       }
 
       if (commandHasBeenExecuted)
       {
-        pHandle->CommandState = MCI_COMMAND_EXECUTED_SUCCESFULLY;
+        pHandle->CommandState = MCI_COMMAND_EXECUTED_SUCCESSFULLY;
       }
       else
       {
-        pHandle->CommandState = MCI_COMMAND_EXECUTED_UNSUCCESFULLY;
+        pHandle->CommandState = MCI_COMMAND_EXECUTED_UNSUCCESSFULLY;
       }
     }
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 }
 
 /**
-  * @brief  It returns information about the state of the last buffered command.
+  * @brief  Returns information about the state of the last buffered command.
   * @param  pHandle Pointer on the component instance to work on.
-  * @retval CommandState_t  It can be one of the following codes:
-  *         - MCI_BUFFER_EMPTY if no buffered command has been called.
-  *         - MCI_COMMAND_NOT_ALREADY_EXECUTED if the buffered command
-  *         condition hasn't already occurred.
-  *         - MCI_COMMAND_EXECUTED_SUCCESFULLY if the buffered command has
-  *         been executed successfully. In this case calling this function reset
-  *         the command state to BC_BUFFER_EMPTY.
-  *         - MCI_COMMAND_EXECUTED_UNSUCCESFULLY if the buffered command has
-  *         been executed unsuccessfully. In this case calling this function
-  *         reset the command state to BC_BUFFER_EMPTY.
+  * @retval The state of the last buffered command
+  *
+  * The state returned by this function can be one of the following codes:
+  * - #MCI_BUFFER_EMPTY if no buffered command has been called.
+  * - #MCI_COMMAND_NOT_ALREADY_EXECUTED if the buffered command
+  * condition has not already occurred.
+  * - #MCI_COMMAND_EXECUTED_SUCCESSFULLY if the buffered command has
+  * been executed successfully. In this case calling this function resets
+  * the command state to #MCI_BUFFER_EMPTY.
+  * - #MCI_COMMAND_EXECUTED_UNSUCCESSFULLY if the buffered command has
+  * been executed unsuccessfully. In this case calling this function
+  * resets the command state to #MCI_BUFFER_EMPTY.
   */
-__weak MCI_CommandState_t  MCI_IsCommandAcknowledged(MCI_Handle_t *pHandle)
+__weak MCI_CommandState_t MCI_IsCommandAcknowledged(MCI_Handle_t *pHandle)
 {
   MCI_CommandState_t retVal;
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
-    retVal = MCI_COMMAND_EXECUTED_UNSUCCESFULLY;
+    retVal = MCI_COMMAND_EXECUTED_UNSUCCESSFULLY;
   }
   else
   {
 #endif
     retVal = pHandle->CommandState;
 
-    if ((MCI_COMMAND_EXECUTED_SUCCESFULLY == retVal) || (MCI_COMMAND_EXECUTED_UNSUCCESFULLY == retVal) )
+    if ((MCI_COMMAND_EXECUTED_SUCCESSFULLY == retVal) || (MCI_COMMAND_EXECUTED_UNSUCCESSFULLY == retVal) )
     {
       pHandle->CommandState = MCI_BUFFER_EMPTY;
     }
@@ -708,7 +879,7 @@ __weak MCI_CommandState_t  MCI_IsCommandAcknowledged(MCI_Handle_t *pHandle)
     {
       /* Nothing to do */
     }
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
   return (retVal);
@@ -719,59 +890,87 @@ __weak MCI_CommandState_t  MCI_IsCommandAcknowledged(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval State_t It returns the current state of the related pSTM object.
   */
-__weak MCI_State_t  MCI_GetSTMState(MCI_Handle_t *pHandle)
+__weak MCI_State_t MCI_GetSTMState(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
+#ifdef NULL_PTR_CHECK_MC_INT
+  return ((MC_NULL == pHandle) ? FAULT_NOW : pHandle->State);
+#else
   return (pHandle->State);
+#endif
 }
 
 /**
-  * @brief It returns a 16 bit fields containing information about faults
-  *        historically occurred since the state machine has been moved into
-  *        FAULT_NOW state.
-  * \n\link Fault_generation_error_codes Returned error codes are listed here \endlink
-  * @param pHandle Pointer on the component instance to work on.
+  * @brief Returns the list of non-acknowledged faults that occured on the target motor
+  *
+  * This function returns a bitfield indicating the faults that occured since the state machine
+  * of the target motor has been moved into the #FAULT_NOW state.
+  *
+  * Possible error codes are listed in the @ref fault_codes "Fault codes" section.
+  *
+  * @param  pHandle Pointer on the target motor drive structure.
   * @retval uint16_t  16 bit fields with information about the faults
   *         historically occurred since the state machine has been moved into
-  *         FAULT_NOW state.
-  * \n\link Fault_generation_error_codes Returned error codes are listed here \endlink
   */
-__weak uint16_t MCI_GetOccurredFaults(MCI_Handle_t *pHandle)
+__weak uint16_t MCI_GetOccurredFaults(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
+#ifdef NULL_PTR_CHECK_MC_INT
+  return ((MC_NULL == pHandle) ? MC_SW_ERROR : (uint16_t)pHandle->PastFaults);
+#else
   return ((uint16_t)pHandle->PastFaults);
+#endif
 }
 
 /**
-  * @brief It returns a 16 bit fields containing information about faults
-  *        currently present.
-  * \n\link Fault_generation_error_codes Returned error codes are listed here \endlink
-  * @param pHandle Pointer on the component instance to work on.
-  * @retval uint16_t  16 bit fields with information about about currently
-  *         present faults.
-  * \n\link Fault_generation_error_codes Returned error codes are listed here \endlink
+  * @brief Returns the list of faults that are currently active on the target motor
+  *
+  * This function returns a bitfield that indicates faults that occured on the Motor
+  * Control subsystem for the target motor and that are still active (the conditions
+  * that triggered the faults returned are still true).
+  *
+  * Possible error codes are listed in the @ref fault_codes "Fault codes" section.
+  *
+  * @param  pHandle Pointer on the target motor drive structure.
   */
-__weak uint16_t MCI_GetCurrentFaults(MCI_Handle_t *pHandle)
+__weak uint16_t MCI_GetCurrentFaults(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
+#ifdef NULL_PTR_CHECK_MC_INT
+  return ((MC_NULL == pHandle) ? MC_SW_ERROR : (uint16_t)pHandle->CurrentFaults);
+#else
   return ((uint16_t)pHandle->CurrentFaults);
+#endif
 }
 
 /**
-  * @brief It returns two 16 bit fields containing information about both faults
-  *        currently present and faults historically occurred since the state
-  *        machine has been moved into state
-  * @param pHanlde pointer of type  STM_Handle_t.
-  * @retval uint32_t  Two 16 bit fields: in the most significant half are stored
-  *         the information about currently present faults. In the least
-  *         significant half are stored the information about the faults
-  *         historically occurred since the state machine has been moved into
-  *         FAULT_NOW state
+  * @brief Returns the lists of current and past faults that occurred on the target motor
+  *
+  *  This function returns two bitfields containing information about the faults currently
+  * present and the faults occurred since the state machine has been moved into the #FAULT_NOW
+  * state.
+  *
+  * These two bitfields are 16 bits wide each and are concatenated into the 32-bit data. The
+  * 16 most significant bits contains the status of the current faults while that of the
+  * past faults is in the 16 least significant bits.
+  *
+  * @sa MCI_GetOccurredFaults, MCI_GetCurrentFaults
+  *
+  * @param  pHandle Pointer on the target motor drive structure.
   */
-__weak uint32_t MCI_GetFaultState(MCI_Handle_t *pHandle)
+__weak uint32_t MCI_GetFaultState(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
   uint32_t LocalFaultState;
-
-  LocalFaultState = (uint32_t)(pHandle->PastFaults);
-  LocalFaultState |= (uint32_t)(pHandle->CurrentFaults) << 16;
-
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    LocalFaultState = MC_SW_ERROR | (MC_SW_ERROR << 16);
+  }
+  else
+  {
+#endif
+    LocalFaultState = (uint32_t)(pHandle->PastFaults);
+    LocalFaultState |= (uint32_t)(pHandle->CurrentFaults) << 16;
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
   return (LocalFaultState);
 }
 
@@ -781,9 +980,9 @@ __weak uint32_t MCI_GetFaultState(MCI_Handle_t *pHandle)
   * @retval MC_ControlMode_t It returns the modality of STC. It can be one of
   *         these two values: MCM_TORQUE_MODE or MCM_SPEED_MODE.
   */
-__weak MC_ControlMode_t MCI_GetControlMode(MCI_Handle_t *pHandle)
+__weak MC_ControlMode_t MCI_GetControlMode(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   return ((MC_NULL == pHandle) ? MCM_TORQUE_MODE : pHandle->LastModalitySetByUser);
 #else
   return (pHandle->LastModalitySetByUser);
@@ -797,11 +996,11 @@ __weak MC_ControlMode_t MCI_GetControlMode(MCI_Handle_t *pHandle)
   * @retval int16_t It returns 1 or -1 according the sign of hFinalSpeed,
   *         hFinalTorque or Iqdref.q of the last command.
   */
-__weak int16_t MCI_GetImposedMotorDirection(MCI_Handle_t *pHandle)
+__weak int16_t MCI_GetImposedMotorDirection(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
   int16_t retVal = 1;
 
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -812,29 +1011,47 @@ __weak int16_t MCI_GetImposedMotorDirection(MCI_Handle_t *pHandle)
     switch (pHandle->lastCommand)
     {
       case MCI_CMD_EXECSPEEDRAMP:
+      {
         if (pHandle->hFinalSpeed < 0)
         {
-
           retVal = -1;
         }
+        else
+        {
+          /* Nothing to do */
+        }
         break;
+      }
+
       case MCI_CMD_EXECTORQUERAMP:
+      {
         if (pHandle->hFinalTorque < 0)
         {
           retVal = -1;
         }
+        else
+        {
+          /* Nothing to do */
+        }
         break;
+      }
+
       case MCI_CMD_SETCURRENTREFERENCES:
+      {
         if (pHandle->Iqdref.q < 0)
         {
           retVal = -1;
         }
+        else
+        {
+          /* Nothing to do */
+        }
         break;
-
+       }
       default:
         break;
     }
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
   return (retVal);
@@ -847,9 +1064,9 @@ __weak int16_t MCI_GetImposedMotorDirection(MCI_Handle_t *pHandle)
   * @retval int16_t last ramp final speed sent by the user expressed in
   *         the unit defined by #SPEED_UNIT.
   */
-__weak int16_t MCI_GetLastRampFinalSpeed(MCI_Handle_t *pHandle)
+__weak int16_t MCI_GetLastRampFinalSpeed(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   int16_t retVal = 0;
 
   if (MC_NULL == pHandle)
@@ -873,9 +1090,9 @@ __weak int16_t MCI_GetLastRampFinalSpeed(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval int16_t last ramp final torque sent by the user expressed in digit
   */
-__weak int16_t MCI_GetLastRampFinalTorque(MCI_Handle_t *pHandle)
+__weak int16_t MCI_GetLastRampFinalTorque(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   int16_t retVal = 0;
 
   if (MC_NULL == pHandle)
@@ -893,14 +1110,40 @@ __weak int16_t MCI_GetLastRampFinalTorque(MCI_Handle_t *pHandle)
 }
 
 /**
+  * @brief  It returns information about the last ramp final torque sent by the
+  *         user .This value represents actually the Iq current expressed in
+  *         Ampere.
+  * @param  pHandle Pointer on the component instance to work on.
+  * @retval float_t last ramp final torque sent by the user expressed in digit
+  */
+__weak float_t MCI_GetLastRampFinalTorque_F(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
+{
+#ifdef NULL_PTR_CHECK_MC_INT
+  float_t retVal = 0;
+
+  if (MC_NULL == pHandle)
+  {
+    /* Nothing to do */
+  }
+  else
+  {
+    retVal = ((float_t)pHandle->hFinalTorque * (float_t)pHandle->pScale->current);
+  }
+  return (retVal);
+#else
+  return ((float_t)pHandle->hFinalTorque * (float_t)pHandle->pScale->current);
+#endif
+}
+
+/**
   * @brief  It returns information about the last ramp Duration sent by the
   *         user .
   * @param  pHandle Pointer on the component instance to work on.
   * @retval uint16_t last ramp final torque sent by the user expressed in digit
   */
-__weak uint16_t MCI_GetLastRampFinalDuration(MCI_Handle_t *pHandle)
+__weak uint16_t MCI_GetLastRampFinalDuration(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   uint16_t retVal = 0;
 
   if (MC_NULL == pHandle)
@@ -920,11 +1163,11 @@ __weak uint16_t MCI_GetLastRampFinalDuration(MCI_Handle_t *pHandle)
 /**
   * @brief  It returns last ramp final speed expressed in rpm.
   * @param  pHandle Pointer on the component instance to work on.
-  * @retval float last ramp final speed sent by the user expressed in rpm.
+  * @retval float_t last ramp final speed sent by the user expressed in rpm.
   */
-__weak float MCI_GetLastRampFinalSpeed_F(MCI_Handle_t *pHandle)
+__weak float_t MCI_GetLastRampFinalSpeed_F(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-  float RetVal = 0.0;
+  float_t reVal = 0.0f;
 
   if (MC_NULL == pHandle)
   {
@@ -932,9 +1175,9 @@ __weak float MCI_GetLastRampFinalSpeed_F(MCI_Handle_t *pHandle)
   }
   else
   {
-    RetVal = (float)((pHandle->hFinalSpeed * U_RPM) / SPEED_UNIT);
+    reVal = (((float_t)pHandle->hFinalSpeed * (float_t)U_RPM) / (float_t)SPEED_UNIT);
   }
-  return (RetVal);
+  return (reVal);
 }
 
 /**
@@ -945,7 +1188,7 @@ __weak float MCI_GetLastRampFinalSpeed_F(MCI_Handle_t *pHandle)
 __weak bool MCI_RampCompleted(MCI_Handle_t *pHandle)
 {
   bool retVal = false;
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -961,7 +1204,7 @@ __weak bool MCI_RampCompleted(MCI_Handle_t *pHandle)
     {
       /* Nothing to do */
     }
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
   return (retVal);
@@ -977,7 +1220,7 @@ __weak bool MCI_RampCompleted(MCI_Handle_t *pHandle)
   */
 __weak bool MCI_StopSpeedRamp(MCI_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   return ((MC_NULL == pHandle) ? false : STC_StopSpeedRamp(pHandle->pSTC));
 #else
   return (STC_StopSpeedRamp(pHandle->pSTC));
@@ -990,7 +1233,7 @@ __weak bool MCI_StopSpeedRamp(MCI_Handle_t *pHandle)
   */
 __weak void MCI_StopRamp(MCI_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -999,7 +1242,7 @@ __weak void MCI_StopRamp(MCI_Handle_t *pHandle)
   {
 #endif
     STC_StopRamp(pHandle->pSTC);
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 }
@@ -1015,7 +1258,7 @@ __weak void MCI_StopRamp(MCI_Handle_t *pHandle)
 __weak bool MCI_GetSpdSensorReliability(MCI_Handle_t *pHandle)
 {
   bool status;
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     status = false;
@@ -1025,7 +1268,7 @@ __weak bool MCI_GetSpdSensorReliability(MCI_Handle_t *pHandle)
 #endif
     SpeednPosFdbk_Handle_t *SpeedSensor = STC_GetSpeedSensor(pHandle->pSTC);
     status = SPD_Check(SpeedSensor);
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 
@@ -1041,7 +1284,7 @@ __weak bool MCI_GetSpdSensorReliability(MCI_Handle_t *pHandle)
 __weak int16_t MCI_GetAvrgMecSpeedUnit(MCI_Handle_t *pHandle)
 {
   int16_t temp_speed;
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     temp_speed = 0;
@@ -1051,7 +1294,7 @@ __weak int16_t MCI_GetAvrgMecSpeedUnit(MCI_Handle_t *pHandle)
 #endif
     SpeednPosFdbk_Handle_t * SpeedSensor = STC_GetSpeedSensor(pHandle->pSTC);
     temp_speed = SPD_GetAvrgMecSpeedUnit(SpeedSensor);
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
   return (temp_speed);
@@ -1062,11 +1305,23 @@ __weak int16_t MCI_GetAvrgMecSpeedUnit(MCI_Handle_t *pHandle)
   *         and related to the sensor actually used by FOC algorithm.
   * @param  pHandle Pointer on the component instance to work on.
   */
-__weak float MCI_GetAvrgMecSpeed_F(MCI_Handle_t *pHandle)
+__weak float_t MCI_GetAvrgMecSpeed_F(MCI_Handle_t *pHandle)
 {
-  SpeednPosFdbk_Handle_t *SpeedSensor = STC_GetSpeedSensor(pHandle->pSTC);
-
-  return ((float)((SPD_GetAvrgMecSpeedUnit(SpeedSensor) * U_RPM) / SPEED_UNIT));
+  float_t returnAvrgSpeed;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    returnAvrgSpeed = 0.0f;
+  }
+  else
+  {
+#endif
+    SpeednPosFdbk_Handle_t *SpeedSensor = STC_GetSpeedSensor(pHandle->pSTC);
+    returnAvrgSpeed = (((float_t)SPD_GetAvrgMecSpeedUnit(SpeedSensor) * (float_t)U_RPM) / (float_t)SPEED_UNIT);
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
+  return (returnAvrgSpeed);
 }
 
 /**
@@ -1077,7 +1332,7 @@ __weak float MCI_GetAvrgMecSpeed_F(MCI_Handle_t *pHandle)
   */
 __weak int16_t MCI_GetMecSpeedRefUnit(MCI_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   return ((MC_NULL == pHandle) ? 0 : STC_GetMecSpeedRefUnit(pHandle->pSTC));
 #else
   return (STC_GetMecSpeedRefUnit(pHandle->pSTC));
@@ -1090,9 +1345,14 @@ __weak int16_t MCI_GetMecSpeedRefUnit(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   *
   */
-__weak float MCI_GetMecSpeedRef_F(MCI_Handle_t *pHandle)
+__weak float_t MCI_GetMecSpeedRef_F(MCI_Handle_t *pHandle)
 {
-  return ((float)((STC_GetMecSpeedRefUnit( pHandle->pSTC ) * U_RPM) / SPEED_UNIT));
+#ifdef NULL_PTR_CHECK_MC_INT
+  return ((MC_NULL == pHandle) ? 0.0f :
+          (((float_t)STC_GetMecSpeedRefUnit(pHandle->pSTC) * (float_t)U_RPM) / (float_t)SPEED_UNIT));
+#else
+  return ((((float_t)STC_GetMecSpeedRefUnit(pHandle->pSTC) * (float_t)U_RPM) / (float_t)SPEED_UNIT));
+#endif
 }
 
 /**
@@ -1100,9 +1360,9 @@ __weak float MCI_GetMecSpeedRef_F(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval ab_t Stator current Iab
   */
-__weak ab_t MCI_GetIab(MCI_Handle_t *pHandle)
+__weak ab_t MCI_GetIab(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   ab_t tempVal;
 
   if (MC_NULL == pHandle)
@@ -1120,14 +1380,25 @@ __weak ab_t MCI_GetIab(MCI_Handle_t *pHandle)
 #endif
 }
 
-__weak ab_f_t MCI_GetIab_F(MCI_Handle_t *pHandle)
+__weak ab_f_t MCI_GetIab_F(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-  ab_f_t Iab;
 
-  Iab.a = (float)((float)pHandle->pFOCVars->Iab.a * CURRENT_CONV_FACTOR_INV);
-  Iab.b = (float)((float)pHandle->pFOCVars->Iab.b * CURRENT_CONV_FACTOR_INV);
-
-  return (Iab);
+  ab_f_t iab;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    iab.a = 0.0f;
+    iab.b = 0.0f;
+  }
+  else
+  {
+#endif
+    iab.a = (float_t)((float_t)pHandle->pFOCVars->Iab.a * pHandle->pScale->current);
+    iab.b = (float_t)((float_t)pHandle->pFOCVars->Iab.b * pHandle->pScale->current);
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
+  return (iab);
 
 }
 
@@ -1136,9 +1407,9 @@ __weak ab_f_t MCI_GetIab_F(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval alphabeta_t Stator current Ialphabeta
   */
-__weak alphabeta_t MCI_GetIalphabeta(MCI_Handle_t *pHandle)
+__weak alphabeta_t MCI_GetIalphabeta(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   alphabeta_t tempVal;
 
   if (MC_NULL == pHandle)
@@ -1161,9 +1432,9 @@ __weak alphabeta_t MCI_GetIalphabeta(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval qd_t Stator current Iqd
   */
-__weak qd_t MCI_GetIqd(MCI_Handle_t *pHandle)
+__weak qd_t MCI_GetIqd(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   qd_t tempVal;
 
   if (MC_NULL == pHandle)
@@ -1182,18 +1453,28 @@ __weak qd_t MCI_GetIqd(MCI_Handle_t *pHandle)
 }
 
 /**
-  * @brief  It returns stator current Iqd in float format
+  * @brief  It returns stator current Iqd in float_t format
   * @param  pHandle Pointer on the component instance to work on.
   * @retval qd_f_t Stator current Iqd (in Ampere)
   */
-__weak qd_f_t MCI_GetIqd_F(MCI_Handle_t *pHandle)
+__weak qd_f_t MCI_GetIqd_F(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-  qd_f_t Iqd;
-
-  Iqd.d = (float)((float)pHandle->pFOCVars->Iqd.d * CURRENT_CONV_FACTOR_INV);
-  Iqd.q = (float)((float)pHandle->pFOCVars->Iqd.q * CURRENT_CONV_FACTOR_INV);
-
-  return (Iqd);
+  qd_f_t iqd;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    iqd.d = 0.0f;
+    iqd.q = 0.0f;
+  }
+  else
+  {
+#endif
+  iqd.d = (float_t)((float_t)pHandle->pFOCVars->Iqd.d * pHandle->pScale->current);
+  iqd.q = (float_t)((float_t)pHandle->pFOCVars->Iqd.q * pHandle->pScale->current);
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
+  return (iqd);
 }
 
 /**
@@ -1202,9 +1483,9 @@ __weak qd_f_t MCI_GetIqd_F(MCI_Handle_t *pHandle)
   * @retval qd_t Stator current IqdHF if HFI is selected as main
   *         sensor. Otherwise it returns { 0, 0}.
   */
-__weak qd_t MCI_GetIqdHF(MCI_Handle_t *pHandle)
+__weak qd_t MCI_GetIqdHF(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   qd_t tempVal;
 
   if (MC_NULL == pHandle)
@@ -1227,9 +1508,9 @@ __weak qd_t MCI_GetIqdHF(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval qd_t Stator current Iqdref
   */
-__weak qd_t MCI_GetIqdref(MCI_Handle_t *pHandle)
+__weak qd_t MCI_GetIqdref(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   qd_t tempVal;
 
   if (MC_NULL == pHandle)
@@ -1248,18 +1529,28 @@ __weak qd_t MCI_GetIqdref(MCI_Handle_t *pHandle)
 }
 
 /**
-  * @brief  It returns stator current Iqdref in float format
+  * @brief  It returns stator current Iqdref in float_t format
   * @param  pHandle Pointer on the component instance to work on.
   * @retval qd_f_t Stator current Iqdref (in Ampere)
   */
-__weak qd_f_t MCI_GetIqdref_F(MCI_Handle_t *pHandle)
+__weak qd_f_t MCI_GetIqdref_F(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-  qd_f_t Iqdref;
-
-  Iqdref.d = (float)((float)pHandle->pFOCVars->Iqdref.d * CURRENT_CONV_FACTOR_INV);
-  Iqdref.q = (float)((float)pHandle->pFOCVars->Iqdref.q * CURRENT_CONV_FACTOR_INV);
-
-  return ( Iqdref );
+  qd_f_t iqdref;
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    iqdref.d = 0.0f;
+    iqdref.q = 0.0f;
+  }
+  else
+  {
+#endif
+    iqdref.d = (float_t)((float_t)pHandle->pFOCVars->Iqdref.d * pHandle->pScale->current);
+    iqdref.q = (float_t)((float_t)pHandle->pFOCVars->Iqdref.q * pHandle->pScale->current);
+ #ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
+  return (iqdref);
 }
 
 /**
@@ -1267,9 +1558,9 @@ __weak qd_f_t MCI_GetIqdref_F(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval qd_t Stator current Vqd
   */
-__weak qd_t MCI_GetVqd(MCI_Handle_t *pHandle)
+__weak qd_t MCI_GetVqd(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   qd_t tempVal;
 
   if (MC_NULL == pHandle)
@@ -1292,9 +1583,9 @@ __weak qd_t MCI_GetVqd(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval alphabeta_t Stator current Valphabeta
   */
-__weak alphabeta_t MCI_GetValphabeta(MCI_Handle_t *pHandle)
+__weak alphabeta_t MCI_GetValphabeta(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   alphabeta_t tempVal;
 
   if (MC_NULL == pHandle)
@@ -1318,9 +1609,9 @@ __weak alphabeta_t MCI_GetValphabeta(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval int16_t Rotor electrical angle in dpp format
   */
-__weak int16_t MCI_GetElAngledpp(MCI_Handle_t *pHandle)
+__weak int16_t MCI_GetElAngledpp(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   return ((MC_NULL == pHandle) ? 0 : pHandle->pFOCVars->hElAngle);
 #else
   return (pHandle->pFOCVars->hElAngle);
@@ -1333,9 +1624,9 @@ __weak int16_t MCI_GetElAngledpp(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval int16_t Teref
   */
-__weak int16_t MCI_GetTeref(MCI_Handle_t *pHandle)
+__weak int16_t MCI_GetTeref(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   return ((MC_NULL == pHandle) ? 0 : pHandle->pFOCVars->hTeref);
 #else
   return (pHandle->pFOCVars->hTeref);
@@ -1345,12 +1636,15 @@ __weak int16_t MCI_GetTeref(MCI_Handle_t *pHandle)
 /**
   * @brief  It returns the reference electrical torque.
   * @param  pHandle Pointer on the component instance to work on.
-  * @retval float Teref
+  * @retval float_t Teref
   */
-__weak float MCI_GetTeref_F(MCI_Handle_t *pHandle)
+__weak float_t MCI_GetTeref_F(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
-
-  return ((float)(pHandle->pFOCVars->hTeref * CURRENT_CONV_FACTOR_INV));
+#ifdef NULL_PTR_CHECK_MC_INT
+  return ((MC_NULL == pHandle) ? 0.0f : ((float_t)pHandle->pFOCVars->hTeref * (float_t)pHandle->pScale->current));
+#else
+  return ((float_t)pHandle->pFOCVars->hTeref * (float_t)pHandle->pScale->current);
+#endif
 }
 
 /**
@@ -1360,12 +1654,12 @@ __weak float MCI_GetTeref_F(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval int16_t Motor phase current (0-to-peak) in s16A
   */
-__weak int16_t MCI_GetPhaseCurrentAmplitude(MCI_Handle_t *pHandle)
+__weak int16_t MCI_GetPhaseCurrentAmplitude(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
   alphabeta_t Local_Curr;
   int16_t wAux;
 
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     wAux = 0;
@@ -1374,8 +1668,8 @@ __weak int16_t MCI_GetPhaseCurrentAmplitude(MCI_Handle_t *pHandle)
   {
 #endif
   Local_Curr = pHandle->pFOCVars->Ialphabeta;
-  wAux = MCM_Modulus( Local_Curr.alpha, Local_Curr.beta );
-#ifdef NULL_PTR_MC_INT
+  wAux = MCM_Modulus(Local_Curr.alpha, Local_Curr.beta);
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 
@@ -1389,10 +1683,10 @@ __weak int16_t MCI_GetPhaseCurrentAmplitude(MCI_Handle_t *pHandle)
   * @param  pHandle Pointer on the component instance to work on.
   * @retval int16_t Motor phase voltage (0-to-peak) in s16V
   */
-__weak int16_t MCI_GetPhaseVoltageAmplitude(MCI_Handle_t *pHandle)
+__weak int16_t MCI_GetPhaseVoltageAmplitude(MCI_Handle_t *pHandle) //cstat !MISRAC2012-Rule-8.13
 {
   int16_t temp_wAux;
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     temp_wAux = 0;
@@ -1416,7 +1710,7 @@ __weak int16_t MCI_GetPhaseVoltageAmplitude(MCI_Handle_t *pHandle)
       wAux1 = (int32_t)INT16_MAX;
     }
     temp_wAux = (int16_t)wAux1;
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
   return (temp_wAux);
@@ -1425,11 +1719,10 @@ __weak int16_t MCI_GetPhaseVoltageAmplitude(MCI_Handle_t *pHandle)
 /**
   * @brief  It re-initializes Iqdref variables with their default values.
   * @param  pHandle Pointer on the component instance to work on.
-  * @retval none
   */
 __weak void MCI_Clear_Iqdref(MCI_Handle_t *pHandle)
 {
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   if (MC_NULL == pHandle)
   {
     /* Nothing to do */
@@ -1438,7 +1731,7 @@ __weak void MCI_Clear_Iqdref(MCI_Handle_t *pHandle)
   {
 #endif
     pHandle->pFOCVars->Iqdref = STC_GetDefaultIqdref(pHandle->pSTC);
-#ifdef NULL_PTR_MC_INT
+#ifdef NULL_PTR_CHECK_MC_INT
   }
 #endif
 }
@@ -1451,4 +1744,8 @@ __weak void MCI_Clear_Iqdref(MCI_Handle_t *pHandle)
   * @}
   */
 
-/************************ (C) COPYRIGHT 2022 STMicroelectronics *****END OF FILE****/
+/**
+  * @}
+  */
+
+/************************ (C) COPYRIGHT 2024 STMicroelectronics *****END OF FILE****/
