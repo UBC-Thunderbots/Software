@@ -13,13 +13,13 @@
 
 
 # Overview:
-The structure of our tactics and plays has undergone a significant change. The new system presents common features of each Play/Tactic/FSM in the structure of the classes itself. Fundamental behaviour has not changed.
+The structure of our tactics and plays has undergone a significant change. The new system presents common features of each Play/Tactic/FSM in template classes which are then passed arguments and extended. Fundamental behaviour has not changed.
 
 This documentation is written to accompany PR #3480
 # Diagrams:
 I discuss tactics in the following section, but this applies to all plays that have been converted to FSMs.
 
-If your ticket requires that you convert a play to an FSM, it would do well to study the following structure closely.
+If your ticket requires that you convert a play to an FSM, the following structures might be helpful.
 
 The following approximately describes our old system's design for a few tactics:
 ```mermaid
@@ -101,8 +101,8 @@ Similarly, the `TacticFSM` classes share a lot of very similar looking code. Wri
 Another advantage is that Tactics with SubFSMs explicitly declare their SubFSMs in the class definition. `AttackerTactic` depends on `DribbleFSM`, `KeepAwayFSM`, and `PivotKickFSM`. Where before, this dependency was not super clear in the class declaration, it is now clearly stated, as `AttackerTactic` passes the `Tactic<_FSM>` template the four FSMs it needs (`AttackerFSM`, `DribbleFSM`, `KeepAwayFSM`, and `PivotKickFSM`). See `attacker_tactic.h` for an example.
 
 # Build Errors and Debugging:
-The most difficult error I encountered while writing the refactor was this error here (The `missing_ctor_parameter` error): ![lovely error message](images/sml-error.png)
-This error occurs when we fail to initialize a Tactic with the correct FSMs. For example, a `HaltTactic` is _always_ expecting a `HaltFSM`, and an `AttackerTactic` is _always_ expecting an `AttackerFSM`, `DribbleFSM`, `KeepAwayFSM`, and `PivotKickFSM`. If we fail to declare this in the class declaration, we get this error. You can fix this by looking for the text circled in green. That will tell you the FSMs that the tactic is expecting.
+One of the most common and daunting errors I encountered while writing the refactor was this error here (The `missing_ctor_parameter` error): ![lovely error message](images/sml-error.png)
+This error occurs when we fail to initialize a Tactic with the correct FSMs. For example, a `HaltTactic` is _always_ expecting a `HaltFSM`, and an `AttackerTactic` is _always_ expecting an `AttackerFSM`, `DribbleFSM`, `KeepAwayFSM`, and `PivotKickFSM`. If we fail to declare this in the class declaration, we get this error. You can fix this by looking for the text circled in green. That will tell you the FSMs/SubFSMs that the FSM is expecting.
 
 Note that every single tactic, play, and FSM is expected a shared pointer to `ai_config`, regardless of it actually uses or not (a consequence of using templates. However, it does help to standardize constructors and initialization). 
 
@@ -111,5 +111,6 @@ You should always be either feeding an existing `ai_config_ptr` through to initi
 * If you know that the tactic/play/FSM being tested doesn't access `ai_config`, you can initialize it with `std::make_shared<TbotsProto::AiConfig>()`
 
 ## Naming Convention
-Personally, I would prefer that we keep the names of each class consistent. Look to the other files to get a sense of what the naming is. I've taken the time to standardize the naming and definitions of constructors and so on, so it should be pretty consistent.
+Look to the other files to get a sense of what the naming is. I've taken the time to standardize the naming and definitions of constructors and so on, so it should be pretty consistent.
+
 
