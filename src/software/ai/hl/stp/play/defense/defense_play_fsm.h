@@ -30,6 +30,15 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     bool shouldDefendAggressively(const Update& event);
 
     /**
+     * Guard to check whether we should be defending more aggressively
+     *
+     * @param event the FSM event
+     *
+     * @return whether we should be defending more aggressively
+     */
+    bool shouldDefendAggressively(const Update& event);
+
+    /**
      * Action to identify all immediate enemy threats and assign
      * defenders to block enemy shots and passes
      *

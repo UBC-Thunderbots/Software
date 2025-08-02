@@ -9,7 +9,6 @@
 #include "software/logger/logger.h"
 
 
-
 /**
  * The control parameters for updating ShadowEnemyFSM
  */
@@ -23,7 +22,6 @@ struct ShadowEnemyFSMControlParams
     // Otherwise it will try to block the pass to the enemy threat.
     double shadow_distance;
 };
-
 
 struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
 {
