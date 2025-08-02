@@ -1,5 +1,6 @@
 #pragma once
 
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 /*
  * Interface for Tactics, so that we can make a std::vector<TacticInterface>
  * Otherwise, we would have to use a template which doesn't really work.
