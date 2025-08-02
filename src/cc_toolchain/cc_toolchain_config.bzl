@@ -624,6 +624,7 @@ def _stm32_gcc_impl(ctx):
                 flag_groups = [
                     flag_group(
                         flags = [
+                            # Compile for the Cortex M0
                             "-mcpu=cortex-m0",
                         ],
                     ),
@@ -632,8 +633,27 @@ def _stm32_gcc_impl(ctx):
         ]
     )
 
+    no_syscalls_feature = feature(
+        name = "no_syscalls",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # No OS, so stub out the system calls
+                            "--specs=nosys.specs",
+                        ],
+                    ),
+                ],
+            )
+        ]
+    )
+
     features = [
-        cortex_feature
+        cortex_feature,
+        no_syscalls_feature,
     ]
 
     return [

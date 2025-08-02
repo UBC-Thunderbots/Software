@@ -206,7 +206,7 @@ cc_toolchain(
 cc_toolchain_config_stm32(
     name = "gcc-arm-none-abi",
     builtin_include_directories = [
-        "/usr/lib/gcc/arm-none-eabi/13.2.1/include/"
+        "/usr/lib/gcc/arm-none-eabi/13.2.1/include/",
     ],
     tool_paths = {
         "ar": "/usr/bin/arm-none-eabi-ar",
