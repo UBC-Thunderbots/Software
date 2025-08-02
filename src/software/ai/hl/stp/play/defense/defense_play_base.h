@@ -69,4 +69,5 @@ class DefensePlayFSMBase : public PlayFSM<DefensePlayBaseControlParams>
 
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
     std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;
+    std::vector<std::shared_ptr<ShadowEnemyTactic>> shadowers;
 };
