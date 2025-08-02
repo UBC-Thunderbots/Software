@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "software/logger/logger.h"
 #include "software/test_util/test_util.h"
 
 TEST(ShadowEnemyFSMTest, test_findBlockPassPoint)
@@ -67,13 +68,16 @@ TEST(ShadowEnemyFSMTest, test_findBlockShotPoint)
 
 TEST(ShadowEnemyFSMTest, test_transitions)
 {
-    Robot enemy                  = ::TestUtil::createRobotAtPos(Point(0, 2));
-    Robot shadowee               = ::TestUtil::createRobotAtPos(Point(0, -2));
+    Robot enemy                  = ::TestUtil::createRobotAtPos(Point(1, 0));
+    Robot shadowee               = ::TestUtil::createRobotAtPos(Point(2, 0));
     Robot shadower               = ::TestUtil::createRobotAtPos(Point(-2, 0));
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
-    EnemyThreat enemy_threat{shadowee,     false, Angle::zero(), std::nullopt,
-                             std::nullopt, 1,     enemy};
+
+    ::TestUtil::setBallPosition(world, Point(1, 0), Timestamp::fromSeconds(0));
+    EnemyThreat enemy_threat{shadowee,     true, Angle::zero(), std::nullopt,
+                             std::nullopt, 1,    enemy};
+
+    FSMLogger logger;
     FSM<ShadowEnemyFSM> fsm{ShadowEnemyFSM(std::make_shared<TbotsProto::AiConfig>()),
                             MoveFSM(std::make_shared<TbotsProto::AiConfig>())};
 
@@ -85,12 +89,14 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
+
+
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::BlockPassState>));
 
     // Shadowee now has the ball, our robot should move to block the shot
     // Robot should be trying to block possible shot on our net
     enemy_threat.has_ball = true;
-    ::TestUtil::setBallPosition(world, Point(0, -2), Timestamp::fromSeconds(0));
+    ::TestUtil::setBallPosition(world, Point(2, 0), Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
@@ -105,7 +111,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // Shadowee still has possession of the ball and robot has arrived at block shot
-    // position Robot should try to steal and chip the ball
+    // position, robot should try to steal the ball
     Point position_to_block = ShadowEnemyFSM::findBlockShotPoint(
         shadower, world->field(), world->friendlyTeam(), world->enemyTeam(), shadowee,
         0.5);
@@ -117,16 +123,20 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::StealAndChipState>));
 
-    // Shadowee still has possession of the ball
-    // Robot should continue to try and steal and chip the ball
+    EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::GoAndStealState>));
+    // Shadower is now has the breakbeam tripped
+    // Robot should try and steal and pull the ball
+    shadower = Robot(2, Point(0, -1.97), Vector(), Angle(), AngularVelocity::zero(),
+                     Timestamp::fromSeconds(0), true);
+
+
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::StealAndChipState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::StealAndPullState>));
 
-    // Either the ball has been stolen and chipped by our robot or the
+    // Either the ball has been stolen by our robot or at least the
     // enemy threat has kicked the ball
     // Tactic is done
     enemy_threat.has_ball = false;
