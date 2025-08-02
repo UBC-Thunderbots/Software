@@ -101,7 +101,7 @@ Similarly, the `TacticFSM` classes share a lot of very similar looking code. Wri
 Another advantage is that Tactics with SubFSMs explicitly declare their SubFSMs in the class definition. `AttackerTactic` depends on `DribbleFSM`, `KeepAwayFSM`, and `PivotKickFSM`. Where before, this dependency was not super clear in the class declaration, it is now clearly stated, as `AttackerTactic` passes the `Tactic<_FSM>` template the four FSMs it needs (`AttackerFSM`, `DribbleFSM`, `KeepAwayFSM`, and `PivotKickFSM`). See `attacker_tactic.h` for an example.
 
 # Build Errors and Debugging:
-The most difficult error I encountered while writing the refactor was this error here (The `missing_ctor_parameter` error): ![lovely error message](image.png)
+The most difficult error I encountered while writing the refactor was this error here (The `missing_ctor_parameter` error): ![lovely error message](images/sml-error.png)
 This error occurs when we fail to initialize a Tactic with the correct FSMs. For example, a `HaltTactic` is _always_ expecting a `HaltFSM`, and an `AttackerTactic` is _always_ expecting an `AttackerFSM`, `DribbleFSM`, `KeepAwayFSM`, and `PivotKickFSM`. If we fail to declare this in the class declaration, we get this error. You can fix this by looking for the text circled in green. That will tell you the FSMs that the tactic is expecting.
 
 Note that every single tactic, play, and FSM is expected a shared pointer to `ai_config`, regardless of it actually uses or not (a consequence of using templates. However, it does help to standardize constructors and initialization). 
@@ -112,3 +112,4 @@ You should always be either feeding an existing `ai_config_ptr` through to initi
 
 ## Naming Convention
 Personally, I would prefer that we keep the names of each class consistent. Look to the other files to get a sense of what the naming is. I've taken the time to standardize the naming and definitions of constructors and so on, so it should be pretty consistent.
+
