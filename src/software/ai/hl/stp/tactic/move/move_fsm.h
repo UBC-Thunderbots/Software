@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/geom/point.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/geom/point.h"
 
 /**
  * The control parameters for updating MoveFSM
@@ -38,9 +38,9 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit MoveFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticFSM<MoveFSMControlParams>(ai_config_ptr)
-                {
-                }
+        : TacticFSM<MoveFSMControlParams>(ai_config_ptr)
+    {
+    }
 
     /**
      * This is an Action that sets the primitive to a move primitive corresponding to the

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/geom/point.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/geom/point.h"
 
 /**
  * The control parameters for updating ChipFSM
@@ -29,7 +29,10 @@ struct ChipFSM : TacticFSM<ChipFSMControlParams>
      *
      * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit ChipFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): TacticFSM<ChipFSMControlParams>(ai_config_ptr) {}
+    explicit ChipFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<ChipFSMControlParams>(ai_config_ptr)
+    {
+    }
 
     /**
      * Action that updates the MovePrimitive

@@ -21,4 +21,5 @@ void HaltPlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltPlay, std::shared_ptr<TbotsProto::AiConfig>> factory;
+static TGenericFactory<std::string, Play, HaltPlay, std::shared_ptr<TbotsProto::AiConfig>>
+    factory;

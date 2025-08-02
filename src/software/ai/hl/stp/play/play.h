@@ -38,7 +38,8 @@ class Play
      * @param ai_config_ptr shared pointer to ai_config
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr, bool requires_goalie);
+    explicit Play(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
+                  bool requires_goalie);
 
     /**
      * Gets Primitives from the Play given the the world, and inter-play communication
@@ -59,8 +60,8 @@ class Play
      *
      * @return a map from tactic to robot id
      */
-    const std::map<std::shared_ptr<const TacticInterface>, RobotId>& getTacticRobotIdAssignment()
-        const;
+    const std::map<std::shared_ptr<const TacticInterface>, RobotId>&
+    getTacticRobotIdAssignment() const;
 
     virtual ~Play() = default;
 

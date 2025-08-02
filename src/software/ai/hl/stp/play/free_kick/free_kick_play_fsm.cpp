@@ -6,10 +6,9 @@ FreeKickPlayFSM::FreeKickPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config
       shoot_tactic(std::make_shared<KickTactic>(ai_config_ptr)),
       chip_tactic(std::make_shared<ChipTactic>(ai_config_ptr)),
       passer_tactic(std::make_shared<KickTactic>(ai_config_ptr)),
-      receiver_tactic(
-          std::make_shared<ReceiverTactic>(ai_config_ptr)),
-      receiver_positioning_tactics(
-          {std::make_shared<MoveTactic>(ai_config_ptr), std::make_shared<MoveTactic>(ai_config_ptr)}),
+      receiver_tactic(std::make_shared<ReceiverTactic>(ai_config_ptr)),
+      receiver_positioning_tactics({std::make_shared<MoveTactic>(ai_config_ptr),
+                                    std::make_shared<MoveTactic>(ai_config_ptr)}),
       defense_play(std::make_shared<DefensePlay>(ai_config_ptr)),
       receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
           std::make_shared<const EighteenZonePitchDivision>(

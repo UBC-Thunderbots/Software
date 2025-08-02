@@ -4,9 +4,9 @@
 
 #include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
+#include "software/ai/hl/stp/tactic/tactic_interface.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
-#include "software/ai/hl/stp/tactic/tactic_interface.h"
 #include "software/world/world.h"
 
 /**
@@ -38,21 +38,29 @@
  * Tactics are stateful, and use Primitives to implement their behaviour. They also
  * make heavy use of our Evaluation functions in order to help them make decisions.
  *
- * @tparam TacticFsm The Tactic FSM to base this tactic off of (e.g. AttackerTactic needs AttackerFSM)
- * @tparam TacticSubFsms the sub FSMs this tactic uses (e.g. AttackerTactic needs DribbleFSM as a sub FSM)
+ * @tparam TacticFsm The Tactic FSM to base this tactic off of (e.g. AttackerTactic needs
+ * AttackerFSM)
+ * @tparam TacticSubFsms the sub FSMs this tactic uses (e.g. AttackerTactic needs
+ * DribbleFSM as a sub FSM)
  */
-template<class TacticFsm, class... TacticSubFsms>
+template <class TacticFsm, class... TacticSubFsms>
 class Tactic : public TacticInterface
 {
    public:
-    // Function definitions must be moved to the header file to be compiled as a single translation unit for template classes.
+    // Function definitions must be moved to the header file to be compiled as a single
+    // translation unit for template classes.
     /**
      * Creates a new Tactic. The Tactic will initially have no Robot assigned to it.
      *
      * @param capability_reqs_ The capability requirements for running this tactic
      */
-    explicit Tactic(const std::set<RobotCapability> &capability_reqs_, std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : last_execution_robot(std::nullopt), ai_config_ptr(ai_config_ptr), fsm_map(), control_params(), capability_reqs(capability_reqs_)
+    explicit Tactic(const std::set<RobotCapability> &capability_reqs_,
+                    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : last_execution_robot(std::nullopt),
+          ai_config_ptr(ai_config_ptr),
+          fsm_map(),
+          control_params(),
+          capability_reqs(capability_reqs_)
     {
         for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
         {
@@ -87,7 +95,7 @@ class Tactic : public TacticInterface
         std::string state_str = "";
         if (last_execution_robot.has_value())
             state_str =
-                    getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));
+                getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));
         return state_str;
     }
 
@@ -135,20 +143,21 @@ class Tactic : public TacticInterface
         std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
 
         {
-            ZoneNamedN(_tracy_tactic_set_primitive, "Tactic: Get primitives for each robot",
-                       true);
+            ZoneNamedN(_tracy_tactic_set_primitive,
+                       "Tactic: Get primitives for each robot", true);
 
             for (const auto &robot : world_ptr->friendlyTeam().getAllRobots())
             {
-                updatePrimitive(TacticUpdate(robot, world_ptr,
-                                             [this](std::shared_ptr<Primitive> new_primitive)
-                                             { primitive = std::move(new_primitive); }),
-                                !last_execution_robot.has_value() ||
-                                last_execution_robot.value() != robot.id());
+                updatePrimitive(
+                    TacticUpdate(robot, world_ptr,
+                                 [this](std::shared_ptr<Primitive> new_primitive)
+                                 { primitive = std::move(new_primitive); }),
+                    !last_execution_robot.has_value() ||
+                        last_execution_robot.value() != robot.id());
 
                 CHECK(primitive != nullptr)
-                        << "Primitive for " << objectTypeName(*this) << " in state "
-                        << getFSMState() << " was not set" << std::endl;
+                    << "Primitive for " << objectTypeName(*this) << " in state "
+                    << getFSMState() << " was not set" << std::endl;
                 primitives_map[robot.id()] = std::move(primitive);
             }
         }
@@ -177,12 +186,15 @@ class Tactic : public TacticInterface
     // The parameters this tactic uses control its FSMs.
     TacticFsm::ControlParams control_params;
 
-    virtual std::unique_ptr<FSM<TacticFsm>> fsmInit() {
-        return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr), TacticSubFsms(ai_config_ptr)...);
+    virtual std::unique_ptr<FSM<TacticFsm>> fsmInit()
+    {
+        return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr),
+                                                TacticSubFsms(ai_config_ptr)...);
     }
 
    private:
-    /** Function to initialize the FSM. By default initializes the template FSM. Some FSMs may override if they initialize sub-FSMs.
+    /** Function to initialize the FSM. By default initializes the template FSM. Some FSMs
+     * may override if they initialize sub-FSMs.
      *
      * @return a pointer to the created FSM.
      */
@@ -202,7 +214,7 @@ class Tactic : public TacticInterface
             fsm_map[tactic_update.robot.id()] = fsmInit();
         }
         fsm_map.at(tactic_update.robot.id())
-                ->process_event(typename TacticFsm::Update(control_params, tactic_update));
+            ->process_event(typename TacticFsm::Update(control_params, tactic_update));
     }
 
 

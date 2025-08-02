@@ -56,7 +56,7 @@ void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
     std::scoped_lock lock(ai_mutex);
 
     // Update the AI with thew new config
-    *ai_config_ptr         = config.ai_config();
+    *ai_config_ptr    = config.ai_config();
     ai_control_config = config.ai_config().ai_control_config();
 
     ai.updateAiConfig();

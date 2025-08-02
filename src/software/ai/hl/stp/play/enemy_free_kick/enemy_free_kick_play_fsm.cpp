@@ -10,7 +10,8 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : DefensePlayFSMBase::DefensePlayFSMBase(ai_config_ptr)
 {
 }
@@ -110,7 +111,8 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
                      distance(friendly_goal_center, block_kick_point) >=
                          ball_far_threshold_m)
             {
-                auto mid_zone_defender = std::make_shared<PassDefenderTactic>(ai_config_ptr);
+                auto mid_zone_defender =
+                    std::make_shared<PassDefenderTactic>(ai_config_ptr);
                 Point mid_point =
                     Point((event.common.world_ptr->ball().position().toVector() +
                            friendly_goal_center.toVector()) /

@@ -5,7 +5,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 ScoringWithStaticDefendersPlay::ScoringWithStaticDefendersPlay(
-        std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : Play(ai_config_ptr, false)
 {
 }

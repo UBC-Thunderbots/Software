@@ -10,7 +10,8 @@
 class ScoringFromContestedPossessionPlay : public Play
 {
    public:
-    ScoringFromContestedPossessionPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    ScoringFromContestedPossessionPlay(
+        std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

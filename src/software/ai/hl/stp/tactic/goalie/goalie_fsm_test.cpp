@@ -90,7 +90,7 @@ TEST(GoalieFSMTest, test_transitions)
     FSM<GoalieFSM> fsm(DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
                        GoalieFSM(std::make_shared<TbotsProto::AiConfig>(),
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT),
-                                 PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()));
+                       PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()));
 
     // goalie starts in PositionToBlock
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));

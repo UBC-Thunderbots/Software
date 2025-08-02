@@ -28,4 +28,6 @@ std::vector<std::string> FreeKickPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay, std::shared_ptr<TbotsProto::AiConfig>> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay,
+                       std::shared_ptr<TbotsProto::AiConfig>>
+    factory;

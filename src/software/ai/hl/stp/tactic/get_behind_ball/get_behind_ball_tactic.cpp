@@ -2,7 +2,8 @@
 
 #include <algorithm>
 
-GetBehindBallTactic::GetBehindBallTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+GetBehindBallTactic::GetBehindBallTactic(
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : Tactic<GetBehindBallFSM>({RobotCapability::Move}, ai_config_ptr)
 {
 }

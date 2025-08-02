@@ -37,7 +37,7 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit ShadowEnemyFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr)
+        : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr)
     {
     }
 

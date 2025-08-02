@@ -10,8 +10,9 @@
 #include "software/logger/logger.h"
 
 PivotKickTactic::PivotKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<PivotKickFSM, DribbleFSM>({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
-              RobotCapability::Dribble}, ai_config_ptr)
+    : Tactic<PivotKickFSM, DribbleFSM>({RobotCapability::Move, RobotCapability::Kick,
+                                        RobotCapability::Chip, RobotCapability::Dribble},
+                                       ai_config_ptr)
 {
 }
 

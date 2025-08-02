@@ -45,7 +45,7 @@ void AttackerFSM::keepAway(const Update& event,
                            boost::sml::back::process<KeepAwayFSM::Update> processEvent)
 {
     KeepAwayFSMControlParams control_params{.best_pass_so_far =
-                                                  event.control_params.best_pass_so_far};
+                                                event.control_params.best_pass_so_far};
 
     processEvent(KeepAwayFSM::Update(control_params, event.common));
 }

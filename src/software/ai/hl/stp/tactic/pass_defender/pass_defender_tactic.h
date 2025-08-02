@@ -31,5 +31,4 @@ class PassDefenderTactic : public Tactic<PassDefenderFSM, DribbleFSM>
                              TbotsProto::BallStealMode ball_steal_mode);
 
     void accept(TacticVisitor& visitor) const override;
-
 };

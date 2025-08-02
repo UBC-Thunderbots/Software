@@ -24,5 +24,4 @@ class MoveTestPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
-
 };

@@ -27,7 +27,7 @@ class GoalieTactic : public Tactic<GoalieFSM, PivotKickFSM, DribbleFSM>
 
     GoalieTactic() = delete;
 
-    //TODO: make sure the calling function uses this instead
+    // TODO: make sure the calling function uses this instead
     /**
      * Updates the current goalie speed mode.
      * Modifies max_allowed_speed_mode

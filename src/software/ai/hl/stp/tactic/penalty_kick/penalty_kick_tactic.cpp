@@ -1,7 +1,9 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 
 PenaltyKickTactic::PenaltyKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}, ai_config_ptr)
+    : Tactic<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>(
+          {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick},
+          ai_config_ptr)
 {
 }
 

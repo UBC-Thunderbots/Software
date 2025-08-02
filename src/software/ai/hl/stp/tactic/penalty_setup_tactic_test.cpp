@@ -5,5 +5,6 @@
 
 TEST(PenaltySetupTacticTest, constructor_test)
 {
-    PenaltySetupTactic tactic = PenaltySetupTactic(std::make_shared<TbotsProto::AiConfig>());
+    PenaltySetupTactic tactic =
+        PenaltySetupTactic(std::make_shared<TbotsProto::AiConfig>());
 }

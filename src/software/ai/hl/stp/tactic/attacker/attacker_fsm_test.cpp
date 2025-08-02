@@ -11,9 +11,9 @@ TEST(AttackerFSMTest, test_transitions)
     Pass pass                    = Pass(Point(0, 0), Point(2, 0), 5);
 
     AttackerFSMControlParams control_params{.best_pass_so_far = pass,
-                                              .pass_committed   = true,
-                                              .shot             = std::nullopt,
-                                              .chip_target      = std::nullopt};
+                                            .pass_committed   = true,
+                                            .shot             = std::nullopt,
+                                            .chip_target      = std::nullopt};
 
     TbotsProto::AiConfig ai_config;
     FSM<AttackerFSM> fsm{DribbleFSM(ai_config.dribble_tactic_config()),

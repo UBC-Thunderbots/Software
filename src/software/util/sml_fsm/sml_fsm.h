@@ -4,8 +4,8 @@
 #include <include/boost/sml.hpp>
 #include <queue>
 
-#include "software/util/typename/typename.h"
 #include "software/util/sml_fsm/fsm_logger.h"
+#include "software/util/typename/typename.h"
 
 /**
  * The Tactic FSM framework uses the [SML library](https://github.com/boost-ext/sml), and

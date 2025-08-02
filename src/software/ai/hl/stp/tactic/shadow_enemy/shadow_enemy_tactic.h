@@ -2,8 +2,8 @@
 
 
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**

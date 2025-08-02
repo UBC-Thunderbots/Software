@@ -3,8 +3,8 @@
 #include <functional>
 #include <memory>
 
-#include "proto/primitive/primitive_msg_factory.h"
 #include "proto/parameters.pb.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/ai/hl/stp/tactic/stop_primitive.h"
@@ -35,10 +35,10 @@ struct TacticUpdate
  *
  * @tparam TFsmControlParams the control parameters for the FSM being built.
  */
-template<class TFsmControlParams>
+template <class TFsmControlParams>
 class TacticFSM
 {
-public:
+   public:
     using ControlParams = TFsmControlParams;
     /**
      * The Update struct is the only event that a tactic FSM should respond to and it is
@@ -50,16 +50,19 @@ public:
     struct Update
     {
         Update(const TFsmControlParams &control_params, const TacticUpdate &common)
-                : control_params(control_params), common(common)
+            : control_params(control_params), common(common)
         {
         }
         TFsmControlParams control_params;
         TacticUpdate common;
     };
 
-    explicit TacticFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): ai_config_ptr(ai_config_ptr){}
+    explicit TacticFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : ai_config_ptr(ai_config_ptr)
+    {
+    }
 
-protected:
+   protected:
     // Former constructors took what they needed from ai_config and stored it locally.
     // Now, we store ai_config as a pointer and use it to update as needed.
     // This ensures that everything gets the update as needed.

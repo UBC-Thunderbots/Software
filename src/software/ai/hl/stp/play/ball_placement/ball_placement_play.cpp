@@ -41,5 +41,6 @@ std::vector<std::string> BallPlacementPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, BallPlacementPlay, std::shared_ptr<TbotsProto::AiConfig>>
+static TGenericFactory<std::string, Play, BallPlacementPlay,
+                       std::shared_ptr<TbotsProto::AiConfig>>
     factory;

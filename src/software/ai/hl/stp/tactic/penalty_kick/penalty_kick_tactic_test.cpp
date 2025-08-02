@@ -30,7 +30,8 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 {
     RobotStateWithId enemy_robot = GetParam();
 
-    auto tactic               = std::make_shared<PenaltyKickTactic>(std::make_shared<TbotsProto::AiConfig>());
+    auto tactic =
+        std::make_shared<PenaltyKickTactic>(std::make_shared<TbotsProto::AiConfig>());
     static RobotId shooter_id = 0;
     setTactic(shooter_id, tactic);
 
@@ -52,7 +53,8 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 // TODO (#2519): fix and re-enable
 TEST_F(PenaltyKickTacticTest, DISABLED_penalty_no_goalie)
 {
-    auto tactic               = std::make_shared<PenaltyKickTactic>(std::make_shared<TbotsProto::AiConfig>());
+    auto tactic =
+        std::make_shared<PenaltyKickTactic>(std::make_shared<TbotsProto::AiConfig>());
     static RobotId shooter_id = 0;
     setTactic(shooter_id, tactic);
 

@@ -6,7 +6,8 @@
 
 
 Point GoalieFSM::getGoaliePositionToBlock(
-    const Ball &ball, const Field &field, TbotsProto::GoalieTacticConfig goalie_tactic_config)
+    const Ball &ball, const Field &field,
+    TbotsProto::GoalieTacticConfig goalie_tactic_config)
 {
     // Check if the ball is in the region where it will be at a sharp
     // angle to the goal -- if so, goalie should snap to goalposts
@@ -96,7 +97,7 @@ Point GoalieFSM::findGoodChipTarget(
                  -goalie_tactic_config.chip_target_area_inset_meters());
     Vector offset_from_goal_line(
         world.field().defenseAreaXLength() +
-                goalie_tactic_config.min_chip_distance_from_crease_meters(),
+            goalie_tactic_config.min_chip_distance_from_crease_meters(),
         0);
     Rectangle chip_target_area =
         Rectangle(world.field().friendlyCornerPos() + offset_from_goal_line + inset,
@@ -121,7 +122,8 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
                              ballInInflatedDefenseArea(event);
 
     // goalie should only evacuate crease if there are no enemy robots nearby
-    double safe_distance_multiplier = ai_config_ptr->goalie_tactic_config().safe_distance_multiplier();
+    double safe_distance_multiplier =
+        ai_config_ptr->goalie_tactic_config().safe_distance_multiplier();
     std::optional<Robot> nearest_enemy_robot =
         event.common.world_ptr->enemyTeam().getNearestRobot(ball.position());
     bool safe_to_evacuate = true;
@@ -135,8 +137,9 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
                            goalie_distance_to_ball;
     }
 
-    double ball_velocity_threshold = ai_config_ptr->goalie_tactic_config().ball_speed_panic();
-    bool ball_is_stagnant          = ball.velocity().length() < ball_velocity_threshold;
+    double ball_velocity_threshold =
+        ai_config_ptr->goalie_tactic_config().ball_speed_panic();
+    bool ball_is_stagnant = ball.velocity().length() < ball_velocity_threshold;
 
     return ball_in_dead_zone && ball_is_stagnant && safe_to_evacuate;
 }
@@ -250,7 +253,8 @@ void GoalieFSM::updatePivotKick(
     Point chip_origin =
         Point(chip_origin_x, event.common.world_ptr->ball().position().y());
 
-    Point chip_target = findGoodChipTarget(*event.common.world_ptr, ai_config_ptr->goalie_tactic_config());
+    Point chip_target  = findGoodChipTarget(*event.common.world_ptr,
+                                            ai_config_ptr->goalie_tactic_config());
     Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSMControlParams control_params{
@@ -266,10 +270,9 @@ void GoalieFSM::updatePivotKick(
 
 void GoalieFSM::positionToBlock(const Update &event)
 {
-    Point goalie_pos =
-        getGoaliePositionToBlock(event.common.world_ptr->ball(),
-                                 event.common.world_ptr->field(),
-                                 ai_config_ptr->goalie_tactic_config());
+    Point goalie_pos = getGoaliePositionToBlock(event.common.world_ptr->ball(),
+                                                event.common.world_ptr->field(),
+                                                ai_config_ptr->goalie_tactic_config());
     Angle goalie_orientation =
         (event.common.world_ptr->ball().position() - goalie_pos).orientation();
 

@@ -40,6 +40,7 @@ class AttackerTactic : public Tactic<AttackerFSM, DribbleFSM, PivotKickFSM, Keep
     void updateControlParams(std::optional<Point> chip_target);
 
     void accept(TacticVisitor& visitor) const override;
+
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 

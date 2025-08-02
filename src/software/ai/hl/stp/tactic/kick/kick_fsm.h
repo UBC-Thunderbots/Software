@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/geom/point.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/geom/point.h"
 
 /**
  * The control parameters for updating KickFSM
@@ -29,7 +29,10 @@ struct KickFSM : TacticFSM<KickFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-     explicit KickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : TacticFSM<KickFSMControlParams>(ai_config_ptr) {}
+    explicit KickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<KickFSMControlParams>(ai_config_ptr)
+    {
+    }
 
     /**
      * Action that updates the MovePrimitive

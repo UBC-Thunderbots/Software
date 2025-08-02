@@ -41,14 +41,16 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      *  @param ai_config_ptr shared pointer to ai_config proto
      *  @param max_allowed_speed_mode The maximum allowed speed mode
      */
-     explicit GoalieFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
-                        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT)
-                        : TacticFSM<GoalieFSMControlParams>(ai_config_ptr),
-                          max_allowed_speed_mode(max_allowed_speed_mode),
-                          robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
-                                  ai_config_ptr->robot_navigation_obstacle_config().robot_obstacle_inflation_factor())
-                                {
-                                }
+    explicit GoalieFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
+                       TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                           TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT)
+        : TacticFSM<GoalieFSMControlParams>(ai_config_ptr),
+          max_allowed_speed_mode(max_allowed_speed_mode),
+          robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
+                                        ai_config_ptr->robot_navigation_obstacle_config()
+                                            .robot_obstacle_inflation_factor())
+    {
+    }
     /**
      * Gets the position for the goalie to move to, to best position itself between the
      * ball and the friendly goal
@@ -59,7 +61,8 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * @return the position that the goalie should move to
      */
     static Point getGoaliePositionToBlock(
-        const Ball &ball, const Field &field, TbotsProto::GoalieTacticConfig goalie_tactic_config);
+        const Ball &ball, const Field &field,
+        TbotsProto::GoalieTacticConfig goalie_tactic_config);
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment
