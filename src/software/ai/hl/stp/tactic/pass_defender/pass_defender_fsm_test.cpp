@@ -13,12 +13,12 @@ TEST(PassDefenderFSMTest, test_transitions)
         Point(1, 0),
     };
     ::TestUtil::setEnemyRobotPositions(world, enemy_robots, Timestamp::fromSeconds(123));
-    PassDefenderFSM::ControlParams control_params{
+    PassDefenderFSMControlParams control_params{
         .position_to_block_from = Point(-2, 0),
         .ball_steal_mode        = TbotsProto::BallStealMode::STEAL};
-    TbotsProto::AiConfig ai_config;
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM(ai_config),
-                             DribbleFSM(ai_config.dribble_tactic_config())};
+
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(std::make_shared<TbotsProto::AiConfig>()),
+                             DribbleFSM(std::make_shared<TbotsProto::AiConfig>())};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
@@ -76,13 +76,12 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
     // create the world and the robot to test at (0,0)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(0, 0));
-    PassDefenderFSM::ControlParams control_params{
+    PassDefenderFSMControlParams control_params{
         .position_to_block_from = Point(-2, 0),
         .ball_steal_mode        = TbotsProto::BallStealMode::STEAL};
-    TbotsProto::AiConfig ai_config;
 
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM(ai_config),
-                             DribbleFSM(ai_config.dribble_tactic_config())};
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(std::make_shared<TbotsProto::AiConfig>()),
+                             DribbleFSM(std::make_shared<TbotsProto::AiConfig>())};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));

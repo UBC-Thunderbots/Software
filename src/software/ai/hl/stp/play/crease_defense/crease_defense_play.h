@@ -3,14 +3,20 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play/play_base.h"
 
 /**
  * Play that set up crease defenders to defend the defense area
  */
-class CreaseDefensePlay : public Play
+class CreaseDefensePlay : public PlayBase<CreaseDefensePlayFSM>
 {
    public:
-    CreaseDefensePlay(TbotsProto::AiConfig config);
+    /**
+     * Constructor for CreaseDefensePlay
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    CreaseDefensePlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
@@ -25,8 +31,4 @@ class CreaseDefensePlay : public Play
     void updateControlParams(const Point &enemy_threat_origin,
                              TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
-   private:
-    FSM<CreaseDefensePlayFSM> fsm;
-    CreaseDefensePlayFSM::ControlParams control_params;
 };

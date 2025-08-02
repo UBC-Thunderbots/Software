@@ -6,21 +6,23 @@
 #include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 #include "software/logger/logger.h"
 
-struct HaltPlayFSM
+/**
+ * Control parameters for Halt Play
+ */
+struct HaltPlayControlParams
 {
-    struct ControlParams
-    {
-    };
-    class HaltState;
+};
 
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+struct HaltPlayFSM : PlayFSM<HaltPlayControlParams>
+{
+    class HaltState;
 
     /**
      * Creates a Halt Play FSM
      *
-     * @param ai_config the play config for this FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit HaltPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit HaltPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to make each robot stop

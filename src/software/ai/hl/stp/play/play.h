@@ -35,10 +35,11 @@ class Play
     /**
      * Creates a new Play
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
+    explicit Play(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
+                  bool requires_goalie);
 
     /**
      * Gets Primitives from the Play given the the world, and inter-play communication
@@ -59,8 +60,8 @@ class Play
      *
      * @return a map from tactic to robot id
      */
-    const std::map<std::shared_ptr<const Tactic>, RobotId>& getTacticRobotIdAssignment()
-        const;
+    const std::map<std::shared_ptr<const TacticInterface>, RobotId>&
+    getTacticRobotIdAssignment() const;
 
     virtual ~Play() = default;
 
@@ -73,12 +74,12 @@ class Play
 
    protected:
     // The Play configuration
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
 
-    std::map<std::shared_ptr<const Tactic>, RobotId> tactic_robot_id_assignment;
+    std::map<std::shared_ptr<const TacticInterface>, RobotId> tactic_robot_id_assignment;
 
     // Cached robot trajectories
     std::map<RobotId, TrajectoryPath> robot_trajectories;
@@ -110,7 +111,7 @@ class Play
      * tactic assignment
      */
     std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-               std::map<std::shared_ptr<const Tactic>, RobotId>>
+               std::map<std::shared_ptr<const TacticInterface>, RobotId>>
     assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
                   const std::vector<Robot>& robots_to_assign);
 

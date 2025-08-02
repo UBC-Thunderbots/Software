@@ -5,35 +5,37 @@
 #include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-struct PassDefenderFSM : public DefenderFSMBase
+
+/**
+ * The control parameters for updating PassDefenderFSM
+ */
+struct PassDefenderFSMControlParams
 {
+    // The location on the field to block enemy passes from
+    Point position_to_block_from;
+    // The pass defender's aggressiveness towards the ball
+    TbotsProto::BallStealMode ball_steal_mode;
+};
+
+struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMControlParams>
+{
+    using Update = TacticFSM<PassDefenderFSMControlParams>::Update;
     class BlockPassState;
     class InterceptBallState;
 
-    // This struct defines the unique control parameters that the PassDefenderFSM requires
-    // in its update
-    struct ControlParams
-    {
-        // The location on the field to block enemy passes from
-        Point position_to_block_from;
-        // The pass defender's aggressiveness towards the ball
-        TbotsProto::BallStealMode ball_steal_mode;
-    };
 
     /**
-     * Constructor for PassDefenderFSM struct
+     * Constructor for PassDefenderFSM
      *
-     * @param ai_config The ai config required
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PassDefenderFSM(const TbotsProto::AiConfig& ai_config)
-        : pass_defender_config(ai_config.pass_defender_config())
+    explicit PassDefenderFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : DefenderFSMBase(), TacticFSM<PassDefenderFSMControlParams>(ai_config_ptr)
     {
     }
-
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     // The minimum speed of the ball for it to be considered a pass
     static constexpr double MIN_PASS_SPEED = 0.5;
@@ -138,6 +140,7 @@ struct PassDefenderFSM : public DefenderFSMBase
     }
 
    private:
+    // Initialized when a pass is started and used when a pass is deflected
+    // Assumption is that a pass has to start before it can be deflected
     Angle pass_orientation;
-    TbotsProto::PassDefenderConfig pass_defender_config;
 };

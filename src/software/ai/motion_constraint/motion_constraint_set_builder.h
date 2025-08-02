@@ -17,7 +17,7 @@
  * @return set of MotionConstraints
  */
 std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
-    const GameState &game_state, const Tactic &tactic);
+    const GameState &game_state, const TacticInterface &tactic);
 
 
 

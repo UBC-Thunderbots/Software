@@ -16,6 +16,13 @@
 #include "software/logger/logger.h"
 
 /**
+ * Control Parameters for a Free Kick Play
+ */
+struct FreeKickPlayControlParams
+{
+};
+
+/**
  * This FSM implements the free kick play. The logic of this play is:
  * - One robot (the kicker) attempts to shoot first. If there is a good shot, then it
  * will shoot the ball.
@@ -25,7 +32,7 @@
  * robot furthest up the field.
  */
 
-struct FreeKickPlayFSM
+struct FreeKickPlayFSM : PlayFSM<FreeKickPlayControlParams>
 {
     class SetupPositionState;
     class ShootState;
@@ -33,18 +40,12 @@ struct FreeKickPlayFSM
     class PassState;
     class ChipState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
     /**
      * Creates a free kick play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit FreeKickPlayFSM(const TbotsProto::AiConfig& ai_config);
+    explicit FreeKickPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that sets up the robots in position to perform the free kick
@@ -263,7 +264,6 @@ struct FreeKickPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::optional<Shot> shot;
     std::shared_ptr<MoveTactic> align_to_ball_tactic;
     std::shared_ptr<KickTactic> shoot_tactic;

@@ -3,15 +3,21 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/defense/defense_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play/play_base.h"
 
 /**
  * Play that sets up defenders to block shots on net and intercept
  * passes between enemy robots
  */
-class DefensePlay : public Play
+class DefensePlay : public PlayBase<DefensePlayFSM>
 {
    public:
-    DefensePlay(const TbotsProto::AiConfig &config);
+    /**
+     * Constructor for DefensePlay
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    DefensePlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
@@ -24,8 +30,4 @@ class DefensePlay : public Play
      */
     void updateControlParams(TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
-   private:
-    FSM<DefensePlayFSM> fsm;
-    DefensePlayFSM::ControlParams control_params;
 };

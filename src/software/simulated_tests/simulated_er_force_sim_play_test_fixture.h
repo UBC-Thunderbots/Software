@@ -44,8 +44,8 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
      *
      * @throw invalid_argument if any tactic is invalid
      */
-    void setTactic(RobotId id, std::shared_ptr<Tactic> tactic);
-    void setTactic(RobotId id, std::shared_ptr<Tactic> tactic,
+    void setTactic(RobotId id, std::shared_ptr<TacticInterface> tactic);
+    void setTactic(RobotId id, std::shared_ptr<TacticInterface> tactic,
                    std::set<TbotsProto::MotionConstraint> motion_constraints);
 
     /**
