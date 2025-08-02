@@ -11,7 +11,8 @@ TEST(DribbleFSMTest, test_transitions)
     ::TestUtil::setBallPosition(world, Point(0.5, 0), Timestamp::fromSeconds(123));
     ::TestUtil::setBallVelocity(world, Vector(0, -1), Timestamp::fromSeconds(123));
 
-    FSM<DribbleFSM> fsm{DribbleFSM(std::make_shared<TbotsProto::AiConfig>())};
+    FSMLogger logger;
+    FSM<DribbleFSM> fsm{DribbleFSM(std::make_shared<TbotsProto::AiConfig>()), logger};
 
     // Start in Dribble
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::GetPossession>));
