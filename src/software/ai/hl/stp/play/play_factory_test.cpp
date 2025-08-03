@@ -7,13 +7,13 @@
 class PlayFactoryTest : public testing::Test
 {
    protected:
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 };
 
 TEST_F(PlayFactoryTest, test_shoot_or_pass_play)
 {
     TbotsProto::Play play_proto = TbotsProto::Play();
     play_proto.set_name(TbotsProto::PlayName::ShootOrPassPlay);
-    std::unique_ptr<Play> play = createPlay(play_proto, ai_config);
+    std::unique_ptr<Play> play = createPlay(play_proto, ai_config_ptr);
     EXPECT_EQ(objectTypeName(*play), "ShootOrPassPlay");
 }
