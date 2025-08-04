@@ -23,7 +23,8 @@ class CreaseDefenderTacticTest
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr = std::make_shared<TbotsProto::AiConfig>();
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr =
+        std::make_shared<TbotsProto::AiConfig>();
 };
 
 TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
