@@ -15,7 +15,7 @@
 # Overview:
 The structure of our tactics and plays has undergone a significant change. The new system presents common features of each Play/Tactic/FSM in template classes which are then passed arguments and extended. Fundamental behaviour has not changed.
 
-This documentation is written to accompany PR #3480
+This documentation is written to accompany PR #3480. Some of it is basically my ramblings from when I was trying to get everything to compile. It's documented here for future me and current you.
 # Diagrams:
 I discuss tactics in the following section, but this applies to all plays that have been converted to FSMs.
 
@@ -115,4 +115,8 @@ Sometimes you may choose to declare a variable such as ai_config_ptr and pass it
 ## Naming Convention
 Look to the other files to get a sense of what the naming is. I've taken the time to standardize the naming and definitions of constructors and so on, so it should be pretty consistent.
 
+# Other notable 'features'
 
+It's a bit tricky to keep track of every available parameter. If you are looking at a tactic or play and are confused as to where certain fields are defined (like control_params) make sure you look at the super classes (all of them).
+
+For every Play, there is a goalie tactic that is declared in `play.h`. This ended up being really important for debugging a segfault in `penalty_kick_enemy_play`, and it might help you as well.
