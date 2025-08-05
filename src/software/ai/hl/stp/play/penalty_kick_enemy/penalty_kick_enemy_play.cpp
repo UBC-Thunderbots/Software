@@ -7,6 +7,9 @@ PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<PenaltyKickEnemyPlayFSM>(ai_config_ptr, true)
 {
+    // Assign the shared pointer to goalie tactic in the Play superclass to the control params instance.
+    // This must be done after construction of every superclass, since control_params and goalie_tactic are defined in PlayBase and Play respectively.
+    control_params.goalie_tactic = goalie_tactic;
 }
 
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
