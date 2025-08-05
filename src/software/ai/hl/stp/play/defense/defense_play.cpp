@@ -32,4 +32,6 @@ void DefensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DefensePlay, std::shared_ptr<TbotsProto::AiConfig>> factory;
+static TGenericFactory<std::string, Play, DefensePlay,
+                       std::shared_ptr<TbotsProto::AiConfig>>
+    factory;

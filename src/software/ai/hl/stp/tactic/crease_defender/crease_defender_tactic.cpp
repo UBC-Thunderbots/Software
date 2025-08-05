@@ -9,8 +9,10 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-CreaseDefenderTactic::CreaseDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<CreaseDefenderFSM, DribbleFSM, MoveFSM>({RobotCapability::Move}, ai_config_ptr)
+CreaseDefenderTactic::CreaseDefenderTactic(
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<CreaseDefenderFSM, DribbleFSM, MoveFSM>({RobotCapability::Move},
+                                                     ai_config_ptr)
 {
 }
 
@@ -30,4 +32,3 @@ void CreaseDefenderTactic::updateControlParams(
     control_params.max_allowed_speed_mode    = max_allowed_speed_mode;
     control_params.ball_steal_mode           = ball_steal_mode;
 }
-

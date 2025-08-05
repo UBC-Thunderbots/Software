@@ -43,8 +43,8 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
             // The ball is not infront of the robot, or the robot is turning too fast
             // so add some additional offset to the ball destination, so we don't bump
             // into it.
-            offset_to_ball =
-                    ai_config_ptr->dribble_tactic_config().offset_to_ball_when_not_aligned_meters();
+            offset_to_ball = ai_config_ptr->dribble_tactic_config()
+                                 .offset_to_ball_when_not_aligned_meters();
         }
 
         auto point_in_front_of_ball = robotPositionToFaceBall(
@@ -63,8 +63,8 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
         // a better chance of intercepting it.
         Duration slack_time_sec =
             std::min(ball_time_to_position,
-                     Duration::fromSeconds(
-                             ai_config_ptr->dribble_tactic_config().max_ball_interception_slack_time_sec()));
+                     Duration::fromSeconds(ai_config_ptr->dribble_tactic_config()
+                                               .max_ball_interception_slack_time_sec()));
 
         if (robot_time_to_pos < (ball_time_to_position + slack_time_sec))
         {
@@ -196,19 +196,21 @@ bool DribbleFSM::dribblingDone(const Update &event)
                getFinalDribbleOrientation(event.common.world_ptr->ball().position(),
                                           event.common.robot.position(),
                                           event.control_params.final_dribble_orientation),
-               Angle::fromDegrees(
-                       ai_config_ptr->dribble_tactic_config().final_destination_close_threshold_deg())) &&
+               Angle::fromDegrees(ai_config_ptr->dribble_tactic_config()
+                                      .final_destination_close_threshold_deg())) &&
            havePossession(event) &&
-           robotStopped(event.common.robot,
-                        ai_config_ptr->dribble_tactic_config().robot_dribbling_done_speed());
+           robotStopped(
+               event.common.robot,
+               ai_config_ptr->dribble_tactic_config().robot_dribbling_done_speed());
 }
 
 bool DribbleFSM::shouldLoseBall(const Update &event)
 {
     std::optional<Segment> dribble_displacement =
         event.common.world_ptr->getDribbleDisplacement();
-    return (!event.control_params.allow_excessive_dribbling &&
-            dribble_displacement.has_value() &&
-            dribble_displacement->length() >=
-                    ai_config_ptr->dribble_tactic_config().max_continuous_dribbling_distance());
+    return (
+        !event.control_params.allow_excessive_dribbling &&
+        dribble_displacement.has_value() &&
+        dribble_displacement->length() >=
+            ai_config_ptr->dribble_tactic_config().max_continuous_dribbling_distance());
 }

@@ -16,7 +16,9 @@
 /**
  * Control Parameters for Shoot Or Pass Play
  */
- struct ShootOrPassPlayControlParams{};
+struct ShootOrPassPlayControlParams
+{
+};
 
 using Zones = std::unordered_set<EighteenZoneId>;
 

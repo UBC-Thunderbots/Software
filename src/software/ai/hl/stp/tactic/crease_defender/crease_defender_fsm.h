@@ -28,7 +28,8 @@ struct CreaseDefenderFSMControlParams
     TbotsProto::BallStealMode ball_steal_mode;
 };
 
-struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMControlParams>
+struct CreaseDefenderFSM : public DefenderFSMBase,
+                           TacticFSM<CreaseDefenderFSMControlParams>
 {
    public:
     using Update = TacticFSM<CreaseDefenderFSMControlParams>::Update;
@@ -39,10 +40,9 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSMCo
      * @param ai_config_ptr Shared pointer to ai_config
      */
     explicit CreaseDefenderFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    :   DefenderFSMBase(),
-        TacticFSM<CreaseDefenderFSMControlParams>(ai_config_ptr)
-      {
-      }
+        : DefenderFSMBase(), TacticFSM<CreaseDefenderFSMControlParams>(ai_config_ptr)
+    {
+    }
 
 
     /**

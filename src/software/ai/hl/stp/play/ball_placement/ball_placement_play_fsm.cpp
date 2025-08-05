@@ -1,7 +1,8 @@
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 
-BallPlacementPlayFSM::BallPlacementPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) :
-    PlayFSM<BallPlacementPlayControlParams>(ai_config_ptr),
+BallPlacementPlayFSM::BallPlacementPlayFSM(
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM<BallPlacementPlayControlParams>(ai_config_ptr),
       pivot_kick_tactic(std::make_shared<WallKickoffTactic>(ai_config_ptr)),
       place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config_ptr)),
       align_placement_tactic(std::make_shared<PlaceBallMoveTactic>(ai_config_ptr)),
@@ -282,8 +283,8 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
     }
 
     move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(num_move_tactics);
-    std::generate(move_tactics.begin(), move_tactics.end(),
-                  [this]() { return std::make_shared<PlaceBallMoveTactic>(this->ai_config_ptr); });
+    std::generate(move_tactics.begin(), move_tactics.end(), [this]()
+                  { return std::make_shared<PlaceBallMoveTactic>(this->ai_config_ptr); });
 
     // non goalie and non ball placing robots line up along a line just outside the
     // friendly defense area to wait for ball placement to finish

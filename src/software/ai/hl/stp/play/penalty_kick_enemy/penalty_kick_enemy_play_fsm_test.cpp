@@ -22,7 +22,8 @@ TEST(PenaltyKickEnemyPlayFSMTest, test_transitions)
         std::make_shared<GoalieTactic>(std::make_shared<TbotsProto::AiConfig>());
 
     FSMLogger logger;
-    FSM<PenaltyKickEnemyPlayFSM> fsm(PenaltyKickEnemyPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, logger);
+    FSM<PenaltyKickEnemyPlayFSM> fsm(
+            PenaltyKickEnemyPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, logger);
 
     EXPECT_TRUE(fsm.is(boost::sml::state<PenaltyKickEnemyPlayFSM::SetupPositionState>));
 

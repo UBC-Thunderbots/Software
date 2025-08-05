@@ -7,7 +7,9 @@
 #include "software/world/ball.h"
 
 AttackerTactic::AttackerTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr)
+    : Tactic<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>(
+          {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move},
+          ai_config_ptr)
 {
 }
 
@@ -16,7 +18,7 @@ void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
 {
     // Update the control parameters stored by this Tactic
     control_params.best_pass_so_far = best_pass_so_far;
-    control_params.pass_committed = pass_committed;
+    control_params.pass_committed   = pass_committed;
 }
 
 void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
@@ -31,7 +33,6 @@ void AttackerTactic::accept(TacticVisitor& visitor) const
 
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
-
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = fsmInit();
@@ -41,9 +42,10 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
         tactic_update.world_ptr->field(), tactic_update.world_ptr->friendlyTeam(),
         tactic_update.world_ptr->enemyTeam(), tactic_update.world_ptr->ball().position(),
         TeamType::ENEMY, {tactic_update.robot});
-    if (control_params.shot && control_params.shot->getOpenAngle() <
-                    Angle::fromDegrees(
-                        ai_config_ptr->attacker_tactic_config().min_open_angle_for_shot_deg()))
+    if (control_params.shot &&
+        control_params.shot->getOpenAngle() <
+            Angle::fromDegrees(
+                ai_config_ptr->attacker_tactic_config().min_open_angle_for_shot_deg()))
     {
         // reject shots that have an open angle below the minimum
         control_params.shot = std::nullopt;
@@ -56,7 +58,6 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
 void AttackerTactic::visualizeControlParams(const World& world)
 {
-
     TbotsProto::AttackerVisualization pass_visualization_msg;
 
     if (control_params.best_pass_so_far.has_value())

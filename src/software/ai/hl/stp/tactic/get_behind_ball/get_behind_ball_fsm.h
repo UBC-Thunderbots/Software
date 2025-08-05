@@ -18,7 +18,7 @@ struct GetBehindBallFSMControlParams
 
 struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
 {
-    public:
+   public:
     using Update = TacticFSM<GetBehindBallFSMControlParams>::Update;
     class GetBehindBallState;
 
@@ -28,9 +28,7 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
      * @param ai_config_ptr Shared pointer to ai_config
      */
     explicit GetBehindBallFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr)
-    {
-    };
+        : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr) {};
 
     /**
      * Action that updates the MovePrimitive

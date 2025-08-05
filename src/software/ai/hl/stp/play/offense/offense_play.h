@@ -22,5 +22,4 @@ class OffensePlay : public PlayBase<OffensePlayFSM>
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
     void updateTactics(const PlayUpdate &play_update) override;
-
 };

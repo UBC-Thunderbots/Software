@@ -11,15 +11,13 @@ TEST(AttackerFSMTest, test_transitions)
     Pass pass                    = Pass(Point(0, 0), Point(2, 0), 5);
 
     AttackerFSMControlParams control_params{.best_pass_so_far = pass,
-                                              .pass_committed   = true,
-                                              .shot             = std::nullopt,
-                                              .chip_target      = std::nullopt};
+                                            .pass_committed   = true,
+                                            .shot             = std::nullopt,
+                                            .chip_target      = std::nullopt};
 
     FSMLogger logger;
-    FSM<AttackerFSM> fsm{DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
-                         KeepAwayFSM(std::make_shared<TbotsProto::AiConfig>()),
-                         AttackerFSM(std::make_shared<TbotsProto::AiConfig>()),
-                         PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()),
+    FSM<AttackerFSM> fsm{DribbleFSM(ai_config_ptr), PivotKickFSM(ai_config_ptr),
+                         KeepAwayFSM(ai_config_ptr), AttackerFSM(ai_config_ptr),
                          logger};
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 

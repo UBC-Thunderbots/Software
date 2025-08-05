@@ -11,7 +11,9 @@
 /**
  * Control Parameters for PenaltyKickPlay
  */
-struct PenaltyKickPlayControlParams{};
+struct PenaltyKickPlayControlParams
+{
+};
 
 struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayControlParams>
 {

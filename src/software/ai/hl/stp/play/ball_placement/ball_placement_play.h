@@ -23,5 +23,4 @@ class BallPlacementPlay : public PlayBase<BallPlacementPlayFSM>
                         const WorldPtr &world_ptr) override;
     void updateTactics(const PlayUpdate &play_update) override;
     std::vector<std::string> getState() override;
-
 };

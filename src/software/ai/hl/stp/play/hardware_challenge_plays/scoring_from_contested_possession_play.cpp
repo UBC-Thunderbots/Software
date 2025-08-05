@@ -6,7 +6,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 ScoringFromContestedPossessionPlay::ScoringFromContestedPossessionPlay(
-        std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : Play(ai_config_ptr, false)
 {
 }

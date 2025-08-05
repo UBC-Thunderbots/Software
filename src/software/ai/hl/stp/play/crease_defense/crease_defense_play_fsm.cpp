@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h"
 
-CreaseDefensePlayFSM ::CreaseDefensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+CreaseDefensePlayFSM ::CreaseDefensePlayFSM(
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : PlayFSM<CreaseDefensePlayControlParams>(ai_config_ptr), crease_defenders({})
 {
 }
@@ -38,6 +39,6 @@ void CreaseDefensePlayFSM::defendDefenseArea(const Update& event)
 void CreaseDefensePlayFSM::setUpDefenders(unsigned int num_defenders)
 {
     crease_defenders = std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_defenders);
-    std::generate(crease_defenders.begin(), crease_defenders.end(),
-                  [this]() { return std::make_shared<CreaseDefenderTactic>(ai_config_ptr); });
+    std::generate(crease_defenders.begin(), crease_defenders.end(), [this]()
+                  { return std::make_shared<CreaseDefenderTactic>(ai_config_ptr); });
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mutex>
 #include <memory>
+#include <mutex>
 
 #include "proto/parameters.pb.h"
 #include "proto/play.pb.h"

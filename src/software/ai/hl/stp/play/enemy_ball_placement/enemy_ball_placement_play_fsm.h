@@ -41,13 +41,13 @@
  *        G
  *     +-----+
  */
- /**
-  * Control parameters for enemy ball placement play
-  */
+/**
+ * Control parameters for enemy ball placement play
+ */
 
- struct EnemyBallPlacementPlayControlParams
- {
- };
+struct EnemyBallPlacementPlayControlParams
+{
+};
 
 struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayControlParams>
 {
@@ -60,7 +60,8 @@ struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit EnemyBallPlacementPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit EnemyBallPlacementPlayFSM(
+        std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Guard that checks if the ball placement point exists

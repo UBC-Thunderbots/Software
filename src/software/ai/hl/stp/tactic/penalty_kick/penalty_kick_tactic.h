@@ -11,7 +11,8 @@
  * This tactic is for a robot performing a penalty kick.
  */
 
-class PenaltyKickTactic : public Tactic<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>
+class PenaltyKickTactic
+    : public Tactic<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>
 {
    public:
     /**

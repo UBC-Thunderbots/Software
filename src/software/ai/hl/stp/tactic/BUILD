@@ -37,8 +37,8 @@ cc_library(
     hdrs = [
         "tactic.h",
         "tactic_fsm.h",
-        "tactic_visitor.h",
         "tactic_interface.h",
+        "tactic_visitor.h",
     ],
     deps = [
         ":stop_primitive",

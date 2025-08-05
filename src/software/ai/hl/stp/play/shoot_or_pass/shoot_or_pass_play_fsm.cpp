@@ -3,11 +3,11 @@
 #include <Tracy.hpp>
 #include <algorithm>
 
-ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+ShootOrPassPlayFSM::ShootOrPassPlayFSM(
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : PlayFSM<ShootOrPassPlayControlParams>(ai_config_ptr),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config_ptr)),
-      receiver_tactic(
-          std::make_shared<ReceiverTactic>(ai_config_ptr)),
+      receiver_tactic(std::make_shared<ReceiverTactic>(ai_config_ptr)),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
           std::make_shared<const EighteenZonePitchDivision>(
@@ -112,9 +112,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
-    attacker_tactic = std::make_shared<AttackerTactic>(ai_config_ptr);
-    receiver_tactic =
-        std::make_shared<ReceiverTactic>(ai_config_ptr);
+    attacker_tactic              = std::make_shared<AttackerTactic>(ai_config_ptr);
+    receiver_tactic              = std::make_shared<ReceiverTactic>(ai_config_ptr);
     pass_optimization_start_time = event.common.world_ptr->getMostRecentTimestamp();
     lookForPass(event);
 }
@@ -166,8 +165,9 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
-    const auto ball_velocity  = event.common.world_ptr->ball().velocity().length();
-    const auto min_pass_speed = this->ai_config_ptr->passing_config().min_pass_speed_m_per_s();
+    const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
+    const auto min_pass_speed =
+        this->ai_config_ptr->passing_config().min_pass_speed_m_per_s();
 
     return (ball_velocity < min_pass_speed) &&
            (best_pass_and_score_so_far.rating > min_pass_score_threshold);

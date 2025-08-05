@@ -1,7 +1,8 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<ShadowEnemyFSM, MoveFSM>({RobotCapability::Move, RobotCapability::Kick}, ai_config_ptr)
+    : Tactic<ShadowEnemyFSM, MoveFSM>({RobotCapability::Move, RobotCapability::Kick},
+                                      ai_config_ptr)
 {
 }
 

@@ -13,12 +13,14 @@ namespace
 {
 std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 Pass pass({1, 1}, {0.5, 0}, 2.29);
-std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr = std::make_shared<TbotsProto::AiConfig>();
+std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr =
+    std::make_shared<TbotsProto::AiConfig>();
 
 // vector of tuples of Tactic, MotionConstraints that should be removed,
 // MotionConstraints that should be added
-std::vector<std::tuple<std::shared_ptr<TacticInterface>, std::set<TbotsProto::MotionConstraint>,
-                       std::set<TbotsProto::MotionConstraint>>>
+std::vector<
+    std::tuple<std::shared_ptr<TacticInterface>, std::set<TbotsProto::MotionConstraint>,
+               std::set<TbotsProto::MotionConstraint>>>
     test_vector = {
         std::make_tuple(std::make_shared<MoveTactic>(ai_config_ptr),
                         std::set<TbotsProto::MotionConstraint>(),
@@ -57,10 +59,9 @@ std::vector<std::tuple<std::shared_ptr<TacticInterface>, std::set<TbotsProto::Mo
                              TbotsProto::MotionConstraint::FRIENDLY_HALF,
                              TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
                         std::set<TbotsProto::MotionConstraint>()),
-        std::make_tuple(
-            std::make_shared<ReceiverTactic>(ai_config_ptr),
-            std::set<TbotsProto::MotionConstraint>(),
-            std::set<TbotsProto::MotionConstraint>()),
+        std::make_tuple(std::make_shared<ReceiverTactic>(ai_config_ptr),
+                        std::set<TbotsProto::MotionConstraint>(),
+                        std::set<TbotsProto::MotionConstraint>()),
         std::make_tuple(std::make_shared<ShadowEnemyTactic>(ai_config_ptr),
                         std::set<TbotsProto::MotionConstraint>(),
                         std::set<TbotsProto::MotionConstraint>()),
@@ -125,9 +126,9 @@ auto them_ball_placement = std::set<TbotsProto::MotionConstraint>(
 }  // namespace
 
 class CheckMotionConstraints
-    : public ::testing::TestWithParam<
-          std::tuple<std::shared_ptr<TacticInterface>, std::set<TbotsProto::MotionConstraint>,
-                     std::set<TbotsProto::MotionConstraint>>>
+    : public ::testing::TestWithParam<std::tuple<std::shared_ptr<TacticInterface>,
+                                                 std::set<TbotsProto::MotionConstraint>,
+                                                 std::set<TbotsProto::MotionConstraint>>>
 {
    public:
     std::set<TbotsProto::MotionConstraint> correct_motion_constraints;

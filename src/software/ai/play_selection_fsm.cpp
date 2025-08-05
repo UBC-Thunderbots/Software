@@ -53,7 +53,8 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
         if (current_set_play != TbotsProto::PlayName::EnemyBallPlacementPlay)
         {
             current_set_play = TbotsProto::PlayName::EnemyBallPlacementPlay;
-            event.set_current_play(std::make_unique<EnemyBallPlacementPlay>(ai_config_ptr));
+            event.set_current_play(
+                std::make_unique<EnemyBallPlacementPlay>(ai_config_ptr));
         }
     }
     else if (event.game_state.isOurKickoff())

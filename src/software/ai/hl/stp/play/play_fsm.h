@@ -51,10 +51,10 @@ struct PlayUpdate
  *
  * @tparam PFsmControlParams the control parameters for the FSM being built.
  */
-template<class PFsmControlParams>
+template <class PFsmControlParams>
 class PlayFSM
 {
-public:
+   public:
     using ControlParams = PFsmControlParams;
 
     /**
@@ -74,9 +74,12 @@ public:
         PlayUpdate common;
     };
 
-     explicit PlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr): ai_config_ptr(ai_config_ptr){}
+    explicit PlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : ai_config_ptr(ai_config_ptr)
+    {
+    }
 
-protected:
+   protected:
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 };
 /**

@@ -4,8 +4,10 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
-PassDefenderTactic::PassDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<PassDefenderFSM, DribbleFSM>({RobotCapability::Move, RobotCapability::Kick}, ai_config_ptr)
+PassDefenderTactic::PassDefenderTactic(
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Tactic<PassDefenderFSM, DribbleFSM>({RobotCapability::Move, RobotCapability::Kick},
+                                          ai_config_ptr)
 {
 }
 

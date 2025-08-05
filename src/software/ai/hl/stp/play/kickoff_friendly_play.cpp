@@ -6,7 +6,9 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : Play(ai_config_ptr, true)
+KickoffFriendlyPlay::KickoffFriendlyPlay(
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Play(ai_config_ptr, true)
 {
 }
 
@@ -69,8 +71,10 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // move tactics to use to move to positions defined above
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<PrepareKickoffMoveTactic>(ai_config_ptr), std::make_shared<MoveTactic>(ai_config_ptr),
-        std::make_shared<MoveTactic>(ai_config_ptr), std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<PrepareKickoffMoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr),
         std::make_shared<MoveTactic>(ai_config_ptr)};
 
     // specific tactics
@@ -134,5 +138,6 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffFriendlyPlay, std::shared_ptr<TbotsProto::AiConfig>>
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay,
+                       std::shared_ptr<TbotsProto::AiConfig>>
     factory;

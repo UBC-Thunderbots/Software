@@ -11,7 +11,9 @@
 /**
  * Control Parameters for Offense Play
  */
-struct OffensePlayControlParams {};
+struct OffensePlayControlParams
+{
+};
 
 struct OffensePlayFSM : PlayFSM<OffensePlayControlParams>
 {

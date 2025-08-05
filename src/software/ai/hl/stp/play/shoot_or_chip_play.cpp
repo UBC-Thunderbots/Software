@@ -14,7 +14,10 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr) : Play(ai_config_ptr, true) {}
+ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    : Play(ai_config_ptr, true)
+{
+}
 
 void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const WorldPtr &world_ptr)
@@ -35,7 +38,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
-        std::make_shared<MoveTactic>(ai_config_ptr), std::make_shared<MoveTactic>(ai_config_ptr)};
+        std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr)};
 
     // Figure out where the fallback chip target is
     // Experimentally determined to be a reasonable value
@@ -101,4 +105,6 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrChipPlay, std::shared_ptr<TbotsProto::AiConfig>> factory;
+static TGenericFactory<std::string, Play, ShootOrChipPlay,
+                       std::shared_ptr<TbotsProto::AiConfig>>
+    factory;

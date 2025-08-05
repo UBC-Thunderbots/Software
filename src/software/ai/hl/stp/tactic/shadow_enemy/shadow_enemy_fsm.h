@@ -9,7 +9,6 @@
 #include "software/logger/logger.h"
 
 
-
 /**
  * The control parameters for updating ShadowEnemyFSM
  */
@@ -23,7 +22,6 @@ struct ShadowEnemyFSMControlParams
     // Otherwise it will try to block the pass to the enemy threat.
     double shadow_distance;
 };
-
 
 struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
 {
@@ -39,7 +37,7 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit ShadowEnemyFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr)
+        : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr)
     {
     }
 

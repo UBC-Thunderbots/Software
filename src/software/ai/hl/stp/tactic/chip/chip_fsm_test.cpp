@@ -9,8 +9,8 @@ TEST(ChipFSMTest, test_transitions)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
     ChipFSMControlParams control_params{.chip_origin          = Point(-2, 1.5),
-                                          .chip_direction       = Angle::threeQuarter(),
-                                          .chip_distance_meters = 1.2};
+                                        .chip_direction       = Angle::threeQuarter(),
+                                        .chip_distance_meters = 1.2};
 
     FSMLogger logger;
     FSM<ChipFSM> fsm{ChipFSM(std::make_shared<TbotsProto::AiConfig>()),

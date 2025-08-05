@@ -37,5 +37,6 @@ void EnemyFreeKickPlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreeKickPlay, std::shared_ptr<TbotsProto::AiConfig>>
+static TGenericFactory<std::string, Play, EnemyFreeKickPlay,
+                       std::shared_ptr<TbotsProto::AiConfig>>
     factory;
