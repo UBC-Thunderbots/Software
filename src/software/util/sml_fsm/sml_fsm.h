@@ -17,16 +17,13 @@ struct FSMLogger {
     template <class SM, class TEvent>
     void log_process_event(const TEvent&)
     {
-//    printf("[%s][process_event] %s\n", sml::aux::get_type_name<SM>(), sml::aux::get_type_name<TEvent>());
-        LOG(INFO) << "Event Processed";
+        LOG(INFO) << "[%s][process_event] %s\n" << boost::sml::aux::get_type_name<SM>() << boost::sml::aux::get_type_name<TEvent>();
     }
 
     template <class SM, class TGuard, class TEvent>
     void log_guard(const TGuard&, const TEvent&, bool result)
     {
-    //        printf("[%s][guard] %s %s %s\n", sml::aux::get_type_name<SM>(), sml::aux::get_type_name<TGuard>(),
-//               sml::aux::get_type_name<TEvent>(), (result ? "[OK]" : "[Reject]"));
-    LOG(INFO) << "Guard Processed";
+    LOG(INFO) << "[%s][guard] %s %s %s\n" << boost::sml::aux::get_type_name<SM>() << boost::sml::aux::get_type_name<TGuard>()<< boost::sml::aux::get_type_name<TEvent>() << (result ? "[OK]" : "[Reject]");
 }
 
     template <class SM, class TAction, class TEvent>
@@ -34,7 +31,7 @@ struct FSMLogger {
     {
         //        printf("[%s][action] %s %s\n", sml::aux::get_type_name<SM>(), sml::aux::get_type_name<TAction>(),
         //               sml::aux::get_type_name<TEvent>());
-        LOG(INFO) << "Action Processed";
+        LOG(INFO) << "[%s][action] %s %s\n" << boost::sml::aux::get_type_name<SM>()<< boost::sml::aux::get_type_name<TAction>() << boost::sml::aux::get_type_name<TEvent>();
     }
 
 
@@ -42,7 +39,7 @@ struct FSMLogger {
     void log_state_change(const TSrcState& src, const TDstState& dst)
     {
 //        printf("[%s][transition] %s -> %s\n", sml::aux::get_type_name<SM>(), src.c_str(), dst.c_str());
-        LOG(INFO) << "State Change Processed";
+        LOG(INFO) << "[%s][transition] %s -> %s\n"<< boost::sml::aux::get_type_name<SM>()<< src.c_str()<< dst.c_str();
     }
 };
 
