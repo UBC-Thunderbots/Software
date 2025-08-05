@@ -16,8 +16,9 @@ TEST(AttackerFSMTest, test_transitions)
                                             .chip_target      = std::nullopt};
 
     FSMLogger logger;
-    FSM<AttackerFSM> fsm{DribbleFSM(ai_config_ptr), PivotKickFSM(ai_config_ptr),
-                         KeepAwayFSM(ai_config_ptr), AttackerFSM(ai_config_ptr),
+
+    FSM<AttackerFSM> fsm{DribbleFSM(std::make_shared<TbotsProto::AiConfig>()), PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()),
+                         KeepAwayFSM(std::make_shared<TbotsProto::AiConfig>()), AttackerFSM(std::make_shared<TbotsProto::AiConfig>()),
                          logger};
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
