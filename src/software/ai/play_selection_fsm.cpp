@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/play/free_kick/free_kick_play.h"
 #include "software/ai/hl/stp/play/halt_play/halt_play.h"
 #include "software/ai/hl/stp/play/kickoff_enemy_play.h"
-#include "software/ai/hl/stp/play/kickoff_friendly_play.h"
+#include "software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play.h"
 #include "software/ai/hl/stp/play/offense/offense_play.h"
 #include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
 #include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
