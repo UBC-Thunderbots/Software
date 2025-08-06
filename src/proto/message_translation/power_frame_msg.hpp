@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pb_decode.h>
-#include <pb_encode.h>
+#include "pb_decode.h"
+#include "pb_encode.h"
 
 #include <cmath>
 #include <cstdint>
@@ -10,7 +10,7 @@
 #include <vector>
 
 #ifdef PLATFORMIO_BUILD
-#include <proto/power_frame_msg.pb.h>
+#include <proto/power_frame_msg.nanopb.h>
 #else  // PLATFORMIO_BUILD
 #include "proto/power_frame_msg.pb.h"
 #include "proto/primitive.pb.h"
@@ -18,7 +18,7 @@
 #include "shared/constants.h"
 
 extern "C" {
-#include "proto/power_frame_msg.pb.h"
+#include "proto/power_frame_msg.nanopb.h"
 }
 #endif  // PLATFORMIO_BUILD
 

@@ -15,9 +15,8 @@ cc_library(
     name = "uart_framing",
     hdrs = ["uart_framing.hpp"],
     deps = [
-        "//proto:tbots_nanopb_proto",
         "//proto/message_translation:power_frame_msg",
-        "@nanopb",
+        "@nanopb//:nanopb",
     ],
 )
 

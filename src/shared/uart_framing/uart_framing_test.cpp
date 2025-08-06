@@ -1,4 +1,4 @@
-#include "shared/uart_framing/uart_framing.hpp"
+#include "uart_framing.hpp"
 
 #include <gtest/gtest.h>
 extern "C"

@@ -56,17 +56,20 @@ def _nanopb_proto_library_impl(ctx):
     all_proto_src_files = []
 
     for proto_file in all_proto_files.to_list():
+        if proto_file.basename in ("descriptor.proto", "nanopb.proto"):
+            continue
         proto_compile_args = []
         for path in all_proto_include_dirs.to_list():
             proto_compile_args += ["-I%s" % path]
-        h_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb.h"
-        c_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb.c"
-
+        target_path = proto_file.path[:-len(".proto")]
+        h_out_name = generation_folder_name + target_path + ".nanopb.h"
+        c_out_name = generation_folder_name + target_path + ".nanopb.c"
         c_out = ctx.actions.declare_file(c_out_name)
         h_out = ctx.actions.declare_file(h_out_name)
 
         proto_compile_args += ["--plugin=protoc-gen-nanopb=%s" % (ctx.executable.nanopb_generator.path)]
         proto_compile_args += ["--nanopb_out=--cpp-descriptors:%s %s" % (generated_folder_abs_path, proto_file.path)]
+        proto_compile_args += ["--nanopb_opt=--extension=.nanopb"]
 
         cmd = [ctx.executable.protoc.path] + proto_compile_args
         cmd_str = " ".join(cmd)
@@ -113,13 +116,10 @@ def _nanopb_proto_library_impl(ctx):
         nanopb_includes.extend(compilation_context.includes.to_list())
         nanopb_includes.extend(compilation_context.quote_includes.to_list())
 
-    # If no includes found, use default Nanopb path
-    if not nanopb_includes:
-        nanopb_includes = ["external/nanopb"]
-
     # Create compiler flags
     copts = ["-I{}".format(include) for include in depset(nanopb_includes).to_list()]
-    copts += ["-D PB_FIELD_32BIT"]
+    copts += ["-DPB_FIELD_32BIT=1"]
+    print([generated_folder_abs_path] + [generated_folder_abs_path + dir for dir in all_proto_include_dirs.to_list()])
 
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = "compile_nanopb_outputs",
@@ -134,8 +134,6 @@ def _nanopb_proto_library_impl(ctx):
         compilation_contexts = nanopb_compilation_contexts,
         user_compile_flags = copts,
     )
-
-    print(nanopb_linking_contexts)
 
     (linking_context, linking_outputs) = \
         cc_common.create_linking_context_from_compilation_outputs(
@@ -158,9 +156,9 @@ def _nanopb_proto_library_impl(ctx):
     for hdr_file in all_proto_hdr_files:
         dir = _PROTO_DIR.format(path = name)
         if "nanopb.pb." in hdr_file.basename:
-            dir = "bazel-out/k8-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
+            dir = "bazel-out/aarch64-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
         elif "descriptor.pb" in hdr_file.basename:
-            dir = "bazel-out/k8-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
+            dir = "bazel-out/aarch64-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
         file = ctx.actions.declare_file(
             _FILENAME.format(dirname = dir, filename = hdr_file.basename),
         )
@@ -173,9 +171,9 @@ def _nanopb_proto_library_impl(ctx):
     for src_file in all_proto_src_files:
         dir = _PROTO_DIR.format(path = name)
         if "nanopb.pb." in src_file.basename:
-            dir = "bazel-out/k8-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
+            dir = "bazel-out/aarch64-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
         elif "descriptor.pb" in src_file.basename:
-            dir = "bazel-out/k8-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
+            dir = "bazel-out/aarch64-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
         file = ctx.actions.declare_file(
             _FILENAME.format(dirname = dir, filename = src_file.basename),
         )
@@ -226,7 +224,7 @@ nanopb_proto_library = rule(
         ),
         "nanopb_libs": attr.label_list(
             providers = [CcInfo],
-            default = [Label("@nanopb//:gf")],
+            default = [Label("@nanopb//:nanopb")],
         ),
         "nanopb_generator": attr.label(
             executable = True,

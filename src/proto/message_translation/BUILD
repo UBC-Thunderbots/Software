@@ -205,7 +205,6 @@ cc_library(
     name = "power_frame_msg",
     hdrs = ["power_frame_msg.hpp"],
     deps = [
-        "//proto:tbots_cc_proto",
         "//proto:tbots_nanopb_proto",
         "//proto/primitive:primitive_msg_factory",
         "@nanopb",
