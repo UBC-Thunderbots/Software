@@ -35,9 +35,9 @@ cc_library(
 cc_library(
     name = "tactic",
     hdrs = [
+        "tactic.h",
         "tactic_base.h",
         "tactic_fsm.h",
-        "tactic.h",
         "tactic_visitor.h",
     ],
     deps = [

@@ -60,8 +60,8 @@ class Play
      *
      * @return a map from tactic to robot id
      */
-    const std::map<std::shared_ptr<const Tactic>, RobotId>&
-    getTacticRobotIdAssignment() const;
+    const std::map<std::shared_ptr<const Tactic>, RobotId>& getTacticRobotIdAssignment()
+        const;
 
     virtual ~Play() = default;
 
@@ -73,7 +73,8 @@ class Play
     virtual std::vector<std::string> getState();
 
    protected:
-    // A shared pointer to the ai configuration to configure ai behaviour, shared by all Plays, Tactics, and FSMs
+    // A shared pointer to the ai configuration to configure ai behaviour, shared by all
+    // Plays, Tactics, and FSMs
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 
     // Goalie tactic common to all plays

@@ -6,8 +6,8 @@
 
 PassDefenderTactic::PassDefenderTactic(
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticBase<PassDefenderFSM, DribbleFSM>({RobotCapability::Move, RobotCapability::Kick},
-                                              ai_config_ptr)
+    : TacticBase<PassDefenderFSM, DribbleFSM>(
+          {RobotCapability::Move, RobotCapability::Kick}, ai_config_ptr)
 {
 }
 
