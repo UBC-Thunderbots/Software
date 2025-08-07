@@ -224,8 +224,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     return primitives_to_run;
 }
 
-const std::map<std::shared_ptr<const Tactic>, RobotId> &
-Play::getTacticRobotIdAssignment() const
+const std::map<std::shared_ptr<const Tactic>, RobotId> &Play::getTacticRobotIdAssignment()
+    const
 {
     return tactic_robot_id_assignment;
 }
@@ -258,8 +258,7 @@ std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
 Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                     const std::vector<Robot> &robots_to_assign)
 {
-    std::map<std::shared_ptr<const Tactic>, RobotId>
-        current_tactic_robot_id_assignment;
+    std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
     auto remaining_robots  = robots_to_assign;
@@ -301,9 +300,9 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
     {
         for (size_t col = 0; col < num_cols; col++)
         {
-            Robot robot                             = robots_to_assign.at(row);
+            Robot robot                    = robots_to_assign.at(row);
             std::shared_ptr<Tactic> tactic = tactic_vector.at(col);
-            auto primitives                         = primitive_sets.at(col);
+            auto primitives                = primitive_sets.at(col);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
             double robot_cost_for_tactic =

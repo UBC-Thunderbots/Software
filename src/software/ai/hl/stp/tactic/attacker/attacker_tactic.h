@@ -11,7 +11,8 @@
  * Note that this tactic does not take into account the time the pass should occur at,
  * it simply tries to move to the best position to take the pass as fast as possible
  */
-class AttackerTactic : public TacticBase<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>
+class AttackerTactic
+    : public TacticBase<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>
 {
    public:
     /**

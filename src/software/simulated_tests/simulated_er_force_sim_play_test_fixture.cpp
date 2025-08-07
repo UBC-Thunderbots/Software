@@ -43,8 +43,8 @@ void SimulatedErForceSimPlayTestFixture::setAiPlay(std::unique_ptr<Play> play)
     ai.overridePlay(std::move(play));
 }
 
-void SimulatedErForceSimPlayTestFixture::setTactic(
-    RobotId id, std::shared_ptr<Tactic> tactic)
+void SimulatedErForceSimPlayTestFixture::setTactic(RobotId id,
+                                                   std::shared_ptr<Tactic> tactic)
 {
     setTactic(id, tactic, {});
 }

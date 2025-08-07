@@ -3,8 +3,8 @@
 #include <algorithm>
 
 KickTactic::KickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : TacticBase<KickFSM, GetBehindBallFSM>({RobotCapability::Kick, RobotCapability::Move},
-                                            ai_config_ptr)
+    : TacticBase<KickFSM, GetBehindBallFSM>(
+          {RobotCapability::Kick, RobotCapability::Move}, ai_config_ptr)
 {
 }
 

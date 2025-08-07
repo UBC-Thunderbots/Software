@@ -3,8 +3,8 @@
 #include <Tracy.hpp>
 
 #include "software/ai/hl/stp/tactic/primitive.h"
-#include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/world/world.h"
@@ -29,8 +29,8 @@
 /**
  * A template class to build all other Tactics out of
  *
- * @tparam TacticFsm The TacticBase FSM to base this tactic off of (e.g. AttackerTactic needs
- * AttackerFSM)
+ * @tparam TacticFsm The TacticBase FSM to base this tactic off of (e.g. AttackerTactic
+ * needs AttackerFSM)
  * @tparam TacticSubFsms the sub FSMs this tactic uses (e.g. AttackerTactic needs
  * DribbleFSM as a sub FSM)
  */
@@ -39,7 +39,8 @@ class TacticBase : public Tactic
 {
    public:
     /**
-     * Creates a new TacticBase. The TacticBase will initially have no Robot assigned to it.
+     * Creates a new TacticBase. The TacticBase will initially have no Robot assigned to
+     * it.
      *
      * @param capability_reqs_ The capability requirements for running this tactic
      */
@@ -125,7 +126,8 @@ class TacticBase : public Tactic
    protected:
     std::optional<RobotId> last_execution_robot;
 
-    // A shared pointer to the ai configuration to configure ai behaviour, shared by all Plays, Tactics, and FSMs
+    // A shared pointer to the ai configuration to configure ai behaviour, shared by all
+    // Plays, Tactics, and FSMs
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 
     // The mapping of robots to their respective FSMs.
@@ -134,7 +136,8 @@ class TacticBase : public Tactic
     // The parameters this tactic uses control its FSMs.
     TacticFsm::ControlParams control_params;
 
-    /** Function to initialize the FSM. By default initializes the template FSM and all subFSMs.
+    /** Function to initialize the FSM. By default initializes the template FSM and all
+     * subFSMs.
      *
      * @return a pointer to the created FSM.
      */
@@ -145,7 +148,6 @@ class TacticBase : public Tactic
     }
 
    private:
-
     std::shared_ptr<Primitive> primitive;
 
     /**
