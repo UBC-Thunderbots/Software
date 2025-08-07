@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h"
-#include "software/ai/hl/stp/play/play_base.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
 
 /**
  * A play for free kicks

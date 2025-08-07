@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/passing/pass.h"
 
 /**

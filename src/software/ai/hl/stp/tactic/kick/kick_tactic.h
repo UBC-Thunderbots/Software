@@ -3,7 +3,7 @@
 #include <queue>
 
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The KickTactic will move the assigned robot to the given kick origin and then

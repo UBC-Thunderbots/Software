@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic_base.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"

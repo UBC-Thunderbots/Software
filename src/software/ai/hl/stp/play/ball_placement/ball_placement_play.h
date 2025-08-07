@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_base.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
 
 /**
  * A Play that performs ball placement, i.e. placing the ball in a defined location

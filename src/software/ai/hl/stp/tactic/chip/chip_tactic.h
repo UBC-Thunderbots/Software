@@ -3,7 +3,7 @@
 #include <queue>
 
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The ChipTactic will move the assigned robot to the given chip origin and then

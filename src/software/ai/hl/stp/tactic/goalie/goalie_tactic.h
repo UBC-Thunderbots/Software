@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic

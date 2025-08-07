@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/passing/pass.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"

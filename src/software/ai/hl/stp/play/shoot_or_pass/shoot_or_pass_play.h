@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_base.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
 
 /**

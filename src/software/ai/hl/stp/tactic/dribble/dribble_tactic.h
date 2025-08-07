@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The DribbleTactic will move the robot to intercept the ball and optionally dribble it

@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_base.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
 
 /**
  * Play that set up crease defenders to defend the defense area

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/play/example/example_play_fsm.h"
-#include "software/ai/hl/stp/play/play_base.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
 
 /**
  * An example play that moves the robots in a circle around the ball
