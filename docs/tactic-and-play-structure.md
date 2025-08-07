@@ -110,7 +110,7 @@ You should always be either feeding an existing `ai_config_ptr` through to initi
 
 * If you know that the tactic/play/FSM being tested doesn't access `ai_config`, you can initialize it with `std::make_shared<TbotsProto::AiConfig>()`
 
-Sometimes you may choose to declare a variable such as ai_config_ptr and pass it to every testing function (like in `play_factory_test.cpp`). If you get a segfault from this then you probably need to initalize that variable with `std::make_shared<TbotsProto::AiConfig>()`. (If you like, you can delete the initialization in `play_factory_test.cpp` and see this for yourself).
+Sometimes you may choose to declare a variable such as ai_config_ptr and pass it to every testing function (like in `play_factory_test.cpp`). If you get a segfault from this then you probably need to initialize that variable with `std::make_shared<TbotsProto::AiConfig>()`. (If you like, you can delete the initialization in `play_factory_test.cpp` and see this for yourself).
 
 ## Naming Convention
 Look to the other files to get a sense of what the naming is. I've taken the time to standardize the naming and definitions of constructors and so on, so it should be pretty consistent.
