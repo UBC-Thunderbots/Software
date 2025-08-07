@@ -17,14 +17,14 @@ struct FSMLogger {
     template <class SM, class TEvent>
     void log_process_event(const TEvent&)
     {
-        LOG(INFO) << "[%s][process_event] %s\n" << boost::sml::aux::get_type_name<SM>() << boost::sml::aux::get_type_name<TEvent>();
+        //LOG(INFO) << "[%s][process_event] %s\n" << boost::sml::aux::get_type_name<SM>() << boost::sml::aux::get_type_name<TEvent>();
     }
 
     template <class SM, class TGuard, class TEvent>
     void log_guard(const TGuard&, const TEvent&, bool result)
     {
-    LOG(INFO) << "[%s][guard] %s %s %s\n" << boost::sml::aux::get_type_name<SM>() << boost::sml::aux::get_type_name<TGuard>()<< boost::sml::aux::get_type_name<TEvent>() << (result ? "[OK]" : "[Reject]");
-}
+        LOG(INFO) << "[%s][guard] %s %s %s\n" << boost::sml::aux::get_type_name<SM>() << boost::sml::aux::get_type_name<TGuard>()<< boost::sml::aux::get_type_name<TEvent>() << (result ? "[OK]" : "[Reject]");
+    }
 
     template <class SM, class TAction, class TEvent>
     void log_action(const TAction&, const TEvent&)
