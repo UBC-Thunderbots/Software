@@ -5,7 +5,7 @@
 #include "charger.h"
 #include "chicker.h"
 #include "geneva.h"
-#include "proto/power_frame_msg.pb.h"
+#include "proto/power_frame_msg.nanopb.h"
 
 class ControlExecutor
 {

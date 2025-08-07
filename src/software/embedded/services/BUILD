@@ -55,4 +55,5 @@ cc_binary(
         "//software/logger",
         "@trinamic",
     ],
+    copts = ["-Iexternal/nanopb+"],
 )

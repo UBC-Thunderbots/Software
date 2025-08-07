@@ -72,6 +72,7 @@ cc_library(
         "//software/util/scoped_timespec_timer",
         "@tracy",
     ],
+    copts = ["-Iexternal/nanopb+"],
 )
 
 cc_library(
@@ -103,6 +104,7 @@ cc_binary(
         ":thunderloop",
         "@boost//:program_options",
     ],
+    copts = ["-Iexternal/nanopb+"],
 )
 
 sh_binary(

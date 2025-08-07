@@ -68,7 +68,7 @@ def _nanopb_proto_library_impl(ctx):
         h_out = ctx.actions.declare_file(h_out_name)
 
         proto_compile_args += ["--plugin=protoc-gen-nanopb=%s" % (ctx.executable.nanopb_generator.path)]
-        proto_compile_args += ["--nanopb_out=--cpp-descriptors:%s %s" % (generated_folder_abs_path, proto_file.path)]
+        proto_compile_args += ["--nanopb_out=%s %s" % (generated_folder_abs_path, proto_file.path)]
         proto_compile_args += ["--nanopb_opt=--extension=.nanopb"]
 
         cmd = [ctx.executable.protoc.path] + proto_compile_args
@@ -119,7 +119,6 @@ def _nanopb_proto_library_impl(ctx):
     # Create compiler flags
     copts = ["-I{}".format(include) for include in depset(nanopb_includes).to_list()]
     copts += ["-DPB_FIELD_32BIT=1"]
-    print([generated_folder_abs_path] + [generated_folder_abs_path + dir for dir in all_proto_include_dirs.to_list()])
 
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = "compile_nanopb_outputs",
@@ -155,10 +154,6 @@ def _nanopb_proto_library_impl(ctx):
 
     for hdr_file in all_proto_hdr_files:
         dir = _PROTO_DIR.format(path = name)
-        if "nanopb.pb." in hdr_file.basename:
-            dir = "bazel-out/aarch64-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
-        elif "descriptor.pb" in hdr_file.basename:
-            dir = "bazel-out/aarch64-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
         file = ctx.actions.declare_file(
             _FILENAME.format(dirname = dir, filename = hdr_file.basename),
         )
@@ -170,10 +165,6 @@ def _nanopb_proto_library_impl(ctx):
 
     for src_file in all_proto_src_files:
         dir = _PROTO_DIR.format(path = name)
-        if "nanopb.pb." in src_file.basename:
-            dir = "bazel-out/aarch64-fastbuild/bin/external/nanopb+/_virtual_imports/nanopb_proto"
-        elif "descriptor.pb" in src_file.basename:
-            dir = "bazel-out/aarch64-fastbuild/bin/external/protobuf+/src/google/protobuf/_virtual_imports/descriptor_proto/google/protobuf"
         file = ctx.actions.declare_file(
             _FILENAME.format(dirname = dir, filename = src_file.basename),
         )
@@ -198,7 +189,6 @@ def _nanopb_proto_library_impl(ctx):
     transitive_libdeps = []
     for dep in ctx.attr.deps:
         if PlatformIOLibraryInfo in dep:
-            print(dep[PlatformIOLibraryInfo].runfiles)
             runfiles.merge_all(dep[PlatformIOLibraryInfo].runfiles)
             transitive_libdeps.extend(dep[PlatformIOLibraryInfo].transitive_libdeps)
     return [
