@@ -166,62 +166,62 @@ class TacticBase : public Tactic
 template <class TacticFsm, class... TacticSubFsms>
 bool TacticBase<TacticFsm, TacticSubFsms...>::done() const
 {
-bool is_done = false;
-if (last_execution_robot.has_value())
-{
-is_done = fsm_map.at(last_execution_robot.value())->is(boost::sml::X);
-}
-return is_done;
+    bool is_done = false;
+    if (last_execution_robot.has_value())
+    {
+        is_done = fsm_map.at(last_execution_robot.value())->is(boost::sml::X);
+    }
+    return is_done;
 }
 
 template <class TacticFsm, class... TacticSubFsms>
 std::string TacticBase<TacticFsm, TacticSubFsms...>::getFSMState() const
 {
-std::string state_str = "";
-if (last_execution_robot.has_value())
-{
-state_str =
-getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));
-}
-return state_str;
-}
-
-template <class TacticFsm, class... TacticSubFsms>
-std::map<RobotId, std::shared_ptr<Primitive>> TacticBase<TacticFsm, TacticSubFsms...>::get(const WorldPtr &world_ptr)
-{
-TbotsProto::RobotNavigationObstacleConfig obstacle_config;
-std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
-
-{
-ZoneNamedN(_tracy_tactic_set_primitive,
-"Tactic: Get primitives for each robot", true);
-
-for (const auto &robot : world_ptr->friendlyTeam().getAllRobots())
-{
-updatePrimitive(
-        TacticUpdate(robot, world_ptr,
-                     [this](std::shared_ptr<Primitive> new_primitive)
-                     { primitive = std::move(new_primitive); }),
-!last_execution_robot.has_value() ||
-last_execution_robot.value() != robot.id());
-
-CHECK(primitive != nullptr)
-<< "Primitive for " << objectTypeName(*this) << " in state "
-<< getFSMState() << " was not set" << std::endl;
-primitives_map[robot.id()] = std::move(primitive);
-}
-}
-
-return primitives_map;
+    std::string state_str = "";
+    if (last_execution_robot.has_value())
+    {
+        state_str = getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));
+    }
+    return state_str;
 }
 
 template <class TacticFsm, class... TacticSubFsms>
-void TacticBase<TacticFsm, TacticSubFsms...>::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+std::map<RobotId, std::shared_ptr<Primitive>>
+TacticBase<TacticFsm, TacticSubFsms...>::get(const WorldPtr &world_ptr)
 {
-if (reset_fsm)
-{
-fsm_map[tactic_update.robot.id()] = fsmInit();
+    TbotsProto::RobotNavigationObstacleConfig obstacle_config;
+    std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
+
+    {
+        ZoneNamedN(_tracy_tactic_set_primitive, "Tactic: Get primitives for each robot",
+                   true);
+
+        for (const auto &robot : world_ptr->friendlyTeam().getAllRobots())
+        {
+            updatePrimitive(TacticUpdate(robot, world_ptr,
+                                         [this](std::shared_ptr<Primitive> new_primitive)
+                                         { primitive = std::move(new_primitive); }),
+                            !last_execution_robot.has_value() ||
+                                last_execution_robot.value() != robot.id());
+
+            CHECK(primitive != nullptr)
+                << "Primitive for " << objectTypeName(*this) << " in state "
+                << getFSMState() << " was not set" << std::endl;
+            primitives_map[robot.id()] = std::move(primitive);
+        }
+    }
+
+    return primitives_map;
 }
-fsm_map.at(tactic_update.robot.id())
-->process_event(typename TacticFsm::Update(control_params, tactic_update));
+
+template <class TacticFsm, class... TacticSubFsms>
+void TacticBase<TacticFsm, TacticSubFsms...>::updatePrimitive(
+    const TacticUpdate &tactic_update, bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = fsmInit();
+    }
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(typename TacticFsm::Update(control_params, tactic_update));
 }
