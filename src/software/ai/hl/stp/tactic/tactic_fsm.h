@@ -63,9 +63,7 @@ class TacticFSM
     }
 
    protected:
-    // Former constructors took what they needed from ai_config and stored it locally.
-    // Now, we store ai_config as a pointer and use it to update as needed.
-    // This ensures that everything gets the update as needed.
+    // A shared pointer to the ai configuration to configure ai behaviour, shared by all Plays, Tactics, and FSMs
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 };
 

@@ -3,14 +3,14 @@
 #include <queue>
 
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 
 /**
  * The KickTactic will move the assigned robot to the given kick origin and then
  * kick the ball to the kick target.
  */
 
-class KickTactic : public Tactic<KickFSM, GetBehindBallFSM>
+class KickTactic : public TacticBase<KickFSM, GetBehindBallFSM>
 {
    public:
     /**

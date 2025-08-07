@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 #include "software/geom/point.h"
 
 /**

@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 #include "software/logger/logger.h"
 
 
@@ -12,7 +12,7 @@
  */
 
 class PenaltyKickTactic
-    : public Tactic<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>
+    : public TacticBase<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>
 {
    public:
     /**

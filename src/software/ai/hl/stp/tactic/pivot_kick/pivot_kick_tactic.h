@@ -3,10 +3,10 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 #include "software/geom/segment.h"
 
-class PivotKickTactic : public Tactic<PivotKickFSM, DribbleFSM>
+class PivotKickTactic : public TacticBase<PivotKickFSM, DribbleFSM>
 {
    public:
     /**

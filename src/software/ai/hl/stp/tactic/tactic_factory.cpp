@@ -37,7 +37,7 @@ std::shared_ptr<TacticInterface> createTactic(
         }
     }
     LOG(FATAL) << "Tactic not set";
-    return std::shared_ptr<TacticInterface>();
+    return std::shared_ptr<Tactic>();
 }
 
 std::shared_ptr<TacticInterface> createTactic(

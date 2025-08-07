@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 
 /**
  * The DribbleTactic will move the robot to intercept the ball and optionally dribble it
@@ -11,7 +11,7 @@
  * Done: When the ball is near the dribbler of the robot and the optional dribble
  * destination and face ball orientation conditions are satisfied
  */
-class DribbleTactic : public Tactic<DribbleFSM>
+class DribbleTactic : public TacticBase<DribbleFSM>
 {
    public:
     /**

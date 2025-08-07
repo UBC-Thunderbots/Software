@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 #include "software/geom/point.h"
 
 /**
@@ -11,7 +11,7 @@
  * an active enemy pass is directed towards the defender.
  *
  */
-class PassDefenderTactic : public Tactic<PassDefenderFSM, DribbleFSM>
+class PassDefenderTactic : public TacticBase<PassDefenderFSM, DribbleFSM>
 {
    public:
     /**

@@ -3,14 +3,14 @@
 #include <queue>
 
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 
 /**
  * The ChipTactic will move the assigned robot to the given chip origin and then
  * chip the ball to the chip target.
  */
 
-class ChipTactic : public Tactic<ChipFSM, GetBehindBallFSM>
+class ChipTactic : public TacticBase<ChipFSM, GetBehindBallFSM>
 {
    public:
     /**

@@ -3,7 +3,7 @@
 #include <algorithm>
 
 MoveTactic::MoveTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<MoveFSM>({RobotCapability::Move}, ai_config_ptr)
+    : TacticBase<MoveFSM>({RobotCapability::Move}, ai_config_ptr)
 {
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 #include "software/ai/passing/pass.h"
 
 /**
@@ -11,7 +11,7 @@
  * Note that this tactic does not take into account the time the pass should occur at,
  * it simply tries to move to the best position to take the pass as fast as possible
  */
-class AttackerTactic : public Tactic<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>
+class AttackerTactic : public TacticBase<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>
 {
    public:
     /**

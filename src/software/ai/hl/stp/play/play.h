@@ -6,7 +6,7 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
@@ -60,7 +60,7 @@ class Play
      *
      * @return a map from tactic to robot id
      */
-    const std::map<std::shared_ptr<const TacticInterface>, RobotId>&
+    const std::map<std::shared_ptr<const Tactic>, RobotId>&
     getTacticRobotIdAssignment() const;
 
     virtual ~Play() = default;
@@ -73,13 +73,13 @@ class Play
     virtual std::vector<std::string> getState();
 
    protected:
-    // The Play configuration
+    // A shared pointer to the ai configuration to configure ai behaviour, shared by all Plays, Tactics, and FSMs
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
 
-    std::map<std::shared_ptr<const TacticInterface>, RobotId> tactic_robot_id_assignment;
+    std::map<std::shared_ptr<const Tactic>, RobotId> tactic_robot_id_assignment;
 
     // Cached robot trajectories
     std::map<RobotId, TrajectoryPath> robot_trajectories;
@@ -111,7 +111,7 @@ class Play
      * tactic assignment
      */
     std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-               std::map<std::shared_ptr<const TacticInterface>, RobotId>>
+               std::map<std::shared_ptr<const Tactic>, RobotId>>
     assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
                   const std::vector<Robot>& robots_to_assign);
 

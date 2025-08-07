@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.h"
 #include "software/geom/point.h"
 
 /**
