@@ -4,7 +4,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::Tactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -40,7 +40,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return std::shared_ptr<Tactic>();
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::AttackerTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -59,7 +59,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::ChipTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -70,7 +70,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::CreaseDefenderTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -84,7 +84,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::DribbleTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -105,7 +105,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::GetBehindBallTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -115,7 +115,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::GoalieTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -124,7 +124,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::KickTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -135,7 +135,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::MoveGoalieToGoalLineTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -143,7 +143,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::MoveTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -157,7 +157,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::PassDefenderTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -167,7 +167,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::PenaltyKickTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -175,7 +175,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::PivotKickTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -186,7 +186,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::ReceiverTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -201,7 +201,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::ShadowEnemyTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
@@ -216,7 +216,7 @@ std::shared_ptr<TacticInterface> createTactic(
     return tactic;
 }
 
-std::shared_ptr<TacticInterface> createTactic(
+std::shared_ptr<Tactic> createTactic(
     const TbotsProto::HaltTactic &tactic_proto,
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
 {
