@@ -21,11 +21,6 @@ DISCONNECTED = "DISCONNECTED"
 
 logger = create_logger(name=__name__, log_level=logging.DEBUG)
 
-with open("robot_ip_config.yml", "r") as file:
-    robot_ip = list(yaml.safe_load(file).get("ip", {}).values())[
-        :MAX_ROBOT_IDS_PER_SIDE
-    ]
-
 
 class WifiCommunicationManager:
     """Manages WiFi communication between different modules of the system."""
@@ -40,6 +35,7 @@ class WifiCommunicationManager:
         should_setup_full_system: bool = False,
         interface: str | None = None,
         referee_port: int = SSL_REFEREE_PORT,
+        config_file: config_file
     ):
         """Sets up WiFi communication between this computer and the robots, SSL Vision, and SSL Referee
 
@@ -48,15 +44,21 @@ class WifiCommunicationManager:
         :param interface: The interface to use for communication with the robots
         :param referee_port: the referee port that we are using. If this is None, the default port is used
         """
+
+        ## Robot IP File Open ##
+        with open(config_file, 'r') as file:
+            robot_ip = list(yaml.safe_load(file).get('ip', {}).values())[:MAX_ROBOT_IDS_PER_SIDE]
+        
         ## Robot IP address tracking ##
         self.robot_ip_addresses: list[tuple[Lock, str | None]] = [
-            (Lock(), None) for ip in robot_ip
+            (Lock(), robot_ip.get(id, None)) for id in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
 
         ## Senders and listeners ##
         self.primitive_senders: list[tuple[Lock, tbots_cpp.PrimitiveSender | None]] = [
-            (Lock(), None) for ip in robot_ip
+            (Lock(), None) for id in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
+
         self.receive_robot_status: tbots_cpp.RobotStatusProtolistener | None = None
         self.receive_robot_log: tbots_cpp.RobotLogProtolistener | None = None
         self.receive_robot_crash: tbots_cpp.RobotCrashProtolistener | None = None

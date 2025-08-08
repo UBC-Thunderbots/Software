@@ -228,6 +228,13 @@ if __name__ == "__main__":
         default=False,
         help="whether or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
     )
+    parser.add_argument(
+        "--wifi_config"
+        action="store",
+        help="File path to configure robot ID and corresponding IPs",
+        default=None,
+        type=os.path.abspath,
+    )
 
     args = parser.parse_args()
 
@@ -339,6 +346,7 @@ if __name__ == "__main__":
             referee_port=gamecontroller.get_referee_port()
             if gamecontroller
             else SSL_REFEREE_PORT,
+            config_file = args.wifi_config,
         ) as wifi_communication_manager, RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
             communication_manager=wifi_communication_manager,
