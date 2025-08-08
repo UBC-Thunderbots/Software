@@ -4,8 +4,8 @@
 
 
 ChipTactic::ChipTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<ChipFSM, GetBehindBallFSM>({RobotCapability::Chip, RobotCapability::Move},
-                                        ai_config_ptr)
+    : TacticBase<ChipFSM, GetBehindBallFSM>(
+          {RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr)
 {
 }
 

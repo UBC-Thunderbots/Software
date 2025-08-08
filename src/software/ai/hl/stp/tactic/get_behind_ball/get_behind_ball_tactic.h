@@ -1,13 +1,13 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The GetBehindBallTactic will move the assigned robot to the given destination and
  * arrive with the specified final orientation and speed
  */
-class GetBehindBallTactic : public Tactic<GetBehindBallFSM>
+class GetBehindBallTactic : public TacticBase<GetBehindBallFSM>
 {
    public:
     /**

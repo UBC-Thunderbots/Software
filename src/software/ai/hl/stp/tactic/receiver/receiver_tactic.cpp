@@ -7,7 +7,7 @@
 #include "software/logger/logger.h"
 
 ReceiverTactic::ReceiverTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<ReceiverFSM>({RobotCapability::Move}, ai_config_ptr)
+    : TacticBase<ReceiverFSM>({RobotCapability::Move}, ai_config_ptr)
 {
 }
 

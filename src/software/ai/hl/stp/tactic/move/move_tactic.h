@@ -1,13 +1,13 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The MoveTactic will move the assigned robot to the given destination and arrive
  * with the specified final orientation and speed
  */
-class MoveTactic : public Tactic<MoveFSM>
+class MoveTactic : public TacticBase<MoveFSM>
 {
    public:
     /**

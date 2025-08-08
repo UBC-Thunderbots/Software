@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/enemy_free_kick/enemy_free_kick_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_base.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
 
 /**
  * Play for defending against enemy free kicks, attempting to block the kicker, while also

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
@@ -14,7 +14,7 @@
  * distance either way to intercept a potential straight shot into the net.
  *
  */
-class GoalieTactic : public Tactic<GoalieFSM, PivotKickFSM, DribbleFSM>
+class GoalieTactic : public TacticBase<GoalieFSM, PivotKickFSM, DribbleFSM>
 {
    public:
     /**

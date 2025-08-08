@@ -4,7 +4,7 @@
 #include "software/ai/motion_constraint/motion_constraint_visitor.h"
 
 std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
-    const GameState &game_state, const TacticInterface &tactic)
+    const GameState &game_state, const Tactic &tactic)
 {
     MotionConstraintVisitor motion_constraint_visitor;
 

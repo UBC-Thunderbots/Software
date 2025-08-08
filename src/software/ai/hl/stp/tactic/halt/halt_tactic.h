@@ -1,13 +1,13 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/halt/halt_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The HaltTactic will stop the robot from moving. The robot will actively try and brake
  * to come to a halt.
  */
-class HaltTactic : public Tactic<HaltFSM>
+class HaltTactic : public TacticBase<HaltFSM>
 {
    public:
     /**

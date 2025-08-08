@@ -7,7 +7,7 @@
 #include "software/world/ball.h"
 
 AttackerTactic::AttackerTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>(
+    : TacticBase<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>(
           {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move},
           ai_config_ptr)
 {

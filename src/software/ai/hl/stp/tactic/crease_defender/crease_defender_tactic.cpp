@@ -11,8 +11,8 @@
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-    : Tactic<CreaseDefenderFSM, DribbleFSM, MoveFSM>({RobotCapability::Move},
-                                                     ai_config_ptr)
+    : TacticBase<CreaseDefenderFSM, DribbleFSM, MoveFSM>({RobotCapability::Move},
+                                                         ai_config_ptr)
 {
 }
 
