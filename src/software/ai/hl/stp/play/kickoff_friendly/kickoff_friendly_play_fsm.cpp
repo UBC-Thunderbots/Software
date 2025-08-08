@@ -109,18 +109,39 @@ void KickoffFriendlyPlayFSM::shootBall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
+/*TODO change chip ball to use location generated from find open circle, pick the biggest circle [0] and get the center.
+ * That will be the chip target. Good luck.
+ *
+ *
+ */
 void KickoffFriendlyPlayFSM::chipBall(const Update &event)
 {
     WorldPtr world_ptr = event.common.world_ptr;
 
     PriorityTacticVector tactics_to_run = {{}};
 
+    // sort targets by distance to enemy goal center.
+    std::vector<Circle> potential_chip_targets = findGoodChipTargets(*world_ptr);
+    std::sort(potential_chip_targets.begin(), potential_chip_targets.end(),
+            [world_ptr](const Circle& first_circle, const Circle& second_circle) {
+
+                return distance(world_ptr->field().enemyGoalCenter(), first_circle.origin()) <
+                        distance(world_ptr->field().enemyGoalCenter(), second_circle.origin());
+            });
+
     // TODO (#2612): This needs to be adjusted post field testing, ball needs to land
-    // exactly in the middle of the enemy field
+    // exactly in the middle of the enemy field (as a default)
+    Point target = world_ptr->field().centerPoint() + Vector(world_ptr->field().xLength() / 6, 0);
+
+    if (!potential_chip_targets.empty())
+    {
+        target = potential_chip_targets[0].origin();
+    }
+
     kickoff_chip_tactic->updateControlParams(
             world_ptr->ball().position(),
-            world_ptr->field().centerPoint() +
-            Vector(world_ptr->field().xLength() / 6, 0));
+            target
+    );
 
     tactics_to_run[0].emplace_back(kickoff_chip_tactic);
 
