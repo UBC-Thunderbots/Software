@@ -143,8 +143,10 @@ class TacticBase : public Tactic
      */
     virtual std::unique_ptr<FSM<TacticFsm>> fsmInit()
     {
+        FSMLogger logger;
         return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr),
-                                                TacticSubFsms(ai_config_ptr)...);
+                                                TacticSubFsms(ai_config_ptr)...,
+                                                logger);
     }
 
    private:
