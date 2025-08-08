@@ -125,9 +125,9 @@ auto them_ball_placement = std::set<TbotsProto::MotionConstraint>(
 }  // namespace
 
 class CheckMotionConstraints
-    : public ::testing::TestWithParam<std::tuple<std::shared_ptr<Tactic>,
-                                                 std::set<TbotsProto::MotionConstraint>,
-                                                 std::set<TbotsProto::MotionConstraint>>>
+    : public ::testing::TestWithParam<
+          std::tuple<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConstraint>,
+                     std::set<TbotsProto::MotionConstraint>>>
 {
    public:
     std::set<TbotsProto::MotionConstraint> correct_motion_constraints;
