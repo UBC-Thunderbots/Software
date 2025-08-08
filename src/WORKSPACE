@@ -439,3 +439,10 @@ new_local_repository(
     build_file = "@//extlibs:py_cc_toolchain.BUILD",
     path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
 )
+
+git_repository(
+    name = "bazel_embedded",
+    commit = "cf5b240d510313b3383e0cdb550eb9f32be7244e",
+    remote = "https://github.com/bazelembedded/bazel-embedded.git",
+    shallow_since = "1685643269 +0000",
+)
