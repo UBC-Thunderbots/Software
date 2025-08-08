@@ -8,11 +8,19 @@
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 
+/**
+ *  The control parameters for a ball placement play
+ */
+struct BallPlacementPlayControlParams
+{
+};
 
 using Zones = std::unordered_set<EighteenZoneId>;
 
-struct BallPlacementPlayFSM
+struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayControlParams>
 {
+    using Update = PlayFSM<BallPlacementPlayControlParams>::Update;
+
     class StartState;
     class KickOffWallState;
     class AlignPlacementState;
@@ -20,18 +28,13 @@ struct BallPlacementPlayFSM
     class WaitState;
     class RetreatState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Creates a ball placement play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit BallPlacementPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that has the placing robot kick the ball off the wall to give more space to
@@ -188,7 +191,6 @@ struct BallPlacementPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<WallKickoffTactic> pivot_kick_tactic;
     std::shared_ptr<PlaceBallTactic> place_ball_tactic;
     std::shared_ptr<MoveTactic> align_placement_tactic;

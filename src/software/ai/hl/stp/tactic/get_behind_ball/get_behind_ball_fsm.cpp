@@ -4,7 +4,6 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
 
-GetBehindBallFSM::GetBehindBallFSM() {}
 
 void GetBehindBallFSM::updateMove(const Update& event)
 {

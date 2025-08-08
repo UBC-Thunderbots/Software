@@ -33,7 +33,7 @@ TEST_P(KickTacticTest, kick_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<KickTactic>();
+    auto tactic = std::make_shared<KickTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
                                 5);
     setTactic(1, tactic);

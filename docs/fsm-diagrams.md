@@ -25,7 +25,7 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [BallPlacementPlayFSM](/src/software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h)
+## [BallPlacementPlayControlParams](/src/software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h)
 
 ```mermaid
 
@@ -50,7 +50,7 @@ RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
 
 ```
 
-## [CreaseDefensePlayFSM](/src/software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h)
+## [CreaseDefensePlayControlParams](/src/software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h)
 
 ```mermaid
 
@@ -79,7 +79,7 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [EnemyBallPlacementPlayFSM](/src/software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h)
+## [EnemyBallPlacementPlayControlParams](/src/software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h)
 
 ```mermaid
 
@@ -109,7 +109,7 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [ExamplePlayFSM](/src/software/ai/hl/stp/play/example/example_play_fsm.h)
+## [ExamplePlayControlParams](/src/software/ai/hl/stp/play/example/example_play_fsm.h)
 
 ```mermaid
 
@@ -122,7 +122,7 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [FreeKickPlayFSM](/src/software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h)
+## [FreeKickPlayControlParams](/src/software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h)
 
 ```mermaid
 
@@ -146,7 +146,7 @@ ChipState --> Terminate:::terminate : [chipDone]
 
 ```
 
-## [HaltPlayFSM](/src/software/ai/hl/stp/play/halt_play/halt_play_fsm.h)
+## [HaltPlayControlParams](/src/software/ai/hl/stp/play/halt_play/halt_play_fsm.h)
 
 ```mermaid
 
@@ -159,7 +159,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>updateStop</i>
 
 ```
 
-## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
+## [OffensePlayControlParams](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
 
 ```mermaid
 
@@ -175,7 +175,7 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [PenaltyKickPlayFSM](/src/software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h)
+## [PenaltyKickPlayControlParams](/src/software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h)
 
 ```mermaid
 
@@ -191,7 +191,7 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [PenaltyKickEnemyPlayFSM](/src/software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_fsm.h)
+## [PenaltyKickEnemyPlayControlParams](/src/software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_fsm.h)
 
 ```mermaid
 
@@ -206,7 +206,7 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [ShootOrPassPlayFSM](/src/software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h)
+## [ShootOrPassPlayControlParams](/src/software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h)
 
 ```mermaid
 
@@ -225,7 +225,7 @@ Terminate:::terminate --> AttemptShotState : <i>startLookingForPass</i>
 
 ```
 
-## [AttackerFSM](/src/software/ai/hl/stp/tactic/attacker/attacker_fsm.h)
+## [AttackerFSMControlParams](/src/software/ai/hl/stp/tactic/attacker/attacker_fsm.h)
 
 ```mermaid
 
@@ -244,7 +244,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [ChipFSM](/src/software/ai/hl/stp/tactic/chip/chip_fsm.h)
+## [ChipFSMControlParams](/src/software/ai/hl/stp/tactic/chip/chip_fsm.h)
 
 ```mermaid
 
@@ -261,7 +261,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [CreaseDefenderFSM](/src/software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h)
+## [CreaseDefenderFSMControlParams](/src/software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h)
 
 ```mermaid
 
@@ -279,7 +279,7 @@ Terminate:::terminate --> MoveFSM : <i>blockThreat</i>
 
 ```
 
-## [DribbleFSM](/src/software/ai/hl/stp/tactic/dribble/dribble_fsm.h)
+## [DribbleFSMControlParams](/src/software/ai/hl/stp/tactic/dribble/dribble_fsm.h)
 
 ```mermaid
 
@@ -301,7 +301,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>dribble</i>
 
 ```
 
-## [GetBehindBallFSM](/src/software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h)
+## [GetBehindBallFSMControlParams](/src/software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h)
 
 ```mermaid
 
@@ -316,7 +316,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [GoalieFSM](/src/software/ai/hl/stp/tactic/goalie/goalie_fsm.h)
+## [GoalieFSMControlParams](/src/software/ai/hl/stp/tactic/goalie/goalie_fsm.h)
 
 ```mermaid
 
@@ -346,7 +346,7 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [HaltFSM](/src/software/ai/hl/stp/tactic/halt/halt_fsm.h)
+## [HaltFSMControlParams](/src/software/ai/hl/stp/tactic/halt/halt_fsm.h)
 
 ```mermaid
 
@@ -361,7 +361,7 @@ Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 
 ```
 
-## [KeepAwayFSM](/src/software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h)
+## [KeepAwayFSMControlParams](/src/software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h)
 
 ```mermaid
 
@@ -375,7 +375,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [KickFSM](/src/software/ai/hl/stp/tactic/kick/kick_fsm.h)
+## [KickFSMControlParams](/src/software/ai/hl/stp/tactic/kick/kick_fsm.h)
 
 ```mermaid
 
@@ -392,7 +392,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [MoveFSM](/src/software/ai/hl/stp/tactic/move/move_fsm.h)
+## [MoveFSMControlParams](/src/software/ai/hl/stp/tactic/move/move_fsm.h)
 
 ```mermaid
 
@@ -407,7 +407,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>updateMove</i>
 
 ```
 
-## [PassDefenderFSM](/src/software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h)
+## [PassDefenderFSMControlParams](/src/software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h)
 
 ```mermaid
 
@@ -426,7 +426,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [PenaltyKickFSM](/src/software/ai/hl/stp/tactic/penalty_kick/penalty_kick_fsm.h)
+## [PenaltyKickFSMControlParams](/src/software/ai/hl/stp/tactic/penalty_kick/penalty_kick_fsm.h)
 
 ```mermaid
 
@@ -444,7 +444,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [PivotKickFSM](/src/software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h)
+## [PivotKickFSMControlParams](/src/software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h)
 
 ```mermaid
 
@@ -461,7 +461,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [ReceiverFSM](/src/software/ai/hl/stp/tactic/receiver/receiver_fsm.h)
+## [ReceiverFSMControlParams](/src/software/ai/hl/stp/tactic/receiver/receiver_fsm.h)
 
 ```mermaid
 
@@ -481,7 +481,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [ShadowEnemyFSM](/src/software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h)
+## [ShadowEnemyFSMControlParams](/src/software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h)
 
 ```mermaid
 
