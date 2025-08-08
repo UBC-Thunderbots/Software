@@ -21,22 +21,60 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
 {
 }
 
+bool PrimitiveExecutor::isLateralTrajectoryNew(const std::optional<TrajectoryPath>& new_trajectory)
+{
+    if (new_trajectory.has_value() != trajectory_path_.has_value())
+    {
+        // Either we don't have a trajectory right now, and this one does, or we have one and this trajectory doesn't.
+        return true;
+    }
+    if (!new_trajectory.has_value())
+    {
+        return false;
+    }
+    return distance(new_trajectory->getDestination(), trajectory_path_->getDestination()) > LATERAL_DESTINATION_THRESHOLD_METERS;
+}
+
+bool PrimitiveExecutor::isAngularTrajectoryNew(const std::optional<BangBangTrajectory1DAngular>& new_trajectory)
+{
+    if (new_trajectory.has_value() != trajectory_path_.has_value())
+    {
+        // Either we don't have a trajectory right now, and this one does, or we have one and this trajectory doesn't.
+        return true;
+    }
+    if (!new_trajectory.has_value())
+    {
+        return false;
+    }
+    return new_trajectory->getDestination().minDiff(angular_trajectory_->getDestination()).toDegrees() > ANGULAR_DESTINATION_THRESHOLD_DEGREES;
+}
+
 void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_msg)
 {
     current_primitive_ = primitive_msg;
 
+
     if (current_primitive_.has_move())
     {
-        trajectory_path_ =
-            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
+        const std::optional new_trajectory_path = createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
                                            position_, velocity_, robot_constants_);
+        // Check if this new trajectory is "new". That is, if its destination differs meaningfully from our current
+        // trajectory.
+        if (isLateralTrajectoryNew(new_trajectory_path))
+        {
+            trajectory_path_ = new_trajectory_path;
+            time_since_linear_trajectory_creation_  = Duration::fromSeconds(RTT_S);
+        }
 
-        angular_trajectory_ = createAngularTrajectoryFromParams(
+        const std::optional new_angular_trajectory = createAngularTrajectoryFromParams(
             current_primitive_.move().w_traj_params(), orientation_, angular_velocity_,
             robot_constants_);
 
-        time_since_linear_trajectory_creation_  = Duration::fromSeconds(RTT_S);
-        time_since_angular_trajectory_creation_ = Duration::fromSeconds(RTT_S);
+        if (isAngularTrajectoryNew(new_angular_trajectory))
+        {
+            angular_trajectory_ = new_angular_trajectory;
+            time_since_angular_trajectory_creation_ = Duration::fromSeconds(RTT_S);
+        }
     }
 }
 
@@ -48,6 +86,22 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
     // velocity_         = velocity;
     orientation_      = orientation;
     // angular_velocity_ = angular_velocity;
+    // If we are lagging behind trajectory too much, we have stalled! We need to regenerate trajectory.
+    // TODO: Add a timeout to following error
+    double lateral_following_error = (position_ - trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds())).length();
+    if (lateral_following_error > LATERAL_STALL_ERROR_MAX_METERS)
+    {
+        // regenerate lateral trajectory
+        trajectory_path_ = createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(), position_, velocity_, robot_constants_);
+
+    }
+    double angular_following_error = angular_trajectory_->getPosition(time_since_angular_trajectory_creation_.toSeconds()).minDiff(orientation_).toDegrees();
+    if (angular_following_error > ANGULAR_STALL_ERROR_MAX_DEGREES)
+    {
+        // regenerate angular trajectory
+        angular_trajectory_ = createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(), orientation_, angular_velocity_, robot_constants_);
+    }
+
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()
