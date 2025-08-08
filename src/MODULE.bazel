@@ -111,7 +111,7 @@ http_archive(
     url = "https://github.com/cylix/tacopie/archive/master.zip",
 )
 
-# Used for on-robot value storage - deprecation soon
+# TODO(#3315): Used for on-robot value storage - deprecation soon
 http_archive(
     name = "cpp_redis",
     sha256 = "12a6fc86ba4ca3d4537a3eee82c094f385b8e03e283c664c976f16d421f17f7d",
@@ -241,17 +241,6 @@ new_git_repository(
 ##############################################
 # Register our Toolchains
 ##############################################
-#register_toolchains("@toolchains_protoc_hub//:all")
-
-# NB: the `:all` here is critical, because `proto_lang_toolchain` expands into two targets:
-# - proto_lang_toolchain rule [name]
-# - toolchain rule [name]_toolchain
-# and the second one is valid for registration.
-# Attempting to register a proto_lang_toolchain rule as a toolchain gives a baffling error like
-# Misconfigured toolchains: //tools:protoc_java_toolchain is declared as a toolchain but has inappropriate dependencies.
-# Declared toolchains should be created with the 'toolchain' rule and should not have dependencies that themselves require toolchains.
-#register_toolchains("//toolchains/proto:all")
-
 register_toolchains("//toolchains/python:py_toolchain")
 
 register_toolchains(
