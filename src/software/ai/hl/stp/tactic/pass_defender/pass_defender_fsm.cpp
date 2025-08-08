@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
@@ -69,6 +70,30 @@ void PassDefenderFSM::interceptBall(const Update& event)
             // that the defender can move to and intercept the pass
             intercept_position = closestPoint(
                 robot_position, Line(ball.position(), ball.position() + ball.velocity()));
+
+            // Here we are using v_f^2=v_0^2+2*a*d to calculate the final
+            // speed and after that the average speed
+            double ball_vel = (event.common.world_ptr->ball().velocity().length());
+            double ball_dis =
+                (event.common.world_ptr->ball().position() - intercept_position).length();
+            double final_vel =
+                sqrt(ball_vel * ball_vel +
+                     2 * ball_dis *
+                         BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED);
+            double avg_vel               = (final_vel + ball_vel) / 2.0;
+            Duration ball_intercept_time = Duration::fromSeconds(
+                ball_dis / (std::max(std::numeric_limits<double>::epsilon(), avg_vel)));
+
+            // Here we check if we can make it in time to the position and stop in time
+            // otherwise we will attempt to overshoot the position and intercept it
+            if (event.common.robot.getTimeToPosition(intercept_position) >
+                ball_intercept_time)
+            {
+                intercept_position = findOvershootInterceptPosition(
+                    event.common.robot, intercept_position,
+                    event.common.world_ptr->field(), ball_intercept_time,
+                    DEFENDER_STEP_SPEED_M_PER_S, false);
+            }
         }
 
         auto face_ball_orientation = (ball.position() - robot_position).orientation();
