@@ -42,7 +42,7 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
 
     // The maximum angle difference to determine if ball has been kicked in
     // the approximate direction of the defender
-    static constexpr Angle MAX_PASS_ANGLE_DIFFERENCE = Angle::fromDegrees(30);
+    static constexpr Angle MAX_PASS_ANGLE_DIFFERENCE = Angle::fromDegrees(35);
 
     // The minimum angle difference between a ball's trajectory and
     // pass_orientation for which we can consider a pass to be deflected
@@ -143,4 +143,7 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMContro
     // Initialized when a pass is started and used when a pass is deflected
     // Assumption is that a pass has to start before it can be deflected
     Angle pass_orientation;
+    // The step amount between speeds we check that the defender is observed to
+    // go at during the interception
+    static constexpr double DEFENDER_STEP_SPEED_M_PER_S = 0.2;
 };
