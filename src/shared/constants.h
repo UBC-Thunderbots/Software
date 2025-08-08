@@ -224,7 +224,5 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 // Number of times thunderloop should tick per second
 static const unsigned THUNDERLOOP_HZ = 300u;
 
-static const unsigned NUM_GENEVA_ANGLES = 5;
-
 // Jetson Nano Constants
 static const double MAX_JETSON_TEMP_C = 97;

@@ -99,14 +99,15 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame,
  *
  * @return a nanopb power status msg with provided fields
  */
-TbotsProto_PowerStatus inline createNanoPbPowerStatus(
-    float battery_voltage, float capacitor_voltage, float current_draw,
-    TbotsProto_Geneva_Slot geneva_slot, uint32_t sequence_num, bool breakbeam_tripped)
+TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage,
+                                                      float capacitor_voltage,
+                                                      float current_draw,
+                                                      uint32_t sequence_num,
+                                                      bool breakbeam_tripped)
 {
     TbotsProto_PowerStatus status = {.battery_voltage   = battery_voltage,
                                      .capacitor_voltage = capacitor_voltage,
                                      .current_draw      = current_draw,
-                                     .geneva_slot       = geneva_slot,
                                      .sequence_num      = sequence_num,
                                      .breakbeam_tripped = breakbeam_tripped};
     return status;
@@ -198,26 +199,6 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         default:
             break;
     }
-    switch (power_control.geneva_slot())
-    {
-        case TbotsProto::Geneva::LEFT:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_LEFT;
-            break;
-        case TbotsProto::Geneva::CENTRE_LEFT:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_CENTRE_LEFT;
-            break;
-        case TbotsProto::Geneva::CENTRE:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_CENTRE;
-            break;
-        case TbotsProto::Geneva::CENTRE_RIGHT:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_CENTRE_RIGHT;
-            break;
-        case TbotsProto::Geneva::RIGHT:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_RIGHT;
-            break;
-        default:
-            break;
-    }
     return nanopb_control;
 }
 /**
@@ -229,12 +210,12 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
 TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     ChickerCommandMode chicker_command, uint32_t kick_pulse_width,
     uint32_t chip_pulse_width, AutoChipOrKickMode auto_chip_or_kick,
-    uint32_t autochip_pulse_width, uint32_t autokick_pulse_width,
-    TbotsProto_Geneva_Slot geneva_slot)
+    uint32_t autochip_pulse_width, uint32_t autokick_pulse_width)
 {
     TbotsProto_PowerPulseControl control = TbotsProto_PowerPulseControl_init_default;
     TbotsProto_PowerPulseControl_ChickerControl chicker =
         TbotsProto_PowerPulseControl_ChickerControl_init_default;
+
     switch (chicker_command)
     {
         case ChickerCommandMode::CHIP:
@@ -272,8 +253,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             break;
     }
 
-    control.chicker     = chicker;
-    control.geneva_slot = geneva_slot;
+    control.chicker = chicker;
 
     return control;
 }

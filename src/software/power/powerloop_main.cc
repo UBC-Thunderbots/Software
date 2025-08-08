@@ -3,7 +3,6 @@
 #include "chicker.h"
 #include "constants_platformio.h"
 #include "control_executor.h"
-#include "geneva.h"
 #include "power_frame_msg_platformio.h"
 #include "power_monitor.h"
 #include "proto/power_frame_msg.nanopb.h"
@@ -17,7 +16,6 @@
 #include "software/power/charger.h"
 #include "software/power/chicker.h"
 #include "software/power/control_executor.h"
-#include "software/power/geneva.h"
 #include "software/power/power_monitor.h"
 
 #endif
@@ -34,7 +32,6 @@ uint32_t sequence_num;
 std::shared_ptr<Charger> charger;
 std::shared_ptr<Chicker> chicker;
 std::shared_ptr<PowerMonitor> monitor;
-std::shared_ptr<Geneva> geneva;
 std::shared_ptr<ControlExecutor> executor;
 
 void setup()
@@ -46,8 +43,7 @@ void setup()
     charger      = std::make_shared<Charger>();
     chicker      = std::make_shared<Chicker>();
     monitor      = std::make_shared<PowerMonitor>();
-    geneva       = std::make_shared<Geneva>();
-    executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
+    executor     = std::make_shared<ControlExecutor>(charger, chicker);
     charger->chargeCapacitors();
 }
 
@@ -74,8 +70,7 @@ void loop()
     // Read sensor values. These are all instantaneous
     auto status = createNanoPbPowerStatus(
         monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
-        monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
-        chicker->getBreakBeamTripped());
+        monitor->getCurrentDrawAmp(), sequence_num++, chicker->getBreakBeamTripped());
     auto status_frame = createUartFrame(status);
     auto packet       = marshallUartPacket(status_frame);
     for (auto byte : packet)

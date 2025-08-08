@@ -117,7 +117,6 @@ class EmbeddedData:
     def get_zero_power_control_primitive(self) -> Primitive:
         """Creates a PowerControl primitive with zeroed/default base values"""
         power_control_primitive = PowerControl()
-        power_control_primitive.geneva_slot = Slot.CENTRE_RIGHT
         return power_control_primitive
 
     def get_zero_motor_control_primitive(self) -> Primitive:
