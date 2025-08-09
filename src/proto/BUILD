@@ -7,22 +7,25 @@ package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "geneva_proto",
-    srcs = [
-        "geneva_slot.proto",
-    ],
+    srcs = [":geneva_slot.proto"],
+)
+
+proto_library(
+    name = "geometry_proto",
+    srcs = [":geometry.proto"],
 )
 
 proto_library(
     name = "robot_proto",
     srcs = [
-        "geometry.proto",
         "robot_crash_msg.proto",
         "robot_log_msg.proto",
         "robot_status_msg.proto",
         "tbots_timestamp_msg.proto",
     ],
     deps = [
-        "geneva_proto",
+        ":geneva_proto",
+        ":geometry_proto",
         "@nanopb//:nanopb_proto",
     ],
 )
@@ -147,6 +150,7 @@ proto_library(
         "validation.proto",
     ],
     deps = [
+        ":geometry_proto",
         ":tbots_proto",
     ],
 )
