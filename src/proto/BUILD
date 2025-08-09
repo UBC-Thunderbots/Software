@@ -146,9 +146,7 @@ proto_library(
 
 proto_library(
     name = "validation_proto",
-    srcs = [
-        "validation.proto",
-    ],
+    srcs = [":validation.proto"],
     deps = [
         ":geometry_proto",
         ":tbots_proto",
@@ -157,9 +155,7 @@ proto_library(
 
 proto_library(
     name = "visualization_proto",
-    srcs = [
-        "visualization.proto",
-    ],
+    srcs = [":visualization.proto"],
     deps = [
         ":tbots_proto",
         "@protobuf//:any_proto",

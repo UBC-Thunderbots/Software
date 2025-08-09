@@ -9,8 +9,8 @@ test --test_output=all
 
 ################## Bazel Debug Configs ##################
 
-common --verbose_failures
-common --sandbox_debug
+# common --verbose_failures
+# common --sandbox_debug
 
 ################ Machine Configurations ################
 
