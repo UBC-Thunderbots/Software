@@ -135,7 +135,7 @@ proto_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
-        "robot_proto",
+        ":robot_proto",
         ":ssl_proto",
         ":tbots_proto",
     ],
@@ -219,6 +219,8 @@ proto_library(
         "ssl_vision_wrapper_tracked.proto",
     ],
     deps = [
+        ":robot_proto",
+        ":ssl_proto",
         ":tbots_proto",
         "@protobuf//:duration_proto",
         "@protobuf//:timestamp_proto",
