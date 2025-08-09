@@ -1,9 +1,9 @@
-#include "shared/uart_framing/uart_framing.hpp"
+#include "uart_framing.hpp"
 
 #include <gtest/gtest.h>
 extern "C"
 {
-#include "proto/robot_status_msg.nanopb.h"
+#include "proto/robot_status_msg.pb.h"
 }
 
 class CobsEncodingTest : public ::testing::TestWithParam<

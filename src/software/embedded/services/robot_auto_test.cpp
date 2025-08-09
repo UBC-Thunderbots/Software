@@ -10,9 +10,9 @@
 
 extern "C"
 {
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
-#include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
+#include "tmc/ic/TMC4671/TMC4671.h"
+#include "tmc/ic/TMC4671/TMC4671_Variants.h"
+#include "tmc/ic/TMC6100/TMC6100.h"
 }
 
 std::unique_ptr<MotorService> motor_service_;

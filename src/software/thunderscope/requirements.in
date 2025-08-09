@@ -2,7 +2,7 @@ colorama==0.4.6
 netifaces==0.11.0
 evdev==1.7.0
 numpy==1.26.4
-protobuf==5.27.3
+protobuf==6.31.1
 pyqtgraph==0.13.7
 pyqtdarktheme-fork==2.3.2
 PyQt6-Qt6==6.8.1

@@ -7,7 +7,6 @@ cc_library(
         "test_util.h",
     ],
     deps = [
-        "//proto:tbots_cc_proto",
         "//proto:tbots_nanopb_proto",
         "//shared:robot_constants",
         "//shared/test_util:tbots_gtest_main",
@@ -23,6 +22,6 @@ cc_library(
     deps = [
         "//software/logger",
         "@boost//:program_options",
-        "@gtest",
+        "@googletest//:gtest",
     ],
 )

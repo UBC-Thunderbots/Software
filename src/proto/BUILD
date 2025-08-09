@@ -1,36 +1,55 @@
-load("@rules_proto//proto:defs.bzl", "proto_library")
-load("//proto:nanopb.bzl", "nanopb_proto_library")
-load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
+load("@nanopb//extra/bazel:nanopb_cc_proto_library.bzl", "cc_nanopb_proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
+load("//starlark/nanopb:nanopb.bzl", "nanopb_proto_library")
 
 package(default_visibility = ["//visibility:public"])
+
+proto_library(
+    name = "geneva_proto",
+    srcs = [
+        "geneva_slot.proto",
+    ],
+)
+
+proto_library(
+    name = "robot_proto",
+    srcs = [
+        "geometry.proto",
+        "robot_crash_msg.proto",
+        "robot_log_msg.proto",
+        "robot_status_msg.proto",
+        "tbots_timestamp_msg.proto",
+    ],
+    deps = [
+        "geneva_proto",
+        "@nanopb//:nanopb_proto",
+    ],
+)
 
 proto_library(
     name = "tbots_proto",
     srcs = [
         "ball.proto",
         "game_state.proto",
-        "geneva_slot.proto",
-        "geometry.proto",
         "ip_notification.proto",
         "parameters.proto",
         "play.proto",
         "power_frame_msg.proto",
         "primitive.proto",
         "replay_bookmark.proto",
-        "robot_crash_msg.proto",
-        "robot_log_msg.proto",
         "robot_statistic.proto",
-        "robot_status_msg.proto",
         "tactic.proto",
         "tbots_software_msgs.proto",
-        "tbots_timestamp_msg.proto",
         "team.proto",
         "vision.proto",
         "world.proto",
     ],
     deps = [
-        "@com_google_protobuf//:descriptor_proto",
-        "@nanopb//:nanopb_options_proto",
+        "geneva_proto",
+        "robot_proto",
+        "@nanopb//:nanopb_proto",
+        "@protobuf//:descriptor_proto",
     ],
 )
 
@@ -41,35 +60,14 @@ cc_proto_library(
 
 nanopb_proto_library(
     name = "tbots_nanopb_proto",
+    nanopb_libs = ["@nanopb//:nanopb"],
     deps = [":tbots_proto"],
 )
 
 py_proto_library(
     name = "tbots_py_proto",
-    srcs = [
-        "ball.proto",
-        "estop_state.proto",
-        "game_state.proto",
-        "geneva_slot.proto",
-        "geometry.proto",
-        "ip_notification.proto",
-        "parameters.proto",
-        "play.proto",
-        "primitive.proto",
-        "replay_bookmark.proto",
-        "robot_statistic.proto",
-        "robot_status_msg.proto",
-        "tactic.proto",
-        "tbots_software_msgs.proto",
-        "tbots_timestamp_msg.proto",
-        "team.proto",
-        "validation.proto",
-        "vision.proto",
-        "visualization.proto",
-        "world.proto",
-    ],
     deps = [
-        "@nanopb//:nanopb_options_py_proto",
+        ":tbots_proto",
     ],
 )
 
@@ -95,9 +93,9 @@ proto_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@com_google_protobuf//:duration_proto",
-        "@com_google_protobuf//:timestamp_proto",
-        "@com_google_protobuf//:wrappers_proto",
+        "@protobuf//:duration_proto",
+        "@protobuf//:timestamp_proto",
+        "@protobuf//:wrappers_proto",
     ],
 )
 
@@ -116,7 +114,7 @@ proto_library(
     visibility = ["//visibility:private"],
     deps = [
         ":ssl_proto",
-        "@com_google_protobuf//:any_proto",
+        "@protobuf//:any_proto",
     ],
 )
 
@@ -127,7 +125,7 @@ cc_proto_library(
 
 cc_proto_library(
     name = "any_cc_proto",
-    deps = ["@com_google_protobuf//:any_proto"],
+    deps = ["@protobuf//:any_proto"],
 )
 
 proto_library(
@@ -137,6 +135,7 @@ proto_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
+        ":robot_proto",
         ":ssl_proto",
         ":tbots_proto",
     ],
@@ -159,7 +158,7 @@ proto_library(
     ],
     deps = [
         ":tbots_proto",
-        "@com_google_protobuf//:any_proto",
+        "@protobuf//:any_proto",
     ],
 )
 
@@ -196,33 +195,51 @@ cc_proto_library(
     deps = [":play_info_msg_proto"],
 )
 
-py_proto_library(
-    name = "software_py_proto",
+proto_library(
+    name = "software_proto",
     srcs = [
         "manual_gc_command.proto",
         "play_info_msg.proto",
-        "robot_crash_msg.proto",
-        "robot_log_msg.proto",
-        "sensor_msg.proto",
-        "ssl_autoref_ci.proto",
-        "ssl_gc_api.proto",
-        "ssl_gc_change.proto",
-        "ssl_gc_ci.proto",
-        "ssl_gc_common.proto",
-        "ssl_gc_engine.proto",
-        "ssl_gc_engine_config.proto",
-        "ssl_gc_game_event.proto",
-        "ssl_gc_geometry.proto",
-        "ssl_gc_referee_message.proto",
-        "ssl_gc_state.proto",
-        "ssl_vision_detection.proto",
-        "ssl_vision_detection_tracked.proto",
-        "ssl_vision_geometry.proto",
-        "ssl_vision_wrapper.proto",
-        "ssl_vision_wrapper_tracked.proto",
     ],
     deps = [
-        ":tbots_py_proto",
+        ":robot_proto",
+        ":sensor_msg_proto",
+        ":ssl_proto",
+        ":tbots_proto",
+        "@protobuf//:duration_proto",
+        "@protobuf//:timestamp_proto",
+        "@protobuf//:wrappers_proto",
+    ],
+)
+
+proto_library(
+    name = "estop_state_proto",
+    srcs = ["estop_state.proto"],
+)
+
+py_proto_library(
+    name = "estop_state_py_proto",
+    deps = ["estop_state_proto"],
+)
+
+py_proto_library(
+    name = "software_py_proto",
+    deps = [
+        ":software_proto",
+    ],
+)
+
+py_proto_library(
+    name = "visualization_py_proto",
+    deps = [
+        ":visualization_proto",
+    ],
+)
+
+py_proto_library(
+    name = "validation_py_proto",
+    deps = [
+        ":validation_proto",
     ],
 )
 

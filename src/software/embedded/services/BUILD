@@ -35,6 +35,7 @@ cc_library(
         "@boost//:asio",
         "@boost//:filesystem",
     ],
+    copts = ["-Iexternal/nanopb+"],
 )
 
 cc_binary(
@@ -54,4 +55,5 @@ cc_binary(
         "//software/logger",
         "@trinamic",
     ],
+    copts = ["-Iexternal/nanopb+"],
 )
