@@ -1,4 +1,4 @@
-#include "software/embedded/gpio_sysfs.h"
+#include "software/embedded/gpio/gpio_sysfs.h"
 
 #include <fcntl.h>
 #include <stdlib.h>
