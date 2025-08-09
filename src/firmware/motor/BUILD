@@ -34,21 +34,12 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "mc_config",
-    srcs = ["mc_config.c"],
-    hdrs = ["mc_config.h"],
-    deps = [
-        ":mdv6_main_hooks",
-        "//firmware/mcsdk:pid_regulator",
+openocd_flash(
+    name = "mdv6_firmware_flash",
+    device_configs = [
     ],
-)
-
-cc_library(
-    name = "mdv6_main_hooks",
-    hdrs = ["main.h"],
-    deps = [
-        "//firmware/stm32f0xx:stm32f0xx",
-        "//firmware/motorcontrol:motorcontrol",
+    image = "",
+    interface_configs = [
     ],
+    transport = "",
 )
