@@ -84,7 +84,6 @@ ALL_COMPILE_ACTIONS = [
     ACTION_NAMES.preprocess_assemble,
     ACTION_NAMES.lto_indexing,
     ACTION_NAMES.lto_backend,
-    ACTION_NAMES.strip,
     ACTION_NAMES.clif_match,
 ]
 

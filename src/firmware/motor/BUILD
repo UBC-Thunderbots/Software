@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@bazel_embedded//tools/openocd:defs.bzl", "openocd_flash")
+
 filegroup(
     name = "mdv6_firmware_srcs",
     srcs = glob(["**/*.c"])
@@ -41,9 +43,10 @@ openocd_flash(
         # https://www.st.com/resource/en/reference_manual/rm0091-stm32f0x1stm32f0x2stm32f0x8-advanced-armbased-32bit-mcus-stmicroelectronics.pdf
         "target/stm32f0x.cfg",
     ],
-    image = "",
+    # .stripped strips debug symbols to reduce the size of the binary.
+    # see: https://bazel.build/reference/be/c-cpp#cc_binary
+    image = ":mdv6_firmware_main.stripped",
     interface_configs = [
         "interface/stlink.cfg",  # The ST-Link V2 programmer is used to flash the firmware.
     ],
-    transport = "",
 )

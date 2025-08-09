@@ -440,9 +440,14 @@ new_local_repository(
     path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
 )
 
+# For flashing the motor driver board
 git_repository(
     name = "bazel_embedded",
     commit = "cf5b240d510313b3383e0cdb550eb9f32be7244e",
     remote = "https://github.com/bazelembedded/bazel-embedded.git",
     shallow_since = "1685643269 +0000",
 )
+
+load("@bazel_embedded//tools/openocd:openocd_repository.bzl", "openocd_deps")
+
+openocd_deps()
