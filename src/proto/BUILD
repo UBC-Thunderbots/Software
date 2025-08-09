@@ -135,7 +135,7 @@ proto_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
-        "robot_proto",
+        ":robot_proto",
         ":ssl_proto",
         ":tbots_proto",
     ],
@@ -200,9 +200,10 @@ proto_library(
     srcs = [
         "manual_gc_command.proto",
         "play_info_msg.proto",
-        "sensor_msg.proto",
     ],
     deps = [
+        ":robot_proto",
+        ":sensor_msg_proto",
         ":ssl_proto",
         ":tbots_proto",
         "@protobuf//:duration_proto",

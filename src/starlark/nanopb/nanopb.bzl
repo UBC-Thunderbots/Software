@@ -93,7 +93,7 @@ def _nanopb_proto_library_impl(ctx):
         cc_toolchain = cc_toolchain,
     )
 
-    #     Get the compilation and linking contexts from all nanopb srcs
+    # Get the compilation and linking contexts from all nanopb srcs
     nanopb_compilation_contexts = [
         label[CcInfo].compilation_context
         for label in ctx.attr.nanopb_libs
@@ -112,7 +112,6 @@ def _nanopb_proto_library_impl(ctx):
         compilation_context = cc_info.compilation_context
 
         # Collect all include paths
-        # nanopb_includes.extend(compilation_context.system_includes.to_list())
         nanopb_includes.extend(compilation_context.includes.to_list())
         nanopb_includes.extend(compilation_context.quote_includes.to_list())
 

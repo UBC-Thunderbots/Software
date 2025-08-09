@@ -22,14 +22,6 @@ extern "C" {
 }
 #endif  // PLATFORMIO_BUILD
 
-// The nanopb generated size isn't c++ compatible so we redefine it here
-// // TODO(#2592): Remove with upgrade to nanopb
-// #undef TbotsProto_PowerFrame_size
-// #define TbotsProto_PowerFrame_size                                                       \
-//     std::max(TbotsProto_PowerPulseControl_size, TbotsProto_PowerStatus_size) +           \
-//         2 * sizeof(uint32_t) + sizeof(uint16_t)
-
-
 /**
  * Serialize nanopb into its byte representation
  *
