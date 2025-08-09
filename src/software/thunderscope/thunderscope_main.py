@@ -346,7 +346,7 @@ if __name__ == "__main__":
             referee_port=gamecontroller.get_referee_port()
             if gamecontroller
             else SSL_REFEREE_PORT,
-            config_file = args.wifi_config,
+            config_file=args.wifi_config,
         ) as wifi_communication_manager, RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
             communication_manager=wifi_communication_manager,

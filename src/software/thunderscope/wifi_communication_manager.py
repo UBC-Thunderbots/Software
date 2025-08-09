@@ -45,15 +45,16 @@ class WifiCommunicationManager:
         :param interface: The interface to use for communication with the robots
         :param referee_port: the referee port that we are using. If this is None, the default port is used
         """
-
         ## Robot IP File Open ##
         self.config_file = Path(config_file) if config_file else None
         robot_ip = []
 
         if self.config_file:
-            with open(self.config_file, 'r') as file:
-                robot_ip = list(yaml.safe_load(file).get('ip', {}).values())[:MAX_ROBOT_IDS_PER_SIDE]
-        
+            with open(self.config_file, "r") as file:
+                robot_ip = list(yaml.safe_load(file).get("ip", {}).values())[
+                    :MAX_ROBOT_IDS_PER_SIDE
+                ]
+
         ## Robot IP address tracking ##
         self.robot_ip_addresses: list[tuple[Lock, str | None]] = [
             (Lock(), robot_ip.get(id, None)) for id in range(MAX_ROBOT_IDS_PER_SIDE)
@@ -63,7 +64,7 @@ class WifiCommunicationManager:
         self.primitive_senders: list[tuple[Lock, tbots_cpp.PrimitiveSender | None]] = [
             (Lock(), None) for id in range(MAX_ROBOT_IDS_PER_SIDE)
         ]
-        
+
         self.receive_robot_status: tbots_cpp.RobotStatusProtolistener | None = None
         self.receive_robot_log: tbots_cpp.RobotLogProtolistener | None = None
         self.receive_robot_crash: tbots_cpp.RobotCrashProtolistener | None = None
