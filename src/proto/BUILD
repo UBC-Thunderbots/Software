@@ -200,7 +200,7 @@ proto_library(
     srcs = [
         "manual_gc_command.proto",
         "play_info_msg.proto",
-        "sensor_msg.proto",
+        # "sensor_msg.proto",
         "ssl_autoref_ci.proto",
         "ssl_gc_api.proto",
         "ssl_gc_change.proto",
@@ -219,6 +219,7 @@ proto_library(
         "ssl_vision_wrapper_tracked.proto",
     ],
     deps = [
+        ":sensor_msg_proto",
         ":robot_proto",
         ":ssl_proto",
         ":tbots_proto",
