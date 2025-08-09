@@ -37,9 +37,13 @@ cc_library(
 openocd_flash(
     name = "mdv6_firmware_flash",
     device_configs = [
+        # Part of the STM32F0 family
+        # https://www.st.com/resource/en/reference_manual/rm0091-stm32f0x1stm32f0x2stm32f0x8-advanced-armbased-32bit-mcus-stmicroelectronics.pdf
+        "target/stm32f0x.cfg",
     ],
     image = "",
     interface_configs = [
+        "interface/stlink.cfg",  # The ST-Link V2 programmer is used to flash the firmware.
     ],
     transport = "",
 )
