@@ -1,6 +1,6 @@
-#ip:
-#  1: 192.168.1.101
-#  2: 192.168.2.202
+ip:
+  1: 192.168.1.101
+  2: 192.168.2.202
 
 
 # uncomment and delete placeholders when using this file

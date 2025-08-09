@@ -229,7 +229,7 @@ if __name__ == "__main__":
         help="whether or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
     )
     parser.add_argument(
-        "--wifi_config"
+        "--wifi_config",
         action="store",
         help="File path to configure robot ID and corresponding IPs",
         default=None,
