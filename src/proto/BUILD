@@ -13,6 +13,9 @@ proto_library(
 proto_library(
     name = "geometry_proto",
     srcs = [":geometry.proto"],
+    #    deps = [
+    #        "@nanopb//:nanopb_proto",
+    #    ],
 )
 
 proto_library(
