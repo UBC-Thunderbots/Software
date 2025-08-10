@@ -158,6 +158,7 @@ proto_library(
     name = "visualization_proto",
     srcs = [":visualization.proto"],
     deps = [
+        ":geometry_proto",
         ":tbots_proto",
         "@protobuf//:any_proto",
     ],
