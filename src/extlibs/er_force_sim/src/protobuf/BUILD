@@ -29,6 +29,7 @@ proto_library(
     ]),
     deps = [
         "//proto:software_proto",
+        "//proto:ssl_proto",
         "@protobuf//:any_proto",
     ],
 )
