@@ -59,6 +59,7 @@ cc_test(
         "tbots_geometry",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
+        "@protobuf//:differencer",
     ],
 )
 
@@ -179,6 +180,7 @@ cc_library(
     name = "er_force_world",
     srcs = ["er_force_world.cpp"],
     hdrs = ["er_force_world.h"],
+    copts = ["-Iexternal/nanopb+"],
     deps = [
         "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
         "//software/world:ball",

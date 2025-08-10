@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+package(default_visibility = ["//visibility:public"])
 
 config_setting(
     name = "build_nano",
@@ -60,6 +60,7 @@ cc_library(
     name = "thunderloop",
     srcs = ["thunderloop.cpp"],
     hdrs = ["thunderloop.h"],
+    copts = ["-Iexternal/nanopb+"],
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
@@ -72,7 +73,6 @@ cc_library(
         "//software/util/scoped_timespec_timer",
         "@tracy",
     ],
-    copts = ["-Iexternal/nanopb+"],
 )
 
 cc_library(
@@ -96,6 +96,7 @@ cc_library(
 cc_binary(
     name = "thunderloop_main",
     srcs = ["thunderloop_main.cpp"],
+    copts = ["-Iexternal/nanopb+"],
     linkopts = [
         "-lpthread",
         "-lrt",
@@ -104,7 +105,6 @@ cc_binary(
         ":thunderloop",
         "@boost//:program_options",
     ],
-    copts = ["-Iexternal/nanopb+"],
 )
 
 sh_binary(
@@ -115,6 +115,7 @@ sh_binary(
 cc_test(
     name = "test_battery",
     srcs = ["battery_test.cpp"],
+    copts = ["-Iexternal/nanopb+"],
     deps = [
         ":thunderloop",
         "//shared/test_util:tbots_gtest_main",
