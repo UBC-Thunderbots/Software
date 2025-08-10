@@ -49,8 +49,9 @@ proto_library(
         "world.proto",
     ],
     deps = [
-        "geneva_proto",
-        "robot_proto",
+        ":geneva_proto",
+        ":geometry_proto",
+        ":robot_proto",
         "@nanopb//:nanopb_proto",
         "@protobuf//:descriptor_proto",
     ],
