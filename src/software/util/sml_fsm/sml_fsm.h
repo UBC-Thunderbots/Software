@@ -3,17 +3,22 @@
 #include <functional>
 #include <include/boost/sml.hpp>
 #include <queue>
+#include <string>
+#include <map>
 #include "proto/play_info_msg.pb.h"
 #include "software/logger/logger.h"
 
 #include "software/util/typename/typename.h"
 
-/*
+/**
  * This struct declares a logger to log the FSM State Changes
  * https://boost-ext.github.io/sml/examples.html#logging
+ *
+ * It also applies some filtering to prevent overwhelming protobuffer messages.
  */
 
-struct FSMLogger {
+class FSMLogger {
+public:
     template <class SM, class TEvent>
     void log_process_event(const TEvent&)
     {
@@ -23,7 +28,7 @@ struct FSMLogger {
     template <class SM, class TGuard, class TEvent>
     void log_guard(const TGuard&, const TEvent&, bool result)
     {
-        LOG(INFO) << "[%s][guard] %s %s %s\n" << boost::sml::aux::get_type_name<SM>() << boost::sml::aux::get_type_name<TGuard>()<< boost::sml::aux::get_type_name<TEvent>() << (result ? "[OK]" : "[Reject]");
+//        LOG(INFO) << boost::sml::aux::get_type_name<SM>() << "  " << boost::sml::aux::get_type_name<TGuard>()<< "  " << boost::sml::aux::get_type_name<TEvent>() << "  " << (result ? "[OK]" : "[Reject]");
     }
 
     template <class SM, class TAction, class TEvent>
@@ -31,17 +36,49 @@ struct FSMLogger {
     {
         //        printf("[%s][action] %s %s\n", sml::aux::get_type_name<SM>(), sml::aux::get_type_name<TAction>(),
         //               sml::aux::get_type_name<TEvent>());
-        LOG(INFO) << "[%s][action] %s %s\n" << boost::sml::aux::get_type_name<SM>()<< boost::sml::aux::get_type_name<TAction>() << boost::sml::aux::get_type_name<TEvent>();
+//        LOG(INFO) << boost::sml::aux::get_type_name<SM>()<< "  " << boost::sml::aux::get_type_name<TAction>() << "  " <<boost::sml::aux::get_type_name<TEvent>();
     }
 
 
     template <class SM, class TSrcState, class TDstState>
     void log_state_change(const TSrcState& src, const TDstState& dst)
     {
-//        printf("[%s][transition] %s -> %s\n", sml::aux::get_type_name<SM>(), src.c_str(), dst.c_str());
-        LOG(INFO) << "[%s][transition] %s -> %s\n"<< boost::sml::aux::get_type_name<SM>()<< src.c_str()<< dst.c_str();
+        // skip if state doesn't change
+        if(src.c_str() == dst.c_str()){
+            last_state_transition = "";
+            return;
+        }
+        std::string message = "";
+        message.append(boost::sml::aux::get_type_name<SM>());
+        message.append(" ");
+        message.append(src.c_str());
+        message.append(" -> ");
+        message.append(dst.c_str());
+        last_state_transition = message; //boost::sml::aux::get_type_name<SM>() + " " + src.c_str() + " -> " + dst.c_str();
     }
+
+    void flush_with_robot_id(unsigned int id) {
+        if (id == robot_logs.begin()->first) {
+
+            std::string output;
+            for (const auto& [key, value] : robot_logs) {
+
+                output.append(std::to_string(key));
+                output.append(": ");
+                output.append(value + "\n");
+            }
+            LOG(INFO) << output;
+        }
+       if (last_state_transition != "") {
+        robot_logs[id] = last_state_transition;
+      }
+    }
+
+private:
+    static std::map<unsigned int, std::string> robot_logs;
+    std::string last_state_transition;
 };
+
 
 /**
  * The Tactic FSM framework uses the [SML library](https://github.com/boost-ext/sml), and

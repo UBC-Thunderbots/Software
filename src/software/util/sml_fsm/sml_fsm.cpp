@@ -1,5 +1,7 @@
 #include "software/util/sml_fsm/sml_fsm.h"
 
+std::map<unsigned int, std::string> FSMLogger::robot_logs;
+
 std::string stripFSMState(std::string s)
 {
     auto pos = s.find_last_of(":<");
