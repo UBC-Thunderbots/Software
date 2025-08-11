@@ -17,6 +17,11 @@ cc_binary(
     deps = [
         ":mdv6_firmware",
     ],
+    # Linker file informs the toolchain how much RAM and flash you have as well as its locations on the chip
+    additional_linker_inputs = [
+        "mdv6_firmware.ld"
+    ],
+    linkopts = ["-T $(location mdv6_firmware.ld)"],
     target_compatible_with = [
         "@platforms//cpu:armv6-m",
         "@platforms//os:none",

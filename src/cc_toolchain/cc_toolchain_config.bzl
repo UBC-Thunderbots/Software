@@ -632,6 +632,25 @@ def _stm32_gcc_impl(ctx):
         ]
     )
 
+    space_optimization_feature = feature(
+        name = "space_optimization",
+        # Optimize for space, otherwise we'll likely overflow RAM and/or stack
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Optimize for size
+                            "-Os",
+                        ],
+                    ),
+                ],
+            )
+        ]
+    )
+
     no_syscalls_feature = feature(
         name = "no_syscalls",
         enabled = True,
@@ -653,6 +672,7 @@ def _stm32_gcc_impl(ctx):
     features = [
         cortex_feature,
         no_syscalls_feature,
+        space_optimization_feature,
     ]
 
     return [
