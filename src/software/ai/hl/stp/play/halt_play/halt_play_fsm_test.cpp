@@ -10,8 +10,7 @@ TEST(HaltPlayFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    FSMLogger logger;
-    FSM<HaltPlayFSM> fsm(HaltPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, logger);
+    FSM<HaltPlayFSM> fsm(HaltPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, FSMLogger::getInstance());
 
     EXPECT_TRUE(fsm.is(boost::sml::state<HaltPlayFSM::HaltState>));
 

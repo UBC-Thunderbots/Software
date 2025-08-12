@@ -19,9 +19,8 @@ TEST(PenaltyKickPlayFSMTest, test_transitions)
 
     int num_tactics = 5;
 
-    FSMLogger logger;
     FSM<PenaltyKickPlayFSM> fsm(
-            PenaltyKickPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, logger);
+            PenaltyKickPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, FSMLogger::getInstance());
 
     EXPECT_TRUE(fsm.is(boost::sml::state<PenaltyKickPlayFSM::SetupPositionState>));
 

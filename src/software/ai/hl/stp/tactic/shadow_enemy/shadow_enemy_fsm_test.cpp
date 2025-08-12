@@ -77,10 +77,9 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     EnemyThreat enemy_threat{shadowee,     true, Angle::zero(), std::nullopt,
                              std::nullopt, 1,    enemy};
 
-    FSMLogger logger;
     FSM<ShadowEnemyFSM> fsm{ShadowEnemyFSM(std::make_shared<TbotsProto::AiConfig>()),
                             MoveFSM(std::make_shared<TbotsProto::AiConfig>()),
-                            logger};
+                            FSMLogger::getInstance()};
 
     // Start in MoveFSM
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));

@@ -12,10 +12,9 @@ TEST(ChipFSMTest, test_transitions)
                                         .chip_direction       = Angle::threeQuarter(),
                                         .chip_distance_meters = 1.2};
 
-    FSMLogger logger;
     FSM<ChipFSM> fsm{ChipFSM(std::make_shared<TbotsProto::AiConfig>()),
                      GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>()),
-                     logger};
+                     FSMLogger::getInstance()};
 
     // Start in GetBehindBallFSM state's GetBehindBallState
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));

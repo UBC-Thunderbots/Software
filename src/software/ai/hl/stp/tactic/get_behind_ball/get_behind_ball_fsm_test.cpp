@@ -11,8 +11,7 @@ TEST(GetBehindBallFSMTest, test_transitions)
     GetBehindBallFSMControlParams control_params{.ball_location   = Point(2, 3),
                                                  .chick_direction = Angle::quarter()};
 
-    FSMLogger logger;
-    FSM<GetBehindBallFSM> fsm{GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>()), logger};
+    FSM<GetBehindBallFSM> fsm{GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>()), FSMLogger::getInstance()};
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
     fsm.process_event(GetBehindBallFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));

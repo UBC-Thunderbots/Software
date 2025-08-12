@@ -10,8 +10,7 @@ TEST(DefensePlayFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    FSMLogger logger;
-    FSM<DefensePlayFSM> fsm(DefensePlayFSM{std::make_shared<TbotsProto::AiConfig>()}, logger);
+    FSM<DefensePlayFSM> fsm(DefensePlayFSM{std::make_shared<TbotsProto::AiConfig>()}, FSMLogger::getInstance());
     EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>));
 
     // Place enemy robots behind the ball implying there is a large attack

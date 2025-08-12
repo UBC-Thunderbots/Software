@@ -9,8 +9,7 @@
 
 Ai::Ai(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
     : ai_config_ptr(ai_config_ptr),
-      logger(),
-      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, logger)),
+      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, FSMLogger::getInstance())),
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config_ptr)),
       ai_config_changed(false)
@@ -47,7 +46,7 @@ void Ai::checkAiConfig()
     {
         ai_config_changed = false;
 
-        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, logger);
+        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, FSMLogger::getInstance());
 
         auto current_override = ai_config_ptr->ai_control_config().override_ai_play();
         if (current_override != TbotsProto::PlayName::UseAiSelection)

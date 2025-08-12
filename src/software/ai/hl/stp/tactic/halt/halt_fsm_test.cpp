@@ -12,8 +12,7 @@ TEST(StopFSMTest, test_transitions)
                            AngularVelocity::zero()),
                 Timestamp::fromSeconds(123));
 
-    FSMLogger logger;
-    FSM<HaltFSM> fsm{HaltFSM(std::make_shared<TbotsProto::AiConfig>()), logger};
+    FSM<HaltFSM> fsm{HaltFSM(std::make_shared<TbotsProto::AiConfig>()), FSMLogger::getInstance()};
     EXPECT_TRUE(fsm.is(boost::sml::state<HaltFSM::StopState>));
     fsm.process_event(HaltFSM::Update(
         {}, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));

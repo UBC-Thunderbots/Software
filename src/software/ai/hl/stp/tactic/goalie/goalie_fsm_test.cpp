@@ -87,12 +87,11 @@ TEST(GoalieFSMTest, test_transitions)
         Point(GoalieFSM::getNoChipRectangle(world_ptr->field()).xMax(), 0);
     Angle clear_ball_direction = Angle::zero();
 
-    FSMLogger logger;
     FSM<GoalieFSM> fsm(DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
                        GoalieFSM(std::make_shared<TbotsProto::AiConfig>(),
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT),
                                  PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()),
-                                 logger);
+                                 FSMLogger::getInstance());
 
     // goalie starts in PositionToBlock
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));

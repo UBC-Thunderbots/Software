@@ -11,26 +11,59 @@
 #include "software/util/typename/typename.h"
 
 /**
- * This struct declares a logger to log the FSM State Changes
+ * This class declares a logger to log the FSM State Changes
  * https://boost-ext.github.io/sml/examples.html#logging
  *
+ * The logger follows the singleton pattern: https://stackoverflow.com/questions/13047526/difference-between-singleton-implemention-using-pointer-and-using-static-object
  * It also applies some filtering to prevent overwhelming protobuffer messages.
  */
 
 class FSMLogger {
 public:
+
+    /**
+     * Get the single logger instance
+     *
+     * @return the logger instance
+     */
+    static FSMLogger& getInstance()
+    {
+        static FSMLogger logger;
+        return logger;
+    }
+
+    /**
+     * This function is called whenever an event is processed by the state machine
+     *
+     * @tparam SM the state machine
+     * @tparam TEvent the event
+     */
     template <class SM, class TEvent>
     void log_process_event(const TEvent&)
     {
         //LOG(INFO) << "[%s][process_event] %s\n" << boost::sml::aux::get_type_name<SM>() << boost::sml::aux::get_type_name<TEvent>();
     }
 
+    /**
+     * This function is called when a guard is processed by the state machine
+     *
+     * @tparam SM the state machine
+     * @tparam TGuard the guard
+     * @tparam TEvent the event
+     * @param result true if the guard passed, false if the guard failed
+     */
     template <class SM, class TGuard, class TEvent>
     void log_guard(const TGuard&, const TEvent&, bool result)
     {
 //        LOG(INFO) << boost::sml::aux::get_type_name<SM>() << "  " << boost::sml::aux::get_type_name<TGuard>()<< "  " << boost::sml::aux::get_type_name<TEvent>() << "  " << (result ? "[OK]" : "[Reject]");
     }
 
+    /**
+     * This function is called when an action is processed
+     * @tparam SM the state machine
+     * @tparam TAction the action
+     * @tparam TEvent the event
+     */
     template <class SM, class TAction, class TEvent>
     void log_action(const TAction&, const TEvent&)
     {
@@ -39,7 +72,15 @@ public:
 //        LOG(INFO) << boost::sml::aux::get_type_name<SM>()<< "  " << boost::sml::aux::get_type_name<TAction>() << "  " <<boost::sml::aux::get_type_name<TEvent>();
     }
 
-
+    /**
+     * This function is called when a state change occurs
+     *
+     * @tparam SM the state machine
+     * @tparam TSrcState the state type being exited
+     * @tparam TDstState the state type being entered
+     * @param src the state being exited
+     * @param dst the state being entered
+     */
     template <class SM, class TSrcState, class TDstState>
     void log_state_change(const TSrcState& src, const TDstState& dst)
     {
@@ -74,8 +115,15 @@ public:
       }
     }
 
+protected:
+    // Prevent construction and construction by copy, assignment, destruction.
+    FSMLogger() = default;
+    FSMLogger(const FSMLogger&) = default;
+    FSMLogger& operator=(const FSMLogger&) = default;
+    ~FSMLogger() = default;
+
 private:
-    static std::map<unsigned int, std::string> robot_logs;
+    std::map<unsigned int, std::string> robot_logs;
     std::string last_state_transition;
 };
 
