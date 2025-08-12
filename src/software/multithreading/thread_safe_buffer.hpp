@@ -4,10 +4,10 @@
 #include <condition_variable>
 #include <cstddef>
 #include <deque>
-#include <mutex>
-#include <optional>
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
+#include <mutex>
+#include <optional>
 
 #include "software/time/duration.h"
 #include "software/util/typename/typename.h"

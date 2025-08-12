@@ -1,13 +1,13 @@
 #pragma once
 
-#include "pb_decode.h"
-#include "pb_encode.h"
-
 #include <cmath>
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+#include "pb_decode.h"
+#include "pb_encode.h"
 
 #ifdef PLATFORMIO_BUILD
 #include <proto/power_frame_msg.nanopb.h>
@@ -17,7 +17,8 @@
 #include "proto/primitive/primitive_types.h"
 #include "shared/constants.h"
 
-extern "C" {
+extern "C"
+{
 #include "proto/power_frame_msg.nanopb.h"
 }
 #endif  // PLATFORMIO_BUILD
@@ -31,7 +32,7 @@ extern "C" {
 template <typename T>
 std::vector<uint8_t> serializeToVector(const T& data)
 {
-    const pb_msgdesc_s * fields;
+    const pb_msgdesc_s* fields;
     int size;
     if (std::is_same<T, TbotsProto_PowerFrame>::value)
     {

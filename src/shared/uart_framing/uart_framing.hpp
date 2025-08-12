@@ -1,9 +1,9 @@
 #pragma once
 
-#include "pb_decode.h"
-
 #include <cstdint>
 #include <vector>
+
+#include "pb_decode.h"
 
 #ifdef PLATFORMIO_BUILD
 #include <power_frame_msg_platformio.h>
