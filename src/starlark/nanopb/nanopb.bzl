@@ -14,7 +14,6 @@ load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 _FILENAME = "lib/{dirname}/{filename}"
 
 _PROTO_DIR = "{path}/proto"
-_OPTIONS_DIR = "{path}/generator/nanopb"
 
 # Command that makes a directory
 _MAKE_DIR_COMMAND = "mkdir -p {dirname}"
@@ -52,6 +51,14 @@ def _nanopb_proto_library_impl(ctx):
             transitive = [all_proto_include_dirs, dep[ProtoInfo].transitive_proto_path],
         )
 
+    # See https://jpa.kapsi.fi/nanopb/docs/reference.html#proto-file-options
+    # Section "Defining the options in a .options file" for more information
+    # on nanopb option files
+    all_options_map = {}
+    for opt_file in ctx.files.options:
+        opt_basename = opt_file.basename[:-len(".options")]
+        all_options_map[opt_basename] = opt_file
+
     all_proto_hdr_files = []
     all_proto_src_files = []
 
@@ -69,7 +76,14 @@ def _nanopb_proto_library_impl(ctx):
 
         proto_compile_args += ["--plugin=protoc-gen-nanopb=%s" % (ctx.executable.nanopb_generator.path)]
         proto_compile_args += ["--nanopb_out=%s %s" % (generated_folder_abs_path, proto_file.path)]
-        proto_compile_args += ["--nanopb_opt=--extension=.nanopb"]
+
+        nanopb_opts = ["--extension=.nanopb"]
+        proto_basename = proto_file.basename[:-len(".proto")]
+        if proto_basename in all_options_map:
+            nanopb_opts.append("--options-file=%s" % all_options_map[proto_basename].path)
+
+        for opt in nanopb_opts:
+            proto_compile_args += ["--nanopb_opt=%s" % opt]
 
         cmd = [ctx.executable.protoc.path] + proto_compile_args
         cmd_str = " ".join(cmd)
@@ -78,7 +92,7 @@ def _nanopb_proto_library_impl(ctx):
                 ctx.executable.protoc,
                 ctx.executable.nanopb_generator,
             ],
-            inputs = all_proto_files,
+            inputs = all_proto_files.to_list() + list(all_options_map.values()),
             outputs = [c_out, h_out],
             mnemonic = "NanopbGeneration",
             command = cmd_str,
@@ -224,6 +238,10 @@ nanopb_proto_library = rule(
             executable = True,
             cfg = "host",
             default = Label("@protobuf//:protoc"),
+        ),
+        "options": attr.label_list(
+            allow_files = [".options"],
+            mandatory = False,
         ),
         "_cc_toolchain": attr.label(
             default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),

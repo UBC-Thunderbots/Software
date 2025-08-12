@@ -1,4 +1,3 @@
-load("@nanopb//extra/bazel:nanopb_cc_proto_library.bzl", "cc_nanopb_proto_library")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
 load("//starlark/nanopb:nanopb.bzl", "nanopb_proto_library")
@@ -13,9 +12,6 @@ proto_library(
 proto_library(
     name = "geometry_proto",
     srcs = [":geometry.proto"],
-    #    deps = [
-    #        "@nanopb//:nanopb_proto",
-    #    ],
 )
 
 proto_library(
@@ -69,6 +65,7 @@ nanopb_proto_library(
     name = "tbots_nanopb_proto",
     nanopb_libs = ["@nanopb//:nanopb"],
     deps = [":tbots_proto"],
+    options = ["geometry.options"],
 )
 
 py_proto_library(
