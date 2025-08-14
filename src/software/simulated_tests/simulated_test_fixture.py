@@ -243,13 +243,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param tick_duration_s: length of a tick
         :param index: index of the current test. default is 0 (invariant test)
                       values can be passed in during aggregate testing for different timeout durations
-        :param ci_cmd_with_delay: A list consisting of a duration, and a
-                        tuple forming a ci command
-                        {
-                            (time, command, team),
-                            (time, command, team),
-                            ...
-                        }
+        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+                                  [
+                                      (time, command, team),
+                                      (time, command, team),
+                                      ...
+                                  ]
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
