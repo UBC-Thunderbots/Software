@@ -75,8 +75,8 @@ class Chicker
 
     static constexpr unsigned int CHRG_DONE_PIN  = 25;
     static constexpr unsigned int CHRG_PIN       = 26;
-    static constexpr unsigned int KICKER_PIN     = 32;
-    static constexpr unsigned int CHIPPER_PIN    = 33;
+    static constexpr unsigned int KICKER_PIN     = 33;
+    static constexpr unsigned int CHIPPER_PIN    = 32;
     static constexpr unsigned int BREAK_BEAM_PIN = 37;
 
     static constexpr unsigned int COOLDOWN_MICROSECONDS  = 3000000;
