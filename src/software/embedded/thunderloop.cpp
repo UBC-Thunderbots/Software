@@ -247,7 +247,7 @@ void Thunderloop::runLoop()
                 // Save new primitive
                 primitive_ = new_primitive;
 
-                auto orientation_msg = primitive_.orientation();
+                TbotsProto::Angle orientation_msg = primitive_.orientation();
                 robot_localizer_.rollbackVision(createAngle(orientation_msg), RTT_S / 2);
 
 
@@ -267,7 +267,7 @@ void Thunderloop::runLoop()
             }
 
             robot_localizer_.step(AngularVelocity::zero());
-            auto imu_poll = imu_service_->pollHeadingRate();
+            std::optional<Angle> imu_poll = imu_service_->pollHeadingRate();
 
             if (imu_poll.has_value())
             {
