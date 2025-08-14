@@ -106,13 +106,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         :param tick_duration_s: The simulation step duration
-        :param ci_cmd_with_delay: A list consisting of a duration, and a
-                                tuple forming a ci command
-                                {
-                                    (time, command, team),
-                                    (time, command, team),
-                                    ...
-                                }
+        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+                                  [
+                                      (time, command, team),
+                                      (time, command, team),
+                                      ...
+                                  ]
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
