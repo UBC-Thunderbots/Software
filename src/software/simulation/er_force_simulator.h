@@ -180,8 +180,8 @@ class ErForceSimulator
      *
      * @return a map from robot id to orientation
      */
-    std::map<RobotId, Angle> getRobotIdToOrientationMap(
-        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
+    static std::map<RobotId, Angle> getRobotIdToOrientationMap(
+            const google::protobuf::RepeatedPtrField<TbotsProto::Robot>& robots);
 
     /**
      * Update Simulator Robot and get the latest robot control
