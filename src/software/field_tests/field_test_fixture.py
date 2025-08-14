@@ -8,11 +8,12 @@ import argparse
 from proto.import_all_protos import *
 
 from software.simulated_tests import validation
-from software.thunderscope.constants import EstopMode
+from software.thunderscope.constants import EstopMode, IndividualRobotMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 from software.logger.logger import create_logger
 
 
@@ -199,7 +200,7 @@ class FieldTestRunner(TbotsTestRunner):
 
 
 def load_command_line_arguments():
-    """Load from command line arguments using argpase
+    """Load in command-line arguments using argparse
 
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
@@ -360,7 +361,7 @@ def field_test_runner():
 
     # Launch all binaries
     with FullSystem(
-        runtime_dir,
+        full_system_runtime_dir=runtime_dir,
         debug_full_system=debug_full_sys,
         friendly_colour_yellow=args.run_yellow,
         should_restart_on_crash=False,
@@ -368,23 +369,26 @@ def field_test_runner():
         # we would be using conventional port if and only if we are playing in robocup.
         suppress_logs=(not args.show_gamecontroller_logs),
         use_conventional_port=False,
-    ) as gamecontroller, RobotCommunication(
+    ) as gamecontroller, WifiCommunicationManager(
         current_proto_unix_io=friendly_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(args.channel),
+        should_setup_full_system=True,
         interface=args.interface,
-        estop_mode=estop_mode,
-        estop_path=estop_path,
-        enable_radio=args.enable_radio,
         referee_port=gamecontroller.get_referee_port()
         if gamecontroller
         else SSL_REFEREE_PORT,
+    ) as wifi_communication_manager, RobotCommunication(
+        current_proto_unix_io=friendly_proto_unix_io,
+        communication_manager=wifi_communication_manager,
+        estop_mode=estop_mode,
+        estop_path=estop_path,
     ) as rc_friendly:
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
-        rc_friendly.setup_for_fullsystem()
 
         gamecontroller.setup_proto_unix_io(
-            blue_full_system_proto_unix_io,
-            yellow_full_system_proto_unix_io,
+            blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+            simulator_proto_unix_io=simulator_proto_unix_io,
         )
         # Inject the proto unix ios into thunderscope and start the test
         tscope = Thunderscope(
@@ -396,6 +400,13 @@ def field_test_runner():
             ),
             layout_path=None,
         )
+
+        # Set control mode for all robots to AI so that packets are sent to the robots
+        for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
+            rc_friendly.toggle_individual_robot_control_mode(
+                robot_id,
+                IndividualRobotMode.AI,
+            )
 
         # connect the keyboard estop toggle to the key event if needed
         if estop_mode == EstopMode.KEYBOARD_ESTOP:

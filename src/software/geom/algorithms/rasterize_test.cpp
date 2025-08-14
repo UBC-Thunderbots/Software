@@ -9,75 +9,72 @@
 
 namespace TestUtil
 {
-    void checkPointsCloseToEachOther(std::vector<Point> all_points, double max_dist)
+void checkPointsCloseToEachOther(std::vector<Point> all_points, double max_dist)
+{
+    for (Point& p : all_points)
     {
-        for (Point& p : all_points)
-        {
-            auto compare_based_on_distance_to_p = [p](const Point& a,
-                                                      const Point& b) -> bool
-            { return distance(a, p) < distance(b, p); };
+        auto compare_based_on_distance_to_p = [p](const Point& a, const Point& b) -> bool
+        { return distance(a, p) < distance(b, p); };
 
-            std::vector<Point> all_points_copy = all_points;
-            all_points_copy.erase(
-                std::remove(all_points_copy.begin(), all_points_copy.end(), p),
-                all_points_copy.end());
-            Point closest_p =
-                *std::min_element(all_points_copy.begin(), all_points_copy.end(),
-                                  compare_based_on_distance_to_p);
-            EXPECT_LE(distance(p, closest_p), max_dist);
-        }
+        std::vector<Point> all_points_copy = all_points;
+        all_points_copy.erase(
+            std::remove(all_points_copy.begin(), all_points_copy.end(), p),
+            all_points_copy.end());
+        Point closest_p =
+            *std::min_element(all_points_copy.begin(), all_points_copy.end(),
+                              compare_based_on_distance_to_p);
+        EXPECT_LE(distance(p, closest_p), max_dist);
     }
+}
 
-    void checkPolygonPointsInsideBoundingBox(Polygon polygon,
-                                             std::vector<Point> all_points)
+void checkPolygonPointsInsideBoundingBox(Polygon polygon, std::vector<Point> all_points)
+{
+    const std::vector<Point>& polygon_vertices = polygon.getPoints();
+    auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
+
+    auto max_point_x = [](const Point& a, const Point& b) { return a.x() < b.x(); };
+
+    // Calculate the highest and lowest x and y points
+    double min_y =
+        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+            ->y();
+    double min_x =
+        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
+            ->x();
+    double max_y =
+        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+            ->y();
+    double max_x =
+        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
+            ->x();
+
+    Rectangle bounding_box = Rectangle(Point(min_x, min_y), Point(max_x, max_y));
+    for (Point p : all_points)
     {
-        const std::vector<Point>& polygon_vertices = polygon.getPoints();
-        auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
-
-        auto max_point_x = [](const Point& a, const Point& b) { return a.x() < b.x(); };
-
-        // Calculate the highest and lowest x and y points
-        double min_y = std::min_element(polygon_vertices.begin(), polygon_vertices.end(),
-                                        max_point_y)
-                           ->y();
-        double min_x = std::min_element(polygon_vertices.begin(), polygon_vertices.end(),
-                                        max_point_x)
-                           ->x();
-        double max_y = std::max_element(polygon_vertices.begin(), polygon_vertices.end(),
-                                        max_point_y)
-                           ->y();
-        double max_x = std::max_element(polygon_vertices.begin(), polygon_vertices.end(),
-                                        max_point_x)
-                           ->x();
-
-        Rectangle bounding_box = Rectangle(Point(min_x, min_y), Point(max_x, max_y));
-        for (Point p : all_points)
-        {
-            EXPECT_TRUE(contains(bounding_box, p));
-        }
+        EXPECT_TRUE(contains(bounding_box, p));
     }
+}
 
-    void checkStadiumPointsInsideBoundingBox(Stadium stadium,
-                                             std::vector<Point> all_points)
+void checkStadiumPointsInsideBoundingBox(Stadium stadium, std::vector<Point> all_points)
+{
+    auto min_x =
+        std::min(stadium.segment().getStart().x(), stadium.segment().getEnd().x());
+    auto max_x =
+        std::max(stadium.segment().getStart().x(), stadium.segment().getEnd().x());
+    auto min_y =
+        std::min(stadium.segment().getStart().y(), stadium.segment().getEnd().y());
+    auto max_y =
+        std::max(stadium.segment().getStart().y(), stadium.segment().getEnd().y());
+
+    Rectangle bounding_box =
+        Rectangle(Point(min_x - stadium.radius(), min_y - stadium.radius()),
+                  Point(max_x + stadium.radius(), max_y + stadium.radius()));
+
+    for (Point p : all_points)
     {
-        auto min_x =
-            std::min(stadium.segment().getStart().x(), stadium.segment().getEnd().x());
-        auto max_x =
-            std::max(stadium.segment().getStart().x(), stadium.segment().getEnd().x());
-        auto min_y =
-            std::min(stadium.segment().getStart().y(), stadium.segment().getEnd().y());
-        auto max_y =
-            std::max(stadium.segment().getStart().y(), stadium.segment().getEnd().y());
-
-        Rectangle bounding_box =
-            Rectangle(Point(min_x - stadium.radius(), min_y - stadium.radius()),
-                      Point(max_x + stadium.radius(), max_y + stadium.radius()));
-
-        for (Point p : all_points)
-        {
-            EXPECT_TRUE(contains(bounding_box, p));
-        }
+        EXPECT_TRUE(contains(bounding_box, p));
     }
+}
 };  // namespace TestUtil
 
 //////////////////////////////////////////////////////
