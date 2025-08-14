@@ -303,14 +303,16 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const auto& sim_robots           = sim_state.yellow_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
     // Need to pass in the orientation that the robots see in vision to the executor
-    const auto robot_orient_map      = getRobotIdToOrientationMap(world_msg->friendly_team().team_robots());
+    const auto robot_orient_map =
+        getRobotIdToOrientationMap(world_msg->friendly_team().team_robots());
 
-    yellow_team_world_msg                 = std::move(world_msg);
+    yellow_team_world_msg               = std::move(world_msg);
     const TbotsProto::World world_proto = *yellow_team_world_msg;
 
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        if (robot_to_vel_pair_map.contains(robot_id) && robot_orient_map.contains(robot_id))
+        if (robot_to_vel_pair_map.contains(robot_id) &&
+            robot_orient_map.contains(robot_id))
         {
             auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
@@ -328,14 +330,16 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const auto& sim_robots           = sim_state.blue_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
     // Need to pass in the orientation that the robots see in vision to the executor
-    const auto robot_orient_map      = getRobotIdToOrientationMap(world_msg->friendly_team().team_robots());
+    const auto robot_orient_map =
+        getRobotIdToOrientationMap(world_msg->friendly_team().team_robots());
 
     blue_team_world_msg                 = std::move(world_msg);
     const TbotsProto::World world_proto = *blue_team_world_msg;
 
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        if (robot_to_vel_pair_map.contains(robot_id) && robot_orient_map.contains(robot_id))
+        if (robot_to_vel_pair_map.contains(robot_id) &&
+            robot_orient_map.contains(robot_id))
         {
             auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
@@ -361,7 +365,6 @@ void ErForceSimulator::setRobotPrimitive(
         auto primitive_executor = robot_primitive_executor_iter->second;
         primitive_executor->updateState(local_velocity, angular_velocity, orientation);
         primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
-
     }
     else
     {
@@ -594,7 +597,8 @@ std::map<RobotId, Angle> ErForceSimulator::getRobotIdToOrientationMap(
     std::map<RobotId, Angle> robot_to_orientation;
     for (const auto& robot : robots)
     {
-        const Angle angle                    = Angle::fromRadians(robot.current_state().global_orientation().radians());
+        const Angle angle =
+            Angle::fromRadians(robot.current_state().global_orientation().radians());
         robot_to_orientation[robot.id()] = angle;
     }
     return robot_to_orientation;
