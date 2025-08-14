@@ -111,14 +111,14 @@ std::optional<AngularVelocity> ImuService::pollHeadingRate()
         return std::nullopt;
     }
     // Two separate registers for the Gyro output data.
-    auto least_significant = static_cast<int16_t>(
+    auto least_significant = static_cast<short>(
         i2c_smbus_read_byte_data(file_descriptor_, YAW_LEAST_SIG_REG));
-    auto most_significant = static_cast<int16_t>(
+    auto most_significant = static_cast<short>(
         i2c_smbus_read_byte_data(file_descriptor_, YAW_MOST_SIG_REG));
 
 
-    auto foo          = static_cast<int16_t>(most_significant << 8);
-    int16_t full_word = foo + least_significant;
+    short foo          = most_significant << 8;
+    short full_word = foo + least_significant;
 
     double degrees_per_sec = double(full_word) / double(SHRT_MAX) * IMU_FULL_SCALE_DPS;
     return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
