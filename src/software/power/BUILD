@@ -13,14 +13,6 @@ platformio_library(
     name = "chicker",
     src = "chicker.cpp",
     hdr = "chicker.h",
-    deps = [":pins"],
-)
-
-platformio_library(
-    name = "charger",
-    src = "charger.cpp",
-    hdr = "charger.h",
-    deps = [":pins"],
 )
 
 platformio_library(
@@ -28,7 +20,6 @@ platformio_library(
     src = "power_monitor.cpp",
     hdr = "power_monitor.h",
     deps = [
-        ":pins",
         "@LTC4151//:LTC4151_platformio",
     ],
 )
@@ -38,17 +29,10 @@ platformio_library(
     src = "control_executor.cpp",
     hdr = "control_executor.h",
     deps = [
-        ":charger",
         ":chicker",
-        ":pins",
         "//proto:tbots_nanopb_proto",
         "@nanopb//:nanopb_platformio",
     ],
-)
-
-platformio_library(
-    name = "pins",
-    hdr = "pins.h",
 )
 
 platformio_project(
@@ -59,10 +43,8 @@ platformio_project(
     framework = "arduino",
     platform = "espressif32",
     deps = [
-        ":charger",
         ":chicker",
         ":control_executor",
-        ":pins",
         ":power_monitor",
         "//proto:tbots_nanopb_proto",
         "//shared:constants_platformio",

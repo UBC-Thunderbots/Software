@@ -4,8 +4,6 @@
 
 #include <memory>
 
-#include "pins.h"
-
 /**
  * Represents the power monitor on the power board
  */
@@ -30,6 +28,10 @@ class PowerMonitor
     float getCurrentDrawAmp();
 
    private:
+    static constexpr unsigned int PM_SDA = 13;
+    static constexpr unsigned int PM_SCL = 14;
+
     static constexpr double RESISTANCE_OHMS = 0.002;
+
     std::shared_ptr<LTC4151> monitor;
 };

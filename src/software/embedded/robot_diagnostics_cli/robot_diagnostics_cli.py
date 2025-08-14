@@ -168,11 +168,6 @@ class RobotDiagnosticsCLI:
             f"{ROBOT_CURRENT_DRAW_REDIS_KEY}",
             self.embedded_data.get_current_draw(),
         )
-        table.add_row(
-            "Capacitor Voltage",
-            f"{ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY}",
-            self.embedded_data.get_cap_volt(),
-        )
         return table
 
     def stats(self) -> None:

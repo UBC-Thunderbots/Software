@@ -1,5 +1,4 @@
 #ifdef PLATFORMIO_BUILD
-#include "charger.h"
 #include "chicker.h"
 #include "constants_platformio.h"
 #include "control_executor.h"
@@ -13,11 +12,9 @@
 #include "proto/tbots_nanopb_proto_nanopb_gen/proto/robot_status_msg.nanopb.h"
 #include "shared/constants.h"
 #include "shared/uart_framing/uart_framing.hpp"
-#include "software/power/charger.h"
 #include "software/power/chicker.h"
 #include "software/power/control_executor.h"
 #include "software/power/power_monitor.h"
-
 #endif
 
 #include <Arduino.h>
@@ -29,7 +26,6 @@ std::vector<uint8_t> buffer;
 
 uint32_t sequence_num;
 
-std::shared_ptr<Charger> charger;
 std::shared_ptr<Chicker> chicker;
 std::shared_ptr<PowerMonitor> monitor;
 std::shared_ptr<ControlExecutor> executor;
@@ -40,11 +36,9 @@ void setup()
     read_buffer_size = getMarshalledSize(
         TbotsProto_PowerPulseControl TbotsProto_PowerPulseControl_init_default);
     sequence_num = 0;
-    charger      = std::make_shared<Charger>();
     chicker      = std::make_shared<Chicker>();
     monitor      = std::make_shared<PowerMonitor>();
-    executor     = std::make_shared<ControlExecutor>(charger, chicker);
-    charger->chargeCapacitors();
+    executor     = std::make_shared<ControlExecutor>(chicker);
 }
 
 void loop()
@@ -55,6 +49,7 @@ void loop()
         incomingByte = Serial.read();
         buffer.emplace_back(static_cast<uint8_t>(incomingByte));
     }
+
     // Once there is enough data attempt to decode
     if (buffer.size() == read_buffer_size)
     {
@@ -67,10 +62,13 @@ void loop()
         }
         buffer.clear();
     }
+
     // Read sensor values. These are all instantaneous
-    auto status = createNanoPbPowerStatus(
-        monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
-        monitor->getCurrentDrawAmp(), sequence_num++, chicker->getBreakBeamTripped());
+    auto status = createNanoPbPowerStatus(monitor->getBatteryVoltage(),
+                                          monitor->getCurrentDrawAmp(), sequence_num++,
+                                          chicker->getBreakBeamTripped());
+
+    // Send out status frame with sensor values
     auto status_frame = createUartFrame(status);
     auto packet       = marshallUartPacket(status_frame);
     for (auto byte : packet)

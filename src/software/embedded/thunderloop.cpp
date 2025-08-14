@@ -491,10 +491,6 @@ void Thunderloop::updateErrorCodes()
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
     }
-    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
-    {
-        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
-    }
     if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);

@@ -141,16 +141,17 @@ message NetworkStatus
     uint32 primitive_packet_loss_percentage = 3;
 }
 
-/* Battery and capacitor voltages */
+/* Data from power board about battery voltages and current draw */
 message PowerStatus
 {
-    // The voltage on the robot’s battery, in volts.
-    float battery_voltage   = 1;
-    float capacitor_voltage = 2;
-    // voltage on the robot’s capacitor, in volts.
-    float current_draw     = 3;
+    reserved 2, 4;
+
+    // The voltage on the robot’s battery, in volts
+    float battery_voltage = 1;
+
+    // The current draw on the robot's battery, in amps
+    float current_draw = 3;
+
     uint32 sequence_num    = 5;
     bool breakbeam_tripped = 6;
-
-    reserved 4;
 }

@@ -51,9 +51,6 @@ class EmbeddedData:
     def get_battery_volt(self) -> str:
         return str(self.redis.get(ROBOT_BATTERY_VOLTAGE_REDIS_KEY))
 
-    def get_cap_volt(self) -> str:
-        return str(self.redis.get(ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY))
-
     def __clamp(self, val: float, min_val: float, max_val: float) -> float:
         """Simple Math Clamp function (Faster than numpy & fewer dependencies)
         :param val: Value to clamp

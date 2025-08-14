@@ -6,6 +6,8 @@ volatile bool Chicker::on_cooldown  = false;
 
 Chicker::Chicker()
 {
+    pinMode(CHRG_DONE_PIN, INPUT);
+    pinMode(CHRG_PIN, OUTPUT);
     pinMode(CHIPPER_PIN, OUTPUT);
     pinMode(KICKER_PIN, OUTPUT);
     pinMode(BREAK_BEAM_PIN, INPUT);
@@ -15,6 +17,11 @@ Chicker::Chicker()
 
     cooldown_timer = timerBegin(CHICKER_COOLDOWN_TIMER, 80, true);
     timerAttachInterrupt(cooldown_timer, &offCooldown, true);
+
+    // Set the charge pin to HIGH to begin charging the capacitors.
+    // Note: we run in regulation mode, meaning the capacitors will recharge
+    // continuously while charge is HIGH
+    digitalWrite(CHRG_PIN, HIGH);
 }
 
 void Chicker::kick(uint32_t kick_pulse_width)
