@@ -101,7 +101,6 @@ message PowerControl
 
 message Primitive
 {
-
     oneof primitive
     {
         MovePrimitive move                    = 1;
