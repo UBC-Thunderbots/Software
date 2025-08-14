@@ -114,7 +114,6 @@ std::optional<AngularVelocity> ImuService::pollHeadingRate()
     int least_significant = i2c_smbus_read_byte_data(file_descriptor_, YAW_LEAST_SIG_REG);
     int most_significant = i2c_smbus_read_byte_data(file_descriptor_, YAW_MOST_SIG_REG);
 
-
     int foo          = most_significant << 8;
     int full_word = foo + least_significant;
 
