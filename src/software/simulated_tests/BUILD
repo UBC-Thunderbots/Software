@@ -31,7 +31,6 @@ cc_library(
     testonly = True,
     srcs = ["simulated_er_force_sim_test_fixture.cpp"],
     hdrs = ["simulated_er_force_sim_test_fixture.h"],
-    copts = ["-Iexternal/nanopb+"],
     deps = [
         "//software/logger",
         "//proto/message_translation:tbots_protobuf",

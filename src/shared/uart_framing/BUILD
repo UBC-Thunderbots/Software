@@ -14,7 +14,6 @@ platformio_library(
 cc_library(
     name = "uart_framing",
     hdrs = ["uart_framing.hpp"],
-    copts = ["-Iexternal/nanopb+"],
     deps = [
         "//proto/message_translation:power_frame_msg",
         "@nanopb",
@@ -26,7 +25,6 @@ cc_test(
     srcs = [
         "uart_framing_test.cpp",
     ],
-    copts = ["-Iexternal/nanopb+"],
     deps = [
         ":uart_framing",
         "//proto:tbots_nanopb_proto",

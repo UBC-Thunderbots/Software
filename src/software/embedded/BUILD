@@ -60,7 +60,6 @@ cc_library(
     name = "thunderloop",
     srcs = ["thunderloop.cpp"],
     hdrs = ["thunderloop.h"],
-    copts = ["-Iexternal/nanopb+"],
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
@@ -96,7 +95,6 @@ cc_library(
 cc_binary(
     name = "thunderloop_main",
     srcs = ["thunderloop_main.cpp"],
-    copts = ["-Iexternal/nanopb+"],
     linkopts = [
         "-lpthread",
         "-lrt",
@@ -115,7 +113,6 @@ sh_binary(
 cc_test(
     name = "test_battery",
     srcs = ["battery_test.cpp"],
-    copts = ["-Iexternal/nanopb+"],
     deps = [
         ":thunderloop",
         "//shared/test_util:tbots_gtest_main",

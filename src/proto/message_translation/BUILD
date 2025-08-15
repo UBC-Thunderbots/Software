@@ -180,7 +180,6 @@ cc_library(
     name = "er_force_world",
     srcs = ["er_force_world.cpp"],
     hdrs = ["er_force_world.h"],
-    copts = ["-Iexternal/nanopb+"],
     deps = [
         "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
         "//software/world:ball",
@@ -206,7 +205,6 @@ platformio_library(
 cc_library(
     name = "power_frame_msg",
     hdrs = ["power_frame_msg.hpp"],
-    copts = ["-Iexternal/nanopb+"],
     deps = [
         "//proto:tbots_nanopb_proto",
         "//proto/primitive:primitive_msg_factory",
@@ -229,7 +227,6 @@ py_library(
 cc_test(
     name = "power_frame_msg_test",
     srcs = ["power_frame_msg_test.cpp"],
-    copts = ["-Iexternal/nanopb+"],
     deps = [
         ":power_frame_msg",
         "//shared/test_util:tbots_gtest_main",

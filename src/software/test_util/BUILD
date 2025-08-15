@@ -11,7 +11,6 @@ cc_library(
         "equal_within_tolerance.h",
         "test_util.h",
     ],
-    copts = ["-Iexternal/nanopb+"],
     deps = [
         "//proto:tbots_nanopb_proto",
         "//proto/message_translation:tbots_protobuf",

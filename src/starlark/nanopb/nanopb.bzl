@@ -187,6 +187,14 @@ def _nanopb_proto_library_impl(ctx):
             destination = file.path,
         ))
 
+    extra_context = cc_common.create_compilation_context(
+        includes = depset(["external/nanopb+"]),
+    )
+
+    final_compilation_context = cc_common.merge_compilation_contexts(
+        compilation_contexts = [compilation_context, extra_context],
+    )
+
     zip_file = ctx.actions.declare_file("%s.zip" % name)
     outputs.append(zip_file)
     commands.append(_ZIP_COMMAND.format(
@@ -211,7 +219,7 @@ def _nanopb_proto_library_impl(ctx):
             transitive_libdeps = transitive_libdeps,
         ),
         CcInfo(
-            compilation_context = compilation_context,
+            compilation_context = final_compilation_context,
             linking_context = linking_context,
         ),
     ]
