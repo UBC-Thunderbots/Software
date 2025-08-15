@@ -65,7 +65,7 @@ nanopb_proto_library(
     name = "tbots_nanopb_proto",
     nanopb_libs = ["@nanopb//:nanopb"],
     deps = [":tbots_proto"],
-    options = ["geometry.options"],
+    options = glob(["*.options"]),
 )
 
 py_proto_library(
