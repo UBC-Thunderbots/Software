@@ -16,16 +16,16 @@
 using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
 StSpinMotorController::StSpinMotorController()
-    : driver_control_enable_gpio_(
-          setupGpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT, GpioState::HIGH)),
-      reset_gpio_(
+    : reset_gpio_(
           setupGpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH))
 {
-    openSpiFileDescriptor(MotorIndex::FRONT_LEFT);
-    openSpiFileDescriptor(MotorIndex::FRONT_RIGHT);
-    openSpiFileDescriptor(MotorIndex::BACK_LEFT);
-    openSpiFileDescriptor(MotorIndex::BACK_RIGHT);
-    openSpiFileDescriptor(MotorIndex::DRIBBLER);
+    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    {
+        if (ENABLED_MOTORS.at(motor))
+        {
+            openSpiFileDescriptor(motor);
+        }
+    }
 }
 
 MotorControllerStatus StSpinMotorController::earlyPoll()
@@ -44,26 +44,43 @@ void StSpinMotorController::setup()
 
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
     {
-        sendAndReceiveFrame(motor, StSpinOpcode::ACK_FAULTS);
+        if (ENABLED_MOTORS.at(motor))
+        {
+            sendAndReceiveFrame(motor, StSpinOpcode::ACK_FAULTS);
+        }
     }
 
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
     {
-        sendAndReceiveFrame(motor, StSpinOpcode::START_MOTOR);
-        checkDriverFault(motor);
-        readThenWriteVelocity(motor, 0);
+        if (ENABLED_MOTORS.at(motor))
+        {
+            sendAndReceiveFrame(motor, StSpinOpcode::START_MOTOR);
+            checkDriverFault(motor);
+            readThenWriteVelocity(motor, 0);
+        }
     }
 }
 
 void StSpinMotorController::reset()
 {
     reset_gpio_->setValue(GpioState::LOW);
+    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+
+    reset_gpio_->setValue(GpioState::HIGH);
+    usleep(MICROSECONDS_PER_MILLISECOND * 100);
 }
 
 MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& motor)
 {
     bool drive_enabled = true;
     std::unordered_set<TbotsProto::MotorFault> motor_faults;
+
+    if (!ENABLED_MOTORS.at(motor))
+    {
+        // Motor is disabled; pretend that the motor is working fine so
+        // that Thunderloop doesn't attempt to reset it and crash
+        return MotorFaultIndicator(drive_enabled, motor_faults);
+    }
 
     sendAndReceiveFrame(motor, StSpinOpcode::GET_FAULT);
 
@@ -158,6 +175,13 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
 double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
                                                     const int& target_velocity)
 {
+    if (!ENABLED_MOTORS.at(motor))
+    {
+        // Motor is disabled; pretend that the motor is working fine so
+        // that Thunderloop doesn't attempt to reset it and crash
+        return 0;
+    }
+
     sendAndReceiveFrame(motor, StSpinOpcode::GET_SPEED);
 
     // SET_SPEEDRAMP expects the target motor speed to be in register ax.
@@ -178,7 +202,6 @@ double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
 
 void StSpinMotorController::immediatelyDisable()
 {
-    driver_control_enable_gpio_->setValue(GpioState::LOW);
 }
 
 void StSpinMotorController::openSpiFileDescriptor(const MotorIndex& motor)
@@ -234,6 +257,11 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
 
     spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_LEN,
                 SPI_SPEED_HZ);
+
+	LOG(INFO) << "TX " << static_cast<int>(tx[0]) << " " << static_cast<int>(tx[1]) << " " << static_cast<int>(tx[2])
+			  << " " << static_cast<int>(tx[3]) << " " << static_cast<int>(tx[4]) << " " << static_cast<int>(tx[5]);
+	LOG(INFO) << "RX " << static_cast<int>(rx[0]) << " " << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2])
+			  << " " << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4]) << " " << static_cast<int>(rx[5]);
 
     return static_cast<int16_t>((static_cast<uint16_t>(rx[2]) << 8) | rx[3]);
 }

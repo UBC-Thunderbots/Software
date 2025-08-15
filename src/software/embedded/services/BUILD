@@ -1,30 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
-
-string_flag(
-    name = "motor_board",
-    build_setting_default = "TRINAMIC",
-    values = [
-        "TRINAMIC",
-        "STSPIN",
-    ],
-)
-
-config_setting(
-    name = "build_trinamic",
-    flag_values = {
-        ":motor_board": "TRINAMIC",
-    },
-)
-
-config_setting(
-    name = "build_stspin",
-    flag_values = {
-        ":motor_board": "STSPIN",
-    },
-)
-
 cc_library(
     name = "motor",
     srcs = ["motor.cpp"],
@@ -36,8 +11,8 @@ cc_library(
             "//software/embedded:build_limited": ["LIMITED"],
         }) +
         select({
-            ":build_trinamic": ["TRINAMIC_MOTOR_BOARD"],
-            ":build_stspin": ["STSPIN_MOTOR_BOARD"],
+            "//software/embedded:build_trinamic": ["TRINAMIC_MOTOR_BOARD"],
+            "//software/embedded:build_stspin": ["STSPIN_MOTOR_BOARD"],
         }),
     deps = [
         "//proto:tbots_cc_proto",

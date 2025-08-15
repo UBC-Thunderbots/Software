@@ -25,7 +25,6 @@ class StSpinMotorController : public MotorController
 
     void immediatelyDisable() override;
 
-   private:
     /**
      * Opens a SPI file descriptor for the given motor
      *
@@ -63,6 +62,14 @@ class StSpinMotorController : public MotorController
     static constexpr uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
     static constexpr uint8_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
 
+    static const inline std::unordered_map<MotorIndex, bool> ENABLED_MOTORS = {
+        {MotorIndex::FRONT_LEFT, true},
+        {MotorIndex::BACK_LEFT, false},
+        {MotorIndex::BACK_RIGHT, false},
+        {MotorIndex::FRONT_RIGHT, false},
+        {MotorIndex::DRIBBLER, false},
+    };
+
     static const inline std::unordered_map<MotorIndex, uint8_t> CHIP_SELECTS = {
         {MotorIndex::FRONT_LEFT, FRONT_LEFT_MOTOR_CHIP_SELECT},
         {MotorIndex::BACK_LEFT, BACK_LEFT_MOTOR_CHIP_SELECT},
@@ -89,7 +96,5 @@ class StSpinMotorController : public MotorController
     // SPI File Descriptors mapping from Chip Select -> File Descriptor
     std::array<int, reflective_enum::size<MotorIndex>()> file_descriptors_;
 
-    // Enable driver gpio
-    std::unique_ptr<Gpio> driver_control_enable_gpio_;
     std::unique_ptr<Gpio> reset_gpio_;
 };

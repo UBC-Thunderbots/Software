@@ -33,6 +33,29 @@ string_flag(
     ],
 )
 
+config_setting(
+    name = "build_trinamic",
+    flag_values = {
+        ":motor_board": "TRINAMIC",
+    },
+)
+
+config_setting(
+    name = "build_stspin",
+    flag_values = {
+        ":motor_board": "STSPIN",
+    },
+)
+
+string_flag(
+    name = "motor_board",
+    build_setting_default = "TRINAMIC",
+    values = [
+        "TRINAMIC",
+        "STSPIN",
+    ],
+)
+
 cc_library(
     name = "platform",
     hdrs = ["platform.h"],
