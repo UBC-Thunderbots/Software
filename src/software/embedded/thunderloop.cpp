@@ -124,10 +124,10 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
-    //motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
-    //g_motor_service = motor_service_.get();
-    //motor_service_->setup();
-    //LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
+    // motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    // g_motor_service = motor_service_.get();
+    // motor_service_->setup();
+    // LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -289,7 +289,8 @@ void Thunderloop::runLoop()
 
             // Power Service: execute the power control command
             power_status_ = pollPowerService(poll_time);
-            LOG(INFO) << "Thunderloop: Poll PowerService: " << power_status_.DebugString();
+            LOG(INFO) << "Thunderloop: Poll PowerService: "
+                      << power_status_.DebugString();
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
@@ -329,7 +330,8 @@ void Thunderloop::runLoop()
             }
 
             // Motor Service: execute the motor control command
-            //motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(),
+            // motor_status_ = pollMotorService(poll_time,
+            // direct_control_.motor_control(),
             //                                 time_since_prev_iter);
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
@@ -341,8 +343,8 @@ void Thunderloop::runLoop()
             // Update Robot Status with poll responses
             robot_status_.set_robot_id(robot_id_);
             robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
-            *(robot_status_.mutable_time_sent())             = time_sent_;
-            *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
+            *(robot_status_.mutable_time_sent())          = time_sent_;
+            *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
             //*(robot_status_.mutable_motor_status())          = motor_status_.value();
             *(robot_status_.mutable_power_status())          = power_status_;
             *(robot_status_.mutable_jetson_status())         = jetson_status_;

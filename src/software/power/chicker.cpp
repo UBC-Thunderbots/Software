@@ -2,7 +2,7 @@
 
 hw_timer_t* Chicker::pulse_timer    = nullptr;
 hw_timer_t* Chicker::cooldown_timer = nullptr;
-hw_timer_t* Chicker::charge_timer = nullptr;
+hw_timer_t* Chicker::charge_timer   = nullptr;
 volatile bool Chicker::on_cooldown  = false;
 
 Chicker::Chicker()

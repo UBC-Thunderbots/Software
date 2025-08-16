@@ -82,8 +82,8 @@ class Chicker
     static constexpr unsigned int CHIPPER_PIN    = 32;
     static constexpr unsigned int BREAK_BEAM_PIN = 37;
 
-    static constexpr unsigned int COOLDOWN_MICROSECONDS  = 3000000;
-    static constexpr unsigned int CHARGE_MICROSECONDS    = 100000;
+    static constexpr unsigned int COOLDOWN_MICROSECONDS = 3000000;
+    static constexpr unsigned int CHARGE_MICROSECONDS   = 100000;
 
     static constexpr unsigned int CHICKER_PULSE_TIMER    = 0;
     static constexpr unsigned int CHICKER_COOLDOWN_TIMER = 3;
