@@ -62,6 +62,8 @@ class Chicker
      */
     static void oneShotPulse(int duration, int pin);
 
+    static void setChargeHigh();
+
     /**
      * Called on a pulse_timer to bring the CHIPPER/KICKER pin low
      */
@@ -70,6 +72,7 @@ class Chicker
 
     static hw_timer_t* pulse_timer;
     static hw_timer_t* cooldown_timer;
+    static hw_timer_t* charge_timer;
 
     static volatile bool on_cooldown;
 
@@ -80,6 +83,9 @@ class Chicker
     static constexpr unsigned int BREAK_BEAM_PIN = 37;
 
     static constexpr unsigned int COOLDOWN_MICROSECONDS  = 3000000;
+    static constexpr unsigned int CHARGE_MICROSECONDS    = 100000;
+
     static constexpr unsigned int CHICKER_PULSE_TIMER    = 0;
     static constexpr unsigned int CHICKER_COOLDOWN_TIMER = 3;
+    static constexpr unsigned int CHARGE_TIMER           = 1;
 };
