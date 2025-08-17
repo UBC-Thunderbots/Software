@@ -1,7 +1,7 @@
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 
 buildifier(
-    name = "buildifier.check",
+    name = "buildifier.fix",
     exclude_patterns = [
         "./.git/*",
     ],
