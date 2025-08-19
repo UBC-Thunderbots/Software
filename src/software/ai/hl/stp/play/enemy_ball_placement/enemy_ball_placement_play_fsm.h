@@ -98,6 +98,9 @@ struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayControlParams>
      */
     void enterDefensiveFormation(const Update& event);
 
+    DEFINE_SML_GUARD(hasPlacementPoint, EnemyBallPlacementPlayFSM)
+    DEFINE_SML_GUARD(isNearlyPlaced, EnemyBallPlacementPlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -111,9 +114,6 @@ struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayControlParams>
         DEFINE_SML_ACTION(setPlacementPoint)
         DEFINE_SML_ACTION(avoid)
         DEFINE_SML_ACTION(enterDefensiveFormation)
-
-        DEFINE_SML_GUARD(hasPlacementPoint)
-        DEFINE_SML_GUARD(isNearlyPlaced)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

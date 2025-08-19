@@ -173,6 +173,11 @@ struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
      */
     bool shouldLoseBall(const Update &event);
 
+    DEFINE_SML_GUARD(havePossession, DribbleFSM)
+    DEFINE_SML_GUARD(lostPossession, DribbleFSM)
+    DEFINE_SML_GUARD(dribblingDone, DribbleFSM)
+    DEFINE_SML_GUARD(shouldLoseBall, DribbleFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -181,10 +186,7 @@ struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
         DEFINE_SML_STATE(Dribble)
         DEFINE_SML_STATE(LoseBall)
         DEFINE_SML_EVENT(Update)
-        DEFINE_SML_GUARD(havePossession)
-        DEFINE_SML_GUARD(lostPossession)
-        DEFINE_SML_GUARD(dribblingDone)
-        DEFINE_SML_GUARD(shouldLoseBall)
+
         DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getPossession)
         DEFINE_SML_ACTION(dribble)

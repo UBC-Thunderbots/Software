@@ -205,6 +205,15 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayControlParams>
      */
     bool chipDone(const Update& event);
 
+    DEFINE_SML_GUARD(setupDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD(shotFound, FreeKickPlayFSM)
+    DEFINE_SML_GUARD(shotDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD(shouldAbortPass, FreeKickPlayFSM)
+    DEFINE_SML_GUARD(passFound, FreeKickPlayFSM)
+    DEFINE_SML_GUARD(passDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD(chipDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD(timeExpired, FreeKickPlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -223,15 +232,6 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayControlParams>
         DEFINE_SML_ACTION(lookForPass)
         DEFINE_SML_ACTION(passBall)
         DEFINE_SML_ACTION(chipBall)
-
-        DEFINE_SML_GUARD(setupDone)
-        DEFINE_SML_GUARD(shotFound)
-        DEFINE_SML_GUARD(shotDone)
-        DEFINE_SML_GUARD(shouldAbortPass)
-        DEFINE_SML_GUARD(passFound)
-        DEFINE_SML_GUARD(passDone)
-        DEFINE_SML_GUARD(chipDone)
-        DEFINE_SML_GUARD(timeExpired)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

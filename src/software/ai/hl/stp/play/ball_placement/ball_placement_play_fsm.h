@@ -144,6 +144,13 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayControlParams>
      */
     void setupMoveTactics(const Update& event);
 
+    DEFINE_SML_GUARD(shouldKickOffWall, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD(alignDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD(kickDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD(ballPlaced, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD(waitDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD(retreatDone, BallPlacementPlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -162,12 +169,6 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayControlParams>
         DEFINE_SML_ACTION(startWait)
         DEFINE_SML_ACTION(retreat)
 
-        DEFINE_SML_GUARD(shouldKickOffWall)
-        DEFINE_SML_GUARD(alignDone)
-        DEFINE_SML_GUARD(kickDone)
-        DEFINE_SML_GUARD(ballPlaced)
-        DEFINE_SML_GUARD(waitDone)
-        DEFINE_SML_GUARD(retreatDone)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

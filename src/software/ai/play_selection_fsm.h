@@ -63,6 +63,11 @@ struct PlaySelectionFSM
      */
     void resetSetPlay(const Update& event);
 
+    DEFINE_SML_GUARD(gameStateStopped, PlaySelectionFSM)
+    DEFINE_SML_GUARD(gameStateHalted, PlaySelectionFSM)
+    DEFINE_SML_GUARD(gameStatePlaying, PlaySelectionFSM)
+    DEFINE_SML_GUARD(gameStateSetupRestart, PlaySelectionFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -71,11 +76,6 @@ struct PlaySelectionFSM
         DEFINE_SML_STATE(Halt)
         DEFINE_SML_STATE(Playing)
         DEFINE_SML_STATE(Stop)
-
-        DEFINE_SML_GUARD(gameStateStopped)
-        DEFINE_SML_GUARD(gameStateHalted)
-        DEFINE_SML_GUARD(gameStatePlaying)
-        DEFINE_SML_GUARD(gameStateSetupRestart)
 
         DEFINE_SML_EVENT(Update)
 

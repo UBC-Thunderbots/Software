@@ -66,6 +66,8 @@ struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
      */
     bool shouldKick(const Update& event);
 
+    DEFINE_SML_GUARD(shouldKick, AttackerFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -76,7 +78,6 @@ struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(shouldKick)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, KeepAwayFSM)
 

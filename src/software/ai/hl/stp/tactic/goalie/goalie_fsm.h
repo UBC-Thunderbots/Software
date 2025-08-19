@@ -192,6 +192,14 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      */
     bool ballInInflatedDefenseArea(const Update &event);
 
+    DEFINE_SML_GUARD(ballInInflatedDefenseArea, GoalieFSM)
+    DEFINE_SML_GUARD(panicDone, GoalieFSM)
+    DEFINE_SML_GUARD(shouldEvacuateCrease, GoalieFSM)
+    DEFINE_SML_GUARD(shouldPivotChip, GoalieFSM)
+    DEFINE_SML_GUARD(shouldPanic, GoalieFSM)
+    DEFINE_SML_GUARD(shouldMoveToGoalLine, GoalieFSM)
+    DEFINE_SML_GUARD(retrieveDone, GoalieFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -204,13 +212,6 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(ballInInflatedDefenseArea)
-        DEFINE_SML_GUARD(panicDone)
-        DEFINE_SML_GUARD(shouldEvacuateCrease)
-        DEFINE_SML_GUARD(shouldPivotChip)
-        DEFINE_SML_GUARD(shouldPanic)
-        DEFINE_SML_GUARD(shouldMoveToGoalLine)
-        DEFINE_SML_GUARD(retrieveDone)
 
         DEFINE_SML_ACTION(panic)
         DEFINE_SML_ACTION(positionToBlock)

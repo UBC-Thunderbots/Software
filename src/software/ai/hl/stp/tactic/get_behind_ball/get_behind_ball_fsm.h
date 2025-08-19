@@ -46,6 +46,8 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
      */
     bool behindBall(const Update& event);
 
+    DEFINE_SML_GUARD(behindBall, GetBehindBallFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -53,7 +55,6 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
         DEFINE_SML_STATE(GetBehindBallState)
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(behindBall)
         DEFINE_SML_ACTION(updateMove)
 
 

@@ -52,6 +52,8 @@ struct PenaltyKickEnemyPlayFSM : PlayFSM<PenaltyKickEnemyPlayControlParams>
      */
     bool setupPositionDone(const Update& event);
 
+    DEFINE_SML_GUARD(setupPositionDone, PenaltyKickEnemyPlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -63,8 +65,6 @@ struct PenaltyKickEnemyPlayFSM : PlayFSM<PenaltyKickEnemyPlayControlParams>
 
         DEFINE_SML_ACTION(setupPosition)
         DEFINE_SML_ACTION(defendKick)
-
-        DEFINE_SML_GUARD(setupPositionDone)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
