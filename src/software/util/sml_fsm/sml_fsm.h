@@ -55,7 +55,13 @@ public:
     template <class SM, class TGuard, class TEvent>
     void log_guard(const TGuard&, const TEvent&, bool result)
     {
-//        LOG(INFO) << boost::sml::aux::get_type_name<SM>() << "  " << boost::sml::aux::get_type_name<TGuard>()<< "  " << boost::sml::aux::get_type_name<TEvent>() << "  " << (result ? "[OK]" : "[Reject]");
+        // The append chain is necessary because of different 'types' of string
+        std::string message = boost::sml::aux::get_type_name<SM>();
+        message.append(" ");
+        message.append(boost::sml::aux::get_type_name<TGuard>());
+        message.append(" ");
+        message.append((result ? "[Pass]" : "[Reject]"));
+        last_guard = message;
     }
 
     /**
@@ -89,8 +95,8 @@ public:
             last_state_transition = "";
             return;
         }
-        std::string message = "";
-        message.append(boost::sml::aux::get_type_name<SM>());
+        // The append chain is necessary because of different 'types' of string
+        std::string message = boost::sml::aux::get_type_name<SM>();
         message.append(" ");
         message.append(src.c_str());
         message.append(" -> ");
@@ -111,7 +117,7 @@ public:
             LOG(INFO) << output;
         }
        if (last_state_transition != "") {
-        robot_logs[id] = last_state_transition;
+        robot_logs[id] = last_state_transition + "\n" + last_guard;
       }
     }
 
@@ -125,6 +131,7 @@ protected:
 private:
     std::map<unsigned int, std::string> robot_logs;
     std::string last_state_transition;
+    std::string last_guard;
 };
 
 
@@ -157,8 +164,16 @@ using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>, boost::sml:
  *
  * @param FUNCTION The function to turn into a lambda
  */
-#define DEFINE_SML_GUARD(FUNCTION)                                                       \
-    const auto FUNCTION##_G = [this](auto event) { return FUNCTION(event); };
+#define DEFINE_SML_GUARD(FUNCTION, FSM)                                                   \
+    class FUNCTION##Guard {                                                               \
+    public:                                                                               \
+        explicit FUNCTION##Guard(FSM* fsm) : _fsm(fsm) {};                               \
+        template<class Update_Param>                                                      \
+        bool operator()(Update_Param event) const {return _fsm->FUNCTION(event);} ;       \
+        private:                                                                          \
+        FSM* _fsm;                                                                        \
+    };                                                                                    \
+    FUNCTION##Guard FUNCTION##_G = FUNCTION##Guard{this};
 
 /**
  * Defines lambda wrapper around a function that can be used as an SML action
