@@ -20,7 +20,7 @@
     {                                                                                    \
         using parent_class::parent_class;                                                \
                                                                                          \
-        inline void accept(TacticVisitor &visitor) const                                        \
+        inline void accept(TacticVisitor &visitor) const                                 \
         {                                                                                \
             visitor.visit(*this);                                                        \
         }                                                                                \
