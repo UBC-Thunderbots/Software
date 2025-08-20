@@ -5,23 +5,6 @@
 #include "software/world/world.h"
 
 /**
- * Copies a tactic, the new tactic will be the same besides having a different name
- *
- * @param new_class The new class that will be created
- * @param parent_class The class that is being copied
- */
-#define COPY_TACTIC(new_class, parent_class)                                             \
-    class new_class : public parent_class                                                \
-    {                                                                                    \
-        using parent_class::parent_class;                                                \
-                                                                                         \
-        void accept(TacticVisitor &visitor) const                                        \
-        {                                                                                \
-            visitor.visit(*this);                                                        \
-        }                                                                                \
-    };
-
-/**
  * In the STP framework, a Tactic represents a role or objective for a single robot.
  * This can be thought of as a "position" on a typical soccer team. Some examples are:
  * - The goalie
