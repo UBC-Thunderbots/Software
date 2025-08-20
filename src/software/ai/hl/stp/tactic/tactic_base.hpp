@@ -20,7 +20,7 @@
     {                                                                                    \
         using parent_class::parent_class;                                                \
                                                                                          \
-        void accept(TacticVisitor &visitor) const                                        \
+        inline void accept(TacticVisitor &visitor) const                                        \
         {                                                                                \
             visitor.visit(*this);                                                        \
         }                                                                                \
@@ -141,7 +141,7 @@ class TacticBase : public Tactic
      *
      * @return a pointer to the created FSM.
      */
-    virtual std::unique_ptr<FSM<TacticFsm>> fsmInit()
+    std::unique_ptr<FSM<TacticFsm>> fsmInit()
     {
         return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr),
                                                 TacticSubFsms(ai_config_ptr)...);
