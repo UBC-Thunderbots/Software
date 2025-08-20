@@ -195,9 +195,9 @@ class RobotCommunication:
         """
         while self.running:
             self.communication_manager.poll()
-
             # map of robot id to diagnostics/fullsystem primitive map
             robot_primitives_map = {}
+            robot_orientations_map = {}
 
             # get the most recent diagnostics primitive
             motor_control = self.motor_control_primitive_buffer.get(block=False)
@@ -207,7 +207,8 @@ class RobotCommunication:
                 direct_control=DirectControlPrimitive(
                     motor_control=motor_control,
                     power_control=power_control,
-                )
+                ),
+                orientation=Angle(radians=0),
             )
 
             # filter for diagnostics controlled robots
@@ -220,6 +221,7 @@ class RobotCommunication:
             # set diagnostics primitives for diagnostics robots
             for robot_id in diagnostics_robots:
                 robot_primitives_map[robot_id] = diagnostics_primitive
+                robot_orientations_map[robot_id] = Angle(radians=0)
 
             # get the most recent fullsystem primitives
             fullsystem_primitive_set = self.fullsystem_primitive_set_buffer.get(
@@ -237,6 +239,9 @@ class RobotCommunication:
             for robot_id in fullsystem_robots:
                 robot_primitives_map[robot_id] = (
                     fullsystem_primitive_set.robot_primitives[robot_id]
+                )
+                robot_orientations_map[robot_id] = (
+                    fullsystem_primitive_set.robot_orientations[robot_id]
                 )
 
             # sends a final stop primitive to all disconnected robots and removes them from list
@@ -257,6 +262,7 @@ class RobotCommunication:
                 primitive.time_sent.CopyFrom(
                     Timestamp(epoch_timestamp_seconds=time.time())
                 )
+                primitive.orientation.CopyFrom(robot_orientations_map[robot_id])
                 self.communication_manager.send_primitive(
                     robot_id=robot_id, primitive=primitive
                 )

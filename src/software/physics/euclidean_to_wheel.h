@@ -79,7 +79,7 @@ class EuclideanToWheel
     /**
      * The radius of the robot in meters.
      */
-    const double robot_radius_m_{};
+    const double robot_center_to_wheel_m_{};
     const RobotConstants_t robot_constants_;
 
     /**
