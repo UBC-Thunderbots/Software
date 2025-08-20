@@ -91,10 +91,10 @@ public:
     void log_state_change(const TSrcState& src, const TDstState& dst)
     {
         // skip if state doesn't change
-        if(src.c_str() == dst.c_str()){
-            last_state_transition = "";
-            return;
-        }
+//        if(src.c_str() == dst.c_str()){
+//            last_state_transition = "";
+//            return;
+//        }
         // The append chain is necessary because of different 'types' of string
         std::string message = boost::sml::aux::get_type_name<SM>();
         message.append(" ");
@@ -117,13 +117,13 @@ public:
             LOG(INFO) << output;
             skip = true;
         }
-       if (last_state_transition != "") {
+       //if (last_state_transition != "") {
            std::string new_msg = last_state_transition + "\n" + last_guard;
            if (robot_logs[id] != new_msg) {
                skip = false;
                robot_logs[id] = new_msg;
            }
-      }
+      //}
     }
 
 protected:
