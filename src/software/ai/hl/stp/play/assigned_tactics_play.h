@@ -9,7 +9,12 @@
 class AssignedTacticsPlay : public Play
 {
    public:
-    AssignedTacticsPlay(TbotsProto::AiConfig config);
+    /**
+     * Constructor for AssignedTacticsPlay
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    AssignedTacticsPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

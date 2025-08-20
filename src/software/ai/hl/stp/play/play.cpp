@@ -10,19 +10,19 @@
 #include "software/logger/logger.h"
 
 
-Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
-    : ai_config(ai_config),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
+Play::Play(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr, bool requires_goalie)
+    : ai_config_ptr(ai_config_ptr),
+      goalie_tactic(std::make_shared<GoalieTactic>(ai_config_ptr)),
       halt_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(
           std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1)),
       world_ptr_(std::nullopt),
-      obstacle_factory(ai_config.robot_navigation_obstacle_config())
+      obstacle_factory(ai_config_ptr->robot_navigation_obstacle_config())
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
-        halt_tactics.push_back(std::make_shared<HaltTactic>());
+        halt_tactics.push_back(std::make_shared<HaltTactic>(ai_config_ptr));
     }
 }
 

@@ -1,24 +1,38 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/geom/point.h"
 
-struct KickFSM
+/**
+ * The control parameters for updating KickFSM
+ */
+struct KickFSMControlParams
+{
+    // The location where the kick will be taken from
+    Point kick_origin;
+    // The direction the Robot will kick in
+    Angle kick_direction;
+    // How fast the Robot will kick the ball in meters per second
+    double kick_speed_meters_per_second;
+};
+
+
+struct KickFSM : TacticFSM<KickFSMControlParams>
 {
    public:
+    using Update = TacticFSM<KickFSMControlParams>::Update;
     class KickState;
 
-    struct ControlParams
+    /**
+     * Constructor for KickFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit KickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<KickFSMControlParams>(ai_config_ptr)
     {
-        // The location where the kick will be taken from
-        Point kick_origin;
-        // The direction the Robot will kick in
-        Angle kick_direction;
-        // How fast the Robot will kick the ball in meters per second
-        double kick_speed_meters_per_second;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    }
 
     /**
      * Action that updates the MovePrimitive

@@ -8,11 +8,12 @@ TEST(KickFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    KickFSM::ControlParams control_params{.kick_origin    = Point(-2, 1.5),
-                                          .kick_direction = Angle::threeQuarter(),
-                                          .kick_speed_meters_per_second = 1.2};
+    KickFSMControlParams control_params{.kick_origin    = Point(-2, 1.5),
+                                        .kick_direction = Angle::threeQuarter(),
+                                        .kick_speed_meters_per_second = 1.2};
 
-    FSM<KickFSM> fsm{GetBehindBallFSM()};
+    FSM<KickFSM> fsm{KickFSM(std::make_shared<TbotsProto::AiConfig>()),
+                     GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>())};
 
     // Start in GetBehindBallFSM state's GetBehindBallState
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));

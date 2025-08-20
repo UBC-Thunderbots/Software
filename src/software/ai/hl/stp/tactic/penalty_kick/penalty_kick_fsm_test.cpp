@@ -12,12 +12,12 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
                                 Timestamp::fromSeconds(0));
     Robot robot = ::TestUtil::createRobotAtPos(world->field().friendlyPenaltyMark());
 
-    TbotsProto::AiConfig ai_config;
-    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(),
-                            DribbleFSM(ai_config.dribble_tactic_config()),
-                            GetBehindBallFSM()};
+    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            KickFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>())};
 
-    PenaltyKickFSM::ControlParams control_params{};
+    PenaltyKickFSMControlParams control_params{};
 
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
