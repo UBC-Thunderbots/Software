@@ -2,12 +2,7 @@
 
 #include <utility>
 
-ControlExecutor::ControlExecutor(std::shared_ptr<Charger> charger,
-                                 std::shared_ptr<Chicker> chicker,
-                                 std::shared_ptr<Geneva> geneva)
-    : charger(std::move(charger)), chicker(std::move(chicker)), geneva(std::move(geneva))
-{
-}
+ControlExecutor::ControlExecutor(std::shared_ptr<Chicker> chicker) : chicker(chicker) {}
 
 void ControlExecutor::execute(const TbotsProto_PowerPulseControl& control)
 {

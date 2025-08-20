@@ -162,7 +162,6 @@ class ChickerWidget(QWidget):
 
         # Send kick, chip, autokick, or autochip primitive
         power_control = PowerControl()
-        power_control.geneva_slot = 3
 
         if command == ChickerCommandMode.KICK:
             power_control.chicker.kick_speed_m_per_s = kick_power
@@ -181,7 +180,6 @@ class ChickerWidget(QWidget):
             # buffer, the last sent message will be repeatedly resent to the robot, which we don't
             # want for kick/chip.
             power_control = PowerControl()
-            power_control.geneva_slot = 3
             self.proto_unix_io.send_proto(PowerControl, power_control, True)
 
     def enable(self) -> None:

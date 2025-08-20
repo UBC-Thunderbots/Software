@@ -85,10 +85,6 @@ int main(int argc, char **argv)
         {
             LOG(WARNING) << "Battery voltage is zero";
         }
-        else if (abs(power_status.capacitor_voltage()) < THRESHOLD)
-        {
-            LOG(WARNING) << "Capacitor voltage is zero";
-        }
         else if (abs(power_status.current_draw()) < THRESHOLD)
         {
             LOG(WARNING) << "Current draw is zero";
