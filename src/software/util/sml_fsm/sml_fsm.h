@@ -105,7 +105,7 @@ public:
     }
 
     void flush_with_robot_id(unsigned int id) {
-        if (id == robot_logs.begin()->first) {
+        if (id == robot_logs.begin()->first && !skip) {
 
             std::string output;
             for (const auto& [key, value] : robot_logs) {
@@ -115,9 +115,14 @@ public:
                 output.append(value + "\n");
             }
             LOG(INFO) << output;
+            skip = true;
         }
        if (last_state_transition != "") {
-        robot_logs[id] = last_state_transition + "\n" + last_guard;
+           std::string new_msg = last_state_transition + "\n" + last_guard;
+           if (robot_logs[id] != new_msg) {
+               skip = false;
+               robot_logs[id] = new_msg;
+           }
       }
     }
 
@@ -132,6 +137,7 @@ private:
     std::map<unsigned int, std::string> robot_logs;
     std::string last_state_transition;
     std::string last_guard;
+    bool skip = true;
 };
 
 
