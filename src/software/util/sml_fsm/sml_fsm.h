@@ -173,7 +173,7 @@ using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>, boost::sml:
 #define DEFINE_SML_GUARD(FUNCTION, FSM)                                                   \
     class FUNCTION##Guard {                                                               \
     public:                                                                               \
-        explicit FUNCTION##Guard(FSM* fsm) : _fsm(fsm) {};                               \
+        explicit FUNCTION##Guard(FSM* fsm) : _fsm(fsm) {};                                \
         template<class Update_Param>                                                      \
         bool operator()(Update_Param event) const {return _fsm->FUNCTION(event);} ;       \
         private:                                                                          \
