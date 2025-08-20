@@ -19,9 +19,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
-    std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(ai_config_ptr),
-        std::make_shared<ShadowEnemyTactic>(ai_config_ptr)};
+    std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics (2, std::make_shared<ShadowEnemyTactic>(ai_config_ptr));
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -66,12 +64,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
               -world_ptr->field().defenseAreaYLength() / 2.0),
     };
     // these move tactics will be used to go to those positions
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(ai_config_ptr),
-        std::make_shared<MoveTactic>(ai_config_ptr),
-        std::make_shared<MoveTactic>(ai_config_ptr),
-        std::make_shared<MoveTactic>(ai_config_ptr),
-        std::make_shared<MoveTactic>(ai_config_ptr)};
+    std::vector<std::shared_ptr<MoveTactic>> move_tactics (5, std::make_shared<MoveTactic>(ai_config_ptr));
 
     // created an enemy_team for mutation
     Team enemy_team = world_ptr->enemyTeam();
