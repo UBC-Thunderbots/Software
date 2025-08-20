@@ -33,21 +33,54 @@ int main(int argc, char **argv)
     motor_controller_ = std::make_unique<StSpinMotorController>();
 	motor_controller_->setup();
 
-  	if (motor_controller_->earlyPoll() == MotorControllerStatus::OK)
+	LOG(INFO) << "Motor controller setup complete";
+
+	LOG(INFO) << "Waiting...";
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+  	/*if (motor_controller_->earlyPoll() == MotorControllerStatus::OK)
     {
-  		motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_LEFT, 60);
-      	std::this_thread::sleep_for(std::chrono::seconds(15));
-  		motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_LEFT, 0);
-  	}
+        for (int i = 0; i <= 100; ++i)
+        {
+  		    motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_RIGHT, 1500);
+		    LOG(INFO) << "Waiting...";
+      	    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  		}
 
-//    for (int i = 0; i < 1000; ++i)
-//    {
-//        motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT, StSpinOpcode::SPI_NOOP);
-//    }
+        motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_RIGHT, 0);
+  	}*/
 
-	motor_controller_->reset();
+	LOG(INFO) << "Waiting...";
+    motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_RIGHT, 1500);
+	LOG(INFO) << "Waiting...";
+  	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_RIGHT, 0);
 
-    LOG(INFO) << "Robot Auto Test Complete";
+
+/*
+    for (int i = 0; i < 1000; ++i)
+    {
+        motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT, StSpinOpcode::SPI_NOOP);
+    }
+*/
+
+//	motor_controller_->reset();
+
+/*
+    motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT, StSpinOpcode::MOV_AX,
+		static_cast<int16_t>(
+			std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::now().time_since_epoch()
+			).count() % 5000
+		));
+*/
+
+/*
+    motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT, StSpinOpcode::MOV_BX, 1000);
+    motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT, StSpinOpcode::SET_SPEEDRAMP);
+    motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT, StSpinOpcode::START_MOTOR);
+*/
+	LOG(INFO) << "Robot Auto Test Complete";
 
     return 0;
 }

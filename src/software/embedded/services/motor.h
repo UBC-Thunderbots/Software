@@ -103,9 +103,14 @@ class MotorService
     //
     // TODO (#2720): compute from robot constants (this was computed by hand and is
     // accurate)
-    static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
+#ifdef TRINAMIC_MOTOR_BOARD
+	static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
     static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS =
         1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+#elif STSPIN_MOTOR_BOARD
+    static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 60 / (3.1415926 * 0.06);
+    static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 1 / ELECTRICAL_RPM_PER_MECHANICAL_MPS;
+#endif
 
     // Controller for communicating with the motor board
     std::unique_ptr<MotorController> motor_controller_;

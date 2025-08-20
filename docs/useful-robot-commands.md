@@ -107,8 +107,9 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
-`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=<platform> --//software/embedded:motor_board=<motor_board> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 * \<platform\> is the host platform on the robot (either `PI` or `NANO`)
+* <motor_board> is the type of motor driver board on the robot (either `STSPIN` or `TRINAMIC`)
 * <robot_ip> is the IP address of the robot
 * <robot_password> is the password of the `robot` user account
 

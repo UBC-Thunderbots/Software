@@ -36,12 +36,6 @@ MotorControllerStatus StSpinMotorController::earlyPoll()
 
 void StSpinMotorController::setup()
 {
-    reset_gpio_->setValue(GpioState::LOW);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-
-    reset_gpio_->setValue(GpioState::HIGH);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
     {
         if (ENABLED_MOTORS.at(motor))
@@ -54,20 +48,20 @@ void StSpinMotorController::setup()
     {
         if (ENABLED_MOTORS.at(motor))
         {
-            sendAndReceiveFrame(motor, StSpinOpcode::START_MOTOR);
-            checkDriverFault(motor);
+			checkDriverFault(motor);
             readThenWriteVelocity(motor, 0);
+            sendAndReceiveFrame(motor, StSpinOpcode::START_MOTOR);
         }
     }
 }
 
 void StSpinMotorController::reset()
 {
-    reset_gpio_->setValue(GpioState::LOW);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-
-    reset_gpio_->setValue(GpioState::HIGH);
-    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+//    reset_gpio_->setValue(GpioState::LOW);
+//    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+//
+//    reset_gpio_->setValue(GpioState::HIGH);
+//    usleep(MICROSECONDS_PER_MILLISECOND * 100);
 }
 
 MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& motor)

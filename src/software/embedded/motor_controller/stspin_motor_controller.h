@@ -64,9 +64,9 @@ class StSpinMotorController : public MotorController
 
     static const inline std::unordered_map<MotorIndex, bool> ENABLED_MOTORS = {
         {MotorIndex::FRONT_LEFT, true},
-        {MotorIndex::BACK_LEFT, false},
-        {MotorIndex::BACK_RIGHT, false},
-        {MotorIndex::FRONT_RIGHT, false},
+        {MotorIndex::BACK_LEFT, true},
+        {MotorIndex::BACK_RIGHT, true},
+        {MotorIndex::FRONT_RIGHT, true},
         {MotorIndex::DRIBBLER, false},
     };
 
@@ -80,16 +80,16 @@ class StSpinMotorController : public MotorController
 
     // SPI Motor Driver Paths
     static const inline std::unordered_map<MotorIndex, const char*> SPI_PATHS = {
-        {MotorIndex::FRONT_LEFT, "/dev/spidev0.0"},
-        {MotorIndex::FRONT_RIGHT, "/dev/spidev0.1"},
-        {MotorIndex::BACK_LEFT, "/dev/spidev0.2"},
-        {MotorIndex::BACK_RIGHT, "/dev/spidev0.3"},
-        {MotorIndex::DRIBBLER, "/dev/spidev0.4"},
+        {MotorIndex::FRONT_LEFT, "/dev/spidev0.2"},
+        {MotorIndex::FRONT_RIGHT, "/dev/spidev0.4"},
+        {MotorIndex::BACK_LEFT, "/dev/spidev0.3"},
+        {MotorIndex::BACK_RIGHT, "/dev/spidev0.0"},
+        {MotorIndex::DRIBBLER, "/dev/spidev0.1"},
     };
 
     // SPI Configs
-    static constexpr uint32_t SPI_SPEED_HZ     = 1000000;  // 1 Mhz
-    static constexpr uint32_t MAX_SPI_SPEED_HZ = 2000000;  // 2 Mhz
+    static constexpr uint32_t SPI_SPEED_HZ     = 100000;
+    static constexpr uint32_t MAX_SPI_SPEED_HZ = 100000;
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;
 
