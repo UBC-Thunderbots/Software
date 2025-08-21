@@ -90,11 +90,6 @@ public:
     template <class SM, class TSrcState, class TDstState>
     void log_state_change(const TSrcState& src, const TDstState& dst)
     {
-        // skip if state doesn't change
-//        if(src.c_str() == dst.c_str()){
-//            last_state_transition = "";
-//            return;
-//        }
         // The append chain is necessary because of different 'types' of string
         std::string message = boost::sml::aux::get_type_name<SM>();
         message.append(" ");
