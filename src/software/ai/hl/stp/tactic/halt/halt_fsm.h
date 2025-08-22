@@ -41,7 +41,7 @@ struct HaltFSM : TacticFSM<HaltFSMControlParams>
      */
     bool stopDone(const Update& event);
 
-    DEFINE_SML_GUARD(stopDone, HaltFSM)
+    DEFINE_SML_GUARD_CLASS(stopDone, HaltFSM)
 
     auto operator()()
     {
@@ -49,6 +49,7 @@ struct HaltFSM : TacticFSM<HaltFSMControlParams>
 
         DEFINE_SML_STATE(StopState)
         DEFINE_SML_EVENT(Update)
+        DEFINE_SML_GUARD(stopDone)
         DEFINE_SML_ACTION(updateStop)
 
         return make_transition_table(

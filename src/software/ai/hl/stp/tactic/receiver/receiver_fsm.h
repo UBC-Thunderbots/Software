@@ -144,10 +144,10 @@ struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
      */
     bool strayPass(const Update& event);
 
-    DEFINE_SML_GUARD(onetouchPossible, ReceiverFSM)
-    DEFINE_SML_GUARD(passStarted, ReceiverFSM)
-    DEFINE_SML_GUARD(passFinished, ReceiverFSM)
-    DEFINE_SML_GUARD(strayPass, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(onetouchPossible, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(passStarted, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(passFinished, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(strayPass, ReceiverFSM)
 
     auto operator()()
     {
@@ -157,6 +157,11 @@ struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
         DEFINE_SML_STATE(OneTouchShotState)
         DEFINE_SML_STATE(WaitingForPassState)
         DEFINE_SML_EVENT(Update)
+
+        DEFINE_SML_GUARD(onetouchPossible)
+        DEFINE_SML_GUARD(passStarted)
+        DEFINE_SML_GUARD(passFinished)
+        DEFINE_SML_GUARD(strayPass)
 
         DEFINE_SML_ACTION(updateOnetouch)
         DEFINE_SML_ACTION(updateReceive)

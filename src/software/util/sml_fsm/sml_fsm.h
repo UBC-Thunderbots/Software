@@ -165,7 +165,7 @@ using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>, boost::sml:
  *
  * @param FUNCTION The function to turn into a lambda
  */
-#define DEFINE_SML_GUARD(FUNCTION, FSM)                                                   \
+#define DEFINE_SML_GUARD_CLASS(FUNCTION, FSM)                                                   \
     class FUNCTION##Guard {                                                               \
     public:                                                                               \
         explicit FUNCTION##Guard(FSM* fsm) : _fsm(fsm) {};                                \
@@ -173,7 +173,9 @@ using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>, boost::sml:
         bool operator()(Update_Param event) const {return _fsm->FUNCTION(event);} ;       \
         private:                                                                          \
         FSM* _fsm;                                                                        \
-    };                                                                                    \
+    };
+
+#define DEFINE_SML_GUARD(FUNCTION) \
     FUNCTION##Guard FUNCTION##_G = FUNCTION##Guard{this};
 
 /**

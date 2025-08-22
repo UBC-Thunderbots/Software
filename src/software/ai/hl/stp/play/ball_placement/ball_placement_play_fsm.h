@@ -144,12 +144,12 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayControlParams>
      */
     void setupMoveTactics(const Update& event);
 
-    DEFINE_SML_GUARD(shouldKickOffWall, BallPlacementPlayFSM)
-    DEFINE_SML_GUARD(alignDone, BallPlacementPlayFSM)
-    DEFINE_SML_GUARD(kickDone, BallPlacementPlayFSM)
-    DEFINE_SML_GUARD(ballPlaced, BallPlacementPlayFSM)
-    DEFINE_SML_GUARD(waitDone, BallPlacementPlayFSM)
-    DEFINE_SML_GUARD(retreatDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shouldKickOffWall, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(alignDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(kickDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(ballPlaced, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(waitDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(retreatDone, BallPlacementPlayFSM)
 
     auto operator()()
     {
@@ -162,6 +162,13 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayControlParams>
         DEFINE_SML_STATE(WaitState)
         DEFINE_SML_STATE(RetreatState)
         DEFINE_SML_EVENT(Update)
+
+        DEFINE_SML_GUARD(shouldKickOffWall)
+        DEFINE_SML_GUARD(alignDone)
+        DEFINE_SML_GUARD(kickDone)
+        DEFINE_SML_GUARD(ballPlaced)
+        DEFINE_SML_GUARD(waitDone)
+        DEFINE_SML_GUARD(retreatDone)
 
         DEFINE_SML_ACTION(alignPlacement)
         DEFINE_SML_ACTION(placeBall)

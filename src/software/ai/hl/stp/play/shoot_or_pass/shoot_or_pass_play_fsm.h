@@ -108,10 +108,10 @@ struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayControlParams>
      */
     bool tookShot(const Update& event);
 
-    DEFINE_SML_GUARD(passFound, ShootOrPassPlayFSM)
-    DEFINE_SML_GUARD(shouldAbortPass, ShootOrPassPlayFSM)
-    DEFINE_SML_GUARD(passCompleted, ShootOrPassPlayFSM)
-    DEFINE_SML_GUARD(tookShot, ShootOrPassPlayFSM)
+    DEFINE_SML_GUARD_CLASS(passFound, ShootOrPassPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shouldAbortPass, ShootOrPassPlayFSM)
+    DEFINE_SML_GUARD_CLASS(passCompleted, ShootOrPassPlayFSM)
+    DEFINE_SML_GUARD_CLASS(tookShot, ShootOrPassPlayFSM)
 
     auto operator()()
     {
@@ -121,6 +121,12 @@ struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayControlParams>
         DEFINE_SML_STATE(TakePassState)
         DEFINE_SML_STATE(StartState)
         DEFINE_SML_EVENT(Update)
+
+        DEFINE_SML_GUARD(passFound)
+        DEFINE_SML_GUARD(shouldAbortPass)
+        DEFINE_SML_GUARD(passCompleted)
+        DEFINE_SML_GUARD(tookShot)
+
 
         DEFINE_SML_ACTION(lookForPass)
         DEFINE_SML_ACTION(startLookingForPass)

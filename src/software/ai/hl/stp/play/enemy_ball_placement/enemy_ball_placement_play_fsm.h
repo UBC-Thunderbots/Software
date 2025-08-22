@@ -98,8 +98,8 @@ struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayControlParams>
      */
     void enterDefensiveFormation(const Update& event);
 
-    DEFINE_SML_GUARD(hasPlacementPoint, EnemyBallPlacementPlayFSM)
-    DEFINE_SML_GUARD(isNearlyPlaced, EnemyBallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(hasPlacementPoint, EnemyBallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(isNearlyPlaced, EnemyBallPlacementPlayFSM)
 
     auto operator()()
     {
@@ -110,6 +110,9 @@ struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayControlParams>
         DEFINE_SML_STATE(DefenseState)
 
         DEFINE_SML_EVENT(Update)
+
+        DEFINE_SML_GUARD(hasPlacementPoint)
+        DEFINE_SML_GUARD(isNearlyPlaced)
 
         DEFINE_SML_ACTION(setPlacementPoint)
         DEFINE_SML_ACTION(avoid)

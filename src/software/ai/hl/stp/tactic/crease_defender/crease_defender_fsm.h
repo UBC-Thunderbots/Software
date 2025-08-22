@@ -89,7 +89,7 @@ struct CreaseDefenderFSM : public DefenderFSMBase,
     void blockThreat(const Update& event,
                      boost::sml::back::process<MoveFSM::Update> processEvent);
 
-    DEFINE_SML_GUARD(ballNearbyWithoutThreat, CreaseDefenderFSM)
+    DEFINE_SML_GUARD_CLASS(ballNearbyWithoutThreat, CreaseDefenderFSM)
 
     auto operator()()
     {
@@ -97,6 +97,9 @@ struct CreaseDefenderFSM : public DefenderFSMBase,
 
         DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_EVENT(Update)
+
+        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
+
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveFSM)
         DEFINE_SML_STATE(DribbleFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)

@@ -63,10 +63,10 @@ struct PlaySelectionFSM
      */
     void resetSetPlay(const Update& event);
 
-    DEFINE_SML_GUARD(gameStateStopped, PlaySelectionFSM)
-    DEFINE_SML_GUARD(gameStateHalted, PlaySelectionFSM)
-    DEFINE_SML_GUARD(gameStatePlaying, PlaySelectionFSM)
-    DEFINE_SML_GUARD(gameStateSetupRestart, PlaySelectionFSM)
+    DEFINE_SML_GUARD_CLASS(gameStateStopped, PlaySelectionFSM)
+    DEFINE_SML_GUARD_CLASS(gameStateHalted, PlaySelectionFSM)
+    DEFINE_SML_GUARD_CLASS(gameStatePlaying, PlaySelectionFSM)
+    DEFINE_SML_GUARD_CLASS(gameStateSetupRestart, PlaySelectionFSM)
 
     auto operator()()
     {
@@ -78,6 +78,11 @@ struct PlaySelectionFSM
         DEFINE_SML_STATE(Stop)
 
         DEFINE_SML_EVENT(Update)
+
+        DEFINE_SML_GUARD(gameStateStopped)
+        DEFINE_SML_GUARD(gameStateHalted)
+        DEFINE_SML_GUARD(gameStatePlaying)
+        DEFINE_SML_GUARD(gameStateSetupRestart)
 
         DEFINE_SML_ACTION(setupSetPlay)
         DEFINE_SML_ACTION(setupStopPlay)

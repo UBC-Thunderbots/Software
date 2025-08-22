@@ -59,8 +59,8 @@ struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayControlParams>
      */
     bool kickDone(const Update& event);
 
-    DEFINE_SML_GUARD(setupPositionDone, PenaltyKickPlayFSM)
-    DEFINE_SML_GUARD(kickDone, PenaltyKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(setupPositionDone, PenaltyKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(kickDone, PenaltyKickPlayFSM)
 
     auto operator()()
     {
@@ -70,6 +70,9 @@ struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayControlParams>
         DEFINE_SML_STATE(PerformKickState)
 
         DEFINE_SML_EVENT(Update)
+
+        DEFINE_SML_GUARD(setupPositionDone)
+        DEFINE_SML_GUARD(kickDone)
 
         DEFINE_SML_ACTION(setupPosition)
         DEFINE_SML_ACTION(performKick)

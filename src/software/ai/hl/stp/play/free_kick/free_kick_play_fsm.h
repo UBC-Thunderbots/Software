@@ -205,14 +205,14 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayControlParams>
      */
     bool chipDone(const Update& event);
 
-    DEFINE_SML_GUARD(setupDone, FreeKickPlayFSM)
-    DEFINE_SML_GUARD(shotFound, FreeKickPlayFSM)
-    DEFINE_SML_GUARD(shotDone, FreeKickPlayFSM)
-    DEFINE_SML_GUARD(shouldAbortPass, FreeKickPlayFSM)
-    DEFINE_SML_GUARD(passFound, FreeKickPlayFSM)
-    DEFINE_SML_GUARD(passDone, FreeKickPlayFSM)
-    DEFINE_SML_GUARD(chipDone, FreeKickPlayFSM)
-    DEFINE_SML_GUARD(timeExpired, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(setupDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shotFound, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shotDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shouldAbortPass, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(passFound, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(passDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(chipDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(timeExpired, FreeKickPlayFSM)
 
     auto operator()()
     {
@@ -225,6 +225,15 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayControlParams>
         DEFINE_SML_STATE(ChipState)
 
         DEFINE_SML_EVENT(Update)
+
+        DEFINE_SML_GUARD(setupDone)
+        DEFINE_SML_GUARD(shotFound)
+        DEFINE_SML_GUARD(shotDone)
+        DEFINE_SML_GUARD(shouldAbortPass)
+        DEFINE_SML_GUARD(passFound)
+        DEFINE_SML_GUARD(passDone)
+        DEFINE_SML_GUARD(chipDone)
+        DEFINE_SML_GUARD(timeExpired)
 
         DEFINE_SML_ACTION(setupPosition)
         DEFINE_SML_ACTION(shootBall)

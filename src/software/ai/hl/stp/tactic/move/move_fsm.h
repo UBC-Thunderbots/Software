@@ -59,7 +59,7 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
      */
     bool moveDone(const Update &event);
 
-    DEFINE_SML_GUARD(moveDone, MoveFSM)
+    DEFINE_SML_GUARD_CLASS(moveDone, MoveFSM)
 
     auto operator()()
     {
@@ -69,6 +69,8 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
         DEFINE_SML_STATE(MoveState)
         // Update_E is the _event_ that the MoveFSM responds to
         DEFINE_SML_EVENT(Update)
+
+        DEFINE_SML_GUARD(moveDone)
 
         DEFINE_SML_ACTION(updateMove)
 
