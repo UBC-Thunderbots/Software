@@ -4,13 +4,13 @@
 #
 #    bazel run //software/embedded/ansible:requirements.update
 #
-ansible==10.5.0 \
-    --hash=sha256:1d10bddba58f1edd0fe0b8e0387e0fafc519535066bb3c919c33b6ea3ec32a0f \
-    --hash=sha256:ba2045031a7d60c203b6e5fe1f8eaddd53ae076f7ada910e636494384135face
+ansible==11.9.0 \
+    --hash=sha256:528ca5a408f11cf1fea00daea7570e68d40e167be38b90c119a7cb45729e4921 \
+    --hash=sha256:79b087ef38105b93e0e092e7013a0f840e154a6a8ce9b5fddd1b47593adc542a
     # via -r software/embedded/ansible/requirements.in
-ansible-core==2.17.13 \
-    --hash=sha256:2ecb85b9fc9145a24145a3027ed3c716b27eda8493dd3e1f0330a20571e63f8b \
-    --hash=sha256:4fe5ead1d08152a44ef3994383b1d12e66e2a911621bb7cef868db6864cb14c5
+ansible-core==2.18.8 \
+    --hash=sha256:b0766215a96a47ce39933d27e1e996ca2beb54cf1b3907c742d35c913b1f78cd \
+    --hash=sha256:b60bc23b2f11fd0559a79d10ac152b52f58a18ca1b7be0a620dfe87f34ced689
     # via ansible
 cffi==1.17.1 \
     --hash=sha256:045d61c734659cc045141be4bae381a41d89b741f795af1dd018bfb532fd0df8 \

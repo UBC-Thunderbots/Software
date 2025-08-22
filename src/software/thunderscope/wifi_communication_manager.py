@@ -201,7 +201,10 @@ class WifiCommunicationManager:
         )
         self.__forward_to_proto_unix_io(
             RobotStatistic,
-            RobotStatistic(round_trip_time_seconds=round_trip_time_seconds),
+            RobotStatistic(
+                robot_id=robot_status.robot_id,
+                round_trip_time_seconds=round_trip_time_seconds,
+            ),
         )
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
