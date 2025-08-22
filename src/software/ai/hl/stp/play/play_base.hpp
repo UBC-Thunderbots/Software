@@ -25,6 +25,8 @@ class PlayBase : public Play
     {
     }
 
+    PlayBase() = delete;
+
     void updateTactics(const PlayUpdate &play_update) override = 0;
 
    protected:

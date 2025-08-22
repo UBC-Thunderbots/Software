@@ -79,6 +79,8 @@ class PlayFSM
     {
     }
 
+    PlayFSM() = delete;
+
    protected:
     // A shared pointer to the ai configuration to configure ai behaviour, shared by all
     // Plays, Tactics, and FSMs
