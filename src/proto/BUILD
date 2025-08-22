@@ -64,8 +64,8 @@ cc_proto_library(
 nanopb_proto_library(
     name = "tbots_nanopb_proto",
     nanopb_libs = ["@nanopb//:nanopb"],
-    deps = [":tbots_proto"],
     options = glob(["*.options"]),
+    deps = [":tbots_proto"],
 )
 
 py_proto_library(

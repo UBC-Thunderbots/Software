@@ -1,9 +1,9 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = [
     "//software/ai:__subpackages__",
     "//software/simulated_tests:__subpackages__",
 ])
-
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 cc_library(
     name = "kinematic_constraints",

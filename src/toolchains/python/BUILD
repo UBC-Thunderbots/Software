@@ -1,6 +1,5 @@
+load("@rules_python//python:defs.bzl", "py_runtime", "py_runtime_pair")
 load("@rules_python//python/cc:py_cc_toolchain.bzl", "py_cc_toolchain")
-load("@rules_python//python:defs.bzl", "py_runtime")
-load("@rules_python//python:defs.bzl", "py_runtime_pair")
 
 py_runtime(
     name = "python3_runtime",

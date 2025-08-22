@@ -3,12 +3,10 @@
 #   log to custom sinks, etc.
 #   https://github.com/KjellKod/g3log
 
-
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 cmake(
     name = "g3log",
-    lib_source = ":all_srcs",
     # Following flags are retrieved from g3log CMakeLists.txt
     # https://github.com/KjellKod/g3log/blob/2.4/CMakeLists.txt
     cache_entries = {
@@ -23,8 +21,9 @@ cmake(
         # https://github.com/KjellKod/g3log/blob/38dbddc7071666ef6cc02f24ff30a8773ee4222f/Build.cmake#L120-L129
         "DEMANGLE_EXISTS": "ON",
     },
-    visibility = ["//visibility:public"],
+    lib_source = ":all_srcs",
     out_static_libs = ["libg3log.a"],
+    visibility = ["//visibility:public"],
 )
 
 filegroup(
@@ -33,4 +32,3 @@ filegroup(
         "**/*",
     ]),
 )
-

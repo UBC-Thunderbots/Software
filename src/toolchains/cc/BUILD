@@ -130,7 +130,7 @@ cc_toolchain_config_fullsystem(
     name = "linux_aarch64_gcc",
     builtin_include_directories = [
         "/usr/lib/gcc/aarch64-linux-gnu/",
-        "/opt/tbotspython/cross_compile_headers/include/python3.12/"
+        "/opt/tbotspython/cross_compile_headers/include/python3.12/",
     ] + make_builtin_include_directories(),
     host_system_name = "aarch64",
     target_cpu = "aarch64",

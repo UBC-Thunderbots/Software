@@ -25,7 +25,6 @@ filegroup(
 
 cmake(
     name = "bullet_build",
-    lib_source = ":bullet_files",
     cache_entries = {
         "BUILD_BULLET3": "ON",
         "USE_MSVC_RUNTIME_LIBRARY_DLL": "ON",
@@ -38,14 +37,15 @@ cmake(
         "BUILD_OPENGL3_DEMOS": "OFF",
         "BUILD_BULLET2_DEMOS": "OFF",
     },
-    generate_crosstool_file = select({
-        "@bazel_tools//src/conditions:windows": True,
-        "//conditions:default": False,
-    }),
     generate_args = select({
         "@bazel_tools//src/conditions:windows": ["-GNinja"],
         "//conditions:default": None,
     }),
+    generate_crosstool_file = select({
+        "@bazel_tools//src/conditions:windows": True,
+        "//conditions:default": False,
+    }),
+    lib_source = ":bullet_files",
     out_static_libs = select({
         "@bazel_tools//src/conditions:windows": [
             "BulletDynamics.lib",
@@ -69,11 +69,11 @@ cmake(
 # NOTE: This is necessary because of the way the bullet includes work
 cc_library(
     name = "bullet",
-    deps = [
-        ":bullet_build",
-    ],
     includes = [
         "bullet_build/include/bullet",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        ":bullet_build",
+    ],
 )
