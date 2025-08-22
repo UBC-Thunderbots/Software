@@ -13,8 +13,8 @@ message PowerPulseControl
     {
         oneof auto_chip_or_kick
         {
-            uint32 autokick_pulse_width = 1;
-            uint32 autochip_pulse_width = 2;
+            double autokick_pulse_width = 1;
+            double autochip_pulse_width = 2;
         }
     }
 
@@ -22,8 +22,8 @@ message PowerPulseControl
     {
         oneof chicker_command
         {
-            uint32 kick_pulse_width          = 1;
-            uint32 chip_pulse_width          = 2;
+            double kick_pulse_width          = 1;
+            double chip_pulse_width          = 2;
             AutoChipOrKick auto_chip_or_kick = 3;
         }
     }

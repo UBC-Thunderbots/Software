@@ -10,10 +10,10 @@
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/embedded/primitive_executor.h"
-#include "software/embedded/redis/redis_client.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
+#include "software/embedded/yaml/yaml_reader.hpp"
 #include "software/logger/logger.h"
 
 class Thunderloop
@@ -62,7 +62,7 @@ class Thunderloop
     std::unique_ptr<PowerService> power_service_;
 
     // Clients
-    std::unique_ptr<RedisClient> redis_client_;
+    YamlReader yaml_config_reader_;
 
    private:
     /*
@@ -150,8 +150,8 @@ class Thunderloop
 
     // Calibrated power service constants
     double kick_coeff_;
-    int kick_constant_;
-    int chip_pulse_width_;
+    double kick_constant_;
+    double chip_pulse_width_;
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
