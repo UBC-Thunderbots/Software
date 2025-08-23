@@ -67,13 +67,6 @@ struct KickoffFriendlyPlayFSM
     bool isSetupDone(const Update& event);
 
     /**
-     * Guard that checks if the ball can be kicked.
-     *
-     * @param event the FreeKickPlayFSM Update event
-     */
-    bool canKick(const Update& event);
-
-    /**
     * Guard that checks if game has started (ball kicked).
     *
     * @param event the FreeKickPlayFSM Update event

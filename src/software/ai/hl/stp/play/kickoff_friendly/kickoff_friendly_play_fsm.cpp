@@ -155,12 +155,6 @@ bool KickoffFriendlyPlayFSM::isSetupDone(const Update &event)
     return !event.common.world_ptr->gameState().isSetupState();
 }
 
-// not used currently.
-bool KickoffFriendlyPlayFSM::canKick(const Update& event)
-{
-    return event.common.world_ptr->gameState().canKick();
-}
-
 bool KickoffFriendlyPlayFSM::isPlaying(const Update& event)
 {
     return event.common.world_ptr->gameState().isPlaying();
