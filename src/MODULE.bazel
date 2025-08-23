@@ -171,9 +171,9 @@ archive_override(
 bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
 archive_override(
     module_name = "platformio_rules",
-    sha256 = "5736292989829a54728ffd429202a8b7f6ac57e8b4e0cf9a07394f3d5f719919",
-    strip_prefix = "platformio_rules-b998c783ce05a224ef726aa9775bd7c2d4121c29",
-    url = "https://github.com/Andrewyx/platformio_rules/archive/b998c783ce05a224ef726aa9775bd7c2d4121c29.tar.gz",
+    sha256 = "a80357230e27b8b57b8deffaa82684d3ee88b2284e4a767a9d8a692e9034e125",
+    strip_prefix = "platformio_rules-3cd18c7c7bb2482fe3cbb58898245dd675421234",
+    url = "https://github.com/mum4k/platformio_rules/archive/3cd18c7c7bb2482fe3cbb58898245dd675421234.tar.gz",
 )
 
 # This is overridden despite being in BCR since it contains protoc v31.1. We can remove this once BCR updates
