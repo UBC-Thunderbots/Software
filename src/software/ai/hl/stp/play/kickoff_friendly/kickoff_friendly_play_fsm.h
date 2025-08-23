@@ -22,7 +22,6 @@ struct KickoffFriendlyPlayFSM
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
     /**
      * Creates a kickoff friendly play FSM
      *
@@ -36,6 +35,8 @@ struct KickoffFriendlyPlayFSM
     * @param world_ptr the world pointer
     */
     void createKickoffSetupPositions(const WorldPtr &world_ptr);
+
+
 
     /**
      * Action to move robots to starting positions

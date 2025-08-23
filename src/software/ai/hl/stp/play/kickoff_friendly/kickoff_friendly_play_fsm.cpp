@@ -109,19 +109,23 @@ void KickoffFriendlyPlayFSM::shootBall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-/*TODO change chip ball to use location generated from find open circle, pick the biggest circle [0] and get the center.
- * That will be the chip target. Good luck.
- *
- *
- */
 void KickoffFriendlyPlayFSM::chipBall(const Update &event)
 {
     WorldPtr world_ptr = event.common.world_ptr;
 
     PriorityTacticVector tactics_to_run = {{}};
 
+    // adjust with testing to give us enough space to catch the ball before it goes out of bounds
+    double ballX     = world_ptr->ball().position().x();
+    double fieldX    = world_ptr->field().enemyGoalCenter().x() - 2;
+    double negFieldY = world_ptr->field().enemyCornerNeg().y() + 0.3;
+    double posFieldY = world_ptr->field().enemyCornerPos().y() - 0.3;
+
+    Rectangle target_area_rectangle =
+            Rectangle(Point(ballX, negFieldY), Point(fieldX, posFieldY));
+
     // sort targets by distance to enemy goal center.
-    std::vector<Circle> potential_chip_targets = findGoodChipTargets(*world_ptr);
+    std::vector<Circle> potential_chip_targets = findGoodChipTargets(*world_ptr, target_area_rectangle);
     std::sort(potential_chip_targets.begin(), potential_chip_targets.end(),
             [world_ptr](const Circle& first_circle, const Circle& second_circle) {
 
@@ -129,8 +133,6 @@ void KickoffFriendlyPlayFSM::chipBall(const Update &event)
                         distance(world_ptr->field().enemyGoalCenter(), second_circle.origin());
             });
 
-    // TODO (#2612): This needs to be adjusted post field testing, ball needs to land
-    // exactly in the middle of the enemy field (as a default)
     Point target = world_ptr->field().centerPoint() + Vector(world_ptr->field().xLength() / 6, 0);
 
     if (!potential_chip_targets.empty())
@@ -164,7 +166,6 @@ bool KickoffFriendlyPlayFSM::isPlaying(const Update& event)
     return event.common.world_ptr->gameState().isPlaying();
 }
 
-// taken from freekickplayfsm
 bool KickoffFriendlyPlayFSM::shotFound(const Update &event)
 {
     shot = calcBestShotOnGoal(event.common.world_ptr->field(),
