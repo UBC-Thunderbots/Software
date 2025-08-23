@@ -17,19 +17,6 @@
 # thunderbots-specific modifications
 
 load(
-    "@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
-    "action_config",
-    "env_entry",
-    "env_set",
-    "feature",
-    "feature_set",
-    "flag_group",
-    "flag_set",
-    "tool",
-    "tool_path",
-    "variable_with_value",
-)
-load(
     "@bazel_tools//tools/build_defs/cc:action_names.bzl",
     "ASSEMBLE_ACTION_NAME",
     "CC_FLAGS_MAKE_VARIABLE_ACTION_NAME",
@@ -48,6 +35,19 @@ load(
     "LTO_INDEXING_ACTION_NAME",
     "PREPROCESS_ASSEMBLE_ACTION_NAME",
     "STRIP_ACTION_NAME",
+)
+load(
+    "@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
+    "action_config",
+    "env_entry",
+    "env_set",
+    "feature",
+    "feature_set",
+    "flag_group",
+    "flag_set",
+    "tool",
+    "tool_path",
+    "variable_with_value",
 )
 
 ACTION_NAMES = struct(

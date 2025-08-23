@@ -6,7 +6,7 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive.pb.h"
-#include "proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 #include "software/geom/algorithms/almost_equal.h"
 #include "software/geom/geom_constants.h"

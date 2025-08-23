@@ -1,11 +1,11 @@
-package(default_visibility = ["//visibility:public"])
-
 load(
     ":cc_toolchain_config.bzl",
     "cc_toolchain_config_fullsystem",
     "cc_toolchain_config_k8_jetson_nano_cross_compile",
     "make_builtin_include_directories",
 )
+
+package(default_visibility = ["//visibility:public"])
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
@@ -130,6 +130,7 @@ cc_toolchain_config_fullsystem(
     name = "linux_aarch64_gcc",
     builtin_include_directories = [
         "/usr/lib/gcc/aarch64-linux-gnu/",
+        "/opt/tbotspython/cross_compile_headers/include/python3.12/",
     ] + make_builtin_include_directories(),
     host_system_name = "aarch64",
     target_cpu = "aarch64",
@@ -197,11 +198,11 @@ cc_toolchain(
 cc_toolchain_config_k8_jetson_nano_cross_compile(
     name = "gcc_k8_jetson_nano_cross_compile",
     builtin_include_directories = [
-        "external/k8_jetson_nano_cross_compile_gcc/include/",
-        "external/k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/include/",
-        "external/k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/libc/lib/",
-        "external/k8_jetson_nano_cross_compile_gcc/aarch64-linux-gnu/libc/usr/include/",
-    ],
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/include/",
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/sysroot/usr/include/",
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/lib/gcc/aarch64-tbots-linux-gnu/8.5.0/include/",
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/lib/gcc/aarch64-tbots-linux-gnu/8.5.0/include-fixed",
+    ] + make_builtin_include_directories(),
     tool_paths = {
         "ar": "wrapper/k8_jetson_nano_cross_compile_ar",
         "cpp": "wrapper/k8_jetson_nano_cross_compile_cpp",
