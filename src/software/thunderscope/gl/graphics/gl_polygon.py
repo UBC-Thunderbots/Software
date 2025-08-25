@@ -21,6 +21,7 @@ class GLPolygon(GLShape):
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
+        closed: bool = False
     ) -> None:
         """Initialize the GLPolygon
 
@@ -30,6 +31,7 @@ class GLPolygon(GLShape):
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill
         :param line_width: The line width of the polygon's outline
+        :param closed: whether the GLPolygon is closed or not
         """
         super().__init__(
             parent_item=parent_item,
@@ -39,6 +41,7 @@ class GLPolygon(GLShape):
         )
 
         self.set_points(points)
+        self.is_closed = closed
 
     def set_points(self, points: list[tuple[float, float]]) -> None:
         """Update the point data representing the polygon to display.
@@ -62,7 +65,8 @@ class GLPolygon(GLShape):
         if not self.points:
             return
 
-        vertices = [(point[0], point[1], 0) for point in self.points + [self.points[0]]]
+        render_points = self.points + [self.points[0]] if self.is_closed else self.points
+        vertices = [(point[0], point[1], 0) for point in render_points]
         self.setData(pos=vertices)
 
         if self.fill_graphic:
