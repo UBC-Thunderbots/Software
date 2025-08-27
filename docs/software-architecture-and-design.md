@@ -78,6 +78,8 @@
 
 # Architecture Overview
 
+![High-Level Architecture Diagram](images/high_level_architecture.svg)
+
 At a high-level, our system is split into several independent processes that [communicate with each other](#inter-process-communication). Our architecture is designed in this manner to promote decoupling of different features, making our system easier to expand, maintain, and test.
 
 - [**Fullsystem**](#fullsystem) is the program that processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [**Sensor Fusion**](#sensor-fusion), which is responsible for processing and filtering raw data, and the [**AI**](#ai) that makes gameplay decisions.
