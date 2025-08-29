@@ -15,10 +15,10 @@ TEST(AttackerFSMTest, test_transitions)
                                             .shot             = std::nullopt,
                                             .chip_target      = std::nullopt};
 
-
+    FSMLogger logger{std::optional(0)};
     FSM<AttackerFSM> fsm{DribbleFSM(std::make_shared<TbotsProto::AiConfig>()), PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()),
                          KeepAwayFSM(std::make_shared<TbotsProto::AiConfig>()), AttackerFSM(std::make_shared<TbotsProto::AiConfig>()),
-                         FSMLogger(std::optional(0))};
+                         logger};
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     // robot far from attacker point
