@@ -8,7 +8,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class PlayInfoWidget(QWidget):
     NUM_ROWS = 6
-    NUM_COLS = 4
+    NUM_COLS = 6
 
     # empirically makes even bolded items fit within columns
     HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
@@ -45,7 +45,9 @@ class PlayInfoWidget(QWidget):
         robot_ids = []
         tactic_fsm_states = []
         tactic_names = []
+        tactic_guards = []
         play_name = []
+        tactic_transitions = []
 
         if not playinfo.robot_tactic_assignment:
             return
@@ -61,19 +63,26 @@ class PlayInfoWidget(QWidget):
         for state in playinfo.play.play_state:
             play_name.append(state)
 
+        play_name.append(playinfo.play.last_guard)
+        play_name.append(playinfo.play.last_transition)
+
         for robot_id in sorted(playinfo.robot_tactic_assignment):
             robot_ids.append(robot_id)
             tactic_fsm_states.append(
                 playinfo.robot_tactic_assignment[robot_id].tactic_fsm_state
             )
-
+            tactic_guards.append(playinfo.robot_tactic_assignment[robot_id].last_guard)
+            tactic_transitions.append(playinfo.robot_tactic_assignment[robot_id].last_transition)
             tactic_names.append(playinfo.robot_tactic_assignment[robot_id].tactic_name)
+
         set_table_data(
             {
                 "Play": play_name,
                 "Robot ID": robot_ids,
                 "Tactic Name": tactic_names,
                 "Tactic FSM State": tactic_fsm_states,
+                "Tactic Guard": tactic_guards,
+                "Tactic Transitions" : tactic_transitions,
             },
             self.play_table,
             PlayInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
