@@ -14,23 +14,42 @@
  * This class declares a logger to log the FSM State Changes
  * https://boost-ext.github.io/sml/examples.html#logging
  *
- * The logger follows the singleton pattern: https://stackoverflow.com/questions/13047526/difference-between-singleton-implemention-using-pointer-and-using-static-object
- * It also applies some filtering to prevent overwhelming protobuffer messages.
+ * This logger DOES NOT FOLLOW the Singleton design pattern.
+ * This is because to maintain synchronization between AI logs and actual AI actions, the controlling Play and each
+ * of its tactics need to have their own separate loggers.
  */
 
 class FSMLogger {
 public:
+    /**
+     * Constructors for FSMLogger
+     *
+     * @param robot_id the Robot ID of the Tactic that this logger is attached to.
+     *                  (nullopt if this logger is attached to a play)
+     */
+    explicit FSMLogger(std::optional<unsigned int> robot_id) : robot_id(robot_id) {}
+
+    FSMLogger() : robot_id(std::nullopt){};
+
+    /**
+     * Set the associated robot ID
+     *
+     * @param robot_id the id of the robot that the associated tactic is running on
+     */
+     void setRobotId(std::optional<unsigned int> robot_id) {
+        this->robot_id = robot_id;
+    }
 
     /**
      * Get the single logger instance
      *
      * @return the logger instance
      */
-    static FSMLogger& getInstance()
-    {
-        static FSMLogger logger;
-        return logger;
-    }
+//    static FSMLogger& getInstance()
+//    {
+//        static FSMLogger logger;
+//        return logger;
+//    }
 
     /**
      * This function is called whenever an event is processed by the state machine
@@ -61,7 +80,10 @@ public:
         message.append(boost::sml::aux::get_type_name<TGuard>());
         message.append(" ");
         message.append((result ? "[Pass]" : "[Reject]"));
-        last_guard = message;
+        if (last_guard != message) {
+            last_guard = message;
+            flush_msg();
+        }
     }
 
     /**
@@ -96,43 +118,29 @@ public:
         message.append(src.c_str());
         message.append(" -> ");
         message.append(dst.c_str());
-        last_state_transition = message; //boost::sml::aux::get_type_name<SM>() + " " + src.c_str() + " -> " + dst.c_str();
-    }
-
-    void flush_with_robot_id(unsigned int id) {
-        if (id == robot_logs.begin()->first && !skip) {
-
-            std::string output;
-            for (const auto& [key, value] : robot_logs) {
-
-                output.append(std::to_string(key));
-                output.append(": ");
-                output.append(value + "\n");
-            }
-            LOG(INFO) << output;
-            skip = true;
+        if (last_state_transition != message) {
+            last_state_transition = message;
+            flush_msg();
         }
-       //if (last_state_transition != "") {
-           std::string new_msg = last_state_transition + "\n" + last_guard;
-           if (robot_logs[id] != new_msg) {
-               skip = false;
-               robot_logs[id] = new_msg;
-           }
-      //}
     }
-
-protected:
-    // Prevent construction and construction by copy, assignment, destruction.
-    FSMLogger() = default;
-    FSMLogger(const FSMLogger&) = default;
-    FSMLogger& operator=(const FSMLogger&) = default;
-    ~FSMLogger() = default;
 
 private:
-    std::map<unsigned int, std::string> robot_logs;
+    /**
+     * Push messages to protobuffer
+     */
+    void flush_msg() {
+        if (robot_id == std::nullopt) {
+            LOG(INFO) << "Play" + last_state_transition + "\n" + last_guard;
+        } else {
+            LOG(INFO) << robot_id.value() << ": " + last_state_transition + "\n" + last_guard;
+        }
+    }
+
+    std::optional<unsigned int> robot_id;
+
     std::string last_state_transition;
     std::string last_guard;
-    bool skip = true;
+    bool skip = false;
 };
 
 
