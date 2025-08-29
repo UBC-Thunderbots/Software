@@ -46,7 +46,8 @@ class TacticBase : public Tactic
      */
     explicit TacticBase(const std::set<RobotCapability> &capability_reqs_,
                         std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
-        : last_execution_robot(std::nullopt),
+        : logger(std::optional<RobotId>(0)),
+          last_execution_robot(std::nullopt),
           ai_config_ptr(ai_config_ptr),
           fsm_map(),
           control_params(),
@@ -103,7 +104,7 @@ class TacticBase : public Tactic
     void setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
     {
         this->last_execution_robot = last_execution_robot;
-        FSMLogger::getInstance().flush_with_robot_id(*last_execution_robot);
+        logger.setRobotId(last_execution_robot);
     }
 
     /**
@@ -126,6 +127,8 @@ class TacticBase : public Tactic
 
    protected:
 
+    FSMLogger logger;
+
     std::optional<RobotId> last_execution_robot;
 
     // A shared pointer to the ai configuration to configure ai behaviour, shared by all
@@ -147,7 +150,7 @@ class TacticBase : public Tactic
     {
         return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr),
                                                 TacticSubFsms(ai_config_ptr)...,
-                                                FSMLogger::getInstance());
+                                                logger);
     }
 
    private:
