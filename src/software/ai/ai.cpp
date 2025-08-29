@@ -120,5 +120,7 @@ TbotsProto::PlayInfo Ai::getPlayInfo() const
         (*info.mutable_robot_tactic_assignment())[robot_id] = tactic_msg;
     }
 
+    FSMLogger::getTransitionAndGuard(info);
+
     return info;
 }
