@@ -82,7 +82,7 @@ public:
         message.append((result ? "[Pass]" : "[Reject]"));
         if (last_guard != message) {
             last_guard = message;
-            flush_msg();
+            guard_logs[robot_id] = message;
         }
     }
 
@@ -120,27 +120,40 @@ public:
         message.append(dst.c_str());
         if (last_state_transition != message) {
             last_state_transition = message;
-            flush_msg();
+            transition_logs[robot_id] = message;
+        }
+    }
+
+    /**
+     * Adds the transition and guard information from logs to info
+     *
+     * @param info
+     */
+    static void getTransitionAndGuard(TbotsProto::PlayInfo& info) {
+        for (const auto& [id, log] : guard_logs) {
+            if (id == std::nullopt) {
+                info.mutable_play()->set_last_guard(log);
+            } else {
+                (*info.mutable_robot_tactic_assignment())[id.value()].set_last_guard(log);
+            }
+        }
+        for (const auto& [id, log] : transition_logs) {
+            if (id == std::nullopt) {
+                info.mutable_play()->set_last_transition(log);
+            } else {
+                (*info.mutable_robot_tactic_assignment())[id.value()].set_last_transition(log);
+            }
         }
     }
 
 private:
-    /**
-     * Push messages to protobuffer
-     */
-    void flush_msg() {
-        if (robot_id == std::nullopt) {
-            LOG(INFO) << "Play" + last_state_transition + "\n" + last_guard;
-        } else {
-            LOG(INFO) << robot_id.value() << ": " + last_state_transition + "\n" + last_guard;
-        }
-    }
 
+    inline static std::map<std::optional<unsigned int>, std::string> guard_logs{};
+    inline static std::map<std::optional<unsigned int>, std::string> transition_logs{};
     std::optional<unsigned int> robot_id;
 
     std::string last_state_transition;
     std::string last_guard;
-    bool skip = false;
 };
 
 
