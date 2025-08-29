@@ -6,32 +6,37 @@
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/passing/pass.h"
 
-struct AttackerFSM
+/**
+ * The control parameters for updating AttackerFSM
+ */
+struct AttackerFSMControlParams
 {
+    // The best pass so far
+    std::optional<Pass> best_pass_so_far;
+    // whether we have committed to the pass and will be taking it
+    bool pass_committed;
+    // The shot to take
+    std::optional<Shot> shot;
+    // The point the robot will chip towards if it is unable to shoot and is in danger
+    // of losing the ball to an enemy
+    std::optional<Point> chip_target;
+};
+
+struct AttackerFSM : TacticFSM<AttackerFSMControlParams>
+{
+    using Update = TacticFSM<AttackerFSMControlParams>::Update;
     /**
      * Constructor for AttackerFSM
      *
-     * @param attacker_tactic_config The config to fetch parameters from
+     * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit AttackerFSM(const TbotsProto::AiConfig& ai_config) : ai_config(ai_config) {}
-
-    struct ControlParams
+    explicit AttackerFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<AttackerFSMControlParams>(ai_config_ptr)
     {
-        // The best pass so far
-        std::optional<Pass> best_pass_so_far = std::nullopt;
-        // whether we have committed to the pass and will be taking it
-        bool pass_committed = false;
-        // The shot to take
-        std::optional<Shot> shot = std::nullopt;
-        // The point the robot will chip towards if it is unable to shoot and is in danger
-        // of losing the ball to an enemy
-        std::optional<Point> chip_target;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    }
 
     /**
      * Action that updates the PivotKickFSM to shoot or pass
@@ -61,6 +66,8 @@ struct AttackerFSM
      */
     bool shouldKick(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(shouldKick, AttackerFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -72,6 +79,7 @@ struct AttackerFSM
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(shouldKick)
+
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, KeepAwayFSM)
 
@@ -83,7 +91,4 @@ struct AttackerFSM
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
-
-   private:
-    TbotsProto::AiConfig ai_config;
 };

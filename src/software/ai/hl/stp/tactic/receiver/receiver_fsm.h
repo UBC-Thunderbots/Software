@@ -5,37 +5,40 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/passing/pass.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 
-struct ReceiverFSM
+/**
+ * The control parameters for updating ReceiverFSM
+ */
+struct ReceiverFSMControlParams
 {
+    // The pass to receive
+    std::optional<Pass> pass;
+
+    // If set to true, we will only receive and dribble
+    bool disable_one_touch_shot;
+};
+
+struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
+{
+    using Update = TacticFSM<ReceiverFSMControlParams>::Update;
+
     /**
      * Constructor for ReceiverFSM
      *
-     * @param receiver_tactic_config The config to fetch parameters from
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ReceiverFSM(TbotsProto::ReceiverTacticConfig receiver_tactic_config)
-        : receiver_tactic_config(receiver_tactic_config)
+    explicit ReceiverFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<ReceiverFSMControlParams>(ai_config_ptr)
     {
     }
 
     class OneTouchShotState;
     class ReceiveAndDribbleState;
     class WaitingForPassState;
-
-    struct ControlParams
-    {
-        // The pass to receive
-        std::optional<Pass> pass = std::nullopt;
-
-        // If set to true, we will only receive and dribble
-        bool disable_one_touch_shot = false;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     static constexpr double MIN_PASS_START_SPEED_M_PER_SEC    = 0.02;
     static constexpr double BALL_MIN_MOVEMENT_SPEED_M_PER_SEC = 0.04;
@@ -141,6 +144,11 @@ struct ReceiverFSM
      */
     bool strayPass(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(onetouchPossible, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(passStarted, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(passFinished, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(strayPass, ReceiverFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -175,8 +183,4 @@ struct ReceiverFSM
             OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
     }
-
-   private:
-    // the receiver tactic config
-    TbotsProto::ReceiverTacticConfig receiver_tactic_config;
 };

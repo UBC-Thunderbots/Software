@@ -72,10 +72,15 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     Robot shadowee               = ::TestUtil::createRobotAtPos(Point(2, 0));
     Robot shadower               = ::TestUtil::createRobotAtPos(Point(-2, 0));
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+
     ::TestUtil::setBallPosition(world, Point(1, 0), Timestamp::fromSeconds(0));
     EnemyThreat enemy_threat{shadowee,     true, Angle::zero(), std::nullopt,
                              std::nullopt, 1,    enemy};
-    FSM<ShadowEnemyFSM> fsm;
+
+FSMLogger logger{std::optional(0)};
+    FSM<ShadowEnemyFSM> fsm{ShadowEnemyFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            MoveFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            logger};
 
     // Start in MoveFSM
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
@@ -134,7 +139,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
 
     // Either the ball has been stolen by our robot or at least the
     // enemy threat has kicked the ball
-    // Tactic is done
+    // TacticBase is done
     enemy_threat.has_ball = false;
     ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(

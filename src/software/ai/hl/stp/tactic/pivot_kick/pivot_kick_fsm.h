@@ -2,26 +2,38 @@
 
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-struct PivotKickFSM
+/**
+ * The control parameters for updating PivotKickFSM
+ */
+struct PivotKickFSMControlParams
 {
+    // The location where the kick will be taken from
+    Point kick_origin;
+    // The direction the Robot will kick in
+    Angle kick_direction;
+    // How the robot will chip or kick the ball
+    AutoChipOrKick auto_chip_or_kick;
+};
+
+struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
+{
+    using Update = TacticFSM<PivotKickFSMControlParams>::Update;
     class KickState;
     class StartState;
 
-    struct ControlParams
+    /**
+     * Constructor for PivotKickFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit PivotKickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<PivotKickFSMControlParams>(ai_config_ptr)
     {
-        // The location where the kick will be taken from
-        Point kick_origin;
-        // The direction the Robot will kick in
-        Angle kick_direction;
-        // How the robot will chip or kick the ball
-        AutoChipOrKick auto_chip_or_kick;
-    };
-
-    // this struct defines the only event that the PivotKickFSM responds to
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    }
 
     /**
      * Action that updates the DribbleFSM to get possession of the ball and pivot
@@ -48,6 +60,8 @@ struct PivotKickFSM
      */
     bool ballKicked(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(ballKicked, PivotKickFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -58,6 +72,7 @@ struct PivotKickFSM
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(ballKicked)
+
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossessionAndPivot, DribbleFSM)
         DEFINE_SML_ACTION(kickBall)
 

@@ -8,24 +8,24 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/logger/logger.h"
 
+/**
+ * Control Parameters for PenaltyKickPlay
+ */
+struct PenaltyKickPlayControlParams
+{
+};
 
-struct PenaltyKickPlayFSM
+struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayControlParams>
 {
     class SetupPositionState;
     class PerformKickState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
     /**
      * Creates a penalty kick play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PenaltyKickPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit PenaltyKickPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to set up the robots in position to start the penalty kick
@@ -59,6 +59,9 @@ struct PenaltyKickPlayFSM
      */
     bool kickDone(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(setupPositionDone, PenaltyKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(kickDone, PenaltyKickPlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -68,11 +71,11 @@ struct PenaltyKickPlayFSM
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_ACTION(setupPosition)
-        DEFINE_SML_ACTION(performKick)
-
         DEFINE_SML_GUARD(setupPositionDone)
         DEFINE_SML_GUARD(kickDone)
+
+        DEFINE_SML_ACTION(setupPosition)
+        DEFINE_SML_ACTION(performKick)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -84,7 +87,6 @@ struct PenaltyKickPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<PenaltyKickTactic> penalty_kick_tactic;
     std::vector<std::shared_ptr<PenaltySetupTactic>> penalty_setup_tactics;
 };
