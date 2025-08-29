@@ -19,7 +19,7 @@ TEST(PassDefenderFSMTest, test_transitions)
 
     FSM<PassDefenderFSM> fsm{PassDefenderFSM(std::make_shared<TbotsProto::AiConfig>()),
                              DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
-                             FSMLogger::getInstance()};
+                             FSMLogger(std::optional(0))};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
@@ -83,7 +83,7 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
 
     FSM<PassDefenderFSM> fsm{PassDefenderFSM(std::make_shared<TbotsProto::AiConfig>()),
                              DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
-                             FSMLogger::getInstance()};
+                             FSMLogger(std::optional(0))};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));

@@ -79,7 +79,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
 
     FSM<ShadowEnemyFSM> fsm{ShadowEnemyFSM(std::make_shared<TbotsProto::AiConfig>()),
                             MoveFSM(std::make_shared<TbotsProto::AiConfig>()),
-                            FSMLogger::getInstance()};
+                            FSMLogger(std::optional(0))};
 
     // Start in MoveFSM
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));

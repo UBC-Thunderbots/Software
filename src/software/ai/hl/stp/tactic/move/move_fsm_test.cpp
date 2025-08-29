@@ -17,7 +17,7 @@ TEST(MoveFSMTest, test_transitions)
         .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE};
 
-    FSM<MoveFSM> fsm{MoveFSM(std::make_shared<TbotsProto::AiConfig>()), FSMLogger::getInstance()};
+    FSM<MoveFSM> fsm{MoveFSM(std::make_shared<TbotsProto::AiConfig>()), FSMLogger(std::optional(0))};
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 
     // robot far from destination

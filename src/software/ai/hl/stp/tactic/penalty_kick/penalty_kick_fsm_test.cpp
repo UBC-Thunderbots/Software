@@ -16,7 +16,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
                             DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
                             KickFSM(std::make_shared<TbotsProto::AiConfig>()),
                             GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>()),
-                            FSMLogger::getInstance()};
+                            FSMLogger(std::optional(0))};
 
     PenaltyKickFSMControlParams control_params{};
 

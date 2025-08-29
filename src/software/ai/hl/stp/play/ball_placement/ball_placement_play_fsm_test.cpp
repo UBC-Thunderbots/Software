@@ -21,7 +21,7 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
     world_ptr->updateGameState(game_state);
 
     FSM<BallPlacementPlayFSM> fsm(
-            BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, FSMLogger::getInstance());
+            BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, FSMLogger());
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
 
@@ -51,7 +51,7 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
     world_ptr->updateGameState(game_state);
 
     FSM<BallPlacementPlayFSM> fsm(
-            BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, FSMLogger::getInstance());
+            BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, FSMLogger());
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
 

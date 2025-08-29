@@ -136,7 +136,7 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM(std::make_shared<TbotsProto::AiConfig>(ai_config)),
                                MoveFSM(std::make_shared<TbotsProto::AiConfig>(ai_config)),
                                DribbleFSM(std::make_shared<TbotsProto::AiConfig>(ai_config)),
-                               FSMLogger::getInstance());
+                               FSMLogger(std::optional(0)));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // robot far from destination, ball in friendly half

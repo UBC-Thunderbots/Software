@@ -15,7 +15,7 @@ TEST(PivotKickFSMTest, test_transitions)
 
     FSM<PivotKickFSM> fsm{PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()),
                           DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
-                          FSMLogger::getInstance()};
+                          FSMLogger(std::optional(0))};
 
     // Start in DribbleFSM
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM::StartState>));

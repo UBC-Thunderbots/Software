@@ -15,7 +15,7 @@ class PlaySelectionFSMTest : public ::testing::Test
     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr =
             std::make_shared<TbotsProto::AiConfig>(ai_config);
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm =
-        std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, FSMLogger::getInstance());
+        std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, FSMLogger());
     GameState game_state;
 };
 

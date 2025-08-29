@@ -14,7 +14,7 @@ TEST(KickFSMTest, test_transitions)
 
     FSM<KickFSM> fsm{KickFSM(std::make_shared<TbotsProto::AiConfig>()),
                      GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>()),
-                     FSMLogger::getInstance()};
+                     FSMLogger(std::optional(0))};
 
     // Start in GetBehindBallFSM state's GetBehindBallState
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));

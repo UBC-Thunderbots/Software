@@ -91,7 +91,7 @@ TEST(GoalieFSMTest, test_transitions)
                        GoalieFSM(std::make_shared<TbotsProto::AiConfig>(),
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT),
                                  PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()),
-                                 FSMLogger::getInstance());
+                                 FSMLogger(std::optional(0)));
 
     // goalie starts in PositionToBlock
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
