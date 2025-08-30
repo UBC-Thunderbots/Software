@@ -29,7 +29,7 @@ struct KickFSM : TacticFSM<KickFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit KickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit KickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : TacticFSM<KickFSMControlParams>(ai_config_ptr)
     {
     }

@@ -45,7 +45,7 @@ class TacticBase : public Tactic
      * @param capability_reqs_ The capability requirements for running this tactic
      */
     explicit TacticBase(const std::set<RobotCapability> &capability_reqs_,
-                        std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : last_execution_robot(std::nullopt),
           ai_config_ptr(ai_config_ptr),
           fsm_map(),

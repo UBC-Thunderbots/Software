@@ -22,7 +22,7 @@ struct HaltPlayFSM : PlayFSM<HaltPlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit HaltPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit HaltPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to make each robot stop

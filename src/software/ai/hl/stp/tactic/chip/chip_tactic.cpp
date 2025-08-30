@@ -3,7 +3,7 @@
 #include <algorithm>
 
 
-ChipTactic::ChipTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+ChipTactic::ChipTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticBase<ChipFSM, GetBehindBallFSM>(
           {RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr)
 {

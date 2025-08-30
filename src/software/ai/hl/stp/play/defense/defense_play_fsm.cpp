@@ -5,7 +5,7 @@
 #include "software/logger/logger.h"
 
 
-DefensePlayFSM::DefensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+DefensePlayFSM::DefensePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : DefensePlayFSMBase::DefensePlayFSMBase(ai_config_ptr)
 {
 }

@@ -28,7 +28,7 @@ class DefensePlayFSMBase : public PlayFSM<DefensePlayBaseControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit DefensePlayFSMBase(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit DefensePlayFSMBase(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
    protected:
     /**

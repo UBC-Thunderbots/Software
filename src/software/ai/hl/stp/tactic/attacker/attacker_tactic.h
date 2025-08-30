@@ -20,7 +20,7 @@ class AttackerTactic
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit AttackerTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit AttackerTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     AttackerTactic() = delete;
 

@@ -26,7 +26,7 @@ struct CreaseDefensePlayFSM : PlayFSM<CreaseDefensePlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit CreaseDefensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit CreaseDefensePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to defend the defense area

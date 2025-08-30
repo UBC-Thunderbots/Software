@@ -23,7 +23,7 @@ class GoalieTactic : public TacticBase<GoalieFSM, PivotKickFSM, DribbleFSM>
      * @param ai_config_ptr shared pointer to ai_config
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit GoalieTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     GoalieTactic() = delete;
 

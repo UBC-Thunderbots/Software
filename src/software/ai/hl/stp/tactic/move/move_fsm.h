@@ -37,7 +37,7 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit MoveFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : TacticFSM<MoveFSMControlParams>(ai_config_ptr)
     {
     }

@@ -16,7 +16,7 @@ class CreaseDefensePlay : public PlayBase<CreaseDefensePlayFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    CreaseDefensePlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    CreaseDefensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

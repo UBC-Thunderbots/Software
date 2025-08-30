@@ -23,7 +23,7 @@ class CreaseDefenderTacticTest
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr =
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr =
         std::make_shared<TbotsProto::AiConfig>();
 };
 

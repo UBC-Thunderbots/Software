@@ -39,7 +39,7 @@ struct CreaseDefenderFSM : public DefenderFSMBase,
      *
      * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit CreaseDefenderFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit CreaseDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : DefenderFSMBase(), TacticFSM<CreaseDefenderFSMControlParams>(ai_config_ptr)
     {
     }

@@ -20,7 +20,7 @@ class PenaltyKickTactic
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PenaltyKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit PenaltyKickTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     PenaltyKickTactic() = delete;
 

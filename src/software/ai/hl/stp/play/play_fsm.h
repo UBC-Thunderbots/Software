@@ -74,7 +74,7 @@ class PlayFSM
         PlayUpdate common;
     };
 
-    explicit PlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : ai_config_ptr(ai_config_ptr)
     {
     }

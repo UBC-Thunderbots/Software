@@ -10,7 +10,7 @@
 class KickoffFriendlyPlay : public Play
 {
    public:
-    KickoffFriendlyPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    KickoffFriendlyPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

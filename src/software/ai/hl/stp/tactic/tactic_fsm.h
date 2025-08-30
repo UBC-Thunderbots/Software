@@ -57,7 +57,7 @@ class TacticFSM
         TacticUpdate common;
     };
 
-    explicit TacticFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit TacticFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : ai_config_ptr(ai_config_ptr)
     {
     }

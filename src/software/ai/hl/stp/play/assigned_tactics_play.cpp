@@ -7,7 +7,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 AssignedTacticsPlay::AssignedTacticsPlay(
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : Play(ai_config_ptr, false),
       assigned_tactics(),
       override_motion_constraints(),
@@ -91,5 +91,5 @@ void AssignedTacticsPlay::updateTactics(const PlayUpdate &play_update) {}
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, AssignedTacticsPlay,
-                       std::shared_ptr<TbotsProto::AiConfig>>
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

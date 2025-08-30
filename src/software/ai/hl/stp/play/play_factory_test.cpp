@@ -7,7 +7,7 @@
 class PlayFactoryTest : public testing::Test
 {
    protected:
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr =
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr =
         std::make_shared<TbotsProto::AiConfig>();
 };
 

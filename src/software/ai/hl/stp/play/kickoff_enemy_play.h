@@ -12,7 +12,7 @@
 class KickoffEnemyPlay : public Play
 {
    public:
-    KickoffEnemyPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    KickoffEnemyPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

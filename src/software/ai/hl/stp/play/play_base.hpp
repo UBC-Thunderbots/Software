@@ -17,7 +17,7 @@ class PlayBase : public Play
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PlayBase(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
+    explicit PlayBase(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
                       bool requires_goalie)
         : Play(ai_config_ptr, requires_goalie),
           fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}...},

@@ -13,7 +13,7 @@ class MoveTactic : public TacticBase<MoveFSM>
     /**
      * Creates a new MoveTactic
      */
-    explicit MoveTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit MoveTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the params assuming that the max allowed speed mode is the physical limits

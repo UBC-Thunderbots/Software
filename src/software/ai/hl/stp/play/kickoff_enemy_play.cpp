@@ -9,7 +9,7 @@
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : Play(ai_config_ptr, true)
 {
 }
@@ -150,5 +150,5 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, KickoffEnemyPlay,
-                       std::shared_ptr<TbotsProto::AiConfig>>
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

@@ -45,7 +45,7 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit FreeKickPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit FreeKickPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that sets up the robots in position to perform the free kick

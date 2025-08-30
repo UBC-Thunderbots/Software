@@ -17,7 +17,7 @@ class HaltPlay : public PlayBase<HaltPlayFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    HaltPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    HaltPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

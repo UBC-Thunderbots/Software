@@ -6,7 +6,7 @@
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
 
-AttackerTactic::AttackerTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+AttackerTactic::AttackerTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticBase<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>(
           {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move},
           ai_config_ptr)

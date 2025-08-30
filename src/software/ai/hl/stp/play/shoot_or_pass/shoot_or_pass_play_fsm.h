@@ -33,7 +33,7 @@ struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ShootOrPassPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit ShootOrPassPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the offensive positioning tactics

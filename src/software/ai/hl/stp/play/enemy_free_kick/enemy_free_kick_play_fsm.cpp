@@ -11,7 +11,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : DefensePlayFSMBase::DefensePlayFSMBase(ai_config_ptr)
 {
 }

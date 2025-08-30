@@ -41,7 +41,7 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      *  @param ai_config_ptr shared pointer to ai_config proto
      *  @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
+    explicit GoalieFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
                        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT)
         : TacticFSM<GoalieFSMControlParams>(ai_config_ptr),

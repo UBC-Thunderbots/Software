@@ -20,7 +20,7 @@ class Ai final
      * Create an AI with given configurations
      * @param ai_config_ptr shared pointer to the ai configuration
      */
-    explicit Ai(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit Ai(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Overrides the play
