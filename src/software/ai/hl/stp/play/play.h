@@ -75,7 +75,7 @@ class Play
    protected:
     // A shared pointer to the ai configuration to configure ai behaviour, shared by all
     // Plays, Tactics, and FSMs
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;

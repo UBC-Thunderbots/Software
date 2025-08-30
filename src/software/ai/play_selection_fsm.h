@@ -120,6 +120,6 @@ struct PlaySelectionFSM
     }
 
    private:
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
     std::optional<TbotsProto::PlayName> current_set_play;
 };
