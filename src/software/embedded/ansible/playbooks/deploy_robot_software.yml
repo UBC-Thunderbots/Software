@@ -14,6 +14,22 @@
       robot_diagnostics_cli_tar: ../../robot_diagnostics_cli/robot_diagnostics_cli_tar.tar.gz
 
   tasks:
+    - name: find SSH key
+      ansible.builtin.stat:
+        path: ~/.ssh/id_ed25519.pub
+      register: SSHfile
+
+    - name: Tell user to make key
+      ansible.builtin.debug:
+        msg: "Please create an ed25519 SSH key using ssh-keygen"
+      when: not SSHfile.stat
+
+    - name: Copy SSH key to robot
+      ansible.posix.authorized_key:
+        user: robot
+        key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
+      when: SSHfile.stat
+
     - name: Log Robot ID
       ansible.builtin.debug:
         msg: "[Robot ID = {{ inventory_hostname }}]"
