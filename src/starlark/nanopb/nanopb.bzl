@@ -131,7 +131,7 @@ def _nanopb_proto_library_impl(ctx):
 
     # Create compiler flags
     copts = ["-I{}".format(include) for include in depset(nanopb_includes).to_list()]
-    copts += ["-DPB_FIELD_16BIT=1"]
+    copts += ["-DPB_FIELD_32BIT=1"]
 
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = "compile_nanopb_outputs",
