@@ -23,7 +23,7 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PenaltyKickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit PenaltyKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : TacticFSM<PenaltyKickFSMControlParams>(ai_config_ptr),
           complete_approach(std::nullopt),
           shot_angle()

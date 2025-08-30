@@ -19,7 +19,7 @@ class DribbleTactic : public TacticBase<DribbleFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit DribbleTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit DribbleTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     DribbleTactic() = delete;
 

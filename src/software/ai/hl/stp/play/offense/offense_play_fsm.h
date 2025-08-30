@@ -25,7 +25,7 @@ struct OffensePlayFSM : PlayFSM<OffensePlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit OffensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit OffensePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Guard to check whether the enemy team has possession of the ball

@@ -19,7 +19,7 @@ class PassDefenderTactic : public TacticBase<PassDefenderFSM, DribbleFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PassDefenderTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit PassDefenderTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Update control params for this tactic

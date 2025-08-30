@@ -25,7 +25,7 @@ struct ExamplePlayFSM : PlayFSM<ExamplePlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ExamplePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit ExamplePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that moves the robots to certain positions around the ball

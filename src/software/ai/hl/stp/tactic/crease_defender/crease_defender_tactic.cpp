@@ -10,7 +10,7 @@
 #include "software/logger/logger.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticBase<CreaseDefenderFSM, DribbleFSM, MoveFSM>({RobotCapability::Move},
                                                          ai_config_ptr)
 {

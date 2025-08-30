@@ -4,7 +4,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<PenaltyKickEnemyPlayFSM>(ai_config_ptr, true)
 {
     // Assign the shared pointer to goalie tactic in the Play superclass to the control
@@ -34,5 +34,5 @@ std::vector<std::string> PenaltyKickEnemyPlay::getState()
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay,
-                       std::shared_ptr<TbotsProto::AiConfig>>
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

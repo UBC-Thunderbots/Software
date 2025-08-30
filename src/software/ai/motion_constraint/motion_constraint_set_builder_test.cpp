@@ -13,7 +13,7 @@ namespace
 {
 std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 Pass pass({1, 1}, {0.5, 0}, 2.29);
-std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr =
+std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr =
     std::make_shared<TbotsProto::AiConfig>();
 
 // vector of tuples of Tactic, MotionConstraints that should be removed,

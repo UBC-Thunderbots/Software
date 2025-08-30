@@ -20,7 +20,7 @@ struct HaltFSM : TacticFSM<HaltFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit HaltFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit HaltFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : TacticFSM<HaltFSMControlParams>(ai_config_ptr)
     {
     }

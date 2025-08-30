@@ -6,7 +6,7 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
-ReceiverTactic::ReceiverTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+ReceiverTactic::ReceiverTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticBase<ReceiverFSM>({RobotCapability::Move}, ai_config_ptr)
 {
 }

@@ -19,7 +19,7 @@ struct EnemyFreeKickPlayFSM : public DefensePlayFSMBase
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit EnemyFreeKickPlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit EnemyFreeKickPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to configure the play for defensive gameplay for enemy free kick

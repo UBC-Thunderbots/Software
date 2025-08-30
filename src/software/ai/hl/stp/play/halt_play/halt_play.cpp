@@ -3,7 +3,7 @@
 #include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-HaltPlay::HaltPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+HaltPlay::HaltPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<HaltPlayFSM>(ai_config_ptr, false)
 {
 }
@@ -21,5 +21,5 @@ void HaltPlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltPlay, std::shared_ptr<TbotsProto::AiConfig>>
+static TGenericFactory<std::string, Play, HaltPlay, std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

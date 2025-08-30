@@ -17,7 +17,7 @@ class BallPlacementPlay : public PlayBase<BallPlacementPlayFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    BallPlacementPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    BallPlacementPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

@@ -14,7 +14,7 @@ class PivotKickTactic : public TacticBase<PivotKickFSM, DribbleFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PivotKickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit PivotKickTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     PivotKickTactic() = delete;
 

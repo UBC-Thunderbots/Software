@@ -20,7 +20,7 @@ class ReceiverTactic : public TacticBase<ReceiverFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ReceiverTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit ReceiverTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the control parameters for this ReceiverTactic.

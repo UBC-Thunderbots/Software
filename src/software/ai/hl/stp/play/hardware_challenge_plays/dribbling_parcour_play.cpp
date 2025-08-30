@@ -6,7 +6,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 DribblingParcourPlay::DribblingParcourPlay(
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : Play(ai_config_ptr, false)
 {
 }
@@ -38,5 +38,5 @@ void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, DribblingParcourPlay,
-                       std::shared_ptr<TbotsProto::AiConfig>>
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

@@ -15,7 +15,7 @@ class PenaltyKickEnemyPlay : public PlayBase<PenaltyKickEnemyPlayFSM>
      * Constructor for Penalty Kick Enemy Play
      * @param ai_config_ptr shared pointer to ai_config
      */
-    PenaltyKickEnemyPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    PenaltyKickEnemyPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

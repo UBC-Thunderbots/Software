@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 
 BallPlacementPlayFSM::BallPlacementPlayFSM(
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayFSM<BallPlacementPlayControlParams>(ai_config_ptr),
       pivot_kick_tactic(std::make_shared<WallKickoffTactic>(ai_config_ptr)),
       place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config_ptr)),

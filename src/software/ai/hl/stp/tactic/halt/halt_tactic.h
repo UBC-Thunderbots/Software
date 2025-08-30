@@ -13,7 +13,7 @@ class HaltTactic : public TacticBase<HaltFSM>
     /**
      * Creates a new HaltTactic
      */
-    explicit HaltTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit HaltTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void accept(TacticVisitor& visitor) const override;
 };

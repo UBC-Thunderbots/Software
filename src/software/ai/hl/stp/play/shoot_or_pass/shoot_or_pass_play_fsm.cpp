@@ -4,7 +4,7 @@
 #include <algorithm>
 
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayFSM<ShootOrPassPlayControlParams>(ai_config_ptr),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config_ptr)),
       receiver_tactic(std::make_shared<ReceiverTactic>(ai_config_ptr)),

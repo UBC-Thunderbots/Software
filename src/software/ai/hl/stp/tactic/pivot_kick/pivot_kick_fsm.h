@@ -30,7 +30,7 @@ struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PivotKickFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit PivotKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : TacticFSM<PivotKickFSMControlParams>(ai_config_ptr)
     {
     }

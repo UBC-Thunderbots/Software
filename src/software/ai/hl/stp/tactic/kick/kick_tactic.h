@@ -18,7 +18,7 @@ class KickTactic : public TacticBase<KickFSM, GetBehindBallFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit KickTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit KickTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the params for this tactic that cannot be derived from the world

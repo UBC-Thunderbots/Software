@@ -5,7 +5,7 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-CreaseDefensePlay::CreaseDefensePlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+CreaseDefensePlay::CreaseDefensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<CreaseDefensePlayFSM>(ai_config_ptr, true)
 {
 }
@@ -35,5 +35,5 @@ void CreaseDefensePlay::updateTactics(const PlayUpdate &play_update)
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, CreaseDefensePlay,
-                       std::shared_ptr<TbotsProto::AiConfig>>
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

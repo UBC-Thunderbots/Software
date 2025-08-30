@@ -29,7 +29,7 @@ struct ChipFSM : TacticFSM<ChipFSMControlParams>
      *
      * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit ChipFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit ChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : TacticFSM<ChipFSMControlParams>(ai_config_ptr)
     {
     }

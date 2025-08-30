@@ -3,7 +3,7 @@
 #include <algorithm>
 
 GetBehindBallTactic::GetBehindBallTactic(
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticBase<GetBehindBallFSM>({RobotCapability::Move}, ai_config_ptr)
 {
 }

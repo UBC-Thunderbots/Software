@@ -4,7 +4,7 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-OffensePlay::OffensePlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+OffensePlay::OffensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<OffensePlayFSM>(ai_config_ptr, true)
 {
 }
@@ -27,5 +27,5 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, OffensePlay,
-                       std::shared_ptr<TbotsProto::AiConfig>>
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

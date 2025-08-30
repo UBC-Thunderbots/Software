@@ -12,7 +12,7 @@ class PlaySelectionFSMTest : public ::testing::Test
 {
    protected:
     TbotsProto::AiConfig ai_config;
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr =
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr =
             std::make_shared<TbotsProto::AiConfig>(ai_config);
     FSMLogger logger{};
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm =

@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_fsm.h"
 
 PenaltyKickEnemyPlayFSM::PenaltyKickEnemyPlayFSM(
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayFSM<PenaltyKickEnemyPlayControlParams>(ai_config_ptr),
       move_tactics(std::vector<std::shared_ptr<MoveTactic>>())
 {

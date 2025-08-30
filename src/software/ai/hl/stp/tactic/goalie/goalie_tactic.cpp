@@ -4,7 +4,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
 
-GoalieTactic::GoalieTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+GoalieTactic::GoalieTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticBase<GoalieFSM, PivotKickFSM, DribbleFSM>(
           {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip},
           ai_config_ptr),

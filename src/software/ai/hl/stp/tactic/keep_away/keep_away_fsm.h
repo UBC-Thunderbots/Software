@@ -21,7 +21,7 @@ struct KeepAwayFSM : TacticFSM<KeepAwayFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit KeepAwayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit KeepAwayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : TacticFSM<KeepAwayFSMControlParams>(ai_config_ptr)
     {
     }

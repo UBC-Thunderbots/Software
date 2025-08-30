@@ -18,7 +18,7 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit DefensePlayFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit DefensePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
 
     /**

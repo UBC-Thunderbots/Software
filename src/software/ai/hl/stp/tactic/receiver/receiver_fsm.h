@@ -31,7 +31,7 @@ struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ReceiverFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit ReceiverFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : TacticFSM<ReceiverFSMControlParams>(ai_config_ptr)
     {
     }

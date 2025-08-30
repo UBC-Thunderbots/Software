@@ -15,7 +15,7 @@ class FreeKickPlay : public PlayBase<FreeKickPlayFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    FreeKickPlay(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    FreeKickPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

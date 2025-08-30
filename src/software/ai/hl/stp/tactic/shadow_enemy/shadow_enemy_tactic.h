@@ -19,7 +19,7 @@ class ShadowEnemyTactic : public TacticBase<ShadowEnemyFSM, MoveFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ShadowEnemyTactic(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr);
+    explicit ShadowEnemyTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the control parameters for this ShadowEnemyTactic

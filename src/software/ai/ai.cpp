@@ -7,7 +7,7 @@
 #include "software/tracy/tracy_constants.h"
 
 
-Ai::Ai(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+Ai::Ai(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : logger(),
       ai_config_ptr(ai_config_ptr),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, logger)),

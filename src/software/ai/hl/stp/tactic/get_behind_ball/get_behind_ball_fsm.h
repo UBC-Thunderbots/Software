@@ -27,7 +27,7 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
      *
      * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit GetBehindBallFSM(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    explicit GetBehindBallFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
         : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr) {};
 
     /**

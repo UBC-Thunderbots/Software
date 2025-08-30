@@ -38,7 +38,7 @@ class Play
      * @param ai_config_ptr shared pointer to ai_config
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr,
+    explicit Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
                   bool requires_goalie);
 
     /**
@@ -75,7 +75,7 @@ class Play
    protected:
     // A shared pointer to the ai configuration to configure ai behaviour, shared by all
     // Plays, Tactics, and FSMs
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;

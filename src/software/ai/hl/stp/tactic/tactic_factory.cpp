@@ -5,7 +5,7 @@
 #include "software/logger/logger.h"
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
 #define PROTO_CREATE_TACTIC_CASE(ONE_OF_CASE_NAME, ONE_OF_VARIABLE_NAME)                 \
     case TbotsProto::Tactic::k##ONE_OF_CASE_NAME:                                        \
@@ -40,7 +40,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<AttackerTactic>(ai_config_ptr);
 
@@ -58,7 +58,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_pr
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ChipTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<ChipTactic>(ai_config_ptr);
     tactic->updateControlParams(createPoint(tactic_proto.chip_origin()),
@@ -68,7 +68,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ChipTactic &tactic_proto,
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config_ptr);
 
@@ -81,7 +81,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tac
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<DribbleTactic>(ai_config_ptr);
     std::optional<Point> dribble_destination       = std::nullopt;
@@ -101,7 +101,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleTactic &tactic_pro
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::GetBehindBallTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<GetBehindBallTactic>(ai_config_ptr);
     tactic->updateControlParams(createPoint(tactic_proto.ball_location()),
@@ -110,7 +110,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::GetBehindBallTactic &tact
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::GoalieTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<GoalieTactic>(ai_config_ptr);
     tactic->updateMaxSpeedMode(tactic_proto.max_allowed_speed_mode());
@@ -118,7 +118,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::GoalieTactic &tactic_prot
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::KickTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<KickTactic>(ai_config_ptr);
     tactic->updateControlParams(createPoint(tactic_proto.kick_origin()),
@@ -129,14 +129,14 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::KickTactic &tactic_proto,
 
 std::shared_ptr<Tactic> createTactic(
     const TbotsProto::MoveGoalieToGoalLineTactic &tactic_proto,
-    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<MoveGoalieToGoalLineTactic>(ai_config_ptr);
     return tactic;
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<MoveTactic>(ai_config_ptr);
     tactic->updateControlParams(
@@ -149,7 +149,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveTactic &tactic_proto,
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PassDefenderTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<PassDefenderTactic>(ai_config_ptr);
     tactic->updateControlParams(createPoint(tactic_proto.position_to_block_from()),
@@ -158,14 +158,14 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::PassDefenderTactic &tacti
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PenaltyKickTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<PenaltyKickTactic>(ai_config_ptr);
     return tactic;
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<PivotKickTactic>(ai_config_ptr);
     tactic->updateControlParams(createPoint(tactic_proto.kick_origin()),
@@ -175,7 +175,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickTactic &tactic_p
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ReceiverTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic              = std::make_shared<ReceiverTactic>(ai_config_ptr);
     std::optional<Pass> pass = std::nullopt;
@@ -189,7 +189,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ReceiverTactic &tactic_pr
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<ShadowEnemyTactic>(ai_config_ptr);
     std::optional<EnemyThreat> enemy_threat = std::nullopt;
@@ -203,7 +203,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::HaltTactic &tactic_proto,
-                                     std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr)
+                                     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<HaltTactic>(ai_config_ptr);
     return tactic;
