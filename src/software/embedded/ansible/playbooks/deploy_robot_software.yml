@@ -14,7 +14,7 @@
       robot_diagnostics_cli_tar: ../../robot_diagnostics_cli/robot_diagnostics_cli_tar.tar.gz
 
   tasks:
-    - name: find SSH key
+    - name: Find SSH key
       ansible.builtin.stat:
         path: ~/.ssh/id_ed25519.pub
       register: SSHfile
