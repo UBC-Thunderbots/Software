@@ -9,7 +9,8 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-PivotKickTactic::PivotKickTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+PivotKickTactic::PivotKickTactic(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticBase<PivotKickFSM, DribbleFSM>(
           {RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
            RobotCapability::Dribble},

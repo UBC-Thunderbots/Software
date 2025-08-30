@@ -10,7 +10,8 @@
 #include "software/logger/logger.h"
 
 
-Play::Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr, bool requires_goalie)
+Play::Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
+           bool requires_goalie)
     : ai_config_ptr(ai_config_ptr),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config_ptr)),
       halt_tactics(),

@@ -13,7 +13,8 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 
-PlaySelectionFSM::PlaySelectionFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+PlaySelectionFSM::PlaySelectionFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : ai_config_ptr(ai_config_ptr), current_set_play(std::nullopt)
 {
 }

@@ -34,7 +34,8 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit BallPlacementPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    explicit BallPlacementPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that has the placing robot kick the ball off the wall to give more space to

@@ -5,7 +5,8 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+ShootOrPassPlay::ShootOrPassPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<ShootOrPassPlayFSM>(ai_config_ptr, true)
 {
 }

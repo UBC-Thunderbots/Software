@@ -4,7 +4,8 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+PenaltyKickPlay::PenaltyKickPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<PenaltyKickPlayFSM>(ai_config_ptr, true)
 {
 }

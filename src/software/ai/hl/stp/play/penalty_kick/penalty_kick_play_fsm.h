@@ -25,7 +25,8 @@ struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PenaltyKickPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    explicit PenaltyKickPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to set up the robots in position to start the penalty kick
