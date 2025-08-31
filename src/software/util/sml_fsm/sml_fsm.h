@@ -49,7 +49,6 @@ public:
     template <class SM, class TEvent>
     void log_process_event(const TEvent&)
     {
-        //LOG(INFO) << "[%s][process_event] %s\n" << boost::sml::aux::get_type_name<SM>() << boost::sml::aux::get_type_name<TEvent>();
     }
 
     /**
@@ -84,9 +83,6 @@ public:
     template <class SM, class TAction, class TEvent>
     void log_action(const TAction&, const TEvent&)
     {
-        //        printf("[%s][action] %s %s\n", sml::aux::get_type_name<SM>(), sml::aux::get_type_name<TAction>(),
-        //               sml::aux::get_type_name<TEvent>());
-//        LOG(INFO) << boost::sml::aux::get_type_name<SM>()<< "  " << boost::sml::aux::get_type_name<TAction>() << "  " <<boost::sml::aux::get_type_name<TEvent>();
     }
 
     /**
