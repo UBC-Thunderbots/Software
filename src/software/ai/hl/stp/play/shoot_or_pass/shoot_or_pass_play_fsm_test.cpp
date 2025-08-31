@@ -39,7 +39,7 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard)
     FSMLogger logger{};
     FSM<ShootOrPassPlayFSM> fsm(
             ShootOrPassPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, logger);
-    EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>))
+    EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
