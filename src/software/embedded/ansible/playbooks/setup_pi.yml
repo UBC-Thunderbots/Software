@@ -4,7 +4,8 @@
 
   tasks:
     - name: Copy SSH public key
-    - ansible.builtin.import_tasks: ../tasks/copy_ssh_key.yml
+      ansible.builtin.import_tasks: ../tasks/copy_ssh_key.yml
+
     - name: Check internet connection
       tags: dependencies
       ansible.builtin.import_tasks:
