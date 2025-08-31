@@ -41,17 +41,6 @@ public:
     }
 
     /**
-     * Get the single logger instance
-     *
-     * @return the logger instance
-     */
-//    static FSMLogger& getInstance()
-//    {
-//        static FSMLogger logger;
-//        return logger;
-//    }
-
-    /**
      * This function is called whenever an event is processed by the state machine
      *
      * @tparam SM the state machine
