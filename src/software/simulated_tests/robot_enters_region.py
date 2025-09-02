@@ -8,92 +8,52 @@ from software.simulated_tests.validation import (
 )
 
 
-class RobotEntersRegion(Validation):
-    """Checks if a Robot enters any of the provided regions."""
+class MinNumberOfRobotsEntersRegion(Validation):
+    """Checks if a certain number of Robots enters a specific set of regions."""
 
-    def __init__(self, regions=None):
-        self.regions = regions if regions else []
-        self.passing_robot = None
+    def __init__(self, regions, req_robot_cnt):
+        """Initializes the validation class with a set of regions and required count of robots
 
-    def get_validation_status(self, world) -> ValidationStatus:
-        """Checks if _any_ robot enters the provided regions
-
-        :param world: The world msg to validate
-        :return: FAILING until a robot enters any of the regions
-                 PASSING when a robot enters
+        :param regions: the regions that will be checked for robot count
+        :param req_robot_cnt: the minimum number of unique robots that must be in the given regions
         """
-        for region in self.regions:
-            for robot in world.friendly_team.team_robots:
-                if tbots_cpp.contains(
-                    region, tbots_cpp.createPoint(robot.current_state.global_position)
-                ):
-                    self.passing_robot = robot
-                    return ValidationStatus.PASSING
-
-        self.passing_robot = None
-        return ValidationStatus.FAILING
-
-    def get_validation_geometry(self, world) -> ValidationGeometry:
-        """(override) shows regions to enter"""
-        return create_validation_geometry(self.regions)
-
-    def __repr__(self):
-        return "Check for robot in regions " + ",".join(
-            repr(region) for region in self.regions
-        )
-
-
-(
-    RobotEventuallyEntersRegion,
-    RobotEventuallyExitsRegion,
-    RobotAlwaysStaysInRegion,
-    RobotNeverEntersRegion,
-) = create_validation_types(RobotEntersRegion)
-
-
-class NumberOfRobotsEntersRegion(Validation):
-    """Checks if a certain number of Robots enters a specific region."""
-
-    def __init__(self, region, req_robot_cnt):
-        self.region = region
+        self.regions = regions
         self.req_robot_cnt = req_robot_cnt
         # map to keep track of robot positions
         self.robot_in_zone = {}
 
     def get_validation_status(self, world) -> ValidationStatus:
-        """Checks if a specific number of robots enter the provided region
+        """Checks if a specific number of robots enter the provided set of regions
 
         :param world: The world msg to validate
-        :return: FAILING until req_robot_cnt robots enter the region
-                 PASSING when req_robot_cnt robots enters
+        :returns: FAILING until req_robot_cnt robots enter the set of regions
+                  PASSING when req_robot_cnt robots enter the set of regions
+        #
         """
-        # Update the map with latest robot status
-        for robot in world.friendly_team.team_robots:
-            self.robot_in_zone[robot.id] = tbots_cpp.contains(
-                self.region, tbots_cpp.createPoint(robot.current_state.global_position)
-            )
-        # Check if there are at least req_robot_cnt number of robots in zone
-        curr_cnt = 0
-        for robot_id in self.robot_in_zone:
-            if self.robot_in_zone[robot_id]:
-                curr_cnt += 1
+        robots_in_regions = set()
+        for region in self.regions:
+            for robot in world.friendly_team.team_robots:
+                if tbots_cpp.contains(
+                    region, tbots_cpp.createPoint(robot.current_state.global_position)
+                ):
+                    robots_in_regions.add(robot.id)
 
-        # Validate on curr_cnt
-        if curr_cnt == self.req_robot_cnt:
+        # Validate on length of set robots_in_regions
+        if len(robots_in_regions) >= self.req_robot_cnt:
             return ValidationStatus.PASSING
-        else:
-            return ValidationStatus.FAILING
+
+        return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) shows region to enter"""
-        return create_validation_geometry([self.region])
+        return create_validation_geometry(self.regions)
 
     def __repr__(self):
         return (
             "Check for "
             + str(self.req_robot_cnt)
             + " robots in region "
-            + ",".join(repr(self.region))
+            + ",".join(repr(self.regions))
         )
 
 
@@ -102,4 +62,23 @@ class NumberOfRobotsEntersRegion(Validation):
     NumberOfRobotsEventuallyExitsRegion,
     NumberOfRobotsAlwaysStaysInRegion,
     NumberOfRobotsNeverEntersRegion,
-) = create_validation_types(NumberOfRobotsEntersRegion)
+) = create_validation_types(MinNumberOfRobotsEntersRegion)
+
+
+class RobotEntersRegion(MinNumberOfRobotsEntersRegion):
+    """Checks if at least one robot is contained within the given regions"""
+
+    def __init__(self, regions):
+        """Initializes the validation class with a set of regions
+
+        :param regions: the regions that will be checked to contain at least one robot
+        """
+        super(RobotEntersRegion, self).__init__(regions, 1)
+
+
+(
+    RobotEventuallyEntersRegion,
+    RobotEventuallyExitsRegion,
+    RobotAlwaysStaysInRegion,
+    RobotNeverEntersRegion,
+) = create_validation_types(RobotEntersRegion)
