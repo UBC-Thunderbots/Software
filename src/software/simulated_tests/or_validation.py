@@ -38,4 +38,4 @@ class OrValidation(Validation):
         return validation_geometry
 
     def get_validation_type(self, world):
-        return ValidationType
+        return self.validations[0].get_validation_type(world)
