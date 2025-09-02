@@ -86,11 +86,9 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     expected_center_circle_or_validation_set = [
         ball_moves_at_rest_validation,
         NumberOfRobotsAlwaysStaysInRegion(
-            regions=[
-                tbots_cpp.Field.createSSLDivisionBField().centerCircle()
-            ],
+            regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
             req_robot_cnt=0,
-        )
+        ),
     ]
 
     friendly_half = tbots_cpp.Field.createSSLDivisionBField().friendlyHalf()
@@ -104,9 +102,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         # that either 0 or 1 robots are in centerCircle OR ball moves from center point
         expected_center_circle_or_validation_set.append(
             NumberOfRobotsAlwaysStaysInRegion(
-                regions=[
-                    tbots_cpp.Field.createSSLDivisionBField().centerCircle()
-                ],
+                regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
                 req_robot_cnt=1,
             )
         )
@@ -121,12 +117,12 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         NumberOfRobotsAlwaysStaysInRegion(
             regions=friendly_regions,
             req_robot_cnt=6,
-        )
+        ),
     ]
 
     always_validation_sequence_set[0] = [
         OrValidation(expected_center_circle_or_validation_set),
-        OrValidation(expected_robot_regions_or_validations_set)
+        OrValidation(expected_robot_regions_or_validations_set),
     ]
 
     eventually_validation_sequence_set = [[]]
