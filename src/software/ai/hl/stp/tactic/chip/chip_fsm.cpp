@@ -5,7 +5,7 @@
 void ChipFSM::updateGetBehindBall(
     const Update &event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
 {
-    GetBehindBallFSM::ControlParams control_params{
+    GetBehindBallFSMControlParams control_params{
         .ball_location   = event.control_params.chip_origin,
         .chick_direction = event.control_params.chip_direction};
 

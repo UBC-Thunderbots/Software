@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/segment.h"
 
 
@@ -27,19 +27,18 @@
  *                       |         ++    <-- Goalie
  *+----------------------+---------++---------+------------------+
  */
-class CreaseDefenderTactic : public Tactic
+class CreaseDefenderTactic : public TacticBase<CreaseDefenderFSM, DribbleFSM, MoveFSM>
 {
    public:
     /**
      * Creates a new CreaseDefenderTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit CreaseDefenderTactic(TbotsProto::AiConfig ai_config);
+    explicit CreaseDefenderTactic(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     CreaseDefenderTactic() = delete;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
     /**
      * Update control params for this tactic
@@ -57,11 +56,4 @@ class CreaseDefenderTactic : public Tactic
         TbotsProto::BallStealMode ball_steal_mode = TbotsProto::BallStealMode::STEAL);
 
     void accept(TacticVisitor &visitor) const override;
-
-   private:
-    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
-    CreaseDefenderFSM::ControlParams control_params;
-    TbotsProto::AiConfig ai_config;
 };

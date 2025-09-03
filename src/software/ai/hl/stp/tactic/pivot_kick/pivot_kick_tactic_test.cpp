@@ -20,7 +20,6 @@ class PivotKickTacticTest
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
-    TbotsProto::AiConfig ai_config;
 };
 
 TEST_P(PivotKickTacticTest, pivot_kick_test)
@@ -35,7 +34,8 @@ TEST_P(PivotKickTacticTest, pivot_kick_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<PivotKickTactic>(ai_config);
+    auto tactic =
+        std::make_shared<PivotKickTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
                                 {AutoChipOrKickMode::AUTOKICK, 5});
     setTactic(1, tactic);
