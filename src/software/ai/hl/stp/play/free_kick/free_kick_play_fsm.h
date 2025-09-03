@@ -16,6 +16,13 @@
 #include "software/logger/logger.h"
 
 /**
+ * Control Parameters for a Free Kick Play
+ */
+struct FreeKickPlayControlParams
+{
+};
+
+/**
  * This FSM implements the free kick play. The logic of this play is:
  * - One robot (the kicker) attempts to shoot first. If there is a good shot, then it
  * will shoot the ball.
@@ -25,7 +32,7 @@
  * robot furthest up the field.
  */
 
-struct FreeKickPlayFSM
+struct FreeKickPlayFSM : PlayFSM<FreeKickPlayControlParams>
 {
     class SetupPositionState;
     class ShootState;
@@ -33,18 +40,12 @@ struct FreeKickPlayFSM
     class PassState;
     class ChipState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
     /**
      * Creates a free kick play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit FreeKickPlayFSM(const TbotsProto::AiConfig& ai_config);
+    explicit FreeKickPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that sets up the robots in position to perform the free kick
@@ -204,6 +205,15 @@ struct FreeKickPlayFSM
      */
     bool chipDone(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(setupDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shotFound, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shotDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shouldAbortPass, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(passFound, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(passDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(chipDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(timeExpired, FreeKickPlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -216,13 +226,6 @@ struct FreeKickPlayFSM
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_ACTION(setupPosition)
-        DEFINE_SML_ACTION(shootBall)
-        DEFINE_SML_ACTION(startLookingForPass)
-        DEFINE_SML_ACTION(lookForPass)
-        DEFINE_SML_ACTION(passBall)
-        DEFINE_SML_ACTION(chipBall)
-
         DEFINE_SML_GUARD(setupDone)
         DEFINE_SML_GUARD(shotFound)
         DEFINE_SML_GUARD(shotDone)
@@ -231,6 +234,13 @@ struct FreeKickPlayFSM
         DEFINE_SML_GUARD(passDone)
         DEFINE_SML_GUARD(chipDone)
         DEFINE_SML_GUARD(timeExpired)
+
+        DEFINE_SML_ACTION(setupPosition)
+        DEFINE_SML_ACTION(shootBall)
+        DEFINE_SML_ACTION(startLookingForPass)
+        DEFINE_SML_ACTION(lookForPass)
+        DEFINE_SML_ACTION(passBall)
+        DEFINE_SML_ACTION(chipBall)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -263,7 +273,6 @@ struct FreeKickPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::optional<Shot> shot;
     std::shared_ptr<MoveTactic> align_to_ball_tactic;
     std::shared_ptr<KickTactic> shoot_tactic;

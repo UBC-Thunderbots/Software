@@ -8,7 +8,7 @@ TEST(MoveFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    MoveFSM::ControlParams control_params{
+    MoveFSMControlParams control_params{
         .destination             = Point(2, 3),
         .final_orientation       = Angle::half(),
         .dribbler_mode           = TbotsProto::DribblerMode::OFF,
@@ -17,7 +17,8 @@ TEST(MoveFSMTest, test_transitions)
         .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE};
 
-    FSM<MoveFSM> fsm;
+FSMLogger logger{std::optional(0)};
+    FSM<MoveFSM> fsm{MoveFSM(std::make_shared<TbotsProto::AiConfig>()), logger};
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 
     // robot far from destination

@@ -5,6 +5,8 @@ cc_library(
     srcs = ["sml_fsm.cpp"],
     hdrs = ["sml_fsm.h"],
     deps = [
+        "//software/logger",
+        "//proto:play_info_msg_cc_proto",
         "//software/util/typename",
         "@sml",
     ],

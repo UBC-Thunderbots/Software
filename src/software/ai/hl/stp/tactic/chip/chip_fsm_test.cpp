@@ -8,11 +8,14 @@ TEST(ChipFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    ChipFSM::ControlParams control_params{.chip_origin          = Point(-2, 1.5),
-                                          .chip_direction       = Angle::threeQuarter(),
-                                          .chip_distance_meters = 1.2};
+    ChipFSMControlParams control_params{.chip_origin          = Point(-2, 1.5),
+                                        .chip_direction       = Angle::threeQuarter(),
+                                        .chip_distance_meters = 1.2};
 
-    FSM<ChipFSM> fsm{GetBehindBallFSM()};
+    FSMLogger logger{std::optional(0)};
+    FSM<ChipFSM> fsm{ChipFSM(std::make_shared<TbotsProto::AiConfig>()),
+                     GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>()),
+                     logger};
 
     // Start in GetBehindBallFSM state's GetBehindBallState
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));

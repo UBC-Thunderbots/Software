@@ -1,26 +1,34 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/triangle.h"
 
-struct GetBehindBallFSM
+/**
+ * The control parameters for updating GetBehindBallFSM
+ */
+struct GetBehindBallFSMControlParams
+{
+    // The location where the chick will be taken, i.e. where we expect the ball to be
+    // when we chip or kick it
+    Point ball_location;
+    // The direction the Robot will chick in
+    Angle chick_direction;
+};
+
+struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
 {
    public:
+    using Update = TacticFSM<GetBehindBallFSMControlParams>::Update;
     class GetBehindBallState;
 
-    struct ControlParams
-    {
-        // The location where the chick will be taken, i.e. where we expect the ball to be
-        // when we chip or kick it
-        Point ball_location;
-        // The direction the Robot will chick in
-        Angle chick_direction;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
-    GetBehindBallFSM();
+    /**
+     * Constructor for GetBehindBallFSM
+     *
+     * @param ai_config_ptr Shared pointer to ai_config
+     */
+    explicit GetBehindBallFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr) {};
 
     /**
      * Action that updates the MovePrimitive
@@ -38,6 +46,8 @@ struct GetBehindBallFSM
      */
     bool behindBall(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(behindBall, GetBehindBallFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -46,6 +56,7 @@ struct GetBehindBallFSM
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(behindBall)
+
         DEFINE_SML_ACTION(updateMove)
 
 

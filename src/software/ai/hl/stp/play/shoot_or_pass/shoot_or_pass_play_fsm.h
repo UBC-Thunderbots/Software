@@ -13,27 +13,27 @@
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
+/**
+ * Control Parameters for Shoot Or Pass Play
+ */
+struct ShootOrPassPlayControlParams
+{
+};
+
 using Zones = std::unordered_set<EighteenZoneId>;
 
-struct ShootOrPassPlayFSM
+struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayControlParams>
 {
     class AttemptShotState;
     class TakePassState;
     class StartState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
-
     /**
      * Creates a shoot or pass play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config);
+    explicit ShootOrPassPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the offensive positioning tactics
@@ -108,6 +108,11 @@ struct ShootOrPassPlayFSM
      */
     bool tookShot(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(passFound, ShootOrPassPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shouldAbortPass, ShootOrPassPlayFSM)
+    DEFINE_SML_GUARD_CLASS(passCompleted, ShootOrPassPlayFSM)
+    DEFINE_SML_GUARD_CLASS(tookShot, ShootOrPassPlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -117,14 +122,15 @@ struct ShootOrPassPlayFSM
         DEFINE_SML_STATE(StartState)
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_ACTION(lookForPass)
-        DEFINE_SML_ACTION(startLookingForPass)
-        DEFINE_SML_ACTION(takePass)
-
         DEFINE_SML_GUARD(passFound)
         DEFINE_SML_GUARD(shouldAbortPass)
         DEFINE_SML_GUARD(passCompleted)
         DEFINE_SML_GUARD(tookShot)
+
+
+        DEFINE_SML_ACTION(lookForPass)
+        DEFINE_SML_ACTION(startLookingForPass)
+        DEFINE_SML_ACTION(takePass)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -141,7 +147,6 @@ struct ShootOrPassPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
