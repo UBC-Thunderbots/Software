@@ -71,10 +71,6 @@ cc_library(
 toolchain(
     name = "k8_jetson_nano_cross_compile_py_cc_toolchain",
     exec_compatible_with = [
-        # Higher version of bazel has stricter hermeticy requirement,
-        # thus refuses to pull in local python dev headers from aarch64.
-        # We will need to set up this toolchain for both architectures.
-        # "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
     target_compatible_with = [
