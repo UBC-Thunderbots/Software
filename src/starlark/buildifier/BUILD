@@ -5,6 +5,5 @@ buildifier(
     exclude_patterns = [
         "./.git/*",
     ],
-    lint_mode = "warn",
     mode = "fix",
 )
