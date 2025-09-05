@@ -1,7 +1,7 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "unix_full_system",

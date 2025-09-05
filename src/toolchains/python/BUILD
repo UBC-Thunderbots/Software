@@ -1,6 +1,5 @@
+load("@rules_python//python:defs.bzl", "py_runtime", "py_runtime_pair")
 load("@rules_python//python/cc:py_cc_toolchain.bzl", "py_cc_toolchain")
-load("@rules_python//python:defs.bzl", "py_runtime")
-load("@rules_python//python:defs.bzl", "py_runtime_pair")
 
 py_runtime(
     name = "python3_runtime",
@@ -72,7 +71,9 @@ cc_library(
 toolchain(
     name = "k8_jetson_nano_cross_compile_py_cc_toolchain",
     exec_compatible_with = [
-        "@platforms//cpu:x86_64",
+        # Higher version of bazel has stricter hermeticy requirement,
+        # thus refuses to pull in local python dev headers from aarch64.
+        # We will need to set up this toolchain for both architectures.
         "@platforms//os:linux",
     ],
     target_compatible_with = [

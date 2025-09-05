@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 py_test(
     name = "replay_corruption_test",
