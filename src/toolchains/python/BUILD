@@ -74,7 +74,6 @@ toolchain(
         # Higher version of bazel has stricter hermeticy requirement,
         # thus refuses to pull in local python dev headers from aarch64.
         # We will need to set up this toolchain for both architectures.
-        # "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
     target_compatible_with = [

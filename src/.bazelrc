@@ -9,6 +9,8 @@ test --test_output=all
 
 ################## Bazel Debug Configs ##################
 
+# Enable the following commands to debug Bazel. Note that the additional overhead from these commands will
+# cause CI to fail
 # common --verbose_failures
 # common --sandbox_debug
 
@@ -41,9 +43,7 @@ build --disk_cache=~/.cache/thunderbots_bazel_disk_cache
 build --experimental_remote_merkle_tree_cache # partial repo caching optimization
 build --incompatible_enable_proto_toolchain_resolution # protoc caching
 
-# Ensure that we don't accidentally build protobuf or gRPC
-#common --per_file_copt=external/.*protobuf.*@--PROTOBUF_WAS_NOT_SUPPOSED_TO_BE_BUILT
-#common --host_per_file_copt=external/.*protobuf.*@--PROTOBUF_WAS_NOT_SUPPOSED_TO_BE_BUILT
+# Ensure that we don't accidentally build gRPC
 common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 
@@ -64,8 +64,7 @@ common --enable_platform_specific_config
 build --incompatible_remove_legacy_whole_archive=False
 
 # Add warnings to Thunderbots code only
-#build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitive/.*,//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
-#build --@nanopb//:nanopb_extension=".nanopb"
+build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitive/.*,//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
 ############## External Deps Compatibility ##############
 build --noincompatible_disallow_ctx_resolve_tools
 build --check_direct_dependencies=off

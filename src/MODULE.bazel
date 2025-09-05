@@ -218,7 +218,7 @@ http_archive(
 
 ##############################################
 # Add new git repos (these cannot be used offline)
-# All of this SHOULD BE NUKED for archive_override
+# All of this SHOULD BE REMOVED in favour of archive_override
 ##############################################
 new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
