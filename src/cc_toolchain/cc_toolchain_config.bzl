@@ -669,8 +669,26 @@ def _stm32_gcc_impl(ctx):
         ]
     )
 
+    map_file_feature = feature(
+        name = "map_file",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Generate a map file
+                            "-Wl,-Map=output.map",
+                        ],
+                    ),
+                ],
+            )
+        ]
+    )
+
     features = [
         cortex_feature,
+        map_file_feature,
         no_syscalls_feature,
         space_optimization_feature,
     ]
