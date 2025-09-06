@@ -124,6 +124,13 @@ filegroup(
     ],
 )
 
+filegroup(
+    name = "motor_board_gcc_all",
+    srcs = [
+        "@motor_board_gcc//:includes",
+    ]
+)
+
 cc_toolchain_config_fullsystem(
     name = "linux_k8_gcc",
     builtin_include_directories = [
@@ -206,30 +213,30 @@ cc_toolchain(
 cc_toolchain_config_stm32(
     name = "gcc-arm-none-abi",
     builtin_include_directories = [
-        "/usr/lib/gcc/arm-none-eabi/13.2.1/include/",
+        "/opt/tbotspython/arm-none-eabi-gcc/lib/gcc/arm-none-eabi/13.2.1/include/",
     ],
     tool_paths = {
-        "ar": "/usr/bin/arm-none-eabi-ar",
-        "gcc": "/usr/bin/arm-none-eabi-gcc",
-        "cpp": "/usr/bin/arm-none-eabi-cpp",
-        "ld": "/usr/bin/arm-none-eabi-ld",
-        "nm": "/usr/bin/arm-none-eabi-nm",
-        "objdump": "/usr/bin/arm-none-eabi-objdump",
-        "strip": "/usr/bin/arm-none-eabi-strip",
+        "ar": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-ar",
+        "gcc": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-gcc",
+        "cpp": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-cpp",
+        "ld": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-ld",
+        "nm": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-nm",
+        "objdump": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-objdump",
+        "strip": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-strip",
     },
     toolchain_identifier = "gcc-stm32",
 )
 
 cc_toolchain(
     name = "cc_toolchain_stm32",
-    all_files = ":empty",
-    ar_files = ":empty",
-    as_files = ":empty",
-    compiler_files = ":empty",
-    dwp_files = ":empty",
-    linker_files = ":empty",
-    objcopy_files = ":empty",
-    strip_files = ":empty",
+    all_files = ":motor_board_gcc_all",
+    ar_files = ":motor_board_gcc_all",
+    as_files = ":motor_board_gcc_all",
+    compiler_files = ":motor_board_gcc_all",
+    dwp_files = ":motor_board_gcc_all",
+    linker_files = ":motor_board_gcc_all",
+    objcopy_files = ":motor_board_gcc_all",
+    strip_files = ":motor_board_gcc_all",
     supports_param_files = True,
     toolchain_config = ":gcc-arm-none-abi",
     toolchain_identifier = "stm32_gcc",

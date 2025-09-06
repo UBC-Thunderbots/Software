@@ -228,4 +228,8 @@ print_status_msg "Set up ansible-lint"
 /opt/tbotspython/bin/ansible-galaxy collection install ansible.posix
 print_status_msg "Finished setting up ansible-lint"
 
+print_status_msg "Setting up STM32 cross-compiler"
+install_stm32_cross_compiler $arch
+print_status_msg "Done setting up STM32 cross-compiler"
+
 print_status_msg "Done Software Setup, please reboot for changes to take place"

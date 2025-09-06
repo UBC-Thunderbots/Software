@@ -251,6 +251,12 @@ new_local_repository(
     path = "/",
 )
 
+new_local_repository(
+    name = "motor_board_gcc",
+    build_file = "@//extlibs:motor_board_gcc.BUILD",
+    path = "/opt/tbotspython/arm-none-eabi-gcc/",
+)
+
 # libclang-dev is installed into the system through setup_software.sh
 new_local_repository(
     name = "libclang",
