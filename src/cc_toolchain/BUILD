@@ -213,7 +213,8 @@ cc_toolchain(
 cc_toolchain_config_stm32(
     name = "gcc-arm-none-abi",
     builtin_include_directories = [
-        "/opt/tbotspython/arm-none-eabi-gcc/lib/gcc/arm-none-eabi/13.2.1/include/",
+        "/opt/tbotspython/arm-none-eabi-gcc/arm-none-eabi/include/",
+        "/opt/tbotspython/arm-none-eabi-gcc/lib/gcc/arm-none-eabi/14.3.1/include/",
     ],
     tool_paths = {
         "ar": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-ar",

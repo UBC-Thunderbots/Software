@@ -121,7 +121,7 @@ install_python_dev_cross_compile_headers() {
 }
 
 install_stm32_cross_compiler() {
-    download_link=https://developer.arm.com/-/media/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi.tar.xz
+    download_link=https://developer.arm.com/-/media/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-x86_64-aarch64_be-none-linux-gnu.tar.xz
 
     if is_x86 $1; then
         download_link=https://developer.arm.com/-/media/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi.tar.xz
