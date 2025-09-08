@@ -54,13 +54,3 @@
         - name: Print Binary Output
           ansible.builtin.debug:
             var: robot_auto_test_output.stdout
-
-        - name: Start Services
-          become: true
-          become_method: ansible.builtin.sudo
-          ansible.builtin.systemd:
-            name: "thunderloop.service"
-            masked: false
-            daemon_reload: true
-            state: started
-          tags: always
