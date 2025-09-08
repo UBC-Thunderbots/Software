@@ -13,24 +13,6 @@ platformio_library(
     name = "chicker",
     src = "chicker.cpp",
     hdr = "chicker.h",
-    deps = [":pins"],
-)
-
-platformio_library(
-    name = "geneva",
-    src = "geneva.cpp",
-    hdr = "geneva.h",
-    deps = [
-        ":pins",
-        "//proto:tbots_nanopb_proto",
-    ],
-)
-
-platformio_library(
-    name = "charger",
-    src = "charger.cpp",
-    hdr = "charger.h",
-    deps = [":pins"],
 )
 
 platformio_library(
@@ -38,7 +20,6 @@ platformio_library(
     src = "power_monitor.cpp",
     hdr = "power_monitor.h",
     deps = [
-        ":pins",
         "@LTC4151//:LTC4151_platformio",
     ],
 )
@@ -48,18 +29,10 @@ platformio_library(
     src = "control_executor.cpp",
     hdr = "control_executor.h",
     deps = [
-        ":charger",
         ":chicker",
-        ":geneva",
-        ":pins",
         "//proto:tbots_nanopb_proto",
         "@nanopb//:nanopb_platformio",
     ],
-)
-
-platformio_library(
-    name = "pins",
-    hdr = "pins.h",
 )
 
 platformio_project(
@@ -70,11 +43,8 @@ platformio_project(
     framework = "arduino",
     platform = "espressif32",
     deps = [
-        ":charger",
         ":chicker",
         ":control_executor",
-        ":geneva",
-        ":pins",
         ":power_monitor",
         "//proto:tbots_nanopb_proto",
         "//shared:constants_platformio",
@@ -86,7 +56,7 @@ platformio_project(
 genrule(
     name = "powerloop_tar",
     outs = ["powerloop.tar.gz"],
-    cmd = "tar -chf $@ $(BINDIR)/../../host/bin/software/power/.* &> /dev/null",
+    cmd = "tar -chf $@ $(BINDIR)/../../host/bin/software/power/* &> /dev/null",
     local = True,
     tools = [":powerloop_main"],
 )

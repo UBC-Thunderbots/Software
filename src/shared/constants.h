@@ -181,10 +181,7 @@ static const double MAX_BATTERY_VOLTAGE =
     MAX_SINGLE_CELL_VOLTAGE * NUM_CELLS_IN_BATTERY * NUM_BATTERIES_IN_SERIES;
 static const double BATTERY_WARNING_VOLTAGE = MIN_BATTERY_VOLTAGE + 1.0;  // 1V headroom
 
-// Chick Capacitor Constants
-static const double MIN_CAPACITOR_VOLTAGE = 0;
-static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
-
+// Chicker Constants
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND;
 
@@ -223,8 +220,6 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
 // Number of times thunderloop should tick per second
 static const unsigned THUNDERLOOP_HZ = 300u;
-
-static const unsigned NUM_GENEVA_ANGLES = 5;
 
 // Jetson Nano Constants
 static const double MAX_JETSON_TEMP_C = 97;
