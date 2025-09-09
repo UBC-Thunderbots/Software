@@ -13,8 +13,6 @@
 struct DribbleFSM : TacticFSM<DribbleFSM>
 {
    public:
-    using Update = TacticFSM<DribbleFSMControlParams>::Update;
-
     struct ControlParams
     {
         // The destination for dribbling the ball
@@ -25,6 +23,8 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
         bool allow_excessive_dribbling;
     };
 
+    using Update = TacticFSM<DribbleFSM>::Update;
+
     class GetPossession;
     class Dribble;
     class LoseBall;
@@ -32,10 +32,10 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
     /**
      * Constructor for DribbleFSM
      *
-     * @param dribble_tactic_config The config to fetch parameters from
+     * @param ai_config_ptr shared ptr to ai_config
      */
-    explicit DribbleFSM(TbotsProto::DribbleTacticConfig dribble_tactic_config)
-        : dribble_tactic_config(dribble_tactic_config)
+    explicit DribbleFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+            : TacticFSM<DribbleFSM>(ai_config_ptr)
     {
     }
 
