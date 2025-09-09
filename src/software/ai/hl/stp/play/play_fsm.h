@@ -49,13 +49,14 @@ struct PlayUpdate
 /**
  * A general FSM class with some utilities for plays.
  *
- * @tparam PFsmControlParams the control parameters for the FSM being built.
+ * @tparam PFsm the Play FSM that inherits from an instance of this template.
+ * See https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
  */
-template <class PFsmControlParams>
+template <class PFsm>
 class PlayFSM
 {
    public:
-    using ControlParams = PFsmControlParams;
+    using ControlParams = PFsm::ControlParams;
 
     /**
      * The Update struct is the only event that a play FSM should respond to and it is

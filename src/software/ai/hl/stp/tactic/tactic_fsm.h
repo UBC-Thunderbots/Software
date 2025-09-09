@@ -33,27 +33,28 @@ struct TacticUpdate
 /**
  * A general FSM class with some utilities for tactics.
  *
- * @tparam TFsmControlParams the control parameters for the FSM being built.
+ * @tparam TFsm The Tactic FSM that inherits from an instance of this template.
+ * See https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
  */
-template <class TFsmControlParams>
+template <class TFsm>
 class TacticFSM
 {
    public:
-    using ControlParams = TFsmControlParams;
+    using ControlParams = TFsm::ControlParams;
     /**
      * The Update struct is the only event that a tactic FSM should respond to and it is
      * composed of the following structs:
      *
-     * TFsmControlParams - uniquely defined parameters for each FSM
-     * TacticUpdate - common struct that contains Robot, World, and SetPrimitiveCallback
+     * control_params- uniquely defined parameters for each FSM
+     * common - common struct that contains Robot, World, and SetPrimitiveCallback
      */
     struct Update
     {
-        Update(const TFsmControlParams &control_params, const TacticUpdate &common)
+        Update(const ControlParams &control_params, const TacticUpdate &common)
             : control_params(control_params), common(common)
         {
         }
-        TFsmControlParams control_params;
+        ControlParams control_params;
         TacticUpdate common;
     };
 
