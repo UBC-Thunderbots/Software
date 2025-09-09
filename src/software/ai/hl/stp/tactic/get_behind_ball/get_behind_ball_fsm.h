@@ -4,23 +4,21 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/triangle.h"
 
-/**
- * The control parameters for updating GetBehindBallFSM
- */
-struct GetBehindBallFSMControlParams
-{
-    // The location where the chick will be taken, i.e. where we expect the ball to be
-    // when we chip or kick it
-    Point ball_location;
-    // The direction the Robot will chick in
-    Angle chick_direction;
-};
-
-struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
+struct GetBehindBallFSM: TacticFSM<GetBehindBallFSM>
 {
    public:
-    using Update = TacticFSM<GetBehindBallFSMControlParams>::Update;
     class GetBehindBallState;
+
+    struct ControlParams
+    {
+        // The location where the chick will be taken, i.e. where we expect the ball to be
+        // when we chip or kick it
+        Point ball_location;
+        // The direction the Robot will chick in
+        Angle chick_direction;
+    };
+
+    using Update = TacticFSM<GetBehindBallFSM>::Update;
 
     /**
      * Constructor for GetBehindBallFSM
@@ -28,7 +26,7 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSMControlParams>
      * @param ai_config_ptr Shared pointer to ai_config
      */
     explicit GetBehindBallFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<GetBehindBallFSMControlParams>(ai_config_ptr) {};
+        : TacticFSM<GetBehindBallFSM>(ai_config_ptr) {};
 
     /**
      * Action that updates the MovePrimitive
