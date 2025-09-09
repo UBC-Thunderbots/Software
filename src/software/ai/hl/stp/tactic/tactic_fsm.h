@@ -40,7 +40,6 @@ template <class TFsm>
 class TacticFSM
 {
    public:
-    using ControlParams = TFsm::ControlParams;
     /**
      * The Update struct is the only event that a tactic FSM should respond to and it is
      * composed of the following structs:
@@ -50,11 +49,11 @@ class TacticFSM
      */
     struct Update
     {
-        Update(const ControlParams &control_params, const TacticUpdate &common)
+        Update(const TFsm::ControlParams &control_params, const TacticUpdate &common)
             : control_params(control_params), common(common)
         {
         }
-        ControlParams control_params;
+        TFsm::ControlParams control_params;
         TacticUpdate common;
     };
 
