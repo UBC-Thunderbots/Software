@@ -4,7 +4,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 
-BallPlacementPlay::BallPlacementPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+BallPlacementPlay::BallPlacementPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<BallPlacementPlayFSM>(ai_config_ptr, true)
 {
 }

@@ -10,23 +10,20 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 
-/**
- * The control parameters for updating DribbleFSM
- */
-struct DribbleFSMControlParams
-{
-    // The destination for dribbling the ball
-    std::optional<Point> dribble_destination;
-    // The final orientation to face the ball when finishing dribbling
-    std::optional<Angle> final_dribble_orientation;
-    // whether to allow excessive dribbling, i.e. more than 1 metre at a time
-    bool allow_excessive_dribbling;
-};
-
-struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
+struct DribbleFSM : TacticFSM<DribbleFSM>
 {
    public:
-    using Update = TacticFSM<DribbleFSMControlParams>::Update;
+    struct ControlParams
+    {
+        // The destination for dribbling the ball
+        std::optional<Point> dribble_destination;
+        // The final orientation to face the ball when finishing dribbling
+        std::optional<Angle> final_dribble_orientation;
+        // whether to allow excessive dribbling, i.e. more than 1 metre at a time
+        bool allow_excessive_dribbling;
+    };
+
+    using Update = TacticFSM<DribbleFSM>::Update;
 
     class GetPossession;
     class Dribble;
@@ -38,10 +35,9 @@ struct DribbleFSM : TacticFSM<DribbleFSMControlParams>
      * @param ai_config_ptr shared ptr to ai_config
      */
     explicit DribbleFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<DribbleFSMControlParams>(ai_config_ptr)
+            : TacticFSM<DribbleFSM>(ai_config_ptr)
     {
     }
-
 
     /**
      * Converts the ball position to the robot's position given the direction that the

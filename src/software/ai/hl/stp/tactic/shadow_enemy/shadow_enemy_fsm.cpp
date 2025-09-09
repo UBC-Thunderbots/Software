@@ -148,7 +148,7 @@ void ShadowEnemyFSM::blockShot(const Update &event,
             enemy_threat_opt.value().robot, event.control_params.shadow_distance);
     };
 
-    MoveFSMControlParams control_params{
+    MoveFSM::ControlParams control_params{
         .destination             = position_to_block,
         .final_orientation       = face_ball_orientation,
         .dribbler_mode           = TbotsProto::DribblerMode::OFF,

@@ -6,15 +6,15 @@
 #include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 #include "software/logger/logger.h"
 
-/**
- * Control parameters for Halt Play
- */
-struct HaltPlayControlParams
+struct HaltPlayFSM : PlayFSM<HaltPlayFSM>
 {
-};
+    /**
+     * Control parameters for Halt Play
+     */
+    struct ControlParams
+    {
+    };
 
-struct HaltPlayFSM : PlayFSM<HaltPlayControlParams>
-{
     class HaltState;
 
     /**

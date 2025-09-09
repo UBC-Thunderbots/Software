@@ -4,7 +4,8 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PassEndurancePlay::PassEndurancePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+PassEndurancePlay::PassEndurancePlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : Play(ai_config_ptr, false)
 {
 }

@@ -9,7 +9,8 @@
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+KickoffEnemyPlay::KickoffEnemyPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : Play(ai_config_ptr, true)
 {
 }

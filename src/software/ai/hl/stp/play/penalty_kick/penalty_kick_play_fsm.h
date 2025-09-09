@@ -8,15 +8,15 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/logger/logger.h"
 
-/**
- * Control Parameters for PenaltyKickPlay
- */
-struct PenaltyKickPlayControlParams
+struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayFSM>
 {
-};
+    /**
+     * Control Parameters for PenaltyKickPlay
+     */
+    struct ControlParams
+    {
+    };
 
-struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayControlParams>
-{
     class SetupPositionState;
     class PerformKickState;
 
@@ -25,7 +25,8 @@ struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayControlParams>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PenaltyKickPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    explicit PenaltyKickPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to set up the robots in position to start the penalty kick

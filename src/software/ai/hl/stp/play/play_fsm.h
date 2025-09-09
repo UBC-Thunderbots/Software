@@ -49,28 +49,28 @@ struct PlayUpdate
 /**
  * A general FSM class with some utilities for plays.
  *
- * @tparam PFsmControlParams the control parameters for the FSM being built.
+ * @tparam PFsm the Play FSM that inherits from an instance of this template.
+ * See https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
  */
-template <class PFsmControlParams>
+template <class PFsm>
 class PlayFSM
 {
    public:
-    using ControlParams = PFsmControlParams;
 
     /**
      * The Update struct is the only event that a play FSM should respond to and it is
      * composed of the following structs:
      *
-     * ControlParams - uniquely defined by each play to control the FSM
-     * PlayUpdate - common struct that contains World and SetTacticsCallback
+     * control_params - uniquely defined by each play to control the FSM
+     * common - common struct that contains World and SetTacticsCallback
      */
     struct Update
     {
-        Update(const ControlParams& control_params, const PlayUpdate& common)
+        Update(const PFsm::ControlParams& control_params, const PlayUpdate& common)
             : control_params(control_params), common(common)
         {
         }
-        ControlParams control_params;
+        PFsm::ControlParams control_params;
         PlayUpdate common;
     };
 

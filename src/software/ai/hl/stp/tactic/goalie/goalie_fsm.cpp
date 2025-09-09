@@ -223,7 +223,7 @@ void GoalieFSM::updatePivotKick(
                                             ai_config_ptr->goalie_tactic_config());
     Vector chip_vector = chip_target - chip_origin;
 
-    PivotKickFSMControlParams control_params{
+    PivotKickFSM::ControlParams control_params{
         .kick_origin    = chip_origin,
         .kick_direction = chip_vector.orientation(),
         .auto_chip_or_kick =
@@ -288,7 +288,7 @@ void GoalieFSM::retrieveFromDeadZone(
     Vector final_dribble_orientation =
         event.common.world_ptr->field().enemyGoalCenter() - ball_position;
 
-    DribbleFSMControlParams control_params{
+    DribbleFSM::ControlParams control_params{
         .dribble_destination =
             event.common.world_ptr->field().friendlyDefenseArea().centre(),
         .final_dribble_orientation = final_dribble_orientation.orientation(),

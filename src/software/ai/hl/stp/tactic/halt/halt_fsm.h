@@ -2,26 +2,21 @@
 
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
-/**
- * The control parameters for updating HaltFSM (there aren't any)
- */
-struct HaltFSMControlParams
+struct HaltFSM : TacticFSM<HaltFSM>
 {
-};
-
-struct HaltFSM : TacticFSM<HaltFSMControlParams>
-{
-   public:
-    using Update = TacticFSM<HaltFSMControlParams>::Update;
+    using Update = TacticFSM<HaltFSM>::Update;
     class StopState;
 
+    struct ControlParams
+    {
+    };
     /**
      * Constructor for HaltFSM struct
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit HaltFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<HaltFSMControlParams>(ai_config_ptr)
+        : TacticFSM<HaltFSM>(ai_config_ptr)
     {
     }
 

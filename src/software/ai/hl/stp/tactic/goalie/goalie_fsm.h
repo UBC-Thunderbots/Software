@@ -13,22 +13,19 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
 
-/**
- * The control parameters for updating GoalieFSM
- */
-struct GoalieFSMControlParams
-{
-    bool should_move_to_goal_line;
-};
 
-struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
+struct GoalieFSM : TacticFSM<GoalieFSM>
 {
-   public:
     class Panic;
     class PositionToBlock;
     class MoveToGoalLine;
 
-    using Update = TacticFSM<GoalieFSMControlParams>::Update;
+    struct ControlParams
+    {
+        bool should_move_to_goal_line;
+    };
+
+    using Update = TacticFSM<GoalieFSM>::Update;
 
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
@@ -44,7 +41,7 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
     explicit GoalieFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
                        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT)
-        : TacticFSM<GoalieFSMControlParams>(ai_config_ptr),
+        : TacticFSM<GoalieFSM>(ai_config_ptr),
           max_allowed_speed_mode(max_allowed_speed_mode),
           robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
                                         ai_config_ptr->robot_navigation_obstacle_config()

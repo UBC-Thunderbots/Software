@@ -4,25 +4,21 @@
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/point.h"
 
-/**
- * The control parameters for updating KickFSM
- */
-struct KickFSMControlParams
+struct KickFSM : TacticFSM<KickFSM>
 {
-    // The location where the kick will be taken from
-    Point kick_origin;
-    // The direction the Robot will kick in
-    Angle kick_direction;
-    // How fast the Robot will kick the ball in meters per second
-    double kick_speed_meters_per_second;
-};
-
-
-struct KickFSM : TacticFSM<KickFSMControlParams>
-{
-   public:
-    using Update = TacticFSM<KickFSMControlParams>::Update;
     class KickState;
+
+    struct ControlParams
+    {
+        // The location where the kick will be taken from
+        Point kick_origin;
+        // The direction the Robot will kick in
+        Angle kick_direction;
+        // How fast the Robot will kick the ball in meters per second
+        double kick_speed_meters_per_second;
+    };
+
+    using Update = TacticFSM<KickFSM>::Update;
 
     /**
      * Constructor for KickFSM
@@ -30,7 +26,7 @@ struct KickFSM : TacticFSM<KickFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit KickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<KickFSMControlParams>(ai_config_ptr)
+        : TacticFSM<KickFSM>(ai_config_ptr)
     {
     }
 

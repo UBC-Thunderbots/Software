@@ -142,7 +142,7 @@ void CreaseDefenderFSM::blockThreat(
         auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance};
     }
 
-    MoveFSMControlParams control_params{
+    MoveFSM::ControlParams control_params{
         .destination             = destination,
         .final_orientation       = face_threat_orientation,
         .dribbler_mode           = TbotsProto::DribblerMode::OFF,

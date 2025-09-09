@@ -16,13 +16,6 @@
 #include "software/logger/logger.h"
 
 /**
- * Control Parameters for a Free Kick Play
- */
-struct FreeKickPlayControlParams
-{
-};
-
-/**
  * This FSM implements the free kick play. The logic of this play is:
  * - One robot (the kicker) attempts to shoot first. If there is a good shot, then it
  * will shoot the ball.
@@ -32,8 +25,15 @@ struct FreeKickPlayControlParams
  * robot furthest up the field.
  */
 
-struct FreeKickPlayFSM : PlayFSM<FreeKickPlayControlParams>
+struct FreeKickPlayFSM : PlayFSM<FreeKickPlayFSM>
 {
+    /**
+     * Control Parameters for a Free Kick Play
+     */
+    struct ControlParams
+    {
+    };
+
     class SetupPositionState;
     class ShootState;
     class AttemptPassState;

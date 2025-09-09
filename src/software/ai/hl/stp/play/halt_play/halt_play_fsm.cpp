@@ -5,7 +5,7 @@
 #include <iterator>
 
 HaltPlayFSM::HaltPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : PlayFSM<HaltPlayControlParams>(ai_config_ptr), halt_tactics({{}})
+    : PlayFSM<HaltPlayFSM>(ai_config_ptr), halt_tactics({{}})
 {
     std::generate_n(std::back_inserter(halt_tactics.front()), MAX_ROBOT_IDS_PER_SIDE,
                     [ai_config_ptr]()

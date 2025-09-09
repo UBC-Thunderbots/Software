@@ -8,27 +8,30 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/logger/logger.h"
 
-/**
- * control parameters for a defense play
- */
-struct DefensePlayBaseControlParams
-{
-    // The maximum allowed speed mode
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
-};
 
 /**
  * Struct containing frequently shared functions of the defense play class
  */
-class DefensePlayFSMBase : public PlayFSM<DefensePlayBaseControlParams>
+class DefensePlayFSMBase : public PlayFSM<DefensePlayFSMBase>
 {
    public:
+    /**
+     * control parameters for a defense play
+     */
+    struct ControlParams
+    {
+        // The maximum allowed speed mode
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+    };
+
+
     /**
      * Creates a play FSM with defensive methods
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit DefensePlayFSMBase(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    explicit DefensePlayFSMBase(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
    protected:
     /**

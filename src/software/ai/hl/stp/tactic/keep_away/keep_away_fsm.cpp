@@ -5,7 +5,7 @@ void KeepAwayFSM::keepAway(const Update& event,
 {
     // ball possession is threatened, get into a better position to take the
     // best pass so far
-    DribbleFSMControlParams control_params;
+    DribbleFSM::ControlParams control_params;
 
     auto best_pass_so_far = Pass(event.common.robot.position(),
                                  event.common.world_ptr->field().enemyGoalCenter(),

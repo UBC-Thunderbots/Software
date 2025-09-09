@@ -15,7 +15,8 @@ class GetBehindBallTactic : public TacticBase<GetBehindBallFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit GetBehindBallTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    explicit GetBehindBallTactic(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the control parameters for this GetBehindBallTactic.

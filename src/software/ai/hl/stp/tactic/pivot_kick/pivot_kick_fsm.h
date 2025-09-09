@@ -6,24 +6,22 @@
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-/**
- * The control parameters for updating PivotKickFSM
- */
-struct PivotKickFSMControlParams
-{
-    // The location where the kick will be taken from
-    Point kick_origin;
-    // The direction the Robot will kick in
-    Angle kick_direction;
-    // How the robot will chip or kick the ball
-    AutoChipOrKick auto_chip_or_kick;
-};
 
-struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
+struct PivotKickFSM : TacticFSM<PivotKickFSM>
 {
-    using Update = TacticFSM<PivotKickFSMControlParams>::Update;
+    using Update = TacticFSM<PivotKickFSM>::Update;
     class KickState;
     class StartState;
+
+    struct ControlParams
+    {
+        // The location where the kick will be taken from
+        Point kick_origin;
+        // The direction the Robot will kick in
+        Angle kick_direction;
+        // How the robot will chip or kick the ball
+        AutoChipOrKick auto_chip_or_kick;
+    };
 
     /**
      * Constructor for PivotKickFSM
@@ -31,7 +29,7 @@ struct PivotKickFSM : TacticFSM<PivotKickFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit PivotKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<PivotKickFSMControlParams>(ai_config_ptr)
+        : TacticFSM<PivotKickFSM>(ai_config_ptr)
     {
     }
 

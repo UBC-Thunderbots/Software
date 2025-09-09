@@ -6,7 +6,7 @@
 
 DefensePlayFSMBase::DefensePlayFSMBase(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : PlayFSM<DefensePlayBaseControlParams>(ai_config_ptr),
+    : PlayFSM<DefensePlayFSMBase>(ai_config_ptr),
       crease_defenders({}),
       pass_defenders({}),
       shadowers({})

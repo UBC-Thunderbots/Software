@@ -10,7 +10,8 @@
 class ScoringWithStaticDefendersPlay : public Play
 {
    public:
-    ScoringWithStaticDefendersPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    ScoringWithStaticDefendersPlay(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

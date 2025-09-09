@@ -14,7 +14,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+ShootOrChipPlay::ShootOrChipPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : Play(ai_config_ptr, true)
 {
 }

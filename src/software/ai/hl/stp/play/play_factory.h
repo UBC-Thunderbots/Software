@@ -11,5 +11,6 @@
  *
  * @return a pointer to the play
  */
-std::unique_ptr<Play> createPlay(const TbotsProto::Play& play_proto,
-                                 std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+std::unique_ptr<Play> createPlay(
+    const TbotsProto::Play& play_proto,
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);

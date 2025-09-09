@@ -10,7 +10,7 @@ void AttackerFSM::pivotKick(const Update& event,
         chip_target = event.control_params.chip_target.value();
     }
     // default to chipping the ball away
-    PivotKickFSMControlParams control_params{
+    PivotKickFSM::ControlParams control_params{
         .kick_origin       = ball_position,
         .kick_direction    = (chip_target - ball_position).orientation(),
         .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
@@ -19,7 +19,7 @@ void AttackerFSM::pivotKick(const Update& event,
     if (event.control_params.shot)
     {
         // shoot on net
-        control_params = PivotKickFSMControlParams{
+        control_params = PivotKickFSM::ControlParams{
             .kick_origin = ball_position,
             .kick_direction =
                 (event.control_params.shot->getPointToShootAt() - ball_position)
@@ -30,7 +30,7 @@ void AttackerFSM::pivotKick(const Update& event,
     else if (event.control_params.pass_committed)
     {
         // we have committed to passing, execute the pass
-        control_params = PivotKickFSMControlParams{
+        control_params = PivotKickFSM::ControlParams{
             .kick_origin    = event.control_params.best_pass_so_far->passerPoint(),
             .kick_direction = event.control_params.best_pass_so_far->passerOrientation(),
             .auto_chip_or_kick =
@@ -44,7 +44,7 @@ void AttackerFSM::pivotKick(const Update& event,
 void AttackerFSM::keepAway(const Update& event,
                            boost::sml::back::process<KeepAwayFSM::Update> processEvent)
 {
-    KeepAwayFSMControlParams control_params{.best_pass_so_far =
+    KeepAwayFSM::ControlParams control_params{.best_pass_so_far =
                                                 event.control_params.best_pass_so_far};
 
     processEvent(KeepAwayFSM::Update(control_params, event.common));

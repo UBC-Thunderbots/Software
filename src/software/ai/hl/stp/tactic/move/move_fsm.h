@@ -3,34 +3,35 @@
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/point.h"
 
-/**
- * The control parameters for updating MoveFSM
- */
-struct MoveFSMControlParams
+struct MoveFSM : TacticFSM<MoveFSM>
 {
-    // The point the robot is trying to move to
-    Point destination;
-    // The orientation the robot should have when it arrives at its destination
-    Angle final_orientation;
-    // How to run the dribbler
-    TbotsProto::DribblerMode dribbler_mode;
-    // How to navigate around the ball
-    TbotsProto::BallCollisionType ball_collision_type;
-    // The command to autochip or autokick
-    AutoChipOrKick auto_chip_or_kick;
-    // The maximum allowed speed mode
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
-    // The obstacle avoidance mode
-    TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
-};
-
-struct MoveFSM : TacticFSM<MoveFSMControlParams>
-{
-   public:
-    using Update = TacticFSM<MoveFSMControlParams>::Update;
     // these classes define the states used in the transition table
     // they are exposed so that tests can check if the FSM is in a particular state
     class MoveState;
+
+    // this struct defines the unique control parameters that the MoveFSM requires in its
+    // update
+    struct ControlParams
+    {
+        // The point the robot is trying to move to
+        Point destination;
+        // The orientation the robot should have when it arrives at its destination
+        Angle final_orientation;
+        // How to run the dribbler
+        TbotsProto::DribblerMode dribbler_mode;
+        // How to navigate around the ball
+        TbotsProto::BallCollisionType ball_collision_type;
+        // The command to autochip or autokick
+        AutoChipOrKick auto_chip_or_kick;
+        // The maximum allowed speed mode
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+        // The obstacle avoidance mode
+        TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
+    };
+
+    using Update = TacticFSM<MoveFSM>::Update;
+    // these classes define the states used in the transition table
+    // they are exposed so that tests can check if the FSM is in a particular state
 
     /**
      * Constructor for MoveFSM
@@ -38,7 +39,7 @@ struct MoveFSM : TacticFSM<MoveFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<MoveFSMControlParams>(ai_config_ptr)
+        : TacticFSM<MoveFSM>(ai_config_ptr)
     {
     }
 
