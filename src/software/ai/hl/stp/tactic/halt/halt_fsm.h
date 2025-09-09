@@ -2,19 +2,14 @@
 
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
-/**
- * The control parameters for updating HaltFSM (there aren't any)
- */
-struct HaltFSMControlParams
+struct HaltFSM : TacticFSM<HaltFSM>
 {
-};
-
-struct HaltFSM : TacticFSM<HaltFSMControlParams>
-{
-   public:
-    using Update = TacticFSM<HaltFSMControlParams>::Update;
+    using Update = TacticFSM<HaltFSM>::Update;
     class StopState;
 
+    struct ControlParams
+    {
+    };
     /**
      * Constructor for HaltFSM struct
      *
