@@ -16,7 +16,6 @@
 
 struct GoalieFSM : TacticFSM<GoalieFSM>
 {
-   public:
     class Panic;
     class PositionToBlock;
     class MoveToGoalLine;
@@ -59,7 +58,8 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      * @return the position that the goalie should move to
      */
     static Point getGoaliePositionToBlock(
-        const Ball &ball, const Field &field);
+        const Ball &ball, const Field &field,
+        TbotsProto::GoalieTacticConfig goalie_tactic_config);
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment
@@ -88,7 +88,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      * @return a point on the field that is a good place to chip to
      */
     static Point findGoodChipTarget(
-        const World &world);
+        const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
 
     /**
      * Guard that checks if the goalie should leave the crease the intercept the ball
