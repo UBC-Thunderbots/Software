@@ -4,7 +4,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/triangle.h"
 
-struct GetBehindBallFSM: TacticFSM<GetBehindBallFSM>
+struct GetBehindBallFSM : TacticFSM<GetBehindBallFSM>
 {
    public:
     class GetBehindBallState;

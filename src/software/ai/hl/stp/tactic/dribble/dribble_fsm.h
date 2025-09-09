@@ -35,7 +35,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      * @param ai_config_ptr shared ptr to ai_config
      */
     explicit DribbleFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-            : TacticFSM<DribbleFSM>(ai_config_ptr)
+        : TacticFSM<DribbleFSM>(ai_config_ptr)
     {
     }
 

@@ -56,7 +56,6 @@ template <class PFsm>
 class PlayFSM
 {
    public:
-
     /**
      * The Update struct is the only event that a play FSM should respond to and it is
      * composed of the following structs:
