@@ -13,26 +13,24 @@
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
 
-/**
- * The control parameters for updating CreaseDefenderFSM
- */
-struct CreaseDefenderFSMControlParams
-{
-    // The origin point of the enemy threat
-    Point enemy_threat_origin;
-    // The crease defender alignment with respect to the enemy threat
-    TbotsProto::CreaseDefenderAlignment crease_defender_alignment;
-    // The maximum allowed speed mode
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
-    // The crease defender's aggressiveness towards the ball
-    TbotsProto::BallStealMode ball_steal_mode;
-};
-
-struct CreaseDefenderFSM : public DefenderFSMBase,
-                           TacticFSM<CreaseDefenderFSMControlParams>
+struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSM>
 {
    public:
-    using Update = TacticFSM<CreaseDefenderFSMControlParams>::Update;
+    // this struct defines the unique control parameters that the CreaseDefenderFSM
+    // requires in its update
+    struct ControlParams
+    {
+        // The origin point of the enemy threat
+        Point enemy_threat_origin;
+        // The crease defender alignment with respect to the enemy threat
+        TbotsProto::CreaseDefenderAlignment crease_defender_alignment;
+        // The maximum allowed speed mode
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+        // The crease defender's aggressiveness towards the ball
+        TbotsProto::BallStealMode ball_steal_mode;
+    };
+
+    using Update = TacticFSM<CreaseDefenderFSM>::Update;
 
     /**
      * Constructor for CreaseDefenderFSM
@@ -40,10 +38,9 @@ struct CreaseDefenderFSM : public DefenderFSMBase,
      * @param ai_config_ptr Shared pointer to ai_config
      */
     explicit CreaseDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : DefenderFSMBase(), TacticFSM<CreaseDefenderFSMControlParams>(ai_config_ptr)
+        : DefenderFSMBase(), TacticFSM<CreaseDefenderFSM>(ai_config_ptr)
     {
     }
-
 
     /**
      * Finds the point to block the threat
@@ -59,8 +56,6 @@ struct CreaseDefenderFSM : public DefenderFSMBase,
         const Field& field, const Point& enemy_threat_origin,
         const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
         double robot_obstacle_inflation_factor);
-
-
 
     /**
      * Guard that checks if the ball is on friendly side, nearby, and unguarded by the
