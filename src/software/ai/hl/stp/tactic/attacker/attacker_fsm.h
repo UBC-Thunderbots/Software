@@ -36,8 +36,6 @@ struct AttackerFSM : TacticFSM<AttackerFSM>
     {
     }
 
-
-
     /**
      * Action that updates the PivotKickFSM to shoot or pass
      *

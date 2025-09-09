@@ -288,7 +288,7 @@ void GoalieFSM::retrieveFromDeadZone(
     Vector final_dribble_orientation =
         event.common.world_ptr->field().enemyGoalCenter() - ball_position;
 
-    DribbleFSMControlParams control_params{
+    DribbleFSM::ControlParams control_params{
         .dribble_destination =
             event.common.world_ptr->field().friendlyDefenseArea().centre(),
         .final_dribble_orientation = final_dribble_orientation.orientation(),
