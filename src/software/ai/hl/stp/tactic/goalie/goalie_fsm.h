@@ -13,22 +13,20 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
 
-/**
- * The control parameters for updating GoalieFSM
- */
-struct GoalieFSMControlParams
-{
-    bool should_move_to_goal_line;
-};
 
-struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
+struct GoalieFSM : TacticFSM<GoalieFSM>
 {
    public:
     class Panic;
     class PositionToBlock;
     class MoveToGoalLine;
 
-    using Update = TacticFSM<GoalieFSMControlParams>::Update;
+    struct ControlParams
+    {
+        bool should_move_to_goal_line;
+    };
+
+    using Update = TacticFSM<GoalieFSM>::Update;
 
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
@@ -61,8 +59,7 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * @return the position that the goalie should move to
      */
     static Point getGoaliePositionToBlock(
-        const Ball &ball, const Field &field,
-        TbotsProto::GoalieTacticConfig goalie_tactic_config);
+        const Ball &ball, const Field &field);
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment
@@ -91,7 +88,7 @@ struct GoalieFSM : TacticFSM<GoalieFSMControlParams>
      * @return a point on the field that is a good place to chip to
      */
     static Point findGoodChipTarget(
-        const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
+        const World &world);
 
     /**
      * Guard that checks if the goalie should leave the crease the intercept the ball

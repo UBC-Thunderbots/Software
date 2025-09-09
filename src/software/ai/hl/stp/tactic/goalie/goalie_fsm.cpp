@@ -5,10 +5,8 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/math/math_functions.h"
 
-
 Point GoalieFSM::getGoaliePositionToBlock(
-    const Ball &ball, const Field &field,
-    TbotsProto::GoalieTacticConfig goalie_tactic_config)
+    const Ball &ball, const Field &field)
 {
     // Check if the ball is in the region where it will be at a sharp
     // angle to the goal -- if so, goalie should snap to goalposts
@@ -42,7 +40,7 @@ Point GoalieFSM::getGoaliePositionToBlock(
     }
 
     // Default to conservative depth when ball is at opposite end of field
-    double depth = goalie_tactic_config.conservative_depth_meters();
+    double depth = ai_config_ptr->goalie_tactic_config().conservative_depth_meters();
 
     if (field.pointInFriendlyHalf(ball.position()))
     {
@@ -50,8 +48,8 @@ Point GoalieFSM::getGoaliePositionToBlock(
         // from playing aggressively out far to a deeper conservative depth
         depth = normalizeValueToRange(ball.position().x(), snap_to_post_region_x,
                                       field.centerPoint().x(),
-                                      goalie_tactic_config.conservative_depth_meters(),
-                                      goalie_tactic_config.aggressive_depth_meters());
+                                      ai_config_ptr->goalie_tactic_config().conservative_depth_meters(),
+                                      ai_config_ptr->goalie_tactic_config().aggressive_depth_meters());
     }
 
     Vector goalie_direction_vector =
@@ -87,18 +85,18 @@ Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
 }
 
 Point GoalieFSM::findGoodChipTarget(
-    const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
+    const World &world)
 {
     // Default chip target is the enemy goal
     Point chip_target = world.field().enemyGoalCenter();
 
     // Avoid chipping out of field or towards friendly corners by restraining the
     // chip target to the region in front of the friendly defense area
-    Vector inset(goalie_tactic_config.chip_target_area_inset_meters(),
-                 -goalie_tactic_config.chip_target_area_inset_meters());
+    Vector inset(ai_config_ptr->goalie_tactic_config().chip_target_area_inset_meters(),
+                 -ai_config_ptr->goalie_tactic_config().chip_target_area_inset_meters());
     Vector offset_from_goal_line(
         world.field().defenseAreaXLength() +
-            goalie_tactic_config.min_chip_distance_from_crease_meters(),
+                ai_config_ptr->goalie_tactic_config().min_chip_distance_from_crease_meters(),
         0);
     Rectangle chip_target_area =
         Rectangle(world.field().friendlyCornerPos() + offset_from_goal_line + inset,
@@ -219,11 +217,10 @@ void GoalieFSM::updatePivotKick(
     Point chip_origin =
         Point(chip_origin_x, event.common.world_ptr->ball().position().y());
 
-    Point chip_target  = findGoodChipTarget(*event.common.world_ptr,
-                                            ai_config_ptr->goalie_tactic_config());
+    Point chip_target = findGoodChipTarget(*event.common.world_ptr);
     Vector chip_vector = chip_target - chip_origin;
 
-    PivotKickFSMControlParams control_params{
+    PivotKickFSM::ControlParams control_params{
         .kick_origin    = chip_origin,
         .kick_direction = chip_vector.orientation(),
         .auto_chip_or_kick =
@@ -288,7 +285,7 @@ void GoalieFSM::retrieveFromDeadZone(
     Vector final_dribble_orientation =
         event.common.world_ptr->field().enemyGoalCenter() - ball_position;
 
-    DribbleFSMControlParams control_params{
+    DribbleFSM::ControlParams control_params{
         .dribble_destination =
             event.common.world_ptr->field().friendlyDefenseArea().centre(),
         .final_dribble_orientation = final_dribble_orientation.orientation(),
