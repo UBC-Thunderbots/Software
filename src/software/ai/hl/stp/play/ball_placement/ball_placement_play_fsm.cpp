@@ -2,7 +2,7 @@
 
 BallPlacementPlayFSM::BallPlacementPlayFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : PlayFSM<BallPlacementPlayControlParams>(ai_config_ptr),
+    : PlayFSM<BallPlacementPlayFSM>(ai_config_ptr),
       pivot_kick_tactic(std::make_shared<WallKickoffTactic>(ai_config_ptr)),
       place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config_ptr)),
       align_placement_tactic(std::make_shared<PlaceBallMoveTactic>(ai_config_ptr)),

@@ -13,17 +13,17 @@
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
-/**
- * Control Parameters for Shoot Or Pass Play
- */
-struct ShootOrPassPlayControlParams
-{
-};
-
 using Zones = std::unordered_set<EighteenZoneId>;
 
-struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayControlParams>
+struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayFSM>
 {
+    /**
+     * Control Parameters for Shoot Or Pass Play
+     */
+    struct ControlParams
+    {
+    };
+
     class AttemptShotState;
     class TakePassState;
     class StartState;

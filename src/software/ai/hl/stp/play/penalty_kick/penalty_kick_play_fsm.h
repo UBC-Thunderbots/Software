@@ -8,15 +8,15 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/logger/logger.h"
 
-/**
- * Control Parameters for PenaltyKickPlay
- */
-struct PenaltyKickPlayControlParams
+struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayFSM>
 {
-};
+    /**
+     * Control Parameters for PenaltyKickPlay
+     */
+    struct ControlParams
+    {
+    };
 
-struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayControlParams>
-{
     class SetupPositionState;
     class PerformKickState;
 

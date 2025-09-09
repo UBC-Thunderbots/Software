@@ -8,15 +8,15 @@
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play.h"
 #include "software/logger/logger.h"
 
-/**
- * Control Parameters for Offense Play
- */
-struct OffensePlayControlParams
+struct OffensePlayFSM : PlayFSM<OffensePlayFSM>
 {
-};
+    /**
+     * Control Parameters for Offense Play
+     */
+    struct ControlParams
+    {
+    };
 
-struct OffensePlayFSM : PlayFSM<OffensePlayControlParams>
-{
     class OffensiveState;
     class DefensiveState;
 

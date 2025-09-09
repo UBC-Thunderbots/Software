@@ -41,16 +41,18 @@
  *        G
  *     +-----+
  */
-/**
- * Control parameters for enemy ball placement play
- */
 
-struct EnemyBallPlacementPlayControlParams
-{
-};
 
-struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayControlParams>
+struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayFSM>
 {
+    /**
+     * Control parameters for enemy ball placement play
+     */
+
+    struct ControlParams
+    {
+    };
+
     class WaitState;
     class AvoidState;
     class DefenseState;

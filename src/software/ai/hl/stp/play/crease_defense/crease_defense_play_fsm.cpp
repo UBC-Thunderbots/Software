@@ -2,7 +2,7 @@
 
 CreaseDefensePlayFSM ::CreaseDefensePlayFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : PlayFSM<CreaseDefensePlayControlParams>(ai_config_ptr), crease_defenders({})
+    : PlayFSM<CreaseDefensePlayFSM>(ai_config_ptr), crease_defenders({})
 {
 }
 

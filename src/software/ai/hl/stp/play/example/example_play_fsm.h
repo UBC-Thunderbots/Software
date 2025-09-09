@@ -6,18 +6,19 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/logger/logger.h"
 
-/**
- * Control parameters for Example Play
- */
-struct ExamplePlayControlParams
-{
-};
 
 /**
  * An example play that moves the robots in a circle around the ball
  */
-struct ExamplePlayFSM : PlayFSM<ExamplePlayControlParams>
+struct ExamplePlayFSM : PlayFSM<ExamplePlayFSM>
 {
+    /**
+     * Control parameters for Example Play
+     */
+    struct ControlParams
+    {
+    };
+
     class MoveState;
 
     /**

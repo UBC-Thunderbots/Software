@@ -7,17 +7,17 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/logger/logger.h"
 
-/**
- * Control Parameters for Penalty Kick Enemy Play
- */
-struct PenaltyKickEnemyPlayControlParams
+struct PenaltyKickEnemyPlayFSM : PlayFSM<PenaltyKickEnemyPlayFSM>
 {
-    // The goalie tactic common to all plays
-    std::shared_ptr<GoalieTactic> goalie_tactic;
-};
+    /**
+     * Control Parameters for Penalty Kick Enemy Play
+     */
+    struct ControlParams
+    {
+        // The goalie tactic common to all plays
+        std::shared_ptr<GoalieTactic> goalie_tactic;
+    };
 
-struct PenaltyKickEnemyPlayFSM : PlayFSM<PenaltyKickEnemyPlayControlParams>
-{
     class SetupPositionState;
     class DefendKickState;
 

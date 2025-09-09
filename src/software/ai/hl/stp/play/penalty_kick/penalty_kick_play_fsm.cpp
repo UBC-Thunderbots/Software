@@ -2,7 +2,7 @@
 
 PenaltyKickPlayFSM::PenaltyKickPlayFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : PlayFSM<PenaltyKickPlayControlParams>(ai_config_ptr),
+    : PlayFSM<PenaltyKickPlayFSM>(ai_config_ptr),
       penalty_kick_tactic(std::make_shared<PenaltyKickTactic>(ai_config_ptr)),
       penalty_setup_tactics(std::vector<std::shared_ptr<PenaltySetupTactic>>())
 {

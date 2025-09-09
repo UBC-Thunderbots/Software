@@ -2,7 +2,7 @@
 
 FreeKickPlayFSM::FreeKickPlayFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : PlayFSM<FreeKickPlayControlParams>(ai_config_ptr),
+    : PlayFSM<FreeKickPlayFSM>(ai_config_ptr),
       align_to_ball_tactic(std::make_shared<MoveTactic>(ai_config_ptr)),
       shoot_tactic(std::make_shared<KickTactic>(ai_config_ptr)),
       chip_tactic(std::make_shared<ChipTactic>(ai_config_ptr)),

@@ -8,18 +8,15 @@
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 
-/**
- *  The control parameters for a ball placement play
- */
-struct BallPlacementPlayControlParams
-{
-};
-
 using Zones = std::unordered_set<EighteenZoneId>;
 
-struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayControlParams>
+struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
 {
-    using Update = PlayFSM<BallPlacementPlayControlParams>::Update;
+
+    /**
+     *  The control parameters for a ball placement play
+     */
+    struct ControlParams {};
 
     class StartState;
     class KickOffWallState;
