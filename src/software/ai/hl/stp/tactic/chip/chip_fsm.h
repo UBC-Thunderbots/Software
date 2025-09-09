@@ -4,9 +4,8 @@
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/point.h"
 
-struct ChipFSM : Tactic_FSM<ChipFSM>
+struct ChipFSM : TacticFSM<ChipFSM>
 {
-   public:
     class ChipState;
 
     struct ControlParams
