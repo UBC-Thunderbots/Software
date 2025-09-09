@@ -4,23 +4,22 @@
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/point.h"
 
-/**
- * The control parameters for updating ChipFSM
- */
-struct ChipFSMControlParams
-{
-    // The location where the chip will be taken from
-    Point chip_origin;
-    // The direction the Robot will chip in
-    Angle chip_direction;
-    // The distance the robot will chip to
-    double chip_distance_meters;
-};
-
-struct ChipFSM : TacticFSM<ChipFSMControlParams>
+struct ChipFSM : Tactic_FSM<ChipFSM>
 {
    public:
-    using Update = TacticFSM<ChipFSMControlParams>::Update;
+    class ChipState;
+
+    struct ControlParams
+    {
+        // The location where the chip will be taken from
+        Point chip_origin;
+        // The direction the Robot will chip in
+        Angle chip_direction;
+        // The distance the robot will chip to
+        double chip_distance_meters;
+    };
+
+    using Update = TacticFSM<ChipFSM>::Update;
 
     class ChipState;
 
@@ -30,7 +29,7 @@ struct ChipFSM : TacticFSM<ChipFSMControlParams>
      * @param ai_config_ptr Shared pointer to ai_config
      */
     explicit ChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<ChipFSMControlParams>(ai_config_ptr)
+        : TacticFSM<ChipFSM>(ai_config_ptr)
     {
     }
 
