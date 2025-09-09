@@ -188,7 +188,7 @@ def _nanopb_proto_library_impl(ctx):
 
     extra_context = cc_common.create_compilation_context(
         includes = depset(["external/nanopb+"]),
-        defines = depset(["PB_FIELD_32BIT"])
+        defines = depset(["PB_FIELD_32BIT"]),
     )
 
     final_compilation_context = cc_common.merge_compilation_contexts(
