@@ -20,8 +20,6 @@ struct ChipFSM : TacticFSM<ChipFSM>
 
     using Update = TacticFSM<ChipFSM>::Update;
 
-    class ChipState;
-
     /**
      * Constructor for ChipFSM
      *
