@@ -30,7 +30,7 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit PassDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : DefenderFSMBase(), TacticFSM<PassDefenderFSMControlParams>(ai_config_ptr)
+        : DefenderFSMBase(), TacticFSM<PassDefenderFSM>(ai_config_ptr)
     {
     }
 
