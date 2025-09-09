@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <iostream>
 
 #include "pb_decode.h"
 
@@ -209,7 +210,7 @@ bool inline unmarshalUartPacket(const std::vector<uint8_t>& data,
     {
         return false;
     }
-    if (decoded.size() != TbotsProto_PowerFrame_size)
+    if (decoded.size() > TbotsProto_PowerFrame_size)
     {
         return false;
     }

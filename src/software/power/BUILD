@@ -65,7 +65,7 @@ platformio_project(
     name = "powerloop_main",
     src = "powerloop_main.cc",
     board = "pico32",
-    build_flags = ["-DPB_FIELD_16BIT=1"],  #Makes platformio use 16 bit numbers for size
+    build_flags = ["-DPB_FIELD_32BIT=1"],  #Makes platformio use 16 bit numbers for size
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
     platform = "espressif32",
@@ -87,7 +87,9 @@ genrule(
     outs = ["powerloop.tar.gz"],
     cmd = """
         TARGET_DIR=$$(dirname $(location :powerloop_main))
-        tar -chf $@ "$$TARGET_DIR/powerloop_main_workdir"
+        cd $$TARGET_DIR
+        echo $@
+        tar -chf $@ "powerloop_main_workdir"
     """,
     local = True,
     tools = [":powerloop_main"],

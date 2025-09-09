@@ -28,7 +28,7 @@
         echo: false
 
     - name: Flashing... (this will take a while on the first run)
-      ansible.builtin.command: "/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/host/bin/software/power"
+      ansible.builtin.command: "/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/bazel-out/k8-opt-exec-ST-d57f47055a04/bin/software/power/powerloop_main_workdir"
       register: result
       changed_when: true
 

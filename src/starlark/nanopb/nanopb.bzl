@@ -131,7 +131,6 @@ def _nanopb_proto_library_impl(ctx):
 
     # Create compiler flags
     copts = ["-I{}".format(include) for include in depset(nanopb_includes).to_list()]
-    copts += ["-DPB_FIELD_32BIT=1"]
 
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = "compile_nanopb_outputs",
@@ -189,6 +188,7 @@ def _nanopb_proto_library_impl(ctx):
 
     extra_context = cc_common.create_compilation_context(
         includes = depset(["external/nanopb+"]),
+        defines = depset(["PB_FIELD_32BIT"])
     )
 
     final_compilation_context = cc_common.merge_compilation_contexts(

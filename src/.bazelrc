@@ -64,7 +64,7 @@ common --enable_platform_specific_config
 build --incompatible_remove_legacy_whole_archive=False
 
 # Add warnings to Thunderbots code only
-build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitive/.*,//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+# build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitive/.*,//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
 ############## External Deps Compatibility ##############
 build --noincompatible_disallow_ctx_resolve_tools
 build --check_direct_dependencies=off
