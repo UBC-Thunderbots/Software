@@ -10,21 +10,20 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 
-/**
- * The control parameters for updating ReceiverFSM
- */
-struct ReceiverFSMControlParams
-{
-    // The pass to receive
-    std::optional<Pass> pass;
 
-    // If set to true, we will only receive and dribble
-    bool disable_one_touch_shot;
-};
 
-struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
+struct ReceiverFSM : TacticFSM<ReceiverFSM>
 {
-    using Update = TacticFSM<ReceiverFSMControlParams>::Update;
+    using Update = TacticFSM<ReceiverFSM>::Update;
+
+    struct ControlParams
+    {
+        // The pass to receive
+        std::optional<Pass> pass;
+
+        // If set to true, we will only receive and dribble
+        bool disable_one_touch_shot;
+    };
 
     /**
      * Constructor for ReceiverFSM
@@ -32,7 +31,7 @@ struct ReceiverFSM : TacticFSM<ReceiverFSMControlParams>
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit ReceiverFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<ReceiverFSMControlParams>(ai_config_ptr)
+        : TacticFSM<ReceiverFSM>(ai_config_ptr)
     {
     }
 
