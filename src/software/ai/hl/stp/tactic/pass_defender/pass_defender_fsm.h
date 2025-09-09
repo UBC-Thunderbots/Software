@@ -8,24 +8,21 @@
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-
-/**
- * The control parameters for updating PassDefenderFSM
- */
-struct PassDefenderFSMControlParams
+struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
 {
-    // The location on the field to block enemy passes from
-    Point position_to_block_from;
-    // The pass defender's aggressiveness towards the ball
-    TbotsProto::BallStealMode ball_steal_mode;
-};
-
-struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMControlParams>
-{
-    using Update = TacticFSM<PassDefenderFSMControlParams>::Update;
+    using Update = TacticFSM<PassDefenderFSM>::Update;
     class BlockPassState;
     class InterceptBallState;
 
+    // This struct defines the unique control parameters that the PassDefenderFSM requires
+    // in its update
+    struct ControlParams
+    {
+        // The location on the field to block enemy passes from
+        Point position_to_block_from;
+        // The pass defender's aggressiveness towards the ball
+        TbotsProto::BallStealMode ball_steal_mode;
+    };
 
     /**
      * Constructor for PassDefenderFSM
