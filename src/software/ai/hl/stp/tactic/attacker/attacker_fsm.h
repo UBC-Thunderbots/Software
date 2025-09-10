@@ -32,7 +32,7 @@ struct AttackerFSM : TacticFSM<AttackerFSM>
      * @param ai_config_ptr Shared pointer to ai_config
      */
     explicit AttackerFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-            : TacticFSM<AttackerFSM>(ai_config_ptr)
+        : TacticFSM<AttackerFSM>(ai_config_ptr)
     {
     }
 

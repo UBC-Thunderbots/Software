@@ -12,11 +12,12 @@ using Zones = std::unordered_set<EighteenZoneId>;
 
 struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
 {
-
     /**
      *  The control parameters for a ball placement play
      */
-    struct ControlParams {};
+    struct ControlParams
+    {
+    };
 
     class StartState;
     class KickOffWallState;

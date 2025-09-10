@@ -11,8 +11,8 @@
 struct CreaseDefensePlayFSM : PlayFSM<CreaseDefensePlayFSM>
 {
     /**
-    * Control parameters for crease defense play
-    */
+     * Control parameters for crease defense play
+     */
     struct ControlParams
     {
         // The origin point of the enemy threat
