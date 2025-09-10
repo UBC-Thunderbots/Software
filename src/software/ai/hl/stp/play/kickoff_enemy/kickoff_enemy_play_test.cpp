@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/kickoff_enemy_play.h"
+#include "software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play.h"
 
 #include <gtest/gtest.h>
 
