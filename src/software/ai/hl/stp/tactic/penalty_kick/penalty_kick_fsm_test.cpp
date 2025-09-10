@@ -17,7 +17,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
                             KickFSM(std::make_shared<TbotsProto::AiConfig>()),
                             GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>())};
 
-    PenaltyKickFSMControlParams control_params{};
+    PenaltyKickFSM::ControlParams control_params{};
 
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));

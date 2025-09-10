@@ -127,7 +127,7 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     std::shared_ptr<World> world           = ::TestUtil::createBlankTestingWorld();
     Robot robot                            = ::TestUtil::createRobotAtPos(Point(-2, -3));
     ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
-    CreaseDefenderFSMControlParams control_params{
+    CreaseDefenderFSM::ControlParams control_params{
         .enemy_threat_origin       = Point(2, 3),
         .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::LEFT,
         .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
