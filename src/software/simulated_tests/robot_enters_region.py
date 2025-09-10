@@ -75,7 +75,6 @@ class RobotEntersRegion(MinNumberOfRobotsEntersRegion):
         """
         super(RobotEntersRegion, self).__init__(regions, 1)
 
-
 (
     RobotEventuallyEntersRegion,
     RobotEventuallyExitsRegion,
