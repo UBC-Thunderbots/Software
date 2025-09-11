@@ -87,9 +87,7 @@ genrule(
     outs = ["powerloop.tar.gz"],
     cmd = """
         TARGET_DIR=$$(dirname $(location :powerloop_main))
-        cd $$TARGET_DIR
-        echo $@
-        tar -chf $@ "powerloop_main_workdir"
+        tar -C "$$TARGET_DIR" -czhf $@ "powerloop_main_workdir"
     """,
     local = True,
     tools = [":powerloop_main"],
