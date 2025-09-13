@@ -19,7 +19,10 @@ from software.simulated_tests.robot_enters_region import (
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
-pytest.skip("Disabling this test until OrValidation does not mix always and eventually validations")
+pytest.skip(
+    "Disabling this test until OrValidation does not mix always and eventually validations"
+)
+
 
 @pytest.mark.parametrize(
     "blue_bots,yellow_bots,ball_initial_pos",
