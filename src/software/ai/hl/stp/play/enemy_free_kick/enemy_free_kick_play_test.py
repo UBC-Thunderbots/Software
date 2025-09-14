@@ -19,6 +19,7 @@ from software.simulated_tests.robot_enters_region import (
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
+
 @pytest.mark.parametrize(
     "blue_bots,yellow_bots,ball_initial_pos",
     [
@@ -93,8 +94,9 @@ from proto.ssl_gc_common_pb2 import Team
         ),
     ],
 )
-
-@pytest.mark.skip("Disabling this test because OrValidation is passed both an always validation and eventually validation")
+@pytest.mark.skip(
+    "Disabling this test because OrValidation is passed both an always validation and eventually validation"
+)
 def test_enemy_free_kick_play(
     simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
