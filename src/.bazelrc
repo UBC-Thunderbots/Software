@@ -32,6 +32,7 @@ build --auto_cpu_environment_group=//toolchains/cc:cpus
 
 # Use Our Custom Toolchain
 build --crosstool_top=//toolchains/cc:toolchain
+common --features=external_include_paths
 
 ################# Build Optimizations #################
 
@@ -63,8 +64,15 @@ common --enable_platform_specific_config
 # the "factory" design pattern.
 build --incompatible_remove_legacy_whole_archive=False
 
-# Add warnings to Thunderbots code only
-# build --per_file_copt=//proto/.*,//proto/message_translation/.*,//proto/primitive/.*,//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+# Escalate Warnings to fail Compile for Thunderbots code
+build --features=external_include_paths
+build --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+# TODO: #3492
+# build --per_file_copt=software/.*,shared/.*,-external/.*@-Wconversion
+
+build --per_file_copt=.*\.pb\.(h|cc|cpp)$@-w
+build --per_file_copt=./external/.*,./bazel-out/.*@-w
+
 ############## External Deps Compatibility ##############
 build --noincompatible_disallow_ctx_resolve_tools
 build --check_direct_dependencies=off
