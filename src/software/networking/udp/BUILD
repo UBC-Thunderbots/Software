@@ -69,6 +69,7 @@ cc_test(
     deps = [
         ":threaded_proto_udp_listener",
         "//shared/test_util:tbots_gtest_main",
+        "@protobuf//:empty_cc_proto",
     ],
 )
 
@@ -90,6 +91,7 @@ cc_test(
     deps = [
         ":threaded_proto_udp_sender",
         "//shared/test_util:tbots_gtest_main",
+        "@protobuf//:empty_cc_proto",
     ],
 )
 
