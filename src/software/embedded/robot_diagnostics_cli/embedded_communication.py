@@ -1,5 +1,5 @@
 from proto.import_all_protos import *
-from embedded_data import EmbeddedData
+from software.embedded.robot_diagnostics_cli.embedded_data import EmbeddedData
 from google.protobuf.message import Message
 from software.embedded.constants.py_constants import get_estop_config, EstopMode
 from rich.progress import track
@@ -29,7 +29,7 @@ class EmbeddedCommunication:
         self.command_duration_seconds = 2.0
         self.send_primitive_interval_s = 0.01
 
-        # Localhost IP Broadcaster
+    # Localhost IP Broadcaster
         self.fullsystem_ip_broadcaster = tbots_cpp.FullsystemIpBroadcastProtoUdpSender(
             getRobotMulticastChannel(int(self.embedded_data.get_channel_id())),
             FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
@@ -132,6 +132,7 @@ class EmbeddedCommunication:
         for RobotStatus msgs, and multicast sender for Primitives
         """
         # Broadcast IP
+        self.running = True
         self.broadcast_ip = Thread(target=self.__broadcast_fullsystem_ip, daemon=True)
         self.broadcast_ip.start()
 
