@@ -11,7 +11,9 @@ from typer_shell import make_typer_shell
 from functools import wraps
 from typing import List, Optional
 from typing_extensions import Annotated
-from software.embedded.robot_diagnostics_cli.embedded_communication import EmbeddedCommunication
+from software.embedded.robot_diagnostics_cli.embedded_communication import (
+    EmbeddedCommunication,
+)
 from proto.import_all_protos import *
 from software.embedded.constants.py_constants import (
     DEFAULT_PRIMITIVE_DURATION,

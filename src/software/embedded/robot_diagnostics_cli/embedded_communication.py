@@ -29,7 +29,7 @@ class EmbeddedCommunication:
         self.command_duration_seconds = 2.0
         self.send_primitive_interval_s = 0.01
 
-    # Localhost IP Broadcaster
+        # Localhost IP Broadcaster
         self.fullsystem_ip_broadcaster = tbots_cpp.FullsystemIpBroadcastProtoUdpSender(
             getRobotMulticastChannel(int(self.embedded_data.get_channel_id())),
             FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
