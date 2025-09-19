@@ -2,18 +2,24 @@
 
 
 #include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The ShadowEnemyTactic will shadow and mark the robot specified in the given
  * EnemyThreat. It will choose to either block the enemy's shot on net or the pass it
  * would receive from another enemy.
  */
-class ShadowEnemyTactic : public Tactic
+class ShadowEnemyTactic : public TacticBase<ShadowEnemyFSM, MoveFSM>
 {
    public:
-    explicit ShadowEnemyTactic();
+    /**
+     * Constructor for ShadowEnemyTactic
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit ShadowEnemyTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the control parameters for this ShadowEnemyTactic
@@ -27,13 +33,4 @@ class ShadowEnemyTactic : public Tactic
                              double shadow_distance);
 
     void accept(TacticVisitor &visitor) const override;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
-   private:
-    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<ShadowEnemyFSM>>> fsm_map;
-
-    ShadowEnemyFSM::ControlParams control_params;
 };
