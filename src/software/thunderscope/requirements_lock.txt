@@ -12,9 +12,6 @@ darkdetect==0.7.1 \
     --hash=sha256:3efe69f8ecd5f1b7f4fbb0d1d93f656b0e493c45cc49222380ffe2a529cbc866 \
     --hash=sha256:47be3cf5134432ddb616bbffc927237718407914993c82809983e7ccebf49013
     # via pyqtdarktheme-fork
-evdev==1.7.0 \
-    --hash=sha256:95bd2a1e0c6ce2cd7a2ecc6e6cd9736ff794b3ad5cb54d81d8cbc2e414d0b870
-    # via -r software/thunderscope/requirements.in
 netifaces==0.11.0 \
     --hash=sha256:043a79146eb2907edf439899f262b3dfe41717d34124298ed281139a8b93ca32 \
     --hash=sha256:08e3f102a59f9eaef70948340aeb6c89bd09734e0dca0f3b82720305729f63ea \
