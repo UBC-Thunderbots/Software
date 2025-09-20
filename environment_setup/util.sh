@@ -8,6 +8,15 @@ install_autoref() {
     rm -rf /tmp/tbots_download_cache/autoReferee.zip /tmp/tbots_download_cache/AutoReferee-${autoref_commit}
 }
 
+install_autoref_macos() {
+    autoref_version=1.5.5
+    curl -L https://github.com/TIGERs-Mannheim/AutoReferee/releases/download/${autoref_version}/autoReferee.zip -o /tmp/tbots_download_cache/autoReferee.zip
+    unzip -q -o -d /tmp/tbots_download_cache/ /tmp/tbots_download_cache/autoReferee.zip
+
+    sudo mv /tmp/tbots_download_cache/autoReferee /opt/tbotspython/
+    rm -rf /tmp/tbots_download_cache/autoReferee.zip
+}
+
 install_bazel() {
     download=https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-linux-arm64 
 
@@ -46,6 +55,19 @@ install_gamecontroller () {
     sudo chmod +x /opt/tbotspython/gamecontroller
 }
 
+install_gamecontroller_macos () {
+    curl -L https://github.com/RoboCup-SSL/ssl-game-controller/archive/refs/tags/v3.17.0.zip -o /tmp/tbots_download_cache/ssl-game-controller.zip
+    unzip -q -o -d /tmp/tbots_download_cache/ /tmp/tbots_download_cache/ssl-game-controller.zip
+    cd /tmp/tbots_download_cache/ssl-game-controller-3.17.0
+    make install
+    go build cmd/ssl-game-controller/main.go
+    sudo mv main /opt/tbotspython/gamecontroller
+    sudo chmod +x /opt/tbotspython/gamecontroller
+
+    cd -
+    sudo rm -rf /tmp/tbots_download_cache/ssl-game-controller-3.17.0 /tmp/tbots_download_cache/go /tmp/tbots_download_cache/go.tar.gz /tmp/tbots_download_cache/ssl-game-controller.zip
+}
+
 install_java () {
     java_home=""
     java_download=https://download.oracle.com/java/21/latest/jdk-21_linux-aarch64_bin.tar.gz
@@ -56,6 +78,17 @@ install_java () {
     tar -xzf /tmp/tbots_download_cache/jdk-21.tar.gz -C /opt/tbotspython/
     mv /opt/tbotspython/jdk-21* /opt/tbotspython/bin/jdk
     rm /tmp/tbots_download_cache/jdk-21.tar.gz
+}
+
+install_java_macos () {
+    java_home=""
+    java_download=https://download.oracle.com/java/21/latest/jdk-21_macos-aarch64_bin.tar.gz
+    curl -L $java_download -o /tmp/tbots_download_cache/jdk-21.tar.gz
+    mkdir /tmp/tbots_download_cache/jdk
+    tar -xzf /tmp/tbots_download_cache/jdk-21.tar.gz -C /tmp/tbots_download_cache
+    sudo mv /tmp/tbots_download_cache/jdk-21*/Contents/Home /opt/tbotspython/bin/jdk
+    rm /tmp/tbots_download_cache/jdk-21.tar.gz
+    rm -rf /tmp/tbots_download_cache/jdk
 }
 
 install_python_dev_cross_compile_headers() {
@@ -88,6 +121,11 @@ install_python_dev_cross_compile_headers() {
     cd -
     rm -rf /tmp/tbots_download_cache/Python-3.12.0
     rm -rf /tmp/tbots_download_cache/python-3.12.0.tar.xz
+}
+
+install_python_toolchain_headers_macos() {
+  sudo mkdir -p /opt/tbotspython/py_headers/include/
+  sudo ln -sfn "$(python3.12-config --includes | awk '{for(i=1;i<=NF;++i) if ($i ~ /^-I/) print substr($i, 3)}' | head -n1)" /opt/tbotspython/py_headers/include/
 }
 
 is_x86() {
