@@ -20,7 +20,10 @@ cc_library(
         "custom_logging_levels.h",
         "logger.h",
     ],
-    linkopts = ["-lstdc++fs"],
+    linkopts = select({
+           "@platforms//os:linux": ["-lstdc++fs"],
+           "//conditions:default": [],
+    }),
     deps = [
         ":coloured_cout_sink",
         ":csv_sink",
