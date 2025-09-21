@@ -10,6 +10,7 @@ cc_library(
     ],
     deps = [
         "@g3log",
+        ":time_compat",
     ],
 )
 
@@ -188,4 +189,9 @@ cc_library(
         "@boost//:filesystem",
         "@zlib",
     ],
+)
+
+cc_library(
+    name = "time_compat",
+    srcs = ["time_compat.h"],
 )
