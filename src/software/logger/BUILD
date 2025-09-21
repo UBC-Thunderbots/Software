@@ -10,7 +10,7 @@ cc_library(
     ],
     deps = [
         "@g3log",
-        ":time_compat",
+        ":compat_flags",
     ],
 )
 
@@ -29,6 +29,7 @@ cc_library(
         ":protobuf_sink",
         "@g3log",
         "@g3sinks",
+        ":compat_flags",
     ],
 )
 
@@ -105,6 +106,7 @@ cc_library(
     ],
     deps = [
         "@g3log",
+        ":compat_flags",
     ],
 )
 
@@ -188,10 +190,11 @@ cc_library(
         "@base64",
         "@boost//:filesystem",
         "@zlib",
+        ":compat_flags",
     ],
 )
 
 cc_library(
-    name = "time_compat",
-    srcs = ["time_compat.h"],
+    name = "compat_flags",
+    srcs = ["compat_flags.h"],
 )
