@@ -16,9 +16,10 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     /**
      * Creates a defense play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit DefensePlayFSM(TbotsProto::AiConfig ai_config);
+    explicit DefensePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
 
     /**
      * Guard to check whether we should be defending more aggressively
@@ -80,6 +81,7 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     void setTactics(const Update& event);
 
 
+    DEFINE_SML_GUARD_CLASS(shouldDefendAggressively, DefensePlayFSM)
 
     auto operator()()
     {

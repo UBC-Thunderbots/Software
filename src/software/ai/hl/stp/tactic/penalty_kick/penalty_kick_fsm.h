@@ -4,22 +4,32 @@
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 
-struct PenaltyKickFSM
+/**
+ * The control parameters for updating PenaltyKickFSM (there aren't any)
+ */
+struct PenaltyKickFSMControlParams
 {
+};
+
+struct PenaltyKickFSM : TacticFSM<PenaltyKickFSMControlParams>
+{
+    using Update = TacticFSM<PenaltyKickFSMControlParams>::Update;
     /**
      * Constructor for DribbleFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    PenaltyKickFSM();
-
-    struct ControlParams
+    explicit PenaltyKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<PenaltyKickFSMControlParams>(ai_config_ptr),
+          complete_approach(std::nullopt),
+          shot_angle()
     {
-    };
+    }
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Helper function that determines whether the shooter robot has a viable shot on net.
@@ -94,6 +104,8 @@ struct PenaltyKickFSM
      */
     bool timeOutApproach(const Update &event);
 
+    DEFINE_SML_GUARD_CLASS(takePenaltyShot, PenaltyKickFSM)
+    DEFINE_SML_GUARD_CLASS(timeOutApproach, PenaltyKickFSM)
 
     auto operator()()
     {
@@ -106,6 +118,7 @@ struct PenaltyKickFSM
 
         DEFINE_SML_GUARD(takePenaltyShot)
         DEFINE_SML_GUARD(timeOutApproach)
+
 
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, KickFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateApproachKeeper, DribbleFSM)
@@ -140,7 +153,6 @@ struct PenaltyKickFSM
     static const inline Duration PENALTY_FINISH_APPROACH_TIMEOUT =
         Duration::fromSeconds(4);
 
-   private:
     std::optional<Timestamp> complete_approach;
     Angle shot_angle;
 };

@@ -4,36 +4,38 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-struct PassDefenderFSM : public DefenderFSMBase
+
+/**
+ * The control parameters for updating PassDefenderFSM
+ */
+struct PassDefenderFSMControlParams
 {
+    // The location on the field to block enemy passes from
+    Point position_to_block_from;
+    // The pass defender's aggressiveness towards the ball
+    TbotsProto::BallStealMode ball_steal_mode;
+};
+
+struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSMControlParams>
+{
+    using Update = TacticFSM<PassDefenderFSMControlParams>::Update;
     class BlockPassState;
     class InterceptBallState;
 
-    // This struct defines the unique control parameters that the PassDefenderFSM requires
-    // in its update
-    struct ControlParams
-    {
-        // The location on the field to block enemy passes from
-        Point position_to_block_from;
-        // The pass defender's aggressiveness towards the ball
-        TbotsProto::BallStealMode ball_steal_mode;
-    };
 
     /**
-     * Constructor for PassDefenderFSM struct
+     * Constructor for PassDefenderFSM
      *
-     * @param ai_config The ai config required
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PassDefenderFSM(const TbotsProto::AiConfig& ai_config)
-        : pass_defender_config(ai_config.pass_defender_config())
+    explicit PassDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : DefenderFSMBase(), TacticFSM<PassDefenderFSMControlParams>(ai_config_ptr)
     {
     }
-
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     // The minimum speed of the ball for it to be considered a pass
     static constexpr double MIN_PASS_SPEED = 0.5;
@@ -101,6 +103,9 @@ struct PassDefenderFSM : public DefenderFSMBase
     void prepareGetPossession(const Update& event,
                               boost::sml::back::process<DribbleFSM::Update> processEvent);
 
+    DEFINE_SML_GUARD_CLASS(passStarted, PassDefenderFSM)
+    DEFINE_SML_GUARD_CLASS(ballDeflected, PassDefenderFSM)
+    DEFINE_SML_GUARD_CLASS(ballNearbyWithoutThreat, PassDefenderFSM)
 
     auto operator()()
     {
@@ -113,12 +118,13 @@ struct PassDefenderFSM : public DefenderFSMBase
 
         DEFINE_SML_GUARD(passStarted)
         DEFINE_SML_GUARD(ballDeflected)
+        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
 
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(interceptBall)
 
         DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
+
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
 
         return make_transition_table(
@@ -138,9 +144,10 @@ struct PassDefenderFSM : public DefenderFSMBase
     }
 
    private:
+    // Initialized when a pass is started and used when a pass is deflected
+    // Assumption is that a pass has to start before it can be deflected
     Angle pass_orientation;
     // The step amount between speeds we check that the defender is observed to
     // go at during the interception
     static constexpr double DEFENDER_STEP_SPEED_M_PER_S = 0.2;
-    TbotsProto::PassDefenderConfig pass_defender_config;
 };

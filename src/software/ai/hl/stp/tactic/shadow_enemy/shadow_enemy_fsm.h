@@ -3,32 +3,43 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
-struct ShadowEnemyFSM
+
+/**
+ * The control parameters for updating ShadowEnemyFSM
+ */
+struct ShadowEnemyFSMControlParams
+{
+    // The Enemy Threat indicating which enemy to shadow
+    std::optional<EnemyThreat> enemy_threat;
+
+    // How far from the enemy the robot will position itself to shadow. If the enemy
+    // threat has the ball, it will position itself to block the shot on goal.
+    // Otherwise it will try to block the pass to the enemy threat.
+    double shadow_distance;
+};
+
+struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSMControlParams>
 {
    public:
+    using Update = TacticFSM<ShadowEnemyFSMControlParams>::Update;
     class BlockPassState;
     class GoAndStealState;
     class StealAndPullState;
 
-    // this struct defines the unique control parameters that the ShadowEnemyFSM requires
-    // in its update
-    struct ControlParams
+    /**
+     * Constructor for ShadowEnemyFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<ShadowEnemyFSMControlParams>(ai_config_ptr)
     {
-        // The Enemy Threat indicating which enemy to shadow
-        std::optional<EnemyThreat> enemy_threat;
-
-        // How far from the enemy the robot will position itself to shadow. If the enemy
-        // threat has the ball, it will position itself to block the shot on goal.
-        // Otherwise it will try to block the pass to the enemy threat.
-        double shadow_distance;
-    };
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    }
 
     /**
      * Calculates the point to block the pass to the robot we are shadowing
@@ -117,6 +128,11 @@ struct ShadowEnemyFSM
      * @param event ShadowEnemyFSM::Update
      */
     void stealAndPull(const Update &event);
+
+    DEFINE_SML_GUARD_CLASS(enemyThreatHasBall, ShadowEnemyFSM)
+    DEFINE_SML_GUARD_CLASS(contestedBall, ShadowEnemyFSM)
+    DEFINE_SML_GUARD_CLASS(blockedShot, ShadowEnemyFSM)
+
 
     auto operator()()
     {

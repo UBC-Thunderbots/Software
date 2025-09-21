@@ -127,14 +127,17 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     std::shared_ptr<World> world           = ::TestUtil::createBlankTestingWorld();
     Robot robot                            = ::TestUtil::createRobotAtPos(Point(-2, -3));
     ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
-    CreaseDefenderFSM::ControlParams control_params{
+    CreaseDefenderFSMControlParams control_params{
         .enemy_threat_origin       = Point(2, 3),
         .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::LEFT,
         .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .ball_steal_mode           = TbotsProto::BallStealMode::STEAL};
 
-    FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{ai_config},
-                               DribbleFSM(ai_config.dribble_tactic_config()));
+    FSMLogger logger{std::optional(0)};
+    FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM(std::make_shared<TbotsProto::AiConfig>(ai_config)),
+                               MoveFSM(std::make_shared<TbotsProto::AiConfig>(ai_config)),
+                               DribbleFSM(std::make_shared<TbotsProto::AiConfig>(ai_config)),
+                               logger);
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // robot far from destination, ball in friendly half

@@ -8,13 +8,15 @@ TEST(PivotKickFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    PivotKickFSM::ControlParams control_params{
+    PivotKickFSMControlParams control_params{
         .kick_origin       = Point(-2, 1.5),
         .kick_direction    = Angle::threeQuarter(),
         .auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK, 1.2}};
 
-    TbotsProto::DribbleTacticConfig dribble_tactic_config;
-    FSM<PivotKickFSM> fsm{DribbleFSM(dribble_tactic_config)};
+FSMLogger logger{std::optional(0)};
+    FSM<PivotKickFSM> fsm{PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()),
+                          DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
+                          logger};
 
     // Start in DribbleFSM
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM::StartState>));
