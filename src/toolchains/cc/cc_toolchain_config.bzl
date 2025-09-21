@@ -619,7 +619,7 @@ def _stm32_gcc_impl(ctx):
         enabled = True,
         flag_sets = [
             flag_set(
-                actions = ALL_COMPILE_ACTIONS,
+                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
                 flag_groups = [
                     flag_group(
                         flags = [
@@ -653,7 +653,7 @@ def _stm32_gcc_impl(ctx):
 
     no_syscalls_feature = feature(
         name = "no_syscalls",
-        enabled = True,
+        #enabled = True,
         flag_sets = [
             flag_set(
                 actions = ALL_LINK_ACTIONS,
@@ -686,11 +686,45 @@ def _stm32_gcc_impl(ctx):
         ]
     )
 
+    lib_gcc_feature = feature(
+        name = "lib_gcc",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            "-lgcc"
+                        ]
+                    )
+                ]
+            )
+        ]
+    )
+
+    relative_addressing_feature = feature(
+        name = "relative_addressing",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            "-fPIC",
+                        ]
+                    )
+                ]
+            )
+        ]
+    )
+
     features = [
         cortex_feature,
         map_file_feature,
         no_syscalls_feature,
         space_optimization_feature,
+        lib_gcc_feature,
+        relative_addressing_feature
     ]
 
     return [
