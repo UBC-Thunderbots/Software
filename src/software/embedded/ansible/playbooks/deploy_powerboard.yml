@@ -3,6 +3,9 @@
   hosts: THUNDERBOTS_HOSTS
 
   tasks:
+    - name: Copy SSH public key
+      ansible.builtin.import_tasks: ../tasks/copy_ssh_key.yml
+
     - name: Sync powerboard files
       become: true
       become_method: ansible.builtin.sudo
@@ -13,7 +16,7 @@
         copy_links: true
 
     - name: Untar powerboard files
-      ansible.builtin.shell: "mkdir -p powerloop && tar -xvf ~/powerloop.tar.gz -C powerloop"
+      ansible.builtin.shell: "mkdir -p powerloop && tar -xzf ~/powerloop.tar.gz -C powerloop"
       register: result
       changed_when: true
       args:
@@ -25,7 +28,7 @@
         echo: false
 
     - name: Flashing... (this will take a while on the first run)
-      ansible.builtin.command: "/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/power"
+      ansible.builtin.command: "/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/powerloop_main_workdir"
       register: result
       changed_when: true
 
