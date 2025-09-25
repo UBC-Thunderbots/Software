@@ -44,7 +44,7 @@ If you want to know more about our coding style you can take a look at our [clan
 * All variable names are `lowercase_with_underscores`
   ```cpp
   // Incorrect
-  float calculatedDistnace;
+  float calculatedDistance;
 
   // Correct
   float calculated_distance;
@@ -179,7 +179,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
 
 ### Includes
 
-* Use `#include` sparingly and only include the necessary sources to build the file. Do not include headers whos class or implementation is not used.
+* Use `#include` sparingly and only include the necessary sources to build the file. Do not include headers whose class or implementation is not used.
 * Often `.cpp` files include its corresponding header `.h` file, it means the `.cpp` file include everything included in the header. Do not have duplicate `#include`'s in both `.h` and `.cpp` files.
 * `#include`s are generally preferred written on the `.cpp` side; use minimum `#include` in the header file. Use _forward declarations_ in headers if necessary.
 * Specify full path of the include file on the file system, relative to the top-level project directory or _WORKSPACE_ file. Do not use relative paths.
