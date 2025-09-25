@@ -273,22 +273,6 @@ private functions for a class/file that should not be exposed to users. impl can
   // Correct
   using PointsArray = std::vector<std::pair<int, int>>;
   ```
-* Avoid initializing multiple variables on the same line.
-  ```cpp
-  // Incorrect
-  int x, y, z = 0;
-
-  // Correct
-  int x;
-  int y;
-  int z = 0;
-
-  // However, the author may have intended the following
-  // or a code reader may have assumed the following
-  int x = 0;
-  int y = 0;
-  int z = 0;
-  ```  
 * Avoid ternary operators. Clarity is more important than line count.
   ```cpp
   // Incorrect
