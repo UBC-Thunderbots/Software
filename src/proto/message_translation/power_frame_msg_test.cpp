@@ -1,7 +1,8 @@
 #include "proto/message_translation/power_frame_msg.hpp"
 
 #include <gtest/gtest.h>
-#include <proto/power_frame_msg.nanopb.h>
+
+#include "proto/power_frame_msg.pb.h"
 
 TEST(PowerFrameMsgTest, proto_to_nanopb)
 {
