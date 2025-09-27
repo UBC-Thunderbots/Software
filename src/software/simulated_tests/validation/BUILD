@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//software/world",
         "@boost//:coroutine2",
-        "@gtest",
+        "@googletest//:gtest",
     ],
 )
 
@@ -42,7 +42,7 @@ cc_library(
     deps = [
         ":validation_function",
         "@boost//:coroutine2",
-        "@gtest",
+        "@googletest//:gtest",
     ],
 )
 

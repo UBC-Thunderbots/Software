@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 py_library(
     name = "drive_and_dribbler_widget",
@@ -90,6 +90,7 @@ py_library(
     name = "estop_view",
     srcs = ["estop_view.py"],
     deps = [
+        "//proto:estop_state_py_proto",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),

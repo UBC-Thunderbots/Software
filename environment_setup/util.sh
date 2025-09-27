@@ -9,12 +9,11 @@ install_autoref() {
 }
 
 install_bazel() {
-    download=https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-linux-arm64
+    download=https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-linux-arm64 
 
     if is_x86 $1; then
-        download=https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-linux-x86_64
+        download=https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-linux-amd64
     fi
-
     wget -nc $download -O /tmp/tbots_download_cache/bazel
     sudo mv /tmp/tbots_download_cache/bazel /usr/bin/bazel
     sudo chmod +x /usr/bin/bazel
@@ -96,28 +95,35 @@ install_java () {
 }
 
 install_python_dev_cross_compile_headers() {
-    if is_x86 $1; then
-        mkdir -p /opt/tbotspython/cross_compile_headers
-        wget -N https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz -O /tmp/tbots_download_cache/python-3.12.0.tar.xz
-        tar -xf /tmp/tbots_download_cache/python-3.12.0.tar.xz -C /tmp/tbots_download_cache/
-        cd /tmp/tbots_download_cache/Python-3.12.0
+    mkdir -p /opt/tbotspython/cross_compile_headers
+    wget -N https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz -O /tmp/tbots_download_cache/python-3.12.0.tar.xz
+    tar -xf /tmp/tbots_download_cache/python-3.12.0.tar.xz -C /tmp/tbots_download_cache/
+    cd /tmp/tbots_download_cache/Python-3.12.0
 
-        # The configuration is taken from the examples provided in https://docs.python.org/3.12/using/configure.html
-        echo ac_cv_buggy_getaddrinfo=no > config.site-aarch64
-        echo ac_cv_file__dev_ptmx=yes >> config.site-aarch64
-        echo ac_cv_file__dev_ptc=no >> config.site-aarch64
+    # The configuration is taken from the examples provided in https://docs.python.org/3.12/using/configure.html
+    echo ac_cv_buggy_getaddrinfo=no > config.site-aarch64
+    echo ac_cv_file__dev_ptmx=yes >> config.site-aarch64
+    echo ac_cv_file__dev_ptc=no >> config.site-aarch64
+    if is_x86 $1; then
         CONFIG_SITE=config.site-aarch64 ./configure \
             --build=x86_64-pc-linux-gnu \
             --host=aarch64-unknown-linux-gnu \
             -with-build-python=/usr/bin/python3.12 \
             --enable-optimizations \
             --prefix=/opt/tbotspython/cross_compile_headers > /dev/null
-        make inclinstall -j$(nproc) > /dev/null
-
-        cd -
-        rm -rf /tmp/tbots_download_cache/Python-3.12.0
-        rm -rf /tmp/tbots_download_cache/python-3.12.0.tar.xz
+    else
+        CONFIG_SITE=config.site-aarch64 ./configure \
+            --build=aarch64-pc-linux-gnu \
+            --host=aarch64-unknown-linux-gnu \
+            -with-build-python=/usr/bin/python3.12 \
+            --enable-optimizations \
+            --prefix=/opt/tbotspython/cross_compile_headers > /dev/null
     fi
+    make inclinstall -j$(nproc) > /dev/null
+
+    cd -
+    rm -rf /tmp/tbots_download_cache/Python-3.12.0
+    rm -rf /tmp/tbots_download_cache/python-3.12.0.tar.xz
 }
 
 is_x86() {

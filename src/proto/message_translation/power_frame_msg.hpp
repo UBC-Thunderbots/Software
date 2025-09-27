@@ -1,14 +1,13 @@
 #pragma once
 
-#include <pb_decode.h>
-#include <pb_encode.h>
-#include <proto/power_frame_msg.nanopb.h>
-
 #include <cmath>
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+#include "pb_decode.h"
+#include "pb_encode.h"
 
 #ifdef PLATFORMIO_BUILD
 #include <proto/power_frame_msg.nanopb.h>
@@ -24,14 +23,6 @@ extern "C"
 }
 #endif  // PLATFORMIO_BUILD
 
-// The nanopb generated size isn't c++ compatible so we redefine it here
-// TODO(#2592): Remove with upgrade to nanopb
-#undef TbotsProto_PowerFrame_size
-#define TbotsProto_PowerFrame_size                                                       \
-    std::max(TbotsProto_PowerPulseControl_size, TbotsProto_PowerStatus_size) +           \
-        2 * sizeof(uint32_t) + sizeof(uint16_t)
-
-
 /**
  * Serialize nanopb into its byte representation
  *
@@ -41,7 +32,7 @@ extern "C"
 template <typename T>
 std::vector<uint8_t> serializeToVector(const T& data)
 {
-    const pb_field_t* fields;
+    const pb_msgdesc_s* fields;
     int size;
     if (std::is_same<T, TbotsProto_PowerFrame>::value)
     {

@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 py_library(
     name = "gl_layer",
@@ -30,6 +30,7 @@ py_library(
     srcs = ["gl_obstacle_layer.py"],
     deps = [
         ":gl_layer",
+        "//proto:visualization_py_proto",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_polygon",
         "//software/thunderscope/gl/graphics:gl_stadium",
@@ -119,6 +120,7 @@ py_library(
     srcs = ["gl_validation_layer.py"],
     deps = [
         ":gl_layer",
+        "//proto:validation_py_proto",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_painter",
         "//software/thunderscope/gl/graphics:gl_polygon",

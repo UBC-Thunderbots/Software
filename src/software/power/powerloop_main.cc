@@ -10,8 +10,8 @@
 #include "proto/robot_status_msg.nanopb.h"
 #include "uart_framing_platformio.h"
 #else
-#include "proto/tbots_nanopb_proto_nanopb_gen/proto/power_frame_msg.nanopb.h"
-#include "proto/tbots_nanopb_proto_nanopb_gen/proto/robot_status_msg.nanopb.h"
+#include "proto/power_frame_msg.nanopb.h"
+#include "proto/robot_status_msg.nanopb.h"
 #include "shared/constants.h"
 #include "shared/uart_framing/uart_framing.hpp"
 #include "software/power/charger.h"
