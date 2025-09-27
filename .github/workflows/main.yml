@@ -50,9 +50,15 @@ jobs:
 
   software-tests:
     name: Software Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
+      # remove the unused packages in the CI runner to free up disk space
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+
       - uses: actions/checkout@v4
 
       - name: Environment Setup
@@ -62,7 +68,7 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel test --copt=-O3 --show_timestamps       \
+          bazel test --copt=-O3 --show_timestamps --verbose_failures \
             -- //... -//software:unix_full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
