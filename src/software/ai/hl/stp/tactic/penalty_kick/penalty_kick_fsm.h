@@ -21,12 +21,7 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PenaltyKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<PenaltyKickFSM>(ai_config_ptr),
-          complete_approach(std::nullopt),
-          shot_angle()
-    {
-    }
+    explicit PenaltyKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Helper function that determines whether the shooter robot has a viable shot on net.

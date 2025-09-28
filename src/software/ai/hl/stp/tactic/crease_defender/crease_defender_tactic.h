@@ -35,8 +35,7 @@ class CreaseDefenderTactic : public TacticBase<CreaseDefenderFSM, DribbleFSM, Mo
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit CreaseDefenderTactic(
-        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    explicit CreaseDefenderTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     CreaseDefenderTactic() = delete;
 

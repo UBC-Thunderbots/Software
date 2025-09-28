@@ -25,10 +25,7 @@ struct KickFSM : TacticFSM<KickFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit KickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<KickFSM>(ai_config_ptr)
-    {
-    }
+    explicit KickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that updates the MovePrimitive

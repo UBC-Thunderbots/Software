@@ -29,10 +29,7 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PassDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : DefenderFSMBase(), TacticFSM<PassDefenderFSM>(ai_config_ptr)
-    {
-    }
+    explicit PassDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     // The minimum speed of the ball for it to be considered a pass
     static constexpr double MIN_PASS_SPEED = 0.5;

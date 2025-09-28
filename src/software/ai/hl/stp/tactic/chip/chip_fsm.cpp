@@ -2,6 +2,11 @@
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
+ChipFSM::ChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+: TacticFSM<ChipFSM>(ai_config_ptr)
+{
+}
+
 void ChipFSM::updateGetBehindBall(
     const Update &event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
 {

@@ -3,7 +3,8 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
-
+GetBehindBallFSM::GetBehindBallFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+: TacticFSM<GetBehindBallFSM>(ai_config_ptr) {};
 
 void GetBehindBallFSM::updateMove(const Update& event)
 {

@@ -35,10 +35,7 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<ShadowEnemyFSM>(ai_config_ptr)
-    {
-    }
+    explicit ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Calculates the point to block the pass to the robot we are shadowing

@@ -30,10 +30,7 @@ struct ReceiverFSM : TacticFSM<ReceiverFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ReceiverFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<ReceiverFSM>(ai_config_ptr)
-    {
-    }
+    explicit ReceiverFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     class OneTouchShotState;
     class ReceiveAndDribbleState;

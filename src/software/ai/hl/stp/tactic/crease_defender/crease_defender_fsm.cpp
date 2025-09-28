@@ -6,6 +6,11 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/stadium.h"
 
+CreaseDefenderFSM::CreaseDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+: DefenderFSMBase(), TacticFSM<CreaseDefenderFSM>(ai_config_ptr)
+{
+}
+
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
     const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,

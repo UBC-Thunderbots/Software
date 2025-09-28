@@ -2,6 +2,11 @@
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
+KickFSM::KickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : TacticFSM<KickFSM>(ai_config_ptr)
+{
+}
+
 void KickFSM::updateKick(const Update &event)
 {
     Vector direction_to_kick =

@@ -5,6 +5,16 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/math/math_functions.h"
 
+GoalieFSM::GoalieFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
+                     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                     TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT)
+        : TacticFSM<GoalieFSM>(ai_config_ptr),
+          max_allowed_speed_mode(max_allowed_speed_mode),
+          robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
+                                        ai_config_ptr->robot_navigation_obstacle_config()
+                                                .robot_obstacle_inflation_factor())
+{
+}
 
 Point GoalieFSM::getGoaliePositionToBlock(
     const Ball &ball, const Field &field,

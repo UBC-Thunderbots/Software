@@ -38,10 +38,7 @@ struct MoveFSM : TacticFSM<MoveFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<MoveFSM>(ai_config_ptr)
-    {
-    }
+    explicit MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * This is an Action that sets the primitive to a move primitive corresponding to the
