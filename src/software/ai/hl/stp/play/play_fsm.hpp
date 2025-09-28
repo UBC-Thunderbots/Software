@@ -73,13 +73,16 @@ class PlayFSM
         PlayUpdate common;
     };
 
-    explicit PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : ai_config_ptr(ai_config_ptr)
-    {
-    }
+    explicit PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
    protected:
     // A shared pointer to the ai configuration to configure ai behaviour, shared by all
     // Plays, Tactics, and FSMs
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
 };
+
+template <class PFsm>
+PlayFSM<PFsm>::PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : ai_config_ptr(ai_config_ptr)
+{
+}

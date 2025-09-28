@@ -18,12 +18,7 @@ class PlayBase : public Play
      * @param ai_config_ptr shared pointer to ai_config
      */
     explicit PlayBase(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
-                      bool requires_goalie)
-        : Play(ai_config_ptr, requires_goalie),
-          fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}...},
-          control_params()
-    {
-    }
+                      bool requires_goalie);
 
     void updateTactics(const PlayUpdate &play_update) override = 0;
 
@@ -31,3 +26,12 @@ class PlayBase : public Play
     FSM<PlayFsm> fsm;
     PlayFsm::ControlParams control_params;
 };
+
+template <class PlayFsm, class... PlaySubFsms>
+PlayBase<PlayFsm, PlaySubFsms...>::PlayBase(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
+         bool requires_goalie)
+        : Play(ai_config_ptr, requires_goalie),
+          fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}...},
+          control_params()
+{
+}

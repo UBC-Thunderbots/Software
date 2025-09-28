@@ -6,8 +6,7 @@
 #include "software/math/math_functions.h"
 
 GoalieFSM::GoalieFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
-                     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
-                     TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT)
+                     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
         : TacticFSM<GoalieFSM>(ai_config_ptr),
           max_allowed_speed_mode(max_allowed_speed_mode),
           robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *

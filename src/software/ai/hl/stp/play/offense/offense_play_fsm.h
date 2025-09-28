@@ -4,7 +4,7 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/defense/defense_play.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play.h"
 #include "software/logger/logger.h"
 
