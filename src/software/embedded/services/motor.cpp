@@ -26,10 +26,10 @@
 
 extern "C"
 {
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Register.h"
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
-#include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
+#include "tmc/ic/TMC4671/TMC4671.h"
+#include "tmc/ic/TMC4671/TMC4671_Register.h"
+#include "tmc/ic/TMC4671/TMC4671_Variants.h"
+#include "tmc/ic/TMC6100/TMC6100.h"
 }
 
 // SPI Configs
@@ -1142,9 +1142,8 @@ void MotorService::checkEncoderConnections()
 
     for (int num_iterations = 0;
          num_iterations < 10 &&
-         std::any_of(
-             calibrated_motors.begin(), calibrated_motors.end(),
-             [](bool calibration_status) { return !calibration_status; });
+         std::any_of(calibrated_motors.begin(), calibrated_motors.end(),
+                     [](bool calibration_status) { return !calibration_status; });
          ++num_iterations)
     {
         for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; ++motor)
