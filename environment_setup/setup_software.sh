@@ -20,8 +20,8 @@ cd "$CURR_DIR" || exit
 
 source util.sh
 
-arch=$(uname -m)
-print_status_msg "Detected architecture: ${arch}"
+g_arch=$(uname -m)  # Global variable. No function should use this name.
+print_status_msg "Detected architecture: ${g_arch}"
 
 print_status_msg "Installing Utilities and Dependencies"
 
@@ -157,15 +157,15 @@ sudo chown -R $USER:$USER /opt/tbotspython
 
 print_status_msg "Done Setting Up Virtual Python Environment"
 print_status_msg "Fetching game controller"
-install_gamecontroller $arch
+install_gamecontroller $g_arch
 
 print_status_msg "Setting up TIGERS AutoRef"
 
 print_status_msg "Installing TIGERS dependency: Java 21"
-install_java $arch
+install_java $g_arch
 
 print_status_msg "Compiling TIGERS AutoRef"
-install_autoref $arch
+install_autoref $g_arch
 
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
@@ -175,20 +175,20 @@ print_status_msg "Finished setting up AutoRef"
 # Install Bazel
 print_status_msg "Installing Bazel"
 
-install_bazel $arch
+install_bazel $g_arch
 
 print_status_msg "Done Installing Bazel"
 
 print_status_msg "Install clang-format"
-install_clang_format $arch
+install_clang_format $g_arch
 print_status_msg "Done installing clang-format"
 
 print_status_msg "Setting up cross compiler for robot software"
-install_cross_compiler $arch
+install_cross_compiler $g_arch
 print_status_msg "Done setting up cross compiler for robot software"
 
 print_status_msg "Setting Up Python Development Headers"
-install_python_dev_cross_compile_headers $arch
+install_python_dev_cross_compile_headers $g_arch
 print_status_msg "Done Setting Up Python Development Headers"
 
 print_status_msg "Setting Up PlatformIO"
