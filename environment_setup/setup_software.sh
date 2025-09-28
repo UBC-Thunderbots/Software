@@ -145,10 +145,6 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     exit 1
 fi
 
-if [[ $(lsb_release -rs) == "20.04" ]]; then
-    sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
-fi
-
 if [[ $(lsb_release -rs) == "22.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
 fi
