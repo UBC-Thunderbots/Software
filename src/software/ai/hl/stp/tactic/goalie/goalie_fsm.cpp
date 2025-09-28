@@ -7,11 +7,11 @@
 
 GoalieFSM::GoalieFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
                      TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
-        : TacticFSM<GoalieFSM>(ai_config_ptr),
-          max_allowed_speed_mode(max_allowed_speed_mode),
-          robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
-                                        ai_config_ptr->robot_navigation_obstacle_config()
-                                                .robot_obstacle_inflation_factor())
+    : TacticFSM<GoalieFSM>(ai_config_ptr),
+      max_allowed_speed_mode(max_allowed_speed_mode),
+      robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
+                                    ai_config_ptr->robot_navigation_obstacle_config()
+                                        .robot_obstacle_inflation_factor())
 {
 }
 

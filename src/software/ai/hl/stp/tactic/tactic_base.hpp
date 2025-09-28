@@ -153,13 +153,14 @@ class TacticBase : public Tactic
 };
 
 template <class TacticFsm, class... TacticSubFsms>
-TacticBase<TacticFsm, TacticSubFsms...>::TacticBase(const std::set<RobotCapability> &capability_reqs_,
-           std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : last_execution_robot(std::nullopt),
-          ai_config_ptr(ai_config_ptr),
-          fsm_map(),
-          control_params(),
-          capability_reqs(capability_reqs_)
+TacticBase<TacticFsm, TacticSubFsms...>::TacticBase(
+    const std::set<RobotCapability> &capability_reqs_,
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : last_execution_robot(std::nullopt),
+      ai_config_ptr(ai_config_ptr),
+      fsm_map(),
+      control_params(),
+      capability_reqs(capability_reqs_)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {

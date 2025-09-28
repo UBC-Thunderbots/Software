@@ -83,6 +83,6 @@ class PlayFSM
 
 template <class PFsm>
 PlayFSM<PFsm>::PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : ai_config_ptr(ai_config_ptr)
+    : ai_config_ptr(ai_config_ptr)
 {
 }
