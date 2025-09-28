@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 py_library(
     name = "simulator",
@@ -22,6 +22,7 @@ py_library(
     deps = [
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
+        "//software/thunderscope/common:thread_safe_circular_buffer",
     ],
 )
 

@@ -26,10 +26,11 @@ class RobotState
      * @param velocity The velocity of the robot, in metres per second
      * @param orientation The orientation of the robot
      * @param angular_velocity The angular velocity of the robot
+     * @param breakbeam_tripped The breakbeam status of the robot
      */
     explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation,
-                        const AngularVelocity &angular_velocity);
+                        const Angle &orientation, const AngularVelocity &angular_velocity,
+                        const bool breakbeam_tripped = false);
 
     /**
      * Creates a new robot state based on the TbotsProto::RobotState protobuf
@@ -69,6 +70,13 @@ class RobotState
     AngularVelocity angularVelocity() const;
 
     /**
+     * Returns the breakbeam status of the robot represented by this state
+     *
+     * @return the breakbeam status of the robot represented by this state
+     */
+    bool breakbeamTripped() const;
+
+    /**
      * Defines the equality operator for a RobotState. RobotStates are equal if
      * all their members are equal
      *
@@ -94,6 +102,7 @@ class RobotState
     Vector velocity_;
     Angle orientation_;
     AngularVelocity angular_velocity_;
+    bool breakbeam_tripped_;
 };
 
 /**

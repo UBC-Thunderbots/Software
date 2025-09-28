@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 py_library(
     name = "proto_configuration_widget",
@@ -55,5 +55,13 @@ py_library(
     srcs = ["toast_msg_helper.py"],
     deps = [
         requirement("pyqt-toast-notification"),
+    ],
+)
+
+py_library(
+    name = "thread_safe_circular_buffer",
+    srcs = ["thread_safe_circular_buffer.py"],
+    deps = [
+        "//software/thunderscope:thread_safe_buffer",
     ],
 )

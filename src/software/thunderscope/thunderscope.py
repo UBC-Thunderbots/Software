@@ -40,7 +40,6 @@ class Thunderscope:
             The interval in milliseconds to refresh all the widgets.
         """
         self.refresh_interval_ms = refresh_interval_ms
-        self.widgets = {}
         self.refresh_timers = []
 
         self.tabs = QTabWidget()

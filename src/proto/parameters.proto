@@ -525,6 +525,10 @@ message DefensePlayConfig
             (bounds).min_double_value = 0.0,
             (bounds).max_double_value = 10.0
         ];
+
+        // The max number of crease defender can be created at a moment
+        required uint32 max_num_crease_defenders = 6
+            [default = 2, (bounds).min_int_value = 1, (bounds).max_int_value = 3];
     }
 
     // The distance at which a threat is considered "immediate" if there is only 1
@@ -634,12 +638,13 @@ message NetworkConfig
 
 message CreaseDefenderConfig
 {
+    // Unique steal config for crease defenders
+    required DefenderStealConfig defender_steal_config = 1;
+
     // The additional buffer length for each side of the goal
     // to determine if crease defender chipping is "towards goal"
     required double goal_post_offset_chipping = 4
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
-    // Unique steal config for crease defenders
-    required DefenderStealConfig defender_steal_config = 1;
 }
 
 message PassDefenderConfig

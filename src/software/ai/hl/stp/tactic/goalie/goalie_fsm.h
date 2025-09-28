@@ -253,6 +253,9 @@ struct GoalieFSM
 
    private:
     static constexpr double BALL_RETRIEVED_THRESHOLD = 0.2;
+    // The step amount between speeds we check that the goalie is observed to
+    // go at during the save
+    static constexpr double GOALIE_STEP_SPEED_M_PER_S = 0.2;
     // The goalie tactic config
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
     // Configuration values for inflated obstacles

@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -15,6 +17,7 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/geom/algorithms",
         "//software/logger",
     ],
 )
@@ -26,21 +29,5 @@ cc_test(
         ":shadow_enemy_tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-    ],
-)
-
-cc_test(
-    name = "shadow_enemy_tactic_test",
-    srcs = ["shadow_enemy_tactic_test.cpp"],
-    deps = [
-        ":shadow_enemy_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/geom:triangle",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )

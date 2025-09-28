@@ -64,15 +64,15 @@ class ColorQLabel(QLabel):
     def __init__(
         self,
         label_text: str,
-        initial_value: str,
+        initial_value: float,
         min_val: float = 0,
         max_val: float = 100,
     ):
         """Initializes the ColorQLabel with the given label, min and max bounds
         Or 0 and 100 as default
 
-        :param label_text: the text displayed within this label as a string.
-        :param initial_value: the initial string value of the label
+        :param label_text: the text displayed within this label as a string
+        :param initial_value: the initial value of the label
         :param min_val: the minimum value of the label color (no color)
         :param max_val: the maxmimum value of the label color (100% red)
         """
@@ -81,17 +81,15 @@ class ColorQLabel(QLabel):
         self.min = min_val
         self.max = max_val
         self.label_text = label_text
-        self.initial_value = initial_value
 
-        self.setText(label_text + initial_value)
-        self.__update_background_color(0)
+        self.set_float_val(initial_value)
 
     def set_float_val(self, val: float) -> None:
         """Sets the current value of the label to the given float value
 
         :param val: the new float value
         """
-        self.setText(f"{self.label_text}{val:02d}")
+        self.setText(f"{self.label_text} {val:d}")
         self.__update_background_color(val)
 
     def __update_background_color(self, val: float) -> None:

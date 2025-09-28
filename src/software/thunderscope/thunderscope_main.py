@@ -25,9 +25,7 @@ from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import (
-    CI_DURATION_S,
-)
+from software.thunderscope.constants import CI_DURATION_S
 from software.thunderscope.util import *
 
 from software.thunderscope.binary_context_managers.full_system import FullSystem
@@ -296,7 +294,7 @@ if __name__ == "__main__":
     # send/recv packets over the provided multicast channel.
 
     elif args.run_blue or args.run_yellow or args.run_diagnostics:
-        tscope_config = config.configure_ai_or_diagnostics(
+        tscope_config, robot_view_widget = config.configure_ai_or_diagnostics(
             args.run_blue,
             args.run_yellow,
             args.run_diagnostics,
@@ -350,17 +348,9 @@ if __name__ == "__main__":
                     robot_communication.toggle_keyboard_estop
                 )
 
-            if args.run_diagnostics:
-                for tab in tscope_config.tabs:
-                    if hasattr(tab, "widgets"):
-                        robot_view_widget = tab.find_widget("Robot View")
-                        if robot_view_widget is not None:
-                            robot_view_widget.individual_robot_control_mode_signal.connect(
-                                lambda robot_id,
-                                robot_mode: robot_communication.toggle_individual_robot_control_mode(
-                                    robot_id, robot_mode
-                                )
-                            )
+            config.connect_robot_view_to_robot_communication(
+                robot_view_widget, robot_communication
+            )
 
             if args.run_blue or args.run_yellow:
                 full_system_runtime_dir = (
@@ -455,7 +445,7 @@ if __name__ == "__main__":
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
         ) as yellow_fs, Gamecontroller(
-            suppress_logs=(not args.verbose)
+            suppress_logs=(not args.verbose),
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -485,9 +475,14 @@ if __name__ == "__main__":
                 autoref_proto_unix_io,
             )
             gamecontroller.setup_proto_unix_io(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
-                autoref_proto_unix_io,
+                blue_full_system_proto_unix_io=tscope.proto_unix_io_map[
+                    ProtoUnixIOTypes.BLUE
+                ],
+                yellow_full_system_proto_unix_io=tscope.proto_unix_io_map[
+                    ProtoUnixIOTypes.YELLOW
+                ],
+                autoref_proto_unix_io=autoref_proto_unix_io,
+                simulator_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
             )
             if args.enable_autoref:
                 autoref.setup_ssl_wrapper_packets(

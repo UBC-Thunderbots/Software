@@ -1,11 +1,13 @@
 #include "software/world/robot_state.h"
 
 RobotState::RobotState(const Point &position, const Vector &velocity,
-                       const Angle &orientation, const AngularVelocity &angular_velocity)
+                       const Angle &orientation, const AngularVelocity &angular_velocity,
+                       const bool breakbeam_tripped)
     : position_(position),
       velocity_(velocity),
       orientation_(orientation),
-      angular_velocity_(angular_velocity)
+      angular_velocity_(angular_velocity),
+      breakbeam_tripped_(breakbeam_tripped)
 {
 }
 
@@ -16,7 +18,8 @@ RobotState::RobotState(const TbotsProto::RobotState &robot_state_proto)
                        robot_state_proto.global_velocity().y_component_meters())),
       orientation_(Angle::fromRadians(robot_state_proto.global_orientation().radians())),
       angular_velocity_(AngularVelocity::fromRadians(
-          robot_state_proto.global_angular_velocity().radians_per_second()))
+          robot_state_proto.global_angular_velocity().radians_per_second())),
+      breakbeam_tripped_(false)
 {
 }
 
@@ -38,6 +41,11 @@ Angle RobotState::orientation() const
 AngularVelocity RobotState::angularVelocity() const
 {
     return angular_velocity_;
+}
+
+bool RobotState::breakbeamTripped() const
+{
+    return breakbeam_tripped_;
 }
 
 bool RobotState::operator==(const RobotState &other) const

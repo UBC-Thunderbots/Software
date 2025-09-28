@@ -5,7 +5,9 @@
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/geom/vector.h"
-#include "software/world/world.h"
+#include "software/time/duration.h"
+#include "software/world/robot_state.h"
+#include "software/world/team_types.h"
 
 class PrimitiveExecutor
 {
