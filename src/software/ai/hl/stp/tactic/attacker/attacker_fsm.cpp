@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
 
 AttackerFSM::AttackerFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-: TacticFSM<AttackerFSM>(ai_config_ptr)
+    : TacticFSM<AttackerFSM>(ai_config_ptr)
 {
 }
 

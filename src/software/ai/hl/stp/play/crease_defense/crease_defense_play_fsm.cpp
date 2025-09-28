@@ -39,6 +39,7 @@ void CreaseDefensePlayFSM::defendDefenseArea(const Update& event)
 void CreaseDefensePlayFSM::setUpDefenders(unsigned int num_defenders)
 {
     crease_defenders = std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_defenders);
-    std::generate(crease_defenders.begin(), crease_defenders.end(), [this]()
+    std::generate(crease_defenders.begin(), crease_defenders.end(),
+                  [this]()
                   { return std::make_shared<CreaseDefenderTactic>(ai_config_ptr); });
 }

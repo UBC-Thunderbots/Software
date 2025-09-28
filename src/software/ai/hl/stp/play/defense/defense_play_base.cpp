@@ -22,7 +22,8 @@ void DefensePlayFSMBase::setUpCreaseDefenders(int num_crease_defenders)
 
     crease_defenders =
         std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
-    std::generate(crease_defenders.begin(), crease_defenders.end(), [this]()
+    std::generate(crease_defenders.begin(), crease_defenders.end(),
+                  [this]()
                   { return std::make_shared<CreaseDefenderTactic>(ai_config_ptr); });
 }
 
@@ -34,7 +35,8 @@ void DefensePlayFSMBase::setUpPassDefenders(int num_pass_defenders)
     }
 
     pass_defenders = std::vector<std::shared_ptr<PassDefenderTactic>>(num_pass_defenders);
-    std::generate(pass_defenders.begin(), pass_defenders.end(), [this]()
+    std::generate(pass_defenders.begin(), pass_defenders.end(),
+                  [this]()
                   { return std::make_shared<PassDefenderTactic>(ai_config_ptr); });
 }
 

@@ -5,7 +5,7 @@
 #include "software/geom/algorithms/distance.h"
 
 ShadowEnemyFSM::ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<ShadowEnemyFSM>(ai_config_ptr)
+    : TacticFSM<ShadowEnemyFSM>(ai_config_ptr)
 {
 }
 
