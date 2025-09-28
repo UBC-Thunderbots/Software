@@ -348,8 +348,7 @@ class AggregateTestRunner(SimulatedTestRunner):
     passing iterations to a predetermined acceptable threshold
     """
 
-    # TODO AVAH this supposed to be __int__ ???
-    def __int__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     @override
