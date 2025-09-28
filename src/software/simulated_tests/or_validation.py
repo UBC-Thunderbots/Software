@@ -2,6 +2,7 @@ from proto.validation_pb2 import *
 from software.simulated_tests.validation import (
     Validation,
 )
+from typing import override
 
 
 class OrValidation(Validation):
@@ -9,12 +10,14 @@ class OrValidation(Validation):
         """An or extension to the validation function"""
         self.validations = validations
 
+    @override
     def get_validation_status(self, world):
         for validation in self.validations:
             if validation.get_validation_status(world) == ValidationStatus.PASSING:
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world):
         validation_geometry = ValidationGeometry()
 
@@ -31,6 +34,7 @@ class OrValidation(Validation):
 
         return validation_geometry
 
+    @override
     def get_validation_type(self, world):
         validation_type_initial = self.validations[0].get_validation_type
 

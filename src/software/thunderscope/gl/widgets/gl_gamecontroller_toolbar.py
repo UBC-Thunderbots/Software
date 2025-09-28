@@ -2,7 +2,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtGui
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from typing import Callable
+from typing import Callable, override
 import webbrowser
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -111,6 +111,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.layout().addWidget(self.gc_browser_button)
         self.layout().addStretch()
 
+    @override
     def refresh(self) -> None:
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())

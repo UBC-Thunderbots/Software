@@ -19,6 +19,7 @@ from software.thunderscope.binary_context_managers.game_controller import Gameco
 from software.thunderscope.thunderscope_config import configure_simulated_test_view
 
 from software.logger.logger import create_logger
+from typing import override
 
 logger = create_logger(__name__)
 
@@ -59,6 +60,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
 
+    @override
     def set_worldState(self, worldstate: WorldState):
         """Sets the simulation worldstate
 
@@ -224,6 +226,7 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         self.__stopper()
 
+    @override
     def run_test(
         self,
         always_validation_sequence_set,
@@ -308,6 +311,7 @@ class InvariantTestRunner(SimulatedTestRunner):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @override
     def run_test(
         self,
         setup=(lambda x: None),
@@ -344,9 +348,11 @@ class AggregateTestRunner(SimulatedTestRunner):
     passing iterations to a predetermined acceptable threshold
     """
 
+    # TODO AVAH this supposed to be __int__ ???
     def __int__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @override
     def run_test(
         self,
         setup=(lambda arg: None),
