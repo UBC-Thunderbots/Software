@@ -37,7 +37,8 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
     {
         penalty_setup_tactics =
             std::vector<std::shared_ptr<PenaltySetupTactic>>(num_tactics);
-        std::generate(penalty_setup_tactics.begin(), penalty_setup_tactics.end(), [this]()
+        std::generate(penalty_setup_tactics.begin(), penalty_setup_tactics.end(),
+                      [this]()
                       { return std::make_shared<PenaltySetupTactic>(ai_config_ptr); });
     }
 

@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
 DribbleFSM::DribbleFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-: TacticFSM<DribbleFSM>(ai_config_ptr)
+    : TacticFSM<DribbleFSM>(ai_config_ptr)
 {
 }
 

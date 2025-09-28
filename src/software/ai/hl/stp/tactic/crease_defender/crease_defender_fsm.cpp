@@ -6,8 +6,9 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/stadium.h"
 
-CreaseDefenderFSM::CreaseDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-: DefenderFSMBase(), TacticFSM<CreaseDefenderFSM>(ai_config_ptr)
+CreaseDefenderFSM::CreaseDefenderFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : DefenderFSMBase(), TacticFSM<CreaseDefenderFSM>(ai_config_ptr)
 {
 }
 

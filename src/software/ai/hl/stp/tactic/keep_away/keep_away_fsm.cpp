@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h"
 
 KeepAwayFSM::KeepAwayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<KeepAwayFSM>(ai_config_ptr)
+    : TacticFSM<KeepAwayFSM>(ai_config_ptr)
 {
 }
 

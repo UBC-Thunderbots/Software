@@ -3,7 +3,7 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
 PivotKickFSM::PivotKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<PivotKickFSM>(ai_config_ptr)
+    : TacticFSM<PivotKickFSM>(ai_config_ptr)
 {
 }
 
