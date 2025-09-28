@@ -57,8 +57,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
     std::vector<Robot> enemy_team_robots;
     std::transform(enemy_robots.begin(), enemy_robots.end(),
                    std::back_inserter(enemy_team_robots),
-                   [](const RobotStateWithId& robot_state)
-                   {
+                   [](const RobotStateWithId& robot_state) {
                        return Robot(robot_state.id, robot_state.robot_state,
                                     Timestamp::fromSeconds(0));
                    });
