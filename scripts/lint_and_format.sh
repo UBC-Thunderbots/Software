@@ -149,4 +149,7 @@ run_eof_new_line
 run_git_diff_check
 run_ansible_lint
 
+# Update time marker so pre-commit git hook knows that code has been formatted
+touch "$CURR_DIR/.last_format_time"
+
 exit 0
