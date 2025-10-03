@@ -5,12 +5,15 @@ filter_formattable_files() {
 }
 
 toplevel="$(git rev-parse --show-toplevel)"
-mtime=$(stat -c %Y "$toplevel/scripts/.last_format_time" 2> /dev/null || echo 0)
+marker="$toplevel/scripts/.format_markers/$(git rev-parse --abbrev-ref HEAD)"
+mtime=$(stat -c %Y "$marker" 2> /dev/null || echo 0)
 
 git diff --staged --name-only | filter_formattable_files | while read -r file; do
     if [ $mtime -lt "$(stat -c %Y "$toplevel/$file")" ]; then
-        # last format invocation was before staged changes
-        echo "Please run $toplevel/scripts/lint_and_format.sh before committing!" 1>&2
-        exit 1
+        # The file was modified AFTER formatting. Remove the marker to tell the pre-push hook
+        # that this commit introduces unformatted code.
+        rm -f "$marker" 2> /dev/null
+        echo "Warning: Code is unformatted."
+        break
     fi
 done

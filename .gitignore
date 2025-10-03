@@ -150,8 +150,8 @@ src/config
 # codespell dictionary
 scripts/dictionary/
 
-# time marker for pre-commit hook to check if staged files have been formatted
-scripts/.last_format_time
+# marker files for pre-commit and pre-push hooks to check if staged files have been formatted
+scripts/.format_markers/
 
 # clangd for nvim lsp
 src/.clangd
