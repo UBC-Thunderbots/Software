@@ -1,0 +1,19 @@
+#!/bin/sh
+
+filter_formattable_files() {
+    grep -E '\.(h|cpp|c|cc|hpp|tpp|proto|py|md|yml)$|/BUILD$'
+}
+
+toplevel="$(git rev-parse --show-toplevel)"
+marker="$toplevel/scripts/.format_markers/$(git rev-parse --abbrev-ref HEAD)"
+mtime=$(stat -c %Y "$marker" 2> /dev/null || echo 0)
+
+git diff --staged --name-only | filter_formattable_files | while read -r file; do
+    if [ $mtime -lt "$(stat -c %Y "$toplevel/$file")" ]; then
+        # The file was modified AFTER formatting. Remove the marker to tell the pre-push hook
+        # that this commit introduces unformatted code.
+        rm -f "$marker" 2> /dev/null
+        echo "Warning: Code is unformatted."
+        break
+    fi
+done

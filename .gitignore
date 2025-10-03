@@ -150,6 +150,9 @@ src/config
 # codespell dictionary
 scripts/dictionary/
 
+# marker files for pre-commit and pre-push hooks to check if staged files have been formatted
+scripts/.format_markers/
+
 # clangd for nvim lsp
 src/.clangd
 
