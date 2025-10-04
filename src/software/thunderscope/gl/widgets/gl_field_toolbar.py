@@ -156,7 +156,7 @@ class GLFieldToolbar(GLToolbar):
             # Setup Redo button
             self.redo_button = ToggleableButton(False)
             self.redo_button.setToolTip("Redo")
-            self.redo_button.setIcon(qta.icon("ph.arrow-u-up-right", color = self.BUTTON_ICON_COLOR) )
+            self.redo_button.setIcon(qta.icon("mdi6.redo-variant", color = self.BUTTON_ICON_COLOR) )
             self.redo_button.setStyleSheet(self.get_button_style(False))
 
             self.reset_button = QPushButton()

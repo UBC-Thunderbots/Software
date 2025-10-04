@@ -54,21 +54,21 @@ class GLGamecontrollerToolbar(GLToolbar):
 
         # Setup Force Start button for sending the FORCE_START gamecontroller command
         self.force_start_button = self.__setup_icon_button(
-            qta.icon("ph.arrow-u-up-right-light"),
+            qta.icon("ph.arrow-u-up-right-fill"),
             "Force Start, restarts the game",
             self.__send_force_start_command,
         )
 
         # Setup Halt button for sending the HALT gamecontroller command
         self.halt_button = self.__setup_icon_button(
-            qta.icon("ph.stop-thin"),
+            qta.icon("fa5s.stop"),
             "Halt, stops all robots immediately",
             self.__send_halt_command,
         )
 
         # Setup Normal Start button for sending the NORMAL_START gamecontroller command
         self.normal_start_button = self.__setup_icon_button(
-            qta.icon("msc.play"),
+            qta.icon("fa5s.play"),
             "Normal Start, resumes game from a set play (disabled when no play selected)",
             self.__send_normal_start_command,
         )
@@ -176,7 +176,7 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.get_button_style(self.normal_start_enabled)
         )
         self.normal_start_button.setIcon(
-            qta.icon("msc.play",
+            qta.icon("fa5s.play",
                      color = self.BUTTON_ICON_COLOR if self.normal_start_enabled else self.DISABLED_BUTTON_ICON_COLOR)
         )
 
