@@ -7,6 +7,8 @@ import webbrowser
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import qtawesome as qta
+
+
 class GamecontrollerPlays:
     """The different plays that can be set for each team"""
 
@@ -133,7 +135,9 @@ class GLGamecontrollerToolbar(GLToolbar):
             GamecontrollerPlays.KICKOFF,
             GamecontrollerPlays.PENALTY,
         ]:
-            icon = qta.icon("mdi6.square-rounded", color="blue" if is_blue else "yellow")
+            icon = qta.icon(
+                "mdi6.square-rounded", color="blue" if is_blue else "yellow"
+            )
             self.plays_menu.addAction(
                 icon,
                 arg,
@@ -176,8 +180,12 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.get_button_style(self.normal_start_enabled)
         )
         self.normal_start_button.setIcon(
-            qta.icon("fa5s.play",
-                     color = self.BUTTON_ICON_COLOR if self.normal_start_enabled else self.DISABLED_BUTTON_ICON_COLOR)
+            qta.icon(
+                "fa5s.play",
+                color=self.BUTTON_ICON_COLOR
+                if self.normal_start_enabled
+                else self.DISABLED_BUTTON_ICON_COLOR,
+            )
         )
 
     def __setup_icon_button(
