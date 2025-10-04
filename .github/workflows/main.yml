@@ -14,7 +14,7 @@ jobs:
   multiplatform-build:
     strategy:
       matrix:
-        platform: [ ubuntu-24.04 ]
+        platform: [ ubuntu-24.04, ubuntu-24.04-arm ]
 
     name: Ubuntu Alternate Builds
     runs-on: ${{ matrix.platform }}
@@ -35,17 +35,17 @@ jobs:
             -//software/ai/hl/...                   \
             -//software/field_tests/...             \
             -//software/embedded/...                \
-            -//cc_toolchain/...
+            -//toolchains/cc/...
 
       - name: Jetson Nano Build Test
         run: |
           cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//cc_toolchain:robot
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//toolchains/cc:robot
 
       - name: Raspberry Pi Build Test
         run: |
           cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//cc_toolchain:robot
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
 
 
   software-tests:
@@ -68,7 +68,7 @@ jobs:
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
             -//software/ai/navigator/...     \
-            -//cc_toolchain/...
+            -//toolchains/cc/...
 
   robot-tests:
     name: Robot Software Tests
@@ -97,13 +97,13 @@ jobs:
       - name: Jetson Nano Build
         run: |
          cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//cc_toolchain:robot
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//toolchains/cc:robot
 
 
       - name: Raspberry Pi Build
         run: |
          cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//cc_toolchain:robot
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
 
 
   simulated-gameplay-tests:
@@ -112,7 +112,7 @@ jobs:
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-        
+
       - name: Environment Setup
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
