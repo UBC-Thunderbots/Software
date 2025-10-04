@@ -6,9 +6,7 @@ from typing import Callable
 import webbrowser
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.thunderscope.gl.widgets.toolbar_icons.gamecontroller.icon_loader as icons
-
-
+import qtawesome as qta
 class GamecontrollerPlays:
     """The different plays that can be set for each team"""
 
@@ -49,28 +47,28 @@ class GLGamecontrollerToolbar(GLToolbar):
 
         # Setup Stop button for sending the STOP gamecontroller command
         self.stop_button = self.__setup_icon_button(
-            icons.get_stop_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("fa6s.pause"),
             "Stops gameplay, robots form circle around ball",
             self.__send_stop_command,
         )
 
         # Setup Force Start button for sending the FORCE_START gamecontroller command
         self.force_start_button = self.__setup_icon_button(
-            icons.get_force_start_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("ph.arrow-u-up-right-light"),
             "Force Start, restarts the game",
             self.__send_force_start_command,
         )
 
         # Setup Halt button for sending the HALT gamecontroller command
         self.halt_button = self.__setup_icon_button(
-            icons.get_halt_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("ph.stop-thin"),
             "Halt, stops all robots immediately",
             self.__send_halt_command,
         )
 
         # Setup Normal Start button for sending the NORMAL_START gamecontroller command
         self.normal_start_button = self.__setup_icon_button(
-            icons.get_normal_start_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("msc.play"),
             "Normal Start, resumes game from a set play (disabled when no play selected)",
             self.__send_normal_start_command,
         )
@@ -89,7 +87,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.__add_plays_menu_items(is_blue=False)
 
         self.gc_browser_button = self.__setup_icon_button(
-            icons.get_open_window_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("mdi6.open-in-new"),
             "Opens the SSL Gamecontroller in a browser window",
             lambda: webbrowser.open(self.GAME_CONTROLLER_URL, new=0, autoraise=True),
             display_text="Open GC",
@@ -135,7 +133,7 @@ class GLGamecontrollerToolbar(GLToolbar):
             GamecontrollerPlays.KICKOFF,
             GamecontrollerPlays.PENALTY,
         ]:
-            icon = icons.get_blue_icon() if is_blue else icons.get_yellow_icon()
+            icon = qta.icon("mdi6.square-rounded", color="blue" if is_blue else "yellow")
             self.plays_menu.addAction(
                 icon,
                 arg,
@@ -178,11 +176,8 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.get_button_style(self.normal_start_enabled)
         )
         self.normal_start_button.setIcon(
-            icons.get_normal_start_icon(
-                self.BUTTON_ICON_COLOR
-                if self.normal_start_enabled
-                else self.DISABLED_BUTTON_ICON_COLOR
-            )
+            qta.icon("msc.play",
+                     color = self.BUTTON_ICON_COLOR if self.normal_start_enabled else self.DISABLED_BUTTON_ICON_COLOR)
         )
 
     def __setup_icon_button(

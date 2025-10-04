@@ -26,6 +26,7 @@ py_library(
         "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode:icon_loader",
         requirement("pyqtgraph"),
+        requirement("qtawesome"),
     ],
 )
 
@@ -38,7 +39,7 @@ py_library(
         "//software/networking:ssl_proto_communication",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/common:common_widgets",
-        "//software/thunderscope/gl/widgets/toolbar_icons/gamecontroller:icon_loader",
         requirement("pyqtgraph"),
+        requirement("qtawesome"),
     ],
 )
