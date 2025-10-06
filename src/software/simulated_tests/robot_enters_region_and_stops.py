@@ -7,6 +7,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
 )
 from software.simulated_tests.robot_enters_region import RobotEntersRegion
+from typing import override
 
 
 class RobotEntersRegionAndStops(RobotEntersRegion):
@@ -28,6 +29,7 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
         self.is_stationary = True
         self.passing_robot_id = None
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if a robot is in the provided region
         Then checks if that robot is stationary within a threshold for the provided number of ticks
@@ -73,10 +75,12 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
             self.is_stationary = False
             return robot_in_region_validation
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) shows region to enter"""
         return create_validation_geometry(self.regions)
 
+    @override
     def __repr__(self):
         """Returns a string representing the stage of validation that failed
         Either the robot has not entered the region yet, or it has but is not stationary

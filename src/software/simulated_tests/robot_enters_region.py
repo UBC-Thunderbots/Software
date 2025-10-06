@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class RobotEntersRegion(Validation):
@@ -15,6 +16,7 @@ class RobotEntersRegion(Validation):
         self.regions = regions if regions else []
         self.passing_robot = None
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if _any_ robot enters the provided regions
 
@@ -33,10 +35,12 @@ class RobotEntersRegion(Validation):
         self.passing_robot = None
         return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) shows regions to enter"""
         return create_validation_geometry(self.regions)
 
+    @override
     def __repr__(self):
         return "Check for robot in regions " + ",".join(
             repr(region) for region in self.regions
@@ -60,6 +64,7 @@ class NumberOfRobotsEntersRegion(Validation):
         # map to keep track of robot positions
         self.robot_in_zone = {}
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if a specific number of robots enter the provided region
 
@@ -84,10 +89,12 @@ class NumberOfRobotsEntersRegion(Validation):
         else:
             return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) shows region to enter"""
         return create_validation_geometry([self.region])
 
+    @override
     def __repr__(self):
         return (
             "Check for "

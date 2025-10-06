@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class FriendlyHasBallPossession(Validation):
@@ -18,6 +19,7 @@ class FriendlyHasBallPossession(Validation):
         """
         self.tolerance = tolerance
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if any friendly robot has possession of the ball
 
@@ -31,6 +33,7 @@ class FriendlyHasBallPossession(Validation):
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) highlights the dribbler area of the robots"""
         return create_validation_geometry(
@@ -40,6 +43,7 @@ class FriendlyHasBallPossession(Validation):
             ]
         )
 
+    @override
     def __repr__(self):
         return "Check that the friendly team has possession of the ball"
 
