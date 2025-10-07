@@ -94,6 +94,10 @@ from proto.ssl_gc_common_pb2 import Team
         ),
     ],
 )
+# TODO: #3503
+@pytest.mark.skip(
+    "Disabling this test because OrValidation is passed both an always validation and eventually validation"
+)
 def test_enemy_free_kick_play(
     simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
