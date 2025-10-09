@@ -26,8 +26,7 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_test)
             }
         });
 
-    client.set("A", "1",
-               [](cpp_redis::reply &reply)
+    client.set("A", "1", [](cpp_redis::reply &reply)
                { std::cout << "Setting A to 1: " << reply << std::endl; });
 
     client.get("A",
@@ -37,8 +36,7 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_test)
                    ASSERT_EQ(atoi(reply.as_string().c_str()), 1);
                });
 
-    client.set("A", "2",
-               [](cpp_redis::reply &reply)
+    client.set("A", "2", [](cpp_redis::reply &reply)
                { std::cout << "Setting A to 2: " << reply << std::endl; });
 
     client.get("A",

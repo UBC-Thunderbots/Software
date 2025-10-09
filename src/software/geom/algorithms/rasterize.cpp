@@ -43,7 +43,7 @@ std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
 
         double x_point = origin.x() - radius + x_offset;
         double y_sqrt  = std::sqrt(
-             std::abs(radius * radius - (x_point - origin.x()) * (x_point - origin.x())));
+            std::abs(radius * radius - (x_point - origin.x()) * (x_point - origin.x())));
         double y_min = -y_sqrt + origin.y();
         double y_max = y_sqrt + origin.y();
 

@@ -36,8 +36,7 @@ std::unique_ptr<TbotsProto::Polygon> createPolygonProto(const Polygon& polygon)
     auto polygon_msg   = std::make_unique<TbotsProto::Polygon>();
     const auto& points = polygon.getPoints();
 
-    std::for_each(points.begin(), points.end(),
-                  [&](const Point& point)
+    std::for_each(points.begin(), points.end(), [&](const Point& point)
                   { *(polygon_msg->add_points()) = *createPointProto(point); });
 
     return polygon_msg;
