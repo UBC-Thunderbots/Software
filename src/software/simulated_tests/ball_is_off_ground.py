@@ -34,11 +34,38 @@ class BallIsOffGround(Validation):
 
         """
         # TODO #3244: Make this a nicer visualization
+
+        direction = tbots_cpp.createVector(
+            world.ball.current_state.global_velocity
+        ).normalize()
+        start_point = tbots_cpp.createPoint(world.ball.current_state.global_position)
+
+        if direction.x() == 0.0 and direction.y() == 0.0:
+            # NOTE if ball is not moving, displays arrow pointing to the right
+            direction = tbots_cpp.Vector(1.0, 0.0)
+
+        perpendicular = direction.perpendicular()
+
+        rectangle_width = 0.04
+        rectangle_length = 0.2
+        triangle_height = 0.15
+        triangle_width = 0.2
+
+        end_point = start_point + direction * rectangle_length
+
+        rectangle_bottom_left = start_point - perpendicular * (rectangle_width / 2)
+        rectangle_top_right = end_point + perpendicular * (rectangle_width / 2)
+
+        triangle_top = end_point + direction * triangle_height
+        triangle_bottom_left = end_point + perpendicular * (triangle_width / 2)
+        triangle_bottom_right = end_point - perpendicular * (triangle_width / 2)
+
         return create_validation_geometry(
             [
-                tbots_cpp.Circle(
-                    tbots_cpp.createPoint(world.ball.current_state.global_position), 0.1
-                )
+                tbots_cpp.Rectangle(rectangle_bottom_left, rectangle_top_right),
+                tbots_cpp.Triangle(
+                    triangle_top, triangle_bottom_left, triangle_bottom_right
+                ),
             ]
         )
 
