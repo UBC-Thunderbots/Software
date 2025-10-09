@@ -114,6 +114,12 @@ bool contains(const Rectangle& container, const Point& contained)
            p.y() <= r.negXNegYCorner().y() + r.diagonal().y();
 }
 
+bool contains(const Triangle& container, const Point& contained)
+{
+    // TODO actually implement this properly for triangle
+    return true;
+}
+
 bool contains(const Stadium& container, const Point& contained)
 {
     return distanceSquared(container.segment(), contained) <=

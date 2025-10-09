@@ -6,6 +6,7 @@
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/stadium.h"
+#include "software/geom/triangle.h"
 
 /**
  * Returns whether `container` contains `contained`
@@ -22,4 +23,5 @@ bool contains(const Ray& container, const Point& contained);
 bool contains(const Segment& container, const Point& contained,
               double fixed_epsilon = FIXED_EPSILON, int ulps_distance = ULPS_EPSILON_TEN);
 bool contains(const Rectangle& container, const Point& contained);
+bool contains(const Triangle& container, const Point& contained);
 bool contains(const Stadium& container, const Point& contained);

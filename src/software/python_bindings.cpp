@@ -36,6 +36,7 @@
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
+#include "software/geom/triangle.h"
 #include "software/geom/vector.h"
 #include "software/math/math_functions.h"
 #include "software/networking/radio/threaded_proto_radio_sender.hpp"
@@ -250,6 +251,17 @@ PYBIND11_MODULE(python_bindings, m)
         .def("yMin", &Rectangle::yMin)
         .def("diagonal", &Rectangle::diagonal)
         .def("expand", &Rectangle::expand);
+    py::class_<Triangle, ConvexPolygon>(m, "Triangle")
+        .def(py::init<Point, Point, Point>())
+        // Overloaded
+        .def("__repr__",
+             [](const Triangle& r)
+             {
+                 std::stringstream stream;
+                 stream << r;
+                 return stream.str();
+             })
+        .def("mean", &Triangle::mean);
 
     py::class_<Segment>(m, "Segment")
         .def(py::init<Point, Point>())
@@ -337,6 +349,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("contains",
           py::overload_cast<const Segment&, const Point&, double, int>(&contains));
     m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
+    m.def("contains", py::overload_cast<const Triangle&, const Point&>(&contains));
     m.def("contains", py::overload_cast<const Stadium&, const Point&>(&contains));
 
     py::class_<Robot>(m, "Robot")
