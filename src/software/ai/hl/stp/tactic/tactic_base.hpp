@@ -227,19 +227,22 @@ std::unique_ptr<FSM<TacticFsm>> TacticBase<TacticFsm, TacticSubFsms...>::fsmInit
 }
 
 template <class TacticFsm, class... TacticSubFsms>
-void TacticBase<TacticFsm, TacticSubFsms...>::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
+void TacticBase<TacticFsm, TacticSubFsms...>::setLastExecutionRobot(
+    std::optional<RobotId> last_execution_robot)
 {
     this->last_execution_robot = last_execution_robot;
 }
 
 template <class TacticFsm, class... TacticSubFsms>
-std::set<RobotCapability> &TacticBase<TacticFsm, TacticSubFsms...>::mutableRobotCapabilityRequirements()
+std::set<RobotCapability>
+    &TacticBase<TacticFsm, TacticSubFsms...>::mutableRobotCapabilityRequirements()
 {
     return capability_reqs;
 }
 
 template <class TacticFsm, class... TacticSubFsms>
-const std::set<RobotCapability> &TacticBase<TacticFsm, TacticSubFsms...>::robotCapabilityRequirements() const
+const std::set<RobotCapability>
+    &TacticBase<TacticFsm, TacticSubFsms...>::robotCapabilityRequirements() const
 {
     return capability_reqs;
 }
