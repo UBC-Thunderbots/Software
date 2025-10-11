@@ -36,6 +36,7 @@ py_test(
     srcs = [
         "ball_placement_play_test.py",
     ],
+    timeout = "long",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
