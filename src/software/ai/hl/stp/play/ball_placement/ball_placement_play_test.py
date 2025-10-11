@@ -129,6 +129,14 @@ def test_robocup_technical_challenge_placement(
     run_ball_placement_scenario(simulated_test_runner, ball_start_point, ball_placement_point, blue_only=True)
 
 
+"""
+Runs a ball placement test scenario with the specified parameters.
+
+:param simulated_test_runner: The test runner used to simulate robot and ball behavior.
+:param ball_start_point: The initial position of the ball (provided by pytest parameterization).
+:param ball_placement_point: The target position where the ball should be placed (provided by pytest parameterization).
+:param blue_only: If True, only the blue team is active; the yellow team is ignored.
+"""
 def run_ball_placement_scenario(
             simulated_test_runner, ball_start_point, ball_placement_point, blue_only=False
     ):
