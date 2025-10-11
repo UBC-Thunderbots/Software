@@ -1,3 +1,4 @@
+import math
 import os
 
 from typing import Any, Optional
@@ -279,6 +280,30 @@ def setup_performance_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
 
     # Register observer
     proto_unix_io.register_observer(NamedValue, proto_plotter.buffers[NamedValue])
+    return proto_plotter
+
+
+def setup_ball_speed_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
+    """Setup the ball speed plot
+
+    :param proto_unix_io: The proto unix io object
+    :return: The ball speed plot widget
+    """
+
+    def extract_ball_speed_data(world):
+        v = world.ball.current_state.global_velocity;
+        return {
+            "Maximum Ball Speed": 6.5,
+            "Ball Speed": math.sqrt(v.x_component_meters ** 2 + v.y_component_meters ** 2),
+        }
+
+    proto_plotter = ProtoPlotter(
+        min_y=0,
+        max_y=10,
+        window_secs=10,
+        configuration={World: extract_ball_speed_data},
+    )
+    proto_unix_io.register_observer(World, proto_plotter.buffers[World])
     return proto_plotter
 
 
