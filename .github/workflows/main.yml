@@ -14,7 +14,7 @@ jobs:
   multiplatform-build:
     strategy:
       matrix:
-        platform: [ ubuntu-24.04, ubuntu-24.04-arm ]
+        platform: [ ubuntu-22.04, ubuntu-24.04-arm ]
 
     name: Ubuntu Alternate Builds
     runs-on: ${{ matrix.platform }}
@@ -29,7 +29,7 @@ jobs:
       - name: Software Build Test
         run: |
           cd src
-          bazel build --show_timestamps --copt=-O3  \
+          bazel build --show_timestamps --copt=-O3 --verbose_failures \
             -- //... -//software:unix_full_system   \
             -//software/simulated_tests/...         \
             -//software/ai/hl/...                   \
@@ -50,9 +50,16 @@ jobs:
 
   software-tests:
     name: Software Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
+      # remove the unused packages in the CI runner to free up disk space
+      # https://github.com/actions/runner-images/issues/2840
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+
       - uses: actions/checkout@v4
 
       - name: Environment Setup
@@ -62,7 +69,7 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel test --copt=-O3 --show_timestamps       \
+          bazel test --copt=-O3 --show_timestamps --verbose_failures \
             -- //... -//software:unix_full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
@@ -72,7 +79,7 @@ jobs:
 
   robot-tests:
     name: Robot Software Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
@@ -108,7 +115,7 @@ jobs:
 
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
@@ -146,7 +153,7 @@ jobs:
 
   autorefd-game:
     name: AutoRef'd Game (3 Minutes)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
