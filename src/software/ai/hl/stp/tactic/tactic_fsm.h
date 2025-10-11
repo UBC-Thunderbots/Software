@@ -1,7 +1,9 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
+#include "proto/parameters.pb.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/hl/stp/tactic/primitive.h"
@@ -29,42 +31,42 @@ struct TacticUpdate
 };
 
 /**
- * The Update struct is the only event that a tactic fsm should respond to and it is
- * composed of the following structs:
+ * A general FSM class with some utilities for tactics.
  *
- * ControlParams - uniquely defined by each tactic to control the FSM
- * TacticUpdate - common struct that contains Robot, World, and SetPrimitiveCallback
+ * @tparam TFsm The Tactic FSM that inherits from an instance of this template.
+ * See https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
  */
-#define DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                       \
-    struct Update                                                                        \
-    {                                                                                    \
-        Update(const ControlParams &control_params, const TacticUpdate &common)          \
-            : control_params(control_params), common(common)                             \
-        {                                                                                \
-        }                                                                                \
-        ControlParams control_params;                                                    \
-        TacticUpdate common;                                                             \
+template <class TFsm>
+class TacticFSM
+{
+   public:
+    /**
+     * The Update struct is the only event that a tactic FSM should respond to and it is
+     * composed of the following structs:
+     *
+     * control_params- uniquely defined parameters for each FSM
+     * common - common struct that contains Robot, World, and SetPrimitiveCallback
+     */
+    struct Update
+    {
+        Update(const TFsm::ControlParams &control_params, const TacticUpdate &common)
+            : control_params(control_params), common(common)
+        {
+        }
+        TFsm::ControlParams control_params;
+        TacticUpdate common;
     };
 
-#define DEFINE_TACTIC_DONE_AND_GET_FSM_STATE                                             \
-    bool done() const override                                                           \
-    {                                                                                    \
-        bool is_done = false;                                                            \
-        if (last_execution_robot.has_value())                                            \
-        {                                                                                \
-            is_done = fsm_map.at(last_execution_robot.value())->is(boost::sml::X);       \
-        }                                                                                \
-        return is_done;                                                                  \
-    }                                                                                    \
-                                                                                         \
-    std::string getFSMState() const override                                             \
-    {                                                                                    \
-        std::string state_str = "";                                                      \
-        if (last_execution_robot.has_value())                                            \
-            state_str =                                                                  \
-                getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));      \
-        return state_str;                                                                \
+    explicit TacticFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : ai_config_ptr(ai_config_ptr)
+    {
     }
+
+   protected:
+    // A shared pointer to the ai configuration to configure ai behaviour, shared by all
+    // Plays, Tactics, and FSMs
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
+};
 
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
     [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }

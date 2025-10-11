@@ -9,9 +9,8 @@
 TEST(ExamplePlayFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    TbotsProto::AiConfig ai_config;
 
-    FSM<ExamplePlayFSM> fsm(ExamplePlayFSM{});
+    FSM<ExamplePlayFSM> fsm(ExamplePlayFSM{std::make_shared<TbotsProto::AiConfig>()});
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ExamplePlayFSM::MoveState>));
 
