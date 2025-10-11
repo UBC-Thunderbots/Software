@@ -233,13 +233,13 @@ void TacticBase<TacticFsm, TacticSubFsms...>::setLastExecutionRobot(std::optiona
 }
 
 template <class TacticFsm, class... TacticSubFsms>
-std::set<RobotCapability> &TacticBase<TacticFsm, TacticSubFsms>::mutableRobotCapabilityRequirements()
+std::set<RobotCapability> &TacticBase<TacticFsm, TacticSubFsms...>::mutableRobotCapabilityRequirements()
 {
     return capability_reqs;
 }
 
 template <class TacticFsm, class... TacticSubFsms>
-const std::set<RobotCapability> TacticBase<TacticFsm, TacticSubFsms>::&robotCapabilityRequirements() const
+const std::set<RobotCapability> &TacticBase<TacticFsm, TacticSubFsms...>::robotCapabilityRequirements() const
 {
     return capability_reqs;
 }
