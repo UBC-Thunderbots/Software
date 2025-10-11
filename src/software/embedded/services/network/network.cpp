@@ -48,7 +48,6 @@ NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_ad
     {
         LOG(FATAL) << "Failed to get IP addresses associated with " << interface;
     }
-
 }
 
 void NetworkService::onFullSystemIpNotification(
