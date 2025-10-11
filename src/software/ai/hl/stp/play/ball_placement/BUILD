@@ -33,10 +33,10 @@ cc_library(
 
 py_test(
     name = "ball_placement_play_test",
+    timeout = "long",
     srcs = [
         "ball_placement_play_test.py",
     ],
-    timeout = "long",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",

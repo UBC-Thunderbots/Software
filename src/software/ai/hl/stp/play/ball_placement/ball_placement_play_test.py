@@ -37,8 +37,12 @@ def ball_placement_play_setup(
             tbots_cpp.Point(1, 2.5),
             tbots_cpp.Point(1, -2.5),
             tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXNegYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXPosYCorner(),
         ]
     else:
         yellow_bots = []
@@ -64,7 +68,9 @@ def ball_placement_play_setup(
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
     if not blue_only:
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -98,35 +104,39 @@ def ball_placement_play_setup(
 def test_two_ai_ball_placement(
     simulated_test_runner, ball_start_point, ball_placement_point
 ):
-    run_ball_placement_scenario(simulated_test_runner, ball_start_point, ball_placement_point)
+    run_ball_placement_scenario(
+        simulated_test_runner, ball_start_point, ball_placement_point
+    )
 
 
 @pytest.mark.parametrize(
     "ball_start_point, ball_placement_point",
     [
-        #2023 RoboCup ball placement scenarios
-        #Scenario 1
-        (tbots_cpp.Point(-0.2, -2.8), tbots_cpp.Point(-0.2,2.8)),
-        #Scenario 2
-        (tbots_cpp.Point(-3.5, -2.25), tbots_cpp.Point(0,0)),
-        #Scenario 3
-        (tbots_cpp.Point(-1.5, -2.25), tbots_cpp.Point(-0.2,-2.8)),
-        #Scenario 4
-        (tbots_cpp.Point(-4.4, -2.9), tbots_cpp.Point(-0.2,2.8)),
-        #Scenario 5
-        (tbots_cpp.Point(-0.5, -0), tbots_cpp.Point(-4.3,2.8)),
-        #Scenario 6
-        (tbots_cpp.Point(-1, -3.15), tbots_cpp.Point(-3.5,-2.8)),
-        #Scenario 7
+        # 2023 RoboCup ball placement scenarios
+        # Scenario 1
+        (tbots_cpp.Point(-0.2, -2.8), tbots_cpp.Point(-0.2, 2.8)),
+        # Scenario 2
+        (tbots_cpp.Point(-3.5, -2.25), tbots_cpp.Point(0, 0)),
+        # Scenario 3
+        (tbots_cpp.Point(-1.5, -2.25), tbots_cpp.Point(-0.2, -2.8)),
+        # Scenario 4
+        (tbots_cpp.Point(-4.4, -2.9), tbots_cpp.Point(-0.2, 2.8)),
+        # Scenario 5
+        (tbots_cpp.Point(-0.5, -0), tbots_cpp.Point(-4.3, 2.8)),
+        # Scenario 6
+        (tbots_cpp.Point(-1, -3.15), tbots_cpp.Point(-3.5, -2.8)),
+        # Scenario 7
         (tbots_cpp.Point(-1, 3.15), tbots_cpp.Point(-3.5, 2.8)),
-        #Scenario 8
-        (tbots_cpp.Point(-4.45,-0.1), tbots_cpp.Point(-0.5, 2.8)),
-        ]
+        # Scenario 8
+        (tbots_cpp.Point(-4.45, -0.1), tbots_cpp.Point(-0.5, 2.8)),
+    ],
 )
 def test_robocup_technical_challenge_placement(
     simulated_test_runner, ball_start_point, ball_placement_point
-    ):
-    run_ball_placement_scenario(simulated_test_runner, ball_start_point, ball_placement_point, blue_only=True)
+):
+    run_ball_placement_scenario(
+        simulated_test_runner, ball_start_point, ball_placement_point, blue_only=True
+    )
 
 
 """
@@ -137,9 +147,11 @@ Runs a ball placement test scenario with the specified parameters.
 :param ball_placement_point: The target position where the ball should be placed (provided by pytest parameterization).
 :param blue_only: If True, only the blue team is active; the yellow team is ignored.
 """
+
+
 def run_ball_placement_scenario(
-            simulated_test_runner, ball_start_point, ball_placement_point, blue_only=False
-    ):
+    simulated_test_runner, ball_start_point, ball_placement_point, blue_only=False
+):
     # Placement Eventually Validation
     placement_eventually_validation_sequence_set = [
         [
@@ -148,7 +160,6 @@ def run_ball_placement_scenario(
                 regions=[tbots_cpp.Circle(ball_placement_point, 0.15)]
             ),
         ]
-
     ]
 
     simulated_test_runner.run_test(
@@ -156,7 +167,7 @@ def run_ball_placement_scenario(
             test_setup_arg["ball_start_point"],
             test_setup_arg["ball_placement_point"],
             simulated_test_runner,
-            blue_only
+            blue_only,
         ),
         params=[
             {
