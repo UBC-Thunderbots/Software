@@ -30,8 +30,6 @@ struct MoveFSM : TacticFSM<MoveFSM>
     };
 
     using Update = TacticFSM<MoveFSM>::Update;
-    // these classes define the states used in the transition table
-    // they are exposed so that tests can check if the FSM is in a particular state
 
     /**
      * Constructor for MoveFSM

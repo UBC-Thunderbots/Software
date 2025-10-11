@@ -8,6 +8,9 @@
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
+/**
+ *
+ */
 struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
 {
    public:
