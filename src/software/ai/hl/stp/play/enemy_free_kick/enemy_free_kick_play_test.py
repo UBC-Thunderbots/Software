@@ -94,6 +94,7 @@ from proto.ssl_gc_common_pb2 import Team
         ),
     ],
 )
+# TODO: #3503
 @pytest.mark.skip(
     "Disabling this test because OrValidation is passed both an always validation and eventually validation"
 )
