@@ -39,3 +39,6 @@ class OrValidation(Validation):
 
     def get_validation_type(self, world):
         return self.validations[0].get_validation_type(world)
+
+    def __repr__(self):
+        return "PLACEHOLDER"
