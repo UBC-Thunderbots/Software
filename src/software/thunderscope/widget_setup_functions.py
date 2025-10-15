@@ -291,10 +291,14 @@ def setup_ball_speed_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
     """
 
     def extract_ball_speed_data(world):
-        v = world.ball.current_state.global_velocity
+        velocity = world.ball.current_state.global_velocity
+        if velocity is None:
+            return {}
         return {
-            "Maximum Ball Speed": 6.5,
-            "Ball Speed": math.sqrt(v.x_component_meters**2 + v.y_component_meters**2),
+            "Maximum Ball Speed": BALL_MAX_SPEED_METERS_PER_SECOND,
+            "Ball Speed": math.sqrt(
+                velocity.x_component_meters**2 + velocity.y_component_meters**2
+            ),
         }
 
     proto_plotter = ProtoPlotter(
