@@ -60,3 +60,8 @@ static constexpr unsigned int SSL_VISION_PORT = 10020;
 
 const std::string SSL_REFEREE_ADDRESS          = "224.5.23.1";
 static constexpr unsigned int SSL_REFEREE_PORT = 10003;
+
+// Robot diagnostics constants
+constexpr double AUTO_CHIP_DISTANCE_DEFAULT_M = 1.5;
+constexpr double AUTO_KICK_SPEED_DEFAULT_M_PER_S = 1.5;
+constexpr double WHEEL_ROTATION_MAX_SPEED_M_PER_S = 15.2;
