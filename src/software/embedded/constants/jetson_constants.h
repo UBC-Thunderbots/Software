@@ -10,5 +10,4 @@ constexpr const char DRIVER_CONTROL_ENABLE_GPIO[]             = "194";
 // Path to the CPU thermal zone temperature file
 constexpr const char CPU_TEMP_FILE_PATH[] = "/sys/class/thermal/thermal_zone1/temp";
 
-
 constexpr Platform PLATFORM = Platform::JETSON_NANO;

@@ -11,5 +11,4 @@ constexpr int DRIVER_CONTROL_ENABLE_GPIO             = 0;
 // Path to the CPU thermal zone temperature file
 constexpr const char CPU_TEMP_FILE_PATH[] = "/sys/class/thermal/thermal_zone0/temp";
 
-
 constexpr Platform PLATFORM = Platform::LIMITED_BUILD;
