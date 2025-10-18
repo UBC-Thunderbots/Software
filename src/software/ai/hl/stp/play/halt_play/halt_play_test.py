@@ -1,7 +1,3 @@
-import sys
-
-import pytest
-
 import software.python_bindings as tbots_cpp
 from software.simulated_tests.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
