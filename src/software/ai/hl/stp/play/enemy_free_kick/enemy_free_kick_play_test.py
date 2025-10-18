@@ -18,6 +18,9 @@ from software.simulated_tests.robot_enters_region import (
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+from software.simulated_tests.simulated_test_fixture import (
+    pytest_main,
+)
 
 
 @pytest.mark.parametrize(
@@ -160,5 +163,4 @@ def test_enemy_free_kick_play(
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)

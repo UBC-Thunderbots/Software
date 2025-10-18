@@ -10,6 +10,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 
+
 @pytest.mark.parametrize(
     "ball_start_point, ball_placement_point",
     [
