@@ -46,15 +46,17 @@ class BallIsOffGround(Validation):
 
         perpendicular = direction.perpendicular()
 
-        rectangle_width = 0.04
-        rectangle_length = 0.2
+        line_width = 0.08
+        line_length = 0.2
         triangle_height = 0.15
         triangle_width = 0.2
 
-        end_point = start_point + direction * rectangle_length
+        end_point = start_point + direction * line_length
 
-        rectangle_bottom_left = start_point - perpendicular * (rectangle_width / 2)
-        rectangle_top_right = end_point + perpendicular * (rectangle_width / 2)
+        line_bottom_left = start_point - perpendicular * (line_width / 2)
+        line_bottom_right = start_point + perpendicular * (line_width / 2)
+        line_top_right = end_point + perpendicular * (line_width / 2)
+        line_top_left = end_point - perpendicular * (line_width / 2)
 
         triangle_top = end_point + direction * triangle_height
         triangle_bottom_left = end_point + perpendicular * (triangle_width / 2)
@@ -62,9 +64,11 @@ class BallIsOffGround(Validation):
 
         return create_validation_geometry(
             [
-                tbots_cpp.Rectangle(rectangle_bottom_left, rectangle_top_right),
-                tbots_cpp.Triangle(
-                    triangle_top, triangle_bottom_left, triangle_bottom_right
+                tbots_cpp.Polygon(
+                    [line_bottom_left, line_bottom_right, line_top_right, line_top_left]
+                ),
+                tbots_cpp.Polygon(
+                    [triangle_top, triangle_bottom_left, triangle_bottom_right]
                 ),
             ]
         )
