@@ -11,8 +11,10 @@ from typing import Optional
 import numpy as np
 
 
-ROBOT_SHADER = shaders.ShaderProgram("robot-shader", [
-    shaders.VertexShader("""
+ROBOT_SHADER = shaders.ShaderProgram(
+    "robot-shader",
+    [
+        shaders.VertexShader("""
         varying vec3 normal;
         void main() {
             // find vertex normals and positions
@@ -22,7 +24,7 @@ ROBOT_SHADER = shaders.ShaderProgram("robot-shader", [
             gl_Position = ftransform();
         }
     """),
-    shaders.FragmentShader("""
+        shaders.FragmentShader("""
         varying vec3 normal;
         void main() {
             // create an alternate robot color (blue becomes teal, yellow becomes orange)
@@ -37,7 +39,8 @@ ROBOT_SHADER = shaders.ShaderProgram("robot-shader", [
             gl_FragColor = vec4(mix(color, color_bright, fac), 1.0);
         }
     """),
-])
+    ],
+)
 
 
 class GLRobot(GLMeshItem):
