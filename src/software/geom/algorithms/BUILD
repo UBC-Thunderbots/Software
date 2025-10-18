@@ -50,7 +50,6 @@ cc_library(
         "//software/geom:rectangle",
         "//software/geom:segment",
         "//software/geom:stadium",
-        "//software/geom:triangle",
         "//software/geom:vector",
         "//software/logger",
     ],

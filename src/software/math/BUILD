@@ -7,7 +7,6 @@ cc_library(
     deps = [
         "//software/geom:circle",
         "//software/geom:rectangle",
-        "//software/geom:triangle",
     ],
 )
 
