@@ -33,8 +33,6 @@ class BallIsOffGround(Validation):
         :return: ValidationGeometry containing geometry to visualize
 
         """
-        # TODO #3244: Make this a nicer visualization
-
         direction = tbots_cpp.createVector(
             world.ball.current_state.global_velocity
         ).normalize()
