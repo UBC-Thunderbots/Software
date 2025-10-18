@@ -133,7 +133,7 @@ install_python_dev_cross_compile_headers() {
     rm -rf /tmp/tbots_download_cache/python-3.12.0.tar.xz
 }
 
-install_python_toolchain_headers_macos() {
+install_python_toolchain_headers() {
   sudo mkdir -p /opt/tbotspython/py_headers/include/
   sudo ln -sfn "$(python3.12-config --includes | awk '{for(i=1;i<=NF;++i) if ($i ~ /^-I/) print substr($i, 3)}' | head -n1)" /opt/tbotspython/py_headers/include/
 }
