@@ -15,30 +15,30 @@ ROBOT_SHADER = shaders.ShaderProgram(
     "robot-shader",
     [
         shaders.VertexShader("""
-        varying vec3 normal;
-        void main() {
-            // find vertex normals and positions
-            normal = normalize(gl_Normal);
-            gl_FrontColor = gl_Color;
-            gl_BackColor = gl_Color;
-            gl_Position = ftransform();
-        }
-    """),
+            varying vec3 normal;
+            void main() {
+                // find vertex normals and positions
+                normal = normalize(gl_Normal);
+                gl_FrontColor = gl_Color;
+                gl_BackColor = gl_Color;
+                gl_Position = ftransform();
+            }
+        """),
         shaders.FragmentShader("""
-        varying vec3 normal;
-        void main() {
-            // create an alternate robot color (blue becomes teal, yellow becomes orange)
-            vec3 color = gl_Color.rgb;
-            vec3 color_bright = vec3(color.r, 0.65, color.b);
+            varying vec3 normal;
+            void main() {
+                // create an alternate robot color (blue becomes teal, yellow becomes orange)
+                vec3 color = gl_Color.rgb;
+                vec3 color_bright = vec3(color.r, 0.65, color.b);
 
-            // this is the vector pointing forward from the robot
-            vec3 front = vec3(-1.0, 1.0, 0.0);
+                // this is the vector pointing forward from the robot
+                vec3 front = vec3(-1.0, 1.0, 0.0);
 
-            // mix colors depending on proximity of the face to the front of the robot
-            float fac = pow(max(dot(normal, front), 0.0), 0.5);
-            gl_FragColor = vec4(mix(color, color_bright, fac), 1.0);
-        }
-    """),
+                // mix colors depending on proximity of the face to the front of the robot
+                float fac = pow(max(dot(normal, front), 0.0), 0.5);
+                gl_FragColor = vec4(mix(color, color_bright, fac), 1.0);
+            }
+        """),
     ],
 )
 
