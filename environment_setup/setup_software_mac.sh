@@ -88,7 +88,7 @@ install_cross_compiler_mac
 print_status_msg "Done setting up cross compiler for robot software"
 
 print_status_msg "Setting Up Python Development Headers"
-install_python_toolchain_headers_macos
+install_python_toolchain_headers
 print_status_msg "Done Setting Up Python Development Headers"
 
 print_status_msg "Granting Permissions to /opt/tbotspython"
