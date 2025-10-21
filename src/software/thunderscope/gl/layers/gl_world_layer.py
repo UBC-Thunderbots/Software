@@ -469,7 +469,7 @@ class GLWorldLayer(GLLayer):
         :param robot_names: A dict mapping ids to names of robots
         """
         # Ensure we have the same number of graphics as robots
-        robot_graphics.resize(len(robots), lambda: GLRobot())
+        robot_graphics.resize(len(robots), lambda: GLRobot(color=color))
         robot_id_graphics.resize(
             len(robots),
             lambda: GLTextItem(
