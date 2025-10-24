@@ -216,6 +216,13 @@ http_archive(
     url = "https://github.com/saebyn/munkres-cpp/archive/61086fcf5b3a8ad4bda578cdc2d1dca57b548786.tar.gz",
 )
 
+http_archive(
+    name = "cppcrc",
+    build_file = "@//extlibs:cppcrc.BUILD",
+    strip_prefix = "cppcrc-6360eee1c8966d32b2552ce156b135ec6a3235f1",
+    url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
+)
+
 ##############################################
 # Add new git repos (these cannot be used offline)
 # All of this SHOULD BE REMOVED in favour of archive_override
