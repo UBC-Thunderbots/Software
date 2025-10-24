@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/logger/logger.h"
 
 
@@ -11,27 +11,20 @@
  * This tactic is for a robot performing a penalty kick.
  */
 
-class PenaltyKickTactic : public Tactic
+class PenaltyKickTactic
+    : public TacticBase<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>
 {
    public:
     /**
      * Creates a new PenaltyKickTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PenaltyKickTactic(TbotsProto::AiConfig ai_config);
+    explicit PenaltyKickTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     PenaltyKickTactic() = delete;
 
     void updateControlParams();
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
     void accept(TacticVisitor &visitor) const override;
-
-   private:
-    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<PenaltyKickFSM>>> fsm_map;
-    TbotsProto::AiConfig ai_config;
 };

@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
@@ -15,25 +15,26 @@
 
 using Zones = std::unordered_set<EighteenZoneId>;
 
-struct ShootOrPassPlayFSM
+struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayFSM>
 {
-    class AttemptShotState;
-    class TakePassState;
-    class StartState;
-
+    /**
+     * Control Parameters for Shoot Or Pass Play
+     */
     struct ControlParams
     {
     };
 
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
+    class AttemptShotState;
+    class TakePassState;
+    class StartState;
 
     /**
      * Creates a shoot or pass play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config);
+    explicit ShootOrPassPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the offensive positioning tactics
@@ -141,7 +142,6 @@ struct ShootOrPassPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
