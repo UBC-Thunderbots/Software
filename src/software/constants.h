@@ -60,4 +60,3 @@ static constexpr unsigned int SSL_VISION_PORT = 10020;
 
 const std::string SSL_REFEREE_ADDRESS          = "224.5.23.1";
 static constexpr unsigned int SSL_REFEREE_PORT = 10003;
-
