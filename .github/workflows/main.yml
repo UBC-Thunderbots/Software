@@ -14,7 +14,7 @@ jobs:
   multiplatform-build:
     strategy:
       matrix:
-        platform: [ ubuntu-24.04 ]
+        platform: [ ubuntu-22.04, ubuntu-24.04-arm ]
 
     name: Ubuntu Alternate Builds
     runs-on: ${{ matrix.platform }}
@@ -29,30 +29,37 @@ jobs:
       - name: Software Build Test
         run: |
           cd src
-          bazel build --show_timestamps --copt=-O3  \
+          bazel build --show_timestamps --copt=-O3 --verbose_failures \
             -- //... -//software:unix_full_system   \
             -//software/simulated_tests/...         \
             -//software/ai/hl/...                   \
             -//software/field_tests/...             \
             -//software/embedded/...                \
-            -//cc_toolchain/...
+            -//toolchains/cc/...
 
       - name: Jetson Nano Build Test
         run: |
           cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//cc_toolchain:robot
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//toolchains/cc:robot
 
       - name: Raspberry Pi Build Test
         run: |
           cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//cc_toolchain:robot
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
 
 
   software-tests:
     name: Software Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
+      # remove the unused packages in the CI runner to free up disk space
+      # https://github.com/actions/runner-images/issues/2840
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+
       - uses: actions/checkout@v4
 
       - name: Environment Setup
@@ -62,17 +69,17 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel test --copt=-O3 --show_timestamps       \
+          bazel test --copt=-O3 --show_timestamps --verbose_failures \
             -- //... -//software:unix_full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
             -//software/ai/navigator/...     \
-            -//cc_toolchain/...
+            -//toolchains/cc/...
 
   robot-tests:
     name: Robot Software Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
@@ -97,22 +104,22 @@ jobs:
       - name: Jetson Nano Build
         run: |
          cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//cc_toolchain:robot
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//toolchains/cc:robot
 
 
       - name: Raspberry Pi Build
         run: |
          cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//cc_toolchain:robot
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
 
 
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-        
+
       - name: Environment Setup
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
@@ -146,7 +153,7 @@ jobs:
 
   autorefd-game:
     name: AutoRef'd Game (3 Minutes)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4

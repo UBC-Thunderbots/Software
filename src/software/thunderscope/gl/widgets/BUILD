@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 py_library(
     name = "gl_toolbar",
@@ -24,8 +24,8 @@ py_library(
     deps = [
         ":gl_toolbar",
         "//software/thunderscope/common:common_widgets",
-        "//software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode:icon_loader",
         requirement("pyqtgraph"),
+        requirement("qtawesome"),
     ],
 )
 
@@ -38,7 +38,7 @@ py_library(
         "//software/networking:ssl_proto_communication",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/common:common_widgets",
-        "//software/thunderscope/gl/widgets/toolbar_icons/gamecontroller:icon_loader",
         requirement("pyqtgraph"),
+        requirement("qtawesome"),
     ],
 )

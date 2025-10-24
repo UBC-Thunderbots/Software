@@ -40,7 +40,7 @@ class GLRobotOutline(GLShape):
 
     @staticmethod
     def get_robot_outline(
-        z_coordinate: float = 0, num_points: int = 10
+        z_coordinate: float = 0, num_points: int = 20
     ) -> list[tuple[float, float, float]]:
         """Returns a list of points that represent the outline of a robot.
         The points will be on a plane parallel to the x-y plane.
