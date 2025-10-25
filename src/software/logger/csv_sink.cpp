@@ -1,10 +1,6 @@
 #include "software/logger/csv_sink.h"
 
-#if __cplusplus > 201703L
-#include <filesystem>
-#else
-#include <experimental/filesystem>
-#endif
+#include "compat_flags.h"
 
 CSVSink::CSVSink(const std::string& log_directory) : log_directory(log_directory) {}
 

@@ -11,7 +11,7 @@ std::list<g3::LogMessage> LogMerger::log(g3::LogMessage &log)
     {
         std::string msg = log.message();
 
-        std::chrono::_V2::system_clock::time_point current_time =
+        Clock::time_point current_time =
             std::chrono::system_clock::now();
         // add passed time from testing
         current_time += passed_time;
@@ -38,8 +38,7 @@ std::list<g3::LogMessage> LogMerger::log(g3::LogMessage &log)
     }
 }
 
-std::list<g3::LogMessage> LogMerger::_getOldMessages(
-    std::chrono::_V2::system_clock::time_point current_time)
+std::list<g3::LogMessage> LogMerger::_getOldMessages(Clock::time_point current_time)
 {
     std::list<g3::LogMessage> result;
     while (message_list.size() > 0)
