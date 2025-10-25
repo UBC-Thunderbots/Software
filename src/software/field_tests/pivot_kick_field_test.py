@@ -7,6 +7,9 @@ from software.field_tests.field_test_fixture import *
 
 from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import create_logger
+from software.simulated_tests.simulated_test_fixture import (
+    pytest_main,
+)
 
 logger = create_logger(__name__)
 
@@ -45,5 +48,4 @@ def test_pivot_kick(field_test_runner):
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)
