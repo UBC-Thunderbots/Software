@@ -10,7 +10,6 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/services/network/proto_tracker.h"
-#include "software/networking/radio/threaded_proto_radio_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/time/duration.h"
@@ -137,8 +136,6 @@ class NetworkService
         robot_to_fullsystem_ip_sender;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::Primitive>>
         udp_listener_primitive;
-    std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::Primitive>>
-        radio_listener_primitive_set;
     std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> robot_log_sender;
 
     // The network interface to listen and send messages on
