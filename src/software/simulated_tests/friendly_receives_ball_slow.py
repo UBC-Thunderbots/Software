@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class FriendlyReceivesBallSlow(Validation):
@@ -21,6 +22,7 @@ class FriendlyReceivesBallSlow(Validation):
         self.robot_id = robot_id
         self.max_receive_speed = max_receive_speed
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the specified robot receives the ball too fast
 
@@ -39,6 +41,7 @@ class FriendlyReceivesBallSlow(Validation):
                         return ValidationStatus.FAILING
         return ValidationStatus.PASSING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) highlights the dribbler area of the robots"""
         return create_validation_geometry(
@@ -48,6 +51,7 @@ class FriendlyReceivesBallSlow(Validation):
             ]
         )
 
+    @override
     def __repr__(self):
         return f"Check that robot {self.robot_id} is receiving the ball slowly"
 

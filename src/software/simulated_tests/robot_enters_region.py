@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class MinNumberOfRobotsEntersRegion(Validation):
@@ -22,6 +23,7 @@ class MinNumberOfRobotsEntersRegion(Validation):
         # map to keep track of robot positions
         self.robot_in_zone = {}
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if a specific number of robots enter the provided set of regions
 
@@ -44,10 +46,12 @@ class MinNumberOfRobotsEntersRegion(Validation):
 
         return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) shows region to enter"""
         return create_validation_geometry(self.regions)
 
+    @override
     def __repr__(self):
         return (
             "Check for "

@@ -4,6 +4,7 @@ import socketserver
 from threading import Thread
 from software.logger.logger import create_logger
 from software import py_constants
+from typing import override
 
 logger = create_logger(__name__)
 
@@ -70,6 +71,7 @@ class Session(socketserver.BaseRequestHandler):
         self.proto_class = proto_class
         super().__init__(*args, **keys)
 
+    @override
     def handle(self):
         """Handle proto"""
         if self.proto_class:

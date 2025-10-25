@@ -7,6 +7,7 @@ from software.thunderscope.constants import Colors, DepthValues
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
+from typing import override
 
 
 class GLSimulatorLayer(GLLayer):
@@ -35,6 +36,7 @@ class GLSimulatorLayer(GLLayer):
         # Enables transparency
         self.ball_graphic.setGLOptions("translucent")
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         sim_world_state = self.simulator_state_buffer.get(block=False)

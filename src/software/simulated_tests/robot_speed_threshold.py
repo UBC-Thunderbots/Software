@@ -2,6 +2,7 @@ import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.simulated_tests.speed_threshold_helpers import *
+from typing import override
 
 
 from software.simulated_tests.validation import (
@@ -21,6 +22,7 @@ class RobotSpeedThreshold(Validation):
         """
         self.speed_threshold = speed_threshold
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the friendly robots' speed is at or above some threshold
 
@@ -36,6 +38,7 @@ class RobotSpeedThreshold(Validation):
                 return ValidationStatus.FAILING
         return ValidationStatus.PASSING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) shows regions to enter"""
         segments = []
@@ -67,6 +70,7 @@ class RobotSpeedThreshold(Validation):
             [tbots_cpp.Segment(points[0], points[1]) for points in segments]
         )
 
+    @override
     def __repr__(self):
         return "Check that the friendly robots' speed is at or above above " + str(
             self.speed_threshold

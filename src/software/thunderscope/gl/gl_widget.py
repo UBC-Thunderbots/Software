@@ -27,6 +27,7 @@ from proto.replay_bookmark_pb2 import ReplayBookmark
 from proto.tbots_timestamp_msg_pb2 import Timestamp
 
 from software.thunderscope.common.toast_msg_helper import success_toast
+from typing import override
 
 
 class GLWidget(QWidget):
@@ -135,6 +136,7 @@ class GLWidget(QWidget):
         """Returns the simulation control toolbar"""
         return self.simulation_control_toolbar
 
+    @override
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
 
@@ -156,6 +158,7 @@ class GLWidget(QWidget):
         for layer in self.layers:
             layer.keyPressEvent(event)
 
+    @override
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
 

@@ -9,6 +9,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtGui
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from typing import override
 
 
 class ProtoPlotter(QWidget):
@@ -92,6 +93,7 @@ class ProtoPlotter(QWidget):
         self.update_interval = 1.0 / plot_rate_hz
         self.buffer_size = buffer_size
 
+    @override
     def isVisible(self) -> bool:
         return self.win.isVisible()
 

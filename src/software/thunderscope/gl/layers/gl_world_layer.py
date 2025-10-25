@@ -33,6 +33,7 @@ from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLWorldLayer(GLLayer):
@@ -145,6 +146,7 @@ class GLWorldLayer(GLLayer):
         self.auto_chip_graphics = ObservableList(self._graphics_changed)
         self.speed_line_graphics = ObservableList(self._graphics_changed)
 
+    @override
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
 
@@ -218,6 +220,7 @@ class GLWorldLayer(GLLayer):
         )
         self.simulator_io.send_proto(SimulationState, simulator_state)
 
+    @override
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
 
@@ -225,6 +228,7 @@ class GLWorldLayer(GLLayer):
         """
         self.key_pressed[event.key()] = False
 
+    @override
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was pressed and picked a point in the 3D scene
 
@@ -249,6 +253,7 @@ class GLWorldLayer(GLLayer):
         )
         self.simulator_io.send_proto(WorldState, world_state)
 
+    @override
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was dragged within the 3D scene
 
@@ -274,6 +279,7 @@ class GLWorldLayer(GLLayer):
             self.ball_velocity_vector.normalize()
             self.ball_velocity_vector *= BALL_MAX_SPEED_METERS_PER_SECOND
 
+    @override
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was released after picking a point in the 3D scene
 
@@ -308,6 +314,7 @@ class GLWorldLayer(GLLayer):
         self.ball_velocity_vector = None
         self.simulator_io.send_proto(WorldState, world_state)
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         self.cached_world = self.world_buffer.get(block=False, return_cached=True)

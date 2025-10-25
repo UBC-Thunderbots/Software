@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class BallMovesFromRest(Validation):
@@ -20,6 +21,7 @@ class BallMovesFromRest(Validation):
         self.initial_ball_position = position
         self.threshold = threshold
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if ball has moved threshold meters from initial position. Default is 0.05m.
 
@@ -39,12 +41,14 @@ class BallMovesFromRest(Validation):
 
         return validation_status
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the last ball position line"""
         return create_validation_geometry(
             [tbots_cpp.Circle(self.initial_ball_position, self.threshold)]
         )
 
+    @override
     def __repr__(self):
         return "Check that the ball moves from rest"
 

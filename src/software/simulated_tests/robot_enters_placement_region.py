@@ -7,6 +7,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class RobotEntersPlacementRegion(Validation):
@@ -24,6 +25,7 @@ class RobotEntersPlacementRegion(Validation):
             # https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement_interference
         )
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if robots enter the ball placement region
 
@@ -55,6 +57,7 @@ class RobotEntersPlacementRegion(Validation):
 
         return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) shows regions to enter"""
         segment = tbots_cpp.Segment(
@@ -64,6 +67,7 @@ class RobotEntersPlacementRegion(Validation):
         stadium = tbots_cpp.Stadium(segment, ENEMY_BALL_PLACEMENT_DISTANCE_METERS)
         return create_validation_geometry([stadium])
 
+    @override
     def __repr__(self):
         return "Check for robot in ball placement stadium region"
 
