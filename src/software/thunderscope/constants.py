@@ -331,6 +331,7 @@ class DiagnosticsConstants:
     SUPPORTED_CONTROLLERS = {
         "Microsoft Xbox One X pad",
         "Microsoft X-Box One S pad",
+        "Microsoft X-Box 360 pad",
         "Microsoft Xbox 360 pad",
     }
 

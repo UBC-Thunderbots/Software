@@ -9,17 +9,23 @@ cc_library(
             "//software/embedded:build_nano": ["NANO"],
             "//software/embedded:build_pi": ["PI"],
             "//software/embedded:build_limited": ["LIMITED"],
+        }) +
+        select({
+            "//software/embedded:build_trinamic": ["TRINAMIC_MOTOR_BOARD"],
+            "//software/embedded:build_stspin": ["STSPIN_MOTOR_BOARD"],
         }),
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
-        "//software/embedded:gpio",
         "//software/embedded/constants",
+        "//software/embedded/gpio",
+        "//software/embedded/motor_controller",
+        "//software/embedded/motor_controller:motor_board",
+        "//software/embedded/motor_controller:motor_fault_indicator",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
         "//software/util/scoped_timespec_timer",
         "@eigen",
-        "@trinamic",
     ],
 )
 

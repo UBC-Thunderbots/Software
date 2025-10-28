@@ -8,7 +8,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "software/embedded/gpio.h"
+#include "software/embedded/gpio/gpio.h"
 
 /**
  * GPIO with the sysfs interface

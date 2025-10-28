@@ -8,11 +8,9 @@ RobotConstants_t create2021RobotConstants(void)
         .mass_kg         = 2.5f,   // determined experimentally
         .inertial_factor = 0.37f,  // determined experimentally
         .robot_radius_m  = static_cast<float>(ROBOT_MAX_RADIUS_METERS),
-        // TODO (#2112): update this
         .jerk_limit_kg_m_per_s_3 = 40.0f,
-        .front_wheel_angle_deg   = 32.06f,
-        .back_wheel_angle_deg    = 46.04f,
-        // TODO (#2112): update this
+        .front_wheel_angle_deg   = 25.0f,
+        .back_wheel_angle_deg    = 40.0f,
 
         .front_of_robot_width_meters = 0.11f,
         .dribbler_width_meters       = 0.07825f,
