@@ -7,6 +7,7 @@ compile_pip_requirements(
     name = "requirements",
     src = "requirements.in",
     requirements_txt = "requirements_lock.txt",
+    requirements_darwin = "requirements_lock.darwin.txt",
 )
 
 py_binary(
