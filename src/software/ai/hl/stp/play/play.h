@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
@@ -35,10 +35,11 @@ class Play
     /**
      * Creates a new Play
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
+    explicit Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
+                  bool requires_goalie);
 
     /**
      * Gets Primitives from the Play given the the world, and inter-play communication
@@ -72,8 +73,9 @@ class Play
     virtual std::vector<std::string> getState();
 
    protected:
-    // The Play configuration
-    TbotsProto::AiConfig ai_config;
+    // A shared pointer to the ai configuration to configure ai behaviour, shared by all
+    // Plays, Tactics, and FSMs
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
