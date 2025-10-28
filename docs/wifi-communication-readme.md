@@ -22,7 +22,7 @@ You must know:
 - The WiFi interface of the robot. We will refer to this interface as `{robot_wifi_interface}`. This interface is typically found by running `ifconfig` or `ip a` on the robot.
 - The network interface of the host computer. We will refer to this interface as `{host_interface}`. This interface is typically found by running `ifconfig` or `ip a` on the host computer.
 
-1. Build the latency tester secondary node: `./tbots.py build latency_tester_secondary_node --platforms=//cc_toolchain:robot`
+1. Build the latency tester secondary node: `./tbots.py build latency_tester_secondary_node --platforms=//toolchains/cc:robot`
 2. Copy the binary to the robot: `scp bazel-bin/software/networking/benchmarking_utils/latency_tester_secondary_node robot@{robot_ip}:/home/robot/latency_tester_secondary_node`
 3. SSH into the robot: `ssh robot@{robot_ip}`
 4. There are two test modes: multicast or unicast
