@@ -218,16 +218,16 @@ http_archive(
 
 http_archive(
     name = "LTC4151",
-    url = "https://github.com/kerrydwong/LTC4151/archive/729952f10bcdcf359877b6f728565c17a8f17423.tar.gz",
-    sha256 = "6aa2dd380a13b08366338cdf0fbbeeeed96887512ac7b0753ee6ea1e8856df31",
     build_file = "@//extlibs:LTC4151.BUILD",
+    sha256 = "6aa2dd380a13b08366338cdf0fbbeeeed96887512ac7b0753ee6ea1e8856df31",
+    url = "https://github.com/kerrydwong/LTC4151/archive/729952f10bcdcf359877b6f728565c17a8f17423.tar.gz",
 )
 
 http_archive(
     name = "trinamic",
-    url = "https://github.com/analogdevicesinc/TMC-API/archive/0cd695fab6d43ceb121af4b8608e5d92b14e1ce9.tar.gz",
-    sha256 = "4c1640a87347afdc4d5954752f0e773f6d9fbb0ea0fb1481dbdb3012ec00ef8b",
     build_file = "@//extlibs:trinamic.BUILD",
+    sha256 = "4c1640a87347afdc4d5954752f0e773f6d9fbb0ea0fb1481dbdb3012ec00ef8b",
+    url = "https://github.com/analogdevicesinc/TMC-API/archive/0cd695fab6d43ceb121af4b8608e5d92b14e1ce9.tar.gz",
 )
 
 ##############################################
