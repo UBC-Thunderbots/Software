@@ -16,15 +16,13 @@ from proto.ssl_gc_common_pb2 import Team
 def ball_placement_play_setup(
     ball_start_point, ball_placement_point, simulated_test_runner, blue_only
 ):
+    """Set up ball placement test by initializing bot positions, ball placement targets, and test settings
+
+    :param ball_start_point: Initial point of the ball
+    :param ball_placement_point: Target point of the ball
+    :param simulated_test_runner: Simulated test runner
+    :param blue_only: If True, only the blue team is active; the yellow team is ignored.
     """
-Set up ball placement test by initializing bot positions, ball placement targets, and test settings
-
-:param ball_start_point: Initial point of the ball
-:param ball_placement_point: Target point of the ball
-:param simulated_test_runner: Simulated test runner
-:param blue_only: If True, only the blue team is active; the yellow team is ignored.
-"""
-
     # Setup blue robots
     blue_bots = [
         tbots_cpp.Point(-2.75, 1.5),
@@ -145,22 +143,16 @@ def test_robocup_technical_challenge_placement(
     )
 
 
-
-
 def run_ball_placement_scenario(
     simulated_test_runner, ball_start_point, ball_placement_point, blue_only=False
 ):
+    """Runs a ball placement test scenario with the specified parameters.
 
+    :param simulated_test_runner: The test runner used to simulate robot and ball behavior.
+    :param ball_start_point: The initial position of the ball (provided by pytest parameterization).
+    :param ball_placement_point: The target position where the ball should be placed (provided by pytest parameterization).
+    :param blue_only: If True, only the blue team is active; the yellow team is ignored.
     """
-Runs a ball placement test scenario with the specified parameters.
-
-:param simulated_test_runner: The test runner used to simulate robot and ball behavior.
-:param ball_start_point: The initial position of the ball (provided by pytest parameterization).
-:param ball_placement_point: The target position where the ball should be placed (provided by pytest parameterization).
-:param blue_only: If True, only the blue team is active; the yellow team is ignored.
-"""
-
-
     # Placement Eventually Validation
     placement_eventually_validation_sequence_set = [
         [
