@@ -16,6 +16,15 @@ from proto.ssl_gc_common_pb2 import Team
 def ball_placement_play_setup(
     ball_start_point, ball_placement_point, simulated_test_runner, blue_only
 ):
+    """
+Set up ball placement test by initializing bot positions, ball placement targets, and test settings
+
+:param ball_start_point: Initial point of the ball
+:param ball_placement_point: Target point of the ball
+:param simulated_test_runner: Simulated test runner
+:param blue_only: If True, only the blue team is active; the yellow team is ignored.
+"""
+
     # Setup blue robots
     blue_bots = [
         tbots_cpp.Point(-2.75, 1.5),
@@ -62,7 +71,6 @@ def ball_placement_play_setup(
     blue_play = Play()
     blue_play.name = PlayName.BallPlacementPlay
 
-    # TODO (#3019): Re-enable enemy ai after enemy ball placement is fixed
     yellow_play = Play()
     yellow_play.name = PlayName.HaltPlay
 
@@ -84,8 +92,6 @@ def ball_placement_play_setup(
     )
 
 
-# TODO (#2599): Remove Duration parameter from test
-# TODO (#2690): Robot gets stuck in corner of defense area
 @pytest.mark.parametrize(
     "ball_start_point, ball_placement_point",
     [
@@ -139,7 +145,13 @@ def test_robocup_technical_challenge_placement(
     )
 
 
-"""
+
+
+def run_ball_placement_scenario(
+    simulated_test_runner, ball_start_point, ball_placement_point, blue_only=False
+):
+
+    """
 Runs a ball placement test scenario with the specified parameters.
 
 :param simulated_test_runner: The test runner used to simulate robot and ball behavior.
@@ -149,9 +161,6 @@ Runs a ball placement test scenario with the specified parameters.
 """
 
 
-def run_ball_placement_scenario(
-    simulated_test_runner, ball_start_point, ball_placement_point, blue_only=False
-):
     # Placement Eventually Validation
     placement_eventually_validation_sequence_set = [
         [
