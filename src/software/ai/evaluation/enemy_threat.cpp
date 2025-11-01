@@ -7,6 +7,7 @@
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/geom/algorithms/intersects.h"
+#include "software/logger/logger.h"
 #include "software/world/team.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPairs(
@@ -218,6 +219,8 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats)
     // Sort threats from highest threat to lowest threat
     // Use reverse iterators to sort the vector in descending order
     std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
+
+    LOG(INFO)<<threats[0].robot.id();
 }
 
 std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &friendly_team,
@@ -230,7 +233,6 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
     }
 
     std::vector<EnemyThreat> threats;
-
     for (const auto &robot : enemy_team.getAllRobots())
     {
         bool has_ball = robot.isNearDribbler(ball.position());

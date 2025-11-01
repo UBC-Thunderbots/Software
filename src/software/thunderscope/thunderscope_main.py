@@ -215,7 +215,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--empty",
-        action="store_true",
+        action="store_true", 
         default=False,
         help="Whether to populate with default robot positions (False) or start with an empty field (True) for AI vs AI",
     )
