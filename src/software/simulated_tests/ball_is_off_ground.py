@@ -33,19 +33,36 @@ class BallIsOffGround(Validation):
         :return: ValidationGeometry containing geometry to visualize
 
         """
-        direction = tbots_cpp.createVector(
-            world.ball.current_state.global_velocity
-        ).normalize()
-        start_point = tbots_cpp.createPoint(world.ball.current_state.global_position)
+        velocity = tbots_cpp.createVector(world.ball.current_state.global_velocity)
+        ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
 
-        if direction.x() == 0.0 and direction.y() == 0.0:
-            # NOTE if ball is not moving, displays arrow pointing to the right
-            direction = tbots_cpp.Vector(1.0, 0.0)
+        if velocity.length() < 0.01:
+            return self.create_octagon_geometry(ball_position)
 
-        return self.create_arrow_geometry(start_point, direction)
+        direction = velocity.normalize()
+
+        return self.create_arrow_geometry(ball_position, direction)
 
     def __repr__(self):
         return "Check if the ball is chipped"
+
+    def create_octagon_geometry(self, centre_point):
+        radius = 0.2
+        start = tbots_cpp.Vector(radius, 0.0)
+        # offset 45/2 degrees so octagon is parallel to the x/y axis
+        start = start.rotate(tbots_cpp.Angle().fromDegrees(45.0 / 2.0))
+
+        return create_validation_geometry(
+            [
+                tbots_cpp.Polygon(
+                    [
+                        centre_point
+                        + start.rotate(tbots_cpp.Angle().fromDegrees(45.0 * i))
+                        for i in range(7)
+                    ]
+                )
+            ]
+        )
 
     def create_arrow_geometry(self, start_point, direction):
         line_length = 0.2
