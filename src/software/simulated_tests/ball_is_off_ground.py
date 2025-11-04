@@ -42,14 +42,19 @@ class BallIsOffGround(Validation):
             # NOTE if ball is not moving, displays arrow pointing to the right
             direction = tbots_cpp.Vector(1.0, 0.0)
 
-        perpendicular = direction.perpendicular()
+        return self.create_arrow_geometry(start_point, direction)
 
-        line_width = 0.08
+    def __repr__(self):
+        return "Check if the ball is chipped"
+
+    def create_arrow_geometry(self, start_point, direction):
         line_length = 0.2
+        line_width = 0.08
         triangle_height = 0.15
         triangle_width = 0.2
 
         end_point = start_point + direction * line_length
+        perpendicular = direction.perpendicular()
 
         line_bottom_left = start_point - perpendicular * (line_width / 2)
         line_bottom_right = start_point + perpendicular * (line_width / 2)
@@ -63,16 +68,18 @@ class BallIsOffGround(Validation):
         return create_validation_geometry(
             [
                 tbots_cpp.Polygon(
-                    [line_bottom_left, line_bottom_right, line_top_right, line_top_left]
-                ),
-                tbots_cpp.Polygon(
-                    [triangle_top, triangle_bottom_left, triangle_bottom_right]
+                    [
+                        line_bottom_left,
+                        line_top_left,
+                        triangle_bottom_left,
+                        triangle_top,
+                        triangle_bottom_right,
+                        line_top_right,
+                        line_bottom_right,
+                    ]
                 ),
             ]
         )
-
-    def __repr__(self):
-        return "Check if the ball is chipped"
 
 
 (
