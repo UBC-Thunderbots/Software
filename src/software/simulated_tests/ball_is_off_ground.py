@@ -11,6 +11,12 @@ from software.simulated_tests.validation import (
 class BallIsOffGround(Validation):
     """Checks if a ball is of ground (i.e. it has air time)"""
 
+    LINE_LENGTH = 0.2
+    LINE_WIDTH = 0.08
+    TRIANGLE_HEIGHT = 0.15
+    TRIANGLE_WIDTH = 0.2
+    OCTAGON_RADIUS = 0.2
+
     def __init__(self, threshold=0.01):
         self.threshold = threshold
 
@@ -53,8 +59,7 @@ class BallIsOffGround(Validation):
         :return: An octagon ValidationGeometry
 
         """
-        radius = 0.2
-        start = tbots_cpp.Vector(radius, 0.0)
+        start = tbots_cpp.Vector(self.OCTAGON_RADIUS, 0.0)
         # offset 45/2 degrees so octagon is parallel to the x/y axis
         start = start.rotate(tbots_cpp.Angle().fromDegrees(45.0 / 2.0))
 
@@ -78,22 +83,17 @@ class BallIsOffGround(Validation):
         :return: An arrow ValidationGeometry
 
         """
-        line_length = 0.2
-        line_width = 0.08
-        triangle_height = 0.15
-        triangle_width = 0.2
-
-        end_point = start_point + direction * line_length
+        end_point = start_point + direction * self.LINE_LENGTH
         perpendicular = direction.perpendicular()
 
-        line_bottom_left = start_point - perpendicular * (line_width / 2)
-        line_bottom_right = start_point + perpendicular * (line_width / 2)
-        line_top_right = end_point + perpendicular * (line_width / 2)
-        line_top_left = end_point - perpendicular * (line_width / 2)
+        line_bottom_left = start_point - perpendicular * (self.LINE_WIDTH / 2)
+        line_bottom_right = start_point + perpendicular * (self.LINE_WIDTH / 2)
+        line_top_right = end_point + perpendicular * (self.LINE_WIDTH / 2)
+        line_top_left = end_point - perpendicular * (self.LINE_WIDTH / 2)
 
-        triangle_top = end_point + direction * triangle_height
-        triangle_bottom_left = end_point + perpendicular * (triangle_width / 2)
-        triangle_bottom_right = end_point - perpendicular * (triangle_width / 2)
+        triangle_top = end_point + direction * self.TRIANGLE_HEIGHT
+        triangle_bottom_left = end_point + perpendicular * (self.TRIANGLE_WIDTH / 2)
+        triangle_bottom_right = end_point - perpendicular * (self.TRIANGLE_WIDTH / 2)
 
         return create_validation_geometry(
             [
