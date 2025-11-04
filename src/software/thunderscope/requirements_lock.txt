@@ -123,7 +123,13 @@ pyqtgraph==0.13.7 \
     --hash=sha256:64f84f1935c6996d0e09b1ee66fe478a7771e3ca6f3aaa05f00f6e068321d9e3 \
     --hash=sha256:7754edbefb6c367fa0dfb176e2d0610da3ada20aa7a5318516c74af5fb72bf7a
     # via -r software/thunderscope/requirements.in
+qtawesome==1.4.0 \
+    --hash=sha256:783e414d1317f3e978bf67ea8e8a1b1498bad9dbd305dec814027e3b50521be6 \
+    --hash=sha256:a4d689fa071c595aa6184171ce1f0f847677cb8d2db45382c43129f1d72a3d93
+    # via -r software/thunderscope/requirements.in
 qtpy==2.4.2 \
     --hash=sha256:5a696b1dd7a354cb330657da1d17c20c2190c72d4888ba923f8461da67aa1a1c \
     --hash=sha256:9d6ec91a587cc1495eaebd23130f7619afa5cdd34a277acb87735b4ad7c65156
-    # via pyqt-toast-notification
+    # via
+    #   pyqt-toast-notification
+    #   qtawesome

@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class BallMovesForward(Validation):
@@ -22,6 +23,7 @@ class BallMovesForward(Validation):
         self.max_displacement_so_far = None
         self.tolerance = tolerance
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if ball is moving forward
 
@@ -43,6 +45,7 @@ class BallMovesForward(Validation):
         # beyond a threshold, return FAILING
         return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the last ball position line"""
         return create_validation_geometry(
@@ -60,6 +63,7 @@ class BallMovesForward(Validation):
             ]
         )
 
+    @override
     def __repr__(self):
         return "Check that the ball moves forward"
 
@@ -79,6 +83,7 @@ class BallMovesForwardInRegions(BallMovesForward):
         super().__init__(initial_ball_position, tolerance=tolerance)
         self.regions = regions
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         for region in self.regions:
             if tbots.contains(
@@ -88,10 +93,12 @@ class BallMovesForwardInRegions(BallMovesForward):
 
         return ValidationStatus.PASSING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the last ball position line, and the regions the ball should be moving in"""
         return create_validation_geometry(self.regions)
 
+    @override
     def __repr__(self):
         return (
             "Check that the ball moves forward"

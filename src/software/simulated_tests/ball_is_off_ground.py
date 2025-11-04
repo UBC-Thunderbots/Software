@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class BallIsOffGround(Validation):
@@ -20,6 +21,7 @@ class BallIsOffGround(Validation):
     def __init__(self, threshold=0.01):
         self.threshold = threshold
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the ball has is threshold meters off the ground
 
@@ -32,6 +34,7 @@ class BallIsOffGround(Validation):
         else:
             return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
@@ -49,6 +52,7 @@ class BallIsOffGround(Validation):
 
         return self.create_arrow_geometry(ball_position, direction)
 
+    @override
     def __repr__(self):
         return "Check if the ball is chipped"
 

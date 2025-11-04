@@ -10,6 +10,7 @@ from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtGui
 from software.thunderscope.util import *
+from typing import override
 
 
 class GLMaxDribbleLayer(GLLayer):
@@ -37,6 +38,7 @@ class GLMaxDribbleLayer(GLLayer):
         )
         self.dribble_circle_graphic.set_radius(1, 24)
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         world = self.world_buffer.get(block=False)
