@@ -47,6 +47,12 @@ class BallIsOffGround(Validation):
         return "Check if the ball is chipped"
 
     def create_octagon_geometry(self, centre_point):
+        """Returns octagon validation geometry
+
+        :param centre_point: The position to create octagon geometry at
+        :return: An octagon ValidationGeometry
+
+        """
         radius = 0.2
         start = tbots_cpp.Vector(radius, 0.0)
         # offset 45/2 degrees so octagon is parallel to the x/y axis
@@ -65,6 +71,13 @@ class BallIsOffGround(Validation):
         )
 
     def create_arrow_geometry(self, start_point, direction):
+        """Returns arrow validation geometry
+
+        :param start_point: The starting position of arrow
+        :param direction: The direction the arrow is pointing
+        :return: An arrow ValidationGeometry
+
+        """
         line_length = 0.2
         line_width = 0.08
         triangle_height = 0.15
