@@ -48,7 +48,7 @@ void StSpinMotorController::setup()
     {
         if (ENABLED_MOTORS.at(motor))
         {
-			checkDriverFault(motor);
+            checkDriverFault(motor);
             readThenWriteVelocity(motor, 0);
             sendAndReceiveFrame(motor, StSpinOpcode::START_MOTOR);
         }
@@ -57,11 +57,11 @@ void StSpinMotorController::setup()
 
 void StSpinMotorController::reset()
 {
-//    reset_gpio_->setValue(GpioState::LOW);
-//    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-//
-//    reset_gpio_->setValue(GpioState::HIGH);
-//    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+    //    reset_gpio_->setValue(GpioState::LOW);
+    //    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+    //
+    //    reset_gpio_->setValue(GpioState::HIGH);
+    //    usleep(MICROSECONDS_PER_MILLISECOND * 100);
 }
 
 MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& motor)
@@ -194,9 +194,7 @@ double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
     return current_velocity;
 }
 
-void StSpinMotorController::immediatelyDisable()
-{
-}
+void StSpinMotorController::immediatelyDisable() {}
 
 void StSpinMotorController::openSpiFileDescriptor(const MotorIndex& motor)
 {
@@ -252,10 +250,12 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_LEN,
                 SPI_SPEED_HZ);
 
-	LOG(INFO) << "TX " << static_cast<int>(tx[0]) << " " << static_cast<int>(tx[1]) << " " << static_cast<int>(tx[2])
-			  << " " << static_cast<int>(tx[3]) << " " << static_cast<int>(tx[4]) << " " << static_cast<int>(tx[5]);
-	LOG(INFO) << "RX " << static_cast<int>(rx[0]) << " " << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2])
-			  << " " << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4]) << " " << static_cast<int>(rx[5]);
+    LOG(INFO) << "TX " << static_cast<int>(tx[0]) << " " << static_cast<int>(tx[1]) << " "
+              << static_cast<int>(tx[2]) << " " << static_cast<int>(tx[3]) << " "
+              << static_cast<int>(tx[4]) << " " << static_cast<int>(tx[5]);
+    LOG(INFO) << "RX " << static_cast<int>(rx[0]) << " " << static_cast<int>(rx[1]) << " "
+              << static_cast<int>(rx[2]) << " " << static_cast<int>(rx[3]) << " "
+              << static_cast<int>(rx[4]) << " " << static_cast<int>(rx[5]);
 
     return static_cast<int16_t>((static_cast<uint16_t>(rx[2]) << 8) | rx[3]);
 }

@@ -210,7 +210,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     // Run-away protection
     // TODO: fix me
-    if constexpr (MOTOR_BOARD == MotorBoard::TRINAMIC) {
+    if constexpr (MOTOR_BOARD == MotorBoard::TRINAMIC)
+    {
         if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
                      prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
             RUNAWAY_PROTECTION_THRESHOLD_MPS)

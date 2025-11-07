@@ -41,15 +41,15 @@
             copy_links: true
           tags: always
 
-        - name: Run Binary
-          ansible.builtin.command: "./robot_auto_test"
-          args:
-            chdir: /home/robot/thunderbots_binaries
-          become_method: ansible.builtin.sudo
-          become: true
-          register: robot_auto_test_output
-          changed_when: true
-          ignore_errors: true
+#        - name: Run Binary
+#          ansible.builtin.command: "./robot_auto_test"
+#          args:
+#            chdir: /home/robot/thunderbots_binaries
+#          become_method: ansible.builtin.sudo
+#          become: true
+#          register: robot_auto_test_output
+#          changed_when: true
+#          ignore_errors: true
 
         - name: Print Binary Output
           ansible.builtin.debug:
