@@ -2,6 +2,7 @@
 
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 #include "software/logger/logger.h"
 
 
@@ -96,17 +97,41 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
 
         if (defender_assignment.type == CREASE_DEFENDER && max_num_crease_defenders > 0)
         {
-            crease_defender_assignments.emplace_back(defender_assignment);
-            max_num_crease_defenders--;
+            bool is_valid_position = DefensePlayFSM::validateCreaseDefenderPosition(
+                event.common.world_ptr->field(), 
+                defender_assignment.target);
 
-            // If we have at least two available defenders, two defenders should
-            // be assigned to the highest scoring crease defender assignment to better
-            // block the shot cone of the most threatening enemy
-            if (i == 0 && event.common.num_tactics >= 2 && max_num_crease_defenders > 0)
-            {
+            if (is_valid_position) {
                 crease_defender_assignments.emplace_back(defender_assignment);
-                i++;
                 max_num_crease_defenders--;
+
+                // If we have at least two available defenders, two defenders should
+                // be assigned to the highest scoring crease defender assignment to better
+                // block the shot cone of the most threatening enemy
+                if (i == 0 && event.common.num_tactics >= 2 && max_num_crease_defenders > 0)
+                {
+                    bool second_defender_valid_position = DefensePlayFSM::validateCreaseDefenderPosition(
+                        event.common.world_ptr->field(), 
+                        defender_assignment.target);
+
+                    if (second_defender_valid_position) 
+                    {
+                        crease_defender_assignments.emplace_back(defender_assignment);
+                        i++;
+                        max_num_crease_defenders--;
+                    }
+                    else
+                    {
+                        pass_defender_assignments.emplace_back(defender_assignment);
+                        i++;
+                        max_num_crease_defenders--;
+                    }
+                    
+                }
+            } 
+            else
+            {
+                pass_defender_assignments.emplace_back(defender_assignment);
             }
         }
         else
@@ -161,4 +186,43 @@ void DefensePlayFSM::setTactics(const Update& event)
                                 shadowers.end());
 
     event.common.set_tactics(tactics_to_return);
+}
+
+bool DefensePlayFSM::validateCreaseDefenderPosition(
+    const Field& field, const Point& threat_origin)
+{
+    // Test all three alignments by calling findBlockThreatPoint
+    std::vector<TbotsProto::CreaseDefenderAlignment> alignments = {
+        TbotsProto::CreaseDefenderAlignment::CENTRE,
+        TbotsProto::CreaseDefenderAlignment::LEFT,
+        TbotsProto::CreaseDefenderAlignment::RIGHT
+    };
+    
+    for (const auto& alignment : alignments)
+    {
+        auto position = CreaseDefenderFSM::findBlockThreatPoint(
+            field, threat_origin, alignment, 1.0);
+        
+        if (position.has_value())
+        {
+            // Check if position is on or behind goal line
+            Segment goal_line = Segment(
+                field.friendlyGoal().posXPosYCorner(),
+                field.friendlyGoal().posXNegYCorner()
+            );
+            
+            double robot_diameter = 2.0 * ROBOT_MAX_RADIUS_METERS;
+            
+            // Validate the position
+            if (distance(position.value(), goal_line) < robot_diameter ||
+                contains(field.friendlyGoal(), position.value()))
+            {
+                continue;  // This alignment is invalid, try next
+            }
+            
+            return true;  // At least one alignment is valid
+        }
+    }
+    
+    return false;  // No valid positions found for any alignment
 }
