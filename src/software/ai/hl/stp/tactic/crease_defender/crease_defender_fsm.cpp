@@ -19,42 +19,46 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
                              6.0;
     Angle angle_to_positive_goalpost =
         (field.friendlyGoalpostPos() - enemy_threat_origin).orientation();
-        
-    Angle center_angle = angle_to_positive_goalpost + shot_angle_sixth * 3.0; 
+
+    Angle center_angle = angle_to_positive_goalpost + shot_angle_sixth * 3.0;
 
     // Shot ray to block for center position
-    Ray center_ray(enemy_threat_origin, center_angle); 
+    Ray center_ray(enemy_threat_origin, center_angle);
 
-    std::optional<Point> center_position = findDefenseAreaIntersection(
-        field, center_ray, robot_obstacle_inflation_factor);
-    
-    if (!center_position.has_value()) {
-        return std::nullopt; 
+    std::optional<Point> center_position =
+        findDefenseAreaIntersection(field, center_ray, robot_obstacle_inflation_factor);
+
+    if (!center_position.has_value())
+    {
+        return std::nullopt;
     }
 
     // If this is the center alignment, return the center position
-    if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::CENTRE) {
-        return center_position; 
+    if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::CENTRE)
+    {
+        return center_position;
     }
 
-    Rectangle defense_area = field.friendlyDefenseArea(); 
-    Polygon defense_perimeter({
-        defense_area.posXPosYCorner(), 
-        defense_area.posXNegYCorner(), 
-        defense_area.negXNegYCorner(), 
-        defense_area.negXPosYCorner()
-    });
+    Rectangle defense_area = field.friendlyDefenseArea();
+    Polygon defense_perimeter(
+        {defense_area.posXPosYCorner(), defense_area.posXNegYCorner(),
+         defense_area.negXNegYCorner(), defense_area.negXPosYCorner()});
 
-    double step_distance = 2.0 * ROBOT_MAX_RADIUS_METERS; 
+    double step_distance = 2.0 * ROBOT_MAX_RADIUS_METERS;
 
-    Point stepped_position; 
-    if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT) {
-        stepped_position = stepAlongPerimeter(defense_perimeter, center_position.value(), -step_distance); 
-    } else {
-        stepped_position = stepAlongPerimeter(defense_perimeter, center_position.value(), step_distance); 
+    Point stepped_position;
+    if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
+    {
+        stepped_position = stepAlongPerimeter(defense_perimeter, center_position.value(),
+                                              -step_distance);
+    }
+    else
+    {
+        stepped_position =
+            stepAlongPerimeter(defense_perimeter, center_position.value(), step_distance);
     }
 
-    return stepped_position; 
+    return stepped_position;
 }
 
 bool CreaseDefenderFSM::isAnyEnemyInZone(const Update& event, const Stadium& zone)

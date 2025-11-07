@@ -170,7 +170,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
 
 
 @pytest.mark.parametrize(
-    "blue_bots,yellow_bots", 
+    "blue_bots,yellow_bots",
     [
         (
             [
@@ -179,7 +179,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
                 tbots_cpp.Point(-3, 0.5),
                 tbots_cpp.Point(-3, -0.5),
                 tbots_cpp.Point(-3, -1.5),
-            ], 
+            ],
             [
                 tbots_cpp.Point(-3.8, 0.5),
                 tbots_cpp.Point(-3.8, -0.5),
@@ -208,10 +208,12 @@ def test_defense_play_near_goal_line(simulated_test_runner, blue_bots, yellow_bo
         yellow_play.name = PlayName.HaltPlay
 
         simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
         simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState, 
+            WorldState,
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
