@@ -10,6 +10,9 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 
+/**
+ * Finite State Machine class for Dribbling
+ */
 struct DribbleFSM : TacticFSM<DribbleFSM>
 {
    public:
@@ -34,10 +37,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      *
      * @param ai_config_ptr shared ptr to ai_config
      */
-    explicit DribbleFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-            : TacticFSM<DribbleFSM>(ai_config_ptr)
-    {
-    }
+    explicit DribbleFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Converts the ball position to the robot's position given the direction that the

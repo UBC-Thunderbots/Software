@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/logger/logger.h"
 
@@ -11,8 +11,8 @@
 struct CreaseDefensePlayFSM : PlayFSM<CreaseDefensePlayFSM>
 {
     /**
-    * Control parameters for crease defense play
-    */
+     * Control parameters for crease defense play
+     */
     struct ControlParams
     {
         // The origin point of the enemy threat

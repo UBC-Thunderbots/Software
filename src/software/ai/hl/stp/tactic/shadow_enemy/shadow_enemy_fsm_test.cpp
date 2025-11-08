@@ -139,7 +139,7 @@ FSMLogger logger{std::optional(0)};
 
     // Either the ball has been stolen by our robot or at least the
     // enemy threat has kicked the ball
-    // TacticBase is done
+    // Tactic is done
     enemy_threat.has_ball = false;
     ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(

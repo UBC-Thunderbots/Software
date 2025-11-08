@@ -283,7 +283,8 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
     }
 
     move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(num_move_tactics);
-    std::generate(move_tactics.begin(), move_tactics.end(), [this]()
+    std::generate(move_tactics.begin(), move_tactics.end(),
+                  [this]()
                   { return std::make_shared<PlaceBallMoveTactic>(this->ai_config_ptr); });
 
     // non goalie and non ball placing robots line up along a line just outside the

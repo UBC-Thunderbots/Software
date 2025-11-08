@@ -25,10 +25,7 @@ struct ChipFSM : TacticFSM<ChipFSM>
      *
      * @param ai_config_ptr Shared pointer to ai_config
      */
-    explicit ChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<ChipFSM>(ai_config_ptr)
-    {
-    }
+    explicit ChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that updates the MovePrimitive

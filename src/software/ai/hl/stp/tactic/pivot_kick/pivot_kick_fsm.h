@@ -6,7 +6,9 @@
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-
+/**
+ * Finite State Machine class for Pivot Kick
+ */
 struct PivotKickFSM : TacticFSM<PivotKickFSM>
 {
     using Update = TacticFSM<PivotKickFSM>::Update;
@@ -28,10 +30,7 @@ struct PivotKickFSM : TacticFSM<PivotKickFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PivotKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<PivotKickFSM>(ai_config_ptr)
-    {
-    }
+    explicit PivotKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that updates the DribbleFSM to get possession of the ball and pivot

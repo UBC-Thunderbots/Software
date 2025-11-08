@@ -3,6 +3,11 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
+DribbleFSM::DribbleFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<DribbleFSM>(ai_config_ptr)
+{
+}
+
 Point DribbleFSM::robotPositionToFaceBall(const Point &ball_position,
                                           const Angle &face_ball_angle,
                                           double additional_offset)

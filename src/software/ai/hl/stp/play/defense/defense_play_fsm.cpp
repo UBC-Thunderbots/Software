@@ -146,7 +146,8 @@ void DefensePlayFSM::setUpShadowers(int num_shadowers)
 
     shadowers = std::vector<std::shared_ptr<ShadowEnemyTactic>>(num_shadowers);
     std::generate(shadowers.begin(), shadowers.end(),
-                  [this]() { return std::make_shared<ShadowEnemyTactic>(ai_config_ptr); });
+                  [this]()
+                  { return std::make_shared<ShadowEnemyTactic>(ai_config_ptr); });
 }
 
 void DefensePlayFSM::setTactics(const Update& event)

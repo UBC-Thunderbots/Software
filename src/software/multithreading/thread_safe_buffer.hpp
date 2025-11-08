@@ -4,6 +4,8 @@
 #include <condition_variable>
 #include <cstddef>
 #include <deque>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 #include <mutex>
 #include <optional>
 
@@ -156,8 +158,7 @@ void ThreadSafeBuffer<T>::push(const T& value)
     std::scoped_lock<std::mutex> buffer_lock(buffer_mutex);
     if (log_buffer_full && buffer.full())
     {
-        std::cerr << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T)
-                  << std::endl;
+        LOG(DEBUG) << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T);
     }
     buffer.push_back(value);
     received_new_value.notify_all();

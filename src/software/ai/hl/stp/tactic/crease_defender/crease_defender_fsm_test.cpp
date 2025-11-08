@@ -13,8 +13,8 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_in_front_of_crease)
     Field field                            = Field::createSSLDivisionBField();
     Point enemy_threat_origin              = Point(2, 3);
     auto threat_point_centre               = CreaseDefenderFSM::findBlockThreatPoint(
-        field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
-        robot_obstacle_inflation_factor);
+                      field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
+                      robot_obstacle_inflation_factor);
     ASSERT_TRUE(threat_point_centre);
     EXPECT_GT(threat_point_centre.value().x(), field.friendlyDefenseArea().xMax());
 
@@ -41,8 +41,8 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_left_of_crease)
     Field field                            = Field::createSSLDivisionBField();
     Point enemy_threat_origin              = Point(-2.5, 3);
     auto threat_point_centre               = CreaseDefenderFSM::findBlockThreatPoint(
-        field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
-        robot_obstacle_inflation_factor);
+                      field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
+                      robot_obstacle_inflation_factor);
     ASSERT_TRUE(threat_point_centre);
     EXPECT_GE(threat_point_centre.value().y(), field.friendlyDefenseArea().yMax());
     EXPECT_LE(threat_point_centre.value().x(), field.friendlyDefenseArea().xMax());
@@ -72,8 +72,8 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_right_of_crease)
     Field field                            = Field::createSSLDivisionBField();
     Point enemy_threat_origin              = Point(-4.25, -2);
     auto threat_point_centre               = CreaseDefenderFSM::findBlockThreatPoint(
-        field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
-        robot_obstacle_inflation_factor);
+                      field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
+                      robot_obstacle_inflation_factor);
     ASSERT_TRUE(threat_point_centre);
     EXPECT_LE(threat_point_centre.value().y(), field.friendlyDefenseArea().yMin());
     EXPECT_LE(threat_point_centre.value().x(), field.friendlyDefenseArea().xMax());
@@ -103,8 +103,8 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_threat_in_crease)
     Field field                            = Field::createSSLDivisionBField();
     Point enemy_threat_origin              = Point(-4.25, 0);
     auto threat_point                      = CreaseDefenderFSM::findBlockThreatPoint(
-        field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
-        robot_obstacle_inflation_factor);
+                             field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
+                             robot_obstacle_inflation_factor);
     EXPECT_FALSE(threat_point);
 
     threat_point = CreaseDefenderFSM::findBlockThreatPoint(
@@ -127,7 +127,7 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     std::shared_ptr<World> world           = ::TestUtil::createBlankTestingWorld();
     Robot robot                            = ::TestUtil::createRobotAtPos(Point(-2, -3));
     ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
-    CreaseDefenderFSMControlParams control_params{
+    CreaseDefenderFSM::ControlParams control_params{
         .enemy_threat_origin       = Point(2, 3),
         .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::LEFT,
         .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,

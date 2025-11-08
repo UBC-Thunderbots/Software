@@ -5,6 +5,12 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
+PassDefenderFSM::PassDefenderFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : DefenderFSMBase(), TacticFSM<PassDefenderFSM>(ai_config_ptr)
+{
+}
+
 bool PassDefenderFSM::passStarted(const Update& event)
 {
     auto ball_position = event.common.world_ptr->ball().position();

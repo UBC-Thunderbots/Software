@@ -16,22 +16,32 @@ class PlayBase : public Play
      * The constructor for a PlayBase
      *
      * @param ai_config_ptr shared pointer to ai_config
+     * @param requires_goalie true if the play needs a goalie
      */
     explicit PlayBase(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
-                      bool requires_goalie)
-            : Play(ai_config_ptr, requires_goalie),
-              logger(),
-              fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}..., logger},
-              control_params()
-    {
-    }
+                      bool requires_goalie);
+
+    /**
+     * Update the associated FSM with a PlayUpdate struct defined in play_fsm
+     *
+     * @param play_update the update package
+     */
+    void updateTactics(const PlayUpdate &play_update) override = 0;
 
     PlayBase() = delete;
-
-    void updateTactics(const PlayUpdate &play_update) override = 0;
 
    protected:
     FSMLogger logger;
     FSM<PlayFsm> fsm;
     PlayFsm::ControlParams control_params;
 };
+
+template <class PlayFsm, class... PlaySubFsms>
+PlayBase<PlayFsm, PlaySubFsms...>::PlayBase(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr, bool requires_goalie)
+    : Play(ai_config_ptr, requires_goalie),
+      logger(),
+      fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}...},
+      control_params()
+{
+}

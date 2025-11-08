@@ -2,6 +2,9 @@
 
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
+/**
+ * Finite State Machine class for Halting
+ */
 struct HaltFSM : TacticFSM<HaltFSM>
 {
     using Update = TacticFSM<HaltFSM>::Update;
@@ -15,10 +18,7 @@ struct HaltFSM : TacticFSM<HaltFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit HaltFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<HaltFSM>(ai_config_ptr)
-    {
-    }
+    explicit HaltFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to set the StopPrimitive

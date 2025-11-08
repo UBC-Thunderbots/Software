@@ -8,6 +8,9 @@
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
+/**
+ * Finite State Machine class for Pass Defenders
+ */
 struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
 {
     using Update = TacticFSM<PassDefenderFSM>::Update;
@@ -29,10 +32,7 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PassDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : DefenderFSMBase(), TacticFSM<PassDefenderFSM>(ai_config_ptr)
-    {
-    }
+    explicit PassDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     // The minimum speed of the ball for it to be considered a pass
     static constexpr double MIN_PASS_SPEED = 0.5;

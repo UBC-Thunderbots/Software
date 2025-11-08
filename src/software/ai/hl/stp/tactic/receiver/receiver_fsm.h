@@ -10,8 +10,9 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 
-
-
+/**
+ * Finite State Machine Class for Receivers
+ */
 struct ReceiverFSM : TacticFSM<ReceiverFSM>
 {
     using Update = TacticFSM<ReceiverFSM>::Update;
@@ -30,10 +31,7 @@ struct ReceiverFSM : TacticFSM<ReceiverFSM>
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ReceiverFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<ReceiverFSM>(ai_config_ptr)
-    {
-    }
+    explicit ReceiverFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     class OneTouchShotState;
     class ReceiveAndDribbleState;

@@ -1,8 +1,7 @@
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 from software.py_constants import *
-from proto.import_all_protos import *
-
+from proto.estop_state_pb2 import EstopState
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 

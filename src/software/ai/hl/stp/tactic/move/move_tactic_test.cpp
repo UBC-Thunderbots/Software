@@ -115,7 +115,7 @@ TEST_F(MoveTacticTest, test_autokick_move)
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::threeQuarter(),
                                   AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+           {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
             field.enemyDefenseArea().negXNegYCorner(),
             field.enemyDefenseArea().negXPosYCorner()});
 

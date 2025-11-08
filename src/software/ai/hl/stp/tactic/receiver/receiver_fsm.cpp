@@ -2,6 +2,11 @@
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
+ReceiverFSM::ReceiverFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<ReceiverFSM>(ai_config_ptr)
+{
+}
+
 Angle ReceiverFSM::getOneTouchShotDirection(const Ray& shot, const Ball& ball)
 {
     Vector shot_vector = shot.toUnitVector();

@@ -19,7 +19,7 @@ FSMLogger logger{std::optional(0)};
                             GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>()),
                             logger};
 
-    PenaltyKickFSMControlParams control_params{};
+    PenaltyKickFSM::ControlParams control_params{};
 
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));

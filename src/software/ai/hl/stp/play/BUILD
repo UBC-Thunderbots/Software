@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 # We force linking for all plays so that the static variables required for the
 # "factory" design pattern to work are linked in
@@ -87,7 +87,7 @@ cc_library(
     hdrs = [
         "play.h",
         "play_base.hpp",
-        "play_fsm.h",
+        "play_fsm.hpp",
     ],
     deps = [
         "//software/ai/hl/stp/tactic",

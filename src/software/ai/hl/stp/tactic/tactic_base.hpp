@@ -43,21 +43,10 @@ class TacticBase : public Tactic
      * it.
      *
      * @param capability_reqs_ The capability requirements for running this tactic
+     * @param ai_config_ptr shared pointer to ai_config
      */
     explicit TacticBase(const std::set<RobotCapability> &capability_reqs_,
-                        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : logger(std::optional<RobotId>(0)),
-          last_execution_robot(std::nullopt),
-          ai_config_ptr(ai_config_ptr),
-          fsm_map(),
-          control_params(),
-          capability_reqs(capability_reqs_)
-    {
-        for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-        {
-            fsm_map[id] = fsmInit();
-        }
-    }
+                        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     TacticBase() = delete;
 
@@ -80,20 +69,14 @@ class TacticBase : public Tactic
      *
      * @return the robot capability requirements
      */
-    const std::set<RobotCapability> &robotCapabilityRequirements() const
-    {
-        return capability_reqs;
-    }
+    const std::set<RobotCapability> &robotCapabilityRequirements() const;
 
     /**
      * Mutable robot hardware capability requirements of the tactic.
      *
      * @return the Mutable robot hardware capability requirements of the tactic
      */
-    std::set<RobotCapability> &mutableRobotCapabilityRequirements()
-    {
-        return capability_reqs;
-    }
+    std::set<RobotCapability> &mutableRobotCapabilityRequirements();
 
     /**
      * Updates the last execution robot
@@ -101,11 +84,7 @@ class TacticBase : public Tactic
      * @param last_execution_robot The robot id of the robot that last executed the
      * primitive for this tactic
      */
-    void setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
-    {
-        this->last_execution_robot = last_execution_robot;
-        logger.setRobotId(last_execution_robot);
-    }
+    void setLastExecutionRobot(std::optional<RobotId> last_execution_robot);
 
     /**
      * Updates and returns a set of primitives for all friendly robots from this tactic
@@ -146,12 +125,7 @@ class TacticBase : public Tactic
      *
      * @return a pointer to the created FSM.
      */
-    std::unique_ptr<FSM<TacticFsm>> fsmInit()
-    {
-        return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr),
-                                                TacticSubFsms(ai_config_ptr)...,
-                                                logger);
-    }
+    std::unique_ptr<FSM<TacticFsm>> fsmInit();
 
    private:
     std::shared_ptr<Primitive> primitive;
@@ -168,6 +142,23 @@ class TacticBase : public Tactic
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;
 };
+
+template <class TacticFsm, class... TacticSubFsms>
+TacticBase<TacticFsm, TacticSubFsms...>::TacticBase(
+    const std::set<RobotCapability> &capability_reqs_,
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : logger(std::optional<RobotId>(0)),
+      last_execution_robot(std::nullopt),
+      ai_config_ptr(ai_config_ptr),
+      fsm_map(),
+      control_params(),
+      capability_reqs(capability_reqs_)
+{
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+    {
+        fsm_map[id] = fsmInit();
+    }
+}
 
 template <class TacticFsm, class... TacticSubFsms>
 bool TacticBase<TacticFsm, TacticSubFsms...>::done() const
@@ -230,4 +221,32 @@ void TacticBase<TacticFsm, TacticSubFsms...>::updatePrimitive(
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(typename TacticFsm::Update(control_params, tactic_update));
+}
+
+template <class TacticFsm, class... TacticSubFsms>
+std::unique_ptr<FSM<TacticFsm>> TacticBase<TacticFsm, TacticSubFsms...>::fsmInit()
+{
+    return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr),
+                                            TacticSubFsms(ai_config_ptr)...,
+                                            logger);
+}
+template <class TacticFsm, class... TacticSubFsms>
+void TacticBase<TacticFsm, TacticSubFsms...>::setLastExecutionRobot(
+    std::optional<RobotId> last_execution_robot)
+{
+    this->last_execution_robot = last_execution_robot;
+}
+
+template <class TacticFsm, class... TacticSubFsms>
+std::set<RobotCapability>
+    &TacticBase<TacticFsm, TacticSubFsms...>::mutableRobotCapabilityRequirements()
+{
+    return capability_reqs;
+}
+
+template <class TacticFsm, class... TacticSubFsms>
+const std::set<RobotCapability>
+    &TacticBase<TacticFsm, TacticSubFsms...>::robotCapabilityRequirements() const
+{
+    return capability_reqs;
 }

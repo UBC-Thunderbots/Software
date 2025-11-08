@@ -9,35 +9,18 @@ install_autoref() {
 }
 
 install_bazel() {
-    download=https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-linux-arm64
+    download=https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-linux-arm64 
 
     if is_x86 $1; then
-        download=https://github.com/bazelbuild/bazel/releases/download/5.4.0/bazel-5.4.0-linux-x86_64
+        download=https://github.com/bazelbuild/bazelisk/releases/download/v1.26.0/bazelisk-linux-amd64
     fi
-
     wget -nc $download -O /tmp/tbots_download_cache/bazel
     sudo mv /tmp/tbots_download_cache/bazel /usr/bin/bazel
     sudo chmod +x /usr/bin/bazel
 }
 
 install_clang_format() {
-    download=https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/clang+llvm-19.1.7-aarch64-linux-gnu.tar.xz
-    clang_folder=clang+llvm-19.1.7-aarch64-linux-gnu
-
-    if is_x86 $1; then
-        download=https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/LLVM-19.1.7-Linux-X64.tar.xz
-        clang_folder=LLVM-19.1.7-Linux-X64
-    fi
-
-    wget $download -O /tmp/tbots_download_cache/clang.tar.xz
-
-    # Temporarily need more space to extract the clang tarball
-    mkdir -p ~/.tbots
-    tar -xf /tmp/tbots_download_cache/clang.tar.xz -C ~/.tbots/
-
-    clang_format_path=~/.tbots/$clang_folder/bin/clang-format
-    sudo cp $clang_format_path /opt/tbotspython/bin/clang-format
-    rm -rf ~/.tbots
+    ln -s /usr/bin/clang-format-14 /opt/tbotspython/bin/clang-format
 }
 
 install_cross_compiler() {
@@ -53,34 +36,14 @@ install_cross_compiler() {
 }
 
 install_gamecontroller () {
-    # TODO(#3335): Whenever we deprecate Ubuntu 20.04, we can just grab the latest version of the SSL game controller
-    # binary from the releases page. This is a workaround since the latest version of the game controller is compiled
-    # with a newer GLIBC version than what is available on Ubuntu 20.04.
-    go_arch=arm64
+    arch=arm64
     if is_x86 $1; then
-        go_arch=amd64
+        arch=amd64
     fi
-    sudo wget -N https://go.dev/dl/go1.23.0.linux-${go_arch}.tar.gz -O /tmp/tbots_download_cache/go.tar.gz
-    tar -C /tmp/tbots_download_cache -xf /tmp/tbots_download_cache/go.tar.gz
-    export PATH=$PATH:/tmp/tbots_download_cache/go/bin
-    sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/archive/refs/tags/v3.12.3.zip -O /tmp/tbots_download_cache/ssl-game-controller.zip
-    unzip -q -o -d /tmp/tbots_download_cache/ /tmp/tbots_download_cache/ssl-game-controller.zip
-    cd /tmp/tbots_download_cache/ssl-game-controller-3.12.3
 
-    # Installing nvm
-    wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-	export NVM_DIR="$HOME/.nvm"
-	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-    nvm install 20
-
-    make install
-    go build cmd/ssl-game-controller/main.go
-    sudo mv main /opt/tbotspython/gamecontroller
+    wget https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.16.1/ssl-game-controller_v3.16.1_linux_${arch} -O /tmp/tbots_download_cache/gamecontroller
+    sudo mv /tmp/tbots_download_cache/gamecontroller /opt/tbotspython/gamecontroller
     sudo chmod +x /opt/tbotspython/gamecontroller
-
-    cd -
-    sudo rm -rf /tmp/tbots_download_cache/ssl-game-controller-3.12.3 /tmp/tbots_download_cache/go /tmp/tbots_download_cache/go.tar.gz /tmp/tbots_download_cache/ssl-game-controller.zip
 }
 
 install_java () {
@@ -96,28 +59,35 @@ install_java () {
 }
 
 install_python_dev_cross_compile_headers() {
-    if is_x86 $1; then
-        mkdir -p /opt/tbotspython/cross_compile_headers
-        wget -N https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz -O /tmp/tbots_download_cache/python-3.12.0.tar.xz
-        tar -xf /tmp/tbots_download_cache/python-3.12.0.tar.xz -C /tmp/tbots_download_cache/
-        cd /tmp/tbots_download_cache/Python-3.12.0
+    mkdir -p /opt/tbotspython/cross_compile_headers
+    wget -N https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz -O /tmp/tbots_download_cache/python-3.12.0.tar.xz
+    tar -xf /tmp/tbots_download_cache/python-3.12.0.tar.xz -C /tmp/tbots_download_cache/
+    cd /tmp/tbots_download_cache/Python-3.12.0
 
-        # The configuration is taken from the examples provided in https://docs.python.org/3.12/using/configure.html
-        echo ac_cv_buggy_getaddrinfo=no > config.site-aarch64
-        echo ac_cv_file__dev_ptmx=yes >> config.site-aarch64
-        echo ac_cv_file__dev_ptc=no >> config.site-aarch64
+    # The configuration is taken from the examples provided in https://docs.python.org/3.12/using/configure.html
+    echo ac_cv_buggy_getaddrinfo=no > config.site-aarch64
+    echo ac_cv_file__dev_ptmx=yes >> config.site-aarch64
+    echo ac_cv_file__dev_ptc=no >> config.site-aarch64
+    if is_x86 $1; then
         CONFIG_SITE=config.site-aarch64 ./configure \
             --build=x86_64-pc-linux-gnu \
             --host=aarch64-unknown-linux-gnu \
             -with-build-python=/usr/bin/python3.12 \
             --enable-optimizations \
             --prefix=/opt/tbotspython/cross_compile_headers > /dev/null
-        make inclinstall -j$(nproc) > /dev/null
-
-        cd -
-        rm -rf /tmp/tbots_download_cache/Python-3.12.0
-        rm -rf /tmp/tbots_download_cache/python-3.12.0.tar.xz
+    else
+        CONFIG_SITE=config.site-aarch64 ./configure \
+            --build=aarch64-pc-linux-gnu \
+            --host=aarch64-unknown-linux-gnu \
+            -with-build-python=/usr/bin/python3.12 \
+            --enable-optimizations \
+            --prefix=/opt/tbotspython/cross_compile_headers > /dev/null
     fi
+    make inclinstall -j$(nproc) > /dev/null
+
+    cd -
+    rm -rf /tmp/tbots_download_cache/Python-3.12.0
+    rm -rf /tmp/tbots_download_cache/python-3.12.0.tar.xz
 }
 
 is_x86() {

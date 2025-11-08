@@ -12,6 +12,8 @@ class HaltTactic : public TacticBase<HaltFSM>
    public:
     /**
      * Creates a new HaltTactic
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
     explicit HaltTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 

@@ -3,6 +3,9 @@
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/point.h"
 
+/**
+ * Finite State Machine class for Moving
+ */
 struct MoveFSM : TacticFSM<MoveFSM>
 {
     // these classes define the states used in the transition table
@@ -30,18 +33,13 @@ struct MoveFSM : TacticFSM<MoveFSM>
     };
 
     using Update = TacticFSM<MoveFSM>::Update;
-    // these classes define the states used in the transition table
-    // they are exposed so that tests can check if the FSM is in a particular state
 
     /**
      * Constructor for MoveFSM
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : TacticFSM<MoveFSM>(ai_config_ptr)
-    {
-    }
+    explicit MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * This is an Action that sets the primitive to a move primitive corresponding to the

@@ -1,6 +1,11 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_fsm.h"
 
-
+PenaltyKickFSM::PenaltyKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<PenaltyKickFSM>(ai_config_ptr),
+      complete_approach(std::nullopt),
+      shot_angle()
+{
+}
 
 bool PenaltyKickFSM::evaluatePenaltyShot(std::optional<Robot> enemy_goalie, Field field,
                                          Point ball_position, Robot robot)

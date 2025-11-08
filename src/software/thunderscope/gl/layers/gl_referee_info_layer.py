@@ -13,6 +13,7 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from typing import override
 
 
 class GLRefereeInfoLayer(GLLayer):
@@ -126,6 +127,7 @@ class GLRefereeInfoLayer(GLLayer):
             + Referee.Command.Name(referee_proto.command)
         )
 
+    @override
     def refresh_graphics(self) -> None:
         """Refresh all visuals for both ball placement and referee info"""
         self.cached_world = self.world_buffer.get(block=False, return_cached=True)
