@@ -7,6 +7,9 @@
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/logger/logger.h"
 
+/**
+ * Finite State Machine base class for Defenders
+ */
 struct DefenderFSMBase
 {
     /**

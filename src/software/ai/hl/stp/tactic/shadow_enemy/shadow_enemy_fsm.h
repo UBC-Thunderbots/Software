@@ -9,7 +9,7 @@
 #include "software/logger/logger.h"
 
 /**
- *
+ * Finite State Machine Class for Shadow Enemy
  */
 struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
 {

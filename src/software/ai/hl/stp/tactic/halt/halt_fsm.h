@@ -2,6 +2,9 @@
 
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
+/**
+ * Finite State Machine class for Halting
+ */
 struct HaltFSM : TacticFSM<HaltFSM>
 {
     using Update = TacticFSM<HaltFSM>::Update;

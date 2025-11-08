@@ -13,7 +13,9 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
 
-
+/**
+ * Finite State Machine class for the Goalie
+ */
 struct GoalieFSM : TacticFSM<GoalieFSM>
 {
     class Panic;

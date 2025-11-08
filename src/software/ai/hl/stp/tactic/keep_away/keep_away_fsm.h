@@ -4,6 +4,9 @@
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
+/**
+ * Finite State Machine class for Keep Away
+ */
 struct KeepAwayFSM : TacticFSM<KeepAwayFSM>
 {
     using Update = TacticFSM<KeepAwayFSM>::Update;

@@ -48,6 +48,9 @@ build --incompatible_enable_proto_toolchain_resolution # protoc caching
 common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 
+build --experimental_disk_cache_gc_max_size=32G
+build  --experimental_disk_cache_gc_max_age=28d
+
 ################# Build Configurations #################
 # Lock C++ version
 build --cxxopt="-std=c++2a"

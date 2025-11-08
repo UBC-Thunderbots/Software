@@ -6,7 +6,9 @@
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-
+/**
+ * Finite State Machine class for Pivot Kick
+ */
 struct PivotKickFSM : TacticFSM<PivotKickFSM>
 {
     using Update = TacticFSM<PivotKickFSM>::Update;

@@ -10,8 +10,9 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 
-
-
+/**
+ * Finite State Machine Class for Receivers
+ */
 struct ReceiverFSM : TacticFSM<ReceiverFSM>
 {
     using Update = TacticFSM<ReceiverFSM>::Update;

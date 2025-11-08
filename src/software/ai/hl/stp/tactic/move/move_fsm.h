@@ -3,6 +3,9 @@
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/point.h"
 
+/**
+ * Finite State Machine class for Moving
+ */
 struct MoveFSM : TacticFSM<MoveFSM>
 {
     // these classes define the states used in the transition table

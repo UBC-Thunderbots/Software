@@ -13,6 +13,9 @@
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
 
+/**
+ * Finite State Machine class for Penalty Kicks
+ */
 struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSM>
 {
    public:

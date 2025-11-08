@@ -4,6 +4,9 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/triangle.h"
 
+/**
+ * Finite State Machine class for Get Behind Ball
+ */
 struct GetBehindBallFSM : TacticFSM<GetBehindBallFSM>
 {
    public:

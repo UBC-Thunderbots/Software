@@ -4,6 +4,9 @@
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/point.h"
 
+/**
+ * Finite State Machine class for Kicks
+ */
 struct KickFSM : TacticFSM<KickFSM>
 {
     class KickState;

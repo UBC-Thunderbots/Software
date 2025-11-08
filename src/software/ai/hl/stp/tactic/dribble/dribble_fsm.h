@@ -10,6 +10,9 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 
+/**
+ * Finite State Machine class for Dribbling
+ */
 struct DribbleFSM : TacticFSM<DribbleFSM>
 {
    public:

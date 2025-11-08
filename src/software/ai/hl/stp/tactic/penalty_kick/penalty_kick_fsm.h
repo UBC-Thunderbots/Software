@@ -8,6 +8,9 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 
+/**
+ * Finite State Machine class for Penalty Kicks
+ */
 struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
 {
     using Update = TacticFSM<PenaltyKickFSM>::Update;

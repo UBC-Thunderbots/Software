@@ -6,6 +6,9 @@
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/segment.h"
 
+/**
+ * This tactic is for turning aiming and kicking.
+ */
 class PivotKickTactic : public TacticBase<PivotKickFSM, DribbleFSM>
 {
    public:

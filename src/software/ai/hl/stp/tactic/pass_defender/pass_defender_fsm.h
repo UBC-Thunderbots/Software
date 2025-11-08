@@ -8,6 +8,9 @@
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
+/**
+ * Finite State Machine class for Pass Defenders
+ */
 struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
 {
     using Update = TacticFSM<PassDefenderFSM>::Update;
