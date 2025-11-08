@@ -19,20 +19,8 @@ jobs:
     name: Ubuntu Alternate Builds
     runs-on: ${{ matrix.platform }}
     steps:
-      # remove the unused packages in the CI runner to free up disk space
-      # https://github.com/actions/runner-images/issues/2840
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-
-      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
 
       - name: Software Build Test
         run: |
@@ -60,20 +48,8 @@ jobs:
     name: Software Tests
     runs-on: ubuntu-24.04
     steps:
-      # remove the unused packages in the CI runner to free up disk space
-      # https://github.com/actions/runner-images/issues/2840
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-
-      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
 
       - name: Software Test
         run: |
@@ -90,20 +66,8 @@ jobs:
     name: Robot Software Tests
     runs-on: ubuntu-24.04
     steps:
-      # remove the unused packages in the CI runner to free up disk space
-      # https://github.com/actions/runner-images/issues/2840
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-
-      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
 
       - name: Install and start redis server
         run: |
@@ -134,20 +98,8 @@ jobs:
     name: Simulated Gameplay Tests
     runs-on: ubuntu-24.04
     steps:
-      # remove the unused packages in the CI runner to free up disk space
-      # https://github.com/actions/runner-images/issues/2840
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-
-      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
 
       - name: Simulated Test Run
         run: |
@@ -180,20 +132,8 @@ jobs:
     name: AutoRef'd Game (3 Minutes)
     runs-on: ubuntu-24.04
     steps:
-      # remove the unused packages in the CI runner to free up disk space
-      # https://github.com/actions/runner-images/issues/2840
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-
-      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
 
       - name: AI vs AI (3 minutes)
         run: |
