@@ -11,9 +11,7 @@ struct EnemyThreat
 {
     // The enemy robot
     Robot robot;
-    float threat_score;
-    Point pos;
-    Vector vel;
+
     // Whether or not this robot has possession of the ball
     bool has_ball;
 

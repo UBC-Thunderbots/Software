@@ -192,8 +192,7 @@ Point Field::friendlyGoalCenter() const
     return Point(-xLength() / 2.0, 0.0);
 }
 
-Point Field::enemy
-    float threatScore;Center() const
+Point Field::enemyGoalCenter() const
 {
     return Point(xLength() / 2.0, 0.0);
 }

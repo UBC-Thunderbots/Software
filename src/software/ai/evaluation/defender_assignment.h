@@ -21,7 +21,7 @@ struct DefenderAssignment
 {
     // The type of defender for this assignment
     DefenderAssignmentType type;
-c
+
     // The location on the field that the defender should target
     Point target;
 
