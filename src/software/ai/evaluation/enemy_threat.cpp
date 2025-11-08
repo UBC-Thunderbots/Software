@@ -304,7 +304,7 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
     sortThreatsInDecreasingOrder(robot_to_threat);
     std::vector<EnemyThreat> threats;
     threats.reserve(robot_to_threat.size());
-    for (const auto &p: robot_to_threat)
+    for (const auto p: robot_to_threat)
     {
         threats.push_back(p.first);
     }
