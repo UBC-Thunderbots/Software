@@ -66,8 +66,7 @@ class GLRobot(GLMeshItem):
 
     @override
     def initializeGL(self) -> None:
-        """Recreate the shader using the current OpenGL context
-        """
+        """Recreate the shader using the current OpenGL context"""
         self.curr_gl_ctx = QtGui.QOpenGLContext.currentContext()
         self.curr_shader = shaders.ShaderProgram(
             "robot-shader",
@@ -81,8 +80,7 @@ class GLRobot(GLMeshItem):
 
     @override
     def paint(self) -> None:
-        """Draw the GLRobot
-        """
+        """Draw the GLRobot"""
         ctx = QtGui.QOpenGLContext.currentContext()
         if self.curr_shader is None or self.curr_gl_ctx != ctx:
             # When context is invalid, recreate the shader
