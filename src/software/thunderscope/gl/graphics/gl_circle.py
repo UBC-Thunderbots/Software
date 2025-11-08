@@ -5,7 +5,7 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.gl.graphics.gl_shape import GLShape
 
-from typing import Optional
+from typing import Optional, override
 
 import math
 import numpy as np
@@ -58,6 +58,7 @@ class GLCircle(GLShape):
 
         self._update_shape_data()
 
+    @override
     def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape
