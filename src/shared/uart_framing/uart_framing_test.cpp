@@ -100,9 +100,8 @@ class UartFramingTest : public ::testing::Test
     }
 
     TbotsProto_PowerPulseControl test_message;
-    // TODO: Previously from online calculator, but this value may be incorrect since the
-    // bazel 8 migration
-    const uint16_t TEST_MESSAGE_CRC = 34041;
+
+    const uint16_t TEST_MESSAGE_CRC = 60410;
 };
 
 bool operator==(const TbotsProto_PowerPulseControl& lhs,
@@ -149,5 +148,9 @@ TEST_F(UartFramingTest, marshalling_test)
     EXPECT_EQ(test_frame_unmarshalled.length, TbotsProto_PowerPulseControl_size);
     EXPECT_EQ(test_frame_unmarshalled.crc, TEST_MESSAGE_CRC);
     EXPECT_EQ(test_frame_unmarshalled.power_msg.power_control, test_message);
+    EXPECT_EQ(test_frame_unmarshalled.power_msg.power_control.chicker
+              .chicker_command.auto_chip_or_kick.auto_chip_or_kick.autochip_pulse_width,
+              test_message.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick
+              .autochip_pulse_width);
     EXPECT_TRUE(verifyLengthAndCrc(test_frame_unmarshalled));
 }
