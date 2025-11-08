@@ -10,6 +10,7 @@ from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLTrailLayer(GLLayer):
@@ -34,6 +35,7 @@ class GLTrailLayer(GLLayer):
         self.refresh_interval = TrailValues.DEFAULT_TRAIL_SAMPLING_RATE
         self.refresh_count = self.refresh_interval
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         self.cached_world = self.world_buffer.get(block=False, return_cached=False)

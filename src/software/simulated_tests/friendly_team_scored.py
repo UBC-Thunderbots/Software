@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class FriendlyTeamScored(Validation):
@@ -14,6 +15,7 @@ class FriendlyTeamScored(Validation):
     def __init__(self):
         self.region = tbots_cpp.Field.createSSLDivisionBField().enemyGoal()
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the ball enters the provided regions
 
@@ -28,6 +30,7 @@ class FriendlyTeamScored(Validation):
 
         return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
@@ -36,6 +39,7 @@ class FriendlyTeamScored(Validation):
         """
         return create_validation_geometry([self.region])
 
+    @override
     def __repr__(self):
         return "Checking ball in " + repr(self.region)
 

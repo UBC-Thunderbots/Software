@@ -1,5 +1,5 @@
 import math
-from typing import Optional
+from typing import Optional, override
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtGui import *
@@ -89,6 +89,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.undo_operations = []
         self.redo_operations = []
 
+    @override
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Requires Ctrl + Shift to be pressed along with mouse click
         Gets the point(s) that the mouse click corresponds to on the xy-plane and other planes
@@ -119,6 +120,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             # if a robot was clicked
             self.__handle_existing_robot_event(event, robot_id, index)
 
+    @override
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Requires Ctrl + Shift to be pressed along with mouse click
 
@@ -175,6 +177,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 self.selected_robot_id, point_on_current_plane, self.DEFAULT_ROBOT_ANGLE
             )
 
+    @override
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Reset the selected robot and the in progress move
 
@@ -188,6 +191,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.selected_robot_plane = None
         self.move_in_progress = False
 
+    @override
     def refresh_graphics(self) -> None:
         """Calls the super class refresh graphics
 
@@ -270,6 +274,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # apply the operation
         self.__undo_redo_internal(operation)
 
+    @override
     def toggle_play_state(self) -> bool:
         """When the simulator is paused / played, reset the local positions
 
@@ -633,6 +638,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
     #       GRAPHICS UPDATE METHODS       #
     # # # # # # # # # # # # # # # # # # # #
 
+    @override
     def _update_robots_graphics(self) -> None:
         """Overrides the _update_robots_graphics method in the super class
         Adds local state robots to the friendly team cache before updating the robot graphics

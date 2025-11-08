@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class ExcessivelyDribbling(Validation):
@@ -14,6 +15,7 @@ class ExcessivelyDribbling(Validation):
     def __init__(self):
         self.continous_dribbling_start_point = None
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m.
 
@@ -35,6 +37,7 @@ class ExcessivelyDribbling(Validation):
                 self.continous_dribbling_start_point = ball_position
         return ValidationStatus.PASSING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the max allowed dribbling circle"""
         return create_validation_geometry(
@@ -43,6 +46,7 @@ class ExcessivelyDribbling(Validation):
             else []
         )
 
+    @override
     def __repr__(self):
         return "Check that the dribbling robot has not dribbled for more than 1m"
 
