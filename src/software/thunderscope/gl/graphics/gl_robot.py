@@ -6,41 +6,36 @@ from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import Colors
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 
-from typing import Optional
+from typing import Optional, override
 
 import numpy as np
 
 
-ROBOT_SHADER = shaders.ShaderProgram(
-    "robot-shader",
-    [
-        shaders.VertexShader("""
-            varying vec3 normal;
-            void main() {
-                // find vertex normals and positions
-                normal = normalize(gl_Normal);
-                gl_FrontColor = gl_Color;
-                gl_BackColor = gl_Color;
-                gl_Position = ftransform();
-            }
-        """),
-        shaders.FragmentShader("""
-            varying vec3 normal;
-            void main() {
-                // create an alternate robot color (blue becomes teal, yellow becomes orange)
-                vec3 color = gl_Color.rgb;
-                vec3 color_bright = vec3(color.r, 0.65, color.b);
+ROBOT_SHADER_VERT_SRC = """
+    varying vec3 normal;
+    void main() {
+        // find vertex normals and positions
+        normal = normalize(gl_Normal);
+        gl_FrontColor = gl_Color;
+        gl_BackColor = gl_Color;
+        gl_Position = ftransform();
+    }
+"""
+ROBOT_SHADER_FRAG_SRC = """
+    varying vec3 normal;
+    void main() {
+        // create an alternate robot color (blue becomes teal, yellow becomes orange)
+        vec3 color = gl_Color.rgb;
+        vec3 color_bright = vec3(color.r, 0.65, color.b);
 
-                // this is the vector pointing forward from the robot
-                vec3 front = vec3(-1.0, 1.0, 0.0);
+        // this is the vector pointing forward from the robot
+        vec3 front = vec3(-1.0, 1.0, 0.0);
 
-                // mix colors depending on proximity of the face to the front of the robot
-                float fac = pow(max(dot(normal, front), 0.0), 0.5);
-                gl_FragColor = vec4(mix(color, color_bright, fac), 1.0);
-            }
-        """),
-    ],
-)
+        // mix colors depending on proximity of the face to the front of the robot
+        float fac = pow(max(dot(normal, front), 0.0), 0.5);
+        gl_FragColor = vec4(mix(color, color_bright, fac), 1.0);
+    }
+"""
 
 
 class GLRobot(GLMeshItem):
@@ -61,12 +56,38 @@ class GLRobot(GLMeshItem):
             meshdata=self.__get_mesh_data(),
             color=color,
             smooth=False,
-            shader=ROBOT_SHADER,
         )
 
         self.x = 0
         self.y = 0
         self.orientation = 0
+        self.curr_shader = None
+        self.curr_gl_ctx = None
+
+    @override
+    def initializeGL(self) -> None:
+        """Recreate the shader using the current OpenGL context
+        """
+        self.curr_gl_ctx = QtGui.QOpenGLContext.currentContext()
+        self.curr_shader = shaders.ShaderProgram(
+            "robot-shader",
+            [
+                shaders.VertexShader(ROBOT_SHADER_VERT_SRC),
+                shaders.FragmentShader(ROBOT_SHADER_FRAG_SRC),
+            ],
+        )
+        self.setShader(self.curr_shader)
+        super().initializeGL()
+
+    @override
+    def paint(self) -> None:
+        """Draw the GLRobot
+        """
+        ctx = QtGui.QOpenGLContext.currentContext()
+        if self.curr_shader is None or self.curr_gl_ctx != ctx:
+            # When context is invalid, recreate the shader
+            self.initializeGL()
+        super().paint()
 
     def set_position(self, x: float, y: float) -> None:
         """Set the position of the graphic in the scene
