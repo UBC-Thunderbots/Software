@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_types,
     create_validation_geometry,
 )
+from typing import override
 
 
 class RobotsDoNotCollide(Validation):
@@ -19,6 +20,7 @@ class RobotsDoNotCollide(Validation):
         """
         self.fouled_robots = []
 
+    @override
     def get_validation_status(self, world: World) -> ValidationStatus:
         """Checks if any 2 robots in the world have collided
 
@@ -117,6 +119,7 @@ class RobotsDoNotCollide(Validation):
             else:
                 self.fouled_robots.extend([robot2_id])
 
+    @override
     def get_validation_geometry(self, world: World) -> ValidationGeometry:
         """Returns a list of circles indicating the boundary of each robot in the world
 
@@ -137,6 +140,7 @@ class RobotsDoNotCollide(Validation):
             ]
         )
 
+    @override
     def __repr__(self):
         """String representation of the validation
 

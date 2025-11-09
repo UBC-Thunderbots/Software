@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, override
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
@@ -197,6 +197,7 @@ class GLFieldToolbar(GLToolbar):
         if not replay_mode:
             self.layout().addWidget(self.bookmark_button)
 
+    @override
     def refresh(self) -> None:
         """Refreshes the UI for all the toolbar icons and updates toolbar position"""
         # update the pause button state

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TypeVar, Iterable, Callable
+from typing import override
 
 T = TypeVar("T")
 
@@ -79,11 +80,13 @@ class ObservableList(list):
         elif len(self) < length:
             self.extend([element_generator() for _ in range(length - len(self))])
 
+    @override
     def append(self, element: T) -> None:
         """See list.append"""
         super().append(element)
         self.__notify_elements_added(self.__slice_at_index(len(self) - 1))
 
+    @override
     def insert(self, index: int, element: T) -> None:
         """See list.insert"""
         super().insert(index, element)
@@ -96,6 +99,7 @@ class ObservableList(list):
                 index = 0
         self.__notify_elements_added(self.__slice_at_index(index))
 
+    @override
     def extend(self, other: Iterable[T]) -> None:
         """See list.extend"""
         if other:
@@ -103,29 +107,35 @@ class ObservableList(list):
             super().extend(other)
             self.__notify_elements_added(self.__slice_at_index(index, len(other)))
 
+    @override
     def pop(self, index: int = -1) -> T:
         """See list.pop"""
         self.__notify_elements_removed(self.__slice_at_index(index))
         return super().pop(index)
 
+    @override
     def clear(self) -> None:
         """See list.clear"""
         self.__notify_elements_removed(slice(0, len(self)))
         return super().clear()
 
+    @override
     def __iadd__(self, other: Iterable[T]) -> ObservableList:
         """See list.__iadd__"""
         self.extend(other)
         return self
 
+    @override
     def __imul__(self, multiplier):
         raise NotImplementedError()
 
+    @override
     def __delitem__(self, index_or_slice: int | slice) -> None:
         """See list.__delitem__"""
         self.__notify_elements_removed_index_or_slice(index_or_slice)
         super().__delitem__(index_or_slice)
 
+    @override
     def __setitem__(self, index_or_slice: int | slice, value: T) -> None:
         """See list.__setitem__"""
         notify_added = self.__notify_elements_removed_index_or_slice(index_or_slice)

@@ -1,7 +1,7 @@
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from pyqtgraph.Qt import QtCore, QtGui
 
-from typing import Optional, Callable
+from typing import Optional, Callable, override
 
 
 class GLPainter(GLGraphicsItem):
@@ -30,6 +30,7 @@ class GLPainter(GLGraphicsItem):
         """
         self.draw_functions.append(draw_function)
 
+    @override
     def paint(self):
         """Called by the GLViewWidget to draw this graphic"""
         self.setupGLState()
