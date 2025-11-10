@@ -7,7 +7,6 @@ module(
 ##############################################################
 # Import Dependencies available in the Bazel Central Registry
 ##############################################################
-
 bazel_dep(name = "googletest", version = "1.15.2")
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "pybind11_bazel", version = "2.13.6")
@@ -15,11 +14,10 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.14.0")
 bazel_dep(name = "rules_python", version = "1.4.1")
-bazel_dep(name = "protobuf", version = "31.1")
 bazel_dep(name = "eigen", version = "3.4.0.bcr.3")
-bazel_dep(name = "zlib", version = "1.3.1.bcr.5")
-bazel_dep(name = "nanopb", version = "0.4.9.1")
-bazel_dep(name = "toolchains_protoc", version = "0.4.1")
+bazel_dep(name = "zlib", version = "1.3.1.bcr.6")
+bazel_dep(name = "nanopb", version = "0.4.9.1.bcr.2")
+bazel_dep(name = "protobuf", version = "31.1")
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "yaml-cpp", version = "0.8.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
@@ -78,18 +76,6 @@ use_repo(pip, "nanopb_deps")
 # Configure pybind11 since it is special!
 pybind11_configure = use_extension("@pybind11_bazel//:internal_configure.bzl", "internal_configure_extension")
 use_repo(pybind11_configure, "pybind11")
-
-# Configure proto compiler optimization
-# Optional: choose a version of protoc rather than the latest.
-protoc = use_extension("@toolchains_protoc//protoc:extensions.bzl", "protoc")
-protoc.toolchain(
-    # Creates a repository to satisfy well-known-types dependencies such as
-    # deps=["@com_google_protobuf//:any_proto"]
-    google_protobuf = "com_google_protobuf",
-    # Pin to any version of protoc
-    version = "v31.1",
-)
-use_repo(protoc, "com_google_protobuf", "toolchains_protoc_hub")
 
 ###########################################################################
 # Setup non Bazel Central Registry dependencies & Non MODULE supported deps
