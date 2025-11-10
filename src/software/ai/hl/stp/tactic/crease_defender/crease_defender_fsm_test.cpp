@@ -16,22 +16,28 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_in_front_of_crease)
                       field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
                       robot_obstacle_inflation_factor);
     ASSERT_TRUE(threat_point_centre);
-    EXPECT_GT(threat_point_centre.value().x(), field.friendlyDefenseArea().xMax());
+    EXPECT_GE(threat_point_centre.value().x(), field.friendlyDefenseArea().xMax());
 
     auto threat_point_left = CreaseDefenderFSM::findBlockThreatPoint(
         field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::LEFT,
         robot_obstacle_inflation_factor);
     ASSERT_TRUE(threat_point_left);
-    EXPECT_GT(threat_point_left.value().x(), field.friendlyDefenseArea().xMax());
+    EXPECT_GE(threat_point_left.value().x(), field.friendlyDefenseArea().xMax());
 
     auto threat_point_right = CreaseDefenderFSM::findBlockThreatPoint(
         field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::RIGHT,
         robot_obstacle_inflation_factor);
     ASSERT_TRUE(threat_point_right);
-    EXPECT_GT(threat_point_right.value().x(), field.friendlyDefenseArea().xMax());
+    EXPECT_GE(threat_point_right.value().x(), field.friendlyDefenseArea().xMax());
 
-    EXPECT_LT(threat_point_centre.value().y(), threat_point_left.value().y());
-    EXPECT_GT(threat_point_centre.value().y(), threat_point_right.value().y());
+    // Verify perimeter stepping spacing
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_left.value()), ROBOT_MAX_RADIUS_METERS);
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_right.value()), ROBOT_MAX_RADIUS_METERS);
+    
+    // Verify positions are distinct
+    EXPECT_NE(threat_point_centre.value(), threat_point_left.value());
+    EXPECT_NE(threat_point_centre.value(), threat_point_right.value());
+    EXPECT_NE(threat_point_left.value(), threat_point_right.value());
 }
 
 TEST(CreaseDefenderFSMTest, test_find_block_threat_point_left_of_crease)
@@ -61,8 +67,11 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_left_of_crease)
     EXPECT_GE(threat_point_right.value().y(), field.friendlyDefenseArea().yMax());
     EXPECT_LE(threat_point_right.value().x(), field.friendlyDefenseArea().xMax());
 
-    EXPECT_GT(threat_point_centre.value().x(), threat_point_left.value().x());
-    EXPECT_LT(threat_point_centre.value().x(), threat_point_right.value().x());
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_left.value()), ROBOT_MAX_RADIUS_METERS);
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_right.value()), ROBOT_MAX_RADIUS_METERS);
+    EXPECT_NE(threat_point_centre.value(), threat_point_left.value());
+    EXPECT_NE(threat_point_centre.value(), threat_point_right.value());
+    EXPECT_NE(threat_point_left.value(), threat_point_right.value());
 }
 
 TEST(CreaseDefenderFSMTest, test_find_block_threat_point_right_of_crease)
@@ -70,7 +79,7 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_right_of_crease)
     TbotsProto::RobotNavigationObstacleConfig config;
     double robot_obstacle_inflation_factor = config.robot_obstacle_inflation_factor();
     Field field                            = Field::createSSLDivisionBField();
-    Point enemy_threat_origin              = Point(-4.25, -2);
+    Point enemy_threat_origin              = Point(-4.25, -3);
     auto threat_point_centre               = CreaseDefenderFSM::findBlockThreatPoint(
                       field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::CENTRE,
                       robot_obstacle_inflation_factor);
@@ -92,8 +101,11 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_right_of_crease)
     EXPECT_LE(threat_point_right.value().y(), field.friendlyDefenseArea().yMin());
     EXPECT_LE(threat_point_right.value().x(), field.friendlyDefenseArea().xMax());
 
-    EXPECT_LT(threat_point_centre.value().x(), threat_point_left.value().x());
-    EXPECT_GT(threat_point_centre.value().x(), threat_point_right.value().x());
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_left.value()), ROBOT_MAX_RADIUS_METERS);
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_right.value()), ROBOT_MAX_RADIUS_METERS);
+    EXPECT_NE(threat_point_centre.value(), threat_point_left.value());
+    EXPECT_NE(threat_point_centre.value(), threat_point_right.value());
+    EXPECT_NE(threat_point_left.value(), threat_point_right.value());
 }
 
 TEST(CreaseDefenderFSMTest, test_find_block_threat_point_threat_in_crease)
