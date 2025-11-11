@@ -52,7 +52,6 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     });
 
     double step_distance = 2.0 * ROBOT_MAX_RADIUS_METERS;
-    double step_distance = 2.0 * ROBOT_MAX_RADIUS_METERS;
 
     Point stepped_position = stepAlongPerimeter(defense_perimeter, center_position.value(),
                                                     (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
