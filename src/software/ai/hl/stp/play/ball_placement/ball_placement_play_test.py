@@ -37,6 +37,8 @@ def ball_placement_play_setup(
         .negXPosYCorner(),
     ]
 
+    yellow_bots = []
+
     # Optionally skip yellow robots entirely
     if not blue_only:
         yellow_bots = [
@@ -51,8 +53,6 @@ def ball_placement_play_setup(
             .enemyDefenseArea()
             .negXPosYCorner(),
         ]
-    else:
-        yellow_bots = []
 
     # Game Controller Setup
     simulated_test_runner.gamecontroller.send_gc_command(
@@ -74,9 +74,7 @@ def ball_placement_play_setup(
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
     if not blue_only:
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
