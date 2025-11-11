@@ -166,35 +166,40 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
     return std::nullopt;
 }
 
-void sortThreatsInDecreasingOrder(std::vector<std::pair<EnemyThreat, float>> threats)
+void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats, const Field& field)
 {
+
     // A lambda function that implements the '<' operator for the EnemyThreat struct
     // so it can be sorted. Lower threats are "less than" higher threats.
-    auto enemyThreatLessThanComparator = [](const std::pair<EnemyThreat, float> &a, const std::pair<EnemyThreat, float> &b)
+    auto enemyThreatLessThanComparator = [&field](const EnemyThreat &a, const EnemyThreat &b)
     {
         // Robots with the ball are more threatening than robots without the ball, and
         // robots with the ball are the most threatening since they can shoot or move
         // the ball towards our net
-        if (a.first.has_ball && !b.first.has_ball)
+        std::vector<float> a_threat = getThreatScore(a, field);
+        std::vector<float> b_threat = getThreatScore(b, field);
+        float a_threatscore = std::accumulate(a_threat.begin(), a_threat.end(), 0.0f);
+        float b_threatscore = std::accumulate(b_threat.begin(), b_threat.end(), 0.0f);
+        if (a.has_ball && !b.has_ball)
         {
             return false;
         }
-        else if (!a.first.has_ball && b.first.has_ball)
+        else if (!a.has_ball && b.has_ball)
         {
             return true;
         }
-        if (a.second>b.second)
+        if (a_threatscore>b_threatscore)
         {
             return false;
         }
-        else if (a.second<b.second)
+        else if (a_threatscore<b_threatscore)
         {
             return true;
         }
         else
         {
             //get closer distance
-            if (a.first.best_shot_angle>b.first.best_shot_angle)
+            if (a.best_shot_angle>b.best_shot_angle)
             {
                 return false;
             }
@@ -208,28 +213,30 @@ void sortThreatsInDecreasingOrder(std::vector<std::pair<EnemyThreat, float>> thr
     };
 
     // Sort threats from highest threat to lowest threat
-    // Use reverse iterators to sort the vector in descending order
+    // Use reverse iterators to sort the vector in ssdescending order
     std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
+    std::cout << "\nExtracted Ages:" << std::endl;
+    for (EnemyThreat a : threats) {
+        std::vector<float> temp = getThreatScore(a, field);
+        LOG(INFO)<<std::endl<<a.robot.id() <<" : " << temp[0]<<" "<<temp[1]<<" "<<temp[2]<<" "<<temp[3]<<" "<<temp[4];
+    }
 
 }
 
-float get_threat_score(const EnemyThreat& enemy, const Ball& ball)
+std::vector<float> getThreatScore(const EnemyThreat& enemy, const Field& field)
 {
-    //Pure shot angle
-    Angle goal_angle = enemy.goal_angle;
-    Angle mid = Angle::fromRadians(boost::math::float_constants::pi/4);
-    int k = 5;
-    float S_geo = 1/(1+exp(-k*(goal_angle.toRadians()-mid.toRadians())));
+    //Normalized distance - calculate distance from robot to enemy goal
+    //When distance is half the goal width, its at 1/e of maximum threat
+    Point friendly_goal_center = field.friendlyGoalCenter();
+    Vector to_goal = friendly_goal_center - enemy.robot.position();
+    float S_geo = expf(-1.0*(to_goal.length())/4.5);
 
-    //Distance from ball normalized
-    float distance_ball = (enemy.robot.position()-ball.position()).length();
-    float S_pos = expf(-0.8f *distance_ball);
+    //Distance from goal
+    float num_pass = enemy.num_passes_to_get_possession;
+    float S_pos = expf(-num_pass);
 
-    //Orientation
-    Vector to_goal = Point(3,0) - enemy.robot.position();
-    float facing_direction = to_goal.normalize().dot(enemy.robot.velocity().normalize());
-    float S_ori = std::max(static_cast<float>(0.0),facing_direction);
-
+    //Angle to goal
+    float S_angle = enemy.goal_angle.toRadians();
     //Visibility
     float block_frac = enemy.best_shot_angle->toRadians()/enemy.goal_angle.toRadians();
     float S_vis = 1.0f - block_frac;
@@ -238,14 +245,15 @@ float get_threat_score(const EnemyThreat& enemy, const Ball& ball)
     float vel_dot = enemy.robot.velocity().normalize().dot(to_goal.normalize());
     float S_pred = std::max(0.0f,vel_dot)*1.0f+0.2f*enemy.robot.velocity().length();
 
-    return 0.3f*S_geo + 0.25f*S_pos + 0.15f*S_ori + 0.2f*S_vis + 0.1f*S_pred;
+    return {0.4f*S_geo ,0.25f*S_pos,0.1f*S_angle,0.1f*S_vis,0.15f*S_pred};
 }
 
 std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &friendly_team,
                                             Team enemy_team, const Ball &ball,
                                             bool include_goalie)
 {
-    std::vector<std::pair<EnemyThreat, float>> robot_to_threat;
+
+    std::vector<EnemyThreat> threats;
     if (!include_goalie && enemy_team.getGoalieId())
     {
         enemy_team.removeRobotWithId(*enemy_team.getGoalieId());
@@ -296,17 +304,13 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
                            best_shot_angle, best_shot_target, num_passes,
                            passer};
 
-        robot_to_threat.emplace_back(threat,get_threat_score(threat,ball));
+        threats.emplace_back(threat);
     }
 
     // Sort the threats so the "most threatening threat" is first in the vector, and the
     // "least threatening threat" is last in the vector
-    sortThreatsInDecreasingOrder(robot_to_threat);
-    std::vector<EnemyThreat> threats;
-    threats.reserve(robot_to_threat.size());
-    for (const auto p: robot_to_threat)
-    {
-        threats.push_back(p.first);
-    }
+    sortThreatsInDecreasingOrder(threats, field);
+
     return threats;
+
 }

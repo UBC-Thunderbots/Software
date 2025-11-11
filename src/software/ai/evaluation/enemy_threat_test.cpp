@@ -402,6 +402,8 @@ TEST(SortEnemyThreatsTest,
     EXPECT_EQ(threats, expected_result);
 }
 
+
+
 TEST(EnemyThreatTest, no_enemies_on_field)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
@@ -417,6 +419,7 @@ TEST(EnemyThreatTest, no_enemies_on_field)
     // Make sure we got the correct number of results
     EXPECT_EQ(result.size(), 0);
 }
+
 
 
 TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
@@ -452,6 +455,210 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     EXPECT_EQ(threat.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat.passer);
 }
+
+TEST(SortEnemyThreatsTest,
+     three_enemies_chained_pass_scenario)
+{
+    // This test evaluates the enemy threat for a 3-vs-1 scenario
+    //
+    //                                    enemy robot 2
+    //
+    //
+    //      enemy robot 1
+    //          ball
+    //
+    //                         friendly robot
+    //
+    //
+    //                                                    enemy robot 3
+    //
+    //
+    //                       | friendly net |
+    //                       ----------------
+    //
+    // This tests threat cases where passes between enemy robots are possible, and where
+    // different robots have significantly different views of the goal.
+    //
+    // Enemy robot 1 is the most threatening because it has the ball and has a good view
+    // of the goal. Enemy robot 2 is the second most threatening because it also has a
+    // good view of the goal, and can receive the ball quickly via a pass from enemy 1.
+    // Finally, enemy robot 3 is the least threatening because it would take 2 passes to
+    // get the ball, and doesn't have a great angle on the goal because it's off to
+    // the side.
+
+    Robot e1 = Robot(0, Point(-2.5, 0.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e2 = Robot(1, Point(-1.0, 1.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e3 = Robot(2, Point(-4.0, -1.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    auto t1 = EnemyThreat{e1, true,  Angle::fromDegrees(55), Angle::fromDegrees(35),
+                          Point(-2.5, 0.5), 0, std::nullopt};
+    auto t2 = EnemyThreat{e2, false, Angle::fromDegrees(50), Angle::fromDegrees(25),
+                          Point(-1.0, 1.5), 1, e1};
+    auto t3 = EnemyThreat{e3, false, Angle::fromDegrees(30), Angle::fromDegrees(10),
+                          Point(-4.0, -1.5), 2, e2};
+
+    std::vector<EnemyThreat> threats = {t3, t2, t1};
+    std::vector<EnemyThreat> expected = {t1, t2, t3};
+
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected);
+}
+
+
+TEST(SortEnemyThreatsTest,
+     four_enemies_equal_passes_but_different_goal_angles)
+{
+    // This test simulates four enemy robots all within passing range, but at different
+    // lateral positions, giving each a distinct goal angle.
+    //
+    //                 enemy 2
+    //
+    //      enemy 1           ball             enemy 3
+    //
+    //
+    //                              enemy 4
+    //
+    //                      | friendly net |
+    //                      ----------------
+    //
+    // All can be reached in one pass, but their field positions give them different
+    // views of the goal. Enemy 3, centered with a wide shooting lane, is most dangerous.
+    // Enemy 2 has a smaller but still open shot. Enemy 1 and 4 are wider and less aligned.
+
+    Robot e1 = Robot(0, Point(-3.0, -1.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e2 = Robot(1, Point(-2.0, 0.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e3 = Robot(2, Point(-1.5, 0.0), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e4 = Robot(3, Point(-2.0, -1.0), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    auto t1 = EnemyThreat{e1, false, Angle::fromDegrees(40), Angle::fromDegrees(15),
+                          Point(-3.0, -1.5), 1, std::nullopt};
+    auto t2 = EnemyThreat{e2, false, Angle::fromDegrees(55), Angle::fromDegrees(25),
+                          Point(-2.0, 0.5), 1, std::nullopt};
+    auto t3 = EnemyThreat{e3, false, Angle::fromDegrees(70), Angle::fromDegrees(30),
+                          Point(-1.5, 0.0), 1, std::nullopt};
+    auto t4 = EnemyThreat{e4, false, Angle::fromDegrees(45), Angle::fromDegrees(20),
+                          Point(-2.0, -1.0), 1, std::nullopt};
+
+    std::vector<EnemyThreat> threats = {t1, t4, t2, t3};
+    std::vector<EnemyThreat> expected = {t3, t2, t4, t1};
+
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected);
+}
+TEST(SortEnemyThreatsTest,
+     five_enemies_staggered_chain_attack)
+{
+    // This scenario represents a coordinated chain attack where enemies are spread
+    // across depth layers of the field.
+    //
+    //              enemy 2
+    //
+    //      enemy 1 (has ball)
+    //
+    //                       enemy 3
+    //
+    //      enemy 4
+    //
+    //                                 enemy 5
+    //
+    //                         | friendly net |
+    //                         ----------------
+    //
+    // Robot 1 has the ball and initiates the attack.
+    // Robot 2 is forward and open, reachable in 1 pass.
+    // Robot 3 is slightly off-center, reachable in 2 passes.
+    // Robot 4 is deeper but blocked — slower chain.
+    // Robot 5 has a narrow shooting lane, least threat overall.
+
+    Robot e1 = Robot(0, Point(-3.5, 1.0), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e2 = Robot(1, Point(-2.0, 1.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e3 = Robot(2, Point(-1.0, 0.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e4 = Robot(3, Point(-4.0, -0.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e5 = Robot(4, Point(-1.5, -1.0), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    auto t1 = EnemyThreat{e1, true,  Angle::fromDegrees(60), Angle::fromDegrees(40),
+                          Point(-3.5, 1.0), 0, std::nullopt};
+    auto t2 = EnemyThreat{e2, false, Angle::fromDegrees(55), Angle::fromDegrees(25),
+                          Point(-2.0, 1.5), 1, e1};
+    auto t3 = EnemyThreat{e3, false, Angle::fromDegrees(50), Angle::fromDegrees(20),
+                          Point(-1.0, 0.5), 2, e2};
+    auto t4 = EnemyThreat{e4, false, Angle::fromDegrees(45), Angle::fromDegrees(15),
+                          Point(-4.0, -0.5), 3, e3};
+    auto t5 = EnemyThreat{e5, false, Angle::fromDegrees(35), Angle::fromDegrees(10),
+                          Point(-1.5, -1.0), 4, e4};
+
+    std::vector<EnemyThreat> threats = {t5, t3, t1, t4, t2};
+    std::vector<EnemyThreat> expected = {t1, t2, t3, t4, t5};
+
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected);
+}
+
+
+TEST(SortEnemyThreatsTest,
+     defensive_overload_flank_positions)
+{
+    // Scenario: 5 enemy attackers, only one has the ball near the top, others flank-wide.
+    // This simulates a wide formation attack where some robots have poor goal view.
+    //
+    //                   enemy 1 (has ball)
+    //        enemy 2
+    //
+    //                                      enemy 3
+    //
+    //        enemy 4
+    //
+    //                                  enemy 5
+    //
+    //                          | friendly net |
+    //                          ----------------
+    //
+    // Enemy 1 is most threatening (has the ball, central).
+    // Enemy 2 and 3 are next (one-pass away and wide but still viable).
+    // Enemy 4 and 5 are far to the flanks and have narrow goal angles.
+
+    Robot e1 = Robot(0, Point(-2.5, 1.2), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e2 = Robot(1, Point(-3.0, 2.0), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e3 = Robot(2, Point(-3.0, 0.0), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e4 = Robot(3, Point(-4.5, -1.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot e5 = Robot(4, Point(-1.0, -1.5), Vector(0, 0), Angle::zero(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    auto t1 = EnemyThreat{e1, true,  Angle::fromDegrees(70), Angle::fromDegrees(45),
+                          Point(-2.5, 1.2), 0, std::nullopt};
+    auto t2 = EnemyThreat{e2, false, Angle::fromDegrees(55), Angle::fromDegrees(30),
+                          Point(-3.0, 2.0), 1, e1};
+    auto t3 = EnemyThreat{e3, false, Angle::fromDegrees(50), Angle::fromDegrees(25),
+                          Point(-3.0, 0.0), 1, e1};
+    auto t4 = EnemyThreat{e4, false, Angle::fromDegrees(35), Angle::fromDegrees(10),
+                          Point(-4.5, -1.5), 2, e2};
+    auto t5 = EnemyThreat{e5, false, Angle::fromDegrees(30), Angle::fromDegrees(8),
+                          Point(-1.0, -1.5), 2, e3};
+
+    std::vector<EnemyThreat> threats = {t4, t2, t1, t5, t3};
+    std::vector<EnemyThreat> expected = {t1, t2, t3, t4, t5};
+
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected);
+}
+
+
 
 TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
 {
