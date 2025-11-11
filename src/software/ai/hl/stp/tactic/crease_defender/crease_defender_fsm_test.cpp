@@ -31,9 +31,11 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_in_front_of_crease)
     EXPECT_GE(threat_point_right.value().x(), field.friendlyDefenseArea().xMax());
 
     // Verify perimeter stepping spacing
-    EXPECT_GT(distance(threat_point_centre.value(), threat_point_left.value()), ROBOT_MAX_RADIUS_METERS);
-    EXPECT_GT(distance(threat_point_centre.value(), threat_point_right.value()), ROBOT_MAX_RADIUS_METERS);
-    
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_left.value()),
+              ROBOT_MAX_RADIUS_METERS);
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_right.value()),
+              ROBOT_MAX_RADIUS_METERS);
+
     // Verify positions are distinct
     EXPECT_NE(threat_point_centre.value(), threat_point_left.value());
     EXPECT_NE(threat_point_centre.value(), threat_point_right.value());
@@ -67,8 +69,10 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_left_of_crease)
     EXPECT_GE(threat_point_right.value().y(), field.friendlyDefenseArea().yMax());
     EXPECT_LE(threat_point_right.value().x(), field.friendlyDefenseArea().xMax());
 
-    EXPECT_GT(distance(threat_point_centre.value(), threat_point_left.value()), ROBOT_MAX_RADIUS_METERS);
-    EXPECT_GT(distance(threat_point_centre.value(), threat_point_right.value()), ROBOT_MAX_RADIUS_METERS);
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_left.value()),
+              ROBOT_MAX_RADIUS_METERS);
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_right.value()),
+              ROBOT_MAX_RADIUS_METERS);
     EXPECT_NE(threat_point_centre.value(), threat_point_left.value());
     EXPECT_NE(threat_point_centre.value(), threat_point_right.value());
     EXPECT_NE(threat_point_left.value(), threat_point_right.value());
@@ -101,8 +105,10 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_right_of_crease)
     EXPECT_LE(threat_point_right.value().y(), field.friendlyDefenseArea().yMin());
     EXPECT_LE(threat_point_right.value().x(), field.friendlyDefenseArea().xMax());
 
-    EXPECT_GT(distance(threat_point_centre.value(), threat_point_left.value()), ROBOT_MAX_RADIUS_METERS);
-    EXPECT_GT(distance(threat_point_centre.value(), threat_point_right.value()), ROBOT_MAX_RADIUS_METERS);
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_left.value()),
+              ROBOT_MAX_RADIUS_METERS);
+    EXPECT_GT(distance(threat_point_centre.value(), threat_point_right.value()),
+              ROBOT_MAX_RADIUS_METERS);
     EXPECT_NE(threat_point_centre.value(), threat_point_left.value());
     EXPECT_NE(threat_point_centre.value(), threat_point_right.value());
     EXPECT_NE(threat_point_left.value(), threat_point_right.value());
