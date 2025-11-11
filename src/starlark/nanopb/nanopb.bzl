@@ -3,11 +3,6 @@ load("@platformio_rules//platformio:platformio.bzl", "PlatformIOLibraryInfo")
 # This file is heavily referencing platformio.bzl from rules_platformio project
 # https://github.com/mum4k/platformio_rules
 
-# This rule is an adapter between proto_library + nanopb for the platformio_library
-# There is a similar rule: cc_nanopb_proto_library from nanopb natively which does something similar
-# However, platformio_rules do not support cc_library due to the way cross compiling works in platformio for
-# embedded systems (cc_library compiles srcs to .so/.a files which is not supported the same way by platformio).
-
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 
 # The relative filename of the header file.
@@ -365,6 +360,11 @@ def _nanopb_proto_library_impl(ctx):
     1) DefaultInfo             - A zip archive of generated nanopb files & deps, mandatory for all rule outputs
     2) PlatformIOLibraryInfo   - A library compatible with PlatformIO rules so this can be used as a dep
     3) CcInfo                  - A cc compilation context so that cc_library can use this as a dep
+
+    This rule is an adapter between proto_library + nanopb for the platformio_library
+    There is a similar rule: cc_nanopb_proto_library from nanopb natively which does something similar
+    However, platformio_rules do not support cc_library due to the way cross compiling works in platformio for
+    embedded systems (cc_library compiles srcs to .so/.a files which is not supported the same way by platformio).
 
     :param ctx:                         The context to refer to
     :return:
