@@ -74,7 +74,9 @@ def ball_placement_play_setup(
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
     if not blue_only:
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
