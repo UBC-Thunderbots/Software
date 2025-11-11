@@ -159,10 +159,10 @@ INSTANTIATE_TEST_CASE_P(
         // Enemy threat in front of crease, RIGHT
         std::make_tuple(Point(1.5, 2), TbotsProto::CreaseDefenderAlignment::RIGHT, 2),
         // Enemy threat left side of crease, RIGHT
-        std::make_tuple(Point(-3.5, 2.5), TbotsProto::CreaseDefenderAlignment::RIGHT, 1),
+        std::make_tuple(Point(-2.5, 2.5), TbotsProto::CreaseDefenderAlignment::RIGHT, 1),
         // Enemy threat left side of crease, CENTRE
         std::make_tuple(Point(-4, 2.5), TbotsProto::CreaseDefenderAlignment::CENTRE, 0),
         // goal Enemy threat right side of crease, RIGHT
-        std::make_tuple(Point(-4, -2), TbotsProto::CreaseDefenderAlignment::RIGHT, 5),
+        std::make_tuple(Point(-4.2, -2), TbotsProto::CreaseDefenderAlignment::RIGHT, 5),
         // Enemy threat right side of crease, LEFT
         std::make_tuple(Point(-4.25, -2), TbotsProto::CreaseDefenderAlignment::LEFT, 5)));
