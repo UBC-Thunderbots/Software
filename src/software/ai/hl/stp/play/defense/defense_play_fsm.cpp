@@ -77,9 +77,9 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
         defender_assignment_config.max_num_crease_defenders();
 
     // Get primary threat position for calculating pass defender positions
-    Point primary_threat_position = enemy_threats.empty() 
-        ? event.common.world_ptr->ball().position()
-        : enemy_threats.front().robot.position();
+    Point primary_threat_position = enemy_threats.empty()
+                                        ? event.common.world_ptr->ball().position()
+                                        : enemy_threats.front().robot.position();
 
     // Choose which defender assignments to assign defenders to based on number
     // of tactics available to set
@@ -129,13 +129,14 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
                     else
                     {
                         // Calculate proper pass defender position: midpoint between
-                        // primary threat and the threat this crease defender was defending
+                        // primary threat and the threat this crease defender was
+                        // defending
                         Point threat_position = defender_assignment.target;
                         Segment passing_lane(primary_threat_position, threat_position);
                         Point pass_defender_position = passing_lane.midPoint();
-                        
+
                         DefenderAssignment pass_defender_assignment = defender_assignment;
-                        pass_defender_assignment.type = PASS_DEFENDER;
+                        pass_defender_assignment.type               = PASS_DEFENDER;
                         pass_defender_assignment.target = pass_defender_position;
                         pass_defender_assignments.emplace_back(pass_defender_assignment);
                         i++;
@@ -149,10 +150,10 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
                 Point threat_position = defender_assignment.target;
                 Segment passing_lane(primary_threat_position, threat_position);
                 Point pass_defender_position = passing_lane.midPoint();
-                
+
                 DefenderAssignment pass_defender_assignment = defender_assignment;
-                pass_defender_assignment.type = PASS_DEFENDER;
-                pass_defender_assignment.target = pass_defender_position;
+                pass_defender_assignment.type               = PASS_DEFENDER;
+                pass_defender_assignment.target             = pass_defender_position;
                 pass_defender_assignments.emplace_back(pass_defender_assignment);
             }
         }
@@ -238,7 +239,7 @@ bool DefensePlayFSM::validateCreaseDefenderPosition(const Field& field,
             if (distance(position.value(), goal_line) < safety_margin &&
                 !contains(field.friendlyGoal(), position.value()))
             {
-                return true; // close to goal line - valid
+                return true;  // close to goal line - valid
             }
 
             if (contains(field.friendlyGoal(), position.value()))
@@ -248,7 +249,7 @@ bool DefensePlayFSM::validateCreaseDefenderPosition(const Field& field,
 
             if (distance(position.value(), goal_line) < robot_diameter)
             {
-                continue; // invalid
+                continue;  // invalid
             }
 
             return true;  // At least one alignment is valid
