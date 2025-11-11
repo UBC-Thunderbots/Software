@@ -27,7 +27,7 @@ _ZIP_COMMAND = "cd {output_dir} && zip -qq -r -u {zip_filename} lib/"
 
 def _generate_output_dirs(ctx):
     """
-    This helper creates the folder we will place all our generation artifacts in
+    This helper creates the folder we will place all our generation artifacts in and its corresponding path.
 
     Because we need to generate the `.c` and `.h` files for all the proto files required
     for this library, including all the transitive dependencies, we would like to
@@ -35,6 +35,9 @@ def _generate_output_dirs(ctx):
     permit us to modify/produce files outside the folder that this rule is called from.
     We get around this be reproducing the folder structure under a generation folder
     and adding the root of this directory as an include path.
+
+    :param ctx: The context to refer to
+    :return: generation_folder_name, generated_folder_abs_path(path to generation_folder_name)
     """
     generation_folder_name = ctx.attr.name + "_nanopb_gen/"
     generated_folder_abs_path = ctx.genfiles_dir.path + "/" + \
@@ -45,6 +48,11 @@ def _collect_deps(ctx):
     """
     Generate import flags for the protobuf compiler so it can find proto files we
     depend on, and a list of proto files to include
+
+    :param ctx: The context to refer to
+    :return:
+        all_proto_files        - depset of proto files meant for compilation
+        all_proto_include_dirs - depset of paths for transitive deps to be linked
     """
     all_proto_files = depset()
     all_proto_include_dirs = depset()
@@ -59,9 +67,12 @@ def _collect_deps(ctx):
 
 def _collect_compile_options(ctx, all_options_map):
     """
+    Populates the given map with any nanopb/proto options types.
+
     See https://jpa.kapsi.fi/nanopb/docs/reference.html#proto-file-options
     Section "Defining the options in a .options file" for more information
     on nanopb option files
+    :param all_options_map: Map to populate with options
     """
     for opt_file in ctx.files.options:
         opt_basename = opt_file.basename[:-len(".options")]
@@ -75,7 +86,18 @@ def _compile_protos_for_nanopb(
         generation_folder_name,
         generated_folder_abs_path):
     """
-    This helper compiles the proto files using the protoc compiler to generate the small-sized nanopb .c and .h files
+    Compiles the proto files using the protoc compiler to generate the small-sized nanopb .c and .h files.
+
+    :param ctx:                       The context to refer to
+    :param all_proto_files:           Proto files to compile
+    :param all_proto_include_dirs:    Proto includes to link for compilation
+    :param all_options_map:           Proto options to include for configuration of compilation
+    :param generation_folder_name:    Name of folder to place generated artifacts
+    :param generated_folder_abs_path: Path of folder to place generated artifacts
+
+    :return:
+        all_proto_hdr_files - Nanopb generated header files
+        all_proto_src_files - Nanopb generated source files
     """
     all_proto_hdr_files = []
     all_proto_src_files = []
@@ -122,7 +144,13 @@ def _compile_protos_for_nanopb(
 
 def _collect_explicit_nanopb_contexts(ctx):
     """
-    Get the compilation and linking contexts from all nanopb srcs
+    Get any compilation and linking contexts from any additional explicitly provided nanopb libs.
+
+    :param ctx: The context to refer to
+
+    :return:
+        nanopb_linking_contexts     - Linking contexts
+        nanopb_compilation_contexts - Compilation contexts
     """
     nanopb_compilation_contexts = [
         label[CcInfo].compilation_context
@@ -138,7 +166,10 @@ def _collect_explicit_nanopb_contexts(ctx):
 
 def _collect_implicit_nanopb_deps(ctx):
     """
-    Get include paths from Nanopb dependencies
+    Get any transitive/implicit compilation and linking contexts from any additionally provided nanopb libs.
+
+    :param ctx: The context to refer to
+    :return: nanopb_includes - list of paths to contexts included for provided deps
     """
     nanopb_includes = []
     for lib in ctx.attr.nanopb_libs:
@@ -160,7 +191,25 @@ def _construct_cc_info(
         nanopb_includes,
         nanopb_linking_contexts,
         nanopb_compilation_contexts):
-    """Constructs the CcInfo"""
+    """
+    Constructs the CcInfo, the underlying provider for cc_library.
+
+    Since CcInfo's in a dep tree are compiled incrementally into artifacts and linked during bazel build,
+    we must construct this build target explicitly so that any cc_library's in our codebase can refer to these
+    nanopb proto libs. Nanopb has their own similar implementation to support nanopb proto usage in C++,
+    but we cannot use that since platformio requires some unique additional processing.
+
+    :param ctx:                         The context to refer to
+    :param all_proto_include_dirs:      Proto includes to link for compilation
+    :param all_proto_hdr_files:         Nanopb generated header files to compile
+    :param all_proto_src_files:         Nanopb generated source files to compile
+    :param generated_folder_abs_path:   Path of folder to place generated artifacts
+    :param nanopb_includes:             Additional nanopb-specific files to link
+    :param nanopb_linking_contexts:     Additional nanopb-specific linked contexts to merge
+    :param nanopb_compilation_contexts: Additional nanopb-specific compilation contexts to merge
+
+    :return: CcInfo with the contents of provided proto files.
+    """
 
     cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
@@ -209,8 +258,10 @@ def _construct_cc_info(
 
 def _construct_default_info(zip_file):
     """
-    Builder for the DefaultInfo provider. This provider is necessary for every rule in Bazel and is a collection of
+    Builder for the DefaultInfo provider.
+    This provider is necessary for every rule in Bazel and is a collection of
     deps and files. Without this provider, the rule will not perform any actions or generate any artifacts.
+
     :param zip_file: Archived files to wrap as a DefaultInfo
 
     :return: DefaultInfo with contents of zip_file
@@ -235,7 +286,19 @@ def _package_platformio_lib(ctx, all_proto_hdr_files, all_proto_src_files):
     default location of libraries/headers. This is necessary due to platformIO's API definition and where it expects
     lib headers to be located.
 
+    Explicit copying of sources/headers is necessary since platformio during its upload process uses a
+    custom internal compiler to compile .c and .h files. This is the central reason why we cannot use CcInfo to manage
+    these libs. Hence, the transitive deps of a lib must contain the actual locations of source and headers rather
+    than incremental build artifacts as in the case with CcInfo.
     See https://docs.platformio.org/en/latest/projectconf/sections/platformio/options/directory/lib_dir.html
+
+    :param ctx:                         The context to refer to
+    :param all_proto_hdr_files:         Nanopb generated header files to copy
+    :param all_proto_src_files:         Nanopb generated source files to copy
+
+    :return:
+        outputs  - File destinations once the copy commands are executed
+        commands - Copy commands to populate the new libs dir
     """
     outputs = []
     commands = []
@@ -265,8 +328,18 @@ def _package_platformio_lib(ctx, all_proto_hdr_files, all_proto_src_files):
 
 def _package_archive(ctx, all_proto_hdr_files, all_proto_src_files):
     """
-    platformio_* bazel rules require a provider named transitive_zip_files and an output zip file
-    these contain all files needed for compilation with platformio.
+    Creates an archive containing all the provided header and source nanopb files.
+
+    Extra: platformio_* bazel rules require a provider named transitive_zip_files and an output zip file which
+    contains all files needed for compilation with platformio.
+
+    :param ctx:                         The context to refer to
+    :param all_proto_hdr_files:         Nanopb generated header files to package
+    :param all_proto_src_files:         Nanopb generated source files to package
+
+    :return:
+        zip_file - A zipped folder containing the packaged headers and source (& transitive deps) files
+                   in platformio structure ready for compilation/upload
     """
     inputs = all_proto_hdr_files + all_proto_src_files
 
@@ -292,14 +365,18 @@ def _nanopb_proto_library_impl(ctx):
     1) DefaultInfo             - A zip archive of generated nanopb files & deps, mandatory for all rule outputs
     2) PlatformIOLibraryInfo   - A library compatible with PlatformIO rules so this can be used as a dep
     3) CcInfo                  - A cc compilation context so that cc_library can use this as a dep
+
+    :param ctx:                         The context to refer to
+    :return:
+        DefaultInfo
+        PlatformIOLibraryInfo
+        CcInfo
     """
     (generation_folder_name, generated_folder_abs_path) = _generate_output_dirs(ctx)
-
     (all_proto_files, all_proto_include_dirs) = _collect_deps(ctx)
 
     all_options_map = {}
     _collect_compile_options(ctx, all_options_map)
-
     (all_proto_hdr_files, all_proto_src_files) = _compile_protos_for_nanopb(
         ctx,
         all_proto_files,
