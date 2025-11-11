@@ -168,6 +168,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
         test_timeout_s=30,
     )
 
+
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
     sys.exit(pytest.main([__file__, "-svv"]))

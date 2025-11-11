@@ -40,23 +40,21 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     }
 
     // Center uses inflated area, so polygon must as well
-    double robot_radius_expansion = 
+    double robot_radius_expansion =
         ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
 
     Rectangle defense_area = field.friendlyDefenseArea().expand(robot_radius_expansion);
-    Polygon defense_perimeter({
-        defense_area.posXPosYCorner(), 
-        defense_area.posXNegYCorner(), 
-        defense_area.negXNegYCorner(), 
-        defense_area.negXPosYCorner()
-    });
+    Polygon defense_perimeter(
+        {defense_area.posXPosYCorner(), defense_area.posXNegYCorner(),
+         defense_area.negXNegYCorner(), defense_area.negXPosYCorner()});
 
     double step_distance = 2.0 * ROBOT_MAX_RADIUS_METERS;
 
-    Point stepped_position = stepAlongPerimeter(defense_perimeter, center_position.value(),
-                                                    (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
-                                                    ? -step_distance
-                                                    : step_distance);
+    Point stepped_position = stepAlongPerimeter(
+        defense_perimeter, center_position.value(),
+        (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
+            ? -step_distance
+            : step_distance);
 
     return stepped_position;
 }
