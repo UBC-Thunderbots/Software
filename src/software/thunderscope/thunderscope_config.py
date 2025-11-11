@@ -42,14 +42,6 @@ def initialize_application() -> None:
     # Setup stylesheet
     qdarktheme.setup_theme()
 
-    # Force recompilation of shaders; the OpenGL context will change
-    # when we reinitialize the app, so we need to make sure that all
-    # shaders will get compiled in the current context
-    for shader_prog in pyqtgraph.opengl.shaders.Shaders:
-        shader_prog.prog = None
-        for shader in shader_prog.shaders:
-            shader.compiled = None
-
 
 def configure_robot_view(
     proto_unix_io: ProtoUnixIO, available_control_modes: list[IndividualRobotMode]
