@@ -187,7 +187,7 @@ def _construct_cc_info(
         nanopb_linking_contexts,
         nanopb_compilation_contexts):
     """
-    Constructs the CcInfo, the underlying provider for cc_library.
+    Builder for CcInfo, the underlying provider for cc_library.
 
     Since CcInfo's in a dep tree are compiled incrementally into artifacts and linked during bazel build,
     we must construct this build target explicitly so that any cc_library's in our codebase can refer to these
@@ -264,6 +264,16 @@ def _construct_default_info(zip_file):
     return DefaultInfo(files = depset([zip_file]))
 
 def _construct_platformio_library_info(ctx, zip_file):
+    """
+    Builder for the PlatformIOLibraryInfo provider.
+
+    This is the provider used by platformio_rules so that the generated lib can be used as a dep in platformio_library.
+    This provider allows for platformio_rules to aggregate dependencies via paths to source files and also allows for
+    for using other platformio_library's as a dep to this lib. Transitive deps are also collected at this stage.
+
+    :param zip_file: Files and deps to include in the library
+    :return: PlatformIOLibraryInfo with the contents of zip_file
+    """
     runfiles = ctx.runfiles(files = [zip_file])
     transitive_libdeps = []
     for dep in ctx.attr.deps:
