@@ -2,6 +2,7 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from pyqtgraph.opengl.GLViewWidget import GLViewMixin
 from pyqtgraph.opengl.shaders import ShaderProgram
 from pyqtgraph.Qt import QtGui
+from typing import Callable
 
 
 def GLGraphicsItem_setParentItem_patched(self, parent: GLGraphicsItem) -> None:
@@ -68,11 +69,12 @@ def GLViewMixin_removeItem_patched(self, item: GLGraphicsItem) -> None:
     self.update()
 
 
-def ShaderProgram_program_patched(original):
+def ShaderProgram_program_patched(original: Callable) -> Callable:
     """Returns a patched version of ShaderProgram.program that forces
     recompilation of the shader program when the OpenGL context changes.
 
     :param original: the original ShaderProgram.program method
+    :return: the patched ShaderProgram.program method
     """
 
     def patched(self):
