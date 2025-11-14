@@ -40,7 +40,6 @@ class BallIsOffGround(Validation):
 
         :param world: The world msg to create validation geometry from
         :return: ValidationGeometry containing geometry to visualize
-
         """
         velocity = tbots_cpp.createVector(world.ball.current_state.global_velocity)
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
@@ -61,7 +60,6 @@ class BallIsOffGround(Validation):
 
         :param centre_point: The position to create octagon geometry at
         :return: An octagon ValidationGeometry
-
         """
         start = tbots_cpp.Vector(self.OCTAGON_RADIUS, 0.0)
         # offset 45/2 degrees so octagon is parallel to the x/y axis
