@@ -77,22 +77,10 @@ class ProtoConfigurationWidget(QWidget):
         layout.addWidget(self.search_query)
         layout.addWidget(self.param_tree)
 
-        self.run_onetime_async(
-            ProtoConfigurationWidget.DELAYED_CONFIGURATION_TIMEOUT_S,
+        QTimer.singleShot(
+            int(self.DELAYED_CONFIGURATION_TIMEOUT_S * MILLISECONDS_PER_SECOND),
             self.send_proto_to_fullsystem,
         )
-
-    def run_onetime_async(self, time_in_seconds: float, func: Callable) -> None:
-        """Starting a timer that runs a given function after a given
-        amount of seconds one time asynchronously.
-
-        :time_in_seconds: the amount of time in seconds
-        :func: the function that is going to be ran
-        """
-        self.timer = QTimer()
-        self.timer.setSingleShot(True)
-        self.timer.timeout.connect(func)
-        self.timer.start(round(time_in_seconds * MILLISECONDS_PER_SECOND))
 
     def create_widget(self) -> tuple[QHBoxLayout, QHBoxLayout]:
         """Creating widgets that are used to load, save parameters
