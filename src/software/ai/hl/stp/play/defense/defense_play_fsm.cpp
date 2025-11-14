@@ -233,10 +233,7 @@ bool DefensePlayFSM::validateCreaseDefenderPosition(const Field& field,
 
             double robot_diameter = 2.0 * ROBOT_MAX_RADIUS_METERS;
 
-            // Validate the position
-            double safety_margin = robot_diameter * 0.5;
-
-            if (distance(position.value(), goal_line) < safety_margin &&
+            if (distance(position.value(), goal_line) < ROBOT_MAX_RADIUS_METERS &&
                 !contains(field.friendlyGoal(), position.value()))
             {
                 return true;  // close to goal line - valid
