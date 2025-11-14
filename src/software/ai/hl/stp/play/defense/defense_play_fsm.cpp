@@ -137,7 +137,7 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
 
                         DefenderAssignment pass_defender_assignment = defender_assignment;
                         pass_defender_assignment.type               = PASS_DEFENDER;
-                        pass_defender_assignment.target = pass_defender_position;
+                        pass_defender_assignment.target             = pass_defender_position;
                         pass_defender_assignments.emplace_back(pass_defender_assignment);
                         i++;
                     }

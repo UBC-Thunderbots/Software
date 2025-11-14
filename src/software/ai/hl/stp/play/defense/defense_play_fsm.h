@@ -85,7 +85,6 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      *
      * @param field The field geometry
      * @param threat_origin The threat origin for the crease defender
-     * @param ball_positon The ball position (for alignment calculation)
      * @return true if at least one alignment would result in a valid position
      */
     bool validateCreaseDefenderPosition(const Field& field, const Point& threat_origin);
