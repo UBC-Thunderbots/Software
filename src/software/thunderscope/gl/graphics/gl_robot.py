@@ -10,6 +10,7 @@ from typing import Optional
 
 import numpy as np
 
+
 class GLRobot(GLMeshItem):
     """Displays a 3D mesh representing a robot"""
 

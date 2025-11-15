@@ -21,7 +21,7 @@ class GLPolygon(GLShape):
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
-        closed: bool = False
+        closed: bool = False,
     ) -> None:
         """Initialize the GLPolygon
 
@@ -31,7 +31,7 @@ class GLPolygon(GLShape):
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill
         :param line_width: The line width of the polygon's outline
-        :param closed: If true, connect the first and the last point to form a 
+        :param closed: If true, connect the first and the last point to form a
                        closed shape. Otherwise, the shape is left open.
         """
         super().__init__(
@@ -66,7 +66,9 @@ class GLPolygon(GLShape):
         if not self.points:
             return
 
-        render_points = self.points + [self.points[0]] if self.is_closed else self.points
+        render_points = (
+            self.points + [self.points[0]] if self.is_closed else self.points
+        )
         vertices = [(point[0], point[1], 0) for point in render_points]
         self.setData(pos=vertices)
 
