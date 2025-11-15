@@ -31,7 +31,8 @@ class GLPolygon(GLShape):
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill
         :param line_width: The line width of the polygon's outline
-        :param closed: whether the GLPolygon is closed or not
+        :param closed: If true, connect the first and the last point to form a 
+                       closed shape. Otherwise, the shape is left open.
         """
         super().__init__(
             parent_item=parent_item,
@@ -40,8 +41,8 @@ class GLPolygon(GLShape):
             line_width=line_width,
         )
 
-        self.set_points(points)
         self.is_closed = closed
+        self.set_points(points)
 
     def set_points(self, points: list[tuple[float, float]]) -> None:
         """Update the point data representing the polygon to display.
