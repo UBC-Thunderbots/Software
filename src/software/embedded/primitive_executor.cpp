@@ -92,7 +92,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
     Angle orientation_to_destination =
         orientation_.minDiff(angular_trajectory_->getDestination());
     Angle error      = orientation_.minSignedDiff(angular_trajectory_->getPosition(
-        time_since_angular_trajectory_creation_.toSeconds()));
+             time_since_angular_trajectory_creation_.toSeconds()));
     angular_velocity = angular_velocity + error * ORIENTATION_KP;
     if (orientation_to_destination.toDegrees() < 5)
     {

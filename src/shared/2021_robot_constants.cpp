@@ -7,7 +7,7 @@ RobotConstants_t create2021RobotConstants(void)
     RobotConstants_t robot_constants = {
         .mass_kg                        = 2.5f,   // determined experimentally
         .inertial_factor                = 0.37f,  // determined experimentally
-        .robot_radius_m  = static_cast<float>(ROBOT_MAX_RADIUS_METERS),
+        .robot_radius_m                 = static_cast<float>(ROBOT_MAX_RADIUS_METERS),
         .robot_center_to_wheel_center_m = 0.08,
         // TODO (#2112): update this
         .jerk_limit_kg_m_per_s_3 = 40.0f,
