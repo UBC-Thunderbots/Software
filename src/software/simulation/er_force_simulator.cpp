@@ -404,9 +404,9 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         {
             auto direct_control_no_ramp = primitive_executor->stepPrimitive(status);
             direct_control              = getRampedVelocityPrimitive(
-                current_velocity_map.at(robot_id).first,
-                current_velocity_map.at(robot_id).second, *direct_control_no_ramp,
-                primitive_executor_time_step_s);
+                             current_velocity_map.at(robot_id).first,
+                             current_velocity_map.at(robot_id).second, *direct_control_no_ramp,
+                             primitive_executor_time_step_s);
         }
         else
         {

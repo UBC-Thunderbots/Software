@@ -449,7 +449,7 @@ inline constexpr double Angle::toDegrees() const
 
 inline constexpr Angle Angle::mod(Angle divisor) const
 {
-    if (divisor.toRadians() == 0)
+    if (divisor.toRadians() < FIXED_EPSILON)
     {
         return Angle::fromRadians(toRadians());
     }

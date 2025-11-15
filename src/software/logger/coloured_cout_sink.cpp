@@ -1,5 +1,6 @@
 #include "software/logger/coloured_cout_sink.h"
 
+#include "g3log/loglevels.hpp"
 #include "software/logger/custom_logging_levels.h"
 
 ColouredCoutSink::ColouredCoutSink(bool print_detailed, bool reduce_repetition)

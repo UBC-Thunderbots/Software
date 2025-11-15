@@ -1,10 +1,13 @@
 #pragma once
 
+#include <cmath>
+
 #include "software/ai/navigator/obstacle/geom_obstacle.hpp"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"
+#include "software/geom/geom_constants.h"
 
 template <typename GEOM_TYPE>
 class TrajectoryObstacle : public GeomObstacle<GEOM_TYPE>
@@ -40,7 +43,7 @@ TrajectoryObstacle<GEOM_TYPE>::TrajectoryObstacle(const GEOM_TYPE& geom,
 template <typename GEOM_TYPE>
 bool TrajectoryObstacle<GEOM_TYPE>::contains(const Point& p, const double t_sec) const
 {
-    if (t_sec == 0)
+    if (std::abs(t_sec) < FIXED_EPSILON)
     {
         return ::contains(this->geom_, p);
     }
@@ -56,7 +59,7 @@ bool TrajectoryObstacle<GEOM_TYPE>::contains(const Point& p, const double t_sec)
 template <typename GEOM_TYPE>
 double TrajectoryObstacle<GEOM_TYPE>::distance(const Point& p, const double t_sec) const
 {
-    if (t_sec == 0)
+    if (std::abs(t_sec) < FIXED_EPSILON)
     {
         return ::distance(this->geom_, p);
     }
@@ -73,7 +76,7 @@ template <typename GEOM_TYPE>
 double TrajectoryObstacle<GEOM_TYPE>::signedDistance(const Point& p,
                                                      const double t_sec) const
 {
-    if (t_sec == 0)
+    if (std::abs(t_sec) < FIXED_EPSILON)
     {
         return ::signedDistance(this->geom_, p);
     }
@@ -90,7 +93,7 @@ template <typename GEOM_TYPE>
 bool TrajectoryObstacle<GEOM_TYPE>::intersects(const Segment& segment,
                                                const double t_sec) const
 {
-    if (t_sec == 0)
+    if (std::abs(t_sec) < FIXED_EPSILON)
     {
         return ::intersects(this->geom_, segment);
     }

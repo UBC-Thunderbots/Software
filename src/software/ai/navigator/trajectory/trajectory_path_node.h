@@ -20,7 +20,7 @@ class TrajectoryPathNode
      */
     TrajectoryPathNode(const std::shared_ptr<Trajectory2D> &trajectory,
                        double trajectory_end_time_s)
-        : trajectory(trajectory), trajectory_end_time_s(trajectory_end_time_s) {};
+        : trajectory(trajectory), trajectory_end_time_s(trajectory_end_time_s){};
 
     /**
      * Constructor for a trajectory. It is assumed that the end time
@@ -28,7 +28,7 @@ class TrajectoryPathNode
      * @param trajectory Trajectory of this trajectory path node
      */
     TrajectoryPathNode(const std::shared_ptr<Trajectory2D> &trajectory)
-        : trajectory(trajectory), trajectory_end_time_s(trajectory->getTotalTime()) {};
+        : trajectory(trajectory), trajectory_end_time_s(trajectory->getTotalTime()){};
 
     /**
      * Get the trajectory of this trajectory path node

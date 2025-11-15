@@ -142,6 +142,7 @@ cc_library(
         "//shared:constants",
         "//software/networking/udp:threaded_udp_sender",
         "@g3log",
+        "@protobuf//:json_util",
     ],
 )
 

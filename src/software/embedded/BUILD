@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+package(default_visibility = ["//visibility:public"])
 
 config_setting(
     name = "build_nano",
