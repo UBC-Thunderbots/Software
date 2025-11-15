@@ -81,10 +81,10 @@ def test_example_play(simulated_test_runner):
         inv_eventually_validation_sequence_set=[
             [
                 NumberOfRobotsEventuallyEntersRegion(
-                    region=tbots_cpp.Circle(ball_initial_pos, 1.1), req_robot_cnt=6
+                    regions=[tbots_cpp.Circle(ball_initial_pos, 1.1)], req_robot_cnt=6
                 ),
                 NumberOfRobotsEventuallyExitsRegion(
-                    region=tbots_cpp.Circle(ball_initial_pos, 0.9), req_robot_cnt=6
+                    regions=[tbots_cpp.Circle(ball_initial_pos, 0.9)], req_robot_cnt=6
                 ),
             ]
         ],
