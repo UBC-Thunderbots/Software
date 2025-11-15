@@ -1,6 +1,3 @@
-import pytest
-
-import sys
 import math
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
