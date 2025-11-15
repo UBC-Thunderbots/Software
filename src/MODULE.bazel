@@ -228,7 +228,7 @@ http_archive(
     name = "trinamic",
     build_file = "@//extlibs:trinamic.BUILD",
     sha256 = "4c1640a87347afdc4d5954752f0e773f6d9fbb0ea0fb1481dbdb3012ec00ef8b",
-    strip_prefix = "trinamic-0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
+    strip_prefix = "TMC-API-0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
     url = "https://github.com/analogdevicesinc/TMC-API/archive/0cd695fab6d43ceb121af4b8608e5d92b14e1ce9.tar.gz",
 )
 
