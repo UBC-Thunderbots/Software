@@ -11,7 +11,9 @@ from typer_shell import make_typer_shell
 from functools import wraps
 from typing import List, Optional
 from typing_extensions import Annotated
-from embedded_communication import EmbeddedCommunication
+from software.embedded.robot_diagnostics_cli.embedded_communication import (
+    EmbeddedCommunication,
+)
 from proto.import_all_protos import *
 from software.embedded.constants.py_constants import (
     DEFAULT_PRIMITIVE_DURATION,
@@ -19,6 +21,7 @@ from software.embedded.constants.py_constants import (
     ROBOT_MAX_SPEED_M_PER_S,
     MAX_FORCE_DRIBBLER_SPEED_RPM,
 )
+from software.py_constants import WHEEL_ROTATION_MAX_SPEED_M_PER_S
 
 
 class RobotDiagnosticsCLI:
@@ -365,7 +368,7 @@ class RobotDiagnosticsCLI:
         velocity: Annotated[
             Optional[float],
             Typer.Option(
-                help=f"Clamped to {-ROBOT_MAX_SPEED_M_PER_S} & {ROBOT_MAX_SPEED_M_PER_S} m/s"
+                help=f"Clamped to {-WHEEL_ROTATION_MAX_SPEED_M_PER_S} & {WHEEL_ROTATION_MAX_SPEED_M_PER_S} m/s"
             ),
         ] = 0,
         duration_seconds: Annotated[
@@ -378,7 +381,7 @@ class RobotDiagnosticsCLI:
         :param velocity: Velocity to rotate the wheel
         :param duration_seconds: Duration to move
         """
-        # TODO (#3436): Confirm max speed for wheel rotation (it is currently net robot velocity)
+        # Using wheel-specific max speed constant instead of net robot velocity
         description = (
             f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"
         )

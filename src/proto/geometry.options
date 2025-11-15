@@ -1,0 +1,5 @@
+# See https://jpa.kapsi.fi/nanopb/docs/reference.html#proto-file-options
+# Section "Defining the options in a .options file"
+TbotsProto.Path.points max_count:20
+TbotsProto.Polygon.points max_count:20
+

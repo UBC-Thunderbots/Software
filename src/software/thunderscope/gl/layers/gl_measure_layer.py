@@ -17,6 +17,7 @@ from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLMeasureLayer(GLLayer):
@@ -41,6 +42,7 @@ class GLMeasureLayer(GLLayer):
         self.measurement_line_graphics = ObservableList(self._graphics_changed)
         self.measurement_point_graphics = ObservableList(self._graphics_changed)
 
+    @override
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was pressed and picked a point in the 3D scene
 
@@ -125,6 +127,7 @@ class GLMeasureLayer(GLLayer):
             # Clear the point cache
             self.measurement_points_cache.clear()
 
+    @override
     def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was moved within the 3D scene
 
@@ -139,6 +142,7 @@ class GLMeasureLayer(GLLayer):
         self.measurement_point_graphics.clear()
         self.measurement_points_cache.clear()
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         # Display coordinates of point at mouse cursor
