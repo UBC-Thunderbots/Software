@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/kickoff_enemy_play.h"
+#include "software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play.h"
 
 #include <gtest/gtest.h>
 
@@ -15,7 +15,7 @@
 
 class KickoffEnemyPlayTest : public SimulatedErForceSimPlayTestFixture
 {
-   protected:
+protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
 };
@@ -23,20 +23,20 @@ class KickoffEnemyPlayTest : public SimulatedErForceSimPlayTestFixture
 // TODO (#3105): Re-enable test once destinations are moved outside of obstacles
 TEST_F(KickoffEnemyPlayTest, DISABLED_test_kickoff_enemy_play)
 {
-    BallState ball_state(Point(0, 0), Vector(0, 0));
-    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
+BallState ball_state(Point(0, 0), Vector(0, 0));
+auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(-3, -2.5)});
-    setFriendlyGoalie(0);
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+setFriendlyGoalie(0);
+auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
-    setEnemyGoalie(0);
-    setAiPlay(TbotsProto::PlayName::KickoffEnemyPlay);
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_THEM);
+setEnemyGoalie(0);
+setAiPlay(TbotsProto::PlayName::KickoffEnemyPlay);
+setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_THEM);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {
+std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
         {
             // Two friendly robots in position to shadow enemy robots. Rectangles are
@@ -54,10 +54,10 @@ TEST_F(KickoffEnemyPlayTest, DISABLED_test_kickoff_enemy_play)
             robotInPolygon(robotsDefendingRect, 2, world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
+std::vector<ValidationFunction> non_terminating_validation_functions = {
         robotsInFriendlyHalf, robotsNotInCenterCircle};
 
-    runTest(field_type, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+runTest(field_type, ball_state, friendly_robots, enemy_robots,
+        terminating_validation_functions, non_terminating_validation_functions,
+        Duration::fromSeconds(10));
 }
