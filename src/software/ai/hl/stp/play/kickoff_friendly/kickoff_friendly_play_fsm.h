@@ -104,12 +104,12 @@ struct KickoffFriendlyPlayFSM
                 *SetupState_S + Update_E[!isSetupDone_G] / setupKickoff_A = SetupState_S,
 
                 // shoot directly at net if possible.
-                SetupState_S  + Update_E[shotFound_G]                    = ShootState_S,
+                SetupState_S  + Update_E[shotFound_G]                     = ShootState_S,
                 ShootState_S  + Update_E[!isPlaying_G] / shootBall_A      = ShootState_S,
                 ShootState_S  + Update_E[isPlaying_G]                     = X,
 
                 // else chip over the defenders.
-                SetupState_S  + Update_E                                  = ChipState_S,
+                SetupState_S + Update_E[!shotFound_G]                   = ChipState_S,
                 ChipState_S  + Update_E[!isPlaying_G] / chipBall_A      = ChipState_S,
                 ChipState_S  + Update_E[isPlaying_G]                     = X,
 
