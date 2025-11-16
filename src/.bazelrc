@@ -65,8 +65,8 @@ common --enable_platform_specific_config
 build --incompatible_remove_legacy_whole_archive=False
 
 # Escalate Warnings to fail Compile for Thunderbots code
-build --features=external_include_paths
-build --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+build:linux --features=external_include_paths
+build:linux --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
 # TODO: #3492
 # build --per_file_copt=software/.*,shared/.*,-external/.*@-Wconversion
 
