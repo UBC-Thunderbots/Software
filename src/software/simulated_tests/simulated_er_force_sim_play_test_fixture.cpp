@@ -5,7 +5,8 @@
 #include "software/test_util/test_util.h"
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
-    : game_state(), ai(friendly_thunderbots_config.ai_config())
+    : game_state(),
+      ai(std::make_shared<TbotsProto::AiConfig>(friendly_thunderbots_config.ai_config()))
 {
 }
 
@@ -33,7 +34,8 @@ void SimulatedErForceSimPlayTestFixture::setAiPlay(
         ->mutable_ai_control_config()
         ->set_override_ai_play(ai_play_name);
 
-    ai = Ai(friendly_thunderbots_config.ai_config());
+    ai = Ai(
+        std::make_shared<TbotsProto::AiConfig>(friendly_thunderbots_config.ai_config()));
 }
 
 void SimulatedErForceSimPlayTestFixture::setAiPlay(std::unique_ptr<Play> play)
@@ -52,8 +54,8 @@ void SimulatedErForceSimPlayTestFixture::setTactic(
     std::set<TbotsProto::MotionConstraint> motion_constraints)
 {
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
-    std::unique_ptr<AssignedTacticsPlay> play =
-        std::make_unique<AssignedTacticsPlay>(friendly_thunderbots_config.ai_config());
+    std::unique_ptr<AssignedTacticsPlay> play = std::make_unique<AssignedTacticsPlay>(
+        std::make_shared<TbotsProto::AiConfig>(friendly_thunderbots_config.ai_config()));
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
         motion_constraint_override_map;
     motion_constraint_override_map[id] = motion_constraints;

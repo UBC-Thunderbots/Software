@@ -4,6 +4,11 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/distance.h"
 
+ShadowEnemyFSM::ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<ShadowEnemyFSM>(ai_config_ptr)
+{
+}
+
 Point ShadowEnemyFSM::findBlockPassPoint(const Point &ball_position,
                                          const Robot &shadowee,
                                          const double &shadow_distance)

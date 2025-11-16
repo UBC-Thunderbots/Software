@@ -1,11 +1,11 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/geom/point.h"
 
-struct ChipFSM
+struct ChipFSM : TacticFSM<ChipFSM>
 {
-   public:
     class ChipState;
 
     struct ControlParams
@@ -18,7 +18,14 @@ struct ChipFSM
         double chip_distance_meters;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    using Update = TacticFSM<ChipFSM>::Update;
+
+    /**
+     * Constructor for ChipFSM
+     *
+     * @param ai_config_ptr Shared pointer to ai_config
+     */
+    explicit ChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that updates the MovePrimitive
@@ -55,6 +62,9 @@ struct ChipFSM
      */
     bool shouldRealignWithBall(const Update &event);
 
+    DEFINE_SML_GUARD_CLASS(ballChicked, ChipFSM)
+    DEFINE_SML_GUARD_CLASS(shouldRealignWithBall, ChipFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -65,6 +75,7 @@ struct ChipFSM
 
         DEFINE_SML_GUARD(ballChicked)
         DEFINE_SML_GUARD(shouldRealignWithBall)
+
         DEFINE_SML_ACTION(updateChip)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
 

@@ -2,17 +2,23 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 
-
 using Zones = std::unordered_set<EighteenZoneId>;
 
-struct BallPlacementPlayFSM
+struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
 {
+    /**
+     *  The control parameters for a ball placement play
+     */
+    struct ControlParams
+    {
+    };
+
     class StartState;
     class KickOffWallState;
     class AlignPlacementState;
@@ -20,18 +26,14 @@ struct BallPlacementPlayFSM
     class WaitState;
     class RetreatState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Creates a ball placement play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit BallPlacementPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that has the placing robot kick the ball off the wall to give more space to
@@ -141,6 +143,13 @@ struct BallPlacementPlayFSM
      */
     void setupMoveTactics(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(shouldKickOffWall, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(alignDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(kickDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(ballPlaced, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(waitDone, BallPlacementPlayFSM)
+    DEFINE_SML_GUARD_CLASS(retreatDone, BallPlacementPlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -153,18 +162,19 @@ struct BallPlacementPlayFSM
         DEFINE_SML_STATE(RetreatState)
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_ACTION(alignPlacement)
-        DEFINE_SML_ACTION(placeBall)
-        DEFINE_SML_ACTION(kickOffWall)
-        DEFINE_SML_ACTION(startWait)
-        DEFINE_SML_ACTION(retreat)
-
         DEFINE_SML_GUARD(shouldKickOffWall)
         DEFINE_SML_GUARD(alignDone)
         DEFINE_SML_GUARD(kickDone)
         DEFINE_SML_GUARD(ballPlaced)
         DEFINE_SML_GUARD(waitDone)
         DEFINE_SML_GUARD(retreatDone)
+
+        DEFINE_SML_ACTION(alignPlacement)
+        DEFINE_SML_ACTION(placeBall)
+        DEFINE_SML_ACTION(kickOffWall)
+        DEFINE_SML_ACTION(startWait)
+        DEFINE_SML_ACTION(retreat)
+
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -188,7 +198,6 @@ struct BallPlacementPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<WallKickoffTactic> pivot_kick_tactic;
     std::shared_ptr<PlaceBallTactic> place_ball_tactic;
     std::shared_ptr<MoveTactic> align_placement_tactic;
