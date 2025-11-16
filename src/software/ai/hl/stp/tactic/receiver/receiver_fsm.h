@@ -115,6 +115,14 @@ struct ReceiverFSM
     void adjustReceive(const Update& event);
 
     /**
+     * Move the robot away from the planned shot path by moving
+     * perpendicular to the path by a metre.
+     *
+     * @param event ReceiverFSM::Update event
+     */
+    void moveAwayFromShot(const Update& event);
+
+    /**
      * Guard that checks if the ball has been kicked
      *
      * @param event PivotKickFSM::Update event
@@ -141,6 +149,14 @@ struct ReceiverFSM
      */
     bool strayPass(const Update& event);
 
+    /**
+     * Checks if attacker wants to shoot and receiver is in the way.
+     *
+     * @param event ReceiverFSM::Update event
+     * @return true if should move away from shot attempt
+     */
+    bool shouldMoveAwayFromShot(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -154,14 +170,18 @@ struct ReceiverFSM
         DEFINE_SML_GUARD(passStarted)
         DEFINE_SML_GUARD(passFinished)
         DEFINE_SML_GUARD(strayPass)
+        DEFINE_SML_GUARD(shouldMoveAwayFromShot)
 
         DEFINE_SML_ACTION(updateOnetouch)
         DEFINE_SML_ACTION(updateReceive)
         DEFINE_SML_ACTION(adjustReceive)
+        DEFINE_SML_ACTION(moveAwayFromShot)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *WaitingForPassState_S + Update_E[!passStarted_G] / updateReceive_A,
+            *WaitingForPassState_S +
+                Update_E[shouldMoveAwayFromShot_G] / moveAwayFromShot_A,
+            WaitingForPassState_S + Update_E[!passStarted_G] / updateReceive_A,
             WaitingForPassState_S + Update_E[passStarted_G && onetouchPossible_G] /
                                         updateOnetouch_A = OneTouchShotState_S,
             WaitingForPassState_S + Update_E[passStarted_G && !onetouchPossible_G] /
