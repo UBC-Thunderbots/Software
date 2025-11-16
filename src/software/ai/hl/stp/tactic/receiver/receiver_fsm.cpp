@@ -230,6 +230,11 @@ bool ReceiverFSM::strayPass(const Update& event)
 
 bool ReceiverFSM::shouldMoveAwayFromShot(const Update& event)
 {
-    // TODO: implement this avah
-    return true;
+    Point ball       = event.common.world_ptr->ball().position();
+    Point goal_left  = event.common.world_ptr->field().enemyGoalpostNeg();
+    Point goal_right = event.common.world_ptr->field().enemyGoalpostPos();
+
+    Point robot = event.common.robot.position();
+
+    return contains(Polygon{ball, goal_left, goal_right}, robot);
 }
