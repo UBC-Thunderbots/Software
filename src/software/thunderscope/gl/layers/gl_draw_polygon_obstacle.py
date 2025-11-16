@@ -39,7 +39,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         self.rendering_polygons = ObservableList(self._graphics_changed)
 
         # The current polygon being edited (not visible yet)
-        self.current_polygon = GLPolygon(parent_item=self, line_width=2)
+        self.current_polygon = GLPolygon(parent_item=self, line_width=2, closed=True)
 
         self.can_double_click = False
 
@@ -75,7 +75,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         self.points.clear()
 
         self.rendering_polygons.append(self.current_polygon)
-        self.current_polygon = GLPolygon(parent_item=self, line_width=2)
+        self.current_polygon = GLPolygon(parent_item=self, line_width=2, closed=True)
 
     def __add_one_point(self, point: Point) -> None:
         """Adding one points to a polygon
