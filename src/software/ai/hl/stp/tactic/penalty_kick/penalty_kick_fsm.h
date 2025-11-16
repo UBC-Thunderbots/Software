@@ -4,22 +4,27 @@
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 
-struct PenaltyKickFSM
+/**
+ * Finite State Machine class for Penalty Kicks
+ */
+struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
 {
-    /**
-     * Constructor for DribbleFSM
-     */
-    PenaltyKickFSM();
+    using Update = TacticFSM<PenaltyKickFSM>::Update;
 
     struct ControlParams
     {
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    /**
+     * Constructor for DribbleFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit PenaltyKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Helper function that determines whether the shooter robot has a viable shot on net.
@@ -140,7 +145,6 @@ struct PenaltyKickFSM
     static const inline Duration PENALTY_FINISH_APPROACH_TIMEOUT =
         Duration::fromSeconds(4);
 
-   private:
     std::optional<Timestamp> complete_approach;
     Angle shot_angle;
 };

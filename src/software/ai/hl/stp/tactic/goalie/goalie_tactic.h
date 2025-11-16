@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
@@ -14,34 +14,31 @@
  * distance either way to intercept a potential straight shot into the net.
  *
  */
-class GoalieTactic : public Tactic
+class GoalieTactic : public TacticBase<GoalieFSM, PivotKickFSM, DribbleFSM>
 {
    public:
     /**
      * Creates a new GoalieTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieTactic(TbotsProto::AiConfig ai_config,
-                          TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
-                              TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    explicit GoalieTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     GoalieTactic() = delete;
+
+    // TODO: make sure the calling function uses this instead
+    /**
+     * Updates the current goalie speed mode.
+     * Modifies max_allowed_speed_mode
+     * @param new_speed_mode the new speed mode to use.
+     */
+    void updateMaxSpeedMode(TbotsProto::MaxAllowedSpeedMode new_speed_mode);
 
     void updateControlParams(bool should_move_to_goal_line);
 
     void accept(TacticVisitor &visitor) const override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
    private:
-    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<GoalieFSM>>> fsm_map;
-
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
-
-    GoalieFSM::ControlParams control_params;
-    TbotsProto::AiConfig ai_config;
 };

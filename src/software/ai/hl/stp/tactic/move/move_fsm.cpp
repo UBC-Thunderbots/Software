@@ -2,6 +2,11 @@
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
+MoveFSM::MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<MoveFSM>(ai_config_ptr)
+{
+}
+
 void MoveFSM::updateMove(const Update &event)
 {
     event.common.set_primitive(std::make_unique<MovePrimitive>(
