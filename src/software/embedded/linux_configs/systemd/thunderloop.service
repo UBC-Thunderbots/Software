@@ -15,7 +15,8 @@ ExecStart=/home/robot/thunderbots_binaries/thunderloop_main
 TimeoutStopSec=15s
 
 # Always restart on crash
-Restart=always
+Restart=on-failure
+RestartSec=0.5
 
 [Install]
 # This unit should be run at startup
