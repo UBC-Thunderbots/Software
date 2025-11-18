@@ -29,9 +29,9 @@ struct PlaySelectionFSM
     /**
      * Creates a play selection FSM
      *
-     * @param ai_config the default play config for this play fsm
+     * @param ai_config_ptr pointer to the default play config for this play fsm
      */
-    explicit PlaySelectionFSM(TbotsProto::AiConfig ai_config);
+    explicit PlaySelectionFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Guards for whether the game state is stopped, halted, playing, or in set up
@@ -63,6 +63,11 @@ struct PlaySelectionFSM
      */
     void resetSetPlay(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(gameStateStopped, PlaySelectionFSM)
+    DEFINE_SML_GUARD_CLASS(gameStateHalted, PlaySelectionFSM)
+    DEFINE_SML_GUARD_CLASS(gameStatePlaying, PlaySelectionFSM)
+    DEFINE_SML_GUARD_CLASS(gameStateSetupRestart, PlaySelectionFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -72,12 +77,12 @@ struct PlaySelectionFSM
         DEFINE_SML_STATE(Playing)
         DEFINE_SML_STATE(Stop)
 
+        DEFINE_SML_EVENT(Update)
+
         DEFINE_SML_GUARD(gameStateStopped)
         DEFINE_SML_GUARD(gameStateHalted)
         DEFINE_SML_GUARD(gameStatePlaying)
         DEFINE_SML_GUARD(gameStateSetupRestart)
-
-        DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_ACTION(setupSetPlay)
         DEFINE_SML_ACTION(setupStopPlay)
@@ -120,6 +125,6 @@ struct PlaySelectionFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
     std::optional<TbotsProto::PlayName> current_set_play;
 };

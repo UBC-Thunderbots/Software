@@ -13,8 +13,10 @@ TEST(PivotKickFSMTest, test_transitions)
         .kick_direction    = Angle::threeQuarter(),
         .auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK, 1.2}};
 
-    TbotsProto::DribbleTacticConfig dribble_tactic_config;
-    FSM<PivotKickFSM> fsm{DribbleFSM(dribble_tactic_config)};
+FSMLogger logger{std::optional(0)};
+    FSM<PivotKickFSM> fsm{PivotKickFSM(std::make_shared<TbotsProto::AiConfig>()),
+                          DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
+                          logger};
 
     // Start in DribbleFSM
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM::StartState>));

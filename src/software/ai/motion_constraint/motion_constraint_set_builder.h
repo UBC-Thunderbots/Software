@@ -3,7 +3,7 @@
 #include <set>
 
 #include "proto/primitive.pb.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/world/game_state.h"
 
