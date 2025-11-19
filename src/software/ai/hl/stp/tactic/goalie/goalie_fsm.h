@@ -35,7 +35,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
 
 
     /**
-     *  Constructor for GoalieFSM struct
+     * Constructor for GoalieFSM struct
      *
      *  @param ai_config_ptr shared pointer to ai_config proto
      *  @param max_allowed_speed_mode The maximum allowed speed mode

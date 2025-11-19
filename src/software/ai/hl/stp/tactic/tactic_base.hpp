@@ -45,7 +45,7 @@ class TacticBase : public Tactic
      * @param capability_reqs_ The capability requirements for running this tactic
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit TacticBase(const std::set<RobotCapability> &capability_reqs_,
+    explicit TacticBase(const std::set<RobotCapability> &capability_reqs,
                         std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     TacticBase() = delete;
