@@ -41,7 +41,7 @@ PlayBase<PlayFsm, PlaySubFsms...>::PlayBase(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr, bool requires_goalie)
     : Play(ai_config_ptr, requires_goalie),
       logger(),
-      fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}...},
+      fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}..., logger},
       control_params()
 {
 }
