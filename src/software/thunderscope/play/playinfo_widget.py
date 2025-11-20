@@ -4,7 +4,10 @@ from proto.import_all_protos import *
 from software.thunderscope.common.common_widgets import set_table_data
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from PyQt6.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
 
+print(f"PyQt6 Version: {PYQT_VERSION_STR}")
+print(f"Qt Version (underlying C++ library): {QT_VERSION_STR}")
 
 class PlayInfoWidget(QWidget):
     NUM_ROWS = 6
