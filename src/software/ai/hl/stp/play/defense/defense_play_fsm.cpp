@@ -2,6 +2,7 @@
 
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 #include "software/logger/logger.h"
 
 
@@ -75,6 +76,11 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
     unsigned int max_num_crease_defenders =
         defender_assignment_config.max_num_crease_defenders();
 
+    // Get primary threat position for calculating pass defender positions
+    Point primary_threat_position = enemy_threats.empty()
+                                        ? event.common.world_ptr->ball().position()
+                                        : enemy_threats.front().robot.position();
+
     // Choose which defender assignments to assign defenders to based on number
     // of tactics available to set
     std::vector<DefenderAssignment> crease_defender_assignments;
@@ -96,17 +102,59 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
 
         if (defender_assignment.type == CREASE_DEFENDER && max_num_crease_defenders > 0)
         {
-            crease_defender_assignments.emplace_back(defender_assignment);
-            max_num_crease_defenders--;
+            bool is_valid_position = DefensePlayFSM::validateCreaseDefenderPosition(
+                event.common.world_ptr->field(), defender_assignment.target);
 
-            // If we have at least two available defenders, two defenders should
-            // be assigned to the highest scoring crease defender assignment to better
-            // block the shot cone of the most threatening enemy
-            if (i == 0 && event.common.num_tactics >= 2 && max_num_crease_defenders > 0)
+            if (is_valid_position)
             {
                 crease_defender_assignments.emplace_back(defender_assignment);
-                i++;
                 max_num_crease_defenders--;
+
+                // If we have at least two available defenders, two defenders should
+                // be assigned to the highest scoring crease defender assignment to better
+                // block the shot cone of the most threatening enemy
+                if (i == 0 && event.common.num_tactics >= 2 &&
+                    max_num_crease_defenders > 0)
+                {
+                    bool second_defender_valid_position =
+                        DefensePlayFSM::validateCreaseDefenderPosition(
+                            event.common.world_ptr->field(), defender_assignment.target);
+
+                    if (second_defender_valid_position)
+                    {
+                        crease_defender_assignments.emplace_back(defender_assignment);
+                        i++;
+                        max_num_crease_defenders--;
+                    }
+                    else
+                    {
+                        // Calculate proper pass defender position: midpoint between
+                        // primary threat and the threat this crease defender was
+                        // defending
+                        Point threat_position = defender_assignment.target;
+                        Segment passing_lane(primary_threat_position, threat_position);
+                        Point pass_defender_position = passing_lane.midPoint();
+
+                        DefenderAssignment pass_defender_assignment = defender_assignment;
+                        pass_defender_assignment.type               = PASS_DEFENDER;
+                        pass_defender_assignment.target = pass_defender_position;
+                        pass_defender_assignments.emplace_back(pass_defender_assignment);
+                        i++;
+                    }
+                }
+            }
+            else
+            {
+                // Calculate proper pass defender position: midpoint between
+                // primary threat and the threat this crease defender was defending
+                Point threat_position = defender_assignment.target;
+                Segment passing_lane(primary_threat_position, threat_position);
+                Point pass_defender_position = passing_lane.midPoint();
+
+                DefenderAssignment pass_defender_assignment = defender_assignment;
+                pass_defender_assignment.type               = PASS_DEFENDER;
+                pass_defender_assignment.target             = pass_defender_position;
+                pass_defender_assignments.emplace_back(pass_defender_assignment);
             }
         }
         else
@@ -162,4 +210,49 @@ void DefensePlayFSM::setTactics(const Update& event)
                                 shadowers.end());
 
     event.common.set_tactics(tactics_to_return);
+}
+
+bool DefensePlayFSM::validateCreaseDefenderPosition(const Field& field,
+                                                    const Point& threat_origin)
+{
+    // Test all three alignments by calling findBlockThreatPoint
+    std::vector<TbotsProto::CreaseDefenderAlignment> alignments = {
+        TbotsProto::CreaseDefenderAlignment::CENTRE,
+        TbotsProto::CreaseDefenderAlignment::LEFT,
+        TbotsProto::CreaseDefenderAlignment::RIGHT};
+
+    for (const auto& alignment : alignments)
+    {
+        auto position =
+            CreaseDefenderFSM::findBlockThreatPoint(field, threat_origin, alignment, 1.0);
+
+        if (position.has_value())
+        {
+            // Check if position is on or behind goal line
+            Segment goal_line = Segment(field.friendlyGoal().posXPosYCorner(),
+                                        field.friendlyGoal().posXNegYCorner());
+
+            double robot_diameter = 2.0 * ROBOT_MAX_RADIUS_METERS;
+
+            if (distance(position.value(), goal_line) < ROBOT_MAX_RADIUS_METERS &&
+                !contains(field.friendlyGoal(), position.value()))
+            {
+                return true;  // close to goal line - valid
+            }
+
+            if (contains(field.friendlyGoal(), position.value()))
+            {
+                continue;  // inside the goal - invalid
+            }
+
+            if (distance(position.value(), goal_line) < robot_diameter)
+            {
+                continue;  // invalid
+            }
+
+            return true;  // At least one alignment is valid
+        }
+    }
+
+    return false;  // No valid positions found for any alignment
 }

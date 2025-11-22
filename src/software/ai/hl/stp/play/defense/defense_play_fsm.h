@@ -80,7 +80,15 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      */
     void setTactics(const Update& event);
 
-
+    /**
+     * Validates that a crease defender position would be valid (not on or behind goal
+     * line)
+     *
+     * @param field The field geometry
+     * @param threat_origin The threat origin for the crease defender
+     * @return true if at least one alignment would result in a valid position
+     */
+    bool validateCreaseDefenderPosition(const Field& field, const Point& threat_origin);
 
     auto operator()()
     {
