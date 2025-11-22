@@ -88,7 +88,7 @@ class StSpinMotorController : public MotorController
     };
 
     // SPI Configs
-    static constexpr uint32_t SPI_SPEED_HZ     = 250000;    // 250 KHz
+    static constexpr uint32_t SPI_SPEED_HZ     = 2000000;   // 2 MHz
     static constexpr uint32_t MAX_SPI_SPEED_HZ = 250000000; // 250 MHz
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;
@@ -97,4 +97,5 @@ class StSpinMotorController : public MotorController
     std::array<int, reflective_enum::size<MotorIndex>()> file_descriptors_;
 
     std::unique_ptr<Gpio> reset_gpio_;
+    std::unique_ptr<Gpio> data_ready_gpio_;
 };

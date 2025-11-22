@@ -1,6 +1,8 @@
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
 
 #include <linux/spi/spidev.h>
+#include <chrono>
+#include <thread>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
@@ -17,7 +19,9 @@ using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
 StSpinMotorController::StSpinMotorController()
     : reset_gpio_(
-          setupGpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH))
+          setupGpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH)),
+      data_ready_gpio_(
+          setupGpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::INPUT, GpioState::LOW))
 {
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
     {
@@ -36,6 +40,8 @@ MotorControllerStatus StSpinMotorController::earlyPoll()
 
 void StSpinMotorController::setup()
 {
+    reset();
+
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
     {
         if (ENABLED_MOTORS.at(motor))
@@ -57,11 +63,9 @@ void StSpinMotorController::setup()
 
 void StSpinMotorController::reset()
 {
-    //    reset_gpio_->setValue(GpioState::LOW);
-    //    usleep(MICROSECONDS_PER_MILLISECOND * 100);
-    //
-    //    reset_gpio_->setValue(GpioState::HIGH);
-    //    usleep(MICROSECONDS_PER_MILLISECOND * 100);
+    reset_gpio_->setValue(GpioState::LOW);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    reset_gpio_->setValue(GpioState::HIGH);
 }
 
 MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& motor)
@@ -235,8 +239,13 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     //  The byte order of DATA is big endian; therefore the MSB is transmitted first.
     //  DATA may be ignored if the operation has no data to transmit/receive.
 
-    uint8_t tx[FRAME_LEN] = {0};
-    uint8_t rx[FRAME_LEN] = {0};
+    while (data_ready_gpio_->getValue() != GpioState::HIGH)
+    {
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
+    }
+
+    uint8_t tx[FRAME_LEN] = {};
+    uint8_t rx[FRAME_LEN] = {};
 
     tx[0] = FRAME_SOF;
     tx[1] = static_cast<uint8_t>(opcode);
@@ -244,18 +253,21 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     tx[3] = static_cast<uint8_t>(0xFF & data);
     tx[5] = FRAME_EOF;
 
-    const uint8_t message[] = {tx[1], tx[2], tx[3]};
-    tx[4]                   = Crc8Autosar::calc(message, sizeof(message));
+    const uint8_t tx_msg[] = {tx[1], tx[2], tx[3]};
+    tx[4]                  = Crc8Autosar::calc(tx_msg, sizeof(tx_msg));
 
     spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_LEN,
                 SPI_SPEED_HZ);
 
-    LOG(INFO) << "TX " << static_cast<int>(tx[0]) << " " << static_cast<int>(tx[1]) << " "
-              << static_cast<int>(tx[2]) << " " << static_cast<int>(tx[3]) << " "
-              << static_cast<int>(tx[4]) << " " << static_cast<int>(tx[5]);
-    LOG(INFO) << "RX " << static_cast<int>(rx[0]) << " " << static_cast<int>(rx[1]) << " "
-              << static_cast<int>(rx[2]) << " " << static_cast<int>(rx[3]) << " "
-              << static_cast<int>(rx[4]) << " " << static_cast<int>(rx[5]);
+    // Frame integrity check
+    const uint8_t rx_msg[] = {rx[1], rx[2], rx[3]};
+    const uint8_t rx_crc   = Crc8Autosar::calc(rx_msg, sizeof(rx_msg));
+    if (rx[0] != FRAME_SOF || rx[5] != FRAME_EOF || rx[4] != rx_crc)
+    {
+        LOG(WARNING) << "Received frame that failed integrity check. Expected CRC "
+                     << static_cast<int>(rx_crc) << " got " << static_cast<int>(rx[4]);
+    }
 
+    // Return the DATA field of the received frame
     return static_cast<int16_t>((static_cast<uint16_t>(rx[2]) << 8) | rx[3]);
 }

@@ -8,6 +8,8 @@
 class MotorController
 {
    public:
+    virtual ~MotorController() = default;
+
     virtual MotorControllerStatus earlyPoll() = 0;
 
     virtual void setup() = 0;

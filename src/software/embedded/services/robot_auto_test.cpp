@@ -36,56 +36,13 @@ int main(int argc, char **argv)
 
     LOG(INFO) << "Motor controller setup complete";
 
-    LOG(INFO) << "Waiting...";
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
-    motor_controller_->readThenWriteVelocity(MotorIndex::BACK_RIGHT, 1500);
-    LOG(INFO) << "Waiting...";
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    motor_controller_->readThenWriteVelocity(MotorIndex::BACK_RIGHT, 0);
-
-
-
-    /*if (motor_controller_->earlyPoll() == MotorControllerStatus::OK)
+    for (int i = 0; i < 100000; ++i)
     {
-        for (int i = 0; i <= 100; ++i)
-        {
-            motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_RIGHT, 1500);
-            LOG(INFO) << "Waiting...";
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
+        motor_controller_->readThenWriteVelocity(MotorIndex::BACK_RIGHT, 300);
+        motor_controller_->readThenWriteVelocity(MotorIndex::BACK_RIGHT, 0);
+        LOG(INFO) << i;
+    }
 
-        motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_RIGHT, 0);
-    }*/
-
-
-    /*
-        for (int i = 0; i < 1000; ++i)
-        {
-            motor_controller_->sendAndReceiveFrame(MotorIndex::BACK_RIGHT,
-       StSpinOpcode::SPI_NOOP);
-        }
-    */
-
-    //	motor_controller_->reset();
-
-    /*
-        motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
-       StSpinOpcode::MOV_AX, static_cast<int16_t>(
-                std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::system_clock::now().time_since_epoch()
-                ).count() % 5000
-            ));
-    */
-
-    /*
-        motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
-       StSpinOpcode::MOV_BX, 1000);
-        motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
-       StSpinOpcode::SET_SPEEDRAMP);
-        motor_controller_->sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
-       StSpinOpcode::START_MOTOR);
-    */
     LOG(INFO) << "Robot Auto Test Complete";
 
     return 0;
