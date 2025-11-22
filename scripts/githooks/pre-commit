@@ -1,14 +1,17 @@
 #!/bin/sh
 
+# From the list of files on stdin (separated by newline), return formattable files to stdout
 filter_formattable_files() {
     grep -E '\.(h|cpp|c|cc|hpp|tpp|proto|py|md|yml)$|/BUILD$'
 }
 
+# Find repo root, marker for the current branch, and marker mtime (0 if marker does not exist)
 toplevel="$(git rev-parse --show-toplevel)"
 marker="$toplevel/scripts/.format_markers/$(git rev-parse --abbrev-ref HEAD)"
 mtime=$(stat -c %Y "$marker" 2> /dev/null || echo 0)
 
 git diff --staged --name-only | filter_formattable_files | while read -r file; do
+    # Compare marker mtime with file mtime
     if [ $mtime -lt "$(stat -c %Y "$toplevel/$file")" ]; then
         # The file was modified AFTER formatting. Remove the marker to tell the pre-push hook
         # that this commit introduces unformatted code.
