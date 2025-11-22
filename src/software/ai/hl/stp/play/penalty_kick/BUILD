@@ -1,9 +1,9 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 # We force linking for all plays so that the static variables required for the
 # "factory" design pattern to work are linked in
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "penalty_kick_play",

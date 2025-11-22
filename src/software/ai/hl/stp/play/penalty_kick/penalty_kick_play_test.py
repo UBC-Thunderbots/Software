@@ -17,8 +17,9 @@ from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from proto.play_pb2 import Play, PlayName
 
-from software.simulated_tests.robot_enters_region import NumberOfRobotsEventuallyExitsRegion, \
-    NumberOfRobotsEventuallyEntersRegion
+from software.simulated_tests.robot_enters_region import (
+    NumberOfRobotsEventuallyEntersRegion,
+)
 
 
 def test_penalty_kick_play_setup(simulated_test_runner):
@@ -73,7 +74,6 @@ def test_penalty_kick_play_setup(simulated_test_runner):
             gc_command=Command.Type.PENALTY, team=Team.BLUE
         )
 
-
         # Create world state
         simulated_test_runner.simulator_proto_unix_io.send_proto(
             WorldState,
@@ -95,8 +95,15 @@ def test_penalty_kick_play_setup(simulated_test_runner):
     # Eventually Validation
     inv_eventually_validation_sequence_set = [
         [
-            NumberOfRobotsEventuallyEntersRegion(region=tbots_cpp.Rectangle(tbots_cpp.Point(-4.5,-3),tbots_cpp.Point(-2.5,3)), req_robot_cnt=5),
-            NumberOfRobotsEventuallyEntersRegion(region=tbots_cpp.Circle(ball_initial_pos,0.5), req_robot_cnt=1),
+            NumberOfRobotsEventuallyEntersRegion(
+                region=tbots_cpp.Rectangle(
+                    tbots_cpp.Point(-4.5, -3), tbots_cpp.Point(-2.5, 3)
+                ),
+                req_robot_cnt=5,
+            ),
+            NumberOfRobotsEventuallyEntersRegion(
+                region=tbots_cpp.Circle(ball_initial_pos, 0.5), req_robot_cnt=1
+            ),
         ]
     ]
     ag_eventually_validation_sequence_set = [[]]
@@ -110,6 +117,7 @@ def test_penalty_kick_play_setup(simulated_test_runner):
         ag_always_validation_sequence_set=ag_always_validation_sequence_set,
         test_timeout_s=15,
     )
+
 
 def test_penalty_kick_play_kick(simulated_test_runner):
     ball_initial_pos = tbots_cpp.Point(-1.5, 0)
@@ -132,7 +140,6 @@ def test_penalty_kick_play_kick(simulated_test_runner):
             tbots_cpp.Point(-2.5, 2.5),
             tbots_cpp.Point(-2.5, -2.5),
             tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-
         ]
 
         # Force play override here
