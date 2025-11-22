@@ -94,8 +94,4 @@ typedef struct RobotConstants
     // The radius of the wheel, in meters
     float wheel_radius_meters;
 
-    // The gear ratio between the motor shaft and wheel shaft
-    // [# of wheel rotations / 1 motor rotation]
-    float wheel_rotations_per_motor_rotation;
-
 } RobotConstants_t;

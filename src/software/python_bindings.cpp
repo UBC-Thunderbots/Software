@@ -305,8 +305,6 @@ PYBIND11_MODULE(python_bindings, m)
         .def_readwrite("indefinite_dribbler_speed_rpm",
                        &RobotConstants::indefinite_dribbler_speed_rpm)
         .def_readwrite("wheel_radius_meters", &RobotConstants::wheel_radius_meters)
-        .def_readwrite("wheel_rotations_per_motor_rotation",
-                       &RobotConstants::wheel_rotations_per_motor_rotation)
         .def_readwrite("robot_max_speed_m_per_s",
                        &RobotConstants::robot_max_speed_m_per_s)
         .def_readwrite("robot_max_ang_speed_rad_per_s",
