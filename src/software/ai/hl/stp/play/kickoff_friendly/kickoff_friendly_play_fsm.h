@@ -109,7 +109,8 @@ struct KickoffFriendlyPlayFSM
                 ShootState_S  + Update_E[isPlaying_G]                     = X,
 
                 // else chip over the defenders.
-                SetupState_S + Update_E[!shotFound_G]                   = ChipState_S,
+                SetupState_S + Update_E                  = ChipState_S,
+                ChipState_S  + Update_E[shotFound_G && !isPlaying_G]      = ShootState_S,
                 ChipState_S  + Update_E[!isPlaying_G] / chipBall_A      = ChipState_S,
                 ChipState_S  + Update_E[isPlaying_G]                     = X,
 

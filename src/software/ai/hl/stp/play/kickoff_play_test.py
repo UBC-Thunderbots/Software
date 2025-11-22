@@ -26,8 +26,6 @@ def setup_kickoff_attacker():
 
 
 def setup_kickoff_defender():
-    # The defense has a hole in it from 0, 0 to the net.
-    # Robots that cannot move will allow the kicker to shoot directly into the net.
     yellow_bots = [
         tbots_cpp.Point(1, 0.5),
         tbots_cpp.Point(1, 2.5),
@@ -67,13 +65,13 @@ def init_plays(simulated_test_runner, is_friendly, force_out):
         blue_play.name = PlayName.KickoffFriendlyPlay if kicking_team == Team.BLUE else PlayName.HaltPlay
         yellow_play.name = PlayName.KickoffFriendlyPlay if kicking_team == Team.YELLOW else PlayName.HaltPlay
 
-    simulated_test_runner.gamecontroller.send_gc_command(gc_command=Command.Type.NORMAL_START, team=kicking_team)
     simulated_test_runner.gamecontroller.send_gc_command(gc_command=Command.Type.KICKOFF, team=kicking_team)
+    simulated_test_runner.gamecontroller.send_gc_command(gc_command=Command.Type.KICKOFF, team=non_kicking_team)
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
 
-@pytest.mark.parametrize("is_friendly_test, force_open", [(True, False)])
+@pytest.mark.parametrize("is_friendly_test, force_open", [(True, False), (True, True), (False, False), (False, True)])
 def test_kickoff_play(simulated_test_runner, is_friendly_test, force_open):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
