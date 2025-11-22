@@ -10,6 +10,7 @@ cc_library(
     ],
     deps = [
         "@g3log",
+        ":compat_flags",
     ],
 )
 
@@ -19,7 +20,10 @@ cc_library(
         "custom_logging_levels.h",
         "logger.h",
     ],
-    linkopts = ["-lstdc++fs"],
+    linkopts = select({
+           "@platforms//os:linux": ["-lstdc++fs"],
+           "//conditions:default": [],
+    }),
     deps = [
         ":coloured_cout_sink",
         ":csv_sink",
@@ -28,6 +32,7 @@ cc_library(
         ":protobuf_sink",
         "@g3log",
         "@g3sinks",
+        ":compat_flags",
     ],
 )
 
@@ -104,6 +109,7 @@ cc_library(
     ],
     deps = [
         "@g3log",
+        ":compat_flags",
     ],
 )
 
@@ -187,5 +193,11 @@ cc_library(
         "@base64",
         "@boost//:filesystem",
         "@zlib",
+        ":compat_flags",
     ],
+)
+
+cc_library(
+    name = "compat_flags",
+    srcs = ["compat_flags.h"],
 )

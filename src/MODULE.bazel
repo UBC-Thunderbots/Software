@@ -268,7 +268,7 @@ new_local_repository(
 new_local_repository(
     name = "py_cc_toolchain_host",
     build_file = "@//extlibs:py_cc_toolchain.BUILD",
-    path = "/usr/include/python3.12/",
+    path = "/opt/tbotspython/py_headers/include/python3.12/",
 )
 
 new_local_repository(
