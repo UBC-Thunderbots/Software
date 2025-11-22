@@ -260,7 +260,7 @@ std::vector<float> getThreatScore(const EnemyThreat& enemy, const Field& field)
     float S_geo = expf(-1.0*(to_goal.length())/4.5);
 
     //Distance from goal
-    float num_pass = enemy.num_passes_to_get_possession;
+    float num_pass = enemy.num_robots_between_passer_and_receiver;
     float S_pos = expf(-num_pass);
 
     //Angle to goal
