@@ -357,7 +357,7 @@ Tracy also samples call stacks. If the profiled binary is run with root permissi
 
 ## Building for the robot
 
-To build for the robot computer, build the target with the `--platforms=//cc_toolchain:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//cc_toolchain:robot //software/geom/...`.
+To build for the robot computer, build the target with the `--platforms=//toolchains/cc:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//toolchains/cc:robot //software/geom/...`.
 
 ## Deploying Robot Software to the robot
 
@@ -365,7 +365,9 @@ We use Ansible to automatically update software running on the robot. [More info
 
 To update binaries on a working robot, you can run:
 
-`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+```bash
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
+```
 
 Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), and `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
 
@@ -388,7 +390,7 @@ It is possible to run Thunderloop without having a fully-working robot. Using th
 
 2. If you have a robot PC that doesn't have proper communication with the power or motor board, you can still run Thunderloop in a limited capacity to test software features (eg. networking).
     1. First, build the Thunderloop binary:
-        - `bazel build //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED --platforms=//cc_toolchain:robot`
+        - `bazel build //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED --platforms=//toolchains/cc:robot`
     2. Find the `<robot_ip>` of the robot you want to run Thunderloop on. This guide may help you find the IP address of the robot: [Useful Robot Commands](useful-robot-commands.md#Wifi-Disclaimer).
     3. Copy the binary to the robot:
         - `scp bazel-bin/software/embedded/thunderloop_main robot@<robot_ip>:/home/robot/thunderloop_main`

@@ -42,7 +42,7 @@ common --features=external_include_paths
 build --disk_cache=~/.cache/thunderbots_bazel_disk_cache
 
 build --experimental_remote_merkle_tree_cache # partial repo caching optimization
-build --incompatible_enable_proto_toolchain_resolution # protoc caching
+common --incompatible_enable_proto_toolchain_resolution # protoc caching
 
 # Ensure that we don't accidentally build gRPC
 common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
