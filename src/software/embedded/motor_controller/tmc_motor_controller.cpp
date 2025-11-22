@@ -82,12 +82,12 @@ double TmcMotorController::readThenWriteVelocity(const MotorIndex& motor,
 void TmcMotorController::writeToDriverOrDieTrying(uint8_t motor, uint8_t address,
                                                   int32_t value)
 {
-    int num_retires_left = NUM_RETRIES_SPI;
+    int num_retries_left = NUM_RETRIES_SPI;
     int read_value       = 0;
 
     // The SPI lines have a lot of noise, and sometimes a transfer will fail
     // randomly. So we retry a few times before giving up.
-    while (num_retires_left > 0)
+    while (num_retries_left > 0)
     {
         tmc6100_writeInt(motor, address, value);
         read_value = tmc6100_readInt(motor, address);
@@ -96,7 +96,7 @@ void TmcMotorController::writeToDriverOrDieTrying(uint8_t motor, uint8_t address
             return;
         }
         LOG(DEBUG) << "SPI Transfer to Driver Failed, retrying...";
-        num_retires_left--;
+        num_retries_left--;
     }
 
     // If we get here, we have failed to write to the driver. We reset
@@ -112,12 +112,12 @@ void TmcMotorController::writeToDriverOrDieTrying(uint8_t motor, uint8_t address
 void TmcMotorController::writeToControllerOrDieTrying(const MotorIndex& motor,
                                                       uint8_t address, int32_t value)
 {
-    int num_retires_left = NUM_RETRIES_SPI;
+    int num_retries_left = NUM_RETRIES_SPI;
     int read_value       = 0;
 
     // The SPI lines have a lot of noise, and sometimes a transfer will fail
     // randomly. So we retry a few times before giving up.
-    while (num_retires_left > 0)
+    while (num_retries_left > 0)
     {
         tmc4671_writeInt(CHIP_SELECTS.at(motor), address, value);
         read_value = tmc4671_readInt(CHIP_SELECTS.at(motor), address);
@@ -126,7 +126,7 @@ void TmcMotorController::writeToControllerOrDieTrying(const MotorIndex& motor,
             return;
         }
         LOG(DEBUG) << "SPI Transfer to Controller Failed, retrying...";
-        num_retires_left--;
+        num_retries_left--;
     }
 }
 

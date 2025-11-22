@@ -25,6 +25,7 @@ class StSpinMotorController : public MotorController
 
     void immediatelyDisable() override;
 
+   private:
     /**
      * Opens a SPI file descriptor for the given motor
      *
@@ -63,10 +64,10 @@ class StSpinMotorController : public MotorController
     static constexpr uint8_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
 
     static const inline std::unordered_map<MotorIndex, bool> ENABLED_MOTORS = {
-        {MotorIndex::FRONT_LEFT, true},
-        {MotorIndex::BACK_LEFT, true},
+        {MotorIndex::FRONT_LEFT, false},
+        {MotorIndex::BACK_LEFT, false},
         {MotorIndex::BACK_RIGHT, true},
-        {MotorIndex::FRONT_RIGHT, true},
+        {MotorIndex::FRONT_RIGHT, false},
         {MotorIndex::DRIBBLER, false},
     };
 

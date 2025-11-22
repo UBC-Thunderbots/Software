@@ -239,6 +239,7 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     //  The byte order of DATA is big endian; therefore the MSB is transmitted first.
     //  DATA may be ignored if the operation has no data to transmit/receive.
 
+    // Busy wait for slave data ready assertion
     while (data_ready_gpio_->getValue() != GpioState::HIGH)
     {
         std::this_thread::sleep_for(std::chrono::microseconds(100));

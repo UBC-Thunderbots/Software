@@ -5,23 +5,16 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
-#include "software/embedded/motor_controller/motor_board.h"
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
 #include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/power.h"
 #include "software/logger/network_logger.h"
-#include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 
-std::unique_ptr<StSpinMotorController> motor_controller_;
+std::unique_ptr<MotorController> motor_controller_;
 std::unique_ptr<PowerService> power_service_;
-RobotConstants_t robot_constants_;
-int read_value;
 
-// SPI Chip Selects
-constexpr double THRESHOLD = 0.0001;
-constexpr int DELAY_NS     = 10000;
 std::string runtime_dir    = "/tmp/tbots/yellow_test";
 
 int main(int argc, char **argv)
