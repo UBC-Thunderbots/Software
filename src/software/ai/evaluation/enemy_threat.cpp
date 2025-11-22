@@ -14,6 +14,34 @@
 #include "software/logger/logger.h"
 #include "software/world/team.h"
 
+int robotsBetweenPasserAndReceiver(const Robot &passer, const Robot &receiver,
+                                    const Team &enemy_team, const Team &friendly_team)
+{
+    //Creates a segment between passer and receiver
+    Segment passer_to_receiver_segment(passer.position(), receiver.position());
+
+    //Count friendly robots as obstacles
+    std::vector<Robot> all_friendly_robots = friendly_team.getAllRobots();
+
+    // Count how many enemy robots intersect with the segment between passer and receiver
+    // Exclude the passer and receiver themselves
+    int count = 0;
+    for (const auto &friendly_robot : all_friendly_robots)
+    {
+
+        // Check if this enemy robot intersects with the segment
+        // First check if the circle intersects the segment
+        if (intersects(Circle(friendly_robot.position(), ROBOT_MAX_RADIUS_METERS*3),
+                       passer_to_receiver_segment))
+        {
+            count++;
+        }
+    }
+
+    return count;
+
+}
+
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPairs(
     const std::vector<Robot> &possible_passers,
     const std::vector<Robot> &possible_receivers, const std::vector<Robot> &all_robots)
