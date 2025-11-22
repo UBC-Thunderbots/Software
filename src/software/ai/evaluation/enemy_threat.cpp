@@ -315,22 +315,42 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
         // passer to be an empty optional
         int num_passes              = static_cast<int>(enemy_team.numRobots());
         std::optional<Robot> passer = std::nullopt;
-        auto robot_with_effective_possession =
-            getRobotWithEffectiveBallPossession(enemy_team, ball, field);
-        if (robot_with_effective_possession)
+        int num_robots_between      = 0;
+
+        // Find all possible passers and select the one with the fewest robots between
+        // it and the receiver using robotsBetweenPasserAndReceiver
+        std::vector<Robot> all_enemy_robots = enemy_team.getAllRobots();
+
+        //If the current robot has ball continue
+        if (has_ball)
         {
-            auto pass_data = getNumPassesToRobot(robot_with_effective_possession.value(),
-                                                 robot, enemy_team, friendly_team);
-            if (pass_data)
+            num_robots_between = 0;
+        }
+        //Or else find robots between passer and receiver for all enemy robots
+        else
+        {
+            for (const auto &potential_passer: all_enemy_robots)
             {
-                num_passes = pass_data->first;
-                passer     = pass_data->second;
+                if (potential_passer.isNearDribbler(ball.position()))
+                {
+                    passer = potential_passer;
+                    num_robots_between =
+                    robotsBetweenPasserAndReceiver(potential_passer, robot, enemy_team, friendly_team);
+
+                }
+                else
+                {
+
+                }
+
             }
         }
 
-        EnemyThreat threat{robot,     has_ball,         goal_angle,
+
+
+        EnemyThreat threat{robot,           has_ball,         goal_angle,
                            best_shot_angle, best_shot_target, num_passes,
-                           passer};
+                           passer,          num_robots_between};
 
         threats.emplace_back(threat);
     }
