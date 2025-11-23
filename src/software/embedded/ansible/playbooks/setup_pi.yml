@@ -83,12 +83,15 @@
             dest: ~/
             remote_src: true
 
-        - name: Set up Wifi drivers
+        - name: Set up Wifi drivers (always copy over from /home/robot)
           become: true
-          become_method: ansible.builtin.sudo
-          ansible.builtin.command:
-            cmd: "mv /home/{{ ansible_user }}/iwlwifi* /lib/firmware/"
-            creates: /lib/firmware/iwlwifi*.ucode
+          become_method: sudo
+          ansible.builtin.shell: "cp iwlwifi* /lib/firmware/"
+          args:
+            chdir: "/home/{{ ansible_user }}"
+          register: wifi_fw_copy
+          ignore_errors: true
+
         - name: Set up systemd Wifi interface name rule
           ansible.builtin.import_tasks:
             file: ../tasks/setup_wifi_interface.yml
