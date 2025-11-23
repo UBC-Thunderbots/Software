@@ -21,6 +21,7 @@ import threading
 import time
 from typing import override
 
+
 class TigersAutoref(TimeProvider):
     """A wrapper over the TigersAutoref binary. It coordinates communication between the
     Simulator, TigersAutoref and Gamecontroller.
