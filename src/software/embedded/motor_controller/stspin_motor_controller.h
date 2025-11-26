@@ -56,40 +56,49 @@ class StSpinMotorController : public MotorController
     // Length of frame (in number of bytes)
     static constexpr unsigned int FRAME_LEN = 6;
 
-    // SPI Chip Selects
-    static constexpr uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-    static constexpr uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
-    static constexpr uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
-    static constexpr uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-    static constexpr uint8_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
-
     static const inline std::unordered_map<MotorIndex, bool> ENABLED_MOTORS = {
-        {MotorIndex::FRONT_LEFT, false},
-        {MotorIndex::BACK_LEFT, false},
-        {MotorIndex::BACK_RIGHT, true},
-        {MotorIndex::FRONT_RIGHT, false},
-        {MotorIndex::DRIBBLER, false},
+        {MotorIndex::FRONT_LEFT,  false},
+        {MotorIndex::BACK_LEFT,   false},
+        {MotorIndex::BACK_RIGHT,  false},
+        {MotorIndex::FRONT_RIGHT, true},
+        {MotorIndex::DRIBBLER,    false},
     };
 
+    // SPI Chip Selects
+    // clang-format off
     static const inline std::unordered_map<MotorIndex, uint8_t> CHIP_SELECTS = {
-        {MotorIndex::FRONT_LEFT, FRONT_LEFT_MOTOR_CHIP_SELECT},
-        {MotorIndex::BACK_LEFT, BACK_LEFT_MOTOR_CHIP_SELECT},
-        {MotorIndex::BACK_RIGHT, BACK_RIGHT_MOTOR_CHIP_SELECT},
-        {MotorIndex::FRONT_RIGHT, FRONT_RIGHT_MOTOR_CHIP_SELECT},
-        {MotorIndex::DRIBBLER, DRIBBLER_MOTOR_CHIP_SELECT},
+        {MotorIndex::FRONT_LEFT,  0},
+        {MotorIndex::BACK_LEFT,   1},
+        {MotorIndex::BACK_RIGHT,  2},
+        {MotorIndex::FRONT_RIGHT, 3},
+        {MotorIndex::DRIBBLER,    4},
     };
+    // clang-format on
 
     // SPI Motor Driver Paths
+    // clang-format off
     static const inline std::unordered_map<MotorIndex, const char*> SPI_PATHS = {
-        {MotorIndex::FRONT_LEFT, "/dev/spidev0.2"},
+        {MotorIndex::FRONT_LEFT,  "/dev/spidev0.2"},
+        {MotorIndex::BACK_LEFT,   "/dev/spidev0.3"},
+        {MotorIndex::BACK_RIGHT,  "/dev/spidev0.0"},
         {MotorIndex::FRONT_RIGHT, "/dev/spidev0.4"},
-        {MotorIndex::BACK_LEFT, "/dev/spidev0.3"},
-        {MotorIndex::BACK_RIGHT, "/dev/spidev0.0"},
-        {MotorIndex::DRIBBLER, "/dev/spidev0.1"},
+        {MotorIndex::DRIBBLER,    "/dev/spidev0.1"},
     };
+    // clang-format on
+
+    // Data Ready GPIO Pins
+    // clang-format off
+    static const inline std::unordered_map<MotorIndex, uint8_t> DATA_READY_GPIO_PINS = {
+        {MotorIndex::FRONT_LEFT,  24},
+        {MotorIndex::BACK_LEFT,   16},
+        {MotorIndex::BACK_RIGHT,  26},
+        {MotorIndex::FRONT_RIGHT, 23},
+        {MotorIndex::DRIBBLER,    0},
+    };
+    // clang-format on
 
     // SPI Configs
-    static constexpr uint32_t SPI_SPEED_HZ     = 2000000;   // 2 MHz
+    static constexpr uint32_t SPI_SPEED_HZ     = 1000000;   // 2 MHz
     static constexpr uint32_t MAX_SPI_SPEED_HZ = 250000000; // 250 MHz
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;
@@ -98,5 +107,5 @@ class StSpinMotorController : public MotorController
     std::array<int, reflective_enum::size<MotorIndex>()> file_descriptors_;
 
     std::unique_ptr<Gpio> reset_gpio_;
-    std::unique_ptr<Gpio> data_ready_gpio_;
+    std::unordered_map<MotorIndex, std::unique_ptr<Gpio>> data_ready_gpio_;
 };

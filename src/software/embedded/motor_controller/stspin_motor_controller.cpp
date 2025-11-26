@@ -19,15 +19,17 @@ using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
 StSpinMotorController::StSpinMotorController()
     : reset_gpio_(
-          setupGpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH)),
-      data_ready_gpio_(
-          setupGpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::INPUT, GpioState::LOW))
+          setupGpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH))
 {
     for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
     {
         if (ENABLED_MOTORS.at(motor))
         {
             openSpiFileDescriptor(motor);
+
+            data_ready_gpio_[motor] =
+                setupGpio(DATA_READY_GPIO_PINS.at(motor), GpioDirection::INPUT,
+                          GpioState::LOW);
         }
     }
 }
@@ -191,7 +193,7 @@ double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
     // SET_SPEEDRAMP expects the ramp time in millis to be in register bx.
     // We do speed ramping ourselves in MotorService, so we just want to
     // set the target speed without ramping (hence we set reg bx to 0).
-    sendAndReceiveFrame(motor, StSpinOpcode::MOV_BX, 0);
+    sendAndReceiveFrame(motor, StSpinOpcode::MOV_BX, 300);
 
     sendAndReceiveFrame(motor, StSpinOpcode::SET_SPEEDRAMP);
 
@@ -240,7 +242,7 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     //  DATA may be ignored if the operation has no data to transmit/receive.
 
     // Busy wait for slave data ready assertion
-    while (data_ready_gpio_->getValue() != GpioState::HIGH)
+    while (data_ready_gpio_.at(motor)->getValue() != GpioState::HIGH)
     {
         std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
@@ -266,7 +268,8 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     if (rx[0] != FRAME_SOF || rx[5] != FRAME_EOF || rx[4] != rx_crc)
     {
         LOG(WARNING) << "Received frame that failed integrity check. Expected CRC "
-                     << static_cast<int>(rx_crc) << " got " << static_cast<int>(rx[4]);
+                     << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[4])
+                     << " for motor " << motor;
     }
 
     // Return the DATA field of the received frame

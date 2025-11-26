@@ -31,9 +31,28 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < 100000; ++i)
     {
+        motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_RIGHT, 500);
+        motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_LEFT, 300);
+        motor_controller_->readThenWriteVelocity(MotorIndex::BACK_LEFT, 300);
         motor_controller_->readThenWriteVelocity(MotorIndex::BACK_RIGHT, 300);
+
+        LOG(INFO) << "Spinning all motors";
+
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+
+        motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_RIGHT, 0);
+        motor_controller_->readThenWriteVelocity(MotorIndex::FRONT_LEFT, 0);
+        motor_controller_->readThenWriteVelocity(MotorIndex::BACK_LEFT, 0);
         motor_controller_->readThenWriteVelocity(MotorIndex::BACK_RIGHT, 0);
-        LOG(INFO) << i;
+
+        motor_controller_->checkDriverFault(MotorIndex::FRONT_RIGHT);
+        motor_controller_->checkDriverFault(MotorIndex::FRONT_LEFT);
+        motor_controller_->checkDriverFault(MotorIndex::BACK_LEFT);
+        motor_controller_->checkDriverFault(MotorIndex::BACK_RIGHT);
+
+        LOG(INFO) << "Completed iteration " << i;
+
+        std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
     LOG(INFO) << "Robot Auto Test Complete";
