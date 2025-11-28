@@ -1,6 +1,8 @@
 #include "software/ai/evaluation/enemy_threat.h"
 
+#include <algorithm>
 #include <deque>
+#include <numeric>
 #include <boost/geometry/algorithms/detail/relate/result.hpp>
 #include <boost/geometry/arithmetic/dot_product.hpp>
 #include <boost/geometry/strategies/normalize.hpp>
@@ -13,34 +15,6 @@
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 #include "software/world/team.h"
-
-int robotsBetweenPasserAndReceiver(const Robot &passer, const Robot &receiver,
-                                    const Team &enemy_team, const Team &friendly_team)
-{
-    //Creates a segment between passer and receiver
-    Segment passer_to_receiver_segment(passer.position(), receiver.position());
-
-    //Count friendly robots as obstacles
-    std::vector<Robot> all_friendly_robots = friendly_team.getAllRobots();
-
-    // Count how many enemy robots intersect with the segment between passer and receiver
-    // Exclude the passer and receiver themselves
-    int count = 0;
-    for (const auto &friendly_robot : all_friendly_robots)
-    {
-
-        // Check if this enemy robot intersects with the segment
-        // First check if the circle intersects the segment
-        if (intersects(Circle(friendly_robot.position(), ROBOT_MAX_RADIUS_METERS*3),
-                       passer_to_receiver_segment))
-        {
-            count++;
-        }
-    }
-
-    return count;
-
-}
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPairs(
     const std::vector<Robot> &possible_passers,
@@ -194,35 +168,40 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
     return std::nullopt;
 }
 
-void sortThreatsInDecreasingOrder(std::vector<std::pair<EnemyThreat, float>> threats)
+void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats, const Field& field)
 {
+
     // A lambda function that implements the '<' operator for the EnemyThreat struct
     // so it can be sorted. Lower threats are "less than" higher threats.
-    auto enemyThreatLessThanComparator = [](const std::pair<EnemyThreat, float> &a, const std::pair<EnemyThreat, float> &b)
+    auto enemyThreatLessThanComparator = [&field](const EnemyThreat &a, const EnemyThreat &b)
     {
         // Robots with the ball are more threatening than robots without the ball, and
         // robots with the ball are the most threatening since they can shoot or move
         // the ball towards our net
-        if (a.first.has_ball && !b.first.has_ball)
+        std::vector<float> a_threat = getThreatScore(a, field);
+        std::vector<float> b_threat = getThreatScore(b, field);
+        float a_threatscore = std::accumulate(a_threat.begin(), a_threat.end(), 0.0f);
+        float b_threatscore = std::accumulate(b_threat.begin(), b_threat.end(), 0.0f);
+        if (a.has_ball && !b.has_ball)
         {
             return false;
         }
-        else if (!a.first.has_ball && b.first.has_ball)
+        else if (!a.has_ball && b.has_ball)
         {
             return true;
         }
-        if (a.second>b.second)
+        if (a_threatscore>b_threatscore)
         {
             return false;
         }
-        else if (a.second<b.second)
+        else if (a_threatscore<b_threatscore)
         {
             return true;
         }
         else
         {
             //get closer distance
-            if (a.first.best_shot_angle>b.first.best_shot_angle)
+            if (a.best_shot_angle>b.best_shot_angle)
             {
                 return false;
             }
@@ -238,42 +217,59 @@ void sortThreatsInDecreasingOrder(std::vector<std::pair<EnemyThreat, float>> thr
     // Sort threats from highest threat to lowest threat
     // Use reverse iterators to sort the vector in descending order
     std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
+    for (EnemyThreat a : threats) {
+        std::vector<float> temp = getThreatScore(a, field);
+        LOG(INFO)<<std::endl<<a.robot.id() <<" : " << temp[0]<<" "<<temp[1]<<" "<<temp[2]<<" "<<temp[3]<<" "<<temp[4];
+    }
 
 }
 
-float get_threat_score(const EnemyThreat& enemy, const Ball& ball)
+std::vector<float> getThreatScore(const EnemyThreat& enemy, const Field& field)
 {
-    //Pure shot angle
-    Angle goal_angle = enemy.goal_angle;
-    Angle mid = Angle::fromRadians(boost::math::float_constants::pi/4);
-    int k = 5;
-    float S_geo = 1/(1+exp(-k*(goal_angle.toRadians()-mid.toRadians())));
+    //Normalized distance - calculate distance from robot to enemy goal
+    //When distance is half the goal width, its at 1/e of maximum threat
+    Point friendly_goal_center = field.friendlyGoalCenter();
+    Vector to_goal = friendly_goal_center - enemy.robot.position();
+    float S_geo = expf(-1.0*(to_goal.length())/4.5);
 
-    //Distance from ball normalized
-    float distance_ball = (enemy.robot.position()-ball.position()).length();
-    float S_pos = expf(-0.8f *distance_ball);
+    //Distance from goal
+    float num_pass = enemy.num_passes_to_get_possession;
+    float S_pos = expf(-num_pass);
 
-    //Orientation
-    Vector to_goal = Point(3,0) - enemy.robot.position();
-    float facing_direction = to_goal.normalize().dot(enemy.robot.velocity().normalize());
-    float S_ori = std::max(static_cast<float>(0.0),facing_direction);
-
+    //Angle to goal
+    float S_angle = enemy.goal_angle.toRadians();
     //Visibility
-    float block_frac = enemy.best_shot_angle->toRadians()/enemy.goal_angle.toRadians();
-    float S_vis = 1.0f - block_frac;
+    float S_vis = 1.0f;
+    if (enemy.best_shot_angle.has_value() && enemy.goal_angle.toRadians() > 0.0f)
+    {
+        float block_frac = enemy.best_shot_angle->toRadians() / enemy.goal_angle.toRadians();
+        S_vis = 1.0f - block_frac;
+    }
 
     //predictive motion
-    float vel_dot = enemy.robot.velocity().normalize().dot(to_goal.normalize());
-    float S_pred = std::max(0.0f,vel_dot)*1.0f+0.2f*enemy.robot.velocity().length();
+    float S_pred = 0.0f;
+    Vector velocity = enemy.robot.velocity();
+    float velocity_length = velocity.length();
+    
+    // Only calculate if robot is moving and goal direction is valid
+    if (velocity_length > 0.0f && to_goal.length() > 0.0f)
+    {
+        float vel_dot = velocity.normalize().dot(to_goal.normalize());
+        float direction_component = std::max(0.0f, vel_dot);  // Only positive (toward goal)
+        float max_speed = enemy.robot.robotConstants().robot_max_speed_m_per_s;
+        float speed_component = std::min(1.0f, velocity_length / max_speed);
+        S_pred = 0.7f * direction_component + 0.3f * speed_component;
+    }
 
-    return 0.3f*S_geo + 0.25f*S_pos + 0.15f*S_ori + 0.2f*S_vis + 0.1f*S_pred;
+    return {0.4f*S_geo ,0.25f*S_pos,0.1f*S_angle,0.1f*S_vis,0.15f*S_pred};
 }
 
 std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &friendly_team,
                                             Team enemy_team, const Ball &ball,
                                             bool include_goalie)
 {
-    std::vector<std::pair<EnemyThreat, float>> robot_to_threat;
+
+    std::vector<EnemyThreat> threats;
     if (!include_goalie && enemy_team.getGoalieId())
     {
         enemy_team.removeRobotWithId(*enemy_team.getGoalieId());
@@ -307,54 +303,30 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
         // passer to be an empty optional
         int num_passes              = static_cast<int>(enemy_team.numRobots());
         std::optional<Robot> passer = std::nullopt;
-        int num_robots_between      = 0;
-
-        // Find all possible passers and select the one with the fewest robots between
-        // it and the receiver using robotsBetweenPasserAndReceiver
-        std::vector<Robot> all_enemy_robots = enemy_team.getAllRobots();
-
-        //If the current robot has ball continue
-        if (has_ball)
+        auto robot_with_effective_possession =
+            getRobotWithEffectiveBallPossession(enemy_team, ball, field);
+        if (robot_with_effective_possession)
         {
-            num_robots_between = 0;
-        }
-        //Or else find robots between passer and receiver for all enemy robots
-        else
-        {
-            for (const auto &potential_passer: all_enemy_robots)
+            auto pass_data = getNumPassesToRobot(robot_with_effective_possession.value(),
+                                                 robot, enemy_team, friendly_team);
+            if (pass_data)
             {
-                if (potential_passer.isNearDribbler(ball.position()))
-                {
-                    passer = potential_passer;
-                    num_robots_between =
-                    robotsBetweenPasserAndReceiver(potential_passer, robot, enemy_team, friendly_team);
-
-                }
-                else
-                {
-
-                }
-
+                num_passes = pass_data->first;
+                passer     = pass_data->second;
             }
         }
 
-
-
-        EnemyThreat threat{robot,           has_ball,         goal_angle,
+        EnemyThreat threat{robot,     has_ball,         goal_angle,
                            best_shot_angle, best_shot_target, num_passes,
-                           passer,          num_robots_between};
+                           passer};
 
-        robot_to_threat.emplace_back(threat,get_threat_score(threat,ball));
+        threats.emplace_back(threat);
     }
 
     // Sort the threats so the "most threatening threat" is first in the vector, and the
     // "least threatening threat" is last in the vector
-    sortThreatsInDecreasingOrder(robot_to_threat);
-    std::vector<EnemyThreat> threats;
-    threats.reserve(robot_to_threat.size());
-    for (const auto p: robot_to_threat)
-    {
-        threats.push_back(p.first);
-    }
+    sortThreatsInDecreasingOrder(threats, field);
+
     return threats;
+
 }
