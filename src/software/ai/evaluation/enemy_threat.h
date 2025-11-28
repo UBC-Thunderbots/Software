@@ -94,19 +94,8 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
  * sorted in-place.
  *
  * @param threats The given list of threats to sort in-place
- * @param field The field being played on
  */
-
-void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats, const Field& field);
-
-/**
- * Get threat score of a threat
- *
- * @param enemy The enemy threat to evaluate
- * @param field The field being played on
- * @return threatScore
- */
-std::vector<float> getThreatScore(const EnemyThreat& enemy, const Field& field);
+void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats);
 
 /**
  * Calculates the threat of each enemy robot on the field, and returns them in order
