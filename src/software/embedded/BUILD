@@ -63,7 +63,7 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
-        "//software/embedded/redis",
+        "//software/embedded/toml_config",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",

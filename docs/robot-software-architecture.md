@@ -39,9 +39,9 @@ More commands available [here](useful-robot-commands.md#off-robot-commands)
 
 To learn more about how it works, [see the RFC](https://docs.google.com/document/d/1hN3Us2Vjr8z6ihqUVp_3L7rrjKc-EZ-l2hZJc31gNOc/edit)
 
-## Redis
+## TOML Configuration
 
-[Redis](https://redis.io/docs/about/) is an in-memory key-value store. This allows us to share state between processes as well as modify values dynamically through the provided [cli](useful-robot-commands#redis). Values also persists between boots.
+Robot configuration is stored in a TOML file in home directory. This file contains both static configuration values and dynamic runtime values. 
 
 # Thunderloop
 

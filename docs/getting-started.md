@@ -374,16 +374,26 @@ Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), 
 It is possible to run Thunderloop without having a fully-working robot. Using this mode is useful when testing features that don't require the power board or motors.
 
 1. To run Thunderloop locally on your computer
-    1. First, you must ensure that `redis` is installed. Installation instructions can be found [here](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-linux/). The result of these installation directions will likely enable `redis-server` as a service that starts on boot. You may want to run `sudo systemctl disable redis-server` to prevent this.
-    2. Next, run the command `redis-server` in a terminal.
-    3. Set up the following required REDIS constants by running the following commands in the terminal:
-        - `redis-cli set /robot_id "{robot_id}"` where `{robot_id}` is the robot's ID (e.g. `1`, `2`, etc.)
-        - `redis-cli set /network_interface "{network_interface}"` where `{network_interface}` is one of the interfaces listed by `ip a`.
-        - `redis-cli set /channel_id "{channel_id}"` where `{channel_id}` is the channel id of the robot (e.g. `1`, `2`, etc.)
-        - `redis-cli set /kick_coeff "{kick_coeff}"` where `{kick_coeff}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-        - `redis-cli set /kick_constant "{kick_constant}"` where `{kick_constant}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-        - `redis-cli set /chip_pulse_width "{chip_pulse_width}"` where `{chip_pulse_width}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-    4. Now, run Thunderloop with the following command:
+    1. Create a TOML configuration file in home directory with the following content (replace values as needed):
+        ```toml
+        robot_id = "1"
+        channel_id = "0"
+        network_interface = "wlan0"
+        kick_constant = "0"
+        kick_coeff = "0.0"
+        chip_pulse_width = "0"
+        battery_voltage = "0.0"
+        current_draw = "0.0"
+        cap_voltage = "0.0"
+        ```
+        Where:
+        - `robot_id` is the robot's ID (e.g. `1`, `2`, etc.)
+        - `network_interface` is one of the interfaces listed by `ip a`.
+        - `channel_id` is the channel id of the robot (e.g. `1`, `2`, etc.)
+        - `kick_coeff` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+        - `kick_constant` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+        - `chip_pulse_width` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+    2. Now, run Thunderloop with the following command:
         - `bazel run //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED`
 
 2. If you have a robot PC that doesn't have proper communication with the power or motor board, you can still run Thunderloop in a limited capacity to test software features (eg. networking).
