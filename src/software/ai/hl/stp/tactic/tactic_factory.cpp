@@ -253,5 +253,5 @@ EnemyThreat createEnemyThreat(const TbotsProto::EnemyThreat &enemy_threat_proto)
                        best_shot_angle,
                        best_shot_target,
                        enemy_threat_proto.num_passes_to_get_possession(),
-                       Robot(enemy_threat_proto.passer()),0};
+                       Robot(enemy_threat_proto.passer())};
 }
