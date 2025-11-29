@@ -378,7 +378,7 @@ It is possible to run Thunderloop without having a fully-working robot. Using th
         ```toml
         robot_id = "1"
         channel_id = "0"
-        network_interface = "wlan0"
+        network_interface = "tbotswifi5"
         kick_constant = "0"
         kick_coeff = "0.0"
         chip_pulse_width = "0"
