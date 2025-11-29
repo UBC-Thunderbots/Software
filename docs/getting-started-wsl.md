@@ -4,13 +4,15 @@
 
 <!--TOC-->
 
-- [Table of Contents](#table-of-contents)
-- [Introduction](#introduction)
-- [WSLg Setup (Windows 11/10 - Recommended)](#wslg-setup-windows-1110---recommended)
-- [WSL2 Setup (Windows 10)](#wsl2-setup-windows-10)
-  - [X Server Setup](#x-server-setup)
-- [Networking Issues](#networking-issues)
-- [USB Issues](#usb-issues)
+- [Software Setup on Windows Subsystem for Linux](#software-setup-on-windows-subsystem-for-linux)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [WSL2 Setup (Windows 11 - Recommended)](#wsl2-setup-windows-11---recommended)
+  - [WSLg Setup (Windows 11/10 - Recommended)](#wslg-setup-windows-1110---recommended)
+  - [WSL2 Setup (Windows 10)](#wsl2-setup-windows-10)
+    - [X Server Setup](#x-server-setup)
+  - [Networking Issues](#networking-issues)
+  - [USB Issues](#usb-issues)
 
 <!--TOC-->
 
@@ -18,8 +20,20 @@
 
 Windows has a Windows Subsystem for Linux component that can be used to develop and run code for Linux on Windows. WSL1 was a Windows component that implemented Linux kernel interfaces, and didn't work great with Thunderbots software. WSL2 runs a full-fledged Linux kernel in a VM, and works great with Thunderbots software with the exception that we need to use software rendering instead of GPU-accelerated rendering for our AI. WSLg is WSL2 but with built-in support for running GUI applications (e.g. Thunderscope).
 
+Update for 2025: WSL2 now comes prepackaged with support for running GUI applications like Thunderscope. Setup is now significantly simplified.
+
 > [!WARNING]  
 > **Support for WSL is experimental. Performance will be degraded, features may not work properly, and the developer experience will be worse overall.**
+
+## WSL2 Setup (Windows 11 - Recommended)
+Installing WSL2 through Windows 11 is very simple. \
+[Reference](https://documentation.ubuntu.com/wsl/latest/howto/install-ubuntu-wsl2/)
+1. First, we enable WSL2: \
+Open PowerShell and run: `wsl --install`. You may be required to grant administrator permissions and restart your computer.\
+2. Then, install Ubuntu 24.04. Type `wsl --list --online` to list the available distributions, and look for the Ubuntu 24.04 LTS entry in the Friendly name column.
+![alt text](/images/wsldistros.png)
+3. Follow [Software Setup](./getting-started.md).
+
 
 ## WSLg Setup (Windows 11/10 - Recommended)
 1. Installing WSLg is more straight forward than WSL2 and is the recommended way to run Linux GUI applications in Windows. For up to date documentation, please follow the [official documentation for setting up WSLg](https://github.com/microsoft/wslg#installing-wslg). 
