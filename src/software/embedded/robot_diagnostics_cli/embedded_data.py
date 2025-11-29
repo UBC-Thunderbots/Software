@@ -16,7 +16,7 @@ class EmbeddedData:
     """
 
     def __init__(self) -> None:
-        self.config_file_path = "/home/parallels/robot_config.toml"
+        self.config_file_path = "/opt/tbotspython/robot_config.toml"
         self.config = self._load_config()
         self.epoch_timestamp_seconds = 0
         self.battery_voltage = 0

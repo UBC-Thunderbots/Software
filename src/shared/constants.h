@@ -35,7 +35,7 @@ static const unsigned int REPLAY_FILE_VERSION       = 2;
 #endif  // PLATFORMIO_BUILD
 
 // TOML config file path for robot configuration
-static const char TOML_CONFIG_FILE_PATH[] = "/home/parallels/robot_config.toml";
+static const char TOML_CONFIG_FILE_PATH[] = "/opt/tbotspython/robot_config.toml";
 
 // the UDP port robots are listening to for primitives
 static const short unsigned int PRIMITIVE_PORT = 42070;
