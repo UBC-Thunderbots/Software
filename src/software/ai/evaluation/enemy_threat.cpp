@@ -168,7 +168,7 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
     return std::nullopt;
 }
 
-void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats, const Field& field)
+void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats, const Field &field)
 {
 
     // A lambda function that implements the '<' operator for the EnemyThreat struct
@@ -182,14 +182,8 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats, const Field
         std::vector<float> b_threat = getThreatScore(b, field);
         float a_threatscore = std::accumulate(a_threat.begin(), a_threat.end(), 0.0f);
         float b_threatscore = std::accumulate(b_threat.begin(), b_threat.end(), 0.0f);
-        if (a.has_ball && !b.has_ball)
-        {
-            return false;
-        }
-        else if (!a.has_ball && b.has_ball)
-        {
-            return true;
-        }
+        if (a.has_ball != b.has_ball)
+            return a.has_ball < b.has_ball;
         if (a_threatscore>b_threatscore)
         {
             return false;
@@ -250,7 +244,7 @@ std::vector<float> getThreatScore(const EnemyThreat& enemy, const Field& field)
     float S_pred = 0.0f;
     Vector velocity = enemy.robot.velocity();
     float velocity_length = velocity.length();
-    
+
     // Only calculate if robot is moving and goal direction is valid
     if (velocity_length > 0.0f && to_goal.length() > 0.0f)
     {

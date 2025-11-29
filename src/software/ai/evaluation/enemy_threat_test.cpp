@@ -312,7 +312,8 @@ TEST(SortEnemyThreatsTest, only_one_robot_has_possession)
     std::vector<EnemyThreat> expected_result = {threat1, threat2};
 
     std::vector<EnemyThreat> threats = {threat2, threat1};
-    sortThreatsInDecreasingOrder(threats);
+    Field field = Field::createSSLDivisionBField();
+    sortThreatsInDecreasingOrder(threats, field);
     EXPECT_EQ(threats, expected_result);
 }
 
@@ -338,7 +339,8 @@ TEST(SortEnemyThreatsTest, multiple_robots_have_possession_simultaneously)
     std::vector<EnemyThreat> expected_result = {threat2, threat1};
 
     std::vector<EnemyThreat> threats = {threat1, threat2};
-    sortThreatsInDecreasingOrder(threats);
+    Field field = Field::createSSLDivisionBField();
+    sortThreatsInDecreasingOrder(threats, field);
     EXPECT_EQ(threats, expected_result);
 }
 
@@ -364,7 +366,8 @@ TEST(SortEnemyThreatsTest,
     std::vector<EnemyThreat> expected_result = {threat1, threat2};
 
     std::vector<EnemyThreat> threats = {threat2, threat1};
-    sortThreatsInDecreasingOrder(threats);
+    Field field = Field::createSSLDivisionBField();
+    sortThreatsInDecreasingOrder(threats, field);
     EXPECT_EQ(threats, expected_result);
 }
 
@@ -398,9 +401,12 @@ TEST(SortEnemyThreatsTest,
     std::vector<EnemyThreat> expected_result = {threat2, threat1};
 
     std::vector<EnemyThreat> threats = {threat1, threat2};
-    sortThreatsInDecreasingOrder(threats);
+    Field field = Field::createSSLDivisionBField();
+    sortThreatsInDecreasingOrder(threats, field);
     EXPECT_EQ(threats, expected_result);
 }
+
+
 
 TEST(EnemyThreatTest, no_enemies_on_field)
 {
@@ -417,6 +423,7 @@ TEST(EnemyThreatTest, no_enemies_on_field)
     // Make sure we got the correct number of results
     EXPECT_EQ(result.size(), 0);
 }
+
 
 
 TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
@@ -452,6 +459,7 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     EXPECT_EQ(threat.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat.passer);
 }
+
 
 TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
 {
@@ -553,4 +561,58 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     EXPECT_EQ(threat_2.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_2.passer);
     EXPECT_EQ(threat_2.passer, enemy_robot_1);
+}
+
+TEST(EnemyThreatTest, two_enemies_one_with_ball_one_without)
+{
+    // This test verifies that when there are two enemy robots, one with the ball
+    // and one without, the threat evaluation correctly identifies both and sorts
+    // the one with the ball as more threatening.
+    //
+    //      enemy robot 1 (has ball)
+    //
+    //                         enemy robot 2
+    //
+    //                       | friendly net |
+    //                       ----------------
+
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+
+    // Position enemy robot 1 close to the friendly goal with the ball
+    Robot enemy_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(1.5, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    
+    // Position enemy robot 2 further away without the ball
+    Robot enemy_robot_2 =
+        Robot(2, world->field().friendlyGoalCenter() + Vector(3, 1.5), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_robot_1, enemy_robot_2});
+    world->updateEnemyTeamState(enemy_team);
+
+    // Put the ball with enemy robot 1
+    ::TestUtil::setBallPosition(
+        world, enemy_robot_1.position() + Vector(-DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
+
+    // Make sure we got the correct number of results
+    EXPECT_EQ(result.size(), 2);
+
+    // The first threat should be enemy robot 1 (has the ball)
+    auto threat_0 = result.at(0);
+    EXPECT_EQ(threat_0.robot, enemy_robot_1);
+    EXPECT_TRUE(threat_0.has_ball);
+    EXPECT_EQ(threat_0.num_passes_to_get_possession, 0);
+    ASSERT_FALSE(threat_0.passer);
+
+    // The second threat should be enemy robot 2 (doesn't have the ball)
+    auto threat_1 = result.at(1);
+    EXPECT_EQ(threat_1.robot, enemy_robot_2);
+    EXPECT_FALSE(threat_1.has_ball);
+    EXPECT_GT(threat_1.num_passes_to_get_possession, 0);
 }
