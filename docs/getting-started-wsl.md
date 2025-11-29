@@ -31,7 +31,7 @@ Installing WSL2 through Windows 11 is very simple. \
 1. First, we enable WSL2: \
 Open PowerShell and run: `wsl --install`. You may be required to grant administrator permissions and restart your computer.\
 2. Then, install Ubuntu 24.04. Type `wsl --list --online` to list the available distributions, and look for the Ubuntu 24.04 LTS entry in the Friendly name column.
-![alt text](/images/wsldistros.png)
+![alt text](/docs/images/wsldistros.png)
 3. Follow [Software Setup](./getting-started.md).
 
 
