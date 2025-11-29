@@ -8,6 +8,7 @@ from software.thunderscope.replay.bookmark_marker import BookmarkMarker
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.common import common_widgets
 from software.py_constants import *
+from typing import override
 
 
 class ReplayControls(QWidget):
@@ -151,6 +152,7 @@ class ReplayControls(QWidget):
             else "Start\nClip"
         )
 
+    @override
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """When a key is pressed, pause the player.
 
@@ -198,6 +200,7 @@ class ReplayControls(QWidget):
         for marker in self.bookmarks_markers:
             marker.update()
 
+    @override
     def resizeEvent(self, evt):
         """Compute the positions of bookmark visuals when resizing.
         :param evt: resize event

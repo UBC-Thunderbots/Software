@@ -6,7 +6,9 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffFriendlyPlay::KickoffFriendlyPlay(TbotsProto::AiConfig config) : Play(config, true)
+KickoffFriendlyPlay::KickoffFriendlyPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : Play(ai_config_ptr, true)
 {
 }
 
@@ -69,12 +71,14 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // move tactics to use to move to positions defined above
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<PrepareKickoffMoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>()};
+        std::make_shared<PrepareKickoffMoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr)};
 
     // specific tactics
-    auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>();
+    auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(ai_config_ptr);
 
     // Part 1: setup state (move to key positions)
     while (world_ptr->gameState().isSetupState())
@@ -134,5 +138,6 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffFriendlyPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay,
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

@@ -22,6 +22,7 @@ from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.estop_helpers import get_estop_config
 from software.py_constants import *
+from typing import override
 
 logger = create_logger(__name__)
 
@@ -85,6 +86,7 @@ class FieldTestRunner(TbotsTestRunner):
                 f"No Worlds were received with in {WORLD_BUFFER_TIMEOUT} seconds. Please make sure atleast 1 robot and 1 ball is present on the field."
             )
 
+    @override
     def send_gamecontroller_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
@@ -103,6 +105,7 @@ class FieldTestRunner(TbotsTestRunner):
             final_ball_placement_point=final_ball_placement_point,
         )
 
+    @override
     def run_test(
         self,
         always_validation_sequence_set=[[]],
@@ -288,13 +291,6 @@ def load_command_line_arguments():
         type=int,
         default=0,
         help="Which channel to communicate over",
-    )
-
-    parser.add_argument(
-        "--enable_radio",
-        action="store_true",
-        default=False,
-        help="Whether to use radio (True) or Wi-Fi (False) for sending primitives to robots",
     )
 
     parser.add_argument(

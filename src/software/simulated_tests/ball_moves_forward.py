@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class BallMovesForward(Validation):
@@ -14,6 +15,7 @@ class BallMovesForward(Validation):
     def __init__(self, initial_ball_position):
         self.last_ball_position = initial_ball_position
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if ball is moving forward, i.e. in the +x direction
 
@@ -31,6 +33,7 @@ class BallMovesForward(Validation):
         self.last_ball_position = current_ball_position
         return validation_status
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the last ball position line"""
         return create_validation_geometry(
@@ -48,6 +51,7 @@ class BallMovesForward(Validation):
             ]
         )
 
+    @override
     def __repr__(self):
         return "Check that the ball moves forward"
 
