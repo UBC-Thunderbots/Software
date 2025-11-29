@@ -312,7 +312,7 @@ TEST(SortEnemyThreatsTest, only_one_robot_has_possession)
     std::vector<EnemyThreat> expected_result = {threat1, threat2};
 
     std::vector<EnemyThreat> threats = {threat2, threat1};
-    Field field = Field::createSSLDivisionBField();
+    Field field                      = Field::createSSLDivisionBField();
     sortThreatsInDecreasingOrder(threats, field);
     EXPECT_EQ(threats, expected_result);
 }
@@ -339,7 +339,7 @@ TEST(SortEnemyThreatsTest, multiple_robots_have_possession_simultaneously)
     std::vector<EnemyThreat> expected_result = {threat2, threat1};
 
     std::vector<EnemyThreat> threats = {threat1, threat2};
-    Field field = Field::createSSLDivisionBField();
+    Field field                      = Field::createSSLDivisionBField();
     sortThreatsInDecreasingOrder(threats, field);
     EXPECT_EQ(threats, expected_result);
 }
@@ -366,7 +366,7 @@ TEST(SortEnemyThreatsTest,
     std::vector<EnemyThreat> expected_result = {threat1, threat2};
 
     std::vector<EnemyThreat> threats = {threat2, threat1};
-    Field field = Field::createSSLDivisionBField();
+    Field field                      = Field::createSSLDivisionBField();
     sortThreatsInDecreasingOrder(threats, field);
     EXPECT_EQ(threats, expected_result);
 }
@@ -401,7 +401,7 @@ TEST(SortEnemyThreatsTest,
     std::vector<EnemyThreat> expected_result = {threat2, threat1};
 
     std::vector<EnemyThreat> threats = {threat1, threat2};
-    Field field = Field::createSSLDivisionBField();
+    Field field                      = Field::createSSLDivisionBField();
     sortThreatsInDecreasingOrder(threats, field);
     EXPECT_EQ(threats, expected_result);
 }
@@ -582,12 +582,12 @@ TEST(EnemyThreatTest, two_enemies_one_with_ball_one_without)
     Robot enemy_robot_1 =
         Robot(1, world->field().friendlyGoalCenter() + Vector(1.5, 0), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    
+
     // Position enemy robot 2 further away without the ball
     Robot enemy_robot_2 =
         Robot(2, world->field().friendlyGoalCenter() + Vector(3, 1.5), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    
+
     Team enemy_team = Team(Duration::fromSeconds(1));
     enemy_team.updateRobots({enemy_robot_1, enemy_robot_2});
     world->updateEnemyTeamState(enemy_team);

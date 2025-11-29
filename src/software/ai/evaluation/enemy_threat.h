@@ -96,7 +96,7 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
  * @param threats The given list of threats to sort in-place
  * @param field field being played on
  */
-void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats, const Field &field );
+void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats, const Field &field);
 
 /**
  * Calculates the threat of each enemy robot on the field, and returns them in order
@@ -135,7 +135,8 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
 //    Open shooting angle toward the friendly goal.
 //
 // 4. Visibility / Blocking (0.10):
-//    Unblocked fraction of the shooting angle: S_vis = 1 - (best_shot_angle / goal_angle).
+//    Unblocked fraction of the shooting angle: S_vis = 1 - (best_shot_angle /
+goal_angle).
 //
 // 5. Predictive Motion (0.15):
 //    Movement toward the goal: 0.7 * direction_alignment + 0.3 * normalized_speed.
@@ -149,4 +150,4 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
  * @return A vector of five float values representing the weighted threat score
  *         components: [geographic, possession, angle, visibility, predictive]
  */
-std::vector<float> getThreatScore(const EnemyThreat& enemy, const Field& field);
+std::vector<float> getThreatScore(const EnemyThreat &enemy, const Field &field);
