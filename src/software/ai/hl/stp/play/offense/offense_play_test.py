@@ -79,7 +79,7 @@ def test_offense_play(simulated_test_runner):
     # Always Validation
     inv_always_validation_sequence_set = [
         [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])],
-        [NeverExcessivelyDribbles()]
+        [NeverExcessivelyDribbles()],
     ]
 
     ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
