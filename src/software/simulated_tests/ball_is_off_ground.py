@@ -16,7 +16,6 @@ class BallIsOffGround(Validation):
     LINE_WIDTH = 0.08
     TRIANGLE_HEIGHT = 0.15
     TRIANGLE_WIDTH = 0.2
-    OCTAGON_RADIUS = 0.2
 
     def __init__(self, threshold=0.01):
         self.threshold = threshold
@@ -45,7 +44,7 @@ class BallIsOffGround(Validation):
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
 
         if velocity.length() < 0.01:
-            return self.create_octagon_geometry(ball_position)
+            return create_validation_geometry()
 
         direction = velocity.normalize()
 
@@ -54,28 +53,6 @@ class BallIsOffGround(Validation):
     @override
     def __repr__(self):
         return "Check if the ball is chipped"
-
-    def create_octagon_geometry(self, centre_point):
-        """Returns octagon validation geometry
-
-        :param centre_point: The position to create octagon geometry at
-        :return: An octagon ValidationGeometry
-        """
-        start = tbots_cpp.Vector(self.OCTAGON_RADIUS, 0.0)
-        # offset 45/2 degrees so octagon is parallel to the x/y axis
-        start = start.rotate(tbots_cpp.Angle().fromDegrees(45.0 / 2.0))
-
-        return create_validation_geometry(
-            [
-                tbots_cpp.Polygon(
-                    [
-                        centre_point
-                        + start.rotate(tbots_cpp.Angle().fromDegrees(45.0 * i))
-                        for i in range(7)
-                    ]
-                )
-            ]
-        )
 
     def create_arrow_geometry(self, start_point, direction):
         """Returns arrow validation geometry
