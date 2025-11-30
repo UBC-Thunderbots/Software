@@ -1,5 +1,6 @@
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 from software.simulated_tests.validation import (
     Validation,
@@ -11,16 +12,30 @@ from software.simulated_tests.validation import (
 class ExcessivelyDribbling(Validation):
     """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
 
-    def __init__(self):
+    def __init__(self, buffer_size: int = 5):
         self.continous_dribbling_start_point = None
 
-    def get_validation_status(self, world) -> ValidationStatus:
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+
+    def get_validation_status(self, world, max_dribble_length: int = 1) -> ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m.
 
         :param world: The world msg to validate
+        :param max_dribble_length: the maximum dribble distance allowed (competition 1m)
         :return: FAILING when the robot is excessively dribbling
                  PASSING when the robot is not excessively dribbling
         """
+
+        if world.HasField("dribble_displacement"):
+            dribble_disp = world.dribble_displacement
+            dist = tbots_cpp.createSegment(dribble_disp).length()
+            if dist > max_dribble_length:
+                return ValidationStatus.FAILING
+
+        return ValidationStatus.PASSING
+
+
+
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         ball = world.friendly_team.team_robots
         for robot in world.friendly_team.team_robots:

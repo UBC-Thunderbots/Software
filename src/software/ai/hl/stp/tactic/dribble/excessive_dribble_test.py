@@ -18,7 +18,7 @@ from proto.ssl_gc_common_pb2 import Team
     "dribble_destination,final_dribble_orientation,allow_excessive_dribbling",
     [
         # Dribble Destination for the ball > 1.0 from its starting position
-        (tbots_cpp.Point(1.012, 0), tbots_cpp.Angle(), True),
+        (tbots_cpp.Point(1.03, 0), tbots_cpp.Angle(), True),
     ],
 )
 

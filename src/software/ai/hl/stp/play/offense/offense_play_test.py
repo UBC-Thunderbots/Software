@@ -83,8 +83,6 @@ def test_offense_play(simulated_test_runner):
         [NeverExcessivelyDribbles()]
     ]
 
-
-
     ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
 
     # Eventually Validation
