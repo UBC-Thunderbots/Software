@@ -22,18 +22,19 @@ class ExcessivelyDribbling(Validation):
                  PASSING when the robot is not excessively dribbling
         """
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
+        ball = world.friendly_team.team_robots
         for robot in world.friendly_team.team_robots:
-            if not tbots_cpp.Robot(robot).isNearDribbler(ball_position, 0.01):
+            if not tbots_cpp.Robot(robot).isNearDribbler(ball_position, 0.02):
                 # if ball is not near dribbler then de-activate this validation
                 self.continous_dribbling_start_point = None
-            elif (
-                ball_position - (self.continous_dribbling_start_point or ball_position)
-            ).length() > 1.0:
-                return ValidationStatus.FAILING
-            elif self.continous_dribbling_start_point is None:
-                # ball is in dribbler, but previously wasn't in dribbler, so set continuous dribbling start point
-                self.continous_dribbling_start_point = ball_position
+            else:
+                if self.continous_dribbling_start_point is None:
+                    self.continous_dribbling_start_point = ball_position
+                print(ball_position)
+                if (ball_position - self.continous_dribbling_start_point).length() > 1:
+                    return ValidationStatus.FAILING
         return ValidationStatus.PASSING
+
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the max allowed dribbling circle"""
