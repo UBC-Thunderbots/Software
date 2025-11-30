@@ -34,7 +34,8 @@ class TbotsTestRunner:
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
         self.is_yellow_friendly = is_yellow_friendly
-        self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
+        self.world_buffer = ThreadSafeBuffer(
+            buffer_size=20, protobuf_type=World)
         self.primitive_set_buffer = ThreadSafeBuffer(
             buffer_size=1, protobuf_type=PrimitiveSet
         )
@@ -134,7 +135,8 @@ class TbotsTestRunner:
 
         :param worldstate: the worldstate proto to use
         """
-        raise NotImplementedError("abstract class method called set_worldstate")
+        raise NotImplementedError(
+            "abstract class method called set_worldstate")
 
     @abstractmethod
     def run_test(
@@ -149,4 +151,5 @@ class TbotsTestRunner:
         :param eventually_validation_sequence_set: validation set that must eventually be true
         :param test_timeout_s: how long the test will run
         """
-        raise NotImplementedError("abstract method run_test called from base class")
+        raise NotImplementedError(
+            "abstract method run_test called from base class")

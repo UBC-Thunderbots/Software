@@ -1,4 +1,5 @@
 #include "software/world/world.h"
+#include "software/logger/logger.h"
 
 #include "boost/circular_buffer.hpp"
 
@@ -29,6 +30,7 @@ World::World(const TbotsProto::World &world_proto)
 
 void World::updateBall(const Ball &new_ball)
 {
+    LOG(INFO) << new_ball.currentState().velocity().x() << " " << new_ball.currentState().velocity().y();
     ball_ = new_ball;
     updateTimestamp(getMostRecentTimestampFromMembers());
     current_game_state_.updateBall(ball_);

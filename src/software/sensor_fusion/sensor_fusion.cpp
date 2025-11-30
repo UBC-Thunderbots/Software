@@ -302,6 +302,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
         if (new_ball)
         {
+            //LOG(INFO) << "A";
             updateBall(*new_ball);
         }
     }
@@ -311,6 +312,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         if (new_ball)
         {
             // If vision detected a new ball, then use that one
+            //LOG(INFO) << "B";
             updateBall(*new_ball);
         }
         else if (ball)
@@ -344,6 +346,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
 void SensorFusion::updateBall(Ball new_ball)
 {
+    //LOG(INFO) << *ball.currentState().velocity().x() << " " << *ball.currentState().velocity().y();
     ball = new_ball;
     game_state.updateBall(*ball);
 }
@@ -351,6 +354,7 @@ void SensorFusion::updateBall(Ball new_ball)
 std::optional<Ball> SensorFusion::createBall(
     const std::vector<BallDetection> &ball_detections)
 {
+    // LOG(INFO) << ball_detections.size();
     if (field)
     {
         std::optional<Ball> new_ball =

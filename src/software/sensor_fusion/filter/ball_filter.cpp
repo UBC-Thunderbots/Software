@@ -9,6 +9,7 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/math/math_functions.h"
+#include "software/logger/logger.h"
 
 
 BallFilter::BallFilter() : ball_detection_buffer(MAX_BUFFER_SIZE) {}
@@ -352,6 +353,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
             Vector velocity_vector    = current_position - previous_position;
             double velocity_magnitude = velocity_vector.length() / time_diff.toSeconds();
             Vector velocity           = velocity_vector.normalize(velocity_magnitude);
+	    //LOG(INFO) << i << " " << j << ": " << velocity.x() << " " << velocity.y();
 
             ball_velocity_magnitudes.emplace_back(velocity_magnitude);
             ball_velocities.emplace_back(velocity);
@@ -385,6 +387,8 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
 
     BallVelocityEstimate velocity_data(
         {average_velocity, average_velocity_magnitude, min_max_average});
+
+    LOG(INFO) << velocity_data.average_velocity_magnitude;
 
     return velocity_data;
 }

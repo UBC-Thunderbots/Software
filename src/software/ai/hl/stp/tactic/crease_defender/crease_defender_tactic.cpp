@@ -14,6 +14,7 @@ CreaseDefenderTactic::CreaseDefenderTactic(
     : TacticBase<CreaseDefenderFSM, DribbleFSM, MoveFSM>({RobotCapability::Move},
                                                          ai_config_ptr)
 {
+    LOG(INFO) << "log xd";
 }
 
 void CreaseDefenderTactic::accept(TacticVisitor &visitor) const

@@ -130,11 +130,13 @@ class SimulatedTestRunner(TbotsTestRunner):
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
-                    self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
+                    self.gamecontroller.send_gc_command(
+                        gc_command=cmd, team=team)
                     # remove command from the list
                     ci_cmd_with_delay.remove((delay, cmd, team))
 
-            tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
+            tick = SimulatorTick(
+                milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
 
@@ -156,7 +158,8 @@ class SimulatedTestRunner(TbotsTestRunner):
                 except queue.Empty:
                     # If we timeout, that means full_system missed the last
                     # wrapper and robot status, lets resend it.
-                    logger.warning("Fullsystem missed last wrapper, resending ...")
+                    logger.warning(
+                        "Fullsystem missed last wrapper, resending ...")
 
                     ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
                     robot_status = self.robot_status_buffer.get(block=False)
@@ -174,6 +177,8 @@ class SimulatedTestRunner(TbotsTestRunner):
             # if the time we have blocked is less than a tick, sleep for the remaining time (for Thunderscope only)
             if self.thunderscope and tick_duration_s > processing_time:
                 time.sleep(tick_duration_s - processing_time)
+
+            # print(world.ball.current_state.global_velocity)
 
             # Validate
             (
@@ -212,7 +217,8 @@ class SimulatedTestRunner(TbotsTestRunner):
             if not run_till_end:
                 try:
                     # Check that all eventually validations are eventually valid
-                    validation.check_validation(eventually_validation_proto_set)
+                    validation.check_validation(
+                        eventually_validation_proto_set)
                     self.__stopper()
                     return
                 except AssertionError as e:
@@ -255,8 +261,10 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
+        print("ran simulated test")
         test_timeout_duration = (
-            test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
+            test_timeout_s[index] if type(
+                test_timeout_s) == list else test_timeout_s
         )
 
         # Start the test with a delay to allow the simulator to receive
@@ -508,7 +516,8 @@ def simulated_test_runner():
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
     # Grab the current test name to store the proto log for the test case
-    current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
+    current_test = os.environ.get(
+        "PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
     current_test = current_test.replace("]", "")
     current_test = current_test.replace("[", "-")
 

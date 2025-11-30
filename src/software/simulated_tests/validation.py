@@ -159,6 +159,8 @@ def run_validation_sequence_sets(
     eventually_validation_proto_set = ValidationProtoSet()
     eventually_validation_proto_set.validation_type = ValidationType.EVENTUALLY
 
+    # print(world.ball.current_state.global_velocity)
+
     def create_validation_proto_helper(validation_proto_set, validation):
         """Helper function that computes the status and creates a
         validation_proto, and updates it in the validation_proto_set.
@@ -175,7 +177,8 @@ def run_validation_sequence_sets(
         # Create validation proto
         validation_proto.status = status
         validation_proto.failure_msg = str(validation) + " failed"
-        validation_proto.geometry.CopyFrom(validation.get_validation_geometry(world))
+        validation_proto.geometry.CopyFrom(
+            validation.get_validation_geometry(world))
 
         validation_proto_set.validations.append(validation_proto)
 
@@ -205,7 +208,8 @@ def run_validation_sequence_sets(
     # Validate the always validations. We need to look at all of them
     for validation_sequence in always_validation_sequence_set:
         for validation in validation_sequence:
-            create_validation_proto_helper(always_validation_proto_set, validation)
+            create_validation_proto_helper(
+                always_validation_proto_set, validation)
 
     return eventually_validation_proto_set, always_validation_proto_set
 
