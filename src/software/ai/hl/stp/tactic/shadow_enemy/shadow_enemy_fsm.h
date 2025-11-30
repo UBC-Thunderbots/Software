@@ -3,17 +3,18 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
-struct ShadowEnemyFSM
+/**
+ * Finite State Machine Class for Shadow Enemy
+ */
+struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
 {
    public:
-    class BlockPassState;
-    class GoAndStealState;
-    class StealAndPullState;
+    using Update = TacticFSM<ShadowEnemyFSM>::Update;
 
     // this struct defines the unique control parameters that the ShadowEnemyFSM requires
     // in its update
@@ -28,7 +29,16 @@ struct ShadowEnemyFSM
         double shadow_distance;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    class BlockPassState;
+    class GoAndStealState;
+    class StealAndPullState;
+
+    /**
+     * Constructor for ShadowEnemyFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Calculates the point to block the pass to the robot we are shadowing

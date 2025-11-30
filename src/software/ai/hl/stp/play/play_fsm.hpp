@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
@@ -47,19 +47,42 @@ struct PlayUpdate
 };
 
 /**
- * The Update struct is the only event that a play FSM should respond to and it is
- * composed of the following structs:
+ * A general FSM class with some utilities for plays.
  *
- * ControlParams - uniquely defined by each play to control the FSM
- * PlayUpdate - common struct that contains World and SetTacticsCallback
+ * @tparam PFsm the Play FSM that inherits from an instance of this template.
+ * See https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
  */
-#define DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                         \
-    struct Update                                                                        \
-    {                                                                                    \
-        Update(const ControlParams& control_params, const PlayUpdate& common)            \
-            : control_params(control_params), common(common)                             \
-        {                                                                                \
-        }                                                                                \
-        ControlParams control_params;                                                    \
-        PlayUpdate common;                                                               \
+template <class PFsm>
+class PlayFSM
+{
+   public:
+    /**
+     * The Update struct is the only event that a play FSM should respond to and it is
+     * composed of the following structs:
+     *
+     * control_params - uniquely defined by each play to control the FSM
+     * common - common struct that contains World and SetTacticsCallback
+     */
+    struct Update
+    {
+        Update(const PFsm::ControlParams& control_params, const PlayUpdate& common)
+            : control_params(control_params), common(common)
+        {
+        }
+        PFsm::ControlParams control_params;
+        PlayUpdate common;
     };
+
+    explicit PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
+   protected:
+    // A shared pointer to the ai configuration to configure ai behaviour, shared by all
+    // Plays, Tactics, and FSMs
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
+};
+
+template <class PFsm>
+PlayFSM<PFsm>::PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : ai_config_ptr(ai_config_ptr)
+{
+}
