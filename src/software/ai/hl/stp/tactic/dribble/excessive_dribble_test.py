@@ -21,16 +21,19 @@ from proto.ssl_gc_common_pb2 import Team
         (tbots_cpp.Point(0.5, 0), tbots_cpp.Point(1.02, 0), tbots_cpp.Angle(), True),
 
         # Dribble Testing diagonally
-        (tbots_cpp.Point(0.25, 0.25), tbots_cpp.Point(0.85, 0.65), tbots_cpp.Angle.fromRadians(50), True),
+        (tbots_cpp.Point(0.25, 0.25), tbots_cpp.Point(0.80, 0.50), tbots_cpp.Angle.fromRadians(50), True),
 
         # Boundary Testing, because of the autoref implementation (initial of position Bot to final of Ball),
-        # a dribble distance a tiny bit over 1m should pass
-        (tbots_cpp.Point(0.01, 0), tbots_cpp.Point(1.025, 0), tbots_cpp.Angle(), True),
-        (tbots_cpp.Point(1, 1.5), tbots_cpp.Point(2, 1.5), tbots_cpp.Angle(), True),
+        # a conservative max dribble distance (0.95 m) is used
 
-        # When the robot is directly on the ball, the orientation at which the bot begins to
-        # dribble is different; there appears to be a bit more leeway
-        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0, 2.025), tbots_cpp.Angle(), True),
+        # Test vertical dribbling
+        (tbots_cpp.Point(0.01, 0), tbots_cpp.Point(0.96, 0), tbots_cpp.Angle(), True),
+
+        # Test horizontal dribbling
+        (tbots_cpp.Point(1, 1.5), tbots_cpp.Point(1.95, 1.5), tbots_cpp.Angle(), True),
+
+        # Test bot and ball in same position
+        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0.95, 1), tbots_cpp.Angle(), True),
     ],
 )
 
@@ -94,15 +97,23 @@ def test_not_excessive_dribbling(
         (tbots_cpp.Point(0, 2), tbots_cpp.Point(0, 0.5), tbots_cpp.Angle(), True),
         # Dribble Testing diagonally
         (tbots_cpp.Point(0.1, 1.1), tbots_cpp.Point(1.1, 0.1), tbots_cpp.Angle.fromRadians(50), True),
-        # Boundary Testing, because of the autoref implementation (initial position of Bot to final of Ball),
-        # a dribble distance a tiny bit over 1m should pass, but too much (> 1.015 from testing) fails
-        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0, 2.02), tbots_cpp.Angle(), True),
 
-        # When the robot is directly on the ball, the orientation at which the bot begins to
-        # dribble is different; there appears to be a bit more leeway on the distance that passes
-        # Furthermore, that leeway appears to be different depending on the position of the bot and ball
-        # (e.g. here the point is 0, 0, and the leeway is 1 cm more than at 0, 1)
-        (tbots_cpp.Point(0, 0), tbots_cpp.Point(0, 1.035), tbots_cpp.Angle(), True),
+        # Boundary Testing, due to the conservative implementation a dribble distance of 1 m should fail
+
+        # Test Vertical Dribbling
+        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0, 2), tbots_cpp.Angle(), True),
+
+        # Test Horizontal Dribbling
+        (tbots_cpp.Point(1, 2), tbots_cpp.Point(0, 2), tbots_cpp.Angle(), True),
+
+        # Test Diagonal Dribbling
+        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0.6, 1.8), tbots_cpp.Angle(), True),
+
+        # Test robot and ball at same position (affects dribbling orientation and therefore perceived dribble distance)
+        (tbots_cpp.Point(0, 0), tbots_cpp.Point(0, 1), tbots_cpp.Angle(), True),
+        (tbots_cpp.Point(0.0, 0.01), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True),
+        (tbots_cpp.Point(0.01, 0.00), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True),
+        (tbots_cpp.Point(0.0, 0.00), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True),
     ],
 )
 
