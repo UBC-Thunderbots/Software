@@ -1,7 +1,3 @@
-import sys
-
-import pytest
-
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 
@@ -11,6 +7,9 @@ from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_has_ball_possession import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+from software.simulated_tests.simulated_test_fixture import (
+    pytest_main,
+)
 
 
 def test_offense_play(simulated_test_runner):
@@ -80,7 +79,7 @@ def test_offense_play(simulated_test_runner):
     # Always Validation
     inv_always_validation_sequence_set = [
         [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])],
-        [NeverExcessivelyDribbles()]
+        [NeverExcessivelyDribbles()],
     ]
 
     ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
@@ -102,5 +101,4 @@ def test_offense_play(simulated_test_runner):
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)

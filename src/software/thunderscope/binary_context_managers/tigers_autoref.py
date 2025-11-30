@@ -19,6 +19,7 @@ import logging
 import os
 import threading
 import time
+from typing import override
 
 
 class TigersAutoref(TimeProvider):
@@ -95,6 +96,7 @@ class TigersAutoref(TimeProvider):
 
         return self
 
+    @override
     def time_provider(self):
         with self.timestamp_mutex:
             return self.current_timestamp * SECONDS_PER_NANOSECOND

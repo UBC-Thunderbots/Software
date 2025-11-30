@@ -3,6 +3,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import MULTI_PLANE_POINTS
+from typing import override
 
 
 class MouseInSceneEvent:
@@ -62,6 +63,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         # This must be enabled for the mouse_moved_in_scene_signal to be emitted
         self.detect_mouse_movement_in_scene = False
 
+    @override
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was pressed
 
@@ -87,6 +89,7 @@ class ExtendedGLViewWidget(GLViewWidget):
             # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
             super().mousePressEvent(event)
 
+    @override
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was moved
 
@@ -110,6 +113,7 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         super().mouseMoveEvent(event)
 
+    @override
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was released
 
