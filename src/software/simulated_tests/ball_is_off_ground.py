@@ -17,7 +17,7 @@ class BallIsOffGround(Validation):
     TRIANGLE_HEIGHT = 0.15
     TRIANGLE_WIDTH = 0.2
 
-    def __init__(self, threshold=0.01):
+    def __init__(self, threshold=0.2):
         self.threshold = threshold
 
     @override
@@ -40,8 +40,10 @@ class BallIsOffGround(Validation):
         :param world: The world msg to create validation geometry from
         :return: ValidationGeometry containing geometry to visualize
         """
-        velocity = tbots_cpp.createVector(world.ball.current_state.global_velocity)
-        ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
+        velocity = tbots_cpp.createVector(
+            world.ball.current_state.global_velocity)
+        ball_position = tbots_cpp.createPoint(
+            world.ball.current_state.global_position)
 
         if velocity.length() < 0.01:
             return create_validation_geometry()
@@ -71,8 +73,10 @@ class BallIsOffGround(Validation):
         line_top_left = end_point - perpendicular * (self.LINE_WIDTH / 2)
 
         triangle_top = end_point + direction * self.TRIANGLE_HEIGHT
-        triangle_bottom_left = end_point + perpendicular * (self.TRIANGLE_WIDTH / 2)
-        triangle_bottom_right = end_point - perpendicular * (self.TRIANGLE_WIDTH / 2)
+        triangle_bottom_left = end_point + \
+            perpendicular * (self.TRIANGLE_WIDTH / 2)
+        triangle_bottom_right = end_point - \
+            perpendicular * (self.TRIANGLE_WIDTH / 2)
 
         return create_validation_geometry(
             [
