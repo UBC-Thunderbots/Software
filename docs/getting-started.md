@@ -374,7 +374,7 @@ Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), 
 It is possible to run Thunderloop without having a fully-working robot. Using this mode is useful when testing features that don't require the power board or motors.
 
 1. To run Thunderloop locally on your computer
-    1. Create a TOML configuration file in home directory with the following content (replace values as needed):
+    1. Create a TOML configuration file in the opt/tbotspython directory with the following content (replace values as needed):
         ```toml
         robot_id = "1"
         channel_id = "0"

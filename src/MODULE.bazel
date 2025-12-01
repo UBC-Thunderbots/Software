@@ -24,7 +24,6 @@ bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "yaml-cpp", version = "0.8.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
 bazel_dep(name = "pybind11_protobuf", version = "0.0.0-20250210-f02a2b7")
-#bazel_dep(name = "tomlplusplus", version = "3.4.0")
 
 ##############################################
 # Load PIP packages and our Requirements
