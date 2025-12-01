@@ -2,7 +2,6 @@
 
 #include <Eigen/Dense>
 #include <algorithm>
-#include <limits>
 #include <vector>
 
 #include "shared/constants.h"
@@ -264,17 +263,9 @@ BallFilter::LinearRegressionResults BallFilter::calculateLinearRegression(
         A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
     // How to calculate the error is from
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
-    double regression_error = std::numeric_limits<double>::max();
-
-    if ((A * regression_vector - b).norm() == 0 && b.norm() == 0)
-    {
-        regression_error = 0;
-    }
-    if (b.norm() != 0)
-    {
-        regression_error =
-            (A * regression_vector - b).norm() / (b.norm());  // norm() is L2 norm
-    }
+    // NOTE: using absolute error instead of relative because coordinates
+    // values should not affect error, also handles divide by 0 error
+    double regression_error = (A * regression_vector - b).norm();
 
     // Find 2 points on the regression line that we solved for, and use this to construct
     // our own Line class
