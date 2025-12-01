@@ -72,7 +72,6 @@ class TomlConfigClient
     void writeConfig();
 
     /**
-     * Converts a Redis-style key (e.g., "/robot_id") to a TOML key path.
      * Removes leading slash and converts to nested structure if needed.
      */
     std::string normalizeKey(const std::string& key);
