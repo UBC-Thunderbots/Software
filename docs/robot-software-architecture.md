@@ -9,7 +9,6 @@
 - [Tools](#tools)
   - [Ansible](#ansible)
   - [Systemd](#systemd)
-  - [Redis](#redis)
 - [Thunderloop](#thunderloop)
 
 <!--TOC-->
