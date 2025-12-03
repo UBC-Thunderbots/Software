@@ -8,6 +8,11 @@ from software.embedded.constants.py_constants import (
     ROBOT_MAX_SPEED_M_PER_S,
     MAX_FORCE_DRIBBLER_SPEED_RPM,
 )
+from software.py_constants import (
+    AUTO_CHIP_DISTANCE_DEFAULT_M,
+    AUTO_KICK_SPEED_DEFAULT_M_PER_S,
+    WHEEL_ROTATION_MAX_SPEED_M_PER_S,
+)
 
 
 class EmbeddedData:
@@ -119,8 +124,7 @@ class EmbeddedData:
         if not auto:
             power_control_primitive.chicker.chip_distance_meters = distance
         else:
-            # TODO-3436: Change this default to the correct constant once defined by ELEC
-            power_control_primitive.chicker.auto_chip_or_kick.autochip_distance_meters = 1.5
+            power_control_primitive.chicker.auto_chip_or_kick.autochip_distance_meters = AUTO_CHIP_DISTANCE_DEFAULT_M
         direct_control_primitive = DirectControlPrimitive(
             motor_control=MotorControl(), power_control=power_control_primitive
         )
@@ -150,9 +154,8 @@ class EmbeddedData:
         if not auto:
             power_control_primitive.chicker.kick_speed_m_per_s = speed
         else:
-            # TODO (#3436): Change this default to the correct constant once defined by ELEC
             power_control_primitive.chicker.auto_chip_or_kick.autokick_speed_m_per_s = (
-                1.5
+                AUTO_KICK_SPEED_DEFAULT_M_PER_S
             )
         direct_control_primitive = DirectControlPrimitive(
             motor_control=self.get_zero_motor_control_primitive(),
@@ -185,8 +188,8 @@ class EmbeddedData:
         wheel_velocity_map = {1: 0, 2: 0, 3: 0, 4: 0}
         velocity = self.__clamp(
             val=velocity,
-            min_val=-ROBOT_MAX_SPEED_M_PER_S,
-            max_val=ROBOT_MAX_SPEED_M_PER_S,
+            min_val=-WHEEL_ROTATION_MAX_SPEED_M_PER_S,
+            max_val=WHEEL_ROTATION_MAX_SPEED_M_PER_S,
         )
 
         for wheel in wheels:

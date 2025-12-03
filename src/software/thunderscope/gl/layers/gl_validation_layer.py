@@ -17,6 +17,7 @@ from software.thunderscope.gl.graphics.gl_stadium import GLStadium
 from software.thunderscope.gl.graphics.gl_painter import GLPainter
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLValidationOverlayLayer(GLLayer):
@@ -35,6 +36,7 @@ class GLValidationOverlayLayer(GLLayer):
         self.validation_layer = validation_layer
         self.overlay_graphic: GLPainter = None
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         if not self.overlay_graphic:
@@ -98,6 +100,7 @@ class GLValidationLayer(GLLayer):
         self.circle_graphics = ObservableList(self._graphics_changed)
         self.stadium_graphics = ObservableList(self._graphics_changed)
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         # Consume the validation set buffer
