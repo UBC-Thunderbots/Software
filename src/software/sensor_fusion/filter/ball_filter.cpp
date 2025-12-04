@@ -265,7 +265,7 @@ BallFilter::LinearRegressionResults BallFilter::calculateLinearRegression(
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
     // NOTE: using absolute error instead of relative because coordinates
     // values should not affect error, also handles divide by 0 error
-    double regression_error = (A * regression_vector - b).norm();
+    double regression_error = (A * regression_vector - b).norm();  // norm() is L2 norm
 
     // Find 2 points on the regression line that we solved for, and use this to construct
     // our own Line class
