@@ -147,8 +147,7 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
         // Remove any receivers from the unvisited robots, since they have
         // now been visited
         unvisited_robots.erase(remove_if(unvisited_robots.begin(), unvisited_robots.end(),
-                                         [&](auto x)
-                                         {
+                                         [&](auto x) {
                                              return find(all_receivers.begin(),
                                                          all_receivers.end(),
                                                          x) != all_receivers.end();

@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "crease_defender_tactic",

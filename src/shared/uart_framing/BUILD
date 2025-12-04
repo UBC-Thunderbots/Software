@@ -1,9 +1,9 @@
-package(default_visibility = ["//visibility:public"])
-
 load(
     "@platformio_rules//platformio:platformio.bzl",
     "platformio_library",
 )
+
+package(default_visibility = ["//visibility:public"])
 
 platformio_library(
     name = "uart_framing_platformio",
@@ -15,7 +15,6 @@ cc_library(
     name = "uart_framing",
     hdrs = ["uart_framing.hpp"],
     deps = [
-        "//proto:tbots_nanopb_proto",
         "//proto/message_translation:power_frame_msg",
         "@nanopb",
     ],

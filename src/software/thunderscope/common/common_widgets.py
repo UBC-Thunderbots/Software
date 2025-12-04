@@ -3,6 +3,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
 from software.py_constants import *
 from software.thunderscope.util import color_from_gradient
+from typing import override
 
 
 class FloatSlider(QSlider):
@@ -25,6 +26,7 @@ class FloatSlider(QSlider):
         """Emits a signal with the slider's float value"""
         self.floatValueChanged.emit(self.value())
 
+    @override
     def value(self) -> float:
         """Gets the actual value of the slider and converts it to the float value
         of corresponding decimal places
@@ -33,6 +35,7 @@ class FloatSlider(QSlider):
         """
         return float(super(FloatSlider, self).value()) / self.decimals
 
+    @override
     def setMinimum(self, min_val: float) -> None:
         """Sets a minimum float value for this slider
 
@@ -40,6 +43,7 @@ class FloatSlider(QSlider):
         """
         return super(FloatSlider, self).setMinimum(int(min_val * self.decimals))
 
+    @override
     def setMaximum(self, max_val: float) -> None:
         """Sets a maximum float value for this slider
 
@@ -47,6 +51,7 @@ class FloatSlider(QSlider):
         """
         return super(FloatSlider, self).setMaximum(int(max_val * self.decimals))
 
+    @override
     def setValue(self, value: float) -> None:
         """Sets a float value as the value for this slider
 
@@ -136,6 +141,7 @@ class ColorProgressBar(QProgressBar):
         """Emits a signal with the slider's float value"""
         self.floatValueChanged.emit(self.value())
 
+    @override
     def setValue(self, value: float) -> None:
         """Sets the value of the slider to the given float value
         Sets the color of the slider based on the percentage filled
@@ -176,14 +182,17 @@ class ColorProgressBar(QProgressBar):
             ),
         )
 
+    @override
     def maximum(self) -> float:
         """Gets the maximum value of this progress bar as a float"""
         return float(super(ColorProgressBar, self).maximum()) / self.decimals
 
+    @override
     def minimum(self) -> float:
         """Gets the minimum value of this progress bar as a float"""
         return float(super(ColorProgressBar, self).minimum()) / self.decimals
 
+    @override
     def value(self) -> float:
         """Gets the current value of this progress bar as a float"""
         return float(super(ColorProgressBar, self).value()) / self.decimals
@@ -208,6 +217,7 @@ class ToggleableButton(QPushButton):
         """
         self.enabled = enabled
 
+    @override
     def enterEvent(self, event) -> None:
         """Sets the cursor to depending on if the button is enabled
         to indicate that this widget is clickable or unclickable

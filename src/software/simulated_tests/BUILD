@@ -1,7 +1,7 @@
-package(default_visibility = ["//visibility:public"])
-
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 compile_pip_requirements(
     name = "requirements",
@@ -57,7 +57,7 @@ cc_library(
     deps = [
         ":simulated_er_force_sim_test_fixture",
         "//software/ai",
-        "@gtest",
+        "@googletest//:gtest",
     ],
 )
 

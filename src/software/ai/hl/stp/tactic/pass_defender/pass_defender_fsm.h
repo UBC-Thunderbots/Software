@@ -4,11 +4,16 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-struct PassDefenderFSM : public DefenderFSMBase
+/**
+ * Finite State Machine class for Pass Defenders
+ */
+struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
 {
+    using Update = TacticFSM<PassDefenderFSM>::Update;
     class BlockPassState;
     class InterceptBallState;
 
@@ -23,24 +28,18 @@ struct PassDefenderFSM : public DefenderFSMBase
     };
 
     /**
-     * Constructor for PassDefenderFSM struct
+     * Constructor for PassDefenderFSM
      *
-     * @param ai_config The ai config required
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PassDefenderFSM(const TbotsProto::AiConfig& ai_config)
-        : pass_defender_config(ai_config.pass_defender_config())
-    {
-    }
-
-
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    explicit PassDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     // The minimum speed of the ball for it to be considered a pass
     static constexpr double MIN_PASS_SPEED = 0.5;
 
     // The maximum angle difference to determine if ball has been kicked in
     // the approximate direction of the defender
-    static constexpr Angle MAX_PASS_ANGLE_DIFFERENCE = Angle::fromDegrees(30);
+    static constexpr Angle MAX_PASS_ANGLE_DIFFERENCE = Angle::fromDegrees(35);
 
     // The minimum angle difference between a ball's trajectory and
     // pass_orientation for which we can consider a pass to be deflected
@@ -138,6 +137,10 @@ struct PassDefenderFSM : public DefenderFSMBase
     }
 
    private:
+    // Initialized when a pass is started and used when a pass is deflected
+    // Assumption is that a pass has to start before it can be deflected
     Angle pass_orientation;
-    TbotsProto::PassDefenderConfig pass_defender_config;
+    // The step amount between speeds we check that the defender is observed to
+    // go at during the interception
+    static constexpr double DEFENDER_STEP_SPEED_M_PER_S = 0.2;
 };

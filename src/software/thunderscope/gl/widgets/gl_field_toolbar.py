@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, override
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
@@ -8,9 +8,9 @@ from software.thunderscope.constants import (
     THUNDERSCOPE_HELP_TEXT,
     SIMULATION_SPEEDS,
 )
-import software.thunderscope.gl.widgets.toolbar_icons.sandbox_mode.icon_loader as icons
 from software.thunderscope.common.common_widgets import ToggleableButton
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
+import qtawesome as qta
 
 
 class GLFieldToolbar(GLToolbar):
@@ -62,7 +62,9 @@ class GLFieldToolbar(GLToolbar):
         # Set up View button for setting the camera position to standard views
         self.camera_view_button = QPushButton()
         self.camera_view_button.setToolTip("View")
-        self.camera_view_button.setIcon(icons.get_view_icon(self.BUTTON_ICON_COLOR))
+        self.camera_view_button.setIcon(
+            qta.icon("msc.device-camera-video", color=self.BUTTON_ICON_COLOR)
+        )
         self.camera_view_button.setStyleSheet(self.get_button_style())
         self.camera_view_menu = QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
@@ -90,7 +92,9 @@ class GLFieldToolbar(GLToolbar):
         # Setup Measure button for enabling/disabling measure mode
         self.measure_button = QPushButton()
         self.measure_button.setToolTip("Measure")
-        self.measure_button.setIcon(icons.get_measure_icon(self.BUTTON_ICON_COLOR))
+        self.measure_button.setIcon(
+            qta.icon("ph.ruler-light", color=self.BUTTON_ICON_COLOR)
+        )
         self.measure_button.setStyleSheet(self.get_button_style())
         self.measure_button.setShortcut("m")
         self.measure_button.clicked.connect(lambda: on_measure_mode())
@@ -98,7 +102,9 @@ class GLFieldToolbar(GLToolbar):
         # Setup Help button
         self.help_button = QPushButton()
         self.help_button.setToolTip("Help")
-        self.help_button.setIcon(icons.get_help_icon(self.BUTTON_ICON_COLOR))
+        self.help_button.setIcon(
+            qta.icon("mdi.help-circle", color=self.BUTTON_ICON_COLOR)
+        )
         self.help_button.setStyleSheet(self.get_button_style())
         self.help_button.clicked.connect(
             lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
@@ -122,7 +128,7 @@ class GLFieldToolbar(GLToolbar):
         if not replay_mode:
             self.bookmark_button = QPushButton()
             self.bookmark_button.setIcon(
-                icons.get_bookmark_icon(self.BUTTON_ICON_COLOR)
+                qta.icon(("fa6.bookmark"), color=self.BUTTON_ICON_COLOR)
             )
             self.bookmark_button.setShortcut("b")
             self.bookmark_button.setStyleSheet(self.get_button_style())
@@ -151,18 +157,26 @@ class GLFieldToolbar(GLToolbar):
             # Setup Undo button
             self.undo_button = ToggleableButton(False)
             self.undo_button.setToolTip("Undo")
-            self.undo_button.setIcon(icons.get_undo_icon(self.BUTTON_ICON_COLOR))
+            self.undo_button.setIcon(
+                qta.icon("mdi6.undo-variant", color=self.BUTTON_ICON_COLOR)
+            )
             self.undo_button.setStyleSheet(self.get_button_style(False))
 
             # Setup Redo button
             self.redo_button = ToggleableButton(False)
             self.redo_button.setToolTip("Redo")
-            self.redo_button.setIcon(icons.get_redo_icon(self.BUTTON_ICON_COLOR))
+            self.redo_button.setIcon(
+                qta.icon("mdi6.redo-variant", color=self.BUTTON_ICON_COLOR)
+            )
             self.redo_button.setStyleSheet(self.get_button_style(False))
 
             self.reset_button = QPushButton()
             self.reset_button.setToolTip("Reset")
-            self.reset_button.setIcon(icons.get_reset_icon(self.BUTTON_ICON_COLOR))
+            self.reset_button.setIcon(
+                qta.icon(
+                    "ph.arrow-counter-clockwise-fill", color=self.BUTTON_ICON_COLOR
+                )
+            )
             self.reset_button.setStyleSheet(self.get_button_style())
 
         # Setup toolbar
@@ -183,6 +197,7 @@ class GLFieldToolbar(GLToolbar):
         if not replay_mode:
             self.layout().addWidget(self.bookmark_button)
 
+    @override
     def refresh(self) -> None:
         """Refreshes the UI for all the toolbar icons and updates toolbar position"""
         # update the pause button state
@@ -200,9 +215,10 @@ class GLFieldToolbar(GLToolbar):
         """
         self.pause_button.setToolTip("Pause" if is_playing else "Play")
         self.pause_button.setIcon(
-            icons.get_pause_icon(self.BUTTON_ICON_COLOR)
-            if is_playing
-            else icons.get_play_icon(self.BUTTON_ICON_COLOR)
+            qta.icon(
+                "fa6s.pause" if is_playing else "fa5s.play",
+                color=self.BUTTON_ICON_COLOR,
+            )
         )
 
     def update_simulation_speed(self, speed: float) -> None:

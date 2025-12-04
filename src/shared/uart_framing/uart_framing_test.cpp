@@ -1,4 +1,4 @@
-#include "shared/uart_framing/uart_framing.hpp"
+#include "uart_framing.hpp"
 
 #include <gtest/gtest.h>
 extern "C"
@@ -100,7 +100,9 @@ class UartFramingTest : public ::testing::Test
     }
 
     TbotsProto_PowerPulseControl test_message;
-    const uint16_t TEST_MESSAGE_CRC = 14297;  // From online calculator
+    // TODO: Previously from online calculator, but this value may be incorrect since the
+    // bazel 8 migration
+    const uint16_t TEST_MESSAGE_CRC = 34041;
 };
 
 bool operator==(const TbotsProto_PowerPulseControl& lhs,
