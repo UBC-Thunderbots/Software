@@ -22,8 +22,8 @@ py_library(
     deps = [
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
-        "//software/thunderscope/common:thread_safe_circular_buffer",
         "//software/thunderscope:util",
+        "//software/thunderscope/common:thread_safe_circular_buffer",
     ],
 )
 

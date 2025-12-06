@@ -9,8 +9,8 @@ cc_library(
         "log_merger.h",
     ],
     deps = [
-        "@g3log",
         ":compat_flags",
+        "@g3log",
     ],
 )
 
@@ -21,18 +21,18 @@ cc_library(
         "logger.h",
     ],
     linkopts = select({
-           "@platforms//os:linux": ["-lstdc++fs"],
-           "//conditions:default": [],
+        "@platforms//os:linux": ["-lstdc++fs"],
+        "//conditions:default": [],
     }),
     deps = [
         ":coloured_cout_sink",
+        ":compat_flags",
         ":csv_sink",
         ":log_merger",
         ":plotjuggler_sink",
         ":protobuf_sink",
         "@g3log",
         "@g3sinks",
-        ":compat_flags",
     ],
 )
 
@@ -108,8 +108,8 @@ cc_library(
         "custom_logging_levels.h",
     ],
     deps = [
-        "@g3log",
         ":compat_flags",
+        "@g3log",
     ],
 )
 
@@ -188,12 +188,12 @@ cc_library(
         "proto_logger.h",
     ],
     deps = [
+        ":compat_flags",
         "//proto:tbots_cc_proto",
         "//software/multithreading:thread_safe_buffer",
         "@base64",
         "@boost//:filesystem",
         "@zlib",
-        ":compat_flags",
     ],
 )
 

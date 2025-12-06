@@ -288,7 +288,6 @@ class Gamecontroller:
             if autoref_proto_unix_io is not None:
                 autoref_proto_unix_io.send_proto(Referee, data)
 
-
         if is_current_platform_macos():
             loopback_iface = "en0"
         else:

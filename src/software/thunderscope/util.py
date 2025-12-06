@@ -197,9 +197,9 @@ def color_from_gradient(
                         int(a_range[i] + (a_range[i + 1] - a_range[i]) * sig_val),
                     )
 
+
 def is_current_platform_macos() -> bool:
-    """
-    Return True if the current process is running on macOS.
+    """Return True if the current process is running on macOS.
     Uses platform.system(), which should reliably return 'Darwin' on macOS.
     """
     return platform.system().lower() == "darwin"

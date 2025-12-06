@@ -11,8 +11,8 @@
 #include <vector>
 
 #include "base64.h"
-#include "shared/constants.h"
 #include "compat_flags.h"
+#include "shared/constants.h"
 
 ProtoLogger::ProtoLogger(const std::string& log_path,
                          std::function<double()> time_provider,

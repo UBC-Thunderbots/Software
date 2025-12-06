@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include <unordered_map>
+
 #include "compat_flags.h"
 
 
@@ -56,8 +57,7 @@ class LogMerger
         std::string msg;
         Clock::time_point timestamp;
 
-        Message(g3::LogMessage &log, std::string msg,
-                Clock::time_point timestamp)
+        Message(g3::LogMessage &log, std::string msg, Clock::time_point timestamp)
             : log(log), msg(msg), timestamp(timestamp)
         {
         }

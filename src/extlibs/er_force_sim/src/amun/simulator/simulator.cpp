@@ -682,7 +682,8 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
 
             if (realism.has_vision_processing_time())
             {
-                m_visionProcessingTime = std::max<int64_t>(0l, realism.vision_processing_time());
+                m_visionProcessingTime =
+                    std::max<int64_t>(0l, realism.vision_processing_time());
             }
 
             if (realism.has_simulate_dribbling())

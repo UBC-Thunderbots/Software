@@ -7,13 +7,12 @@
 #include <g3log/logmessage.hpp>
 #include <g3log/logworker.hpp>
 
+#include "compat_flags.h"
 #include "software/logger/coloured_cout_sink.h"
 #include "software/logger/csv_sink.h"
 #include "software/logger/custom_logging_levels.h"
 #include "software/logger/plotjuggler_sink.h"
 #include "software/logger/protobuf_sink.h"
-
-#include "compat_flags.h"
 
 // This undefines LOG macro defined by g3log
 #undef LOG
