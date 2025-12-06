@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # UBC Thunderbots macOS Software Setup
 #
@@ -13,7 +12,7 @@ cd "$CURR_DIR" || exit
 
 source util.sh
 
-arch=$(uname -m)
+arch=$(uname -s)
 print_status_msg "Detected architecture: ${arch}"
 
 # Check for Homebrew and install if missing
@@ -74,17 +73,16 @@ sudo pip install -r macos_requirements.txt
 print_status_msg "Done Setting Up Python Environment"
 
 print_status_msg "Fetching game controller"
-install_gamecontroller_macos
+install_gamecontroller $arch
 
 print_status_msg "Setting up TIGERS AutoRef"
-install_java_macos
-install_autoref_macos
+install_autoref $arch
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
 print_status_msg "Finished setting up AutoRef"
 
 print_status_msg "Setting up cross compiler for robot software"
-install_cross_compiler_mac
+install_cross_compiler $arch
 print_status_msg "Done setting up cross compiler for robot software"
 
 print_status_msg "Setting Up Python Development Headers"
