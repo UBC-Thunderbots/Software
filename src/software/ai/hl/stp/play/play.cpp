@@ -206,7 +206,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                  new_primitives_to_assign->robot_primitives())
             {
                 primitives_to_run->mutable_robot_primitives()->insert(
-                    google::protobuf::MapPair<uint32_t, TbotsProto::Primitive>(robot_id, primitive));
+                    google::protobuf::MapPair<uint32_t, TbotsProto::Primitive>(
+                        robot_id, primitive));
             }
 
             robots = remaining_robots;
