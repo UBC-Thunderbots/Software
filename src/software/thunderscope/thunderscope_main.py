@@ -99,6 +99,13 @@ if __name__ == "__main__":
         help="Visualize C++ Tests",
     )
     parser.add_argument(
+        "--log_level",
+        action="store",
+        help="Minimum g3log level for full_system logs (DEBUG|INFO|WARNING|FATAL)",
+        default="DEBUG",
+        type=str,
+    )
+    parser.add_argument(
         "--blue_log",
         action="store",
         help="Replay folder for the blue full_system",
@@ -359,6 +366,7 @@ if __name__ == "__main__":
                     friendly_colour_yellow=friendly_colour_yellow,
                     should_restart_on_crash=True,
                     run_sudo=args.sudo,
+                    log_level=args.log_level
                 ) as full_system:
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
@@ -432,6 +440,7 @@ if __name__ == "__main__":
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
+            log_level=args.log_level
         ) as blue_fs, FullSystem(
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
@@ -439,6 +448,7 @@ if __name__ == "__main__":
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
+            log_level=args.log_level
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose),
         ) as gamecontroller, (
