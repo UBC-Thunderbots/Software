@@ -117,7 +117,6 @@ int main(int argc, char** argv)
         {
             std::cout << "error: --log_level " << args.log_level
                       << " is not a valid option." << std::endl;
-            ;
             return 2;
         }
 
