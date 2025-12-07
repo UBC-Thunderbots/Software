@@ -156,8 +156,6 @@ if __name__ == "__main__":
 
     command = ["bazel", args.action, target]
 
-    command += ["--copt=-DG3_DYNAMIC_LOGGING"]
-
     # Trigger a debug build
     if args.debug_build or args.select_debug_binaries:
         command += ["-c", "dbg"]
