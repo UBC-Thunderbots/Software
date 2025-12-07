@@ -71,9 +71,9 @@ int main(int argc, char** argv)
     desc.add_options()(
         "ci", boost::program_options::bool_switch(&args.ci),
         "If true, then the World timestamp will be used to as the time provider for ProtoLogger");
-    desc.add_options()("log_level",
-                       boost::program_options::value<std::string>(&args.log_level),
-                       "The minimum g3log level that will be printed (DEBUG|INFO|WARNING|FATAL)");
+    desc.add_options()(
+        "log_level", boost::program_options::value<std::string>(&args.log_level),
+        "The minimum g3log level that will be printed (DEBUG|INFO|WARNING|FATAL)");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -95,22 +95,31 @@ int main(int argc, char** argv)
             TracySetProgramName("Thunderbots: Yellow");
         }
 
-        LEVELS minimum_log_level = FATAL;
+        LEVELS minimum_log_level = DEBUG;
 
-        if (args.log_level == "DEBUG") {
+        if (args.log_level == "DEBUG")
+        {
             minimum_log_level = DEBUG;
-        } else if (args.log_level == "INFO") {
+        }
+        else if (args.log_level == "INFO")
+        {
             minimum_log_level = INFO;
-        } else if (args.log_level == "WARNING") {
+        }
+        else if (args.log_level == "WARNING")
+        {
             minimum_log_level = WARNING;
-        } else if (args.log_level == "FATAL") {
+        }
+        else if (args.log_level == "FATAL")
+        {
             minimum_log_level = FATAL;
-        } else {
-            std::cout << "error: --log_level " << args.log_level << " is not a valid option." << std::endl;;
+        }
+        else
+        {
+            std::cout << "error: --log_level " << args.log_level
+                      << " is not a valid option." << std::endl;
+            ;
             return 2;
         }
-
-        std::cout << "Using log level: " << args.log_level << std::endl;
 
         std::function<double()> time_provider;
         if (!args.ci)
@@ -131,7 +140,8 @@ int main(int argc, char** argv)
         }
         proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, time_provider,
                                                      args.friendly_colour_yellow);
-        LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger, minimum_log_level);
+        LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger,
+                                          minimum_log_level);
         TbotsProto::ThunderbotsConfig tbots_proto;
 
         // Override friendly color
