@@ -21,6 +21,9 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
+from software.thunderscope.gl.widgets.gl_simulated_test_toolbar import (
+    GLSimulatedTestToolbar,
+)
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.world_pb2 import SimulationState
 from proto.replay_bookmark_pb2 import ReplayBookmark
@@ -113,7 +116,10 @@ class GLWidget(QWidget):
             friendly_color_yellow=friendly_color_yellow,
         )
 
+        self.simulated_test_toolbar = GLSimulatedTestToolbar(parent=self.gl_view_widget)
+
         self.__add_toolbar_toggle(self.gamecontroller_toolbar, "Gamecontroller")
+        self.__add_toolbar_toggle(self.simulated_test_toolbar, "Tests")
 
         # Setup replay controls if player is provided and the log has some size
         self.player = player
@@ -269,6 +275,7 @@ class GLWidget(QWidget):
         if self.simulation_control_toolbar:
             self.simulation_control_toolbar.refresh()
             self.gamecontroller_toolbar.refresh()
+            self.simulated_test_toolbar.refresh()
 
         simulation_state = self.simulation_state_buffer.get(block=False)
         # Don't refresh the layers if the simulation is paused
