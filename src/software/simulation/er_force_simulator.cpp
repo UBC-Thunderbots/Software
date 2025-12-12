@@ -370,7 +370,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     SSLSimulationProto::RobotControl robot_control;
 
     auto sim_state = getSimulatorState();
-    std::map<RobotId, std::pair<Vector, Angle>> current_velocity_map;
+    std::map<RobotId, std::pair<Vector, AngularVelocity>> current_velocity_map;
     if (side == gameController::Team::BLUE)
     {
         const auto& sim_robots = sim_state.blue_robots();
@@ -574,7 +574,7 @@ ErForceSimulator::getRobotIdToLocalVelocityMap(
         const Vector local_vel =
             globalToLocalVelocity(Vector(sim_robot.v_x(), sim_robot.v_y()),
                                   Angle::fromRadians(sim_robot.angle()));
-        const AngularVelocity angular_vel       = Angle::fromRadians(sim_robot.r_z());
+        const AngularVelocity angular_vel = AngularVelocity::fromRadians(sim_robot.r_z());
         robot_to_local_velocity[sim_robot.id()] = {local_vel, angular_vel};
     }
     return robot_to_local_velocity;

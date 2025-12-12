@@ -1,6 +1,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
+#include "software/geom/angular_acceleration.h"
 #include "software/logger/logger.h"
 
 
@@ -482,9 +483,9 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
         createAngle(params.start_angle()), createAngle(params.final_angle()),
         initial_velocity,
         AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
-        AngularVelocity::fromRadians(
+        AngularAcceleration::fromRadians(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2),
-        AngularVelocity::fromRadians(
+        AngularAcceleration::fromRadians(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2));
 }
 

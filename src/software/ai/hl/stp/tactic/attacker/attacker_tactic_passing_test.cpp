@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/angular_velocity.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
@@ -73,23 +74,23 @@ INSTANTIATE_TEST_CASE_P(
         // Stationary Ball Tests
         // Attacker point != Balls location & Balls location != Robots Location
         std::make_tuple(Pass(Point(0.0, 0.5), Point(0, 0), 5),
-                        RobotStateWithId{
-                            1, RobotState(Point(0, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
+                        RobotStateWithId{1, RobotState(Point(0, 0), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))},
                         BallState(Point(0.5, 0.5), Vector(0, 0))),
 
         // Attacker point == Balls location & Balls location != Robots Location
         std::make_tuple(Pass(Point(-0.5, -0.5), Point(0, 0), 5),
-                        RobotStateWithId{
-                            1, RobotState(Point(0, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
+                        RobotStateWithId{1, RobotState(Point(0, 0), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))},
                         BallState(Point(-0.5, -0.5), Vector(0, 0))),
 
         // Attacker point != Balls location & Balls location == Robots Location
         std::make_tuple(Pass(Point(0.5, 0.5), Point(0, 1), 5),
-                        RobotStateWithId{
-                            1, RobotState(Point(0.5, 0.5), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
+                        RobotStateWithId{1, RobotState(Point(0.5, 0.5), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))},
                         BallState(Point(-0.5, 0.5), Vector(0, 0))),
 
         // TODO(#2909) : Enable test once the robot can turn faster and hits the ball with
@@ -103,24 +104,24 @@ INSTANTIATE_TEST_CASE_P(
 
         // Attacker point far away (not a normal use case, but just to sanity check)
         std::make_tuple(Pass(Point(0.0, 0.0), Point(0, 0), 5),
-                        RobotStateWithId{
-                            1, RobotState(Point(3.5, 2.5), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
+                        RobotStateWithId{1, RobotState(Point(3.5, 2.5), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))},
                         BallState(Point(0.0, 0.0), Vector(0, 0))),
 
         // Attacker point != Balls location & Balls location != Robots Location
         std::make_tuple(Pass(Point(0.0, 0.5), Point(0, 0), 5),
-                        RobotStateWithId{
-                            1, RobotState(Point(0, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
+                        RobotStateWithId{1, RobotState(Point(0, 0), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))},
                         BallState(Point(0.5, 0.5), Vector(0, 0))),
 
         // Moving Ball Tests
         // Attacker point == Balls location & Balls location != Robots Location
         std::make_tuple(Pass(Point(-0.5, -0.5), Point(0, 0), 5),
-                        RobotStateWithId{
-                            1, RobotState(Point(0, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
+                        RobotStateWithId{1, RobotState(Point(0, 0), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))},
                         BallState(Point(-0.5, -0.5), Vector(1, 0))),
 
         // TODO (#2859): Robot does not kick ball when dribbler is off since it is
@@ -135,7 +136,7 @@ INSTANTIATE_TEST_CASE_P(
 
         // Attacker point == Balls location & Balls location == Robots Location
         std::make_tuple(Pass(Point(0.0, 0.0), Point(0, 0), 5),
-                        RobotStateWithId{
-                            1, RobotState(Point(0, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
+                        RobotStateWithId{1, RobotState(Point(0, 0), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))},
                         BallState(Point(0.0, 0.0), Vector(1, 0)))));
