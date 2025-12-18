@@ -124,9 +124,9 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
-    //    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
-    //    g_motor_service = motor_service_.get();
-    //    motor_service_->setup();
+    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    g_motor_service = motor_service_.get();
+    motor_service_->setup();
     LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
@@ -328,9 +328,8 @@ void Thunderloop::runLoop()
             }
 
             // Motor Service: execute the motor control command
-            // motor_status_ = pollMotorService(poll_time,
-            // direct_control_.motor_control(),
-            //                                 time_since_prev_iter);
+            motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(),
+                                            time_since_prev_iter);
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
 

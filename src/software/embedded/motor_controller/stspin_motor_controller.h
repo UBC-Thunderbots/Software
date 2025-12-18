@@ -98,7 +98,7 @@ class StSpinMotorController : public MotorController
     // clang-format on
 
     // SPI Configs
-    static constexpr uint32_t SPI_SPEED_HZ     = 1000000;   // 2 MHz
+    static constexpr uint32_t SPI_SPEED_HZ     = 100000;    // 100 KHz
     static constexpr uint32_t MAX_SPI_SPEED_HZ = 250000000; // 250 MHz
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;

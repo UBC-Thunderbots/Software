@@ -208,34 +208,35 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
                                              back_left_velocity, back_right_velocity};
 
-    if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
-                 prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
-        RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    {
-        motor_controller_->immediatelyDisable();
-        LOG(FATAL) << "Front right motor runaway";
-    }
-    else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
-                      prev_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
-             RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    {
-        motor_controller_->immediatelyDisable();
-        LOG(FATAL) << "Front left motor runaway";
-    }
-    else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
-                      prev_wheel_velocities_[BACK_LEFT_WHEEL_SPACE_INDEX]) >
-             RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    {
-        motor_controller_->immediatelyDisable();
-        LOG(FATAL) << "Back left motor runaway";
-    }
-    else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
-                      prev_wheel_velocities_[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
-             RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    {
-        motor_controller_->immediatelyDisable();
-        LOG(FATAL) << "Back right motor runaway";
-    }
+    // if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
+    //              prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
+    //     RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    // {
+    //     motor_controller_->immediatelyDisable();
+    //     LOG(FATAL) << "Front right motor runaway";
+    // }
+    // else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
+    //                   prev_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
+    //          RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    // {
+    //     motor_controller_->immediatelyDisable();
+    //     LOG(FATAL) << "Front left motor runaway";
+    // }
+    // else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
+    //                   prev_wheel_velocities_[BACK_LEFT_WHEEL_SPACE_INDEX]) >
+    //          RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    // {
+    //     motor_controller_->immediatelyDisable();
+    //     LOG(FATAL) << "Back left motor runaway";
+    // }
+    // else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
+    //                   prev_wheel_velocities_[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
+    //          RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    // {
+    //     motor_controller_->immediatelyDisable();
+    //     LOG(FATAL) << "Back right motor runaway";
+    // }
+    (void)RUNAWAY_PROTECTION_THRESHOLD_MPS;
 
     // Convert to Euclidean velocity_delta
     EuclideanSpace_t current_euclidean_velocity =

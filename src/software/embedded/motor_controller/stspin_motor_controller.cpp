@@ -49,13 +49,6 @@ void StSpinMotorController::setup()
         if (ENABLED_MOTORS.at(motor))
         {
             sendAndReceiveFrame(motor, StSpinOpcode::ACK_FAULTS);
-        }
-    }
-
-    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
-    {
-        if (ENABLED_MOTORS.at(motor))
-        {
             checkDriverFault(motor);
             readThenWriteVelocity(motor, 0);
             sendAndReceiveFrame(motor, StSpinOpcode::START_MOTOR);
@@ -68,6 +61,7 @@ void StSpinMotorController::reset()
     reset_gpio_->setValue(GpioState::LOW);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     reset_gpio_->setValue(GpioState::HIGH);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& motor)
@@ -102,21 +96,21 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
 
     if (faults & static_cast<uint16_t>(StSpinFaultCode::OVER_VOLT))
     {
-        LOG(WARNING) << "OVER_VOLT: Software overvoltage";
+        LOG(WARNING) << "OVER_VOLT: Over voltage";
         motor_faults.insert(TbotsProto::MotorFault::OVER_VOLT);
         drive_enabled = false;
     }
 
     if (faults & static_cast<uint16_t>(StSpinFaultCode::UNDER_VOLT))
     {
-        LOG(WARNING) << "UNDER_VOLT: Software undervoltage";
+        LOG(WARNING) << "UNDER_VOLT: Under voltage";
         motor_faults.insert(TbotsProto::MotorFault::UNDER_VOLT);
         drive_enabled = false;
     }
 
     if (faults & static_cast<uint16_t>(StSpinFaultCode::OVER_TEMP))
     {
-        LOG(WARNING) << "OVER_TEMP: Software over temperature";
+        LOG(WARNING) << "OVER_TEMP: Over temperature";
         motor_faults.insert(TbotsProto::MotorFault::OVER_TEMP);
         drive_enabled = false;
     }
@@ -137,7 +131,7 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
 
     if (faults & static_cast<uint16_t>(StSpinFaultCode::OVER_CURR))
     {
-        LOG(WARNING) << "OVER_CURR: Software overcurrent";
+        LOG(WARNING) << "OVER_CURR: Over current";
         motor_faults.insert(TbotsProto::MotorFault::OVER_CURR);
         drive_enabled = false;
     }
@@ -157,7 +151,7 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
 
     if (faults & static_cast<uint16_t>(StSpinFaultCode::OVERCURR_SW))
     {
-        LOG(INFO) << "OVERCURR_SW: Software overcurrent";
+        LOG(INFO) << "OVERCURR_SW: Software over current";
         motor_faults.insert(TbotsProto::MotorFault::OVERCURR_SW);
         drive_enabled = false;
     }
@@ -193,7 +187,7 @@ double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
     // SET_SPEEDRAMP expects the ramp time in millis to be in register bx.
     // We do speed ramping ourselves in MotorService, so we just want to
     // set the target speed without ramping (hence we set reg bx to 0).
-    sendAndReceiveFrame(motor, StSpinOpcode::MOV_BX, 300);
+    sendAndReceiveFrame(motor, StSpinOpcode::MOV_BX, 0);
 
     sendAndReceiveFrame(motor, StSpinOpcode::SET_SPEEDRAMP);
 
@@ -270,6 +264,18 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
         LOG(WARNING) << "Received frame that failed integrity check. Expected CRC "
                      << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[4])
                      << " for motor " << motor;
+
+        LOG(WARNING) << "RX motor " << motor << " "
+                     << static_cast<int>(rx[0]) << " "
+                     << static_cast<int>(rx[1]) << " "
+                     << static_cast<int>(rx[2]) << " "
+                     << static_cast<int>(rx[3]) << " "
+                     << static_cast<int>(rx[4]) << " "
+                     << static_cast<int>(rx[5]);
+    }
+    else if (static_cast<StSpinOpcode>(rx[1]) == StSpinOpcode::NACK)
+    {
+        LOG(WARNING) << "Frame not acknowledged by motor " << motor;
     }
 
     // Return the DATA field of the received frame
