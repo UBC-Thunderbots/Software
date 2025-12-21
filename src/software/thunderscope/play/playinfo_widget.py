@@ -2,12 +2,17 @@ from proto.play_info_msg_pb2 import PlayInfo
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.common.common_widgets import set_table_data
-
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from PyQt6.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
 
 print(f"PyQt6 Version: {PYQT_VERSION_STR}")
 print(f"Qt Version (underlying C++ library): {QT_VERSION_STR}")
+
+import pkg_resources
+installed_packages = pkg_resources.working_set
+for package in installed_packages:
+    print(f"{package.key}=={package.version}")
 
 class PlayInfoWidget(QWidget):
     NUM_ROWS = 6
