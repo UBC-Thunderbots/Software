@@ -6,6 +6,7 @@ from software.thunderscope.common.common_widgets import set_table_data
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
+
 class PlayInfoWidget(QWidget):
     NUM_ROWS = 6
     NUM_COLS = 4
