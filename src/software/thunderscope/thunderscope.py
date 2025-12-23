@@ -4,6 +4,17 @@ import logging
 import pathlib
 import os
 
+import pkg_resources
+installed_packages = pkg_resources.working_set
+for package in installed_packages:
+    print(f"{package.key}=={package.version}")
+
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
+
+print(f"PyQt6 Version: {PYQT_VERSION_STR}")
+print(f"Qt Version (underlying C++ library): {QT_VERSION_STR}")
+
 import pyqtgraph
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
