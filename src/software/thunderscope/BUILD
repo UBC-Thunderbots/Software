@@ -14,6 +14,10 @@ py_binary(
     name = "thunderscope_main",
     srcs = ["thunderscope_main.py"],
     package_collisions = "warning",
+    env = {
+        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
+        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
+    },
     deps = [
         ":config",
         ":constants",
@@ -54,7 +58,6 @@ py_library(
         requirement("pyqtdarktheme-fork"),
         requirement("pyqtgraph"),
         requirement("setuptools"),
-        requirement("pyqt6-webengine")
     ],
 )
 
