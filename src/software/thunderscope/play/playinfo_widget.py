@@ -5,6 +5,7 @@ from software.thunderscope.common.common_widgets import set_table_data
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+
 class PlayInfoWidget(QWidget):
     NUM_ROWS = 6
     NUM_COLS = 4
@@ -19,7 +20,7 @@ class PlayInfoWidget(QWidget):
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
         """
-        QWidget.__init__(self)        
+        QWidget.__init__(self)
 
         self.play_table = QTableWidget(PlayInfoWidget.NUM_ROWS, PlayInfoWidget.NUM_COLS)
 

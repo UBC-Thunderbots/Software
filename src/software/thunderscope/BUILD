@@ -1,6 +1,6 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
-load("@aspect_rules_py//py:defs.bzl", "py_library", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,11 +13,11 @@ compile_pip_requirements(
 py_binary(
     name = "thunderscope_main",
     srcs = ["thunderscope_main.py"],
-    package_collisions = "warning",
     env = {
         "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
         "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
     },
+    package_collisions = "warning",
     deps = [
         ":config",
         ":constants",
