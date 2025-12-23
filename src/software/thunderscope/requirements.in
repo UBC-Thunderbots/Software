@@ -11,5 +11,4 @@ qtawesome==1.4.0
 PyQt6==6.10.0
 PyOpenGL==3.1.6
 psutil==5.9.0
-PyQt6-WebEngine==6.10.0
 thefuzz==0.19.0

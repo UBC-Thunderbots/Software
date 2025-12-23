@@ -12,7 +12,6 @@ py_library(
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
-        requirement("pyqt6-webengine"),
     ],
 )
 

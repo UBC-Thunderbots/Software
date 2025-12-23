@@ -29,7 +29,6 @@ class PlayInfoWidget(QWidget):
 
         self.vertical_layout = QVBoxLayout()
         self.vertical_layout.addWidget(self.play_table)
-        self.vertical_layout.addWidget(self.webEngineView)
         self.setLayout(self.vertical_layout)
 
     def refresh(self) -> None:

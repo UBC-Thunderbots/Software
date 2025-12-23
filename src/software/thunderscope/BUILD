@@ -57,7 +57,6 @@ py_library(
         requirement("numpy"),
         requirement("pyqtdarktheme-fork"),
         requirement("pyqtgraph"),
-        requirement("setuptools"),
     ],
 )
 
