@@ -5,6 +5,8 @@ from software.thunderscope.common.common_widgets import set_table_data
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from PyQt6.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtCore import QUrl
 
 print(f"PyQt6 Version: {PYQT_VERSION_STR}")
 print(f"Qt Version (underlying C++ library): {QT_VERSION_STR}")
@@ -27,6 +29,11 @@ class PlayInfoWidget(QWidget):
         """
         QWidget.__init__(self)
 
+        self.webEngineView = QWebEngineView()
+        self.loadPage()
+        
+        
+
         self.play_table = QTableWidget(PlayInfoWidget.NUM_ROWS, PlayInfoWidget.NUM_COLS)
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
@@ -35,7 +42,26 @@ class PlayInfoWidget(QWidget):
 
         self.vertical_layout = QVBoxLayout()
         self.vertical_layout.addWidget(self.play_table)
+        self.vertical_layout.addWidget(self.webEngineView)
         self.setLayout(self.vertical_layout)
+
+    def loadPage(self) -> None:
+        # with open('test.html', 'r') as f:
+        self.webEngineView.setUrl(QUrl("https://www.google.com"))
+        #     html = f.read()
+#         self.webEngineView.setHtml("""<!DOCTYPE html>
+# <html lang="en">
+# <head>
+#     <meta charset="UTF-8">
+#     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+#     <title>Home page</title>
+# </head>
+# <body>
+#     <p>
+#         This is a simple HTML page.
+#     </p>
+# </body>
+# </html>""")
 
     def refresh(self) -> None:
         """Update the play info widget with new play information"""

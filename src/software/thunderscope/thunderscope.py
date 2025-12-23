@@ -9,7 +9,7 @@ installed_packages = pkg_resources.working_set
 for package in installed_packages:
     print(f"{package.key}=={package.version}")
 
-from PyQt6.QtWebEngineWidgets import QWebEngineView
+
 from PyQt6.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
 
 print(f"PyQt6 Version: {PYQT_VERSION_STR}")
