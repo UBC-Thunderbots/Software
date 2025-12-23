@@ -6,7 +6,6 @@ package(default_visibility = ["//visibility:public"])
 py_library(
     name = "playinfo_widget",
     srcs = ["playinfo_widget.py"],
-    data = ["test.html"],
     deps = [
         "//proto:software_py_proto",
         "//software/thunderscope:constants",
