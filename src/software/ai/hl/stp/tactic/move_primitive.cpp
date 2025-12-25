@@ -1,4 +1,5 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
+
 #include <cmath>
 
 #include "proto/message_translation/tbots_geometry.h"
@@ -66,8 +67,12 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
 
     Rectangle field_boundary = world.field().fieldBoundary();
-    Point neg_x_neg_y_corner(field_boundary.negXNegYCorner().x() + ROBOT_MAX_RADIUS_METERS, field_boundary.negXNegYCorner().y()+ ROBOT_MAX_RADIUS_METERS);
-    Point pos_x_pos_y_corner(field_boundary.posXPosYCorner().x() - ROBOT_MAX_RADIUS_METERS, field_boundary.posXPosYCorner().y()- ROBOT_MAX_RADIUS_METERS);
+    Point neg_x_neg_y_corner(
+        field_boundary.negXNegYCorner().x() + ROBOT_MAX_RADIUS_METERS,
+        field_boundary.negXNegYCorner().y() + ROBOT_MAX_RADIUS_METERS);
+    Point pos_x_pos_y_corner(
+        field_boundary.posXPosYCorner().x() - ROBOT_MAX_RADIUS_METERS,
+        field_boundary.posXPosYCorner().y() - ROBOT_MAX_RADIUS_METERS);
     Rectangle navigable_area = Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
 
     // If the robot is in a static obstacle, then we should first move to the nearest
