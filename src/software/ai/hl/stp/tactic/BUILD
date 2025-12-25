@@ -34,9 +34,9 @@ cc_library(
 
 cc_library(
     name = "tactic",
-    srcs = ["tactic.cpp"],
     hdrs = [
         "tactic.h",
+        "tactic_base.hpp",
         "tactic_fsm.h",
         "tactic_visitor.h",
     ],

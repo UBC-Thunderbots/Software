@@ -505,7 +505,7 @@ int main(int argc, char** argv)
     //
     // The move constructor / assgnment is allowed.
     //
-    // We can verify this with the code below, or by lookinAg at pull_coroutine.hpp
+    // We can verify this with the code below, or by looking at pull_coroutine.hpp
     // https://www.boost.org/doc/libs/1_74_0/libs/coroutine2/doc/html/coroutine2/coroutine/asymmetric/pull_coro.html
 
     auto data = std::make_shared<int>(99);

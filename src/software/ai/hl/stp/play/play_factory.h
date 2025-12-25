@@ -7,9 +7,10 @@
  * Creates a play given a play proto
  *
  * @param play_proto the play proto
- * @param ai_config The AI config
+ * @param ai_config_ptr shared pointer to ai_config
  *
  * @return a pointer to the play
  */
-std::unique_ptr<Play> createPlay(const TbotsProto::Play& play_proto,
-                                 TbotsProto::AiConfig ai_config);
+std::unique_ptr<Play> createPlay(
+    const TbotsProto::Play& play_proto,
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);

@@ -3,31 +3,35 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/defender_assignment.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/logger/logger.h"
 
+
 /**
  * Struct containing frequently shared functions of the defense play class
  */
-class DefensePlayFSMBase
+class DefensePlayFSMBase : public PlayFSM<DefensePlayFSMBase>
 {
    public:
+    /**
+     * control parameters for a defense play
+     */
     struct ControlParams
     {
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     };
 
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Creates a play FSM with defensive methods
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit DefensePlayFSMBase(TbotsProto::AiConfig ai_config);
+    explicit DefensePlayFSMBase(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
    protected:
     /**
@@ -66,7 +70,6 @@ class DefensePlayFSMBase
         std::vector<DefenderAssignment> &pass_defender_assignments,
         TbotsProto::BallStealMode ball_steal_mode);
 
-    TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
     std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadowers;

@@ -151,12 +151,7 @@ if __name__ == "__main__":
         default=0,
         help="Which channel to communicate over",
     )
-    parser.add_argument(
-        "--enable_radio",
-        action="store_true",
-        default=False,
-        help="Whether to use radio (True) or Wi-Fi (False) for sending primitives to robots",
-    )
+
     parser.add_argument(
         "--visualization_buffer_size",
         action="store",
