@@ -90,6 +90,7 @@ fi
 
 virtualenv_opt_args=""
 if [[ $(lsb_release -rs) == "24.04" ]]; then
+    sudo apt remove "python3-pyqt6" "pyqt6-dev-tools" "python3-pyqt6.qtsvg"
     virtualenv_opt_args="--system-site-packages"
 fi
 

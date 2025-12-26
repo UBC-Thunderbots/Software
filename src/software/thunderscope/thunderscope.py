@@ -15,6 +15,10 @@ from software.thunderscope.constants import *
 
 from software.thunderscope.thunderscope_config import TScopeConfig
 
+from PyQt6.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
+
+print(f"PyQt6 Version: {PYQT_VERSION_STR}")
+print(f"Qt Version (underlying C++ library): {QT_VERSION_STR}")
 
 class Thunderscope:
     """Thunderscope is our main visualizer that can visualize our field,
