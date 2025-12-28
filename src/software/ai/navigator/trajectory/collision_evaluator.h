@@ -6,12 +6,40 @@
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/navigator/trajectory/trajectory_path_with_cost.h"
 
+/**
+ * Collision evaluator computes the collision between a trajectory and obstacles.
+ * Computed sub-trajectories are stored in a cache to reduce computational load.
+ **/
 class CollisionEvaluator
 {
   public:
+    /**
+     * Constructor
+     * @param obstacles A vector of obstacle pointers, where obstacles are calculated for collision
+     */
     explicit CollisionEvaluator(const std::vector<ObstaclePtr>& obstacles);
 
-  TrajectoryPathWithCost evaluate(
+
+    /**
+ * Evaluates a trajectory for collision information and cost, optionally reusing
+ * collision results from a previously evaluated prefix trajectory.
+ * If a prefix trajectory is provided, collision information that occurs entirely
+ * before the given prefix duration may be reused to avoid redundant collision
+ * checking. Collision checks beyond the prefix duration are computed normally.
+ * @param trajectory
+ *        The trajectory to evaluate for collisions and cost.
+ * @param sub_traj_with_cost
+ *        An optional previously evaluated prefix trajectory whose collision
+ *        information may be reused if the prefix fully covers the relevant
+ *        collision interval.
+ * @param sub_traj_duration_s
+ *        The duration (in seconds) of the prefix trajectory within trajectory.
+ * @return
+ *         A TrajectoryPathWithCost< containing the trajectory along with
+ *         computed collision timing information and total cost.
+ */
+
+    TrajectoryPathWithCost evaluate(
     const TrajectoryPath &trajectory,
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
     std::optional<double> sub_traj_duration_s
