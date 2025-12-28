@@ -106,6 +106,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "collision_evaluator",
+    srcs = ["collision_evaluator.cpp"],
+    hdrs = ["collision_evaluator.h"],
+    deps = [
+        ":trajectory_path",
+        "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/trajectory:trajectory_path_with_cost",
+    ],
+)
+
 cc_test(
     name = "bang_bang_trajectory_1d_test",
     srcs = ["bang_bang_trajectory_1d_test.cpp"],
