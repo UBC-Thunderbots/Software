@@ -38,7 +38,6 @@ class CollisionEvaluator
  *         A TrajectoryPathWithCost< containing the trajectory along with
  *         computed collision timing information and total cost.
  */
-
     TrajectoryPathWithCost evaluate(
     const TrajectoryPath &trajectory,
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
