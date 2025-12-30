@@ -23,7 +23,7 @@ from cli.cli_params import (
     EnableVisualizerOption,
     StopAIOnStartOption,
     DebugBinary,
-    Platform
+    Platform,
 )
 
 # thefuzz is a fuzzy string matcher in python
@@ -38,23 +38,26 @@ NUM_FILTERED_MATCHES_TO_SHOW = 10
 app = Typer()
 
 
-@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True}, no_args_is_help=True)
+@app.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+    no_args_is_help=True,
+)
 def main(
-        ctx: Context,
-        action: ActionArgument,
-        search_query: str,
-        print_command: PrintCommandOption = False,
-        no_optimized_build: NoOptimizedBuildOption = False,
-        debug_build: DebugBuildOption = False,
-        select_debug_binaries: SelectDebugBinariesOption = None,
-        flash_robots: FlashRobotsOption = None,
-        ssh_password: SSHPasswordOption = None,
-        interactive_search: InteractiveModeOption = False,
-        tracy: TracyOption = False,
-        platform: PlatformOption = None,
-        enable_thunderscope: EnableThunderscopeOption = False,
-        enable_visualizer: EnableVisualizerOption = False,
-        stop_ai_on_start: StopAIOnStartOption = False,
+    ctx: Context,
+    action: ActionArgument,
+    search_query: str,
+    print_command: PrintCommandOption = False,
+    no_optimized_build: NoOptimizedBuildOption = False,
+    debug_build: DebugBuildOption = False,
+    select_debug_binaries: SelectDebugBinariesOption = None,
+    flash_robots: FlashRobotsOption = None,
+    ssh_password: SSHPasswordOption = None,
+    interactive_search: InteractiveModeOption = False,
+    tracy: TracyOption = False,
+    platform: PlatformOption = None,
+    enable_thunderscope: EnableThunderscopeOption = False,
+    enable_visualizer: EnableVisualizerOption = False,
+    stop_ai_on_start: StopAIOnStartOption = False,
 ) -> None:
     if bool(flash_robots) ^ bool(ssh_password):
         print(
@@ -166,9 +169,9 @@ def main(
         command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
 
         if (
-                "--debug_blue_full_system" in unknown_args
-                or "--debug_yellow_full_system" in unknown_args
-                or "--debug_simulator" in unknown_args
+            "--debug_blue_full_system" in unknown_args
+            or "--debug_yellow_full_system" in unknown_args
+            or "--debug_simulator" in unknown_args
         ):
             print(
                 "Do not run simulated pytests as a test when debugging, use ./tbots.py -d run instead"

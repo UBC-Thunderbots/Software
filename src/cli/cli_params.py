@@ -24,19 +24,14 @@ class Platform(str, Enum):
 
 
 PrintCommandOption: type[bool] = Annotated[
-    bool, Option(
-        "-p",
-        "--print_command",
-        help="Print the generated Bazel command"
-    )
+    bool, Option("-p", "--print_command", help="Print the generated Bazel command")
 ]
 
 NoOptimizedBuildOption: type[bool] = Annotated[
-    bool, Option(
-        "-no",
-        "--no_optimized_build",
-        help="Compile binaries without -O3 optimizations"
-    )
+    bool,
+    Option(
+        "-no", "--no_optimized_build", help="Compile binaries without -O3 optimizations"
+    ),
 ]
 
 DebugBuildOption: type[bool] = Annotated[
@@ -45,7 +40,7 @@ DebugBuildOption: type[bool] = Annotated[
         "-d",
         "--debug",
         help="Compile binaries with debug symbols",
-    )
+    ),
 ]
 
 SelectDebugBinariesOption = Annotated[
@@ -53,8 +48,8 @@ SelectDebugBinariesOption = Annotated[
     MultiOption(
         "-ds",
         "--select_debug_binaries",
-        help="Select all binaries which are running separately in debug mode"
-    )
+        help="Select all binaries which are running separately in debug mode",
+    ),
 ]
 
 FlashRobotsOption = Annotated[
@@ -63,17 +58,15 @@ FlashRobotsOption = Annotated[
         "-f",
         "--flash_robots",
         help="A list of space separated integers representing the robot IDs "
-             "that should be flashed by the deploy_robot_software Ansible playbook"
-    )
+        "that should be flashed by the deploy_robot_software Ansible playbook",
+    ),
 ]
 
 SSHPasswordOption = Annotated[
     str,
     Option(
-        "-pwd",
-        "--pwd",
-        help="Password used by Ansible when SSHing into the robots"
-    )
+        "-pwd", "--pwd", help="Password used by Ansible when SSHing into the robots"
+    ),
 ]
 
 InteractiveModeOption = Annotated[
@@ -82,24 +75,15 @@ InteractiveModeOption = Annotated[
         "-i",
         "--interactive",
         help="Enables interactive searching for bazel targets",
-    )
+    ),
 ]
 
 TracyOption = Annotated[
-    bool,
-    Option(
-        "--tracy",
-        help="Run the binary with the TRACY_ENABLE macro defined"
-    )
+    bool, Option("--tracy", help="Run the binary with the TRACY_ENABLE macro defined")
 ]
 
 PlatformOption = Annotated[
-    Platform,
-    Option(
-        "-pl",
-        "--platform",
-        help="The platform to build Thunderloop for"
-    )
+    Platform, Option("-pl", "--platform", help="The platform to build Thunderloop for")
 ]
 
 EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]

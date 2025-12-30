@@ -12,6 +12,7 @@ from typer.models import OptionInfo
 # See https://github.com/fastapi/typer/issues/110
 # ==============================================================
 
+
 class OptionEatAll(typer.core.TyperOption):
     """Click option that consumes arguments until next option flag."""
 
@@ -49,13 +50,16 @@ class OptionEatAll(typer.core.TyperOption):
 
 class MultiOptionInfo(OptionInfo):
     """Marker for multi-argument options."""
+
     is_multi_option: bool = True
 
     def __init__(self, option_info: OptionInfo) -> None:
         super().__init__(**option_info.__dict__)
 
 
-def MultiOption(default: Any = ..., *param_decls: str, **kwargs: Any) -> MultiOptionInfo:
+def MultiOption(
+    default: Any = ..., *param_decls: str, **kwargs: Any
+) -> MultiOptionInfo:
     """Create option that accepts multiple values."""
     return MultiOptionInfo(typer.Option(default, *param_decls, **kwargs))
 
