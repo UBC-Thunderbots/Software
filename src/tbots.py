@@ -2,11 +2,29 @@
 
 import os
 import sys
+
 import iterfzf
 import itertools
 from subprocess import PIPE, run
-import argparse
 from thefuzz import process
+from typer import Typer, Context
+from cli.cli_params import (
+    ActionArgument,
+    PrintCommandOption,
+    NoOptimizedBuildOption,
+    DebugBuildOption,
+    SelectDebugBinariesOption,
+    FlashRobotsOption,
+    SSHPasswordOption,
+    InteractiveModeOption,
+    TracyOption,
+    PlatformOption,
+    EnableThunderscopeOption,
+    EnableVisualizerOption,
+    StopAIOnStartOption,
+    DebugBinary,
+    Platform
+)
 
 # thefuzz is a fuzzy string matcher in python
 # https://github.com/seatgeek/thefuzz
@@ -17,97 +35,32 @@ from thefuzz import process
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run stuff", add_help=False)
+app = Typer()
 
-    parser.add_argument("action", choices=["build", "run", "test"])
-    parser.add_argument("search_query")
-    parser.add_argument("-h", "--help", action="store_true")
-    parser.add_argument(
-        "-p",
-        "--print_command",
-        action="store_true",
-        help="Print the generated Bazel command",
-    )
-    parser.add_argument(
-        "-no",
-        "--no_optimized_build",
-        action="store_true",
-        default=False,
-        help="Compile binaries without -O3 optimizations",
-    )
-    parser.add_argument(
-        "-d",
-        "--debug_build",
-        action="store_true",
-        help="Compile binaries with debug symbols",
-    )
-    parser.add_argument(
-        "-ds",
-        "--select_debug_binaries",
-        choices=["sim", "blue", "yellow"],
-        nargs="+",
-        help="Select all binaries which are running separately in debug mode",
-        action="store",
-    )
-    parser.add_argument(
-        "-f",
-        "--flash_robots",
-        nargs="+",
-        type=int,
-        help="A list of space separated integers representing the robot IDs "
-        "that should be flashed by the deploy_robot_software Ansible playbook",
-        action="store",
-    )
-    parser.add_argument(
-        "-pwd",
-        "--pwd",
-        type=str,
-        help="Password used by Ansible when SSHing into the robots",
-        action="store",
-    )
-    parser.add_argument(
-        "-i",
-        "--interactive",
-        help="Interactively search for a bazel target",
-        action="store_true",
-    )
-    parser.add_argument(
-        "--tracy",
-        help="Run the binary with the TRACY_ENABLE macro defined",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-pl",
-        "--platform",
-        type=str,
-        choices=["PI", "NANO", "LIMITED"],
-        help="The platform to build Thunderloop for",
-        action="store",
-    )
 
-    # These are shortcut args for commonly used arguments on our tests
-    # and full_system. All other arguments are passed through as-is
-    # to the underlying binary/test that is being run (unknown_args)
-    parser.add_argument("-t", "--enable_thunderscope", action="store_true")
-    parser.add_argument("-v", "--enable_visualizer", action="store_true")
-    parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
-    args, unknown_args = parser.parse_known_args()
-
-    if bool(args.flash_robots) ^ bool(args.pwd):
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True}, no_args_is_help=True)
+def main(
+        ctx: Context,
+        action: ActionArgument,
+        search_query: str,
+        print_command: PrintCommandOption = False,
+        no_optimized_build: NoOptimizedBuildOption = False,
+        debug_build: DebugBuildOption = False,
+        select_debug_binaries: SelectDebugBinariesOption = None,
+        flash_robots: FlashRobotsOption = None,
+        ssh_password: SSHPasswordOption = None,
+        interactive_search: InteractiveModeOption = False,
+        tracy: TracyOption = False,
+        platform: PlatformOption = None,
+        enable_thunderscope: EnableThunderscopeOption = False,
+        enable_visualizer: EnableVisualizerOption = False,
+        stop_ai_on_start: StopAIOnStartOption = False,
+) -> None:
+    if bool(flash_robots) ^ bool(ssh_password):
         print(
             "If you want to flash robots, both the robot IDs and password must be provided"
         )
         sys.exit(1)
-
-    # If help was requested, print the help for the tbots script
-    # and propagate the help to the underlying binary/test to
-    # also see the arguments it supports
-    if args.help:
-        print(45 * "=" + " tbots.py help " + 45 * "=")
-        parser.print_help()
-        print(100 * "=")
-        unknown_args += ["--help"]
 
     test_query = ["bazel", "query", "tests(//...)"]
     binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
@@ -120,13 +73,13 @@ if __name__ == "__main__":
     }
 
     # Run the appropriate bazel query and ask thefuzz to find the best matching
-    # target, gauranteed to return 1 result because we set limit=1
+    # target, guaranteed to return 1 result because we set limit=1
     # Combine results of multiple queries with itertools.chain
     targets = list(
         itertools.chain.from_iterable(
             [
                 run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
-                for query in bazel_queries[args.action]
+                for query in bazel_queries[action]
             ]
         )
     )
@@ -135,15 +88,15 @@ if __name__ == "__main__":
 
     # Use thefuzz to find the best matching target name
     most_similar_target_name, confidence = process.extract(
-        args.search_query, list(target_dict.keys()), limit=1
+        search_query, list(target_dict.keys()), limit=1
     )[0]
     target = str(target_dict[most_similar_target_name], encoding="utf-8")
 
     print("Found target {} with confidence {}".format(target, confidence))
 
-    if args.interactive or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
+    if interactive_search or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
         filtered_targets = process.extract(
-            args.search_query,
+            search_query,
             list(target_dict.keys()),
             limit=NUM_FILTERED_MATCHES_TO_SHOW,
         )
@@ -154,67 +107,68 @@ if __name__ == "__main__":
         target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
         print("User selected {}".format(target))
 
-    command = ["bazel", args.action, target]
+    command = ["bazel", action.value, target]
+    unknown_args = ctx.args
 
     # Trigger a debug build
-    if args.debug_build or args.select_debug_binaries:
+    if debug_build or select_debug_binaries:
         command += ["-c", "dbg"]
 
     # Trigger an optimized build by default. Note that Thunderloop should always be
     # compiled with optimizations for best performance
-    if not args.debug_build and (not args.no_optimized_build or args.flash_robots):
+    if not debug_build and (not no_optimized_build or flash_robots):
         command += ["--copt=-O3"]
 
     # Used for when flashing Jetsons
-    if args.flash_robots:
+    if flash_robots:
         command += ["--platforms=//toolchains/cc:robot"]
 
     # Select debug binaries to run
-    if args.select_debug_binaries:
-        if "sim" in args.select_debug_binaries:
+    if select_debug_binaries:
+        if DebugBinary.sim in select_debug_binaries:
             unknown_args += ["--debug_simulator"]
-        if "blue" in args.select_debug_binaries:
+        if DebugBinary.blue in select_debug_binaries:
             unknown_args += ["--debug_blue_full_system"]
-        if "yellow" in args.select_debug_binaries:
+        if DebugBinary.yellow in select_debug_binaries:
             unknown_args += ["--debug_yellow_full_system"]
 
     # To run the Tracy profile, enable the TRACY_ENABLE macro
-    if args.tracy:
+    if tracy:
         command += ["--cxxopt=-DTRACY_ENABLE"]
 
-    if args.platform:
-        command += ["--//software/embedded:host_platform=" + args.platform]
+    if platform:
+        command += ["--//software/embedded:host_platform=" + platform.value]
 
     # Don't cache test results
-    if args.action in "test":
+    if action == ActionArgument.test:
         command += ["--cache_test_results=false"]
-    if args.action in "run":
+    if action == ActionArgument.run:
         command += ["--"]
 
     bazel_arguments = unknown_args
-    if args.stop_ai_on_start:
+    if stop_ai_on_start:
         bazel_arguments += ["--stop_ai_on_start"]
-    if args.enable_visualizer:
+    if enable_visualizer:
         bazel_arguments += ["--enable_visualizer"]
-    if args.enable_thunderscope:
+    if enable_thunderscope:
         bazel_arguments += ["--enable_thunderscope"]
-    if args.flash_robots:
-        if not args.platform:
+    if flash_robots:
+        if not platform:
             print("No platform specified! Make sure to set the --platform argument.")
             sys.exit(1)
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        platform_ip = "0" if args.platform == "NANO" else "6"
-        bazel_arguments += [f"192.168.{platform_ip}.20{id}" for id in args.flash_robots]
-        bazel_arguments += ["-pwd", args.pwd]
+        platform_ip = "0" if platform == Platform.NANO else "6"
+        bazel_arguments += [f"192.168.{platform_ip}.20{id}" for id in flash_robots]
+        bazel_arguments += ["-pwd", ssh_password]
 
-    if args.action in "test":
+    if action == ActionArgument.test:
         command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
 
         if (
-            "--debug_blue_full_system" in unknown_args
-            or "--debug_yellow_full_system" in unknown_args
-            or "--debug_simulator" in unknown_args
+                "--debug_blue_full_system" in unknown_args
+                or "--debug_yellow_full_system" in unknown_args
+                or "--debug_simulator" in unknown_args
         ):
             print(
                 "Do not run simulated pytests as a test when debugging, use ./tbots.py -d run instead"
@@ -225,7 +179,7 @@ if __name__ == "__main__":
         command += bazel_arguments
 
     # If the user requested a command dump, just print the command to run
-    if args.print_command:
+    if print_command:
         print(" ".join(command))
 
     # Otherwise, run the command! We use os.system here because we don't
@@ -235,3 +189,7 @@ if __name__ == "__main__":
         code = os.system(" ".join(command))
         # propagate exit code
         sys.exit(1 if code != 0 else 0)
+
+
+if __name__ == "__main__":
+    app()
