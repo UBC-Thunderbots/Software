@@ -31,7 +31,8 @@ jobs:
             -//software/ai/hl/...                   \
             -//software/field_tests/...             \
             -//software/embedded/...                \
-            -//toolchains/cc/...
+            -//toolchains/cc/...                    \
+            -//firmware/...
 
       - name: Jetson Nano Build Test
         run: |
