@@ -57,7 +57,7 @@ void loop()
         if (receiving)
         {
             buffer.push_back(byte);
-            if (byte == START_END_FLAG_BYTE) // End of packet?
+            if (byte == START_END_FLAG_BYTE)  // End of packet?
             {
                 TbotsProto_PowerFrame frame = TbotsProto_PowerFrame_init_default;
                 if (unmarshalUartPacket(buffer, frame))
@@ -73,7 +73,7 @@ void loop()
         }
         else
         {
-            if (byte == START_END_FLAG_BYTE) // Start of packet?
+            if (byte == START_END_FLAG_BYTE)  // Start of packet?
             {
                 buffer.push_back(byte);
                 receiving = true;
