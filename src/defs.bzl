@@ -1,3 +1,4 @@
+load("@bazel_embedded//tools/openocd:openocd_repository.bzl", "openocd_deps")
 load("@rules_pkg//pkg:providers.bzl", "PackageFilegroupInfo", "PackageFilesInfo", "PackageSymlinkInfo")
 
 # No idea how this works, refer to:
@@ -94,4 +95,11 @@ pkg_executable = rule(
         ),
     },
     provides = [PackageFilegroupInfo],
+)
+
+def _openocd_extension_impl(_ctx):
+    openocd_deps()
+
+openocd_extension = module_extension(
+    implementation = _openocd_extension_impl,
 )

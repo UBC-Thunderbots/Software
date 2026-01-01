@@ -210,6 +210,9 @@ http_archive(
     url = "https://github.com/bazelembedded/bazel-embedded/archive/cf5b240d510313b3383e0cdb550eb9f32be7244e.zip",
 )
 
+openocd = use_extension("//:defs.bzl", "openocd_extension")
+use_repo(openocd, "com_openocd")
+
 http_archive(
     name = "LTC4151",
     build_file = "@//extlibs:LTC4151.BUILD",

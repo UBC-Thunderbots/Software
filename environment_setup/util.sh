@@ -91,15 +91,15 @@ install_python_dev_cross_compile_headers() {
 }
 
 install_stm32_cross_compiler() {
-    download_link=https://developer.arm.com/-/media/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-x86_64-aarch64_be-none-linux-gnu.tar.xz
-
+    arch="aarch64"
     if is_x86 $1; then
-        download_link=https://developer.arm.com/-/media/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi.tar.xz
+        arch="x86_64"
     fi
+    download_link=https://developer.arm.com/-/media/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-${arch}-arm-none-eabi.tar.xz
 
     wget -N $download_link -O /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz
     tar -xf /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz -C /tmp/tbots_download_cache/
-    sudo mv /tmp/tbots_download_cache/arm-gnu-toolchain-14.3.rel1-x86_64-aarch64_be-none-linux-gnu /opt/tbotspython/arm-none-eabi-gcc
+    sudo mv /tmp/tbots_download_cache/arm-gnu-toolchain-14.3.rel1-${arch}-arm-none-eabi /opt/tbotspython/arm-none-eabi-gcc
     rm /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz
 }
 
