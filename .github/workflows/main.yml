@@ -52,7 +52,7 @@ jobs:
     name: Motor Firmware
     runs-on: ubuntu-24.04
     steps:
-      -uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
 
       - name: Build Motor Firmware
