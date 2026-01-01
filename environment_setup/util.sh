@@ -99,7 +99,7 @@ install_stm32_cross_compiler() {
 
     wget -N $download_link -O /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz
     tar -xf /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz -C /tmp/tbots_download_cache/
-    sudo mv /tmp/tbots_download_cache/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi /opt/tbotspython/arm-none-eabi-gcc
+    sudo mv /tmp/tbots_download_cache/arm-gnu-toolchain-14.3.rel1-x86_64-aarch64_be-none-linux-gnu /opt/tbotspython/arm-none-eabi-gcc
     rm /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz
 }
 
