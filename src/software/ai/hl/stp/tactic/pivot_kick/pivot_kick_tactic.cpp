@@ -9,18 +9,13 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-PivotKickTactic::PivotKickTactic(TbotsProto::AiConfig ai_config)
-    : Tactic({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
-              RobotCapability::Dribble}),
-      fsm_map(),
-      control_params(PivotKickFSM::ControlParams()),
-      ai_config(ai_config)
+PivotKickTactic::PivotKickTactic(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticBase<PivotKickFSM, DribbleFSM>(
+          {RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
+           RobotCapability::Dribble},
+          ai_config_ptr)
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<PivotKickFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()));
-    }
 }
 
 void PivotKickTactic::accept(TacticVisitor &visitor) const
@@ -35,15 +30,4 @@ void PivotKickTactic::updateControlParams(const Point &kick_origin,
     control_params.kick_origin       = kick_origin;
     control_params.kick_direction    = kick_direction;
     control_params.auto_chip_or_kick = auto_chip_or_kick;
-}
-
-void PivotKickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
-{
-    if (reset_fsm)
-    {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PivotKickFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()));
-    }
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(PivotKickFSM::Update(control_params, tactic_update));
 }
