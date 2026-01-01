@@ -644,10 +644,25 @@ def _stm32_gcc_impl(ctx):
                         flags = [
                             # Optimize for size
                             "-Os",
+                            # Places each function into its own section. If coupled with --gc-sections in the linker
+                            # stage, this option strips out unused functions and reduces code size.
+                            "-ffunction-sections",
                         ],
                     ),
                 ],
-            )
+            ),
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Garbage collects unused sections of code. Used with the compiler's -ffunction-sections,
+                            # this option will completely strip out unused functions out of the created binary.
+                            "-Wl,--gc-sections",
+                        ],
+                    )
+                ],
+            ),
         ]
     )
 
@@ -677,11 +692,49 @@ def _stm32_gcc_impl(ctx):
                 flag_groups = [
                     flag_group(
                         flags = [
-                            # Generate a map file
-                            "-Wl,-Map=output.map",
+                            # Generate a map file with the cross-reference table. This is very helpful to figure out
+                            # what functions are taking the most space in RAM and flash and who calls them.
+                            "-Wl,-Map=output.map,--cref",
                         ],
                     ),
                 ],
+            )
+        ]
+    )
+
+    bare_metal_feature = feature(
+        name = "bare_metal",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Tells the compiler that the target platform may not have an operating system, which
+                            # allows it to make some performance and size optimizations.
+                            "-ffreestanding",
+                        ]
+                    )
+                ]
+            )
+        ]
+    )
+
+    memory_usage_feature = feature(
+        name = "memory_usage",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Print remaining FLASH and RAM available.
+                            "-Wl,--print-memory-usage"
+                        ]
+                    )
+                ]
             )
         ]
     )
@@ -691,6 +744,8 @@ def _stm32_gcc_impl(ctx):
         map_file_feature,
         no_syscalls_feature,
         space_optimization_feature,
+        bare_metal_feature,
+        memory_usage_feature,
     ]
 
     return [
