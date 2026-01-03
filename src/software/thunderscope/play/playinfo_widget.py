@@ -27,41 +27,51 @@ class PlayInfoWidget(QWidget):
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
         """
+        self.play_transitions = set()
+
         QWidget.__init__(self)
 
         self.webEngineView = QWebEngineView()
         self.loadPage()
         
-        
-
         self.play_table = QTableWidget(PlayInfoWidget.NUM_ROWS, PlayInfoWidget.NUM_COLS)
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.play_table.verticalHeader().setVisible(False)
         self.last_playinfo = None
 
-        self.vertical_layout = QVBoxLayout()
-        self.vertical_layout.addWidget(self.play_table)
-        self.vertical_layout.addWidget(self.webEngineView)
-        self.setLayout(self.vertical_layout)
+        self.horizontal_layout = QHBoxLayout()
+        self.horizontal_layout.addWidget(self.play_table)
+        self.horizontal_layout.addWidget(self.webEngineView)
+        self.setLayout(self.horizontal_layout)
 
     def loadPage(self) -> None:
-        # with open('test.html', 'r') as f:
-        self.webEngineView.setUrl(QUrl("https://www.google.com"))
-        #     html = f.read()
-#         self.webEngineView.setHtml("""<!DOCTYPE html>
-# <html lang="en">
-# <head>
-#     <meta charset="UTF-8">
-#     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-#     <title>Home page</title>
-# </head>
-# <body>
-#     <p>
-#         This is a simple HTML page.
-#     </p>
-# </body>
-# </html>""")
+        html = """<html>
+        <body>
+            <h1>Play tree</h1>
+
+            <div style="width:100%; overflow-x: scroll;">
+                <pre class="mermaid" >
+            graph TD
+                """
+
+        for t in self.play_transitions:
+            html += t + "\n";
+
+        html += """
+                </pre>
+            </div>
+            <script type="module">
+            import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+            mermaid.initialize({ 
+            startOnLoad: true,
+            flowchart: {
+                useMaxWidth: false 
+            } });
+            </script>
+        </body>
+        </html>"""
+        self.webEngineView.setHtml(html)
 
     def refresh(self) -> None:
         """Update the play info widget with new play information"""
@@ -96,6 +106,16 @@ class PlayInfoWidget(QWidget):
 
         play_name.append(playinfo.play.last_guard)
         play_name.append(playinfo.play.last_transition)
+
+        last_play_guard = playinfo.play.last_guard.split(" ", 1)
+        prev_fsm = ""
+        last_play_transition = playinfo.play.last_transition.split(" -> ")
+        if len(last_play_transition) == 2:
+            last_play_transition.insert(1," -- " + last_play_guard[1] + " --> ")
+            msg_len = len(self.play_transitions)
+            self.play_transitions.add(''.join(last_play_transition))
+            if msg_len != len(self.play_transitions):
+                self.loadPage()
 
         for robot_id in sorted(playinfo.robot_tactic_assignment):
             robot_ids.append(robot_id)

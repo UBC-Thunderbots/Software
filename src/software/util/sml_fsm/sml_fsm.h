@@ -98,9 +98,7 @@ public:
     void log_state_change(const TSrcState& src, const TDstState& dst)
     {
         // The append chain is necessary because of different 'types' of string
-        std::string message = boost::sml::aux::get_type_name<SM>();
-        message.append(" ");
-        message.append(src.c_str());
+        std::string message = src.c_str();
         message.append(" -> ");
         message.append(dst.c_str());
         if (last_state_transition != message) {
