@@ -82,10 +82,15 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
         .position_to_block_from = Point(-2, 0),
         .ball_steal_mode        = TbotsProto::BallStealMode::STEAL};
 
+<<<<<<< HEAD
 FSMLogger logger{std::optional(0)};
     FSM<PassDefenderFSM> fsm{PassDefenderFSM(std::make_shared<TbotsProto::AiConfig>()),
                              DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
                              logger};
+=======
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(std::make_shared<TbotsProto::AiConfig>()),
+                             DribbleFSM(std::make_shared<TbotsProto::AiConfig>())};
+>>>>>>> 97dd982118962af26ae69a7b1e097e35c8b5778c
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));

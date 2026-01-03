@@ -47,7 +47,11 @@ void Ai::checkAiConfig()
     {
         ai_config_changed = false;
 
+<<<<<<< HEAD
         fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, logger);
+=======
+        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr});
+>>>>>>> 97dd982118962af26ae69a7b1e097e35c8b5778c
 
         auto current_override = ai_config_ptr->ai_control_config().override_ai_play();
         if (current_override != TbotsProto::PlayName::UseAiSelection)

@@ -40,8 +40,12 @@ template <class PlayFsm, class... PlaySubFsms>
 PlayBase<PlayFsm, PlaySubFsms...>::PlayBase(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr, bool requires_goalie)
     : Play(ai_config_ptr, requires_goalie),
+<<<<<<< HEAD
       logger(),
       fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}..., logger},
+=======
+      fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}...},
+>>>>>>> 97dd982118962af26ae69a7b1e097e35c8b5778c
       control_params()
 {
 }

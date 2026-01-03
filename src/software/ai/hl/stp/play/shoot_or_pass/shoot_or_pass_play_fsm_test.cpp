@@ -36,9 +36,14 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard)
         Timestamp::fromSeconds(0));
     world->updateRefereeCommand(RefereeCommand::FORCE_START);
 
+<<<<<<< HEAD
     FSMLogger logger{};
     FSM<ShootOrPassPlayFSM> fsm(
             ShootOrPassPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, logger);
+=======
+    FSM<ShootOrPassPlayFSM> fsm(
+        ShootOrPassPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
+>>>>>>> 97dd982118962af26ae69a7b1e097e35c8b5778c
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
@@ -106,9 +111,14 @@ TEST(ShootOrPassPlayFSMTest, test_took_shot_guard)
     ::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 0), Point(2, 0)},
                                           Timestamp::fromSeconds(0));
 
+<<<<<<< HEAD
     FSMLogger logger{};
     FSM<ShootOrPassPlayFSM> fsm(
             ShootOrPassPlayFSM{std::make_shared<TbotsProto::AiConfig>()}, logger);
+=======
+    FSM<ShootOrPassPlayFSM> fsm(
+        ShootOrPassPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
+>>>>>>> 97dd982118962af26ae69a7b1e097e35c8b5778c
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
