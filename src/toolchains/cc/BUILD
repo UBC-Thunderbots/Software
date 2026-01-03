@@ -128,7 +128,7 @@ filegroup(
     name = "motor_board_gcc_all",
     srcs = [
         "@motor_board_gcc//:includes",
-    ]
+    ],
 )
 
 cc_toolchain_config_fullsystem(

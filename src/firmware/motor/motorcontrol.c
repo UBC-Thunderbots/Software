@@ -1,38 +1,38 @@
 /**
-  ******************************************************************************
-  * @file    motorcontrol.c
-  * @author  Motor Control SDK Team, ST Microelectronics
-  * @brief   Motor Control Subsystem initialization functions.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
-  ******************************************************************************
-  * @ingroup MCInterface
-  */
+ ******************************************************************************
+ * @file    motorcontrol.c
+ * @author  Motor Control SDK Team, ST Microelectronics
+ * @brief   Motor Control Subsystem initialization functions.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under Ultimate Liberty license
+ * SLA0044, the "License"; You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ *                             www.st.com/SLA0044
+ *
+ ******************************************************************************
+ * @ingroup MCInterface
+ */
 #include "firmware/motor/motorcontrol.h"
 
-//cstat -MISRAC2012-Rule-21.1
+// cstat -MISRAC2012-Rule-21.1
 #include "firmware/motor/main.h"
-//cstat +MISRAC2012-Rule-21.1
+// cstat +MISRAC2012-Rule-21.1
 #include "firmware/motor/mc_interface.h"
 #include "firmware/motor/mc_tasks.h"
 
 
 /** @addtogroup MCSDK
-  * @{
-  */
+ * @{
+ */
 
 /** @addtogroup MCInterface
-  * @{
-  */
+ * @{
+ */
 
 MCI_Handle_t* pMCI[NBR_OF_MOTORS];
 
@@ -49,21 +49,21 @@ MCI_Handle_t* pMCI[NBR_OF_MOTORS];
  */
 __weak void MX_MotorControl_Init(void)
 {
-  /* Reconfigure the SysTick interrupt to fire every 500 us. */
-  (void)HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / SYS_TICK_FREQUENCY);
-  HAL_NVIC_SetPriority(SysTick_IRQn, uwTickPrio, 0U);
+    /* Reconfigure the SysTick interrupt to fire every 500 us. */
+    (void)HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / SYS_TICK_FREQUENCY);
+    HAL_NVIC_SetPriority(SysTick_IRQn, uwTickPrio, 0U);
 
-  /* Initialize the Motor Control Subsystem */
-  MCboot(pMCI);
-  mc_lock_pins();
+    /* Initialize the Motor Control Subsystem */
+    MCboot(pMCI);
+    mc_lock_pins();
 }
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /******************* (C) COPYRIGHT 2022 STMicroelectronics *****END OF FILE****/

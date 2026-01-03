@@ -1,55 +1,56 @@
 /**
-  ******************************************************************************
-  * @file    motorcontrol.h
-  * @author  Motor Control SDK Team, ST Microelectronics
-  * @brief   Motor Control Subsystem initialization functions.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
-  ******************************************************************************
-  * @ingroup MCInterface
-  */
+ ******************************************************************************
+ * @file    motorcontrol.h
+ * @author  Motor Control SDK Team, ST Microelectronics
+ * @brief   Motor Control Subsystem initialization functions.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under Ultimate Liberty license
+ * SLA0044, the "License"; You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ *                             www.st.com/SLA0044
+ *
+ ******************************************************************************
+ * @ingroup MCInterface
+ */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef MOTORCONTROL_H
 #define MOTORCONTROL_H
 
+#include "firmware/motor/mc_api.h"
 #include "firmware/motor/mc_config.h"
 #include "firmware/motor/parameters_conversion.h"
-#include "firmware/motor/mc_api.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C"
+{
 #endif /* __cplusplus */
 
-/** @addtogroup MCSDK
-  * @{
-  */
+    /** @addtogroup MCSDK
+     * @{
+     */
 
-/** @addtogroup MCInterface
-  * @{
-  */
+    /** @addtogroup MCInterface
+     * @{
+     */
 
-/* Initializes the Motor Control Subsystem */
-void MX_MotorControl_Init(void);
+    /* Initializes the Motor Control Subsystem */
+    void MX_MotorControl_Init(void);
 
 /* Do not remove the definition of this symbol. */
 #define MC_HAL_IS_USED
-/**
-  * @}
-  */
+    /**
+     * @}
+     */
 
-/**
-  * @}
-  */
+    /**
+     * @}
+     */
 
 #ifdef __cplusplus
 }

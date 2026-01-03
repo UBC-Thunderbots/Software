@@ -1,22 +1,22 @@
 
 /**
-  ******************************************************************************
-  * @file    mc_stm_types.h
-  * @author  Motor Control SDK Team, ST Microelectronics
-  * @brief   Includes HAL/LL headers relevant to the current configuration.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    mc_stm_types.h
+ * @author  Motor Control SDK Team, ST Microelectronics
+ * @brief   Includes HAL/LL headers relevant to the current configuration.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under Ultimate Liberty license
+ * SLA0044, the "License"; You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ *                             www.st.com/SLA0044
+ *
+ ******************************************************************************
+ */
 #ifndef MC_STM_TYPES_H
 #define MC_STM_TYPES_H
 
@@ -84,72 +84,80 @@
 #define USE_FULL_LL_DRIVER
 #endif
 
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_bus.h"
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_rcc.h"
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_system.h"
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_adc.h"
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_tim.h"
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_gpio.h"
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_usart.h"
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_dac.h"
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_dma.h"
-  #include "firmware/motor/stm32f0xx/stm32f0xx_ll_comp.h"
+#include <stddef.h>
 
-  #include <stddef.h>
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_adc.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_bus.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_comp.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_dac.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_dma.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_gpio.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_rcc.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_system.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_tim.h"
+#include "firmware/motor/stm32f0xx/stm32f0xx_ll_usart.h"
 
 /* Make this define visible for all projects */
-#define NBR_OF_MOTORS             1
+#define NBR_OF_MOTORS 1
 
 __STATIC_INLINE void LL_DMA_ClearFlag_TC(DMA_TypeDef *DMAx, uint32_t Channel)
 {
-  if (NULL == DMAx)
-  {
-    /* Nothing to do */
-  }
-  else
-  {
-    /* Clear TC bits with bits position depending on parameter "Channel" */
-    WRITE_REG (DMAx->IFCR, DMA_IFCR_CTCIF1 << ((Channel-LL_DMA_CHANNEL_1)<<2));
-  }
+    if (NULL == DMAx)
+    {
+        /* Nothing to do */
+    }
+    else
+    {
+        /* Clear TC bits with bits position depending on parameter "Channel" */
+        WRITE_REG(DMAx->IFCR, DMA_IFCR_CTCIF1 << ((Channel - LL_DMA_CHANNEL_1) << 2));
+    }
 }
 
-//cstat !MISRAC2012-Rule-8.13
+// cstat !MISRAC2012-Rule-8.13
 __STATIC_INLINE uint32_t LL_DMA_IsActiveFlag_TC(DMA_TypeDef *DMAx, uint32_t Channel)
 {
-  return ((NULL == DMAx) ? 0U : ((READ_BIT(DMAx->ISR,
-          (DMA_ISR_TCIF1 << ((Channel-LL_DMA_CHANNEL_1)<<2))) == (DMA_ISR_TCIF1 << ((Channel-LL_DMA_CHANNEL_1)<<2))) ?
-          1UL : 0UL));
+    return ((NULL == DMAx)
+                ? 0U
+                : ((READ_BIT(DMAx->ISR,
+                             (DMA_ISR_TCIF1 << ((Channel - LL_DMA_CHANNEL_1) << 2))) ==
+                    (DMA_ISR_TCIF1 << ((Channel - LL_DMA_CHANNEL_1) << 2)))
+                       ? 1UL
+                       : 0UL));
 }
-//cstat !MISRAC2012-Rule-8.13
+// cstat !MISRAC2012-Rule-8.13
 __STATIC_INLINE void LL_DMA_ClearFlag_HT(DMA_TypeDef *DMAx, uint32_t Channel)
 {
-  if (NULL == DMAx)
-  {
-    /* Nothing to do */
-  }
-  else
-  {
-    /* Clear HT bits with bits position depending on parameter "Channel" */
-    WRITE_REG (DMAx->IFCR, DMA_IFCR_CHTIF1 << ((Channel-LL_DMA_CHANNEL_1)<<2));
-  }
+    if (NULL == DMAx)
+    {
+        /* Nothing to do */
+    }
+    else
+    {
+        /* Clear HT bits with bits position depending on parameter "Channel" */
+        WRITE_REG(DMAx->IFCR, DMA_IFCR_CHTIF1 << ((Channel - LL_DMA_CHANNEL_1) << 2));
+    }
 }
-//cstat !MISRAC2012-Rule-8.13
+// cstat !MISRAC2012-Rule-8.13
 __STATIC_INLINE uint32_t LL_DMA_IsActiveFlag_HT(DMA_TypeDef *DMAx, uint32_t Channel)
 {
- return ((NULL == DMAx) ? 0U : ((READ_BIT(DMAx->ISR,
-         (DMA_ISR_HTIF1 << ((Channel-LL_DMA_CHANNEL_1)<<2))) == (DMA_ISR_HTIF1 << ((Channel-LL_DMA_CHANNEL_1)<<2))) ?
-         1UL : 0UL));
+    return ((NULL == DMAx)
+                ? 0U
+                : ((READ_BIT(DMAx->ISR,
+                             (DMA_ISR_HTIF1 << ((Channel - LL_DMA_CHANNEL_1) << 2))) ==
+                    (DMA_ISR_HTIF1 << ((Channel - LL_DMA_CHANNEL_1) << 2)))
+                       ? 1UL
+                       : 0UL));
 }
 
 /*
-* Get ADC group regular conversion data, range fit for
-*        ADC resolution 12 bits Left Aligned.
-* param  ADCx ADC instance
-* retval Value between Min_Data=0x0000 and Max_Data=0xFFF0
-*/
+ * Get ADC group regular conversion data, range fit for
+ *        ADC resolution 12 bits Left Aligned.
+ * param  ADCx ADC instance
+ * retval Value between Min_Data=0x0000 and Max_Data=0xFFF0
+ */
 __STATIC_INLINE uint16_t LL_ADC_REG_ReadConversionData12L(const ADC_TypeDef *ADCx)
 {
-  return (uint16_t)(READ_REG(ADCx->DR) & 0x0000FFF0UL);
+    return (uint16_t)(READ_REG(ADCx->DR) & 0x0000FFF0UL);
 }
 
 #define CIRCLE_LIMITATION_SQRT_M0
@@ -180,21 +188,21 @@ __STATIC_INLINE uint16_t LL_ADC_REG_ReadConversionData12L(const ADC_TypeDef *ADC
 /**
  * @brief Rotation speed unit used at the interface with the application
  *
- * This symbols defines the value of 1 Hertz in the unit used by the functions of the API for
- * their speed parameters.
+ * This symbols defines the value of 1 Hertz in the unit used by the functions of the API
+ * for their speed parameters.
  *
- * For instance, if the chosen unit is the RPM, SPEED_UNIT is defined to 60, since 1 Hz is 60 RPM.
- * The default unit is #U_01HZ, set on the initial generation of the project by the Workbench.
- * As this symbol is defined in a User Section, custom values set by users persist across project
- * regeneration.
+ * For instance, if the chosen unit is the RPM, SPEED_UNIT is defined to 60, since 1 Hz is
+ * 60 RPM. The default unit is #U_01HZ, set on the initial generation of the project by
+ * the Workbench. As this symbol is defined in a User Section, custom values set by users
+ * persist across project regeneration.
  *
  * PID parameters computed by the Motor Control Workbench for speed regulation are
- * suited for a speed in 01Hz. The motor control subsystem internally scales them to adapt to the
- * actual speed unit.
+ * suited for a speed in 01Hz. The motor control subsystem internally scales them to adapt
+ * to the actual speed unit.
  *
- * This symbol should not be set to a literal numeric value. Rather, it should be set to one
- * of the symbols predefined for that purpose such as #U_RPM, #U_01HZ,... See @ref SpeedUnit for
- * more details.
+ * This symbol should not be set to a literal numeric value. Rather, it should be set to
+ * one of the symbols predefined for that purpose such as #U_RPM, #U_01HZ,... See @ref
+ * SpeedUnit for more details.
  *
  * Refer to the documentation of the @ref MCIAPI for the functions that use this unit.
  *
@@ -204,12 +212,12 @@ __STATIC_INLINE uint16_t LL_ADC_REG_ReadConversionData12L(const ADC_TypeDef *ADC
 
 /* USER CODE END DEFINITIONS */
 /*!< Convenient macro to convert user friendly RPM into SpeedUnit used by MC API */
-#define RPM_2_SPEED_UNIT(rpm)   ((int16_t)(((rpm)*SPEED_UNIT)/U_RPM))
+#define RPM_2_SPEED_UNIT(rpm) ((int16_t)(((rpm)*SPEED_UNIT) / U_RPM))
 /*!< Convenient macro to convert SpeedUnit used by MC API into user friendly RPM */
-#define SPEED_UNIT_2_RPM(speed)   ((int16_t)(((speed)*U_RPM)/SPEED_UNIT))
+#define SPEED_UNIT_2_RPM(speed) ((int16_t)(((speed)*U_RPM) / SPEED_UNIT))
 /**
-* @}
-*/
+ * @}
+ */
 
 #endif /* MC_STM_TYPES_H */
 /******************* (C) COPYRIGHT 2024 STMicroelectronics *****END OF FILE****/

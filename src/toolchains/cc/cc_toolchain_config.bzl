@@ -628,8 +628,8 @@ def _stm32_gcc_impl(ctx):
                         ],
                     ),
                 ],
-            )
-        ]
+            ),
+        ],
     )
 
     space_optimization_feature = feature(
@@ -660,10 +660,10 @@ def _stm32_gcc_impl(ctx):
                             # this option will completely strip out unused functions out of the created binary.
                             "-Wl,--gc-sections",
                         ],
-                    )
+                    ),
                 ],
             ),
-        ]
+        ],
     )
 
     no_syscalls_feature = feature(
@@ -680,8 +680,8 @@ def _stm32_gcc_impl(ctx):
                         ],
                     ),
                 ],
-            )
-        ]
+            ),
+        ],
     )
 
     map_file_feature = feature(
@@ -698,8 +698,8 @@ def _stm32_gcc_impl(ctx):
                         ],
                     ),
                 ],
-            )
-        ]
+            ),
+        ],
     )
 
     bare_metal_feature = feature(
@@ -714,11 +714,11 @@ def _stm32_gcc_impl(ctx):
                             # Tells the compiler that the target platform may not have an operating system, which
                             # allows it to make some performance and size optimizations.
                             "-ffreestanding",
-                        ]
-                    )
-                ]
-            )
-        ]
+                        ],
+                    ),
+                ],
+            ),
+        ],
     )
 
     memory_usage_feature = feature(
@@ -731,12 +731,12 @@ def _stm32_gcc_impl(ctx):
                     flag_group(
                         flags = [
                             # Print remaining FLASH and RAM available.
-                            "-Wl,--print-memory-usage"
-                        ]
-                    )
-                ]
-            )
-        ]
+                            "-Wl,--print-memory-usage",
+                        ],
+                    ),
+                ],
+            ),
+        ],
     )
 
     features = [
@@ -772,7 +772,6 @@ def _stm32_gcc_impl(ctx):
             cc_target_os = None,
         ),
     ]
-
 
 cc_toolchain_config_stm32 = rule(
     implementation = _stm32_gcc_impl,

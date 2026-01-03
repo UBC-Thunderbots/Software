@@ -1,23 +1,23 @@
 
 /**
-  ******************************************************************************
-  * @file    mc_config.h
-  * @author  Motor Control SDK Team, ST Microelectronics
-  * @brief   Motor Control Subsystem components configuration and handler
-  *          structures declarations.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    mc_config.h
+ * @author  Motor Control SDK Team, ST Microelectronics
+ * @brief   Motor Control Subsystem components configuration and handler
+ *          structures declarations.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under Ultimate Liberty license
+ * SLA0044, the "License"; You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ *                             www.st.com/SLA0044
+ *
+ ******************************************************************************
+ */
 
 #ifndef MC_CONFIG_H
 #define MC_CONFIG_H
@@ -52,7 +52,7 @@ extern FOCVars_t FOCVars[NBR_OF_MOTORS];
 extern PID_Handle_t *pPIDIq[NBR_OF_MOTORS];
 extern PID_Handle_t *pPIDId[NBR_OF_MOTORS];
 extern PQD_MotorPowMeas_Handle_t *pMPM[NBR_OF_MOTORS];
-extern MCI_Handle_t* pMCI[NBR_OF_MOTORS];
+extern MCI_Handle_t *pMCI[NBR_OF_MOTORS];
 extern SpeednTorqCtrl_Handle_t *pSTC[NBR_OF_MOTORS];
 extern MCI_Handle_t Mci[NBR_OF_MOTORS];
 extern SpeednTorqCtrl_Handle_t SpeednTorqCtrlM1;

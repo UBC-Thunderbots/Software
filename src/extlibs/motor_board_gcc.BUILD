@@ -4,6 +4,6 @@ filegroup(
     name = "includes",
     srcs = glob([
         "arm-none-eabi/include",
-        "lib/gcc/arm-none-eabi/14.3.1/include"
-    ])
+        "lib/gcc/arm-none-eabi/14.3.1/include",
+    ]),
 )

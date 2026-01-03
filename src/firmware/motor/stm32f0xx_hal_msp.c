@@ -20,7 +20,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "firmware/motor/main.h"
-
 #include "firmware/motor/stm32f0xx/stm32f0xx_hal_spi.h"
 
 /* USER CODE BEGIN Includes */
@@ -63,7 +62,8 @@
 /**
  * Initializes the Global MSP.
  */
-void HAL_MspInit(void) {
+void HAL_MspInit(void)
+{
     /* USER CODE BEGIN MspInit 0 */
 
     /* USER CODE END MspInit 0 */
@@ -80,10 +80,12 @@ void HAL_MspInit(void) {
 
 /* USER CODE BEGIN 1 */
 
-void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi) {
+void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
+{
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-    if (hspi->Instance == SPI1) {
+    if (hspi->Instance == SPI1)
+    {
         __HAL_RCC_SPI1_CLK_ENABLE();
 
         // clocks or something
@@ -119,8 +121,10 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi) {
  * @param hspi: SPI handle pointer
  * @retval None
  */
-void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi) {
-    if (hspi->Instance == SPI1) {
+void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
+{
+    if (hspi->Instance == SPI1)
+    {
         // turn off clock
         __HAL_RCC_SPI1_CLK_DISABLE();
 

@@ -19,6 +19,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "firmware/motor/main.h"
 
+#include <stdint.h>
+
 #include "firmware/motor/crc.h"
 #include "firmware/motor/firmware.h"
 #include "firmware/motor/mc_api.h"
@@ -27,8 +29,6 @@
 #include "firmware/motor/stm32f0xx/stm32f031x6.h"
 #include "firmware/motor/stm32f0xx/stm32f0xx_hal_spi.h"
 #include "firmware/motor/types.h"
-
-#include <stdint.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -85,7 +85,8 @@ static void MX_SPI1_Init(void);
  * @brief  The application entry point.
  * @retval int
  */
-int main(void) {
+int main(void)
+{
     /* USER CODE BEGIN 1 */
 
     /* USER CODE END 1 */
@@ -126,21 +127,26 @@ int main(void) {
     // MC_GetOccurredFaultsMotor1();
 
     // Initial arm of SPI recv
-    if (HAL_SPI_TransmitReceive_IT(&hspi1, TX_Buffer, RX_Buffer, FRAME_SIZE) != HAL_OK) {
+    if (HAL_SPI_TransmitReceive_IT(&hspi1, TX_Buffer, RX_Buffer, FRAME_SIZE) != HAL_OK)
+    {
         Error_Handler();
     }
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
-    while (1) {
+    while (1)
+    {
         /* USER CODE END WHILE */
         /* USER CODE BEGIN 3 */
         // TODO: Need 2 add double buffering to prevent race condition
-        if (new_data_received) {
+        if (new_data_received)
+        {
             // frame integrity check
             if (RX_Buffer[0] != FRAME_SOF || RX_Buffer[5] != FRAME_EOF ||
-                RX_Buffer[4] != crc_gen_checksum(RX_Buffer[1], (RX_Buffer[2] << 8) + RX_Buffer[3])) {
+                RX_Buffer[4] !=
+                    crc_gen_checksum(RX_Buffer[1], (RX_Buffer[2] << 8) + RX_Buffer[3]))
+            {
                 TX_Buffer[3] = 0;
                 // send the NACK
                 new_data_received = false;
@@ -149,7 +155,8 @@ int main(void) {
 
             uint16_t data = 0;
 
-            switch (RX_Buffer[1]) {
+            switch (RX_Buffer[1])
+            {
                 case MOV_AX:
                     ax = (RX_Buffer[2] << 8) + RX_Buffer[3];
                     break;
@@ -209,14 +216,17 @@ int main(void) {
  * @param  hspi: pointer to a SPI_HandleTypeDef structure.
  * @retval None
  */
-void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef* hspi) {
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef* hspi)
+{
     // let main thread know new data has been recv
-    if (hspi->Instance == SPI1) {
+    if (hspi->Instance == SPI1)
+    {
         new_data_received = 1;
     }
 
     // rearm the receiver
-    if (HAL_SPI_TransmitReceive_IT(&hspi1, TX_Buffer, RX_Buffer, FRAME_SIZE) != HAL_OK) {
+    if (HAL_SPI_TransmitReceive_IT(&hspi1, TX_Buffer, RX_Buffer, FRAME_SIZE) != HAL_OK)
+    {
         Error_Handler();
     }
 }
@@ -226,8 +236,10 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef* hspi) {
  * @param  hspi: pointer to a SPI_HandleTypeDef structure.
  * @retval None
  */
-void HAL_SPI_ErrorCallback(SPI_HandleTypeDef* hspi) {
-    if (hspi->Instance == SPI1) {
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef* hspi)
+{
+    if (hspi->Instance == SPI1)
+    {
         Error_Handler();
     }
 }
@@ -236,19 +248,23 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef* hspi) {
  * @brief System Clock Configuration
  * @retval None
  */
-void SystemClock_Config(void) {
+void SystemClock_Config(void)
+{
     LL_FLASH_SetLatency(LL_FLASH_LATENCY_1);
-    while (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_1) {
+    while (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_1)
+    {
     }
     LL_RCC_HSE_Enable();
 
     /* Wait till HSE is ready */
-    while (LL_RCC_HSE_IsReady() != 1) {
+    while (LL_RCC_HSE_IsReady() != 1)
+    {
     }
     LL_RCC_HSI14_Enable();
 
     /* Wait till HSI14 is ready */
-    while (LL_RCC_HSI14_IsReady() != 1) {
+    while (LL_RCC_HSI14_IsReady() != 1)
+    {
     }
     LL_RCC_HSI14_SetCalibTrimming(16);
     LL_RCC_HSE_EnableCSS();
@@ -256,19 +272,22 @@ void SystemClock_Config(void) {
     LL_RCC_PLL_Enable();
 
     /* Wait till PLL is ready */
-    while (LL_RCC_PLL_IsReady() != 1) {
+    while (LL_RCC_PLL_IsReady() != 1)
+    {
     }
     LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
     LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
     LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
 
     /* Wait till System clock is ready */
-    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) {
+    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL)
+    {
     }
     LL_SetSystemCoreClock(48000000);
 
     /* Update the time base */
-    if (HAL_InitTick(TICK_INT_PRIORITY) != HAL_OK) {
+    if (HAL_InitTick(TICK_INT_PRIORITY) != HAL_OK)
+    {
         Error_Handler();
     }
     LL_RCC_HSI14_EnableADCControl();
@@ -279,7 +298,8 @@ void SystemClock_Config(void) {
  * @brief NVIC Configuration.
  * @retval None
  */
-static void MX_NVIC_Init(void) {
+static void MX_NVIC_Init(void)
+{
     /* USART1_IRQn interrupt configuration */
     // NVIC_SetPriority(USART1_IRQn, 3);
     // NVIC_EnableIRQ(USART1_IRQn);
@@ -308,7 +328,8 @@ static void MX_NVIC_Init(void) {
  * @param None
  * @retval None
  */
-static void MX_ADC_Init(void) {
+static void MX_ADC_Init(void)
+{
     /* USER CODE BEGIN ADC_Init 0 */
 
     /* USER CODE END ADC_Init 0 */
@@ -333,7 +354,8 @@ static void MX_ADC_Init(void) {
     /* ADC DMA Init */
 
     /* ADC Init */
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_1,
+                                    LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PRIORITY_LOW);
 
@@ -382,7 +404,8 @@ static void MX_ADC_Init(void) {
  * @param None
  * @retval None
  */
-static void MX_TIM1_Init(void) {
+static void MX_TIM1_Init(void)
+{
     /* USER CODE BEGIN TIM1_Init 0 */
 
     /* USER CODE END TIM1_Init 0 */
@@ -411,7 +434,8 @@ static void MX_TIM1_Init(void) {
     /* TIM1 DMA Init */
 
     /* TIM1_CH4_TRIG_COM Init */
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_4, LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_4,
+                                    LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
 
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_4, LL_DMA_PRIORITY_HIGH);
 
@@ -426,7 +450,8 @@ static void MX_TIM1_Init(void) {
     LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_4, LL_DMA_MDATAALIGN_HALFWORD);
 
     /* TIM1_CH3_UP Init */
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_5, LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_5,
+                                    LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
 
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_5, LL_DMA_PRIORITY_HIGH);
 
@@ -552,7 +577,8 @@ static void MX_TIM1_Init(void) {
  * @param None
  * @retval None
  */
-static void MX_TIM2_Init(void) {
+static void MX_TIM2_Init(void)
+{
     /* USER CODE BEGIN TIM2_Init 0 */
 
     /* USER CODE END TIM2_Init 0 */
@@ -636,7 +662,8 @@ static void MX_TIM2_Init(void) {
  * @param None
  * @retval None
  */
-static void MX_USART1_UART_Init(void) {
+static void MX_USART1_UART_Init(void)
+{
     /* USER CODE BEGIN USART1_Init 0 */
 
     /* USER CODE END USART1_Init 0 */
@@ -672,7 +699,8 @@ static void MX_USART1_UART_Init(void) {
     /* USART1 DMA Init */
 
     /* USART1_RX Init */
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_3, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_3,
+                                    LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_3, LL_DMA_PRIORITY_LOW);
 
@@ -687,7 +715,8 @@ static void MX_USART1_UART_Init(void) {
     LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_3, LL_DMA_MDATAALIGN_BYTE);
 
     /* USART1_TX Init */
-    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_2, LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
+    LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_CHANNEL_2,
+                                    LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
 
     LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_2, LL_DMA_PRIORITY_LOW);
 
@@ -723,7 +752,8 @@ static void MX_USART1_UART_Init(void) {
 /**
  * Enable DMA controller clock
  */
-static void MX_DMA_Init(void) {
+static void MX_DMA_Init(void)
+{
     /* Init with LL driver */
     /* DMA controller clock enable */
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
@@ -734,7 +764,8 @@ static void MX_DMA_Init(void) {
  * @param None
  * @retval None
  */
-static void MX_GPIO_Init(void) {
+static void MX_GPIO_Init(void)
+{
     LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
     /* USER CODE BEGIN MX_GPIO_Init_1 */
     /* USER CODE END MX_GPIO_Init_1 */
@@ -773,7 +804,8 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 
-static void MX_SPI1_Init(void) {
+static void MX_SPI1_Init(void)
+{
     hspi1.Instance            = SPI1;
     hspi1.Init.Mode           = SPI_MODE_SLAVE;
     hspi1.Init.Direction      = SPI_DIRECTION_2LINES;
@@ -788,7 +820,8 @@ static void MX_SPI1_Init(void) {
     hspi1.Init.CRCLength      = SPI_CRC_LENGTH_DATASIZE;
     hspi1.Init.NSSPMode       = SPI_NSS_PULSE_DISABLE;
 
-    if (HAL_SPI_Init(&hspi1) != HAL_OK) {
+    if (HAL_SPI_Init(&hspi1) != HAL_OK)
+    {
         Error_Handler();
     }
 }
@@ -799,12 +832,14 @@ static void MX_SPI1_Init(void) {
  * @brief  This function is executed in case of error occurrence.
  * @retval None
  */
-void Error_Handler(void) {
+void Error_Handler(void)
+{
     /* USER CODE BEGIN Error_Handler_Debug */
     /* User can add his own implementation to report the HAL error return state
      */
     __disable_irq();
-    while (1) {
+    while (1)
+    {
     }
     /* USER CODE END Error_Handler_Debug */
 }
@@ -817,7 +852,8 @@ void Error_Handler(void) {
  * @param  line: assert_param error line source number
  * @retval None
  */
-void assert_failed(uint8_t* file, uint32_t line) {
+void assert_failed(uint8_t* file, uint32_t line)
+{
     /* USER CODE BEGIN 6 */
     /* User can add his own implementation to report the file name and line
        number, ex printf("Wrong parameters value: file %s on line %d\r\n", file,

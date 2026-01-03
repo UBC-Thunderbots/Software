@@ -1,30 +1,30 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@bazel_embedded//tools/openocd:defs.bzl", "openocd_flash")
+
+package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "mdv6_firmware_srcs",
-    srcs = glob(["**/*.c"])
+    srcs = glob(["**/*.c"]),
 )
 
 filegroup(
     name = "mdv6_firmware_hdrs",
-    srcs = glob(["**/*.h"])
+    srcs = glob(["**/*.h"]),
 )
 
 cc_binary(
     name = "mdv6_firmware_main",
-    deps = [
-        ":mdv6_firmware",
-    ],
     # Linker file informs the toolchain how much RAM and flash you have as well as its locations on the chip
     additional_linker_inputs = [
-        "mdv6_firmware.ld"
+        "mdv6_firmware.ld",
     ],
     linkopts = ["-T $(location mdv6_firmware.ld)"],
     target_compatible_with = [
         "@platforms//cpu:armv6-m",
         "@platforms//os:none",
+    ],
+    deps = [
+        ":mdv6_firmware",
     ],
 )
 
