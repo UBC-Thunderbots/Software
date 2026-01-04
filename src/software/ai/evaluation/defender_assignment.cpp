@@ -3,6 +3,7 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersection.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/math/math_functions.h"
 
 std::vector<DefenderAssignment> getAllDefenderAssignments(
@@ -45,9 +46,22 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
             Segment(primary_threat_position, filtered_threats.at(i).robot.position());
         double threat_rating = static_cast<double>(filtered_threats.size()) - i;
         passing_lanes.emplace_back(ShootingLane{lane, threat_rating});
-        assignments.emplace_back(
-            DefenderAssignment{PASS_DEFENDER, lane.midPoint(), threat_rating});
-    }
+
+		Point intercept_point;
+        if(distance(lane.midPoint(),filtered_threats.at(i).robot.position()) < 1.2 || intersects(field.friendlyDefenseArea(),lane)){
+        	//We can use the midpoint if it is close enough to the reciever to prevent
+			//a chip pass or the segment goes through the goalie box
+		   	intercept_point = lane.midPoint();
+		}else{
+			//Otherwise we will position the defender closer to the
+			intercept_point = filtered_threats.at(i).robot.position() + (primary_threat_position-filtered_threats.at(i).robot.position()).normalize(1.2);
+		}
+
+		assignments.emplace_back(DefenderAssignment{PASS_DEFENDER, intercept_point, threat_rating});
+
+
+
+}
 
     // Construct goal lanes.
     // Using full list of threats (not filtered threats) since we need to
