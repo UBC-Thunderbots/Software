@@ -43,10 +43,10 @@ TEST(FindAllPasserReceiverPairsTest,
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot friendly_robot_1 = Robot(1, Point(3, 2), Vector(0, 0), Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot friendly_robot_2 = Robot(2, Point(5, 0), Vector(0, 0), Angle::zero(),
+    Robot friendly_robot_2 = Robot(2, Point(3, 0), Vector(0, 0), Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    // Blocks the pass from robot 0 to robot 2
+    // Blocks the pass from robot 0 to robot 2, is close enough to robot 2 to prevent a chip pass
     Robot enemy_robot_0 = Robot(0, Point(2, 0), Vector(0, 0), Angle::zero(),
                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
@@ -62,6 +62,32 @@ TEST(FindAllPasserReceiverPairsTest,
     EXPECT_EQ(result, expected_result);
 }
 
+TEST(FindAllPasserReceiverPairsTest,
+     two_passers_one_receiver_with_no_pass_blocked_by_obstacles)
+{
+    Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_1 = Robot(1, Point(3, 2), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_2 = Robot(2, Point(5, 0), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    // Is too far awar from robot 2 to block a chip pass
+    Robot enemy_robot_0 = Robot(0, Point(2, 0), Vector(0, 0), Angle::zero(),
+                                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    std::vector<Robot> all_robots{friendly_robot_0, friendly_robot_1, friendly_robot_2,
+                                  enemy_robot_0};
+
+    auto result = findAllReceiverPasserPairs({friendly_robot_0, friendly_robot_1},
+                                             {friendly_robot_2}, all_robots);
+
+    std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> expected_result = {
+        std::make_pair(friendly_robot_2, std::vector<Robot>{friendly_robot_0,friendly_robot_1})};
+
+    EXPECT_EQ(result, expected_result);
+}
+
 TEST(FindAllPasserReceiverPairsTest, all_passes_blocked)
 {
     Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -70,7 +96,7 @@ TEST(FindAllPasserReceiverPairsTest, all_passes_blocked)
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     // Blocks the pass from robot 0 to robot 1
-    Robot enemy_robot_0 = Robot(0, Point(2, 0), Vector(0, 0), Angle::zero(),
+    Robot enemy_robot_0 = Robot(0, Point(4, 0), Vector(0, 0), Angle::zero(),
                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     std::vector<Robot> all_robots{friendly_robot_0, friendly_robot_1, enemy_robot_0};
@@ -79,6 +105,28 @@ TEST(FindAllPasserReceiverPairsTest, all_passes_blocked)
         findAllReceiverPasserPairs({friendly_robot_0}, {friendly_robot_1}, all_robots);
 
     EXPECT_TRUE(result.empty());
+}
+
+TEST(FindAllPasserReceiverPairsTest, chip_pass_not_blocked)
+{
+    Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_1 = Robot(1, Point(5, 0), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    // Not close enough to robot 1 to block the pass
+    Robot enemy_robot_0 = Robot(0, Point(2, 0), Vector(0, 0), Angle::zero(),
+                                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    std::vector<Robot> all_robots{friendly_robot_0, friendly_robot_1, enemy_robot_0};
+
+    auto result =
+        findAllReceiverPasserPairs({friendly_robot_0}, {friendly_robot_1}, all_robots);
+
+    std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> expected_result = {
+        std::make_pair(friendly_robot_1, std::vector<Robot>{friendly_robot_0})};
+
+    EXPECT_EQ(result, expected_result);
 }
 
 TEST(FindAllPasserReceiverPairsTest, receiver_with_multiple_passers)
@@ -152,7 +200,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
     EXPECT_EQ(passer.value(), friendly_robot_0);
 }
 
-// TODO: Re-enable as part of https://github.com/UBC-Thunderbots/Software/issues/642
+// TODO: Re-enable as part of +
 // TEST(GetNumPassesToRobotTest, two_passes_around_a_single_obstacle)
 //{
 //    Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
