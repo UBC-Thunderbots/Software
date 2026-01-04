@@ -6,8 +6,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/world/team.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPairs(
@@ -43,18 +43,20 @@ std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPa
                                     Segment(passer.position(), receiver.position()));
                             });
 
-            bool chick_pass_blocked =
-                std::any_of(obstacles.begin(), obstacles.end(),
-                            [passer, receiver](const Robot &obstacle)
-                            {
-                                Segment pass_lane = Segment(passer.position(), receiver.position());
-                               return contains(
-                                 Circle(pass_lane.midPoint(), pass_lane.length()/2.0),
-                                  obstacle.position()) //Here we check if the obstacle is between the reciever and passer
-                                  && contains(
-                                    Circle(receiver.position(), 1.2),
-                                    obstacle.position()); //Here we check if the obstacle is too close to the reciever
-                            });
+            bool chick_pass_blocked = std::any_of(
+                obstacles.begin(), obstacles.end(),
+                [passer, receiver](const Robot &obstacle)
+                {
+                    Segment pass_lane = Segment(passer.position(), receiver.position());
+                    return contains(
+                               Circle(pass_lane.midPoint(), pass_lane.length() / 2.0),
+                               obstacle.position())  // Here we check if the obstacle is
+                                                     // between the receiver and passer
+                           && contains(
+                                  Circle(receiver.position(), 1.2),
+                                  obstacle.position());  // Here we check if the obstacle
+                                                         // is too close to the receiver
+                });
 
             if (!pass_blocked || !chick_pass_blocked)
             {
