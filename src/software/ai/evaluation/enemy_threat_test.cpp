@@ -46,7 +46,8 @@ TEST(FindAllPasserReceiverPairsTest,
     Robot friendly_robot_2 = Robot(2, Point(3, 0), Vector(0, 0), Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    // Blocks the pass from robot 0 to robot 2, is close enough to robot 2 to prevent a chip pass
+    // Blocks the pass from robot 0 to robot 2, is close enough to robot 2 to prevent a
+    // chip pass
     Robot enemy_robot_0 = Robot(0, Point(2, 0), Vector(0, 0), Angle::zero(),
                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
@@ -83,7 +84,8 @@ TEST(FindAllPasserReceiverPairsTest,
                                              {friendly_robot_2}, all_robots);
 
     std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> expected_result = {
-        std::make_pair(friendly_robot_2, std::vector<Robot>{friendly_robot_0,friendly_robot_1})};
+        std::make_pair(friendly_robot_2,
+                       std::vector<Robot>{friendly_robot_0, friendly_robot_1})};
 
     EXPECT_EQ(result, expected_result);
 }
