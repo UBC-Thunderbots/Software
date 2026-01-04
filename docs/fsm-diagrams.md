@@ -469,6 +469,7 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> WaitingForPassState
+WaitingForPassState --> WaitingForPassState : [shouldMoveAwayFromShot]\n<i>moveAwayFromShot</i>
 WaitingForPassState --> WaitingForPassState : [!passStarted]\n<i>updateReceive</i>
 WaitingForPassState --> OneTouchShotState : [passStarted && onetouchPossible]\n<i>updateOnetouch</i>
 WaitingForPassState --> ReceiveAndDribbleState : [passStarted && !onetouchPossible]\n<i>updateReceive</i>
