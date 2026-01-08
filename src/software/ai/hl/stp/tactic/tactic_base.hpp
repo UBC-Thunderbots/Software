@@ -105,6 +105,9 @@ class TacticBase : public Tactic
     virtual ~TacticBase() = default;
 
    protected:
+
+    FSMLogger logger;
+
     std::optional<RobotId> last_execution_robot;
 
     // A shared pointer to the ai configuration to configure ai behaviour, shared by all
@@ -144,7 +147,8 @@ template <class TacticFsm, class... TacticSubFsms>
 TacticBase<TacticFsm, TacticSubFsms...>::TacticBase(
     const std::set<RobotCapability> &capability_reqs_,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : last_execution_robot(std::nullopt),
+    : logger(std::optional<RobotId>(0)),
+      last_execution_robot(std::nullopt),
       ai_config_ptr(ai_config_ptr),
       fsm_map(),
       control_params(),
@@ -223,9 +227,9 @@ template <class TacticFsm, class... TacticSubFsms>
 std::unique_ptr<FSM<TacticFsm>> TacticBase<TacticFsm, TacticSubFsms...>::fsmInit()
 {
     return std::make_unique<FSM<TacticFsm>>(TacticFsm(ai_config_ptr),
-                                            TacticSubFsms(ai_config_ptr)...);
+                                            TacticSubFsms(ai_config_ptr)...,
+                                            logger);
 }
-
 template <class TacticFsm, class... TacticSubFsms>
 void TacticBase<TacticFsm, TacticSubFsms...>::setLastExecutionRobot(
     std::optional<RobotId> last_execution_robot)

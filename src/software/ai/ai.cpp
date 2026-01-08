@@ -8,8 +8,9 @@
 
 
 Ai::Ai(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : ai_config_ptr(ai_config_ptr),
-      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr})),
+    : logger(),
+      ai_config_ptr(ai_config_ptr),
+      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, logger)),
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config_ptr)),
       ai_config_changed(false)
@@ -46,7 +47,7 @@ void Ai::checkAiConfig()
     {
         ai_config_changed = false;
 
-        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr});
+        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_ptr}, logger);
 
         auto current_override = ai_config_ptr->ai_control_config().override_ai_play();
         if (current_override != TbotsProto::PlayName::UseAiSelection)
@@ -120,6 +121,8 @@ TbotsProto::PlayInfo Ai::getPlayInfo() const
         tactic_msg.set_tactic_fsm_state(tactic->getFSMState());
         (*info.mutable_robot_tactic_assignment())[robot_id] = tactic_msg;
     }
+
+    FSMLogger::getTransitionAndGuard(info);
 
     return info;
 }

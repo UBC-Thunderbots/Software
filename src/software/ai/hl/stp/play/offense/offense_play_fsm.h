@@ -60,6 +60,8 @@ struct OffensePlayFSM : PlayFSM<OffensePlayFSM>
      */
     void setTactics(const Update& event, int num_shoot_or_pass, int num_defenders);
 
+    DEFINE_SML_GUARD_CLASS(enemyHasPossession, OffensePlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;

@@ -28,7 +28,10 @@ class PlayBase : public Play
      */
     void updateTactics(const PlayUpdate &play_update) override = 0;
 
+    PlayBase() = delete;
+
    protected:
+    FSMLogger logger;
     FSM<PlayFsm> fsm;
     PlayFsm::ControlParams control_params;
 };
@@ -37,7 +40,8 @@ template <class PlayFsm, class... PlaySubFsms>
 PlayBase<PlayFsm, PlaySubFsms...>::PlayBase(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr, bool requires_goalie)
     : Play(ai_config_ptr, requires_goalie),
-      fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}...},
+      logger(),
+      fsm{PlayFsm{ai_config_ptr}, PlaySubFsms{ai_config_ptr}..., logger},
       control_params()
 {
 }
