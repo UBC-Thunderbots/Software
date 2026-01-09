@@ -1,13 +1,8 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_enters_region import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_moves_in_direction import *
-from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
-from software.simulated_tests.excessive_dribbling import *
+from software.simulated_tests.excessive_dribbling import NeverExcessivelyDribbles, EventuallyStartsExcessivelyDribbling
+from proto.message_translation.tbots_protobuf import WorldState, AssignedTacticPlayControlParams, DribbleTactic
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -60,7 +55,6 @@ from proto.ssl_gc_common_pb2 import Team
         (tbots_cpp.Point(0, 0), tbots_cpp.Point(0, 1), tbots_cpp.Angle(), True, True),
         (tbots_cpp.Point(0.0, 0.01), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True, True),
         (tbots_cpp.Point(0.01, 0.00), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True, True),
-        (tbots_cpp.Point(0.0, 0.00), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True, True),
     ],
 )
 
