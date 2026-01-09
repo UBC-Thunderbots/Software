@@ -30,8 +30,8 @@ NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_ad
 
         udp_listener_primitive =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
-                primitive_listener_port, std::bind(&NetworkService::primitiveCallback,
-                                                   this, std::placeholders::_1));
+                primitive_listener_port,
+                [&](TbotsProto::Primitive primitive) { primitiveCallback(primitive); });
     }
     catch (const TbotsNetworkException& e)
     {
@@ -48,10 +48,6 @@ NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_ad
     {
         LOG(FATAL) << "Failed to get IP addresses associated with " << interface;
     }
-
-    radio_listener_primitive_set =
-        std::make_unique<ThreadedProtoRadioListener<TbotsProto::Primitive>>(
-            std::bind(&NetworkService::primitiveCallback, this, std::placeholders::_1));
 }
 
 void NetworkService::onFullSystemIpNotification(

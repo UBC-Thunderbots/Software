@@ -47,7 +47,8 @@ TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1971
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
                 yield("Timestamp not at 9.5s");

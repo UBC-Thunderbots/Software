@@ -1,14 +1,13 @@
-package(default_visibility = ["//visibility:public"])
-
+load("@ansible_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
-load("@ansible_deps//:requirements.bzl", "requirement")
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
+package(default_visibility = ["//visibility:public"])
 
 compile_pip_requirements(
     name = "requirements",
-    src = "requirements.in",
-    requirements_txt = "requirements_lock.txt",
+    src = ":requirements.in",
+    requirements_txt = ":requirements_lock.txt",
 )
 
 py_binary(
@@ -18,7 +17,6 @@ py_binary(
     ],
     data = [
         ":playbooks",
-        ":scripts",
         ":tasks",
         "//software/embedded:setup_robot_software_deps",
         "//software/embedded:thunderloop_main",
@@ -26,6 +24,7 @@ py_binary(
         "//software/embedded/linux_configs/pi:pi_files",
         "//software/embedded/linux_configs/systemd:systemd_files",
         "//software/embedded/redis",
+        "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli_tar",
         "//software/embedded/services:robot_auto_test",
         "//software/power:powerloop_tar",
     ],
@@ -38,13 +37,6 @@ filegroup(
     name = "playbooks",
     data = glob([
         "playbooks/**/*.yml",
-    ]),
-)
-
-filegroup(
-    name = "scripts",
-    data = glob([
-        "scripts/**/*.py",
     ]),
 )
 

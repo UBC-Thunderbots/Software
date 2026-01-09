@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The DribbleTactic will move the robot to intercept the ball and optionally dribble it
@@ -11,15 +11,15 @@
  * Done: When the ball is near the dribbler of the robot and the optional dribble
  * destination and face ball orientation conditions are satisfied
  */
-class DribbleTactic : public Tactic
+class DribbleTactic : public TacticBase<DribbleFSM>
 {
    public:
     /**
      * Creates a new DribbleTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit DribbleTactic(TbotsProto::AiConfig ai_config);
+    explicit DribbleTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     DribbleTactic() = delete;
 
@@ -43,15 +43,6 @@ class DribbleTactic : public Tactic
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     void accept(TacticVisitor& visitor) const override;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<DribbleFSM>>> fsm_map;
-    DribbleFSM::ControlParams control_params;
-    TbotsProto::AiConfig ai_config;
 };
 
 COPY_TACTIC(BallPlacementDribbleTactic, DribbleTactic)

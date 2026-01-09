@@ -47,7 +47,6 @@ class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    TbotsProto::AiConfig ai_config;
     std::set<TbotsProto::MotionConstraint> motion_constraints = {
         TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA};
 };
@@ -59,14 +58,14 @@ TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -82,14 +81,14 @@ TEST_F(DribbleTacticTest, test_stopped_ball)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -105,14 +104,14 @@ TEST_F(DribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -129,20 +128,23 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(dribble_destination, std::nullopt);
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, tactic](std::shared_ptr<World> world_ptr,
-                                            ValidationCoroutine::push_type& yield) {
+                                            ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             checkPossession(tactic, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
@@ -160,13 +162,15 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(std::nullopt, dribble_orientation);
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_orientation, tactic](std::shared_ptr<World> world_ptr,
-                                            ValidationCoroutine::push_type& yield) {
+                                            ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
                                yield);
@@ -189,13 +193,15 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
-            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
@@ -204,7 +210,8 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
@@ -222,13 +229,15 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
     BallState ball_state(Point(4, -2.5), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
-            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
@@ -237,7 +246,8 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
@@ -256,13 +266,15 @@ TEST_F(DribbleTacticTest,
     BallState ball_state(Point(4.2, -2.5), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(dribble_destination, dribble_orientation, true);
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
-            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
@@ -290,14 +302,16 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
         .robot_state = RobotState(Point(1, 1.1), Vector(), Angle::fromDegrees(-30),
                                   AngularVelocity::zero())});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     // Don't avoid enemy robots to knock ball away
     setTactic(1, tactic, {});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
-            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             checkPossession(tactic, world_ptr, yield);
             ballAtPoint(dribble_destination, world_ptr, yield);
             robotAtOrientation(1, world_ptr, dribble_orientation, Angle::fromDegrees(5),
@@ -306,7 +320,8 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
@@ -327,17 +342,18 @@ TEST_F(DribbleTacticTest, test_robot_not_bumping_ball_when_turning_around)
     BallState initial_ball_state(Point(-1 + ROBOT_MAX_RADIUS_METERS, 0),
                                  Vector(0.0, 0.0));
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (distance(world_ptr->ball().position(), initial_ball_state.position()) >
                    0.05)
             {

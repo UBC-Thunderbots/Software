@@ -2,11 +2,16 @@
 
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/geom/point.h"
 #include "software/logger/logger.h"
 
-struct PivotKickFSM
+/**
+ * Finite State Machine class for Pivot Kick
+ */
+struct PivotKickFSM : TacticFSM<PivotKickFSM>
 {
+    using Update = TacticFSM<PivotKickFSM>::Update;
     class KickState;
     class StartState;
 
@@ -20,8 +25,12 @@ struct PivotKickFSM
         AutoChipOrKick auto_chip_or_kick;
     };
 
-    // this struct defines the only event that the PivotKickFSM responds to
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    /**
+     * Constructor for PivotKickFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit PivotKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that updates the DribbleFSM to get possession of the ball and pivot

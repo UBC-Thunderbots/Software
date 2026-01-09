@@ -99,7 +99,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kStop:
         {
             auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
-                                                     TbotsProto::AutoChipOrKick());
+                                                       TbotsProto::AutoChipOrKick());
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
             status.set_running_primitive(false);

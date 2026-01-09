@@ -6,32 +6,24 @@
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
 
-AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
-    : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
-      fsm_map(),
-      best_pass_so_far(std::nullopt),
-      pass_committed(false),
-      chip_target(std::nullopt),
-      ai_config(ai_config)
+AttackerTactic::AttackerTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticBase<AttackerFSM, DribbleFSM, PivotKickFSM, KeepAwayFSM>(
+          {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move},
+          ai_config_ptr)
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()), AttackerFSM(ai_config));
-    }
 }
 
 void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
                                          bool pass_committed)
 {
     // Update the control parameters stored by this Tactic
-    this->best_pass_so_far = best_pass_so_far;
-    this->pass_committed   = pass_committed;
+    control_params.best_pass_so_far = best_pass_so_far;
+    control_params.pass_committed   = pass_committed;
 }
 
 void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
 {
-    this->chip_target = chip_target;
+    control_params.chip_target = chip_target;
 }
 
 void AttackerTactic::accept(TacticVisitor& visitor) const
@@ -43,35 +35,28 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()), AttackerFSM(ai_config));
+        fsm_map[tactic_update.robot.id()] = fsmInit();
     }
 
-    std::optional<Shot> shot = calcBestShotOnGoal(
+    control_params.shot = calcBestShotOnGoal(
         tactic_update.world_ptr->field(), tactic_update.world_ptr->friendlyTeam(),
         tactic_update.world_ptr->enemyTeam(), tactic_update.world_ptr->ball().position(),
         TeamType::ENEMY, {tactic_update.robot});
-    if (shot && shot->getOpenAngle() <
-                    Angle::fromDegrees(
-                        ai_config.attacker_tactic_config().min_open_angle_for_shot_deg()))
+    if (control_params.shot &&
+        control_params.shot->getOpenAngle() <
+            Angle::fromDegrees(
+                ai_config_ptr->attacker_tactic_config().min_open_angle_for_shot_deg()))
     {
         // reject shots that have an open angle below the minimum
-        shot = std::nullopt;
+        control_params.shot = std::nullopt;
     }
-
-    AttackerFSM::ControlParams control_params{.best_pass_so_far = best_pass_so_far,
-                                              .pass_committed   = pass_committed,
-                                              .shot             = shot,
-                                              .chip_target      = chip_target};
-
     fsm_map.at(tactic_update.robot.id())
         ->process_event(AttackerFSM::Update(control_params, tactic_update));
 
-    visualizeControlParams(*tactic_update.world_ptr, control_params);
+    visualizeControlParams(*tactic_update.world_ptr);
 }
 
-void AttackerTactic::visualizeControlParams(
-    const World& world, const AttackerFSM::ControlParams& control_params)
+void AttackerTactic::visualizeControlParams(const World& world)
 {
     TbotsProto::AttackerVisualization pass_visualization_msg;
 
@@ -86,7 +71,7 @@ void AttackerTactic::visualizeControlParams(
         *(pass_visualization_msg.mutable_pass_()) = pass_msg;
     }
 
-    pass_visualization_msg.set_pass_committed(pass_committed);
+    pass_visualization_msg.set_pass_committed(control_params.pass_committed);
 
     if (control_params.shot.has_value())
     {
@@ -99,10 +84,10 @@ void AttackerTactic::visualizeControlParams(
         *(pass_visualization_msg.mutable_shot()) = shot_msg;
     }
 
-    if (chip_target.has_value())
+    if (control_params.chip_target.has_value())
     {
         *(pass_visualization_msg.mutable_chip_target()) =
-            *createPointProto(chip_target.value());
+            *createPointProto(control_params.chip_target.value());
     }
 
     LOG(VISUALIZE) << pass_visualization_msg;

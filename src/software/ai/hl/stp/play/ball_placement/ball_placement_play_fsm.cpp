@@ -1,12 +1,13 @@
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 
-BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
+BallPlacementPlayFSM::BallPlacementPlayFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM<BallPlacementPlayFSM>(ai_config_ptr),
       align_wall_tactic(std::make_shared<BallPlacementMoveTactic>()),
-      pickoff_wall_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config)),
-      place_ball_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config)),
-      align_placement_tactic(std::make_shared<BallPlacementMoveTactic>()),
-      retreat_tactic(std::make_shared<MoveTactic>()),
+      pickoff_wall_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config_ptr)),
+      place_ball_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config_ptr)),
+      align_placement_tactic(std::make_shared<BallPlacementMoveTactic>(ai_config_ptr)),
+      retreat_tactic(std::make_shared<MoveTactic>(ai_config_ptr)),
       wait_tactic(std::make_shared<MoveTactic>()),
       move_tactics(std::vector<std::shared_ptr<BallPlacementMoveTactic>>())
 {

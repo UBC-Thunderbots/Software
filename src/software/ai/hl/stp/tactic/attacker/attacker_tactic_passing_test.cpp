@@ -36,13 +36,15 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
     // force passing for this test by setting min acceptable shot angle very high
     ai_config.mutable_attacker_tactic_config()->set_min_open_angle_for_shot_deg(90);
 
-    auto tactic = std::make_shared<AttackerTactic>(ai_config);
+    auto tactic = std::make_shared<AttackerTactic>(
+        std::make_shared<TbotsProto::AiConfig>(ai_config));
     tactic->updateControlParams(pass, true);
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield)
+        {
             // We check if the robot reaches the desired orientation, at the
             // desired position before checking if the ball has been kicked.
             //

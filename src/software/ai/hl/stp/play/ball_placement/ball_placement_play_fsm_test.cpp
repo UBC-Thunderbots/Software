@@ -20,8 +20,9 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
     game_state.setBallPlacementPoint(ball_placement_point);
     world_ptr->updateGameState(game_state);
 
-    TbotsProto::AiConfig ai_config;
-    FSM<BallPlacementPlayFSM> fsm(BallPlacementPlayFSM{ai_config});
+
+    FSM<BallPlacementPlayFSM> fsm(
+        BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
 

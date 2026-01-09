@@ -95,7 +95,8 @@ int main(int argc, char** argv)
         if (!args.ci)
         {
             // Return the current time since epoch in seconds
-            time_provider = []() {
+            time_provider = []()
+            {
                 return std::chrono::duration<double>(
                            std::chrono::system_clock::now().time_since_epoch())
                     .count();
@@ -121,8 +122,8 @@ int main(int argc, char** argv)
         if (args.ci)
         {
             // Update the time provider for ProtoLogger
-            proto_logger->updateTimeProvider(
-                [&backend]() { return backend->getLastWorldTimeSec(); });
+            proto_logger->updateTimeProvider([&backend]()
+                                             { return backend->getLastWorldTimeSec(); });
         }
 
         auto sensor_fusion =
@@ -133,9 +134,8 @@ int main(int argc, char** argv)
         auto tactic_override_listener =
             ThreadedProtoUnixListener<TbotsProto::AssignedTacticPlayControlParams>(
                 args.runtime_dir + TACTIC_OVERRIDE_PATH,
-                [&ai](TbotsProto::AssignedTacticPlayControlParams input) {
-                    ai->overrideTactics(input);
-                });
+                [&ai](TbotsProto::AssignedTacticPlayControlParams input)
+                { ai->overrideTactics(input); });
 
         auto play_override_listener = ThreadedProtoUnixListener<TbotsProto::Play>(
             args.runtime_dir + PLAY_OVERRIDE_PATH,
@@ -148,6 +148,7 @@ int main(int argc, char** argv)
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(ai);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(sensor_fusion);
+        backend->Subject<TbotsProto::VirtualObstacles>::registerObserver(sensor_fusion);
 
         // Handle some of the signals that we manually send when we want to shut down full
         // system cleanly. SIGTERM is sent by Thunderscope to stop full system

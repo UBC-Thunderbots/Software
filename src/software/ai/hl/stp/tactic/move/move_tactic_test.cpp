@@ -32,13 +32,14 @@ TEST_F(MoveTacticTest, test_move_across_field)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(destination, Angle::zero());
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -71,7 +72,7 @@ TEST_F(MoveTacticTest, test_autochip_move)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(destination, Angle::zero(), TbotsProto::DribblerMode::OFF,
                                 TbotsProto::BallCollisionType::ALLOW,
                                 {AutoChipOrKickMode::AUTOCHIP, 2.0},
@@ -81,7 +82,8 @@ TEST_F(MoveTacticTest, test_autochip_move)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -113,11 +115,11 @@ TEST_F(MoveTacticTest, test_autokick_move)
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::threeQuarter(),
                                   AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
-         field.enemyDefenseArea().negXNegYCorner(),
-         field.enemyDefenseArea().negXPosYCorner()});
+           {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+            field.enemyDefenseArea().negXNegYCorner(),
+            field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(
         destination, Angle::threeQuarter(), TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOKICK, 3.0},
@@ -127,7 +129,8 @@ TEST_F(MoveTacticTest, test_autokick_move)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -160,7 +163,7 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
                                   AngularVelocity::quarter())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(destination, Angle::zero(), TbotsProto::DribblerMode::OFF,
                                 TbotsProto::BallCollisionType::ALLOW,
                                 {AutoChipOrKickMode::OFF, 0.0},
@@ -170,7 +173,8 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(1 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);
@@ -207,7 +211,7 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
                                   AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>();
+    auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(destination, Angle::half(), TbotsProto::DribblerMode::OFF,
                                 TbotsProto::BallCollisionType::ALLOW,
                                 {AutoChipOrKickMode::OFF, 0.0},
@@ -217,7 +221,8 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield)
+        {
             robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(-4 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);

@@ -75,7 +75,10 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DefenseState
-DefenseState --> DefenseState : <i>defendAgainstThreats</i>
+DefenseState --> AggressiveDefenseState : [shouldDefendAggressively]\n<i>shadowAndBlockShots</i>
+DefenseState --> DefenseState : <i>blockShots</i>
+AggressiveDefenseState --> DefenseState : [!shouldDefendAggressively]\n<i>blockShots</i>
+AggressiveDefenseState --> AggressiveDefenseState : <i>shadowAndBlockShots</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -106,6 +109,19 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> BlockEnemyKickerState
 BlockEnemyKickerState --> BlockEnemyKickerState : <i>blockEnemyKicker</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
+## [ExamplePlayFSM](/src/software/ai/hl/stp/play/example/example_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> MoveState
+MoveState --> MoveState : <i>moveToPosition</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -222,7 +238,10 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleFSM
 DribbleFSM --> PivotKickFSM : [shouldKick]\n<i>pivotKick</i>
-DribbleFSM --> DribbleFSM : [!shouldKick]\n<i>keepAway</i>
+DribbleFSM --> KeepAwayFSM : [!shouldKick]\n<i>keepAway</i>
+KeepAwayFSM --> PivotKickFSM : [shouldKick]\n<i>pivotKick</i>
+KeepAwayFSM --> KeepAwayFSM : <i>keepAway</i>
+KeepAwayFSM --> DribbleFSM
 PivotKickFSM --> PivotKickFSM : <i>pivotKick</i>
 PivotKickFSM --> Terminate:::terminate
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
@@ -272,14 +291,14 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> GetPossession
-GetPossession --> Dribble : [havePossession]\n<i>startDribble</i>
+GetPossession --> Dribble : [havePossession]\n<i>dribble</i>
 GetPossession --> GetPossession : [!havePossession]\n<i>getPossession</i>
-Dribble --> GetPossession : [lostPossession]\n<i>getPossession</i>
 Dribble --> LoseBall : [shouldLoseBall]\n<i>loseBall</i>
+Dribble --> GetPossession : [lostPossession]\n<i>getPossession</i>
 Dribble --> Dribble : [!dribblingDone]\n<i>dribble</i>
 Dribble --> Terminate:::terminate : [dribblingDone]\n<i>dribble</i>
-LoseBall --> LoseBall : [!lostPossession]\n<i>loseBall</i>
-LoseBall --> GetPossession : [lostPossession]\n<i>getPossession</i>
+LoseBall --> LoseBall : [shouldLoseBall]\n<i>loseBall</i>
+LoseBall --> GetPossession : [!shouldLoseBall]\n<i>getPossession</i>
 Terminate:::terminate --> GetPossession : [lostPossession]\n<i>getPossession</i>
 Terminate:::terminate --> Dribble : [!dribblingDone]\n<i>dribble</i>
 Terminate:::terminate --> Terminate:::terminate : <i>dribble</i>
@@ -343,6 +362,20 @@ StopState --> StopState : [!stopDone]\n<i>updateStop</i>
 StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
 Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+
+```
+
+## [KeepAwayFSM](/src/software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> DribbleFSM
+DribbleFSM --> DribbleFSM : <i>keepAway</i>
+DribbleFSM --> Terminate:::terminate
+Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
 
@@ -461,12 +494,16 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> MoveFSM
 MoveFSM --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
+MoveFSM --> GoAndStealState : [blockedShot]\n<i>goAndSteal</i>
 MoveFSM --> MoveFSM : <i>blockShot</i>
-MoveFSM --> StealAndChipState
+MoveFSM --> GoAndStealState
 BlockPassState --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 BlockPassState --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
-StealAndChipState --> StealAndChipState : [enemyThreatHasBall]\n<i>stealAndChip</i>
-StealAndChipState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPass</i>
+GoAndStealState --> GoAndStealState : [enemyThreatHasBall && !contestedBall]\n<i>goAndSteal</i>
+GoAndStealState --> StealAndPullState : [enemyThreatHasBall && contestedBall]\n<i>goAndSteal</i>
+GoAndStealState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPass</i>
+StealAndPullState --> StealAndPullState : [enemyThreatHasBall]\n<i>stealAndPull</i>
+StealAndPullState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>

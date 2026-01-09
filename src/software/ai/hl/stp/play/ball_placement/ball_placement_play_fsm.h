@@ -2,15 +2,22 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/closest_point.h"
 
-struct BallPlacementPlayFSM
+struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
 {
+    /**
+     *  The control parameters for a ball placement play
+     */
+    struct ControlParams
+    {
+    };
+
     class StartState;
     class PickOffWallState;
     class AlignWallState;
@@ -19,18 +26,14 @@ struct BallPlacementPlayFSM
     class ReleaseBallState;
     class RetreatState;
 
-    struct ControlParams
-    {
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Creates a BallPlacementPlayFSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit BallPlacementPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that has the robot align with the wall in order to pick the ball off of it

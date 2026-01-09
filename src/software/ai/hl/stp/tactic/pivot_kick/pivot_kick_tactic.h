@@ -3,22 +3,23 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/segment.h"
 
-class PivotKickTactic : public Tactic
+/**
+ * This tactic is for turning aiming and kicking.
+ */
+class PivotKickTactic : public TacticBase<PivotKickFSM, DribbleFSM>
 {
    public:
     /**
      * Creates a new PivotKickTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PivotKickTactic(TbotsProto::AiConfig ai_config);
+    explicit PivotKickTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     PivotKickTactic() = delete;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
     /**
      * Update control params for this tactic
@@ -31,14 +32,6 @@ class PivotKickTactic : public Tactic
                              AutoChipOrKick auto_chip_or_kick);
 
     void accept(TacticVisitor& visitor) const override;
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<PivotKickFSM>>> fsm_map;
-
-    PivotKickFSM::ControlParams control_params;
-    TbotsProto::AiConfig ai_config;
 };
 
 COPY_TACTIC(WallKickoffTactic, PivotKickTactic)

@@ -1,6 +1,7 @@
 #include "software/backend/unix_simulator_backend.h"
 
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
 #include "proto/robot_log_msg.pb.h"
@@ -8,6 +9,7 @@
 #include "shared/constants.h"
 #include "software/constants.h"
 #include "software/logger/logger.h"
+#include "software/multithreading/subject.hpp"
 #include "software/util/generic_factory/generic_factory.h"
 
 UnixSimulatorBackend::UnixSimulatorBackend(
@@ -36,6 +38,13 @@ UnixSimulatorBackend::UnixSimulatorBackend(
         new ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
             runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
             [&](TbotsProto::ThunderbotsConfig& msg) { receiveThunderbotsConfig(msg); },
+            proto_logger));
+
+    // external obstacles for bang bang trajectory planner
+    external_obstacles_list_.reset(
+        new ThreadedProtoUnixListener<TbotsProto::VirtualObstacles>(
+            runtime_dir + VIRTUAL_OBSTACLES_UNIX_PATH,
+            [&](TbotsProto::VirtualObstacles& msg) { receiveObstacleList(msg); },
             proto_logger));
 
     // The following listeners have an empty callback since their values are

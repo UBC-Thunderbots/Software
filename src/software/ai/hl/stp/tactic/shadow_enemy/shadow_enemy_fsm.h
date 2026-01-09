@@ -3,15 +3,18 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
-struct ShadowEnemyFSM
+/**
+ * Finite State Machine Class for Shadow Enemy
+ */
+struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
 {
    public:
-    class BlockPassState;
-    class StealAndChipState;
+    using Update = TacticFSM<ShadowEnemyFSM>::Update;
 
     // this struct defines the unique control parameters that the ShadowEnemyFSM requires
     // in its update
@@ -26,13 +29,16 @@ struct ShadowEnemyFSM
         double shadow_distance;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    class BlockPassState;
+    class GoAndStealState;
+    class StealAndPullState;
 
-
-    // Distance to chip the ball when trying to yeet it
-    // TODO (#1878): Replace this with a more intelligent chip distance system
-    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
-
+    /**
+     * Constructor for ShadowEnemyFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Calculates the point to block the pass to the robot we are shadowing
@@ -70,6 +76,24 @@ struct ShadowEnemyFSM
     bool enemyThreatHasBall(const Update &event);
 
     /**
+     * Guard that checks if we may have contested the ball
+     *
+     * @param event ShadowEnemyFSM::Update
+     *
+     * @return if we are within dribbling range of ball
+     */
+    bool contestedBall(const Update &event);
+
+    /**
+     * Guard that checks if we have essentially blocked the shot
+     *
+     * @param event ShadowEnemyFSM::Update
+     *
+     * @return if we are blocking a shot
+     */
+    bool blockedShot(const Update &event);
+
+    /**
      * Action to block the pass to our shadowee
      *
      *
@@ -87,13 +111,22 @@ struct ShadowEnemyFSM
                    boost::sml::back::process<MoveFSM::Update> processEvent);
 
     /**
-     * Action to steal and chip the ball
+     * Action to go to steal the ball
      *
-     * Steal the ball if enemy threat is close enough and chip the ball away
+     * Go to steal the ball if enemy threat is close enough and chip the ball away
      *
      * @param event ShadowEnemyFSM::Update
      */
-    void stealAndChip(const Update &event);
+    void goAndSteal(const Update &event);
+
+    /**
+     * Action to pull the ball
+     *
+     * Attempt to pull the ball away if within roller
+     *
+     * @param event ShadowEnemyFSM::Update
+     */
+    void stealAndPull(const Update &event);
 
     auto operator()()
     {
@@ -101,24 +134,50 @@ struct ShadowEnemyFSM
 
         DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_STATE(BlockPassState)
-        DEFINE_SML_STATE(StealAndChipState)
+        DEFINE_SML_STATE(GoAndStealState)
+        DEFINE_SML_STATE(StealAndPullState)
+
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(enemyThreatHasBall)
+        DEFINE_SML_GUARD(contestedBall)
+        DEFINE_SML_GUARD(blockedShot)
+
         DEFINE_SML_ACTION(blockPass)
-        DEFINE_SML_ACTION(stealAndChip)
+        DEFINE_SML_ACTION(goAndSteal)
+        DEFINE_SML_ACTION(stealAndPull)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockShot, MoveFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
-            MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = StealAndChipState_S,
+            MoveFSM_S + Update_E[blockedShot_G] / goAndSteal_A = GoAndStealState_S,
+            MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = GoAndStealState_S,
             BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
             BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,
-            StealAndChipState_S + Update_E[enemyThreatHasBall_G] / stealAndChip_A,
-            StealAndChipState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,
+            GoAndStealState_S +
+                Update_E[enemyThreatHasBall_G && !contestedBall_G] / goAndSteal_A,
+            GoAndStealState_S + Update_E[enemyThreatHasBall_G && contestedBall_G] /
+                                    goAndSteal_A = StealAndPullState_S,
+            GoAndStealState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,
+            StealAndPullState_S + Update_E[enemyThreatHasBall_G] / stealAndPull_A,
+            StealAndPullState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,
             X + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
             X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION          = X);
     }
+
+   private:
+    // Here we define roughly how close the enemy needs to be to the ball to be considered
+    // as possessing the ball, this was determined experimentally in the simulator where
+    // it was determined that vision often mistake the ball to be further away from the
+    // enemy than it actually is, leading the robot to overcommit to stealing the ball
+    static constexpr double ENEMY_NEAR_BALL_DIST_M = 0.22;
+
+    // This is just checking whether it the defender is within a reasonable distance
+    // to start pressing the robot
+    static constexpr double NEAR_PRESS_M = 0.8;
+
+    // Angle that enemy has to be facing the net within to consider going for the ball
+    static constexpr double ENEMY_FACE_RADIANS = M_PI / 4.0;
 };

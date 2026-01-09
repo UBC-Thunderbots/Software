@@ -261,7 +261,7 @@ BallFilter::LinearRegressionResults BallFilter::calculateLinearRegression(
     // Perform linear regression to find the line of best fit through the ball positions.
     // This is solving the formula Ax = b, where x is the vector we want to solve for.
     Eigen::Vector2f regression_vector =
-        A.bdcSvd<Eigen::ComputeThinU | Eigen::ComputeThinV>().solve(b);
+        A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
     // How to calculate the error is from
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
     double regression_error = std::numeric_limits<double>::max();
@@ -340,7 +340,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
             if (ball_regression_line)
             {
                 current_position  = closestPoint(current_detection.position,
-                                                ball_regression_line.value());
+                                                 ball_regression_line.value());
                 previous_position = closestPoint(previous_detection.position,
                                                  ball_regression_line.value());
             }

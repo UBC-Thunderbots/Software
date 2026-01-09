@@ -1,4 +1,4 @@
-from google.protobuf.json_format import MessageToDict
+from collections import defaultdict
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
@@ -34,6 +34,9 @@ class RefereeInfoWidget(QWidget):
         self.vertical_layout.addWidget(self.referee_info)
         self.setLayout(self.vertical_layout)
 
+        # Team info table data, indexed by [field_name]["blue" | "yellow"]
+        self.team_info = defaultdict(dict)
+
     def refresh(self) -> None:
         """Update the referee info widget with new referee information"""
         referee = self.referee_buffer.get(block=False, return_cached=False)
@@ -42,68 +45,27 @@ class RefereeInfoWidget(QWidget):
         if referee is None:
             return
 
-        referee_msg_dict = MessageToDict(referee)
-
-        if not referee_msg_dict:
-            return
-
-        stage_time_left_s = (
-            int(referee_msg_dict["stageTimeLeft"]) * SECONDS_PER_MICROSECOND
-        )
-        p = (
-            f"Packet Timestamp: {round(float(referee_msg_dict['packetTimestamp']) * SECONDS_PER_MICROSECOND, 3)}\n"
+        stage_time_left_s = referee.stage_time_left * SECONDS_PER_MICROSECOND
+        self.referee_info.setText(
+            f"Packet Timestamp: {round(referee.packet_timestamp * SECONDS_PER_MICROSECOND, 3)}\n"
             + f"Stage Time Left: {int(stage_time_left_s / SECONDS_PER_MINUTE):02d}"
             + f":{int(stage_time_left_s % SECONDS_PER_MINUTE):02d}\n"
-            + f"Stage: {referee_msg_dict['stage']}\n"
-            + "Command: "
-            + referee_msg_dict["command"]
-            + "\n"
-            + f"Blue Team on Positive Half: {referee_msg_dict['blueTeamOnPositiveHalf']}\n"
+            + f"Stage: {Referee.Stage.Name(referee.stage)}\n"
+            + f"Command: {Referee.Command.Name(referee.command)}\n"
+            + f"Blue Team on Positive Half: {referee.blue_team_on_positive_half}\n"
         )
-        self.referee_info.setText(p)
 
-        team_info = []
-        blue = []
-        yellow = []
+        for field_descriptor, field_val in referee.blue.ListFields():
+            self.team_info[field_descriptor.name]["blue"] = field_val
 
-        for team_info_name in referee_msg_dict["blue"]:
-            if team_info_name == "timeouts":
-                team_info.append("remainingTimeouts")
-            elif team_info_name == "goalkeeper":
-                team_info.append("goalkeeperID")
-            else:
-                team_info.append(team_info_name)
-
-        for team_info_name in referee_msg_dict["yellow"]:
-            if team_info_name in team_info:
-                continue
-
-            if team_info_name == "timeouts":
-                team_info.append("remainingTimeouts")
-            elif team_info_name == "goalkeeper":
-                team_info.append("goalkeeperID")
-            else:
-                team_info.append(team_info_name)
-
-        for info in team_info:
-            if info == "yellowCardTimes":
-                blue.append(self.parse_yellow_card_times(referee_msg_dict["blue"]))
-                yellow.append(self.parse_yellow_card_times(referee_msg_dict["yellow"]))
-            elif info == "remainingTimeouts":
-                blue.append(referee_msg_dict["blue"]["timeouts"])
-                yellow.append(referee_msg_dict["yellow"]["timeouts"])
-            elif info == "goalkeeperID":
-                blue.append(referee_msg_dict["blue"]["goalkeeper"])
-                yellow.append(referee_msg_dict["yellow"]["goalkeeper"])
-            else:
-                blue.append(referee_msg_dict["blue"][info])
-                yellow.append(referee_msg_dict["yellow"][info])
+        for field_descriptor, field_val in referee.yellow.ListFields():
+            self.team_info[field_descriptor.name]["yellow"] = field_val
 
         set_table_data(
             {
-                "Team Info": team_info,
-                "Blue": blue,
-                "Yellow": yellow,
+                "Team Info": self.team_info.keys(),
+                "Blue": [val["blue"] for val in self.team_info.values()],
+                "Yellow": [val["yellow"] for val in self.team_info.values()],
             },
             self.referee_table,
             RefereeInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
@@ -118,18 +80,6 @@ class RefereeInfoWidget(QWidget):
 
         :param team_info: TeamInfo protobuf dict to parse
         """
-        text = ""
-        if "yellowCardTimes" in team_info:
-            yellow_card_times = team_info["yellowCardTimes"]
-            for i in range(0, len(yellow_card_times) - 1):
-                formatted_time = int(yellow_card_times[i] * SECONDS_PER_MICROSECOND)
-                text = text + str(formatted_time) + ", "
-
-            formatted_time = int(
-                yellow_card_times[len(yellow_card_times) - 1] * SECONDS_PER_MICROSECOND
-            )
-            text = text + str(formatted_time)
-        else:
-            text = "0"
-
-        return text
+        return [
+            time * SECONDS_PER_MICROSECOND for time in team_info.yellow_card_times
+        ].join(", ")

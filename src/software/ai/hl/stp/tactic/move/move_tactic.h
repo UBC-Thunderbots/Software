@@ -1,19 +1,19 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The MoveTactic will move the assigned robot to the given destination and arrive
  * with the specified final orientation and speed
  */
-class MoveTactic : public Tactic
+class MoveTactic : public TacticBase<MoveFSM>
 {
    public:
     /**
      * Creates a new MoveTactic
      */
-    explicit MoveTactic();
+    explicit MoveTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the params assuming that the max allowed speed mode is the physical limits
@@ -55,15 +55,6 @@ class MoveTactic : public Tactic
                              TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode);
 
     void accept(TacticVisitor& visitor) const override;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<MoveFSM>>> fsm_map;
-
-    MoveFSM::ControlParams control_params;
 };
 
 // Creates duplicates of MoveTactic for various situations

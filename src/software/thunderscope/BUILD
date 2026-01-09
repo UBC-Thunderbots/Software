@@ -1,7 +1,7 @@
-package(default_visibility = ["//visibility:public"])
-
-load("@thunderscope_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 compile_pip_requirements(
     name = "requirements",
@@ -87,7 +87,9 @@ py_library(
         "//software/thunderscope/gl/layers:gl_attacker_layer",
         "//software/thunderscope/gl/layers:gl_cost_vis_layer",
         "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
+        "//software/thunderscope/gl/layers:gl_draw_polygon_obstacle",
         "//software/thunderscope/gl/layers:gl_max_dribble_layer",
+        "//software/thunderscope/gl/layers:gl_movement_field_test_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
         "//software/thunderscope/gl/layers:gl_path_layer",

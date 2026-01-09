@@ -10,10 +10,12 @@ TEST(DefensePlayFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    TbotsProto::AiConfig ai_config;
-
-    FSM<DefensePlayFSM> fsm(DefensePlayFSM{ai_config});
+    FSM<DefensePlayFSM> fsm(DefensePlayFSM{std::make_shared<TbotsProto::AiConfig>()});
     EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>));
+
+    // Place enemy robots behind the ball implying there is a large attack
+    ::TestUtil::setEnemyRobotPositions(world, {Point(0, 0), Point(-1, 0), Point(-2, 0)},
+                                       Timestamp::fromSeconds(0));
 
     fsm.process_event(DefensePlayFSM::Update(
         DefensePlayFSM::ControlParams{
@@ -22,6 +24,20 @@ TEST(DefensePlayFSMTest, test_transitions)
             world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
-    // DefensePlayFSM always stays in the DefenseState
     EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::DefenseState>));
+
+
+    // Place more friendly robots behind the ball implying this is a safe time
+    // to aggressively defense
+    ::TestUtil::setFriendlyRobotPositions(
+        world, {Point(-1, 0), Point(-3, 0), Point(-2, 0)}, Timestamp::fromSeconds(0));
+
+    fsm.process_event(DefensePlayFSM::Update(
+        DefensePlayFSM::ControlParams{
+            .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT},
+        PlayUpdate(
+            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
+
+    EXPECT_TRUE(fsm.is(boost::sml::state<DefensePlayFSM::AggressiveDefenseState>));
 }

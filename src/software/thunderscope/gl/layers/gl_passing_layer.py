@@ -1,7 +1,6 @@
 from pyqtgraph.opengl import *
 
 import time
-import queue
 
 
 from proto.visualization_pb2 import PassVisualization
@@ -12,6 +11,7 @@ from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLPassingLayer(GLLayer):
@@ -39,12 +39,10 @@ class GLPassingLayer(GLLayer):
 
         self.pass_graphics = ObservableList(self._graphics_changed)
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-        try:
-            pass_vis = self.pass_visualization_buffer.queue.get_nowait()
-        except queue.Empty:
-            pass_vis = None
+        pass_vis = self.pass_visualization_buffer.get(block=False, return_cached=False)
 
         if not pass_vis:
             pass_vis = self.cached_pass_vis

@@ -9,6 +9,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtGui
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from typing import override
 
 
 class ProtoPlotter(QWidget):
@@ -92,6 +93,7 @@ class ProtoPlotter(QWidget):
         self.update_interval = 1.0 / plot_rate_hz
         self.buffer_size = buffer_size
 
+    @override
     def isVisible(self) -> bool:
         return self.win.isVisible()
 
@@ -100,7 +102,7 @@ class ProtoPlotter(QWidget):
         # Dump the entire buffer into a deque. This operation is fast because
         # its just consuming data from the buffer and appending it to a deque.
         for proto_class, buffer in self.buffers.items():
-            for _ in range(buffer.queue.qsize()):
+            for _ in range(buffer.size()):
                 data = self.configuration[proto_class](buffer.get(block=False))
 
                 # If named_value is new, create a plot and for the new value and

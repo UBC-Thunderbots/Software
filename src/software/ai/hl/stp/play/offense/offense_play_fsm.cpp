@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/play/offense/offense_play_fsm.h"
 
-OffensePlayFSM::OffensePlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
-      shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
-      defense_play(std::make_shared<DefensePlay>(ai_config))
+OffensePlayFSM::OffensePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM<OffensePlayFSM>(ai_config_ptr),
+      shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config_ptr)),
+      defense_play(std::make_shared<DefensePlay>(ai_config_ptr))
 {
 }
 
@@ -55,7 +55,8 @@ void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
     {
         shoot_or_pass_play->updateTactics(PlayUpdate(
             event.common.world_ptr, num_shoot_or_pass,
-            [&tactics_to_return](PriorityTacticVector new_tactics) {
+            [&tactics_to_return](PriorityTacticVector new_tactics)
+            {
                 for (const auto& tactic_vector : new_tactics)
                 {
                     tactics_to_return.push_back(tactic_vector);
@@ -71,7 +72,8 @@ void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
     {
         defense_play->updateTactics(PlayUpdate(
             event.common.world_ptr, num_defenders,
-            [&tactics_to_return](PriorityTacticVector new_tactics) {
+            [&tactics_to_return](PriorityTacticVector new_tactics)
+            {
                 for (const auto& tactic_vector : new_tactics)
                 {
                     tactics_to_return.push_back(tactic_vector);

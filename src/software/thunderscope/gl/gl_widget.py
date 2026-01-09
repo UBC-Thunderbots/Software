@@ -11,7 +11,6 @@ from typing import Optional
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from software.thunderscope.constants import *
-
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
@@ -28,6 +27,7 @@ from proto.replay_bookmark_pb2 import ReplayBookmark
 from proto.tbots_timestamp_msg_pb2 import Timestamp
 
 from software.thunderscope.common.toast_msg_helper import success_toast
+from typing import override
 
 
 class GLWidget(QWidget):
@@ -94,6 +94,7 @@ class GLWidget(QWidget):
         self.layers_menu = QMenu()
         self.toolbars_menu = QMenu()
         self.layers_menu_actions = {}
+
         self.simulation_control_toolbar = GLFieldToolbar(
             parent=self.gl_view_widget,
             on_camera_view_change=self.set_camera_view,
@@ -135,6 +136,7 @@ class GLWidget(QWidget):
         """Returns the simulation control toolbar"""
         return self.simulation_control_toolbar
 
+    @override
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
 
@@ -156,6 +158,7 @@ class GLWidget(QWidget):
         for layer in self.layers:
             layer.keyPressEvent(event)
 
+    @override
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
 

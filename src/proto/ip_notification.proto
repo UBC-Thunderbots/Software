@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "proto/tbots_timestamp_msg.proto";
-
 package TbotsProto;
 
 message IpNotification

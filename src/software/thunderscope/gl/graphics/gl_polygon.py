@@ -3,7 +3,7 @@ from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors, LINE_WIDTH
-from typing import Optional
+from typing import Optional, override
 
 import software.thunderscope.gl.helpers.triangulate as triangulate
 from software.thunderscope.gl.graphics.gl_shape import GLShape
@@ -52,6 +52,7 @@ class GLPolygon(GLShape):
         self.points = points
         self._update_shape_data()
 
+    @override
     def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape
@@ -61,7 +62,7 @@ class GLPolygon(GLShape):
         if not self.points:
             return
 
-        vertices = [(point[0], point[1], 0) for point in self.points]
+        vertices = [(point[0], point[1], 0) for point in self.points + [self.points[0]]]
         self.setData(pos=vertices)
 
         if self.fill_graphic:

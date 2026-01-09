@@ -36,13 +36,15 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>(TbotsProto::ReceiverTacticConfig());
+    auto tactic =
+        std::make_shared<ReceiverTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(pass);
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield)
+        {
             // We check if the robot reaches the desired orientation, at the
             // desired position before checking if the ball has been received.
             //
@@ -126,13 +128,15 @@ TEST_P(ReceiverTacticTestOneTouch, test_one_touch)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>(TbotsProto::ReceiverTacticConfig());
+    auto tactic =
+        std::make_shared<ReceiverTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(pass);
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield)
+        {
             // We just care if we scored!
             friendlyScored(world_ptr, yield);
         }};
