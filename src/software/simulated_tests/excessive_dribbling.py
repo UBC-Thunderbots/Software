@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+from proto.import_all_protos import ValidationStatus, ValidationGeometry
 
 from software.simulated_tests.validation import (
     Validation,
@@ -15,7 +15,7 @@ class ExcessivelyDribbling(Validation):
     def __init__(self):
         self.continous_dribbling_start_point = None
 
-    def get_validation_status(self, world, max_dribble_length: float = 1.00, max_dribble_error_margin: float = 0.06) -> ValidationStatus:
+    def get_validation_status(self, world, max_dribble_length: float = 1.00, max_dribble_error_margin: float = 0.05) -> ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m.
 
         :param world: The world msg to validate
@@ -27,6 +27,7 @@ class ExcessivelyDribbling(Validation):
         """
         # Use world calculation of dribbling distance, which uses implementation
         # of initial position of BOT to final position of BALL
+
         if world.HasField("dribble_displacement"):
             dribble_disp = world.dribble_displacement
             dist = tbots_cpp.createSegment(dribble_disp).length()
@@ -37,11 +38,13 @@ class ExcessivelyDribbling(Validation):
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the max allowed dribbling circle"""
-        return create_validation_geometry(
-            [tbots_cpp.Circle(self.continous_dribbling_start_point, 1.0)]
-            if self.continous_dribbling_start_point is not None
-            else []
-        )
+        if world.HasField("dribble_displacement"):
+            dribbling_start_point = tbots_cpp.createSegment(world.dribble_displacement).getStart()
+            return create_validation_geometry(
+                [tbots_cpp.Circle(dribbling_start_point, 1.0)]
+            )
+        return create_validation_geometry([])
+
 
     def __repr__(self):
         return "Check that the dribbling robot has not dribbled for more than 1m"
