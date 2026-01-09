@@ -15,7 +15,12 @@ class ExcessivelyDribbling(Validation):
     def __init__(self):
         self.continous_dribbling_start_point = None
 
-    def get_validation_status(self, world, max_dribble_length: float = 1.00, max_dribble_error_margin: float = 0.05) -> ValidationStatus:
+    def get_validation_status(
+        self,
+        world,
+        max_dribble_length: float = 1.00,
+        max_dribble_error_margin: float = 0.05,
+    ) -> ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m.
 
         :param world: The world msg to validate
