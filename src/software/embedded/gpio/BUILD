@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "gpio",
     srcs = [
+        "gpio.cpp",
         "gpio_char_dev.cpp",
         "gpio_sysfs.cpp",
     ],

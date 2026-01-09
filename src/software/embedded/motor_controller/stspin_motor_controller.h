@@ -57,9 +57,9 @@ class StSpinMotorController : public MotorController
     static constexpr unsigned int FRAME_LEN = 6;
 
     static const inline std::unordered_map<MotorIndex, bool> ENABLED_MOTORS = {
-        {MotorIndex::FRONT_LEFT,  false},
-        {MotorIndex::BACK_LEFT,   false},
-        {MotorIndex::BACK_RIGHT,  false},
+        {MotorIndex::FRONT_LEFT,  true},
+        {MotorIndex::BACK_LEFT,   true},
+        {MotorIndex::BACK_RIGHT,  true},
         {MotorIndex::FRONT_RIGHT, true},
         {MotorIndex::DRIBBLER,    false},
     };
@@ -102,6 +102,9 @@ class StSpinMotorController : public MotorController
     static constexpr uint32_t MAX_SPI_SPEED_HZ = 250000000; // 250 MHz
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;
+
+    static constexpr std::chrono::milliseconds DATA_READY_TIMEOUT_MS =
+        std::chrono::milliseconds(200);
 
     // SPI File Descriptors mapping from Chip Select -> File Descriptor
     std::array<int, reflective_enum::size<MotorIndex>()> file_descriptors_;

@@ -235,10 +235,10 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     //  The byte order of DATA is big endian; therefore the MSB is transmitted first.
     //  DATA may be ignored if the operation has no data to transmit/receive.
 
-    // Busy wait for slave data ready assertion
-    while (data_ready_gpio_.at(motor)->getValue() != GpioState::HIGH)
+    // Wait for slave data ready assertion
+    while (!data_ready_gpio_.at(motor)->pollValue(GpioState::HIGH, DATA_READY_TIMEOUT_MS))
     {
-        std::this_thread::sleep_for(std::chrono::microseconds(100));
+        LOG(WARNING) << "Timed out waiting for " << motor << " to signal data ready";
     }
 
     uint8_t tx[FRAME_LEN] = {};
@@ -272,10 +272,13 @@ int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
                      << static_cast<int>(rx[3]) << " "
                      << static_cast<int>(rx[4]) << " "
                      << static_cast<int>(rx[5]);
+
+        return 0;
     }
-    else if (static_cast<StSpinOpcode>(rx[1]) == StSpinOpcode::NACK)
+
+    if (static_cast<StSpinOpcode>(rx[1]) == StSpinOpcode::NACK)
     {
-        LOG(WARNING) << "Frame not acknowledged by motor " << motor;
+        LOG(WARNING) << "Last frame sent was not acknowledged by motor " << motor;
     }
 
     // Return the DATA field of the received frame
