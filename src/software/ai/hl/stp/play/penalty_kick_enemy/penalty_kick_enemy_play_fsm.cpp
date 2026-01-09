@@ -1,7 +1,9 @@
 #include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_fsm.h"
 
-PenaltyKickEnemyPlayFSM::PenaltyKickEnemyPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config), move_tactics(std::vector<std::shared_ptr<MoveTactic>>())
+PenaltyKickEnemyPlayFSM::PenaltyKickEnemyPlayFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM<PenaltyKickEnemyPlayFSM>(ai_config_ptr),
+      move_tactics(std::vector<std::shared_ptr<MoveTactic>>())
 {
 }
 
@@ -15,7 +17,7 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
     {
         move_tactics = std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
         std::generate(move_tactics.begin(), move_tactics.end(),
-                      []() { return std::make_shared<MoveTactic>(); });
+                      [this]() { return std::make_shared<MoveTactic>(ai_config_ptr); });
     }
 
     // Move all robots behind the penalty mark

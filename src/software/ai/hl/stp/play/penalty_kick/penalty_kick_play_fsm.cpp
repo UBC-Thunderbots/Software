@@ -1,8 +1,9 @@
 #include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h"
 
-PenaltyKickPlayFSM::PenaltyKickPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
-      penalty_kick_tactic(std::make_shared<PenaltyKickTactic>(ai_config)),
+PenaltyKickPlayFSM::PenaltyKickPlayFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM<PenaltyKickPlayFSM>(ai_config_ptr),
+      penalty_kick_tactic(std::make_shared<PenaltyKickTactic>(ai_config_ptr)),
       penalty_setup_tactics(std::vector<std::shared_ptr<PenaltySetupTactic>>())
 {
 }
@@ -37,7 +38,8 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
         penalty_setup_tactics =
             std::vector<std::shared_ptr<PenaltySetupTactic>>(num_tactics);
         std::generate(penalty_setup_tactics.begin(), penalty_setup_tactics.end(),
-                      []() { return std::make_shared<PenaltySetupTactic>(); });
+                      [this]()
+                      { return std::make_shared<PenaltySetupTactic>(ai_config_ptr); });
     }
 
     // Move all non-shooter robots behind the penalty
