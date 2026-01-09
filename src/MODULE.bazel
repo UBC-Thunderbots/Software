@@ -93,8 +93,8 @@ http_archive(
     name = "tomlplusplus",
     build_file = "@//extlibs:tomlplusplus.BUILD",
     sha256 = "8517f65938a4faae9ccf8ebb36631a38c1cadfb5efa85d9a72e15b9e97d25155",
-    urls = ["https://github.com/marzer/tomlplusplus/archive/refs/tags/v3.4.0.tar.gz"],
     strip_prefix = "tomlplusplus-3.4.0",
+    urls = ["https://github.com/marzer/tomlplusplus/archive/refs/tags/v3.4.0.tar.gz"],
 )
 
 http_archive(

@@ -9,6 +9,7 @@
 - [Tools](#tools)
   - [Ansible](#ansible)
   - [Systemd](#systemd)
+  - [TOML Configuration](#toml-configuration)
 - [Thunderloop](#thunderloop)
 
 <!--TOC-->

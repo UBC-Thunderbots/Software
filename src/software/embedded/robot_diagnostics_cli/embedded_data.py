@@ -36,7 +36,9 @@ class EmbeddedData:
             with open(self.config_file_path, "rb") as f:
                 return tomllib.load(f)
         except Exception as e:
-            print(f"Warning: Failed to load TOML config from {self.config_file_path}: {e}")
+            print(
+                f"Warning: Failed to load TOML config from {self.config_file_path}: {e}"
+            )
             return {}
 
     def _get_value(self, key: str):

@@ -6,6 +6,6 @@ cc_library(
     hdrs = ["toml_config_client.h"],
     deps = [
         "//software/logger",
-        "@tomlplusplus//:tomlplusplus",
+        "@tomlplusplus",
     ],
 )

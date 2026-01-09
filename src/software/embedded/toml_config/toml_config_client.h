@@ -3,6 +3,7 @@
 #include <mutex>
 #include <string>
 #include <toml++/toml.hpp>
+
 #include "software/logger/logger.h"
 
 /**

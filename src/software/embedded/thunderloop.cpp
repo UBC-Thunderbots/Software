@@ -71,18 +71,18 @@ extern "C"
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
     // TODO (#2495): Set the friendly team colour
-    : toml_config_client_(
-          std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
+    : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       motor_status_(std::nullopt),
       robot_constants_(robot_constants),
       robot_id_(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY))),
-      channel_id_(std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY))),
+      channel_id_(
+          std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY))),
       network_interface_(toml_config_client_->get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY)),
       loop_hz_(loop_hz),
       kick_coeff_(std::stod(toml_config_client_->get(ROBOT_KICK_EXP_COEFF_CONFIG_KEY))),
       kick_constant_(std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY))),
       chip_pulse_width_(
-            std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
+          std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {

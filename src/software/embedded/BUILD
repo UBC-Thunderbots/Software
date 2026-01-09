@@ -63,10 +63,10 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
-        "//software/embedded/toml_config",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",
+        "//software/embedded/toml_config",
         "//software/logger:network_logger",
         "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",

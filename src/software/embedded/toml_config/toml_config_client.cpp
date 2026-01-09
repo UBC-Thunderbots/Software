@@ -60,7 +60,7 @@ void TomlConfigClient::loadConfig()
     catch (const toml::parse_error& err)
     {
         LOG(WARNING) << "Failed to parse TOML config file: " << config_file_path_
-                   << ". Error: " << err.description();
+                     << ". Error: " << err.description();
         // Create empty table on parse error
         config_table_ = toml::table{};
     }
@@ -72,7 +72,7 @@ void TomlConfigClient::writeConfig()
     if (!file.is_open())
     {
         LOG(WARNING) << "Failed to open TOML config file for writing: "
-                   << config_file_path_;
+                     << config_file_path_;
         return;
     }
 
@@ -118,8 +118,7 @@ std::string TomlConfigClient::get(const std::string& key)
         }
         else
         {
-            LOG(WARNING) << "TOML key '" << key
-                         << "' exists but is not a supported type";
+            LOG(WARNING) << "TOML key '" << key << "' exists but is not a supported type";
             return "";
         }
     }
@@ -140,8 +139,7 @@ void TomlConfigClient::set(const std::string& key, const std::string& value)
     writeConfig();
 }
 
-void TomlConfigClient::setNoCommit(const std::string& key,
-                                    const std::string& value)
+void TomlConfigClient::setNoCommit(const std::string& key, const std::string& value)
 {
     std::lock_guard<std::mutex> lock(config_mutex_);
 
