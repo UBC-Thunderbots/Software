@@ -4,15 +4,14 @@
 
 <!--TOC-->
 
-- [Software Setup on Windows Subsystem for Linux](#software-setup-on-windows-subsystem-for-linux)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [WSL2 Setup (Windows 11 - Recommended)](#wsl2-setup-windows-11---recommended)
-  - [WSLg Setup (Windows 11/10 - Recommended)](#wslg-setup-windows-1110---recommended)
-  - [WSL2 Setup (Windows 10)](#wsl2-setup-windows-10)
-    - [X Server Setup](#x-server-setup)
-  - [Networking Issues](#networking-issues)
-  - [USB Issues](#usb-issues)
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+- [WSL2 Setup (Windows 11 - Recommended)](#wsl2-setup-windows-11---recommended)
+- [WSLg Setup (Windows 11/10 - Recommended)](#wslg-setup-windows-1110---recommended)
+- [WSL2 Setup (Windows 10)](#wsl2-setup-windows-10)
+  - [X Server Setup](#x-server-setup)
+- [Networking Issues](#networking-issues)
+- [USB Issues](#usb-issues)
 
 <!--TOC-->
 
