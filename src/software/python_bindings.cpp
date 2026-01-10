@@ -38,7 +38,6 @@
 #include "software/geom/segment.h"
 #include "software/geom/vector.h"
 #include "software/math/math_functions.h"
-#include "software/networking/radio/threaded_proto_radio_sender.hpp"
 #include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
@@ -72,23 +71,6 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
         .def("get_ip_address", &Class::getIpAddress)
         .def("send_proto", &Class::sendProto, py::arg("message"),
              py::arg("async") = false);
-}
-
-/**
- * Declares a Python binding for a ThreadedProtoRadioSender of type T
- *
- * @param m The module to define the sender/receiver in
- * @param The name to insert into the binded class name (ex. {name}ProtoRadioSender)
- */
-template <typename T>
-void declareThreadedProtoRadioSender(py::module& m, std::string name)
-{
-    using Class              = ThreadedProtoRadioSender<T>;
-    std::string pyclass_name = name + "ProtoRadioSender";
-    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
-                                              py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<>())
-        .def("send_proto", &Class::sendProto);
 }
 
 /**
@@ -426,7 +408,6 @@ PYBIND11_MODULE(python_bindings, m)
 
     // Senders
     declareThreadedProtoUdpSender<TbotsProto::Primitive>(m, "Primitive");
-    declareThreadedProtoRadioSender<TbotsProto::Primitive>(m, "Primitive");
     declareThreadedProtoUdpSender<TbotsProto::IpNotification>(m, "FullsystemIpBroadcast");
 
     py::register_exception<TbotsNetworkException>(m, "TbotsNetworkException");

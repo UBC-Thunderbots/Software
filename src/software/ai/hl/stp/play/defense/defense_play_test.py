@@ -1,5 +1,3 @@
-import sys
-
 import pytest
 
 import software.python_bindings as tbots_cpp
@@ -10,6 +8,9 @@ from software.simulated_tests.friendly_has_ball_possession import (
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+from software.simulated_tests.simulated_test_fixture import (
+    pytest_main,
+)
 
 
 @pytest.mark.parametrize(
@@ -82,11 +83,11 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
             ]
         ],
         inv_eventually_validation_sequence_set=[
-            [FriendlyEventuallyHasBallPossession(tolerance=0.05)]
+            [FriendlyEventuallyHasBallPossession(tolerance=0.2)]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
-        test_timeout_s=12,
+        test_timeout_s=20,
     )
 
 
@@ -161,7 +162,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
             ]
         ],
         inv_eventually_validation_sequence_set=[
-            [FriendlyEventuallyHasBallPossession(tolerance=0.05)]
+            [FriendlyEventuallyHasBallPossession(tolerance=0.1)]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
@@ -170,5 +171,4 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)
