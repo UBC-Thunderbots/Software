@@ -66,8 +66,8 @@ class CollisionEvaluator
      * @param start_time_s The time in seconds to start the search from
      * @param search_end_time_s The time in seconds to stop the search at
      * @return The first collision time within [start_time_sec and search_end_time_s]
-     * and a pointer to the obstacle if a collision exists, otherwise returns
-     * std::numeric_limits<double>::max() and nullptr.
+     * using a COLLISION_CHECK_STEP_INTERVAL_SEC resolution and a pointer to the obstacle
+     * if a collision exists, otherwise returns std::numeric_limits<double>::max() and nullptr.
      */
     std::pair<double, ObstaclePtr> getFirstCollisionTime(
         const TrajectoryPath &traj_path,
