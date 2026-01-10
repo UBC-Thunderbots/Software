@@ -30,6 +30,7 @@ py_library(
         ":common_widgets",
         requirement("netifaces"),
         requirement("thefuzz"),
+        requirement("levenshtein"),
     ],
 )
 

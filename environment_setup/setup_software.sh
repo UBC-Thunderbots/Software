@@ -35,6 +35,7 @@ sudo apt-get install -y software-properties-common # required for add-apt-reposi
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update
+sudo apt autoremove
 
 # Detect if running under WSL
 # See https://github.com/microsoft/WSL/issues/4071#issuecomment-1221588337
