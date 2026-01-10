@@ -152,11 +152,9 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
     const std::optional<double> sub_traj_duration_s)
 {
-    
     CollisionEvaluator evaluator(obstacles);
-    TrajectoryPathWithCost traj_with_cost(evaluator.evaluate( trajectory,
-    sub_traj_with_cost,
-     sub_traj_duration_s));
+    TrajectoryPathWithCost traj_with_cost(
+        evaluator.evaluate(trajectory, sub_traj_with_cost, sub_traj_duration_s));
     traj_with_cost.cost = calculateCost(traj_with_cost);
 
     return traj_with_cost;

@@ -12,38 +12,39 @@
  **/
 class CollisionEvaluator
 {
-  public:
+   public:
     /**
      * Constructor
-     * @param obstacles A vector of obstacle pointers, where obstacles are calculated for collision
+     * @param obstacles A vector of obstacle pointers, where obstacles are calculated for
+     * collision
      */
-    explicit CollisionEvaluator(const std::vector<ObstaclePtr>& obstacles);
+    explicit CollisionEvaluator(const std::vector<ObstaclePtr> &obstacles);
 
 
     /**
- * Evaluates a trajectory for collision information and cost, optionally reusing
- * collision results from a previously evaluated prefix trajectory.
- * If a prefix trajectory is provided, collision information that occurs entirely
- * before the given prefix duration may be reused to avoid redundant collision
- * checking. Collision checks beyond the prefix duration are computed normally.
- * @param trajectory
- *        The trajectory to evaluate for collisions and cost.
- * @param sub_traj_with_cost
- *        An optional previously evaluated prefix trajectory whose collision
- *        information may be reused if the prefix fully covers the relevant
- *        collision interval.
- * @param sub_traj_duration_s
- *        The duration (in seconds) of the prefix trajectory within trajectory.
- * @return
- *         A TrajectoryPathWithCost< containing the trajectory along with
- *         computed collision timing information and total cost.
- */
+     * Evaluates a trajectory for collision information and cost, optionally reusing
+     * collision results from a previously evaluated prefix trajectory.
+     * If a prefix trajectory is provided, collision information that occurs entirely
+     * before the given prefix duration may be reused to avoid redundant collision
+     * checking. Collision checks beyond the prefix duration are computed normally.
+     * @param trajectory
+     *        The trajectory to evaluate for collisions and cost.
+     * @param sub_traj_with_cost
+     *        An optional previously evaluated prefix trajectory whose collision
+     *        information may be reused if the prefix fully covers the relevant
+     *        collision interval.
+     * @param sub_traj_duration_s
+     *        The duration (in seconds) of the prefix trajectory within trajectory.
+     * @return
+     *         A TrajectoryPathWithCost< containing the trajectory along with
+     *         computed collision timing information and total cost.
+     */
     TrajectoryPathWithCost evaluate(
-    const TrajectoryPath &trajectory,
-    const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-    std::optional<double> sub_traj_duration_s
-  );
-    private:
+        const TrajectoryPath &trajectory,
+        const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
+        std::optional<double> sub_traj_duration_s);
+
+   private:
     std::vector<ObstaclePtr> obstacles;
 
     /**
@@ -67,11 +68,12 @@ class CollisionEvaluator
      * @param search_end_time_s The time in seconds to stop the search at
      * @return The first collision time within [start_time_sec and search_end_time_s]
      * using a COLLISION_CHECK_STEP_INTERVAL_SEC resolution and a pointer to the obstacle
-     * if a collision exists, otherwise returns std::numeric_limits<double>::max() and nullptr.
+     * if a collision exists, otherwise returns std::numeric_limits<double>::max() and
+     * nullptr.
      */
     std::pair<double, ObstaclePtr> getFirstCollisionTime(
-        const TrajectoryPath &traj_path,
-        const double start_time_s, const double search_end_time_s) const;
+        const TrajectoryPath &traj_path, const double start_time_s,
+        const double search_end_time_s) const;
 
     /**
      * Returns the latest time (within the search_end_time_s) at which the trajectory
@@ -86,7 +88,6 @@ class CollisionEvaluator
      */
     double getLastNonCollisionTime(const TrajectoryPath &traj_path,
                                    const double search_end_time_s) const;
-
 };
 
 const double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;

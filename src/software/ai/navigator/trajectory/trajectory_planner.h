@@ -104,7 +104,7 @@ class TrajectoryPlanner
     static constexpr Angle MIN_SUB_DESTINATION_ANGLE = Angle::fromDegrees(20);
     static constexpr Angle MAX_SUB_DESTINATION_ANGLE = Angle::fromDegrees(140);
 
-    const double SUB_DESTINATION_STEP_INTERVAL_SEC         = 0.2;
+    const double SUB_DESTINATION_STEP_INTERVAL_SEC = 0.2;
 
 
     const double SUB_DESTINATION_CLOSE_BONUS_THRESHOLD_METERS = 0.1;

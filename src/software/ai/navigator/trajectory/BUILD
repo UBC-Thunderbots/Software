@@ -102,8 +102,8 @@ cc_library(
         ":trajectory_path",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/trajectory:trajectory_path_with_cost",
         "//software/ai/navigator/trajectory:collision_evaluator",
+        "//software/ai/navigator/trajectory:trajectory_path_with_cost",
     ],
 )
 
