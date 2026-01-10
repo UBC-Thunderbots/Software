@@ -26,7 +26,6 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     class ReleaseBallState;
     class RetreatState;
 
-
     /**
      * Creates a BallPlacementPlayFSM
      *
@@ -271,14 +270,13 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     Angle pickoff_final_orientation;
     Timestamp start_time;
 
-    static constexpr double BACK_AWAY_FROM_CORNER_EXTRA_M = 0.9;
-    static constexpr double BACK_AWAY_FROM_WALL_M         = ROBOT_MAX_RADIUS_METERS * 5.5;
-    static constexpr double MIN_DISTANCE_FROM_WALL_FOR_ALIGN_M =
-        ROBOT_MAX_RADIUS_METERS * 4;
-    static constexpr double RETREAT_DISTANCE_M         = 0.6;
-    static constexpr double PLACEMENT_DIST_THRESHOLD_M = 0.15;
-    static constexpr double WAITING_LINE_OFFSET_M      = ROBOT_MAX_RADIUS_METERS * 3;
-    static constexpr double BALL_IS_PLACED_WAIT_S      = 2.0;
-    static constexpr double ALIGNMENT_VECTOR_LENGTH_FACTOR =
-        ROBOT_MAX_RADIUS_METERS * 2.5;
+    static constexpr double BACK_AWAY_FROM_CORNER_M                = 0.9;
+    static constexpr double BACK_AWAY_FROM_WALL_M                  = 0.5;
+    static constexpr double MIN_DISTANCE_FROM_WALL_FOR_ALIGN_M     = 0.35;
+    static constexpr double RETREAT_DISTANCE_M                     = 0.7;
+    static constexpr double PLACEMENT_DIST_THRESHOLD_M             = 0.15;
+    static constexpr double APPROACHING_PLACEMENT_DIST_THRESHOLD_M = 0.3;
+    static constexpr double WAITING_LINE_OFFSET_M     = ROBOT_MAX_RADIUS_METERS * 3;
+    static constexpr double BALL_IS_PLACED_WAIT_S     = 2.0;
+    static constexpr double ALIGNMENT_VECTOR_LENGTH_M = ROBOT_MAX_RADIUS_METERS * 2.5;
 };

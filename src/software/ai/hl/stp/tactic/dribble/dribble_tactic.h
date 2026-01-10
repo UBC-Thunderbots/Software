@@ -32,7 +32,9 @@ class DribbleTactic : public TacticBase<DribbleFSM>
      * finishing dribbling
      * @param allow_excessive_dribbling Whether to allow excessive dribbling, i.e. more
      * than 1 metre at a time
-     * @param max_speed_dribble The max speed attained while the ball is in possession
+     * @param max_speed_dribble The max speed allowed while we are dribbling the ball
+     * @param max_speed_get_possession The max speed allowed while we are moving towards
+     * the ball to get possession
      */
     void updateControlParams(std::optional<Point> dribble_destination,
                              std::optional<Angle> final_dribble_orientation,

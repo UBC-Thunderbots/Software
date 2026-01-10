@@ -97,11 +97,6 @@ void MotionConstraintVisitor::visit(const BallPlacementMoveTactic &tactic)
     current_motion_constraints.clear();
 }
 
-void MotionConstraintVisitor::visit(const WallKickoffTactic &tactic)
-{
-    current_motion_constraints.clear();
-}
-
 void MotionConstraintVisitor::visit(const AvoidInterferenceTactic &tactic)
 {
     current_motion_constraints.clear();

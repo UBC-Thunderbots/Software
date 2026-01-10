@@ -5,13 +5,7 @@
 DribbleTactic::DribbleTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticBase<DribbleFSM>(
           {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick},
-          ai_config_ptr),
-      control_params{DribbleFSM::ControlParams{
-          .dribble_destination       = std::nullopt,
-          .final_dribble_orientation = std::nullopt,
-          .allow_excessive_dribbling = false,
-          .max_speed_dribble         = TbotsProto::MaxAllowedSpeedMode::DRIBBLE,
-          .max_speed_get_possession  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}},
+          ai_config_ptr)
 {
 }
 
