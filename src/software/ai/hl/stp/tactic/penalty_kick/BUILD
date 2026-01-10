@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -34,7 +36,7 @@ cc_test(
 )
 
 cc_test(
-    name = "penalty_kick_tactic_test",
+    name = "penalty_kick_tactic_test_cpp",
     srcs = ["penalty_kick_tactic_test.cpp"],
     deps = [
         ":penalty_kick_tactic",
@@ -46,5 +48,21 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "penalty_kick_tactic_test",
+    srcs = [
+        "penalty_kick_tactic_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
