@@ -378,6 +378,7 @@ class ProtoPlayerFlags(Enum):
     NO_ERROR_FLAG = 0
     UNCAUGHT_EXCEPTION_FLAG = 1 << 0
 
+
 class DribblingConstants:
     """Constants to be used to check whether the robot has dribbled beyond competition regulations"""
 

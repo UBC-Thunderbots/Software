@@ -29,7 +29,10 @@ class ExcessivelyDribbling(Validation):
         if world.HasField("dribble_displacement"):
             dribble_disp = world.dribble_displacement
             dist = tbots_cpp.createSegment(dribble_disp).length()
-            if dist > (DribblingConstants.MAX_DRIBBLING_DISTANCE - DribblingConstants.DRIBBLING_ERROR_MARGIN):
+            if dist > (
+                DribblingConstants.MAX_DRIBBLING_DISTANCE
+                - DribblingConstants.DRIBBLING_ERROR_MARGIN
+            ):
                 return ValidationStatus.FAILING
 
         return ValidationStatus.PASSING
