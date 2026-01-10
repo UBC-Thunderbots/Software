@@ -10,51 +10,51 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 @pytest.mark.parametrize(
-    "initial_location,dribble_destination,final_dribble_orientation,allow_excessive_dribbling, should_excessively_dribble",
+    "initial_location,dribble_destination,final_dribble_orientation, should_excessively_dribble",
     [
         # Tests Should not excessively dribble
 
         # Dribble Destination for the ball < 1.0 from its starting position
-        (tbots_cpp.Point(0.5, 0), tbots_cpp.Point(1.02, 0), tbots_cpp.Angle(), True, False),
+        (tbots_cpp.Point(0.5, 0), tbots_cpp.Point(1.02, 0), tbots_cpp.Angle(), False),
 
         # Dribble Testing diagonally
-        (tbots_cpp.Point(0.25, 0.25), tbots_cpp.Point(0.80, 0.50), tbots_cpp.Angle.fromRadians(50), True, False),
+        (tbots_cpp.Point(0.25, 0.25), tbots_cpp.Point(0.80, 0.50), tbots_cpp.Angle.fromRadians(50), False),
 
         # Boundary Testing, because of the autoref implementation (initial of position Bot to final of Ball),
         # a conservative max dribble distance (0.95 m) is used
 
         # Test vertical dribbling
-        (tbots_cpp.Point(0.01, 0), tbots_cpp.Point(0.96, 0), tbots_cpp.Angle(), True, False),
+        (tbots_cpp.Point(0.01, 0), tbots_cpp.Point(0.96, 0), tbots_cpp.Angle(), False),
 
         # Test horizontal dribbling
-        (tbots_cpp.Point(1, 1.5), tbots_cpp.Point(1.95, 1.5), tbots_cpp.Angle(), True, False),
+        (tbots_cpp.Point(1, 1.5), tbots_cpp.Point(1.95, 1.5), tbots_cpp.Angle(), False),
 
         # Test bot and ball in same position
-        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0.95, 1), tbots_cpp.Angle(), True, False),
+        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0.95, 1), tbots_cpp.Angle(), False),
 
         # Tests Should excessively dribble
 
         # Dribble Destination for the ball > 1.0 from its starting position
-        (tbots_cpp.Point(0, 2), tbots_cpp.Point(0, 0.5), tbots_cpp.Angle(), True, True),
+        (tbots_cpp.Point(0, 2), tbots_cpp.Point(0, 0.5), tbots_cpp.Angle(), True),
 
         # Dribble Testing diagonally
-        (tbots_cpp.Point(0.1, 1.1), tbots_cpp.Point(1.1, 0.1), tbots_cpp.Angle.fromRadians(50), True, True),
+        (tbots_cpp.Point(0.1, 1.1), tbots_cpp.Point(1.1, 0.1), tbots_cpp.Angle.fromRadians(50), True),
 
         # Boundary Testing, due to the conservative implementation a dribble distance of 1 m should fail
 
         # Test Vertical Dribbling
-        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0, 2), tbots_cpp.Angle(), True, True),
+        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0, 2), tbots_cpp.Angle(), True),
 
         # Test Horizontal Dribbling
-        (tbots_cpp.Point(1, 2), tbots_cpp.Point(0, 2), tbots_cpp.Angle(), True, True),
+        (tbots_cpp.Point(1, 2), tbots_cpp.Point(0, 2), tbots_cpp.Angle(), True),
 
         # Test Diagonal Dribbling
-        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0.6, 1.8), tbots_cpp.Angle(), True, True),
+        (tbots_cpp.Point(0, 1), tbots_cpp.Point(0.6, 1.8), tbots_cpp.Angle(), True),
 
         # Test robot and ball at same position (affects dribbling orientation and therefore perceived dribble distance)
-        (tbots_cpp.Point(0, 0), tbots_cpp.Point(0, 1), tbots_cpp.Angle(), True, True),
-        (tbots_cpp.Point(0.0, 0.01), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True, True),
-        (tbots_cpp.Point(0.01, 0.00), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True, True),
+        (tbots_cpp.Point(0, 0), tbots_cpp.Point(0, 1), tbots_cpp.Angle(), True),
+        (tbots_cpp.Point(0.0, 0.01), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True),
+        (tbots_cpp.Point(0.01, 0.00), tbots_cpp.Point(0.81, 0.61), tbots_cpp.Angle(), True),
     ],
 )
 
@@ -62,7 +62,6 @@ def test_excessive_dribbling(
         initial_location,
         dribble_destination,
         final_dribble_orientation,
-        allow_excessive_dribbling,
         should_excessively_dribble,
         simulated_test_runner,
 ):
@@ -96,7 +95,7 @@ def test_excessive_dribbling(
         DribbleTactic(
             dribble_destination=tbots_cpp.createPointProto(dribble_destination),
             final_dribble_orientation=tbots_cpp.createAngleProto(final_dribble_orientation),
-            allow_excessive_dribbling=allow_excessive_dribbling,
+            allow_excessive_dribbling=True,
         )
     )
 
