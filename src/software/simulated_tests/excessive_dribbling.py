@@ -8,7 +8,6 @@ from software.simulated_tests.validation import (
     create_validation_types,
 )
 
-from typing import override
 
 class ExcessivelyDribbling(Validation):
     """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
@@ -38,12 +37,13 @@ class ExcessivelyDribbling(Validation):
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the max allowed dribbling circle"""
         if world.HasField("dribble_displacement"):
-            dribbling_start_point = tbots_cpp.createSegment(world.dribble_displacement).getStart()
+            dribbling_start_point = tbots_cpp.createSegment(
+                world.dribble_displacement
+            ).getStart()
             return create_validation_geometry(
                 [tbots_cpp.Circle(dribbling_start_point, 1.0)]
             )
         return create_validation_geometry([])
-
 
     def __repr__(self):
         return "Check that the dribbling robot has not dribbled for more than 1m"
