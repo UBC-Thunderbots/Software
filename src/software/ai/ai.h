@@ -18,9 +18,9 @@ class Ai final
 
     /**
      * Create an AI with given configurations
-     * @param ai_config_ The AI configuration
+     * @param ai_config_ptr shared pointer to the ai configuration
      */
-    explicit Ai(const TbotsProto::AiConfig& ai_config);
+    explicit Ai(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Overrides the play
@@ -60,12 +60,12 @@ class Ai final
      *
      * @param ai_config The new AiConfig proto
      */
-    void updateAiConfig(TbotsProto::AiConfig& ai_config);
+    void updateAiConfig();
 
    private:
     void checkAiConfig();
 
-    TbotsProto::AiConfig ai_config_;
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;

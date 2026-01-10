@@ -48,7 +48,7 @@ function run_clang_format () {
 function run_bazel_formatting () {
     printf "Running bazel buildifier to format all bazel BUILD files...\n\n"
     cd $BAZEL_ROOT_DIR
-    bazel run @com_github_bazelbuild_buildtools//:buildifier
+    bazel run //starlark/buildifier:buildifier.fix
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to format bazel BUILD files!***\n\n"
@@ -148,5 +148,11 @@ run_md_toc
 run_eof_new_line
 run_git_diff_check
 run_ansible_lint
+
+# Update markers, telling Git hooks that formatting has been done
+# (Per-branch, so switching branches doesn't confuse the hooks)
+branch="$(git rev-parse --abbrev-ref HEAD)"
+mkdir -p "$CURR_DIR/.format_markers/$(dirname "$branch")"
+touch "$CURR_DIR/.format_markers/${branch}"
 
 exit 0

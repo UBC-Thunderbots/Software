@@ -8,6 +8,7 @@ import software.thunderscope.robot_diagnostics.robot_error_log_icons.error_log_c
 from proto.robot_log_msg_pb2 import RobotLog
 from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.constants import LOG_LEVEL_STR_MAP
+from typing import override
 
 
 class RobotLogMessageWidget(QFrame):
@@ -105,6 +106,7 @@ class RobotLogMessageWidget(QFrame):
         )
         self.setStyleSheet(self.base_stylesheet)
 
+    @override
     def close(self) -> None:
         """Sets the widget to closed"""
         self.log_open = not self.log_open
@@ -115,6 +117,7 @@ class RobotLogMessageWidget(QFrame):
         time_diff = datetime.now() - self.timestamp
         self.time_since_label.setText(f"{int(time_diff.total_seconds())} seconds ago")
 
+    @override
     def mouseReleaseEvent(self, event) -> None:
         """Mouse Release Event handler for child classes to override
 
@@ -182,6 +185,7 @@ class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
         )
         self.dialog = None
 
+    @override
     def enterEvent(self, event) -> None:
         """Sets the cursor to indicate that this widget is clickable upon mouse enter
 
@@ -189,6 +193,7 @@ class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
         """
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
+    @override
     def mouseReleaseEvent(self, event) -> None:
         """If the error has a robot status to display, creates and opens a dialog to
         display it on mouse click

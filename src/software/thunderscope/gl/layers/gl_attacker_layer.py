@@ -16,6 +16,7 @@ from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLAttackerLayer(GLLayer):
@@ -44,6 +45,7 @@ class GLAttackerLayer(GLLayer):
         self.cache_vis_proto = None
         self.timeout = time.time() + self.TIMEOUT_DURATION_SEC
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         attacker_vis_proto = self.attacker_vis_buffer.get(

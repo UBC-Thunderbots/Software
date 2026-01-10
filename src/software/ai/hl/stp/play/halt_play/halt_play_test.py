@@ -1,11 +1,10 @@
-import sys
-
-import pytest
-
 import software.python_bindings as tbots_cpp
 from software.simulated_tests.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+from software.simulated_tests.simulated_test_fixture import (
+    pytest_main,
+)
 
 
 # TODO issue  #2599 - Remove Duration parameter from test
@@ -46,10 +45,6 @@ def test_halt_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
-        # Structure for a delayed call is tuple (delay in seconds, command, team)
-        (3, Command.Type.HALT, Team.BLUE)
-        (3, Command.Type.HALT, Team.YELLOW)
-
         # No plays to override. AI does whatever for 3 seconds before HALT CMD
         # is issued
 
@@ -76,10 +71,13 @@ def test_halt_play(simulated_test_runner):
         ag_eventually_validation_sequence_set=[
             [RobotSpeedEventuallyBelowThreshold(1e-3)]
         ],
+        ci_cmd_with_delay=[
+            (3, Command.Type.HALT, Team.BLUE),
+            (3, Command.Type.HALT, Team.YELLOW),
+        ],
         test_timeout_s=10,
     )
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)

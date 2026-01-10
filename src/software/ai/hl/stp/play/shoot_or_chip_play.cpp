@@ -14,7 +14,11 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-ShootOrChipPlay::ShootOrChipPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+ShootOrChipPlay::ShootOrChipPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : Play(ai_config_ptr, true)
+{
+}
 
 void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const WorldPtr &world_ptr)
@@ -30,12 +34,13 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
      */
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(ai_config),
-        std::make_shared<CreaseDefenderTactic>(ai_config),
+        std::make_shared<CreaseDefenderTactic>(ai_config_ptr),
+        std::make_shared<CreaseDefenderTactic>(ai_config_ptr),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()};
+        std::make_shared<MoveTactic>(ai_config_ptr),
+        std::make_shared<MoveTactic>(ai_config_ptr)};
 
     // Figure out where the fallback chip target is
     // Experimentally determined to be a reasonable value
@@ -44,7 +49,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
     Point fallback_chip_target =
         world_ptr->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
-    auto attacker = std::make_shared<AttackerTactic>(ai_config);
+    auto attacker = std::make_shared<AttackerTactic>(ai_config_ptr);
     attacker->updateControlParams(fallback_chip_target);
 
     do
@@ -101,4 +106,6 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrChipPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, ShootOrChipPlay,
+                       std::shared_ptr<const TbotsProto::AiConfig>>
+    factory;
