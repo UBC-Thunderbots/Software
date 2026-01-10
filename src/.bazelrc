@@ -70,6 +70,8 @@ build --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,s
 # TODO: #3492
 # build --per_file_copt=software/.*,shared/.*,-external/.*@-Wconversion
 
+build --cxxopt="-DG3_DYNAMIC_LOGGING"
+
 build --per_file_copt=.*\.pb\.(h|cc|cpp)$@-w
 build --per_file_copt=./external/.*,./bazel-out/.*@-w
 
