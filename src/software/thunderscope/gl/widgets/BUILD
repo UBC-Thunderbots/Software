@@ -42,3 +42,14 @@ py_library(
         requirement("qtawesome"),
     ],
 )
+
+py_library(
+    name = "gl_simulated_test_toolbar",
+    srcs = ["gl_simulated_test_toolbar.py"],
+    deps = [
+        ":gl_toolbar",
+        "//software/thunderscope/common:common_widgets",
+        requirement("pyqtgraph"),
+        requirement("qtawesome"),
+    ],
+)
