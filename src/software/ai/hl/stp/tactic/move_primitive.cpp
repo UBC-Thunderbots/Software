@@ -5,6 +5,7 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
+#include "software/geom/angular_acceleration.h"
 
 MovePrimitive::MovePrimitive(
     const Robot &robot, const Point &destination, const Angle &final_angle,
@@ -38,9 +39,9 @@ MovePrimitive::MovePrimitive(
             robot.orientation(), final_angle, robot.angularVelocity(),
             AngularVelocity::fromRadians(
                 robot.robotConstants().robot_max_ang_speed_rad_per_s),
-            AngularVelocity::fromRadians(
+            AngularAcceleration::fromRadians(
                 robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2),
-            AngularVelocity::fromRadians(
+            AngularAcceleration::fromRadians(
                 robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2));
 
         estimated_cost =

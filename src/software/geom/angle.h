@@ -11,7 +11,7 @@
  * This class helps prevent accidentally combining values in degrees and radians
  * without proper conversion.
  */
-class Angle final
+class Angle
 {
    public:
     /**
@@ -178,7 +178,7 @@ class Angle final
      */
     constexpr Angle minDiff(const Angle &other) const;
 
-   private:
+   protected:
     /**
      * The measurement in radians of this Angle.
      */
