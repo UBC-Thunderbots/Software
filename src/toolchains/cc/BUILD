@@ -2,6 +2,7 @@ load(
     ":cc_toolchain_config.bzl",
     "cc_toolchain_config_fullsystem",
     "cc_toolchain_config_k8_jetson_nano_cross_compile",
+    "cc_toolchain_config_stm32",
     "make_builtin_include_directories",
 )
 
@@ -60,6 +61,14 @@ platform(
     ],
 )
 
+platform(
+    name = "motor_board",
+    constraint_values = [
+        "@platforms//cpu:armv6-m",
+        "@platforms//os:none",
+    ],
+)
+
 # This represents a mapping of CPU -> Compiler To Use
 cc_toolchain_suite(
     name = "toolchain",
@@ -112,6 +121,13 @@ filegroup(
         "@linux_aarch64_gcc//:libs",
         "@linux_aarch64_gcc//:runtime_libs",
         "@linux_aarch64_gcc//:static_libs",
+    ],
+)
+
+filegroup(
+    name = "motor_board_gcc_all",
+    srcs = [
+        "@motor_board_gcc//:includes",
     ],
 )
 
@@ -195,6 +211,39 @@ cc_toolchain(
     toolchain_identifier = "gcc-k8-jetson-nano-cross-compile",
 )
 
+cc_toolchain_config_stm32(
+    name = "gcc-arm-none-abi",
+    builtin_include_directories = [
+        "/opt/tbotspython/arm-none-eabi-gcc/arm-none-eabi/include/",
+        "/opt/tbotspython/arm-none-eabi-gcc/lib/gcc/arm-none-eabi/14.3.1/include/",
+    ],
+    tool_paths = {
+        "ar": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-ar",
+        "gcc": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-gcc",
+        "cpp": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-cpp",
+        "ld": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-ld",
+        "nm": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-nm",
+        "objdump": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-objdump",
+        "strip": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-strip",
+    },
+    toolchain_identifier = "gcc-stm32",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_stm32",
+    all_files = ":motor_board_gcc_all",
+    ar_files = ":motor_board_gcc_all",
+    as_files = ":motor_board_gcc_all",
+    compiler_files = ":motor_board_gcc_all",
+    dwp_files = ":motor_board_gcc_all",
+    linker_files = ":motor_board_gcc_all",
+    objcopy_files = ":motor_board_gcc_all",
+    strip_files = ":motor_board_gcc_all",
+    supports_param_files = True,
+    toolchain_config = ":gcc-arm-none-abi",
+    toolchain_identifier = "stm32_gcc",
+)
+
 cc_toolchain_config_k8_jetson_nano_cross_compile(
     name = "gcc_k8_jetson_nano_cross_compile",
     builtin_include_directories = [
@@ -254,5 +303,15 @@ toolchain(
         "@platforms//os:linux",
     ],
     toolchain = ":cc_toolchain_linux_aarch64_gcc",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+toolchain(
+    name = "cc_toolchain_for_stm32",
+    target_compatible_with = [
+        "@platforms//cpu:armv6-m",
+        "@platforms//os:none",
+    ],
+    toolchain = ":cc_toolchain_stm32",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )

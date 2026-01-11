@@ -31,7 +31,8 @@ jobs:
             -//software/ai/hl/...                   \
             -//software/field_tests/...             \
             -//software/embedded/...                \
-            -//toolchains/cc/...
+            -//toolchains/cc/...                    \
+            -//firmware/...
 
       - name: Jetson Nano Build Test
         run: |
@@ -43,6 +44,22 @@ jobs:
           cd src
           bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
 
+      - name: Motor Firmware build Test
+        run: |
+          cd src
+          bazel build //firmware/motor:mdv6_firmware_main --platforms=//toolchains/cc:motor_board
+
+  motor-firmare:
+    name: Motor Firmware
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/environment-setup
+
+      - name: Build Motor Firmware
+        run: |
+          cd src
+          bazel build //firmware/motor:mdv6_firmware_main --platforms=//toolchains/cc:motor_board
 
   software-tests:
     name: Software Tests
@@ -60,7 +77,8 @@ jobs:
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
             -//software/ai/navigator/...     \
-            -//toolchains/cc/...
+            -//toolchains/cc/...             \
+            -//firmware/...
 
   robot-tests:
     name: Robot Software Tests

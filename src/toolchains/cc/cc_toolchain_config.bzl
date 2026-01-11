@@ -84,7 +84,6 @@ ALL_COMPILE_ACTIONS = [
     ACTION_NAMES.preprocess_assemble,
     ACTION_NAMES.lto_indexing,
     ACTION_NAMES.lto_backend,
-    ACTION_NAMES.strip,
     ACTION_NAMES.clif_match,
 ]
 
@@ -612,6 +611,183 @@ cc_toolchain_config_fullsystem = rule(
     },
     provides = [CcToolchainConfigInfo],
     executable = True,
+)
+
+def _stm32_gcc_impl(ctx):
+    cortex_feature = feature(
+        name = "cortex_cpu",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Compile for the Cortex M0
+                            "-mcpu=cortex-m0",
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    space_optimization_feature = feature(
+        name = "space_optimization",
+        # Optimize for space, otherwise we'll likely overflow RAM and/or stack
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Optimize for size
+                            "-Os",
+                            # Places each function into its own section. If coupled with --gc-sections in the linker
+                            # stage, this option strips out unused functions and reduces code size.
+                            "-ffunction-sections",
+                        ],
+                    ),
+                ],
+            ),
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Garbage collects unused sections of code. Used with the compiler's -ffunction-sections,
+                            # this option will completely strip out unused functions out of the created binary.
+                            "-Wl,--gc-sections",
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    no_syscalls_feature = feature(
+        name = "no_syscalls",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # No OS, so stub out the system calls
+                            "--specs=nosys.specs",
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    map_file_feature = feature(
+        name = "map_file",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Generate a map file with the cross-reference table. This is very helpful to figure out
+                            # what functions are taking the most space in RAM and flash and who calls them.
+                            "-Wl,-Map=output.map,--cref",
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    bare_metal_feature = feature(
+        name = "bare_metal",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Tells the compiler that the target platform may not have an operating system, which
+                            # allows it to make some performance and size optimizations.
+                            "-ffreestanding",
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    memory_usage_feature = feature(
+        name = "memory_usage",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            # Print remaining FLASH and RAM available.
+                            "-Wl,--print-memory-usage",
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    features = [
+        cortex_feature,
+        map_file_feature,
+        no_syscalls_feature,
+        space_optimization_feature,
+        bare_metal_feature,
+        memory_usage_feature,
+    ]
+
+    return [
+        cc_common.create_cc_toolchain_config_info(
+            ctx = ctx,
+            features = features,
+            action_configs = [],
+            artifact_name_patterns = [],
+            cxx_builtin_include_directories = ctx.attr.builtin_include_directories,
+            toolchain_identifier = ctx.attr.toolchain_identifier,
+            host_system_name = ctx.attr.host_system_name,
+            target_system_name = ctx.attr.target_system_name,
+            target_cpu = ctx.attr.target_cpu,
+            target_libc = "libc",
+            compiler = "gcc",
+            abi_version = "unknown",
+            abi_libc_version = "unknown",
+            tool_paths = [
+                tool_path(name = name, path = path)
+                for name, path in ctx.attr.tool_paths.items()
+            ],
+            make_variables = [],
+            builtin_sysroot = None,
+            cc_target_os = None,
+        ),
+    ]
+
+cc_toolchain_config_stm32 = rule(
+    implementation = _stm32_gcc_impl,
+    attrs = {
+        "builtin_include_directories": attr.string_list(),
+        "extra_features": attr.string_list(),
+        "extra_no_canonical_prefixes_flags": attr.string_list(),
+        "host_compiler_warnings": attr.string_list(),
+        "host_system_name": attr.string(),
+        "host_unfiltered_compile_flags": attr.string_list(),
+        "target_cpu": attr.string(),
+        "target_system_name": attr.string(),
+        "tool_paths": attr.string_dict(),
+        "toolchain_identifier": attr.string(),
+    },
+    provides = [CcToolchainConfigInfo],
 )
 
 def _k8_jetson_nano_cross_compile_impl(ctx):
