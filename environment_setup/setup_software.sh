@@ -18,6 +18,8 @@
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd "$CURR_DIR" || exit
 
+git config core.hooksPath "$CURR_DIR/../scripts/githooks"
+
 source util.sh
 
 g_arch=$(uname -m)  # Global variable. No function should use this name.
