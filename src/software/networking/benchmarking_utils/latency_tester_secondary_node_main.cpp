@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        LoggerSingleton::initializeLogger(args.runtime_dir, nullptr, false);
+        LoggerSingleton::initializeLogger(args.runtime_dir, nullptr, DEBUG, false);
 
         std::unique_ptr<LatencyTesterSecondaryNode> tester;
         if (args.unicast)
