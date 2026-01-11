@@ -100,8 +100,8 @@ extern "C"
         bool IsSpeedReliable;          /*!< Latest private speed reliability information,
                                              updated by the *_CalcAvrgMecSpeedUnit() functions. It
                                           is          true if the speed measurement variance is
-                                          lower than          the          threshold corresponding to
-                                          hVariancePercentage */
+                                          lower than          the          threshold corresponding
+                                          to          hVariancePercentage */
         uint8_t ConsistencyCounter;    /*!< Counter of passed tests for start-up
                                              validation */
         uint8_t ReliabilityCounter;    /*!< Counter for reliability check internal to

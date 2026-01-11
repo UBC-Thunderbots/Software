@@ -68,20 +68,21 @@ extern "C"
         uint32_t
             DataAlign; /*!< Specifies whether the ADC data  alignment is left or right.
                             This parameter can be a value of @ref ADC_Data_align */
-        uint32_t
-            ScanConvMode;      /*!< Configures the sequencer of regular group.
+        uint32_t ScanConvMode; /*!< Configures the sequencer of regular group.
                                     This parameter can be associated to parameter
-                                  'DiscontinuousConvMode' to have main sequence subdivided in
-                                  successive parts.      Sequencer is automatically enabled if
-                                  several channels are set (sequencer cannot be disabled, as it
-                                  can be the case on other STM32 devices):      If only 1
-                                  channel is      set: Conversion is performed in single mode.      If
-                                  several      channels are set:  Conversions are performed in
-                                  sequence mode      (ranks defined by each channel number: channel
-                                  0 fixed on      rank 0, channel 1 fixed on rank1, ...).      Scan
-                                  direction can be      set to forward (from channel 0 to channel
-                                  18) or backward      (from channel 18 to channel 0).      This
-                                  parameter can be a value      of @ref ADC_Scan_mode */
+                                  'DiscontinuousConvMode' to have main sequence subdivided
+                                  in successive parts.      Sequencer is automatically
+                                  enabled if several channels are set (sequencer cannot be
+                                  disabled, as it can be the case on other STM32 devices):
+                                  If only 1 channel is      set: Conversion is performed
+                                  in single mode. If      several      channels are set:
+                                  Conversions are performed in      sequence mode (ranks
+                                  defined by each channel number: channel      0 fixed on
+                                  rank 0, channel 1 fixed on rank1,
+                                  ...).      Scan      direction can be      set to
+                                  forward (from channel 0 to channel      18) or backward
+                                  (from channel 18 to channel 0).      This      parameter
+                                  can be a value      of @ref ADC_Scan_mode */
         uint32_t EOCSelection; /*!< Specifies what EOC (End Of Conversion) flag is used
                                   for conversion by polling and interruption: end of
                                   conversion of each rank or complete sequence. This

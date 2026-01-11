@@ -75,8 +75,8 @@ typedef struct
                                   *
                                   * This value is updated on each call to the PI_Controller() or
                                   * PID_Controller() functions. It           contains the
-                                  * integral term before       being divided by @f$K_{id}@f$, the
-                                  * divisor of the integral           gain:
+                                  * integral term before       being divided by @f$K_{id}@f$,
+                                  * the       divisor of the integral           gain:
                                   *
                                   * @f[
                                   * K_{ig}\times\sum_{k=0}^t{\epsilon_k}
@@ -130,8 +130,9 @@ typedef struct
                               *
                               * If #FULL_MISRA_C_COMPLIANCY is not defined  the divisor is
                               * implemented through          algebrical right shifts to speed up
-                              * the          execution of the controller functions. Only in this          case does
-                              * this          parameter specify the number of right shifts to be executed.
+                              * the          execution of the controller functions. Only in this
+                              * case does          this          parameter specify the number of
+                              * right          shifts to be executed.
                               */
     uint16_t hKpDivisorPOW2; /**< @brief @f$K_{pd}@f$, divisor of the proportional gain,
                               * expressed as power of 2.
@@ -162,8 +163,9 @@ typedef struct
                               *
                               * If #FULL_MISRA_C_COMPLIANCY is not defined  the divisor is
                               * implemented through          algebrical right shifts to speed up
-                              * the          execution of the controller functions. Only in this          case does
-                              * this          parameter specify the number of right shifts to be executed.
+                              * the          execution of the controller functions. Only in this
+                              * case does          this          parameter specify the number of
+                              * right          shifts to be executed.
                               */
     uint16_t hKdDivisorPOW2; /**< @brief @f$K_{dd}@f$, divisor of the derivative gain,
                               * expressed as power of 2.
