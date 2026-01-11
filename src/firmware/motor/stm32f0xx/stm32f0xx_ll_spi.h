@@ -177,9 +177,10 @@ extern "C"
 /** @defgroup SPI_LL_EC_PROTOCOL Serial Protocol
  * @{
  */
-#define LL_SPI_PROTOCOL_MOTOROLA 0x00000000U /*!< Motorola mode. Used as default value   \
-                                              */
-#define LL_SPI_PROTOCOL_TI (SPI_CR2_FRF)     /*!< TI mode                              */
+#define LL_SPI_PROTOCOL_MOTOROLA                                                         \
+    0x00000000U                          /*!< Motorola mode. Used as default value       \
+                                          */
+#define LL_SPI_PROTOCOL_TI (SPI_CR2_FRF) /*!< TI mode                              */
 /**
  * @}
  */
@@ -274,18 +275,20 @@ extern "C"
  * @{
  */
 #define LL_SPI_DATAWIDTH_4BIT                                                            \
-    (SPI_CR2_DS_0 | SPI_CR2_DS_1)            /*!< Data length for SPI transfer:  4 bits */
-#define LL_SPI_DATAWIDTH_5BIT (SPI_CR2_DS_2) /*!< Data length for SPI transfer:  5 bits  \
-                                              */
+    (SPI_CR2_DS_0 | SPI_CR2_DS_1) /*!< Data length for SPI transfer:  4 bits */
+#define LL_SPI_DATAWIDTH_5BIT                                                            \
+    (SPI_CR2_DS_2) /*!< Data length for SPI transfer:  5 bits                            \
+                    */
 #define LL_SPI_DATAWIDTH_6BIT                                                            \
     (SPI_CR2_DS_2 | SPI_CR2_DS_0) /*!< Data length for SPI transfer:  6 bits */
 #define LL_SPI_DATAWIDTH_7BIT                                                            \
     (SPI_CR2_DS_2 | SPI_CR2_DS_1) /*!< Data length for SPI transfer:  7 bits */
 #define LL_SPI_DATAWIDTH_8BIT                                                            \
     (SPI_CR2_DS_2 | SPI_CR2_DS_1 |                                                       \
-     SPI_CR2_DS_0)                           /*!< Data length for SPI transfer:  8 bits */
-#define LL_SPI_DATAWIDTH_9BIT (SPI_CR2_DS_3) /*!< Data length for SPI transfer:  9 bits  \
-                                              */
+     SPI_CR2_DS_0) /*!< Data length for SPI transfer:  8 bits */
+#define LL_SPI_DATAWIDTH_9BIT                                                            \
+    (SPI_CR2_DS_3) /*!< Data length for SPI transfer:  9 bits                            \
+                    */
 #define LL_SPI_DATAWIDTH_10BIT                                                           \
     (SPI_CR2_DS_3 | SPI_CR2_DS_0) /*!< Data length for SPI transfer: 10 bits */
 #define LL_SPI_DATAWIDTH_11BIT                                                           \
@@ -344,11 +347,12 @@ extern "C"
 /** @defgroup SPI_LL_EC_RX_FIFO RX FIFO Level
  * @{
  */
-#define LL_SPI_RX_FIFO_EMPTY 0x00000000U                      /*!< FIFO reception empty */
-#define LL_SPI_RX_FIFO_QUARTER_FULL (SPI_SR_FRLVL_0)          /*!< FIFO reception 1/4   */
-#define LL_SPI_RX_FIFO_HALF_FULL (SPI_SR_FRLVL_1)             /*!< FIFO reception 1/2   */
-#define LL_SPI_RX_FIFO_FULL (SPI_SR_FRLVL_1 | SPI_SR_FRLVL_0) /*!< FIFO reception full   \
-                                                               */
+#define LL_SPI_RX_FIFO_EMPTY 0x00000000U             /*!< FIFO reception empty */
+#define LL_SPI_RX_FIFO_QUARTER_FULL (SPI_SR_FRLVL_0) /*!< FIFO reception 1/4   */
+#define LL_SPI_RX_FIFO_HALF_FULL (SPI_SR_FRLVL_1)    /*!< FIFO reception 1/2   */
+#define LL_SPI_RX_FIFO_FULL                                                              \
+    (SPI_SR_FRLVL_1 | SPI_SR_FRLVL_0) /*!< FIFO reception full                           \
+                                       */
 /**
  * @}
  */
@@ -1622,9 +1626,10 @@ extern "C"
 /** @defgroup I2S_LL_EC_POLARITY Clock Polarity
  * @{
  */
-#define LL_I2S_POLARITY_LOW 0x00000000U          /*!< Clock steady state is low level  */
-#define LL_I2S_POLARITY_HIGH (SPI_I2SCFGR_CKPOL) /*!< Clock steady state is high level   \
-                                                  */
+#define LL_I2S_POLARITY_LOW 0x00000000U /*!< Clock steady state is low level  */
+#define LL_I2S_POLARITY_HIGH                                                             \
+    (SPI_I2SCFGR_CKPOL) /*!< Clock steady state is high level                            \
+                         */
 /**
  * @}
  */
@@ -1697,8 +1702,9 @@ extern "C"
 #define LL_I2S_AUDIOFREQ_16K 16000U /*!< Audio Frequency configuration  16000 Hz */
 #define LL_I2S_AUDIOFREQ_11K 11025U /*!< Audio Frequency configuration  11025 Hz */
 #define LL_I2S_AUDIOFREQ_8K 8000U   /*!< Audio Frequency configuration   8000 Hz       */
-#define LL_I2S_AUDIOFREQ_DEFAULT 2U /*!< Audio Freq not specified. Register I2SDIV = 2   \
-                                     */
+#define LL_I2S_AUDIOFREQ_DEFAULT                                                         \
+    2U /*!< Audio Freq not specified. Register I2SDIV = 2                                \
+        */
 /**
  * @}
  */

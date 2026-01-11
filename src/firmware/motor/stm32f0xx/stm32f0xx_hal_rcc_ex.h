@@ -938,8 +938,8 @@ extern "C"
  */
 #define RCC_CRS_HSI48CALIBRATION_DEFAULT                                                 \
     (0x00000020U) /*!< The default value is 32, which corresponds to the middle of the   \
-                     trimming interval. The trimming step is around 67 kHz between two                                          \
-                     consecutive TRIM steps. A higher TRIM value corresponds to a higher                                                                 \
+                     trimming interval. The trimming step is around 67 kHz between two   \
+                     consecutive TRIM steps. A higher TRIM value corresponds to a higher \
                      output frequency */
 /**
  * @}

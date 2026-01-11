@@ -475,8 +475,9 @@ extern "C"
 
 /* SCB Configuration Control Register Definitions */
 #define SCB_CCR_STKALIGN_Pos 9U /*!< SCB CCR: STKALIGN Position */
-#define SCB_CCR_STKALIGN_Msk (1UL << SCB_CCR_STKALIGN_Pos) /*!< SCB CCR: STKALIGN Mask   \
-                                                            */
+#define SCB_CCR_STKALIGN_Msk                                                             \
+    (1UL << SCB_CCR_STKALIGN_Pos) /*!< SCB CCR: STKALIGN Mask                            \
+                                   */
 
 #define SCB_CCR_UNALIGN_TRP_Pos 3U /*!< SCB CCR: UNALIGN_TRP Position */
 #define SCB_CCR_UNALIGN_TRP_Msk                                                          \

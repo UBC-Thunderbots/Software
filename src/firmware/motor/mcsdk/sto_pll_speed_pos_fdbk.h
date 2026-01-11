@@ -88,7 +88,8 @@ typedef struct
                   *  Max Measurable Current in Ampere [**A**]. \n
                   *  Max Application Speed in Rotation per minute [**rpm**]. \n
                   *  Motor Bemf Constant in Voltage line to line root mean square per kilo-rpm
-                  * [**Vllrms/krpm**]. \n     State Observer Execution Rate in Hertz [**Hz**]. \n
+                  * [**Vllrms/krpm**]. \n     State Observer Execution Rate in Hertz [**Hz**].
+                  * \n
                   */
     int16_t hC5; /**< @brief State observer constant @f$ C_5 @f$.
                   *
@@ -127,8 +128,9 @@ typedef struct
     bool IsSpeedReliable;       /**< @brief Estimated speed reliability information.
                                  *
                                  *  Updated during speed average computation in
-                                 * STO_PLL_CalcAvrgMecSpeedUnit,       True if the speed measurement
-                                 * variance is lower than threshold VariancePercentage.
+                                 * STO_PLL_CalcAvrgMecSpeedUnit,       True if the speed
+                                 * measurement       variance is lower than threshold
+                                 * VariancePercentage.
                                  */
     uint8_t ConsistencyCounter; /**< @brief Counter of passed tests for start-up
                                    validation. */
@@ -154,8 +156,8 @@ typedef struct
                                   */
     uint8_t SpeedBufferSizeDpp;  /**< @brief Depth of FIFO used to calculate both average
                                   * estimated speed exported by SPD_GetElSpeedDpp and state
-                                  * observer equations.  Must be an integer number between 1
-                                  * and SpeedBufferSizeUnit
+                                  * observer equations.  Must be an integer number between
+                                  * 1  and SpeedBufferSizeUnit
                                   */
     uint16_t
         VariancePercentage; /**< @brief Maximum allowed variance of speed estimation. */

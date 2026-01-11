@@ -471,8 +471,9 @@ extern "C"
 /*       If they are not listed below, they do not require any specific       */
 /*       path enable. In this case, Access to measurement path is done        */
 /*       only by selecting the corresponding ADC internal channel.            */
-#define LL_ADC_PATH_INTERNAL_NONE (0x00000000U) /*!< ADC measurement paths all disabled  \
-                                                 */
+#define LL_ADC_PATH_INTERNAL_NONE                                                        \
+    (0x00000000U) /*!< ADC measurement paths all disabled                                \
+                   */
 #define LL_ADC_PATH_INTERNAL_VREFINT                                                     \
     (ADC_CCR_VREFEN) /*!< ADC measurement path to internal channel VrefInt */
 #define LL_ADC_PATH_INTERNAL_TEMPSENSOR                                                  \

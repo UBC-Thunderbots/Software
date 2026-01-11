@@ -67,7 +67,7 @@ extern "C"
     typedef enum
     {
         /******  Cortex-M0 Processor Exceptions Numbers
-           **************************************************************/
+         **************************************************************/
         NonMaskableInt_IRQn = -14, /*!< 2 Non Maskable Interrupt */
         HardFault_IRQn      = -13, /*!< 3 Cortex-M0 Hard Fault Interrupt */
         SVCall_IRQn         = -5,  /*!< 11 Cortex-M0 SV Call Interrupt  */
@@ -75,7 +75,7 @@ extern "C"
         SysTick_IRQn        = -1,  /*!< 15 Cortex-M0 System Tick Interrupt  */
 
         /******  STM32F0 specific Interrupt Numbers
-           ******************************************************************/
+         ******************************************************************/
         WWDG_IRQn     = 0, /*!< Window WatchDog Interrupt                               */
         PVD_IRQn      = 1, /*!< PVD Interrupt through EXTI Lines 16 */
         RTC_IRQn      = 2, /*!< RTC Interrupt through EXTI Lines 17, 19 and 20 */
@@ -397,18 +397,18 @@ extern "C"
      */
     typedef struct
     {
-        __IO uint32_t TR;     /*!< RTC time register,     Address offset: 0x00 */
-        __IO uint32_t DR;     /*!< RTC date register,     Address offset: 0x04 */
-        __IO uint32_t CR;     /*!< RTC control register,     Address offset: 0x08 */
-        __IO uint32_t ISR;    /*!< RTC initialization and status register,    Address offset:
-                                 0x0C */
+        __IO uint32_t TR;  /*!< RTC time register,     Address offset: 0x00 */
+        __IO uint32_t DR;  /*!< RTC date register,     Address offset: 0x04 */
+        __IO uint32_t CR;  /*!< RTC control register,     Address offset: 0x08 */
+        __IO uint32_t ISR; /*!< RTC initialization and status register,    Address offset:
+                              0x0C */
         __IO uint32_t PRER;   /*!< RTC prescaler register,   Address offset: 0x10 */
         uint32_t RESERVED1;   /*!< Reserved,   Address offset: 0x14 */
         uint32_t RESERVED2;   /*!< Reserved,   Address offset: 0x18 */
         __IO uint32_t ALRMAR; /*!< RTC alarm A register, Address offset: 0x1C */
         uint32_t RESERVED3;   /*!< Reserved,   Address offset: 0x20 */
-        __IO uint32_t WPR;    /*!< RTC write protection register,    Address offset: 0x24 */
-        __IO uint32_t SSR;    /*!< RTC sub second register,    Address offset: 0x28 */
+        __IO uint32_t WPR; /*!< RTC write protection register,    Address offset: 0x24 */
+        __IO uint32_t SSR; /*!< RTC sub second register,    Address offset: 0x28 */
         __IO uint32_t SHIFTR; /*!< RTC shift control register, Address offset: 0x2C */
         __IO uint32_t TSTR;   /*!< RTC time stamp time register,   Address offset: 0x30 */
         __IO uint32_t TSDR;   /*!< RTC time stamp date register,   Address offset: 0x34 */
@@ -418,7 +418,7 @@ extern "C"
         __IO uint32_t TAFCR; /*!< RTC tamper and alternate function configuration
                                 register,  Address offset: 0x40 */
         __IO uint32_t
-            ALRMASSR;        /*!< RTC alarm A sub second register,        Address offset: 0x44 */
+            ALRMASSR; /*!< RTC alarm A sub second register,        Address offset: 0x44 */
         uint32_t RESERVED4;  /*!< Reserved,  Address offset: 0x48 */
         uint32_t RESERVED5;  /*!< Reserved,  Address offset: 0x4C */
         __IO uint32_t BKP0R; /*!< RTC backup register 0, Address offset: 0x50 */
@@ -447,9 +447,9 @@ extern "C"
                                  offset: 0x14 */
         __IO uint32_t TXCRCR; /*!< SPI Tx CRC register (not used in I2S mode), Address
                                  offset: 0x18 */
-        __IO
-            uint32_t I2SCFGR; /*!< SPI_I2S configuration register, Address offset: 0x1C */
-        __IO uint32_t I2SPR;  /*!< SPI_I2S prescaler register,  Address offset: 0x20 */
+        __IO uint32_t
+            I2SCFGR;         /*!< SPI_I2S configuration register, Address offset: 0x1C */
+        __IO uint32_t I2SPR; /*!< SPI_I2S prescaler register,  Address offset: 0x20 */
     } SPI_TypeDef;
 
     /**
@@ -590,8 +590,9 @@ extern "C"
 #define DMA1_Channel5_BASE (DMA1_BASE + 0x00000058UL)
 
 #define RCC_BASE (AHBPERIPH_BASE + 0x00001000UL)
-#define FLASH_R_BASE (AHBPERIPH_BASE + 0x00002000UL) /*!< FLASH registers base address   \
-                                                      */
+#define FLASH_R_BASE                                                                     \
+    (AHBPERIPH_BASE + 0x00002000UL) /*!< FLASH registers base address                    \
+                                     */
 #define OB_BASE 0x1FFFF800UL        /*!< FLASH Option Bytes base address */
 #define FLASHSIZE_BASE 0x1FFFF7CCUL /*!< FLASH Size register base address */
 #define UID_BASE 0x1FFFF7ACUL       /*!< Unique device ID register base address */
@@ -1082,45 +1083,54 @@ extern "C"
 
 /****************  Bit definition for DBGMCU_IDCODE register  *****************/
 #define DBGMCU_IDCODE_DEV_ID_Pos (0U)
-#define DBGMCU_IDCODE_DEV_ID_Msk (0xFFFUL << DBGMCU_IDCODE_DEV_ID_Pos) /*!< 0x00000FFF   \
-                                                                        */
+#define DBGMCU_IDCODE_DEV_ID_Msk                                                         \
+    (0xFFFUL << DBGMCU_IDCODE_DEV_ID_Pos)             /*!< 0x00000FFF                    \
+                                                       */
 #define DBGMCU_IDCODE_DEV_ID DBGMCU_IDCODE_DEV_ID_Msk /*!< Device Identifier */
 
 #define DBGMCU_IDCODE_REV_ID_Pos (16U)
-#define DBGMCU_IDCODE_REV_ID_Msk (0xFFFFUL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0xFFFF0000  \
-                                                                         */
+#define DBGMCU_IDCODE_REV_ID_Msk                                                         \
+    (0xFFFFUL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0xFFFF0000                               \
+                                            */
 #define DBGMCU_IDCODE_REV_ID                                                             \
     DBGMCU_IDCODE_REV_ID_Msk /*!< REV_ID[15:0] bits (Revision Identifier) */
-#define DBGMCU_IDCODE_REV_ID_0 (0x0001UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x00010000 */
-#define DBGMCU_IDCODE_REV_ID_1 (0x0002UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x00020000 */
-#define DBGMCU_IDCODE_REV_ID_2 (0x0004UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x00040000 */
-#define DBGMCU_IDCODE_REV_ID_3 (0x0008UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x00080000 */
-#define DBGMCU_IDCODE_REV_ID_4 (0x0010UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x00100000 */
-#define DBGMCU_IDCODE_REV_ID_5 (0x0020UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x00200000 */
-#define DBGMCU_IDCODE_REV_ID_6 (0x0040UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x00400000 */
-#define DBGMCU_IDCODE_REV_ID_7 (0x0080UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x00800000 */
-#define DBGMCU_IDCODE_REV_ID_8 (0x0100UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x01000000 */
-#define DBGMCU_IDCODE_REV_ID_9 (0x0200UL << DBGMCU_IDCODE_REV_ID_Pos)  /*!< 0x02000000 */
-#define DBGMCU_IDCODE_REV_ID_10 (0x0400UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x04000000   \
-                                                                        */
-#define DBGMCU_IDCODE_REV_ID_11 (0x0800UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x08000000   \
-                                                                        */
-#define DBGMCU_IDCODE_REV_ID_12 (0x1000UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x10000000   \
-                                                                        */
-#define DBGMCU_IDCODE_REV_ID_13 (0x2000UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x20000000   \
-                                                                        */
-#define DBGMCU_IDCODE_REV_ID_14 (0x4000UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x40000000   \
-                                                                        */
-#define DBGMCU_IDCODE_REV_ID_15 (0x8000UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x80000000   \
-                                                                        */
+#define DBGMCU_IDCODE_REV_ID_0 (0x0001UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x00010000 */
+#define DBGMCU_IDCODE_REV_ID_1 (0x0002UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x00020000 */
+#define DBGMCU_IDCODE_REV_ID_2 (0x0004UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x00040000 */
+#define DBGMCU_IDCODE_REV_ID_3 (0x0008UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x00080000 */
+#define DBGMCU_IDCODE_REV_ID_4 (0x0010UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x00100000 */
+#define DBGMCU_IDCODE_REV_ID_5 (0x0020UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x00200000 */
+#define DBGMCU_IDCODE_REV_ID_6 (0x0040UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x00400000 */
+#define DBGMCU_IDCODE_REV_ID_7 (0x0080UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x00800000 */
+#define DBGMCU_IDCODE_REV_ID_8 (0x0100UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x01000000 */
+#define DBGMCU_IDCODE_REV_ID_9 (0x0200UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x02000000 */
+#define DBGMCU_IDCODE_REV_ID_10                                                          \
+    (0x0400UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x04000000                               \
+                                            */
+#define DBGMCU_IDCODE_REV_ID_11                                                          \
+    (0x0800UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x08000000                               \
+                                            */
+#define DBGMCU_IDCODE_REV_ID_12                                                          \
+    (0x1000UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x10000000                               \
+                                            */
+#define DBGMCU_IDCODE_REV_ID_13                                                          \
+    (0x2000UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x20000000                               \
+                                            */
+#define DBGMCU_IDCODE_REV_ID_14                                                          \
+    (0x4000UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x40000000                               \
+                                            */
+#define DBGMCU_IDCODE_REV_ID_15                                                          \
+    (0x8000UL << DBGMCU_IDCODE_REV_ID_Pos) /*!< 0x80000000                               \
+                                            */
 
 /******************  Bit definition for DBGMCU_CR register  *******************/
 #define DBGMCU_CR_DBG_STOP_Pos (1U)
 #define DBGMCU_CR_DBG_STOP_Msk (0x1UL << DBGMCU_CR_DBG_STOP_Pos) /*!< 0x00000002 */
 #define DBGMCU_CR_DBG_STOP DBGMCU_CR_DBG_STOP_Msk                /*!< Debug Stop Mode */
 #define DBGMCU_CR_DBG_STANDBY_Pos (2U)
-#define DBGMCU_CR_DBG_STANDBY_Msk (0x1UL << DBGMCU_CR_DBG_STANDBY_Pos) /*!< 0x00000004   \
-                                                                        */
+#define DBGMCU_CR_DBG_STANDBY_Msk                                                        \
+    (0x1UL << DBGMCU_CR_DBG_STANDBY_Pos)                /*!< 0x00000004                  \
+                                                         */
 #define DBGMCU_CR_DBG_STANDBY DBGMCU_CR_DBG_STANDBY_Msk /*!< Debug Standby mode */
 
 /******************  Bit definition for DBGMCU_APB1_FZ register  **************/
@@ -2112,9 +2122,10 @@ extern "C"
     FLASH_OBR_VDDA_MONITOR_Msk /*!< VDDA power supply supervisor */
 #define FLASH_OBR_RAM_PARITY_CHECK_Pos (14U)
 #define FLASH_OBR_RAM_PARITY_CHECK_Msk                                                   \
-    (0x1UL << FLASH_OBR_RAM_PARITY_CHECK_Pos)                     /*!< 0x00004000 */
-#define FLASH_OBR_RAM_PARITY_CHECK FLASH_OBR_RAM_PARITY_CHECK_Msk /*!< RAM parity check  \
-                                                                   */
+    (0x1UL << FLASH_OBR_RAM_PARITY_CHECK_Pos) /*!< 0x00004000 */
+#define FLASH_OBR_RAM_PARITY_CHECK                                                       \
+    FLASH_OBR_RAM_PARITY_CHECK_Msk /*!< RAM parity check                                 \
+                                    */
 #define FLASH_OBR_DATA0_Pos (16U)
 #define FLASH_OBR_DATA0_Msk (0xFFUL << FLASH_OBR_DATA0_Pos) /*!< 0x00FF0000 */
 #define FLASH_OBR_DATA0 FLASH_OBR_DATA0_Msk                 /*!< Data0 */
@@ -2267,62 +2278,72 @@ extern "C"
 
 /****************  Bit definition for GPIO_OSPEEDR register  ******************/
 #define GPIO_OSPEEDR_OSPEEDR0_Pos (0U)
-#define GPIO_OSPEEDR_OSPEEDR0_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR0_Pos) /*!< 0x00000003   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR0_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR0_Pos) /*!< 0x00000003                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR0 GPIO_OSPEEDR_OSPEEDR0_Msk
 #define GPIO_OSPEEDR_OSPEEDR0_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR0_Pos) /*!< 0x00000001 */
 #define GPIO_OSPEEDR_OSPEEDR0_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR0_Pos) /*!< 0x00000002 */
 #define GPIO_OSPEEDR_OSPEEDR1_Pos (2U)
-#define GPIO_OSPEEDR_OSPEEDR1_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR1_Pos) /*!< 0x0000000C   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR1_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR1_Pos) /*!< 0x0000000C                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR1 GPIO_OSPEEDR_OSPEEDR1_Msk
 #define GPIO_OSPEEDR_OSPEEDR1_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR1_Pos) /*!< 0x00000004 */
 #define GPIO_OSPEEDR_OSPEEDR1_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR1_Pos) /*!< 0x00000008 */
 #define GPIO_OSPEEDR_OSPEEDR2_Pos (4U)
-#define GPIO_OSPEEDR_OSPEEDR2_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR2_Pos) /*!< 0x00000030   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR2_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR2_Pos) /*!< 0x00000030                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR2 GPIO_OSPEEDR_OSPEEDR2_Msk
 #define GPIO_OSPEEDR_OSPEEDR2_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR2_Pos) /*!< 0x00000010 */
 #define GPIO_OSPEEDR_OSPEEDR2_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR2_Pos) /*!< 0x00000020 */
 #define GPIO_OSPEEDR_OSPEEDR3_Pos (6U)
-#define GPIO_OSPEEDR_OSPEEDR3_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR3_Pos) /*!< 0x000000C0   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR3_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR3_Pos) /*!< 0x000000C0                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR3 GPIO_OSPEEDR_OSPEEDR3_Msk
 #define GPIO_OSPEEDR_OSPEEDR3_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR3_Pos) /*!< 0x00000040 */
 #define GPIO_OSPEEDR_OSPEEDR3_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR3_Pos) /*!< 0x00000080 */
 #define GPIO_OSPEEDR_OSPEEDR4_Pos (8U)
-#define GPIO_OSPEEDR_OSPEEDR4_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR4_Pos) /*!< 0x00000300   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR4_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR4_Pos) /*!< 0x00000300                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR4 GPIO_OSPEEDR_OSPEEDR4_Msk
 #define GPIO_OSPEEDR_OSPEEDR4_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR4_Pos) /*!< 0x00000100 */
 #define GPIO_OSPEEDR_OSPEEDR4_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR4_Pos) /*!< 0x00000200 */
 #define GPIO_OSPEEDR_OSPEEDR5_Pos (10U)
-#define GPIO_OSPEEDR_OSPEEDR5_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR5_Pos) /*!< 0x00000C00   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR5_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR5_Pos) /*!< 0x00000C00                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR5 GPIO_OSPEEDR_OSPEEDR5_Msk
 #define GPIO_OSPEEDR_OSPEEDR5_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR5_Pos) /*!< 0x00000400 */
 #define GPIO_OSPEEDR_OSPEEDR5_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR5_Pos) /*!< 0x00000800 */
 #define GPIO_OSPEEDR_OSPEEDR6_Pos (12U)
-#define GPIO_OSPEEDR_OSPEEDR6_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR6_Pos) /*!< 0x00003000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR6_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR6_Pos) /*!< 0x00003000                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR6 GPIO_OSPEEDR_OSPEEDR6_Msk
 #define GPIO_OSPEEDR_OSPEEDR6_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR6_Pos) /*!< 0x00001000 */
 #define GPIO_OSPEEDR_OSPEEDR6_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR6_Pos) /*!< 0x00002000 */
 #define GPIO_OSPEEDR_OSPEEDR7_Pos (14U)
-#define GPIO_OSPEEDR_OSPEEDR7_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR7_Pos) /*!< 0x0000C000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR7_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR7_Pos) /*!< 0x0000C000                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR7 GPIO_OSPEEDR_OSPEEDR7_Msk
 #define GPIO_OSPEEDR_OSPEEDR7_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR7_Pos) /*!< 0x00004000 */
 #define GPIO_OSPEEDR_OSPEEDR7_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR7_Pos) /*!< 0x00008000 */
 #define GPIO_OSPEEDR_OSPEEDR8_Pos (16U)
-#define GPIO_OSPEEDR_OSPEEDR8_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR8_Pos) /*!< 0x00030000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR8_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR8_Pos) /*!< 0x00030000                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR8 GPIO_OSPEEDR_OSPEEDR8_Msk
 #define GPIO_OSPEEDR_OSPEEDR8_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR8_Pos) /*!< 0x00010000 */
 #define GPIO_OSPEEDR_OSPEEDR8_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR8_Pos) /*!< 0x00020000 */
 #define GPIO_OSPEEDR_OSPEEDR9_Pos (18U)
-#define GPIO_OSPEEDR_OSPEEDR9_Msk (0x3UL << GPIO_OSPEEDR_OSPEEDR9_Pos) /*!< 0x000C0000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR9_Msk                                                        \
+    (0x3UL << GPIO_OSPEEDR_OSPEEDR9_Pos) /*!< 0x000C0000                                 \
+                                          */
 #define GPIO_OSPEEDR_OSPEEDR9 GPIO_OSPEEDR_OSPEEDR9_Msk
 #define GPIO_OSPEEDR_OSPEEDR9_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR9_Pos) /*!< 0x00040000 */
 #define GPIO_OSPEEDR_OSPEEDR9_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR9_Pos) /*!< 0x00080000 */
@@ -2330,50 +2351,62 @@ extern "C"
 #define GPIO_OSPEEDR_OSPEEDR10_Msk                                                       \
     (0x3UL << GPIO_OSPEEDR_OSPEEDR10_Pos) /*!< 0x00300000 */
 #define GPIO_OSPEEDR_OSPEEDR10 GPIO_OSPEEDR_OSPEEDR10_Msk
-#define GPIO_OSPEEDR_OSPEEDR10_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR10_Pos) /*!< 0x00100000   \
-                                                                        */
-#define GPIO_OSPEEDR_OSPEEDR10_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR10_Pos) /*!< 0x00200000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR10_0                                                         \
+    (0x1UL << GPIO_OSPEEDR_OSPEEDR10_Pos) /*!< 0x00100000                                \
+                                           */
+#define GPIO_OSPEEDR_OSPEEDR10_1                                                         \
+    (0x2UL << GPIO_OSPEEDR_OSPEEDR10_Pos) /*!< 0x00200000                                \
+                                           */
 #define GPIO_OSPEEDR_OSPEEDR11_Pos (22U)
 #define GPIO_OSPEEDR_OSPEEDR11_Msk                                                       \
     (0x3UL << GPIO_OSPEEDR_OSPEEDR11_Pos) /*!< 0x00C00000 */
 #define GPIO_OSPEEDR_OSPEEDR11 GPIO_OSPEEDR_OSPEEDR11_Msk
-#define GPIO_OSPEEDR_OSPEEDR11_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR11_Pos) /*!< 0x00400000   \
-                                                                        */
-#define GPIO_OSPEEDR_OSPEEDR11_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR11_Pos) /*!< 0x00800000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR11_0                                                         \
+    (0x1UL << GPIO_OSPEEDR_OSPEEDR11_Pos) /*!< 0x00400000                                \
+                                           */
+#define GPIO_OSPEEDR_OSPEEDR11_1                                                         \
+    (0x2UL << GPIO_OSPEEDR_OSPEEDR11_Pos) /*!< 0x00800000                                \
+                                           */
 #define GPIO_OSPEEDR_OSPEEDR12_Pos (24U)
 #define GPIO_OSPEEDR_OSPEEDR12_Msk                                                       \
     (0x3UL << GPIO_OSPEEDR_OSPEEDR12_Pos) /*!< 0x03000000 */
 #define GPIO_OSPEEDR_OSPEEDR12 GPIO_OSPEEDR_OSPEEDR12_Msk
-#define GPIO_OSPEEDR_OSPEEDR12_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR12_Pos) /*!< 0x01000000   \
-                                                                        */
-#define GPIO_OSPEEDR_OSPEEDR12_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR12_Pos) /*!< 0x02000000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR12_0                                                         \
+    (0x1UL << GPIO_OSPEEDR_OSPEEDR12_Pos) /*!< 0x01000000                                \
+                                           */
+#define GPIO_OSPEEDR_OSPEEDR12_1                                                         \
+    (0x2UL << GPIO_OSPEEDR_OSPEEDR12_Pos) /*!< 0x02000000                                \
+                                           */
 #define GPIO_OSPEEDR_OSPEEDR13_Pos (26U)
 #define GPIO_OSPEEDR_OSPEEDR13_Msk                                                       \
     (0x3UL << GPIO_OSPEEDR_OSPEEDR13_Pos) /*!< 0x0C000000 */
 #define GPIO_OSPEEDR_OSPEEDR13 GPIO_OSPEEDR_OSPEEDR13_Msk
-#define GPIO_OSPEEDR_OSPEEDR13_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR13_Pos) /*!< 0x04000000   \
-                                                                        */
-#define GPIO_OSPEEDR_OSPEEDR13_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR13_Pos) /*!< 0x08000000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR13_0                                                         \
+    (0x1UL << GPIO_OSPEEDR_OSPEEDR13_Pos) /*!< 0x04000000                                \
+                                           */
+#define GPIO_OSPEEDR_OSPEEDR13_1                                                         \
+    (0x2UL << GPIO_OSPEEDR_OSPEEDR13_Pos) /*!< 0x08000000                                \
+                                           */
 #define GPIO_OSPEEDR_OSPEEDR14_Pos (28U)
 #define GPIO_OSPEEDR_OSPEEDR14_Msk                                                       \
     (0x3UL << GPIO_OSPEEDR_OSPEEDR14_Pos) /*!< 0x30000000 */
 #define GPIO_OSPEEDR_OSPEEDR14 GPIO_OSPEEDR_OSPEEDR14_Msk
-#define GPIO_OSPEEDR_OSPEEDR14_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR14_Pos) /*!< 0x10000000   \
-                                                                        */
-#define GPIO_OSPEEDR_OSPEEDR14_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR14_Pos) /*!< 0x20000000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR14_0                                                         \
+    (0x1UL << GPIO_OSPEEDR_OSPEEDR14_Pos) /*!< 0x10000000                                \
+                                           */
+#define GPIO_OSPEEDR_OSPEEDR14_1                                                         \
+    (0x2UL << GPIO_OSPEEDR_OSPEEDR14_Pos) /*!< 0x20000000                                \
+                                           */
 #define GPIO_OSPEEDR_OSPEEDR15_Pos (30U)
 #define GPIO_OSPEEDR_OSPEEDR15_Msk                                                       \
     (0x3UL << GPIO_OSPEEDR_OSPEEDR15_Pos) /*!< 0xC0000000 */
 #define GPIO_OSPEEDR_OSPEEDR15 GPIO_OSPEEDR_OSPEEDR15_Msk
-#define GPIO_OSPEEDR_OSPEEDR15_0 (0x1UL << GPIO_OSPEEDR_OSPEEDR15_Pos) /*!< 0x40000000   \
-                                                                        */
-#define GPIO_OSPEEDR_OSPEEDR15_1 (0x2UL << GPIO_OSPEEDR_OSPEEDR15_Pos) /*!< 0x80000000   \
-                                                                        */
+#define GPIO_OSPEEDR_OSPEEDR15_0                                                         \
+    (0x1UL << GPIO_OSPEEDR_OSPEEDR15_Pos) /*!< 0x40000000                                \
+                                           */
+#define GPIO_OSPEEDR_OSPEEDR15_1                                                         \
+    (0x2UL << GPIO_OSPEEDR_OSPEEDR15_Pos) /*!< 0x80000000                                \
+                                           */
 
 /* Old Bit definition for GPIO_OSPEEDR register maintained for legacy purpose */
 #define GPIO_OSPEEDER_OSPEEDR0 GPIO_OSPEEDR_OSPEEDR0
@@ -2937,8 +2970,9 @@ extern "C"
 #define I2C_TIMEOUTR_TIDLE_Msk (0x1UL << I2C_TIMEOUTR_TIDLE_Pos) /*!< 0x00001000 */
 #define I2C_TIMEOUTR_TIDLE I2C_TIMEOUTR_TIDLE_Msk /*!< Idle clock timeout detection */
 #define I2C_TIMEOUTR_TIMOUTEN_Pos (15U)
-#define I2C_TIMEOUTR_TIMOUTEN_Msk (0x1UL << I2C_TIMEOUTR_TIMOUTEN_Pos) /*!< 0x00008000   \
-                                                                        */
+#define I2C_TIMEOUTR_TIMOUTEN_Msk                                                        \
+    (0x1UL << I2C_TIMEOUTR_TIMOUTEN_Pos)                /*!< 0x00008000                  \
+                                                         */
 #define I2C_TIMEOUTR_TIMOUTEN I2C_TIMEOUTR_TIMOUTEN_Msk /*!< Clock timeout enable */
 #define I2C_TIMEOUTR_TIMEOUTB_Pos (16U)
 #define I2C_TIMEOUTR_TIMEOUTB_Msk                                                        \
@@ -2946,8 +2980,9 @@ extern "C"
 #define I2C_TIMEOUTR_TIMEOUTB I2C_TIMEOUTR_TIMEOUTB_Msk /*!< Bus timeout B*/
 #define I2C_TIMEOUTR_TEXTEN_Pos (31U)
 #define I2C_TIMEOUTR_TEXTEN_Msk (0x1UL << I2C_TIMEOUTR_TEXTEN_Pos) /*!< 0x80000000 */
-#define I2C_TIMEOUTR_TEXTEN I2C_TIMEOUTR_TEXTEN_Msk /*!< Extended clock timeout enable   \
-                                                     */
+#define I2C_TIMEOUTR_TEXTEN                                                              \
+    I2C_TIMEOUTR_TEXTEN_Msk /*!< Extended clock timeout enable                           \
+                             */
 
 /******************  Bit definition for I2C_ISR register  ********************/
 #define I2C_ISR_TXE_Pos (0U)
@@ -3330,8 +3365,9 @@ extern "C"
 /*!< MCO configuration */
 #define RCC_CFGR_MCO_Pos (24U)
 #define RCC_CFGR_MCO_Msk (0xFUL << RCC_CFGR_MCO_Pos) /*!< 0x0F000000 */
-#define RCC_CFGR_MCO RCC_CFGR_MCO_Msk /*!< MCO[3:0] bits (Microcontroller Clock Output)  \
-                                       */
+#define RCC_CFGR_MCO                                                                     \
+    RCC_CFGR_MCO_Msk /*!< MCO[3:0] bits (Microcontroller Clock Output)                   \
+                      */
 #define RCC_CFGR_MCO_0 (0x1UL << RCC_CFGR_MCO_Pos) /*!< 0x01000000 */
 #define RCC_CFGR_MCO_1 (0x2UL << RCC_CFGR_MCO_Pos) /*!< 0x02000000 */
 #define RCC_CFGR_MCO_2 (0x4UL << RCC_CFGR_MCO_Pos) /*!< 0x04000000 */
@@ -3457,13 +3493,15 @@ extern "C"
     (0x1UL << RCC_APB2RSTR_USART1RST_Pos)                 /*!< 0x00004000 */
 #define RCC_APB2RSTR_USART1RST RCC_APB2RSTR_USART1RST_Msk /*!< USART1 reset */
 #define RCC_APB2RSTR_TIM16RST_Pos (17U)
-#define RCC_APB2RSTR_TIM16RST_Msk (0x1UL << RCC_APB2RSTR_TIM16RST_Pos) /*!< 0x00020000   \
-                                                                        */
-#define RCC_APB2RSTR_TIM16RST RCC_APB2RSTR_TIM16RST_Msk                /*!< TIM16 reset */
+#define RCC_APB2RSTR_TIM16RST_Msk                                                        \
+    (0x1UL << RCC_APB2RSTR_TIM16RST_Pos)                /*!< 0x00020000                  \
+                                                         */
+#define RCC_APB2RSTR_TIM16RST RCC_APB2RSTR_TIM16RST_Msk /*!< TIM16 reset */
 #define RCC_APB2RSTR_TIM17RST_Pos (18U)
-#define RCC_APB2RSTR_TIM17RST_Msk (0x1UL << RCC_APB2RSTR_TIM17RST_Pos) /*!< 0x00040000   \
-                                                                        */
-#define RCC_APB2RSTR_TIM17RST RCC_APB2RSTR_TIM17RST_Msk                /*!< TIM17 reset */
+#define RCC_APB2RSTR_TIM17RST_Msk                                                        \
+    (0x1UL << RCC_APB2RSTR_TIM17RST_Pos)                /*!< 0x00040000                  \
+                                                         */
+#define RCC_APB2RSTR_TIM17RST RCC_APB2RSTR_TIM17RST_Msk /*!< TIM17 reset */
 #define RCC_APB2RSTR_DBGMCURST_Pos (22U)
 #define RCC_APB2RSTR_DBGMCURST_Msk                                                       \
     (0x1UL << RCC_APB2RSTR_DBGMCURST_Pos)                 /*!< 0x00400000 */
@@ -3480,8 +3518,9 @@ extern "C"
 #define RCC_APB1RSTR_TIM3RST_Msk (0x1UL << RCC_APB1RSTR_TIM3RST_Pos) /*!< 0x00000002 */
 #define RCC_APB1RSTR_TIM3RST RCC_APB1RSTR_TIM3RST_Msk                /*!< Timer 3 reset */
 #define RCC_APB1RSTR_TIM14RST_Pos (8U)
-#define RCC_APB1RSTR_TIM14RST_Msk (0x1UL << RCC_APB1RSTR_TIM14RST_Pos) /*!< 0x00000100   \
-                                                                        */
+#define RCC_APB1RSTR_TIM14RST_Msk                                                        \
+    (0x1UL << RCC_APB1RSTR_TIM14RST_Pos)                /*!< 0x00000100                  \
+                                                         */
 #define RCC_APB1RSTR_TIM14RST RCC_APB1RSTR_TIM14RST_Msk /*!< Timer 14 reset */
 #define RCC_APB1RSTR_WWDGRST_Pos (11U)
 #define RCC_APB1RSTR_WWDGRST_Msk (0x1UL << RCC_APB1RSTR_WWDGRST_Pos) /*!< 0x00000800 */
@@ -3726,8 +3765,9 @@ extern "C"
 /*******************  Bit definition for RCC_CR2 register  *******************/
 #define RCC_CR2_HSI14ON_Pos (0U)
 #define RCC_CR2_HSI14ON_Msk (0x1UL << RCC_CR2_HSI14ON_Pos) /*!< 0x00000001 */
-#define RCC_CR2_HSI14ON RCC_CR2_HSI14ON_Msk /*!< Internal High Speed 14MHz clock enable  \
-                                             */
+#define RCC_CR2_HSI14ON                                                                  \
+    RCC_CR2_HSI14ON_Msk /*!< Internal High Speed 14MHz clock enable                      \
+                         */
 #define RCC_CR2_HSI14RDY_Pos (1U)
 #define RCC_CR2_HSI14RDY_Msk (0x1UL << RCC_CR2_HSI14RDY_Pos) /*!< 0x00000002 */
 #define RCC_CR2_HSI14RDY                                                                 \
@@ -4448,10 +4488,12 @@ extern "C"
 /*****************************************************************************/
 /*****************  Bit definition for SYSCFG_CFGR1 register  ****************/
 #define SYSCFG_CFGR1_MEM_MODE_Pos (0U)
-#define SYSCFG_CFGR1_MEM_MODE_Msk (0x3UL << SYSCFG_CFGR1_MEM_MODE_Pos) /*!< 0x00000003   \
-                                                                        */
-#define SYSCFG_CFGR1_MEM_MODE SYSCFG_CFGR1_MEM_MODE_Msk /*!< SYSCFG_Memory Remap Config  \
-                                                         */
+#define SYSCFG_CFGR1_MEM_MODE_Msk                                                        \
+    (0x3UL << SYSCFG_CFGR1_MEM_MODE_Pos) /*!< 0x00000003                                 \
+                                          */
+#define SYSCFG_CFGR1_MEM_MODE                                                            \
+    SYSCFG_CFGR1_MEM_MODE_Msk /*!< SYSCFG_Memory Remap Config                            \
+                               */
 #define SYSCFG_CFGR1_MEM_MODE_0 (0x1UL << SYSCFG_CFGR1_MEM_MODE_Pos) /*!< 0x00000001 */
 #define SYSCFG_CFGR1_MEM_MODE_1 (0x2UL << SYSCFG_CFGR1_MEM_MODE_Pos) /*!< 0x00000002 */
 
@@ -4628,12 +4670,14 @@ extern "C"
 #define SYSCFG_EXTICR3_EXTI9_Msk (0xFUL << SYSCFG_EXTICR3_EXTI9_Pos) /*!< 0x000000F0 */
 #define SYSCFG_EXTICR3_EXTI9 SYSCFG_EXTICR3_EXTI9_Msk /*!< EXTI 9 configuration */
 #define SYSCFG_EXTICR3_EXTI10_Pos (8U)
-#define SYSCFG_EXTICR3_EXTI10_Msk (0xFUL << SYSCFG_EXTICR3_EXTI10_Pos) /*!< 0x00000F00   \
-                                                                        */
+#define SYSCFG_EXTICR3_EXTI10_Msk                                                        \
+    (0xFUL << SYSCFG_EXTICR3_EXTI10_Pos)                /*!< 0x00000F00                  \
+                                                         */
 #define SYSCFG_EXTICR3_EXTI10 SYSCFG_EXTICR3_EXTI10_Msk /*!< EXTI 10 configuration */
 #define SYSCFG_EXTICR3_EXTI11_Pos (12U)
-#define SYSCFG_EXTICR3_EXTI11_Msk (0xFUL << SYSCFG_EXTICR3_EXTI11_Pos) /*!< 0x0000F000   \
-                                                                        */
+#define SYSCFG_EXTICR3_EXTI11_Msk                                                        \
+    (0xFUL << SYSCFG_EXTICR3_EXTI11_Pos)                /*!< 0x0000F000                  \
+                                                         */
 #define SYSCFG_EXTICR3_EXTI11 SYSCFG_EXTICR3_EXTI11_Msk /*!< EXTI 11 configuration */
 
 /**
@@ -4675,20 +4719,24 @@ extern "C"
 
 /*****************  Bit definition for SYSCFG_EXTICR4 register  **************/
 #define SYSCFG_EXTICR4_EXTI12_Pos (0U)
-#define SYSCFG_EXTICR4_EXTI12_Msk (0xFUL << SYSCFG_EXTICR4_EXTI12_Pos) /*!< 0x0000000F   \
-                                                                        */
+#define SYSCFG_EXTICR4_EXTI12_Msk                                                        \
+    (0xFUL << SYSCFG_EXTICR4_EXTI12_Pos)                /*!< 0x0000000F                  \
+                                                         */
 #define SYSCFG_EXTICR4_EXTI12 SYSCFG_EXTICR4_EXTI12_Msk /*!< EXTI 12 configuration */
 #define SYSCFG_EXTICR4_EXTI13_Pos (4U)
-#define SYSCFG_EXTICR4_EXTI13_Msk (0xFUL << SYSCFG_EXTICR4_EXTI13_Pos) /*!< 0x000000F0   \
-                                                                        */
+#define SYSCFG_EXTICR4_EXTI13_Msk                                                        \
+    (0xFUL << SYSCFG_EXTICR4_EXTI13_Pos)                /*!< 0x000000F0                  \
+                                                         */
 #define SYSCFG_EXTICR4_EXTI13 SYSCFG_EXTICR4_EXTI13_Msk /*!< EXTI 13 configuration */
 #define SYSCFG_EXTICR4_EXTI14_Pos (8U)
-#define SYSCFG_EXTICR4_EXTI14_Msk (0xFUL << SYSCFG_EXTICR4_EXTI14_Pos) /*!< 0x00000F00   \
-                                                                        */
+#define SYSCFG_EXTICR4_EXTI14_Msk                                                        \
+    (0xFUL << SYSCFG_EXTICR4_EXTI14_Pos)                /*!< 0x00000F00                  \
+                                                         */
 #define SYSCFG_EXTICR4_EXTI14 SYSCFG_EXTICR4_EXTI14_Msk /*!< EXTI 14 configuration */
 #define SYSCFG_EXTICR4_EXTI15_Pos (12U)
-#define SYSCFG_EXTICR4_EXTI15_Msk (0xFUL << SYSCFG_EXTICR4_EXTI15_Pos) /*!< 0x0000F000   \
-                                                                        */
+#define SYSCFG_EXTICR4_EXTI15_Msk                                                        \
+    (0xFUL << SYSCFG_EXTICR4_EXTI15_Pos)                /*!< 0x0000F000                  \
+                                                         */
 #define SYSCFG_EXTICR4_EXTI15 SYSCFG_EXTICR4_EXTI15_Msk /*!< EXTI 15 configuration */
 
 /**
@@ -4741,15 +4789,17 @@ extern "C"
     SYSCFG_CFGR2_SRAM_PARITY_LOCK_Msk /*!< Enables and locks the SRAM_PARITY error       \
                                          signal with Break Input of TIMER1 */
 #define SYSCFG_CFGR2_PVD_LOCK_Pos (2U)
-#define SYSCFG_CFGR2_PVD_LOCK_Msk (0x1UL << SYSCFG_CFGR2_PVD_LOCK_Pos) /*!< 0x00000004   \
-                                                                        */
+#define SYSCFG_CFGR2_PVD_LOCK_Msk                                                        \
+    (0x1UL << SYSCFG_CFGR2_PVD_LOCK_Pos) /*!< 0x00000004                                 \
+                                          */
 #define SYSCFG_CFGR2_PVD_LOCK                                                            \
     SYSCFG_CFGR2_PVD_LOCK_Msk /*!< Enables and locks the PVD connection with Timer1      \
                                  Break Input and also the PVD_EN and PVDSEL[2:0] bits of \
                                  the Power Control Interface */
 #define SYSCFG_CFGR2_SRAM_PEF_Pos (8U)
-#define SYSCFG_CFGR2_SRAM_PEF_Msk (0x1UL << SYSCFG_CFGR2_SRAM_PEF_Pos) /*!< 0x00000100   \
-                                                                        */
+#define SYSCFG_CFGR2_SRAM_PEF_Msk                                                        \
+    (0x1UL << SYSCFG_CFGR2_SRAM_PEF_Pos)                /*!< 0x00000100                  \
+                                                         */
 #define SYSCFG_CFGR2_SRAM_PEF SYSCFG_CFGR2_SRAM_PEF_Msk /*!< SRAM Parity error flag */
 #define SYSCFG_CFGR2_SRAM_PE                                                             \
     SYSCFG_CFGR2_SRAM_PEF /*!< SRAM Parity error flag (define maintained for legacy      \
@@ -4869,8 +4919,9 @@ extern "C"
 
 #define TIM_SMCR_ETPS_Pos (12U)
 #define TIM_SMCR_ETPS_Msk (0x3UL << TIM_SMCR_ETPS_Pos) /*!< 0x00003000 */
-#define TIM_SMCR_ETPS TIM_SMCR_ETPS_Msk /*!<ETPS[1:0] bits (External trigger prescaler)  \
-                                         */
+#define TIM_SMCR_ETPS                                                                    \
+    TIM_SMCR_ETPS_Msk /*!<ETPS[1:0] bits (External trigger prescaler)                    \
+                       */
 #define TIM_SMCR_ETPS_0 (0x1UL << TIM_SMCR_ETPS_Pos) /*!< 0x00001000 */
 #define TIM_SMCR_ETPS_1 (0x2UL << TIM_SMCR_ETPS_Pos) /*!< 0x00002000 */
 

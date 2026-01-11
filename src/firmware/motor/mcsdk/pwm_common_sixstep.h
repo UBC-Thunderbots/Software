@@ -146,7 +146,7 @@ extern "C"
                                                instance used to switch PWM on */
         PWMC_SetADCTriggerChannel_Cb_t /**< pointer on the function the component instance
                                           used to set the trigger point of the ADC */
-                                           pFctSetADCTriggerChannel;
+            pFctSetADCTriggerChannel;
         PWMC_TurnOnLowSides_Cb_t
             pFctTurnOnLowSides; /**< pointer on the function the component instance used
                                    to turn low sides on */

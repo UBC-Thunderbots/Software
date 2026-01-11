@@ -264,10 +264,11 @@ extern "C"
 #define LL_USART_CR3_CTSIE USART_CR3_CTSIE /*!< CTS interrupt enable */
 #if defined(USART_CR1_UESM)
 #if defined(USART_CR3_WUFIE)
-#define LL_USART_CR3_WUFIE USART_CR3_WUFIE /*!< Wakeup from Stop mode interrupt enable   \
-                                            */
-#endif                                     /* USART_CR3_WUFIE */
-#endif                                     /* USART_CR1_UESM */
+#define LL_USART_CR3_WUFIE                                                               \
+    USART_CR3_WUFIE /*!< Wakeup from Stop mode interrupt enable                          \
+                     */
+#endif              /* USART_CR3_WUFIE */
+#endif              /* USART_CR1_UESM */
 /**
  * @}
  */
@@ -275,8 +276,9 @@ extern "C"
 /** @defgroup USART_LL_EC_DIRECTION Communication Direction
  * @{
  */
-#define LL_USART_DIRECTION_NONE 0x00000000U /*!< Transmitter and Receiver are disabled   \
-                                             */
+#define LL_USART_DIRECTION_NONE                                                          \
+    0x00000000U /*!< Transmitter and Receiver are disabled                               \
+                 */
 #define LL_USART_DIRECTION_RX                                                            \
     USART_CR1_RE /*!< Transmitter is disabled and Receiver is enabled */
 #define LL_USART_DIRECTION_TX                                                            \
@@ -395,8 +397,9 @@ extern "C"
 #endif                                         /* USART_SMARTCARD_SUPPORT */
 #define LL_USART_STOPBITS_1 0x00000000U        /*!< 1 stop bit */
 #if defined(USART_SMARTCARD_SUPPORT)
-#define LL_USART_STOPBITS_1_5 (USART_CR2_STOP_0 | USART_CR2_STOP_1) /*!< 1.5 stop bits   \
-                                                                     */
+#define LL_USART_STOPBITS_1_5                                                            \
+    (USART_CR2_STOP_0 | USART_CR2_STOP_1)    /*!< 1.5 stop bits                          \
+                                              */
 #endif                                       /* USART_SMARTCARD_SUPPORT */
 #define LL_USART_STOPBITS_2 USART_CR2_STOP_1 /*!< 2 stop bits */
 /**

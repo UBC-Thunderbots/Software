@@ -578,8 +578,9 @@ extern "C"
 /** @defgroup TIM_LL_EC_AUTOMATICOUTPUT_ENABLE Automatic output enable
  * @{
  */
-#define LL_TIM_AUTOMATICOUTPUT_DISABLE 0x00000000U /*!< MOE can be set only by software  \
-                                                    */
+#define LL_TIM_AUTOMATICOUTPUT_DISABLE                                                   \
+    0x00000000U /*!< MOE can be set only by software                                     \
+                 */
 #define LL_TIM_AUTOMATICOUTPUT_ENABLE                                                    \
     TIM_BDTR_AOE /*!< MOE can be set by software or automatically at the next update     \
                     event */
@@ -735,8 +736,9 @@ extern "C"
 #define LL_TIM_OCMODE_FROZEN                                                             \
     0x00000000U /*!<The comparison between the output compare register TIMx_CCRy and the \
                    counter TIMx_CNT has no effect on the output channel level */
-#define LL_TIM_OCMODE_ACTIVE TIM_CCMR1_OC1M_0 /*!<OCyREF is forced high on compare       \
-                                                 match*/
+#define LL_TIM_OCMODE_ACTIVE                                                             \
+    TIM_CCMR1_OC1M_0 /*!<OCyREF is forced high on compare                                \
+                        match*/
 #define LL_TIM_OCMODE_INACTIVE                                                           \
     TIM_CCMR1_OC1M_1 /*!<OCyREF is forced low on compare match*/
 #define LL_TIM_OCMODE_TOGGLE                                                             \
@@ -782,8 +784,9 @@ extern "C"
 /** @defgroup TIM_LL_EC_ACTIVEINPUT Active Input Selection
  * @{
  */
-#define LL_TIM_ACTIVEINPUT_DIRECTTI (TIM_CCMR1_CC1S_0 << 16U) /*!< ICx is mapped on TIx  \
-                                                               */
+#define LL_TIM_ACTIVEINPUT_DIRECTTI                                                      \
+    (TIM_CCMR1_CC1S_0 << 16U) /*!< ICx is mapped on TIx                                  \
+                               */
 #define LL_TIM_ACTIVEINPUT_INDIRECTTI                                                    \
     (TIM_CCMR1_CC1S_1 << 16U)                          /*!< ICx is mapped on TIy */
 #define LL_TIM_ACTIVEINPUT_TRC (TIM_CCMR1_CC1S << 16U) /*!< ICx is mapped on TRC */
@@ -811,23 +814,27 @@ extern "C"
  * @{
  */
 #define LL_TIM_IC_FILTER_FDIV1 0x00000000U /*!< No filter, sampling is done at fDTS */
-#define LL_TIM_IC_FILTER_FDIV1_N2 (TIM_CCMR1_IC1F_0 << 16U) /*!< fSAMPLING=fCK_INT, N=2  \
-                                                             */
-#define LL_TIM_IC_FILTER_FDIV1_N4 (TIM_CCMR1_IC1F_1 << 16U) /*!< fSAMPLING=fCK_INT, N=4  \
-                                                             */
+#define LL_TIM_IC_FILTER_FDIV1_N2                                                        \
+    (TIM_CCMR1_IC1F_0 << 16U) /*!< fSAMPLING=fCK_INT, N=2                                \
+                               */
+#define LL_TIM_IC_FILTER_FDIV1_N4                                                        \
+    (TIM_CCMR1_IC1F_1 << 16U) /*!< fSAMPLING=fCK_INT, N=4                                \
+                               */
 #define LL_TIM_IC_FILTER_FDIV1_N8                                                        \
-    ((TIM_CCMR1_IC1F_1 | TIM_CCMR1_IC1F_0) << 16U)          /*!< fSAMPLING=fCK_INT, N=8 */
-#define LL_TIM_IC_FILTER_FDIV2_N6 (TIM_CCMR1_IC1F_2 << 16U) /*!< fSAMPLING=fDTS/2, N=6   \
-                                                             */
+    ((TIM_CCMR1_IC1F_1 | TIM_CCMR1_IC1F_0) << 16U) /*!< fSAMPLING=fCK_INT, N=8 */
+#define LL_TIM_IC_FILTER_FDIV2_N6                                                        \
+    (TIM_CCMR1_IC1F_2 << 16U) /*!< fSAMPLING=fDTS/2, N=6                                 \
+                               */
 #define LL_TIM_IC_FILTER_FDIV2_N8                                                        \
     ((TIM_CCMR1_IC1F_2 | TIM_CCMR1_IC1F_0) << 16U) /*!< fSAMPLING=fDTS/2, N=8 */
 #define LL_TIM_IC_FILTER_FDIV4_N6                                                        \
     ((TIM_CCMR1_IC1F_2 | TIM_CCMR1_IC1F_1) << 16U) /*!< fSAMPLING=fDTS/4, N=6 */
 #define LL_TIM_IC_FILTER_FDIV4_N8                                                        \
     ((TIM_CCMR1_IC1F_2 | TIM_CCMR1_IC1F_1 | TIM_CCMR1_IC1F_0)                            \
-     << 16U)                                                /*!< fSAMPLING=fDTS/4, N=8 */
-#define LL_TIM_IC_FILTER_FDIV8_N6 (TIM_CCMR1_IC1F_3 << 16U) /*!< fSAMPLING=fDTS/8, N=6   \
-                                                             */
+     << 16U) /*!< fSAMPLING=fDTS/4, N=8 */
+#define LL_TIM_IC_FILTER_FDIV8_N6                                                        \
+    (TIM_CCMR1_IC1F_3 << 16U) /*!< fSAMPLING=fDTS/8, N=6                                 \
+                               */
 #define LL_TIM_IC_FILTER_FDIV8_N8                                                        \
     ((TIM_CCMR1_IC1F_3 | TIM_CCMR1_IC1F_0) << 16U) /*!< fSAMPLING=fDTS/8, N=8 */
 #define LL_TIM_IC_FILTER_FDIV16_N5                                                       \
@@ -842,9 +849,10 @@ extern "C"
      << 16U) /*!< fSAMPLING=fDTS/32, N=5 */
 #define LL_TIM_IC_FILTER_FDIV32_N6                                                       \
     ((TIM_CCMR1_IC1F_3 | TIM_CCMR1_IC1F_2 | TIM_CCMR1_IC1F_1)                            \
-     << 16U)                                               /*!< fSAMPLING=fDTS/32, N=6 */
-#define LL_TIM_IC_FILTER_FDIV32_N8 (TIM_CCMR1_IC1F << 16U) /*!< fSAMPLING=fDTS/32, N=8   \
-                                                            */
+     << 16U) /*!< fSAMPLING=fDTS/32, N=6 */
+#define LL_TIM_IC_FILTER_FDIV32_N8                                                       \
+    (TIM_CCMR1_IC1F << 16U) /*!< fSAMPLING=fDTS/32, N=8                                  \
+                             */
 /**
  * @}
  */
@@ -1198,8 +1206,9 @@ extern "C"
  */
 #define LL_TIM_OCREF_CLR_INT_OCREF_CLR                                                   \
     0x00000000U /*!< OCREF_CLR_INT is connected to the OCREF_CLR input */
-#define LL_TIM_OCREF_CLR_INT_ETR TIM_SMCR_OCCS /*!< OCREF_CLR_INT is connected to ETRF   \
-                                                */
+#define LL_TIM_OCREF_CLR_INT_ETR                                                         \
+    TIM_SMCR_OCCS /*!< OCREF_CLR_INT is connected to ETRF                                \
+                   */
 /**
  * @}
  */

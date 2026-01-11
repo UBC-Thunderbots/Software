@@ -69,8 +69,9 @@ extern "C"
     (uint32_t)(0x00000010) /**< @brief Deadtime ERROR occured. */
 #define GAP_ERROR_CODE_CFG                                                               \
     (uint32_t)(0x00000020) /**< @brief Configuration ERROR occured. */
-#define GAP_ERROR_CODE_GATE (uint32_t)(0x00000100) /**< @brief GATE path ERROR occured.  \
-                                                    */
+#define GAP_ERROR_CODE_GATE                                                              \
+    (uint32_t)(0x00000100) /**< @brief GATE path ERROR occured.                          \
+                            */
 #define GAP_ERROR_CODE_ASC                                                               \
     (uint32_t)(0x00000200) /**< @brief Asynchronous stop command ERROR occured. */
 #define GAP_ERROR_CODE_REGERRR                                                           \
@@ -342,9 +343,9 @@ extern "C"
 #define GAP_STATUS2_REGERRR                                                              \
     (uint8_t)(                                                                           \
         0x02) /**< @brief STATUS2 register: Register or communication error on isolated  \
-                 side is forced high when: 1 Programming procedure is not correctly                                                \
-                 performed. 2 Isolated interface communication fails. 3 An unexpected                                                                         \
-                 register value change occurs in one of the remote registers. It is also                                                                              \
+                 side is forced high when: 1 Programming procedure is not correctly      \
+                 performed. 2 Isolated interface communication fails. 3 An unexpected    \
+                 register value change occurs in one of the remote registers. It is also \
                  latched at power-up/reset and from Sleep state. */
 #define GAP_STATUS2_ASC                                                                  \
     (uint8_t)(0x01) /**< @brief STATUS2 register: ASC pin status. When ASC pin is high   \
@@ -357,14 +358,14 @@ extern "C"
 #define GAP_STATUS3_SPI_ERR                                                              \
     (uint8_t)(                                                                           \
         0x08) /**< @brief STATUS3 register: SPI communication error flag is forced high  \
-                 when the SPI communication fails cause: 1 Wrong CRC check. 2  Wrong                                                                                \
-                 number of CK rising edges. 3 Attempt to execute a not-allowed command.                                             \
+                 when the SPI communication fails cause: 1 Wrong CRC check. 2  Wrong     \
+                 number of CK rising edges. 3 Attempt to execute a not-allowed command.  \
                     4 Attempt to read, write or reset at a not available address. */
 #define GAP_STATUS3_REGERRL                                                              \
     (uint8_t)(                                                                           \
         0x04) /**< @brief STATUS3 register: Register or communication error on low       \
-                voltage side is forced high when: - 1 Programming procedure is not                                                          \
-                correctly performed. 2 Isolated interface communication fails. 3 An                                                                                    \
+                voltage side is forced high when: - 1 Programming procedure is not       \
+                correctly performed. 2 Isolated interface communication fails. 3 An      \
                 unexpected register value change occurs in one of the remote registers.  \
                 * It is latched at power-up/reset also. */
 #define GAP_STATUS3_OVLOD                                                                \
@@ -447,8 +448,8 @@ extern "C"
         SENSE_COMPARATOR_CHK, /*!< Security check to verify the functionality of the sense
                                  comparator. */
         GON_CHK,  /*!< Security check to verify the path integrity including the driver's
-                     GON output,  the GON (turn-on) gate resistor, the power switch gate and
-                     the CLAMP pin. */
+                     GON output,  the GON (turn-on) gate resistor, the power switch gate
+                     and  the CLAMP pin. */
         GOFF_CHK, /*!< Security check to verify the path integrity including the driver's
                      GOFF output, the GOFF (turn-off) gate resistor, the power switch gate
                      and the CLAMP pin. */

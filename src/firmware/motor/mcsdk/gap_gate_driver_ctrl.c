@@ -71,7 +71,8 @@
     0x2A /**< @brief CRC data computation value to start GAP driver configuration. */
 #define GAP_STOPCONFIG                                                                   \
     0x3A /**< @brief CRC data computation value to stop GAP driver configuration. */
-#define GAP_WRITEREG 0x80 /**< @brief CRC data computation value for writing register.   \
+#define GAP_WRITEREG                                                                     \
+    0x80                  /**< @brief CRC data computation value for writing register.   \
                            */
 #define GAP_READREG 0xA0  /**< @brief CRC data computation value for reading register. */
 #define GAP_RESETREG 0xC0 /**< @brief CRC data computation value to reset a register. */

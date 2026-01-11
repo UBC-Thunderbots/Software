@@ -258,21 +258,21 @@ extern "C"
      */
     typedef struct
     {
-        uint32_t ClearInputState;    /*!< TIM clear Input state
-                                          This parameter can be ENABLE or DISABLE */
-        uint32_t ClearInputSource;   /*!< TIM clear Input sources
-                                          This parameter can be a value of @ref
-                                        TIM_ClearInput_Source */
-        uint32_t ClearInputPolarity; /*!< TIM Clear Input polarity
-                                          This parameter can be a value of @ref
-                                        TIM_ClearInput_Polarity */
-        uint32_t
-            ClearInputPrescaler;   /*!< TIM Clear Input prescaler
-                                        This parameter must be 0: When OCRef clear feature
-                                      is used with ETR source,   ETR prescaler must be off */
-        uint32_t ClearInputFilter; /*!< TIM Clear Input filter
-                                        This parameter can be a number between Min_Data =
-                                      0x0 and Max_Data = 0xF */
+        uint32_t ClearInputState;     /*!< TIM clear Input state
+                                           This parameter can be ENABLE or DISABLE */
+        uint32_t ClearInputSource;    /*!< TIM clear Input sources
+                                           This parameter can be a value of @ref
+                                         TIM_ClearInput_Source */
+        uint32_t ClearInputPolarity;  /*!< TIM Clear Input polarity
+                                           This parameter can be a value of @ref
+                                         TIM_ClearInput_Polarity */
+        uint32_t ClearInputPrescaler; /*!< TIM Clear Input prescaler
+                                           This parameter must be 0: When OCRef clear
+                                         feature is used with ETR source,   ETR prescaler
+                                         must be off */
+        uint32_t ClearInputFilter;    /*!< TIM Clear Input filter
+                                           This parameter can be a number between Min_Data =
+                                         0x0 and Max_Data = 0xF */
     } TIM_ClearInputConfigTypeDef;
 
     /**
@@ -575,8 +575,9 @@ typedef struct
  * @{
  */
 #define TIM_CLEARINPUTSOURCE_NONE 0x00000000U /*!< OCREF_CLR is disabled */
-#define TIM_CLEARINPUTSOURCE_ETR 0x00000001U  /*!< OCREF_CLR is connected to ETRF input  \
-                                               */
+#define TIM_CLEARINPUTSOURCE_ETR                                                         \
+    0x00000001U /*!< OCREF_CLR is connected to ETRF input                                \
+                 */
 #define TIM_CLEARINPUTSOURCE_OCREFCLR                                                    \
     0x00000002U /*!< OCREF_CLR is connected to OCREF_CLR_INT */
 /**
@@ -809,12 +810,9 @@ typedef struct
 #define TIM_ICPSC_DIV1                                                                   \
     0x00000000U /*!< Capture performed each time an edge is detected on the capture      \
                    input */
-#define TIM_ICPSC_DIV2                                                                   \
-    TIM_CCMR1_IC1PSC_0 /*!< Capture performed once every 2 events */
-#define TIM_ICPSC_DIV4                                                                   \
-    TIM_CCMR1_IC1PSC_1 /*!< Capture performed once every 4 events */
-#define TIM_ICPSC_DIV8                                                                   \
-    TIM_CCMR1_IC1PSC /*!< Capture performed once every 8 events */
+#define TIM_ICPSC_DIV2 TIM_CCMR1_IC1PSC_0 /*!< Capture performed once every 2 events */
+#define TIM_ICPSC_DIV4 TIM_CCMR1_IC1PSC_1 /*!< Capture performed once every 4 events */
+#define TIM_ICPSC_DIV8 TIM_CCMR1_IC1PSC   /*!< Capture performed once every 8 events */
 /**
  * @}
  */
@@ -893,8 +891,9 @@ typedef struct
                       event */
 #define TIM_DMA_COM                                                                      \
     TIM_DIER_COMDE /*!< DMA request is triggered by the commutation event */
-#define TIM_DMA_TRIGGER TIM_DIER_TDE /*!< DMA request is triggered by the trigger event  \
-                                      */
+#define TIM_DMA_TRIGGER                                                                  \
+    TIM_DIER_TDE /*!< DMA request is triggered by the trigger event                      \
+                  */
 /**
  * @}
  */
@@ -988,8 +987,7 @@ typedef struct
 /** @defgroup TIM_Clock_Prescaler TIM Clock Prescaler
  * @{
  */
-#define TIM_CLOCKPRESCALER_DIV1                                                          \
-    TIM_ETRPRESCALER_DIV1 /*!< No prescaler is used */
+#define TIM_CLOCKPRESCALER_DIV1 TIM_ETRPRESCALER_DIV1 /*!< No prescaler is used */
 #define TIM_CLOCKPRESCALER_DIV2                                                          \
     TIM_ETRPRESCALER_DIV2 /*!< Prescaler for External ETR Clock: Capture performed once  \
                              every 2 events. */
@@ -1017,8 +1015,7 @@ typedef struct
 /** @defgroup TIM_ClearInput_Prescaler TIM Clear Input Prescaler
  * @{
  */
-#define TIM_CLEARINPUTPRESCALER_DIV1                                                     \
-    TIM_ETRPRESCALER_DIV1 /*!< No prescaler is used */
+#define TIM_CLEARINPUTPRESCALER_DIV1 TIM_ETRPRESCALER_DIV1 /*!< No prescaler is used */
 #define TIM_CLEARINPUTPRESCALER_DIV2                                                     \
     TIM_ETRPRESCALER_DIV2 /*!< Prescaler for External ETR pin: Capture performed once    \
                              every 2 events. */
@@ -1114,11 +1111,11 @@ typedef struct
 #define TIM_TRGO_OC1REF                                                                  \
     TIM_CR2_MMS_2 /*!< OC1REF signal is used as trigger output (TRGO)                */
 #define TIM_TRGO_OC2REF                                                                  \
-    (TIM_CR2_MMS_2 |                                                                     \
-     TIM_CR2_MMS_0) /*!< OC2REF signal is used as trigger output(TRGO) */
+    (TIM_CR2_MMS_2 | TIM_CR2_MMS_0) /*!< OC2REF signal is used as trigger output(TRGO)   \
+                                     */
 #define TIM_TRGO_OC3REF                                                                  \
-    (TIM_CR2_MMS_2 |                                                                     \
-     TIM_CR2_MMS_1) /*!< OC3REF signal is used as trigger output(TRGO) */
+    (TIM_CR2_MMS_2 | TIM_CR2_MMS_1) /*!< OC3REF signal is used as trigger output(TRGO)   \
+                                     */
 #define TIM_TRGO_OC4REF                                                                  \
     (TIM_CR2_MMS_2 | TIM_CR2_MMS_1 |                                                     \
      TIM_CR2_MMS_0) /*!< OC4REF signal is used as trigger output(TRGO) */
@@ -1215,8 +1212,7 @@ typedef struct
 /** @defgroup TIM_Trigger_Prescaler TIM Trigger Prescaler
  * @{
  */
-#define TIM_TRIGGERPRESCALER_DIV1                                                        \
-    TIM_ETRPRESCALER_DIV1 /*!< No prescaler is used */
+#define TIM_TRIGGERPRESCALER_DIV1 TIM_ETRPRESCALER_DIV1 /*!< No prescaler is used */
 #define TIM_TRIGGERPRESCALER_DIV2                                                        \
     TIM_ETRPRESCALER_DIV2 /*!< Prescaler for External ETR Trigger: Capture performed     \
                              once every 2 events. */

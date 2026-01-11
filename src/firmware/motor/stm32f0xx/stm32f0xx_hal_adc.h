@@ -74,14 +74,14 @@ extern "C"
                                   'DiscontinuousConvMode' to have main sequence subdivided in
                                   successive parts.      Sequencer is automatically enabled if
                                   several channels are set (sequencer cannot be disabled, as it
-                                  can be the case on other STM32 devices):      If only 1 channel is
-                                  set: Conversion is performed in single mode.      If several
-                                  channels are set:  Conversions are performed in sequence mode
-                                  (ranks defined by each channel number: channel 0 fixed on
-                                  rank 0, channel 1 fixed on rank1, ...).      Scan direction can be
-                                  set to forward (from channel 0 to channel 18) or backward
-                                  (from channel 18 to channel 0).      This parameter can be a value
-                                  of @ref ADC_Scan_mode */
+                                  can be the case on other STM32 devices):      If only 1
+                                  channel is      set: Conversion is performed in single mode.      If
+                                  several      channels are set:  Conversions are performed in
+                                  sequence mode      (ranks defined by each channel number: channel
+                                  0 fixed on      rank 0, channel 1 fixed on rank1, ...).      Scan
+                                  direction can be      set to forward (from channel 0 to channel
+                                  18) or backward      (from channel 18 to channel 0).      This
+                                  parameter can be a value      of @ref ADC_Scan_mode */
         uint32_t EOCSelection; /*!< Specifies what EOC (End Of Conversion) flag is used
                                   for conversion by polling and interruption: end of
                                   conversion of each rank or complete sequence. This
@@ -193,10 +193,10 @@ extern "C"
                                On STM32F0 devices,  number of ranks in the sequence is
                              defined by number of channels enabled, rank of each channel is
                              defined by channel number (channel 0 fixed on rank 0, channel 1
-                             fixed on rank1, ...)..    Despite the channel rank is fixed, this
-                             parameter allow an additional possibility: to remove the
-                             selected rank (selected channel) from sequencer.    This parameter
-                             can be a value of @ref ADC_rank */
+                             fixed on rank1, ...)..    Despite the channel rank is fixed,
+                             this    parameter allow an additional possibility: to remove the
+                             selected rank (selected channel) from sequencer.    This
+                             parameter    can be a value of @ref ADC_rank */
         uint32_t
             SamplingTime; /*!< Sampling time value to be set for the selected channel.
                                Unit: ADC clock cycles
@@ -273,7 +273,7 @@ extern "C"
 /* States of ADC group regular */
 #define HAL_ADC_STATE_REG_BUSY                                                           \
     (0x00000100U) /*!< A conversion on group regular is ongoing or can occur (either by  \
-                     continuous mode, external trigger, low power auto power-on,                                              \
+                     continuous mode, external trigger, low power auto power-on,         \
                      multimode ADC master control) */
 #define HAL_ADC_STATE_REG_EOC                                                            \
     (0x00000200U) /*!< Conversion data available on group regular */
@@ -284,7 +284,7 @@ extern "C"
 /* States of ADC group injected */
 #define HAL_ADC_STATE_INJ_BUSY                                                           \
     (0x00001000U) /*!< Not available on STM32F0 device: A conversion on group injected   \
-                     is ongoing or can occur (either by auto-injection mode, external                                                                                \
+                     is ongoing or can occur (either by auto-injection mode, external    \
                      trigger, low power auto power-on, multimode ADC master control) */
 #define HAL_ADC_STATE_INJ_EOC                                                            \
     (0x00002000U) /*!< Not available on STM32F0 device: Conversion data available on     \
@@ -575,11 +575,12 @@ extern "C"
 /** @defgroup ADC_flags_definition ADC flags definition
  * @{
  */
-#define ADC_FLAG_AWD ADC_ISR_AWD   /*!< ADC Analog watchdog flag */
-#define ADC_FLAG_OVR ADC_ISR_OVR   /*!< ADC overrun flag */
-#define ADC_FLAG_EOS ADC_ISR_EOSEQ /*!< ADC End of Regular sequence of Conversions flag  \
-                                    */
-#define ADC_FLAG_EOC ADC_ISR_EOC   /*!< ADC End of Regular Conversion flag */
+#define ADC_FLAG_AWD ADC_ISR_AWD /*!< ADC Analog watchdog flag */
+#define ADC_FLAG_OVR ADC_ISR_OVR /*!< ADC overrun flag */
+#define ADC_FLAG_EOS                                                                     \
+    ADC_ISR_EOSEQ                /*!< ADC End of Regular sequence of Conversions flag    \
+                                  */
+#define ADC_FLAG_EOC ADC_ISR_EOC /*!< ADC End of Regular Conversion flag */
 #define ADC_FLAG_EOSMP ADC_ISR_EOSMP /*!< ADC End of Sampling flag */
 #define ADC_FLAG_RDY ADC_ISR_ADRDY   /*!< ADC Ready flag */
 /**
