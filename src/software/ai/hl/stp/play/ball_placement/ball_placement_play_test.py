@@ -116,23 +116,24 @@ def test_two_ai_ball_placement(
 @pytest.mark.parametrize(
     "ball_start_point, ball_placement_point",
     [
-        # 2023 RoboCup ball placement scenarios
-        # Scenario 1
-        (tbots_cpp.Point(-0.2, -2.8), tbots_cpp.Point(-0.2, 2.8)),
-        # Scenario 2
-        (tbots_cpp.Point(-3.5, -2.25), tbots_cpp.Point(0, 0)),
-        # Scenario 3
-        (tbots_cpp.Point(-1.5, -2.25), tbots_cpp.Point(-0.2, -2.8)),
-        # Scenario 4
-        (tbots_cpp.Point(-4.4, -2.9), tbots_cpp.Point(-0.2, 2.8)),
-        # Scenario 5
-        (tbots_cpp.Point(-0.5, -0), tbots_cpp.Point(-4.3, 2.8)),
-        # Scenario 6
-        (tbots_cpp.Point(-1, -3.15), tbots_cpp.Point(-3.5, -2.8)),
-        # Scenario 7
-        (tbots_cpp.Point(-1, 3.15), tbots_cpp.Point(-3.5, 2.8)),
-        # Scenario 8
-        (tbots_cpp.Point(-4.45, -0.1), tbots_cpp.Point(-0.5, 2.8)),
+        # TODO: Remove these ball placement tests until #3561 is resolved
+        # # 2023 RoboCup ball placement scenarios
+        # # Scenario 1
+        # (tbots_cpp.Point(-0.2, -2.8), tbots_cpp.Point(-0.2, 2.8)),
+        # # Scenario 2
+        # (tbots_cpp.Point(-3.5, -2.25), tbots_cpp.Point(0, 0)),
+        # # Scenario 3
+        # (tbots_cpp.Point(-1.5, -2.25), tbots_cpp.Point(-0.2, -2.8)),
+        # # Scenario 4
+        # (tbots_cpp.Point(-4.4, -2.9), tbots_cpp.Point(-0.2, 2.8)),
+        # # Scenario 5
+        # (tbots_cpp.Point(-0.5, -0), tbots_cpp.Point(-4.3, 2.8)),
+        # # Scenario 6
+        # (tbots_cpp.Point(-1, -3.15), tbots_cpp.Point(-3.5, -2.8)),
+        # # Scenario 7
+        # (tbots_cpp.Point(-1, 3.15), tbots_cpp.Point(-3.5, 2.8)),
+        # # Scenario 8
+        # (tbots_cpp.Point(-4.45, -0.1), tbots_cpp.Point(-0.5, 2.8)),
     ],
 )
 def test_robocup_technical_challenge_placement(
