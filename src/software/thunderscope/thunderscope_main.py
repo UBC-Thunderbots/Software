@@ -39,8 +39,6 @@ from software.thunderscope.wifi_communication_manager import WifiCommunicationMa
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
 
-    # Libraries to use for yellow
-
     # Setup parser
     parser = argparse.ArgumentParser(
         description="Thunderscope: Run with no arguments to run AI vs AI"
@@ -427,7 +425,15 @@ if __name__ == "__main__":
                     tick_rate_ms, tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], tscope
                 )
 
-        print(args.yellow_full_system_runtime_dir)
+        # Libraries to use for yellow
+        external_libary = "enemy_threats"
+        if external_libary == "default":
+            yellow_fs_path = "software/unix_full_system"
+        else:
+            yellow_fs_path = "/opt/tbotspython/external_ai/{}/unix_full_system".format(
+                external_libary
+            )
+
         # Launch all binaries
         with (
             Simulator(
@@ -449,7 +455,7 @@ if __name__ == "__main__":
                 should_restart_on_crash=False,
                 run_sudo=args.sudo,
                 running_in_realtime=(not args.ci_mode),
-                path_to_binary="/opt/tbotspython/external_libraries/unix_full_system",
+                path_to_binary=yellow_fs_path,
             ) as yellow_fs,
             Gamecontroller(
                 suppress_logs=(not args.verbose),

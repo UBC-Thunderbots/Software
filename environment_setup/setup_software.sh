@@ -22,7 +22,7 @@ git config core.hooksPath "$CURR_DIR/../scripts/githooks"
 
 source util.sh
 
-g_arch=$(uname -m)  # Global variable. No function should use this name.
+g_arch=$(uname -m) # Global variable. No function should use this name.
 print_status_msg "Detected architecture: ${g_arch}"
 
 if [[ $(lsb_release -rs) == "20.04" ]] || [[ $(lsb_release -rs) == "22.04" ]]; then
@@ -51,33 +51,33 @@ fi
 
 # (sorted alphabetically)
 host_software_packages=(
-    cmake # Needed to build some of our dependencies
+    cmake           # Needed to build some of our dependencies
     clang-format-14 # Used to format C++ code
-    codespell # Fixes typos
+    codespell       # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
-    gcc-10 # Full system compiles with gcc 10
+    gcc-10      # Full system compiles with gcc 10
     libstdc++6-9-dbg
     git # required for build
     g++-10
-    kcachegrind # This lets us view the profiles output by callgrind
+    kcachegrind   # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
     libudev-dev
     libusb-1.0-0-dev
-    libxcb-cursor0 # This is used as the Linux platform abstraction by Qt 
-    python3.12        # Python 3
-    python3.12-dev    # Python 3 headers
-    python3.12-venv   # Virtual Environment
-    python3-pip       # Required for bazel to install python dependencies for build targets
-    python3-yaml 	  # Load dynamic parameter configuration files
-    valgrind # Checks for memory leaks
-    libsqlite3-dev # needed to build Python 3 with sqlite support
-    libffi-dev # needed to use _ctypes in Python3
-    libssl-dev # needed to build Python 3 with ssl support
-    openssl # possibly also necessary for ssl in Python 3
-    sshpass #used to remotely ssh into robots via Ansible
-    unzip # installing tigers autoref
-    xvfb # used for CI to run GUI applications
+    libxcb-cursor0  # This is used as the Linux platform abstraction by Qt
+    python3.12      # Python 3
+    python3.12-dev  # Python 3 headers
+    python3.12-venv # Virtual Environment
+    python3-pip     # Required for bazel to install python dependencies for build targets
+    python3-yaml    # Load dynamic parameter configuration files
+    valgrind        # Checks for memory leaks
+    libsqlite3-dev  # needed to build Python 3 with sqlite support
+    libffi-dev      # needed to use _ctypes in Python3
+    libssl-dev      # needed to build Python 3 with ssl support
+    openssl         # possibly also necessary for ssl in Python 3
+    sshpass         #used to remotely ssh into robots via Ansible
+    unzip           # installing tigers autoref
+    xvfb            # used for CI to run GUI applications
 )
 
 # Clear the download cache
@@ -87,7 +87,7 @@ mkdir /tmp/tbots_download_cache
 if [[ $(lsb_release -rs) == "24.04" ]]; then
     # This is required because a Braille TTY device that Linux provides a driver for conflicts with the ESP32
     wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/tbots_download_cache/85-brltty.rules
-    sudo mv /tmp/tbots_download_cache/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
+    sudo mv /tmp/tbots_download_cache/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules
 fi
 
 virtualenv_opt_args=""
@@ -99,7 +99,7 @@ if [[ $(lsb_release -rs) == "24.04" ]]; then
     virtualenv_opt_args="--system-site-packages"
 fi
 
-if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
+if ! sudo apt-get install "${host_software_packages[@]}" -y; then
     print_status_msg "Error: Installing utilities and dependencies failed"
     exit 1
 fi
@@ -110,12 +110,12 @@ print_status_msg "Setting Up Virtual Python Environment"
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-if ! sudo /usr/bin/python3.12 -m venv /opt/tbotspython $virtualenv_opt_args ; then
+if ! sudo /usr/bin/python3.12 -m venv /opt/tbotspython $virtualenv_opt_args; then
     print_status_msg "Error: Setting up virtual environment failed"
     exit 1
 fi
 
-if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
+if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip; then
     print_status_msg "Error: Upgrading pip version in venv failed"
     exit 1
 fi
@@ -143,6 +143,9 @@ sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoRefe
 
 print_status_msg "Finished setting up AutoRef"
 
+sudo mkdir /opt/tbotspython/external_ai
+
+sudo chown -R $USER:$USER /opt/tbotspython/external_ai/
 # Install Bazel
 print_status_msg "Installing Bazel"
 
