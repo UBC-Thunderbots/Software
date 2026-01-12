@@ -6,7 +6,7 @@
 
 constexpr int SLEEP_DURATION_S = 1;
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     struct CommandLineArgs
     {
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        LoggerSingleton::initializeLogger(args.runtime_dir, nullptr, DEBUG, false);
+        LoggerSingleton::initializeLogger(args.runtime_dir, nullptr, false);
 
         std::unique_ptr<LatencyTesterSecondaryNode> tester;
         if (args.unicast)

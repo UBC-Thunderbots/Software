@@ -151,7 +151,7 @@ int main(int argc, char** argv)
         }
         proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, time_provider,
                                                      args.friendly_colour_yellow);
-        LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger,
+        LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger, true,
                                           *minimum_log_level);
         TbotsProto::ThunderbotsConfig tbots_proto;
 
