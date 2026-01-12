@@ -36,6 +36,7 @@ class FullSystem:
         :param should_restart_on_crash: whether or not to restart the program after it has been crashed
         :param run_sudo: true if we should run full system under sudo
         :param running_in_realtime: True if we are running fullsystem in realtime, else False
+        :param path_to_binary: The path of the binary used for this unix full system
         """
         self.full_system_runtime_dir = full_system_runtime_dir
         self.debug_full_system = debug_full_system
