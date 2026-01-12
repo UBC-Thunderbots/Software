@@ -426,7 +426,8 @@ if __name__ == "__main__":
                 )
 
         # Libraries to use for yellow
-        external_libary = "enemy_threats"
+        external_libary = "default"
+
         if external_libary == "default":
             yellow_fs_path = "software/unix_full_system"
         else:
