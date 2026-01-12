@@ -126,6 +126,11 @@ class LoggerSingleton
 
         g3::log_levels::setHighest(minimum_log_level);
 
+        // Add custom logging levels below setHighest to always enable
+        g3::only_change_at_initialization::addLogLevel(CSV);
+        g3::only_change_at_initialization::addLogLevel(VISUALIZE);
+        g3::only_change_at_initialization::addLogLevel(PLOTJUGGLER);
+
         g3::initializeLogging(logWorker.get());
     }
 
