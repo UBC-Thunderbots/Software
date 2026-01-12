@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-import os
 import logging
-import time
+import os
 import threading
-
+import time
 from subprocess import Popen, TimeoutExpired
+
+from software.py_constants import *
+from software.python_bindings import *
+
+from proto.import_all_protos import *
+from software.thunderscope.binary_context_managers.util import is_cmd_running
 from software.thunderscope.gl.layers.gl_obstacle_layer import ObstacleList
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.python_bindings import *
-from proto.import_all_protos import *
-from software.py_constants import *
-from software.thunderscope.binary_context_managers.util import is_cmd_running
 
 
 class FullSystem:
@@ -25,6 +26,7 @@ class FullSystem:
         should_restart_on_crash: bool = True,
         run_sudo: bool = False,
         running_in_realtime: bool = True,
+        path_to_binary: str = "software/unix_full_system",
     ) -> None:
         """Run FullSystem
 
@@ -42,7 +44,7 @@ class FullSystem:
         self.should_restart_on_crash = should_restart_on_crash
         self.should_run_under_sudo = run_sudo
         self.running_in_realtime = running_in_realtime
-
+        self.path_to_binary = path_to_binary
         self.thread = threading.Thread(target=self.__restart__, daemon=True)
 
     def __enter__(self) -> FullSystem:
@@ -61,7 +63,8 @@ class FullSystem:
         except:
             pass
 
-        self.full_system = "software/unix_full_system --runtime_dir={} {} {}".format(
+        self.full_system = "{} --runtime_dir={} {} {}".format(
+            self.path_to_binary,
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
             "--ci" if not self.running_in_realtime else "",
