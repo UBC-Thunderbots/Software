@@ -430,9 +430,7 @@ if __name__ == "__main__":
         if external_libary == "default":
             yellow_fs_path = "software/unix_full_system"
         else:
-            yellow_fs_path = "/opt/tbotspython/external_ai/{}/unix_full_system".format(
-                external_libary
-            )
+            yellow_fs_path = "/opt/tbotspython/external_ai/{}".format(external_libary)
 
         # Launch all binaries
         with (
