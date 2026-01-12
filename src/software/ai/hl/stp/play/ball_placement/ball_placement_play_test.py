@@ -181,7 +181,7 @@ def run_ball_placement_scenario(
         inv_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
-        test_timeout_s=[20],
+        test_timeout_s=[15],
     )
 
     # Drop Ball Always Validation
@@ -214,7 +214,7 @@ def run_ball_placement_scenario(
         inv_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
         ag_always_validation_sequence_set=drop_ball_always_validation_sequence_set,
         ag_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
-        test_timeout_s=[30],
+        test_timeout_s=[5],
     )
 
 
