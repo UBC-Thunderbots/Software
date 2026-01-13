@@ -14,15 +14,17 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Build Binaries
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: | 
           cd src
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- -//software:unix_full_system_tar
+      
+      - name: Package Binary
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd src
           [ -e bazel-bin/software ] && echo "bazel bin exists" || echo "does not exist"
-          echo $(ls -a)
+          echo (ls -a bazel-bin)
           TAG="v1.0.${{ github.run_number }}"
           gh release create "$TAG" "bazel-bin/software/unix_full_system_tar.tar.gz" --generate-notes
-
-          
