@@ -13,4 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Build Binaries
-        run: 
+        run: | 
+          bazel build //software:unix_full_system_tar
+      
+      - name: Package Binary
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v1.0.${{ github.run_number }}"
+          gh release create "$TAG" $(bazel info bazel-bin)/software/unix_full_system_tar.tar.gz --generate-notes
