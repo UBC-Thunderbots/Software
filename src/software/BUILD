@@ -1,7 +1,7 @@
-load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
-load("@thunderscope_deps//:requirements.bzl", "requirement")
-load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -32,8 +32,8 @@ cc_binary(
 pkg_tar(
     name = "unix_full_system_tar_gen",
     srcs = [":unix_full_system"],
-    mode = "0755",
     extension = "tar.gz",
+    mode = "0755",
 )
 
 write_source_files(
