@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v5
       - name: Build Binaries
         run: | 
+          cd src
           bazel build //software:unix_full_system_tar
       
       - name: Package Binary
