@@ -23,5 +23,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          TAR_PATH=$(bazel info bazel-bin)/software/unix_full_system_tar.tar.gz
           TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" $(bazel info bazel-bin)/software/unix_full_system_tar.tar.gz --generate-notes
+          gh release create "$TAG" "$TAR_PATH" --generate-notes
