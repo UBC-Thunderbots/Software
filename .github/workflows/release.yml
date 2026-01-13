@@ -12,14 +12,21 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/environment-setup
       - name: Build Binaries
         run: | 
-          bazel build //software:unix_full_system_tar
-      
-      - name: Package Binary
+          cd src
+          bazel build --show_timestamps --copt=-O3 --verbose_failures \
+          -- //software:unix_full_system_tar_gen
+      - name: Copy Binaries 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          cd src
+          bazel run --show_timestamps --copt=-O3 --verbose_failures \
+          -- //software:write_full_system_tar
           TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" $(bazel info bazel-bin)/software/unix_full_system_tar.tar.gz --generate-notes
+          gh release create "$TAG" "software/tar-out/unix_full_system_tar.tar.gz" --generate-notes  
+        
+          
