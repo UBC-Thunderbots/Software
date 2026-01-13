@@ -18,7 +18,7 @@ jobs:
           cd src
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- -//software:unix_full_system_tar
-          echo $(ls -a $(bazel info bazel-bin))
+          echo $(ls -a $(bazel cquery --output=files //software:unix_full_system_tar))
       
       - name: Package Binary
         env:
@@ -26,6 +26,6 @@ jobs:
         run: |
           cd src
           [ -e bazel-bin/software ] && echo "bazel bin exists" || echo "does not exist"
-          echo $(ls -a $(bazel info bazel-bin))
+          echo $(ls -a $(bazel cquery --output=files //software:unix_full_system_tar))
           TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" "bazel-bin/software/unix_full_system_tar.tar.gz" --generate-notes
+          gh release create "$TAG" $(bazel cquery --output=files //software:unix_full_system_tar) --generate-notes
