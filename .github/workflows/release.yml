@@ -1,0 +1,16 @@
+name: Release binary on commit
+
+on: 
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build Binaries
+        run: 

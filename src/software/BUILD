@@ -1,5 +1,6 @@
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -25,6 +26,12 @@ cc_binary(
         "@boost//:program_options",
         "@tracy",
     ],
+)
+
+pkg_tar(
+    name = "unix_full_system_tar",
+    srcs = [":unix_full_system"],
+    mode = "0755",
 )
 
 cc_binary(
