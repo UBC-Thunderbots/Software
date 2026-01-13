@@ -20,7 +20,7 @@ jobs:
           cd src
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- -//software:unix_full_system_tar
-          echo $(bazel cquery --output=files //software:unix_full_system_tar)
+          echo "file is here $(bazel cquery --output=files //software:unix_full_system_tar) "
           TAG="v1.0.${{ github.run_number }}"
           gh release create "$TAG" $(bazel cquery --output=files //software:unix_full_system_tar) --generate-notes
           
