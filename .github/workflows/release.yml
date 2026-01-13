@@ -25,7 +25,6 @@ jobs:
         run: |
           cd src
           TAR_PATH=$(bazel info bazel-bin)/software/unix_full_system_tar.tar.gz
-          cd ~
           [ -e bazel-bin ] && echo "bazel bin exists" || echo "does not exist"
           TAG="v1.0.${{ github.run_number }}"
           gh release create "$TAG" "$TAR_PATH" --generate-notes
