@@ -32,6 +32,7 @@ pkg_tar(
     name = "unix_full_system_tar",
     srcs = [":unix_full_system"],
     mode = "0755",
+    extension = "tar.gz",
 )
 
 cc_binary(
