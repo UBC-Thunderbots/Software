@@ -14,6 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Build Binaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: | 
           cd src
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
