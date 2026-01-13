@@ -66,8 +66,8 @@ class LoggerSingleton
                                  const bool reduce_repetition   = true,
                                  const LEVELS minimum_log_level = DEBUG)
     {
-        static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton(
-            runtime_dir, proto_logger, reduce_repetition, minimum_log_level));
+        static LoggerSingleton s(runtime_dir, proto_logger, reduce_repetition,
+                                 minimum_log_level);
     }
 
    private:
