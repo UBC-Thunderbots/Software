@@ -24,7 +24,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd src
-          TAR_PATH=$(bazel info bazel-bin)/software/unix_full_system_tar.tar.gz
-          [ -e bazel-bin ] && echo "bazel bin exists" || echo "does not exist"
+          [ -e bazel-bin/software ] && echo "bazel bin exists" || echo "does not exist"
           TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" "$TAR_PATH" --generate-notes
+          gh release create "$TAG" "bazel-bin/software/unix_full_system_tar.tar.gz" --generate-notes
