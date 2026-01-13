@@ -11,6 +11,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
+from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers.util import is_cmd_running
 
 
@@ -25,7 +26,7 @@ class FullSystem:
         should_restart_on_crash: bool = True,
         run_sudo: bool = False,
         running_in_realtime: bool = True,
-        log_level: str = "DEBUG",
+        log_level: LogLevels = LogLevels.DEBUG,
     ) -> None:
         """Run FullSystem
 
@@ -69,7 +70,7 @@ class FullSystem:
                 self.full_system_runtime_dir,
                 "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
                 "--ci" if not self.running_in_realtime else "",
-                self.log_level,
+                self.log_level.value,
             )
         )
 
