@@ -427,7 +427,7 @@ if __name__ == "__main__":
 
         # Libraries to use for yellow
 
-        # TODO (#3557) Set external_ai varaibles to follow toml file in /opt/tbotspython/external_ai/ai_config.toml
+        # TODO (#3557) Set external_ai variables to follow toml file in /opt/tbotspython/external_ai/ai_config.toml
         blue_external_ai = "None"
         yellow_external_ai = "None"
 
