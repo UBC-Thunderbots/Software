@@ -25,7 +25,7 @@ from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import CI_DURATION_S
+from software.thunderscope.constants import CI_DURATION_S, LogLevels
 from software.thunderscope.util import *
 
 from software.thunderscope.binary_context_managers.full_system import FullSystem
@@ -101,9 +101,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--log_level",
         action="store",
-        help="Minimum g3log level for full_system logs (DEBUG|INFO|WARNING|FATAL)",
-        default="DEBUG",
-        type=str,
+        help="Minimum g3log level for full_system logs",
+        choices=[level for level in LogLevels],
+        default=LogLevels.DEBUG,
+        type=LogLevels,
     )
     parser.add_argument(
         "--blue_log",
@@ -366,7 +367,7 @@ if __name__ == "__main__":
                     friendly_colour_yellow=friendly_colour_yellow,
                     should_restart_on_crash=True,
                     run_sudo=args.sudo,
-                    log_level=args.log_level,
+                    log_level=args.log_level.value,
                 ) as full_system:
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
@@ -440,7 +441,7 @@ if __name__ == "__main__":
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
-            log_level=args.log_level,
+            log_level=args.log_level.value,
         ) as blue_fs, FullSystem(
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
@@ -448,7 +449,7 @@ if __name__ == "__main__":
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
-            log_level=args.log_level,
+            log_level=args.log_level.value,
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose),
         ) as gamecontroller, (
