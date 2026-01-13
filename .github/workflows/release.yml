@@ -16,7 +16,8 @@ jobs:
       - name: Build Binaries
         run: | 
           cd src
-          bazel build //software:unix_full_system_tar
+          bazel build --show_timestamps --copt=-O3 --verbose_failures \
+          -- -//software:unix_full_system_tar
       
       - name: Package Binary
         env:
