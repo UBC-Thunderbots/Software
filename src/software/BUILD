@@ -38,9 +38,8 @@ pkg_tar(
 
 write_source_files(
     name = "write_full_system_tar",
-    files = {
-        "tar-out/unix_full_system_tar.tar.gz": "//software:unix_full_system_tar_gen",
-    },
+    in_file = "//software:unix_full_system_tar_gen",
+    out_file = "tar-out/unix_full_system_tar.tar.gz",
 )
 
 cc_binary(
