@@ -65,7 +65,7 @@ MovePrimitive::generatePrimitiveProtoMessage(
         max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
-
+    // Shrink the field by the radius of robot to ensure robot don't go out of bounds
     Rectangle field_boundary = world.field().fieldBoundary();
     Point neg_x_neg_y_corner(
         field_boundary.negXNegYCorner().x() + ROBOT_MAX_RADIUS_METERS,
