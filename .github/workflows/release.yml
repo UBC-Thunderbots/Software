@@ -23,7 +23,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd src
-          bazel run --copt=-O3 --verbose_failures -- //software:write_full_system_tar
+          bazel run --show_timestamps --copt=-O3 --verbose_failures \
+          -- -//software:write_full_system_tar
           TAG="v1.0.${{ github.run_number }}"
           gh release create "$TAG" "/tar-out/unix_full_system_tar.tar.gz" --generate-notes  
         
