@@ -22,5 +22,5 @@ jobs:
           -- -//software:unix_full_system_tar
           echo "file is here $(bazel cquery --output=files //software:unix_full_system_tar) "
           TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" $(bazel cquery --output=files //software:unix_full_system_tar) --generate-notes
+          gh release create "$TAG" "bazel-out/k8-fastbuild/bin/software/unix_full_system_tar.tar.gz" --generate-notes
           
