@@ -18,6 +18,7 @@ jobs:
           cd src
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- -//software:unix_full_system_tar
+          echo $(ls -a bazel-bin)
       
       - name: Package Binary
         env:
