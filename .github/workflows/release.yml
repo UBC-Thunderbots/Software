@@ -39,4 +39,4 @@ jobs:
           echo "${{ matrix.platform }}"
           mv software/tar-out/unix_full_system.tar.gz "software/tar-out/unix_full_system_${{ matrix.platform }}.tar.gz"
           TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" "software/tar-out/unix_full_system_${{ matrix.runner }}.tar.gz" --generate-notes  
+          gh release create "$TAG" "software/tar-out/unix_full_system_${{ matrix.platform }}.tar.gz" --generate-notes  
