@@ -11,6 +11,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
+from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers.util import is_cmd_running
 
 
@@ -25,6 +26,7 @@ class FullSystem:
         should_restart_on_crash: bool = True,
         run_sudo: bool = False,
         running_in_realtime: bool = True,
+        log_level: LogLevels = LogLevels.DEBUG,
     ) -> None:
         """Run FullSystem
 
@@ -34,6 +36,7 @@ class FullSystem:
         :param should_restart_on_crash: whether or not to restart the program after it has been crashed
         :param run_sudo: true if we should run full system under sudo
         :param running_in_realtime: True if we are running fullsystem in realtime, else False
+        :param log_level: Minimum g3log level that will be printed (DEBUG|INFO|WARNING|FATAL)
         """
         self.full_system_runtime_dir = full_system_runtime_dir
         self.debug_full_system = debug_full_system
@@ -42,6 +45,7 @@ class FullSystem:
         self.should_restart_on_crash = should_restart_on_crash
         self.should_run_under_sudo = run_sudo
         self.running_in_realtime = running_in_realtime
+        self.log_level = log_level
 
         self.thread = threading.Thread(target=self.__restart__, daemon=True)
 
@@ -61,10 +65,13 @@ class FullSystem:
         except:
             pass
 
-        self.full_system = "software/unix_full_system --runtime_dir={} {} {}".format(
-            self.full_system_runtime_dir,
-            "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
-            "--ci" if not self.running_in_realtime else "",
+        self.full_system = (
+            "software/unix_full_system --runtime_dir={} {} {} --log_level={}".format(
+                self.full_system_runtime_dir,
+                "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
+                "--ci" if not self.running_in_realtime else "",
+                self.log_level.value,
+            )
         )
 
         if self.should_run_under_sudo:

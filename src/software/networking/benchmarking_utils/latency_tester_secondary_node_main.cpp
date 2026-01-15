@@ -6,7 +6,7 @@
 
 constexpr int SLEEP_DURATION_S = 1;
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     struct CommandLineArgs
     {
