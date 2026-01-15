@@ -37,10 +37,17 @@ pkg_tar(
 )
 
 write_source_files(
-    name = "write_full_system_tar",
+    name = "write_full_system_x86",
     in_file = "//software:unix_full_system_tar_gen",
-    out_file = "tar-out/unix_full_system_tar.tar.gz",
+    out_file = "tar-out/unix_full_system_x86.tar.gz",
 )
+
+write_source_files(
+    name = "write_full_system_arm",
+    in_file = "//software:unix_full_system_tar_gen",
+    out_file = "tar-out/unix_full_system_arm.tar.gz",
+)
+
 
 cc_binary(
     name = "er_force_simulator_main",

@@ -25,8 +25,28 @@ jobs:
         run: |
           cd src
           bazel run --show_timestamps --copt=-O3 --verbose_failures \
-          -- //software:write_full_system_tar
+          -- //software:write_full_system_x86
           TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" "software/tar-out/unix_full_system_tar.tar.gz" --generate-notes  
-        
+          gh release create "$TAG" "software/tar-out/unix_full_system_x86.tar.gz" --generate-notes  
+  release:
+    runs-on: macos-arm64
+    permissions:
+      contents: write
+    steps: 
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/environment-setup
+      - name: Build Binaries
+        run: | 
+          cd src
+          bazel build --show_timestamps --copt=-O3 --verbose_failures \
+          -- //software:unix_full_system_tar_gen
+      - name: Copy Binaries 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd src
+          bazel run --show_timestamps --copt=-O3 --verbose_failures \
+          -- //software:write_full_system_arm
+          TAG="v1.0.${{ github.run_number }}"
+          gh release create "$TAG" "software/tar-out/unix_full_system_arm.tar.gz" --generate-notes  
           
