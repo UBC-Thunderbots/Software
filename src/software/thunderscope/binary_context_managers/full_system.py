@@ -20,13 +20,13 @@ class FullSystem:
 
     def __init__(
         self,
+        path_to_binary: str,
         full_system_runtime_dir: os.PathLike = None,
         debug_full_system: bool = False,
         friendly_colour_yellow: bool = False,
         should_restart_on_crash: bool = True,
         run_sudo: bool = False,
         running_in_realtime: bool = True,
-        path_to_binary: str = "software/unix_full_system",
     ) -> None:
         """Run FullSystem
 
