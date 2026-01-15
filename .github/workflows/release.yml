@@ -14,8 +14,9 @@ jobs:
         include:
           - platform: x86
             runner: ubuntu-24.04
-          - platform: arm64
-            runner: macos-latest
+          # This is for when we support macos arm and have a setup-software script setup properly
+          # - platform: arm64
+          #   runner: macos-latest
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: write
