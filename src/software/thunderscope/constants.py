@@ -384,8 +384,8 @@ class DribblingConstants:
 
     MAX_DRIBBLING_DISTANCE = 1.0
     DRIBBLING_ERROR_MARGIN = 0.06
-    
-    
+
+
 class LogLevels(StrEnum):
     """Log levels for FullSystem to indicate minimum logged level"""
 
