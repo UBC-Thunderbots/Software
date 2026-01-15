@@ -96,6 +96,14 @@ if __name__ == "__main__":
         help="Visualize C++ Tests",
     )
     parser.add_argument(
+        "--log_level",
+        action="store",
+        help="Minimum g3log level for full_system logs",
+        choices=[level for level in LogLevels],
+        default=LogLevels.DEBUG,
+        type=LogLevels,
+    )
+    parser.add_argument(
         "--blue_log",
         action="store",
         help="Replay folder for the blue full_system",
@@ -362,6 +370,7 @@ if __name__ == "__main__":
                     friendly_colour_yellow=friendly_colour_yellow,
                     should_restart_on_crash=True,
                     run_sudo=args.sudo,
+                    log_level=args.log_level,
                 ) as full_system:
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
@@ -446,29 +455,33 @@ if __name__ == "__main__":
         )
 
         # Launch all binaries
-        with (
-            Simulator(
-                args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
-            ) as simulator,
-            FullSystem(
-                full_system_runtime_dir=args.blue_full_system_runtime_dir,
-                debug_full_system=args.debug_blue_full_system,
-                friendly_colour_yellow=False,
-                should_restart_on_crash=False,
-                run_sudo=args.sudo,
-                running_in_realtime=(not args.ci_mode),
-                path_to_binary=blue_path_to_binary,
-            ) as blue_fs,
-            FullSystem(
-                full_system_runtime_dir=args.yellow_full_system_runtime_dir,
-                debug_full_system=args.debug_yellow_full_system,
-                friendly_colour_yellow=True,
-                should_restart_on_crash=False,
-                run_sudo=args.sudo,
-                running_in_realtime=(not args.ci_mode),
-                path_to_binary=yellow_path_to_binary,
-            ) as yellow_fs,
-            Gamecontroller(
+        with Simulator(
+            args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
+        ) as simulator, FullSystem(
+            full_system_runtime_dir=args.blue_full_system_runtime_dir,
+            debug_full_system=args.debug_blue_full_system,
+            friendly_colour_yellow=False,
+            should_restart_on_crash=False,
+            run_sudo=args.sudo,
+            running_in_realtime=(not args.ci_mode),
+            log_level=args.log_level,
+        ) as blue_fs, FullSystem(
+            full_system_runtime_dir=args.yellow_full_system_runtime_dir,
+            debug_full_system=args.debug_yellow_full_system,
+            friendly_colour_yellow=True,
+            should_restart_on_crash=False,
+            run_sudo=args.sudo,
+            running_in_realtime=(not args.ci_mode),
+            log_level=args.log_level,
+        ) as yellow_fs, Gamecontroller(
+            suppress_logs=(not args.verbose),
+        ) as gamecontroller, (
+            # Here we only initialize autoref if the --enable_autoref flag is requested.
+            # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
+            # All calls to autoref should be guarded with args.enable_autoref
+            TigersAutoref(
+                ci_mode=True,
+                gc=gamecontroller,
                 suppress_logs=(not args.verbose),
             ) as gamecontroller,
             (
