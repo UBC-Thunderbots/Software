@@ -10,7 +10,7 @@ jobs:
   release:
     strategy:
       matrix:
-        platform: [x86]
+        platform: [x86] # TODO: #3567 add MacOS support.
         include:
           - platform: x86
             runner: ubuntu-24.04
