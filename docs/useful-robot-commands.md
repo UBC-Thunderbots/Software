@@ -156,7 +156,7 @@ bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:ro
 ### Raspberry Pi
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=PI -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
 ## Robot Diagnostics
@@ -202,7 +202,7 @@ bazel run //software/embedded/ansible:run_ansible --//software/embedded:host_pla
 
 ## Systemd Services
 
-Status shows whether the service is running and some recent logs. More logs can be found using `journalctl` shown below. More control can be achieved with `systemctl`. Valid `<service_name>` are `thunderloop`, `display`, and `wifi_announcements`  
+Status shows whether the service is running and some recent logs. More logs can be found using `journalctl` shown below. More control can be achieved with `systemctl`. Currently, the only valid `<service_name>` is `thunderloop`.  
 
 ```bash
 service <service_name> status
