@@ -31,7 +31,9 @@ jobs:
             -//software/ai/hl/...                   \
             -//software/field_tests/...             \
             -//software/embedded/...                \
-            -//toolchains/cc/...
+            -//toolchains/cc/...                    \
+            -//software:unix_full_system_tar_gen    \
+            -//software:unix_full_system_tar
 
       - name: Jetson Nano Build Test
         run: |
@@ -60,7 +62,9 @@ jobs:
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
             -//software/ai/navigator/...     \
-            -//toolchains/cc/...
+            -//toolchains/cc/...             \
+            -//software:unix_full_system_tar_gen    \
+            -//software:unix_full_system_ta
 
   robot-tests:
     name: Robot Software Tests
@@ -108,7 +112,9 @@ jobs:
             //software:unix_full_system       \
             //software/simulated_tests/...    \
             //software/ai/hl/...              \
-            //software/ai/navigator/...
+            //software/ai/navigator/...       \
+            -//software:unix_full_system_tar_gen    \
+            -//software:unix_full_system_ta
 
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
