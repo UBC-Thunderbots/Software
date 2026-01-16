@@ -16,7 +16,7 @@ assert protobuf_impl_type == "upb", (
 )
 
 from software.py_constants import *
-
+from software.thunderscope.constants import LogLevels
 import software.thunderscope.thunderscope_config as config
 from proto.import_all_protos import *
 from software.thunderscope.binary_context_managers import *
