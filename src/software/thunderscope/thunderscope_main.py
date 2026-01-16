@@ -483,22 +483,12 @@ if __name__ == "__main__":
                 ci_mode=True,
                 gc=gamecontroller,
                 suppress_logs=(not args.verbose),
-            ) as gamecontroller,
-            (
-                # Here we only initialize autoref if the --enable_autoref flag is requested.
-                # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
-                # All calls to autoref should be guarded with args.enable_autoref
-                TigersAutoref(
-                    ci_mode=True,
-                    gc=gamecontroller,
-                    suppress_logs=(not args.verbose),
-                    tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
-                    show_gui=args.show_autoref_gui,
-                )
-                if args.enable_autoref
-                else contextlib.nullcontext()
-            ) as autoref,
-        ):
+                tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+                show_gui=args.show_autoref_gui,
+            )
+            if args.enable_autoref
+            else contextlib.nullcontext()
+        ) as autoref:
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
