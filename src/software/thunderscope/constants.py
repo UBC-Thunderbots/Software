@@ -381,7 +381,7 @@ class ProtoPlayerFlags(Enum):
 class AISelectorConstants:
     """Constants for the AI Selector"""
 
-    AI_FOLDER = "/opt/tbotspython/test_external_ai"
+    AI_FOLDER = "/opt/tbotspython/external_ai"
     CONFIG_FILE_PATH = AI_FOLDER + "/ai_config.toml"
     FULLSYSTEM_DISPLAY_NAME = "Default Fullsystem" #TODO is there a better name?
     FULLSYSTEM_PATH = "software/unix_full_system" #TODO is this right? Should I use absolute path?
