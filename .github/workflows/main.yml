@@ -63,10 +63,7 @@ jobs:
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
             -//software/ai/navigator/...     \
-            -//toolchains/cc/...             \
-            -- -//software:unix_full_system_tar_gen    \
-            -//software:write_full_system_tar
-            -//software:write_full_system_tar_test
+            -//toolchains/cc/...             
 
   robot-tests:
     name: Robot Software Tests
@@ -114,11 +111,7 @@ jobs:
             //software:unix_full_system       \
             //software/simulated_tests/...    \
             //software/ai/hl/...              \
-            //software/ai/navigator/...       \
-            -- -//software:unix_full_system_tar_gen    \
-            -//software:write_full_system_tar
-            -//software:write_full_system_tar_test
-
+            //software/ai/navigator/...       
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
         if: always()
