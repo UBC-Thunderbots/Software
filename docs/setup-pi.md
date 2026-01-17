@@ -83,7 +83,7 @@ sudo iptables -A FORWARD -i wlo1 -o eno2 -m state --state RELATED,ESTABLISHED -j
 
 #### Thunderloop Service Configuration Through Ansible
 1. SSH into the Raspberry Pi from your device by connecting to the `tbots` WiFi and typing the following in the command terminal:
-   * ssh `<robot_name>` (Ex: `ssh <aimbot.local>`)
+   * ssh `<robot_name>` (Ex: `ssh aimbot.local`)
    * enter the password when prompted
 2. Verify that the Pi has internet connection by pinging Google's Public DNS Service with the following command:
 ```bash
@@ -98,7 +98,7 @@ bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:ro
    * This may take a while.
 4. Done!
 
-#### Common Errors and Debugging
+### Common Errors and Debugging
 
 **Cannot SSH into Pi** 
 A: Confirm that your device is connected to the `tbots` WiFi
