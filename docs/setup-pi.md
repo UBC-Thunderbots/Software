@@ -40,4 +40,26 @@ Once installed, follow these steps to set up the Raspberry Pi:
   * The output screen on the HDMI should appear similar to a default laptop/PC screen. If this is the case, the write was successful.
   * If you do not see the above, and instead see text on a black screen with messages akin to "Unable to read partition as FAT" - the write was not successful.
 
+## Configure Raspberry Pi with Thunderbots Service
+
+### Introduction
+
+We use the Raspberry Pi OS, which is based on the Linux kernel. The Linux kernel uses systemd as its service manager. Our core service is [thunderloop.service](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/embedded/linux_configs/systemd/thunderloop.service).
+
+To run and manage the thunderloop service on the Pi, however, there are many dependencies (drivers, admin control, internet, etc.) that must be set up first. Luckily, all of this setup can be done using one command through an Ansible playbook. 
+
+Read more about Ansible in our robot-software-architecture documentation [here](https://github.com/UBC-Thunderbots/Software/blob/master/docs/robot-software-architecture.md).
+
+### Configuration
+
+Before running the Ansible command, we must do the following:
+1. SSH into the Raspberry Pi from your device by typing the following in the command terminal (Ubuntu):
+   * ssh `<robot_name>` (Ex: `ssh <aimbot.local>`)
+   * enter the password when prompted
+2. Ensure your Raspberry Pi is connected to internet through an ethernet cable. Ensure your ethernet cable is not broken, as there are many non-functioning ones in the Thunderbots EDC space.
+3. Configure the following settings on your device:
+   * Network Settings: click the settings icon on the right and do the following
+
+
+
 
