@@ -15,22 +15,26 @@ assert protobuf_impl_type == "upb", (
     f"The current version of protobuf is {google.protobuf.__version__}"
 )
 
-from software.py_constants import *
+
+from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
-import software.thunderscope.thunderscope_config as config
-from proto.import_all_protos import *
 from software.thunderscope.binary_context_managers import *
-from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.binary_context_managers.simulator import Simulator
-from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
-from software.thunderscope.constants import CI_DURATION_S, EstopMode, ProtoUnixIOTypes
+from proto.import_all_protos import *
+from software.py_constants import *
+from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
+from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.robot_communication import RobotCommunication
-from software.thunderscope.thunderscope import Thunderscope
+import software.thunderscope.thunderscope_config as config
+from software.thunderscope.constants import CI_DURATION_S
 from software.thunderscope.util import *
-from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
+
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+
+from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
 ###########################################################################
 #                         Thunderscope Main                               #
@@ -324,31 +328,25 @@ if __name__ == "__main__":
         )
 
         with (
-            (
-                Gamecontroller(
-                    suppress_logs=(not args.verbose), use_conventional_port=False
-                )
-                if args.launch_gc
-                else contextlib.nullcontext()
-            ) as gamecontroller,
-            WifiCommunicationManager(
-                current_proto_unix_io=current_proto_unix_io,
-                multicast_channel=getRobotMulticastChannel(args.channel),
-                should_setup_full_system=(args.run_blue or args.run_yellow),
-                interface=args.interface,
-                referee_port=(
-                    gamecontroller.get_referee_port()
-                    if gamecontroller
-                    else SSL_REFEREE_PORT
-                ),
-            ) as wifi_communication_manager,
-            RobotCommunication(
-                current_proto_unix_io=current_proto_unix_io,
-                communication_manager=wifi_communication_manager,
-                estop_mode=estop_mode,
-                estop_path=estop_path,
-            ) as robot_communication,
-        ):
+            Gamecontroller(
+                suppress_logs=(not args.verbose), use_conventional_port=False
+            )
+            if args.launch_gc
+            else contextlib.nullcontext()
+        ) as gamecontroller, WifiCommunicationManager(
+            current_proto_unix_io=current_proto_unix_io,
+            multicast_channel=getRobotMulticastChannel(args.channel),
+            should_setup_full_system=(args.run_blue or args.run_yellow),
+            interface=args.interface,
+            referee_port=gamecontroller.get_referee_port()
+            if gamecontroller
+            else SSL_REFEREE_PORT,
+        ) as wifi_communication_manager, RobotCommunication(
+            current_proto_unix_io=current_proto_unix_io,
+            communication_manager=wifi_communication_manager,
+            estop_mode=estop_mode,
+            estop_path=estop_path,
+        ) as robot_communication:
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
                 tscope.keyboard_estop_shortcut.activated.connect(
                     robot_communication.toggle_keyboard_estop
