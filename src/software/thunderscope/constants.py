@@ -377,3 +377,14 @@ class ProtoPlayerFlags(Enum):
 
     NO_ERROR_FLAG = 0
     UNCAUGHT_EXCEPTION_FLAG = 1 << 0
+
+class AISelectorConstants:
+    """Constants for the AI Selector"""
+
+    AI_FOLDER = "/opt/tbotspython/test_external_ai"
+    CONFIG_FILE_PATH = AI_FOLDER + "/ai_config.toml"
+    FULLSYSTEM_DISPLAY_NAME = "Default Fullsystem" #TODO is there a better name?
+    FULLSYSTEM_PATH = "software/unix_full_system" #TODO is this right? Should I use absolute path?
+    BLUE_TOML_FIELD = "blue_path_to_binary"
+    YELLOW_TOML_FIELD = "yellow_path_to_binary"
+

@@ -194,6 +194,15 @@ print_status_msg "Done PlatformIO Setup"
 
 print_status_msg "Set up ansible-lint"
 /opt/tbotspython/bin/ansible-galaxy collection install ansible.posix
+
+#TODO integrate later if it's right
+
+sudo mkdir /opt/tbotspython/external_ai
+sudo touch /opt/tbotspython/external_ai/ai_config.toml
+
+sudo chown -R $USER:$USER /opt/tbotspython/external_ai/
+sudo chmod 600 /opt/tbotspython/external_ai/ai_config.toml
+
 print_status_msg "Finished setting up ansible-lint"
 
 print_status_msg "Done Software Setup, please reboot for changes to take place"

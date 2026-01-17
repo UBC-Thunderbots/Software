@@ -21,12 +21,13 @@ from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
+from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes, AISelectorConstants
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import CI_DURATION_S
 from software.thunderscope.util import *
+from software.thunderscope.binary_context_managers.ai_selector import read_saved_ai
 
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
@@ -421,6 +422,11 @@ if __name__ == "__main__":
                 realtime_sim_ticker(
                     tick_rate_ms, tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], tscope
                 )
+
+        #TODO integrate later if it's right
+        selected_ais = read_saved_ai()
+        blue_external_ai = selected_ais.get(AISelectorConstants.BLUE_TOML_FIELD)
+        yellow_external_ai = selected_ais.get(AISelectorConstants.YELLOW_TOML_FIELD)
 
         # Launch all binaries
         with Simulator(
