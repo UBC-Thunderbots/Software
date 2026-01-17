@@ -34,6 +34,7 @@ py_library(
     srcs = ["gl_gamecontroller_toolbar.py"],
     deps = [
         ":gl_toolbar",
+        ":backend_selection_dialog",
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
         "//software/thunderscope/binary_context_managers:game_controller",
@@ -41,4 +42,12 @@ py_library(
         requirement("pyqtgraph"),
         requirement("qtawesome"),
     ],
+)
+
+py_library(
+    name = "backend_selection_dialog",
+    srcs = ["backend_selection_dialog.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ]
 )
