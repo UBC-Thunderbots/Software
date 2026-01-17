@@ -63,7 +63,10 @@ jobs:
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
             -//software/ai/navigator/...     \
-            -//toolchains/cc/...             
+            -//toolchains/cc/...             \
+            -//software:unix_full_system_tar_gen    \
+            -//software:write_full_system_tar \
+            -//software:write_full_system_tar_test
 
   robot-tests:
     name: Robot Software Tests
