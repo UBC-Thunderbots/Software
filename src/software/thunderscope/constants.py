@@ -1,7 +1,7 @@
 from pyqtgraph.Qt import QtGui
 from OpenGL.GL import *
 from proto.import_all_protos import *
-from enum import Enum, IntEnum
+from enum import Enum, IntEnum, StrEnum
 from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
@@ -388,3 +388,11 @@ class AISelectorConstants:
     BLUE_TOML_FIELD = "blue_path_to_binary"
     YELLOW_TOML_FIELD = "yellow_path_to_binary"
 
+
+class LogLevels(StrEnum):
+    """Log levels for FullSystem to indicate minimum logged level"""
+
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    FATAL = "FATAL"
