@@ -25,9 +25,9 @@ Once installed, follow these steps to set up the Raspberry Pi:
     * Operating System: Raspberry Pi OS (64-bit)
     * Storage: `<your_inserted_micro_SD_card>`
     * Customization:
-      * Hostname: `<robot_name>`.local (Ex: `aimbot.local`) 
+      * Hostname: `<robot_name`.local (Ex: `aimbot.local`). The `local` part is autofilled by the Raspberry Pi Imager. 
       * Localization -> Timezone: America/Vancouver
-      * User -> Username: `<robot_name>` (Ex: `aimbot.local`)
+      * User -> Username: robot
       * User -> Password: `<password>` (ask someone if you don't know what the correct password is)
       * WiFi -> Secure Network -> SSID: `<tbots_wifi_name>` (`tbots` as of Jan 2026)
       * WiFi -> Password: `<password>` (ask someone if you don't know what the correct password is)
@@ -83,7 +83,7 @@ sudo iptables -A FORWARD -i wlo1 -o eno2 -m state --state RELATED,ESTABLISHED -j
 
 #### Thunderloop Service Configuration Through Ansible
 1. SSH into the Raspberry Pi from your device by connecting to the `tbots` WiFi and typing the following in the command terminal:
-   * ssh `<robot_name>` (Ex: `ssh aimbot.local`)
+   * ssh `robot@<robot_name>` (Ex: `ssh robot@aimbot.local`)
    * enter the password when prompted
 2. Verify that the Pi has internet connection by pinging Google's Public DNS Service with the following command:
 ```bash
