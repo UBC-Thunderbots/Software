@@ -96,12 +96,10 @@ class GLGamecontrollerToolbar(GLToolbar):
             display_text="Open GC",
         )
 
-        self.runtime_installer_dialog = RuntimeInstallerDialog(parent=parent)
-
         self.runtime_installer_button = self.__setup_icon_button(
             qta.icon("mdi6.download"),
             "Opens a runtime installer modal",
-            self.runtime_installer_dialog.show,
+            self.__open_runtime_installer_dialog,
             display_text="Install Runtimes",
         )
 
@@ -260,3 +258,11 @@ class GLGamecontrollerToolbar(GLToolbar):
         """
         command = ManualGCCommand(manual_command=Command(type=command, for_team=team))
         self.proto_unix_io.send_proto(ManualGCCommand, command)
+
+    def __open_runtime_installer_dialog(self):
+        """Opens the runtime installer modal, initializing if first time"""
+
+        if not hasattr(self, "runtime_installer_dialog"):
+            self.runtime_installer_dialog = RuntimeInstallerDialog(parent=self.parent())
+
+        self.runtime_installer_dialog.show()

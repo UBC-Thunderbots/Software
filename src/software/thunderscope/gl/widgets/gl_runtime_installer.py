@@ -4,18 +4,16 @@ from pyqtgraph.Qt import QtWidgets
 class RuntimeInstallerDialog(QtWidgets.QDialog):
     """Modal that displays selectable list of runtimes to install"""
 
-    def __init__(
-        self,
-        parent: QtWidgets.QWidget,
-        # TODO (#3559): get list of runtimes from GET request
-        runtimes: list[str] = [f"runtime_{i}" for i in range(10)],
-    ):
-        """Initializes runtime installer modal with list of installable runtimes
+    def __init__(self, parent: QtWidgets.QWidget):
+        """Initializes runtime installer modal, fetching a list of installable
+        runtimes and adding to a selectable list
 
         :param parent: the modal's parent
-        :param runtimes: list of runtimes available to be installed
         """
         super().__init__(parent)
+
+        # TODO (#3559): get list of runtimes from GET request
+        runtimes = [f"runtime_{i}" for i in range(10)]
 
         self.setWindowTitle("Install runtimes")
         self.setModal(True)
