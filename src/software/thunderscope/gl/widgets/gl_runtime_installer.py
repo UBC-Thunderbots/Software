@@ -1,10 +1,17 @@
-from pyqtgraph.Qt import QtWidgets
+from pyqtgraph.Qt.QtWidgets import (
+    QDialog,
+    QWidget,
+    QPushButton,
+    QListWidget,
+    QAbstractItemView,
+    QVBoxLayout,
+)
 
 
-class GLRuntimeInstallerDialog(QtWidgets.QDialog):
+class GLRuntimeInstallerDialog(QDialog):
     """Modal that displays selectable list of runtimes to install"""
 
-    def __init__(self, parent: QtWidgets.QWidget):
+    def __init__(self, parent: QWidget):
         """Initializes runtime installer modal, fetching a list of installable
         runtimes and adding to a selectable list
 
@@ -19,19 +26,19 @@ class GLRuntimeInstallerDialog(QtWidgets.QDialog):
         self.setModal(True)
         self.setMinimumWidth(400)
 
-        install_button = QtWidgets.QPushButton("Install")
+        install_button = QPushButton("Install")
         install_button.clicked.connect(self.__install_selected_runtimes)
 
-        runtime_select_list = QtWidgets.QListWidget()
+        runtime_select_list = QListWidget()
         runtime_select_list.setSelectionMode(
-            QtWidgets.QAbstractItemView.SelectionMode.MultiSelection
+            QAbstractItemView.SelectionMode.MultiSelection
         )
         runtime_select_list.setFixedHeight(200)
         runtime_select_list.addItems(runtimes)
 
         self.runtime_select_list = runtime_select_list
 
-        layout = QtWidgets.QVBoxLayout(self)
+        layout = QVBoxLayout(self)
         layout.addWidget(runtime_select_list)
         layout.addWidget(install_button)
 
