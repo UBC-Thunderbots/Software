@@ -261,7 +261,6 @@ class GLGamecontrollerToolbar(GLToolbar):
 
     def __open_runtime_installer_dialog(self):
         """Opens the runtime installer modal, initializing if first time"""
-
         if not hasattr(self, "runtime_installer_dialog"):
             self.runtime_installer_dialog = RuntimeInstallerDialog(parent=self.parent())
 
