@@ -38,6 +38,8 @@ class RuntimeInstallerDialog(QtWidgets.QDialog):
         layout.addWidget(install_button)
 
     def __install_selected_runtimes(self) -> None:
+        """Installs all runtimes that are currently selected"""
+
         selected_items = self.runtime_select_list.selectedItems()
         selected_runtimes = [item.text() for item in selected_items]
 
