@@ -102,7 +102,7 @@ class GLGamecontrollerToolbar(GLToolbar):
             qta.icon("mdi6.download"),
             "Opens a runtime installer modal",
             self.runtime_installer_dialog.show,
-            display_text="Install runtime",
+            display_text="Install Runtimes",
         )
 
         # disable the normal start button when no play is selected
