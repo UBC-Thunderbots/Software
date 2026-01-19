@@ -6,6 +6,7 @@ from typing import Callable, override
 import webbrowser
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.gl.widgets.gl_runtime_installer import RuntimeInstallerDialog
 import qtawesome as qta
 
 
@@ -95,6 +96,15 @@ class GLGamecontrollerToolbar(GLToolbar):
             display_text="Open GC",
         )
 
+        self.runtime_installer_dialog = RuntimeInstallerDialog(parent=parent)
+
+        self.runtime_installer_button = self.__setup_icon_button(
+            qta.icon("mdi6.download"),
+            "Opens a runtime installer modal",
+            self.runtime_installer_dialog.show,
+            display_text="Install runtime",
+        )
+
         # disable the normal start button when no play is selected
         self.normal_start_enabled = True
         self.__toggle_normal_start_button()
@@ -110,6 +120,8 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.__add_separator(self.layout())
         self.layout().addWidget(self.gc_browser_button)
         self.layout().addStretch()
+        self.__add_separator(self.layout())
+        self.layout().addWidget(self.runtime_installer_button)
 
     @override
     def refresh(self) -> None:
