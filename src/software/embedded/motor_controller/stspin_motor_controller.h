@@ -90,8 +90,8 @@ class StSpinMotorController : public MotorController
     // clang-format off
     static const inline std::unordered_map<MotorIndex, uint8_t> DATA_READY_GPIO_PINS = {
         {MotorIndex::FRONT_LEFT,  24},
-        {MotorIndex::BACK_LEFT,   16},
-        {MotorIndex::BACK_RIGHT,  26},
+        {MotorIndex::BACK_LEFT,   21},
+        {MotorIndex::BACK_RIGHT,  16},
         {MotorIndex::FRONT_RIGHT, 23},
         {MotorIndex::DRIBBLER,    0},
     };
