@@ -1,7 +1,7 @@
 from pyqtgraph.Qt import QtWidgets
 
 
-class RuntimeInstallerDialog(QtWidgets.QDialog):
+class GLRuntimeInstallerDialog(QtWidgets.QDialog):
     """Modal that displays selectable list of runtimes to install"""
 
     def __init__(self, parent: QtWidgets.QWidget):
