@@ -42,7 +42,6 @@ class FullSystem:
         :param running_in_realtime: True if we are running fullsystem in realtime, else False
         :param log_level: Minimum g3log level that will be printed (DEBUG|INFO|WARNING|FATAL)
         """
-
         self.path_to_binary = path_to_binary
         self.full_system_runtime_dir = full_system_runtime_dir
         self.debug_full_system = debug_full_system
