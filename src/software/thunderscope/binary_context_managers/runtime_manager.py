@@ -1,5 +1,5 @@
 from software.thunderscope.binary_context_managers.runtime_installer import RuntimeInstaller
-from software.thunderscope.binary_context_managers.runtime_loader import RunTimeLoader
+from software.thunderscope.binary_context_managers.runtime_loader import RuntimeLoader
 
 
 class RuntimeManager:
@@ -9,7 +9,7 @@ class RuntimeManager:
 
     def __init__(self):
         self.runtime_installer = RuntimeInstaller()
-        self.runtime_loader = RunTimeLoader()
+        self.runtime_loader = RuntimeLoader()
 
     def fetch_remote_runtimes(self) -> list[str]:
         """
