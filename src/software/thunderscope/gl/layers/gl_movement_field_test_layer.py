@@ -7,6 +7,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.logger.logger import create_logger
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from typing import override
 
 logger = create_logger(__name__)
 
@@ -50,6 +51,7 @@ class GLMovementFieldTestLayer(GLLayer):
         self.selected_robot_id = closest_robot.id()
         self.is_selected = True
 
+    @override
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Move to the point clicked.
         If Shift+Alt+Control is pressed, clicking selects a robot based on the closest point in scene.
@@ -99,6 +101,7 @@ class GLMovementFieldTestLayer(GLLayer):
 
         self.fullsystem_io.send_proto(AssignedTacticPlayControlParams, assign_tactic)
 
+    @override
     def refresh_graphics(self):
         """Updating the world cache"""
         world = self.world_buffer.get(block=False, return_cached=False)

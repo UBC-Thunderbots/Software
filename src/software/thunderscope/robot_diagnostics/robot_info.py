@@ -8,7 +8,7 @@ import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
-from typing import Type
+from typing import Type, override
 from collections import deque
 
 
@@ -44,6 +44,7 @@ class BreakbeamLabel(QLabel):
                 "border-color: green"
             )
 
+    @override
     def event(self, event: QtCore.QEvent) -> bool:
         """Overridden event function which intercepts all events
         On hover, displays a tooltip with the current breakbeam status

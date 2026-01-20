@@ -12,6 +12,7 @@ from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLPathLayer(GLLayer):
@@ -35,6 +36,7 @@ class GLPathLayer(GLLayer):
         self.destination_graphics = ObservableList(self._graphics_changed)
         self.path_graphics = ObservableList(self._graphics_changed)
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         path_list = self.path_visualization_buffer.get(block=False).paths

@@ -6,6 +6,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class BallEntersRegion(Validation):
@@ -15,6 +16,7 @@ class BallEntersRegion(Validation):
         self.regions = regions if regions else []
         self.ball_position = None
 
+    @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the ball enters the provided regions
 
@@ -30,6 +32,7 @@ class BallEntersRegion(Validation):
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
@@ -39,6 +42,7 @@ class BallEntersRegion(Validation):
         """
         return create_validation_geometry(self.regions)
 
+    @override
     def __repr__(self):
         return (
             "Checking ball in regions "

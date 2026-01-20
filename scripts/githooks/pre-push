@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Prompt user for confirmation at a [y/N] prompt and return 0 when user responds "yes" or "y"
+confirm() {
+    read -r -p "$1 [y/N] " response < /dev/tty
+    case "$response" in
+        [yY][eE][sS]|[yY])
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+scriptsdir="$(git rev-parse --show-toplevel)/scripts"
+
+# If marker for current branch does not exist
+if ! [ -f "$scriptsdir/.format_markers/$(git rev-parse --abbrev-ref HEAD)" ]; then
+    echo "Warning: Code is unformatted. Please run $scriptsdir/lint_and_format.sh."
+    if confirm 'Continue without formatting?'; then
+        echo "Continuing push anyway."
+        exit 0
+    else
+        echo "Aborting push."
+        exit 1
+    fi
+fi

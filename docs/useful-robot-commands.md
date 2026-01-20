@@ -93,7 +93,10 @@ If you are not using the tbots network you will need to use a network utility (`
 Individual miscellaneous tasks (ex reboot, shutdown, rtt test) can be run through the `misc.yml` playbook by specifying the corresponding tag.
 
 To view a list of supported arguments, run:
-`bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -h` 
+
+```bash
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -h
+```
 
 If desired, the `-ho`, `--hosts` argument can be replaced with `-p`, `--port`, defining a port to listen to for Announcements from hosts.
 
@@ -107,7 +110,10 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
-`bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> --//software/embedded:motor_board=<motor_board> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+```bash
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> --//software/embedded:motor_board=<motor_board> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
+```
+
 * \<platform\> is the host platform on the robot (either `PI` or `NANO`)
 * <motor_board> is the type of motor driver board on the robot (either `STSPIN` or `TRINAMIC`)
 * <robot_ip> is the IP address of the robot
@@ -122,7 +128,9 @@ You could also use the `tbots.py` script to flash robot software
 
 Example: Flashing robots 1, 4, and 7 that have a Raspberry Pi
 
-`./tbots.py run run_ansible -pl PI -f 1 4 7 -pwd <robot_password>`
+```bash
+./tbots.py run run_ansible -pl PI -f 1 4 7 -pwd <robot_password>
+```
 
 ## Flashing the powerboard
 
@@ -130,7 +138,9 @@ This will flash powerloop, the current firmware in `software/power/`, onto the p
 
 Looking from the back of the robot the reset and boot buttons are on right side of the battery holder on the lowest board with the reset being on the left and the boot on the right. <b>Warning it may kick/chip when pressed.</b>
 
-`bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+```bash
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass <robot_password>
+```
 
 ## Setting up the embedded host
 
@@ -140,11 +150,15 @@ This section refers to setting up the computer on the robot for the first time. 
 
 ### Jetson Nano
 
-`bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+```bash
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>
+```
 
 ### Raspberry Pi
 
-`bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=PI -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+```bash
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=PI -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>
+```
 
 ## Robot Diagnostics
 
@@ -156,13 +170,17 @@ Robot Diagnostics allow users to input various commands to the robots. It can be
 
 From Software/src
 
-`./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
+```bash
+./tbots.py run thunderscope --run_diagnostics --interface <network_interface>
+```
 
 ### For AI + Diagnostics
 
 From Software/src
 
-`./tbots.py run thunderscope --run_blue --run_diagnostics --interface <network_interface>`
+```bash
+./tbots.py run thunderscope --run_blue --run_diagnostics --interface <network_interface>
+```
 
 network_interface can be found with `ifconfig` commonly `wlp59s0` for wifi.
 
@@ -171,7 +189,10 @@ Runs the robot auto test fixture on a robot through Ansible, which tests the mot
 
 From Software/src:
 
-`bazel run //software/embedded/ansible:run_ansible --//software/embedded:host_platform=<platform> --platforms=//toolchains/cc:robot -- --playbook robot_auto_test_playbook.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+```bash
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> --//software/embedded:motor_board=<motor_board> -- --playbook robot_auto_test_playbook.yml --hosts <robot_ip> --ssh_pass <robot_password>
+```
+
 * replace the \<platform\> with the target platform for the robot (either `PI` or `NANO`)
 * replace the \<robot_ip\> with the actual ip address of the jetson nano for the ssh connection.
 * replace the <robot_password> with the actual password for the jetson nano for the ssh connection.
@@ -184,15 +205,21 @@ From Software/src:
 
 Status shows whether the service is running and some recent logs. More logs can be found using `journalctl` shown below. More control can be achieved with `systemctl`. Valid `<service_name>` are `thunderloop`, `display`, and `wifi_announcements`  
 
-`service <service_name> status`
+```bash
+service <service_name> status
+```
 
 Change whether the service is running or restart it. Valid `<run_command>` are `stop`, `start` and `restart`.
 
-`service <service_name> <run_command>`
- 
+```bash
+service <service_name> <run_command>
+```
+
 To view the full logs in vi/vim:  
 
-`journalctl <service_name>`  
+```bash
+journalctl <service_name>
+```
 
 `Shift + g` to jump to bottom
 
@@ -200,7 +227,9 @@ To view the full logs in vi/vim:
 
 To follow the recent outputs to the log:
 
-`journalctl -fu <service_name>`
+```bash
+journalctl -fu <service_name>
+```
 
 ## Debugging Uart
 
@@ -213,7 +242,9 @@ The baudrate of powerloop is `460800` other programs will have different baudrat
 
 Usage:
 
-`screen <serial_port> <baudrate>`
+```bash
+screen <serial_port> <baudrate>
+```
 
 Exiting:
 
@@ -235,19 +266,27 @@ Current redis keys that are used are available in `software/constants.h`.  Offic
 
 Redis repl can be accessed through the following command.
 
-`redis-cli`
+```bash
+redis-cli
+```
 
 Other common commands (once inside redis repl):
 
-`get <redis_key>`
-
-`set <redis_key> <value>`
+```bash
+get <redis_key>
+set <redis_key> <value>
+```
 
 To Exit:
 
-`quit`
+```bash
+quit
+```
 
 Alternative (without entering redis repl):
 
-`redis-cli get <redis_key>` or `redis-cli set <redis_key> <value>`
+```bash
+redis-cli get <redis_key>  
+redis-cli set <redis_key> <value>
+```
 

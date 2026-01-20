@@ -8,7 +8,7 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.gl.graphics.gl_shape import GLShape
 import software.thunderscope.gl.helpers.triangulate as triangulate
 
-from typing import Optional
+from typing import Optional, override
 
 import math
 import numpy as np
@@ -66,6 +66,7 @@ class GLRobotOutline(GLShape):
 
         return points
 
+    @override
     def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
 
@@ -76,6 +77,7 @@ class GLRobotOutline(GLShape):
         # the right way
         super().set_orientation(degrees + 45)
 
+    @override
     def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape

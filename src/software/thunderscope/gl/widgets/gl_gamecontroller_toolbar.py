@@ -2,10 +2,13 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtGui
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from typing import Callable
+from typing import Callable, override
 import webbrowser
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.gl.widgets.gl_runtime_installer import (
+    GLRuntimeInstallerDialog,
+)
 import qtawesome as qta
 
 
@@ -95,6 +98,13 @@ class GLGamecontrollerToolbar(GLToolbar):
             display_text="Open GC",
         )
 
+        self.runtime_installer_button = self.__setup_icon_button(
+            qta.icon("mdi6.download"),
+            "Opens a runtime installer modal",
+            self.__open_runtime_installer_dialog,
+            display_text="Install Runtimes",
+        )
+
         # disable the normal start button when no play is selected
         self.normal_start_enabled = True
         self.__toggle_normal_start_button()
@@ -110,7 +120,10 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.__add_separator(self.layout())
         self.layout().addWidget(self.gc_browser_button)
         self.layout().addStretch()
+        self.__add_separator(self.layout())
+        self.layout().addWidget(self.runtime_installer_button)
 
+    @override
     def refresh(self) -> None:
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
@@ -247,3 +260,12 @@ class GLGamecontrollerToolbar(GLToolbar):
         """
         command = ManualGCCommand(manual_command=Command(type=command, for_team=team))
         self.proto_unix_io.send_proto(ManualGCCommand, command)
+
+    def __open_runtime_installer_dialog(self):
+        """Opens the runtime installer modal, initializing if first time"""
+        if not hasattr(self, "runtime_installer_dialog"):
+            self.runtime_installer_dialog = GLRuntimeInstallerDialog(
+                parent=self.parent()
+            )
+
+        self.runtime_installer_dialog.show()
