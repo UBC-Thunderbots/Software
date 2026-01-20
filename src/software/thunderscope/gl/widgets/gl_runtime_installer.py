@@ -21,7 +21,6 @@ class GLRuntimeInstallerDialog(QDialog):
         """
         super().__init__(parent)
 
-        # TODO (#3559): get list of runtimes from GET request
         runtimes = runtime_manager_instance.fetch_remote_runtimes()
 
         self.setWindowTitle("Install runtimes")
