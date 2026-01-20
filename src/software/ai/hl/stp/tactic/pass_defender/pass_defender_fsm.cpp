@@ -20,7 +20,8 @@ bool PassDefenderFSM::passStarted(const Update& event)
         event.control_params.position_to_block_from.y() - ball_position.y());
 
     // Make sure ball is within playing area
-    if (!contains(event.common.world_ptr->field().fieldLines(), ball_position)) {
+    if (!contains(event.common.world_ptr->field().fieldLines(), ball_position))
+    {
         return false;
     }
 
