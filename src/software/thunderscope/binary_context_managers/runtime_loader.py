@@ -1,6 +1,7 @@
 from software.thunderscope.constants import RuntimeManagerConstants
 
-#TODO: #3557
+
+# TODO: #3557
 class RuntimeLoader:
     """Delegate class for handling local runtimes and managing runtime selection"""
 

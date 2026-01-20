@@ -1,4 +1,6 @@
-from software.thunderscope.binary_context_managers.runtime_installer import RuntimeInstaller
+from software.thunderscope.binary_context_managers.runtime_installer import (
+    RuntimeInstaller,
+)
 from software.thunderscope.binary_context_managers.runtime_loader import RuntimeLoader
 
 
