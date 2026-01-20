@@ -143,9 +143,9 @@ sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoRefe
 
 print_status_msg "Finished setting up AutoRef"
 
-# setup external_ai 
-sudo mkdir /opt/tbotspython/external_ai
-sudo chown -R $USER:$USER /opt/tbotspython/external_ai/
+# setup external_runtimes 
+sudo mkdir /opt/tbotspython/external_runtimes
+sudo chown -R $USER:$USER /opt/tbotspython/external_runtimes/
 
 # Install Bazel
 print_status_msg "Installing Bazel"

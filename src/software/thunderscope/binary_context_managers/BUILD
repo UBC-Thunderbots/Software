@@ -50,3 +50,12 @@ py_library(
         "//software/thunderscope:time_provider",
     ],
 )
+
+py_library(
+    name = "runtime_manager",
+    srcs = [
+        "runtime_installer.py",
+        "runtime_loader.py",
+        "runtime_manager.py",
+    ],
+)

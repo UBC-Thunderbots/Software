@@ -7,6 +7,8 @@ from pyqtgraph.Qt.QtWidgets import (
     QVBoxLayout,
 )
 
+from software.thunderscope.binary_context_managers.runtime_manager import runtime_manager_instance
+
 
 class GLRuntimeInstallerDialog(QDialog):
     """Modal that displays selectable list of runtimes to install"""
@@ -20,7 +22,7 @@ class GLRuntimeInstallerDialog(QDialog):
         super().__init__(parent)
 
         # TODO (#3559): get list of runtimes from GET request
-        runtimes = [f"runtime_{i}" for i in range(10)]
+        runtimes = runtime_manager_instance.fetch_remote_runtimes()
 
         self.setWindowTitle("Install runtimes")
         self.setModal(True)
