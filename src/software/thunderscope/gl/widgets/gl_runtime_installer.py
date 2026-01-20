@@ -7,7 +7,9 @@ from pyqtgraph.Qt.QtWidgets import (
     QVBoxLayout,
 )
 
-from software.thunderscope.binary_context_managers.runtime_manager import runtime_manager_instance
+from software.thunderscope.binary_context_managers.runtime_manager import (
+    runtime_manager_instance,
+)
 
 
 class GLRuntimeInstallerDialog(QDialog):

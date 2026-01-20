@@ -8,7 +8,9 @@ import threading
 import google.protobuf
 from google.protobuf.internal import api_implementation
 
-from software.thunderscope.binary_context_managers.runtime_manager import runtime_manager_instance
+from software.thunderscope.binary_context_managers.runtime_manager import (
+    runtime_manager_instance,
+)
 
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (
@@ -24,7 +26,11 @@ from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes, RuntimeManagerConstants
+from software.thunderscope.constants import (
+    EstopMode,
+    ProtoUnixIOTypes,
+    RuntimeManagerConstants,
+)
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
@@ -329,11 +335,11 @@ if __name__ == "__main__":
         )
 
         with (
-                Gamecontroller(
-                    suppress_logs=(not args.verbose), use_conventional_port=False
-                )
-                if args.launch_gc
-                else contextlib.nullcontext()
+            Gamecontroller(
+                suppress_logs=(not args.verbose), use_conventional_port=False
+            )
+            if args.launch_gc
+            else contextlib.nullcontext()
         ) as gamecontroller, WifiCommunicationManager(
             current_proto_unix_io=current_proto_unix_io,
             multicast_channel=getRobotMulticastChannel(args.channel),
@@ -364,12 +370,12 @@ if __name__ == "__main__":
                     else args.yellow_full_system_runtime_dir
                 )
                 with FullSystem(
-                        full_system_runtime_dir=runtime_dir,
-                        debug_full_system=debug,
-                        friendly_colour_yellow=friendly_colour_yellow,
-                        should_restart_on_crash=True,
-                        run_sudo=args.sudo,
-                        log_level=args.log_level,
+                    full_system_runtime_dir=runtime_dir,
+                    debug_full_system=debug,
+                    friendly_colour_yellow=friendly_colour_yellow,
+                    should_restart_on_crash=True,
+                    run_sudo=args.sudo,
+                    log_level=args.log_level,
                 ) as full_system:
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
@@ -409,7 +415,6 @@ if __name__ == "__main__":
             layout_path=args.layout,
         )
 
-
         def __ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
 
@@ -434,15 +439,16 @@ if __name__ == "__main__":
                     tick_rate_ms, tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], tscope
                 )
 
-
         # Fetch the AI runtime/backends
         runtime_config = runtime_manager_instance.fetch_runtime_config()
 
         # Launch all binaries
         with Simulator(
-                args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
+            args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
-            path_to_binary=runtime_config[RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY],
+            path_to_binary=runtime_config[
+                RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+            ],
             full_system_runtime_dir=args.blue_full_system_runtime_dir,
             debug_full_system=args.debug_blue_full_system,
             friendly_colour_yellow=False,
@@ -451,7 +457,9 @@ if __name__ == "__main__":
             running_in_realtime=(not args.ci_mode),
             log_level=args.log_level,
         ) as blue_fs, FullSystem(
-            path_to_binary=runtime_config[RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY],
+            path_to_binary=runtime_config[
+                RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+            ],
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
             friendly_colour_yellow=True,
@@ -462,18 +470,18 @@ if __name__ == "__main__":
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose),
         ) as gamecontroller, (
-                # Here we only initialize autoref if the --enable_autoref flag is requested.
-                # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
-                # All calls to autoref should be guarded with args.enable_autoref
-                TigersAutoref(
-                    ci_mode=True,
-                    gc=gamecontroller,
-                    suppress_logs=(not args.verbose),
-                    tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
-                    show_gui=args.show_autoref_gui,
-                )
-                if args.enable_autoref
-                else contextlib.nullcontext()
+            # Here we only initialize autoref if the --enable_autoref flag is requested.
+            # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
+            # All calls to autoref should be guarded with args.enable_autoref
+            TigersAutoref(
+                ci_mode=True,
+                gc=gamecontroller,
+                suppress_logs=(not args.verbose),
+                tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+                show_gui=args.show_autoref_gui,
+            )
+            if args.enable_autoref
+            else contextlib.nullcontext()
         ) as autoref:
             tscope.register_refresh_function(gamecontroller.refresh)
 
