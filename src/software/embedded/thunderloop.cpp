@@ -329,7 +329,7 @@ void Thunderloop::runLoop()
 
             // Motor Service: execute the motor control command
             motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(),
-                                            time_since_prev_iter);
+                                             time_since_prev_iter);
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
 

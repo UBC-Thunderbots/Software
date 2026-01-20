@@ -15,7 +15,7 @@
 std::unique_ptr<MotorController> motor_controller_;
 std::unique_ptr<PowerService> power_service_;
 
-std::string runtime_dir    = "/tmp/tbots/yellow_test";
+std::string runtime_dir = "/tmp/tbots/yellow_test";
 
 int main(int argc, char **argv)
 {

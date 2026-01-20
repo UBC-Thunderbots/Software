@@ -1,27 +1,5 @@
 #pragma once
 
-enum class StSpinOpcode
-{
-    SPI_NOOP      = 0b00000000,
-    MOV_AX        = 0b10000010,
-    GET_AX        = 0b10000011,
-    MOV_BX        = 0b10000100,
-    GET_BX        = 0b10000101,
-    SET_SPEEDRAMP = 0b00000010,
-    GET_SPEED     = 0b00000011,
-    SET_ENCODER   = 0b00000100,
-    GET_ENCODER   = 0b00000101,
-    START_MOTOR   = 0b00001000,
-    STOP_MOTOR    = 0b11111111,
-    ACK_FAULTS    = 0b00010000,
-    GET_FAULT     = 0b00010001,
-    SET_CURRENT   = 0b00100000,
-    GET_CURRENT   = 0b00100001,
-    ACK           = 0b11000000,
-    NACK          = 0b11000001,
-    SPI_ERROR     = 0b11100000
-};
-
 enum class StSpinFaultCode
 {
     NO_FAULT     = 0x0000,

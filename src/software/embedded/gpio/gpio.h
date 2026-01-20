@@ -1,8 +1,8 @@
 #pragma once
 
-#include "software/util/make_enum/make_enum.hpp"
-
 #include <chrono>
+
+#include "software/util/make_enum/make_enum.hpp"
 
 MAKE_ENUM(GpioState, LOW, HIGH);
 MAKE_ENUM(GpioDirection, INPUT, OUTPUT);

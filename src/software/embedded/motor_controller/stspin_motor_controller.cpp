@@ -1,6 +1,7 @@
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
 
 #include <linux/spi/spidev.h>
+
 #include <chrono>
 #include <thread>
 
@@ -10,6 +11,7 @@
 #pragma GCC diagnostic pop
 
 #include "shared/constants.h"
+#include "software/embedded/motor_controller/stspin_constants.h"
 #include "software/embedded/spi_utils.h"
 #include "software/logger/logger.h"
 
@@ -26,10 +28,6 @@ StSpinMotorController::StSpinMotorController()
         if (ENABLED_MOTORS.at(motor))
         {
             openSpiFileDescriptor(motor);
-
-            data_ready_gpio_[motor] =
-                setupGpio(DATA_READY_GPIO_PINS.at(motor), GpioDirection::INPUT,
-                          GpioState::LOW);
         }
     }
 }
@@ -48,10 +46,9 @@ void StSpinMotorController::setup()
     {
         if (ENABLED_MOTORS.at(motor))
         {
-            sendAndReceiveFrame(motor, StSpinOpcode::ACK_FAULTS);
-            checkDriverFault(motor);
-            readThenWriteVelocity(motor, 0);
-            sendAndReceiveFrame(motor, StSpinOpcode::START_MOTOR);
+            motor_enabled_[motor]            = true;
+            motor_measured_speed_rpm_[motor] = 0;
+            motor_faults_[motor]             = 0;
         }
     }
 }
@@ -76,11 +73,7 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
         return MotorFaultIndicator(drive_enabled, motor_faults);
     }
 
-    sendAndReceiveFrame(motor, StSpinOpcode::GET_FAULT);
-
-    // We must send a SPI_NOOP in order to clock out the response
-    // to the GET_FAULT request.
-    const uint16_t faults = sendAndReceiveFrame(motor, StSpinOpcode::SPI_NOOP);
+    const uint16_t faults = motor_faults_.at(motor);
 
     if (faults != 0)
     {
@@ -166,8 +159,8 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
     return MotorFaultIndicator(drive_enabled, motor_faults);
 }
 
-double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
-                                                    const int& target_velocity)
+int StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
+                                                 const int& target_velocity)
 {
     if (!ENABLED_MOTORS.at(motor))
     {
@@ -176,25 +169,32 @@ double StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
         return 0;
     }
 
-    sendAndReceiveFrame(motor, StSpinOpcode::GET_SPEED);
+    const auto outgoingFrame = OutgoingFrame{
+        .motor_enabled          = motor_enabled_.at(motor),
+        .motor_target_speed_rpm = static_cast<int16_t>(target_velocity),
+    };
 
-    // SET_SPEEDRAMP expects the target motor speed to be in register ax.
-    // Also, the frame we receive here contains the response to the GET_SPEED
-    // request made in the previous frame.
-    const int16_t current_velocity = sendAndReceiveFrame(
-        motor, StSpinOpcode::MOV_AX, static_cast<int16_t>(target_velocity));
+    const auto incomingFrame = sendAndReceiveFrame(motor, outgoingFrame);
 
-    // SET_SPEEDRAMP expects the ramp time in millis to be in register bx.
-    // We do speed ramping ourselves in MotorService, so we just want to
-    // set the target speed without ramping (hence we set reg bx to 0).
-    sendAndReceiveFrame(motor, StSpinOpcode::MOV_BX, 0);
+    if (incomingFrame.has_value())
+    {
+        motor_measured_speed_rpm_[motor] = incomingFrame->motor_measured_speed_rpm;
+        motor_faults_[motor]             = incomingFrame->motor_faults;
+    }
 
-    sendAndReceiveFrame(motor, StSpinOpcode::SET_SPEEDRAMP);
-
-    return current_velocity;
+    return motor_measured_speed_rpm_.at(motor);
 }
 
-void StSpinMotorController::immediatelyDisable() {}
+void StSpinMotorController::immediatelyDisable()
+{
+    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    {
+        if (ENABLED_MOTORS.at(motor))
+        {
+            motor_enabled_[motor] = false;
+        }
+    }
+}
 
 void StSpinMotorController::openSpiFileDescriptor(const MotorIndex& motor)
 {
@@ -218,69 +218,63 @@ void StSpinMotorController::openSpiFileDescriptor(const MotorIndex& motor)
                      << "error: " << strerror(errno);
 }
 
-int16_t StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
-                                                   const StSpinOpcode opcode,
-                                                   const int16_t data)
+std::optional<StSpinMotorController::IncomingFrame>
+StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
+                                           const OutgoingFrame outgoing_frame) const
 {
-    //  A frame is 6 bytes long and has the following format:
-    //
-    //  +-------+--------+---------------+-------+-------+
-    //  |  SOF  | OPCODE |     DATA      |  CRC  |  EOF  |
-    //  +-------+--------+---------------+-------+-------+
-    //      0       1        2       3       4       5
-    //
-    //  For slave frames, OPCODE will be either an ACK or NACK acknowledging
-    //  receival of the last master frame.
-    //
-    //  The byte order of DATA is big endian; therefore the MSB is transmitted first.
-    //  DATA may be ignored if the operation has no data to transmit/receive.
-
-    // Wait for slave data ready assertion
-    while (!data_ready_gpio_.at(motor)->pollValue(GpioState::HIGH, DATA_READY_TIMEOUT_MS))
-    {
-        LOG(WARNING) << "Timed out waiting for " << motor << " to signal data ready";
-    }
-
     uint8_t tx[FRAME_LEN] = {};
     uint8_t rx[FRAME_LEN] = {};
 
-    tx[0] = FRAME_SOF;
-    tx[1] = static_cast<uint8_t>(opcode);
-    tx[2] = static_cast<uint8_t>(0xFF & (data >> 8));
-    tx[3] = static_cast<uint8_t>(0xFF & data);
-    tx[5] = FRAME_EOF;
+    //  Outgoing frames have the following format:
+    //
+    //  +-------+--------+---------------+-------+-------+
+    //  | DELIM | ENABLE |   SPEED_RPM   |       |  CRC  |
+    //  +-------+--------+---------------+-------+-------+
+    //      0       1        2       3       4       5
+    //
+    //  The byte order of SPEED_RPM is big endian; i.e. the MSB is
+    //  transmitted first. Byte 4 is currently unused.
 
-    const uint8_t tx_msg[] = {tx[1], tx[2], tx[3]};
-    tx[4]                  = Crc8Autosar::calc(tx_msg, sizeof(tx_msg));
+    tx[0] = FRAME_DELIMITER;
+    tx[1] = static_cast<uint8_t>(outgoing_frame.motor_enabled);
+    tx[2] = static_cast<uint8_t>(0xFF & (outgoing_frame.motor_target_speed_rpm >> 8));
+    tx[3] = static_cast<uint8_t>(0xFF & outgoing_frame.motor_target_speed_rpm);
+    tx[4] = 0;
+    tx[5] = Crc8Autosar::calc(tx, FRAME_LEN - 1);
 
     spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_LEN,
                 SPI_SPEED_HZ);
 
+    //  Incoming frames have the following format:
+    //
+    //  +-------+---------------+----------------+-------+
+    //  | DELIM |   SPEED_RPM   |     FAULTS     |  CRC  |
+    //  +-------+---------------+----------------+-------+
+    //      0       1       2        3      4        5
+    //
+    //  The byte order of SPEED_RPM and FAULTS is big endian;
+    //  i.e. the MSB is transmitted first.
+
     // Frame integrity check
-    const uint8_t rx_msg[] = {rx[1], rx[2], rx[3]};
-    const uint8_t rx_crc   = Crc8Autosar::calc(rx_msg, sizeof(rx_msg));
-    if (rx[0] != FRAME_SOF || rx[5] != FRAME_EOF || rx[4] != rx_crc)
+    const uint8_t rx_crc = Crc8Autosar::calc(rx, FRAME_LEN - 1);
+    if (rx[0] != FRAME_DELIMITER || rx[5] != rx_crc)
     {
         LOG(WARNING) << "Received frame that failed integrity check. Expected CRC "
-                     << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[4])
+                     << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[5])
                      << " for motor " << motor;
 
-        LOG(WARNING) << "RX motor " << motor << " "
-                     << static_cast<int>(rx[0]) << " "
-                     << static_cast<int>(rx[1]) << " "
-                     << static_cast<int>(rx[2]) << " "
-                     << static_cast<int>(rx[3]) << " "
-                     << static_cast<int>(rx[4]) << " "
+        LOG(WARNING) << "RX motor " << motor << " " << static_cast<int>(rx[0]) << " "
+                     << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2]) << " "
+                     << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4]) << " "
                      << static_cast<int>(rx[5]);
 
-        return 0;
+        return std::nullopt;
     }
 
-    if (static_cast<StSpinOpcode>(rx[1]) == StSpinOpcode::NACK)
-    {
-        LOG(WARNING) << "Last frame sent was not acknowledged by motor " << motor;
-    }
-
-    // Return the DATA field of the received frame
-    return static_cast<int16_t>((static_cast<uint16_t>(rx[2]) << 8) | rx[3]);
+    return IncomingFrame{
+        .motor_measured_speed_rpm =
+            static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]),
+        .motor_faults =
+            static_cast<uint16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]),
+    };
 }

@@ -59,10 +59,11 @@ TmcMotorController::TmcMotorController()
 
 MotorControllerStatus TmcMotorController::earlyPoll()
 {
-    auto motors              = driveMotors();
-    bool encoders_calibrated = std::accumulate(
-        motors.begin(), motors.end(), false, [&](const bool& acc, const MotorIndex& motor)
-        { return acc || encoder_calibrated_[motor]; });
+    auto motors = driveMotors();
+    bool encoders_calibrated =
+        std::accumulate(motors.begin(), motors.end(), false,
+                        [&](const bool& acc, const MotorIndex& motor)
+                        { return acc || encoder_calibrated_[motor]; });
 
     if (!encoders_calibrated)
     {
@@ -72,8 +73,8 @@ MotorControllerStatus TmcMotorController::earlyPoll()
     return MotorControllerStatus::OK;
 }
 
-double TmcMotorController::readThenWriteVelocity(const MotorIndex& motor,
-                                                 const int& target_velocity)
+int TmcMotorController::readThenWriteVelocity(const MotorIndex& motor,
+                                              const int& target_velocity)
 {
     return readThenWriteValue(motor, TMC4671_PID_VELOCITY_ACTUAL,
                               TMC4671_PID_VELOCITY_TARGET, target_velocity);
@@ -172,10 +173,11 @@ void TmcMotorController::setup()
         endEncoderCalibration(motor);
     }
 
-    auto motors                  = driveMotors();
-    bool has_encoders_calibrated = std::accumulate(
-        motors.begin(), motors.end(), false, [&](const bool& acc, const MotorIndex& motor)
-        { return acc || encoder_calibrated_[motor]; });
+    auto motors = driveMotors();
+    bool has_encoders_calibrated =
+        std::accumulate(motors.begin(), motors.end(), false,
+                        [&](const bool& acc, const MotorIndex& motor)
+                        { return acc || encoder_calibrated_[motor]; });
     CHECK(has_encoders_calibrated)
         << "Running without encoder calibration can cause serious harm, exiting";
 }
@@ -390,10 +392,10 @@ MotorFaultIndicator TmcMotorController::checkDriverFault(const MotorIndex& motor
     return MotorFaultIndicator(drive_enabled, motor_faults);
 }
 
-double TmcMotorController::readThenWriteValue(const MotorIndex& motor,
-                                              const uint8_t& read_addr,
-                                              const uint8_t& write_addr,
-                                              const int& write_data)
+int TmcMotorController::readThenWriteValue(const MotorIndex& motor,
+                                           const uint8_t& read_addr,
+                                           const uint8_t& write_addr,
+                                           const int& write_data)
 {
     spi_demux_select_0_->setValue(GpioState::HIGH);
     spi_demux_select_1_->setValue(GpioState::LOW);
@@ -627,10 +629,9 @@ void TmcMotorController::checkEncoderConnections()
 
     for (int num_iterations = 0;
          num_iterations < 10 &&
-         std::any_of(
-             calibrated_motors.begin(), calibrated_motors.end(),
-             [](std::pair<const MotorIndex, bool> calibration_status_pair)
-             { return !calibration_status_pair.second; });
+         std::any_of(calibrated_motors.begin(), calibrated_motors.end(),
+                     [](std::pair<const MotorIndex, bool> calibration_status_pair)
+                     { return !calibration_status_pair.second; });
          ++num_iterations)
     {
         for (const MotorIndex& motor : driveMotors())

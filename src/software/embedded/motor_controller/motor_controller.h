@@ -26,8 +26,8 @@ class MotorController
      */
     virtual MotorFaultIndicator checkDriverFault(const MotorIndex& motor) = 0;
 
-    virtual double readThenWriteVelocity(const MotorIndex& motor,
-                                         const int& target_velocity) = 0;
+    virtual int readThenWriteVelocity(const MotorIndex& motor,
+                                      const int& target_velocity) = 0;
 
     virtual void immediatelyDisable() = 0;
 };

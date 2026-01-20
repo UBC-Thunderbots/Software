@@ -21,8 +21,8 @@ class TmcMotorController : public MotorController
 
     void immediatelyDisable() override;
 
-    double readThenWriteVelocity(const MotorIndex& motor,
-                                 const int& target_velocity) override;
+    int readThenWriteVelocity(const MotorIndex& motor,
+                              const int& target_velocity) override;
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins appropriately and
@@ -90,8 +90,8 @@ class TmcMotorController : public MotorController
      * @param write_data the data to write
      * @return the value read from the trinamic controller
      */
-    double readThenWriteValue(const MotorIndex& motor, const uint8_t& read_addr,
-                              const uint8_t& write_addr, const int& write_data);
+    int readThenWriteValue(const MotorIndex& motor, const uint8_t& read_addr,
+                           const uint8_t& write_addr, const int& write_data);
 
     /**
      * A lot of initialization parameters are necessary to function. Even if

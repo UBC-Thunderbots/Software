@@ -5,7 +5,6 @@
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
 #include "software/embedded/motor_controller/motor_index.h"
-#include "software/embedded/motor_controller/stspin_constants.h"
 
 class StSpinMotorController : public MotorController
 {
@@ -20,8 +19,8 @@ class StSpinMotorController : public MotorController
 
     MotorFaultIndicator checkDriverFault(const MotorIndex& motor) override;
 
-    double readThenWriteVelocity(const MotorIndex& motor,
-                                 const int& target_velocity) override;
+    int readThenWriteVelocity(const MotorIndex& motor,
+                              const int& target_velocity) override;
 
     void immediatelyDisable() override;
 
@@ -33,36 +32,45 @@ class StSpinMotorController : public MotorController
      */
     void openSpiFileDescriptor(const MotorIndex& motor);
 
+    struct IncomingFrame
+    {
+        int16_t motor_measured_speed_rpm;
+        uint16_t motor_faults;
+    };
+
+    struct OutgoingFrame
+    {
+        bool motor_enabled;
+        int16_t motor_target_speed_rpm;
+    };
+
     /**
      * Transmits a frame to the given motor and receives a frame back over SPI.
      *
-     * Note: to receive data for GET operations, it is expected that we send a
-     * second frame (e.g. a NOOP) after the initial frame requesting the GET.
-     * The data in the second frame received will contain the response to the
-     * GET request.
-     *
      * @param motor the motor to send the frame to
-     * @param opcode the opcode to include in the transmitted frame
-     * @param data the data to include in the transmitted frame
-     * @return the data in the frame received from the motor
+     * @param outgoing_frame the outgoing frame to send to the motor
+     * @return the incoming frame received from the motor
      */
-    int16_t sendAndReceiveFrame(const MotorIndex& motor, const StSpinOpcode opcode,
-                                const int16_t data = 0);
-
-    // Start-of-frame and end-of-frame markers
-    static constexpr uint8_t FRAME_SOF = 0x73;
-    static constexpr uint8_t FRAME_EOF = 0x45;
+    std::optional<IncomingFrame> sendAndReceiveFrame(const MotorIndex& motor,
+                                                     OutgoingFrame outgoing_frame) const;
 
     // Length of frame (in number of bytes)
     static constexpr unsigned int FRAME_LEN = 6;
 
+    // Byte marking the start of a new frame.
+    // We don't _need_ frame delimiters, but they're useful as part of a
+    // quick frame integrity check.
+    static constexpr uint8_t FRAME_DELIMITER = 0x67;
+
+    // clang-format off
     static const inline std::unordered_map<MotorIndex, bool> ENABLED_MOTORS = {
-        {MotorIndex::FRONT_LEFT,  true},
-        {MotorIndex::BACK_LEFT,   true},
-        {MotorIndex::BACK_RIGHT,  true},
+        {MotorIndex::FRONT_LEFT, true},
+        {MotorIndex::BACK_LEFT, true},
+        {MotorIndex::BACK_RIGHT, true},
         {MotorIndex::FRONT_RIGHT, true},
-        {MotorIndex::DRIBBLER,    false},
+        {MotorIndex::DRIBBLER, false},
     };
+    // clang-format on
 
     // SPI Chip Selects
     // clang-format off
@@ -86,29 +94,18 @@ class StSpinMotorController : public MotorController
     };
     // clang-format on
 
-    // Data Ready GPIO Pins
-    // clang-format off
-    static const inline std::unordered_map<MotorIndex, uint8_t> DATA_READY_GPIO_PINS = {
-        {MotorIndex::FRONT_LEFT,  24},
-        {MotorIndex::BACK_LEFT,   21},
-        {MotorIndex::BACK_RIGHT,  16},
-        {MotorIndex::FRONT_RIGHT, 23},
-        {MotorIndex::DRIBBLER,    0},
-    };
-    // clang-format on
-
     // SPI Configs
-    static constexpr uint32_t SPI_SPEED_HZ     = 100000;    // 100 KHz
-    static constexpr uint32_t MAX_SPI_SPEED_HZ = 250000000; // 250 MHz
+    static constexpr uint32_t SPI_SPEED_HZ     = 100000;     // 100 KHz
+    static constexpr uint32_t MAX_SPI_SPEED_HZ = 250000000;  // 250 MHz
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;
-
-    static constexpr std::chrono::milliseconds DATA_READY_TIMEOUT_MS =
-        std::chrono::milliseconds(200);
 
     // SPI File Descriptors mapping from Chip Select -> File Descriptor
     std::array<int, reflective_enum::size<MotorIndex>()> file_descriptors_;
 
     std::unique_ptr<Gpio> reset_gpio_;
-    std::unordered_map<MotorIndex, std::unique_ptr<Gpio>> data_ready_gpio_;
+
+    std::unordered_map<MotorIndex, bool> motor_enabled_;
+    std::unordered_map<MotorIndex, int16_t> motor_measured_speed_rpm_;
+    std::unordered_map<MotorIndex, uint16_t> motor_faults_;
 };
