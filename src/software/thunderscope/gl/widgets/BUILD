@@ -6,6 +6,7 @@ py_library(
     name = "gl_runtime_installer",
     srcs = ["gl_runtime_installer.py"],
     deps = [
+        "//software/thunderscope/binary_context_managers:runtime_manager",
         requirement("pyqtgraph"),
     ],
 )
