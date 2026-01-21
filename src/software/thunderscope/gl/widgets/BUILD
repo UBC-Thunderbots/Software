@@ -44,7 +44,7 @@ py_library(
     deps = [
         ":gl_runtime_installer",
         ":gl_toolbar",
-        ":backend_selection_dialog",
+        ":gl_runtime_selector",
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
         "//software/thunderscope/binary_context_managers:game_controller",
@@ -55,7 +55,7 @@ py_library(
 )
 
 py_library(
-    name = "backend_selection_dialog",
+    name = "gl_runtime_selector",
     srcs = ["gl_runtime_selector.py"],
     deps = [
         requirement("pyqtgraph"),
