@@ -7,12 +7,16 @@ message PlayInfo
     message Play
     {
         repeated string play_state = 1;
+        string last_transition = 2;
+        string last_guard = 3;
     }
 
     message Tactic
     {
         string tactic_name      = 1;
         string tactic_fsm_state = 2;
+        string last_transition = 3;
+        string last_guard = 4;
     }
 
     map<uint32, Tactic> robot_tactic_assignment = 1;

@@ -23,6 +23,7 @@ py_library(
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
         "//software/thunderscope/common:thread_safe_circular_buffer",
+        requirement("psutil"),
     ],
 )
 
@@ -34,6 +35,7 @@ py_library(
     ],
     data = [
         "//software:unix_full_system",
+        requirement("psutil"),
     ],
 )
 

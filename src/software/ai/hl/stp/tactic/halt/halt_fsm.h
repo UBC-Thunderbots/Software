@@ -36,6 +36,8 @@ struct HaltFSM : TacticFSM<HaltFSM>
      */
     bool stopDone(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(stopDone, HaltFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
