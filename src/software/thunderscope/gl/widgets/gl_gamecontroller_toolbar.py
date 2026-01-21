@@ -4,7 +4,9 @@ from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from typing import Callable, override
 import webbrowser
-from software.thunderscope.binary_context_managers.runtime_manager import runtime_manager_instance
+from software.thunderscope.binary_context_managers.runtime_manager import (
+    runtime_manager_instance,
+)
 from software.thunderscope.gl.widgets.gl_runtime_selector import GLRuntimeSelectorDialog
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -288,7 +290,7 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.runtime_selector_dialog = GLRuntimeSelectorDialog(
                 parent=self.parent(),
                 runtime_options=options,
-                on_runtimes_selected=runtime_manager_instance.load_existing_runtimes
+                on_runtimes_selected=runtime_manager_instance.load_existing_runtimes,
             )
 
         self.runtime_selector_dialog.show()

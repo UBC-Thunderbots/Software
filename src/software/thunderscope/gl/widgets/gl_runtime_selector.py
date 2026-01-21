@@ -26,7 +26,6 @@ class GLRuntimeSelectorDialog(QDialog):
         :param runtime_options: the list of runtime options to display in both menus
         :param on_runtimes_selected: the callback for runtime selection
         """
-
         super().__init__(parent)
 
         self.on_runtimes_selected = on_runtimes_selected
@@ -56,7 +55,9 @@ class GLRuntimeSelectorDialog(QDialog):
 
         # Restart note
         layout.addSpacing(15)
-        restart_note = QLabel("<i>Note: Restart Thunderscope for changes to take effect.</i>")
+        restart_note = QLabel(
+            "<i>Note: Restart Thunderscope for changes to take effect.</i>"
+        )
         layout.addWidget(restart_note)
 
         # Done button
