@@ -56,7 +56,7 @@ py_library(
 
 py_library(
     name = "backend_selection_dialog",
-    srcs = ["backend_selection_dialog.py"],
+    srcs = ["gl_runtime_selector.py"],
     deps = [
         requirement("pyqtgraph"),
     ]
