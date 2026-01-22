@@ -53,7 +53,6 @@ py_library(
 
 py_library(
     name = "ai_selector",
-    srcs = ["ai_selector.py"],
-    data = [],
+    srcs = ["ai_selector.py"]
 )
 
