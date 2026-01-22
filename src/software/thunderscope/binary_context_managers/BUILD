@@ -52,7 +52,11 @@ py_library(
 )
 
 py_library(
-    name = "ai_selector",
-    srcs = ["ai_selector.py"]
+    name = "runtime_manager",
+    srcs = [
+        "runtime_installer.py",
+        "runtime_loader.py",
+        "runtime_manager.py",
+    ]
 )
 

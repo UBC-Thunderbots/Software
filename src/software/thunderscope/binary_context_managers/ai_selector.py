@@ -13,11 +13,15 @@ class AIConfig:
 
     def __init__(
         self,
-        chosen_blue: str,
-        chosen_yellow: str,
+        chosen_blue_name: str,
+        chosen_yellow_name: str,
     ) -> None:
-        self.chosen_blue = chosen_blue
-        self.chosen_yellow = chosen_yellow
+        """Struct-like class to store the names of the binaries
+        :param chosen_blue_name the name for the blue fullsystem
+        :param chosen_yellow_name the name for the yellow fullsystem
+        """
+        self.chosen_blue_name = chosen_blue_name
+        self.chosen_yellow_name = chosen_yellow_name
 
 def find_available_ai() -> list[str]:
     """Returns a list of all available binary names, including our fullsystem
@@ -67,8 +71,8 @@ def write_selected_ai(
     @param chosen_yellow: the name of the selected AI binary for yellow
     """
 
-    blue_path = return_ai_path(fullsystem_pair.chosen_blue)
-    yellow_path = return_ai_path(fullsystem_pair.chosen_yellow)
+    blue_path = return_ai_path(fullsystem_pair.chosen_blue_name)
+    yellow_path = return_ai_path(fullsystem_pair.chosen_yellow_name)
 
     """Format in TOML as:
     blue_path_to_binary: '<absolute path>'
@@ -100,16 +104,16 @@ def read_saved_ai() -> AIConfig:
             selected_ai_dict = tomllib.load(file)
             # If a different blue fullsystem is persisted, replace the default arrangement
             if AISelectorConstants.BLUE_TOML_FIELD in selected_ai_dict.keys():
-                fullsystem_pair.chosen_blue = selected_ai_dict.get(AISelectorConstants.BLUE_TOML_FIELD)
+                fullsystem_pair.chosen_blue_name = selected_ai_dict.get(AISelectorConstants.BLUE_TOML_FIELD)
             # If a different yellow fullsystem is persisted, replace the default arrangemnet
             if AISelectorConstants.YELLOW_TOML_FIELD in selected_ai_dict.keys():
-                fullsystem_pair.chosen_blue = selected_ai_dict.get(AISelectorConstants.YELLOW_TOML_FIELD)
+                fullsystem_pair.chosen_blue_name = selected_ai_dict.get(AISelectorConstants.YELLOW_TOML_FIELD)
             file.close()
 
     # Display logging message when using default fullsystem
-    if fullsystem_pair.chosen_blue == AISelectorConstants.BLUE_TOML_FIELD:
+    if fullsystem_pair.chosen_blue_name == AISelectorConstants.BLUE_TOML_FIELD:
         logging.info("TBots Fullsystem selected for blue side.")
-    if fullsystem_pair.chosen_yellow == AISelectorConstants.YELLOW_TOML_FIELD:
+    if fullsystem_pair.chosen_yellow_name == AISelectorConstants.YELLOW_TOML_FIELD:
         logging.info("TBots Fullsystem selected for yellow side.")
 
     return fullsystem_pair
