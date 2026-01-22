@@ -33,7 +33,7 @@ def find_available_ai() -> list[str]:
                 list_of_ai.append(os.path.basename(file_name))
 
     except (FileNotFoundError, PermissionError, NotADirectoryError):
-        pass #TODO not sure what behaviour to put here, maybe a debug message or something (if it's even necessary)?
+        logging.info("No external AI")
 
     finally:
         # Add an option for our fullsystem
