@@ -12,21 +12,9 @@ cd "$CURR_DIR" || exit
 
 source util.sh
 
-arch=$(uname -s)
-print_status_msg "Detected architecture: ${arch}"
-
-# Check for Homebrew and install if missing
-if ! command -v brew &>/dev/null; then
-    print_status_msg "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    # Configure Homebrew in current shell
-    if [ "$arch" = "arm64" ]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    else
-        eval "$(/usr/local/bin/brew shellenv)"
-    fi
-fi
+# Since we only support MacOS Arm chips (M series), we can use "Darwin" as the identifier
+# for mac setup procedures and ignore the architecture for now.
+sys=$(uname -s)
 
 print_status_msg "Installing Utilities and Dependencies"
 
@@ -73,16 +61,16 @@ sudo pip install -r macos_requirements.txt
 print_status_msg "Done Setting Up Python Environment"
 
 print_status_msg "Fetching game controller"
-install_gamecontroller $arch
+install_gamecontroller $sys
 
 print_status_msg "Setting up TIGERS AutoRef"
-install_autoref $arch
+install_autoref $sys
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
 print_status_msg "Finished setting up AutoRef"
 
 print_status_msg "Setting up cross compiler for robot software"
-install_cross_compiler $arch
+install_cross_compiler $sys
 print_status_msg "Done setting up cross compiler for robot software"
 
 print_status_msg "Setting Up Python Development Headers"
@@ -93,7 +81,9 @@ print_status_msg "Granting Permissions to /opt/tbotspython"
 sudo chown -R $(id -u):$(id -g) /opt/tbotspython
 print_status_msg "Done Granting Permissions to /opt/tbotspython"
 
-print_status_msg "Done Environment Configuration"
+print_status_msg "Set up ansible-lint"
+/opt/tbotspython/bin/ansible-galaxy collection install ansible.posix
+print_status_msg "Finished setting up ansible-lint"
 
 print_status_msg "Software Setup Complete"
 print_status_msg "Note: Some changes require a new terminal session to take effect"
