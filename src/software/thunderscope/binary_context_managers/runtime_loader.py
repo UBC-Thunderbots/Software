@@ -1,6 +1,5 @@
 from software.thunderscope.constants import RuntimeManagerConstants
 import os
-from pathlib import Path
 import tomllib
 import logging
 
@@ -12,8 +11,8 @@ class AIConfig:
             chosen_yellow_name: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
     ) -> None:
         """Data class to store the names of the binaries
-        :param chosen_blue_name the name for the blue fullsystem
-        :param chosen_yellow_name the name for the yellow fullsystem
+        :param chosen_blue_name the name for the blue FullSystem
+        :param chosen_yellow_name the name for the yellow FullSystem
         """
         self.chosen_blue_name = chosen_blue_name
         self.chosen_yellow_name = chosen_yellow_name
@@ -25,8 +24,8 @@ class RuntimeLoader:
         self.cached_runtimes = None
 
     def fetch_installed_runtimes(self) -> list[str]:
-        """Fetches the list of available runtimes, including our fullsystem, from the local disk
-        :return: A list of names for available runtimes, or just a list with our fullsystem if no available runtimes
+        """Fetches the list of available runtimes, including our FullSystem, from the local disk
+        :return: A list of names for available runtimes, or just a list with our FullSystem if no available runtimes
         could be found
         """
         if self.cached_runtimes:
@@ -40,10 +39,10 @@ class RuntimeLoader:
                     list_of_ai.append(os.path.basename(file_name))
 
         except (FileNotFoundError, PermissionError, NotADirectoryError):
-            logging.info("No external AI")
+            logging.info("Folder for external AI could not be accessed.")
 
         finally:
-            # Add an option for our fullsystem
+            # Add an option for our FullSystem
             list_of_ai.append(RuntimeManagerConstants.DEFAULT_BINARY_NAME)
             return list_of_ai
 
@@ -57,37 +56,40 @@ class RuntimeLoader:
         pass
 
     def fetch_runtime_config(self) -> AIConfig:
-        """Fetches the runtime configuration from the local disk.
+        """Fetches the runtime configuration from the local disk, and caches it in this.
         :return: Returns the runtime configuration as a AIConfig
         """
-        # Create default fullsystem pair with our fullsystem binaries
-        fullsystem_pair = AIConfig()
+        # Create default FullSystem pair with our FullSystem binaries
+        config = AIConfig()
 
         if os.path.isfile(RuntimeManagerConstants.RUNTIME_CONFIG_PATH):
             with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "rb") as file:
                 selected_ai_dict = tomllib.load(file)
-                # If a different blue fullsystem is persisted, replace the default arrangement
+                # If a different blue FullSystem is persisted, replace the default arrangement
                 if RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY in selected_ai_dict.keys():
-                    fullsystem_pair.chosen_blue_name = selected_ai_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY)
-                # If a different yellow fullsystem is persisted, replace the default arrangement
+                    config.chosen_blue_name = selected_ai_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY)
+                # If a different yellow FullSystem is persisted, replace the default arrangement
                 if RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY in selected_ai_dict.keys():
-                    fullsystem_pair.chosen_blue_name = selected_ai_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY)
-                file.close()
+                    config.chosen_blue_name = selected_ai_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY)
 
-        # Display logging message when using default fullsystem
-        if fullsystem_pair.chosen_blue_name == RuntimeManagerConstants.RUNTIME_CONFIG_PATH:
-            logging.info("TBots Fullsystem selected for blue side.")
-        if fullsystem_pair.chosen_yellow_name == RuntimeManagerConstants.RUNTIME_CONFIG_PATH:
-            logging.info("TBots Fullsystem selected for yellow side.")
+        # Display logging message when using default FullSystem
+        if config.chosen_blue_name == RuntimeManagerConstants.RUNTIME_CONFIG_PATH:
+            logging.info("TBots FullSystem selected for blue side.")
+        if config.chosen_yellow_name == RuntimeManagerConstants.RUNTIME_CONFIG_PATH:
+            logging.info("TBots FullSystem selected for yellow side.")
 
-        return fullsystem_pair
+        # Cache runtimes
+        self.cached_runtimes = config
+
+        return config
 
     def _create_runtime_config(self) -> None:
         """Creates the runtime configuration file on disk and throws an error upon failure."""
-        # TODO ask about creating config file
+        # TODO Not sure if this function really has an use, since python open() creates a new file by default if it 
+        #  doesn't exist
         pass
 
-    def _set_runtime_config(self, fullsystem_pair: AIConfig) -> None:
+    def _set_runtime_config(self, config: AIConfig) -> None:
         """Sets/persists the runtime configuration file on disk and creates the configuration
         file if it doesn't exist.
         :param config: The runtime configuration containing
@@ -95,8 +97,8 @@ class RuntimeLoader:
          - color_runtime : relative path of DEFAULT_BINARY_PATH
         """
 
-        blue_path = self._return_ai_path(fullsystem_pair.chosen_blue_name)
-        yellow_path = self._return_ai_path(fullsystem_pair.chosen_yellow_name)
+        blue_path = self._return_ai_path(config.chosen_blue_name)
+        yellow_path = self._return_ai_path(config.chosen_yellow_name)
 
         """Format in TOML as:
         blue_path_to_binary: '<absolute path>'
@@ -108,15 +110,16 @@ class RuntimeLoader:
         )
 
         # create a new config file if it doesn't exist, and write in the format above to it
-
-        with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "w") as file:
-            Path(RuntimeManagerConstants.RUNTIME_CONFIG_PATH).write_text(selected_ais, encoding="utf-8")
-            file.close()
+        try:
+            with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "w") as file:
+                file.write(selected_ais)
+        except (PermissionError, NotADirectoryError):
+            logging.error("Could not access the configuration file.")
         pass
 
     def _return_ai_path(self, selected_ai: str) -> str:
-        """Returns the absolute path of a binary given its name, or the path of our default fullsystem if the binary is not
-        valid.
+        """Returns the absolute path of a binary given its name, or the path of our default FullSystem
+        if the binary is not valid.
         :param selected_ai: the name of the selected AI binary
 
         :return: the absolute path of the binary as a string
