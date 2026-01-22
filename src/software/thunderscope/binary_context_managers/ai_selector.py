@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import tomllib
+import logging
 from software.thunderscope.constants import AISelectorConstants
 
 #TODO integration with (#3568); seems really straightforward hopefully
@@ -8,6 +9,15 @@ from software.thunderscope.constants import AISelectorConstants
 #TODO integration with (3560); also seems straightforward I think. I think it might be easier if I wait till these two
 # are merged to begin integrating? (though I did make comments in thunderscope main and setup sh)
 
+class AIConfig:
+
+    def __init__(
+        self,
+        chosen_blue: str,
+        chosen_yellow: str,
+    ) -> None:
+        self.chosen_blue = chosen_blue
+        self.chosen_yellow = chosen_yellow
 
 def find_available_ai() -> list[str]:
     """Returns a list of all available binary names, including our fullsystem
@@ -44,13 +54,11 @@ def return_ai_path(selected_ai: str) -> str:
         return AISelectorConstants.FULLSYSTEM_PATH
     else:
         # Remove all white space and return
-        #TODO not sure if that is necessary, but probably doesn't hurt?
-        return "".join(file_path.split())
+        return file_path.strip()
 
 
 def write_selected_ai(
-        chosen_blue: str,
-        chosen_yellow: str) -> None:
+        fullsystem_pair: AIConfig) -> None:
 
     """Creates a new TOML file named ai_config (if it doesn't already exist), and persists the absolute path
     of the selected blue and yellow binaries to it.
@@ -59,8 +67,8 @@ def write_selected_ai(
     @param chosen_yellow: the name of the selected AI binary for yellow
     """
 
-    blue_path = return_ai_path(chosen_blue)
-    yellow_path = return_ai_path(chosen_yellow)
+    blue_path = return_ai_path(fullsystem_pair.chosen_blue)
+    yellow_path = return_ai_path(fullsystem_pair.chosen_yellow)
 
     """Format in TOML as:
     blue_path_to_binary: '<absolute path>'
@@ -77,42 +85,33 @@ def write_selected_ai(
         Path(AISelectorConstants.CONFIG_FILE_PATH).write_text(selected_ais, encoding="utf-8")
         file.close()
 
-def read_saved_ai() -> dict[str, str]:
+def read_saved_ai() -> AIConfig:
 
-    """Returns a string dictionary mapping to the AI binaries saved in the TOML file ai_config
+    """Returns a Fullsystem pair mapping to the AI binaries saved in the TOML file ai_config
 
-    :return: a string dictionary of the blue and yellow AI binary paths
+    :return: a FullsystemPair object containing the blue and yellow AI binary paths
     """
 
-    saved_blue = None
-    saved_yellow = None
+    # Create default fullsystem pair with our fullsystem binaries
+    fullsystem_pair = AIConfig(AISelectorConstants.FULLSYSTEM_PATH, AISelectorConstants.FULLSYSTEM_PATH)
 
-    if not os.path.isfile(AISelectorConstants.CONFIG_FILE_PATH):
-        # If there is no config file, default to our fullsystem
-        saved_blue = AISelectorConstants.FULLSYSTEM_PATH
-        saved_yellow = AISelectorConstants.FULLSYSTEM_PATH
-    else:
+    if os.path.isfile(AISelectorConstants.CONFIG_FILE_PATH):
         with open(AISelectorConstants.CONFIG_FILE_PATH, "rb") as file:
-            # If the TOML File formatting is invalid, default to our fullsystem
             selected_ai_dict = tomllib.load(file)
+            # If a different blue fullsystem is persisted, replace the default arrangement
             if AISelectorConstants.BLUE_TOML_FIELD in selected_ai_dict.keys():
-                saved_blue = selected_ai_dict.get(AISelectorConstants.BLUE_TOML_FIELD)
-            else:
-                saved_blue = AISelectorConstants.FULLSYSTEM_PATH
+                fullsystem_pair.chosen_blue = selected_ai_dict.get(AISelectorConstants.BLUE_TOML_FIELD)
+            # If a different yellow fullsystem is persisted, replace the default arrangemnet
             if AISelectorConstants.YELLOW_TOML_FIELD in selected_ai_dict.keys():
-                saved_yellow = selected_ai_dict.get(AISelectorConstants.YELLOW_TOML_FIELD)
-            else:
-                saved_yellow = AISelectorConstants.FULLSYSTEM_PATH
+                fullsystem_pair.chosen_blue = selected_ai_dict.get(AISelectorConstants.YELLOW_TOML_FIELD)
             file.close()
 
-    # Return a dictionary of colour to the path string
-    saved_ais = {
-        "Blue": saved_blue,
-        "Yellow": saved_yellow
-    }
+    if fullsystem_pair.chosen_blue == AISelectorConstants.BLUE_TOML_FIELD:
+        logging.info("TBots Fullsystem selected for blue side.")
+    if fullsystem_pair.chosen_yellow == AISelectorConstants.YELLOW_TOML_FIELD:
+        logging.info("TBots Fullsystem selected for yellow side.")
 
-    #TODO not sure if this should be a dictionary or something like a tuple
-    return saved_ais
+    return fullsystem_pair
 
 
 
