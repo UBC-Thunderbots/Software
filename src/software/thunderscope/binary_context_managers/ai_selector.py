@@ -53,7 +53,7 @@ def return_ai_path(selected_ai: str) -> str:
     if selected_ai == AISelectorConstants.FULLSYSTEM_DISPLAY_NAME or not os.path.isfile(file_path):
         return AISelectorConstants.FULLSYSTEM_PATH
     else:
-        # Remove all white space and return
+        # Remove leading and trailing white space and return
         return file_path.strip()
 
 
@@ -106,6 +106,7 @@ def read_saved_ai() -> AIConfig:
                 fullsystem_pair.chosen_blue = selected_ai_dict.get(AISelectorConstants.YELLOW_TOML_FIELD)
             file.close()
 
+    # Display logging message when using default fullsystem
     if fullsystem_pair.chosen_blue == AISelectorConstants.BLUE_TOML_FIELD:
         logging.info("TBots Fullsystem selected for blue side.")
     if fullsystem_pair.chosen_yellow == AISelectorConstants.YELLOW_TOML_FIELD:
