@@ -377,17 +377,7 @@ class ProtoPlayerFlags(Enum):
 
     NO_ERROR_FLAG = 0
     UNCAUGHT_EXCEPTION_FLAG = 1 << 0
-
-class AISelectorConstants:
-    """Constants for the AI Selector"""
-
-    AI_FOLDER = "/opt/tbotspython/external_ai"
-    CONFIG_FILE_PATH = AI_FOLDER + "/ai_config.toml"
-    FULLSYSTEM_DISPLAY_NAME = "Default Fullsystem"
-    FULLSYSTEM_PATH = "software/unix_full_system"
-    BLUE_TOML_FIELD = "blue_path_to_binary"
-    YELLOW_TOML_FIELD = "yellow_path_to_binary"
-
+    
 
 class LogLevels(StrEnum):
     """Log levels for FullSystem to indicate minimum logged level"""
