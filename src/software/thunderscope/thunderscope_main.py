@@ -12,9 +12,6 @@ from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )
 
-from software.thunderscope.binary_context_managers.runtime_loader import (
-    AIConfig
-)
 
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (
@@ -33,7 +30,6 @@ from software.thunderscope.wifi_communication_manager import WifiCommunicationMa
 from software.thunderscope.constants import (
     EstopMode,
     ProtoUnixIOTypes,
-    RuntimeManagerConstants,
 )
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO

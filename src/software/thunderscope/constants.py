@@ -377,7 +377,7 @@ class ProtoPlayerFlags(Enum):
 
     NO_ERROR_FLAG = 0
     UNCAUGHT_EXCEPTION_FLAG = 1 << 0
-    
+
 
 class LogLevels(StrEnum):
     """Log levels for FullSystem to indicate minimum logged level"""

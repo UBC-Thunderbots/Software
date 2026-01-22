@@ -3,12 +3,12 @@ import os
 import tomllib
 import logging
 
-class AIConfig:
 
+class AIConfig:
     def __init__(
-            self,
-            chosen_blue_name: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
-            chosen_yellow_name: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
+        self,
+        chosen_blue_name: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
+        chosen_yellow_name: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
     ) -> None:
         """Data class to store the names of the binaries
         :param chosen_blue_name the name for the blue FullSystem
@@ -16,6 +16,7 @@ class AIConfig:
         """
         self.chosen_blue_name = chosen_blue_name
         self.chosen_yellow_name = chosen_yellow_name
+
 
 class RuntimeLoader:
     """Delegate class for handling local runtimes and managing runtime selection"""
@@ -34,7 +35,9 @@ class RuntimeLoader:
         try:
             # Check for all executable files in the folder
             for file_name in os.listdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
-                file_path = os.path.join(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, file_name)
+                file_path = os.path.join(
+                    RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, file_name
+                )
                 if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
                     list_of_ai.append(os.path.basename(file_name))
 
@@ -66,11 +69,21 @@ class RuntimeLoader:
             with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "rb") as file:
                 selected_ai_dict = tomllib.load(file)
                 # If a different blue FullSystem is persisted, replace the default arrangement
-                if RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY in selected_ai_dict.keys():
-                    config.chosen_blue_name = selected_ai_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY)
+                if (
+                    RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+                    in selected_ai_dict.keys()
+                ):
+                    config.chosen_blue_name = selected_ai_dict.get(
+                        RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+                    )
                 # If a different yellow FullSystem is persisted, replace the default arrangement
-                if RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY in selected_ai_dict.keys():
-                    config.chosen_blue_name = selected_ai_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY)
+                if (
+                    RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+                    in selected_ai_dict.keys()
+                ):
+                    config.chosen_blue_name = selected_ai_dict.get(
+                        RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+                    )
 
         # Display logging message when using default FullSystem
         if config.chosen_blue_name == RuntimeManagerConstants.RUNTIME_CONFIG_PATH:
@@ -85,7 +98,7 @@ class RuntimeLoader:
 
     def _create_runtime_config(self) -> None:
         """Creates the runtime configuration file on disk and throws an error upon failure."""
-        # TODO Not sure if this function really has an use, since python open() creates a new file by default if it 
+        # TODO Not sure if this function really has an use, since python open() creates a new file by default if it
         #  doesn't exist
         pass
 
@@ -96,7 +109,6 @@ class RuntimeLoader:
          - color_runtime : absolute path of external runtime, or
          - color_runtime : relative path of DEFAULT_BINARY_PATH
         """
-
         blue_path = self._return_ai_path(config.chosen_blue_name)
         yellow_path = self._return_ai_path(config.chosen_yellow_name)
 
@@ -124,10 +136,14 @@ class RuntimeLoader:
 
         :return: the absolute path of the binary as a string
         """
-
-        file_path = os.path.join(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, selected_ai)
+        file_path = os.path.join(
+            RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, selected_ai
+        )
         # Default to our full system if it is selected or the selected binary doesn't exist
-        if selected_ai == RuntimeManagerConstants.DEFAULT_BINARY_NAME or not os.path.isfile(file_path):
+        if (
+            selected_ai == RuntimeManagerConstants.DEFAULT_BINARY_NAME
+            or not os.path.isfile(file_path)
+        ):
             return RuntimeManagerConstants.DEFAULT_BINARY_PATH
         else:
             # Remove leading and trailing white space and return
