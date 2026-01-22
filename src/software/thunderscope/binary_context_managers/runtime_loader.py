@@ -4,7 +4,6 @@ from pathlib import Path
 import tomllib
 import logging
 
-# TODO: #3557
 class AIConfig:
 
     def __init__(
