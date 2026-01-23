@@ -3,7 +3,7 @@ from software.thunderscope.binary_context_managers.runtime_installer import (
 )
 from software.thunderscope.binary_context_managers.runtime_loader import (
     RuntimeLoader,
-    AIConfig,
+    RuntimeConfig,
 )
 
 
@@ -39,9 +39,9 @@ class RuntimeManager:
         """
         self.runtime_loader.load_existing_runtimes(yellow_runtime, blue_runtime)
 
-    def fetch_runtime_config(self) -> AIConfig:
+    def fetch_runtime_config(self) -> RuntimeConfig:
         """Fetches the runtime configuration from the local disk
-        :return: Returns the runtime configuration as a map
+        :return: Returns the runtime configuration as a RuntimeConfig
         """
         return self.runtime_loader.fetch_runtime_config()
 
