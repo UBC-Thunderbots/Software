@@ -115,6 +115,7 @@ jobs:
             //software/simulated_tests/...    \
             //software/ai/hl/...              \
             //software/ai/navigator/...       
+            
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
         if: always()

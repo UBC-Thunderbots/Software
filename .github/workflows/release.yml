@@ -1,9 +1,10 @@
 name: Release binary on commit
 
 on: 
+  schedule:
+    -cron: 0 0 * * 0 # Midnight Sundays
   push:
     branches:
-      - master
       - new_release_workflow
       - debug_mv
 
@@ -24,8 +25,19 @@ jobs:
     steps:
 
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+      - name: Check for recent commits
+        id: check
+        run: |
+        COUNT = $(git log --since="1 week ago" --oneline | wc -l)
+        echo "count=$COUNT" >> $GITHUB_OUTPUT
+
       - uses: ./.github/actions/environment-setup
+        if: steps.check.outputs.count > 0
+
       - name: Build Binaries
+        if: steps.check.outputs.count > 0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: | 
