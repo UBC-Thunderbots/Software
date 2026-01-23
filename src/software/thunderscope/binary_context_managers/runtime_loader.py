@@ -24,10 +24,12 @@ class RuntimeLoader:
     """Delegate class for handling local runtimes and managing runtime selection"""
 
     def __init__(self):
+        # Dictionary of runtime name to runtime path. Scans the disk if the cache is empty or None.
         self.cached_runtimes = None
 
     def fetch_installed_runtimes(self) -> list[str]:
-        """Fetches the list of available runtimes, including our FullSystem, from the local disk
+        """Fetches the list of available runtimes, including our FullSystem, from the local disk. Caches a dictionary
+        of the runtime name to runtime path.
         :return: A list of names for available runtimes, or just a list with our FullSystem if no available runtimes
         could be found
         """
