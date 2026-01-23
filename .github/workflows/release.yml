@@ -24,19 +24,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
       - name: Build Binaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: | 
           cd src
           echo "{{ matrix.runner }}"
+          TAG="v1.0.${{ github.run_number }}"
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- //software:unix_full_system_tar_gen
-      - name: Copy Binaries 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cd src
-          bazel run --show_timestamps --copt=-O3 --verbose_failures \
-          -- //software:write_full_system_tar
-          echo "${{ matrix.platform }}"
-          mv software/tar-out/unix_full_system.tar.gz "software/tar-out/unix_full_system_${{ matrix.platform }}.tar.gz"
-          TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" "software/tar-out/unix_full_system_${{ matrix.platform }}.tar.gz" --generate-notes  
+          mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "{{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" 
+          gh release create "$TAG" "{{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" --generate-notes  
