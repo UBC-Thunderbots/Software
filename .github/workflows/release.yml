@@ -30,7 +30,7 @@ jobs:
         id: check
         run: COUNT=$(git log --since="1 week ago" --oneline | wc -l)
           echo "count=$COUNT" >> $GITHUB_OUTPUT
-          echo "count: $COUNT"
+          echo "the total log count is: $COUNT"
 
       - uses: ./.github/actions/environment-setup
         if: steps.check.outputs.count > 0
