@@ -23,8 +23,7 @@ jobs:
       contents: write
     steps:
       - name: test
-        run: | 
-        echo "temp at ${{ runner.temp }}"
+        run: echo "temp at ${{ runner.temp }}"
 
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
