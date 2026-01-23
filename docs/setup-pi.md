@@ -91,12 +91,13 @@ ping -c 3 8.8.8.8
 ```
    * If successful, you should see all packets transmitted and received at some point in the return message. Ex: ```3 packets transmitted, 3 received, 0% packet loss, time 2004ms```.
    * If not successful, you will see packets not received. Ex: ```3 packets transmitted, 0 received, 100% packet loss, time 2052ms```.
-3. Run the bazel ansible command:
+3. Exit the SSH connection to the Raspberry Pi with the `exit` command.
+4. Change directory to `Software/src` and run the bazel ansible command:
 ```bash
 bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot  --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts aimbot.local --ssh_pass thunderbots
 ```
    * This may take a while.
-4. Done!
+5. Done!
 
 ### Common Errors and Debugging
 
