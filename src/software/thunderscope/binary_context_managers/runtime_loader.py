@@ -67,7 +67,8 @@ class RuntimeLoader:
         self._set_runtime_config(config)
 
     def fetch_runtime_config(self) -> RuntimeConfig:
-        """Fetches the runtime configuration from the local disk
+        """Fetches the runtime configuration from the local disk. If the blue/yellow configuration is invalid,
+        returns the default runtime configuration for blue/yellow
         :return: Returns the runtime configuration as a RuntimeConfig
         """
         # Create default FullSystem pair with our FullSystem binaries
