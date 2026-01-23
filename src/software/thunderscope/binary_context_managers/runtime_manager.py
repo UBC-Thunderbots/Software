@@ -33,7 +33,7 @@ class RuntimeManager:
         return self.runtime_loader.fetch_installed_runtimes()
 
     def load_existing_runtimes(self, yellow_runtime: str, blue_runtime: str) -> None:
-        """Loads the runtimes of the specified name or throws an error upon failure.
+        """Loads the runtimes of the specified name or logs a warning upon failure.
         :param blue_runtime: name of the blue runtime to load
         :param yellow_runtime: name of the yellow runtime to load
         """
