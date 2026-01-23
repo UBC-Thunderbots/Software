@@ -29,8 +29,8 @@ jobs:
       - name: Check for recent commits
         id: check
         run: |
-        COUNT=$(git log --since="1 week ago" --oneline | wc -l)
-        echo "count=$COUNT" >> $GITHUB_OUTPUT
+          COUNT=$(git log --since="1 week ago" --oneline | wc -l)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
 
       - uses: ./.github/actions/environment-setup
         if: steps.check.outputs.count > 0
