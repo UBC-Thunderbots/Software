@@ -1,8 +1,6 @@
 name: Release binary on commit
 
 on: 
-  schedule:
-    -cron: 0 0 * * 0 # Midnight Sundays
   push:
     branches:
       - new_release_workflow
@@ -28,8 +26,7 @@ jobs:
           fetch-depth: 0 
       - name: Check for recent commits
         id: check
-        run: |
-          COUNT=$(git log --since="1 week ago" --oneline | wc -l)
+        run: COUNT=$(git log --since="1 week ago" --oneline | wc -l)
           echo "count=$COUNT" >> $GITHUB_OUTPUT
 
       - uses: ./.github/actions/environment-setup
