@@ -145,7 +145,10 @@ print_status_msg "Finished setting up AutoRef"
 
 # setup external_runtimes 
 sudo mkdir /opt/tbotspython/external_runtimes
+sudo touch /opt/tbotspython/external_runtimes/runtime_config.toml
 sudo chown -R $USER:$USER /opt/tbotspython/external_runtimes/
+
+sudo chmod 600 /opt/tbotspython/external_runtimes/runtime_config.toml
 
 # Install Bazel
 print_status_msg "Installing Bazel"
@@ -198,14 +201,6 @@ print_status_msg "Done PlatformIO Setup"
 
 print_status_msg "Set up ansible-lint"
 /opt/tbotspython/bin/ansible-galaxy collection install ansible.posix
-
-#TODO integrate later if it's right
-
-sudo mkdir /opt/tbotspython/external_ai
-sudo touch /opt/tbotspython/external_ai/ai_config.toml
-
-sudo chown -R $USER:$USER /opt/tbotspython/external_ai/
-sudo chmod 600 /opt/tbotspython/external_ai/ai_config.toml
 
 print_status_msg "Finished setting up ansible-lint"
 
