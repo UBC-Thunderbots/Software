@@ -1,6 +1,8 @@
 name: Release binary on commit
 
 on: 
+  # schedule:
+  #   -cron: 0 0 * * 0 # Midnight Sundays
   push:
     branches:
       - new_release_workflow
@@ -28,6 +30,7 @@ jobs:
         id: check
         run: COUNT=$(git log --since="1 week ago" --oneline | wc -l)
           echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "count: $COUNT"
 
       - uses: ./.github/actions/environment-setup
         if: steps.check.outputs.count > 0
