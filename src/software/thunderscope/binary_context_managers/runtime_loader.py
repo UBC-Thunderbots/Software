@@ -8,13 +8,13 @@ import logging
 
 class RuntimeConfig:
     """Data class to store the paths of the two binaries"""
+
     def __init__(
         self,
         chosen_blue_path: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
         chosen_yellow_path: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
     ) -> None:
-        """
-        Stores the paths of the binaries in this
+        """Stores the paths of the binaries in this
         :param chosen_blue_path the name for the blue FullSystem
         :param chosen_yellow_path the name for the yellow FullSystem
         """
@@ -49,11 +49,15 @@ class RuntimeLoader:
                     runtime_dict[os.path.basename(file_name)] = file_path
 
         except (FileNotFoundError, PermissionError, NotADirectoryError):
-            logging.warning(f"Folder for external runtimes {RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH} could not be accessed.")
+            logging.warning(
+                f"Folder for external runtimes {RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH} could not be accessed."
+            )
 
         finally:
             # Add an option for our FullSystem
-            runtime_dict[RuntimeManagerConstants.DEFAULT_BINARY_NAME] = RuntimeManagerConstants.DEFAULT_BINARY_PATH
+            runtime_dict[RuntimeManagerConstants.DEFAULT_BINARY_NAME] = (
+                RuntimeManagerConstants.DEFAULT_BINARY_PATH
+            )
 
             # Cache external runtimes
             self.cached_runtimes = runtime_dict
@@ -64,7 +68,10 @@ class RuntimeLoader:
         :param blue_runtime: Unique name of the blue runtime to set
         :param yellow_runtime: Unique name of the yellow runtime to set
         """
-        config = RuntimeConfig(self._return_runtime_path(blue_runtime), self._return_runtime_path(yellow_runtime))
+        config = RuntimeConfig(
+            self._return_runtime_path(blue_runtime),
+            self._return_runtime_path(yellow_runtime),
+        )
         self._set_runtime_config(config)
 
     def fetch_runtime_config(self) -> RuntimeConfig:
@@ -82,15 +89,21 @@ class RuntimeLoader:
                     RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
                     in selected_runtime_dict.keys()
                 ):
-                    config.chosen_blue_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY]
+                    config.chosen_blue_path = selected_runtime_dict[
+                        RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+                    ]
                 # If a different yellow FullSystem is persisted, replace the default arrangement
                 if (
                     RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
                     in selected_runtime_dict.keys()
                 ):
-                    config.chosen_yellow_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY]
+                    config.chosen_yellow_path = selected_runtime_dict[
+                        RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+                    ]
         except (FileNotFoundError, PermissionError, TOMLDecodeError):
-            logging.warning(f"Failed to fetch runtime configuration from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
+            logging.warning(
+                f"Failed to fetch runtime configuration from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
+            )
 
         # Display logging message when using default FullSystem
         if config.chosen_blue_path == RuntimeManagerConstants.DEFAULT_BINARY_PATH:
@@ -140,9 +153,8 @@ class RuntimeLoader:
             RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, selected_runtime
         )
         # Default to our full system if it is selected or the selected binary isn't an existing executable
-        if (
-            selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME
-            or not (os.path.isfile(file_path) and os.access(file_path, os.X_OK))
+        if selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME or not (
+            os.path.isfile(file_path) and os.access(file_path, os.X_OK)
         ):
             return RuntimeManagerConstants.DEFAULT_BINARY_PATH
         else:
