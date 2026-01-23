@@ -107,10 +107,10 @@ class RuntimeInstaller:
                 else:
                     subprocess.run(
                         ["cp", str(archive_path), str(INSTALL_DIR / filename)],
-                        check=True
+                        check=True,
                     )
 
-    if not selected_asset:
+            if not selected_asset:
                 raise RuntimeError(f"No asset found with name: {version}")
 
             break
