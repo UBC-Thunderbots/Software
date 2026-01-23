@@ -4,7 +4,7 @@
 VisProtoDeduper::VisProtoDeduper(unsigned int window_size):
     window_size(window_size) {}
 
-void VisProtoDeduper::loadDistinct(const std::vector<ObstaclePtr> &obstacle_list, TbotsProto::ObstacleList& obstacle_list_out) {
+void VisProtoDeduper::dedupeAndFill(const std::vector<ObstaclePtr> &obstacle_list, TbotsProto::ObstacleList& obstacle_list_out) {
     // Lazily evit the ObstacleList from the deque
     if (sent_queue.size() > window_size) {
         const std::vector<std::size_t>& popped_hashes = sent_queue.front();
@@ -24,6 +24,8 @@ void VisProtoDeduper::loadDistinct(const std::vector<ObstaclePtr> &obstacle_list
             sent_set.insert(hash_val);
             obstacle_list_out.add_obstacles()->CopyFrom(proto);
             current_hashes.push_back(hash_val);
+        } else {
+            // std::cout << "Duplicate" << std::endl;
         }
     }
     sent_queue.push_back(std::move(current_hashes));
@@ -37,8 +39,7 @@ void VisProtoDeduper::hashCombine(std::size_t &seed, std::size_t value) const {
 std::size_t VisProtoDeduper::hash(const TbotsProto::Obstacle &obstacle) const {
     std::size_t seed = 0;
     auto mix_float = [&](double val) {
-        long long quantized = static_cast<long long>(val * 10000.0);
-        hashCombine(seed, std::hash<long long>{}(quantized));
+        hashCombine(seed, std::hash<long long>{}(val));
     };
 
     if (obstacle.has_circle()) {

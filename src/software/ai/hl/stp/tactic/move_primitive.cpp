@@ -8,7 +8,7 @@
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
 
-VisProtoDeduper MovePrimitive::vis_proto_deduper(100);
+VisProtoDeduper MovePrimitive::vis_proto_deduper(30);
 
 MovePrimitive::MovePrimitive(
     const Robot &robot, const Point &destination, const Angle &final_angle,
@@ -267,10 +267,7 @@ void MovePrimitive::getVisualizationProtos(
     TbotsProto::ObstacleList &obstacle_list_out,
     TbotsProto::PathVisualization &path_visualization_out) const
 {
-    for (const auto &obstacle : obstacles)
-    {
-        obstacle_list_out.add_obstacles()->CopyFrom(obstacle->createObstacleProto());
-    }
+   vis_proto_deduper.dedupeAndFill(obstacles, obstacle_list_out);
 
     TbotsProto::Path path;
     if (traj_path.has_value())
