@@ -24,8 +24,8 @@ jobs:
     steps:
       - name: test
         run: | 
-        echo ${{ runner.temp }}
-        
+        echo {{ runner.temp }}
+
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
       - name: Build Binaries
