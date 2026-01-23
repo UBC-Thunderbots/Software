@@ -29,7 +29,7 @@ jobs:
       - name: Check for recent commits
         id: check
         run: |
-        COUNT = $(git log --since="1 week ago" --oneline | wc -l)
+        COUNT=$(git log --since="1 week ago" --oneline | wc -l)
         echo "count=$COUNT" >> $GITHUB_OUTPUT
 
       - uses: ./.github/actions/environment-setup
@@ -41,7 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: | 
           cd src
-          echo "{{ matrix.runner }}"
+          echo "${{ matrix.runner }}"
           TAG="v1.0.${{ github.run_number }}"
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- //software:unix_full_system_tar_gen
