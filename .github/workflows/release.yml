@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - new_release_workflow
-      - debug_mv
 
 jobs:
   release:
