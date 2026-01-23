@@ -25,7 +25,7 @@ Once installed, follow these steps to set up the Raspberry Pi:
     * Operating System: Raspberry Pi OS (64-bit)
     * Storage: `<your_inserted_micro_SD_card>`
     * Customization:
-      * Hostname: `<robot_name`.local (Ex: `aimbot.local`). The `local` part is autofilled by the Raspberry Pi Imager. 
+      * Hostname: `<robot_name>`.local (Ex: `aimbot`.local). The `local` part is autofilled by the Raspberry Pi Imager. 
       * Localization -> Timezone: America/Vancouver
       * User -> Username: robot
       * User -> Password: `<password>` (ask someone if you don't know what the correct password is)
