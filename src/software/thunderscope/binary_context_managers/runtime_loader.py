@@ -1,5 +1,4 @@
 from tomllib import TOMLDecodeError
-
 from software.thunderscope.constants import RuntimeManagerConstants
 import os
 import tomllib
@@ -45,7 +44,7 @@ class RuntimeLoader:
                 file_path = os.path.join(
                     RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, file_name
                 )
-                if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
+                if self._is_valid_runtime(file_path):
                     runtime_dict[os.path.basename(file_name)] = file_path
 
         except (FileNotFoundError, PermissionError, NotADirectoryError):
@@ -91,6 +90,14 @@ class RuntimeLoader:
                     config.chosen_yellow_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY]
         except (FileNotFoundError, PermissionError, TOMLDecodeError):
             logging.warning(f"Failed to fetch runtime configuration from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
+
+        # Check if paths are valid runtimes
+        if (config.chosen_blue_path != RuntimeManagerConstants.DEFAULT_BINARY_PATH and
+                not self._is_valid_runtime(config.chosen_blue_path)):
+            config.chosen_blue_path = RuntimeManagerConstants.DEFAULT_BINARY_PATH
+        if (config.chosen_yellow_path != RuntimeManagerConstants.DEFAULT_BINARY_PATH and
+                not self._is_valid_runtime(config.chosen_yellow_path)):
+            config.chosen_yellow_path = RuntimeManagerConstants.DEFAULT_BINARY_PATH
 
         # Display logging message when using default FullSystem
         if config.chosen_blue_path == RuntimeManagerConstants.DEFAULT_BINARY_PATH:
@@ -139,12 +146,20 @@ class RuntimeLoader:
         file_path = os.path.join(
             RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, selected_runtime
         )
-        # Default to our full system if it is selected or the selected binary isn't an existing executable
+        # Default to our full system if it is selected or the selected binary isn't a valid runtime
         if (
             selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME
-            or not (os.path.isfile(file_path) and os.access(file_path, os.X_OK))
+            or not self._is_valid_runtime(file_path)
         ):
             return RuntimeManagerConstants.DEFAULT_BINARY_PATH
         else:
             # Remove leading and trailing white space and return
             return file_path.strip()
+
+    def _is_valid_runtime(self, runtime_path: str) -> bool:
+        """Returns if the path exists and if it is an executable
+        :param runtime_path the path to check
+        """
+        if os.path.isfile(runtime_path) and os.access(runtime_path, os.X_OK):
+            return True
+        return False
