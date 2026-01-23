@@ -202,6 +202,17 @@ http_archive(
     url = "https://github.com/saebyn/munkres-cpp/archive/61086fcf5b3a8ad4bda578cdc2d1dca57b548786.tar.gz",
 )
 
+# For flashing the motor driver board
+http_archive(
+    name = "bazel_embedded",
+    sha256 = "91a78efbb0f94479fe9ca2912aced712be9e7028325bada9a73e7d325427b404",
+    strip_prefix = "bazel-embedded-cf5b240d510313b3383e0cdb550eb9f32be7244e",
+    url = "https://github.com/bazelembedded/bazel-embedded/archive/cf5b240d510313b3383e0cdb550eb9f32be7244e.zip",
+)
+
+openocd = use_extension("//:defs.bzl", "openocd_extension")
+use_repo(openocd, "com_openocd")
+
 http_archive(
     name = "LTC4151",
     build_file = "@//extlibs:LTC4151.BUILD",
@@ -233,6 +244,7 @@ register_toolchains(
     "//toolchains/cc:cc_toolchain_for_k8_jetson_nano_cross_compile",
     "//toolchains/cc:cc_toolchain_for_k8",
     "//toolchains/cc:cc_toolchain_for_aarch64",
+    "//toolchains/cc:cc_toolchain_for_stm32",
 )
 
 ##############################################
@@ -263,6 +275,12 @@ new_local_repository(
     name = "k8_jetson_nano_cross_compile_gcc",
     build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
+)
+
+new_local_repository(
+    name = "motor_board_gcc",
+    build_file = "@//extlibs:motor_board_gcc.BUILD",
+    path = "/opt/tbotspython/arm-none-eabi-gcc/",
 )
 
 new_local_repository(
