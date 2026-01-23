@@ -6,13 +6,13 @@ import logging
 
 class RuntimeConfig:
     """Data class to store the names of the binaries"""
+
     def __init__(
         self,
         chosen_blue_name: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
         chosen_yellow_name: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
     ) -> None:
-        """
-        Stores the names of the binaries in this
+        """Stores the names of the binaries in this
         :param chosen_blue_name the name for the blue FullSystem
         :param chosen_yellow_name the name for the yellow FullSystem
         """
@@ -44,11 +44,15 @@ class RuntimeLoader:
                     runtime_dict[os.path.basename(file_name)] = file_path
 
         except (FileNotFoundError, PermissionError, NotADirectoryError):
-            logging.warning(f"Folder for external runtimes {RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH} could not be accessed.")
+            logging.warning(
+                f"Folder for external runtimes {RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH} could not be accessed."
+            )
 
         finally:
             # Add an option for our FullSystem
-            runtime_dict[RuntimeManagerConstants.DEFAULT_BINARY_NAME] = RuntimeManagerConstants.DEFAULT_BINARY_PATH
+            runtime_dict[RuntimeManagerConstants.DEFAULT_BINARY_NAME] = (
+                RuntimeManagerConstants.DEFAULT_BINARY_PATH
+            )
 
             # Cache external runtimes
             self.cached_runtimes = runtime_dict
