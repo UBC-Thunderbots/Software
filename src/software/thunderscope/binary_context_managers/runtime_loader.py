@@ -7,7 +7,7 @@ import logging
 
 
 class RuntimeConfig:
-    """Data class to store the paths of the binaries"""
+    """Data class to store the paths of the two binaries"""
     def __init__(
         self,
         chosen_blue_path: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
