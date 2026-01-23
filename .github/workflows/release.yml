@@ -28,7 +28,8 @@ jobs:
           fetch-depth: 0 
       - name: Check for recent commits
         id: check
-        run: COUNT=$(git log --since="1 week ago" --oneline | wc -l)
+        run: |
+          COUNT=$(git log --since="1 week ago" --oneline | wc -l)
           echo "the total log count is: $COUNT"
           echo "count=$COUNT" >> $GITHUB_OUTPUT
           
