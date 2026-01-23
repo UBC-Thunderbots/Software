@@ -92,11 +92,9 @@ class RuntimeLoader:
             logging.warning(f"Failed to fetch runtime configuration from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
 
         # Check if paths are valid runtimes
-        if (config.chosen_blue_path != RuntimeManagerConstants.DEFAULT_BINARY_PATH and
-                not self._is_valid_runtime(config.chosen_blue_path)):
+        if not self._is_valid_runtime(config.chosen_blue_path):
             config.chosen_blue_path = RuntimeManagerConstants.DEFAULT_BINARY_PATH
-        if (config.chosen_yellow_path != RuntimeManagerConstants.DEFAULT_BINARY_PATH and
-                not self._is_valid_runtime(config.chosen_yellow_path)):
+        if not self._is_valid_runtime(config.chosen_yellow_path):
             config.chosen_yellow_path = RuntimeManagerConstants.DEFAULT_BINARY_PATH
 
         # Display logging message when using default FullSystem
