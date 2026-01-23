@@ -94,7 +94,7 @@ ping -c 3 8.8.8.8
 3. Exit the SSH connection to the Raspberry Pi with the `exit` command.
 4. Change directory to `Software/src` and run the bazel ansible command:
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot  --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts aimbot.local --ssh_pass thunderbots
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot  --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_name>.local --ssh_pass thunderbots
 ```
    * This may take a while.
 5. Done!
