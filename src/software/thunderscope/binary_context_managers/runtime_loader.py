@@ -158,6 +158,7 @@ class RuntimeLoader:
     def _is_valid_runtime(self, runtime_path: str) -> bool:
         """Returns if the path exists and if it is an executable
         :param runtime_path the path to check
+        :return: whether it is a valid runtime or not
         """
         if os.path.isfile(runtime_path) and os.access(runtime_path, os.X_OK):
             return True
