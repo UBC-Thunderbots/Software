@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: test
         run: | 
-        echo {{ runner.temp }}
+        echo "temp at ${{ runner.temp }}"
 
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
