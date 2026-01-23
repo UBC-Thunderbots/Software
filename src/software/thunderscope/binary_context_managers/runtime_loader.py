@@ -4,13 +4,15 @@ import tomllib
 import logging
 
 
-class AIConfig:
+class RuntimeConfig:
+    """Data class to store the names of the binaries"""
     def __init__(
         self,
         chosen_blue_name: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
         chosen_yellow_name: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
     ) -> None:
-        """Data class to store the names of the binaries
+        """
+        Stores the names of the binaries in this
         :param chosen_blue_name the name for the blue FullSystem
         :param chosen_yellow_name the name for the yellow FullSystem
         """
@@ -30,8 +32,8 @@ class RuntimeLoader:
         could be found
         """
         if self.cached_runtimes:
-            return self.cached_runtimes.keys()
-        list_of_ai = []
+            return list(self.cached_runtimes.keys())
+        runtime_dict = {}
         try:
             # Check for all executable files in the folder
             for file_name in os.listdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
@@ -39,49 +41,51 @@ class RuntimeLoader:
                     RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, file_name
                 )
                 if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
-                    list_of_ai.append(os.path.basename(file_name))
+                    runtime_dict[os.path.basename(file_name)] = file_path
 
         except (FileNotFoundError, PermissionError, NotADirectoryError):
-            logging.info("Folder for external AI could not be accessed.")
+            logging.warning(f"Folder for external runtimes {RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH} could not be accessed.")
 
         finally:
             # Add an option for our FullSystem
-            list_of_ai.append(RuntimeManagerConstants.DEFAULT_BINARY_NAME)
-            return list_of_ai
+            runtime_dict[RuntimeManagerConstants.DEFAULT_BINARY_NAME] = RuntimeManagerConstants.DEFAULT_BINARY_PATH
+
+            # Cache external runtimes
+            self.cached_runtimes = runtime_dict
+            return list(runtime_dict.keys())
 
     def load_existing_runtimes(self, yellow_runtime: str, blue_runtime: str) -> None:
         """Loads the yellow and blue runtimes specified by saving them in the local disk.
         :param blue_runtime: Unique name of the blue runtime to set
         :param yellow_runtime: Unique name of the yellow runtime to set
         """
-        config = AIConfig(blue_runtime, yellow_runtime)
+        config = RuntimeConfig(blue_runtime, yellow_runtime)
         self._set_runtime_config(config)
-        pass
 
-    def fetch_runtime_config(self) -> AIConfig:
+    def fetch_runtime_config(self) -> RuntimeConfig:
         """Fetches the runtime configuration from the local disk, and caches it in this.
-        :return: Returns the runtime configuration as a AIConfig
+        :return: Returns the runtime configuration as a RuntimeConfig
         """
         # Create default FullSystem pair with our FullSystem binaries
-        config = AIConfig()
+        config = RuntimeConfig()
 
         if os.path.isfile(RuntimeManagerConstants.RUNTIME_CONFIG_PATH):
             with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "rb") as file:
-                selected_ai_dict = tomllib.load(file)
+                selected_runtime_dict = tomllib.load(file)
                 # If a different blue FullSystem is persisted, replace the default arrangement
                 if (
                     RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
-                    in selected_ai_dict.keys()
+                    in selected_runtime_dict.keys()
                 ):
-                    config.chosen_blue_name = selected_ai_dict.get(
+                    config.chosen_blue_name = selected_runtime_dict.get(
                         RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
                     )
                 # If a different yellow FullSystem is persisted, replace the default arrangement
                 if (
                     RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
-                    in selected_ai_dict.keys()
+                    in selected_runtime_dict.keys()
                 ):
-                    config.chosen_blue_name = selected_ai_dict.get(
+                    config.chosen_blue_name = selected_runtime_dict.get(
                         RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
                     )
 
@@ -96,27 +100,21 @@ class RuntimeLoader:
 
         return config
 
-    def _create_runtime_config(self) -> None:
-        """Creates the runtime configuration file on disk and throws an error upon failure."""
-        # TODO Not sure if this function really has an use, since python open() creates a new file by default if it
-        #  doesn't exist
-        pass
-
-    def _set_runtime_config(self, config: AIConfig) -> None:
+    def _set_runtime_config(self, config: RuntimeConfig) -> None:
         """Sets/persists the runtime configuration file on disk and creates the configuration
         file if it doesn't exist.
         :param config: The runtime configuration containing
          - color_runtime : absolute path of external runtime, or
          - color_runtime : relative path of DEFAULT_BINARY_PATH
         """
-        blue_path = self._return_ai_path(config.chosen_blue_name)
-        yellow_path = self._return_ai_path(config.chosen_yellow_name)
+        blue_path = self._return_runtime_path(config.chosen_blue_name)
+        yellow_path = self._return_runtime_path(config.chosen_yellow_name)
 
         """Format in TOML as:
         blue_path_to_binary: '<absolute path>'
         yellow_path_to_binary: '<absolute path>'"""
 
-        selected_ais = (
+        selected_runtimes = (
             f'{RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY} = "{blue_path}"\n'
             f'{RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY} = "{yellow_path}"\n'
         )
@@ -124,24 +122,26 @@ class RuntimeLoader:
         # create a new config file if it doesn't exist, and write in the format above to it
         try:
             with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "w") as file:
-                file.write(selected_ais)
+                file.write(selected_runtimes)
         except (PermissionError, NotADirectoryError):
             logging.error("Could not access the configuration file.")
-        pass
 
-    def _return_ai_path(self, selected_ai: str) -> str:
+    def _return_runtime_path(self, selected_runtime: str) -> str:
         """Returns the absolute path of a binary given its name, or the path of our default FullSystem
         if the binary is not valid.
-        :param selected_ai: the name of the selected AI binary
+        :param selected_runtime: the name of the selected runtime binary
 
         :return: the absolute path of the binary as a string
         """
+        # Check cache
+        if self.cached_runtimes and selected_runtime in self.cached_runtimes:
+            return self.cached_runtimes[selected_runtime]
         file_path = os.path.join(
-            RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, selected_ai
+            RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, selected_runtime
         )
         # Default to our full system if it is selected or the selected binary doesn't exist
         if (
-            selected_ai == RuntimeManagerConstants.DEFAULT_BINARY_NAME
+            selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME
             or not os.path.isfile(file_path)
         ):
             return RuntimeManagerConstants.DEFAULT_BINARY_PATH
