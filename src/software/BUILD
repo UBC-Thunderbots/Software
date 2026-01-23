@@ -36,13 +36,6 @@ pkg_tar(
     mode = "0755",
 )
 
-write_source_files(
-    name = "write_full_system_tar",
-    diff_test = False,
-    in_file = "//software:unix_full_system_tar_gen",
-    out_file = "tar-out/unix_full_system.tar.gz",
-)
-
 cc_binary(
     name = "er_force_simulator_main",
     srcs = ["er_force_simulator_main.cpp"],
