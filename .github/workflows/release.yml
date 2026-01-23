@@ -22,8 +22,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: test
-        run: echo "temp at ${{ runner.temp }}"
 
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -36,7 +34,5 @@ jobs:
           TAG="v1.0.${{ github.run_number }}"
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- //software:unix_full_system_tar_gen
-          ls bazel-bin
-          ls bazel-bin/software
-          mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "{{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" 
-          gh release create "$TAG" "{{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" --generate-notes  
+          mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" 
+          gh release create "$TAG" "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" --generate-notes  
