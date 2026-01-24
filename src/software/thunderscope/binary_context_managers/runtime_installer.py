@@ -70,8 +70,6 @@ class RuntimeInstaller:
             target_dir = Path(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH)
             tmp_path = Path("/tmp") / filename
 
-            target_dir.mkdir(parents=True, exist_ok=True)
-
             with requests.get(url, stream=True) as r:
                 r.raise_for_status()
                 with open(tmp_path, "wb") as f:
