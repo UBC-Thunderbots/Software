@@ -87,8 +87,6 @@ jobs:
 
       - name: Build Binaries
         if: steps.check.outputs.count > 0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: | 
           cd src
           echo "${{ matrix.runner }}"
