@@ -117,6 +117,7 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:trajectory_planner",
         "//software/geom/algorithms:end_in_obstacle_sample",
+        ":vis_proto_deduper",
     ],
 )
 
