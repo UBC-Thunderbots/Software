@@ -15,9 +15,6 @@ on:
           - major
           - minor
           - patch
-  # push:
-  #   branches:
-  #     - new_release_workflow
 
 jobs:
   release:
