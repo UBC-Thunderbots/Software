@@ -100,8 +100,8 @@ jobs:
             --generate-notes \
             --draft 
 
-  upload_assets:
-    needs: prepare_release
+  upload-assets:
+    needs: prepare-release
     if: needs.prepare_release.outputs.should_release == 'true'
     strategy:
       matrix:
