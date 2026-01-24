@@ -27,7 +27,7 @@ on:
         default: ''
 
 jobs:
-  prepare-release:
+  prepare_release:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.bump_logic.outputs.tag }}
@@ -100,8 +100,8 @@ jobs:
             --generate-notes \
             --draft 
 
-  upload-assets:
-    needs: prepare-release
+  upload_assets:
+    needs: prepare_release
     if: needs.prepare_release.outputs.should_release == 'true'
     strategy:
       matrix:
@@ -133,8 +133,8 @@ jobs:
           mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" 
           gh release upload "$TAG" "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz"
 
-  publish-release:
-    needs: [prepare-release, upload-assets]
+  publish_release:
+    needs: [prepare_release, upload_assets]
     runs-on: ubuntu-latest
     permissions:
       contents: write
