@@ -1,25 +1,19 @@
 from tomllib import TOMLDecodeError
 from software.thunderscope.constants import RuntimeManagerConstants
+from dataclasses import dataclass
 import os
 import tomllib
 import logging
 
-
+@dataclass
 class RuntimeConfig:
     """Data class to store the paths of the two binaries"""
-    def __init__(
-        self,
-        chosen_blue_path: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
-        chosen_yellow_path: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH,
-    ) -> None:
-        """
-        Stores the paths of the binaries in this
-        :param chosen_blue_path the name for the blue FullSystem
-        :param chosen_yellow_path the name for the yellow FullSystem
-        """
-        self.chosen_blue_path = chosen_blue_path
-        self.chosen_yellow_path = chosen_yellow_path
 
+    chosen_blue_path: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH
+    """Blue runtime path"""
+
+    chosen_yellow_path: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH
+    """Yellow runtime path"""
 
 class RuntimeLoader:
     """Delegate class for handling local runtimes and managing runtime selection"""
