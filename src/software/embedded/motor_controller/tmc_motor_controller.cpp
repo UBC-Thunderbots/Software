@@ -76,8 +76,15 @@ MotorControllerStatus TmcMotorController::earlyPoll()
 int TmcMotorController::readThenWriteVelocity(const MotorIndex& motor,
                                               const int& target_velocity)
 {
-    return readThenWriteValue(motor, TMC4671_PID_VELOCITY_ACTUAL,
-                              TMC4671_PID_VELOCITY_TARGET, target_velocity);
+    const int velocity_erpm = readThenWriteValue(
+        motor, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET, target_velocity);
+
+    if (motor == MotorIndex::DRIBBLER)
+    {
+        return velocity_erpm * DRIBBLER_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
+    }
+
+    return velocity_erpm * DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
 }
 
 void TmcMotorController::writeToDriverOrDieTrying(uint8_t motor, uint8_t address,
@@ -504,7 +511,8 @@ void TmcMotorController::startController(MotorIndex motor, bool dribbler)
     if (dribbler)
     {
         // Configure to brushless DC motor with 1 pole pair
-        writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030001);
+        writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS,
+                                     0x00030000 + DRIBBLER_MOTOR_NUM_POLE_PAIRS);
         configureHall(motor);
 
         configureDribblerPI(motor);
@@ -512,7 +520,8 @@ void TmcMotorController::startController(MotorIndex motor, bool dribbler)
     else
     {
         // Configure to brushless DC motor with 8 pole pairs
-        writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
+        writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS,
+                                     0x00030000 + DRIVE_MOTOR_NUM_POLE_PAIRS);
         configureEncoder(motor);
     }
 }

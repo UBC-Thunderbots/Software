@@ -256,4 +256,17 @@ class TmcMotorController : public MotorController
 
     // Trinamics communicate with 5 byte messages
     static constexpr uint32_t TMC_CMD_MSG_SIZE = 5;
+
+    static constexpr int DRIVE_MOTOR_NUM_POLE_PAIRS    = 8;
+    static constexpr int DRIBBLER_MOTOR_NUM_POLE_PAIRS = 1;
+
+    // All Trinamic RPMs are Electrical RPMs (eRPM), which represents the speed at which
+    // the rotating magnetic field inside the motor moves (as opposed to mechanical RPM
+    // which indicates how fast the motor shaft is rotating).
+    //
+    // RPM = eRPM / # of pole pairs
+    static constexpr double DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM =
+        1 / DRIVE_MOTOR_NUM_POLE_PAIRS;
+    static constexpr double DRIBBLER_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM =
+        1 / DRIBBLER_MOTOR_NUM_POLE_PAIRS;
 };

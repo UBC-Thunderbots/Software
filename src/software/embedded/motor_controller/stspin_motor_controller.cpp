@@ -75,10 +75,13 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
 
     const uint16_t faults = motor_faults_.at(motor);
 
-    if (faults != 0)
+    if (faults == 0)
     {
-        LOG(WARNING) << "======= Faults For Motor " << motor << "=======";
+        // No faults; early return
+        return MotorFaultIndicator(drive_enabled, motor_faults);
     }
+
+    LOG(WARNING) << "======= Faults For Motor " << motor << "=======";
 
     if (faults & static_cast<uint16_t>(StSpinFaultCode::DURATION))
     {
