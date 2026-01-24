@@ -64,11 +64,17 @@ class RuntimeLoader:
             with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "rb") as file:
                 selected_runtime_dict = tomllib.load(file)
                 # If a different blue FullSystem is persisted, replace the default arrangement
-                toml_blue_path = selected_runtime_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY, RuntimeManagerConstants.DEFAULT_BINARY_PATH)
+                toml_blue_path = selected_runtime_dict.get(
+                    RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY,
+                    RuntimeManagerConstants.DEFAULT_BINARY_PATH,
+                )
                 if self._is_valid_runtime(toml_blue_path):
                     config.chosen_blue_path = toml_blue_path
                 # If a different yellow FullSystem is persisted, replace the default arrangement
-                toml_yellow_path = selected_runtime_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY, RuntimeManagerConstants.DEFAULT_BINARY_PATH)
+                toml_yellow_path = selected_runtime_dict.get(
+                    RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY,
+                    RuntimeManagerConstants.DEFAULT_BINARY_PATH,
+                )
                 if self._is_valid_runtime(toml_yellow_path):
                     config.chosen_yellow_path = toml_yellow_path
         except (FileNotFoundError, PermissionError, TOMLDecodeError):
@@ -107,7 +113,6 @@ class RuntimeLoader:
         :param selected_runtime: the name of the selected runtime binary
         :return: the absolute path of the binary as a string, or the relative path of our FullSystem
         """
-
         file_path = os.path.join(
             RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, selected_runtime
         )
