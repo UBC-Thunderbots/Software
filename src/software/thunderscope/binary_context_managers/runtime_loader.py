@@ -20,43 +20,26 @@ class RuntimeConfig:
 class RuntimeLoader:
     """Delegate class for handling local runtimes and managing runtime selection"""
 
-    def __init__(self):
-        # Dictionary of runtime name to runtime path. When fetching installed runtimes,
-        # scans the disk if the cache is empty or None.
-        self.cached_runtimes = None
-
     def fetch_installed_runtimes(self) -> list[str]:
-        """Fetches the list of available runtimes, including our FullSystem, from the local disk. Caches a dictionary
-        of the runtime name mapped to runtime path.
+        """Fetches the list of available runtimes, including our FullSystem, from the local disk. Makes the folder
+        in our local disk if it does not exist yet.
         :return: A list of names for available runtimes, or just a list with our FullSystem if no available runtimes
         could be found
         """
-        if self.cached_runtimes:
-            return list(self.cached_runtimes.keys())
-        runtime_dict = {}
-        try:
-            # Check for all executable files in the folder
-            for file_name in os.listdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
-                file_path = os.path.join(
-                    RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, file_name
-                )
-                if self._is_valid_runtime(file_path):
-                    runtime_dict[os.path.basename(file_name)] = file_path
+        runtime_list = [RuntimeManagerConstants.DEFAULT_BINARY_NAME]
 
-        except (FileNotFoundError, PermissionError, NotADirectoryError):
-            logging.warning(
-                f"Folder for external runtimes {RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH} could not be accessed."
+        if not os.path.isdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
+            os.mkdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH)
+        # Check for all executable files in the folder
+        for file_name in os.listdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
+            file_path = os.path.join(
+                RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, file_name
             )
+            if os.access(file_path, os.X_OK):
+                runtime_list.append(file_name)
 
-        finally:
-            # Add an option for our FullSystem
-            runtime_dict[RuntimeManagerConstants.DEFAULT_BINARY_NAME] = (
-                RuntimeManagerConstants.DEFAULT_BINARY_PATH
-            )
-
-            # Cache external runtimes
-            self.cached_runtimes = runtime_dict
-            return list(runtime_dict.keys())
+        # Cache external runtimes
+        return runtime_list
 
     def load_existing_runtimes(self, yellow_runtime: str, blue_runtime: str) -> None:
         """Loads the yellow and blue runtimes specified by saving them in the local disk.
@@ -81,33 +64,13 @@ class RuntimeLoader:
             with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "rb") as file:
                 selected_runtime_dict = tomllib.load(file)
                 # If a different blue FullSystem is persisted, replace the default arrangement
-                if (
-                    RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
-                    in selected_runtime_dict.keys()
-                ):
-                    toml_blue_path = selected_runtime_dict[
-                        RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
-                    ]
-                    if self._is_valid_runtime(toml_blue_path):
-                        config.chosen_blue_path = toml_blue_path
-                else:
-                    logging.warning(
-                        f"Failed to fetch runtime configuration blue field from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
-                    )
+                toml_blue_path = selected_runtime_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY, RuntimeManagerConstants.DEFAULT_BINARY_PATH)
+                if self._is_valid_runtime(toml_blue_path):
+                    config.chosen_blue_path = toml_blue_path
                 # If a different yellow FullSystem is persisted, replace the default arrangement
-                if (
-                    RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
-                    in selected_runtime_dict.keys()
-                ):
-                    toml_yellow_path = selected_runtime_dict[
-                        RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
-                    ]
-                    if self._is_valid_runtime(toml_yellow_path):
-                        config.chosen_yellow_path = toml_yellow_path
-                else:
-                    logging.warning(
-                        f"Failed to fetch runtime configuration yellow field from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
-                    )
+                toml_yellow_path = selected_runtime_dict.get(RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY, RuntimeManagerConstants.DEFAULT_BINARY_PATH)
+                if self._is_valid_runtime(toml_yellow_path):
+                    config.chosen_yellow_path = toml_yellow_path
         except (FileNotFoundError, PermissionError, TOMLDecodeError):
             logging.warning(
                 f"Failed to read TOML file at: {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
@@ -131,26 +94,20 @@ class RuntimeLoader:
 
         selected_runtimes = (
             f'{RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY} = "{blue_path}"\n'
-            f'{RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY} = "{yellow_path}"\n'
+            f'{RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY} = "{yellow_path}"'
         )
 
         # create a new config file if it doesn't exist, and write in the format above to it
-        try:
-            with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "w") as file:
-                file.write(selected_runtimes)
-        except (PermissionError, NotADirectoryError):
-            logging.error("Could not access the configuration file.")
+        with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "w") as file:
+            file.write(selected_runtimes)
 
     def _return_runtime_path(self, selected_runtime: str) -> str:
         """Returns the absolute path of a binary given its name, or the path of our default FullSystem
         if the binary is not valid.
         :param selected_runtime: the name of the selected runtime binary
-
-        :return: the absolute path of the binary as a string
+        :return: the absolute path of the binary as a string, or the relative path of our FullSystem
         """
-        # Check cache
-        if self.cached_runtimes and selected_runtime in self.cached_runtimes:
-            return self.cached_runtimes[selected_runtime]
+
         file_path = os.path.join(
             RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, selected_runtime
         )
@@ -160,9 +117,8 @@ class RuntimeLoader:
             or not self._is_valid_runtime(file_path)
         ):
             return RuntimeManagerConstants.DEFAULT_BINARY_PATH
-        else:
-            # Remove leading and trailing white space and return
-            return file_path.strip()
+        # Remove leading and trailing white space and return
+        return file_path.strip()
 
     def _is_valid_runtime(self, runtime_path: str) -> bool:
         """Returns if the path exists and if it is an executable. Logs a warning if it is not valid.

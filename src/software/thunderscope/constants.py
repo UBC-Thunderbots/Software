@@ -394,6 +394,6 @@ class RuntimeManagerConstants:
     RUNTIME_CONFIG_BLUE_KEY = "blue_path_to_binary"
     RUNTIME_CONFIG_YELLOW_KEY = "yellow_path_to_binary"
     DEFAULT_BINARY_PATH = "software/unix_full_system"
-    DEFAULT_BINARY_NAME = "localhost"
+    DEFAULT_BINARY_NAME = "Current Fullsystem"
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
