@@ -4,7 +4,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 KickoffEnemyPlay::KickoffEnemyPlay(TbotsProto::AiConfig config)
-        : Play(config, true), fsm{KickoffEnemyPlayFSM{config}}, control_params{}
+    : Play(config, true), fsm{KickoffEnemyPlayFSM{config}}, control_params{}
 {
 }
 

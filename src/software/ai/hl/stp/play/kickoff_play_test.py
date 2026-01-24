@@ -51,7 +51,6 @@ def init_world_state(runner, blue_bots, yellow_bots):
 
 
 def init_plays(simulated_test_runner, is_friendly, force_out):
-
     blue_play = Play()
     yellow_play = Play()
 
@@ -59,23 +58,48 @@ def init_plays(simulated_test_runner, is_friendly, force_out):
     non_kicking_team = Team.YELLOW if is_friendly else Team.BLUE
 
     if not force_out:
-        blue_play.name = PlayName.KickoffFriendlyPlay if kicking_team == Team.BLUE else PlayName.KickoffEnemyPlay
-        yellow_play.name = PlayName.KickoffFriendlyPlay if kicking_team == Team.YELLOW else PlayName.KickoffEnemyPlay
+        blue_play.name = (
+            PlayName.KickoffFriendlyPlay
+            if kicking_team == Team.BLUE
+            else PlayName.KickoffEnemyPlay
+        )
+        yellow_play.name = (
+            PlayName.KickoffFriendlyPlay
+            if kicking_team == Team.YELLOW
+            else PlayName.KickoffEnemyPlay
+        )
     else:
-        blue_play.name = PlayName.KickoffFriendlyPlay if kicking_team == Team.BLUE else PlayName.HaltPlay
-        yellow_play.name = PlayName.KickoffFriendlyPlay if kicking_team == Team.YELLOW else PlayName.HaltPlay
+        blue_play.name = (
+            PlayName.KickoffFriendlyPlay
+            if kicking_team == Team.BLUE
+            else PlayName.HaltPlay
+        )
+        yellow_play.name = (
+            PlayName.KickoffFriendlyPlay
+            if kicking_team == Team.YELLOW
+            else PlayName.HaltPlay
+        )
 
-    simulated_test_runner.gamecontroller.send_gc_command(gc_command=Command.Type.KICKOFF, team=kicking_team)
-    simulated_test_runner.gamecontroller.send_gc_command(gc_command=Command.Type.KICKOFF, team=non_kicking_team)
+    simulated_test_runner.gamecontroller.send_gc_command(
+        gc_command=Command.Type.KICKOFF, team=kicking_team
+    )
+    simulated_test_runner.gamecontroller.send_gc_command(
+        gc_command=Command.Type.KICKOFF, team=non_kicking_team
+    )
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
 
-@pytest.mark.parametrize("is_friendly_test, force_open", [(True, False), (True, True), (False, False), (False, True)])
+@pytest.mark.parametrize(
+    "is_friendly_test, force_open",
+    [(True, False), (True, True), (False, False), (False, True)],
+)
 def test_kickoff_play(simulated_test_runner, is_friendly_test, force_open):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
-    init_world_state(simulated_test_runner, setup_kickoff_attacker(), setup_kickoff_defender())
+    init_world_state(
+        simulated_test_runner, setup_kickoff_attacker(), setup_kickoff_defender()
+    )
     init_plays(simulated_test_runner, is_friendly_test, force_open)
 
     always_validation_sequence_set = [[]]

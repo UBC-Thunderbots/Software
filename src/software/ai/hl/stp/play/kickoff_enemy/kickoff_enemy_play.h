@@ -10,12 +10,12 @@
 
 class KickoffEnemyPlay : public Play
 {
-public:
+   public:
     /**
-    * Creates an enemy kickoff play
-    *
-    * @param ai_config the play config for this play
-    */
+     * Creates an enemy kickoff play
+     *
+     * @param ai_config the play config for this play
+     */
     KickoffEnemyPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
@@ -23,7 +23,7 @@ public:
     void updateTactics(const PlayUpdate &play_update) override;
     std::vector<std::string> getState() override;
 
-private:
+   private:
     FSM<KickoffEnemyPlayFSM> fsm;
     KickoffEnemyPlayFSM::ControlParams control_params;
 };

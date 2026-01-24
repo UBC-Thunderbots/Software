@@ -11,12 +11,12 @@
 
 class KickoffFriendlyPlay : public Play
 {
-public:
+   public:
     /**
-    * Creates a friendly kickoff play
-    *
-    * @param ai_config the play config for this play
-    */
+     * Creates a friendly kickoff play
+     *
+     * @param ai_config the play config for this play
+     */
     KickoffFriendlyPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
@@ -24,7 +24,7 @@ public:
     void updateTactics(const PlayUpdate &play_update) override;
     std::vector<std::string> getState() override;
 
-private:
+   private:
     FSM<KickoffFriendlyPlayFSM> fsm;
     KickoffFriendlyPlayFSM::ControlParams control_params;
 };

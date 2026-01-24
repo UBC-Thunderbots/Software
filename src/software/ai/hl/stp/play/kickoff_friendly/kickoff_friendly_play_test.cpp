@@ -16,7 +16,7 @@
 
 class KickoffFriendlyPlayTest : public SimulatedErForceSimPlayTestFixture
 {
-protected:
+   protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
 };
@@ -24,20 +24,20 @@ protected:
 // TODO (#2608): re-enable when fixed
 TEST_F(KickoffFriendlyPlayTest, DISABLED_test_kickoff_friendly_play)
 {
-BallState ball_state(Point(0, 0), Vector(0, 0));
-auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
+    BallState ball_state(Point(0, 0), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(-3, -2.5)});
-setFriendlyGoalie(0);
-auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+    setFriendlyGoalie(0);
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
-setEnemyGoalie(0);
-setAiPlay(TbotsProto::PlayName::KickoffEnemyPlay);
-setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
+    setEnemyGoalie(0);
+    setAiPlay(TbotsProto::PlayName::KickoffEnemyPlay);
+    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
-std::vector<ValidationFunction> terminating_validation_functions = {
+    std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
         {
             // Robot 4 is the only robot allowed to be in the center circle and start
@@ -56,7 +56,7 @@ std::vector<ValidationFunction> terminating_validation_functions = {
             robotInPolygon(robotsDefensiveRect, 3, world_ptr, yield);
         }};
 
-std::vector<ValidationFunction> non_terminating_validation_functions = {
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
         {
             for (RobotId robot_id : {0, 1, 2, 3, 5})
@@ -68,7 +68,7 @@ std::vector<ValidationFunction> non_terminating_validation_functions = {
             }
         }};
 
-runTest(field_type, ball_state, friendly_robots, enemy_robots,
-        terminating_validation_functions, non_terminating_validation_functions,
-        Duration::fromSeconds(10));
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }

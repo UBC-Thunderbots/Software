@@ -5,7 +5,7 @@
 
 
 KickoffFriendlyPlay::KickoffFriendlyPlay(TbotsProto::AiConfig config)
-        : Play(config, true), fsm{KickoffFriendlyPlayFSM{config}}, control_params{}
+    : Play(config, true), fsm{KickoffFriendlyPlayFSM{config}}, control_params{}
 {
 }
 
@@ -32,4 +32,5 @@ std::vector<std::string> KickoffFriendlyPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffFriendlyPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay, TbotsProto::AiConfig>
+    factory;
