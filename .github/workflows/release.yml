@@ -52,22 +52,18 @@ jobs:
         if: steps.check.outputs.count > 0
         id: bump_logic
         run: |
-          # 1. Determine the 'type' of bump
           BUMP="patch"
           if [ "$(date +%d)" = "01" ]; then BUMP="minor"; fi
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             BUMP="${{ github.event.inputs.version_type }}"
           fi
           
-          # 2. Get the latest tag, default to v1.0.0 if none exists
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
           # Strip the 'v' prefix
           BASE_VERSION=${LATEST_TAG#v}
           
-          # Split into array
           IFS='.' read -r major minor patch <<< "$BASE_VERSION"
           
-          # 3. Increment based on logic
           if [ "$BUMP" = "major" ]; then
             major=$((major + 1)); minor=0; patch=0
           elif [ "$BUMP" = "minor" ]; then
