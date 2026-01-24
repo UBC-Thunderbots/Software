@@ -15,16 +15,26 @@ on:
           - major
           - minor
           - patch
+      release_tag:
+        description: 'Specify the new release tag name (e.g., v1.2.3)'
+        required: true
+        type: string
+      
+      target_commit:
+        description: 'Optional commit SHA/branch to release (leave empty for current HEAD)'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   release:
     strategy:
       matrix:
-        platform: [x86, arm64]
+        platform: [ubuntu-x86, mac-arm64]
         include:
-          - platform: x86
+          - platform: ubuntu-x86
             runner: ubuntu-24.04
-          - platform: arm64
+          - platform: mac-arm64
             runner: macos-latest
     runs-on: ${{ matrix.runner }}
     permissions:
