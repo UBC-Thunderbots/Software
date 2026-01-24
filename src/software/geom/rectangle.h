@@ -1,6 +1,9 @@
 #pragma once
 
+#include <functional>
+
 #include "software/geom/convex_polygon.h"
+#include "software/util/hash/hash_combine.h"
 
 /**
  * A rectangle is a ConvexPolygon of four Points with the invariant that two sides are
@@ -125,3 +128,19 @@ class Rectangle : public ConvexPolygon
 
     bool operator==(const Rectangle &p) const;
 };
+
+template <>
+struct std::hash<Rectangle>
+{
+   size_t operator()(const Rectangle &rectangle) const
+   {
+        std::hash<Point> hasher;
+        std::size_t seed = 0;
+        hashCombine(seed, hasher(rectangle.posXPosYCorner()));
+        hashCombine(seed, hasher(rectangle.negXPosYCorner()));
+        hashCombine(seed, hasher(rectangle.negXNegYCorner()));
+        hashCombine(seed, hasher(rectangle.posXNegYCorner()));
+        return seed;
+    }
+};
+

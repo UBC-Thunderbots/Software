@@ -16,13 +16,12 @@ public:
 
     void dedupeAndFill(const std::vector<ObstaclePtr>& obstacle_list, TbotsProto::ObstacleList& obstacle_list_out);
 
-    std::size_t hash(const TbotsProto::Obstacle& obstacle) const;
 
 private:
     unsigned int window_size;
     std::unordered_set<std::size_t> sent_set;
     std::deque<std::vector<std::size_t>> sent_queue;
 
-    void hashCombine(std::size_t& seed, std::size_t value) const;
+    std::hash<Obstacle> obstacle_hasher;
 };
 
