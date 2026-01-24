@@ -2,12 +2,18 @@
 import requests
 import subprocess
 from pathlib import Path
+from software.logger.logger import create_logger
+import zipfile
+import tarfile
+import shutil
 
-
+logger = create_logger(__name__)
 class RuntimeInstaller:
     """Delegate class for handling runtime installation and remote interfacing"""
 
     def __init__(self):
+        download_urls = []
+
         pass
 
     def fetch_remote_runtimes(self) -> list[str]:
@@ -16,11 +22,10 @@ class RuntimeInstaller:
         :return: A unique list of names for available runtimes
         """
         url = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
-
         headers = {"Accept": "application/vnd.github+json"}
 
         response = requests.get(url, headers=headers)
-        response.raise_for_status()
+        logger.warning(response)
 
         releases = response.json()
 
@@ -44,14 +49,17 @@ class RuntimeInstaller:
 
         PREFIX = "https://github.com/UBC-Thunderbots/Software/releases/download/"
 
-        download_urls = []
-
+        #I'm going to assume you are trying to reload the assets so reset the download_urls
+        if len(download_urls) != 0:
+            download_urls = []
+        download_names = []
         for release in releases:
             for asset in release.get("assets", []):
                 url = asset["browser_download_url"]
+                download_urls.append(url)
                 trimmed = url.removeprefix(PREFIX)
-                download_urls.append(trimmed)
-        return download_urls
+                download_names.append(trimmed)
+        return download_names
 
     def install_runtime(self, version: str) -> None:
         """Installs the runtime of the specified version or throws an error upon failure.
@@ -62,7 +70,7 @@ class RuntimeInstaller:
         headers = {"Accept": "application/vnd.github+json"}
 
         response = requests.get(url, headers=headers)
-        response.raise_for_status()
+        logger.warning(response)
 
         releases = response.json()
 
@@ -70,49 +78,41 @@ class RuntimeInstaller:
 
         selected_asset = None
 
-        for release in releases:
-            for asset in release.get("assets", []):
-                if asset["browser_download_url"].endswith(TARGET_SUFFIX):
-                    selected_asset = {
-                        "name": asset["name"],
-                        "download_url": asset["browser_download_url"],
-                        "size_bytes": asset["size"],
-                        "created_at": asset["created_at"],
-                        "release_tag": release["tag_name"],
-                    }
-                    break
-            if selected_asset:
-                url = selected_asset["download_url"]
-                filename = Path(url).name
-                target_dir = Path("/opt/tbotspython/external_runtimes")
+        for i in range(len(download_urls)):
+            if download_urls[i].endswith(TARGET_SUFFIX):
+                selected_asset = download_urls[i]
 
-                # Ensure target directory exists
-                subprocess.run(["sudo", "mkdir", "-p", str(target_dir)], check=True)
+        if selected_asset:
+            url = selected_asset
+            filename = Path(url).name
 
-                tmp_path = Path("/tmp") / filename
-                subprocess.run(["wget", "-O", str(tmp_path), url], check=True)
+            target_dir = Path("/opt/tbotspython/external_runtimes")
+            tmp_path = Path("/tmp") / filename
 
-                if filename.endswith((".tar.gz", ".tgz")):
-                    subprocess.run(
-                        ["sudo", "tar", "-xvf", str(tmp_path), "-C", str(target_dir)],
-                        check=True,
-                    )
+            target_dir.mkdir(parents=True, exist_ok=True)
 
-                elif filename.endswith(".zip"):
-                    subprocess.run(
-                        ["sudo", "unzip", str(tmp_path), "-d", str(target_dir)],
-                        check=True,
-                    )
+            with requests.get(url, stream=True) as r:
+                r.raise_for_status()
+                with open(tmp_path, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
 
-                else:
-                    subprocess.run(
-                        ["cp", str(archive_path), str(INSTALL_DIR / filename)],
-                        check=True,
-                    )
 
-            if not selected_asset:
-                raise RuntimeError(f"No asset found with name: {version}")
+            if filename.endswith((".tar.gz", ".tgz")):
+                with tarfile.open(tmp_path, "r:*") as tar:
+                    tar.extractall(path=target_dir)
 
-            break
+            elif filename.endswith(".zip"):
+                with zipfile.ZipFile(tmp_path, "r") as zipf:
+                    zipf.extractall(path=target_dir)
+
+            else:
+                dest = target_dir / filename
+                shutil.copy2(tmp_path, dest)
+                dest.chmod(0o755)  # make executable (common for runtimes)
+
+        if not selected_asset:
+            logger.warning("Can't find binary")
 
         pass
