@@ -14,7 +14,7 @@ concurrency:
 jobs:
   formatting-check:
     name: Formatting and FSM diagram generation with pre-commit-ci-lite
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4

@@ -63,16 +63,17 @@ class LoggerSingleton
      */
     static void initializeLogger(const std::string& runtime_dir,
                                  const std::shared_ptr<ProtoLogger>& proto_logger,
-                                 const bool reduce_repetition = true)
+                                 const bool reduce_repetition   = true,
+                                 const LEVELS minimum_log_level = DEBUG)
     {
-        static std::shared_ptr<LoggerSingleton> s(
-            new LoggerSingleton(runtime_dir, proto_logger, reduce_repetition));
+        static LoggerSingleton s(runtime_dir, proto_logger, reduce_repetition,
+                                 minimum_log_level);
     }
 
    private:
     LoggerSingleton(const std::string& runtime_dir,
                     const std::shared_ptr<ProtoLogger>& proto_logger,
-                    const bool reduce_repetition)
+                    const bool reduce_repetition, const LEVELS minimum_log_level)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
@@ -122,6 +123,13 @@ class LoggerSingleton
         // Sink for PlotJuggler plotting
         auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>(),
                                                      &PlotJugglerSink::sendToPlotJuggler);
+
+        g3::log_levels::setHighest(minimum_log_level);
+
+        // Add custom logging levels below setHighest to always enable
+        g3::only_change_at_initialization::addLogLevel(CSV);
+        g3::only_change_at_initialization::addLogLevel(VISUALIZE);
+        g3::only_change_at_initialization::addLogLevel(PLOTJUGGLER);
 
         g3::initializeLogging(logWorker.get());
     }

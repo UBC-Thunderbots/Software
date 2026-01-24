@@ -20,6 +20,7 @@ py_binary(
         ":util",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:runtime_manager",
         "//software/thunderscope/binary_context_managers:simulator",
     ],
 )

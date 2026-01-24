@@ -52,7 +52,8 @@ cc_library(
     srcs = ["play.cpp"],
     hdrs = [
         "play.h",
-        "play_fsm.h",
+        "play_base.hpp",
+        "play_fsm.hpp",
     ],
     deps = [
         "//software/ai/hl/stp/tactic",
