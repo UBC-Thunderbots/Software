@@ -6,6 +6,10 @@ from software.thunderscope.binary_context_managers.runtime_loader import (
     RuntimeConfig,
 )
 
+import os
+
+from software.thunderscope.constants import RuntimeManagerConstants
+
 
 class RuntimeManager:
     """Class for interfacing with AI runtimes/backends (full system or external) on the disk"""
@@ -44,6 +48,14 @@ class RuntimeManager:
         :return: Returns the runtime configuration as a RuntimeConfig
         """
         return self.runtime_loader.fetch_runtime_config()
+
+    def create_runtime_dir(self) -> None:
+        """Creates the external runtimes directory if it doesn't exist
+        """
+        if not os.path.isdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
+            os.mkdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH)
+
+
 
 
 runtime_manager_instance = RuntimeManager()
