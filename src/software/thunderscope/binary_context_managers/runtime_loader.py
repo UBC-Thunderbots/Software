@@ -160,6 +160,4 @@ class RuntimeLoader:
         :param runtime_path the path to check
         :return: whether it is a valid runtime or not
         """
-        if os.path.isfile(runtime_path) and os.access(runtime_path, os.X_OK):
-            return True
-        return False
+        return os.path.isfile(runtime_path) and os.access(runtime_path, os.X_OK)
