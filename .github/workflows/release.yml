@@ -1,11 +1,11 @@
 name: Release binary on commit
 
 on: 
-  # schedule:
-  #   -cron: 0 0 * * 0 # Midnight Sundays
-  push:
-    branches:
-      - new_release_workflow
+  schedule:
+    - cron: 0 0 * * 0 # Midnight Sundays
+  # push:
+  #   branches:
+  #     - new_release_workflow
 
 jobs:
   release:
