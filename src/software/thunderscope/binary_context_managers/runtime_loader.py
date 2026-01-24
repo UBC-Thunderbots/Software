@@ -5,6 +5,7 @@ import os
 import tomllib
 import logging
 
+
 @dataclass
 class RuntimeConfig:
     """Data class to store the paths of the two binaries"""
@@ -14,6 +15,7 @@ class RuntimeConfig:
 
     chosen_yellow_path: str = RuntimeManagerConstants.DEFAULT_BINARY_PATH
     """Yellow runtime path"""
+
 
 class RuntimeLoader:
     """Delegate class for handling local runtimes and managing runtime selection"""
@@ -42,11 +44,15 @@ class RuntimeLoader:
                     runtime_dict[os.path.basename(file_name)] = file_path
 
         except (FileNotFoundError, PermissionError, NotADirectoryError):
-            logging.warning(f"Folder for external runtimes {RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH} could not be accessed.")
+            logging.warning(
+                f"Folder for external runtimes {RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH} could not be accessed."
+            )
 
         finally:
             # Add an option for our FullSystem
-            runtime_dict[RuntimeManagerConstants.DEFAULT_BINARY_NAME] = RuntimeManagerConstants.DEFAULT_BINARY_PATH
+            runtime_dict[RuntimeManagerConstants.DEFAULT_BINARY_NAME] = (
+                RuntimeManagerConstants.DEFAULT_BINARY_PATH
+            )
 
             # Cache external runtimes
             self.cached_runtimes = runtime_dict
@@ -57,7 +63,10 @@ class RuntimeLoader:
         :param blue_runtime: Unique name of the blue runtime to set
         :param yellow_runtime: Unique name of the yellow runtime to set
         """
-        config = RuntimeConfig(self._return_runtime_path(blue_runtime), self._return_runtime_path(yellow_runtime))
+        config = RuntimeConfig(
+            self._return_runtime_path(blue_runtime),
+            self._return_runtime_path(yellow_runtime),
+        )
         self._set_runtime_config(config)
 
     def fetch_runtime_config(self) -> RuntimeConfig:
@@ -73,26 +82,36 @@ class RuntimeLoader:
                 selected_runtime_dict = tomllib.load(file)
                 # If a different blue FullSystem is persisted, replace the default arrangement
                 if (
-                        RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
-                        in selected_runtime_dict.keys()
+                    RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+                    in selected_runtime_dict.keys()
                 ):
-                    toml_blue_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY]
+                    toml_blue_path = selected_runtime_dict[
+                        RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+                    ]
                     if self._is_valid_runtime(toml_blue_path):
                         config.chosen_blue_path = toml_blue_path
                 else:
-                    logging.warning(f"Failed to fetch runtime configuration blue field from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
+                    logging.warning(
+                        f"Failed to fetch runtime configuration blue field from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
+                    )
                 # If a different yellow FullSystem is persisted, replace the default arrangement
                 if (
-                        RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
-                        in selected_runtime_dict.keys()
+                    RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+                    in selected_runtime_dict.keys()
                 ):
-                    toml_yellow_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY]
+                    toml_yellow_path = selected_runtime_dict[
+                        RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+                    ]
                     if self._is_valid_runtime(toml_yellow_path):
                         config.chosen_yellow_path = toml_yellow_path
                 else:
-                    logging.warning(f"Failed to fetch runtime configuration yellow field from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
+                    logging.warning(
+                        f"Failed to fetch runtime configuration yellow field from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
+                    )
         except (FileNotFoundError, PermissionError, TOMLDecodeError):
-            logging.warning(f"Failed to read TOML file at: {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
+            logging.warning(
+                f"Failed to read TOML file at: {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
+            )
 
         return config
 
@@ -137,8 +156,8 @@ class RuntimeLoader:
         )
         # Default to our full system if it is selected or the selected binary isn't a valid runtime
         if (
-                selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME
-                or not self._is_valid_runtime(file_path)
+            selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME
+            or not self._is_valid_runtime(file_path)
         ):
             return RuntimeManagerConstants.DEFAULT_BINARY_PATH
         else:
@@ -152,5 +171,7 @@ class RuntimeLoader:
         """
         if os.path.isfile(runtime_path) and os.access(runtime_path, os.X_OK):
             return True
-        logging.warning(f"The runtime retrieved at {runtime_path} is not a valid runtime.")
+        logging.warning(
+            f"The runtime retrieved at {runtime_path} is not a valid runtime."
+        )
         return False
