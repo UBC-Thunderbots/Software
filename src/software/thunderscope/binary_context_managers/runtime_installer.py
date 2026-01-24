@@ -94,5 +94,3 @@ class RuntimeInstaller:
 
         if not selected_asset:
             logger.warning("Can't find binary")
-
-        pass
