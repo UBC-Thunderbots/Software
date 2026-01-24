@@ -82,27 +82,23 @@ class RuntimeLoader:
                     RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
                     in selected_runtime_dict.keys()
                 ):
-                    config.chosen_blue_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY]
+                    toml_blue_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY]
+                    if self._is_valid_runtime(toml_blue_path):
+                        config.chosen_blue_path = toml_blue_path
+                else:
+                    logging.warning(f"Failed to fetch runtime configuration blue field from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
                 # If a different yellow FullSystem is persisted, replace the default arrangement
                 if (
                     RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
                     in selected_runtime_dict.keys()
                 ):
-                    config.chosen_yellow_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY]
+                    toml_yellow_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY]
+                    if self._is_valid_runtime(toml_yellow_path):
+                        config.chosen_yellow_path = toml_yellow_path
+                else:
+                    logging.warning(f"Failed to fetch runtime configuration yellow field from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
         except (FileNotFoundError, PermissionError, TOMLDecodeError):
-            logging.warning(f"Failed to fetch runtime configuration from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
-
-        # Check if paths are valid runtimes
-        if not self._is_valid_runtime(config.chosen_blue_path):
-            config.chosen_blue_path = RuntimeManagerConstants.DEFAULT_BINARY_PATH
-        if not self._is_valid_runtime(config.chosen_yellow_path):
-            config.chosen_yellow_path = RuntimeManagerConstants.DEFAULT_BINARY_PATH
-
-        # Display logging message when using default FullSystem
-        if config.chosen_blue_path == RuntimeManagerConstants.DEFAULT_BINARY_PATH:
-            logging.info("TBots FullSystem selected for blue side.")
-        if config.chosen_yellow_path == RuntimeManagerConstants.DEFAULT_BINARY_PATH:
-            logging.info("TBots FullSystem selected for yellow side.")
+            logging.warning(f"Failed to read TOML file at: {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
 
         return config
 
@@ -156,8 +152,11 @@ class RuntimeLoader:
             return file_path.strip()
 
     def _is_valid_runtime(self, runtime_path: str) -> bool:
-        """Returns if the path exists and if it is an executable
+        """Returns if the path exists and if it is an executable. Logs a warning if it is not valid.
         :param runtime_path the path to check
         :return: whether it is a valid runtime or not
         """
-        return os.path.isfile(runtime_path) and os.access(runtime_path, os.X_OK)
+        if os.path.isfile(runtime_path) and os.access(runtime_path, os.X_OK):
+            return True
+        logging.warning(f"The runtime retrieved at {runtime_path} is not a valid runtime.")
+        return False
