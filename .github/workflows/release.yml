@@ -27,16 +27,11 @@ on:
         default: ''
 
 jobs:
-  release:
-    strategy:
-      matrix:
-        platform: [ubuntu-x86, mac-arm64]
-        include:
-          - platform: ubuntu-x86
-            runner: ubuntu-24.04
-          - platform: mac-arm64
-            runner: macos-latest
-    runs-on: ${{ matrix.runner }}
+  prepare-release:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.bump_logic.outputs.tag }}
+      should_release: ${{ steps.check.outputs.count > 0 }}
     permissions:
       contents: write
     steps:
@@ -87,9 +82,6 @@ jobs:
           echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
           echo "Using version: $NEW_TAG"
 
-      - uses: ./.github/actions/environment-setup
-        if: steps.check.outputs.count > 0
-
       - name: Draft Release Notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -98,15 +90,56 @@ jobs:
           version: ${{ steps.bump_logic.outputs.tag }}
           tag: ${{ steps.bump_logic.outputs.tag }}
 
-      - name: Build Binaries
+      - name: Create GitHub Release
         if: steps.check.outputs.count > 0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.bump_logic.outputs.tag }}" \
+            --title "${{ steps.bump_logic.outputs.tag }}" \
+            --generate-notes \
+            --draft 
+
+  upload_assets:
+  needs: prepare_release
+  if: needs.prepare_release.outputs.should_release == 'true'
+    strategy:
+      matrix:
+        platform: [ubuntu-x86, mac-arm64]
+        include:
+          - platform: ubuntu-x86
+            runner: ubuntu-24.04
+          - platform: mac-arm64
+            runner: macos-latest
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.target_commit || github.ref }} 
+
+      - uses: ./.github/actions/environment-setup
+
+      - name: Build Binaries
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: | 
           cd src
-          echo "${{ matrix.runner }}"
-          TAG="${{ steps.bump_logic.outputs.tag }}"
+          TAG="${{ needs.prepare_release.outputs.tag }}"
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- //software:unix_full_system_tar_gen
           mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" 
-          gh release create "$TAG" "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" --generate-notes 
+          gh release upload "$TAG" "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz"
+          
+  publish_release:
+    needs: [prepare_release, upload_assets]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Undraft Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ needs.prepare_release.outputs.tag }}" --draft=false
