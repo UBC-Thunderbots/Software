@@ -23,11 +23,11 @@ jobs:
   release:
     strategy:
       matrix:
-        platform: [x86] # TODO: #3567 add MacOS support.
+        platform: [x86] # TODO: #3567 add MacOS support. 
         include:
           - platform: x86
             runner: ubuntu-24.04
-          # This is for when we support macos arm and have a setup-software script setup properly
+          # This is for when we support macos arm and have a setup-software script setup properly, after #3529
           # - platform: arm64
           #   runner: macos-latest
     runs-on: ${{ matrix.runner }}
