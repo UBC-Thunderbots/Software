@@ -8,7 +8,7 @@
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
 
-VisProtoDeduper MovePrimitive::vis_proto_deduper(30);
+VisProtoDeduper MovePrimitive::vis_proto_deduper(5);
 
 MovePrimitive::MovePrimitive(
     const Robot &robot, const Point &destination, const Angle &final_angle,

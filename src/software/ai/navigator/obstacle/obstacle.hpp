@@ -112,6 +112,13 @@ class Obstacle
      * @param visitor An Obstacle Visitor
      */
     virtual void accept(ObstacleVisitor& visitor) const = 0;
+
+    /**
+     * Computes the hash of the current obstacle object
+     *
+     * @return hash value
+     */
+    virtual std::size_t hash() const = 0;
 };
 
 /**
@@ -144,3 +151,13 @@ inline std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_pt
     os << obstacle_ptr->toString();
     return os;
 }
+
+template <>
+struct std::hash<Obstacle>
+{
+    size_t operator()(const Obstacle &obstacle) const
+    {
+        return obstacle.hash();
+    }
+};
+
