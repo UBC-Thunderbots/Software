@@ -75,6 +75,16 @@ jobs:
       - uses: ./.github/actions/environment-setup
         if: steps.check.outputs.count > 0
 
+        - name: Draft Release Notes
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          uses: release-drafter/release-drafter@v6
+          with:
+            version: ${{ steps.bump_logic.outputs.tag }}
+            tag: ${{ steps.bump_logic.outputs.tag }}
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build Binaries
         if: steps.check.outputs.count > 0
         env:
