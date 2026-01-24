@@ -1,6 +1,5 @@
 # TODO: #3559
 import requests
-import subprocess
 from pathlib import Path
 from software.logger.logger import create_logger
 import zipfile
@@ -8,6 +7,8 @@ import tarfile
 import shutil
 
 logger = create_logger(__name__)
+
+
 class RuntimeInstaller:
     """Delegate class for handling runtime installation and remote interfacing"""
 
@@ -49,7 +50,7 @@ class RuntimeInstaller:
 
         PREFIX = "https://github.com/UBC-Thunderbots/Software/releases/download/"
 
-        #I'm going to assume you are trying to reload the assets so reset the download_urls
+        # I'm going to assume you are trying to reload the assets so reset the download_urls
         if len(download_urls) != 0:
             download_urls = []
         download_names = []
@@ -97,7 +98,6 @@ class RuntimeInstaller:
                     for chunk in r.iter_content(chunk_size=8192):
                         if chunk:
                             f.write(chunk)
-
 
             if filename.endswith((".tar.gz", ".tgz")):
                 with tarfile.open(tmp_path, "r:*") as tar:
