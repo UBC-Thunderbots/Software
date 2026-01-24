@@ -73,8 +73,8 @@ class RuntimeLoader:
                 selected_runtime_dict = tomllib.load(file)
                 # If a different blue FullSystem is persisted, replace the default arrangement
                 if (
-                    RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
-                    in selected_runtime_dict.keys()
+                        RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+                        in selected_runtime_dict.keys()
                 ):
                     toml_blue_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY]
                     if self._is_valid_runtime(toml_blue_path):
@@ -83,8 +83,8 @@ class RuntimeLoader:
                     logging.warning(f"Failed to fetch runtime configuration blue field from {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}")
                 # If a different yellow FullSystem is persisted, replace the default arrangement
                 if (
-                    RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
-                    in selected_runtime_dict.keys()
+                        RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+                        in selected_runtime_dict.keys()
                 ):
                     toml_yellow_path = selected_runtime_dict[RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY]
                     if self._is_valid_runtime(toml_yellow_path):
@@ -137,8 +137,8 @@ class RuntimeLoader:
         )
         # Default to our full system if it is selected or the selected binary isn't a valid runtime
         if (
-            selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME
-            or not self._is_valid_runtime(file_path)
+                selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME
+                or not self._is_valid_runtime(file_path)
         ):
             return RuntimeManagerConstants.DEFAULT_BINARY_PATH
         else:
