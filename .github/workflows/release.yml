@@ -133,8 +133,8 @@ jobs:
           mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" 
           gh release upload "$TAG" "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz"
 
-  publish_release:
-    needs: [prepare_release, upload_assets]
+  publish-release:
+    needs: [prepare-release, upload-assets]
     runs-on: ubuntu-latest
     permissions:
       contents: write
