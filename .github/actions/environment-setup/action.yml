@@ -1,4 +1,12 @@
 name: Environment Setup
+
+on:
+  workflow_Call:
+    inputs: 
+      os: 
+        required: true
+        type: string
+
 runs:
   using: "composite"
   steps:
@@ -13,5 +21,12 @@ runs:
 
     - name: Run setup_software.sh
       shell: bash
+      if: runner.os == 'x86'
       run: |
         "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+    
+    - name: Run setup_software_mac.sh
+      shell: bash
+      if: runner.os == 'arm64'
+      run: |
+        "${GITHUB_WORKSPACE}"/environment_setup/setup_software_mac.sh
