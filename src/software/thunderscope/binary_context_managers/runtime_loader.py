@@ -67,6 +67,7 @@ class RuntimeLoader:
         """
         # Create default FullSystem pair with our FullSystem binaries
         config = RuntimeConfig()
+        create_runtime_dir()
 
         try:
             with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "rb") as file:

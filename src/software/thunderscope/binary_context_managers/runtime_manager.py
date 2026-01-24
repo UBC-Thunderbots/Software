@@ -49,13 +49,5 @@ class RuntimeManager:
         """
         return self.runtime_loader.fetch_runtime_config()
 
-    def create_runtime_dir(self) -> None:
-        """Creates the external runtimes directory if it doesn't exist
-        """
-        if not os.path.isdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
-            os.mkdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH)
-
-
-
 
 runtime_manager_instance = RuntimeManager()
