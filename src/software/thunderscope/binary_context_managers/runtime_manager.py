@@ -6,10 +6,6 @@ from software.thunderscope.binary_context_managers.runtime_loader import (
     RuntimeConfig,
 )
 
-import os
-
-from software.thunderscope.constants import RuntimeManagerConstants
-
 
 class RuntimeManager:
     """Class for interfacing with AI runtimes/backends (full system or external) on the disk"""
