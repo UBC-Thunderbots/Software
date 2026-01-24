@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "compat_flags.h"
+
 
 /**
  * Handles merging repeated log messages into a single message
@@ -41,11 +43,9 @@ class LogMerger
      * Looks through the message list for expired messages, removes them from the list and
      * map, and returns them as strings
      */
-    std::list<g3::LogMessage> _getOldMessages(
-        std::chrono::_V2::system_clock::time_point current_time);
+    std::list<g3::LogMessage> _getOldMessages(Clock::time_point current_time);
 
-    const std::chrono::_V2::system_clock::duration LOG_MERGE_DURATION =
-        std::chrono::seconds(2);
+    const Clock::duration LOG_MERGE_DURATION = std::chrono::seconds(2);
 
    private:
     /**
@@ -55,10 +55,9 @@ class LogMerger
     {
         g3::LogMessage log;
         std::string msg;
-        std::chrono::_V2::system_clock::time_point timestamp;
+        Clock::time_point timestamp;
 
-        Message(g3::LogMessage &log, std::string msg,
-                std::chrono::_V2::system_clock::time_point timestamp)
+        Message(g3::LogMessage &log, std::string msg, Clock::time_point timestamp)
             : log(log), msg(msg), timestamp(timestamp)
         {
         }
@@ -68,8 +67,7 @@ class LogMerger
         repeat_map;  // maps string messages to their number of repeats for fast access
     std::list<Message> message_list;  // used to keep track of time order for messages
 
-    std::chrono::_V2::system_clock::duration
-        passed_time;  // for testing, time passed manually
+    Clock::duration passed_time;  // for testing, time passed manually
 
     bool enable_merging;
 };

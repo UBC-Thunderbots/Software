@@ -8,6 +8,10 @@ import threading
 import google.protobuf
 from google.protobuf.internal import api_implementation
 
+from software.thunderscope.binary_context_managers.runtime_manager import (
+    runtime_manager_instance,
+)
+
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (
     f"Trying to use the {protobuf_impl_type} protobuf implementation. "
@@ -16,16 +20,21 @@ assert protobuf_impl_type == "upb", (
 )
 
 from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
+from software.thunderscope.constants import (
+    EstopMode,
+    ProtoUnixIOTypes,
+    RuntimeManagerConstants,
+)
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import CI_DURATION_S, LogLevels
+from software.thunderscope.constants import CI_DURATION_S
 from software.thunderscope.util import *
 
 from software.thunderscope.binary_context_managers.full_system import FullSystem
@@ -33,7 +42,6 @@ from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
-
 
 ###########################################################################
 #                         Thunderscope Main                               #
@@ -431,10 +439,16 @@ if __name__ == "__main__":
                     tick_rate_ms, tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], tscope
                 )
 
+        # Fetch the AI runtime/backends
+        runtime_config = runtime_manager_instance.fetch_runtime_config()
+
         # Launch all binaries
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
+            path_to_binary=runtime_config[
+                RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+            ],
             full_system_runtime_dir=args.blue_full_system_runtime_dir,
             debug_full_system=args.debug_blue_full_system,
             friendly_colour_yellow=False,
@@ -443,6 +457,9 @@ if __name__ == "__main__":
             running_in_realtime=(not args.ci_mode),
             log_level=args.log_level,
         ) as blue_fs, FullSystem(
+            path_to_binary=runtime_config[
+                RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+            ],
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
             friendly_colour_yellow=True,
