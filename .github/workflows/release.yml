@@ -1,23 +1,23 @@
 name: Release binary on commit
 
 on: 
-  # schedule:
-  #   - cron: '0 0 * * 0' # Weekly Patch (Sundays)
-  #   - cron: '0 0 1 * *' # Monthly Minor (1st of the month)
-  # workflow_dispatch:
-  #   inputs:
-  #     version_type:
-  #       description: 'Manual Release Level'
-  #       required: true
-  #       default: 'major'
-  #       type: choice
-  #       options:
-  #         - major
-  #         - minor
-  #         - patch
-  push:
-    branches:
-      - new_release_workflow
+  schedule:
+    - cron: '0 0 * * 0' # Weekly Patch (Sundays)
+    - cron: '0 0 1 * *' # Monthly Minor (1st of the month)
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Manual Release Level'
+        required: true
+        default: 'major'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+  # push:
+  #   branches:
+  #     - new_release_workflow
 
 jobs:
   release:
