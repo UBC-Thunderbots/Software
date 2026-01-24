@@ -17,13 +17,12 @@ TEST(PenaltyKickEnemyPlayFSMTest, test_transitions)
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_THEM);
     world->updateGameState(game_state);
 
-    TbotsProto::AiConfig ai_config;
-
     int num_tactics = 5;
     std::shared_ptr<GoalieTactic> goalie_tactic =
-        std::make_shared<GoalieTactic>(ai_config);
+        std::make_shared<GoalieTactic>(std::make_shared<TbotsProto::AiConfig>());
 
-    FSM<PenaltyKickEnemyPlayFSM> fsm(PenaltyKickEnemyPlayFSM{ai_config});
+    FSM<PenaltyKickEnemyPlayFSM> fsm(
+        PenaltyKickEnemyPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
 
     EXPECT_TRUE(fsm.is(boost::sml::state<PenaltyKickEnemyPlayFSM::SetupPositionState>));
 

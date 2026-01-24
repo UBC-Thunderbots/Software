@@ -42,7 +42,7 @@ common --features=external_include_paths
 build --disk_cache=~/.cache/thunderbots_bazel_disk_cache
 
 build --experimental_remote_merkle_tree_cache # partial repo caching optimization
-build --incompatible_enable_proto_toolchain_resolution # protoc caching
+common --incompatible_enable_proto_toolchain_resolution # protoc caching
 
 # Ensure that we don't accidentally build gRPC
 common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
@@ -66,9 +66,11 @@ build --incompatible_remove_legacy_whole_archive=False
 
 # Escalate Warnings to fail Compile for Thunderbots code
 build --features=external_include_paths
-build --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+build:linux --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
 # TODO: #3492
 # build --per_file_copt=software/.*,shared/.*,-external/.*@-Wconversion
+
+build --cxxopt="-DG3_DYNAMIC_LOGGING"
 
 build --per_file_copt=.*\.pb\.(h|cc|cpp)$@-w
 build --per_file_copt=./external/.*,./bazel-out/.*@-w

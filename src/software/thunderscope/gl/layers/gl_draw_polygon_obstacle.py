@@ -12,7 +12,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 
-from typing import Callable
+from typing import Callable, override
 
 
 class GLDrawPolygonObstacleLayer(GLLayer):
@@ -43,6 +43,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         self.can_double_click = False
 
+    @override
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Responding to key events that are going to push obstacles to the stack or add point
 
@@ -123,6 +124,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         return __handle_single_click
 
+    @override
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Adding the point in scene
 
@@ -149,6 +151,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
                 self.__create_single_click_callback(event),
             )
 
+    @override
     def refresh_graphics(self) -> None:
         """Refreshing graphics"""
         return

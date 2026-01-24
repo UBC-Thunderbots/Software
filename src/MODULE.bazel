@@ -7,7 +7,6 @@ module(
 ##############################################################
 # Import Dependencies available in the Bazel Central Registry
 ##############################################################
-
 bazel_dep(name = "googletest", version = "1.15.2")
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "pybind11_bazel", version = "2.13.6")
@@ -15,11 +14,10 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.14.0")
 bazel_dep(name = "rules_python", version = "1.4.1")
-bazel_dep(name = "protobuf", version = "31.1")
 bazel_dep(name = "eigen", version = "3.4.0.bcr.3")
-bazel_dep(name = "zlib", version = "1.3.1.bcr.5")
-bazel_dep(name = "nanopb", version = "0.4.9.1")
-bazel_dep(name = "toolchains_protoc", version = "0.4.1")
+bazel_dep(name = "zlib", version = "1.3.1.bcr.6")
+bazel_dep(name = "nanopb", version = "0.4.9.1.bcr.2")
+bazel_dep(name = "protobuf", version = "31.1")
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "yaml-cpp", version = "0.8.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
@@ -78,18 +76,6 @@ use_repo(pip, "nanopb_deps")
 # Configure pybind11 since it is special!
 pybind11_configure = use_extension("@pybind11_bazel//:internal_configure.bzl", "internal_configure_extension")
 use_repo(pybind11_configure, "pybind11")
-
-# Configure proto compiler optimization
-# Optional: choose a version of protoc rather than the latest.
-protoc = use_extension("@toolchains_protoc//protoc:extensions.bzl", "protoc")
-protoc.toolchain(
-    # Creates a repository to satisfy well-known-types dependencies such as
-    # deps=["@com_google_protobuf//:any_proto"]
-    google_protobuf = "com_google_protobuf",
-    # Pin to any version of protoc
-    version = "v31.1",
-)
-use_repo(protoc, "com_google_protobuf", "toolchains_protoc_hub")
 
 ###########################################################################
 # Setup non Bazel Central Registry dependencies & Non MODULE supported deps
@@ -216,26 +202,20 @@ http_archive(
     url = "https://github.com/saebyn/munkres-cpp/archive/61086fcf5b3a8ad4bda578cdc2d1dca57b548786.tar.gz",
 )
 
-##############################################
-# Add new git repos (these cannot be used offline)
-# All of this SHOULD BE REMOVED in favour of archive_override
-##############################################
-new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
-
-new_git_repository(
+http_archive(
     name = "LTC4151",
     build_file = "@//extlibs:LTC4151.BUILD",
-    commit = "729952f10bcdcf359877b6f728565c17a8f17423",
-    remote = "https://github.com/kerrydwong/LTC4151.git",
-    shallow_since = "1397951678 -0400",
+    sha256 = "6aa2dd380a13b08366338cdf0fbbeeeed96887512ac7b0753ee6ea1e8856df31",
+    strip_prefix = "LTC4151-729952f10bcdcf359877b6f728565c17a8f17423",
+    url = "https://github.com/kerrydwong/LTC4151/archive/729952f10bcdcf359877b6f728565c17a8f17423.tar.gz",
 )
 
-new_git_repository(
+http_archive(
     name = "trinamic",
     build_file = "@//extlibs:trinamic.BUILD",
-    commit = "0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
-    remote = "https://github.com/trinamic/TMC-API.git",
-    shallow_since = "1631132123 +0200",
+    sha256 = "4c1640a87347afdc4d5954752f0e773f6d9fbb0ea0fb1481dbdb3012ec00ef8b",
+    strip_prefix = "TMC-API-0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
+    url = "https://github.com/analogdevicesinc/TMC-API/archive/0cd695fab6d43ceb121af4b8608e5d92b14e1ce9.tar.gz",
 )
 
 ##############################################
@@ -288,7 +268,7 @@ new_local_repository(
 new_local_repository(
     name = "py_cc_toolchain_host",
     build_file = "@//extlibs:py_cc_toolchain.BUILD",
-    path = "/usr/include/python3.12/",
+    path = "/opt/tbotspython/py_headers/include/python3.12/",
 )
 
 new_local_repository(
