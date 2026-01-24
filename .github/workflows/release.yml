@@ -42,7 +42,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.target_commit || github.ref }} 
 
       - name: Check for recent commits
         id: check
@@ -55,30 +56,34 @@ jobs:
           fi
           
       - name: Determine Version Bump
-        if: steps.check.outputs.count > 0
+        if: steps.check.outputs.count > 0 
         id: bump_logic
         run: |
-          BUMP="patch"
-          if [ "$(date +%d)" = "01" ]; then BUMP="minor"; fi
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            BUMP="${{ github.event.inputs.version_type }}"
+          if [ "${{ github.event.inputs.release_tag }}" = "" ]; then
+            BUMP="patch"
+            if [ "$(date +%d)" = "01" ]; then BUMP="minor"; fi
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              BUMP="${{ github.event.inputs.version_type }}"
+            fi
+            
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
+            # Strip the 'v' prefix
+            BASE_VERSION=${LATEST_TAG#v}
+            
+            IFS='.' read -r major minor patch <<< "$BASE_VERSION"
+            
+            if [ "$BUMP" = "major" ]; then
+              major=$((major + 1)); minor=0; patch=0
+            elif [ "$BUMP" = "minor" ]; then
+              minor=$((minor + 1)); patch=0
+            else
+              patch=$((patch + 1))
+            fi
+            
+            NEW_TAG="v$major.$minor.$patch"
+          else 
+            NEW_TAG="${{ github.event.inputs.release_tag }}"
           fi
-          
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
-          # Strip the 'v' prefix
-          BASE_VERSION=${LATEST_TAG#v}
-          
-          IFS='.' read -r major minor patch <<< "$BASE_VERSION"
-          
-          if [ "$BUMP" = "major" ]; then
-            major=$((major + 1)); minor=0; patch=0
-          elif [ "$BUMP" = "minor" ]; then
-            minor=$((minor + 1)); patch=0
-          else
-            patch=$((patch + 1))
-          fi
-          
-          NEW_TAG="v$major.$minor.$patch"
           echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
           echo "Using version: $NEW_TAG"
 
