@@ -17,7 +17,7 @@ on:
           - patch
       release_tag:
         description: 'Specify the new release tag name (e.g., v1.2.3)'
-        required: true
+        required: false
         type: string
       
       target_commit:
