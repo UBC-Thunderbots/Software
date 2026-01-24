@@ -145,10 +145,7 @@ print_status_msg "Finished setting up AutoRef"
 
 # setup external_runtimes 
 sudo mkdir /opt/tbotspython/external_runtimes
-sudo touch /opt/tbotspython/external_runtimes/runtime_config.toml
 sudo chown -R $USER:$USER /opt/tbotspython/external_runtimes/
-
-sudo chmod 600 /opt/tbotspython/external_runtimes/runtime_config.toml
 
 # Install Bazel
 print_status_msg "Installing Bazel"
