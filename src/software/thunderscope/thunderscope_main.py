@@ -12,6 +12,7 @@ from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )
 
+
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (
     f"Trying to use the {protobuf_impl_type} protobuf implementation. "
@@ -29,7 +30,6 @@ from software.thunderscope.wifi_communication_manager import WifiCommunicationMa
 from software.thunderscope.constants import (
     EstopMode,
     ProtoUnixIOTypes,
-    RuntimeManagerConstants,
 )
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -446,9 +446,7 @@ if __name__ == "__main__":
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
-            path_to_binary=runtime_config[
-                RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
-            ],
+            path_to_binary=runtime_config.chosen_blue_path,
             full_system_runtime_dir=args.blue_full_system_runtime_dir,
             debug_full_system=args.debug_blue_full_system,
             friendly_colour_yellow=False,
@@ -457,9 +455,7 @@ if __name__ == "__main__":
             running_in_realtime=(not args.ci_mode),
             log_level=args.log_level,
         ) as blue_fs, FullSystem(
-            path_to_binary=runtime_config[
-                RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
-            ],
+            path_to_binary=runtime_config.chosen_yellow_path,
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
             friendly_colour_yellow=True,
