@@ -446,7 +446,7 @@ if __name__ == "__main__":
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
-            path_to_binary=runtime_config.blue_runtime_path,
+            path_to_binary=runtime_config.get_blue_runtime_path(),
             full_system_runtime_dir=args.blue_full_system_runtime_dir,
             debug_full_system=args.debug_blue_full_system,
             friendly_colour_yellow=False,
@@ -455,7 +455,7 @@ if __name__ == "__main__":
             running_in_realtime=(not args.ci_mode),
             log_level=args.log_level,
         ) as blue_fs, FullSystem(
-            path_to_binary=runtime_config.yellow_runtime_path,
+            path_to_binary=runtime_config.get_yellow_runtime_path(),
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
             friendly_colour_yellow=True,
