@@ -7,6 +7,7 @@ from software.thunderscope.constants import RuntimeManagerConstants
 import logging
 from proto.visualization_pb2 import AttackerVisualization, GoalieVisualization
 from proto.import_all_protos import *
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 
 @dataclass
@@ -18,10 +19,14 @@ class FSStats:
     self.num_shots_on_net: int = 0
     self.latest_shot_on_net: tbots_cpp.Point = None
 
+    self.is_shot_incoming = False
     self.num_enemy_shots_blocked: int = 0
 
 
 class GlFSStatsLayer(GLLayer):
+    # From GoalieTacticConfig
+    INCOMING_SHOT_MIN_VELOCITY = 0.2
+
     def __init__(
         self,
         name: str,
@@ -34,7 +39,6 @@ class GlFSStatsLayer(GLLayer):
         self.friendly_colour_yellow = friendly_colour_yellow
 
         self.last_possession_enemy = None
-        self.is_shot_incoming = False
 
         self.attacker_vis_buffer = ThreadSafeBuffer(buffer_size, AttackerVisualization)
         self.goalie_vis_buffer = ThreadSafeBuffer(buffer_size, GoalieVisualization)
@@ -56,7 +60,7 @@ class GlFSStatsLayer(GLLayer):
 
         self._record_world_stats()
 
-        self._record_refree_stats()
+        self._record_referee_stats()
 
     def _record_world_stats(self) -> None:
         world_msg = self.world_buffer.get(block=False, return_cached=True)
@@ -66,21 +70,49 @@ class GlFSStatsLayer(GLLayer):
         ):
             return
 
+        world = tbots_cpp.World(world_msg)
+
         friendly_team, enemy_team = (
-            (world_msg.enemy_team, world_msg.friendly_team)
+            (world.enemyTeam, world.friendlyTeam)
             if self.friendly_color_yellow
-            else (world_msg.friendly_team, world_msg.enemy_team)
+            else (world.friendlyTeam, world.enemyTeam)
         )
+
+        if self.record_enemy_stats:
+            self._record_enemy_blocked_goals(world.ball().position(), world.field())
 
         self.last_possession_enemy = self._check_posession_for_teams(
-            friendly_team, enemy_team, world.ball.current_state.global_position
+            friendly_team, enemy_team, world.ball().position()
         )
 
-    def _check_posession_for_teams(
-        self, friendly_team: Team, enemy_team: Team, ball_pos: Point
-    ) -> bool:
-        ball_position = tbots_cpp.createPoint(ball_pos)
+    def _record_enemy_blocked_goals(
+        self, ball: tbots_cpp.Ball, field: tbots_cpp.Field
+    ) -> None:
+        """HEAVY WORKAROUND: as a fallback for when the enemy fullsystem doesn't calculate this
+        This should ordinarily be calculated by using the Goalie Visualization proto on the enemy side
+        not very clean, but follows similar logic to goalie_fsm.cpp, but from the enemy's perspective
+        """
+        ball_ray = tbots_cpp.Ray(ball.position(), ball.velocity())
+        enemy_goal_segment = tbots_cpp.Segment(
+            field.enemyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS),
+            field.enemyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS),
+        )
+        shot_incoming_for_enemy = (
+            len(tbots_cpp.intersects(ball_ray, enemy_goal_segment)) != 0
+            and ball.velocity().length() > self.INCOMING_SHOT_MIN_VELOCITY
+        )
 
+        if not shot_incoming_for_enemy and self.enemy_stats.is_shot_incoming:
+            self.enemy_stats.num_enemy_shots_blocked += 1
+
+        self.enemy_stats.is_shot_incoming = shot_incoming_for_enemy
+
+    def _check_posession_for_teams(
+        self,
+        friendly_team: tbots_cpp.Team,
+        enemy_team: tbots_cpp.Team,
+        ball_position: tbots_cpp.Point,
+    ) -> bool:
         if self._check_posession_for_team(enemy_team, ball_position):
             return True
 
@@ -90,8 +122,8 @@ class GlFSStatsLayer(GLLayer):
         return None
 
     def _check_posession_for_team(self, team: Team, ball_position: tbots_cpp.Point):
-        for robot in team.team_robots:
-            if tbots_cpp.Robot(robot).isNearDribbler(ball_position):
+        for robot in team.getAllRobots():
+            if robot.isNearDribbler(ball_position):
                 return True
 
         return False
@@ -117,27 +149,31 @@ class GlFSStatsLayer(GLLayer):
         goalie_vis_msg = self.goalie_vis_buffer.get(block=False)
 
         if goalie_vis_msg and goalie_vis_msg.HasField("is_shot_incoming"):
-            # assume that if a ball was previously incoming and then was no longer incoming
-            # then we successfully blocked it
-            # TODO: verify if this is accurate
-            if not goalie_vis_msg.is_shot_incoming and self.is_shot_incoming:
-                self.num_enemy_shots_blocked += 1
-
             shot_incoming = (
                 goalie_vis_msg.is_shot_incoming and self.last_possession_enemy
             )
 
+            # assume that if a ball was previously incoming and then was no longer incoming
+            # then we successfully blocked it
+            # TODO: verify if this is accurate
+            if not goalie_vis_msg.is_shot_incoming and self.stats.is_shot_incoming:
+                self.stats.num_enemy_shots_blocked += 1
+
             # if there wasn't an incoming shot and now there is, the enemy must have taken a shot at us
-            if self.record_enemy_stats and shot_incoming and not self.is_shot_incoming:
+            if (
+                self.record_enemy_stats
+                and shot_incoming
+                and not self.stats.is_shot_incoming
+            ):
                 self.enemy_stats.num_shots_on_net += 1
 
-            self.is_shot_incoming = shot_incoming
+            self.stats.is_shot_incoming = shot_incoming
 
     def _record_referee_stats(self) -> None:
         refree_msg = self.referee_buffer.get(block=False, return_cached=True)
 
         if refree_msg.HasField("yellow" if self.friendly_colour_yellow else "blue"):
-            self._record_refree_stats_per_team(
+            self._record_referee_stats_per_team(
                 refree_msg.yellow if self.friendly_colour_yellow else refree_msg.blue,
                 self.stats,
             )
@@ -145,12 +181,12 @@ class GlFSStatsLayer(GLLayer):
         if self.record_enemy_stats and refree_msg.HasField(
             "blue" if self.friendly_colour_yellow else "yellow"
         ):
-            self._record_refree_stats_per_team(
+            self._record_referee_stats_per_team(
                 refree_msg.blue if self.friendly_colour_yellow else refree_msg.yellow,
                 self.enemy_stats,
             )
 
-    def _record_refree_stats_per_team(self, team_info: TeamInfo, stats: FSStats):
+    def _record_referee_stats_per_team(self, team_info: TeamInfo, stats: FSStats):
         if team_info.HasField("score"):
             stats.num_scores = team_info.score
 
