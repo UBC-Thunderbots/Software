@@ -129,8 +129,8 @@ jobs:
           TAG="${{ needs.prepare_release.outputs.tag }}"
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- //software:unix_full_system_tar_gen
-          mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz" 
-          gh release upload "$TAG" "${{ runner.temp }}/unix_full_system_$TAG_${{ matrix.platform }}.tar.gz"
+          mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/unix_full_system_${{ needs.prepare_release.outputs.tag }}_${{ matrix.platform }}.tar.gz" 
+          gh release upload "$TAG" "${{ runner.temp }}/unix_full_system_${{ needs.prepare_release.outputs.tag }}_${{ matrix.platform }}.tar.gz"
 
   publish_release:
     needs: [prepare_release, upload_assets]
