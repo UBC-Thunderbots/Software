@@ -115,25 +115,27 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout target code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.inputs.target_commit || github.ref }} 
+          ref: ${{ github.event.inputs.target_commit || github.sha }}
+          path: target_code
 
       - name: Checkout modern setup scripts
         uses: actions/checkout@v4
         with:
           sparse-checkout: .github/actions
-          path: modern-actions
           ref: main
+          path: modern_scripts
 
-      - uses: ./.github/actions/environment-setup
+      - uses: ./modern_scripts/.github/actions/environment-setup
 
       - name: Build Binaries
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: | 
-          cd src
+          cd target_code/src
           TAG="${{ needs.prepare_release.outputs.tag }}"
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- //software:unix_full_system_tar_gen
