@@ -8,19 +8,20 @@ import logging
 from proto.visualization_pb2 import AttackerVisualization, GoalieVisualization
 from proto.import_all_protos import *
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
+from typing import override
 
 
 @dataclass
 class FSStats:
-    self.num_yellow_cards: int = 0
-    self.num_red_cards: int = 0
-    self.num_scores: int = 0
+    num_yellow_cards: int = 0
+    num_red_cards: int = 0
+    num_scores: int = 0
 
-    self.num_shots_on_net: int = 0
-    self.latest_shot_on_net: tbots_cpp.Point = None
+    num_shots_on_net: int = 0
+    latest_shot_on_net: tbots_cpp.Point = None
 
-    self.is_shot_incoming = False
-    self.num_enemy_shots_blocked: int = 0
+    is_shot_incoming: bool = False
+    num_enemy_shots_blocked: int = 0
 
 
 class GlFSStatsLayer(GLLayer):
@@ -38,7 +39,9 @@ class GlFSStatsLayer(GLLayer):
 
         self.friendly_colour_yellow = friendly_colour_yellow
 
-        self.last_possession_enemy = None
+        # True if enemy had the last possession, False if friendly
+        # None if neither
+        self.last_possession_enemy: bool | None = None
 
         self.attacker_vis_buffer = ThreadSafeBuffer(buffer_size, AttackerVisualization)
         self.goalie_vis_buffer = ThreadSafeBuffer(buffer_size, GoalieVisualization)
@@ -94,8 +97,8 @@ class GlFSStatsLayer(GLLayer):
         """
         ball_ray = tbots_cpp.Ray(ball.position(), ball.velocity())
         enemy_goal_segment = tbots_cpp.Segment(
-            field.enemyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS),
-            field.enemyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS),
+            field.enemyGoalpostPos() + tbots_cpp.Vector(0, -ROBOT_MAX_RADIUS_METERS),
+            field.enemyGoalpostNeg() + tbots_cpp.Vector(0, ROBOT_MAX_RADIUS_METERS),
         )
         shot_incoming_for_enemy = (
             len(tbots_cpp.intersects(ball_ray, enemy_goal_segment)) != 0
@@ -112,7 +115,7 @@ class GlFSStatsLayer(GLLayer):
         friendly_team: tbots_cpp.Team,
         enemy_team: tbots_cpp.Team,
         ball_position: tbots_cpp.Point,
-    ) -> bool:
+    ) -> bool | None:
         if self._check_posession_for_team(enemy_team, ball_position):
             return True
 
@@ -121,7 +124,9 @@ class GlFSStatsLayer(GLLayer):
 
         return None
 
-    def _check_posession_for_team(self, team: Team, ball_position: tbots_cpp.Point):
+    def _check_posession_for_team(
+        self, team: tbots_cpp.Team, ball_position: tbots_cpp.Point
+    ):
         for robot in team.getAllRobots():
             if robot.isNearDribbler(ball_position):
                 return True
@@ -131,7 +136,7 @@ class GlFSStatsLayer(GLLayer):
     def _record_attacker_stats(self) -> None:
         attacker_vis_msg = self.attacker_vis_buffer.get(block=False, return_cached=True)
 
-        if attacker_vis_msg.HasField("shot"):
+        if attacker_vis_msg and attacker_vis_msg.HasField("shot"):
             if attacker_vis_msg.shot.HasField("shot_origin"):
                 shot_origin = attacker_vis_msg.shot.shot_origin
                 shot_origin_point = tbots_cpp.Point(
@@ -203,7 +208,7 @@ class GlFSStatsLayer(GLLayer):
             else RuntimeManagerConstants.RUNTIME_FRIENDLY_STATS_FILE
         )
 
-        self._write_stats_to_file(stats_file_name, self.stats)
+        self._write_stats_to_file(self.stats, stats_file_name)
 
         if self.record_enemy_stats:
             enemy_stats_file_name = (
@@ -212,7 +217,7 @@ class GlFSStatsLayer(GLLayer):
                 else RuntimeManagerConstants.RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE
             )
 
-            self._write_stats_to_file(enemy_stats_file_name, self.enemy_stats)
+            self._write_stats_to_file(self.enemy_stats, enemy_stats_file_name)
 
     def _write_stats_to_file(self, stats: FSStats, file_name: str) -> None:
         file_path = os.path.join(
