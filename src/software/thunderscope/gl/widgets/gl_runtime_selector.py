@@ -7,34 +7,40 @@ from pyqtgraph.Qt.QtWidgets import (
     QPushButton,
     QComboBox,
 )
-from typing import Callable
+
+from software.thunderscope.binary_context_managers.runtime_manager import (
+    runtime_manager_instance,
+)
 
 
 class GLRuntimeSelectorDialog(QDialog):
-    """Modal that displays the selectable list of runtimes for yellow and blue teams"""
+    """Modal that displays the selectable list of runtimes for blue and yellow teams"""
 
-    def __init__(
-        self,
-        parent: QWidget,
-        runtime_options: list[str],
-        on_runtimes_selected: Callable[[str, str], None],
-    ):
+    def __init__(self, parent: QWidget):
         """Initializes the runtime selector modal, displaying the same list of installed
         runtimes for both the blue and yellow teams.
 
         :param parent: the modal's parent
-        :param runtime_options: the list of runtime options to display in both menus
-        :param on_runtimes_selected: the callback for runtime selection
         """
         super().__init__(parent)
 
-        self.on_runtimes_selected = on_runtimes_selected
+        runtime_options = runtime_manager_instance.fetch_installed_runtimes()
 
         self.setWindowTitle("Select Runtimes")
         self.setModal(True)
         self.setMinimumWidth(400)
 
         layout = QVBoxLayout(self)
+
+        # Blue runtime
+        layout.addWidget(QLabel("<b>Blue Runtime</b>"))
+        self.blue_menu = QComboBox()
+        self.blue_menu.addItems(runtime_options)
+        self.blue_menu.currentTextChanged.connect(self._on_blue_changed)
+        self._blue_selection = self.blue_menu.currentText()
+        layout.addWidget(self.blue_menu)
+
+        layout.addSpacing(10)
 
         # Yellow runtime
         layout.addWidget(QLabel("<b>Yellow Runtime</b>"))
@@ -43,15 +49,6 @@ class GLRuntimeSelectorDialog(QDialog):
         self.yellow_menu.currentTextChanged.connect(self._on_yellow_changed)
         self._yellow_selection = self.yellow_menu.currentText()
         layout.addWidget(self.yellow_menu)
-
-        # Blue runtime
-        layout.addSpacing(10)
-        layout.addWidget(QLabel("<b>Blue Runtime</b>"))
-        self.blue_menu = QComboBox()
-        self.blue_menu.addItems(runtime_options)
-        self.blue_menu.currentTextChanged.connect(self._on_blue_changed)
-        self._blue_selection = self.blue_menu.currentText()
-        layout.addWidget(self.blue_menu)
 
         # Restart note
         layout.addSpacing(15)
@@ -71,13 +68,6 @@ class GLRuntimeSelectorDialog(QDialog):
 
         layout.addLayout(button_row)
 
-    def _on_yellow_changed(self, value: str) -> None:
-        """Stores currently selected runtime for yellow team
-
-        :param value: the value of the selected option
-        """
-        self._yellow_selection = value
-
     def _on_blue_changed(self, value: str) -> None:
         """Stores currently selected runtime for blue team
 
@@ -85,8 +75,17 @@ class GLRuntimeSelectorDialog(QDialog):
         """
         self._blue_selection = value
 
+    def _on_yellow_changed(self, value: str) -> None:
+        """Stores currently selected runtime for yellow team
+
+        :param value: the value of the selected option
+        """
+        self._yellow_selection = value
+
     def _on_done(self) -> None:
         """Commits the selected runtimes and closes the modal."""
-        self.on_runtimes_selected(self._yellow_selection, self._blue_selection)
+        runtime_manager_instance.load_existing_runtimes(
+            self._yellow_selection, self._blue_selection
+        )
 
         self.close()

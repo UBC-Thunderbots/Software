@@ -47,7 +47,6 @@ py_library(
         ":gl_toolbar",
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
-        "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/common:common_widgets",
         requirement("pyqtgraph"),
         requirement("qtawesome"),
@@ -58,6 +57,7 @@ py_library(
     name = "gl_runtime_selector",
     srcs = ["gl_runtime_selector.py"],
     deps = [
+        "//software/thunderscope/binary_context_managers:game_controller",
         requirement("pyqtgraph"),
     ],
 )
