@@ -72,6 +72,15 @@ py_library(
 )
 
 py_library(
+    name = "gl_fs_stats_layer",
+    srcs = ["gl_fs_stats_layer.py"],
+    deps = [
+        ":gl_layer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "gl_world_layer",
     srcs = ["gl_world_layer.py"],
     deps = [
