@@ -3,6 +3,7 @@ from pathlib import Path
 import zipfile
 import tarfile
 import shutil
+import platform
 from software.thunderscope.constants import RuntimeManagerConstants
 
 
@@ -24,10 +25,15 @@ class RuntimeInstaller:
 
         download_names = []
 
+        # Currently the only targets that are supported for each os
+        os_to_target = {"Darwin": "mac-arm64", "Linux": "ubuntu-x86"}
+        target = os_to_target[platform.system()]
+
         for release in releases:
             for asset in release.get("assets", []):
                 url = asset["browser_download_url"]
-                if "unix_full_system" not in url:
+
+                if "unix_full_system" not in url or target not in url:
                     continue
 
                 version = url.removeprefix(RuntimeManagerConstants.DOWNLOAD_PREFIX)
