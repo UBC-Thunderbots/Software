@@ -30,7 +30,7 @@ class RuntimeLoader:
 
         if not os.path.isdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
             os.mkdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH)
-        # Check for all executable files in the folder
+        # Check for all executable files in the folder, and add its name to the list
         for file_name in os.listdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
             file_path = os.path.join(
                 RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, file_name
@@ -63,14 +63,14 @@ class RuntimeLoader:
         try:
             with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "rb") as file:
                 selected_runtime_dict = tomllib.load(file)
-                # If a different blue FullSystem is persisted, replace the default arrangement
+                # Get the persisted blue path, or replace with the default arrangement if it doesn't exist
                 toml_blue_path = selected_runtime_dict.get(
                     RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY,
                     RuntimeManagerConstants.DEFAULT_BINARY_PATH,
                 )
                 if self._is_valid_runtime(toml_blue_path):
                     config.chosen_blue_path = toml_blue_path
-                # If a different yellow FullSystem is persisted, replace the default arrangement
+                # Get the persisted yellow path, or replace with the default arrangement if it doesn't exist
                 toml_yellow_path = selected_runtime_dict.get(
                     RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY,
                     RuntimeManagerConstants.DEFAULT_BINARY_PATH,
