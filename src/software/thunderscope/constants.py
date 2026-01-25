@@ -397,5 +397,6 @@ class RuntimeManagerConstants:
     DEFAULT_BINARY_NAME = "Current Fullsystem"
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
-    INSTALL_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
-    DOWNLOAD_PREFIX = "https://github.com/UBC-Thunderbots/Software/releases/download/"
+    RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
+    DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
+    MAX_RELEASES_FETCHED = 5

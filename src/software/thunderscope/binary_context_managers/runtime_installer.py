@@ -19,7 +19,7 @@ class RuntimeInstaller:
         :return: A unique list of names for available runtimes
         """
         releases = requests.get(
-            RuntimeManagerConstants.INSTALL_URL,
+            RuntimeManagerConstants.RELEASES_URL,
             headers={"Accept": "application/vnd.github+json"},
         ).json()
 
@@ -36,11 +36,11 @@ class RuntimeInstaller:
                 if "unix_full_system" not in url or target not in url:
                     continue
 
-                version = url.removeprefix(RuntimeManagerConstants.DOWNLOAD_PREFIX)
+                version = url.removeprefix(RuntimeManagerConstants.DOWNLOAD_URL)
                 download_names.append(version)
                 self.runtime_install_targets[version] = url
 
-        return download_names[:5]
+        return download_names[: RuntimeManagerConstants.MAX_RELEASES_FETCHED]
 
     def install_runtime(self, version: str) -> None:
         """Installs the runtime of the specified version or throws an error upon failure.
