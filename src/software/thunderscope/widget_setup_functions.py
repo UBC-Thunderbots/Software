@@ -112,10 +112,7 @@ def setup_gl_widget(
         "Attacker Tactic", visualization_buffer_size
     )
     fs_stats_layer = gl_fs_stats_layer.GlFSStatsLayer(
-        "FullSystem Stats", 
-        friendly_colour_yellow,
-        visualization_buffer_size,
-        True
+        "FullSystem Stats", friendly_colour_yellow, visualization_buffer_size, True
     )
     cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
         "Passing Cost", visualization_buffer_size
