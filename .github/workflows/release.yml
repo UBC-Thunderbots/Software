@@ -120,6 +120,13 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.inputs.target_commit || github.ref }} 
 
+      - name: Checkout modern setup scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+          path: modern-actions
+          ref: main
+
       - uses: ./.github/actions/environment-setup
 
       - name: Build Binaries
