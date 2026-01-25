@@ -273,6 +273,7 @@ if __name__ == "__main__":
             {"proto_class": PathVisualization},
             {"proto_class": PassVisualization},
             {"proto_class": AttackerVisualization},
+            {"proto_class": GoalieVisualization},
             {"proto_class": CostVisualization},
             {"proto_class": DebugShapes},
             {"proto_class": NamedValue},
