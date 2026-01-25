@@ -1,5 +1,5 @@
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
-name-template: 'v$RESOLVED_VERSION 🌈'
+name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 change-title-escapes: '\<*_&'
 exclude-labels:
