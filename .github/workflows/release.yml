@@ -149,7 +149,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-        with:
+        with: 
           ref: ${{ github.event.inputs.target_commit || github.sha }}
       - name: Undraft Release
         env:
