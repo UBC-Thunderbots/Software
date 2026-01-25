@@ -23,24 +23,22 @@ class RuntimeInstaller:
             headers={"Accept": "application/vnd.github+json"},
         ).json()
 
-        download_names = []
+        version_names = []
 
         # Currently the only targets that are supported for each os
         os_to_target = {"Darwin": "mac-arm64", "Linux": "ubuntu-x86"}
         target = os_to_target[platform.system()]
 
         for release in releases:
+            version = release["tag_name"]
             for asset in release.get("assets", []):
                 url = asset["browser_download_url"]
 
-                if "unix_full_system" not in url or target not in url:
-                    continue
+                if "unix_full_system" in url and target in url:
+                    version_names.append(version)
+                    self.runtime_install_targets[version] = url
 
-                version = url.removeprefix(RuntimeManagerConstants.DOWNLOAD_URL)
-                download_names.append(version)
-                self.runtime_install_targets[version] = url
-
-        return download_names[: RuntimeManagerConstants.MAX_RELEASES_FETCHED]
+        return version_names[: RuntimeManagerConstants.MAX_RELEASES_FETCHED]
 
     def install_runtime(self, version: str) -> None:
         """Installs the runtime of the specified version or throws an error upon failure.
@@ -62,9 +60,7 @@ class RuntimeInstaller:
                     if chunk:
                         f.write(chunk)
 
-        # TODO: make this not reliant on release assets name formatting
-        # The split + join gets rid of file extension and os in filename
-        dest = target_dir / "_".join(filename.split("_")[:-1])
+        dest = target_dir / f"{extracted_binary_name}_{version}"
 
         if filename.endswith((".tar.gz", ".tgz")):
             with tarfile.open(tmp_path, "r:*") as tar:
