@@ -84,7 +84,7 @@ class GLRuntimeSelectorDialog(QDialog):
 
     def _on_done(self) -> None:
         """Commits the selected runtimes and closes the modal."""
-        runtime_manager_instance.load_existing_runtimes(
+        runtime_manager_instance.load_selected_runtimes(
             self._yellow_selection, self._blue_selection
         )
 

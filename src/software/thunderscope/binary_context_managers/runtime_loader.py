@@ -41,7 +41,7 @@ class RuntimeLoader:
         # Cache external runtimes
         return runtime_list
 
-    def load_existing_runtimes(self, yellow_runtime: str, blue_runtime: str) -> None:
+    def load_selected_runtimes(self, yellow_runtime: str, blue_runtime: str) -> None:
         """Loads the yellow and blue runtimes specified by saving them in the local disk.
         :param blue_runtime: Unique name of the blue runtime to set
         :param yellow_runtime: Unique name of the yellow runtime to set
