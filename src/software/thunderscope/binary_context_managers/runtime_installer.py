@@ -9,6 +9,7 @@ import platform
 
 logger = create_logger(__name__)
 
+
 class RuntimeInstaller:
     """Delegate class for handling runtime installation and remote interfacing"""
 
@@ -39,7 +40,7 @@ class RuntimeInstaller:
         for release in releases:
             tag = release.get("tag_name", "")
 
-        # ✅ Only keep tags that include the OS name
+            # ✅ Only keep tags that include the OS name
             if os_name not in tag:
                 continue
             for asset in release.get("assets", []):
