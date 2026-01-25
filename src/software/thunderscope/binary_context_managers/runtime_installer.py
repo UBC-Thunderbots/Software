@@ -49,7 +49,8 @@ class RuntimeInstaller:
                 self.download_urls.append(url)
                 trimmed = url.removeprefix(PREFIX)
                 download_names.append(trimmed)
-        return download_names
+
+        return download_names[:5]
 
     def install_runtime(self, version: str) -> None:
         """Installs the runtime of the specified version or throws an error upon failure.
