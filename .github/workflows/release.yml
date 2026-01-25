@@ -1,4 +1,4 @@
-name: Release binary on commit
+name: Release binary
 
 on: 
   schedule:
@@ -38,7 +38,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.inputs.target_commit || github.ref }} 
 
       - name: Check for recent commits
         id: check
