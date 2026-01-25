@@ -32,6 +32,13 @@ class Simulator:
         :param enable_realism: a argument (--enable_realism) that is going to be passed to er_force_simulator_main binary
         """
         self.simulator_runtime_dir = simulator_runtime_dir
+        self.generic_command = [
+            # We keep the path relative to match processes that might have been
+            # started in different working directories, but keep the runtime dir
+            # the same as this one so we don't kill other force simulators
+            "er_force_simulator_main",
+            "--runtime_dir={}".format(self.simulator_runtime_dir),
+        ]
         self.debug_simulator = debug_simulator
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
@@ -60,12 +67,7 @@ class Simulator:
         if self.debug_simulator:
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
-            if not is_cmd_running(
-                [
-                    "er_force_simulator_main",
-                    "--runtime_dir={}".format(self.simulator_runtime_dir),
-                ]
-            ):
+            if not is_cmd_running(self.generic_command): # used generic_command instead of hardcoding the array here
                 logging.info(
                     (
                         f"""
@@ -87,6 +89,7 @@ gdb --args bazel-bin/{simulator_command}
                 while True:
                     time.sleep(1)
         else:
+            kill_cmd_if_running(self.generic_command)
             self.er_force_simulator_proc = Popen(simulator_command.split(" "))
 
         return self

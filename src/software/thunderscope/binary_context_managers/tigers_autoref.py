@@ -9,6 +9,7 @@ from software.networking.ssl_proto_communication import (
 from software.py_constants import NANOSECONDS_PER_MILLISECOND, SECONDS_PER_NANOSECOND
 import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import TimeProvider
@@ -228,7 +229,10 @@ class TigersAutoref(TimeProvider):
         env = os.environ.copy()
         env["JAVA_HOME"] = self.AUTOREF_JAVA_HOME
 
-        autoref_cmd = "bin/autoReferee -a"
+        autoref_cmd = "bin/autoReferee"
+        kill_cmd_if_running([autoref_cmd])
+        autoref_cmd += " -a"
+
         if not self.show_gui:
             autoref_cmd += " -hl"
 

@@ -12,7 +12,7 @@ from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import LogLevels
-from software.thunderscope.binary_context_managers.util import is_cmd_running
+from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.gl.layers.gl_obstacle_layer import ObstacleList
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
@@ -44,6 +44,13 @@ class FullSystem:
         """
         self.path_to_binary = path_to_binary
         self.full_system_runtime_dir = full_system_runtime_dir
+        self.generic_command = [
+            # We keep the path relative to match processes that might have been
+            # started in different working directories, but keep the runtime dir
+            # the same as this one so we don't kill other fullsystems
+            "unix_full_system",
+            "--runtime_dir={}".format(self.full_system_runtime_dir),
+        ]
         self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
         self.full_system_proc = None
@@ -77,13 +84,11 @@ class FullSystem:
             self.log_level.value,
         )
 
+        if not self.debug_full_system:
+            kill_cmd_if_running(self.generic_command)
+
         if self.should_run_under_sudo:
-            if not is_cmd_running(
-                [
-                    "unix_full_system",
-                    "--runtime_dir={}".format(self.full_system_runtime_dir),
-                ]
-            ):
+            if not is_cmd_running(self.generic_command):
                 logging.info(
                     (
                         f"""
@@ -108,12 +113,7 @@ sudo bazel-bin/{self.full_system}
         elif self.debug_full_system:
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
-            if not is_cmd_running(
-                [
-                    "unix_full_system",
-                    "--runtime_dir={}".format(self.full_system_runtime_dir),
-                ]
-            ):
+            if not is_cmd_running(self.generic_command):
                 logging.info(
                     (
                         f"""
@@ -146,12 +146,7 @@ gdb --args bazel-bin/{self.full_system}
     def __restart__(self) -> None:
         """Restarts full system."""
         while self.should_restart_on_crash:
-            if not is_cmd_running(
-                [
-                    "unix_full_system",
-                    "--runtime_dir={}".format(self.full_system_runtime_dir),
-                ]
-            ):
+            if not is_cmd_running(self.generic_command):
                 self.full_system_proc = Popen(self.full_system.split(" "))
                 logging.info("FullSystem has restarted.")
 
