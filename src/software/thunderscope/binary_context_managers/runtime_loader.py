@@ -8,9 +8,27 @@ import logging
 class RuntimeConfig:
     """Class to store the names and get paths of the two binaries"""
 
-    def __init__(self) -> None:
-        self.blue_runtime = RuntimeManagerConstants.DEFAULT_BINARY_NAME
-        self.yellow_runtime = RuntimeManagerConstants.DEFAULT_BINARY_NAME
+    def __init__(
+        self,
+        blue_runtime: str | None = None,
+        yellow_runtime: str | None = None,
+    ) -> None:
+        """Create runtime config, replacing invalid runtimes with default FullSystem
+        :param blue_runtime: blue runtime name, None if default
+        :param yellow_runtime: yellow runtime name, None if default
+        """
+        self.blue_runtime = (
+            blue_runtime
+            if blue_runtime
+            and self._is_valid_runtime_path(self._get_runtime_path(blue_runtime))
+            else RuntimeManagerConstants.DEFAULT_BINARY_NAME
+        )
+        self.yellow_runtime = (
+            yellow_runtime
+            if yellow_runtime
+            and self._is_valid_runtime_path(self._get_runtime_path(yellow_runtime))
+            else RuntimeManagerConstants.DEFAULT_BINARY_NAME
+        )
 
     def get_blue_runtime_path(self) -> str:
         """Returns the path of the stored yellow runtime
@@ -36,13 +54,13 @@ class RuntimeConfig:
         # Default to local FullSystem if it is selected or the selected binary isn't a valid runtime
         if (
             selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME
-            or not self._is_valid_runtime(file_path)
+            or not self._is_valid_runtime_path(file_path)
         ):
             return RuntimeManagerConstants.DEFAULT_BINARY_PATH
         # Remove leading and trailing white space and return
         return file_path.strip()
 
-    def _is_valid_runtime(self, runtime_path: str) -> bool:
+    def _is_valid_runtime_path(self, runtime_path: str) -> bool:
         """Returns if the binary exists and if it is an executable.
         :param runtime_path: the path to check
         :return: True if it is a valid runtime
@@ -92,8 +110,6 @@ class RuntimeLoader:
         """Fetches the runtime configuration from the local disk, creating it if it doesn't exist.
         :return: Returns the runtime configuration as a RuntimeConfig
         """
-        config = RuntimeConfig()
-
         # Create empty config file if doesn't exist yet
         os.makedirs(
             os.path.dirname(RuntimeManagerConstants.RUNTIME_CONFIG_PATH), exist_ok=True
@@ -104,18 +120,20 @@ class RuntimeLoader:
             with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "rb") as file:
                 selected_runtime_dict = tomllib.load(file)
 
-                # Get the persisted runtimes, or replace with the default runtime if it doesn't exist
-                config.blue_runtime = selected_runtime_dict.get(
-                    RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY,
-                    RuntimeManagerConstants.DEFAULT_BINARY_NAME,
+                # Get the persisted runtimes
+                config = RuntimeConfig(
+                    selected_runtime_dict.get(
+                        RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+                    ),
+                    selected_runtime_dict.get(
+                        RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+                    ),
                 )
-                config.yellow_runtime = selected_runtime_dict.get(
-                    RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY,
-                    RuntimeManagerConstants.DEFAULT_BINARY_NAME,
-                )
+
+                return config
         except TOMLDecodeError:
             logging.warning(
                 f"Failed to read TOML file at: {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
             )
 
-        return config
+        return RuntimeConfig()

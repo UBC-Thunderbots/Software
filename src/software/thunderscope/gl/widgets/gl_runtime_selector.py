@@ -25,6 +25,15 @@ class GLRuntimeSelectorDialog(QDialog):
         super().__init__(parent)
 
         runtime_options = runtime_manager_instance.fetch_installed_runtimes()
+        runtime_config = runtime_manager_instance.fetch_runtime_config()
+
+        # Put selected runtimes from config at start of list
+        blue_runtimes = [runtime_config.blue_runtime] + [
+            x for x in runtime_options if x != runtime_config.blue_runtime
+        ]
+        yellow_runtimes = [runtime_config.yellow_runtime] + [
+            x for x in runtime_options if x != runtime_config.yellow_runtime
+        ]
 
         self.setWindowTitle("Select Runtimes")
         self.setModal(True)
@@ -35,7 +44,7 @@ class GLRuntimeSelectorDialog(QDialog):
         # Blue runtime
         layout.addWidget(QLabel("<b>Blue Runtime</b>"))
         self.blue_menu = QComboBox()
-        self.blue_menu.addItems(runtime_options)
+        self.blue_menu.addItems(blue_runtimes)
         self.blue_menu.currentTextChanged.connect(self._on_blue_changed)
         self._blue_selection = self.blue_menu.currentText()
         layout.addWidget(self.blue_menu)
@@ -45,7 +54,7 @@ class GLRuntimeSelectorDialog(QDialog):
         # Yellow runtime
         layout.addWidget(QLabel("<b>Yellow Runtime</b>"))
         self.yellow_menu = QComboBox()
-        self.yellow_menu.addItems(runtime_options)
+        self.yellow_menu.addItems(yellow_runtimes)
         self.yellow_menu.currentTextChanged.connect(self._on_yellow_changed)
         self._yellow_selection = self.yellow_menu.currentText()
         layout.addWidget(self.yellow_menu)
