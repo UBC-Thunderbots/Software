@@ -86,6 +86,16 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
         const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
 
     /**
+     * Visualize when there is a shot on goal, and when the goalie blocks it
+     * If the goalie enters "panic" mode, it is interpreted as a shot on goal
+     * If the goalie comes out of "panic" mode, it is interpreted as the goalie having
+     * blocked the shot
+     *
+     * @param ball_incoming if the ball has been shot towards the goal
+     */
+    void visualizeShotsOnGoal(bool ball_incoming);
+
+    /**
      * Guard that checks if the goalie should leave the crease the intercept the ball
      * when it is stuck in the dead zone right that exists right outside of the crease
      *

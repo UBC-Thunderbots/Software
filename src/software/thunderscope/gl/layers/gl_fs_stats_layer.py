@@ -5,6 +5,8 @@ from dataclasses import dataclass
 import software.python_bindings as tbots_cpp
 from software.thunderscope.constants import RuntimeManagerConstants
 import logging
+from proto.visualization_pb2 import AttackerVisualization, GoalieVisualization
+from proto.import_all_protos import *
 
 
 @dataclass
@@ -12,8 +14,11 @@ class FSStats:
     self.num_yellow_cards: int = 0
     self.num_red_cards: int = 0
     self.num_scores: int = 0
+
     self.num_shots_on_net: int = 0
     self.latest_shot_on_net: tbots_cpp.Point = None
+
+    self.is_ball_incoming: bool = False
     self.num_enemy_shots_blocked: int = 0
 
 
@@ -30,7 +35,9 @@ class GlFSStatsLayer(GLLayer):
         self.friendly_colour_yellow = friendly_colour_yellow
 
         self.attacker_vis_buffer = ThreadSafeBuffer(buffer_size, AttackerVisualization)
+        self.goalie_vis_buffer = ThreadSafeBuffer(buffer_size, GoalieVisualization)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
 
         self.stats = FSStats()
 
@@ -41,21 +48,9 @@ class GlFSStatsLayer(GLLayer):
     @override
     def refresh_graphics(self) -> None:
         """Refreshes the stats for the game so far"""
-        attacker_vis_msg = self.attacker_vis_buffer.get(block=False, return_cached=True)
+        self._record_attacker_stats()
 
-        if attacker_vis_msg.HasField("shot"):
-            if attacker_vis_msg.shot.HasField("shot_origin"):
-                shot_origin = attacker_vis_msg.shot.shot_origin
-                shot_origin_point = tbots_cpp.Point(
-                    shot_origin.x_meters, shot_origin.y_meters
-                )
-
-                if (
-                    self.latest_shot_on_net is None
-                    or self.latest_shot_on_net != shot_origin_point
-                ):
-                    self.latest_shot_on_net = shot_origin_point
-                    self.num_shots_on_net += 1
+        self._record_goalie_stats()
 
         refree_msg = self.referee_buffer.get(block=False, return_cached=True)
 
@@ -73,15 +68,46 @@ class GlFSStatsLayer(GLLayer):
                 self.enemy_stats,
             )
 
+    def _record_attacker_stats(self) -> None:
+        attacker_vis_msg = self.attacker_vis_buffer.get(block=False, return_cached=True)
+
+        if attacker_vis_msg.HasField("shot"):
+            if attacker_vis_msg.shot.HasField("shot_origin"):
+                shot_origin = attacker_vis_msg.shot.shot_origin
+                shot_origin_point = tbots_cpp.Point(
+                    shot_origin.x_meters, shot_origin.y_meters
+                )
+
+                if (
+                    self.stats.latest_shot_on_net is None
+                    or self.stats.latest_shot_on_net != shot_origin_point
+                ):
+                    self.stats.latest_shot_on_net = shot_origin_point
+                    self.stats.num_shots_on_net += 1
+
+    def _record_goalie_stats(self) -> None:
+        goalie_vis_msg = self.goalie_vis_buffer.get(block=False)
+
+        if goalie_vis_msg and goalie_vis_msg.HasField("goalie_state"):
+            if goalie_vis_msg.goalie_state == GoalieState.BALL_INCOMING:
+                self.stats.is_ball_incoming = True
+            else:
+                # assume that if a ball was previously incoming and then was no longer incoming
+                # then we successfully blocked it
+                # TODO: verify if this is accurate
+                if self.stats.is_ball_incoming:
+                    self.stats.is_ball_incoming = False
+                    self.num_enemy_shots_blocked += 1
+
     def _record_referee_stats(self, team_info: TeamInfo, stats: FSStats) -> None:
         if team_info.HasField("score"):
-            self.stats.num_scores = team_info.score
+            stats.num_scores = team_info.score
 
         if team_info.HasField("yellow_cards"):
-            self.stats.num_yellow_cards = team_info.yellow_cards
+            stats.num_yellow_cards = team_info.yellow_cards
 
         if team_info.HasField("red_cards"):
-            self.stats.num_red_cards = team_info.red_cards
+            stats.num_red_cards = team_info.red_cards
 
     def __del__(self):
         stats_file_name = (

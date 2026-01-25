@@ -41,6 +41,17 @@ message AttackerVisualization
     optional Point chip_target = 4;
 }
 
+enum GoalieState
+{
+    BALL_INCOMING = 0;
+    BALL_AWAY     = 1;
+}
+
+message GoalieVisualization
+{
+    GoalieState goalie_state = 1;
+}
+
 message BallPlacementVisualization
 {
     Point ball_placement_point = 1;
