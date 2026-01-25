@@ -1,6 +1,5 @@
 import requests
 from pathlib import Path
-import zipfile
 import tarfile
 import shutil
 import platform
@@ -62,14 +61,7 @@ class RuntimeInstaller:
 
         dest = target_dir / f"{extracted_binary_name}_{version}"
 
-        if filename.endswith((".tar.gz", ".tgz")):
-            with tarfile.open(tmp_path, "r:*") as tar:
-                tar.extractall(tmp_dir)
-                shutil.move(tmp_dir / extracted_binary_name, dest)
-        elif filename.endswith(".zip"):
-            with zipfile.ZipFile(tmp_path, "r") as zipf:
-                zipf.extractall(tmp_dir)
-                shutil.move(tmp_dir / extracted_binary_name, dest)
-        else:
-            shutil.copy2(tmp_path, dest)
-            dest.chmod(0o755)  # make executable (common for runtimes)
+        # Our release assets for FullSystem are always tar.gz files
+        with tarfile.open(tmp_path, "r:*") as tar:
+            tar.extractall(tmp_dir)
+            shutil.move(tmp_dir / extracted_binary_name, dest)
