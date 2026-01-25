@@ -23,7 +23,6 @@ void AttackerFSM::pivotKick(const Update& event,
 
     if (event.control_params.shot)
     {
-        std::cout << "SHOOTING NOW!!!!" << std::endl;
         // shoot on net
         control_params = PivotKickFSM::ControlParams{
             .kick_origin = ball_position,
