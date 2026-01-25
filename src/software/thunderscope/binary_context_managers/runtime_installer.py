@@ -5,7 +5,6 @@ import zipfile
 import tarfile
 import shutil
 from software.thunderscope.constants import RuntimeManagerConstants
-import platform
 
 logger = create_logger(__name__)
 
@@ -35,17 +34,11 @@ class RuntimeInstaller:
         if len(self.download_urls) != 0:
             self.download_urls = []
         download_names = []
-        os_name = platform.system()
 
         for release in releases:
-            tag = release.get("tag_name", "")
-
-            # ✅ Only keep tags that include the OS name
-            if os_name not in tag:
-                continue
             for asset in release.get("assets", []):
                 url = asset["browser_download_url"]
-                if "fullsystem" not in asset_name:
+                if "unix_full_system" not in url:
                     continue
                 self.download_urls.append(url)
                 trimmed = url.removeprefix(PREFIX)
