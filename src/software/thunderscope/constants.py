@@ -391,8 +391,8 @@ class LogLevels(StrEnum):
 class RuntimeManagerConstants:
     """Constants for Runtime Manager"""
 
-    RUNTIME_CONFIG_BLUE_KEY = "blue_path_to_binary"
-    RUNTIME_CONFIG_YELLOW_KEY = "yellow_path_to_binary"
+    RUNTIME_CONFIG_BLUE_KEY = "blue_runtime_name"
+    RUNTIME_CONFIG_YELLOW_KEY = "yellow_runtime_name"
     DEFAULT_BINARY_PATH = "software/unix_full_system"
     DEFAULT_BINARY_NAME = "Current Fullsystem"
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"

@@ -42,11 +42,15 @@ class RuntimeLoader:
         :param blue_runtime: name of the blue runtime to set
         :param yellow_runtime: name of the yellow runtime to set
         """
-        config = RuntimeConfig(
-            self._return_runtime_path(blue_runtime),
-            self._return_runtime_path(yellow_runtime),
+        # Format as TOML
+        selected_runtimes = (
+            f'{RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY} = "{blue_runtime}"\n'
+            f'{RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY} = "{yellow_runtime}"'
         )
-        self._set_runtime_config(config)
+
+        # create a new config file if it doesn't exist, and write in the format above to it
+        with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "w") as file:
+            file.write(selected_runtimes)
 
     def fetch_runtime_config(self) -> RuntimeConfig:
         """Fetches the runtime configuration from the local disk.
@@ -60,48 +64,24 @@ class RuntimeLoader:
                 selected_runtime_dict = tomllib.load(file)
 
                 # Get the persisted blue path, or replace with the default path if it doesn't exist
-                toml_blue_path = selected_runtime_dict.get(
+                toml_blue_name = selected_runtime_dict.get(
                     RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY,
-                    RuntimeManagerConstants.DEFAULT_BINARY_PATH,
+                    RuntimeManagerConstants.DEFAULT_BINARY_NAME,
                 )
-                if self._is_valid_runtime(toml_blue_path):
-                    config.blue_runtime_path = toml_blue_path
+                config.blue_runtime_path = self._return_runtime_path(toml_blue_name)
 
                 # Get the persisted yellow path, or replace with the default path if it doesn't exist
-                toml_yellow_path = selected_runtime_dict.get(
+                toml_yellow_name = selected_runtime_dict.get(
                     RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY,
-                    RuntimeManagerConstants.DEFAULT_BINARY_PATH,
+                    RuntimeManagerConstants.DEFAULT_BINARY_NAME,
                 )
-                if self._is_valid_runtime(toml_yellow_path):
-                    config.yellow_runtime_path = toml_yellow_path
+                config.yellow_runtime_path = self._return_runtime_path(toml_yellow_name)
         except (FileNotFoundError, PermissionError, TOMLDecodeError):
             logging.warning(
                 f"Failed to read TOML file at: {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
             )
 
         return config
-
-    def _set_runtime_config(self, config: RuntimeConfig) -> None:
-        """Sets the runtime configuration file on disk
-        :param config: The runtime configuration being saved
-        """
-        blue_path = config.blue_runtime_path
-        yellow_path = config.yellow_runtime_path
-
-        """
-        Format in TOML as:
-        blue_path_to_binary: "<runtime path>"
-        yellow_path_to_binary: "<runtime path>"
-        """
-
-        selected_runtimes = (
-            f'{RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY} = "{blue_path}"\n'
-            f'{RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY} = "{yellow_path}"'
-        )
-
-        # create a new config file if it doesn't exist, and write in the format above to it
-        with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "w") as file:
-            file.write(selected_runtimes)
 
     def _return_runtime_path(self, selected_runtime: str) -> str:
         """Returns the absolute path of a binary given its name, or the path of our default FullSystem
