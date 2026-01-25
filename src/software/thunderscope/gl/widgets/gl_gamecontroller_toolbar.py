@@ -280,8 +280,6 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.runtime_installer_dialog.show()
 
     def __open_runtime_selector_dialog(self) -> None:
-        """Opens the runtime selector dialog, initializing if first time"""
-        if not hasattr(self, "runtime_selector_dialog"):
-            self.runtime_selector_dialog = GLRuntimeSelectorDialog(parent=self.parent())
-
+        """Initializes and opens the runtime selector dialog"""
+        self.runtime_selector_dialog = GLRuntimeSelectorDialog(parent=self.parent())
         self.runtime_selector_dialog.show()
