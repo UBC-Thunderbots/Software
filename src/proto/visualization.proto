@@ -41,11 +41,6 @@ message AttackerVisualization
     optional Point chip_target = 4;
 }
 
-message GoalieVisualization
-{
-    bool is_ball_incoming = 1;
-}
-
 message BallPlacementVisualization
 {
     Point ball_placement_point = 1;

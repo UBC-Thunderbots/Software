@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import software.python_bindings as tbots_cpp
 from software.thunderscope.constants import RuntimeManagerConstants
 import logging
-from proto.visualization_pb2 import AttackerVisualization, GoalieVisualization
+from proto.visualization_pb2 import AttackerVisualization
 from proto.import_all_protos import *
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 from typing import override
@@ -18,7 +18,8 @@ class FSStats:
     num_scores: int = 0
 
     num_shots_on_net: int = 0
-    latest_shot_on_net: tbots_cpp.Point = None
+    latest_shot_angle: tbots_cpp.Angle = tbots_cpp.Angle()
+    shot_taken: bool = False
 
     is_shot_incoming: bool = False
     num_enemy_shots_blocked: int = 0
@@ -27,6 +28,13 @@ class FSStats:
 class GlFSStatsLayer(GLLayer):
     # From GoalieTacticConfig
     INCOMING_SHOT_MIN_VELOCITY = 0.2
+
+    # tune these values to reduce noise in what is considered a "shot" to net
+    # higher values exclude noise such as dribbling or passes
+    # but can exclude real kicks
+    MIN_SHOT_SPEED = 2.0
+    MAX_KICK_ANGLE_DIFFERENCE = tbots_cpp.Angle.fromDegrees(5)
+    MIN_NEW_SHOT_ANGLE_DIFFERENCE_RAD = tbots_cpp.Angle.fromDegrees(10).toRadians()
 
     def __init__(
         self,
@@ -44,7 +52,6 @@ class GlFSStatsLayer(GLLayer):
         self.last_possession_enemy: bool | None = None
 
         self.attacker_vis_buffer = ThreadSafeBuffer(buffer_size, AttackerVisualization)
-        self.goalie_vis_buffer = ThreadSafeBuffer(buffer_size, GoalieVisualization)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
 
@@ -57,58 +64,100 @@ class GlFSStatsLayer(GLLayer):
     @override
     def refresh_graphics(self) -> None:
         """Refreshes the stats for the game so far"""
-        self._record_attacker_stats()
+        world_msg = self.world_buffer.get(block=False, return_cached=True)
+        world = tbots_cpp.World(world_msg)
 
-        self._record_goalie_stats()
+        self._update_posession(world)
 
-        self._record_world_stats()
+        self._record_attacker_stats(world.ball())
+
+        self._record_goalie_stats(world.ball(), world.field())
 
         self._record_referee_stats()
 
-    def _record_world_stats(self) -> None:
-        world_msg = self.world_buffer.get(block=False, return_cached=True)
+        self._flush_stats()
 
-        if not world_msg.HasField("friendly_team") and not world_msg.HasField(
-            "enemy_team"
-        ):
-            return
-
-        world = tbots_cpp.World(world_msg)
-
+    def _update_posession(self, world: tbots_cpp.World) -> None:
         friendly_team, enemy_team = (
-            (world.enemyTeam, world.friendlyTeam)
-            if self.friendly_color_yellow
-            else (world.friendlyTeam, world.enemyTeam)
+            (world.enemyTeam(), world.friendlyTeam())
+            if self.friendly_colour_yellow
+            else (world.friendlyTeam(), world.enemyTeam())
         )
-
-        if self.record_enemy_stats:
-            self._record_enemy_blocked_goals(world.ball().position(), world.field())
 
         self.last_possession_enemy = self._check_posession_for_teams(
             friendly_team, enemy_team, world.ball().position()
         )
 
-    def _record_enemy_blocked_goals(
+    def _is_goal_shot_incoming(
+        self, ball: tbots_cpp.Ball, field: tbots_cpp.Field, for_friendly: bool
+    ) -> bool:
+        """Follows similar logic to goalie_fsm.cpp
+        Checks if the ball velocity intersects with the goal line given
+        and if the ball is moving fast enough in the right direction
+        and if the ball is in the correct half of the field
+        and if the last possession was by the correct team
+        to consider it a shot on goal
+        """
+        ball_position = ball.position()
+        ball_velocity = ball.velocity()
+        ball_ray = tbots_cpp.Ray(ball_position, ball_velocity)
+        goal_segment = (
+            tbots_cpp.Segment(
+                field.friendlyGoalpostPos()
+                + tbots_cpp.Vector(0, -ROBOT_MAX_RADIUS_METERS),
+                field.friendlyGoalpostNeg()
+                + tbots_cpp.Vector(0, ROBOT_MAX_RADIUS_METERS),
+            )
+            if for_friendly
+            else tbots_cpp.Segment(
+                field.enemyGoalpostPos()
+                + tbots_cpp.Vector(0, -ROBOT_MAX_RADIUS_METERS),
+                field.enemyGoalpostNeg() + tbots_cpp.Vector(0, ROBOT_MAX_RADIUS_METERS),
+            )
+        )
+
+        shot_incoming = (
+            len(tbots_cpp.intersection(ball_ray, goal_segment)) != 0
+            and ball_velocity.length() > self.MIN_SHOT_SPEED
+            and (
+                field.pointInFriendlyHalf(ball_position)
+                if for_friendly
+                else field.pointInEnemyHalf(ball_position)
+            )
+            and (ball_velocity.x() <= 0 if for_friendly else ball_velocity.x() >= 0)
+        )
+
+        return shot_incoming
+
+    def _record_goalie_stats(
         self, ball: tbots_cpp.Ball, field: tbots_cpp.Field
     ) -> None:
-        """HEAVY WORKAROUND: as a fallback for when the enemy fullsystem doesn't calculate this
-        This should ordinarily be calculated by using the Goalie Visualization proto on the enemy side
-        not very clean, but follows similar logic to goalie_fsm.cpp, but from the enemy's perspective
-        """
-        ball_ray = tbots_cpp.Ray(ball.position(), ball.velocity())
-        enemy_goal_segment = tbots_cpp.Segment(
-            field.enemyGoalpostPos() + tbots_cpp.Vector(0, -ROBOT_MAX_RADIUS_METERS),
-            field.enemyGoalpostNeg() + tbots_cpp.Vector(0, ROBOT_MAX_RADIUS_METERS),
-        )
-        shot_incoming_for_enemy = (
-            len(tbots_cpp.intersects(ball_ray, enemy_goal_segment)) != 0
-            and ball.velocity().length() > self.INCOMING_SHOT_MIN_VELOCITY
+        friendly_shot_incoming = self._is_goal_shot_incoming(
+            ball, field, for_friendly=True
         )
 
-        if not shot_incoming_for_enemy and self.enemy_stats.is_shot_incoming:
-            self.enemy_stats.num_enemy_shots_blocked += 1
+        # assume that if a ball was previously incoming and then was no longer incoming
+        # then we successfully blocked it
+        # TODO: verify if this is accurate
+        if not friendly_shot_incoming and self.stats.is_shot_incoming:
+            self.stats.num_enemy_shots_blocked += 1
 
-        self.enemy_stats.is_shot_incoming = shot_incoming_for_enemy
+        if self.record_enemy_stats:
+            # if there wasn't an incoming shot and now there is, the enemy must have taken a shot at us
+            if friendly_shot_incoming and not self.stats.is_shot_incoming:
+                self.enemy_stats.num_shots_on_net += 1
+
+            # same logic, but from the enemy's perspective
+            enemy_shot_incoming = self._is_goal_shot_incoming(
+                ball, field, for_friendly=False
+            )
+
+            if not enemy_shot_incoming and self.enemy_stats.is_shot_incoming:
+                self.enemy_stats.num_enemy_shots_blocked += 1
+
+            self.enemy_stats.is_shot_incoming = enemy_shot_incoming
+
+        self.stats.is_shot_incoming = friendly_shot_incoming
 
     def _check_posession_for_teams(
         self,
@@ -133,46 +182,39 @@ class GlFSStatsLayer(GLLayer):
 
         return False
 
-    def _record_attacker_stats(self) -> None:
-        attacker_vis_msg = self.attacker_vis_buffer.get(block=False, return_cached=True)
+    def _update_latest_shot_angle(self) -> None:
+        attacker_vis_msg = self.attacker_vis_buffer.get(block=False)
 
         if attacker_vis_msg and attacker_vis_msg.HasField("shot"):
-            if attacker_vis_msg.shot.HasField("shot_origin"):
-                shot_origin = attacker_vis_msg.shot.shot_origin
-                shot_origin_point = tbots_cpp.Point(
-                    shot_origin.x_meters, shot_origin.y_meters
-                )
-
-                if (
-                    self.stats.latest_shot_on_net is None
-                    or self.stats.latest_shot_on_net != shot_origin_point
-                ):
-                    self.stats.latest_shot_on_net = shot_origin_point
-                    self.stats.num_shots_on_net += 1
-
-    def _record_goalie_stats(self) -> None:
-        goalie_vis_msg = self.goalie_vis_buffer.get(block=False)
-
-        if goalie_vis_msg and goalie_vis_msg.HasField("is_shot_incoming"):
-            shot_incoming = (
-                goalie_vis_msg.is_shot_incoming and self.last_possession_enemy
+            shot_origin = tbots_cpp.Point(
+                attacker_vis_msg.shot.shot_origin.x_meters,
+                attacker_vis_msg.shot.shot_origin.y_meters,
             )
+            shot_target = tbots_cpp.Point(
+                attacker_vis_msg.shot.shot_target.x_meters,
+                attacker_vis_msg.shot.shot_target.y_meters,
+            )
+            new_shot_angle = tbots_cpp.Vector(
+                shot_target.x() - shot_origin.x(), shot_target.y() - shot_origin.y()
+            ).orientation()
 
-            # assume that if a ball was previously incoming and then was no longer incoming
-            # then we successfully blocked it
-            # TODO: verify if this is accurate
-            if not goalie_vis_msg.is_shot_incoming and self.stats.is_shot_incoming:
-                self.stats.num_enemy_shots_blocked += 1
-
-            # if there wasn't an incoming shot and now there is, the enemy must have taken a shot at us
             if (
-                self.record_enemy_stats
-                and shot_incoming
-                and not self.stats.is_shot_incoming
+                abs((new_shot_angle - self.stats.latest_shot_angle).toRadians())
+                > self.MIN_NEW_SHOT_ANGLE_DIFFERENCE_RAD
             ):
-                self.enemy_stats.num_shots_on_net += 1
+                self.stats.latest_shot_angle = new_shot_angle
+                self.stats.shot_taken = False
 
-            self.stats.is_shot_incoming = shot_incoming
+    def _record_attacker_stats(self, ball: tbots_cpp.Ball) -> None:
+        self._update_latest_shot_angle()
+
+        if not self.stats.shot_taken and ball.hasBallBeenKicked(
+            self.stats.latest_shot_angle,
+            self.MIN_SHOT_SPEED,
+            self.MAX_KICK_ANGLE_DIFFERENCE,
+        ):
+            self.stats.num_shots_on_net += 1
+            self.stats.shot_taken = True
 
     def _record_referee_stats(self) -> None:
         refree_msg = self.referee_buffer.get(block=False, return_cached=True)
@@ -201,7 +243,7 @@ class GlFSStatsLayer(GLLayer):
         if team_info.HasField("red_cards"):
             stats.num_red_cards = team_info.red_cards
 
-    def __del__(self):
+    def _flush_stats(self):
         stats_file_name = (
             RuntimeManagerConstants.RUNTIME_ENEMY_STATS_FILE
             if self.friendly_colour_yellow
@@ -239,5 +281,6 @@ class GlFSStatsLayer(GLLayer):
 
             with open(file_path, "w") as stats_file:
                 stats_file.write(stats_to_write)
+
         except (FileNotFoundError, PermissionError):
             logging.warning(f"Failed to write TOML FS stats file at: {file_path}")

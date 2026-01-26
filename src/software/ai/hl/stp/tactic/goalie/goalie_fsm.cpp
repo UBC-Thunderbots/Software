@@ -183,11 +183,6 @@ bool GoalieFSM::panicDone(const Update &event)
         event.common.world_ptr->ball().velocity().length() <= ball_speed_panic ||
         intersections.empty();
 
-    if (!panic_done)
-    {
-        visualizeShotsOnGoal(false);
-    }
-
     return panic_done;
 }
 
@@ -221,26 +216,6 @@ void GoalieFSM::panic(const Update &event)
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
-
-    visualizeShotsOnGoal(true);
-}
-
-void GoalieFSM::visualizeShotsOnGoal(bool ball_incoming)
-{
-    TbotsProto::GoalieVisualization goalie_visualization_msg;
-
-    if (ball_incoming)
-    {
-        *(goalie_visualization_msg.mutable_goalie_state()) =
-            TbotsProto::GoalieState::BALL_INCOMING;
-    }
-    else
-    {
-        *(goalie_visualization_msg.mutable_ball_incoming()) =
-            TbotsProto::GoalieState::BALL_AWAY;
-    }
-
-    LOG(VISUALIZE) << goalie_visualization_msg;
 }
 
 void GoalieFSM::updatePivotKick(
