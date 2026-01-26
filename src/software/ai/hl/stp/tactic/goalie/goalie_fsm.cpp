@@ -179,11 +179,8 @@ bool GoalieFSM::panicDone(const Update &event)
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(
             event.common.world_ptr->ball(), event.common.world_ptr->field());
 
-    bool panic_done =
-        event.common.world_ptr->ball().velocity().length() <= ball_speed_panic ||
-        intersections.empty();
-
-    return panic_done;
+    return event.common.world_ptr->ball().velocity().length() <= ball_speed_panic ||
+           intersections.empty();
 }
 
 void GoalieFSM::panic(const Update &event)
@@ -203,6 +200,7 @@ void GoalieFSM::panic(const Update &event)
         (event.common.world_ptr->ball().position() - goalie_pos).length() /
         (std::max(std::numeric_limits<double>::epsilon(),
                   event.common.world_ptr->ball().velocity().length())));
+
 
     if (event.common.robot.getTimeToPosition(goalie_pos) > ball_intercept_time)
     {
