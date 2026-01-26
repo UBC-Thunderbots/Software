@@ -21,7 +21,7 @@ class RuntimeManager:
         return self.runtime_installer.fetch_remote_runtimes()
 
     def install_runtime(self, version: str) -> None:
-        """Installs the runtime of the specified version or throws an error upon failure.
+        """Installs the runtime of the specified version or throws an error upon failure
         :param version: Version of the runtime hosted on the remote to install
         """
         self.runtime_installer.install_runtime(version)
@@ -32,12 +32,12 @@ class RuntimeManager:
         """
         return self.runtime_loader.fetch_installed_runtimes()
 
-    def load_existing_runtimes(self, yellow_runtime: str, blue_runtime: str) -> None:
-        """Loads the runtimes of the specified name or logs a warning upon failure.
+    def load_selected_runtimes(self, yellow_runtime: str, blue_runtime: str) -> None:
+        """Loads the runtimes into the runtime loader config file on the local disk
         :param blue_runtime: name of the blue runtime to load
         :param yellow_runtime: name of the yellow runtime to load
         """
-        self.runtime_loader.load_existing_runtimes(yellow_runtime, blue_runtime)
+        self.runtime_loader.load_selected_runtimes(yellow_runtime, blue_runtime)
 
     def fetch_runtime_config(self) -> RuntimeConfig:
         """Fetches the runtime configuration from the local disk
