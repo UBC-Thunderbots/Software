@@ -106,9 +106,9 @@ std::ostream& operator<<(std::ostream& os, const Polygon& poly);
 template <>
 struct std::hash<Polygon>
 {
-    size_t operator()(const Polygon &polygon) const
+    std::size_t operator()(const Polygon &polygon) const
     {
-        size_t seed = 0;
+        std::size_t seed = 0;
         for (const auto& point : polygon.getPoints())
         {
             hashCombine(seed, point);

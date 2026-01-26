@@ -100,7 +100,8 @@ class MovePrimitive : public Primitive
     BangBangTrajectory1DAngular angular_trajectory;
     TrajectoryPlanner planner;
 
-    static VisProtoDeduper vis_proto_deduper;
-
     constexpr static unsigned int NUM_TRAJECTORY_VISUALIZATION_POINTS = 10;
+    constexpr static unsigned int PROTO_DEDUPER_WINDOW_SIZE = 5;
+
+    inline static VisProtoDeduper vis_proto_deduper{PROTO_DEDUPER_WINDOW_SIZE};
 };
