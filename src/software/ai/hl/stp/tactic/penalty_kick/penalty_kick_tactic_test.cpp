@@ -4,6 +4,7 @@
 
 #include <utility>
 
+#include "software/geom/angular_velocity.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_never_moves_backward_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
@@ -21,8 +22,8 @@ class PenaltyKickTacticTest : public SimulatedErForceSimPlayTestFixture,
     Field field                      = Field::createField(field_type);
     BallState ball           = BallState(field.friendlyPenaltyMark(), Vector(0, 0));
     Point initial_position   = field.friendlyPenaltyMark() + Vector(-0.1, 0);
-    RobotStateWithId shooter = {
-        0, RobotState(initial_position, Vector(0, 0), Angle::zero(), Angle::zero())};
+    RobotStateWithId shooter = {0, RobotState(initial_position, Vector(0, 0),
+                                              Angle::zero(), AngularVelocity::zero())};
 };
 
 // TODO (#2232): Improve dribbling control so the ball is not lost during this test
@@ -79,22 +80,23 @@ INSTANTIATE_TEST_CASE_P(
     RobotLocations, PenaltyKickTacticTest,
     ::testing::Values(
         // enemy robot stationary at centre of goal
-        RobotStateWithId{0, RobotState(Field::createSSLDivisionBField().enemyGoalCenter(),
-                                       Vector(0, 0), Angle::half(), Angle::zero())},
+        RobotStateWithId{
+            0, RobotState(Field::createSSLDivisionBField().enemyGoalCenter(),
+                          Vector(0, 0), Angle::half(), AngularVelocity::zero())},
 
         // enemy robot stationary left of net
-        RobotStateWithId{0,
-                         RobotState(Field::createSSLDivisionBField().enemyGoalpostNeg(),
-                                    Vector(0, 0), Angle::half(), Angle::zero())},
+        RobotStateWithId{
+            0, RobotState(Field::createSSLDivisionBField().enemyGoalpostNeg(),
+                          Vector(0, 0), Angle::half(), AngularVelocity::zero())},
         // enemy robot stationary right of net
-        RobotStateWithId{0,
-                         RobotState(Field::createSSLDivisionBField().enemyGoalpostPos(),
-                                    Vector(0, 0), Angle::half(), Angle::zero())},
+        RobotStateWithId{
+            0, RobotState(Field::createSSLDivisionBField().enemyGoalpostPos(),
+                          Vector(0, 0), Angle::half(), AngularVelocity::zero())},
         // enemy robot left of net but moving right
-        RobotStateWithId{0,
-                         RobotState(Field::createSSLDivisionBField().enemyGoalpostNeg(),
-                                    Vector(0, 1.2), Angle::half(), Angle::zero())},
+        RobotStateWithId{
+            0, RobotState(Field::createSSLDivisionBField().enemyGoalpostNeg(),
+                          Vector(0, 1.2), Angle::half(), AngularVelocity::zero())},
         // enemy robot right of net but moving left
-        RobotStateWithId{0,
-                         RobotState(Field::createSSLDivisionBField().enemyGoalpostPos(),
-                                    Vector(0, -1.2), Angle::half(), Angle::zero())}));
+        RobotStateWithId{
+            0, RobotState(Field::createSSLDivisionBField().enemyGoalpostPos(),
+                          Vector(0, -1.2), Angle::half(), AngularVelocity::zero())}));

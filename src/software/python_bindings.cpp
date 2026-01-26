@@ -323,7 +323,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("contains", py::overload_cast<const Stadium&, const Point&>(&contains));
 
     py::class_<Robot>(m, "Robot")
-        .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
+        .def(py::init<unsigned, Point&, Vector&, Angle&, AngularVelocity&, Timestamp&>())
         .def(py::init<TbotsProto::Robot>())
         .def("timestamp", &Robot::timestamp)
         .def("position", &Robot::position)
