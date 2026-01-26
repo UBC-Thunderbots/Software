@@ -13,6 +13,8 @@ from typing import override
 
 @dataclass
 class FSStats:
+    """Stats for how well a FullSystem is performing"""
+
     num_yellow_cards: int = 0
     num_red_cards: int = 0
     num_scores: int = 0
@@ -43,6 +45,13 @@ class GlFSStatsLayer(GLLayer):
         buffer_size: int = 5,
         record_enemy_stats: bool = False,
     ):
+        """Initializes a GlFSStatsLayer
+
+        :param name: the display name of this layer
+        :param friendly_colour_yellow: if the friendly colour is yellow
+        :param buffer_size: the buffer size for protocol buffers
+        :param record_enemy_stats: if this layer should record both friendly and enemy stats or just friendly
+        """
         super().__init__(name)
 
         self.friendly_colour_yellow = friendly_colour_yellow
@@ -78,6 +87,10 @@ class GlFSStatsLayer(GLLayer):
         self._flush_stats()
 
     def _update_posession(self, world: tbots_cpp.World) -> None:
+        """Updates the team which last had the ball
+
+        :param world: the current state of the world
+        """
         friendly_team, enemy_team = (
             (world.enemyTeam(), world.friendlyTeam())
             if self.friendly_colour_yellow
@@ -97,6 +110,11 @@ class GlFSStatsLayer(GLLayer):
         and if the ball is in the correct half of the field
         and if the last possession was by the correct team
         to consider it a shot on goal
+
+        :param ball: the current state of the ball
+        :param field: the current state of the field
+        :param for_friendly: if we should check for a goal shot on the friendly or enemy side
+        :return:
         """
         ball_position = ball.position()
         ball_velocity = ball.velocity()
@@ -132,6 +150,12 @@ class GlFSStatsLayer(GLLayer):
     def _record_goalie_stats(
         self, ball: tbots_cpp.Ball, field: tbots_cpp.Field
     ) -> None:
+        """Record stats related to the goalie
+        So shots taken and blocked on goal
+
+        :param ball: the current state of the ball
+        :param field: the current state of the field
+        """
         friendly_shot_incoming = self._is_goal_shot_incoming(
             ball, field, for_friendly=True
         )
@@ -165,6 +189,14 @@ class GlFSStatsLayer(GLLayer):
         enemy_team: tbots_cpp.Team,
         ball_position: tbots_cpp.Point,
     ) -> bool | None:
+        """Check for which team has possession of the ball
+        True if enemy team, False if friendly team, None if neither
+
+        :param friendly_team: the friendly team
+        :param enemy_team: the enemy team
+        :param ball_position: the current ball position
+        :return: True / False / None depending on which team has possession
+        """
         if self._check_posession_for_team(enemy_team, ball_position):
             return True
 
@@ -175,7 +207,13 @@ class GlFSStatsLayer(GLLayer):
 
     def _check_posession_for_team(
         self, team: tbots_cpp.Team, ball_position: tbots_cpp.Point
-    ):
+    ) -> bool:
+        """Check if the given team has possession of the ball
+
+        :param team: the team to check
+        :param ball_position: the current ball position
+        :return: True if the team has possession, False otherwise
+        """
         for robot in team.getAllRobots():
             if robot.isNearDribbler(ball_position):
                 return True
@@ -183,6 +221,9 @@ class GlFSStatsLayer(GLLayer):
         return False
 
     def _update_latest_shot_angle(self) -> None:
+        """Update the latest shot angle if there is a new shot from the attacker
+        that is different enough from the old shot
+        """
         attacker_vis_msg = self.attacker_vis_buffer.get(block=False)
 
         if attacker_vis_msg and attacker_vis_msg.HasField("shot"):
@@ -206,6 +247,12 @@ class GlFSStatsLayer(GLLayer):
                 self.stats.shot_taken = False
 
     def _record_attacker_stats(self, ball: tbots_cpp.Ball) -> None:
+        """Record stats related to the attacker
+        i.e the shots taken on goal by the friendly team
+        Checks if the shot has actually been taken or not
+
+        :param ball: the current state of the ball
+        """
         self._update_latest_shot_angle()
 
         if not self.stats.shot_taken and ball.hasBallBeenKicked(
@@ -217,6 +264,9 @@ class GlFSStatsLayer(GLLayer):
             self.stats.shot_taken = True
 
     def _record_referee_stats(self) -> None:
+        """Record stats related to the referee
+        such as game score and red / yellow cards
+        """
         refree_msg = self.referee_buffer.get(block=False, return_cached=True)
 
         if refree_msg.HasField("yellow" if self.friendly_colour_yellow else "blue"):
@@ -233,7 +283,14 @@ class GlFSStatsLayer(GLLayer):
                 self.enemy_stats,
             )
 
-    def _record_referee_stats_per_team(self, team_info: TeamInfo, stats: FSStats):
+    def _record_referee_stats_per_team(
+        self, team_info: TeamInfo, stats: FSStats
+    ) -> None:
+        """Record stats related to the referee for the given team
+
+        :param team_info: the information about the team
+        :param stats: the stats to update
+        """
         if team_info.HasField("score"):
             stats.num_scores = team_info.score
 
@@ -244,6 +301,7 @@ class GlFSStatsLayer(GLLayer):
             stats.num_red_cards = team_info.red_cards
 
     def _flush_stats(self):
+        """Write the current stats to disk"""
         stats_file_name = (
             RuntimeManagerConstants.RUNTIME_ENEMY_STATS_FILE
             if self.friendly_colour_yellow
@@ -262,6 +320,11 @@ class GlFSStatsLayer(GLLayer):
             self._write_stats_to_file(self.enemy_stats, enemy_stats_file_name)
 
     def _write_stats_to_file(self, stats: FSStats, file_name: str) -> None:
+        """Write the given stats to the given file
+
+        :param stats: the stats to write
+        :param file_name: the file to write to
+        """
         file_path = os.path.join(
             RuntimeManagerConstants.RUNTIME_STATS_DIRECTORY_PATH, file_name
         )
