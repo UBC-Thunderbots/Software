@@ -69,21 +69,11 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/environment-setup
 
-      - name: Install and start redis server
+      - name: Environment Setup
         run: |
-          wget http://download.redis.io/redis-stable.tar.gz 
-          tar xvzf redis-stable.tar.gz >/dev/null 
-          cd redis-stable
-          make >/dev/null 
-          make install >/dev/null 
-          redis-server --daemonize yes          
-
-      - name: Stop redis server
-        run: |
-          redis-cli shutdown
-
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+        
       - name: Jetson Nano Build
         run: |
          cd src
