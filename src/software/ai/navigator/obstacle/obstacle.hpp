@@ -155,7 +155,7 @@ inline std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_pt
 template <>
 struct std::hash<Obstacle>
 {
-    size_t operator()(const Obstacle &obstacle) const
+    std::size_t operator()(const Obstacle &obstacle) const
     {
         return obstacle.hash();
     }
