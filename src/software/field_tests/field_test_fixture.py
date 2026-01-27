@@ -357,6 +357,7 @@ def field_test_runner():
 
     # Launch all binaries
     with FullSystem(
+        "software/unix_full_system",
         full_system_runtime_dir=runtime_dir,
         debug_full_system=debug_full_sys,
         friendly_colour_yellow=args.run_yellow,

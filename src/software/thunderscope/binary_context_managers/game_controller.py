@@ -4,7 +4,6 @@ import queue
 import random
 import logging
 import os
-import socket
 import time
 from subprocess import Popen
 from typing import Any
@@ -21,6 +20,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
+from software.thunderscope.util import is_current_platform_macos
 
 logger = logging.getLogger(__name__)
 import itertools
@@ -288,10 +288,15 @@ class Gamecontroller:
             if autoref_proto_unix_io is not None:
                 autoref_proto_unix_io.send_proto(Referee, data)
 
+        if is_current_platform_macos():
+            loopback_iface = "en0"
+        else:
+            loopback_iface = "lo"
+
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP,
             self.referee_port,
-            "lo",
+            loopback_iface,
             __send_referee_command,
             True,
         )

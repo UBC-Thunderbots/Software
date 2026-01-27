@@ -1,17 +1,20 @@
 from __future__ import annotations
 
-import os
 import logging
-import time
+import os
 import threading
-
+import time
 from subprocess import Popen, TimeoutExpired
-from software.thunderscope.gl.layers.gl_obstacle_layer import ObstacleList
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+
+from software.py_constants import *
 from software.python_bindings import *
+
 from proto.import_all_protos import *
 from software.py_constants import *
+from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers.util import is_cmd_running
+from software.thunderscope.gl.layers.gl_obstacle_layer import ObstacleList
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class FullSystem:
@@ -19,22 +22,27 @@ class FullSystem:
 
     def __init__(
         self,
+        path_to_binary: str,
         full_system_runtime_dir: os.PathLike = None,
         debug_full_system: bool = False,
         friendly_colour_yellow: bool = False,
         should_restart_on_crash: bool = True,
         run_sudo: bool = False,
         running_in_realtime: bool = True,
+        log_level: LogLevels = LogLevels.DEBUG,
     ) -> None:
         """Run FullSystem
 
+        :param path_to_binary: The path of the binary used for this unix full system
         :param full_system_runtime_dir: The directory to run the blue full_system in
         :param debug_full_system: Whether to run the full_system in debug mode
         :param friendly_color_yellow: a argument passed into the unix_full_system binary (--friendly_colour_yellow)
         :param should_restart_on_crash: whether or not to restart the program after it has been crashed
         :param run_sudo: true if we should run full system under sudo
         :param running_in_realtime: True if we are running fullsystem in realtime, else False
+        :param log_level: Minimum g3log level that will be printed (DEBUG|INFO|WARNING|FATAL)
         """
+        self.path_to_binary = path_to_binary
         self.full_system_runtime_dir = full_system_runtime_dir
         self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
@@ -42,7 +50,7 @@ class FullSystem:
         self.should_restart_on_crash = should_restart_on_crash
         self.should_run_under_sudo = run_sudo
         self.running_in_realtime = running_in_realtime
-
+        self.log_level = log_level
         self.thread = threading.Thread(target=self.__restart__, daemon=True)
 
     def __enter__(self) -> FullSystem:
@@ -61,10 +69,12 @@ class FullSystem:
         except:
             pass
 
-        self.full_system = "software/unix_full_system --runtime_dir={} {} {}".format(
+        self.full_system = "{} --runtime_dir={} {} {} --log_level={}".format(
+            self.path_to_binary,
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
             "--ci" if not self.running_in_realtime else "",
+            self.log_level.value,
         )
 
         if self.should_run_under_sudo:

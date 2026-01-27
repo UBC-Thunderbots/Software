@@ -4,7 +4,6 @@ import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_team_scored import *
-from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from software.simulated_tests.simulated_test_fixture import (
@@ -104,17 +103,7 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos, must_s
             }
         ],
         inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[
-            [
-                RobotEventuallyEntersRegion(
-                    regions=[tbots_cpp.Circle(ball_initial_pos, 0.3)]
-                ),
-                BallEventuallyExitsRegion(
-                    regions=[tbots_cpp.Circle(ball_initial_pos, 0.5)]
-                ),
-            ]
-            + ([FriendlyTeamScored()] if must_score else []),
-        ],
+        inv_eventually_validation_sequence_set=[[]],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=10,

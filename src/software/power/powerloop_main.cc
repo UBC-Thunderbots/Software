@@ -19,15 +19,13 @@
 #include "software/power/control_executor.h"
 #include "software/power/geneva.h"
 #include "software/power/power_monitor.h"
-
 #endif
 
 #include <Arduino.h>
 
 // Used for uart communication
-uint8_t incomingByte;
-size_t read_buffer_size;
 std::vector<uint8_t> buffer;
+bool receiving;
 
 uint32_t sequence_num;
 
@@ -40,8 +38,7 @@ std::shared_ptr<ControlExecutor> executor;
 void setup()
 {
     Serial.begin(460800, SERIAL_8N1);
-    read_buffer_size = getMarshalledSize(
-        TbotsProto_PowerPulseControl TbotsProto_PowerPulseControl_init_default);
+    receiving    = false;
     sequence_num = 0;
     charger      = std::make_shared<Charger>();
     chicker      = std::make_shared<Chicker>();
@@ -53,38 +50,47 @@ void setup()
 
 void loop()
 {
-    // Read in bytes from Serial and put them into a buffer to read
-    while (Serial.available() > 0 && buffer.size() < read_buffer_size)
+    // Read bytes in from Serial
+    while (Serial.available() > 0)
     {
-        incomingByte = Serial.read();
-        buffer.emplace_back(static_cast<uint8_t>(incomingByte));
-    }
-    // Once there is enough data attempt to decode
-    if (buffer.size() == read_buffer_size)
-    {
-        TbotsProto_PowerFrame frame = TbotsProto_PowerFrame_init_default;
-        if (unmarshalUartPacket(buffer, frame))
+        const uint8_t byte = Serial.read();
+        if (receiving)
         {
-            // On successful decoding execute the given command
-            TbotsProto_PowerPulseControl control = frame.power_msg.power_control;
-            executor->execute(control);
+            buffer.push_back(byte);
+            if (byte == START_END_FLAG_BYTE)  // End of packet?
+            {
+                TbotsProto_PowerFrame frame = TbotsProto_PowerFrame_init_default;
+                if (unmarshalUartPacket(buffer, frame))
+                {
+                    // On successful decoding execute the given command
+                    TbotsProto_PowerPulseControl control = frame.power_msg.power_control;
+                    executor->execute(control);
+                }
+
+                buffer.clear();
+                receiving = false;
+            }
         }
-        buffer.clear();
+        else
+        {
+            if (byte == START_END_FLAG_BYTE)  // Start of packet?
+            {
+                buffer.push_back(byte);
+                receiving = true;
+            }
+        }
     }
+
     // Read sensor values. These are all instantaneous
-    auto status = createNanoPbPowerStatus(
+    TbotsProto_PowerStatus status = createNanoPbPowerStatus(
         monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
         monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
         chicker->getBreakBeamTripped());
-    auto status_frame = createUartFrame(status);
-    auto packet       = marshallUartPacket(status_frame);
-    for (auto byte : packet)
-    {
-        while (Serial.availableForWrite() <= 0)
-        {
-        }
-        Serial.write(byte);
-    }
+
+    // Write sensor values out to Serial
+    TbotsProto_PowerFrame status_frame = createUartFrame(status);
+    std::vector<uint8_t> packet        = marshallUartPacket(status_frame);
+    Serial.write(packet.data(), packet.size());
     Serial.flush();
 
     delay(5);

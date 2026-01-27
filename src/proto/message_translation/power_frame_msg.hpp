@@ -142,6 +142,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     kick_constant = std::min(kick_constant, MAX_KICK_CONSTANT);
     kick_coeff    = std::min(kick_coeff, MAX_KICK_COEFFICIENT);
 
+    nanopb_control.has_chicker = true;
+
     switch (power_control.chicker().chicker_command_case())
     {
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
@@ -229,17 +231,17 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     switch (chicker_command)
     {
         case ChickerCommandMode::CHIP:
-            control.chicker.which_chicker_command =
+            chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
             chicker.chicker_command.chip_pulse_width = chip_pulse_width;
             break;
         case ChickerCommandMode::KICK:
-            control.chicker.which_chicker_command =
+            chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             chicker.chicker_command.kick_pulse_width = kick_pulse_width;
             break;
         case ChickerCommandMode::AUTOCHIPORKICK:
-            control.chicker.which_chicker_command =
+            chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_auto_chip_or_kick_tag;
             switch (auto_chip_or_kick)
             {
@@ -263,6 +265,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             break;
     }
 
+    control.has_chicker = true;
     control.chicker     = chicker;
     control.geneva_slot = geneva_slot;
 

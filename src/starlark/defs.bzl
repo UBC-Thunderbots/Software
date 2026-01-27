@@ -1,9 +1,11 @@
 load("@rules_pkg//pkg:providers.bzl", "PackageFilegroupInfo", "PackageFilesInfo", "PackageSymlinkInfo")
 
-# No idea how this works, refer to:
-# https://gist.github.com/pauldraper/7bc811ffbef6d3f3d4a4bb01afa9808f
+# ===================================================================
+# Custom Build Rules and Definitions
+# ===================================================================
 
-# For maintaining Bazel runfile tree structure during packaging
+# For maintaining Bazel runfile tree structure during packaging. Used in the onboard python CLI
+# See for reference https://gist.github.com/pauldraper/7bc811ffbef6d3f3d4a4bb01afa9808f
 def _runfile_path(workspace_name, file):
     path = file.short_path
     return path[len("../"):] if path.startswith("../") else "%s/%s" % (workspace_name, path)
