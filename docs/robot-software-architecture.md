@@ -35,9 +35,7 @@ More commands available [here](useful-robot-commands.md#off-robot-commands)
 
 ## Systemd
 
-[Systemd](https://www.freedesktop.org/wiki/Software/systemd/) allows us to have services which start as soon as we boot the robot, will automatically restart and are individually controllable. All services have the file {service}.service, which controls the configuration of that service. Currently we have a service for thunderloop, announcements and display
-
-To learn more about how it works, [see the RFC](https://docs.google.com/document/d/1hN3Us2Vjr8z6ihqUVp_3L7rrjKc-EZ-l2hZJc31gNOc/edit)
+[Systemd](https://www.freedesktop.org/wiki/Software/systemd/) allows us to have services which start as soon as we boot the robot, will automatically restart and are individually controllable. All services have the file {service}.service, which controls the configuration of that service. Our core service brought up by systemd is thunderloop. The thunderloop.service file can be seen [here](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/embedded/linux_configs/systemd/thunderloop.service).
 
 ## Redis
 

@@ -5,10 +5,6 @@
 <!--TOC-->
 
 - [Table of Contents](#table-of-contents)
-- [Common Debugging Steps](#common-debugging-steps)
-- [Off Robot Commands](#off-robot-commands)
-  - [Wifi Disclaimer](#wifi-disclaimer)
-  - [Miscellaneous Ansible Tasks & Options](#miscellaneous-ansible-tasks--options)
   - [Flashing the robot's compute module](#flashing-the-robots-compute-module)
   - [Flashing the powerboard](#flashing-the-powerboard)
   - [Setting up the embedded host](#setting-up-the-embedded-host)
@@ -24,28 +20,6 @@
   - [Redis](#redis)
 
 <!--TOC-->
-
-# Common Debugging Steps
-```mermaid
----
-title: Robot Debugging Steps
----
-flowchart TD
-    ssh("Can you SSH into the robot? 
-        `ssh robot@192.168.0.20RobotID` (for Nanos) OR `ssh robot@192.168.5.20RobotID` (for Pis) OR `ssh robot@robot_name.local`
-        e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.5.203` (for Pis) or `ssh robot@robert.local`
-        for a robot called robert with robot id 3")
-    ssh ---> |Yes| tloop_status
-    ssh --> |No - Second Try| monitor("Connect Jetson or Pi to an external monitor and check wifi connection or SSH using an ethernet cable")
-    ssh --> |No - First Try| restart(Restart robot)
-    restart --> ssh
-
-    diagnostics("`Run Diagnostics while connected to '**tbots**' wifi`") --> robot_view
-    robot_view(Robot is shown as connected in 'Robot View' widget?) --> |Yes| check_motors(All motors move?)
-    style diagnostics stroke:#f66,stroke-width:2px,stroke-dasharray: 5 5
-
-    check_motors -->|Yes| field_test(Running AI?)
-    field_test -->|No| done(Done)
     style done stroke:#30fa02,stroke-width:2px,stroke-dasharray: 5 5
     field_test -->|Yes| field_test_moves(Does robot move during field test?)
     field_test_moves --> |No| check_shell("`Check that the correct shell is placed on the robot`")
@@ -156,7 +130,7 @@ bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:ro
 ### Raspberry Pi
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=PI -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
 ## Robot Diagnostics
@@ -202,7 +176,7 @@ bazel run //software/embedded/ansible:run_ansible --//software/embedded:host_pla
 
 ## Systemd Services
 
-Status shows whether the service is running and some recent logs. More logs can be found using `journalctl` shown below. More control can be achieved with `systemctl`. Valid `<service_name>` are `thunderloop`, `display`, and `wifi_announcements`  
+Status shows whether the service is running and some recent logs. More logs can be found using `journalctl` shown below. More control can be achieved with `systemctl`. Currently, the only valid `<service_name>` is `thunderloop`.  
 
 ```bash
 service <service_name> status
