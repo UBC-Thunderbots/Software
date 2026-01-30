@@ -45,12 +45,12 @@ static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
     2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
 
 // TOML Config Keys
-const std::string ROBOT_ID_CONFIG_KEY                = "/robot_id";
-const std::string ROBOT_MULTICAST_CHANNEL_CONFIG_KEY = "/channel_id";
-const std::string ROBOT_NETWORK_INTERFACE_CONFIG_KEY = "/network_interface";
-const std::string ROBOT_KICK_CONSTANT_CONFIG_KEY     = "/kick_constant";
-const std::string ROBOT_KICK_EXP_COEFF_CONFIG_KEY    = "/kick_coeff";
-const std::string ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY  = "/chip_pulse_width";
+const std::string ROBOT_ID_CONFIG_KEY                = "robot_id";
+const std::string ROBOT_MULTICAST_CHANNEL_CONFIG_KEY = "channel_id";
+const std::string ROBOT_NETWORK_INTERFACE_CONFIG_KEY = "network_interface";
+const std::string ROBOT_KICK_CONSTANT_CONFIG_KEY     = "kick_constant";
+const std::string ROBOT_KICK_EXP_COEFF_CONFIG_KEY    = "kick_coeff";
+const std::string ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY  = "chip_pulse_width";
 
 const std::string SSL_VISION_ADDRESS          = "224.5.23.2";
 static constexpr unsigned int SSL_VISION_PORT = 10020;

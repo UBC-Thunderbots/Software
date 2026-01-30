@@ -81,25 +81,13 @@ void TomlConfigClient::writeConfig()
     has_pending_changes_ = false;
 }
 
-std::string TomlConfigClient::normalizeKey(const std::string& key)
-{
-    // Remove leading slash if present
-    if (!key.empty() && key[0] == '/')
-    {
-        return key.substr(1);
-    }
-    return key;
-}
-
 std::string TomlConfigClient::get(const std::string& key)
 {
     std::lock_guard<std::mutex> lock(config_mutex_);
 
-    std::string normalized_key = normalizeKey(key);
-
     try
     {
-        auto node = config_table_[normalized_key];
+        auto node = config_table_[key];
         if (node.is_string())
         {
             return node.as_string()->get();
