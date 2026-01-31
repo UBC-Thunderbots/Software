@@ -7,6 +7,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from typing import override
 
 
 class ExcessivelyDribbling(Validation):
@@ -34,6 +35,7 @@ class ExcessivelyDribbling(Validation):
                 - DribblingConstants.DRIBBLING_ERROR_MARGIN
             ):
                 return ValidationStatus.FAILING
+        else:
 
         return ValidationStatus.PASSING
 
