@@ -27,7 +27,7 @@ class ExcessivelyDribbling(Validation):
         # Use world calculation of dribbling distance, which uses implementation
         # of initial position of BOT to final position of BALL
 
-        if world.HasField("dribble_displacement"):
+        if world.hasValue("dribble_displacement"):
             dribble_disp = world.dribble_displacement
             dist = tbots_cpp.createSegment(dribble_disp).length()
             if dist > (
@@ -35,7 +35,6 @@ class ExcessivelyDribbling(Validation):
                 - DribblingConstants.DRIBBLING_ERROR_MARGIN
             ):
                 return ValidationStatus.FAILING
-        else:
 
         return ValidationStatus.PASSING
 
