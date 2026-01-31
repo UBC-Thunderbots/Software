@@ -13,6 +13,7 @@ from typing import override
 class ExcessivelyDribbling(Validation):
     """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
 
+    @override
     def get_validation_status(
         self,
         world,
@@ -38,6 +39,7 @@ class ExcessivelyDribbling(Validation):
 
         return ValidationStatus.PASSING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the max allowed dribbling circle"""
         if world.HasField("dribble_displacement"):
@@ -49,6 +51,7 @@ class ExcessivelyDribbling(Validation):
             )
         return create_validation_geometry([])
 
+    @override
     def __repr__(self):
         return "Check that the dribbling robot has not dribbled for more than 1m"
 
