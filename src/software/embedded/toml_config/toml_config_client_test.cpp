@@ -1,8 +1,9 @@
 #include "software/embedded/toml_config/toml_config_client.h"
 
+#include <gtest/gtest.h>
+
 #include <cstdio>
 #include <filesystem>
-#include <gtest/gtest.h>
 
 class TomlConfigClientTest : public ::testing::Test
 {
