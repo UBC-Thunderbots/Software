@@ -1,7 +1,7 @@
 from pyqtgraph.Qt import QtGui
 from OpenGL.GL import *
 from proto.import_all_protos import *
-from enum import Enum, IntEnum
+from enum import Enum, IntEnum, StrEnum
 from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
@@ -384,3 +384,12 @@ class DribblingConstants:
 
     MAX_DRIBBLING_DISTANCE = 1.0
     DRIBBLING_ERROR_MARGIN = 0.06
+
+
+class LogLevels(StrEnum):
+    """Log levels for FullSystem to indicate minimum logged level"""
+
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    FATAL = "FATAL"
