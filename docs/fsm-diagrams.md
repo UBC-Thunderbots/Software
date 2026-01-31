@@ -109,7 +109,7 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [ExamplePlayFSM](/src/software/ai/hl/stp/play/example/example_play_fsm.h)
+## ExamplePlayFSM
 
 ```mermaid
 
@@ -122,7 +122,6 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [FreeKickPlayFSM](/src/software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h)
 ## FreeKickPlayFSM
 
 ```mermaid
@@ -362,7 +361,7 @@ Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 
 ```
 
-## [KeepAwayFSM](/src/software/ai/hl/stp/tactic/keep_away/keep_away_fsm.h)
+## KeepAwayFSM
 
 ```mermaid
 
@@ -376,7 +375,6 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [KickFSM](/src/software/ai/hl/stp/tactic/kick/kick_fsm.h)
 ## KickFSM
 
 ```mermaid
