@@ -120,9 +120,7 @@ std::string TomlConfigClient::get(const std::string& key)
 void TomlConfigClient::set(const std::string& key, const std::string& value)
 {
     std::lock_guard<std::mutex> lock(config_mutex_);
-
-    std::string normalized_key = normalizeKey(key);
-    config_table_.insert_or_assign(normalized_key, value);
+    config_table_.insert_or_assign(key, value);
     has_pending_changes_ = true;
     writeConfig();
 }
@@ -130,9 +128,7 @@ void TomlConfigClient::set(const std::string& key, const std::string& value)
 void TomlConfigClient::setNoCommit(const std::string& key, const std::string& value)
 {
     std::lock_guard<std::mutex> lock(config_mutex_);
-
-    std::string normalized_key = normalizeKey(key);
-    config_table_.insert_or_assign(normalized_key, value);
+    config_table_.insert_or_assign(key, value);
     has_pending_changes_ = true;
 }
 

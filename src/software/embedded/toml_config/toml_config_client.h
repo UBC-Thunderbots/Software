@@ -71,9 +71,4 @@ class TomlConfigClient
      * Writes the current config_table_ to the TOML file.
      */
     void writeConfig();
-
-    /**
-     * Removes leading slash and converts to nested structure if needed.
-     */
-    std::string normalizeKey(const std::string& key);
 };
