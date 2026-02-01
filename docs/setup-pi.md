@@ -96,9 +96,9 @@ ping -c 3 8.8.8.8
 3. Exit the SSH connection to the Raspberry Pi with the `exit` command.
 4. Change directory to `Software/src` and run the bazel ansible command:
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot  --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_name>.local --ssh_pass <password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot  --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_name>.local --ssh_pass <robot_password>
 ```
-   * Ensure you configure <robot_name> and <password> in the command above. Copy/pasting the above won't work.
+   * Ensure you configure `<robot_name>` and `<password>` in the command above. Copy/pasting the above won't work.
    * This may take a while.
 5. Done!
 
