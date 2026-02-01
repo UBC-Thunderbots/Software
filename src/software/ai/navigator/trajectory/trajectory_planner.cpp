@@ -139,8 +139,7 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     }
 
 	// In move primitive, a stop primitive is created when trajectory path is null.
-	// Check if there is an unavoidable collision in a short period of time, when the robot is high collision_velocity
-	// If so, return a null pointer if such collision exist on best path
+	// Check if there is an unavoidable collision, and return a null pointer if such collision exist on best path
 	double collision_velocity = best_traj_with_cost.traj_path.getVelocity(best_traj_with_cost.first_collision_time_s).length();
 	if (best_traj_with_cost.collides() && best_traj_with_cost.first_collision_time_s < UNAVOIDABLE_COLLISION_TIME_THRESHOLD && collision_velocity > UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD){
 		return std::nullopt;
