@@ -1,11 +1,20 @@
 install_autoref() {
-    autoref_commit=b30660b78728c3ce159de8ae096181a1ec52e9ba
-    wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/${autoref_commit}.zip -O /tmp/tbots_download_cache/autoReferee.zip
-    unzip -q -o -d /tmp/tbots_download_cache/ /tmp/tbots_download_cache/autoReferee.zip
+    if is_darwin $1; then
+        autoref_version=1.5.5
+        curl -L https://github.com/TIGERs-Mannheim/AutoReferee/releases/download/${autoref_version}/autoReferee.zip -o /tmp/tbots_download_cache/autoReferee.zip
+        unzip -q -o -d /tmp/tbots_download_cache/ /tmp/tbots_download_cache/autoReferee.zip
 
-    /tmp/tbots_download_cache/AutoReferee-${autoref_commit}/./gradlew installDist -p /tmp/tbots_download_cache/AutoReferee-${autoref_commit} -Dorg.gradle.java.home=/opt/tbotspython/bin/jdk
-    mv /tmp/tbots_download_cache/AutoReferee-${autoref_commit}/build/install/autoReferee /opt/tbotspython/
-    rm -rf /tmp/tbots_download_cache/autoReferee.zip /tmp/tbots_download_cache/AutoReferee-${autoref_commit}
+        sudo mv /tmp/tbots_download_cache/autoReferee /opt/tbotspython/
+        rm -rf /tmp/tbots_download_cache/autoReferee.zip
+    else
+        autoref_commit=b30660b78728c3ce159de8ae096181a1ec52e9ba
+        wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/${autoref_commit}.zip -O /tmp/tbots_download_cache/autoReferee.zip
+        unzip -q -o -d /tmp/tbots_download_cache/ /tmp/tbots_download_cache/autoReferee.zip
+
+        /tmp/tbots_download_cache/AutoReferee-${autoref_commit}/./gradlew installDist -p /tmp/tbots_download_cache/AutoReferee-${autoref_commit} -Dorg.gradle.java.home=/opt/tbotspython/bin/jdk
+        mv /tmp/tbots_download_cache/AutoReferee-${autoref_commit}/build/install/autoReferee /opt/tbotspython/
+        rm -rf /tmp/tbots_download_cache/autoReferee.zip /tmp/tbots_download_cache/AutoReferee-${autoref_commit}
+    fi
 }
 
 install_bazel() {
@@ -20,66 +29,52 @@ install_bazel() {
 }
 
 install_clang_format() {
-    download=https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/clang+llvm-19.1.7-aarch64-linux-gnu.tar.xz
-    clang_folder=clang+llvm-19.1.7-aarch64-linux-gnu
-
-    if is_x86 $1; then
-        download=https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/LLVM-19.1.7-Linux-X64.tar.xz
-        clang_folder=LLVM-19.1.7-Linux-X64
-    fi
-
-    wget $download -O /tmp/tbots_download_cache/clang.tar.xz
-
-    # Temporarily need more space to extract the clang tarball
-    mkdir -p ~/.tbots
-    tar -xf /tmp/tbots_download_cache/clang.tar.xz -C ~/.tbots/
-
-    clang_format_path=~/.tbots/$clang_folder/bin/clang-format
-    sudo cp $clang_format_path /opt/tbotspython/bin/clang-format
-    rm -rf ~/.tbots
+    ln -s /usr/bin/clang-format-14 /opt/tbotspython/bin/clang-format
 }
 
 install_cross_compiler() {
     file_name=aarch64-tbots-linux-gnu-for-aarch64
-    if is_x86 $1; then
-        file_name=aarch64-tbots-linux-gnu-for-x86
+    if is_darwin $1; then
+       full_file_name=$file_name.tar.xz
+       curl -L "https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name" \
+           -o /tmp/tbots_download_cache/$full_file_name
+       tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
+       sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
+       rm /tmp/tbots_download_cache/$full_file_name
+    else
+        if is_x86 $1; then
+            file_name=aarch64-tbots-linux-gnu-for-x86
+        fi
+        full_file_name=$file_name.tar.xz
+        wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
+        tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
+        sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
+        rm /tmp/tbots_download_cache/$full_file_name
     fi
-    full_file_name=$file_name.tar.xz
-    wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
-    tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
-    sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
-    rm /tmp/tbots_download_cache/$full_file_name
 }
 
 install_gamecontroller () {
-    # TODO(#3335): Whenever we deprecate Ubuntu 20.04, we can just grab the latest version of the SSL game controller
-    # binary from the releases page. This is a workaround since the latest version of the game controller is compiled
-    # with a newer GLIBC version than what is available on Ubuntu 20.04.
-    go_arch=arm64
-    if is_x86 $1; then
-        go_arch=amd64
+    if is_darwin $1; then
+        curl -L https://github.com/RoboCup-SSL/ssl-game-controller/archive/refs/tags/v3.17.0.zip -o /tmp/tbots_download_cache/ssl-game-controller.zip
+        unzip -q -o -d /tmp/tbots_download_cache/ /tmp/tbots_download_cache/ssl-game-controller.zip
+        cd /tmp/tbots_download_cache/ssl-game-controller-3.17.0
+        make install
+        go build cmd/ssl-game-controller/main.go
+        sudo mv main /opt/tbotspython/gamecontroller
+        sudo chmod +x /opt/tbotspython/gamecontroller
+
+        cd -
+        sudo rm -rf /tmp/tbots_download_cache/ssl-game-controller-3.17.0 /tmp/tbots_download_cache/go /tmp/tbots_download_cache/go.tar.gz /tmp/tbots_download_cache/ssl-game-controller.zip
+    else
+        arch=arm64
+        if is_x86 $1; then
+            arch=amd64
+        fi
+
+        wget https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.16.1/ssl-game-controller_v3.16.1_linux_${arch} -O /tmp/tbots_download_cache/gamecontroller
+        sudo mv /tmp/tbots_download_cache/gamecontroller /opt/tbotspython/gamecontroller
+        sudo chmod +x /opt/tbotspython/gamecontroller
     fi
-    sudo wget -N https://go.dev/dl/go1.23.0.linux-${go_arch}.tar.gz -O /tmp/tbots_download_cache/go.tar.gz
-    tar -C /tmp/tbots_download_cache -xf /tmp/tbots_download_cache/go.tar.gz
-    export PATH=$PATH:/tmp/tbots_download_cache/go/bin
-    sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/archive/refs/tags/v3.12.3.zip -O /tmp/tbots_download_cache/ssl-game-controller.zip
-    unzip -q -o -d /tmp/tbots_download_cache/ /tmp/tbots_download_cache/ssl-game-controller.zip
-    cd /tmp/tbots_download_cache/ssl-game-controller-3.12.3
-
-    # Installing nvm
-    wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-	export NVM_DIR="$HOME/.nvm"
-	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-    nvm install 20
-
-    make install
-    go build cmd/ssl-game-controller/main.go
-    sudo mv main /opt/tbotspython/gamecontroller
-    sudo chmod +x /opt/tbotspython/gamecontroller
-
-    cd -
-    sudo rm -rf /tmp/tbots_download_cache/ssl-game-controller-3.12.3 /tmp/tbots_download_cache/go /tmp/tbots_download_cache/go.tar.gz /tmp/tbots_download_cache/ssl-game-controller.zip
 }
 
 install_java () {
@@ -126,8 +121,21 @@ install_python_dev_cross_compile_headers() {
     rm -rf /tmp/tbots_download_cache/python-3.12.0.tar.xz
 }
 
+install_python_toolchain_headers() {
+  sudo mkdir -p /opt/tbotspython/py_headers/include/
+  sudo ln -sfn "$(python3.12-config --includes | awk '{for(i=1;i<=NF;++i) if ($i ~ /^-I/) print substr($i, 3)}' | head -n1)" /opt/tbotspython/py_headers/include/
+}
+
 is_x86() {
     if [[ $1 == "x86_64" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+is_darwin() {
+    if [[ $1 == "Darwin" ]]; then
         return 0
     else
         return 1

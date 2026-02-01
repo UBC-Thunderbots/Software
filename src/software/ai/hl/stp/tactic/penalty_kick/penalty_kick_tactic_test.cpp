@@ -23,7 +23,6 @@ class PenaltyKickTacticTest : public SimulatedErForceSimPlayTestFixture,
     Point initial_position   = field.friendlyPenaltyMark() + Vector(-0.1, 0);
     RobotStateWithId shooter = {
         0, RobotState(initial_position, Vector(0, 0), Angle::zero(), Angle::zero())};
-    TbotsProto::AiConfig ai_config;
 };
 
 // TODO (#2232): Improve dribbling control so the ball is not lost during this test
@@ -31,7 +30,8 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 {
     RobotStateWithId enemy_robot = GetParam();
 
-    auto tactic               = std::make_shared<PenaltyKickTactic>(ai_config);
+    auto tactic =
+        std::make_shared<PenaltyKickTactic>(std::make_shared<TbotsProto::AiConfig>());
     static RobotId shooter_id = 0;
     setTactic(shooter_id, tactic);
 
@@ -53,7 +53,8 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 // TODO (#2519): fix and re-enable
 TEST_F(PenaltyKickTacticTest, DISABLED_penalty_no_goalie)
 {
-    auto tactic               = std::make_shared<PenaltyKickTactic>(ai_config);
+    auto tactic =
+        std::make_shared<PenaltyKickTactic>(std::make_shared<TbotsProto::AiConfig>());
     static RobotId shooter_id = 0;
     setTactic(shooter_id, tactic);
 

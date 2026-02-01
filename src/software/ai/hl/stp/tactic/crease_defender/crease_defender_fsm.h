@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/convex_angle.h"
@@ -13,7 +13,10 @@
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
 
-struct CreaseDefenderFSM : public DefenderFSMBase
+/**
+ * Finite State Machine class for Penalty Kicks
+ */
+struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSM>
 {
    public:
     // this struct defines the unique control parameters that the CreaseDefenderFSM
@@ -30,8 +33,14 @@ struct CreaseDefenderFSM : public DefenderFSMBase
         TbotsProto::BallStealMode ball_steal_mode;
     };
 
-    // this struct defines the only event that the CreaseDefenderFSM responds to
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    using Update = TacticFSM<CreaseDefenderFSM>::Update;
+
+    /**
+     * Constructor for CreaseDefenderFSM
+     *
+     * @param ai_config_ptr Shared pointer to ai_config
+     */
+    explicit CreaseDefenderFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Finds the point to block the threat
@@ -47,17 +56,6 @@ struct CreaseDefenderFSM : public DefenderFSMBase
         const Field& field, const Point& enemy_threat_origin,
         const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
         double robot_obstacle_inflation_factor);
-
-    /**
-     * Constructor for CreaseDefenderFSM struct
-     *
-     * @param ai_config The ai config for this struct
-     */
-    explicit CreaseDefenderFSM(const TbotsProto::AiConfig& ai_config)
-        : robot_navigation_obstacle_config(ai_config.robot_navigation_obstacle_config()),
-          crease_defender_config(ai_config.crease_defender_config())
-    {
-    }
 
     /**
      * Guard that checks if the ball is on friendly side, nearby, and unguarded by the
@@ -136,7 +134,4 @@ struct CreaseDefenderFSM : public DefenderFSMBase
      * @return true if any enemy robot is within the given zone, else false
      */
     static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
-
-    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
-    TbotsProto::CreaseDefenderConfig crease_defender_config;
 };

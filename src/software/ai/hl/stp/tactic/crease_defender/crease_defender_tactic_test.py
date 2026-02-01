@@ -209,7 +209,7 @@ def test_crease_autochip(
     # Always Validation
     always_validation_sequence_set = [
         [
-            BallIsAlwaysOnGround(threshold=0.05),
+            BallIsAlwaysOnGround(),
             NeverExcessivelyDribbles(),
         ]
     ]
@@ -220,9 +220,7 @@ def test_crease_autochip(
         # Always Validation for chipping
         always_validation_sequence_set = [[]]
         # Eventually Validation for chipping
-        eventually_validation_sequence_set = [
-            [BallIsEventuallyOffGround(threshold=0.05)]
-        ]
+        eventually_validation_sequence_set = [[BallIsEventuallyOffGround()]]
 
     simulated_test_runner.run_test(
         setup=setup,
@@ -300,7 +298,7 @@ def test_crease_get_ball(
     # Always Validation
     always_validation_sequence_set = [
         [
-            BallIsAlwaysOnGround(threshold=0.05),
+            BallIsAlwaysOnGround(),
             NeverExcessivelyDribbles(),
         ]
     ]

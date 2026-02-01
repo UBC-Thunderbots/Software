@@ -2,8 +2,9 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
-    : Play(config, false), fsm{EnemyBallPlacementPlayFSM{config}}, control_params{}
+EnemyBallPlacementPlay::EnemyBallPlacementPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayBase<EnemyBallPlacementPlayFSM>(ai_config_ptr, false)
 {
 }
 
@@ -27,5 +28,6 @@ std::vector<std::string> EnemyBallPlacementPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, EnemyBallPlacementPlay,
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;
