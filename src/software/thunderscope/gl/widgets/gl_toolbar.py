@@ -1,6 +1,8 @@
 import textwrap
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtGui
+from typing import Callable
 
 
 class GLToolbar(QWidget):
@@ -54,3 +56,42 @@ class GLToolbar(QWidget):
             }}
             """
         )
+
+    def add_separator(self) -> None:
+        """Adds a separator line with enough spacing to the layout"""
+        self.layout().addSpacing(10)
+        self.add_label("<b>|</b>")
+        self.layout().addSpacing(10)
+
+    def setup_icon_button(
+        self,
+        icon: QtGui.QPixmap,
+        tooltip: str,
+        callback: Callable[[], None],
+        display_text: str = None,
+    ) -> QPushButton:
+        """Sets up a button with the given name and callback
+
+        :param icon: the icon displayed on the button
+        :param tooltip: the tooltip displayed when hovering over the button
+        :param callback: the callback for the button click
+        :param display_text: optional param if button needs both text and an icon
+        :return: the button
+        """
+        button = QPushButton()
+        button.setIcon(icon)
+        button.setToolTip(tooltip)
+        button.setStyleSheet(self.get_button_style())
+        button.clicked.connect(callback)
+
+        if display_text:
+            button.setText(display_text)
+        return button
+
+    def add_button(self, button: QPushButton) -> None:
+        """Adds an already setup button to the toolbar"""
+        self.layout().addWidget(button)
+
+    def add_label(self, text: str) -> None:
+        """Adds an already setup label to the toolbar"""
+        self.layout().addWidget(QLabel(text))
