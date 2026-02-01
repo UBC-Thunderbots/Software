@@ -138,15 +138,24 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
         }
     }
 
-	// In move primitive, a stop primitive is created when trajectory path is null.
-	// Check if there is an unavoidable collision, and return a null pointer if such collision exist on best path
-	double collision_velocity = best_traj_with_cost.traj_path.getVelocity(best_traj_with_cost.first_collision_time_s).length();
-	if (best_traj_with_cost.collides() && best_traj_with_cost.first_collision_time_s < UNAVOIDABLE_COLLISION_TIME_THRESHOLD && collision_velocity > UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD){
-		return std::nullopt;
-	}
-	else{
-		return best_traj_with_cost.traj_path;
-	}
+    // In move primitive, a stop primitive is created when trajectory path is null.
+    // Check if there is an unavoidable collision, and return a null pointer if such
+    // collision exist on best path
+    double collision_velocity =
+        best_traj_with_cost.traj_path
+            .getVelocity(best_traj_with_cost.first_collision_time_s)
+            .length();
+    if (best_traj_with_cost.collides() &&
+        best_traj_with_cost.first_collision_time_s <
+            UNAVOIDABLE_COLLISION_TIME_THRESHOLD &&
+        collision_velocity > UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return best_traj_with_cost.traj_path;
+    }
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
