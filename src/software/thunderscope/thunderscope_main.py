@@ -238,12 +238,24 @@ if __name__ == "__main__":
         help="whether or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
     )
 
+    parser.add_argument(
+        "--sandbox_mode",
+        action="store_true",
+        default=False,
+        help="whether or not to launch Thunderscope in Sandbox Mode",
+    )
+
     args = parser.parse_args()
 
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
     if not args.run_blue and not args.run_yellow and args.launch_gc:
         parser.error(
             "--launch_gc has to be ran with --run_blue or --run_yellow argument"
+        )
+
+    if args.sandbox_mode and (args.run_blue or args.run_yellow or args.run_diagnostics):
+        parser.error(
+            "--sandbox_mode can only be run with AI vs AI, not real robots"
         )
 
     ###########################################################################
@@ -410,7 +422,8 @@ if __name__ == "__main__":
     else:
         tscope = Thunderscope(
             config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size
+                visualization_buffer_size=args.visualization_buffer_size,
+                sandbox_mode=args.sandbox_mode,
             ),
             layout_path=args.layout,
         )
@@ -423,7 +436,7 @@ if __name__ == "__main__":
             """
             sync_simulation(
                 tscope,
-                0 if args.empty else DIV_B_NUM_ROBOTS,
+                0 if args.empty or args.sandbox_mode else DIV_B_NUM_ROBOTS,
             )
 
             if args.ci_mode:

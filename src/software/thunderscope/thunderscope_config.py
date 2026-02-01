@@ -255,7 +255,7 @@ def configure_base_diagnostics(
 
 
 def configure_two_ai_gamecontroller_view(
-    visualization_buffer_size: int = 5,
+    visualization_buffer_size: int = 5, sandbox_mode: bool = False
 ) -> TScopeConfig:
     """Constructs the Thunderscope Config for a view with 2 FullSystem tabs (Blue and Yellow)
     And 1 Gamecontroller tab
@@ -290,7 +290,7 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    sandbox_mode=True,
+                    sandbox_mode=sandbox_mode,
                     extra_widgets=[],
                     frame_swap_counter=blue_frame_swap_frametime_counter,
                     refresh_counter=blue_refresh_func_frametime_counter,
