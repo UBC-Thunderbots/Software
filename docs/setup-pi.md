@@ -12,6 +12,8 @@ The Raspberry Pi 5 is compatible with many different (primarily Linux-based) ope
 
 To install the Raspberry Pi OS onto a microSD card, we use the Raspberry Pi Imager program. Install it [here](https://www.raspberrypi.com/software/). 
 
+*Note: if using the "Download for Linux" option, you will have to right click on the installed `.AppImage` file and select `Properties` &rarr; `Permissions` &rarr; `Allow Executing File as Program` (this may appear as a checkbox)
+
 When you open the imager, you should see something like this:
 
 * <img width="402" height="159" alt="image" src="https://github.com/user-attachments/assets/b31e03e3-0d25-4b99-b0d5-0168387f715d" />
@@ -26,11 +28,11 @@ Once installed, follow these steps to set up the Raspberry Pi:
     * Storage: `<your_inserted_micro_SD_card>`
     * Customization:
       * Hostname: `<robot_name>`.local (Ex: `aimbot`.local). The `local` part is autofilled by the Raspberry Pi Imager. 
-      * Localization -> Timezone: America/Vancouver
-      * User -> Username: robot
-      * User -> Password: `<password>` (ask someone if you don't know what the correct password is)
-      * WiFi -> Secure Network -> SSID: `<tbots_wifi_name>` (`tbots` as of Jan 2026)
-      * WiFi -> Password: `<password>` (ask someone if you don't know what the correct password is)
+      * Localization &rarr; Timezone: America/Vancouver
+      * User &rarr; Username: robot
+      * User &rarr; Password: `<password>` (ask someone if you don't know what the correct password is)
+      * WiFi &rarr; Secure Network &rarr; SSID: `<tbots_wifi_name>` (`tbots` as of Jan 2026)
+      * WiFi &rarr; Password: `<password>` (ask someone if you don't know what the correct password is)
       * Remote Access: Enable SSH and select "Use Password Authentication"
     * Click the "Write" button and wait until complete
   
