@@ -4,12 +4,9 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.import_all_protos import *
 import qtawesome as qta
 
-class GLGenerateTestToolbar:
 
-    def __init__(
-        self, toolbar: GLToolbar,
-        buffer_size: int = 5
-    ):
+class GLGenerateTestToolbar:
+    def __init__(self, toolbar: GLToolbar, buffer_size: int = 5):
         self.__toolbar = toolbar
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
@@ -29,5 +26,3 @@ class GLGenerateTestToolbar:
 
     def __generate_test(self):
         pass
-
-

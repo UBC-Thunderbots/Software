@@ -1,6 +1,8 @@
 from typing import override
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
-from software.thunderscope.gl.widgets.toolbars.generate_test.gl_generate_test_toolbar import GLGenerateTestToolbar
+from software.thunderscope.gl.widgets.toolbars.generate_test.gl_generate_test_toolbar import (
+    GLGenerateTestToolbar,
+)
 from software.thunderscope.gl.widgets.toolbars.runtime.gl_runtime_toolbar import (
     GLRuntimeToolbar,
 )
@@ -18,7 +20,11 @@ class GLUtilToolbar(GLToolbar):
     GAME_CONTROLLER_URL = "http://localhost:8081"
 
     def __init__(
-        self, parent: QWidget, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool, generate_tests: bool = False
+        self,
+        parent: QWidget,
+        proto_unix_io: ProtoUnixIO,
+        friendly_color_yellow: bool,
+        generate_tests: bool = False,
     ):
         """Initializes the toolbar and constructs its layout
 

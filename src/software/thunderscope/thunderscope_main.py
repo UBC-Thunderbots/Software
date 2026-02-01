@@ -254,9 +254,7 @@ if __name__ == "__main__":
         )
 
     if args.sandbox_mode and (args.run_blue or args.run_yellow or args.run_diagnostics):
-        parser.error(
-            "--sandbox_mode can only be run with AI vs AI, not real robots"
-        )
+        parser.error("--sandbox_mode can only be run with AI vs AI, not real robots")
 
     ###########################################################################
     #                      Visualize CPP Tests                                #

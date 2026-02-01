@@ -8,9 +8,6 @@ from software.simulated_tests.ball_moves_from_rest import *
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
-    pytest_main,
-)
 from software.simulated_tests.or_validation import OrValidation
 
 
@@ -142,4 +139,3 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         inv_always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
     )
-
