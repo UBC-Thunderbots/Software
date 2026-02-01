@@ -32,12 +32,13 @@ class FSMGrapher:
 
         dot = Digraph(engine = 'dot')
         dot.attr(rankdir='LR')
+        dot.attr(splines='curved')
 
         for n in self.nodes:
             dot.node(n)
 
         for src, dst, grd in self.edges:
-            dot.edge(src, dst, label = str(grd))
+            dot.edge(src, dst, label = str(grd), labeldistance='2.0')
         
         raw_layout = dot.pipe(format='plain').decode('utf-8')
 
@@ -100,7 +101,6 @@ class PlayInfoWidget(QWidget):
 
         self.fsm_graph = FSMGrapher()
         self.label_items = []
-        self.arrow_items = []
 
     def refresh(self) -> None:
         """Update the play info widget with new play information"""
@@ -167,7 +167,8 @@ class PlayInfoWidget(QWidget):
         if active_node in node_names:
             brushes[node_names.index(active_node)] = pg.mkBrush('g')
 
-        self.graph.setData(pos=pos, adj=adj, symbolBrush=brushes, size=10, symbol='o')
+
+        self.graph.setData(pos=pos, adj=adj, symbolBrush=brushes, size=20, symbol='o')
 
         for robot_id in sorted(playinfo.robot_tactic_assignment):
             robot_ids.append(robot_id)
