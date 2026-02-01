@@ -133,7 +133,14 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
         }
     }
 
-    return best_traj_with_cost.traj_path;
+	// In move primitive, a stop primitive is created when trajectory path is null.
+	// Check if there is an unavoidable collision, and return a null pointer if such collision exist on best path
+	if (best_traj_with_cost.collids()){
+		return std::nullptr;
+	}
+	else{
+		return best_traj_with_cost.traj_path;
+	}
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
