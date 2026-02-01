@@ -143,6 +143,3 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         test_timeout_s=10,
     )
 
-
-if __name__ == "__main__":
-    pytest_main(__file__)

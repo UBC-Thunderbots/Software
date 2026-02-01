@@ -111,6 +111,7 @@ class GLWidget(QWidget):
             parent=self.gl_view_widget,
             proto_unix_io=proto_unix_io,
             friendly_color_yellow=friendly_color_yellow,
+            generate_tests=sandbox_mode
         )
 
         self.__add_toolbar_toggle(self.util_toolbar, "Util")
@@ -268,6 +269,8 @@ class GLWidget(QWidget):
 
         if self.simulation_control_toolbar:
             self.simulation_control_toolbar.refresh()
+
+        if self.util_toolbar:
             self.util_toolbar.refresh()
 
         simulation_state = self.simulation_state_buffer.get(block=False)

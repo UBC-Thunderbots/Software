@@ -336,9 +336,6 @@ class GLWorldLayer(GLLayer):
             for robot in self.cached_world.friendly_team.team_robots
         }
 
-        if not self.friendly_colour_yellow:
-            print(len(self.cached_world.friendly_team.team_robots))
-
         self._cached_enemy_team = {
             robot.id: (
                 robot.current_state.global_position.x_meters,

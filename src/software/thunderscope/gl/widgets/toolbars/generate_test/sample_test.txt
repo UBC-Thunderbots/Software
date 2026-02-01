@@ -1,0 +1,19 @@
+from software.simulated_tests.simulated_test_fixture import (
+    pytest_main,
+)
+
+@pytest.mark.parametrize(
+    "blue_locations,yelow_locations",
+    [
+        (
+            {blue_locations},
+            {yellow_locations}
+        )
+    ]
+)
+def {test_case_name}(simulated_test_runner, blue_locations, yellow_locations):
+
+
+
+if __name__ == "__main__":
+    pytest_main(__file__)
