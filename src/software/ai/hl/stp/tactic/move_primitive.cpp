@@ -64,18 +64,16 @@ MovePrimitive::generatePrimitiveProtoMessage(
     KinematicConstraints constraints(
         max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
-	
-    // Shrink the field by the radius of robot to ensure robot don't go out of bounds, if we are in a game
-	// Return normal field boundaries if not in a game
+
+    // Shrink the field by the radius of robot to ensure robot don't go out of bounds, if
+    // we are in a game Return normal field boundaries if not in a game
     Rectangle field_boundary = world.field().fieldBoundary();
-	
+
     double shrink_amount = world.gameState().isPlaying() ? ROBOT_MAX_RADIUS_METERS : 0.0;
-	Point neg_x_neg_y_corner(
-    	    field_boundary.negXNegYCorner().x() + shrink_amount,
-    	    field_boundary.negXNegYCorner().y() + shrink_amount);
-    Point pos_x_pos_y_corner(
-    	    field_boundary.posXPosYCorner().x() - shrink_amount,
-    	    field_boundary.posXPosYCorner().y() - shrink_amount);
+    Point neg_x_neg_y_corner(field_boundary.negXNegYCorner().x() + shrink_amount,
+                             field_boundary.negXNegYCorner().y() + shrink_amount);
+    Point pos_x_pos_y_corner(field_boundary.posXPosYCorner().x() - shrink_amount,
+                             field_boundary.posXPosYCorner().y() - shrink_amount);
     Rectangle navigable_area = Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
 
 
