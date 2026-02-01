@@ -163,7 +163,7 @@ Runs the robot auto test fixture on a robot through Ansible, which tests the mot
 From Software/src:
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --//software/embedded:host_platform=<platform> --platforms=//toolchains/cc:robot -- --playbook robot_auto_test_playbook.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --//software/embedded:host_platform=<platform> --platforms=//toolchains/cc:robot -- --playbook robot_auto_test_playbook.yml --hosts <robot_name> --ssh_pass <robot_password>
 ```
 
 * replace the \<platform\> with the target platform for the robot (either `PI` or `NANO`)
