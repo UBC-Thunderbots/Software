@@ -50,15 +50,15 @@ We use the Raspberry Pi OS, which is based on the Linux kernel. The Linux kernel
 
 To run and manage the thunderloop service on the Pi, however, there are many dependencies (drivers, admin control, internet, etc.) that must be set up first. Luckily, all of this setup can be done using one command with an Ansible playbook. 
 
-Read more about Ansible in our robot software architecture documentation [here](https://github.com/UBC-Thunderbots/Software/blob/master/docs/robot-software-architecture.md).
+Read more about Ansible in our robot software architecture documentation [here](https://github.com/UBC-Thunderbots/Software/blob/master/docs/robot-software-architecture.md#ansible).
 
 ### Configuration
 
 #### Internet Configuration
 
 Before running the Ansible command, we must do the following to configure internet access to the Pi:
-1. Ensure your Raspberry Pi is connected to internet through an ethernet cable. Ensure your ethernet cable is not broken, as there are many non-functioning ones in the Thunderbots EDC space.
-2. Configure network settings through the following steps:
+1. Ensure your Raspberry Pi is connected to internet through an ethernet cable. Do this by connecting one end to the Rapsberry Pi and the other to your device (PC/laptop). Ensure your ethernet cable is not broken, as there are many non-functioning ones in the Thunderbots EDC space.
+2. On your device (PC/laptop), configure network settings through the following steps:
    1. Go to network settings. You should see something like this:
    
    * <img width="446" height="77.5" alt="image" src="https://github.com/user-attachments/assets/20f9b3e5-e629-40c7-ac49-024f34df66ca" />
@@ -96,8 +96,9 @@ ping -c 3 8.8.8.8
 3. Exit the SSH connection to the Raspberry Pi with the `exit` command.
 4. Change directory to `Software/src` and run the bazel ansible command:
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot  --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_name>.local --ssh_pass thunderbots
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot  --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_name>.local --ssh_pass <password>
 ```
+   * Ensure you configure <robot_name> and <password> in the command above. Copy/pasting the above won't work.
    * This may take a while.
 5. Done!
 
