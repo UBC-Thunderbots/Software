@@ -86,6 +86,11 @@ PlatformOption = Annotated[
     Platform, Option("-pl", "--platform", help="The platform to build Thunderloop for")
 ]
 
+QueryTestSuiteOption = Annotated[
+    bool,
+    Option("-s", "--suite", help="Search for test suites instead of bazel targets"),
+]
+
 EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]
 EnableVisualizerOption = Annotated[bool, Option("-v", "--enable_visualizer")]
 StopAIOnStartOption = Annotated[bool, Option("-t", "--stop_ai_on_start")]

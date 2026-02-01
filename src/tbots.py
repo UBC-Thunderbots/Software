@@ -22,6 +22,7 @@ from cli.cli_params import (
     EnableThunderscopeOption,
     EnableVisualizerOption,
     StopAIOnStartOption,
+    QueryTestSuiteOption,
     DebugBinary,
     Platform,
 )
@@ -58,6 +59,7 @@ def main(
     enable_thunderscope: EnableThunderscopeOption = False,
     enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
+    query_test_suite: QueryTestSuiteOption = False,
 ) -> None:
     if bool(flash_robots) ^ bool(ssh_password):
         print(
@@ -78,16 +80,36 @@ def main(
     # Run the appropriate bazel query and ask thefuzz to find the best matching
     # target, guaranteed to return 1 result because we set limit=1
     # Combine results of multiple queries with itertools.chain
-    targets = list(
-        itertools.chain.from_iterable(
-            [
-                run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
-                for query in bazel_queries[action]
-            ]
+    targets = (
+        list(
+            itertools.chain.from_iterable(
+                [
+                    run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
+                    for query in bazel_queries[action]
+                ]
+            )
         )
+        if not query_test_suite
+        else []
     )
     # Create a dictionary to map target names to complete bazel targets
-    target_dict = {target.split(b":")[-1]: target for target in targets}
+    target_dict = (
+        {target.split(b":")[-1]: target for target in targets}
+        if not query_test_suite
+        else {
+            b"simulated_gameplay_tests": b"""//software:unix_full_system    \\
+            //software/simulated_tests/... \\
+            //software/ai/hl/...           \\
+            //software/ai/navigator/...""",
+            b"software_tests": b"""-- //... -//software:unix_full_system \\
+              -//software/simulated_tests/...     \\
+              -//software/ai/hl/...               \\
+              -//software/field_tests/...         \\
+              -//software/ai/navigator/...        \\
+              -//toolchains/cc/...                \\
+              -//software:unix_full_system_tar_gen""",
+        }
+    )
 
     # Use thefuzz to find the best matching target name
     most_similar_target_name, confidence = process.extract(
@@ -110,7 +132,7 @@ def main(
         target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
         print("User selected {}".format(target))
 
-    command = ["bazel", action.value, target]
+    command = ["bazel", action.value]
     unknown_args = ctx.args
 
     # Trigger a debug build
@@ -147,6 +169,8 @@ def main(
         command += ["--cache_test_results=false"]
     if action == ActionArgument.run:
         command += ["--"]
+
+    command.append(target)
 
     bazel_arguments = unknown_args
     if stop_ai_on_start:
