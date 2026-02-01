@@ -4,6 +4,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtGui
 from typing import Callable
 
+
 class GLToolbar(QWidget):
     """Base class for a toolbar in our UI
 
@@ -57,18 +58,17 @@ class GLToolbar(QWidget):
         )
 
     def add_separator(self) -> None:
-        """Adds a separator line with enough spacing to the layout
-        """
+        """Adds a separator line with enough spacing to the layout"""
         self.layout().addSpacing(10)
         self.add_label("<b>|</b>")
         self.layout().addSpacing(10)
 
     def setup_icon_button(
-            self,
-            icon: QtGui.QPixmap,
-            tooltip: str,
-            callback: Callable[[], None],
-            display_text: str = None,
+        self,
+        icon: QtGui.QPixmap,
+        tooltip: str,
+        callback: Callable[[], None],
+        display_text: str = None,
     ) -> QPushButton:
         """Sets up a button with the given name and callback
 

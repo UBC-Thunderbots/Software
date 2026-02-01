@@ -1,10 +1,15 @@
 from typing import override
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
-from software.thunderscope.gl.widgets.toolbars.runtime.gl_runtime_toolbar import GLRuntimeToolbar
+from software.thunderscope.gl.widgets.toolbars.runtime.gl_runtime_toolbar import (
+    GLRuntimeToolbar,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from pyqtgraph.Qt.QtWidgets import *
 
-from software.thunderscope.gl.widgets.toolbars.gl_gamecontroller_toolbar import GLGamecontrollerToolbar
+from software.thunderscope.gl.widgets.toolbars.gl_gamecontroller_toolbar import (
+    GLGamecontrollerToolbar,
+)
+
 
 class GLUtilToolbar(GLToolbar):
     """A toolbar with utility controls for GameController and Installing Runtimes"""
@@ -22,16 +27,18 @@ class GLUtilToolbar(GLToolbar):
         """
         super(GLUtilToolbar, self).__init__(parent=parent)
 
-        self.gc_toolbar = GLGamecontrollerToolbar(toolbar=self, proto_unix_io=proto_unix_io, friendly_color_yellow=friendly_color_yellow)
+        self.gc_toolbar = GLGamecontrollerToolbar(
+            toolbar=self,
+            proto_unix_io=proto_unix_io,
+            friendly_color_yellow=friendly_color_yellow,
+        )
 
         self.layout().addStretch()
         self.add_separator()
 
         self.runtime_toolbar = GLRuntimeToolbar(toolbar=self)
 
-
     @override
     def refresh(self) -> None:
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
-

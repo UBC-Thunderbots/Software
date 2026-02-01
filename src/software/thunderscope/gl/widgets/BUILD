@@ -33,10 +33,10 @@ py_library(
     name = "gl_util_toolbar",
     srcs = ["gl_util_toolbar.py"],
     deps = [
-        "//software/thunderscope/gl/widgets/toolbars:gl_gamecontroller_toolbar",
-        "//software/thunderscope/gl/widgets/toolbars:gl_runtime_toolbar",
         ":gl_toolbar",
         "//proto:import_all_protos",
+        "//software/thunderscope/gl/widgets/toolbars:gl_gamecontroller_toolbar",
+        "//software/thunderscope/gl/widgets/toolbars:gl_runtime_toolbar",
         requirement("pyqtgraph"),
         requirement("qtawesome"),
     ],

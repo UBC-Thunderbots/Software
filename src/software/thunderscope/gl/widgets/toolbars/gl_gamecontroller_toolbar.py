@@ -7,6 +7,7 @@ import webbrowser
 import qtawesome as qta
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
+
 class GamecontrollerPlays:
     """The different plays that can be set for each team"""
 
@@ -26,12 +27,17 @@ class GamecontrollerEvents:
     TIMEOUT = "Start Timeout"
 
 
-class GLGamecontrollerToolbar():
+class GLGamecontrollerToolbar:
     """A toolbar with controls to send GameController commands from Thunderscope"""
 
     GAME_CONTROLLER_URL = "http://localhost:8081"
 
-    def __init__(self, toolbar: GLToolbar, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool):
+    def __init__(
+        self,
+        toolbar: GLToolbar,
+        proto_unix_io: ProtoUnixIO,
+        friendly_color_yellow: bool,
+    ):
         self.proto_unix_io = proto_unix_io
         self.friendly_color_yellow = friendly_color_yellow
 
@@ -121,7 +127,7 @@ class GLGamecontrollerToolbar():
             )
 
     def __plays_menu_handler(
-            self, play: GamecontrollerPlays, icon: QtGui.QIcon, is_blue: bool
+        self, play: GamecontrollerPlays, icon: QtGui.QIcon, is_blue: bool
     ) -> None:
         """The handler called when a play is selected. Sends the right gc command
         based on the play we want.

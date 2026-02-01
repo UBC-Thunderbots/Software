@@ -2,11 +2,15 @@ from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.gl.widgets.toolbars.runtime.gl_runtime_installer import (
     GLRuntimeInstallerDialog,
 )
-from software.thunderscope.gl.widgets.toolbars.runtime.gl_runtime_selector import GLRuntimeSelectorDialog
+from software.thunderscope.gl.widgets.toolbars.runtime.gl_runtime_selector import (
+    GLRuntimeSelectorDialog,
+)
 import qtawesome as qta
 
-class GLRuntimeToolbar():
+
+class GLRuntimeToolbar:
     """A toolbar with controls for Installing Runtimes"""
+
     def __init__(self, toolbar: GLToolbar):
         self.toolbar = toolbar
 

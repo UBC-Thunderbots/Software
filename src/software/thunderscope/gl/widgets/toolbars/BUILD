@@ -39,8 +39,8 @@ py_library(
     deps = [
         ":gl_runtime_installer",
         ":gl_runtime_selector",
-        "//software/thunderscope/gl/widgets:gl_toolbar",
         "//proto:import_all_protos",
+        "//software/thunderscope/gl/widgets:gl_toolbar",
         requirement("pyqtgraph"),
         requirement("qtawesome"),
     ],
