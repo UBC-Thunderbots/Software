@@ -41,31 +41,31 @@ class GLGamecontrollerToolbar:
         self.proto_unix_io = proto_unix_io
         self.friendly_color_yellow = friendly_color_yellow
 
-        self.toolbar = toolbar
+        self.__toolbar = toolbar
 
         # Setup Stop button for sending the STOP gamecontroller command
-        self.stop_button = self.toolbar.setup_icon_button(
+        self.stop_button = self.__toolbar.setup_icon_button(
             qta.icon("fa6s.pause"),
             "Stops gameplay, robots form circle around ball",
             self.__send_stop_command,
         )
 
         # Setup Force Start button for sending the FORCE_START gamecontroller command
-        self.force_start_button = self.toolbar.setup_icon_button(
+        self.force_start_button = self.__toolbar.setup_icon_button(
             qta.icon("ph.arrow-u-up-right-fill"),
             "Force Start, restarts the game",
             self.__send_force_start_command,
         )
 
         # Setup Halt button for sending the HALT gamecontroller command
-        self.halt_button = self.toolbar.setup_icon_button(
+        self.halt_button = self.__toolbar.setup_icon_button(
             qta.icon("fa5s.stop"),
             "Halt, stops all robots immediately",
             self.__send_halt_command,
         )
 
         # Setup Normal Start button for sending the NORMAL_START gamecontroller command
-        self.normal_start_button = self.toolbar.setup_icon_button(
+        self.normal_start_button = self.__toolbar.setup_icon_button(
             qta.icon("fa5s.play"),
             "Normal Start, resumes game from a set play (disabled when no play selected)",
             self.__send_normal_start_command,
@@ -76,7 +76,7 @@ class GLGamecontrollerToolbar:
 
         self.plays_menu_button = QPushButton()
         self.plays_menu_button.setText("Plays")
-        self.plays_menu_button.setStyleSheet(self.toolbar.get_button_style())
+        self.plays_menu_button.setStyleSheet(self.__toolbar.get_button_style())
         self.plays_menu_button.setMenu(self.plays_menu)
 
         # add play items for each team color
@@ -84,7 +84,7 @@ class GLGamecontrollerToolbar:
         self.plays_menu.addSeparator()
         self.__add_plays_menu_items(is_blue=False)
 
-        self.gc_browser_button = self.toolbar.setup_icon_button(
+        self.gc_browser_button = self.__toolbar.setup_icon_button(
             qta.icon("mdi6.open-in-new"),
             "Opens the SSL Gamecontroller in a browser window",
             lambda: webbrowser.open(self.GAME_CONTROLLER_URL, new=0, autoraise=True),
@@ -95,16 +95,16 @@ class GLGamecontrollerToolbar:
         self.normal_start_enabled = True
         self.__toggle_normal_start_button()
 
-        self.toolbar.add_label("<b>Gamecontroller</b>")
-        self.toolbar.add_separator()
-        self.toolbar.add_button(self.stop_button)
-        self.toolbar.add_button(self.halt_button)
-        self.toolbar.add_button(self.force_start_button)
-        self.toolbar.add_separator()
-        self.toolbar.add_button(self.plays_menu_button)
-        self.toolbar.add_button(self.normal_start_button)
-        self.toolbar.add_separator()
-        self.toolbar.add_button(self.gc_browser_button)
+        self.__toolbar.add_label("<b>Gamecontroller</b>")
+        self.__toolbar.add_separator()
+        self.__toolbar.add_button(self.stop_button)
+        self.__toolbar.add_button(self.halt_button)
+        self.__toolbar.add_button(self.force_start_button)
+        self.__toolbar.add_separator()
+        self.__toolbar.add_button(self.plays_menu_button)
+        self.__toolbar.add_button(self.normal_start_button)
+        self.__toolbar.add_separator()
+        self.__toolbar.add_button(self.gc_browser_button)
 
     def __add_plays_menu_items(self, is_blue: bool) -> None:
         """Initializes the plays menu with the available plays for the given team
@@ -159,14 +159,14 @@ class GLGamecontrollerToolbar:
         """Toggles the enabled / disabled state of the Normal Start button"""
         self.normal_start_enabled = not self.normal_start_enabled
         self.normal_start_button.setStyleSheet(
-            self.toolbar.get_button_style(self.normal_start_enabled)
+            self.__toolbar.get_button_style(self.normal_start_enabled)
         )
         self.normal_start_button.setIcon(
             qta.icon(
                 "fa5s.play",
-                color=self.toolbar.BUTTON_ICON_COLOR
+                color=self.__toolbar.BUTTON_ICON_COLOR
                 if self.normal_start_enabled
-                else self.toolbar.DISABLED_BUTTON_ICON_COLOR,
+                else self.__toolbar.DISABLED_BUTTON_ICON_COLOR,
             )
         )
 

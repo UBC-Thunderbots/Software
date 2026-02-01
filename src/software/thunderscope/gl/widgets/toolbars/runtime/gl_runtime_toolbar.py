@@ -12,16 +12,16 @@ class GLRuntimeToolbar:
     """A toolbar with controls for Installing Runtimes"""
 
     def __init__(self, toolbar: GLToolbar):
-        self.toolbar = toolbar
+        self.__toolbar = toolbar
 
-        self.runtime_installer_button = self.toolbar.setup_icon_button(
+        self.runtime_installer_button = self.__toolbar.setup_icon_button(
             qta.icon("mdi6.download"),
             "Opens a runtime installer modal",
             self.__open_runtime_installer_dialog,
             display_text="Install Runtimes",
         )
 
-        self.runtime_selector_button = self.toolbar.setup_icon_button(
+        self.runtime_selector_button = self.__toolbar.setup_icon_button(
             qta.icon("mdi6.server"),
             "Select runtimes for each team",
             self.__open_runtime_selector_dialog,
