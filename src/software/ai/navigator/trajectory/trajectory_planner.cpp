@@ -5,9 +5,9 @@
 #include "software/geom/algorithms/distance.h"
 
 
-const double UNAVOIDABLE_COLLISION_TIME_THRESHOLD = 0.2;
+const double UNAVOIDABLE_COLLISION_TIME_THRESHOLD = 0.2f;
 // Tune
-const double UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD = 0.5;
+const double UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD = 0.5f;
 
 TrajectoryPlanner::TrajectoryPlanner()
     : relative_sub_destinations(getRelativeSubDestinations())
