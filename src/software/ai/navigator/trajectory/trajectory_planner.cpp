@@ -4,6 +4,9 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
+
+const double UNAVOIDABLE_COLLISION_STOP_THRESHOLD = 0.2f;
+
 TrajectoryPlanner::TrajectoryPlanner()
     : relative_sub_destinations(getRelativeSubDestinations())
 {
@@ -135,7 +138,7 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
 
 	// In move primitive, a stop primitive is created when trajectory path is null.
 	// Check if there is an unavoidable collision, and return a null pointer if such collision exist on best path
-	if (best_traj_with_cost.collides()){
+	if (best_traj_with_cost.collides() && best_traj_with_cost.first_collision_time_s < UNAVOIDABLE_COLLISION_STOP_THRESHOLD){
 		return std::nullopt;
 	}
 	else{
