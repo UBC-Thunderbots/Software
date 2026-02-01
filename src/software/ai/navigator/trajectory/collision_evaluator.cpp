@@ -9,11 +9,11 @@ TrajectoryPathWithCost CollisionEvaluator::evaluate(
     const TrajectoryPath &trajectory,
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
     const std::optional<double> sub_traj_duration_s,
-	const std::optional<double> max_cost)
+	const double max_cost)
 {
     TrajectoryPathWithCost traj_with_cost(trajectory);	
 
-	const double traj_time = trajectory.getTotalTime;
+	const double traj_time = trajectory.getTotalTime();
     const double search_end_time_s =
         std::min(trajectory.getTotalTime(), MAX_FUTURE_COLLISION_CHECK_SEC);
     const Point destination = traj_with_cost.traj_path.getDestination();
@@ -87,16 +87,16 @@ TrajectoryPathWithCost CollisionEvaluator::evaluate(
     }
 	
     // 4. Add 6.0 to collision if mid-trajectory collision exist
-	if (traj_with_cost.colliding_obstacle != std::nullptr){
+	if (traj_with_cost.colliding_obstacle != nullptr){
 		total_cost += 6.0;
 	}
 
-    // 5: Add distance from first collision to destination                                                                                                                                   │
-    Point first_collision_position = trajectory.getPosition(traj_with_cost.first_collision_time_s);                                                                                               │
-    total_cost += (first_collision_position - destination).length();                                                                                                                            │
-                                                                                                                                                                                                  │
-    // 6: Add early collision penalty                                                                                                                                                        │
-    total_cost += std::max(0.0, MAX_FUTURE_COLLISION_CHECK_SEC - traj_with_cost.first_collision_time_s);                                                                                        │
+    // 5: Add distance from first collision to destination                                                                                                                                   
+    Point first_collision_position = trajectory.getPosition(traj_with_cost.first_collision_time_s);                                                                                               
+    total_cost += (first_collision_position - destination).length();                                                                                                                            
+                                                                                                                                                                                                  
+    // 6: Add early collision penalty                                                                                                                                                        
+    total_cost += std::max(0.0, MAX_FUTURE_COLLISION_CHECK_SEC - traj_with_cost.first_collision_time_s);                                                                                        
 
 	traj_with_cost.cost = total_cost;
     return traj_with_cost;

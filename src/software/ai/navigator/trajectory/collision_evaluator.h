@@ -35,6 +35,8 @@ class CollisionEvaluator
      *        collision interval.
      * @param sub_traj_duration_s
      *        The duration (in seconds) of the prefix trajectory within trajectory.
+	 * #param max_cost
+	 *		Current maximum cost of best path
      * @return
      *         A TrajectoryPathWithCost< containing the trajectory along with
      *         computed collision timing information and total cost.
@@ -42,7 +44,7 @@ class CollisionEvaluator
     TrajectoryPathWithCost evaluate(
         const TrajectoryPath &trajectory,
         const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-        std::optional<double> sub_traj_duration_s);
+        std::optional<double> sub_traj_duration_s, const double max_cost);
 
    private:
     std::vector<ObstaclePtr> obstacles;

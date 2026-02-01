@@ -110,7 +110,7 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
             }
 
             TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
-                traj_path_to_dest, obstacles, sub_trajectory, connection_time);
+                traj_path_to_dest, obstacles, sub_trajectory, connection_time, best_traj_with_cost.cost);
             full_traj_with_cost.cost += cost_offset;
             if (full_traj_with_cost.cost < best_traj_with_cost.cost)
             {
@@ -140,22 +140,24 @@ TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
     const Point &start, const Point &destination, const Vector &initial_velocity,
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles)
 {
+	// Calculate full new cost regardless by passing in maximum max cost
     return getTrajectoryWithCost(
         TrajectoryPath(std::make_shared<BangBangTrajectory2D>(
                            start, destination, initial_velocity, constraints),
                        BangBangTrajectory2D::generator),
-        obstacles, std::nullopt, std::nullopt);
+        obstacles, std::nullopt, std::nullopt, std::numeric_limits<double>::max());
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-    const std::optional<double> sub_traj_duration_s)
+    const std::optional<double> sub_traj_duration_s,
+	const double max_cost)
 {
     CollisionEvaluator evaluator(obstacles);
     TrajectoryPathWithCost traj_with_cost(
-        evaluator.evaluate(trajectory, sub_traj_with_cost, sub_traj_duration_s));
-    traj_with_cost.cost = calculateCost(traj_with_cost);
+        evaluator.evaluate(trajectory, sub_traj_with_cost, sub_traj_duration_s, max_cost));
+	
 
     return traj_with_cost;
 }
