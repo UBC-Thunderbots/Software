@@ -68,21 +68,16 @@ MovePrimitive::generatePrimitiveProtoMessage(
     // Shrink the field by the radius of robot to ensure robot don't go out of bounds, if we are in a game
 	// Return normal field boundaries if not in a game
     Rectangle field_boundary = world.field().fieldBoundary();
-	Rectangle navigable_area;
 	
-	if(world.gameState().isPlaying()){
+    double shrink_amount = world.gameState().isPlaying() ? ROBOT_MAX_RADIUS_METERS : 0.0;
+	Point neg_x_neg_y_corner(
+    	    field_boundary.negXNegYCorner().x() + shrink_amount,
+    	    field_boundary.negXNegYCorner().y() + shrink_amount);
+    Point pos_x_pos_y_corner(
+    	    field_boundary.posXPosYCorner().x() - shrink_amount,
+    	    field_boundary.posXPosYCorner().y() - shrink_amount);
+    Rectangle navigable_area = Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
 
-		Point neg_x_neg_y_corner(
-    	    field_boundary.negXNegYCorner().x() + ROBOT_MAX_RADIUS_METERS,
-    	    field_boundary.negXNegYCorner().y() + ROBOT_MAX_RADIUS_METERS);
-    	Point pos_x_pos_y_corner(
-    	    field_boundary.posXPosYCorner().x() - ROBOT_MAX_RADIUS_METERS,
-    	    field_boundary.posXPosYCorner().y() - ROBOT_MAX_RADIUS_METERS);
-    	Rectangle navigable_area = Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
-	}
-	else{
-		navigable_area = field_boundary;
-	}
 
     // If the robot is in a static obstacle, then we should first move to the nearest
     // point out
