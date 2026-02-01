@@ -113,7 +113,8 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     if (!traj_path.has_value())
     {
-        LOG(WARNING) << "Could not find trajectory path for robot " << robot.id()
+		// A std::nullopt is recieved if best trajectory has an unavoidable collision when travelling in a high velocity
+        LOG(INFO) << "Could not find safe trajectory path for robot " << robot.id()
                      << " to move to " << destination;
         return std::make_pair(std::nullopt, std::move(createStopPrimitiveProto()));
     }
