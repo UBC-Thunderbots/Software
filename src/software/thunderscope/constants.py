@@ -397,7 +397,7 @@ class RuntimeManagerConstants:
     DEFAULT_BINARY_NAME = "Current Fullsystem"
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
-    
+
     RUNTIME_STATS_DIRECTORY_PATH = "/tmp/tbots/stats"
     RUNTIME_FRIENDLY_STATS_FILE = "blue.toml"
     RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE = "yellow_from_blue.toml"
