@@ -162,31 +162,3 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     return traj_with_cost;
 }
 
-double TrajectoryPlanner::calculateCost(
-    const TrajectoryPathWithCost &traj_with_cost) const
-{
-    double total_cost = traj_with_cost.traj_path.getTotalTime();
-
-    // Add a large cost if the trajectory collides with an obstacle
-    // Note that this ignores collisions that may be in at the
-    // start of the trajectory as those are unavoidable by all trajectories.
-    if (traj_with_cost.colliding_obstacle != nullptr)
-    {
-        total_cost += 6.0;
-    }
-
-    // The closer the collision is to the destination, the lower its cost will be
-    Point first_collision_position =
-        traj_with_cost.traj_path.getPosition(traj_with_cost.first_collision_time_s);
-    Point destination = traj_with_cost.traj_path.getDestination();
-    total_cost += (first_collision_position - destination).length();
-
-    total_cost += std::max(
-        0.0, (MAX_FUTURE_COLLISION_CHECK_SEC - traj_with_cost.first_collision_time_s));
-
-    total_cost += 3 * traj_with_cost.collision_duration_front_s;
-
-    total_cost += 1 * traj_with_cost.collision_duration_back_s;
-
-    return total_cost;
-}

@@ -36,14 +36,6 @@ class TrajectoryPlanner
 
    private:
     /**
-     * Calculate the cost of the given trajectory path with cost
-     *
-     * @param traj_with_cost A complete trajectory path with cost
-     * @return The cost of the trajectory
-     */
-    double calculateCost(const TrajectoryPathWithCost &traj_with_cost) const;
-
-    /**
      * Get a single trajectory with cost that goes directly from the start to the
      * destination.
      *
