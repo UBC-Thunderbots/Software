@@ -113,7 +113,7 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     if (!traj_path.has_value())
     {
-        LOG(WARNING) << "Could not find trajectory path for robot " << robot.id()
+		LOG(WARNING) << "Could not find trajectory path for robot " << robot.id()
                      << " to move to " << destination;
         return std::make_pair(std::nullopt, std::move(createStopPrimitiveProto()));
     }

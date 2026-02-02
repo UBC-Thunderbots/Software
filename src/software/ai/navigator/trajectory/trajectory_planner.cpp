@@ -3,7 +3,6 @@
 #include "collision_evaluator.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
-#include "software/logger/logger.h"
 
 TrajectoryPlanner::TrajectoryPlanner()
     : relative_sub_destinations(getRelativeSubDestinations())
@@ -134,7 +133,7 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
         }
     }
 
-    return best_traj_with_cost.traj_path;
+	return best_traj_with_cost.traj_path;
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
