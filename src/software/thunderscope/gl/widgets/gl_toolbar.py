@@ -67,7 +67,7 @@ class GLToolbar(QWidget):
         self,
         icon: QtGui.QPixmap,
         tooltip: str,
-        callback: Callable[[], None],
+        callback: Callable[[], None] = lambda: ...,
         display_text: str = None,
     ) -> QPushButton:
         """Sets up a button with the given name and callback

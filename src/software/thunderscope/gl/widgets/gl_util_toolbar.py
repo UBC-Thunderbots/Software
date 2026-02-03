@@ -9,6 +9,9 @@ from pyqtgraph.Qt.QtWidgets import *
 from software.thunderscope.gl.widgets.toolbars.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
+from software.thunderscope.gl.widgets.toolbars.gl_sandbox_state_toolbar import (
+    GLSandboxStateToolbar,
+)
 
 
 class GLUtilToolbar(GLToolbar):
@@ -17,7 +20,7 @@ class GLUtilToolbar(GLToolbar):
     GAME_CONTROLLER_URL = "http://localhost:8081"
 
     def __init__(
-        self, parent: QWidget, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool
+        self, parent: QWidget, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool, sandbox_mode: bool = False
     ):
         """Initializes the toolbar and constructs its layout
 
@@ -26,6 +29,8 @@ class GLUtilToolbar(GLToolbar):
         :param friendly_color_yellow True if yellow is friendly team, False if not
         """
         super(GLUtilToolbar, self).__init__(parent=parent)
+        
+        self.sandbox_mode = sandbox_mode
 
         self.gc_toolbar = GLGamecontrollerToolbar(
             toolbar=self,
@@ -37,8 +42,15 @@ class GLUtilToolbar(GLToolbar):
         self.add_separator()
 
         self.runtime_toolbar = GLRuntimeToolbar(toolbar=self)
+        
+        if self.sandbox_mode:
+            self.add_separator()
+            self.sandbox_state_toolbar = GLSandboxStateToolbar(toolbar=self)
 
     @override
     def refresh(self) -> None:
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
+        
+        if self.sandbox_mode:
+            self.sandbox_state_toolbar.refresh()
