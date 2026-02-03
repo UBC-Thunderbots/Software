@@ -24,7 +24,7 @@
     - name: Make MD5 Hash Script Executable
       ansible.builtin.file:
         path: "~/hash_thunderloop_binary.sh"
-        mode: 0755
+        mode: "0755"
 
     - name: Compute Thunderloop MD5 Hash
       ansible.builtin.command: "/home/{{ ansible_user }}/hash_thunderloop_binary.sh"
