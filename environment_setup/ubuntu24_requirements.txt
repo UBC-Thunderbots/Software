@@ -5,3 +5,4 @@ ruff==0.5.5
 md-toc==9.0.0
 grpcio-tools==1.71.0
 python-Levenshtein==0.25.1
+typer==0.21.0

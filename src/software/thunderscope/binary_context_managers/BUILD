@@ -22,6 +22,7 @@ py_library(
     deps = [
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
+        "//software/thunderscope:util",
         "//software/thunderscope/common:thread_safe_circular_buffer",
         requirement("psutil"),
     ],
@@ -50,5 +51,14 @@ py_library(
     deps = [
         ":game_controller",
         "//software/thunderscope:time_provider",
+    ],
+)
+
+py_library(
+    name = "runtime_manager",
+    srcs = [
+        "runtime_installer.py",
+        "runtime_loader.py",
+        "runtime_manager.py",
     ],
 )
