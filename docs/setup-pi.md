@@ -104,13 +104,13 @@ bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:ro
 
 ### Common Errors and Debugging
 
-**Cannot SSH into Pi** 
+**Cannot SSH into Pi**   
 A: Confirm that your device is connected to the `tbots` WiFi
 
-**Raspberry Pi shuts off (light turns red, HDMI output disconnects if connected) while the Bazel Ansible command is running**
+**Raspberry Pi shuts off (light turns red, HDMI output disconnects if connected) while the Bazel Ansible command is running**  
 A: This is a power brownout (voltage drops below required threshold). There are too many peripherals connected. Disconnect some and try again.
 
-**Raspberry Pi unresponsive and LED always solid green**
+**Raspberry Pi unresponsive and LED always solid green**  
 A: This is usually an indicator that the Pi's SD Card is corrupted or empty. Operational Raspberry Pi's usually have a flickering LED. Fix by reprovisioning the SD Card with the Raspberry Pi Imager (directions above). 
 
 
