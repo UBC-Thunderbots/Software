@@ -63,26 +63,30 @@ class GLSandboxStateToolbar:
         try:
             with open(state_path, "rb") as file:
                 state_dict = tomllib.load(file)
-                # Get the persisted blue path, or replace with the default arrangement if it doesn't exist
-                toml_blue_path = selected_runtime_dict.get(
-                    RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY,
-                    RuntimeManagerConstants.DEFAULT_BINARY_PATH,
-                )
-                if self._is_valid_runtime(toml_blue_path):
-                    config.chosen_blue_path = toml_blue_path
-                # Get the persisted yellow path, or replace with the default arrangement if it doesn't exist
-                toml_yellow_path = selected_runtime_dict.get(
-                    RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY,
-                    RuntimeManagerConstants.DEFAULT_BINARY_PATH,
-                )
-                if self._is_valid_runtime(toml_yellow_path):
-                    config.chosen_yellow_path = toml_yellow_path
+                
+                # Load Blue team
+                
+                # Load Yellow team
+                
         except (FileNotFoundError, PermissionError, TOMLDecodeError):
             logging.warning(
                 f"Failed to read TOML file at: {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
             )
             
-    
+    def __build_team(self, robot_positions: list[list[int]]):
+        return tbots_cpp.Team(
+            [
+                tbots_cpp.Robot(
+                    index,
+                    location,
+                    tbots_cpp.Vector(0.0, 0.0),
+                    tbots_cpp.Angle.fromRadians(0),
+                    tbots_cpp.Angle(),
+                    tbots_cpp.Timestamp(),
+                )
+                for index, location in enumerate(blue_robot_locations)
+            ]
+        ),
         
     def __refresh_state_options(self):
         saved_states = self.__load_saved_states()
