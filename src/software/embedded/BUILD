@@ -110,7 +110,7 @@ sh_binary(
     srcs = ["setup_robot_software_deps.sh"],
 )
 
-sh_binary(
+filegroup(
     name = "hash_thunderloop_binary",
     srcs = ["hash_thunderloop_binary.sh"],
 )
