@@ -282,15 +282,12 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     front_right_target_rpm =
         static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] /
                          drive_motor_mps_per_rpm_);
-    front_left_target_rpm =
-        static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] /
-                         drive_motor_mps_per_rpm_);
-    back_left_target_rpm =
-        static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] /
-                         drive_motor_mps_per_rpm_);
-    back_right_target_rpm =
-        static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] /
-                         drive_motor_mps_per_rpm_);
+    front_left_target_rpm = static_cast<int>(
+        target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] / drive_motor_mps_per_rpm_);
+    back_left_target_rpm = static_cast<int>(
+        target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] / drive_motor_mps_per_rpm_);
+    back_right_target_rpm = static_cast<int>(
+        target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] / drive_motor_mps_per_rpm_);
 
     // Get target dribbler rpm from the primitive
     int target_dribbler_rpm;

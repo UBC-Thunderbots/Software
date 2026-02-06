@@ -49,6 +49,8 @@ void StSpinMotorController::setup()
             motor_enabled_[motor]            = true;
             motor_measured_speed_rpm_[motor] = 0;
             motor_faults_[motor]             = 0;
+            motor_iq_[motor]                 = 0;
+            motor_id_[motor]                 = 0;
         }
     }
 }
@@ -172,18 +174,12 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
         return 0;
     }
 
-    const auto outgoingFrame = OutgoingFrame{
+    const auto outgoing_frame = SetTargetSpeedFrame{
         .motor_enabled          = motor_enabled_.at(motor),
         .motor_target_speed_rpm = static_cast<int16_t>(target_velocity),
     };
 
-    const auto incomingFrame = sendAndReceiveFrame(motor, outgoingFrame);
-
-    if (incomingFrame.has_value())
-    {
-        motor_measured_speed_rpm_[motor] = incomingFrame->motor_measured_speed_rpm;
-        motor_faults_[motor]             = incomingFrame->motor_faults;
-    }
+    sendAndReceiveFrame(motor, outgoing_frame);
 
     return motor_measured_speed_rpm_.at(motor);
 }
@@ -195,6 +191,7 @@ void StSpinMotorController::immediatelyDisable()
         if (ENABLED_MOTORS.at(motor))
         {
             motor_enabled_[motor] = false;
+            readThenWriteVelocity(motor, 0);
         }
     }
 }
@@ -221,63 +218,98 @@ void StSpinMotorController::openSpiFileDescriptor(const MotorIndex& motor)
                      << "error: " << strerror(errno);
 }
 
-std::optional<StSpinMotorController::IncomingFrame>
-StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
-                                           const OutgoingFrame outgoing_frame) const
+void StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
+                                                const OutgoingFrame outgoing_frame)
 {
     uint8_t tx[FRAME_LEN] = {};
     uint8_t rx[FRAME_LEN] = {};
 
-    //  Outgoing frames have the following format:
-    //
-    //  +-------+--------+---------------+-------+-------+
-    //  | DELIM | ENABLE |   SPEED_RPM   |       |  CRC  |
-    //  +-------+--------+---------------+-------+-------+
-    //      0       1        2       3       4       5
-    //
-    //  The byte order of SPEED_RPM is big endian; i.e. the MSB is
-    //  transmitted first. Byte 4 is currently unused.
+    std::visit(
+        [&]<typename TFrame>(TFrame&& frame)
+        {
+            using T = std::decay_t<TFrame>;
+            if constexpr (std::is_same_v<T, SetTargetSpeedFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_SPEED);
+                tx[1] = static_cast<uint8_t>(frame.motor_enabled);
+                tx[2] = static_cast<uint8_t>(0xFF & (frame.motor_target_speed_rpm >> 8));
+                tx[3] = static_cast<uint8_t>(0xFF & frame.motor_target_speed_rpm);
+            }
+            else if constexpr (std::is_same_v<T, SetTargetTorqueFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_TORQUE);
+                tx[1] = static_cast<uint8_t>(frame.motor_enabled);
+                tx[2] = static_cast<uint8_t>(0xFF & (frame.motor_target_torque >> 8));
+                tx[3] = static_cast<uint8_t>(0xFF & frame.motor_target_torque);
+            }
+            else if constexpr (std::is_same_v<T, SetResponseTypeFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_RESPONSE_TYPE);
+                tx[1] = static_cast<uint8_t>(frame.response_type);
+            }
+            else if constexpr (std::is_same_v<T, SetPidTorqueKpKiFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_PID_TORQUE_KP_KI);
+                tx[1] = static_cast<uint8_t>(0xFF & (frame.kp >> 8));
+                tx[2] = static_cast<uint8_t>(0xFF & frame.kp);
+                tx[3] = static_cast<uint8_t>(0xFF & (frame.ki >> 8));
+                tx[4] = static_cast<uint8_t>(0xFF & frame.ki);
+            }
+            else if constexpr (std::is_same_v<T, SetPidFluxKpKiFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_PID_FLUX_KP_KI);
+                tx[1] = static_cast<uint8_t>(0xFF & (frame.kp >> 8));
+                tx[2] = static_cast<uint8_t>(0xFF & frame.kp);
+                tx[3] = static_cast<uint8_t>(0xFF & (frame.ki >> 8));
+                tx[4] = static_cast<uint8_t>(0xFF & frame.ki);
+            }
+            else if constexpr (std::is_same_v<T, SetPidSpeedKpKiFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_PID_SPEED_KP_KI);
+                tx[1] = static_cast<uint8_t>(0xFF & (frame.kp >> 8));
+                tx[2] = static_cast<uint8_t>(0xFF & frame.kp);
+                tx[3] = static_cast<uint8_t>(0xFF & (frame.ki >> 8));
+                tx[4] = static_cast<uint8_t>(0xFF & frame.ki);
+            }
+        },
+        outgoing_frame);
 
-    tx[0] = FRAME_DELIMITER;
-    tx[1] = static_cast<uint8_t>(outgoing_frame.motor_enabled);
-    tx[2] = static_cast<uint8_t>(0xFF & (outgoing_frame.motor_target_speed_rpm >> 8));
-    tx[3] = static_cast<uint8_t>(0xFF & outgoing_frame.motor_target_speed_rpm);
-    tx[4] = 0;
     tx[5] = Crc8Autosar::calc(tx, FRAME_LEN - 1);
 
     spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_LEN,
                 SPI_SPEED_HZ);
 
-    //  Incoming frames have the following format:
-    //
-    //  +-------+---------------+----------------+-------+
-    //  | DELIM |   SPEED_RPM   |     FAULTS     |  CRC  |
-    //  +-------+---------------+----------------+-------+
-    //      0       1       2        3      4        5
-    //
-    //  The byte order of SPEED_RPM and FAULTS is big endian;
-    //  i.e. the MSB is transmitted first.
-
     // Frame integrity check
     const uint8_t rx_crc = Crc8Autosar::calc(rx, FRAME_LEN - 1);
-    if (rx[0] != FRAME_DELIMITER || rx[5] != rx_crc)
+    if (rx[5] != rx_crc)
     {
         LOG(WARNING) << "Received frame that failed integrity check. Expected CRC "
                      << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[5])
-                     << " for motor " << motor;
-
-        LOG(WARNING) << "RX motor " << motor << " " << static_cast<int>(rx[0]) << " "
+                     << " for motor " << motor << "\n"
+                     << "RX: " << static_cast<int>(rx[0]) << " "
                      << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2]) << " "
                      << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4]) << " "
                      << static_cast<int>(rx[5]);
-
-        return std::nullopt;
+        return;
     }
 
-    return IncomingFrame{
-        .motor_measured_speed_rpm =
-            static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]),
-        .motor_faults =
-            static_cast<uint16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]),
-    };
+    switch (static_cast<StSpinResponseType>(rx[0]))
+    {
+        case StSpinResponseType::SPEED_AND_FAULTS:
+        {
+            motor_measured_speed_rpm_[motor] =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_faults_[motor] =
+                static_cast<uint16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
+        case StSpinResponseType::IQ_AND_ID:
+        {
+            motor_iq_[motor] =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_id_[motor] =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
+    }
 }

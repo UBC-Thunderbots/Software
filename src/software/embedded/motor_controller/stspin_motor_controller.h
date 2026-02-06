@@ -5,6 +5,7 @@
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
 #include "software/embedded/motor_controller/motor_index.h"
+#include "software/embedded/motor_controller/stspin_constants.h"
 
 class StSpinMotorController : public MotorController
 {
@@ -32,35 +33,20 @@ class StSpinMotorController : public MotorController
      */
     void openSpiFileDescriptor(const MotorIndex& motor);
 
-    struct IncomingFrame
-    {
-        int16_t motor_measured_speed_rpm;
-        uint16_t motor_faults;
-    };
-
-    struct OutgoingFrame
-    {
-        bool motor_enabled;
-        int16_t motor_target_speed_rpm;
-    };
+    using OutgoingFrame =
+        std::variant<SetResponseTypeFrame, SetTargetSpeedFrame, SetTargetTorqueFrame,
+                     SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame, SetPidSpeedKpKiFrame>;
 
     /**
      * Transmits a frame to the given motor and receives a frame back over SPI.
      *
      * @param motor the motor to send the frame to
      * @param outgoing_frame the outgoing frame to send to the motor
-     * @return the incoming frame received from the motor
      */
-    std::optional<IncomingFrame> sendAndReceiveFrame(const MotorIndex& motor,
-                                                     OutgoingFrame outgoing_frame) const;
+    void sendAndReceiveFrame(const MotorIndex& motor, OutgoingFrame outgoing_frame);
 
     // Length of frame (in number of bytes)
     static constexpr unsigned int FRAME_LEN = 6;
-
-    // Byte marking the start of a new frame.
-    // We don't _need_ frame delimiters, but they're useful as part of a
-    // quick frame integrity check.
-    static constexpr uint8_t FRAME_DELIMITER = 0x67;
 
     // clang-format off
     static const inline std::unordered_map<MotorIndex, bool> ENABLED_MOTORS = {
@@ -108,4 +94,8 @@ class StSpinMotorController : public MotorController
     std::unordered_map<MotorIndex, bool> motor_enabled_;
     std::unordered_map<MotorIndex, int16_t> motor_measured_speed_rpm_;
     std::unordered_map<MotorIndex, uint16_t> motor_faults_;
+    std::unordered_map<MotorIndex, int16_t> motor_iq_;
+    std::unordered_map<MotorIndex, int16_t> motor_id_;
+
+    friend void runRobotAutoTest();
 };

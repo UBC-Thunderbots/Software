@@ -54,6 +54,7 @@ cc_binary(
         ":motor",
         ":power",
         "//proto/message_translation:tbots_geometry",
+        "//proto/message_translation:tbots_protobuf",
         "//proto/primitive:primitive_msg_factory",
         "//shared:robot_constants",
         "//software/embedded:primitive_executor",
