@@ -154,6 +154,7 @@ cc_library(
         ":primitive",
         "//proto/message_translation:tbots_protobuf",
         "//software/util/hash:hash_combine",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
     ]
 )
 

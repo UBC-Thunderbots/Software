@@ -1,6 +1,7 @@
 
 #include "software/ai/hl/stp/tactic/vis_proto_deduper.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/geom/polygon.h"
 #include "software/geom/point.h"
 
@@ -8,17 +9,14 @@
 #include <memory>
 #include <vector>
 
-// Helper to create a unique obstacle based on a position offset
-// This ensures we have distinct geometries to hash.
-ObstaclePtr createTestObstacle(double x, double y)
-{
-    auto polygon = Polygon({Point(x, y), Point(x + 1.0, y + 1.0), Point(x - 1.0, y - 1.0)});
-    return std::make_shared<Obstacle>(polygon);
-}
+
 
 class VisProtoDeduperTest : public ::testing::Test
 {
 protected:
+    RobotNavigationObstacleFactory obstacle_factory =
+        RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig());
+
     // Helper to extract the list of obstacles from the proto message for easy verification
     std::vector<TbotsProto::Obstacle> getObstaclesFromProto(const TbotsProto::ObstacleList& msg)
     {
@@ -27,7 +25,15 @@ protected:
         {
             obstacles.push_back(obs);
         }
-        return obstacles;
+        return obstacles;;
+    }
+
+    // Helper to create a unique obstacle based on a position offset
+    // This ensures we have distinct geometries to hash.
+    ObstaclePtr createTestObstacle(double x, double y)
+    {
+        auto polygon = Polygon({Point(x, y), Point(x + 1.0, y), Point(x, y + 1.0)});
+        return obstacle_factory.createFromShape(polygon);
     }
 };
 
