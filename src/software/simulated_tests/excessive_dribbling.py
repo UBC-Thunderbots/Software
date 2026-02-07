@@ -13,6 +13,7 @@ from typing import override
 class ExcessivelyDribbling(Validation):
     """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
 
+    @override
     def get_validation_status(
         self,
         world,
@@ -25,9 +26,9 @@ class ExcessivelyDribbling(Validation):
                  PASSING when the robot is not excessively dribbling
         """
         # Use world calculation of dribbling distance, which uses implementation
-        # of initial position of BOT to final position of BALL
+        # of initial position of bot to final position of BALL
 
-        if world.hasValue("dribble_displacement"):
+        if world.HasField("dribble_displacement") and world.dribble_displacement is not None:
             dribble_disp = world.dribble_displacement
             dist = tbots_cpp.createSegment(dribble_disp).length()
             if dist > (
@@ -38,6 +39,7 @@ class ExcessivelyDribbling(Validation):
 
         return ValidationStatus.PASSING
 
+    @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the max allowed dribbling circle"""
         if world.HasField("dribble_displacement"):
@@ -49,6 +51,7 @@ class ExcessivelyDribbling(Validation):
             )
         return create_validation_geometry([])
 
+    @override
     def __repr__(self):
         return "Check that the dribbling robot has not dribbled for more than 1m"
 
