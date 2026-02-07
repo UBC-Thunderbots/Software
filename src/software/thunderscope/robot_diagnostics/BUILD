@@ -35,12 +35,8 @@ py_library(
         ":handheld_controller",
         "//software/thunderscope:constants",
         requirement("pyqtgraph"),
-    ] + select({
-        # TODO: remove this selection when we replace evdev to
-        #   other macos supported libs.
-        "@platforms//os:linux": [requirement("evdev")],
-        "//conditions:default": [],
-    }),
+        requirement("evdev"),
+    ],
 )
 
 py_library(

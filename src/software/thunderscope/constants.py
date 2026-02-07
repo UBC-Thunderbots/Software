@@ -393,17 +393,3 @@ class LogLevels(StrEnum):
     INFO = "INFO"
     WARNING = "WARNING"
     FATAL = "FATAL"
-
-
-class RuntimeManagerConstants:
-    """Constants for Runtime Manager"""
-
-    RUNTIME_CONFIG_BLUE_KEY = "blue_runtime_name"
-    RUNTIME_CONFIG_YELLOW_KEY = "yellow_runtime_name"
-    DEFAULT_BINARY_PATH = "software/unix_full_system"
-    DEFAULT_BINARY_NAME = "Current Fullsystem"
-    EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
-    RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
-    RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
-    DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
-    MAX_RELEASES_FETCHED = 5

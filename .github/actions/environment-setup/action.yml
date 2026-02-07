@@ -1,12 +1,4 @@
 name: Environment Setup
-
-on:
-  workflow_call:
-    inputs: 
-      os: 
-        required: true
-        type: string
-
 runs:
   using: "composite"
   steps:
@@ -18,15 +10,8 @@ runs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /usr/local/lib/android
         sudo rm -rf /opt/ghc
-        
+
     - name: Run setup_software.sh
       shell: bash
-      if: runner.os == 'Linux'
       run: |
         "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
-    
-    - name: Run setup_software_mac.sh
-      shell: bash
-      if: runner.os == 'macOS'
-      run: |
-        "${GITHUB_WORKSPACE}"/environment_setup/setup_software_mac.sh
