@@ -1,4 +1,5 @@
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+load("@aspect_rules_py//py:defs.bzl", "py_library", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,6 +11,7 @@ py_library(
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
+        requirement("graphviz"),
     ],
 )
 

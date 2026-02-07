@@ -29,6 +29,7 @@ py_library(
     deps = [
         ":common_widgets",
         requirement("netifaces"),
+        requirement("thefuzz"),
     ],
 )
 

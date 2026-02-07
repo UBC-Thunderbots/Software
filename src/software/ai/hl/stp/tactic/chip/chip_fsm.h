@@ -62,6 +62,9 @@ struct ChipFSM : TacticFSM<ChipFSM>
      */
     bool shouldRealignWithBall(const Update &event);
 
+    DEFINE_SML_GUARD_CLASS(ballChicked, ChipFSM)
+    DEFINE_SML_GUARD_CLASS(shouldRealignWithBall, ChipFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -72,6 +75,7 @@ struct ChipFSM : TacticFSM<ChipFSM>
 
         DEFINE_SML_GUARD(ballChicked)
         DEFINE_SML_GUARD(shouldRealignWithBall)
+
         DEFINE_SML_ACTION(updateChip)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
 
