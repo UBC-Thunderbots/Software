@@ -26,7 +26,7 @@ class ExcessivelyDribbling(Validation):
                  PASSING when the robot is not excessively dribbling
         """
         # Use world calculation of dribbling distance, which uses implementation
-        # of initial position of BOT to final position of BALL
+        # of initial position of bot to final position of BALL
 
         if world.HasField("dribble_displacement") and world.dribble_displacement is not None:
             dribble_disp = world.dribble_displacement
