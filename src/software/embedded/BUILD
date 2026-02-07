@@ -110,6 +110,11 @@ sh_binary(
     srcs = ["setup_robot_software_deps.sh"],
 )
 
+filegroup(
+    name = "hash_thunderloop_binary",
+    srcs = ["hash_thunderloop_binary.sh"],
+)
+
 cc_test(
     name = "test_battery",
     srcs = ["battery_test.cpp"],
