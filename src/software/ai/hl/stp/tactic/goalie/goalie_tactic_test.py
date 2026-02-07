@@ -30,19 +30,15 @@ from proto.ssl_gc_common_pb2 import Team
         # test ball very fast misses net
         (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 1), tbots_cpp.Point(-4.5, 0)),
         # test ball very fast get saved
-        # TODO (#3377): This test is flaky due to inconsistent goalie reach. The linked ticket may provide a permanent fix.
         (
             tbots_cpp.Point(-2.5, 0),
-            # TODO Revert velocity to (-4.8, 1.1)
-            tbots_cpp.Vector(-3.6, 0.825),
+            tbots_cpp.Vector(-4.8, 1.1),
             tbots_cpp.Point(-4.5, 0),
         ),
         # test ball very fast with the goalie out of position saved
-        # TODO (#3377): This test is flaky due to inconsistent goalie reach. The linked ticket may provide a permanent fix.
         (
             tbots_cpp.Point(-2, 0),
-            # TODO Revert velocity to (-5.5,1)
-            tbots_cpp.Vector(-4.125, 0.75),
+            tbots_cpp.Vector(-5.5, 1),
             tbots_cpp.Point(-4.5, -0.1),
         ),
         # ball slow inside friendly defense area

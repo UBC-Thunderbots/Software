@@ -1,6 +1,6 @@
 colorama==0.4.6
 netifaces==0.11.0
-evdev==1.7.0; sys_platform == "linux"
+evdev==1.7.0
 numpy==1.26.4
 protobuf==6.31.1
 pyqtgraph==0.13.7

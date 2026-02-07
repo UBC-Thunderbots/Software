@@ -1,11 +1,6 @@
 import numpy
 
-# TODO: remove the try-catch when we rewrite this with macOS-compatible lib
-try:
-    from evdev import InputDevice, ecodes
-except ImportError:
-    pass
-
+from evdev import InputDevice, ecodes
 from threading import Thread
 
 

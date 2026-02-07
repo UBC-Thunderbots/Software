@@ -1,11 +1,7 @@
 import numpy
 
-# TODO: remove the try-catch when we rewrite this with macOS-compatible lib
-try:
-    import evdev
-    from evdev import ecodes
-except ImportError:
-    pass
+import evdev
+from evdev import ecodes
 
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtWidgets import *

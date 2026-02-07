@@ -520,14 +520,12 @@ def simulated_test_runner():
         args.debug_simulator,
         args.enable_realism,
     ) as simulator, FullSystem(
-        "software/unix_full_system",
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,
         False,
         should_restart_on_crash=False,
         running_in_realtime=args.enable_thunderscope,
     ) as blue_fs, FullSystem(
-        "software/unix_full_system",
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         args.debug_yellow_full_system,
         True,
