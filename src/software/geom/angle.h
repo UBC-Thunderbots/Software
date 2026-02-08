@@ -10,6 +10,9 @@ struct AngleTag;
 struct AngularVelocityTag;
 struct AngularAccelerationTag;
 
+template <typename Tag>
+concept IsBaseAngleTag = std::is_same_v<Tag, AngleTag>;
+
 /**
  * A typesafe representation of an angle.
  *
@@ -117,7 +120,7 @@ class GenericAngle final
      *
      * @return the modulus of this GenericAngle ÷ divisor.
      */
-    constexpr GenericAngle mod(GenericAngle divisor) const;
+    constexpr GenericAngle mod(GenericAngle divisor) const requires IsBaseAngleTag<Tag>;
 
     /**
      * Computes the remainder of a division between this angle and
@@ -127,7 +130,8 @@ class GenericAngle final
      *
      * @return the remainder of this GenericAngle ÷ divisor.
      */
-    constexpr GenericAngle remainder(const GenericAngle& divisor) const;
+    constexpr GenericAngle remainder(const GenericAngle& divisor) const requires
+        IsBaseAngleTag<Tag>;
 
     /**
      * Returns the absolute value of this angle.
@@ -172,7 +176,7 @@ class GenericAngle final
      *
      * @return the clamped angle.
      */
-    constexpr GenericAngle clamp() const;
+    constexpr GenericAngle clamp() const requires IsBaseAngleTag<Tag>;
 
     /**
      * Returns the smallest possible rotational difference between this angle
@@ -182,7 +186,8 @@ class GenericAngle final
      *
      * @return the angle between this GenericAngle and other, in the range [0, π].
      */
-    constexpr GenericAngle minDiff(const GenericAngle& other) const;
+    constexpr GenericAngle minDiff(const GenericAngle& other) const requires
+        IsBaseAngleTag<Tag>;
 
    private:
     /**
@@ -192,6 +197,8 @@ class GenericAngle final
 
     explicit constexpr GenericAngle(double rads);
 };
+
+using Angle = GenericAngle<AngleTag>;
 
 template <typename T>
 concept AngleType = std::is_same_v<T, GenericAngle<AngleTag>> ||
@@ -467,7 +474,8 @@ inline constexpr double GenericAngle<Tag>::toDegrees() const
 }
 
 template <typename Tag>
-inline constexpr GenericAngle<Tag> GenericAngle<Tag>::mod(GenericAngle<Tag> divisor) const
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::mod(
+    GenericAngle<Tag> divisor) const requires IsBaseAngleTag<Tag>
 {
     if (divisor.toRadians() < FIXED_EPSILON)
     {
@@ -484,7 +492,8 @@ inline constexpr GenericAngle<Tag> GenericAngle<Tag>::mod(GenericAngle<Tag> divi
 
 template <typename Tag>
 inline constexpr GenericAngle<Tag> GenericAngle<Tag>::remainder(
-    const GenericAngle<Tag>& divisor) const
+    const GenericAngle<Tag>& divisor) const requires IsBaseAngleTag<Tag>
+
 {
     return GenericAngle<Tag>::fromRadians(
         toRadians() - static_cast<double>(static_cast<long>(
@@ -525,14 +534,17 @@ inline double GenericAngle<Tag>::tan() const
 }
 
 template <typename Tag>
-inline constexpr GenericAngle<Tag> GenericAngle<Tag>::clamp() const
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::clamp() const requires
+    IsBaseAngleTag<Tag>
+
 {
     return remainder(GenericAngle<Tag>::full());
 }
 
 template <typename Tag>
 inline constexpr GenericAngle<Tag> GenericAngle<Tag>::minDiff(
-    const GenericAngle<Tag>& other) const
+    const GenericAngle<Tag>& other) const requires IsBaseAngleTag<Tag>
+
 {
     return (*this - other).clamp().abs();
 }
@@ -640,5 +652,3 @@ inline std::ostream& operator<<(std::ostream& os, const AngleType auto& a)
     os << a.toRadians() << "R";
     return os;
 }
-
-using Angle = GenericAngle<AngleTag>;
