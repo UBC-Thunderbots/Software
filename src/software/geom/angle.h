@@ -2,8 +2,13 @@
 
 #include <cmath>
 #include <ostream>
+#include <type_traits>
 
 #include "software/geom/geom_constants.h"
+
+struct AngleTag;
+struct AngularVelocityTag;
+struct AngularAccelerationTag;
 
 /**
  * A typesafe representation of an angle.
@@ -11,33 +16,34 @@
  * This class helps prevent accidentally combining values in degrees and radians
  * without proper conversion.
  */
-class Angle final
+template <typename Tag>
+class GenericAngle final
 {
    public:
     /**
      * The zero angle.
      */
-    static constexpr Angle zero();
+    static constexpr GenericAngle zero();
 
     /**
      * The quarter-turn angle (90°).
      */
-    static constexpr Angle quarter();
+    static constexpr GenericAngle quarter();
 
     /**
      * The half-turn angle (180°).
      */
-    static constexpr Angle half();
+    static constexpr GenericAngle half();
 
     /**
      * The three-quarter turn angle (270°).
      */
-    static constexpr Angle threeQuarter();
+    static constexpr GenericAngle threeQuarter();
 
     /**
      * The full-turn angle (360°).
      */
-    static constexpr Angle full();
+    static constexpr GenericAngle full();
 
     /**
      * Constructs an angle from a value in radians.
@@ -46,7 +52,7 @@ class Angle final
      *
      * @return the constructed angle
      */
-    static constexpr Angle fromRadians(double rad);
+    static constexpr GenericAngle fromRadians(double rad);
 
     /**
      * Constructs an angle from a value in degrees.
@@ -55,7 +61,7 @@ class Angle final
      *
      * @return the constructed angle
      */
-    static constexpr Angle fromDegrees(double deg);
+    static constexpr GenericAngle fromDegrees(double deg);
 
     /**
      * Computes the arcsine of a value.
@@ -64,7 +70,7 @@ class Angle final
      *
      * @return the angle.
      */
-    static Angle asin(double x);
+    static GenericAngle asin(double x);
 
     /**
      * Computes the arccosine of a value.
@@ -73,7 +79,7 @@ class Angle final
      *
      * @return the angle.
      */
-    static Angle acos(double x);
+    static GenericAngle acos(double x);
 
     /**
      * Computes the arctangent of a value.
@@ -82,12 +88,12 @@ class Angle final
      *
      * @return the angle.
      */
-    static Angle atan(double x);
+    static GenericAngle atan(double x);
 
     /**
      * Constructs the "zero" angle.
      */
-    explicit constexpr Angle();
+    explicit constexpr GenericAngle();
 
     /**
      * Converts this angle to a value in radians.
@@ -109,9 +115,9 @@ class Angle final
      *
      * @param divisor the divisor.
      *
-     * @return the modulus of this Angle ÷ divisor.
+     * @return the modulus of this GenericAngle ÷ divisor.
      */
-    constexpr Angle mod(Angle divisor) const;
+    constexpr GenericAngle mod(GenericAngle divisor) const;
 
     /**
      * Computes the remainder of a division between this angle and
@@ -119,16 +125,16 @@ class Angle final
      *
      * @param divisor the divisor.
      *
-     * @return the remainder of this Angle ÷ divisor.
+     * @return the remainder of this GenericAngle ÷ divisor.
      */
-    constexpr Angle remainder(const Angle &divisor) const;
+    constexpr GenericAngle remainder(const GenericAngle& divisor) const;
 
     /**
      * Returns the absolute value of this angle.
      *
      * @return the absolute value of this angle.
      */
-    constexpr Angle abs() const;
+    constexpr GenericAngle abs() const;
 
     /**
      * Checks whether the angle is finite.
@@ -166,7 +172,7 @@ class Angle final
      *
      * @return the clamped angle.
      */
-    constexpr Angle clamp() const;
+    constexpr GenericAngle clamp() const;
 
     /**
      * Returns the smallest possible rotational difference between this angle
@@ -174,18 +180,23 @@ class Angle final
      *
      * @param other the second angle.
      *
-     * @return the angle between this Angle and other, in the range [0, π].
+     * @return the angle between this GenericAngle and other, in the range [0, π].
      */
-    constexpr Angle minDiff(const Angle &other) const;
+    constexpr GenericAngle minDiff(const GenericAngle& other) const;
 
    private:
     /**
-     * The measurement in radians of this Angle.
+     * The measurement in radians of this GenericAngle.
      */
     double rads;
 
-    explicit constexpr Angle(double rads);
+    explicit constexpr GenericAngle(double rads);
 };
+
+template <typename T>
+concept AngleType = std::is_same_v<T, GenericAngle<AngleTag>> ||
+    std::is_same_v<T, GenericAngle<AngularVelocityTag>> ||
+    std::is_same_v<T, GenericAngle<AngularAccelerationTag>>;
 
 /**
  * Negates an angle.
@@ -194,7 +205,7 @@ class Angle final
  *
  * @return the negated angle
  */
-constexpr Angle operator-(const Angle &angle) __attribute__((warn_unused_result));
+constexpr auto operator-(const AngleType auto& angle) __attribute__((warn_unused_result));
 
 /**
  * Adds two angles.
@@ -204,7 +215,7 @@ constexpr Angle operator-(const Angle &angle) __attribute__((warn_unused_result)
  *
  * @return the sum of the angles
  */
-constexpr Angle operator+(const Angle &x, const Angle &y)
+constexpr auto operator+(const AngleType auto& x, const AngleType auto& y)
     __attribute__((warn_unused_result));
 
 /**
@@ -216,7 +227,7 @@ constexpr Angle operator+(const Angle &x, const Angle &y)
  *
  * @return the difference between the minuend and subtrahend.
  */
-constexpr Angle operator-(const Angle &x, const Angle &y)
+constexpr auto operator-(const AngleType auto& x, const AngleType auto& y)
     __attribute__((warn_unused_result));
 
 /**
@@ -227,7 +238,8 @@ constexpr Angle operator-(const Angle &x, const Angle &y)
  *
  * @return the product of the angle and the scalar factor
  */
-constexpr Angle operator*(const Angle &angle, double scale)
+template <typename Tag>
+constexpr GenericAngle<Tag> operator*(const GenericAngle<Tag>& angle, double scale)
     __attribute__((warn_unused_result));
 
 /**
@@ -238,7 +250,8 @@ constexpr Angle operator*(const Angle &angle, double scale)
  *
  * @return the product of the angle and the scalar factor
  */
-constexpr Angle operator*(double scale, const Angle &angle)
+template <typename Tag>
+constexpr GenericAngle<Tag> operator*(double scale, const GenericAngle<Tag>& angle)
     __attribute__((warn_unused_result));
 
 /**
@@ -247,9 +260,10 @@ constexpr Angle operator*(double scale, const Angle &angle)
  * @param angle the angle.
  * @param divisor the scalar divisor.
  *
- * @return the quotient of this Angle ÷ the divisor.
+ * @return the quotient of this AngleType auto ÷ the divisor.
  */
-constexpr Angle operator/(const Angle &angle, double divisor)
+template <typename Tag>
+constexpr GenericAngle<Tag> operator/(const GenericAngle<Tag>& angle, double divisor)
     __attribute__((warn_unused_result));
 
 /**
@@ -260,7 +274,7 @@ constexpr Angle operator/(const Angle &angle, double divisor)
  *
  * @return the quotient of the divident ÷ the divisor.
  */
-constexpr double operator/(const Angle &x, const Angle &y)
+constexpr double operator/(const AngleType auto& x, const AngleType auto& y)
     __attribute__((warn_unused_result));
 
 /**
@@ -271,7 +285,7 @@ constexpr double operator/(const Angle &x, const Angle &y)
  *
  * @return the new angle x
  */
-Angle &operator+=(Angle &x, const Angle &y);
+auto& operator+=(AngleType auto& x, const AngleType auto& y);
 
 /**
  * Subtracts an angle from an angle.
@@ -281,7 +295,7 @@ Angle &operator+=(Angle &x, const Angle &y);
  *
  * @return the new angle x
  */
-Angle &operator-=(Angle &x, const Angle &y);
+auto& operator-=(AngleType auto& x, const AngleType auto& y);
 
 /**
  * Scales an angle by a factor.
@@ -291,7 +305,7 @@ Angle &operator-=(Angle &x, const Angle &y);
  *
  * @return the scaled angle.
  */
-Angle &operator*=(Angle &angle, double scale);
+auto& operator*=(AngleType auto& angle, double scale);
 
 /**
  * Divides an angle by a scalar divisor.
@@ -302,7 +316,7 @@ Angle &operator*=(Angle &angle, double scale);
  *
  * @return the scaled angle.
  */
-Angle &operator/=(Angle &angle, double divisor);
+auto& operator/=(AngleType auto& angle, double divisor);
 
 /**
  * Compares two angles.
@@ -313,7 +327,7 @@ Angle &operator/=(Angle &angle, double divisor);
  *
  * @return true if x is strictly less than y, and false otherwise
  */
-constexpr bool operator<(const Angle &x, const Angle &y);
+constexpr bool operator<(const AngleType auto& x, const AngleType auto& y);
 
 /**
  * Compares two angles.
@@ -323,7 +337,7 @@ constexpr bool operator<(const Angle &x, const Angle &y);
  *
  * @return true if x is strictly greater than y, and false otherwise.
  */
-constexpr bool operator>(const Angle &x, const Angle &y);
+constexpr bool operator>(const AngleType auto& x, const AngleType auto& y);
 
 /**
  * Compares two angles.
@@ -333,7 +347,7 @@ constexpr bool operator>(const Angle &x, const Angle &y);
  *
  * @return true if x is less than or equal to y, and false otherwise.
  */
-constexpr bool operator<=(const Angle &x, const Angle &y);
+constexpr bool operator<=(const AngleType auto& x, const AngleType auto& y);
 
 /**
  * Compares two angles.
@@ -343,7 +357,7 @@ constexpr bool operator<=(const Angle &x, const Angle &y);
  *
  * @return true if x is greater than or equal to y, and false otherwise.
  */
-constexpr bool operator>=(const Angle &x, const Angle &y);
+constexpr bool operator>=(const AngleType auto& x, const AngleType auto& y);
 
 /**
  * Compares two angles for equality
@@ -353,7 +367,7 @@ constexpr bool operator>=(const Angle &x, const Angle &y);
  *
  * @return true if x is equal to y, and false otherwise.
  */
-bool operator==(const Angle &x, const Angle &y);
+bool operator==(const AngleType auto& x, const AngleType auto& y);
 
 /**
  * Compares two angles for inequality.
@@ -363,229 +377,268 @@ bool operator==(const Angle &x, const Angle &y);
  *
  * @return true if x is not equal to y, and false otherwise
  */
-constexpr bool operator!=(const Angle &x, const Angle &y);
+constexpr bool operator!=(const AngleType auto& x, const AngleType auto& y);
 
 /**
- * Prints an Angle to a stream
+ * Prints an AngleType auto to a stream
  *
  * @param os the stream to print to
  * @param a the Point to print
  *
- * @return the stream with the Angle printed
+ * @return the stream with the AngleType auto printed
  */
-inline std::ostream &operator<<(std::ostream &os, const Angle &a);
+inline std::ostream& operator<<(std::ostream& os, const AngleType auto& a);
 
-inline constexpr Angle Angle::zero()
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::zero()
 {
-    return Angle();
+    return GenericAngle<Tag>();
 }
 
-inline constexpr Angle Angle::quarter()
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::quarter()
 {
-    return Angle(M_PI / 2.0);
+    return GenericAngle<Tag>(M_PI / 2.0);
 }
 
-inline constexpr Angle Angle::half()
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::half()
 {
-    return Angle(M_PI);
+    return GenericAngle<Tag>(M_PI);
 }
 
-inline constexpr Angle Angle::threeQuarter()
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::threeQuarter()
 {
-    return Angle(3.0 / 2.0 * M_PI);
+    return GenericAngle<Tag>(3.0 / 2.0 * M_PI);
 }
 
-inline constexpr Angle Angle::full()
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::full()
 {
-    return Angle(2.0 * M_PI);
+    return GenericAngle<Tag>(2.0 * M_PI);
 }
 
-inline constexpr Angle Angle::fromRadians(double rad)
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::fromRadians(double rad)
 {
-    return Angle(rad);
+    return GenericAngle<Tag>(rad);
 }
 
-inline constexpr Angle Angle::fromDegrees(double deg)
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::fromDegrees(double deg)
 {
-    return Angle(deg / 180.0 * M_PI);
+    return GenericAngle<Tag>(deg / 180.0 * M_PI);
 }
 
-inline Angle Angle::asin(double x)
+template <typename Tag>
+inline GenericAngle<Tag> GenericAngle<Tag>::asin(double x)
 {
-    return Angle::fromRadians(std::asin(x));
+    return GenericAngle<Tag>::fromRadians(std::asin(x));
 }
 
-inline Angle Angle::acos(double x)
+template <typename Tag>
+inline GenericAngle<Tag> GenericAngle<Tag>::acos(double x)
 {
     return fromRadians(std::acos(x));
 }
 
-inline Angle Angle::atan(double x)
+template <typename Tag>
+inline GenericAngle<Tag> GenericAngle<Tag>::atan(double x)
 {
-    return Angle::fromRadians(std::atan(x));
+    return GenericAngle<Tag>::fromRadians(std::atan(x));
 }
 
-inline constexpr Angle::Angle() : rads(0.0) {}
+template <typename Tag>
+inline constexpr GenericAngle<Tag>::GenericAngle() : rads(0.0)
+{
+}
 
-inline constexpr double Angle::toRadians() const
+template <typename Tag>
+inline constexpr double GenericAngle<Tag>::toRadians() const
 {
     return rads;
 }
 
-inline constexpr double Angle::toDegrees() const
+template <typename Tag>
+inline constexpr double GenericAngle<Tag>::toDegrees() const
 {
     return rads / M_PI * 180.0;
 }
 
-inline constexpr Angle Angle::mod(Angle divisor) const
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::mod(GenericAngle<Tag> divisor) const
 {
     if (divisor.toRadians() < FIXED_EPSILON)
     {
-        return Angle::fromRadians(toRadians());
+        return GenericAngle<Tag>::fromRadians(toRadians());
     }
     else
     {
-        return Angle::fromRadians(toRadians() - static_cast<double>(static_cast<long>(
-                                                    toRadians() / divisor.toRadians())) *
-                                                    divisor.toRadians());
+        return GenericAngle<Tag>::fromRadians(
+            toRadians() -
+            static_cast<double>(static_cast<long>(toRadians() / divisor.toRadians())) *
+                divisor.toRadians());
     }
 }
 
-inline constexpr Angle Angle::remainder(const Angle &divisor) const
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::remainder(
+    const GenericAngle<Tag>& divisor) const
 {
-    return Angle::fromRadians(toRadians() -
-                              static_cast<double>(static_cast<long>(
-                                  (toRadians() / divisor.toRadians()) >= 0
-                                      ? (toRadians() / divisor.toRadians() + 0.5)
-                                      : (toRadians() / divisor.toRadians() - 0.5))) *
-                                  divisor.toRadians());
+    return GenericAngle<Tag>::fromRadians(
+        toRadians() - static_cast<double>(static_cast<long>(
+                          (toRadians() / divisor.toRadians()) >= 0
+                              ? (toRadians() / divisor.toRadians() + 0.5)
+                              : (toRadians() / divisor.toRadians() - 0.5))) *
+                          divisor.toRadians());
 }
 
-inline constexpr Angle Angle::abs() const
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::abs() const
 {
-    return Angle::fromRadians(toRadians() < 0 ? -toRadians() : toRadians());
+    return GenericAngle<Tag>::fromRadians(toRadians() < 0 ? -toRadians() : toRadians());
 }
 
-inline bool Angle::isFinite() const
+template <typename Tag>
+inline bool GenericAngle<Tag>::isFinite() const
 {
     return std::isfinite(toRadians());
 }
 
-inline double Angle::sin() const
+template <typename Tag>
+inline double GenericAngle<Tag>::sin() const
 {
     return std::sin(toRadians());
 }
 
-inline double Angle::cos() const
+template <typename Tag>
+inline double GenericAngle<Tag>::cos() const
 {
     return std::cos(toRadians());
 }
 
-inline double Angle::tan() const
+template <typename Tag>
+inline double GenericAngle<Tag>::tan() const
 {
     return std::tan(toRadians());
 }
 
-inline constexpr Angle Angle::clamp() const
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::clamp() const
 {
-    return remainder(Angle::full());
+    return remainder(GenericAngle<Tag>::full());
 }
 
-inline constexpr Angle Angle::minDiff(const Angle &other) const
+template <typename Tag>
+inline constexpr GenericAngle<Tag> GenericAngle<Tag>::minDiff(
+    const GenericAngle<Tag>& other) const
 {
     return (*this - other).clamp().abs();
 }
 
-inline constexpr Angle::Angle(double rads) : rads(rads) {}
-
-inline constexpr Angle operator-(const Angle &angle)
+template <typename Tag>
+inline constexpr GenericAngle<Tag>::GenericAngle(double rads) : rads(rads)
 {
-    return Angle::fromRadians(-angle.toRadians());
 }
 
-inline constexpr Angle operator+(const Angle &x, const Angle &y)
+inline constexpr auto operator-(const AngleType auto& angle)
 {
-    return Angle::fromRadians(x.toRadians() + y.toRadians());
+    using T = std::remove_cvref_t<decltype(angle)>;
+    return T::fromRadians(-angle.toRadians());
 }
 
-inline constexpr Angle operator-(const Angle &x, const Angle &y)
+inline constexpr auto operator+(const AngleType auto& x, const AngleType auto& y)
 {
-    return Angle::fromRadians(x.toRadians() - y.toRadians());
+    using T = std::remove_cvref_t<decltype(x)>;
+    return T::fromRadians(x.toRadians() + y.toRadians());
 }
 
-inline constexpr Angle operator*(const Angle &angle, double scale)
+inline constexpr auto operator-(const AngleType auto& x, const AngleType auto& y)
 {
-    return Angle::fromRadians(angle.toRadians() * scale);
+    using T = std::remove_cvref_t<decltype(x)>;
+    return T::fromRadians(x.toRadians() - y.toRadians());
 }
 
-inline constexpr Angle operator*(double scale, const Angle &angle)
+template <typename Tag>
+inline constexpr GenericAngle<Tag> operator*(const GenericAngle<Tag>& angle, double scale)
 {
-    return Angle::fromRadians(scale * angle.toRadians());
+    return GenericAngle<Tag>::fromRadians(angle.toRadians() * scale);
 }
 
-inline constexpr Angle operator/(const Angle &angle, double divisor)
+template <typename Tag>
+inline constexpr GenericAngle<Tag> operator*(double scale, const GenericAngle<Tag>& angle)
 {
-    return Angle::fromRadians(angle.toRadians() / divisor);
+    return GenericAngle<Tag>::fromRadians(scale * angle.toRadians());
 }
 
-inline constexpr double operator/(const Angle &x, const Angle &y)
+template <typename Tag>
+inline constexpr GenericAngle<Tag> operator/(const GenericAngle<Tag>& angle,
+                                             double divisor)
+{
+    return GenericAngle<Tag>::fromRadians(angle.toRadians() / divisor);
+}
+
+inline constexpr double operator/(const AngleType auto& x, const AngleType auto& y)
 {
     return x.toRadians() / y.toRadians();
 }
 
-inline Angle &operator+=(Angle &x, const Angle &y)
+inline auto& operator+=(AngleType auto& x, const AngleType auto& y)
 {
     return x = x + y;
 }
 
-inline Angle &operator-=(Angle &x, const Angle &y)
+inline auto& operator-=(AngleType auto& x, const AngleType auto& y)
 {
     return x = x - y;
 }
 
-inline Angle &operator*=(Angle &angle, double scale)
+inline auto& operator*=(AngleType auto& angle, double scale)
 {
     return angle = angle * scale;
 }
 
-inline Angle &operator/=(Angle &angle, double divisor)
+inline auto& operator/=(AngleType auto& angle, double divisor)
 {
     return angle = angle / divisor;
 }
 
-inline constexpr bool operator<(const Angle &x, const Angle &y)
+inline constexpr bool operator<(const AngleType auto& x, const AngleType auto& y)
 {
     return x.toRadians() < y.toRadians();
 }
 
-inline constexpr bool operator>(const Angle &x, const Angle &y)
+inline constexpr bool operator>(const AngleType auto& x, const AngleType auto& y)
 {
     return x.toRadians() > y.toRadians();
 }
 
-inline constexpr bool operator<=(const Angle &x, const Angle &y)
+inline constexpr bool operator<=(const AngleType auto& x, const AngleType auto& y)
 {
     return x.toRadians() <= y.toRadians();
 }
 
-inline constexpr bool operator>=(const Angle &x, const Angle &y)
+inline constexpr bool operator>=(const AngleType auto& x, const AngleType auto& y)
 {
     return x.toRadians() >= y.toRadians();
 }
 
-inline bool operator==(const Angle &x, const Angle &y)
+inline bool operator==(const AngleType auto& x, const AngleType auto& y)
 {
-    Angle diff = x.clamp().minDiff(y.clamp());
+    AngleType auto diff = x.clamp().minDiff(y.clamp());
     return diff.toRadians() <= FIXED_EPSILON;
 }
 
-inline constexpr bool operator!=(const Angle &x, const Angle &y)
+inline constexpr bool operator!=(const AngleType auto& x, const AngleType auto& y)
 {
     return x.toRadians() != y.toRadians();
 }
 
-inline std::ostream &operator<<(std::ostream &os, const Angle &a)
+inline std::ostream& operator<<(std::ostream& os, const AngleType auto& a)
 {
     os << a.toRadians() << "R";
     return os;
 }
+
+using Angle = GenericAngle<AngleTag>;
