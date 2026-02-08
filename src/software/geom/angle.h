@@ -14,10 +14,10 @@ template <typename Tag>
 concept IsBaseAngleTag = std::is_same_v<Tag, AngleTag>;
 
 /**
- * A typesafe representation of an angle.
+ * A typesafe representation of a generic angle.
  *
- * This class helps prevent accidentally combining values in degrees and radians
- * without proper conversion.
+ * This template class helps prevent accidentally combining values in degrees
+ * and radians without proper conversion.
  */
 template <typename Tag>
 class GenericAngle final
