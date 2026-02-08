@@ -84,7 +84,7 @@ void robotAtAngularVelocity(RobotId robot_id, std::shared_ptr<World> world_ptr,
             << "There is no robot with ID: " + std::to_string(robot_id);
 
         Robot robot = robot_optional.value();
-        if (robot.angularVelocity().minDiff(angular_velocity) >
+        if ((robot.angularVelocity() - angular_velocity).abs() >
             close_to_angular_velocity_threshold)
         {
             return robot.angularVelocity();
