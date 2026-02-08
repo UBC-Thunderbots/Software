@@ -1,4 +1,4 @@
-#include "software/geom/angle.h"
+#include "software/geom/generic_angle.h"
 
 /**
  * A typesafe representation of an angular acceleration.
