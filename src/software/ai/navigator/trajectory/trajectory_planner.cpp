@@ -109,8 +109,9 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
                 break;
             }
 
-            TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
-                traj_path_to_dest, obstacles, sub_trajectory, connection_time, best_traj_with_cost.cost);
+            TrajectoryPathWithCost full_traj_with_cost =
+                getTrajectoryWithCost(traj_path_to_dest, obstacles, sub_trajectory,
+                                      connection_time, best_traj_with_cost.cost);
             full_traj_with_cost.cost += cost_offset;
             if (full_traj_with_cost.cost < best_traj_with_cost.cost)
             {
@@ -133,14 +134,14 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
         }
     }
 
-	return best_traj_with_cost.traj_path;
+    return best_traj_with_cost.traj_path;
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
     const Point &start, const Point &destination, const Vector &initial_velocity,
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles)
 {
-	// Calculate full new cost regardless by passing in maximum max cost
+    // Calculate full new cost regardless by passing in maximum max cost
     return getTrajectoryWithCost(
         TrajectoryPath(std::make_shared<BangBangTrajectory2D>(
                            start, destination, initial_velocity, constraints),
@@ -151,14 +152,12 @@ TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
 TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-    const std::optional<double> sub_traj_duration_s,
-	const std::optional<double> max_cost)
+    const std::optional<double> sub_traj_duration_s, const std::optional<double> max_cost)
 {
     CollisionEvaluator evaluator(obstacles);
-    TrajectoryPathWithCost traj_with_cost(
-        evaluator.evaluate(trajectory, sub_traj_with_cost, sub_traj_duration_s, max_cost));
-	
+    TrajectoryPathWithCost traj_with_cost(evaluator.evaluate(
+        trajectory, sub_traj_with_cost, sub_traj_duration_s, max_cost));
+
 
     return traj_with_cost;
 }
-
