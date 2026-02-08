@@ -35,7 +35,7 @@ class CollisionEvaluator
      *        collision interval.
      * @param sub_traj_duration_s
      *        The duration (in seconds) of the prefix trajectory within trajectory.
-	 * #param max_cost
+	 * @param max_cost
 	 *		Current maximum cost of best path
      * @return
      *         A TrajectoryPathWithCost< containing the trajectory along with

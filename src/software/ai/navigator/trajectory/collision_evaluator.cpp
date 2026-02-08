@@ -1,5 +1,8 @@
 #include "software/ai/navigator/trajectory/collision_evaluator.h"
 
+const double FRONT_COLLISION_COST_CONST = 3.0;
+const double BACK_COLLISION_COST_CONST = 1.0;
+const double MID_TRAJ_COST_CONST = 6.0;
 CollisionEvaluator::CollisionEvaluator(const std::vector<ObstaclePtr> &obstacles)
     : obstacles(obstacles)
 {
@@ -41,7 +44,7 @@ TrajectoryPathWithCost CollisionEvaluator::evaluate(
     traj_with_cost.collision_duration_front_s = first_non_collision_time;
 
 	// 2 .Add first front collision to total cost
-	total_cost += 3 * first_non_collision_time;
+	total_cost += FRONT_COLLISION_COST_CONST * first_non_collision_time;
 
     // Return early if current cost already higher than max cost
 	if (total_cost >= max_cost){
@@ -58,7 +61,7 @@ TrajectoryPathWithCost CollisionEvaluator::evaluate(
         search_end_time_s - last_non_collision_time;
 
 	// 3. Add back collision to total cost
-	total_cost += 1 * traj_with_cost.collision_duration_back_s;
+	total_cost += BACK_COLLISION_COST_CONST * traj_with_cost.collision_duration_back_s;
 
     // Return early if current cost already higher than max cost
 	if (total_cost >= max_cost){
@@ -88,7 +91,7 @@ TrajectoryPathWithCost CollisionEvaluator::evaluate(
 	
     // 4. Add 6.0 to collision if mid-trajectory collision exist
 	if (traj_with_cost.colliding_obstacle != nullptr){
-		total_cost += 6.0;
+		total_cost += MID_TRAJ_COST_CONST;
 	}
 
     // 5: Add distance from first collision to destination                                                                                                                                   
