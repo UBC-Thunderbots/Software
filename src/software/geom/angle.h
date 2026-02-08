@@ -638,13 +638,20 @@ inline constexpr bool operator>=(const AngleType auto& x, const AngleType auto& 
 
 inline bool operator==(const AngleType auto& x, const AngleType auto& y)
 {
-    AngleType auto diff = x.clamp().minDiff(y.clamp());
-    return diff.toRadians() <= FIXED_EPSILON;
+    if constexpr (std::is_same_v<decltype(x), const Angle&>)
+    {
+        Angle diff = x.clamp().minDiff(y.clamp());
+        return diff.toRadians() <= FIXED_EPSILON;
+    }
+    else
+    {
+        return fabs(x.toRadians() - y.toRadians()) <= FIXED_EPSILON;
+    }
 }
 
 inline constexpr bool operator!=(const AngleType auto& x, const AngleType auto& y)
 {
-    return x.toRadians() != y.toRadians();
+    return !(x == y);
 }
 
 inline std::ostream& operator<<(std::ostream& os, const AngleType auto& a)
