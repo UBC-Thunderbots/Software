@@ -27,18 +27,13 @@ class CollisionEvaluator
      * If a prefix trajectory is provided, collision information that occurs entirely
      * before the given prefix duration may be reused to avoid redundant collision
      * checking. Collision checks beyond the prefix duration are computed normally.
-     * @param trajectory
-     *        The trajectory to evaluate for collisions and cost.
-     * @param sub_traj_with_cost
-     *        An optional previously evaluated prefix trajectory whose collision
-     *        information may be reused if the prefix fully covers the relevant
-     *        collision interval.
-     * @param sub_traj_duration_s
-     *        The duration (in seconds) of the prefix trajectory within trajectory.
-	 * @param max_cost
-	 *		Current maximum cost of best path
-     * @return
-     *         A TrajectoryPathWithCost< containing the trajectory along with
+     * @param trajectory The trajectory to evaluate for collisions and cost.
+     * @param sub_traj_with_cost An optional previously evaluated prefix trajectory whose collision
+     * information may be reused if the prefix fully covers the relevant
+     * collision interval.
+     * @param sub_traj_duration_s The duration (in seconds) of the prefix trajectory within trajectory.
+	 * @param max_cost Current maximum cost of best path
+     * @return A TrajectoryPathWithCost< containing the trajectory along with
      *         computed collision timing information and total cost.
      */
     TrajectoryPathWithCost evaluate(
