@@ -34,7 +34,7 @@ class TrajectoryPathWithCost
 
     // The time and obstacle at which the trajectory first collides with an
     // obstacle first_collision_time_s is set to infinity and colliding_obstacle is
-    // nullptr if the trajectory does not collide.
+    // nullopt if the trajectory does not collide.
     // Note that collisions that the trajectory starts or ends in are not considered as
     // those are unavoidable + they are handled by collision_duration_front_s and
     // collision_duration_back_s.
