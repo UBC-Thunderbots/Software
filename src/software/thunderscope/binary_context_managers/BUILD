@@ -63,5 +63,5 @@ py_library(
     ],
     deps = [
         requirement("requests"),
-    ]
+    ],
 )
