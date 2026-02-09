@@ -3,6 +3,7 @@
 
 #include "proto/primitive/primitive_types.h"
 #include "software/ai/hl/stp/tactic/primitive.h"
+#include "software/ai/hl/stp/tactic/vis_proto_deduper.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_2d.h"
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
@@ -100,4 +101,7 @@ class MovePrimitive : public Primitive
     TrajectoryPlanner planner;
 
     constexpr static unsigned int NUM_TRAJECTORY_VISUALIZATION_POINTS = 10;
+    constexpr static unsigned int PROTO_DEDUPER_WINDOW_SIZE = 5;
+
+    inline static VisProtoDeduper vis_proto_deduper{PROTO_DEDUPER_WINDOW_SIZE};
 };
