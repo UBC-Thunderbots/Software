@@ -218,6 +218,11 @@ def setup_gl_widget(
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 
+    if sandbox_mode:
+        full_system_proto_unix_io.register_observer(
+            World, gl_widget.util_toolbar.sandbox_state_toolbar.world_buffer
+        )
+
     return gl_widget
 
 

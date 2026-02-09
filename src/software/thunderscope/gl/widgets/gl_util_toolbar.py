@@ -20,7 +20,11 @@ class GLUtilToolbar(GLToolbar):
     GAME_CONTROLLER_URL = "http://localhost:8081"
 
     def __init__(
-        self, parent: QWidget, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool, sandbox_mode: bool = False
+        self,
+        parent: QWidget,
+        proto_unix_io: ProtoUnixIO,
+        friendly_color_yellow: bool,
+        sandbox_mode: bool = False,
     ):
         """Initializes the toolbar and constructs its layout
 
@@ -29,7 +33,7 @@ class GLUtilToolbar(GLToolbar):
         :param friendly_color_yellow True if yellow is friendly team, False if not
         """
         super(GLUtilToolbar, self).__init__(parent=parent)
-        
+
         self.sandbox_mode = sandbox_mode
 
         self.gc_toolbar = GLGamecontrollerToolbar(
@@ -42,15 +46,17 @@ class GLUtilToolbar(GLToolbar):
         self.add_separator()
 
         self.runtime_toolbar = GLRuntimeToolbar(toolbar=self)
-        
+
         if self.sandbox_mode:
             self.add_separator()
-            self.sandbox_state_toolbar = GLSandboxStateToolbar(toolbar=self)
+            self.sandbox_state_toolbar = GLSandboxStateToolbar(
+                toolbar=self, proto_unix_io=proto_unix_io
+            )
 
     @override
     def refresh(self) -> None:
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
-        
+
         if self.sandbox_mode:
             self.sandbox_state_toolbar.refresh()

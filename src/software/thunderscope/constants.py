@@ -400,9 +400,18 @@ class RuntimeManagerConstants:
     RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
     DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
     MAX_RELEASES_FETCHED = 5
-    
+
+
 class SandboxModeConstants:
     """Constants used in Sandbox Mode"""
-    
+
     SAVED_STATES_PATH = "/tmp/tbots/saved_states"
-    
+
+    SAVED_STATE_BLUE_TEAM = "blue_team"
+    SAVED_STATE_YELLOW_TEAM = "yellow_team"
+
+    class TeamKeys:
+        LOCATION = "location"
+        VELOCITY = "velocity"
+        ORIENTATION = "orientation"
+        ANGULAR_VELOCITY = "angular_velocity"

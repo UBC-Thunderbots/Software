@@ -45,3 +45,14 @@ py_library(
         requirement("qtawesome"),
     ],
 )
+
+py_library(
+    name = "gl_sandbox_state_toolbar",
+    srcs = ["gl_sandbox_state_toolbar.py"],
+    deps = [
+        "//proto:import_all_protos",
+        "//software/thunderscope/gl/widgets:gl_toolbar",
+        requirement("pyqtgraph"),
+        requirement("qtawesome"),
+    ],
+)

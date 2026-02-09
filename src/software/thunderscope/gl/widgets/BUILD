@@ -37,6 +37,7 @@ py_library(
         "//proto:import_all_protos",
         "//software/thunderscope/gl/widgets/toolbars:gl_gamecontroller_toolbar",
         "//software/thunderscope/gl/widgets/toolbars:gl_runtime_toolbar",
+        "//software/thunderscope/gl/widgets/toolbars:gl_sandbox_state_toolbar",
         requirement("pyqtgraph"),
         requirement("qtawesome"),
     ],

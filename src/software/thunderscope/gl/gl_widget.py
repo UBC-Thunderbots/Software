@@ -111,7 +111,7 @@ class GLWidget(QWidget):
             parent=self.gl_view_widget,
             proto_unix_io=proto_unix_io,
             friendly_color_yellow=friendly_color_yellow,
-            sandbox_mode=sandbox_mode
+            sandbox_mode=sandbox_mode,
         )
 
         self.__add_toolbar_toggle(self.util_toolbar, "Util")
