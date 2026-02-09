@@ -73,7 +73,9 @@ class GlFSStatsLayer(GLLayer):
         self.record_enemy_stats = record_enemy_stats
         if self.record_enemy_stats:
             self.enemy_stats = FSStats()
-            print(f"\n\n\n##### Writing Enemy FS Stats to {self._get_enemy_stats_file()}#####\n\n\n")
+            print(
+                f"\n\n\n##### Writing Enemy FS Stats to {self._get_enemy_stats_file()}#####\n\n\n"
+            )
 
     @override
     def refresh_graphics(self) -> None:
@@ -251,7 +253,9 @@ class GlFSStatsLayer(GLLayer):
                 self.stats.latest_shot_angle = new_shot_angle
                 self.stats.shot_taken = False
 
-    def _record_attacker_stats(self, ball: tbots_cpp.Ball, field: tbots_cpp.Field) -> None:
+    def _record_attacker_stats(
+        self, ball: tbots_cpp.Ball, field: tbots_cpp.Field
+    ) -> None:
         """Record stats related to the attacker
         i.e the shots taken on goal by the friendly team
         Checks if the shot has actually been taken or not
@@ -262,11 +266,15 @@ class GlFSStatsLayer(GLLayer):
 
         # check if the shot chosen by the attacker has actually been taken
         # and additionally, if the ball is in the enemy half (reduces noise)
-        if not self.stats.shot_taken and ball.hasBallBeenKicked(
-            self.stats.latest_shot_angle,
-            self.MIN_SHOT_SPEED,
-            self.MAX_KICK_ANGLE_DIFFERENCE,
-        ) and field.pointInEnemyHalf(ball.position()):
+        if (
+            not self.stats.shot_taken
+            and ball.hasBallBeenKicked(
+                self.stats.latest_shot_angle,
+                self.MIN_SHOT_SPEED,
+                self.MAX_KICK_ANGLE_DIFFERENCE,
+            )
+            and field.pointInEnemyHalf(ball.position())
+        ):
             self.stats.num_shots_on_net += 1
             self.stats.shot_taken = True
 
@@ -312,7 +320,7 @@ class GlFSStatsLayer(GLLayer):
             RuntimeManagerConstants.RUNTIME_STATS_DIRECTORY_PATH,
             RuntimeManagerConstants.RUNTIME_ENEMY_STATS_FILE
             if self.friendly_colour_yellow
-            else RuntimeManagerConstants.RUNTIME_FRIENDLY_STATS_FILE
+            else RuntimeManagerConstants.RUNTIME_FRIENDLY_STATS_FILE,
         )
 
     def _get_enemy_stats_file(self):
@@ -320,8 +328,9 @@ class GlFSStatsLayer(GLLayer):
             RuntimeManagerConstants.RUNTIME_STATS_DIRECTORY_PATH,
             RuntimeManagerConstants.RUNTIME_FRIENDLY_FROM_ENEMY_STATS_FILE
             if self.friendly_colour_yellow
-            else RuntimeManagerConstants.RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE
+            else RuntimeManagerConstants.RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE,
         )
+
     def _flush_stats(self):
         """Write the current stats to disk"""
         stats_file_name = self._get_stats_file()
