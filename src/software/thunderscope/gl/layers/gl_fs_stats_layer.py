@@ -66,9 +66,14 @@ class GlFSStatsLayer(GLLayer):
 
         self.stats = FSStats()
 
+        # the python __del__ destructor isn't called reliably
+        # so printing this at the start instead
+        print(f"\n\n\n##### Writing FS Stats to {self._get_stats_file()}#####\n\n\n")
+
         self.record_enemy_stats = record_enemy_stats
         if self.record_enemy_stats:
             self.enemy_stats = FSStats()
+            print(f"\n\n\n##### Writing Enemy FS Stats to {self._get_enemy_stats_file()}#####\n\n\n")
 
     @override
     def refresh_graphics(self) -> None:
@@ -78,7 +83,7 @@ class GlFSStatsLayer(GLLayer):
 
         self._update_posession(world)
 
-        self._record_attacker_stats(world.ball())
+        self._record_attacker_stats(world.ball(), world.field())
 
         self._record_goalie_stats(world.ball(), world.field())
 
@@ -246,7 +251,7 @@ class GlFSStatsLayer(GLLayer):
                 self.stats.latest_shot_angle = new_shot_angle
                 self.stats.shot_taken = False
 
-    def _record_attacker_stats(self, ball: tbots_cpp.Ball) -> None:
+    def _record_attacker_stats(self, ball: tbots_cpp.Ball, field: tbots_cpp.Field) -> None:
         """Record stats related to the attacker
         i.e the shots taken on goal by the friendly team
         Checks if the shot has actually been taken or not
@@ -255,11 +260,13 @@ class GlFSStatsLayer(GLLayer):
         """
         self._update_latest_shot_angle()
 
+        # check if the shot chosen by the attacker has actually been taken
+        # and additionally, if the ball is in the enemy half (reduces noise)
         if not self.stats.shot_taken and ball.hasBallBeenKicked(
             self.stats.latest_shot_angle,
             self.MIN_SHOT_SPEED,
             self.MAX_KICK_ANGLE_DIFFERENCE,
-        ):
+        ) and field.pointInEnemyHalf(ball.position()):
             self.stats.num_shots_on_net += 1
             self.stats.shot_taken = True
 
@@ -300,35 +307,38 @@ class GlFSStatsLayer(GLLayer):
         if team_info.HasField("red_cards"):
             stats.num_red_cards = team_info.red_cards
 
-    def _flush_stats(self):
-        """Write the current stats to disk"""
-        stats_file_name = (
+    def _get_stats_file(self):
+        return os.path.join(
+            RuntimeManagerConstants.RUNTIME_STATS_DIRECTORY_PATH,
             RuntimeManagerConstants.RUNTIME_ENEMY_STATS_FILE
             if self.friendly_colour_yellow
             else RuntimeManagerConstants.RUNTIME_FRIENDLY_STATS_FILE
         )
 
+    def _get_enemy_stats_file(self):
+        return os.path.join(
+            RuntimeManagerConstants.RUNTIME_STATS_DIRECTORY_PATH,
+            RuntimeManagerConstants.RUNTIME_FRIENDLY_FROM_ENEMY_STATS_FILE
+            if self.friendly_colour_yellow
+            else RuntimeManagerConstants.RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE
+        )
+    def _flush_stats(self):
+        """Write the current stats to disk"""
+        stats_file_name = self._get_stats_file()
+
         self._write_stats_to_file(self.stats, stats_file_name)
 
         if self.record_enemy_stats:
-            enemy_stats_file_name = (
-                RuntimeManagerConstants.RUNTIME_FRIENDLY_FROM_ENEMY_STATS_FILE
-                if self.friendly_colour_yellow
-                else RuntimeManagerConstants.RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE
-            )
+            enemy_stats_file_name = self._get_enemy_stats_file()
 
             self._write_stats_to_file(self.enemy_stats, enemy_stats_file_name)
 
-    def _write_stats_to_file(self, stats: FSStats, file_name: str) -> None:
+    def _write_stats_to_file(self, stats: FSStats, file_path: str) -> None:
         """Write the given stats to the given file
 
         :param stats: the stats to write
-        :param file_name: the file to write to
+        :param file_path: the file to write to
         """
-        file_path = os.path.join(
-            RuntimeManagerConstants.RUNTIME_STATS_DIRECTORY_PATH, file_name
-        )
-
         try:
             # formatted as key-value pairs in TOML
             stats_to_write = (
