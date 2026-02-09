@@ -189,7 +189,7 @@ gdb --args bazel-bin/{self.full_system}
                     "--runtime_dir={}".format(self.full_system_runtime_dir),
                 ]
             ):
-                relf.full_system_proc = Popen(self.full_system.split(" "))
+                self.full_system_proc = Popen(self.full_system.split(" "))
                 logging.info("FullSystem has restarted.")
 
             time.sleep(1)
