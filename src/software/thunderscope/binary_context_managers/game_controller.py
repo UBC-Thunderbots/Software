@@ -84,6 +84,10 @@ class Gamecontroller:
         """
         command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
 
+        # Kill any gamecontroller, even those with different IP/port, because
+        # of the port assignment logic when use_conventional_port=False
+        kill_cmd_if_running(command)
+
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
