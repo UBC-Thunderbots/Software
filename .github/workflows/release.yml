@@ -43,10 +43,32 @@ jobs:
       - name: Check for recent commits
         id: check
         run: |
+          git fetch --tags
+          
+          LATEST_TAG=$(git describe --tags --match "v[0-9]*" --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $LATEST_TAG"
+          
+          # Prevent double release on the same day (unless manual dispatch)
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$LATEST_TAG" != "v0.0.0" ]; then
+            TAG_DATE=$(git log -1 --format=%as "$LATEST_TAG")
+            TODAY=$(date +%Y-%m-%d)
+            echo "Tag Date: $TAG_DATE, Today: $TODAY"
+            
+            if [ "$TAG_DATE" = "$TODAY" ]; then
+              echo "Already released $LATEST_TAG today. Skipping."
+              echo "count=0" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "count=1" >> $GITHUB_OUTPUT
           else
-            COUNT=$(git log --since="1 week ago" --oneline | wc -l)
+            if [ "$LATEST_TAG" = "v0.0.0" ]; then
+               COUNT=$(git log --oneline | wc -l)
+            else
+               COUNT=$(git log "$LATEST_TAG"..HEAD --oneline | wc -l)
+            fi
             echo "count=$COUNT" >> $GITHUB_OUTPUT
           fi
           
@@ -54,18 +76,19 @@ jobs:
         if: steps.check.outputs.count > 0 
         id: bump_logic
         run: |
-          if [ "${{ github.event.inputs.release_tag }}" = "" ]; then
+          LATEST_TAG=$(git describe --tags --match "v[0-9]*" --abbrev=0 2>/dev/null || echo "v1.0.0")
+          BASE_VERSION=${LATEST_TAG#v}
+          
+          IFS='.' read -r major minor patch <<< "$BASE_VERSION"
+          
+          if [ "${{ github.event.inputs.release_tag }}" != "" ]; then
+            NEW_TAG="${{ github.event.inputs.release_tag }}"
+          else 
             BUMP="patch"
             if [ "$(date +%d)" = "01" ]; then BUMP="minor"; fi
             if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
               BUMP="${{ github.event.inputs.version_type }}"
             fi
-            
-            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
-            # Strip the 'v' prefix
-            BASE_VERSION=${LATEST_TAG#v}
-            
-            IFS='.' read -r major minor patch <<< "$BASE_VERSION"
             
             if [ "$BUMP" = "major" ]; then
               major=$((major + 1)); minor=0; patch=0
@@ -76,8 +99,6 @@ jobs:
             fi
             
             NEW_TAG="v$major.$minor.$patch"
-          else 
-            NEW_TAG="${{ github.event.inputs.release_tag }}"
           fi
           echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
           echo "Using version: $NEW_TAG"
@@ -89,16 +110,6 @@ jobs:
         with:
           version: ${{ steps.bump_logic.outputs.tag }}
           tag: ${{ steps.bump_logic.outputs.tag }}
-
-      - name: Create GitHub Release
-        if: steps.check.outputs.count > 0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "${{ steps.bump_logic.outputs.tag }}" \
-            --title "${{ steps.bump_logic.outputs.tag }}" \
-            --generate-notes \
-            --draft 
 
   upload_assets:
     needs: prepare_release
@@ -128,10 +139,21 @@ jobs:
         run: | 
           cd src
           TAG="${{ needs.prepare_release.outputs.tag }}"
+          VERSION=${TAG#v}
+          
+          PLATFORM="${{ matrix.platform }}"
+          if [ "$PLATFORM" = "ubuntu-x86" ]; then
+            PLATFORM="linux_amd64"
+          elif [ "$PLATFORM" = "mac-arm64" ]; then
+            PLATFORM="macos_arm64"
+          fi
+          
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- //software:unix_full_system_tar_gen
-          mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/unix_full_system_${{ needs.prepare_release.outputs.tag }}_${{ matrix.platform }}.tar.gz" 
-          gh release upload "$TAG" "${{ runner.temp }}/unix_full_system_${{ needs.prepare_release.outputs.tag }}_${{ matrix.platform }}.tar.gz"
+          
+          ARTIFACT_NAME="unix_full_system-${VERSION}-${PLATFORM}.tar.gz"
+          mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/$ARTIFACT_NAME" 
+          gh release upload "$TAG" "${{ runner.temp }}/$ARTIFACT_NAME"
 
   publish_release:
     needs: [prepare_release, upload_assets]
