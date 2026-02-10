@@ -81,7 +81,7 @@ TrajectoryPathWithCost CollisionEvaluator::evaluate(
         traj_with_cost.colliding_obstacle     = collision.second;
     }
 
-    // Add 6.0 to collision if mid-trajectory collision exist
+    // Add penalty if mid-trajectory collision exists
     if (traj_with_cost.colliding_obstacle != nullptr)
     {
         total_cost += MID_TRAJ_COST_CONST;
