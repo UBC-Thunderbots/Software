@@ -1,8 +1,5 @@
 #include "software/ai/navigator/trajectory/collision_evaluator.h"
 
-const double FRONT_COLLISION_COST_CONST = 3.0;
-const double BACK_COLLISION_COST_CONST  = 1.0;
-const double MID_TRAJ_COST_CONST        = 6.0;
 CollisionEvaluator::CollisionEvaluator(const std::vector<ObstaclePtr> &obstacles)
     : obstacles(obstacles)
 {
