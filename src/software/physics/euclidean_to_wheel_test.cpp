@@ -14,6 +14,7 @@ class EuclideanToWheelTest : public ::testing::Test
     WheelSpace_t calculated_wheel_speeds{};
     RobotConstants robot_constants = create2021RobotConstants();
     double robot_radius            = create2021RobotConstants().robot_radius_m;
+    double track_width = create2021RobotConstants().robot_center_to_wheel_center_m;
 
     WheelSpace_t target_wheel_velocity{};
     WheelSpace_t current_wheel_velocity{};
@@ -115,11 +116,10 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w)
     // Formula for the length of a segment: length = radius * angle
     // Since angle = 1rad, the length of the segment is equal to the radius.
     // Therefore, all wheel speeds must be equal to the robot radius.
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
-                     robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], track_width);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], track_width);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], track_width);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], track_width);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w)
@@ -134,12 +134,10 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w)
     // Therefore, all wheel speeds (=length of segment/sec) must be equal to the robot
     // radius.
     EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
-                     -robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX],
-                     -robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], -robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX],
-                     -robot_radius);
+                     -track_width);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], -track_width);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], -track_width);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], -track_width);
 }
 
 TEST_F(EuclideanToWheelTest, test_conversion_is_linear)

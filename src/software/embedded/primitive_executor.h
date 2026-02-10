@@ -37,13 +37,14 @@ class PrimitiveExecutor
     void setStopPrimitive();
 
     /**
-     * Update primitive executor with the current velocity of the robot
+     * Update primitive executor with the current velocity and orientation of the robot
      *
      * @param local_velocity The current _local_ velocity
      * @param angular_velocity The current angular velocity
+     * @param orientation The current orientation of the robot
      */
-    void updateVelocity(const Vector &local_velocity,
-                        const AngularVelocity &angular_velocity);
+    void updateState(const Vector &local_velocity,
+                     const AngularVelocity &angular_velocity, const Angle &orientation);
 
     /**
      * Set the robot id
@@ -62,6 +63,12 @@ class PrimitiveExecutor
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
         TbotsProto::PrimitiveExecutorStatus &status);
 
+    /*
+     * Get the target angular acceleration that the robot should be at.
+     * @returns AngularVelocity The target angular acceleration
+     */
+    AngularVelocity getTargetAngularAcceleration();
+
    private:
     /*
      * Compute the next target linear _local_ velocity the robot should be at.
@@ -77,7 +84,8 @@ class PrimitiveExecutor
     AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
-    Duration time_since_trajectory_creation_;
+    Duration time_since_angular_trajectory_creation_;
+    Duration time_since_linear_trajectory_creation_;
     Vector velocity_;
     AngularVelocity angular_velocity_;
     Angle orientation_;
@@ -91,8 +99,11 @@ class PrimitiveExecutor
     Duration time_step_;
     RobotId robot_id_;
 
-    // Estimated delay between a vision frame to AI processing to robot executing
-    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+    // When driving, the robot will rotate the direction its driving away from its angular
+    // velocity, if this number is higher, it will lean away more from the turn.
+    static constexpr double LEAN_BIAS = 2;
+
+    static constexpr double ORIENTATION_KP = 0.3;
 
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.

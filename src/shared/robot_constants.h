@@ -15,6 +15,9 @@ typedef struct RobotConstants
     // The radius of the robot [m]
     float robot_radius_m;
 
+    // Distance from center of rotation of the robot to the center of a wheel [m]
+    float robot_center_to_wheel_center_m;
+
     // The maximum jerk this robot may safely undergo [m/s^3]
     float jerk_limit_kg_m_per_s_3;
 
@@ -97,5 +100,14 @@ typedef struct RobotConstants
     // The gear ratio between the motor shaft and wheel shaft
     // [# of wheel rotations / 1 motor rotation]
     float wheel_rotations_per_motor_rotation;
+
+    // Various variances for the robot localizer
+    float kalman_process_noise_variance_rad_per_s_4;
+
+    float kalman_vision_noise_variance_rad_2;
+
+    float kalman_encoder_noise_variance_rad_per_s_2;
+
+    float kalman_target_angular_velocity_variance_rad_per_sec_2;
 
 } RobotConstants_t;
