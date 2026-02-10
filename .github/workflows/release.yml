@@ -139,19 +139,11 @@ jobs:
         run: | 
           cd src
           TAG="${{ needs.prepare_release.outputs.tag }}"
-          VERSION=${TAG#v}
-          
-          PLATFORM="${{ matrix.platform }}"
-          if [ "$PLATFORM" = "ubuntu-x86" ]; then
-            PLATFORM="linux_amd64"
-          elif [ "$PLATFORM" = "mac-arm64" ]; then
-            PLATFORM="macos_arm64"
-          fi
           
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
           -- //software:unix_full_system_tar_gen
           
-          ARTIFACT_NAME="unix_full_system-${VERSION}-${PLATFORM}.tar.gz"
+          ARTIFACT_NAME="unix_full_system_${TAG}_${{ matrix.platform }}.tar.gz"
           mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/$ARTIFACT_NAME" 
           gh release upload "$TAG" "${{ runner.temp }}/$ARTIFACT_NAME"
 
