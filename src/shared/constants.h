@@ -234,5 +234,5 @@ constexpr double AUTO_CHIP_DISTANCE_DEFAULT_M     = 1.5;
 constexpr double AUTO_KICK_SPEED_DEFAULT_M_PER_S  = 1.5;
 constexpr double WHEEL_ROTATION_MAX_SPEED_M_PER_S = 15.2;
 
-static const std::string PASS_FEATURE_DELIMITER  = ",";
-static const std::string PASS_FEATURE_FILE = "pass_features.csv";
+static const std::string PASS_FEATURE_DELIMITER = ",";
+static const std::string PASS_FEATURE_FILE      = "pass_features.csv";

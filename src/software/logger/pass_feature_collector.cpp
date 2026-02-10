@@ -1,21 +1,23 @@
 
 #include "pass_feature_collector.h"
 
-#include <utility>
-#include "compat_flags.h"
 #include <zlib.h>
 
-PassFeatureCollector::PassFeatureCollector(std::string log_dir, bool friendly_colour_yellow)
-    : log_dir_(std::move(log_dir)),
-      friendly_colour_yellow_(friendly_colour_yellow)
+#include <utility>
+
+#include "compat_flags.h"
+
+PassFeatureCollector::PassFeatureCollector(std::string log_dir,
+                                           bool friendly_colour_yellow)
+    : log_dir_(std::move(log_dir)), friendly_colour_yellow_(friendly_colour_yellow)
 {
     log_path_ = log_dir + "/" + PASS_FEATURE_FILE;
     fs::create_directories(log_path_);
 }
 
-PassFeatureCollector::PassFeatureCollector(const std::string& log_path, bool friendly_colour_yellow)
+PassFeatureCollector::PassFeatureCollector(const std::string& log_path,
+                                           bool friendly_colour_yellow)
 {
-
 }
 
 void PassFeatureCollector::logFeaturesToFile(std::string log_entry)
@@ -40,4 +42,3 @@ void PassFeatureCollector::logFeaturesToFile(std::string log_entry)
                   << " with error " << result << std::endl;
     }
 }
-

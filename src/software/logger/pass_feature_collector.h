@@ -21,15 +21,14 @@
  */
 class PassFeatureCollector
 {
-    public:
+   public:
     PassFeatureCollector(const std::string& log_path, bool friendly_colour_yellow);
 
     ~PassFeatureCollector();
 
     void logPassFeatures(const Pass& pass, const World& world);
 
-    private:
-
+   private:
     void logFeaturesToFile(std::string log_entry);
     void isPassDefinitelyBad(const Pass& pass, const World& world);
 
