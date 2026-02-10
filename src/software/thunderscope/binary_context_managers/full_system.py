@@ -105,7 +105,7 @@ class FullSystem:
             logging.debug("Binary support flags: {}".format(supported_flags))
         else:
             logging.warning(
-                "Could not discovery flags for path: '{}'. Continuing...".format(
+                "Could not discover flags for path: '{}'. Continuing...".format(
                     self.path_to_binary
                 )
             )
