@@ -5,6 +5,7 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.gl.graphics.gl_graphic import GLGraphic
 from typing import Optional, override
 
+
 class GLLineStrip(GLGraphic):
     """Displays a 1D line strip on the cartesian plane (i.e. x-y plane)"""
 

@@ -5,14 +5,15 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from software.thunderscope.constants import Colors, LINE_WIDTH
 from typing import Optional
 
+
 class GLGraphic(GLLinePlotItem):
     """Abstract base class for 1D and 2D graphics on the cartesian plane (i.e. x-y plane)"""
 
     def __init__(
-            self,
-            parent_item: Optional[GLGraphicsItem] = None,
-            outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
-            line_width: float = LINE_WIDTH,
+        self,
+        parent_item: Optional[GLGraphicsItem] = None,
+        outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
+        line_width: float = LINE_WIDTH,
     ) -> None:
         """Initialize the GLGraphic
 
