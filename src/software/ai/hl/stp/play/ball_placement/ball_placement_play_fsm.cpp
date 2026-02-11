@@ -13,6 +13,19 @@ BallPlacementPlayFSM::BallPlacementPlayFSM(
 {
 }
 
+// Subtract b from a, or return 0 if b is larger than a
+static unsigned int subSat(unsigned int a, unsigned int b)
+{
+    if (b > a)
+    {
+        return 0;
+    }
+    else
+    {
+        return a - b;
+    }
+}
+
 void BallPlacementPlayFSM::alignWall(const Update &event)
 {
     PriorityTacticVector tactics_to_run = {{align_wall_tactic}};
@@ -25,8 +38,8 @@ void BallPlacementPlayFSM::alignWall(const Update &event)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
 
-    setupMoveTactics(event, event.common.num_tactics -
-                                static_cast<unsigned int>(tactics_to_run[0].size()));
+    setupMoveTactics(event, subSat(event.common.num_tactics,
+                                   static_cast<unsigned int>(tactics_to_run[0].size())));
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                              move_tactics.end());
 
@@ -52,8 +65,8 @@ void BallPlacementPlayFSM::pickOffWall(const Update &event)
         TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE,
         TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE);
 
-    setupMoveTactics(event, event.common.num_tactics -
-                                static_cast<unsigned int>(tactics_to_run[0].size()));
+    setupMoveTactics(event, subSat(event.common.num_tactics,
+                                   static_cast<unsigned int>(tactics_to_run[0].size())));
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                              move_tactics.end());
 
@@ -86,8 +99,8 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
         tactics_to_run[0].push_back(align_placement_tactic);
     }
 
-    setupMoveTactics(event, event.common.num_tactics -
-                                static_cast<unsigned int>(tactics_to_run[0].size()));
+    setupMoveTactics(event, subSat(event.common.num_tactics,
+                                   static_cast<unsigned int>(tactics_to_run[0].size())));
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                              move_tactics.end());
 
@@ -135,8 +148,8 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
         }
     }
 
-    setupMoveTactics(event, event.common.num_tactics -
-                                static_cast<unsigned int>(tactics_to_run[0].size()));
+    setupMoveTactics(event, subSat(event.common.num_tactics,
+                                   static_cast<unsigned int>(tactics_to_run[0].size())));
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                              move_tactics.end());
 
@@ -168,8 +181,8 @@ void BallPlacementPlayFSM::releaseBall(const Update &event)
         tactics_to_run[0].push_back(wait_tactic);
     }
 
-    setupMoveTactics(event, event.common.num_tactics -
-                                static_cast<unsigned int>(tactics_to_run[0].size()));
+    setupMoveTactics(event, subSat(event.common.num_tactics,
+                                   static_cast<unsigned int>(tactics_to_run[0].size())));
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                              move_tactics.end());
 
@@ -220,8 +233,8 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         tactics_to_run[0].push_back(retreat_tactic);
     }
 
-    setupMoveTactics(event, event.common.num_tactics -
-                                static_cast<unsigned int>(tactics_to_run[0].size()));
+    setupMoveTactics(event, subSat(event.common.num_tactics,
+                                   static_cast<unsigned int>(tactics_to_run[0].size())));
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                              move_tactics.end());
 
