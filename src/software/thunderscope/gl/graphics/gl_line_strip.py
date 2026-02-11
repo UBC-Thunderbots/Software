@@ -6,7 +6,7 @@ from software.thunderscope.gl.graphics.gl_graphic import GLGraphic
 from typing import Optional, override
 
 class GLLineStrip(GLGraphic):
-    """Displays a line strip on the cartesian plane (i.e. x-y plane)"""
+    """Displays a 1D line strip on the cartesian plane (i.e. x-y plane)"""
 
     def __init__(
         self,

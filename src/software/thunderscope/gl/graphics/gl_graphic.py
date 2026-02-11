@@ -14,7 +14,7 @@ class GLGraphic(GLLinePlotItem):
             outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
             line_width: float = LINE_WIDTH,
     ) -> None:
-        """Initialize the GLLineStrip
+        """Initialize the GLGraphic
 
         :param parent_item: The parent item of the graphic
         :param outline_color: The color of the graphic's outline
@@ -66,5 +66,5 @@ class GLGraphic(GLLinePlotItem):
         the outline and fill of this shape
         """
         raise NotImplementedError(
-            "Derived class of GLShape must implement _update_shape_data"
+            "Derived class of GLGraphic must implement _update_shape_data"
         )

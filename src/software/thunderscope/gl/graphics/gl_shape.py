@@ -8,7 +8,7 @@ from typing import Optional
 
 
 class GLShape(GLGraphic):
-    """Base class for a graphic that displays a shape on the
+    """Base class for a graphic that displays a 2D geometric shape on the
     cartesian plane (i.e. x-y plane)
     """
 
@@ -22,9 +22,9 @@ class GLShape(GLGraphic):
         """Base constructor for the GLShape
 
         :param parent_item: The parent item of the graphic
-        :param outline_color: The color of the polygon's outline
-        :param fill_color: The color used to fill the polygon, or None if no fill
-        :param line_width: The line width of the polygon's outline
+        :param outline_color: The color of the shape's outline
+        :param fill_color: The color used to fill the shape, or None if no fill
+        :param line_width: The line width of the shape's outline
         """
         super().__init__(
             parent_item=parent_item,
