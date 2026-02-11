@@ -69,7 +69,7 @@ logger = create_logger(__name__)
 
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
-    test_angles = [0, 45, 90, 180, 270, 0]
+    test_angles = [0, math.pi, 0, math.pi, 0, math.pi]
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     if len(world.friendly_team.team_robots) == 0:
@@ -111,7 +111,7 @@ def test_basic_rotation(field_test_runner):
         field_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
-            test_timeout_s=5,
+            test_timeout_s=3,
         )
         # Send a halt tactic after the test finishes
         halt_tactic = HaltTactic()
@@ -122,8 +122,6 @@ def test_basic_rotation(field_test_runner):
 
         # validate by eye
         logger.info(f"robot set to {angle} orientation")
-
-        time.sleep(2)
 
 
 def test_one_robots_square(field_test_runner):

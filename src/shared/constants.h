@@ -61,25 +61,25 @@ static const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 /* Game Rules */
 // The max allowed speed of the ball, in metres per second
 // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_speed
-static const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
+static constexpr double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
 // The safe max speed of the ball that we should shoot at, in metres per second
-static const double BALL_SAFE_MAX_SPEED_METERS_PER_SECOND =
+static constexpr double BALL_SAFE_MAX_SPEED_METERS_PER_SECOND =
     BALL_MAX_SPEED_METERS_PER_SECOND - 0.5;
 // The distance that the ball has to travel for it to be considered in play
 // after a kick-off, free kick, or penalty kick.
 // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_in_and_out_of_play
-static const double BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS = 0.05;
+static constexpr double BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS = 0.05;
 // The max allowed height of the robots, in metres
-static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
+static constexpr double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
-static const double ROBOT_MAX_RADIUS_METERS = 0.09;
+static constexpr double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
-static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.078;
+static constexpr double DIST_TO_FRONT_OF_ROBOT_METERS = 0.078;
 // The approximate radius of the ball according to the SSL rulebook
-static const double BALL_MAX_RADIUS_METERS = 0.0215;
+static constexpr double BALL_MAX_RADIUS_METERS = 0.0215;
 // According to the rules, 80% of the ball must be seen at all times. Robots may not
 // cover more than 20% of the ball
-static const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
+static constexpr double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
 
 // The radius of a circle region where ball placement is acceptable (in meters).
 constexpr double BALL_PLACEMENT_TOLERANCE_RADIUS_METERS = 0.15;
