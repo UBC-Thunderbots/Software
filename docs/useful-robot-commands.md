@@ -1,29 +1,7 @@
+@page useful_robots_commands Useful Robots Commands
+[TOC]
+
 # Useful Robot Commands
-
-# Table of Contents
-
-<!--TOC-->
-
-- [Table of Contents](#table-of-contents)
-- [Common Debugging Steps](#common-debugging-steps)
-- [Off Robot Commands](#off-robot-commands)
-  - [Wifi Disclaimer](#wifi-disclaimer)
-  - [Miscellaneous Ansible Tasks & Options](#miscellaneous-ansible-tasks--options)
-  - [Flashing the robot's compute module](#flashing-the-robots-compute-module)
-  - [Flashing the powerboard](#flashing-the-powerboard)
-  - [Setting up the embedded host](#setting-up-the-embedded-host)
-    - [Jetson Nano](#jetson-nano)
-    - [Raspberry Pi](#raspberry-pi)
-  - [Robot Diagnostics](#robot-diagnostics)
-    - [For Just Diagnostics](#for-just-diagnostics)
-    - [For AI + Diagnostics](#for-ai--diagnostics)
-  - [Robot Auto Test](#robot-auto-test)
-- [On Robot Commands](#on-robot-commands)
-  - [Systemd Services](#systemd-services)
-  - [Debugging Uart](#debugging-uart)
-  - [Redis](#redis)
-
-<!--TOC-->
 
 # Common Debugging Steps
 ```mermaid

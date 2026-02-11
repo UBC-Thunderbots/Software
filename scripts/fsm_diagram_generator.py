@@ -109,7 +109,6 @@ if __name__ == "__main__":
     ai_dir = os.path.join(root_dir, "src/software/ai")
 
     fsm_diagrams = {}
-    fsm_file_paths = {}
 
     for root, dirs, files in os.walk(ai_dir):
         dirs.sort()
@@ -132,18 +131,16 @@ if __name__ == "__main__":
                 file_path = file_path[file_path.find("src/") :]
 
                 fsm_diagrams[fsm_name] = diagram
-                fsm_file_paths[fsm_name] = file_path
 
     output_file_path = os.path.join(root_dir, OUTPUT_FILE_PATH)
     with open(output_file_path, "w") as output_file:
         print("# Play and Tactic FSM Diagrams\n", file=output_file)
 
         for fsm_name, diagram in fsm_diagrams.items():
-            file_path = fsm_file_paths[fsm_name]
 
             # Format diagram in Markdown syntax and write to output file
             print(
-                f"## [{fsm_name}](/{file_path})\n\n"
+                f"## {fsm_name}\n\n"
                 + "```mermaid\n\n"
                 + "stateDiagram-v2\n"
                 + "classDef terminate fill:white,color:black,font-weight:bold\n"
