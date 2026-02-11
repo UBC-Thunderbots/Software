@@ -94,8 +94,9 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
  * sorted in-place.
  *
  * @param threats The given list of threats to sort in-place
+ * @param field field being played on
  */
-void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats);
+void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats, const Field &field);
 
 /**
  * Calculates the threat of each enemy robot on the field, and returns them in order
@@ -117,3 +118,36 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats);
 std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &friendly_team,
                                             Team enemy_team, const Ball &ball,
                                             bool include_goalie);
+
+/**
+ // Computes a 5-component weighted threat score for an enemy robot.
+//
+// Components (higher = more threatening):
+//
+// 1. Geographic Distance (0.40):
+//    Proximity to friendly goal: S_geo = exp(-distance / 4.5).
+//
+// 2. Possession Distance (0.25):
+//    Passes needed to gain possession: S_pos = exp(-num_passes).
+//    Robots with the ball (0 passes) score highest.
+//
+// 3. Goal Angle (0.10):
+//    Open shooting angle toward the friendly goal.
+//
+// 4. Visibility / Blocking (0.10):
+//    Unblocked fraction of the shooting angle: S_vis = 1 - (best_shot_angle /
+goal_angle).
+//
+// 5. Predictive Motion (0.15):
+//    Movement toward the goal: 0.7 * direction_alignment + 0.3 * normalized_speed.
+//    Only computed if robot is moving with valid goal direction.
+//
+// Returns a vector of the weighted components:
+// [0.40*S_geo, 0.25*S_pos, 0.10*S_angle, 0.10*S_vis, 0.15*S_pred]. (Can be adjusted)
+
+ * @param enemy The EnemyThreat struct containing information about the enemy robot
+ * @param field The field being played on (used to determine friendly goal position)
+ * @return A vector of five float values representing the weighted threat score
+ *         components: [geographic, possession, angle, visibility, predictive]
+ */
+std::vector<float> getThreatScore(const EnemyThreat &enemy, const Field &field);
