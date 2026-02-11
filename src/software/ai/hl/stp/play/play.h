@@ -192,6 +192,17 @@ class Play
 
     RobotNavigationObstacleFactory obstacle_factory;
 
+    static constexpr uint32_t ASSIGNMENTS_CACHE_MAX_SIZE = 5;
+
+
+    struct PreviousAssignment
+    {
+        uint32_t penality_cost;
+        std::shared_ptr<const Tactic> previous_tactic;
+    };
+
+    std::deque<std::map<const RobotId, PreviousAssignment>> assignments_cache;
+
     /**
      * 1) matrix of each tactic
      * 2) Robot w/ vector of prev tactics + costs (prune if out of threshold)
@@ -205,4 +216,5 @@ class Play
      * - Exponential punishment for matching tactics
      * - Convolutions as a function of costs over time? For the given tactic? robot?
      */
+
 };
