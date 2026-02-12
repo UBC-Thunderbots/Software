@@ -199,14 +199,3 @@ cc_library(
     name = "compat_flags",
     srcs = ["compat_flags.h"],
 )
-
-cc_library(
-    name = "generic_logger",
-    srcs = ["generic_logger.cpp"],
-    hdrs = ["generic_logger.h"],
-    deps = [
-        "@zlib",
-        "@boost//:filesystem",
-        ":compat_flags"
-    ],
-)

@@ -60,6 +60,8 @@ class PassFeatureCollector
 
    private:
 
+    bool logDatasetEntry(std::string entry) const;
+
     static int getPassScore(const Pass& pass, const World& world,
                             TbotsProto::PassingConfig passing_config);
 
@@ -68,7 +70,7 @@ class PassFeatureCollector
     static std::string createPointFeatureEntry(const Point& point);
     static std::string createTeamFeatureEntry(const Team& team);
 
-    std::optional<GenericLogger> logger_;
+    gzFile log_file_;
 
     static constexpr int DEFINITELY_BAD_SCORE    = -10;
     static constexpr int SLIGHTLY_BAD_SCORE      = -1;

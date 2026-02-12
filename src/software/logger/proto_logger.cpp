@@ -1,6 +1,7 @@
 #include "proto_logger.h"
 
 #include <google/protobuf/message.h>
+#include <zlib.h>
 
 #include <chrono>
 #include <ctime>
@@ -10,6 +11,7 @@
 #include <vector>
 
 #include "base64.h"
+#include "compat_flags.h"
 #include "shared/constants.h"
 
 ProtoLogger::ProtoLogger(const std::string& log_path,
@@ -29,6 +31,7 @@ ProtoLogger::ProtoLogger(const std::string& log_path,
     std::stringstream ss;
     ss << std::put_time(&tm, REPLAY_FILE_TIME_FORMAT.data());
     log_folder_ = log_path_ + "/" + REPLAY_FILE_PREFIX + ss.str() + "/";
+    fs::create_directories(log_folder_);
 
     // Start logging in a separate thread
     log_thread_ = std::thread(&ProtoLogger::logProtobufs, this);
@@ -55,11 +58,15 @@ void ProtoLogger::logProtobufs()
 
     while (!shouldStopLogging())
     {
-        auto logger = GenericLogger::createLogger(log_folder_, std::to_string(replay_index) + "." + REPLAY_FILE_EXTENSION);
+        std::string log_file_path =
+            log_folder_ + std::to_string(replay_index) + "." + REPLAY_FILE_EXTENSION;
 
-        if (!logger)
+        gzFile gz_file = gzopen(log_file_path.c_str(), "wb");
+        if (!gz_file)
         {
-            std::cerr << "Stopping ProtoLogger logger thread!" << std::endl;
+            std::cerr << "ProtoLogger: Failed to open gzip log file: " << log_file_path
+                      << " Error: " + std::string(strerror(errno))
+                      << "\nStopping ProtoLogger logger thread!" << std::endl;
             return;
         }
 
@@ -68,18 +75,16 @@ void ProtoLogger::logProtobufs()
         // format evolves.
         std::string file_metadata =
             REPLAY_FILE_VERSION_PREFIX + std::to_string(REPLAY_FILE_VERSION) + "\n";
-        if (!logger->log(file_metadata.c_str()))
+        int num_bytes_written = gzwrite(gz_file, file_metadata.c_str(),
+                                        static_cast<unsigned>(file_metadata.size()));
+        if (num_bytes_written != static_cast<int>(file_metadata.size()))
         {
             std::cerr << "ProtoLogger: Failed to write metadata to log file: "
-                      << logger->getLogFileName() << std::endl;
+                      << log_file_path << std::endl;
         }
 
-        std::cout << "####### \n\n\n\n\n LOGGER WORKS  2\n\n\n\n\n #########" << std::endl;
-
-
         while (!shouldStopLogging())
-        {            std::cout << "####### \n\n\n\n\n LOGGER WORKS 7 \n\n\n\n\n #########" << std::endl;
-
+        {
             auto serialized_proto_opt =
                 buffer_.popLeastRecentlyAddedValue(BUFFER_BLOCK_TIMEOUT);
             if (!serialized_proto_opt.has_value())
@@ -88,29 +93,24 @@ void ProtoLogger::logProtobufs()
                 continue;
             }
 
-        std::cout << "####### \n\n\n\n\n LOGGER WORKS 3 \n\n\n\n\n #########" << std::endl;
-
-
             const auto& [proto_full_name, serialized_proto, receive_time_sec] =
                 serialized_proto_opt.value();
 
             // Write the log entry to the file with the format:
             std::string log_entry =
                 createLogEntry(proto_full_name, serialized_proto, receive_time_sec);
-
-
-            std::cout << "####### \n\n\n\n\n LOGGER WORKS 4 \n\n\n\n\n #########" << std::endl;
+            num_bytes_written = gzwrite(gz_file, log_entry.c_str(),
+                                        static_cast<unsigned>(log_entry.size()));
 
             // Check if write was successful
-            if (!logger->log(log_entry.c_str()))
-            {            std::cout << "####### \n\n\n\n\n LOGGER WORKS 6 \n\n\n\n\n #########" << std::endl;
-
+            if (num_bytes_written != static_cast<int>(log_entry.size()))
+            {
                 // Only log every FAILED_LOG_PRINT_FREQUENCY times to avoid
                 // spamming the console if the error persists.
                 if (failed_logs_frequency_counter_ == 0)
                 {
                     std::cerr << "ProtoLogger: Failed to write " << proto_full_name
-                              << " to log file: " << logger->getLogFileName() << " "
+                              << " to log file: " << log_file_path << " "
                               << std::to_string(failed_logs_frequency_counter_)
                               << " times" << std::endl;
                 }
@@ -118,23 +118,19 @@ void ProtoLogger::logProtobufs()
                     (failed_logs_frequency_counter_ + 1) % FAILED_LOG_PRINT_FREQUENCY;
             }
 
-        std::cout << "####### \n\n\n\n\n LOGGER WORKS 5\n\n\n\n\n #########" << std::endl;
-
-
             // Limit the size of each replay chunk
-            if (logger->getLogFileSize() > REPLAY_MAX_CHUNK_SIZE_BYTES)
+            if (gzoffset(gz_file) > REPLAY_MAX_CHUNK_SIZE_BYTES)
             {
-
-        std::cout << "####### \n\n\n\n\n LOGGER WORKS 6 \n\n\n\n\n #########" << std::endl;
-
                 break;
             }
         }
 
-        std::cout << "####### \n\n\n\n\n LOGGER WORKS 7 \n\n\n\n\n #########" << std::endl;
-
-
-        logger->close();
+        int result = gzclose(gz_file);
+        if (result != Z_OK)
+        {
+            std::cerr << "ProtoLogger: Failed to close log file: " << log_file_path
+                      << " with error " << result << std::endl;
+        }
         replay_index++;
     }
 }

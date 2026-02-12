@@ -10,8 +10,11 @@
 
 PassFeatureCollector::PassFeatureCollector(const std::string& log_dir)
 {
-    logger_ = std::move(GenericLogger::createLogger(log_dir, PASS_FEATURE_FILE));
-    if (!logger_)
+    fs::create_directories(log_dir);
+    std::string log_file_path = log_dir + PASS_FEATURE_FILE;
+
+    log_file_ = gzopen(log_file_path.c_str(), "wb");
+    if (!log_file_)
     {
         throw std::runtime_error("PassFeatureCollector: Logger failed to initialize");
     }
@@ -24,12 +27,21 @@ void PassFeatureCollector::logPassFeatures(const Pass& pass, const World& world,
 
     std::string logEntry = createDatasetEntry(pass, world, score);
 
-    if (!logger_->log(logEntry))
+    if (!logDatasetEntry(logEntry))
     {
-        std::cerr << "PassFeatureCollector: Failed to write to log file: "
-                      << logger_->getLogFileName() << std::endl;
+        std::cerr << "PassFeatureCollector: Failed to write to log file: " << std::endl;
     }
 }
+
+bool PassFeatureCollector::logDatasetEntry(std::string entry) const
+{
+    int num_bytes_written = gzwrite(log_file_, entry.c_str(),
+                                        static_cast<unsigned>(entry.size()));
+
+    // Check if write was successful
+    return num_bytes_written == static_cast<int>(entry.size());
+}
+
 
 std::string PassFeatureCollector::createDatasetEntry(const Pass& pass, const World& world,
                                                      int score)
@@ -131,5 +143,5 @@ int PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
 
 PassFeatureCollector::~PassFeatureCollector()
 {
-    logger_->close();
+    gzclose(log_file_);
 }
