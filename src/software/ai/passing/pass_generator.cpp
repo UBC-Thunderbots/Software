@@ -157,10 +157,12 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
                 std::cout << num_passes_since_sample_ << std::endl;
                 if (num_passes_since_sample_ == 0)
                 {
-                    pass_feature_collector_.logPassFeatures(optimized_pass, world, passing_config_);
+                    pass_feature_collector_.logPassFeatures(optimized_pass, world,
+                                                            passing_config_);
                 }
 
-                num_passes_since_sample_ = (num_passes_since_sample_ + 1) % PASS_SAMPLING_FREQUENCY;
+                num_passes_since_sample_ =
+                    (num_passes_since_sample_ + 1) % PASS_SAMPLING_FREQUENCY;
             }
 
             if (score > best_pass_for_robot.rating)

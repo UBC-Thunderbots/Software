@@ -4,26 +4,25 @@
 #include <utility>
 
 #include "cost_function.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
-PassFeatureCollector::PassFeatureCollector()
-{
-}
+PassFeatureCollector::PassFeatureCollector() {}
 
 void PassFeatureCollector::logPassFeatures(const Pass& pass, const World& world,
                                            TbotsProto::PassingConfig passing_config) const
 {
-    std::cout << "\n\n\n\n\nPassFeatureCollector::logPassFeatures()\n\n\n\n\n" << std::endl;
+    std::cout << "\n\n\n\n\nPassFeatureCollector::logPassFeatures()\n\n\n\n\n"
+              << std::endl;
     double score = getPassScore(pass, world, passing_config);
 
     LOG(VISUALIZE) << *createPassFeaturesProto(pass, world, score);
 }
 
 double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
-                                       TbotsProto::PassingConfig passing_config)
+                                          TbotsProto::PassingConfig passing_config)
 {
     // if the pass has 0 speed
     if (pass.speed() == 0)

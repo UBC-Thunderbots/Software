@@ -157,6 +157,6 @@ cc_library(
         ":cost_functions",
         ":pass",
         "//software/ai/evaluation:calc_best_shot",
-        "//software/world"
+        "//software/world",
     ],
 )

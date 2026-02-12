@@ -222,7 +222,9 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
  *
  * @return The unique_ptr to a PassFeatures proto
  */
-std::unique_ptr<TbotsProto::PassFeatures> createPassFeaturesProto(const Pass& pass, const World& world, double score);
+std::unique_ptr<TbotsProto::PassFeatures> createPassFeaturesProto(const Pass& pass,
+                                                                  const World& world,
+                                                                  double score);
 
 /**
  * Returns the WorldStateReceivedTrigger given the world state received trigger

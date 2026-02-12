@@ -69,8 +69,8 @@ class PassFeatureCollector
      * @param pass the pass to score
      * @param world the current world state
      * @param passing_config the config containing values to compare against
-     * @return One of NEUTRAL_SCORE, VERY_SLIGHTLY_BAD_SCORE, SLIGHTLY_BAD_SCORE, and DEFINITELY_BAD_SCORE
-     *         to quantify if the pass is bad or neutral
+     * @return One of NEUTRAL_SCORE, VERY_SLIGHTLY_BAD_SCORE, SLIGHTLY_BAD_SCORE, and
+     * DEFINITELY_BAD_SCORE to quantify if the pass is bad or neutral
      */
     static double getPassScore(const Pass& pass, const World& world,
                                TbotsProto::PassingConfig passing_config);
