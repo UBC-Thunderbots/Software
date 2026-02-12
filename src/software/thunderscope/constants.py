@@ -413,3 +413,11 @@ class RuntimeManagerConstants:
     RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
     DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
     MAX_RELEASES_FETCHED = 5
+
+
+class PassFeaturesConstants:
+    """Constants for tracking PassFeatures"""
+
+    PASS_FEATURES_DIR = "/tmp/tbots/ml"
+    BLUE_PASS_FEATURES_FILE = "blue_pass_features.csv"
+    YELLOW_PASS_FEATURES_FILE = "yellow_pass_features.csv"

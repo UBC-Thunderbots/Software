@@ -1,6 +1,7 @@
 from software.thunderscope.log.stats.fs_stats import FSStatsTracker
+from software.thunderscope.log.stats.pass_features import PassFeaturesTracker
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from proto.visualization_pb2 import AttackerVisualization
+from proto.visualization_pb2 import AttackerVisualization, PassFeatures
 from proto.import_all_protos import *
 
 
@@ -22,12 +23,19 @@ class Stats:
             record_enemy_stats=record_enemy_stats,
         )
 
+        self.pass_feature_tracker = PassFeaturesTracker(
+            friendly_colour_yellow=friendly_color_yellow,
+            buffer_size=buffer_size,
+        )
+
         for arg in [
             (AttackerVisualization, self.fs_stats.attacker_vis_buffer),
             (Referee, self.fs_stats.referee_buffer),
             (World, self.fs_stats.world_buffer),
+            (PassFeatures, self.pass_feature_tracker.pass_features_buffer),
         ]:
             proto_unix_io.register_observer(*arg)
 
     def refresh(self):
         self.fs_stats.refresh()
+        self.pass_feature_tracker.refresh()
