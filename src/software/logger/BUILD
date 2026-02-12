@@ -188,16 +188,25 @@ cc_library(
         "proto_logger.h",
     ],
     deps = [
-        ":compat_flags",
         "//proto:tbots_cc_proto",
         "//software/multithreading:thread_safe_buffer",
         "@base64",
-        "@boost//:filesystem",
-        "@zlib",
+        ":generic_logger"
     ],
 )
 
 cc_library(
     name = "compat_flags",
     srcs = ["compat_flags.h"],
+)
+
+cc_library(
+    name = "generic_logger",
+    srcs = ["generic_logger.cpp"],
+    hdrs = ["generic_logger.h"],
+    deps = [
+        "@zlib",
+        "@boost//:filesystem",
+        ":compat_flags"
+    ],
 )

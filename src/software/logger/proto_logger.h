@@ -6,6 +6,7 @@
 #include <string>
 #include <thread>
 
+#include "generic_logger.h"
 #include "software/multithreading/thread_safe_buffer.hpp"
 
 /**

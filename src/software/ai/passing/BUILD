@@ -131,6 +131,7 @@ cc_library(
     hdrs = ["pass_generator.h"],
     deps = [
         ":cost_functions",
+        ":pass_feature_collector",
         ":pass_with_rating",
         "//software/optimization:gradient_descent",
         "//software/world",
@@ -145,5 +146,18 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world",
+    ],
+)
+
+cc_library(
+    name = "pass_feature_collector",
+    srcs = ["pass_feature_collector.cpp"],
+    hdrs = ["pass_feature_collector.h"],
+    deps = [
+        ":cost_functions",
+        ":pass",
+        "//software/ai/evaluation:calc_best_shot",
+        "//software/world",
+        "//software/logger:generic_logger"
     ],
 )

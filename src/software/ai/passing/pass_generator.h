@@ -2,6 +2,7 @@
 
 #include <random>
 
+#include "pass_feature_collector.h"
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass_with_rating.h"
@@ -80,4 +81,9 @@ class PassGenerator
 
     // Passing configuration
     TbotsProto::PassingConfig passing_config_;
+
+    // Pass Feature Collector
+    PassFeatureCollector pass_feature_collector_;
+    unsigned int num_passes_since_sample_ = 0;
+    bool sample_pass_features_ = false;
 };
