@@ -152,6 +152,19 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
                 passing_config_);
             double score = ratePass(world, optimized_pass, passing_config_);
 
+            if (sample_pass_features_)
+            {
+                std::cout << num_passes_since_sample_ << std::endl;
+                if (num_passes_since_sample_ == 0)
+                {
+                    pass_feature_collector_.logPassFeatures(optimized_pass, world,
+                                                            passing_config_);
+                }
+
+                num_passes_since_sample_ =
+                    (num_passes_since_sample_ + 1) % PASS_SAMPLING_FREQUENCY;
+            }
+
             if (score > best_pass_for_robot.rating)
             {
                 best_pass_for_robot = PassWithRating{optimized_pass, score};
