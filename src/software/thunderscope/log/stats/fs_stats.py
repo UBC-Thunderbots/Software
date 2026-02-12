@@ -1,6 +1,5 @@
 import os
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
 from dataclasses import dataclass
 import software.python_bindings as tbots_cpp
 from software.thunderscope.constants import RuntimeManagerConstants
@@ -8,7 +7,6 @@ import logging
 from proto.visualization_pb2 import AttackerVisualization
 from proto.import_all_protos import *
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
-from typing import override
 
 
 @dataclass
@@ -27,7 +25,7 @@ class FSStats:
     num_enemy_shots_blocked: int = 0
 
 
-class GlFSStatsLayer(GLLayer):
+class FSStatsTracker:
     # From GoalieTacticConfig
     INCOMING_SHOT_MIN_VELOCITY = 0.2
 
@@ -35,25 +33,35 @@ class GlFSStatsLayer(GLLayer):
     # higher values exclude noise such as dribbling or passes
     # but can exclude real kicks
     MIN_SHOT_SPEED = 2.0
+
+    # We do not have a 100% guaranteed way of knowing if a ball was kicked
+    # so we use ball.hasBallBeenKicked
+    # this angle is the maximum difference in angle between the expected kick direction and actual ball velocity
+    # for it to count as a kick
+    # lower value -> more sensitive, will exclude some valid kicks
+    # higher value -> may not recognize a real kick if it differs too much from the expected kick direction
     MAX_KICK_ANGLE_DIFFERENCE = tbots_cpp.Angle.fromDegrees(5)
+
+    # We also do not have a 100% guaranteed way to know if an attacker has taken a shot
+    # Often times, the robot will consider many, very similar shots consecutively WITHOUT taking any
+    # so we don't want to count every shot if they're too close together
+    # this angle is the minimum difference in direction a shot should be from the previous one to count as "different"
+    # lower value -> more similar shots are counted as different, adding noise
+    # higher value -> legitimate shots may be excluded since they seem "too similar"
     MIN_NEW_SHOT_ANGLE_DIFFERENCE_RAD = tbots_cpp.Angle.fromDegrees(10).toRadians()
 
     def __init__(
         self,
-        name: str,
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
         record_enemy_stats: bool = False,
     ):
-        """Initializes a GlFSStatsLayer
+        """Initializes the FullSystem Stats Tracker
 
-        :param name: the display name of this layer
         :param friendly_colour_yellow: if the friendly colour is yellow
         :param buffer_size: the buffer size for protocol buffers
-        :param record_enemy_stats: if this layer should record both friendly and enemy stats or just friendly
+        :param record_enemy_stats: if this should record both friendly and enemy stats or just friendly
         """
-        super().__init__(name)
-
         self.friendly_colour_yellow = friendly_colour_yellow
 
         # True if enemy had the last possession, False if friendly
@@ -77,8 +85,7 @@ class GlFSStatsLayer(GLLayer):
                 f"\n\n\n##### Writing Enemy FS Stats to {self._get_enemy_stats_file()}#####\n\n\n"
             )
 
-    @override
-    def refresh_graphics(self) -> None:
+    def refresh(self) -> None:
         """Refreshes the stats for the game so far"""
         world_msg = self.world_buffer.get(block=False, return_cached=True)
         world = tbots_cpp.World(world_msg)

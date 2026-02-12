@@ -23,6 +23,7 @@ py_binary(
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:runtime_manager",
         "//software/thunderscope/binary_context_managers:simulator",
+        "//software/thunderscope/log/stats",
     ],
 )
 
@@ -90,7 +91,6 @@ py_library(
         "//software/thunderscope/gl/layers:gl_cost_vis_layer",
         "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
         "//software/thunderscope/gl/layers:gl_draw_polygon_obstacle",
-        "//software/thunderscope/gl/layers:gl_fs_stats_layer",
         "//software/thunderscope/gl/layers:gl_max_dribble_layer",
         "//software/thunderscope/gl/layers:gl_movement_field_test_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",

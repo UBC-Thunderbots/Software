@@ -24,7 +24,6 @@ from software.thunderscope.gl.layers import (
     gl_validation_layer,
     gl_passing_layer,
     gl_attacker_layer,
-    gl_fs_stats_layer,
     gl_sandbox_world_layer,
     gl_world_layer,
     gl_debug_shapes_layer,
@@ -111,9 +110,6 @@ def setup_gl_widget(
     attacker_layer = gl_attacker_layer.GLAttackerLayer(
         "Attacker Tactic", visualization_buffer_size
     )
-    fs_stats_layer = gl_fs_stats_layer.GlFSStatsLayer(
-        "FullSystem Stats", friendly_colour_yellow, visualization_buffer_size, True
-    )
     cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
         "Passing Cost", visualization_buffer_size
     )
@@ -158,7 +154,6 @@ def setup_gl_widget(
     gl_widget.add_layer(draw_obstacle_layer, False)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(attacker_layer)
-    gl_widget.add_layer(fs_stats_layer)
     gl_widget.add_layer(cost_vis_layer, True)
     gl_widget.add_layer(tactic_layer, False)
     gl_widget.add_layer(validation_layer)
@@ -210,9 +205,6 @@ def setup_gl_widget(
         (PathVisualization, path_layer.path_visualization_buffer),
         (PassVisualization, passing_layer.pass_visualization_buffer),
         (AttackerVisualization, attacker_layer.attacker_vis_buffer),
-        (AttackerVisualization, fs_stats_layer.attacker_vis_buffer),
-        (Referee, fs_stats_layer.referee_buffer),
-        (World, fs_stats_layer.world_buffer),
         (World, tactic_layer.world_buffer),
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
