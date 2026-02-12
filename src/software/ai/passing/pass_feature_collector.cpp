@@ -6,90 +6,23 @@
 #include "cost_function.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/logger/compat_flags.h"
+#include "software/logger/logger.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
-PassFeatureCollector::PassFeatureCollector(const std::string& log_dir)
+PassFeatureCollector::PassFeatureCollector()
 {
-    fs::create_directories(log_dir);
-    std::string log_file_path = log_dir + PASS_FEATURE_FILE;
-
-    log_file_ = gzopen(log_file_path.c_str(), "wb");
-    if (!log_file_)
-    {
-        throw std::runtime_error("PassFeatureCollector: Logger failed to initialize");
-    }
 }
 
 void PassFeatureCollector::logPassFeatures(const Pass& pass, const World& world,
                                            TbotsProto::PassingConfig passing_config) const
 {
-    int score = getPassScore(pass, world, passing_config);
+    std::cout << "\n\n\n\n\nPassFeatureCollector::logPassFeatures()\n\n\n\n\n" << std::endl;
+    double score = getPassScore(pass, world, passing_config);
 
-    std::string logEntry = createDatasetEntry(pass, world, score);
-
-    if (!logDatasetEntry(logEntry))
-    {
-        std::cerr << "PassFeatureCollector: Failed to write to log file: " << std::endl;
-    }
+    LOG(VISUALIZE) << *createPassFeaturesProto(pass, world, score);
 }
 
-bool PassFeatureCollector::logDatasetEntry(std::string entry) const
-{
-    int num_bytes_written = gzwrite(log_file_, entry.c_str(),
-                                        static_cast<unsigned>(entry.size()));
-
-    // Check if write was successful
-    return num_bytes_written == static_cast<int>(entry.size());
-}
-
-
-std::string PassFeatureCollector::createDatasetEntry(const Pass& pass, const World& world,
-                                                     int score)
-{
-    std::stringstream dataset_entry_ss;
-
-    dataset_entry_ss << createPointFeatureEntry(pass.passerPoint())
-                     << PASS_FEATURE_DELIMITER
-                     << createPointFeatureEntry(pass.receiverPoint())
-                     << PASS_FEATURE_DELIMITER
-                     << createPointFeatureEntry(world.ball().position())
-                     << PASS_FEATURE_DELIMITER
-                     << createTeamFeatureEntry(world.friendlyTeam())
-                     << PASS_FEATURE_DELIMITER
-                     << createTeamFeatureEntry(world.enemyTeam())
-                     << PASS_FEATURE_DELIMITER << score << "\n";
-
-    return dataset_entry_ss.str();
-}
-
-std::string PassFeatureCollector::createPointFeatureEntry(const Point& point)
-{
-    std::stringstream point_ss;
-    point_ss << point.x() << PASS_FEATURE_DELIMITER << point.y();
-    return point_ss.str();
-}
-
-std::string PassFeatureCollector::createTeamFeatureEntry(const Team& team)
-{
-    std::stringstream team_ss;
-
-    if (auto teamRobots = team.getAllRobots(); !teamRobots.empty())
-    {
-        auto iterator = teamRobots.begin();
-        team_ss << createPointFeatureEntry(iterator->position());
-        ++iterator;
-
-        for (; iterator != teamRobots.end(); ++iterator)
-        {
-            team_ss << PASS_FEATURE_DELIMITER
-                    << createPointFeatureEntry(iterator->position());
-        }
-    }
-
-    return team_ss.str();
-}
-
-int PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
+double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
                                        TbotsProto::PassingConfig passing_config)
 {
     // if the pass has 0 speed
@@ -139,9 +72,4 @@ int PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
         return VERY_SLIGHTLY_BAD_SCORE;
 
     return NEUTRAL_SCORE;
-}
-
-PassFeatureCollector::~PassFeatureCollector()
-{
-    gzclose(log_file_);
 }

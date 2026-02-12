@@ -2,8 +2,6 @@
 #include <zlib.h>
 
 #include "pass.h"
-#include "software/ai/passing/pass.h"
-#include "software/logger/generic_logger.h"
 #include "software/world/world.h"
 
 //
@@ -51,29 +49,34 @@
 class PassFeatureCollector
 {
    public:
-    PassFeatureCollector(const std::string& log_dir);
+    PassFeatureCollector();
 
-    ~PassFeatureCollector();
-
+    /**
+     * Gets the features and score for the given pass within the given world state
+     * And sends out a proto with the feature info
+     *
+     * @param pass the pass to get features from
+     * @param world the current world state
+     * @param passing_config the static config for passes, to compare against for scoring
+     */
     void logPassFeatures(const Pass& pass, const World& world,
                          TbotsProto::PassingConfig passing_config) const;
 
    private:
+    /**
+     * Gets the score for the given pass in the given world state
+     * Compares against the passing config for scoring
+     * @param pass the pass to score
+     * @param world the current world state
+     * @param passing_config the config containing values to compare against
+     * @return One of NEUTRAL_SCORE, VERY_SLIGHTLY_BAD_SCORE, SLIGHTLY_BAD_SCORE, and DEFINITELY_BAD_SCORE
+     *         to quantify if the pass is bad or neutral
+     */
+    static double getPassScore(const Pass& pass, const World& world,
+                               TbotsProto::PassingConfig passing_config);
 
-    bool logDatasetEntry(std::string entry) const;
-
-    static int getPassScore(const Pass& pass, const World& world,
-                            TbotsProto::PassingConfig passing_config);
-
-    static std::string createDatasetEntry(const Pass& pass, const World& world,
-                                          int score);
-    static std::string createPointFeatureEntry(const Point& point);
-    static std::string createTeamFeatureEntry(const Team& team);
-
-    gzFile log_file_;
-
-    static constexpr int DEFINITELY_BAD_SCORE    = -10;
-    static constexpr int SLIGHTLY_BAD_SCORE      = -1;
-    static constexpr int VERY_SLIGHTLY_BAD_SCORE = -0.1;
-    static constexpr int NEUTRAL_SCORE           = 0;
+    static constexpr double DEFINITELY_BAD_SCORE    = -10;
+    static constexpr double SLIGHTLY_BAD_SCORE      = -1;
+    static constexpr double VERY_SLIGHTLY_BAD_SCORE = -0.1;
+    static constexpr double NEUTRAL_SCORE           = 0;
 };

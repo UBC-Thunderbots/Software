@@ -544,3 +544,27 @@ std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& stadium)
     (*shape_msg->mutable_stadium()) = *createStadiumProto(stadium);
     return shape_msg;
 }
+
+std::unique_ptr<TbotsProto::PassFeatures> createPassFeaturesProto(const Pass& pass, const World& world, double score)
+{
+    auto pass_features_msg = std::make_unique<TbotsProto::PassFeatures>();
+    (*pass_features_msg->mutable_passer_point()) = *createPointProto(pass.passerPoint());
+    (*pass_features_msg->mutable_receiver_point()) = *createPointProto(pass.receiverPoint());
+
+    (*pass_features_msg->mutable_ball_position()) = *createPointProto(world.ball().position());
+
+    const auto& friendly_robots = world.friendlyTeam().getAllRobots();
+    std::for_each(friendly_robots.begin(), friendly_robots.end(),
+                  [&](const Robot& robot)
+                  { *(pass_features_msg->add_friendly_positions()) = *createPointProto(robot.position()); });
+
+    const auto& enemy_robots = world.enemyTeam().getAllRobots();
+    std::for_each(enemy_robots.begin(), enemy_robots.end(),
+                  [&](const Robot& robot)
+                  { *(pass_features_msg->add_enemy_positions()) = *createPointProto(robot.position()); });
+
+    pass_features_msg->set_score(score);
+
+    return pass_features_msg;
+
+}

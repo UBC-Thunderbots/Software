@@ -8,9 +8,7 @@
 PassGenerator::PassGenerator(const TbotsProto::PassingConfig& passing_config)
     : optimizer_(optimizer_param_weights),
       random_num_gen_(RNG_SEED),
-      passing_config_(passing_config),
-      pass_feature_collector_(PASS_FEATURE_DIR),
-      sample_pass_features_(true)
+      passing_config_(passing_config)
 {
 }
 
@@ -156,7 +154,8 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
 
             if (sample_pass_features_)
             {
-                if (num_passes_since_sample_ >= PASS_SAMPLING_FREQUENCY)
+                std::cout << num_passes_since_sample_ << std::endl;
+                if (num_passes_since_sample_ == 0)
                 {
                     pass_feature_collector_.logPassFeatures(optimized_pass, world, passing_config_);
                 }

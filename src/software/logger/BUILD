@@ -188,10 +188,12 @@ cc_library(
         "proto_logger.h",
     ],
     deps = [
+        ":compat_flags",
         "//proto:tbots_cc_proto",
         "//software/multithreading:thread_safe_buffer",
         "@base64",
-        ":generic_logger"
+        "@boost//:filesystem",
+        "@zlib",
     ],
 )
 
