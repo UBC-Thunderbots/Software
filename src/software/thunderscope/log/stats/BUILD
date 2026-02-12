@@ -5,6 +5,14 @@ package(default_visibility = ["//visibility:public"])
 py_library(
     name = "fs_stats",
     srcs = ["fs_stats.py"],
+    deps = [
+        ":kick_tracker",
+    ],
+)
+
+py_library(
+    name = "kick_tracker",
+    srcs = ["kick_tracker.py"],
     deps = [],
 )
 

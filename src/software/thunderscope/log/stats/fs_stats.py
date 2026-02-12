@@ -1,4 +1,6 @@
 import os
+
+from software.thunderscope.log.stats.kick_tracker import KickTracker
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from dataclasses import dataclass
 import software.python_bindings as tbots_cpp
@@ -29,27 +31,6 @@ class FSStatsTracker:
     # From GoalieTacticConfig
     INCOMING_SHOT_MIN_VELOCITY = 0.2
 
-    # tune these values to reduce noise in what is considered a "shot" to net
-    # higher values exclude noise such as dribbling or passes
-    # but can exclude real kicks
-    MIN_SHOT_SPEED = 2.0
-
-    # We do not have a 100% guaranteed way of knowing if a ball was kicked
-    # so we use ball.hasBallBeenKicked
-    # this angle is the maximum difference in angle between the expected kick direction and actual ball velocity
-    # for it to count as a kick
-    # lower value -> more sensitive, will exclude some valid kicks
-    # higher value -> may not recognize a real kick if it differs too much from the expected kick direction
-    MAX_KICK_ANGLE_DIFFERENCE = tbots_cpp.Angle.fromDegrees(5)
-
-    # We also do not have a 100% guaranteed way to know if an attacker has taken a shot
-    # Often times, the robot will consider many, very similar shots consecutively WITHOUT taking any
-    # so we don't want to count every shot if they're too close together
-    # this angle is the minimum difference in direction a shot should be from the previous one to count as "different"
-    # lower value -> more similar shots are counted as different, adding noise
-    # higher value -> legitimate shots may be excluded since they seem "too similar"
-    MIN_NEW_SHOT_ANGLE_DIFFERENCE_RAD = tbots_cpp.Angle.fromDegrees(10).toRadians()
-
     def __init__(
         self,
         friendly_colour_yellow: bool,
@@ -74,6 +55,8 @@ class FSStatsTracker:
 
         self.stats = FSStats()
 
+        self.kick_tracker = KickTracker()
+
         # the python __del__ destructor isn't called reliably
         # so printing this at the start instead
         print(f"\n\n\n##### Writing FS Stats to {self._get_stats_file()}#####\n\n\n")
@@ -89,8 +72,6 @@ class FSStatsTracker:
         """Refreshes the stats for the game so far"""
         world_msg = self.world_buffer.get(block=False, return_cached=True)
         world = tbots_cpp.World(world_msg)
-
-        self._update_posession(world)
 
         self._record_attacker_stats(world.ball(), world.field())
 
@@ -234,56 +215,29 @@ class FSStatsTracker:
 
         return False
 
-    def _update_latest_shot_angle(self) -> None:
-        """Update the latest shot angle if there is a new shot from the attacker
-        that is different enough from the old shot
-        """
-        attacker_vis_msg = self.attacker_vis_buffer.get(block=False)
-
-        if attacker_vis_msg and attacker_vis_msg.HasField("shot"):
-            shot_origin = tbots_cpp.Point(
-                attacker_vis_msg.shot.shot_origin.x_meters,
-                attacker_vis_msg.shot.shot_origin.y_meters,
-            )
-            shot_target = tbots_cpp.Point(
-                attacker_vis_msg.shot.shot_target.x_meters,
-                attacker_vis_msg.shot.shot_target.y_meters,
-            )
-            new_shot_angle = tbots_cpp.Vector(
-                shot_target.x() - shot_origin.x(), shot_target.y() - shot_origin.y()
-            ).orientation()
-
-            if (
-                abs((new_shot_angle - self.stats.latest_shot_angle).toRadians())
-                > self.MIN_NEW_SHOT_ANGLE_DIFFERENCE_RAD
-            ):
-                self.stats.latest_shot_angle = new_shot_angle
-                self.stats.shot_taken = False
-
     def _record_attacker_stats(
-        self, ball: tbots_cpp.Ball, field: tbots_cpp.Field
+        self,
+        ball: tbots_cpp.Ball,
+        field: tbots_cpp.Field,
     ) -> None:
         """Record stats related to the attacker
         i.e the shots taken on goal by the friendly team
         Checks if the shot has actually been taken or not
 
         :param ball: the current state of the ball
+        :param field: the current state of the field
         """
-        self._update_latest_shot_angle()
+        attacker_vis_msg = self.attacker_vis_buffer.get(block=False)
 
-        # check if the shot chosen by the attacker has actually been taken
-        # and additionally, if the ball is in the enemy half (reduces noise)
-        if (
-            not self.stats.shot_taken
-            and ball.hasBallBeenKicked(
-                self.stats.latest_shot_angle,
-                self.MIN_SHOT_SPEED,
-                self.MAX_KICK_ANGLE_DIFFERENCE,
-            )
-            and field.pointInEnemyHalf(ball.position())
-        ):
-            self.stats.num_shots_on_net += 1
-            self.stats.shot_taken = True
+        if not attacker_vis_msg:
+            return
+
+        self.kick_tracker.refresh(
+            attacker_vis_msg,
+            ball,
+            field,
+        )
+        self.stats.num_shots_on_net = self.kick_tracker.num_shots
 
     def _record_referee_stats(self) -> None:
         """Record stats related to the referee
