@@ -40,6 +40,59 @@ NUM_FILTERED_MATCHES_TO_SHOW = 10
 app = Typer()
 
 
+def fuzzy_find_target(
+    action: ActionArgument,
+    search_query: SearchQueryArgument,
+    interactive_search: InteractiveModeOption,
+) -> str:
+    test_query = ["bazel", "query", "tests(//...)"]
+    binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
+    library_query = ["bazel", "query", "kind(.*_library,//...)"]
+
+    bazel_queries = {
+        "test": [test_query],
+        "run": [test_query, binary_query],
+        "build": [library_query, test_query, binary_query],
+    }
+
+    # Run the appropriate bazel query and ask thefuzz to find the best matching
+    # target, guaranteed to return 1 result because we set limit=1
+    # Combine results of multiple queries with itertools.chain
+    targets = list(
+        itertools.chain.from_iterable(
+            [
+                run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
+                for query in bazel_queries[action]
+            ]
+        )
+    )
+    # Create a dictionary to map target names to complete bazel targets
+    target_dict = {target.split(b":")[-1]: target for target in targets}
+
+    # Use thefuzz to find the best matching target name
+    most_similar_target_name, confidence = process.extract(
+        search_query, list(target_dict.keys()), limit=1
+    )[0]
+    target = str(target_dict[most_similar_target_name], encoding="utf-8")
+
+    print("Found target {} with confidence {}".format(target, confidence))
+
+    if interactive_search or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
+        filtered_targets = process.extract(
+            search_query,
+            list(target_dict.keys()),
+            limit=NUM_FILTERED_MATCHES_TO_SHOW,
+        )
+        targets = [
+            target_dict[filtered_target_name[0]]
+            for filtered_target_name in filtered_targets
+        ]
+        target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
+        print("User selected {}".format(target))
+
+    return target
+
+
 @app.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
@@ -74,70 +127,14 @@ def main(
         )
         sys.exit(1)
 
-    test_query = ["bazel", "query", "tests(//...)"]
-    binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
-    library_query = ["bazel", "query", "kind(.*_library,//...)"]
-
-    bazel_queries = {
-        "test": [test_query],
-        "run": [test_query, binary_query],
-        "build": [library_query, test_query, binary_query],
-    }
-
-    # Run the appropriate bazel query and ask thefuzz to find the best matching
-    # target, guaranteed to return 1 result because we set limit=1
-    # Combine results of multiple queries with itertools.chain
-    targets = (
-        list(
-            itertools.chain.from_iterable(
-                [
-                    run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
-                    for query in bazel_queries[action]
-                ]
-            )
-        )
-        if not test_suite
-        else []
-    )
-    # Create a dictionary to map target names to complete bazel targets
-    target_dict = (
-        {target.split(b":")[-1]: target for target in targets}
-        if not test_suite
-        else {
-            b"simulated_gameplay_tests": b"""//software:unix_full_system    \\
-            //software/simulated_tests/... \\
-            //software/ai/hl/...           \\
-            //software/ai/navigator/...""",
-            b"software_tests": b"""-- //... -//software:unix_full_system \\
-              -//software/simulated_tests/...     \\
-              -//software/ai/hl/...               \\
-              -//software/field_tests/...         \\
-              -//software/ai/navigator/...        \\
-              -//toolchains/cc/...                \\
-              -//software:unix_full_system_tar_gen""",
-        }
-    )
-
-    # Use thefuzz to find the best matching target name
-    most_similar_target_name, confidence = process.extract(
-        search_query, list(target_dict.keys()), limit=1
-    )[0]
-    target = str(target_dict[most_similar_target_name], encoding="utf-8")
-
-    print("Found target {} with confidence {}".format(target, confidence))
-
-    if interactive_search or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
-        filtered_targets = process.extract(
-            search_query,
-            list(target_dict.keys()),
-            limit=NUM_FILTERED_MATCHES_TO_SHOW,
-        )
-        targets = [
-            target_dict[filtered_target_name[0]]
-            for filtered_target_name in filtered_targets
-        ]
-        target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
-        print("User selected {}".format(target))
+    if test_suite and action == ActionArgument.test:
+        target = """-- //...                              \\
+                      -//software/field_tests/...         \\
+                      -//toolchains/cc/...                \\
+                      -//software:unix_full_system_tar_gen"""
+        print("Running software and simulated gameplay test suite")
+    else:
+        target = fuzzy_find_target(action, search_query, interactive_search)
 
     command = ["bazel", action.value]
     unknown_args = ctx.args
