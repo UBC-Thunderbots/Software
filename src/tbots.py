@@ -22,7 +22,8 @@ from cli.cli_params import (
     EnableThunderscopeOption,
     EnableVisualizerOption,
     StopAIOnStartOption,
-    QueryTestSuiteOption,
+    SearchQueryArgument,
+    TestSuiteOption,
     DebugBinary,
     Platform,
 )
@@ -46,7 +47,7 @@ app = Typer()
 def main(
     ctx: Context,
     action: ActionArgument,
-    search_query: str,
+    search_query: SearchQueryArgument = None,
     print_command: PrintCommandOption = False,
     no_optimized_build: NoOptimizedBuildOption = False,
     debug_build: DebugBuildOption = False,
@@ -59,11 +60,17 @@ def main(
     enable_thunderscope: EnableThunderscopeOption = False,
     enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
-    query_test_suite: QueryTestSuiteOption = False,
+    test_suite: TestSuiteOption = False,
 ) -> None:
     if bool(flash_robots) ^ bool(ssh_password):
         print(
             "If you want to flash robots, both the robot IDs and password must be provided"
+        )
+        sys.exit(1)
+
+    if search_query is None and (not test_suite or not action == ActionArgument.test):
+        print(
+            "You must specify a search query unless you are running the test suite, use ./tbots.py test --suite instead"
         )
         sys.exit(1)
 
@@ -89,13 +96,13 @@ def main(
                 ]
             )
         )
-        if not query_test_suite
+        if not test_suite
         else []
     )
     # Create a dictionary to map target names to complete bazel targets
     target_dict = (
         {target.split(b":")[-1]: target for target in targets}
-        if not query_test_suite
+        if not test_suite
         else {
             b"simulated_gameplay_tests": b"""//software:unix_full_system    \\
             //software/simulated_tests/... \\
