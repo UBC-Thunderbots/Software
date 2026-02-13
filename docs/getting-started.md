@@ -173,7 +173,6 @@ We have a `tbots.py` test runner script in the src folder that will fuzzy find f
 1. Build a specific target for running (for example): `./tbots.py build angletest`
 2. Run a specific target by running (for example): `./tbots.py run goalietactictest -t`
 3. Run a specific *test* by running (for example): `./tbots.py test goalietactictest -t`
-4. Run a specific test suite by running (for example): `./tbots.py test simulated_gameplay_tests --suite -t`
 
 where the `-t` flag indicates whether Thunderscope should be launched. Run `./tbots.py --help` for more info
 
