@@ -67,8 +67,8 @@ def setup_pass_and_robots(
                     index,
                     location,
                     tbots_cpp.Vector(0.0, 0.0),
-                    tbots_cpp.Angle.fromRadians(0),
                     tbots_cpp.Angle(),
+                    tbots_cpp.AngularVelocity(),
                     tbots_cpp.Timestamp(),
                 )
                 for index, location in enumerate(blue_robot_locations)
@@ -80,8 +80,8 @@ def setup_pass_and_robots(
                     index,
                     location,
                     tbots_cpp.Vector(0.0, 0.0),
-                    tbots_cpp.Angle.fromRadians(0),
                     tbots_cpp.Angle(),
+                    tbots_cpp.AngularVelocity(),
                     tbots_cpp.Timestamp(),
                 )
                 for index, location in enumerate(enemy_robot_positions)

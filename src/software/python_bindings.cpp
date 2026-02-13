@@ -209,6 +209,20 @@ PYBIND11_MODULE(python_bindings, m)
                  return stream.str();
              });
 
+    py::class_<AngularVelocity>(m, "AngularVelocity")
+        .def(py::init<>())
+        .def_static("fromRadians", &Angle::fromRadians)
+        .def_static("fromDegrees", &Angle::fromDegrees)
+        .def("toRadians", &Angle::toRadians)
+        // Overloaded
+        .def("__repr__",
+             [](const AngularVelocity& a)
+             {
+                 std::stringstream stream;
+                 stream << a;
+                 return stream.str();
+             });
+
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
     py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
         .def(py::init<Point, Point>())
