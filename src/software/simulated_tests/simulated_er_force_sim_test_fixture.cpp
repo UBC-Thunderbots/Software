@@ -348,17 +348,17 @@ void SimulatedErForceSimTestFixture::runTest(
         for (size_t i = 0; i < num_robots; i++)
         {
             LOG(INFO) << "Robot " << i << std::endl;
-            LOG(INFO) << "max robot displacement: " << ball_displacement_stats.maximum
+            LOG(INFO) << "max robot displacement: " << robots_displacement_stats[i].maximum
                       << std::endl;
-            LOG(INFO) << "min robot displacement: " << ball_displacement_stats.minimum
+            LOG(INFO) << "min robot displacement: " << robots_displacement_stats[i].minimum
                       << std::endl;
-            LOG(INFO) << "avg robot displacement: " << ball_displacement_stats.average
+            LOG(INFO) << "avg robot displacement: " << robots_displacement_stats[i].average
                       << std::endl;
-            LOG(INFO) << "max robot velocity difference: " << ball_velocity_stats.maximum
+            LOG(INFO) << "max robot velocity difference: " << robots_velocity_stats[i].maximum
                       << std::endl;
-            LOG(INFO) << "min robot velocity difference: " << ball_velocity_stats.minimum
+            LOG(INFO) << "min robot velocity difference: " << robots_velocity_stats[i].minimum
                       << std::endl;
-            LOG(INFO) << "avg robot velocity difference: " << ball_velocity_stats.average
+            LOG(INFO) << "avg robot velocity difference: " << robots_velocity_stats[i].average
                       << std::endl;
         }
 
