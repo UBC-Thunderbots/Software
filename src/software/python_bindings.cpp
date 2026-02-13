@@ -211,9 +211,9 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<AngularVelocity>(m, "AngularVelocity")
         .def(py::init<>())
-        .def_static("fromRadians", &Angle::fromRadians)
-        .def_static("fromDegrees", &Angle::fromDegrees)
-        .def("toRadians", &Angle::toRadians)
+        .def_static("fromRadians", &AngularVelocity::fromRadians)
+        .def_static("fromDegrees", &AngularVelocity::fromDegrees)
+        .def("toRadians", &AngularVelocity::toRadians)
         // Overloaded
         .def("__repr__",
              [](const AngularVelocity& a)
