@@ -80,7 +80,7 @@ def test_ball_chipped_on_intercept(
     ]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [[BallSpeedEventuallyBelowThreshold(0.4)]]
 
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -180,7 +180,7 @@ def test_avoid_intercept_scenario(
     ]
 
     # Eventually Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [[BallSpeedEventuallyBelowThreshold(0.4)]]
 
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -213,7 +213,7 @@ def test_avoid_intercept_scenario(
         (
             tbots_cpp.Point(2, 0),
             tbots_cpp.Vector(-4, 0),
-            tbots_cpp.Point(-2, 1.25),
+            tbots_cpp.Point(-2, 0.5),
             tbots_cpp.Point(2.2, 0),
             True,
         ),
@@ -298,7 +298,7 @@ def test_steal_ball(
             NeverExcessivelyDribbles(),
         ]
     ]  # Eventually Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [[BallSpeedEventuallyBelowThreshold(0.4)]]
 
     if should_steal:
         eventually_validation_sequence_set = [

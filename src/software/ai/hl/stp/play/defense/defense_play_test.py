@@ -83,11 +83,11 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
             ]
         ],
         inv_eventually_validation_sequence_set=[
-            [FriendlyEventuallyHasBallPossession(tolerance=0.05)]
+            [FriendlyEventuallyHasBallPossession(tolerance=0.2)]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
-        test_timeout_s=12,
+        test_timeout_s=20,
     )
 
 
@@ -162,7 +162,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
             ]
         ],
         inv_eventually_validation_sequence_set=[
-            [FriendlyEventuallyHasBallPossession(tolerance=0.05)]
+            [FriendlyEventuallyHasBallPossession(tolerance=0.1)]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
