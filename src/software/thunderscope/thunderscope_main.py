@@ -478,16 +478,15 @@ if __name__ == "__main__":
             )
             if args.enable_autoref
             else contextlib.nullcontext()
-        ) as autoref:
+        ) as autoref, Stats(
+            proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+            record_enemy_stats=True,
+        ) as blue_stats:
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
 
             blue_fs.setup_proto_unix_io(tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE])
-            blue_stats = Stats(
-                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                record_enemy_stats=True,
-            )
             tscope.register_refresh_function(blue_stats.refresh)
 
             yellow_fs.setup_proto_unix_io(

@@ -31,3 +31,9 @@ class Stats:
 
     def refresh(self):
         self.fs_stats.refresh()
+
+    def __enter__(self):
+        self.fs_stats.setup()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.fs_stats.cleanup()
