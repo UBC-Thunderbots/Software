@@ -12,6 +12,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import RuntimeManagerConstants
 import logging
 
+
 @dataclass
 class FSStats:
     """Stats for how well a FullSystem is performing"""
