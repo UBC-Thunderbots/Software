@@ -50,6 +50,10 @@ class FullSystemStats:
 
         self.stats = FSStats()
 
+        # these should be set up using the setup method
+        self.stats_file = None
+        self.enemy_stats_file = None
+
         # the python __del__ destructor isn't called reliably
         # so printing this at the start instead
         print(f"\n\n\n##### Writing FS Stats to {self._get_stats_file()}#####\n\n\n")
@@ -143,23 +147,49 @@ class FullSystemStats:
             else RuntimeManagerConstants.RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE,
         )
 
-    def _flush_stats(self):
-        """Write the current stats to disk"""
+    def setup(self):
+        """Sets up the file resources for logging
+        Creates any missing directories and stores the file handle
+        """
         stats_file_name = self._get_stats_file()
 
-        self._write_stats_to_file(self.stats, stats_file_name)
+        # create temp stats directory if it doesn't exist
+        os.makedirs(os.path.dirname(stats_file_name), exist_ok=True)
+
+        self.stats_file = open(stats_file_name, "w")
 
         if self.record_enemy_stats:
             enemy_stats_file_name = self._get_enemy_stats_file()
 
-            self._write_stats_to_file(self.enemy_stats, enemy_stats_file_name)
+            # create temp stats directory if it doesn't exist
+            os.makedirs(os.path.dirname(enemy_stats_file_name), exist_ok=True)
 
-    def _write_stats_to_file(self, stats: FSStats, file_path: str) -> None:
+            self.enemy_stats_file = open(enemy_stats_file_name, "w")
+
+    def cleanup(self):
+        """Cleans up any created file resources after logging"""
+        if self.stats_file:
+            self.stats_file.close()
+
+        if self.record_enemy_stats and self.enemy_stats_file:
+            self.enemy_stats_file.close()
+
+    def _flush_stats(self):
+        """Write the current stats to disk"""
+        self._write_stats_to_file(self.stats, self.stats_file)
+
+        if self.record_enemy_stats:
+            self._write_stats_to_file(self.enemy_stats, self.enemy_stats_file)
+
+    def _write_stats_to_file(self, stats: FSStats, stats_file) -> None:
         """Write the given stats to the given file
 
         :param stats: the stats to write
-        :param file_path: the file to write to
+        :param stats_file: handle to the file to write to
         """
+        if not stats_file:
+            return
+
         try:
             # formatted as key-value pairs in TOML
             stats_to_write = (
@@ -170,11 +200,7 @@ class FullSystemStats:
                 f'{RuntimeManagerConstants.RUNTIME_STATS_SHOTS_BLOCKED} = "{stats.num_enemy_shots_blocked}"'
             )
 
-            # create temp stats directory if it doesn't exist
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-            with open(file_path, "w") as stats_file:
-                stats_file.write(stats_to_write)
+            stats_file.write(stats_to_write)
 
         except (FileNotFoundError, PermissionError):
-            logging.warning(f"Failed to write TOML FS stats file at: {file_path}")
+            logging.warning("Failed to write TOML FS stats file")
