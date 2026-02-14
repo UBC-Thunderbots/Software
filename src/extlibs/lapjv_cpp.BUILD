@@ -8,6 +8,10 @@ cc_library(
     hdrs = glob(
         [
             "src/**/*.h",
+        ],
+    ),
+    srcs = glob(
+        [
             "src/**/*.cpp",
         ],
     ),

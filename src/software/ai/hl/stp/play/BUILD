@@ -99,7 +99,6 @@ cc_library(
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
         "@lapjv_cpp",
-        "@munkres_cpp",
         "@tracy",
     ],
 )
