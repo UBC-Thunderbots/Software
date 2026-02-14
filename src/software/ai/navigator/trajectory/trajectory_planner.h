@@ -104,9 +104,9 @@ class TrajectoryPlanner
     static constexpr Angle MIN_SUB_DESTINATION_ANGLE = Angle::fromDegrees(20);
     static constexpr Angle MAX_SUB_DESTINATION_ANGLE = Angle::fromDegrees(140);
 
-	// TODO (#3603): Tune collision threshold constants
-	static constexpr double UNAVOIDABLE_COLLISION_TIME_THRESHOLD_S = 0.2;
-	static constexpr double UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD_M_S = 0.5;
+    // TODO (#3603): Tune collision threshold constants
+    static constexpr double UNAVOIDABLE_COLLISION_TIME_THRESHOLD_S       = 0.2;
+    static constexpr double UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD_M_S = 0.5;
 
     const double SUB_DESTINATION_STEP_INTERVAL_SEC = 0.2;
 
