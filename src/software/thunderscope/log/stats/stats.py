@@ -1,6 +1,5 @@
 from software.thunderscope.log.stats.fullsystem_stats import FullSystemStats
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from proto.visualization_pb2 import AttackerVisualization
 from proto.import_all_protos import *
 
 

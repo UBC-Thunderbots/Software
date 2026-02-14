@@ -1,6 +1,11 @@
 import os
 
-from software.thunderscope.log.trackers import PossessionTracker, ShotTracker, TrackerBuilder
+from software.thunderscope.log.trackers import (
+    PossessionTracker,
+    ShotTracker,
+    TrackerBuilder,
+    RefereeTracker
+)
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from dataclasses import dataclass
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -50,15 +55,15 @@ class FullSystemStats:
         # None if neither
         self.last_possession_friendly: bool | None = None
 
-        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
 
         self.stats = FSStats()
 
         self.tracker = (
             TrackerBuilder(proto_unix_io=proto_unix_io)
-                .add_tracker(ShotTracker, callback=self._update_shot_count)
-                .add_tracker(PossessionTracker, callback=self._update_posession)
+            .add_tracker(ShotTracker, callback=self._update_shot_count)
+            .add_tracker(PossessionTracker, callback=self._update_posession)
+            .add_tracker(RefereeTracker, callback=self._update_referee_info_friendly)
         )
 
         # the python __del__ destructor isn't called reliably
@@ -68,6 +73,7 @@ class FullSystemStats:
         self.record_enemy_stats = record_enemy_stats
         if self.record_enemy_stats:
             self.enemy_stats = FSStats()
+            self.tracker = self.tracker.add_tracker(RefereeTracker, callback=self._update_referee_info_enemy)
             print(
                 f"\n\n\n##### Writing Enemy FS Stats to {self._get_enemy_stats_file()}#####\n\n\n"
             )
@@ -76,7 +82,7 @@ class FullSystemStats:
         """Refreshes the stats for the game so far"""
         world_msg = self.world_buffer.get(block=False, return_cached=True)
         world = tbots_cpp.World(world_msg)
-        
+
         self.tracker.refresh()
 
         self._record_goalie_stats(world.ball(), world.field())
@@ -84,12 +90,22 @@ class FullSystemStats:
         self._record_referee_stats()
 
         self._flush_stats()
-        
+
     def _update_shot_count(self, _: Shot):
         self.stats.num_shots_on_net += 1
-        
+
     def _update_posession(self, friendly_posession: bool | None):
         self.last_possession_friendly = not friendly_posession
+        
+    def _update_referee_info_friendly(self, num_goals: int, num_yellow_cards: int, num_red_cards: int) -> None:
+        self.stats.num_scores = num_goals
+        self.stats.num_yellow_cards = num_yellow_cards
+        self.stats.num_red_cards = num_red_cards
+        
+    def _update_referee_info_enemy(self, num_goals: int, num_yellow_cards: int, num_red_cards: int) -> None:
+        self.enemy_stats.num_scores = num_goals
+        self.enemy_stats.num_yellow_cards = num_yellow_cards
+        self.enemy_stats.num_red_cards = num_red_cards
 
     def _is_goal_shot_incoming(
         self, ball: tbots_cpp.Ball, field: tbots_cpp.Field, for_friendly: bool
@@ -209,43 +225,6 @@ class FullSystemStats:
                 return True
 
         return False
-
-    def _record_referee_stats(self) -> None:
-        """Record stats related to the referee
-        such as game score and red / yellow cards
-        """
-        refree_msg = self.referee_buffer.get(block=False, return_cached=True)
-
-        if refree_msg.HasField("yellow" if self.friendly_colour_yellow else "blue"):
-            self._record_referee_stats_per_team(
-                refree_msg.yellow if self.friendly_colour_yellow else refree_msg.blue,
-                self.stats,
-            )
-
-        if self.record_enemy_stats and refree_msg.HasField(
-            "blue" if self.friendly_colour_yellow else "yellow"
-        ):
-            self._record_referee_stats_per_team(
-                refree_msg.blue if self.friendly_colour_yellow else refree_msg.yellow,
-                self.enemy_stats,
-            )
-
-    def _record_referee_stats_per_team(
-        self, team_info: TeamInfo, stats: FSStats
-    ) -> None:
-        """Record stats related to the referee for the given team
-
-        :param team_info: the information about the team
-        :param stats: the stats to update
-        """
-        if team_info.HasField("score"):
-            stats.num_scores = team_info.score
-
-        if team_info.HasField("yellow_cards"):
-            stats.num_yellow_cards = team_info.yellow_cards
-
-        if team_info.HasField("red_cards"):
-            stats.num_red_cards = team_info.red_cards
 
     def _get_stats_file(self):
         return os.path.join(
