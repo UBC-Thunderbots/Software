@@ -59,9 +59,9 @@ class KickTracker(Tracker):
         super().set_proto_unix_io(
             proto_unix_io,
             [
-            (AttackerVisualization, self.attacker_vis_buffer),
-            (World, self.world_buffer),
-        ]   
+                (AttackerVisualization, self.attacker_vis_buffer),
+                (World, self.world_buffer),
+            ],
         )
 
     def _get_new_kick_angle(

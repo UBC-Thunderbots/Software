@@ -13,8 +13,9 @@ class TrackerBuilder:
         self,
         tracker_cls: Type[Tracker],
         callback: Optional[Callable[[Any], None]] = None,
+        **kwargs,
     ) -> Self:
-        tracker = tracker_cls(callback=callback)
+        tracker = tracker_cls(callback=callback, **kwargs)
         tracker.set_proto_unix_io(self.proto_unix_io)
         self.trackers.append(tracker)
         return self

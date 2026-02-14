@@ -14,9 +14,12 @@ class PossessionTracker(Tracker):
 
     @override
     def set_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
-        super().set_proto_unix_io(proto_unix_io, [
-            (World, self.world_buffer),
-        ])
+        super().set_proto_unix_io(
+            proto_unix_io,
+            [
+                (World, self.world_buffer),
+            ],
+        )
 
     @override
     def refresh(self):
