@@ -1,4 +1,4 @@
-from software.thunderscope.log.stats.fs_stats import FSStatsTracker
+from software.thunderscope.log.stats.fullsystem_stats import FullSystemStats
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.visualization_pb2 import AttackerVisualization
 from proto.import_all_protos import *
@@ -16,7 +16,7 @@ class Stats:
     ):
         self.proto_unix_io = proto_unix_io
 
-        self.fs_stats = FSStatsTracker(
+        self.fs_stats = FullSystemStats(
             friendly_colour_yellow=friendly_color_yellow,
             buffer_size=buffer_size,
             record_enemy_stats=record_enemy_stats,
