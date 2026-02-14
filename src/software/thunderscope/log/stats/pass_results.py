@@ -1,7 +1,7 @@
 import datetime
 
 import software.python_bindings as tbots_cpp
-from software.thunderscope.log.stats.kick_tracker import KickTracker
+from software.thunderscope.log.stats.trackers.kick_tracker import KickTracker
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 

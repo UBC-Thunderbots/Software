@@ -1,12 +1,12 @@
 import os
 
-from software.thunderscope.log.stats.kick_tracker import KickTracker
+from software.thunderscope.log.trackers import PossessionTracker, ShotTracker, TrackerBuilder
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from dataclasses import dataclass
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
 from software.thunderscope.constants import RuntimeManagerConstants
 import logging
-from proto.visualization_pb2 import AttackerVisualization
 from proto.import_all_protos import *
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
@@ -33,6 +33,7 @@ class FSStatsTracker:
 
     def __init__(
         self,
+        proto_unix_io: ProtoUnixIO,
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
         record_enemy_stats: bool = False,
@@ -45,17 +46,20 @@ class FSStatsTracker:
         """
         self.friendly_colour_yellow = friendly_colour_yellow
 
-        # True if enemy had the last possession, False if friendly
+        # True if friendly had the last possession, False if enemy
         # None if neither
-        self.last_possession_enemy: bool | None = None
+        self.last_possession_friendly: bool | None = None
 
-        self.attacker_vis_buffer = ThreadSafeBuffer(buffer_size, AttackerVisualization)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
 
         self.stats = FSStats()
 
-        self.kick_tracker = KickTracker()
+        self.tracker = (
+            TrackerBuilder(proto_unix_io=proto_unix_io)
+                .add_tracker(ShotTracker, callback=self._update_shot_count)
+                .add_tracker(PossessionTracker, callback=self._update_posession)
+        )
 
         # the python __del__ destructor isn't called reliably
         # so printing this at the start instead
@@ -72,29 +76,20 @@ class FSStatsTracker:
         """Refreshes the stats for the game so far"""
         world_msg = self.world_buffer.get(block=False, return_cached=True)
         world = tbots_cpp.World(world_msg)
-
-        self._record_attacker_stats(world.ball(), world.field())
+        
+        self.tracker.refresh()
 
         self._record_goalie_stats(world.ball(), world.field())
 
         self._record_referee_stats()
 
         self._flush_stats()
-
-    def _update_posession(self, world: tbots_cpp.World) -> None:
-        """Updates the team which last had the ball
-
-        :param world: the current state of the world
-        """
-        friendly_team, enemy_team = (
-            (world.enemyTeam(), world.friendlyTeam())
-            if self.friendly_colour_yellow
-            else (world.friendlyTeam(), world.enemyTeam())
-        )
-
-        self.last_possession_enemy = self._check_posession_for_teams(
-            friendly_team, enemy_team, world.ball().position()
-        )
+        
+    def _update_shot_count(self, _: Shot):
+        self.stats.num_shots_on_net += 1
+        
+    def _update_posession(self, friendly_posession: bool | None):
+        self.last_possession_friendly = not friendly_posession
 
     def _is_goal_shot_incoming(
         self, ball: tbots_cpp.Ball, field: tbots_cpp.Field, for_friendly: bool
@@ -214,30 +209,6 @@ class FSStatsTracker:
                 return True
 
         return False
-
-    def _record_attacker_stats(
-        self,
-        ball: tbots_cpp.Ball,
-        field: tbots_cpp.Field,
-    ) -> None:
-        """Record stats related to the attacker
-        i.e the shots taken on goal by the friendly team
-        Checks if the shot has actually been taken or not
-
-        :param ball: the current state of the ball
-        :param field: the current state of the field
-        """
-        attacker_vis_msg = self.attacker_vis_buffer.get(block=False)
-
-        if not attacker_vis_msg:
-            return
-
-        self.kick_tracker.refresh(
-            attacker_vis_msg,
-            ball,
-            field,
-        )
-        self.stats.num_shots_on_net = self.kick_tracker.num_shots
 
     def _record_referee_stats(self) -> None:
         """Record stats related to the referee

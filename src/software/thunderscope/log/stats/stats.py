@@ -14,20 +14,12 @@ class Stats:
         record_enemy_stats: bool = False,
         buffer_size: int = 5,
     ):
-        self.proto_unix_io = proto_unix_io
-
         self.fs_stats = FSStatsTracker(
+            proto_unix_io=proto_unix_io,
             friendly_colour_yellow=friendly_color_yellow,
             buffer_size=buffer_size,
             record_enemy_stats=record_enemy_stats,
         )
-
-        for arg in [
-            (AttackerVisualization, self.fs_stats.attacker_vis_buffer),
-            (Referee, self.fs_stats.referee_buffer),
-            (World, self.fs_stats.world_buffer),
-        ]:
-            proto_unix_io.register_observer(*arg)
 
     def refresh(self):
         self.fs_stats.refresh()
