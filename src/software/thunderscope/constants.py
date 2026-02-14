@@ -382,7 +382,7 @@ class ProtoPlayerFlags(Enum):
 class DribblingConstants:
     """Constants to be used to check whether the robot has dribbled beyond competition regulations"""
 
-    MAX_DRIBBLING_DISTANCE = 1.0
+    MAX_DRIBBLING_DISPLACEMENT = 1.0
     DRIBBLING_ERROR_MARGIN = 0.06
 
 

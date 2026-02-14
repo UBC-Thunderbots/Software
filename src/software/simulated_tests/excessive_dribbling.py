@@ -14,14 +14,10 @@ class ExcessivelyDribbling(Validation):
     """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
 
     @override
-    def get_validation_status(
-        self,
-        world,
-    ) -> ValidationStatus:
+    def get_validation_status(self, world) -> ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m.
 
         :param world: The world msg to validate
-               estimate of max dribble distance (effective dribble distance is length - error margin)
         :return: FAILING when the robot is excessively dribbling
                  PASSING when the robot is not excessively dribbling
         """
@@ -35,7 +31,7 @@ class ExcessivelyDribbling(Validation):
             dribble_disp = world.dribble_displacement
             dist = tbots_cpp.createSegment(dribble_disp).length()
             if dist > (
-                DribblingConstants.MAX_DRIBBLING_DISTANCE
+                DribblingConstants.MAX_DRIBBLING_DISPLACEMENT
                 - DribblingConstants.DRIBBLING_ERROR_MARGIN
             ):
                 return ValidationStatus.FAILING
