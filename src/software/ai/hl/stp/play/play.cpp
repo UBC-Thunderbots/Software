@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/play.h"
 
 #include <munkres/munkres.h>
+#include <lapjv/lap.h>
 
 #include <Tracy.hpp>
 
