@@ -5,30 +5,35 @@
 <!--TOC-->
 
 - [Table of Contents](#table-of-contents)
-  - [Installing Software Dependencies](#installing-software-dependencies)
-  - [Installing an IDE](#installing-an-ide)
-    - [Installing an IDE: CLion](#installing-an-ide-clion)
-      - [Getting your Student License](#getting-your-student-license)
-      - [Installing CLion](#installing-clion)
-  - [Installing an IDE: VS Code](#installing-an-ide-vs-code)
-  - [Editing with Vim or NeoVim](#editing-with-vim-or-neovim)
-- [Building and Running the Code](#building-and-running-the-code)
-  - [Building from the command line](#building-from-the-command-line)
-  - [Building from the command line using the fuzzy finder](#building-from-the-command-line-using-the-fuzzy-finder)
-  - [Building with CLion](#building-with-clion)
-  - [Building with VS Code](#building-with-vs-code)
-  - [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
-- [Debugging](#debugging)
-  - [Debugging with CLion](#debugging-with-clion)
-  - [Debugging from the Command Line](#debugging-from-the-command-line)
-- [Profiling](#profiling)
-  - [Callgrind](#callgrind)
-  - [Tracy](#tracy)
-- [Building for the robot](#building-for-the-robot)
-- [Deploying Robot Software to the robot](#deploying-robot-software-to-the-robot)
-- [Testing Robot Software locally](#testing-robot-software-locally)
-- [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
-  - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
+- [Software Setup](#software-setup)
+  - [Introduction](#introduction)
+  - [Installation and Setup](#installation-and-setup)
+    - [Operating systems](#operating-systems)
+    - [Getting the Code](#getting-the-code)
+    - [Installing Software Dependencies](#installing-software-dependencies)
+    - [Installing an IDE](#installing-an-ide)
+      - [Installing an IDE: CLion](#installing-an-ide-clion)
+        - [Getting your Student License](#getting-your-student-license)
+        - [Installing CLion](#installing-clion)
+    - [Installing an IDE: VS Code](#installing-an-ide-vs-code)
+    - [Editing with Vim or NeoVim](#editing-with-vim-or-neovim)
+  - [Building and Running the Code](#building-and-running-the-code)
+    - [Building from the command line](#building-from-the-command-line)
+    - [Building from the command line using the fuzzy finder](#building-from-the-command-line-using-the-fuzzy-finder)
+    - [Building with CLion](#building-with-clion)
+    - [Building with VS Code](#building-with-vs-code)
+    - [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
+  - [Debugging](#debugging)
+    - [Debugging with CLion](#debugging-with-clion)
+    - [Debugging from the Command Line](#debugging-from-the-command-line)
+  - [Profiling](#profiling)
+    - [Callgrind](#callgrind)
+    - [Tracy](#tracy)
+  - [Building for the robot](#building-for-the-robot)
+  - [Deploying Robot Software to the robot](#deploying-robot-software-to-the-robot)
+  - [Testing Robot Software locally](#testing-robot-software-locally)
+  - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
+    - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
 - [Workflow](#workflow)
   - [Issue and Project Tracking](#issue-and-project-tracking)
     - [Issues](#issues)
@@ -44,6 +49,53 @@
   - [Testing](#testing)
 
 <!--TOC-->
+
+# Software Setup
+
+## Introduction
+
+These instructions assume that you have the following accounts setup:
+- [GitHub](https://github.com/login)
+- [Discord](https://discord.com). Please contact a Thunderbots lead to receive the invite link.
+
+These instructions assume you have a basic understanding of Linux and the command line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem and how to run programs or scripts.
+
+## Installation and Setup
+
+### Operating systems
+
+We currently only support Linux, specifically Ubuntu.
+
+If you have a X86_64 machine, we support Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
+
+If you have a ARM64 (also known as AARCH64) machine, we support Ubuntu 24.04 LTS.
+
+You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
+
+You can use Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+
+### Getting the Code
+
+1. Open a new terminal
+2. Install git by running `sudo apt-get install git`
+3. Go to the [software repository](https://github.com/UBC-Thunderbots/Software)
+4. Click the `Fork` button in the top-right to fork the repository ([click here to learn about Forks](https://help.github.com/en/articles/fork-a-repo))
+   1. Click on your user when prompted
+   2. You should be automatically redirected to your new fork
+5. Clone your fork of the repository. As GitHub is forcing users to stop using usernames and passwords for authorization, we will be using the SSH link. 
+
+   To clone using SSH:
+
+   1. If not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).  For each computer you contribute to GitHub with, you will need an additional SSH Key pair linked to your account.
+   2.  After you have successfully set up a SSH key for your device and added it to GitHub, you can clone the repository using the following command:
+        1.  e.g. `git clone git@github.com:<your_username>/Software.git`
+        2.  You can find this link under the green `Code` button on the main page of your fork on GitHub, under the SSH tab.  (This should now be available after adding your SSH key to GitHub successfully.)
+
+   Alternatively, you can clone using HTTPS. You'll need to either use a credential helper (Git Credential Manager, GitHub CLI, etc.) or a personal access token ([details here](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls)).
+6. Set up your git remotes ([what is a remote and how does it work?](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes))
+   1. You should have a remote named `origin` that points to your fork of the repository. Git will have set this up automatically when you cloned your fork in the previous step.
+   2. You will need to add a second remote, named `upstream`, that points to our main Software repository, which is where you created your fork from. (**Note:** This is _not_ your fork)
+      1. Open a terminal and navigate to the folder you cloned (your fork): `cd path/to/the/repository/Software`
       2. Navigate to our main Software repository in your browser and copy the url from the green `Code` button. Copy the SSH url if you originally cloned with SSH, or use the HTTPS url if you previously cloned with HTTPS
       3. From your terminal, add the new remote by running `git remote add upstream <the url>` (without the angle brackets)
          1. e.g. `git remote add upstream git@github.com:UBC-Thunderbots/Software.git`
