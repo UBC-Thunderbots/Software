@@ -12,13 +12,12 @@
  **/
 class CollisionEvaluator
 {
-
-   static constexpr double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;
-   static constexpr double FORWARD_COLLISION_CHECK_STEP_INTERVAL_SEC = 0.05;
-   static constexpr double MAX_FUTURE_COLLISION_CHECK_SEC            = 2.0;
-   static constexpr double FRONT_COLLISION_COST_CONST = 3.0;
-   static constexpr double BACK_COLLISION_COST_CONST  = 1.0;
-   static constexpr double MID_TRAJ_COST_CONST        = 6.0;
+    static constexpr double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;
+    static constexpr double FORWARD_COLLISION_CHECK_STEP_INTERVAL_SEC = 0.05;
+    static constexpr double MAX_FUTURE_COLLISION_CHECK_SEC            = 2.0;
+    static constexpr double FRONT_COLLISION_COST_CONST                = 3.0;
+    static constexpr double BACK_COLLISION_COST_CONST                 = 1.0;
+    static constexpr double MID_TRAJ_COST_CONST                       = 6.0;
 
    public:
     /**
@@ -95,5 +94,3 @@ class CollisionEvaluator
     double getLastNonCollisionTime(const TrajectoryPath &traj_path,
                                    const double search_end_time_s) const;
 };
-
-
