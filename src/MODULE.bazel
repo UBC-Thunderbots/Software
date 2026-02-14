@@ -204,6 +204,14 @@ http_archive(
 )
 
 http_archive(
+    name = "lapjv_cpp",
+    build_file = "@//extlibs:lapjv_cpp.BUILD",
+    sha256 = "f4e180eee3eb683e38e4a394060080eabfa49749de7ac5617b55dffb9fee0667",
+    strip_prefix = "LAPJV-algorithm-c-40b5883b7492107e87ba8fb6abeb2aa05591dd34",
+    url = "https://github.com/yongyanghz/LAPJV-algorithm-c/archive/40b5883b7492107e87ba8fb6abeb2aa05591dd34.tar.gz",
+)
+
+http_archive(
     name = "LTC4151",
     build_file = "@//extlibs:LTC4151.BUILD",
     sha256 = "6aa2dd380a13b08366338cdf0fbbeeeed96887512ac7b0753ee6ea1e8856df31",
