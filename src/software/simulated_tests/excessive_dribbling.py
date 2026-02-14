@@ -1,5 +1,6 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+from proto.import_all_protos import ValidationStatus, ValidationGeometry
+from software.thunderscope.constants import DribblingConstants
 
 from software.simulated_tests.validation import (
     Validation,
@@ -12,9 +13,6 @@ from typing import override
 class ExcessivelyDribbling(Validation):
     """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
 
-    def __init__(self):
-        self.continous_dribbling_start_point = None
-
     @override
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m.
@@ -23,28 +21,34 @@ class ExcessivelyDribbling(Validation):
         :return: FAILING when the robot is excessively dribbling
                  PASSING when the robot is not excessively dribbling
         """
-        ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
-        for robot in world.friendly_team.team_robots:
-            if not tbots_cpp.Robot(robot).isNearDribbler(ball_position, 0.01):
-                # if ball is not near dribbler then de-activate this validation
-                self.continous_dribbling_start_point = None
-            elif (
-                ball_position - (self.continous_dribbling_start_point or ball_position)
-            ).length() > 1.0:
+        # Use world calculation of dribbling distance, which uses implementation
+        # of initial position of bot to final position of BALL
+
+        if (
+            world.HasField("dribble_displacement")
+            and world.dribble_displacement is not None
+        ):
+            dribble_disp = world.dribble_displacement
+            dist = tbots_cpp.createSegment(dribble_disp).length()
+            if dist > (
+                DribblingConstants.MAX_DRIBBLING_DISPLACEMENT
+                - DribblingConstants.DRIBBLING_ERROR_MARGIN
+            ):
                 return ValidationStatus.FAILING
-            elif self.continous_dribbling_start_point is None:
-                # ball is in dribbler, but previously wasn't in dribbler, so set continuous dribbling start point
-                self.continous_dribbling_start_point = ball_position
+
         return ValidationStatus.PASSING
 
     @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """(override) Shows the max allowed dribbling circle"""
-        return create_validation_geometry(
-            [tbots_cpp.Circle(self.continous_dribbling_start_point, 1.0)]
-            if self.continous_dribbling_start_point is not None
-            else []
-        )
+        if world.HasField("dribble_displacement"):
+            dribbling_start_point = tbots_cpp.createSegment(
+                world.dribble_displacement
+            ).getStart()
+            return create_validation_geometry(
+                [tbots_cpp.Circle(dribbling_start_point, 1.0)]
+            )
+        return create_validation_geometry([])
 
     @override
     def __repr__(self):
