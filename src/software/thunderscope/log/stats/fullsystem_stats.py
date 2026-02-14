@@ -27,7 +27,7 @@ class FSStats:
     num_enemy_shots_blocked: int = 0
 
 
-class FSStatsTracker:
+class FullSystemStats:
     # From GoalieTacticConfig
     INCOMING_SHOT_MIN_VELOCITY = 0.2
 
