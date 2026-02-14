@@ -7,13 +7,10 @@ from software.thunderscope.log.trackers import (
     RefereeTracker,
     GoalieTracker,
 )
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from dataclasses import dataclass
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.python_bindings as tbots_cpp
 from software.thunderscope.constants import RuntimeManagerConstants
 import logging
-from proto.import_all_protos import *
 
 
 @dataclass
@@ -25,10 +22,6 @@ class FSStats:
     num_scores: int = 0
 
     num_shots_on_net: int = 0
-    latest_shot_angle: tbots_cpp.Angle = tbots_cpp.Angle()
-    shot_taken: bool = False
-
-    is_shot_incoming: bool = False
     num_enemy_shots_blocked: int = 0
 
 
@@ -54,8 +47,6 @@ class FullSystemStats:
         # True if friendly had the last possession, False if enemy
         # None if neither
         self.last_possession_friendly: bool | None = None
-
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
 
         self.stats = FSStats()
 
@@ -97,12 +88,7 @@ class FullSystemStats:
 
     def refresh(self) -> None:
         """Refreshes the stats for the game so far"""
-        world_msg = self.world_buffer.get(block=False, return_cached=True)
-        world = tbots_cpp.World(world_msg)
-
         self.tracker.refresh()
-
-        self._record_goalie_stats(world.ball(), world.field())
 
         self._flush_stats()
 
