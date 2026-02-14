@@ -159,8 +159,8 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
     BallState ball_state(Point(1, 1), Vector(0, 0));
     auto friendly_robots = {RobotStateWithId{
         .id          = 0,
-        .robot_state = RobotState(initial_position, Vector(0, 0), Angle::zero(),
-                                  AngularVelocity::quarter())}};
+        .robot_state = RobotState(initial_position, Vector(0, 0), -Angle::quarter(),
+                                  AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
@@ -175,8 +175,8 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield)
         {
-            robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(1 * 360),
-                                   AngularVelocity::fromDegrees(50), yield);
+            robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(10),
+                                   AngularVelocity::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);
             robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             while (!tactic->done())
@@ -207,7 +207,7 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
     BallState ball_state(Point(1, 1), Vector(0, 0));
     auto friendly_robots = {RobotStateWithId{
         .id          = 0,
-        .robot_state = RobotState(initial_position, Vector(0, 0), Angle::quarter(),
+        .robot_state = RobotState(initial_position, Vector(0, 0), -Angle::quarter(),
                                   AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
@@ -223,8 +223,8 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield)
         {
-            robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(-4 * 360),
-                                   AngularVelocity::fromDegrees(50), yield);
+            robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(-10),
+                                   AngularVelocity::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);
             robotAtOrientation(0, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
             while (!tactic->done())
