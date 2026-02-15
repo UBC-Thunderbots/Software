@@ -144,6 +144,7 @@ def main(
     if platform:
         command += ["--//software/embedded:host_platform=" + platform.value]
 
+    # limit number of jobs
     if jobs_option:
         command += ["--jobs=" + jobs_option]
 
@@ -154,7 +155,6 @@ def main(
         command += ["--"]
 
     bazel_arguments = unknown_args
-
     if stop_ai_on_start:
         bazel_arguments += ["--stop_ai_on_start"]
     if enable_visualizer:
