@@ -12,7 +12,7 @@
  * This play is applicable when the ball's x and y coordinates are >= 0
  * This play's invariant holds while the ball's x coordinate is >= 0
  */
-class MoveTestPlay : public Play
+class MoveTestPlay : public PlayBase<MoveTestPlay>
 {
    public:
     /**
@@ -24,4 +24,6 @@ class MoveTestPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
+
+    void updateTactics(const PlayUpdate &play_update) override;
 };
