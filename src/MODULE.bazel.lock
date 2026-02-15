@@ -261,6 +261,33 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "//:defs.bzl%openocd_extension": {
+      "general": {
+        "bzlTransitiveDigest": "l1SGMlXmT2O5uZ3b+SaOae1+V2JtUSstC+YGj7hdP3I=",
+        "usagesDigest": "5oNc47N2R0Rr/jGGzqVE3rovJeggLoEAhjTYWYAyQKM=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "com_openocd": {
+            "repoRuleId": "@@+_repo_rules+bazel_embedded//tools/openocd:openocd_repository.bzl%openocd_repository",
+            "attributes": {}
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "",
+            "bazel_embedded",
+            "+_repo_rules+bazel_embedded"
+          ],
+          [
+            "",
+            "rules_pkg",
+            "rules_pkg+"
+          ]
+        ]
+      }
+    },
     "@@apple_support+//crosstool:setup.bzl%apple_cc_configure_extension": {
       "general": {
         "bzlTransitiveDigest": "E970FlMbwpgJPdPUQzatKh6BMfeE0ZpWABvwshh7Tmg=",
