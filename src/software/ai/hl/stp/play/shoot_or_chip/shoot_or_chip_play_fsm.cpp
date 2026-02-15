@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/shoot_or_chip_play.h"
+#include "software/ai/hl/stp/play/sshoot_or_chip_play/shoot_or_chip_play_fsm.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
@@ -27,7 +27,18 @@ ShootOrChipPlayFSM::ShootOrChipPlayFSM(std::shared_ptr<const TbotsProto::AiConfi
 
 void ShootOrChipPlayFSM::updateShootOrChip(const Update& event){
 
+    /**
+     * Our general strategy here is:
+     * - 1 goalie
+     * - 2 crease defenders moving around the friendly defense box
+     * - 2 robots moving into the first and second largest open free space on
+     *   the enemy half
+     * - 1 robot trying to shoot on the goal. If an enemy gets too close to this
+     *   robot, it will chip to right in front of the robot in the largest open free area
+     */
 		
+    // Figure out where the fallback chip target is
+    // Experimentally determined to be a reasonable value
     double fallback_chip_target_x_offset = 1.5;
 
     Point fallback_chip_target =
@@ -85,7 +96,7 @@ void ShootOrChipPlayFSM::updateShootOrChip(const Update& event){
         event.common.set_tactics(result);
 }
 
-bool ShootOrChipPlayFSM::attackerDone(){
+bool ShootOrChipPlayFSM::attackerDone(const Update& event){
 	return attacker->done();
 }
 	
