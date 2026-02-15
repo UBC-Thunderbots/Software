@@ -143,8 +143,8 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
             .length();
     if (best_traj_with_cost.collides() &&
         best_traj_with_cost.first_collision_time_s <
-            UNAVOIDABLE_COLLISION_TIME_THRESHOLD &&
-        collision_velocity > UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD)
+            UNAVOIDABLE_COLLISION_TIME_THRESHOLD_S &&
+        collision_velocity > UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD_M_S)
     {
         return std::nullopt;
     }
