@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/halt_play/halt_test_play_fsm.h"
+#include "software/ai/hl/stp/play/test_plays/halt_test_play_fsm.h"
 
 #include <gtest/gtest.h>
 

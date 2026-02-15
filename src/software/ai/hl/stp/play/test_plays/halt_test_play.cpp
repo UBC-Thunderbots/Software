@@ -3,7 +3,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 HaltTestPlay::HaltTestPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : PlayBase<HaltTestPlay>(ai_config_ptr, false)
+    : PlayBase<HaltTestPlayFSM>(ai_config_ptr, false)
 {
 }
 

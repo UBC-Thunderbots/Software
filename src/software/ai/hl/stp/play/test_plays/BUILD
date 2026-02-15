@@ -3,13 +3,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "halt_test_play",
     srcs = [
-		"halt_test_play.cpp",	
-		"halt_test_play_fsm.cpp"
-	],
+        "halt_test_play.cpp",
+    ],
     hdrs = [
-		"halt_test_play.h",
-		"halt_test_play.h"
-	],
+        "halt_test_play.h",
+        "halt_test_play_fsm.h",
+    ],
     deps = [
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/halt:halt_tactic",

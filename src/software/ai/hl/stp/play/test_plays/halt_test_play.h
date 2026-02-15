@@ -13,7 +13,7 @@
  * This play is applicable when the ball's y coordinate is >= 0
  * This play's invariant holds while the ball is within the field
  */
-class HaltTestPlay : public PlayBase<HaltTestPlay>
+class HaltTestPlay : public PlayBase<HaltTestPlayFSM>
 {
    public:
     /**
