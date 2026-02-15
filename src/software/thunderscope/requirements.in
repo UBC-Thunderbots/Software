@@ -13,7 +13,4 @@ PyOpenGL==3.1.6
 psutil==5.9.0
 thefuzz==0.19.0
 python-Levenshtein==0.25.1
-<<<<<<< HEAD
 requests==2.32.5
-=======
->>>>>>> 911dc36b8a1854a4f78e3e6cd46f7e12ec094508
