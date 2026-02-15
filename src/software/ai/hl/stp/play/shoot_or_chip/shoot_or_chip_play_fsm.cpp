@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/sshoot_or_chip_play/shoot_or_chip_play_fsm.h"
+#include "software/ai/hl/stp/play/shoot_or_chip/shoot_or_chip_play_fsm.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
@@ -44,8 +44,9 @@ void ShootOrChipPlayFSM::updateShootOrChip(const Update& event){
     Point fallback_chip_target =
         event.common.world_ptr->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
+        // Update chipper
+        std::optional<Point> chip_target = fallback_chip_target;
 
-    attacker->updateControlParams(fallback_chip_target);
 
         PriorityTacticVector result = {{}};
 
@@ -60,11 +61,6 @@ void ShootOrChipPlayFSM::updateShootOrChip(const Update& event){
         result[0].emplace_back(std::get<1>(crease_defender_tactics));
 
         // Update tactics moving to open areas
-        std::vector<Point> enemy_robot_points;
-        for (auto const &robot : event.common.world_ptr->enemyTeam().getAllRobots())
-        {
-            enemy_robot_points.emplace_back(robot.position());
-        }
         std::vector<Circle> chip_targets = findGoodChipTargets(*event.common.world_ptr);
         for (unsigned i = 0;
              i < chip_targets.size() && i < move_to_open_area_tactics.size(); i++)
@@ -81,8 +77,6 @@ void ShootOrChipPlayFSM::updateShootOrChip(const Update& event){
             result[0].emplace_back(move_to_open_area_tactics[i]);
         }
 
-        // Update chipper
-        std::optional<Point> chip_target = std::nullopt;
         if (!chip_targets.empty())
         {
             chip_target = chip_targets[0].origin();
