@@ -20,7 +20,8 @@ cc_library(
 cc_library(
     name = "move_test_play",
     srcs = ["move_test_play.cpp"],
-    hdrs = ["move_test_play.h"],
+    hdrs = ["move_test_play.h",
+			"move_test_play_fsm.h"],
     deps = [
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/move:move_tactic",
