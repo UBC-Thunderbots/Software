@@ -33,6 +33,7 @@ class Stats:
     def __enter__(self):
         self.fs_stats.setup()
         self.pass_results.setup()
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.fs_stats.cleanup()
