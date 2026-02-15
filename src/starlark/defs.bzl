@@ -98,10 +98,3 @@ pkg_executable = rule(
     },
     provides = [PackageFilegroupInfo],
 )
-
-def _openocd_extension_impl(_ctx):
-    openocd_deps()
-
-openocd_extension = module_extension(
-    implementation = _openocd_extension_impl,
-)

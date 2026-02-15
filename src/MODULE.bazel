@@ -211,7 +211,7 @@ http_archive(
     url = "https://github.com/bazelembedded/bazel-embedded/archive/cf5b240d510313b3383e0cdb550eb9f32be7244e.zip",
 )
 
-openocd = use_extension("//:defs.bzl", "openocd_extension")
+openocd = use_extension("//starlark/firmware:open_ocd.bzl", "openocd_extension")
 use_repo(openocd, "com_openocd")
 
 http_archive(
@@ -220,6 +220,15 @@ http_archive(
     sha256 = "6aa2dd380a13b08366338cdf0fbbeeeed96887512ac7b0753ee6ea1e8856df31",
     strip_prefix = "LTC4151-729952f10bcdcf359877b6f728565c17a8f17423",
     url = "https://github.com/kerrydwong/LTC4151/archive/729952f10bcdcf359877b6f728565c17a8f17423.tar.gz",
+)
+
+# TODO: Perhaps set this to pull latest
+http_archive(
+    name = "mdv6_firmware",
+    build_file = "@//extlibs:mdv6_firmware.bzl",
+    sha256 = "8054aca4ae3543e39d3587c58aa5904917d9b268922564f6ca3acf4b59bd8fe8",
+    strip_prefix = "MDv6_Firmware-81627d25b5f147c0b5b3f8ceb2c22c883625a3d1",
+    url = "https://github.com/UBC-Thunderbots/MDv6_Firmware/archive/81627d25b5f147c0b5b3f8ceb2c22c883625a3d1.tar.gz",
 )
 
 http_archive(
