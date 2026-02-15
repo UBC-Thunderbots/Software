@@ -23,9 +23,9 @@ py_binary(
         "//software/embedded/linux_configs/jetson_nano:jetson_nano_files",
         "//software/embedded/linux_configs/pi:pi_files",
         "//software/embedded/linux_configs/systemd:systemd_files",
+        "//software/embedded/motor_controller:stspin_motor_controller_test",
         "//software/embedded/redis",
         "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli_tar",
-        "//software/embedded/services:robot_auto_test",
         "//software/power:powerloop_tar",
     ],
     deps = [

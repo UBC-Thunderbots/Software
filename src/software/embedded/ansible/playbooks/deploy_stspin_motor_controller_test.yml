@@ -1,5 +1,5 @@
 ---
-- name: Robot Auto Test Playbook
+- name: Deploy stspin_motor_controller_test binary to robot
   hosts: THUNDERBOTS_HOSTS
 
   tasks:
@@ -8,7 +8,7 @@
         msg: "[Robot ID = {{ inventory_hostname }}]"
       tags: always
 
-    - name: Start Robot Auto Test Process
+    - name: Deploy stspin_motor_controller_test binary
       block:
         - name: Stop Services
           become: true
@@ -20,10 +20,10 @@
             state: stopped
           tags: always
 
-        - name: Delete robot_auto_test binary under ~/thunderbots_binaries
+        - name: Delete stspin_motor_controller_test binary under ~/thunderbots_binaries
           ansible.builtin.file:
             state: absent
-            path: ~/thunderbots_binaries/robot_auto_test
+            path: ~/thunderbots_binaries/stspin_motor_controller_test
           become_method: ansible.builtin.sudo
           become: true
           register: result
@@ -35,22 +35,8 @@
 
         - name: Sync Binary
           ansible.posix.synchronize:
-            src: ../../services/robot_auto_test
+            src: ../../motor_controller/stspin_motor_controller_test
             dest: ~/thunderbots_binaries/
             recursive: true
             copy_links: true
           tags: always
-
-#        - name: Run Binary
-#          ansible.builtin.command: "./robot_auto_test"
-#          args:
-#            chdir: /home/robot/thunderbots_binaries
-#          become_method: ansible.builtin.sudo
-#          become: true
-#          register: robot_auto_test_output
-#          changed_when: true
-#          ignore_errors: true
-
-        - name: Print Binary Output
-          ansible.builtin.debug:
-            var: robot_auto_test_output.stdout

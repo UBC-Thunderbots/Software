@@ -62,3 +62,18 @@ cc_library(
     name = "stspin_types",
     hdrs = ["stspin_types.h"],
 )
+
+cc_binary(
+    name = "stspin_motor_controller_test",
+    srcs = ["stspin_motor_controller_test.cpp"],
+    linkopts = [
+        "-lpthread",
+        "-lrt",
+    ],
+    deps = [
+        ":motor_controller",
+        "//proto/message_translation:tbots_protobuf",
+        "//software/logger",
+        "@boost//:program_options",
+    ],
+)

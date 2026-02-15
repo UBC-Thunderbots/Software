@@ -17,7 +17,7 @@
   - [Robot Diagnostics](#robot-diagnostics)
     - [For Just Diagnostics](#for-just-diagnostics)
     - [For AI + Diagnostics](#for-ai--diagnostics)
-  - [Robot Auto Test](#robot-auto-test)
+  - [STSPIN Motor Controller Test](#stspin-motor-controller-test)
 - [On Robot Commands](#on-robot-commands)
   - [Systemd Services](#systemd-services)
   - [Debugging Uart](#debugging-uart)
@@ -184,18 +184,17 @@ From Software/src
 
 network_interface can be found with `ifconfig` commonly `wlp59s0` for wifi.
 
-## Robot Auto Test
-Runs the robot auto test fixture on a robot through Ansible, which tests the motor board and power board SPI and UART transfer respectively.
+## STSPIN Motor Controller Test
+Deploys the STSPIN Motor Controller Test binary onto a robot through Ansible.
 
 From Software/src:
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> --//software/embedded:motor_board=<motor_board> -- --playbook robot_auto_test_playbook.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=PI --//software/embedded:motor_board=STSPIN -- --playbook deploy_stspin_motor_controller_test.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
-* replace the \<platform\> with the target platform for the robot (either `PI` or `NANO`)
-* replace the \<robot_ip\> with the actual ip address of the jetson nano for the ssh connection.
-* replace the <robot_password> with the actual password for the jetson nano for the ssh connection.
+* replace the \<robot_ip\> with the actual ip address of the robot for the SSH connection.
+* replace the \<robot_password\> with the actual password for the robot nano for the SSH connection.
 
 # On Robot Commands
 

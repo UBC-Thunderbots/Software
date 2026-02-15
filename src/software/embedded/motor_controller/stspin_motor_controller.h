@@ -107,5 +107,5 @@ class StSpinMotorController : public MotorController
 
     std::unique_ptr<Gpio> reset_gpio_;
 
-    friend void runRobotAutoTest();
+    friend class StSpinMotorControllerTest;
 };

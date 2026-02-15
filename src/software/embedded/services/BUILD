@@ -42,23 +42,3 @@ cc_library(
         "@boost//:filesystem",
     ],
 )
-
-cc_binary(
-    name = "robot_auto_test",
-    srcs = ["robot_auto_test.cpp"],
-    linkopts = [
-        "-lpthread",
-        "-lrt",
-    ],
-    deps = [
-        ":motor",
-        ":power",
-        "//proto/message_translation:tbots_geometry",
-        "//proto/message_translation:tbots_protobuf",
-        "//proto/primitive:primitive_msg_factory",
-        "//shared:robot_constants",
-        "//software/embedded:primitive_executor",
-        "//software/logger:network_logger",
-        "@trinamic",
-    ],
-)
