@@ -1,27 +1,15 @@
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 
-#include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
-#include "software/geom/algorithms/contains.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 HaltTestPlay::HaltTestPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : Play(ai_config_ptr, false)
+    : PlayBase<HaltTestPlay>(ai_config_ptr, false)
 {
 }
 
-void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                  const WorldPtr &world_ptr)
-{
-    auto halt_test_tactic_1 = std::make_shared<HaltTactic>(ai_config_ptr);
-    auto halt_test_tactic_2 = std::make_shared<HaltTactic>(ai_config_ptr);
-    auto halt_test_tactic_3 = std::make_shared<HaltTactic>(ai_config_ptr);
-
-    do
-    {
-        yield({{halt_test_tactic_1, halt_test_tactic_2, halt_test_tactic_3}});
-    } while (true);
-}
-
+void HaltTestPlay::updateTactics(const PlayUpdate &play_update){
+	fsm.process_event(HaltTestPlayFSM::Update(control_params, play_update));
+};
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, HaltTestPlay,
                        std::shared_ptr<const TbotsProto::AiConfig>>
