@@ -15,3 +15,5 @@ psutil==5.9.0
 
 thefuzz==0.19.0
 graphviz==0.21
+python-Levenshtein==0.25.1
+requests==2.32.5
