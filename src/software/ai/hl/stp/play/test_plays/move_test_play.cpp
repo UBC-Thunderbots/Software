@@ -4,34 +4,17 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 MoveTestPlay::MoveTestPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : Play(ai_config_ptr, false)
+    : PlayBase<MoveTestPlayFSM>(ai_config_ptr, false)
 {
 }
 
 void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                   const WorldPtr &world_ptr)
 {
-    auto move_test_tactic_friendly_goal = std::make_shared<MoveTactic>(ai_config_ptr);
-    auto move_test_tactic_enemy_goal    = std::make_shared<MoveTactic>(ai_config_ptr);
-    auto move_test_tactic_center_field  = std::make_shared<MoveTactic>(ai_config_ptr);
+}
 
-    do
-    {
-        move_test_tactic_friendly_goal->updateControlParams(
-            world_ptr->field().friendlyGoalCenter(), Angle::zero(),
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::SAFE);
-        move_test_tactic_enemy_goal->updateControlParams(
-            world_ptr->field().enemyGoalCenter(), Angle::zero(),
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::SAFE);
-        move_test_tactic_center_field->updateControlParams(
-            Point(0, 0), Angle::zero(), TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::SAFE);
-
-        yield({{move_test_tactic_center_field, move_test_tactic_friendly_goal,
-                move_test_tactic_enemy_goal}});
-    } while (!move_test_tactic_center_field->done());
+void MoveTestPlay::updateTactics(const PlayUpdate &play_update){
+		fsm.process_event(MoveTestPlayFSM::Update(control_params, play_update));
 }
 
 // Register this play in the genericFactory
