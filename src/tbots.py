@@ -24,6 +24,7 @@ from cli.cli_params import (
     StopAIOnStartOption,
     DebugBinary,
     Platform,
+    JobsOption,
 )
 
 # thefuzz is a fuzzy string matcher in python
@@ -58,6 +59,7 @@ def main(
     enable_thunderscope: EnableThunderscopeOption = False,
     enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
+    jobs_option: JobsOption = None,
 ) -> None:
     if bool(flash_robots) ^ bool(ssh_password):
         print(
@@ -142,6 +144,9 @@ def main(
     if platform:
         command += ["--//software/embedded:host_platform=" + platform.value]
 
+    if jobs_option:
+        command += ["--jobs=" + jobs_option]
+
     # Don't cache test results
     if action == ActionArgument.test:
         command += ["--cache_test_results=false"]
@@ -149,6 +154,7 @@ def main(
         command += ["--"]
 
     bazel_arguments = unknown_args
+
     if stop_ai_on_start:
         bazel_arguments += ["--stop_ai_on_start"]
     if enable_visualizer:
