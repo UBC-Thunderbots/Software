@@ -13,9 +13,10 @@ struct ShootOrChipPlayFSM : PlayFSM<ShootOrChipPlayFSM>
       {
       };
 
-      class ShootOrChipPlayState;
+      class ShootOrChipState;
 
       explicit ShootOrChipPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
       void updateShootOrChip(const Update& event);
 
 	  bool attackerDone(const Update& event);
