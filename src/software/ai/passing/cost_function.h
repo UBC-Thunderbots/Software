@@ -131,6 +131,15 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
 double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
                               const TbotsProto::PassingConfig& passing_config);
 
+Duration getBallTravelTime(const Pass& pass,
+                           const TbotsProto::PassingConfig& passing_config);
+
+const Robot* getClosestReceiverToPass(const Team& friendly_team, const Pass& pass);
+
+Timestamp getEarliestReceiveTime(const Robot* best_receiver, const Pass& pass,
+                                 const TbotsProto::PassingConfig& passing_config);
+
+Timestamp getEarliestTimeToAngle(const Robot* best_receiver, const Pass& pass);
 
 /**
  * Calculate the probability of a friendly robot receiving the given pass
@@ -148,6 +157,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  */
 double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
                                   const TbotsProto::PassingConfig& passing_config);
+
+Rectangle getReducedField(const Field& field, TbotsProto::PassingConfig passing_config);
 
 /**
  * Calculates the static position quality for a given position on a given field
