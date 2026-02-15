@@ -39,3 +39,13 @@ cc_test(
         "//software/test_util",
     ],
 )
+
+cc_test(
+    name = "move_test_play_fsm_test",
+    srcs = ["move_test_play_fsm_test.cpp"],
+    deps = [
+        ":move_test_play",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
