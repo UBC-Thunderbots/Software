@@ -1,4 +1,3 @@
-load("@bazel_embedded//tools/openocd:openocd_repository.bzl", "openocd_deps")
 load("@rules_pkg//pkg:providers.bzl", "PackageFilegroupInfo", "PackageFilesInfo", "PackageSymlinkInfo")
 
 # ===================================================================

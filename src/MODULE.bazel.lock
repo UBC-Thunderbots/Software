@@ -261,10 +261,10 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
-    "//:defs.bzl%openocd_extension": {
+    "//starlark/firmware:open_ocd.bzl%openocd_extension": {
       "general": {
-        "bzlTransitiveDigest": "l1SGMlXmT2O5uZ3b+SaOae1+V2JtUSstC+YGj7hdP3I=",
-        "usagesDigest": "5oNc47N2R0Rr/jGGzqVE3rovJeggLoEAhjTYWYAyQKM=",
+        "bzlTransitiveDigest": "nHqUfbfGUyhDdTVk0sMZhhjz2Q4vRah/GiiBo7N+XrI=",
+        "usagesDigest": "fwt5j4wTh9/7Dm/s7mCIMf9myU5XrpzzXiXM8HfqgcA=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -279,11 +279,6 @@
             "",
             "bazel_embedded",
             "+_repo_rules+bazel_embedded"
-          ],
-          [
-            "",
-            "rules_pkg",
-            "rules_pkg+"
           ]
         ]
       }

@@ -1,20 +1,12 @@
-filegroup(
-    name = "mdv6_firmware_srcs",
-    srcs = glob(["**/*.c"]),
-)
-
-filegroup(
-    name = "mdv6_firmware_hdrs",
-    srcs = glob(["**/*.h"]),
-)
+load("@bazel_embedded//tools/openocd:defs.bzl", "openocd_flash")
 
 cc_binary(
     name = "mdv6_firmware_main",
     # Linker file informs the toolchain how much RAM and flash you have as well as its locations on the chip
     additional_linker_inputs = [
-        "mdv6_firmware.ld",
+        "STM32CubeIDE/STM32F031C6TX_FLASH.ld",
     ],
-    linkopts = ["-T $(location mdv6_firmware.ld)"],
+    linkopts = ["-T $(location STM32CubeIDE/STM32F031C6TX_FLASH.ld)"],
     target_compatible_with = [
         "@platforms//cpu:armv6-m",
         "@platforms//os:none",
@@ -24,10 +16,49 @@ cc_binary(
     ],
 )
 
+openocd_flash(
+    name = "mdv6_firmware_flash",
+    device_configs = [
+        # Part of the STM32F0 family
+        # https://www.st.com/resource/en/reference_manual/rm0091-stm32f0x1stm32f0x2stm32f0x8-advanced-armbased-32bit-mcus-stmicroelectronics.pdf
+        "target/stm32f0x.cfg",
+    ],
+    # WARNING! `flash_offset` attribute is broken in the Bazel rule. The .elf file (mdv6_firmware_main.stripped)
+    # contains the memory mappings already, so this attribute is necessary.
+    flash_offset = "",
+    # .stripped strips debug symbols to reduce the size of the binary.
+    # see: https://bazel.build/reference/be/c-cpp#cc_binary
+    image = ":mdv6_firmware_main.stripped",
+    interface_configs = [
+        "interface/stlink.cfg",  # The ST-Link V2 programmer is used to flash the firmware.
+    ],
+)
+
 cc_library(
     name = "mdv6_firmware",
-    srcs = glob(["**/*.c"]),
-    hdrs = glob(["**/*.h"]),
+    srcs = glob([
+        "Core/Src/**/*.c",
+        "*.c",
+        "Src/**/*.h",
+        "Drivers/STM32F0xx_HAL_Driver/Src/*_ll_*.c",
+        "Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c",
+        "Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c",
+    ]),
+    hdrs = glob([
+        "Core/Inc/**/*.h",
+        "*.h",
+        "Inc/**/*.h",
+        "Drivers/STM32F0xx_HAL_Driver/Inc/**/*.h",
+        "Drivers/CMSIS/Device/ST/STM32F0xx/Include/**/*.h",
+        "Drivers/CMSIS/Include/**/*.h",
+    ]),
+    includes = [
+        "Core/Inc",
+        "Drivers/STM32F0xx_HAL_Driver/Inc",
+        "Drivers/CMSIS/Device/ST/STM32F0xx/Include",
+        "Drivers/CMSIS/Include",
+        "Inc",
+    ],
     defines = [
         # Our MCU is the STM32F0251: https://www.st.com/resource/en/datasheet/stspin32f0251.pdf
         "STM32F031x6",
