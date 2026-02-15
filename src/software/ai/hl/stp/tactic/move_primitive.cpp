@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
+#include <cmath>
+
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
@@ -63,9 +65,17 @@ MovePrimitive::generatePrimitiveProtoMessage(
         max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
-    // TODO (#3104): The fieldBounary should be shrunk by the robot radius before being
-    //  passed to the planner.
-    Rectangle navigable_area = world.field().fieldBoundary();
+    // Shrink the field by the radius of robot to ensure robot don't go out of bounds, if
+    // we are in a game Return normal field boundaries if not in a game
+    Rectangle field_boundary = world.field().fieldBoundary();
+
+    double shrink_amount = world.gameState().isPlaying() ? ROBOT_MAX_RADIUS_METERS : 0.0;
+    Point neg_x_neg_y_corner(field_boundary.negXNegYCorner().x() + shrink_amount,
+                             field_boundary.negXNegYCorner().y() + shrink_amount);
+    Point pos_x_pos_y_corner(field_boundary.posXPosYCorner().x() - shrink_amount,
+                             field_boundary.posXPosYCorner().y() - shrink_amount);
+    Rectangle navigable_area = Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
+
 
     // If the robot is in a static obstacle, then we should first move to the nearest
     // point out
