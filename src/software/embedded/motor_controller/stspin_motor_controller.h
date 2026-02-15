@@ -5,7 +5,7 @@
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
 #include "software/embedded/motor_controller/motor_index.h"
-#include "software/embedded/motor_controller/stspin_constants.h"
+#include "software/embedded/motor_controller/stspin_types.h"
 
 class StSpinMotorController : public MotorController
 {
@@ -35,7 +35,8 @@ class StSpinMotorController : public MotorController
 
     using OutgoingFrame =
         std::variant<SetResponseTypeFrame, SetTargetSpeedFrame, SetTargetTorqueFrame,
-                     SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame, SetPidSpeedKpKiFrame>;
+                     SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame, SetPidSpeedKpKiFrame,
+                     SetPidSpeedKdFrame>;
 
     /**
      * Transmits a frame to the given motor and receives a frame back over SPI.
@@ -89,13 +90,22 @@ class StSpinMotorController : public MotorController
     // SPI File Descriptors mapping from Chip Select -> File Descriptor
     std::array<int, reflective_enum::size<MotorIndex>()> file_descriptors_;
 
-    std::unique_ptr<Gpio> reset_gpio_;
+    struct MotorStatus
+    {
+        bool enabled;
+        int16_t measured_speed_rpm;
+        uint16_t faults;
+        int16_t iq;
+        int16_t id;
+        int16_t vq;
+        int16_t vd;
+        int16_t phase_current;
+        int16_t phase_voltage;
+    };
 
-    std::unordered_map<MotorIndex, bool> motor_enabled_;
-    std::unordered_map<MotorIndex, int16_t> motor_measured_speed_rpm_;
-    std::unordered_map<MotorIndex, uint16_t> motor_faults_;
-    std::unordered_map<MotorIndex, int16_t> motor_iq_;
-    std::unordered_map<MotorIndex, int16_t> motor_id_;
+    std::unordered_map<MotorIndex, MotorStatus> motor_status_;
+
+    std::unique_ptr<Gpio> reset_gpio_;
 
     friend void runRobotAutoTest();
 };

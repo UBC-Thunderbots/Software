@@ -333,6 +333,7 @@ class DiagnosticsConstants:
         "Microsoft X-Box One S pad",
         "Microsoft X-Box 360 pad",
         "Microsoft Xbox 360 pad",
+        "Generic X-Box pad",
     }
 
     BUTTON_PRESSED_THRESHOLD = 0.5

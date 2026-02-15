@@ -10,8 +10,9 @@
 #include "cppcrc.h"
 #pragma GCC diagnostic pop
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
-#include "software/embedded/motor_controller/stspin_constants.h"
+#include "software/embedded/motor_controller/stspin_types.h"
 #include "software/embedded/spi_utils.h"
 #include "software/logger/logger.h"
 
@@ -46,11 +47,11 @@ void StSpinMotorController::setup()
     {
         if (ENABLED_MOTORS.at(motor))
         {
-            motor_enabled_[motor]            = true;
-            motor_measured_speed_rpm_[motor] = 0;
-            motor_faults_[motor]             = 0;
-            motor_iq_[motor]                 = 0;
-            motor_id_[motor]                 = 0;
+            motor_status_[motor].enabled = true;
+
+            sendAndReceiveFrame(motor, SetPidTorqueKpKiFrame{.kp = 13530, .ki = 5772});
+            sendAndReceiveFrame(motor, SetPidFluxKpKiFrame{.kp = 13530, .ki = 5772});
+            sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 40, .ki = 30});
         }
     }
 }
@@ -75,7 +76,7 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
         return MotorFaultIndicator(drive_enabled, motor_faults);
     }
 
-    const uint16_t faults = motor_faults_.at(motor);
+    const uint16_t faults = motor_status_.at(motor).faults;
 
     if (faults == 0)
     {
@@ -175,13 +176,13 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
     }
 
     const auto outgoing_frame = SetTargetSpeedFrame{
-        .motor_enabled          = motor_enabled_.at(motor),
+        .motor_enabled          = motor_status_.at(motor).enabled,
         .motor_target_speed_rpm = static_cast<int16_t>(target_velocity),
     };
 
     sendAndReceiveFrame(motor, outgoing_frame);
 
-    return motor_measured_speed_rpm_.at(motor);
+    return motor_status_.at(motor).measured_speed_rpm;
 }
 
 void StSpinMotorController::immediatelyDisable()
@@ -190,7 +191,7 @@ void StSpinMotorController::immediatelyDisable()
     {
         if (ENABLED_MOTORS.at(motor))
         {
-            motor_enabled_[motor] = false;
+            motor_status_[motor].enabled = false;
             readThenWriteVelocity(motor, 0);
         }
     }
@@ -271,6 +272,12 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
                 tx[3] = static_cast<uint8_t>(0xFF & (frame.ki >> 8));
                 tx[4] = static_cast<uint8_t>(0xFF & frame.ki);
             }
+            else if constexpr (std::is_same_v<T, SetPidSpeedKdFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_PID_SPEED_KD);
+                tx[1] = static_cast<uint8_t>(0xFF & (frame.kd >> 8));
+                tx[2] = static_cast<uint8_t>(0xFF & frame.kd);
+            }
         },
         outgoing_frame);
 
@@ -285,11 +292,10 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     {
         LOG(WARNING) << "Received frame that failed integrity check. Expected CRC "
                      << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[5])
-                     << " for motor " << motor << "\n"
-                     << "RX: " << static_cast<int>(rx[0]) << " "
-                     << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2]) << " "
-                     << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4]) << " "
-                     << static_cast<int>(rx[5]);
+                     << " for motor " << motor << ". RX: " << static_cast<int>(rx[0])
+                     << " " << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2])
+                     << " " << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4])
+                     << " " << static_cast<int>(rx[5]);
         return;
     }
 
@@ -297,17 +303,33 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     {
         case StSpinResponseType::SPEED_AND_FAULTS:
         {
-            motor_measured_speed_rpm_[motor] =
+            motor_status_[motor].measured_speed_rpm =
                 static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
-            motor_faults_[motor] =
+            motor_status_[motor].faults =
                 static_cast<uint16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
             break;
         }
         case StSpinResponseType::IQ_AND_ID:
         {
-            motor_iq_[motor] =
+            motor_status_[motor].iq =
                 static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
-            motor_id_[motor] =
+            motor_status_[motor].id =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
+        case StSpinResponseType::VQ_AND_VD:
+        {
+            motor_status_[motor].vq =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_status_[motor].vd =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
+        case StSpinResponseType::PHASE_CURRENT_AND_VOLTAGE:
+        {
+            motor_status_[motor].phase_current =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_status_[motor].phase_voltage =
                 static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
             break;
         }

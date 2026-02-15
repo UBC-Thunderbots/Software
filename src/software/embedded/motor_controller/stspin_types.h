@@ -11,12 +11,15 @@ enum class StSpinOpcode
     SET_PID_TORQUE_KP_KI = 0x04,
     SET_PID_FLUX_KP_KI   = 0x05,
     SET_PID_SPEED_KP_KI  = 0x06,
+    SET_PID_SPEED_KD     = 0x07,
 };
 
 enum class StSpinResponseType
 {
-    SPEED_AND_FAULTS = 0x01,
-    IQ_AND_ID        = 0x02,
+    SPEED_AND_FAULTS          = 0x01,
+    IQ_AND_ID                 = 0x02,
+    VQ_AND_VD                 = 0x03,
+    PHASE_CURRENT_AND_VOLTAGE = 0x04,
 };
 
 enum class StSpinFaultCode
@@ -68,4 +71,9 @@ struct SetPidSpeedKpKiFrame
 {
     int16_t kp;
     int16_t ki;
+};
+
+struct SetPidSpeedKdFrame
+{
+    int16_t kd;
 };

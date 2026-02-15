@@ -58,7 +58,7 @@ cc_binary(
         "//proto/primitive:primitive_msg_factory",
         "//shared:robot_constants",
         "//software/embedded:primitive_executor",
-        "//software/logger",
+        "//software/logger:network_logger",
         "@trinamic",
     ],
 )
