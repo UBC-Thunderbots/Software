@@ -29,6 +29,7 @@ class Stats:
 
     def refresh(self):
         self.fs_stats.refresh()
+        self.pass_results.refresh()
 
     def __enter__(self):
         self.fs_stats.setup()
