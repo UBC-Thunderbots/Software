@@ -14,46 +14,52 @@
   tasks:
     - name: Build firmware locally
       delegate_to: localhost
-      command: "bazel build @mdv6_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board"
+      ansible.builtin.command: "bazel build @mdv6_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board"
       args:
         chdir: "{{ repo_root }}"
+      changed_when: false
 
     - name: Convert ELF to Binary locally
       delegate_to: localhost
-      command: "objcopy -O binary {{ bazel_out_path }} {{ firmware_bin_name }}"
+      ansible.builtin.command: "objcopy -O binary {{ bazel_out_path }} {{ firmware_bin_name }}"
       args:
         chdir: "{{ repo_root }}"
+      changed_when: false
 
     - name: Archive firmware binary locally
       delegate_to: localhost
-      command: "tar -czf {{ firmware_archive_name }} {{ firmware_bin_name }}"
+      ansible.builtin.command: "tar -czf {{ firmware_archive_name }} {{ firmware_bin_name }}" # noqa: command-instead-of-module
       args:
         chdir: "{{ repo_root }}"
+      changed_when: false
 
     - name: Create directory on remote
-      file:
+      ansible.builtin.file:
         path: "{{ remote_dir }}"
         state: directory
+        mode: "0755"
 
     - name: Copy firmware archive to remote
-      copy:
+      ansible.builtin.copy:
         src: "{{ repo_root }}/{{ firmware_archive_name }}"
         dest: "{{ remote_dir }}/{{ firmware_archive_name }}"
+        mode: "0644"
 
     - name: Copy flashing script to remote
-      copy:
+      ansible.builtin.copy:
         src: "{{ repo_root }}/{{ script_path }}"
         dest: "{{ remote_dir }}/flash_motor_drivers.py"
-        mode: '0755'
+        mode: "0755"
 
     - name: Unarchive firmware on remote
-      unarchive:
+      ansible.builtin.unarchive:
         src: "{{ remote_dir }}/{{ firmware_archive_name }}"
         dest: "{{ remote_dir }}"
-        remote_src: yes
+        remote_src: true
 
     - name: Run flashing script
       become: true
-      command: "python3 flash_motor_drivers.py"
+      ansible.builtin.command: "python3 flash_motor_drivers.py"
       args:
         chdir: "{{ remote_dir }}"
+      changed_when: true
