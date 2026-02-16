@@ -419,6 +419,12 @@ class PassResultsConstants:
     PASS_RESULTS_DIRECTORY_PATH = "/tmp/tbots/ml"
     PASS_RESULTS_FILE_NAME_TEMPLATE = "pass_results_{interval}.csv"
 
-    PASS_RESULTS_TEMPLATE = (
-        "$pass_start_x,$pass_start_y" "$pass_end_x,$pass_end_y" "$speed,$score\n"
-    )
+    FRIENDLY_GOAL_SCORE = 10
+    ENEMY_GOAL_SCORE = -FRIENDLY_GOAL_SCORE
+    FRIENDLY_POSSESSION_SCORE = 2
+    ENEMY_POSSESSION_SCORE = -FRIENDLY_POSSESSION_SCORE
+    NEUTRAL_SCORE = 0
+
+    # the time intervals to log results for after each pass
+    # so after a pass, wait X seconds and then log game state
+    INTERVALS_S = [1, 5, 10]

@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from software.thunderscope.constants import PassResultsConstants
 import os
 from proto.import_all_protos import *
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+import software.python_bindings as tbots_cpp
 
 
 @dataclass
@@ -26,15 +28,26 @@ class PassResultsTracker:
     after certain time intervals
     """
 
-    FRIENDLY_GOAL_SCORE = 10
-    ENEMY_GOAL_SCORE = -FRIENDLY_GOAL_SCORE
-    FRIENDLY_POSSESSION_SCORE = 2
-    ENEMY_POSSESSION_SCORE = -FRIENDLY_POSSESSION_SCORE
-    NEUTRAL_SCORE = 0
+    NUM_ROBOTS = 6
+    FRIENDLY_POS_TEMPLATE = "{{friendly_{index}_x}},{{friendly_{index}_y}}"
+    ENEMY_POS_TEMPLATE = "{{enemy_{index}_x}},{{enemy_{index}_y}}"
 
-    # the time intervals to log results for after each pass
-    # so after a pass, wait X seconds and then log game state
-    INTERVALS_S = [1, 5, 10]
+    PASS_FEATURES_TEMPLATE = (
+        "{pass_start_x},{pass_start_y}"
+        "{pass_end_x},{pass_end_y}"
+        "{speed},"
+        "{ball_x},{ball_y}"
+        f"{",".join(FRIENDLY_POS_TEMPLATE.format(index=index) for index in range(NUM_ROBOTS))},"
+        f"{",".join(FRIENDLY_POS_TEMPLATE.format(index=index) for index in range(NUM_ROBOTS))},"
+        "{score}\n"
+    )
+
+    PASS_RESULTS_TEMPLATE = (
+        "{pass_start_x},{pass_start_y}"
+        "{pass_end_x},{pass_end_y}"
+        "{speed},"
+        "{score}\n"
+    )
 
     def __init__(
         self,
@@ -49,6 +62,9 @@ class PassResultsTracker:
         :param buffer_size: buffer size to use
         """
         self.friendly_colour_yellow = friendly_colour_yellow
+
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        proto_unix_io.register_observer(World, self.world_buffer)
 
         self.tracker = (
             TrackerBuilder(proto_unix_io=proto_unix_io)
@@ -67,7 +83,7 @@ class PassResultsTracker:
         )
 
         self.pass_times_map: dict[int, list[PassLog]] = {
-            interval: [] for interval in self.INTERVALS_S
+            interval: [] for interval in PassResultsConstants.INTERVALS_S
         }
 
         self.is_friendly_possession: bool | None = False
@@ -75,6 +91,8 @@ class PassResultsTracker:
         self.enemy_score = 0
 
         self.pass_results_file_map = {}
+
+        self.world = None
 
     def setup(self):
         """Creates the relevant directories and a csv file for each of the
@@ -85,20 +103,30 @@ class PassResultsTracker:
         # create all directories in path if they doesn't exist
         os.makedirs(os.path.dirname(pass_results_dir), exist_ok=True)
 
-        for interval in self.INTERVALS_S:
-            self.pass_results_file_map[interval] = open(
-                os.path.join(
-                    pass_results_dir,
-                    PassResultsConstants.PASS_RESULTS_FILE_NAME_TEMPLATE.format(
-                        interval=interval
-                    ),
+        for interval in PassResultsConstants.INTERVALS_S:
+            file_path = os.path.join(
+                pass_results_dir,
+                PassResultsConstants.PASS_RESULTS_FILE_NAME_TEMPLATE.format(
+                    interval=interval
                 ),
+            )
+
+            is_new_file = not os.path.exists(file_path)
+
+            self.pass_results_file_map[interval] = open(
+                file_path,
                 "a",
             )
 
+            # write the headers first if the file doesn't already exist
+            if is_new_file:
+                self.pass_results_file_map[interval].write(
+                    self._get_pass_result_headers()
+                )
+
     def cleanup(self):
         """Flushes content and closes all the files for all intervals"""
-        for interval in self.INTERVALS_S:
+        for interval in PassResultsConstants.INTERVALS_S:
             if self.pass_results_file_map[interval]:
                 self.pass_results_file_map[interval].flush()
                 self.pass_results_file_map[interval].close()
@@ -116,7 +144,7 @@ class PassResultsTracker:
         """Adds the given pass, the current timestamp, and the current scores to the lowest interval's list
         :param pass_: the pass to add
         """
-        self.pass_times_map[self.INTERVALS_S[0]].append(
+        self.pass_times_map[PassResultsConstants.INTERVALS_S[0]].append(
             PassLog(
                 pass_=pass_,
                 timestamp=datetime.now(),
@@ -129,6 +157,11 @@ class PassResultsTracker:
         """Refreshes the tracker so we stay up to date on new passes
         and checks to see if any passes are older than their interval
         """
+        world_msg = self.world_buffer.get(block=False, return_cached=True)
+
+        if world_msg:
+            self.world = tbots_cpp.World(world_msg)
+
         self.tracker.refresh()
 
     def _log_pass_result(self, logged_pass: PassLog, interval_s: int) -> None:
@@ -156,17 +189,23 @@ class PassResultsTracker:
         :return: a single integer score for the pass
         """
         if self.friendly_score > logged_pass.friendly_score:
-            return self.FRIENDLY_GOAL_SCORE
+            return PassResultsConstants.FRIENDLY_GOAL_SCORE
 
         if self.enemy_score > logged_pass.enemy_score:
-            return self.ENEMY_GOAL_SCORE
+            return PassResultsConstants.ENEMY_GOAL_SCORE
 
         if self.is_friendly_possession:
-            return self.FRIENDLY_POSSESSION_SCORE
+            return PassResultsConstants.FRIENDLY_POSSESSION_SCORE
         elif self.is_friendly_possession is False:
-            return self.ENEMY_POSSESSION_SCORE
+            return PassResultsConstants.ENEMY_POSSESSION_SCORE
 
-        return self.NEUTRAL_SCORE
+        return PassResultsConstants.NEUTRAL_SCORE
+
+    def _get_pass_features_headers(self):
+        return self.PASS_FEATURES_TEMPLATE.replace("{", "").replace("}", "")
+
+    def _get_pass_result_headers(self):
+        return self.PASS_RESULTS_TEMPLATE.replace("{", "").replace("}", "")
 
     def _log_pass_result_to_file(self, file, pass_: Pass, score: int) -> None:
         """Logs a single pass's result to the given file handle
@@ -175,7 +214,7 @@ class PassResultsTracker:
         :param pass_: the pass to log
         :param score: the score for the given pass
         """
-        pass_result_string = PassResultsConstants.PASS_RESULTS_TEMPLATE.format(
+        pass_result_string = self.PASS_RESULTS_TEMPLATE.format(
             pass_start_x=pass_.passer_point.x_meters,
             pass_start_y=pass_.passer_point.y_meters,
             pass_end_x=pass_.receiver_point.x_meters,
@@ -191,7 +230,7 @@ class PassResultsTracker:
         If so, log their score to the corresponding file
         And move them to the next interval if exists
         """
-        for idx, interval in enumerate(self.INTERVALS_S):
+        for idx, interval in enumerate(PassResultsConstants.INTERVALS_S):
             pass_timestamps = self.pass_times_map[idx]
 
             time_now = datetime.now()
@@ -204,7 +243,7 @@ class PassResultsTracker:
 
                 self._log_pass_result(pass_with_timestamp, interval)
 
-                if idx < len(self.INTERVALS_S) - 1:
-                    self.pass_times_map[self.INTERVALS_S[idx + 1]].append(
-                        pass_with_timestamp
-                    )
+                if idx < len(PassResultsConstants.INTERVALS_S) - 1:
+                    self.pass_times_map[
+                        PassResultsConstants.INTERVALS_S[idx + 1]
+                    ].append(pass_with_timestamp)
