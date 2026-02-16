@@ -8,7 +8,7 @@ CollisionEvaluator::CollisionEvaluator(const std::vector<ObstaclePtr> &obstacles
 TrajectoryPathWithCost CollisionEvaluator::evaluate(
     const TrajectoryPath &trajectory,
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-    const std::optional<double> sub_traj_duration_s, const std::optional<double> max_cost)
+    const std::optional<double> sub_traj_duration_s, const double max_cost)
 {
     TrajectoryPathWithCost traj_with_cost(trajectory);
 

@@ -47,7 +47,7 @@ class CollisionEvaluator
     TrajectoryPathWithCost evaluate(
         const TrajectoryPath &trajectory,
         const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-        std::optional<double> sub_traj_duration_s, const std::optional<double> max_cost);
+        std::optional<double> sub_traj_duration_s, double max_cost);
 
    private:
     std::vector<ObstaclePtr> obstacles;
