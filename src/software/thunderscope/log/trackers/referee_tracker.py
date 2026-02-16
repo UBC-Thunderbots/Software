@@ -1,4 +1,5 @@
 from typing import override, Callable
+from software.thunderscope.log.trackers.tracker import Tracker
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -11,7 +12,7 @@ class RefereeTracker(Tracker):
         callback: Callable[[int, int, int], None],
         buffer_size: int = 5,
     ):
-        super().__init__(callback, buffer_size)
+        super().__init__(callback=callback, buffer_size=buffer_size)
 
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
 
@@ -34,9 +35,9 @@ class RefereeTracker(Tracker):
         if not refree_msg:
             return
 
-        if refree_msg.HasField("yellow" if self.friendly_colour_yellow else "blue"):
+        if refree_msg.HasField("yellow" if self.friendly_color_yellow else "blue"):
             team_info = (
-                refree_msg.yellow if self.friendly_colour_yellow else refree_msg.blue
+                refree_msg.yellow if self.friendly_color_yellow else refree_msg.blue
             )
 
             num_goals = 0

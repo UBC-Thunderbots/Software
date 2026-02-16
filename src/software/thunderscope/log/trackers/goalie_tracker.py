@@ -4,16 +4,22 @@ from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 
 class GoalieTracker(Tracker):
+    # tune these values to reduce noise in what is considered a kick
+    # higher values exclude noise such as dribbling or small movements of the ball
+    # but can exclude real kicks
+    MIN_SHOT_SPEED = 2.0
+
     def __init__(
         self,
         for_friendly: bool,
         callback: Callable[[bool, bool], None],
         buffer_size: int = 5,
     ):
-        super().__init__(callback, buffer_size)
+        super().__init__(callback=callback, buffer_size=buffer_size)
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
 
@@ -48,6 +54,23 @@ class GoalieTracker(Tracker):
             self.callback(latest_is_shot_incoming, self.is_shot_incoming)
 
         self.is_shot_incoming = latest_is_shot_incoming
+
+    def _get_goal_shot_region(
+        self, field: tbots_cpp.Field, for_friendly: bool
+    ) -> tbots_cpp.Rectangle:
+        """Returns the corresponding defense area (friendly or enemy) expanded by the shorter side's length on all sides
+        for the area the ball should at least enter to be considered a shot on goal
+
+        :param field: the current field
+        :param for_friendly: if we should get the area for the friendly or enemy side
+        :return: an expanded defense area
+        """
+        defense_area = (
+            field.friendlyDefenseArea() if for_friendly else field.enemyDefenseArea()
+        )
+
+        expanded_defense_area = defense_area.expand(defense_area.xLength())
+        return expanded_defense_area
 
     def _is_goal_shot_incoming(
         self, ball: tbots_cpp.Ball, field: tbots_cpp.Field, for_friendly: bool
@@ -85,10 +108,8 @@ class GoalieTracker(Tracker):
         shot_incoming = (
             len(tbots_cpp.intersection(ball_ray, goal_segment)) != 0
             and ball_velocity.length() > self.MIN_SHOT_SPEED
-            and (
-                field.pointInFriendlyHalf(ball_position)
-                if for_friendly
-                else field.pointInEnemyHalf(ball_position)
+            and tbots_cpp.contains(
+                self._get_goal_shot_region(field, for_friendly), ball_position
             )
             and (ball_velocity.x() <= 0 if for_friendly else ball_velocity.x() >= 0)
         )

@@ -37,17 +37,15 @@ class KickTracker(Tracker):
 
     def __init__(
         self,
-        kick_callback: Optional[Callable[[Any], None]] = None,
+        callback: Optional[Callable[[Any], None]] = None,
         buffer_size: int = 5,
     ):
         """Initialize the kick tracker
-        :param pass_callback: an optional callback to call when there's a pass
-        :param shot_callback: an optional callback to call when there's a shot
+        :param callback: an optional callback to call when there's a kick
         """
-        super().__init__(kick_callback, buffer_size)
+        super().__init__(callback=callback, buffer_size=buffer_size)
         self.latest_kick_angle: tbots_cpp.Angle = tbots_cpp.Angle()
         self.kick_taken = False
-        self.num_kicks = 0
 
         self.attacker_vis_buffer = ThreadSafeBuffer(
             self.buffer_size, AttackerVisualization
@@ -120,10 +118,11 @@ class KickTracker(Tracker):
 
 
 class PassTracker(KickTracker):
-    def __init__(
-        self, pass_callback: Callable[[Pass], None] = None, buffer_size: int = 5
-    ):
-        super().__init__(pass_callback, buffer_size)
+    def __init__(self, callback: Callable[[Pass], None] = None, buffer_size: int = 5):
+        """Initialize the pass tracker
+        :param callback: an optional callback to call when there's a pass
+        """
+        super().__init__(callback=callback, buffer_size=buffer_size)
 
     @override
     def _refresh_kicks(
@@ -159,7 +158,6 @@ class PassTracker(KickTracker):
             self.MIN_SHOT_SPEED,
             self.MAX_KICK_ANGLE_DIFFERENCE,
         ):
-            self.num_passes += 1
             self.pass_taken = True
 
             if self.callback:
@@ -167,10 +165,11 @@ class PassTracker(KickTracker):
 
 
 class ShotTracker(KickTracker):
-    def __init__(
-        self, shot_callback: Callable[[Shot], None] = None, buffer_size: int = 5
-    ):
-        super().__init__(shot_callback, buffer_size)
+    def __init__(self, callback: Callable[[Shot], None] = None, buffer_size: int = 5):
+        """Initialize the shot tracker
+        :param callback: an optional callback to call when there's a shot
+        """
+        super().__init__(callback=callback, buffer_size=buffer_size)
 
     @override
     def _refresh_kicks(
@@ -208,7 +207,6 @@ class ShotTracker(KickTracker):
             )
             and field.pointInEnemyHalf(ball.position())
         ):
-            self.num_shots += 1
             self.shot_taken = True
 
             if self.callback:
