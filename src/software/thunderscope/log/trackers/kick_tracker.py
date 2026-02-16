@@ -148,7 +148,7 @@ class PassTracker(KickTracker):
 
             if new_pass_angle is not None:
                 self.latest_kick_angle = new_pass_angle
-                self.kick_taken = True
+                self.kick_taken = False
 
         ball = world.ball()
 
@@ -158,7 +158,7 @@ class PassTracker(KickTracker):
             self.MIN_SHOT_SPEED,
             self.MAX_KICK_ANGLE_DIFFERENCE,
         ):
-            self.pass_taken = True
+            self.kick_taken = True
 
             if self.callback:
                 self.callback(attacker_vis_msg.pass_)
@@ -191,7 +191,7 @@ class ShotTracker(KickTracker):
 
             if new_shot_angle is not None:
                 self.latest_kick_angle = new_shot_angle
-                self.kick_taken = True
+                self.kick_taken = False
 
         ball = world.ball()
         field = world.field()
@@ -207,7 +207,7 @@ class ShotTracker(KickTracker):
             )
             and field.pointInEnemyHalf(ball.position())
         ):
-            self.shot_taken = True
+            self.kick_taken = True
 
             if self.callback:
                 self.callback(attacker_vis_msg.shot)
