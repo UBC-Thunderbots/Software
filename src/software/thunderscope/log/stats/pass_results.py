@@ -29,8 +29,8 @@ class PassResultsTracker:
     """
 
     PASS_RESULTS_TEMPLATE = (
-        "{pass_start_x},{pass_start_y}"
-        "{pass_end_x},{pass_end_y}"
+        "{pass_start_x},{pass_start_y},"
+        "{pass_end_x},{pass_end_y},"
         "{speed},"
         "{score}\n"
     )
@@ -41,7 +41,7 @@ class PassResultsTracker:
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
     ):
-        """Initializes the pass results tracker
+        """Initializes the pass resuidxlts tracker
 
         :param proto_unix_io: the proto unix io to use
         :param friendly_colour_yellow: if the friendly color is yellow or not
@@ -109,6 +109,7 @@ class PassResultsTracker:
                 self.pass_results_file_map[interval].write(
                     self._get_pass_result_headers()
                 )
+                self.pass_results_file_map[interval].flush()
 
     def cleanup(self):
         """Flushes content and closes all the files for all intervals"""
@@ -130,6 +131,7 @@ class PassResultsTracker:
         """Adds the given pass, the current timestamp, and the current scores to the lowest interval's list
         :param pass_: the pass to add
         """
+        # TODO: use world timestamp time instead of datetime time
         self.pass_times_map[PassResultsConstants.INTERVALS_S[0]].append(
             PassLog(
                 pass_=pass_,
@@ -149,6 +151,8 @@ class PassResultsTracker:
             self.world = tbots_cpp.World(world_msg)
 
         self.tracker.refresh()
+
+        self._update_pass_timestamps()
 
     def _log_pass_result(self, logged_pass: PassLog, interval_s: int) -> None:
         """For an already recorded pass, calculates and logs its score for the given interval
@@ -207,6 +211,7 @@ class PassResultsTracker:
         )
 
         file.write(pass_result_string)
+        file.flush()
 
     def _update_pass_timestamps(self):
         """For all currently logged passes, check if the interval they belong to has passed
@@ -214,8 +219,9 @@ class PassResultsTracker:
         And move them to the next interval if exists
         """
         for idx, interval in enumerate(PassResultsConstants.INTERVALS_S):
-            pass_timestamps = self.pass_times_map[idx]
+            pass_timestamps = self.pass_times_map[interval]
 
+            # TODO: use world timestamp time instead of datetime time
             time_now = datetime.now()
 
             while (
@@ -223,6 +229,9 @@ class PassResultsTracker:
                 and (time_now - pass_timestamps[0].timestamp).total_seconds() > interval
             ):
                 pass_with_timestamp = pass_timestamps.pop(0)
+                print(
+                    f"Pass {pass_with_timestamp.pass_} is older than interval {interval}"
+                )
 
                 self._log_pass_result(pass_with_timestamp, interval)
 
