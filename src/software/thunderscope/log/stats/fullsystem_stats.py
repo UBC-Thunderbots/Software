@@ -66,22 +66,31 @@ class FullSystemStats:
 
         self.tracker = (
             TrackerBuilder(proto_unix_io=proto_unix_io)
-            .add_tracker(ShotTracker, callback=self._update_shot_count)
-            .add_tracker(PossessionTracker, callback=self._update_posession)
+            .add_tracker(
+                ShotTracker, callback=self._update_shot_count, buffer_size=buffer_size
+            )
+            .add_tracker(
+                PossessionTracker,
+                callback=self._update_posession,
+                buffer_size=buffer_size,
+            )
             .add_tracker(
                 RefereeTracker,
                 callback=self._update_referee_info_friendly,
                 friendly_color_yellow=self.friendly_colour_yellow,
+                buffer_size=buffer_size,
             )
             .add_tracker(
                 GoalieTracker,
                 callback=self._update_goalie_shot_friendly,
                 for_friendly=True,
+                buffer_size=buffer_size,
             )
             .add_tracker(
                 GoalieTracker,
                 callback=self._update_goalie_shot_enemy,
                 for_friendly=False,
+                buffer_size=buffer_size,
             )
         )
 
