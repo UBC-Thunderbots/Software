@@ -65,8 +65,7 @@ class TrajectoryPlanner
     TrajectoryPathWithCost getTrajectoryWithCost(
         const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
         const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-        const std::optional<double> sub_traj_duration_s,
-        double max_cost);
+        const std::optional<double> sub_traj_duration_s, double max_cost);
 
 
 
