@@ -362,11 +362,15 @@ class FullSystemStats:
             self.enemy_stats_file = open(enemy_stats_file_name, "w")
 
     def cleanup(self):
-        """Cleans up any created file resources after logging"""
+        """Writes all logs back to file, and cleans up any created file resources after logging"""
+        self._flush_stats()
+
         if self.stats_file:
+            self.stats_file.flush()
             self.stats_file.close()
 
         if self.record_enemy_stats and self.enemy_stats_file:
+            self.enemy_stats_file.flush()
             self.enemy_stats_file.close()
 
     def _flush_stats(self):
@@ -395,7 +399,9 @@ class FullSystemStats:
                 f'{RuntimeManagerConstants.RUNTIME_STATS_SHOTS_BLOCKED} = "{stats.num_enemy_shots_blocked}"'
             )
 
+            stats_file.seek(0)
             stats_file.write(stats_to_write)
+            stats_file.truncate()
 
         except (FileNotFoundError, PermissionError):
             logging.warning("Failed to write TOML FS stats file")
