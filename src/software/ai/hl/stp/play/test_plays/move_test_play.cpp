@@ -13,8 +13,9 @@ void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
 }
 
-void MoveTestPlay::updateTactics(const PlayUpdate &play_update){
-		fsm.process_event(MoveTestPlayFSM::Update(control_params, play_update));
+void MoveTestPlay::updateTactics(const PlayUpdate &play_update)
+{
+    fsm.process_event(MoveTestPlayFSM::Update(control_params, play_update));
 }
 
 // Register this play in the genericFactory

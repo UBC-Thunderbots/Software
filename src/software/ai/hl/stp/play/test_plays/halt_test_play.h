@@ -2,8 +2,8 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/test_plays/halt_test_play_fsm.h"  // your new FSM
 #include "software/ai/hl/stp/play/play_base.hpp"
+#include "software/ai/hl/stp/play/test_plays/halt_test_play_fsm.h"  // your new FSM
 
 /**
  * A test Play that halts 3 robots.

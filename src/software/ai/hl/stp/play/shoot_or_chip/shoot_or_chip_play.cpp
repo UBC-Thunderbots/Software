@@ -18,9 +18,9 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 
-void ShootOrChipPlay::updateTactics(const PlayUpdate& play_update)
+void ShootOrChipPlay::updateTactics(const PlayUpdate &play_update)
 {
-	fsm.process_event(ShootOrChipPlayFSM::Update(control_params, play_update));
+    fsm.process_event(ShootOrChipPlayFSM::Update(control_params, play_update));
 }
 
 // Register this play in the genericFactory

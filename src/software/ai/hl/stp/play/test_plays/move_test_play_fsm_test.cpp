@@ -8,8 +8,7 @@
 TEST(MoveTestPlayFSMTest, test_stays_in_move_state)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    FSM<MoveTestPlayFSM> fsm(
-        MoveTestPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
+    FSM<MoveTestPlayFSM> fsm(MoveTestPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
 
     // Verify initial state
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveTestPlayFSM::MoveTestState>));

@@ -6,25 +6,24 @@
 #include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
-  TEST(HaltTestPlayFSMTest, test_transitions)
-  {
-      std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-      FSM<HaltTestPlayFSM> fsm(HaltTestPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
+TEST(HaltTestPlayFSMTest, test_transitions)
+{
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    FSM<HaltTestPlayFSM> fsm(HaltTestPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
 
-      // Verify initial state
-      EXPECT_TRUE(fsm.is(boost::sml::state<HaltTestPlayFSM::HaltTestState>));
+    // Verify initial state
+    EXPECT_TRUE(fsm.is(boost::sml::state<HaltTestPlayFSM::HaltTestState>));
 
-      // Capture tactics from callback
-      PriorityTacticVector received_tactics;
-      fsm.process_event(HaltTestPlayFSM::Update(
-          HaltTestPlayFSM::ControlParams{},
-          PlayUpdate(
-              world, 3,
-              [&received_tactics](PriorityTacticVector new_tactics) {
-                  received_tactics = std::move(new_tactics);
-              },
-              InterPlayCommunication{}, [](InterPlayCommunication) {})));
+    // Capture tactics from callback
+    PriorityTacticVector received_tactics;
+    fsm.process_event(HaltTestPlayFSM::Update(
+        HaltTestPlayFSM::ControlParams{},
+        PlayUpdate(
+            world, 3,
+            [&received_tactics](PriorityTacticVector new_tactics)
+            { received_tactics = std::move(new_tactics); },
+            InterPlayCommunication{}, [](InterPlayCommunication) {})));
 
-      // Verify state stays the same (single-state loop)
-      EXPECT_TRUE(fsm.is(boost::sml::state<HaltTestPlayFSM::HaltTestState>));
-  }
+    // Verify state stays the same (single-state loop)
+    EXPECT_TRUE(fsm.is(boost::sml::state<HaltTestPlayFSM::HaltTestState>));
+}

@@ -6,41 +6,41 @@
 #include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 
 struct HaltTestPlayFSM : PlayFSM<HaltTestPlayFSM>
-  {
-      struct ControlParams
-      {
-      };
+{
+    struct ControlParams
+    {
+    };
 
-      class HaltTestState;
+    class HaltTestState;
 
-      explicit HaltTestPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-          : PlayFSM<HaltTestPlayFSM>(ai_config_ptr),
-            halt_tactics({{
-                std::make_shared<HaltTactic>(ai_config_ptr),
-                std::make_shared<HaltTactic>(ai_config_ptr),
-                std::make_shared<HaltTactic>(ai_config_ptr),
-            }})
-      {
-      }
+    explicit HaltTestPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : PlayFSM<HaltTestPlayFSM>(ai_config_ptr),
+          halt_tactics({{
+              std::make_shared<HaltTactic>(ai_config_ptr),
+              std::make_shared<HaltTactic>(ai_config_ptr),
+              std::make_shared<HaltTactic>(ai_config_ptr),
+          }})
+    {
+    }
 
-      void updateHalt(const Update& event)
-      {
-          event.common.set_tactics(halt_tactics);
-      }
+    void updateHalt(const Update& event)
+    {
+        event.common.set_tactics(halt_tactics);
+    }
 
-      auto operator()()
-      {
-          using namespace boost::sml;
+    auto operator()()
+    {
+        using namespace boost::sml;
 
-          DEFINE_SML_STATE(HaltTestState)
-          DEFINE_SML_EVENT(Update)
-          DEFINE_SML_ACTION(updateHalt)
+        DEFINE_SML_STATE(HaltTestState)
+        DEFINE_SML_EVENT(Update)
+        DEFINE_SML_ACTION(updateHalt)
 
-          return make_transition_table(
-              *HaltTestState_S + Update_E / updateHalt_A = HaltTestState_S,
-              X + Update_E / updateHalt_A = X);
-      }
+        return make_transition_table(
+            *HaltTestState_S + Update_E / updateHalt_A = HaltTestState_S,
+            X + Update_E / updateHalt_A                = X);
+    }
 
-     private:
-      PriorityTacticVector halt_tactics;
-  };
+   private:
+    PriorityTacticVector halt_tactics;
+};

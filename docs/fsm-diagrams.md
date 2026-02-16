@@ -206,6 +206,20 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [ShootOrChipPlayFSM](/src/software/ai/hl/stp/play/shoot_or_chip/shoot_or_chip_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> ShootOrChipState
+ShootOrChipState --> ShootOrChipState : [!attackerDone]\n<i>updateShootOrChip</i>
+ShootOrChipState --> Terminate:::terminate : [attackerDone]\n<i>updateShootOrChip</i>
+Terminate:::terminate --> Terminate:::terminate : <i>updateShootOrChip</i>
+
+```
+
 ## [ShootOrPassPlayFSM](/src/software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h)
 
 ```mermaid
@@ -222,6 +236,33 @@ TakePassState --> AttemptShotState : [shouldAbortPass]\n<i>startLookingForPass</
 TakePassState --> TakePassState : [!passCompleted]\n<i>takePass</i>
 TakePassState --> Terminate:::terminate : [passCompleted]\n<i>takePass</i>
 Terminate:::terminate --> AttemptShotState : <i>startLookingForPass</i>
+
+```
+
+## [HaltTestPlayFSM](/src/software/ai/hl/stp/play/test_plays/halt_test_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> HaltTestState
+HaltTestState --> HaltTestState : <i>updateHalt</i>
+Terminate:::terminate --> Terminate:::terminate : <i>updateHalt</i>
+
+```
+
+## [MoveTestPlayFSM](/src/software/ai/hl/stp/play/test_plays/move_test_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> MoveTestState
+MoveTestState --> MoveTestState : [!moveDone]\n<i>updateMove</i>
+MoveTestState --> Terminate:::terminate : [moveDone]\n<i>updateMove</i>
+Terminate:::terminate --> Terminate:::terminate : <i>updateMove</i>
 
 ```
 

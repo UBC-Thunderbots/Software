@@ -93,7 +93,6 @@ cc_library(
         "//software/ai/hl/stp/play/example:example_play",
         "//software/ai/hl/stp/play/free_kick:free_kick_play",
         "//software/ai/hl/stp/play/halt_play",
-        "//software/ai/hl/stp/play/shoot_or_chip:shoot_or_chip_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
@@ -101,6 +100,7 @@ cc_library(
         "//software/ai/hl/stp/play/offense:offense_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
+        "//software/ai/hl/stp/play/shoot_or_chip:shoot_or_chip_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
     ],
 )
