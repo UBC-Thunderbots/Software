@@ -4,16 +4,20 @@ from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
-
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 class GoalieTracker(Tracker):
+    # tune these values to reduce noise in what is considered a kick
+    # higher values exclude noise such as dribbling or small movements of the ball
+    # but can exclude real kicks
+    MIN_SHOT_SPEED = 2.0
     def __init__(
         self,
         for_friendly: bool,
         callback: Callable[[bool, bool], None],
         buffer_size: int = 5,
     ):
-        super().__init__(callback, buffer_size)
+        super().__init__(callback=callback, buffer_size=buffer_size)
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
 

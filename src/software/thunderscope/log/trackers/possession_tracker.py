@@ -8,7 +8,7 @@ import software.python_bindings as tbots_cpp
 
 class PossessionTracker(Tracker):
     def __init__(self, callback: Callable[[bool | None], None], buffer_size: int = 5):
-        super().__init__(callback, buffer_size)
+        super().__init__(callback=callback, buffer_size=buffer_size)
 
         self.world_buffer = ThreadSafeBuffer(self.buffer_size, World)
 

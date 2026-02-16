@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import RuntimeManagerConstants
 import logging
+from proto.import_all_protos import *
 
 
 @dataclass
