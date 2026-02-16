@@ -55,6 +55,23 @@ class GoalieTracker(Tracker):
 
         self.is_shot_incoming = latest_is_shot_incoming
 
+    def _get_goal_shot_region(
+        self, field: tbots_cpp.Field, for_friendly: bool
+    ) -> tbots_cpp.Rectangle:
+        """Returns the corresponding defense area (friendly or enemy) expanded by the shorter side's length on all sides
+        for the area the ball should at least enter to be considered a shot on goal
+
+        :param field: the current field
+        :param for_friendly: if we should get the area for the friendly or enemy side
+        :return: an expanded defense area
+        """
+        defense_area = (
+            field.friendlyDefenseArea() if for_friendly else field.enemyDefenseArea()
+        )
+
+        expanded_defense_area = defense_area.expand(defense_area.xLength())
+        return expanded_defense_area
+
     def _is_goal_shot_incoming(
         self, ball: tbots_cpp.Ball, field: tbots_cpp.Field, for_friendly: bool
     ) -> bool:
@@ -91,10 +108,8 @@ class GoalieTracker(Tracker):
         shot_incoming = (
             len(tbots_cpp.intersection(ball_ray, goal_segment)) != 0
             and ball_velocity.length() > self.MIN_SHOT_SPEED
-            and (
-                field.pointInFriendlyHalf(ball_position)
-                if for_friendly
-                else field.pointInEnemyHalf(ball_position)
+            and tbots_cpp.contains(
+                self._get_goal_shot_region(field, for_friendly), ball_position
             )
             and (ball_velocity.x() <= 0 if for_friendly else ball_velocity.x() >= 0)
         )

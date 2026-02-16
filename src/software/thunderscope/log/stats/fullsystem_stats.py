@@ -49,6 +49,11 @@ class FullSystemStats:
         # None if neither
         self.last_possession_friendly: bool | None = None
 
+        # use both trackers to keep track of shots on net
+        # take the min to avoid noise from the attacker tactic visualization
+        self.num_shots_on_net_attacker: int = 0
+        self.num_shots_on_net_goalie: int = 0
+
         self.stats = FSStats()
 
         # these should be set up using the setup method
@@ -73,6 +78,11 @@ class FullSystemStats:
                 callback=self._update_goalie_shot_friendly,
                 for_friendly=True,
             )
+            .add_tracker(
+                GoalieTracker,
+                callback=self._update_goalie_shot_enemy,
+                for_friendly=False,
+            )
         )
 
         self.record_enemy_stats = record_enemy_stats
@@ -82,10 +92,6 @@ class FullSystemStats:
                 RefereeTracker,
                 callback=self._update_referee_info_enemy,
                 friendly_color_yellow=(not self.friendly_colour_yellow),
-            ).add_tracker(
-                GoalieTracker,
-                callback=self._update_goalie_shot_enemy,
-                for_friendly=False,
             )
             print(
                 f"\n\n\n##### Writing Enemy FS Stats to {self._get_enemy_stats_file()}#####\n\n\n"
@@ -98,7 +104,10 @@ class FullSystemStats:
         self._flush_stats()
 
     def _update_shot_count(self, _: Shot):
-        self.stats.num_shots_on_net += 1
+        self.num_shots_on_net_attacker += 1
+        self.stats.num_shots_on_net = min(
+            self.num_shots_on_net_goalie, self.num_shots_on_net_attacker
+        )
 
     def _update_posession(self, friendly_posession: bool | None):
         self.last_possession_friendly = not friendly_posession
@@ -106,6 +115,11 @@ class FullSystemStats:
     def _update_referee_info_friendly(
         self, num_goals: int, num_yellow_cards: int, num_red_cards: int
     ) -> None:
+        # the callback for tracking incoming shots can't differentiate between a blocked shot vs a goal
+        # so we subtract all "blocked" shots that were actually goals, so not blocked
+        if self.stats.num_scores < num_goals:
+            self.stats.num_enemy_shots_blocked -= 1
+
         self.stats.num_scores = num_goals
         self.stats.num_yellow_cards = num_yellow_cards
         self.stats.num_red_cards = num_red_cards
@@ -113,6 +127,11 @@ class FullSystemStats:
     def _update_referee_info_enemy(
         self, num_goals: int, num_yellow_cards: int, num_red_cards: int
     ) -> None:
+        # the callback for tracking incoming shots can't differentiate between a blocked shot vs a goal
+        # so we subtract all "blocked" shots that were actually goals, so not blocked
+        if self.enemy_stats.num_scores < num_goals:
+            self.enemy_stats.num_enemy_shots_blocked -= 1
+
         self.enemy_stats.num_scores = num_goals
         self.enemy_stats.num_yellow_cards = num_yellow_cards
         self.enemy_stats.num_red_cards = num_red_cards
@@ -123,14 +142,22 @@ class FullSystemStats:
         if not is_shot_incoming and last_shot_incoming:
             self.stats.num_enemy_shots_blocked += 1
 
-        if is_shot_incoming and not last_shot_incoming:
-            self.enemy_stats.num_shots_on_net += 1
+        if self.record_enemy_stats:
+            if is_shot_incoming and not last_shot_incoming:
+                self.enemy_stats.num_shots_on_net += 1
 
     def _update_goalie_shot_enemy(
         self, is_shot_incoming: bool, last_shot_incoming: bool
     ) -> None:
-        if not is_shot_incoming and last_shot_incoming:
-            self.enemy_stats.num_enemy_shots_blocked += 1
+        if is_shot_incoming and not last_shot_incoming:
+            self.num_shots_on_net_goalie += 1
+            self.stats.num_shots_on_net = min(
+                self.num_shots_on_net_goalie, self.num_shots_on_net_attacker
+            )
+
+        if self.record_enemy_stats:
+            if not is_shot_incoming and last_shot_incoming:
+                self.enemy_stats.num_enemy_shots_blocked += 1
 
     def _get_stats_file(self):
         return os.path.join(
