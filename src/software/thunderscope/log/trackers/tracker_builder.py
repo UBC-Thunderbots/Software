@@ -13,6 +13,7 @@ class TrackerBuilder:
         self,
         tracker_cls: Type[Tracker],
         callback: Optional[Callable[[Any], None]] = None,
+        buffer_size: int = 5,
         **kwargs,
     ) -> Self:
         tracker = tracker_cls(callback=callback, **kwargs)
