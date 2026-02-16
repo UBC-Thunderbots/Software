@@ -2,37 +2,58 @@
 - name: Deploy firmware to the motor driver boards
   hosts: THUNDERBOTS_HOSTS
 
+  vars:
+    repo_root: "{{ playbook_dir }}/../../../../"
+    # Bazel output location (convenience symlink)
+    bazel_out_path: "bazel-bin/external/mdv6_firmware/mdv6_firmware_main"
+    firmware_bin_name: "mdv6_firmware_main.bin"
+    firmware_archive_name: "mdv6_firmware.tar.gz"
+    script_path: "software/embedded/ansible/firmware/flash_motor_drivers.py"
+    remote_dir: "~/motor_firmware"
+
   tasks:
-    - name: Copy SSH public key
-      ansible.builtin.import_tasks: ../tasks/copy_ssh_key.yml
-
-    - name: Sync powerboard files
-      become: true
-      become_method: ansible.builtin.sudo
-      ansible.posix.synchronize:
-        src: ../../../../../power/powerloop.tar.gz
-        dest: ~/
-        recursive: true
-        copy_links: true
-
-    - name: Untar powerboard files
-      ansible.builtin.shell: "mkdir -p powerloop && tar -xzf ~/powerloop.tar.gz -C powerloop"
-      register: result
-      changed_when: true
+    - name: Build firmware locally
+      delegate_to: localhost
+      command: "bazel build @mdv6_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board"
       args:
-        chdir: ~/
+        chdir: "{{ repo_root }}"
 
-    - name: Put the powerboard in bootloader mode
-      ansible.builtin.pause:
-        prompt: "Press enter to continue"
-        echo: false
+    - name: Convert ELF to Binary locally
+      delegate_to: localhost
+      command: "objcopy -O binary {{ bazel_out_path }} {{ firmware_bin_name }}"
+      args:
+        chdir: "{{ repo_root }}"
 
-    - name: Flashing... (this will take a while on the first run)
-      ansible.builtin.command: "/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d ~/powerloop/powerloop_main_workdir"
-      register: result
-      changed_when: true
+    - name: Archive firmware binary locally
+      delegate_to: localhost
+      command: "tar -czf {{ firmware_archive_name }} {{ firmware_bin_name }}"
+      args:
+        chdir: "{{ repo_root }}"
 
-    - name: Reset powerboard to finish flashing
-      ansible.builtin.pause:
-        prompt: "Press enter to continue"
-        echo: false
+    - name: Create directory on remote
+      file:
+        path: "{{ remote_dir }}"
+        state: directory
+
+    - name: Copy firmware archive to remote
+      copy:
+        src: "{{ repo_root }}/{{ firmware_archive_name }}"
+        dest: "{{ remote_dir }}/{{ firmware_archive_name }}"
+
+    - name: Copy flashing script to remote
+      copy:
+        src: "{{ repo_root }}/{{ script_path }}"
+        dest: "{{ remote_dir }}/flash_motor_drivers.py"
+        mode: '0755'
+
+    - name: Unarchive firmware on remote
+      unarchive:
+        src: "{{ remote_dir }}/{{ firmware_archive_name }}"
+        dest: "{{ remote_dir }}"
+        remote_src: yes
+
+    - name: Run flashing script
+      become: true
+      command: "python3 flash_motor_drivers.py"
+      args:
+        chdir: "{{ remote_dir }}"
