@@ -9,6 +9,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from software.thunderscope.constants import PassResultsConstants
 import os
+from proto.import_all_protos import *
 
 
 @dataclass
@@ -33,7 +34,7 @@ class PassResultsTracker:
 
     # the time intervals to log results for after each pass
     # so after a pass, wait X seconds and then log game state
-    INTERVALS = [1, 5, 10]
+    INTERVALS_S = [1, 5, 10]
 
     def __init__(
         self,
@@ -41,6 +42,12 @@ class PassResultsTracker:
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
     ):
+        """Initializes the pass results tracker
+
+        :param proto_unix_io: the proto unix io to use
+        :param friendly_colour_yellow: if the friendly color is yellow or not
+        :param buffer_size: buffer size to use
+        """
         self.friendly_colour_yellow = friendly_colour_yellow
 
         self.tracker = (
@@ -60,7 +67,7 @@ class PassResultsTracker:
         )
 
         self.pass_times_map: dict[int, list[PassLog]] = {
-            interval: [] for interval in self.INTERVALS
+            interval: [] for interval in self.INTERVALS_S
         }
 
         self.is_friendly_possession: bool | None = False
@@ -70,24 +77,30 @@ class PassResultsTracker:
         self.pass_results_file_map = {}
 
     def setup(self):
+        """Creates the relevant directories and a csv file for each of the
+        intervals in INTERVALS
+        """
         pass_results_dir = PassResultsConstants.PASS_RESULTS_DIRECTORY_PATH
 
         # create all directories in path if they doesn't exist
         os.makedirs(os.path.dirname(pass_results_dir), exist_ok=True)
 
-        for interval in self.INTERVALS:
+        for interval in self.INTERVALS_S:
             self.pass_results_file_map[interval] = open(
                 os.path.join(
                     pass_results_dir,
                     PassResultsConstants.PASS_RESULTS_FILE_NAME_TEMPLATE.format(
                         interval=interval
                     ),
-                )
+                ),
+                "a",
             )
 
     def cleanup(self):
-        for interval in self.INTERVALS:
+        """Flushes content and closes all the files for all intervals"""
+        for interval in self.INTERVALS_S:
             if self.pass_results_file_map[interval]:
+                self.pass_results_file_map[interval].flush()
                 self.pass_results_file_map[interval].close()
 
     def _update_friendly_possession(self, is_friendly_possession: bool | None) -> None:
@@ -100,7 +113,10 @@ class PassResultsTracker:
         self.enemy_score = enemy_score
 
     def _add_pass_timestamp(self, pass_: Pass) -> None:
-        self.pass_times_map[self.INTERVALS[0]].append(
+        """Adds the given pass, the current timestamp, and the current scores to the lowest interval's list
+        :param pass_: the pass to add
+        """
+        self.pass_times_map[self.INTERVALS_S[0]].append(
             PassLog(
                 pass_=pass_,
                 timestamp=datetime.now(),
@@ -110,19 +126,35 @@ class PassResultsTracker:
         )
 
     def refresh(self) -> None:
-        """Refreshes the kick tracker so we stay up to date on new passes"""
+        """Refreshes the tracker so we stay up to date on new passes
+        and checks to see if any passes are older than their interval
+        """
         self.tracker.refresh()
 
-    def _log_pass_result(self, logged_pass: PassLog, interval: int) -> None:
+    def _log_pass_result(self, logged_pass: PassLog, interval_s: int) -> None:
+        """For an already recorded pass, calculates and logs its score for the given interval
+        i.e after <interval> seconds following the pass
+
+        :param logged_pass: a pass that already occurred that we want to find the score for
+        :param interval_s: how long (in seconds) it has been after the pass
+        """
         pass_score = self._get_pass_score(logged_pass)
 
         self._log_pass_result_to_file(
-            file=self.pass_results_file_map[interval],
+            file=self.pass_results_file_map[interval_s],
             pass_=logged_pass.pass_,
             score=pass_score,
         )
 
     def _get_pass_score(self, logged_pass: PassLog) -> int:
+        """For the given logged pass, get the score based on the current game state
+        If the friendly / enemy scores at the time of pass are different
+        Or if possession has changed, return the corresponding score
+        Else, return the neutral score
+
+        :param logged_pass: the pass to score
+        :return: a single integer score for the pass
+        """
         if self.friendly_score > logged_pass.friendly_score:
             return self.FRIENDLY_GOAL_SCORE
 
@@ -137,6 +169,12 @@ class PassResultsTracker:
         return self.NEUTRAL_SCORE
 
     def _log_pass_result_to_file(self, file, pass_: Pass, score: int) -> None:
+        """Logs a single pass's result to the given file handle
+
+        :param file: the file handle to write to
+        :param pass_: the pass to log
+        :param score: the score for the given pass
+        """
         pass_result_string = PassResultsConstants.PASS_RESULTS_TEMPLATE.format(
             pass_start_x=pass_.passer_point.x_meters,
             pass_start_y=pass_.passer_point.y_meters,
@@ -149,7 +187,11 @@ class PassResultsTracker:
         file.write(pass_result_string)
 
     def _update_pass_timestamps(self):
-        for idx, interval in enumerate(self.INTERVALS):
+        """For all currently logged passes, check if the interval they belong to has passed
+        If so, log their score to the corresponding file
+        And move them to the next interval if exists
+        """
+        for idx, interval in enumerate(self.INTERVALS_S):
             pass_timestamps = self.pass_times_map[idx]
 
             time_now = datetime.now()
@@ -162,7 +204,7 @@ class PassResultsTracker:
 
                 self._log_pass_result(pass_with_timestamp, interval)
 
-                if idx < len(self.INTERVALS) - 1:
-                    self.pass_times_map[self.INTERVALS[idx + 1]].append(
+                if idx < len(self.INTERVALS_S) - 1:
+                    self.pass_times_map[self.INTERVALS_S[idx + 1]].append(
                         pass_with_timestamp
                     )

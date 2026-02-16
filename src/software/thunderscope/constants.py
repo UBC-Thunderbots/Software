@@ -417,7 +417,7 @@ class RuntimeManagerConstants:
 
 class PassResultsConstants:
     PASS_RESULTS_DIRECTORY_PATH = "/tmp/tbots/ml"
-    PASS_RESULTS_FILE_NAME_TEMPLATE = "pass_results_$interval.csv"
+    PASS_RESULTS_FILE_NAME_TEMPLATE = "pass_results_{interval}.csv"
 
     PASS_RESULTS_TEMPLATE = (
         "$pass_start_x,$pass_start_y" "$pass_end_x,$pass_end_y" "$speed,$score\n"
