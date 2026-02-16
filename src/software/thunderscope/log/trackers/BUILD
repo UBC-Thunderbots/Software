@@ -6,7 +6,7 @@ py_library(
     name = "tracker",
     srcs = ["tracker.py"],
     deps = [
-        "//software/thunderscope:thread_safe_buffer"
+        "//software/thunderscope:thread_safe_buffer",
     ],
 )
 
@@ -17,7 +17,7 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
-        ":tracker"
+        ":tracker",
     ],
 )
 
@@ -25,7 +25,7 @@ py_library(
     name = "kick_tracker",
     srcs = ["kick_tracker.py"],
     deps = [
-        ":tracker"
+        ":tracker",
     ],
 )
 
@@ -33,7 +33,7 @@ py_library(
     name = "possession_tracker",
     srcs = ["possession_tracker.py"],
     deps = [
-        ":tracker"
+        ":tracker",
     ],
 )
 
@@ -41,7 +41,7 @@ py_library(
     name = "referee_tracker",
     srcs = ["referee_tracker.py"],
     deps = [
-        ":tracker"
+        ":tracker",
     ],
 )
 
@@ -49,7 +49,7 @@ py_library(
     name = "tracker_builder",
     srcs = ["tracker_builder.py"],
     deps = [
-        ":tracker"
+        ":tracker",
     ],
 )
 
@@ -58,13 +58,12 @@ py_library(
     srcs = [
         "__init__.py",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":goalie_tracker",
-        ":referee_tracker",
         ":kick_tracker",
         ":possession_tracker",
-        ":tracker_builder"
+        ":referee_tracker",
+        ":tracker_builder",
     ],
-    visibility = ["//visibility:public"],
 )
-

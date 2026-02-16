@@ -37,7 +37,7 @@ class KickTracker(Tracker):
 
     def __init__(
         self,
-            callback: Optional[Callable[[Any], None]] = None,
+        callback: Optional[Callable[[Any], None]] = None,
         buffer_size: int = 5,
     ):
         """Initialize the kick tracker
@@ -118,9 +118,7 @@ class KickTracker(Tracker):
 
 
 class PassTracker(KickTracker):
-    def __init__(
-        self, callback: Callable[[Pass], None] = None, buffer_size: int = 5
-    ):
+    def __init__(self, callback: Callable[[Pass], None] = None, buffer_size: int = 5):
         """Initialize the pass tracker
         :param callback: an optional callback to call when there's a pass
         """
@@ -167,9 +165,7 @@ class PassTracker(KickTracker):
 
 
 class ShotTracker(KickTracker):
-    def __init__(
-        self, callback: Callable[[Shot], None] = None, buffer_size: int = 5
-    ):
+    def __init__(self, callback: Callable[[Shot], None] = None, buffer_size: int = 5):
         """Initialize the shot tracker
         :param callback: an optional callback to call when there's a shot
         """

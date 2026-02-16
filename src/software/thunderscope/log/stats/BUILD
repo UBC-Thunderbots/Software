@@ -6,7 +6,7 @@ py_library(
     name = "fullsystem_stats",
     srcs = ["fullsystem_stats.py"],
     deps = [
-        "//software/thunderscope/log/trackers:tracker_module"
+        "//software/thunderscope/log/trackers:tracker_module",
     ],
 )
 
