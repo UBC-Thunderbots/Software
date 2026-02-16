@@ -86,12 +86,6 @@ class FullSystemStats:
                 for_friendly=True,
                 buffer_size=buffer_size,
             )
-            .add_tracker(
-                GoalieTracker,
-                callback=self._update_goalie_shot_enemy,
-                for_friendly=False,
-                buffer_size=buffer_size,
-            )
         )
 
         self.record_enemy_stats = record_enemy_stats
@@ -101,6 +95,11 @@ class FullSystemStats:
                 RefereeTracker,
                 callback=self._update_referee_info_enemy,
                 friendly_color_yellow=(not self.friendly_colour_yellow),
+            ).add_tracker(
+                GoalieTracker,
+                callback=self._update_goalie_shot_enemy,
+                for_friendly=False,
+                buffer_size=buffer_size,
             )
             print(
                 f"\n\n\n##### Writing Enemy FS Stats to {self._get_enemy_stats_file()}#####\n\n\n"
@@ -113,10 +112,7 @@ class FullSystemStats:
         self._flush_stats()
 
     def _update_shot_count(self, _: Shot):
-        self.num_shots_on_net_attacker += 1
-        self.stats.num_shots_on_net = min(
-            self.num_shots_on_net_goalie, self.num_shots_on_net_attacker
-        )
+        self.stats.num_shots_on_net += 1
 
     def _update_posession(self, friendly_posession: bool | None):
         self.last_possession_friendly = not friendly_posession
@@ -158,12 +154,6 @@ class FullSystemStats:
     def _update_goalie_shot_enemy(
         self, is_shot_incoming: bool, last_shot_incoming: bool
     ) -> None:
-        if is_shot_incoming and not last_shot_incoming:
-            self.num_shots_on_net_goalie += 1
-            self.stats.num_shots_on_net = min(
-                self.num_shots_on_net_goalie, self.num_shots_on_net_attacker
-            )
-
         if self.record_enemy_stats:
             if not is_shot_incoming and last_shot_incoming:
                 self.enemy_stats.num_enemy_shots_blocked += 1
