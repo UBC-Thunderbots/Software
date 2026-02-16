@@ -28,20 +28,6 @@ class PassResultsTracker:
     after certain time intervals
     """
 
-    NUM_ROBOTS = 6
-    FRIENDLY_POS_TEMPLATE = "{{friendly_{index}_x}},{{friendly_{index}_y}}"
-    ENEMY_POS_TEMPLATE = "{{enemy_{index}_x}},{{enemy_{index}_y}}"
-
-    PASS_FEATURES_TEMPLATE = (
-        "{pass_start_x},{pass_start_y}"
-        "{pass_end_x},{pass_end_y}"
-        "{speed},"
-        "{ball_x},{ball_y}"
-        f"{",".join(FRIENDLY_POS_TEMPLATE.format(index=index) for index in range(NUM_ROBOTS))},"
-        f"{",".join(FRIENDLY_POS_TEMPLATE.format(index=index) for index in range(NUM_ROBOTS))},"
-        "{score}\n"
-    )
-
     PASS_RESULTS_TEMPLATE = (
         "{pass_start_x},{pass_start_y}"
         "{pass_end_x},{pass_end_y}"
@@ -200,9 +186,6 @@ class PassResultsTracker:
             return PassResultsConstants.ENEMY_POSSESSION_SCORE
 
         return PassResultsConstants.NEUTRAL_SCORE
-
-    def _get_pass_features_headers(self):
-        return self.PASS_FEATURES_TEMPLATE.replace("{", "").replace("}", "")
 
     def _get_pass_result_headers(self):
         return self.PASS_RESULTS_TEMPLATE.replace("{", "").replace("}", "")
