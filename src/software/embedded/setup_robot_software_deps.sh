@@ -6,6 +6,7 @@ host_software_packages=(
     redis
     device-tree-compiler
     curl
+    openocd
 )
 
 # Install packages
