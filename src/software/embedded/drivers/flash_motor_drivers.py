@@ -5,10 +5,9 @@ from gpiozero import LED
 # The reset pins for the motor drivers
 MOTOR_DRIVER_RESET_PINS = [5, 6, 7, 8]
 
-
 class MotorDriverFlasher:
     def __init__(self, pins):
-        # Initialize LEDs for all pins.
+        # Initialize pins as LEDs since we only need high/low logic.
         # We assume High = Run/Active, Low = Reset.
         self.drivers = [LED(pin) for pin in pins]
 
@@ -35,12 +34,9 @@ class MotorDriverFlasher:
                 result = subprocess.run(
                     [
                         "openocd",
-                        "-f",
-                        "raspberrypi.cfg",
-                        "-f",
-                        "target/stm32f0x.cfg",
-                        "-c",
-                        "program mdv6_firmware_main.bin verify reset exit 0x08000000",
+                        "-f", "raspberrypi.cfg",
+                        "-f", "target/stm32f0x.cfg",
+                        "-c", "program mdv6_firmware_main.bin verify reset exit 0x08000000",
                     ],
                     capture_output=True,
                     text=True,
