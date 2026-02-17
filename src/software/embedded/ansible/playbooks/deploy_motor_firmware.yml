@@ -55,13 +55,13 @@
       ansible.builtin.copy:
         src: "{{ repo_root }}/{{ script_path }}"
         dest: "{{ remote_dir }}/flash_motor_drivers.py"
-        mode: '0755'
+        mode: "0755"
 
     - name: Copy openocd config to remote
       ansible.builtin.copy:
         src: "{{ repo_root }}/{{ cfg_path }}"
         dest: "{{ remote_dir }}/raspberrypi.cfg"
-        mode: '0644'
+        mode: "0644"
 
     - name: Unarchive firmware on remote
       ansible.builtin.unarchive:
