@@ -89,3 +89,5 @@ PlatformOption = Annotated[
 EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]
 EnableVisualizerOption = Annotated[bool, Option("-v", "--enable_visualizer")]
 StopAIOnStartOption = Annotated[bool, Option("-t", "--stop_ai_on_start")]
+
+JobsOption = Annotated[str, Option("-j", "--jobs")]

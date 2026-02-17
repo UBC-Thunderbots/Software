@@ -4,6 +4,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
+
 TrajectoryPlanner::TrajectoryPlanner()
     : relative_sub_destinations(getRelativeSubDestinations())
 {
@@ -109,8 +110,9 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
                 break;
             }
 
-            TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
-                traj_path_to_dest, obstacles, sub_trajectory, connection_time);
+            TrajectoryPathWithCost full_traj_with_cost =
+                getTrajectoryWithCost(traj_path_to_dest, obstacles, sub_trajectory,
+                                      connection_time, best_traj_with_cost.cost);
             full_traj_with_cost.cost += cost_offset;
             if (full_traj_with_cost.cost < best_traj_with_cost.cost)
             {
@@ -133,58 +135,47 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
         }
     }
 
-    return best_traj_with_cost.traj_path;
+    // In move primitive, a stop primitive is created when trajectory path is null.
+    // Check if there is an unavoidable collision, and return a null opt if such
+    // collision exist on best path
+    double collision_velocity =
+        best_traj_with_cost.traj_path
+            .getVelocity(best_traj_with_cost.first_collision_time_s)
+            .length();
+    if (best_traj_with_cost.collides() &&
+        best_traj_with_cost.first_collision_time_s <
+            UNAVOIDABLE_COLLISION_TIME_THRESHOLD_S &&
+        collision_velocity > UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD_M_S)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return best_traj_with_cost.traj_path;
+    }
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
     const Point &start, const Point &destination, const Vector &initial_velocity,
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles)
 {
+    // Calculate full new cost regardless by passing in maximum max cost
     return getTrajectoryWithCost(
         TrajectoryPath(std::make_shared<BangBangTrajectory2D>(
                            start, destination, initial_velocity, constraints),
                        BangBangTrajectory2D::generator),
-        obstacles, std::nullopt, std::nullopt);
+        obstacles, std::nullopt, std::nullopt, std::numeric_limits<double>::max());
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-    const std::optional<double> sub_traj_duration_s)
+    const std::optional<double> sub_traj_duration_s, double max_cost)
 {
     CollisionEvaluator evaluator(obstacles);
-    TrajectoryPathWithCost traj_with_cost(
-        evaluator.evaluate(trajectory, sub_traj_with_cost, sub_traj_duration_s));
-    traj_with_cost.cost = calculateCost(traj_with_cost);
+    TrajectoryPathWithCost traj_with_cost(evaluator.evaluate(
+        trajectory, sub_traj_with_cost, sub_traj_duration_s, max_cost));
+
 
     return traj_with_cost;
-}
-
-double TrajectoryPlanner::calculateCost(
-    const TrajectoryPathWithCost &traj_with_cost) const
-{
-    double total_cost = traj_with_cost.traj_path.getTotalTime();
-
-    // Add a large cost if the trajectory collides with an obstacle
-    // Note that this ignores collisions that may be in at the
-    // start of the trajectory as those are unavoidable by all trajectories.
-    if (traj_with_cost.colliding_obstacle != nullptr)
-    {
-        total_cost += 6.0;
-    }
-
-    // The closer the collision is to the destination, the lower its cost will be
-    Point first_collision_position =
-        traj_with_cost.traj_path.getPosition(traj_with_cost.first_collision_time_s);
-    Point destination = traj_with_cost.traj_path.getDestination();
-    total_cost += (first_collision_position - destination).length();
-
-    total_cost += std::max(
-        0.0, (MAX_FUTURE_COLLISION_CHECK_SEC - traj_with_cost.first_collision_time_s));
-
-    total_cost += 3 * traj_with_cost.collision_duration_front_s;
-
-    total_cost += 1 * traj_with_cost.collision_duration_back_s;
-
-    return total_cost;
 }
