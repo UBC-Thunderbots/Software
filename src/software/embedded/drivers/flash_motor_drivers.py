@@ -36,7 +36,7 @@ class MotorDriverFlasher:
                     [
                         "openocd",
                         "-f",
-                        "interface/raspberrypi-swd.cfg",
+                        "raspberrypi.cfg",
                         "-f",
                         "target/stm32f0x.cfg",
                         "-c",

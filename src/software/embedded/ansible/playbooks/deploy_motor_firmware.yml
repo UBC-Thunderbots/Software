@@ -8,7 +8,8 @@
     bazel_out_path: "bazel-bin/external/mdv6_firmware/mdv6_firmware_main"
     firmware_bin_name: "mdv6_firmware_main.bin"
     firmware_archive_name: "mdv6_firmware.tar.gz"
-    script_path: "software/embedded/ansible/firmware/flash_motor_drivers.py"
+    script_path: "software/embedded/drivers/flash_motor_drivers.py"
+    cfg_path: "software/embedded/drivers/raspberrypi.cfg"
     remote_dir: "~/motor_firmware"
 
   tasks:
@@ -33,6 +34,11 @@
         chdir: "{{ repo_root }}"
       changed_when: false
 
+    - name: Remove existing remote directory
+      ansible.builtin.file:
+        path: "{{ remote_dir }}"
+        state: absent
+
     - name: Create directory on remote
       ansible.builtin.file:
         path: "{{ remote_dir }}"
@@ -49,7 +55,13 @@
       ansible.builtin.copy:
         src: "{{ repo_root }}/{{ script_path }}"
         dest: "{{ remote_dir }}/flash_motor_drivers.py"
-        mode: "0755"
+        mode: '0755'
+
+    - name: Copy openocd config to remote
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/{{ cfg_path }}"
+        dest: "{{ remote_dir }}/raspberrypi.cfg"
+        mode: '0644'
 
     - name: Unarchive firmware on remote
       ansible.builtin.unarchive:
