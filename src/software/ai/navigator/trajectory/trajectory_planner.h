@@ -36,14 +36,6 @@ class TrajectoryPlanner
 
    private:
     /**
-     * Calculate the cost of the given trajectory path with cost
-     *
-     * @param traj_with_cost A complete trajectory path with cost
-     * @return The cost of the trajectory
-     */
-    double calculateCost(const TrajectoryPathWithCost &traj_with_cost) const;
-
-    /**
      * Get a single trajectory with cost that goes directly from the start to the
      * destination.
      *
@@ -67,12 +59,13 @@ class TrajectoryPlanner
      * @param sub_traj_with_cost Optional cached trajectory path with cost of the sub
      * trajectory
      * @param sub_traj_duration_s Optional duration of the cached sub_traj_with_cost
+     * @param max_cost Current maximum cost among calculated trajectories
      * @return The trajectory path with its cost
      */
     TrajectoryPathWithCost getTrajectoryWithCost(
         const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
         const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-        const std::optional<double> sub_traj_duration_s);
+        const std::optional<double> sub_traj_duration_s, double max_cost);
 
 
 

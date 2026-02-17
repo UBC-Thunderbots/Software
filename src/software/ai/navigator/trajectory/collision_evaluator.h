@@ -12,6 +12,13 @@
  **/
 class CollisionEvaluator
 {
+    static constexpr double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;
+    static constexpr double FORWARD_COLLISION_CHECK_STEP_INTERVAL_SEC = 0.05;
+    static constexpr double MAX_FUTURE_COLLISION_CHECK_SEC            = 2.0;
+    static constexpr double FRONT_COLLISION_COST_CONST                = 3.0;
+    static constexpr double BACK_COLLISION_COST_CONST                 = 1.0;
+    static constexpr double MID_TRAJ_COST_CONST                       = 6.0;
+
    public:
     /**
      * Constructor
@@ -27,22 +34,20 @@ class CollisionEvaluator
      * If a prefix trajectory is provided, collision information that occurs entirely
      * before the given prefix duration may be reused to avoid redundant collision
      * checking. Collision checks beyond the prefix duration are computed normally.
-     * @param trajectory
-     *        The trajectory to evaluate for collisions and cost.
-     * @param sub_traj_with_cost
-     *        An optional previously evaluated prefix trajectory whose collision
-     *        information may be reused if the prefix fully covers the relevant
-     *        collision interval.
-     * @param sub_traj_duration_s
-     *        The duration (in seconds) of the prefix trajectory within trajectory.
-     * @return
-     *         A TrajectoryPathWithCost< containing the trajectory along with
+     * @param trajectory The trajectory to evaluate for collisions and cost.
+     * @param sub_traj_with_cost An optional previously evaluated prefix trajectory whose
+     * collision information may be reused if the prefix fully covers the relevant
+     * collision interval.
+     * @param sub_traj_duration_s The duration (in seconds) of the prefix trajectory
+     * within trajectory.
+     * @param max_cost Current maximum cost of best path
+     * @return A TrajectoryPathWithCost< containing the trajectory along with
      *         computed collision timing information and total cost.
      */
     TrajectoryPathWithCost evaluate(
         const TrajectoryPath &trajectory,
         const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-        std::optional<double> sub_traj_duration_s);
+        std::optional<double> sub_traj_duration_s, double max_cost);
 
    private:
     std::vector<ObstaclePtr> obstacles;
@@ -89,7 +94,3 @@ class CollisionEvaluator
     double getLastNonCollisionTime(const TrajectoryPath &traj_path,
                                    const double search_end_time_s) const;
 };
-
-const double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;
-const double FORWARD_COLLISION_CHECK_STEP_INTERVAL_SEC = 0.05;
-const double MAX_FUTURE_COLLISION_CHECK_SEC            = 2.0;
