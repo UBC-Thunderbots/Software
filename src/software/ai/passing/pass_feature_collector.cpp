@@ -14,8 +14,6 @@ PassFeatureCollector::PassFeatureCollector() {}
 void PassFeatureCollector::logPassFeatures(const Pass& pass, const World& world,
                                            TbotsProto::PassingConfig passing_config) const
 {
-    std::cout << "\n\n\n\n\nPassFeatureCollector::logPassFeatures()\n\n\n\n\n"
-              << std::endl;
     double score = getPassScore(pass, world, passing_config);
 
     LOG(VISUALIZE) << *createPassFeaturesProto(pass, world, score);

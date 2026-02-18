@@ -154,7 +154,6 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
 
             if (sample_pass_features_)
             {
-                std::cout << num_passes_since_sample_ << std::endl;
                 if (num_passes_since_sample_ == 0)
                 {
                     pass_feature_collector_.logPassFeatures(optimized_pass, world,
