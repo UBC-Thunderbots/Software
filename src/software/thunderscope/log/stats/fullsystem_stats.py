@@ -12,6 +12,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import RuntimeManagerConstants
 import logging
 from proto.import_all_protos import *
+from rich import print
 
 
 @dataclass
@@ -62,7 +63,7 @@ class FullSystemStats:
 
         # the python __del__ destructor isn't called reliably
         # so printing this at the start instead
-        print(f"\n\n\n##### Writing FS Stats to {self._get_stats_file()}#####\n\n\n")
+        print(f"[bold red]Writing FS Stats to {self._get_stats_file()}")
 
         self.tracker = (
             TrackerBuilder(proto_unix_io=proto_unix_io)
@@ -101,9 +102,8 @@ class FullSystemStats:
                 for_friendly=False,
                 buffer_size=buffer_size,
             )
-            print(
-                f"\n\n\n##### Writing Enemy FS Stats to {self._get_enemy_stats_file()}#####\n\n\n"
-            )
+
+            print(f"[bold red]Writing Enemy FS Stats to {self._get_enemy_stats_file()}")
 
     def refresh(self) -> None:
         """Refreshes the stats for the game so far"""
