@@ -7,6 +7,7 @@ import logging
 from proto.visualization_pb2 import AttackerVisualization
 from proto.import_all_protos import *
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
+from rich import print
 
 
 @dataclass
@@ -80,14 +81,12 @@ class FullSystemStats:
 
         # the python __del__ destructor isn't called reliably
         # so printing this at the start instead
-        print(f"\n\n\n##### Writing FS Stats to {self._get_stats_file()}#####\n\n\n")
+        print(f"[bold red]Writing FS Stats to {self._get_stats_file()}")
 
         self.record_enemy_stats = record_enemy_stats
         if self.record_enemy_stats:
             self.enemy_stats = FSStats()
-            print(
-                f"\n\n\n##### Writing Enemy FS Stats to {self._get_enemy_stats_file()}#####\n\n\n"
-            )
+            print(f"[bold red]Writing Enemy FS Stats to {self._get_enemy_stats_file()}")
 
     def refresh(self) -> None:
         """Refreshes the stats for the game so far"""

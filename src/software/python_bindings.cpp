@@ -359,7 +359,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("velocity", &Ball::velocity)
         .def("hasBallBeenKicked", &Ball::hasBallBeenKicked,
              py::arg("expected_kick_direction"), py::arg("min_kick_speed") = 0.5,
-             py::arg("min_kick_speed") = Angle::fromDegrees(20))
+             py::arg("max_angle_difference") = Angle::fromDegrees(20))
         .def("hasBallBeenKicked", &Ball::hasBallBeenKicked);
 
     // https://pybind11.readthedocs.io/en/stable/classes.html
