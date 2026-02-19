@@ -1,4 +1,7 @@
-# Qt Best Practices
+@page qt_best_practices Qt Best Practices
+
+[TOC]
+
 Although this will focus on Qt-specific examples, these principles generally apply to all GUI design and implementation. They are really just Software Engineering principles applied to GUIs.
 
 ## Build A Hierarchy
