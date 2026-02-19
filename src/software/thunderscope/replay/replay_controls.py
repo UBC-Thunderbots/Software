@@ -59,7 +59,7 @@ class ReplayControls(QWidget):
         self.buttons_layout.addWidget(self.playback_speed_combo_box)
 
         for button in [
-            ("↷\nStep", self.player.single_step_forward),
+            ("↷\nstep", self.player.single_step_forward),
             ("↷\n1 s", partial(self.seek_relative, 1)),
             ("↷\n10 s", partial(self.seek_relative, 10)),
             ("↷\n1 min", partial(self.seek_relative, 60)),

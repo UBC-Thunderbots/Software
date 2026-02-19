@@ -63,7 +63,9 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
+        "//software/embedded:robot_localizer",
         "//software/embedded/redis",
+        "//software/embedded/services:imu",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",
@@ -121,5 +123,21 @@ cc_test(
     deps = [
         ":thunderloop",
         "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_library(
+    name = "robot_localizer",
+    srcs = ["robot_localizer.cpp"],
+    hdrs = ["robot_localizer.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software:constants",
+        "//software/embedded/services:imu",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/sensor_fusion/filter:kalman_filter",
+        "//software/util/scoped_timespec_timer",
+        "@eigen",
     ],
 )

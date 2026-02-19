@@ -113,6 +113,8 @@ message Primitive
 
     reserved 5;
 
+    Angle orientation = 7;
+
     // Epoch timestamp when primitives were assigned
     Timestamp time_sent = 6;
 }

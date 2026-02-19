@@ -11,6 +11,8 @@
 #include "shared/constants.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/redis/redis_client.h"
+#include "software/embedded/robot_localizer.h"
+#include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
@@ -60,6 +62,7 @@ class Thunderloop
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
     std::unique_ptr<PowerService> power_service_;
+    std::unique_ptr<ImuService> imu_service_;
 
     // Clients
     std::unique_ptr<RedisClient> redis_client_;
@@ -155,6 +158,9 @@ class Thunderloop
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
+
+    // Robot localization model
+    RobotLocalizer robot_localizer_;
 
     // 500 millisecond timeout on receiving primitives before we stop the robots
     const double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;

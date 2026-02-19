@@ -84,7 +84,12 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
-                          TeamColour::YELLOW, robot_id_)
+                          TeamColour::YELLOW, robot_id_),
+      robot_localizer_(
+          robot_constants.kalman_process_noise_variance_rad_per_s_4,
+          robot_constants.kalman_vision_noise_variance_rad_2,
+          robot_constants.kalman_encoder_noise_variance_rad_per_s_2,
+          robot_constants.kalman_target_angular_velocity_variance_rad_per_sec_2)
 {
     waitForNetworkUp();
 
@@ -127,7 +132,11 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
-    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
+
+    imu_service_ = std::make_unique<ImuService>();
+
+    LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -238,6 +247,10 @@ void Thunderloop::runLoop()
                 // Save new primitive
                 primitive_ = new_primitive;
 
+                TbotsProto::Angle orientation_msg = primitive_.orientation();
+                robot_localizer_.rollbackVision(createAngle(orientation_msg), RTT_S / 2);
+
+
                 // Update primitive executor's primitive set
                 {
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
@@ -253,12 +266,25 @@ void Thunderloop::runLoop()
                 }
             }
 
+            robot_localizer_.step(AngularVelocity::zero());
+            std::optional<Angle> imu_poll = imu_service_->pollHeadingRate();
+
+            if (imu_poll.has_value())
+            {
+                robot_localizer_.updateImu(imu_poll.value());
+            }
+
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
-                primitive_executor_.updateVelocity(
-                    createVector(status.local_velocity()),
+                robot_localizer_.updateEncoders(
                     createAngularVelocity(status.angular_velocity()));
+
+                // step the robot localizer
+
+                primitive_executor_.updateState(createVector(status.local_velocity()),
+                                                robot_localizer_.getAngularVelocity(),
+                                                robot_localizer_.getOrientation());
             }
 
             // Timeout Overrides for Primitives
@@ -269,7 +295,7 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
 
-                ZoneNamedN(_tracy_step_primitive, "Thunderloop: Step Primitive", true);
+                ZoneNamedN(_tracy_step_primitive, "Thunderloop: step Primitive", true);
 
                 // Handle emergency stop override
                 auto nanoseconds_elapsed_since_last_primitive =

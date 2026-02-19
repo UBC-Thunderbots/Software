@@ -229,6 +229,7 @@ static const unsigned NUM_GENEVA_ANGLES = 5;
 // Jetson Nano Constants
 static const double MAX_JETSON_TEMP_C = 97;
 
+static constexpr double RTT_S = 0.03;
 // Robot diagnostics constants
 constexpr double AUTO_CHIP_DISTANCE_DEFAULT_M     = 1.5;
 constexpr double AUTO_KICK_SPEED_DEFAULT_M_PER_S  = 1.5;

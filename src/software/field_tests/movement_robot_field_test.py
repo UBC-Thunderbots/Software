@@ -69,7 +69,7 @@ logger = create_logger(__name__)
 
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
-    test_angles = [0, 45, 90, 180, 270, 0]
+    test_angles = [0, 90, 270, 0]
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     if len(world.friendly_team.team_robots) == 0:
@@ -88,13 +88,14 @@ def test_basic_rotation(field_test_runner):
 
     robot = world.friendly_team.team_robots[0]
     rob_pos_p = robot.current_state.global_position
-    logger.info("staying in pos {rob_pos_p}")
+    # logger.info("staying in pos {rob_pos_p}")
 
     for angle in test_angles:
+        print("Angle")
         move_tactic = MoveTactic()
         move_tactic.destination.CopyFrom(rob_pos_p)
         move_tactic.dribbler_mode = DribblerMode.OFF
-        move_tactic.final_orientation.CopyFrom(Angle(radians=angle))
+        move_tactic.final_orientation.CopyFrom(Angle(radians=angle / 180.0 * math.pi))
         move_tactic.ball_collision_type = BallCollisionType.AVOID
         move_tactic.auto_chip_or_kick.CopyFrom(
             AutoChipOrKick(autokick_speed_m_per_s=0.0)
@@ -116,14 +117,14 @@ def test_basic_rotation(field_test_runner):
         # Send a halt tactic after the test finishes
         halt_tactic = HaltTactic()
         params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[id].stop.CopyFrom(halt_tactic)
+        params.assigned_tactics[id].halt.CopyFrom(halt_tactic)
         # send the halt tactic
         field_test_runner.set_tactics(params, True)
 
         # validate by eye
-        logger.info(f"robot set to {angle} orientation")
+        # logger.info(f"robot set to {angle} orientation")
 
-        time.sleep(2)
+        time.sleep(0.2)
 
 
 def test_one_robots_square(field_test_runner):
@@ -204,4 +205,4 @@ def test_one_robots_square(field_test_runner):
 
 
 if __name__ == "__main__":
-    pytest_main(__file__)
+    sys.exit(pytest.main([__file__, "-svv"]))

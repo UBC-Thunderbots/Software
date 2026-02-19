@@ -178,6 +178,16 @@ class Angle final
      */
     constexpr Angle minDiff(const Angle &other) const;
 
+    /**
+     * Returns the smallest possible rotational difference from this angle to another
+     * angle.
+     *
+     * @param to the second angle.
+     *
+     * @return the angle between this Angle and other, in the range [-π, π].
+     */
+    constexpr Angle minSignedDiff(const Angle &to) const;
+
    private:
     /**
      * The measurement in radians of this Angle.
@@ -494,6 +504,21 @@ inline constexpr Angle Angle::clamp() const
 inline constexpr Angle Angle::minDiff(const Angle &other) const
 {
     return (*this - other).clamp().abs();
+}
+
+inline constexpr Angle Angle::minSignedDiff(const Angle &to) const
+{
+    Angle delta =
+        (to.clamp() - this->clamp());  // this will be clamped between [-2pi, 2pi].
+    if (delta.toRadians() > M_PI)
+    {
+        delta = delta - Angle::full();  // if out of bounds, take coterminal angle
+    }
+    else if (delta.toRadians() < -M_PI)
+    {
+        delta = delta + Angle::full();  // if out of bounds, take coterminal angle
+    }
+    return delta;
 }
 
 inline constexpr Angle::Angle(double rads) : rads(rads) {}
