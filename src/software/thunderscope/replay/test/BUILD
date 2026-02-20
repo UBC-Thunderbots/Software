@@ -1,5 +1,5 @@
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
-
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 package(default_visibility = ["//visibility:public"])
 
 py_test(
@@ -7,6 +7,11 @@ py_test(
     srcs = [
         "replay_corruption_test.py",
     ],
+    env = {
+        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
+        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
+    },
+    package_collisions = "warning",
     data = [
         "//software:py_constants.so",
     ],
@@ -17,6 +22,10 @@ py_test(
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope/replay:proto_player",
         requirement("pytest"),
+        requirement("pyqt6"),
+        requirement("numpy"),
+        requirement("pyqtdarktheme-fork"),
+        requirement("pyqtgraph"),
     ],
 )
 
@@ -25,6 +34,11 @@ py_test(
     srcs = [
         "replay_indexing_test.py",
     ],
+    env = {
+        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
+        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
+    },
+    package_collisions = "warning",
     data = [
         "//software:py_constants.so",
     ],
@@ -36,5 +50,9 @@ py_test(
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/replay/test:replay_corruption_test",
         requirement("pytest"),
+        requirement("pyqt6"),
+        requirement("numpy"),
+        requirement("pyqtdarktheme-fork"),
+        requirement("pyqtgraph"),
     ],
 )

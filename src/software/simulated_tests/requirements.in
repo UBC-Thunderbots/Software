@@ -1,1 +1,6 @@
 pytest==6.2.5
+PyQt6==6.10.0
+PyQt6-Qt6==6.10.0
+pyqtgraph==0.13.7
+numpy==1.26.4
+pyqtdarktheme-fork==2.3.2
