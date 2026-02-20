@@ -1,0 +1,12 @@
+---
+- name: Make sure NTP is enabled to sync time for set_up.yml
+  block:
+    - name: Enable automatic time synchronization
+      ansible.builtin.command: timedatectl set-ntp on
+      changed_when: true
+
+    - name: Ensure the systemd-timesyncd service is running and enabled
+      ansible.builtin.systemd_service:
+        name: systemd-timesyncd
+        state: started
+        enabled: yes
