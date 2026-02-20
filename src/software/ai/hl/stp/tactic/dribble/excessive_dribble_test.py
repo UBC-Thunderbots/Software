@@ -20,7 +20,6 @@ from proto.message_translation.tbots_protobuf import create_world_state
     "initial_location,dribble_destination,final_dribble_orientation, should_excessively_dribble, blue_robot_location",
     [
         # The following tests check that DribbleTactic does not false trigger for distances within regulations
-
         # Dribble Destination for the ball < 1.0 from its starting position
         (
             tbots_cpp.Point(0.5, 0),
@@ -64,7 +63,6 @@ from proto.message_translation.tbots_protobuf import create_world_state
             tbots_cpp.Point(0, 1),
         ),
         # The following tests check that DribbleTactic correctly triggers for distances outside regulation
-
         # Dribble Destination for the ball > 1.0 from its starting position
         (
             tbots_cpp.Point(0, 2),
@@ -120,7 +118,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
             tbots_cpp.Angle(),
             True,
             tbots_cpp.Point(0, 0),
-        )
+        ),
     ],
 )
 def test_excessive_dribbling(
