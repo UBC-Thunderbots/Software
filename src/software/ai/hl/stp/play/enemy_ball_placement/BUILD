@@ -1,5 +1,6 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -28,12 +29,12 @@ py_test(
     srcs = [
         "enemy_ball_placement_play_test.py",
     ],
-    tags = ["exclusive"],
     env = {
         "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
         "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
     },
     package_collisions = "warning",
+    tags = ["exclusive"],
     deps = [
         "//software:conftest",
         "//software/simulated_tests:validation",
