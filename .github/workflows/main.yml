@@ -44,6 +44,22 @@ jobs:
           cd src
           bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
 
+      - name: Motor Firmware build Test
+        run: |
+          cd src
+          bazel build @mdv6_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board
+
+  motor-firmware:
+    name: Motor Firmware
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/environment-setup
+
+      - name: Build Motor Firmware
+        run: |
+          cd src
+          bazel build @mdv6_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board
 
   software-tests:
     name: Software Tests
@@ -101,7 +117,7 @@ jobs:
             //software/simulated_tests/...    \
             //software/ai/hl/...              \
             //software/ai/navigator/...       
-            
+
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
         if: always()

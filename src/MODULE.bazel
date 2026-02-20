@@ -193,12 +193,32 @@ http_archive(
     url = "https://github.com/saebyn/munkres-cpp/archive/61086fcf5b3a8ad4bda578cdc2d1dca57b548786.tar.gz",
 )
 
+# For flashing the motor driver board
+http_archive(
+    name = "bazel_embedded",
+    sha256 = "91a78efbb0f94479fe9ca2912aced712be9e7028325bada9a73e7d325427b404",
+    strip_prefix = "bazel-embedded-cf5b240d510313b3383e0cdb550eb9f32be7244e",
+    url = "https://github.com/bazelembedded/bazel-embedded/archive/cf5b240d510313b3383e0cdb550eb9f32be7244e.zip",
+)
+
+openocd = use_extension("//starlark/firmware:open_ocd.bzl", "openocd_extension")
+use_repo(openocd, "com_openocd")
+
 http_archive(
     name = "LTC4151",
     build_file = "@//extlibs:LTC4151.BUILD",
     sha256 = "6aa2dd380a13b08366338cdf0fbbeeeed96887512ac7b0753ee6ea1e8856df31",
     strip_prefix = "LTC4151-729952f10bcdcf359877b6f728565c17a8f17423",
     url = "https://github.com/kerrydwong/LTC4151/archive/729952f10bcdcf359877b6f728565c17a8f17423.tar.gz",
+)
+
+# TODO: Perhaps set this to pull latest
+http_archive(
+    name = "mdv6_firmware",
+    build_file = "@//extlibs:mdv6_firmware.bzl",
+    sha256 = "8054aca4ae3543e39d3587c58aa5904917d9b268922564f6ca3acf4b59bd8fe8",
+    strip_prefix = "MDv6_Firmware-81627d25b5f147c0b5b3f8ceb2c22c883625a3d1",
+    url = "https://github.com/UBC-Thunderbots/MDv6_Firmware/archive/81627d25b5f147c0b5b3f8ceb2c22c883625a3d1.tar.gz",
 )
 
 http_archive(
@@ -224,6 +244,7 @@ register_toolchains(
     "//toolchains/cc:cc_toolchain_for_k8_jetson_nano_cross_compile",
     "//toolchains/cc:cc_toolchain_for_k8",
     "//toolchains/cc:cc_toolchain_for_aarch64",
+    "//toolchains/cc:cc_toolchain_for_stm32",
 )
 
 ##############################################
@@ -254,6 +275,12 @@ new_local_repository(
     name = "k8_jetson_nano_cross_compile_gcc",
     build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
+)
+
+new_local_repository(
+    name = "motor_board_gcc",
+    build_file = "@//extlibs:motor_board_gcc.BUILD",
+    path = "/opt/tbotspython/arm-none-eabi-gcc/",
 )
 
 new_local_repository(
