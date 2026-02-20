@@ -1,5 +1,6 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 py_test(
@@ -7,14 +8,14 @@ py_test(
     srcs = [
         "replay_corruption_test.py",
     ],
+    data = [
+        "//software:py_constants.so",
+    ],
     env = {
         "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
         "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
     },
     package_collisions = "warning",
-    data = [
-        "//software:py_constants.so",
-    ],
     deps = [
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:import_all_protos",
@@ -34,14 +35,14 @@ py_test(
     srcs = [
         "replay_indexing_test.py",
     ],
+    data = [
+        "//software:py_constants.so",
+    ],
     env = {
         "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
         "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
     },
     package_collisions = "warning",
-    data = [
-        "//software:py_constants.so",
-    ],
     deps = [
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:import_all_protos",
