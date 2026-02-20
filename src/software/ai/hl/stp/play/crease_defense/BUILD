@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -33,6 +34,11 @@ py_test(
     srcs = [
         "crease_defense_play_test.py",
     ],
+    env = {
+        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
+        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
+    },
+    package_collisions = "warning",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",
@@ -41,6 +47,10 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests:validation",
         requirement("pytest"),
+        requirement("pyqt6"),
+        requirement("numpy"),
+        requirement("pyqtdarktheme-fork"),
+        requirement("pyqtgraph"),
     ],
 )
 
