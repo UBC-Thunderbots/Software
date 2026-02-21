@@ -2,6 +2,8 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
+#include "software/ai/hl/stp/play/test_plays/move_test_play_fsm.h"
 
 /**
  * A test Play that moves a robot to the friendly goal, a robot to the enemy goal, and
@@ -12,7 +14,7 @@
  * This play is applicable when the ball's x and y coordinates are >= 0
  * This play's invariant holds while the ball's x coordinate is >= 0
  */
-class MoveTestPlay : public Play
+class MoveTestPlay : public PlayBase<MoveTestPlayFSM>
 {
    public:
     /**
@@ -24,4 +26,6 @@ class MoveTestPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
+
+    void updateTactics(const PlayUpdate &play_update) override;
 };
