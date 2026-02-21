@@ -121,7 +121,7 @@ def main(
     if not debug_build and (not no_optimized_build or flash_robots):
         command += ["--copt=-O3"]
 
-    # Used for when flashing Jetsons
+    # Used for when flashing Raspberry Pi
     if flash_robots:
         command += ["--platforms=//toolchains/cc:robot"]
 
