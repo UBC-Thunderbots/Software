@@ -18,7 +18,6 @@ from cli.cli_params import (
     SSHPasswordOption,
     InteractiveModeOption,
     TracyOption,
-    PlatformOption,
     EnableThunderscopeOption,
     EnableVisualizerOption,
     StopAIOnStartOption,
@@ -54,7 +53,6 @@ def main(
     ssh_password: SSHPasswordOption = None,
     interactive_search: InteractiveModeOption = False,
     tracy: TracyOption = False,
-    platform: PlatformOption = None,
     enable_thunderscope: EnableThunderscopeOption = False,
     enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
@@ -140,9 +138,6 @@ def main(
     if tracy:
         command += ["--cxxopt=-DTRACY_ENABLE"]
 
-    if platform:
-        command += ["--//software/embedded:host_platform=" + platform.value]
-
     # limit number of jobs
     if jobs_option:
         command += ["--jobs=" + jobs_option]
@@ -161,9 +156,6 @@ def main(
     if enable_thunderscope:
         bazel_arguments += ["--enable_thunderscope"]
     if flash_robots:
-        if not platform:
-            print("No platform specified! Make sure to set the --platform argument.")
-            sys.exit(1)
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
         bazel_arguments += [f"192.168.6.20{id}" for id in flash_robots]
