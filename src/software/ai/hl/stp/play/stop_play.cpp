@@ -13,12 +13,6 @@ StopPlay::StopPlay(TbotsProto::AiConfig config) : PlayBase<StopPlayFSM>(config, 
 void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
                               const WorldPtr &world_ptr)
 {
-    // This function doesn't get called and will be removed when coroutines are phased
-    // out.
-    while (true)
-    {
-        yield({{}});
-    }
 }
 
 // Register this play in the genericFactory
