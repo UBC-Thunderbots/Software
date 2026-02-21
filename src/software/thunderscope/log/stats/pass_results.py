@@ -10,8 +10,6 @@ from dataclasses import dataclass
 from software.thunderscope.constants import PassResultsConstants
 import os
 from proto.import_all_protos import *
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-import software.python_bindings as tbots_cpp
 
 
 @dataclass
@@ -48,9 +46,6 @@ class PassResultsTracker:
         :param buffer_size: buffer size to use
         """
         self.friendly_colour_yellow = friendly_colour_yellow
-
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
-        proto_unix_io.register_observer(World, self.world_buffer)
 
         self.tracker = (
             TrackerBuilder(proto_unix_io=proto_unix_io)
@@ -145,11 +140,6 @@ class PassResultsTracker:
         """Refreshes the tracker so we stay up to date on new passes
         and checks to see if any passes are older than their interval
         """
-        world_msg = self.world_buffer.get(block=False, return_cached=True)
-
-        if world_msg:
-            self.world = tbots_cpp.World(world_msg)
-
         self.tracker.refresh()
 
         self._update_pass_timestamps()
