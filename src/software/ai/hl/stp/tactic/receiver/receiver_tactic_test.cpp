@@ -6,6 +6,7 @@
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/angular_velocity.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
@@ -89,27 +90,27 @@ INSTANTIATE_TEST_CASE_P(
 
         // Robot slighty off from receive point: test 2
         std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
-                        RobotStateWithId{
-                            1, RobotState(Point(2.5, 2.0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+                        RobotStateWithId{1, RobotState(Point(2.5, 2.0), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))}),
 
         // Robot facing away from pass
         std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 4),
                         RobotStateWithId{1, RobotState(Point(-3, 0), Vector(0, 0),
                                                        Angle::fromDegrees(180),
-                                                       Angle::fromDegrees(0))}),
+                                                       AngularVelocity::fromDegrees(0))}),
 
         // Robot facing towards from pass
         std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 4),
-                        RobotStateWithId{
-                            1, RobotState(Point(-3, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+                        RobotStateWithId{1, RobotState(Point(-3, 0), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))}),
 
         // Robot facing towards pass speedy
         std::make_tuple(Pass(Point(0.0, 0.0), Point(-3, 0), 5),
-                        RobotStateWithId{
-                            1, RobotState(Point(-3, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))})
+                        RobotStateWithId{1, RobotState(Point(-3, 0), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))})
 
             ));
 
@@ -187,7 +188,7 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(Pass(Point(4.0, 1.5), Point(4, -1), 5),
                         RobotStateWithId{1, RobotState(Point(4.0, -1), Vector(0, 0),
                                                        Angle::fromDegrees(180),
-                                                       Angle::fromDegrees(0))}),
+                                                       AngularVelocity::fromDegrees(0))}),
 
         // TODO (#2570): re-enable when one-touch works for these tests
         // std::make_tuple(Pass(Point(4.0, 1.5), Point(3.5, -1), 5),
@@ -205,7 +206,7 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(Pass(Point(4.0, -1.5), Point(4, 1), 5),
                         RobotStateWithId{1, RobotState(Point(4.0, 1), Vector(0, 0),
                                                        Angle::fromDegrees(180),
-                                                       Angle::fromDegrees(0))}),
+                                                       AngularVelocity::fromDegrees(0))}),
 
         // TODO (#2570): re-enable when one-touch works for these tests
         // std::make_tuple(Pass(Point(4.0, -1.5), Point(3.5, 1), 5),
@@ -215,9 +216,9 @@ INSTANTIATE_TEST_CASE_P(
         //                                  Angle::fromDegrees(0))}),
 
         std::make_tuple(Pass(Point(4.0, -1.5), Point(3.0, 1), 4.5),
-                        RobotStateWithId{
-                            1, RobotState(Point(3.0, 1), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))})
+                        RobotStateWithId{1, RobotState(Point(3.0, 1), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       AngularVelocity::fromDegrees(0))})
 
         // TODO (#2570): re-enable when one-touch works for these tests
         // Direct one touch

@@ -196,7 +196,7 @@ INSTANTIATE_TEST_CASE_P(
             // the state of the friendly robot
             RobotStateWithId{
                 1, RobotState(Point(0.25, 0), Vector(0, 0), Angle::fromDegrees(180),
-                              Angle::fromDegrees(0))},
+                              AngularVelocity::fromDegrees(0))},
             // the state of the ball
             BallState(Point(0., 0.), Vector(0, 0)),
             // the states of the enemy robots
@@ -227,8 +227,9 @@ INSTANTIATE_TEST_CASE_P(
             Pass(Point(FIELD_TOP_LEFT.x() + 0.05, FIELD_TOP_LEFT.y() - 0.05), Point(0, 0),
                  5),
             // the state of the friendly robot
-            RobotStateWithId{1, RobotState(FIELD_TOP_LEFT, Vector(0, 0),
-                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
+            RobotStateWithId{
+                1, RobotState(FIELD_TOP_LEFT, Vector(0, 0), Angle::fromDegrees(0),
+                              AngularVelocity::fromDegrees(0))},
             // the state of the ball
             BallState(Point(FIELD_TOP_LEFT.x() + 0.05, FIELD_TOP_LEFT.y() - 0.2),
                       Vector(0, 0)),
