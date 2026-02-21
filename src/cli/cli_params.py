@@ -19,7 +19,6 @@ class DebugBinary(str, Enum):
 
 class Platform(str, Enum):
     PI = "PI"
-    NANO = "NANO"
     LIMITED = "LIMITED"
 
 

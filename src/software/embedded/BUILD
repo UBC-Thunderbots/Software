@@ -3,13 +3,6 @@ load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 package(default_visibility = ["//visibility:public"])
 
 config_setting(
-    name = "build_nano",
-    flag_values = {
-        ":host_platform": "NANO",
-    },
-)
-
-config_setting(
     name = "build_pi",
     flag_values = {
         ":host_platform": "PI",
@@ -28,7 +21,6 @@ string_flag(
     build_setting_default = "PI",
     values = [
         "PI",
-        "NANO",
         "LIMITED",
     ],
 )

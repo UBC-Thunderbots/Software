@@ -18,12 +18,10 @@ from cli.cli_params import (
     SSHPasswordOption,
     InteractiveModeOption,
     TracyOption,
-    PlatformOption,
     EnableThunderscopeOption,
     EnableVisualizerOption,
     StopAIOnStartOption,
     DebugBinary,
-    Platform,
     JobsOption,
 )
 
@@ -55,7 +53,6 @@ def main(
     ssh_password: SSHPasswordOption = None,
     interactive_search: InteractiveModeOption = False,
     tracy: TracyOption = False,
-    platform: PlatformOption = None,
     enable_thunderscope: EnableThunderscopeOption = False,
     enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
@@ -167,8 +164,7 @@ def main(
             sys.exit(1)
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        platform_ip = "0" if platform == Platform.NANO else "6"
-        bazel_arguments += [f"192.168.{platform_ip}.20{id}" for id in flash_robots]
+        bazel_arguments += [f"192.168.6.20{id}" for id in flash_robots]
         bazel_arguments += ["-pwd", ssh_password]
 
     if action == ActionArgument.test:
