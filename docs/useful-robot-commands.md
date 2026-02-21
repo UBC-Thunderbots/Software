@@ -12,7 +12,6 @@
   - [Flashing the robot's compute module](#flashing-the-robots-compute-module)
   - [Flashing the powerboard](#flashing-the-powerboard)
   - [Setting up the embedded host](#setting-up-the-embedded-host)
-    - [Jetson Nano](#jetson-nano)
     - [Raspberry Pi](#raspberry-pi)
   - [Robot Diagnostics](#robot-diagnostics)
     - [For Just Diagnostics](#for-just-diagnostics)
@@ -102,10 +101,9 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
-* \<platform\> is the host platform on the robot (either `PI` or `NANO`)
 * <robot_ip> is the IP address of the robot
 * <robot_password> is the password of the `robot` user account
 
@@ -138,16 +136,10 @@ This section refers to setting up the computer on the robot for the first time. 
 
 <b>Setting up the robot for the first time requires internet access</b>
 
-### Jetson Nano
-
-```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>
-```
-
 ### Raspberry Pi
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook setup_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
 ## Robot Diagnostics
@@ -180,10 +172,9 @@ Runs the robot auto test fixture on a robot through Ansible, which tests the mot
 From Software/src:
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --//software/embedded:host_platform=<platform> --platforms=//toolchains/cc:robot -- --playbook robot_auto_test_playbook.yml --hosts <robot_name> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook robot_auto_test_playbook.yml --hosts <robot_name> --ssh_pass <robot_password>
 ```
 
-* replace the \<platform\> with the target platform for the robot (either `PI` or `NANO`)
 * replace the \<robot_ip\> with the actual ip address of the jetson nano for the ssh connection.
 * replace the <robot_password> with the actual password for the jetson nano for the ssh connection.
 
