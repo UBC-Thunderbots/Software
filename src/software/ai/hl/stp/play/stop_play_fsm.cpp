@@ -13,6 +13,31 @@ StopPlayFSM::StopPlayFSM(TbotsProto::AiConfig ai_config)
 
 void StopPlayFSM::updateStopPosition(const Update& event)
 {
+    // Robot assignments for the Stop Play
+    //  - 1 robot will be the goalie
+    //  - 2 robots will assist the goalie in blocking the ball, they will snap
+    //      to the best fit semicircle around the defense area
+    //  - 3 robots will stay within 0.5m of the ball, evenly spaced, also blocking the
+    //  goal
+    //
+    //  If x represents the ball and G represents the goalie, the following, also blocking
+    //  the goal diagram depicts a possible outcome of this play
+    //
+    // 		+--------------------+--------------------+
+    // 		|                    |                    |
+    // 		|         4  x       |                    |
+    // 		| 0       2          |                    |
+    // 		+--+ 1     3         |                 +--+
+    // 		|  |                 |                 |  |
+    // 		|G |               +-+-+               |  |
+    // 		|  |               |   |               |  |
+    // 		|  |               +-+-+               |  |
+    // 		|  |                 |                 |  |
+    // 		+--+                 |                 +--+
+    // 		|                    |                    |
+    // 		|                    |                    |
+    // 		|                    |                    |
+    // 		+--------------------+--------------------+
     const WorldPtr& world_ptr = event.common.world_ptr;
     TbotsProto::MaxAllowedSpeedMode stop_mode =
         TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND;
