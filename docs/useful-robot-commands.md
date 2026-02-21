@@ -34,7 +34,7 @@ flowchart TD
         e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.5.203` (for Pis) or `ssh robot@robert.local`
         for a robot called robert with robot id 3")
     ssh ---> |Yes| tloop_status
-    ssh --> |No - Second Try| monitor("Connect Jetson or Pi to an external monitor and check wifi connection or SSH using an ethernet cable")
+    ssh --> |No - Second Try| monitor("Connect Pi to an external monitor and check wifi connection or SSH using an ethernet cable")
     ssh --> |No - First Try| restart(Restart robot)
     restart --> ssh
 
@@ -73,7 +73,6 @@ flowchart TD
 To use most of these commands you will either need to be on the tbots wifi network (no internet access) or on a WiFi with internet access (`ubcvisitor`) and connected to the robot through ethernet tethering. Note that ethernet tethering doesn't work on `ubcsecure` or `eduroam`.
 
 On the tbots network:
-- Jetson Nano robots will have an IP address of `192.168.0.20<robot_id>` so for robot id `1` the IP is `192.168.0.201`.
 - Raspberry Pi robots will have an IP address of `192.168.6.20<robot_id>` so for robot id `1` the IP is `192.168.6.201`. Occasionally, these robots may have an IP address of `192.168.5.20<robot_id>`.
 
 If you are not using the tbots network you will need to use a network utility (`tshark`, `wireshark`, `arp`) to determine the IP address.
@@ -174,8 +173,8 @@ From Software/src:
 bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook robot_auto_test_playbook.yml --hosts <robot_name> --ssh_pass <robot_password>
 ```
 
-* replace the \<robot_ip\> with the actual ip address of the jetson nano for the ssh connection.
-* replace the <robot_password> with the actual password for the jetson nano for the ssh connection.
+* replace the \<robot_ip\> with the actual ip address of the Raspberry Pi for the ssh connection.
+* replace the <robot_password> with the actual password for the Raspberry Pi for the ssh connection.
 
 # On Robot Commands
 
@@ -213,7 +212,7 @@ journalctl -fu <service_name>
 
 ## Debugging Uart
 
-`screen` or [GNU screen](https://www.gnu.org/software/screen/) can act as serial monitor displaying what the jetson is receiving and allowing us to send characters through the terminal. 
+`screen` or [GNU screen](https://www.gnu.org/software/screen/) can act as serial monitor displaying what the Raspberry Pi is receiving and allowing us to send characters through the terminal. 
 
 For uart we use serial port: `/dev/ttyTHS1`  
 For usb we use serial port: `/dev/ttyUSB0`  
