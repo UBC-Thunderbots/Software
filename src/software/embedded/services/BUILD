@@ -4,11 +4,6 @@ cc_library(
     name = "motor",
     srcs = ["motor.cpp"],
     hdrs = ["motor.h"],
-    defines =
-        select({
-            "//software/embedded:build_pi": ["PI"],
-            "//software/embedded:build_limited": ["LIMITED"],
-        }),
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
