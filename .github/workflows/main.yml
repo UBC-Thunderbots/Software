@@ -37,7 +37,7 @@ jobs:
       - name: Raspberry Pi Build Test
         run: |
           cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains/cc:robot
 
 
   software-tests:
@@ -72,7 +72,7 @@ jobs:
       - name: Raspberry Pi Build
         run: |
          cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains/cc:robot
 
 
   simulated-gameplay-tests:
