@@ -201,9 +201,6 @@ void Thunderloop::runLoop()
 
             ScopedTimespecTimer iteration_timer(&iteration_time);
 
-            // Collect jetson status
-            jetson_status_.set_cpu_temperature(getCpuTemperature());
-
             // Network Service: receive newest primitives and send out the last
             // robot status
             {
@@ -344,7 +341,6 @@ void Thunderloop::runLoop()
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
             *(robot_status_.mutable_motor_status())          = motor_status_.value();
             *(robot_status_.mutable_power_status())          = power_status_;
-            *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
             *(robot_status_.mutable_primitive_executor_status()) =
@@ -482,10 +478,6 @@ void Thunderloop::updateErrorCodes()
     if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
-    }
-    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
-    {
-        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
     }
 
     if (!isPowerStable(log_file))

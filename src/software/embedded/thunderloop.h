@@ -131,7 +131,6 @@ class Thunderloop
 
     // Output Msg Buffers
     TbotsProto::RobotStatus robot_status_;
-    TbotsProto::JetsonStatus jetson_status_;
     TbotsProto::NetworkStatus network_status_;
     TbotsProto::PowerStatus power_status_;
     std::optional<TbotsProto::MotorStatus> motor_status_;
