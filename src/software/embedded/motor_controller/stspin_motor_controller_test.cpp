@@ -3,9 +3,11 @@
 #include <boost/program_options.hpp>
 #include <chrono>
 #include <thread>
+#include <utility>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
+#include "software/logger/network_logger.h"
 
 class StSpinMotorControllerTest
 {
@@ -21,25 +23,31 @@ class StSpinMotorControllerTest
         bool help        = false;
         std::string mode = "speed";
         std::vector<int16_t> setpoints;
+        std::unordered_set<MotorIndex> enabled_motors;
         PidOption torque_pid;
         PidOption flux_pid;
         PidOption speed_pid;
     };
 
-    explicit StSpinMotorControllerTest(const CommandLineArgs& args) : args_(args) {}
+    explicit StSpinMotorControllerTest(CommandLineArgs args) : args_(std::move(args)) {}
 
     void runMotorTest() const
     {
         LOG(INFO) << "Running Motor Test";
+
+        std::stringstream ss;
+        for (const MotorIndex motor : args_.enabled_motors)
+        {
+            ss << motor << " ";
+        }
+        LOG(INFO) << "Enabled motors: " << ss.str();
 
         const auto motor_controller = std::make_unique<StSpinMotorController>();
         motor_controller->setup();
 
         LOG(INFO) << "Motor controller setup complete";
 
-        const std::vector motors = {MotorIndex::FRONT_RIGHT};
-
-        for (auto motor : motors)
+        for (auto motor : args_.enabled_motors)
         {
             if (args_.torque_pid.kp && args_.torque_pid.ki)
             {
@@ -69,7 +77,7 @@ class StSpinMotorControllerTest
         {
             LOG(INFO) << "Running speed profile";
 
-            for (auto motor : motors)
+            for (auto motor : args_.enabled_motors)
             {
                 motor_controller->sendAndReceiveFrame(
                     motor, SetResponseTypeFrame{StSpinResponseType::SPEED_AND_FAULTS});
@@ -79,7 +87,7 @@ class StSpinMotorControllerTest
             {
                 for (int i = 0; i < 2000; ++i)
                 {
-                    for (auto motor : motors)
+                    for (auto motor : args_.enabled_motors)
                     {
                         motor_controller->readThenWriteVelocity(motor, setpoint);
                         motor_controller->checkDriverFault(motor);
@@ -99,7 +107,7 @@ class StSpinMotorControllerTest
         {
             LOG(INFO) << "Running torque profile";
 
-            for (auto motor : motors)
+            for (auto motor : args_.enabled_motors)
             {
                 motor_controller->sendAndReceiveFrame(
                     motor, SetResponseTypeFrame{StSpinResponseType::IQ_AND_ID});
@@ -109,7 +117,7 @@ class StSpinMotorControllerTest
             {
                 for (int i = 0; i < 2000; ++i)
                 {
-                    for (auto motor : motors)
+                    for (auto motor : args_.enabled_motors)
                     {
                         motor_controller->sendAndReceiveFrame(
                             motor, SetTargetTorqueFrame{
@@ -136,10 +144,10 @@ class StSpinMotorControllerTest
     CommandLineArgs args_;
 };
 
-static std::vector<int16_t> parseSetpoints(const std::string& setpointsString)
+static std::vector<int16_t> parseSetpoints(const std::string& setpoints_str)
 {
     std::vector<int16_t> setpoints;
-    std::stringstream ss(setpointsString);
+    std::stringstream ss(setpoints_str);
     std::string item;
 
     while (std::getline(ss, item, ','))
@@ -153,10 +161,45 @@ static std::vector<int16_t> parseSetpoints(const std::string& setpointsString)
     return setpoints;
 }
 
+static std::unordered_set<MotorIndex> parseEnabledMotors(
+    const std::string& enabled_motors_str)
+{
+    if (enabled_motors_str == "all")
+    {
+        constexpr auto all_motors = driveMotors();
+        return {all_motors.begin(), all_motors.end()};
+    }
+
+    std::unordered_set<MotorIndex> enabled_motors;
+    std::stringstream ss(enabled_motors_str);
+    std::string item;
+
+    while (std::getline(ss, item, ','))
+    {
+        if (item == "fl")
+        {
+            enabled_motors.insert(MotorIndex::FRONT_LEFT);
+        }
+        else if (item == "fr")
+        {
+            enabled_motors.insert(MotorIndex::FRONT_RIGHT);
+        }
+        else if (item == "bl")
+        {
+            enabled_motors.insert(MotorIndex::BACK_LEFT);
+        }
+        else if (item == "br")
+        {
+            enabled_motors.insert(MotorIndex::BACK_RIGHT);
+        }
+    }
+
+    return enabled_motors;
+}
+
 int main(int argc, char** argv)
 {
-    std::string runtime_dir = "/tmp/tbots/motor_test";
-    LoggerSingleton::initializeLogger(runtime_dir, nullptr);
+    NetworkLoggerSingleton::initializeLogger(0, true);
 
     StSpinMotorControllerTest::CommandLineArgs args;
 
@@ -168,6 +211,8 @@ int main(int argc, char** argv)
             "Control mode: speed | torque")
         ("setpoints", boost::program_options::value<std::string>(),
             "Comma-separated setpoints (required)")
+        ("enabled_motors", boost::program_options::value<std::string>(),
+            "Motors to enable: 'all' (default) or comma-separated list (e.g. 'fl,fr,bl,br')")
         ("torque_kp", boost::program_options::value<int16_t>(), "Torque PID kp")
         ("torque_ki", boost::program_options::value<int16_t>(), "Torque PID ki")
         ("flux_kp", boost::program_options::value<int16_t>(), "Flux PID kp")
@@ -190,6 +235,16 @@ int main(int argc, char** argv)
     {
         std::cerr << "Error: setpoints not set" << std::endl;
         return 1;
+    }
+
+    if (vm.count("enabled_motors"))
+    {
+        args.enabled_motors =
+            parseEnabledMotors(vm.at("enabled_motors").as<std::string>());
+    }
+    else
+    {
+        args.enabled_motors = parseEnabledMotors("all");
     }
 
     args.setpoints = parseSetpoints(vm.at("setpoints").as<std::string>());

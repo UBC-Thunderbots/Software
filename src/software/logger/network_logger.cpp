@@ -21,8 +21,8 @@ NetworkLoggerSingleton::NetworkLoggerSingleton(RobotId robot_id, bool enable_log
         logWorker->addSink(std::make_unique<CSVSink>(CSV_PATH), &CSVSink::appendToFile);
 
     // Sink for PlotJuggler plotting
-    auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>("end0"),
-                                                 &PlotJugglerSink::sendToPlotJuggler);
+    auto plotjuggler_handle = logWorker->addSink(
+        std::make_unique<PlotJugglerSink>("end0"), &PlotJugglerSink::sendToPlotJuggler);
 
     g3::only_change_at_initialization::addLogLevel(CSV);
     g3::only_change_at_initialization::addLogLevel(PLOTJUGGLER);
