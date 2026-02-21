@@ -190,3 +190,29 @@ class Play
 
     RobotNavigationObstacleFactory obstacle_factory;
 };
+
+/**
+ * Base class for plays that are driven by an FSM. Holds the FSM instance and
+ * control params, and implements updateTactics by processing PlayUpdate events.
+ *
+ * @tparam FSM_T The FSM struct type (e.g. StopPlayFSM). Must define ControlParams
+ *               and an Update struct, and be constructible from TbotsProto::AiConfig.
+ */
+template <typename FSM_T>
+class PlayBase : public Play
+{
+   public:
+    explicit PlayBase(TbotsProto::AiConfig ai_config, bool requires_goalie)
+        : Play(ai_config, requires_goalie), fsm(FSM_T(ai_config)), control_params{}
+    {
+    }
+
+    void updateTactics(const PlayUpdate& play_update) override
+    {
+        fsm.process_event(FSM_T::Update(control_params, play_update));
+    }
+
+   protected:
+    FSM<FSM_T> fsm;
+    typename FSM_T::ControlParams control_params;
+};

@@ -2,13 +2,14 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play/stop_play_fsm.h"
 
 /**
  * This Play moves our robots in a formation while keeping them at least 0.5m from the
  * ball. Additionally, the robots are limited to moving no more than 1.5m/s. This Play is
  * used during the referee "Stop" command.
  */
-class StopPlay : public Play
+class StopPlay : public PlayBase<StopPlayFSM>
 {
    public:
     StopPlay(TbotsProto::AiConfig config);
