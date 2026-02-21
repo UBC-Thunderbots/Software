@@ -21,7 +21,6 @@ py_binary(
         "//software/embedded:hash_thunderloop_binary.sh",
         "//software/embedded:setup_robot_software_deps",
         "//software/embedded:thunderloop_main",
-        "//software/embedded/linux_configs/jetson_nano:jetson_nano_files",
         "//software/embedded/linux_configs/pi:pi_files",
         "//software/embedded/linux_configs/systemd:systemd_files",
         "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli_tar",
