@@ -9,5 +9,4 @@
       ansible.builtin.systemd_service:
         name: systemd-timesyncd
         state: started
-        enabled: yes
-
+        enabled: true
