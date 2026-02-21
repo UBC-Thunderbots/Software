@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play/play_base.hpp"
-#include "software/ai/hl/stp/play/test_plays/move_test_play_fsm.h"  
+#include "software/ai/hl/stp/play/test_plays/move_test_play_fsm.h"
 
 /**
  * A test Play that moves a robot to the friendly goal, a robot to the enemy goal, and
