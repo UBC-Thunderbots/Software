@@ -15,7 +15,7 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface,
     listener_             = std::make_unique<UdpListener>(
         io_listener_service_, listen_ip, listen_port, interface, true,
         std::bind(&LatencyTesterNode::onReceive, this, std::placeholders::_1,
-                  std::placeholders::_2));
+                              std::placeholders::_2));
 
     std::string send_ip = ROBOT_MULTICAST_CHANNELS.at(send_channel);
     sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port,

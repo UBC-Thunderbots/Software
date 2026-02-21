@@ -16,8 +16,6 @@
 #include "software/networking/tbots_network_exception.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
-#include "software/world/robot_state.h"
-#include "software/world/team.h"
 
 /**
  * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -73,18 +71,18 @@ extern "C"
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
     // TODO (#2495): Set the friendly team colour
-    : redis_client_(
-          std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
+    : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       motor_status_(std::nullopt),
       robot_constants_(robot_constants),
-      robot_id_(std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY))),
-      channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
-      network_interface_(redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
+      robot_id_(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY))),
+      channel_id_(
+          std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY))),
+      network_interface_(toml_config_client_->get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY)),
       loop_hz_(loop_hz),
-      kick_coeff_(std::stod(redis_client_->getSync(ROBOT_KICK_EXP_COEFF_REDIS_KEY))),
-      kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
+      kick_coeff_(std::stod(toml_config_client_->get(ROBOT_KICK_EXP_COEFF_CONFIG_KEY))),
+      kick_constant_(std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY))),
       chip_pulse_width_(
-          std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
+          std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
@@ -135,7 +133,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
               << ", CHANNEL ID: " << channel_id_
               << ", and NETWORK INTERFACE: " << network_interface_;
     LOG(INFO)
-        << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
+        << "THUNDERLOOP: to update Thunderloop configuration, edit TOML config file and restart Thunderloop";
 }
 
 Thunderloop::~Thunderloop() {}
@@ -150,7 +148,6 @@ void Thunderloop::runLoop()
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
-    struct timespec last_world_received_time;
     struct timespec current_time;
     struct timespec last_chipper_fired;
     struct timespec last_kicker_fired;
@@ -168,7 +165,6 @@ void Thunderloop::runLoop()
     // CLOCK_REALTIME can jump backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
-    clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
     clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
@@ -208,7 +204,7 @@ void Thunderloop::runLoop()
             // Collect jetson status
             jetson_status_.set_cpu_temperature(getCpuTemperature());
 
-            // Network Service: receive newest world, primitives and set out the last
+            // Network Service: receive newest primitives and send out the last
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
@@ -223,8 +219,8 @@ void Thunderloop::runLoop()
 
             uint64_t last_handled_primitive_set = primitive_.sequence_number();
 
-            // Updating primitives and world with newly received data
-            // and setting the correct time elasped since last primitive / world
+            // Updating primitives with newly received data
+            // and setting the correct time elasped since last primitive
 
             struct timespec time_since_last_primitive_received;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
@@ -353,18 +349,6 @@ void Thunderloop::runLoop()
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
             *(robot_status_.mutable_primitive_executor_status()) =
                 primitive_executor_status_;
-
-            // Update Redis
-            {
-                ZoneNamedN(_tracy_redis, "Thunderloop: Commit to REDIS", true);
-
-                redis_client_->setNoCommit(
-                    ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-                    std::to_string(power_status_.battery_voltage()));
-                redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
-                                           std::to_string(power_status_.current_draw()));
-                redis_client_->asyncCommit();
-            }
 
             updateErrorCodes();
         }

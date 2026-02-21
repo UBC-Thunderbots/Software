@@ -1,5 +1,4 @@
 from pyqtgraph.Qt.QtWidgets import *
-import queue
 from software.py_constants import *
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
@@ -63,9 +62,9 @@ class g3logWidget(QWidget):
     def refresh(self) -> None:
         """Update the log widget with another log message"""
         # Need to make sure the message is new before logging it
-        try:
-            log = self.log_buffer.queue.get_nowait()
-        except queue.Empty:
+
+        log = self.log_buffer.get(block=False, return_cached=False)
+        if log is None:
             return
 
         # Checks whether this type of log is enabled from checkboxes

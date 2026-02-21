@@ -35,8 +35,8 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
     });
     setEnemyGoalie(0);
 
-    std::unique_ptr<CreaseDefensePlay> play =
-        std::make_unique<CreaseDefensePlay>(getAiConfig());
+    std::unique_ptr<CreaseDefensePlay> play = std::make_unique<CreaseDefensePlay>(
+        std::make_shared<TbotsProto::AiConfig>(getAiConfig()));
     play->updateControlParams(Point(1, 3));
 
     setAiPlay(std::move(play));
@@ -46,7 +46,8 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
 

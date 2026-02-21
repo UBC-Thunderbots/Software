@@ -23,11 +23,12 @@ TEST_F(HaltTacticTest, robot_already_stopped)
         {Point(-3, 2.5), Point()}, {Vector(), Vector()});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<HaltTactic>();
+    auto tactic = std::make_shared<HaltTactic>(std::make_shared<TbotsProto::AiConfig>());
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             for (unsigned i = 0; i < 1000; i++)
             {
                 robotHalt(world_ptr, yield);
@@ -49,11 +50,12 @@ TEST_F(HaltTacticTest, robot_start_moving)
         {Point(-3, 2.5), Point()}, {Vector(), Vector(4, 4)});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<HaltTactic>();
+    auto tactic = std::make_shared<HaltTactic>(std::make_shared<TbotsProto::AiConfig>());
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             for (unsigned i = 0; i < 1000; i++)
             {
                 robotHalt(world_ptr, yield);

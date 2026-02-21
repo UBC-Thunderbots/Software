@@ -1,16 +1,22 @@
 from __future__ import annotations
 
-import os
 import logging
-import time
+import os
+import subprocess
 import threading
-
+import time
 from subprocess import Popen, TimeoutExpired
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+import re
+
+from software.py_constants import *
 from software.python_bindings import *
+
 from proto.import_all_protos import *
 from software.py_constants import *
+from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers.util import is_cmd_running
+from software.thunderscope.gl.layers.gl_obstacle_layer import ObstacleList
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class FullSystem:
@@ -18,22 +24,27 @@ class FullSystem:
 
     def __init__(
         self,
+        path_to_binary: str,
         full_system_runtime_dir: os.PathLike = None,
         debug_full_system: bool = False,
         friendly_colour_yellow: bool = False,
         should_restart_on_crash: bool = True,
         run_sudo: bool = False,
         running_in_realtime: bool = True,
+        log_level: LogLevels = LogLevels.DEBUG,
     ) -> None:
         """Run FullSystem
 
+        :param path_to_binary: The path of the binary used for this unix full system
         :param full_system_runtime_dir: The directory to run the blue full_system in
         :param debug_full_system: Whether to run the full_system in debug mode
         :param friendly_color_yellow: a argument passed into the unix_full_system binary (--friendly_colour_yellow)
         :param should_restart_on_crash: whether or not to restart the program after it has been crashed
         :param run_sudo: true if we should run full system under sudo
         :param running_in_realtime: True if we are running fullsystem in realtime, else False
+        :param log_level: Minimum g3log level that will be printed (DEBUG|INFO|WARNING|FATAL)
         """
+        self.path_to_binary = path_to_binary
         self.full_system_runtime_dir = full_system_runtime_dir
         self.debug_full_system = debug_full_system
         self.friendly_colour_yellow = friendly_colour_yellow
@@ -41,8 +52,23 @@ class FullSystem:
         self.should_restart_on_crash = should_restart_on_crash
         self.should_run_under_sudo = run_sudo
         self.running_in_realtime = running_in_realtime
-
+        self.log_level = log_level
         self.thread = threading.Thread(target=self.__restart__, daemon=True)
+
+    def discover_supported_flags(self, path_to_binary: str) -> set[str]:
+        """Discover what binary flags are supported by provided binary
+
+        :param path_to_binary path to specific binary
+        :return a set of supported flags
+        """
+        try:
+            result = subprocess.run(
+                [path_to_binary, "--help"], capture_output=True, text=True, timeout=3
+            )
+            flags = re.findall(r"--(\w+)", result.stdout)
+            return set(flags)
+        except (subprocess.TimeoutExpired, FileNotFoundError, PermissionError):
+            return set()
 
     def __enter__(self) -> FullSystem:
         """Enter the full_system context manager.
@@ -60,11 +86,31 @@ class FullSystem:
         except:
             pass
 
-        self.full_system = "software/unix_full_system --runtime_dir={} {} {}".format(
-            self.full_system_runtime_dir,
-            "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
-            "--ci" if not self.running_in_realtime else "",
-        )
+        supported_flags = self.discover_supported_flags(self.path_to_binary)
+
+        cmd_parts = [self.path_to_binary]
+        # runtime_dir is always required (core functionality)
+        cmd_parts.append("--runtime_dir={}".format(self.full_system_runtime_dir))
+
+        # Optional flags - only add if supported
+        if self.friendly_colour_yellow and "friendly_colour_yellow" in supported_flags:
+            cmd_parts.append("--friendly_colour_yellow")
+        if not self.running_in_realtime and "ci" in supported_flags:
+            cmd_parts.append("--ci")
+        if "log_level" in supported_flags:
+            cmd_parts.append("--log_level={}".format(self.log_level.value))
+
+        # Log supported flags info based on importance level
+        if supported_flags:
+            logging.debug("Binary support flags: {}".format(supported_flags))
+        else:
+            logging.warning(
+                "Could not discover flags for path: '{}'. Continuing...".format(
+                    self.path_to_binary
+                )
+            )
+
+        self.full_system = " ".join(cmd_parts)
 
         if self.should_run_under_sudo:
             if not is_cmd_running(
@@ -216,6 +262,7 @@ gdb --args bazel-bin/{self.full_system}
             (VALIDATION_PROTO_SET_PATH, ValidationProtoSet),
             (ROBOT_LOG_PATH, RobotLog),
             (ROBOT_CRASH_PATH, RobotCrash),
+            (VIRTUAL_OBSTACLES_UNIX_PATH, VirtualObstacles),
             (REPLAY_BOOKMARK_PATH, ReplayBookmark),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)

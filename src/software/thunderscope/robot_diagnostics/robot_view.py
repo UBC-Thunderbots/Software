@@ -39,40 +39,38 @@ class RobotViewComponent(QWidget):
         self.layout = QVBoxLayout()
 
         self.robot_info = RobotInfo(
-            robot_id, available_control_modes, individual_robot_control_mode_signal
+            robot_id,
+            available_control_modes,
+            individual_robot_control_mode_signal,
         )
         self.layout.addWidget(self.robot_info)
 
-        self.robot_status = None
+        self.robot_status_view = RobotStatusView()
+        self.layout.addWidget(self.robot_status_view)
 
-        self.robot_info.robot_status_expand.clicked.connect(self.robot_status_expand)
+        self.robot_info.expand_robot_status_button.clicked.connect(
+            self.robot_status_view.toggle_visibility
+        )
 
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
-    def robot_status_expand(self) -> None:
-        """Handles the info button click event from the Robot Info widget
-        If robot status widget is not defined, initialises one and adds it to this layout
-        If robot status widget is defined, toggles its visibility
+    def update_robot_status(self, robot_status: RobotStatus):
+        """Receives a RobotStatus message and updates the widgets
+        in this component with the new data
+
+        :param robot_status: The latest RobotStatus message for this robot
         """
-        if not self.robot_status:
-            self.robot_status = RobotStatusView()
-            self.layout.addWidget(self.robot_status)
+        self.robot_info.update_robot_status(robot_status)
+        self.robot_status_view.update(robot_status)
 
-        self.robot_status.toggle_visibility()
+    def update_robot_statistic(self, robot_statistic: RobotStatistic):
+        """Receives a RobotStatistic message and updates the widgets
+        in this component with the new data
 
-    def update(
-        self, robot_status: RobotStatus, round_trip_time: RobotStatistic
-    ) -> None:
-        """Updates the Robot View Components with the new robot status message
-        Updates the robot info widget and, if initialized, the robot status widget as well
-
-        :param robot_status: the new message data to update the widget with
-        :param round_trip_time: robot statistic proto to update with new metrics
+        :param robot_statistic: The latest RobotStatistic message for this robot
         """
-        self.robot_info.update(robot_status, round_trip_time)
-        if self.robot_status:
-            self.robot_status.update(robot_status)
+        self.robot_info.update_robot_statistic(robot_statistic)
 
 
 class RobotView(QScrollArea):
@@ -93,18 +91,18 @@ class RobotView(QScrollArea):
         super().__init__()
 
         self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
-        self.round_trip_time_buffer = ThreadSafeBuffer(10, RobotStatistic)
+        self.robot_statistic_buffer = ThreadSafeBuffer(10, RobotStatistic)
 
         self.layout = QVBoxLayout()
 
-        self.robot_view_widgets = []
+        self.components = []
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
-            robot_view_widget = RobotViewComponent(
+            component = RobotViewComponent(
                 id, available_control_modes, self.individual_robot_control_mode_signal
             )
-            self.robot_view_widgets.append(robot_view_widget)
-            self.layout.addWidget(robot_view_widget)
+            self.components.append(component)
+            self.layout.addWidget(component)
 
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller
@@ -116,16 +114,15 @@ class RobotView(QScrollArea):
         self.setWidgetResizable(True)
 
     def refresh(self) -> None:
-        """Refresh the view
-        Gets a RobotStatus proto and calls the corresponding update method
-        until the buffer is empty
-        """
+        """Refresh the view with the latest RobotStatus and RobotStatistic data"""
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
-        round_trip_time = self.round_trip_time_buffer.get(
+        robot_statistic = self.robot_statistic_buffer.get(
             block=False, return_cached=False
         )
 
-        if robot_status is not None and round_trip_time is not None:
-            self.robot_view_widgets[robot_status.robot_id].update(
-                robot_status, round_trip_time
+        if robot_status:
+            self.components[robot_status.robot_id].update_robot_status(robot_status)
+        if robot_statistic:
+            self.components[robot_statistic.robot_id].update_robot_statistic(
+                robot_statistic
             )

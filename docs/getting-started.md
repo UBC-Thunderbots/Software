@@ -1,66 +1,64 @@
-Table of Contents
-=================
+# Getting Started
 
-* [Software Setup](#software-setup)
-   * [Introduction](#introduction)
-   * [Installation and Setup](#installation-and-setup)
-      * [Operating systems](#operating-systems)
-      * [Getting the Code](#getting-the-code)
-      * [Installing Software Dependencies](#installing-software-dependencies)
-      * [Installing an IDE](#installing-an-ide)
-         * [Installing an IDE: CLion](#installing-an-ide-clion)
-            * [Getting your Student License](#getting-your-student-license)
-            * [Installing CLion](#installing-clion)
-      * [Installing an IDE: VSCode](#installing-an-ide-vscode)
-      * [Editing with Vim or NeoVim](#editing-with-vim-or-neovim)
-   * [Building and Running the Code](#building-and-running-the-code)
-      * [Building from the command-line](#building-from-the-command-line)
-      * [Building from the command-line using the fuzzy finder](#building-from-the-command-line-using-the-fuzzy-finder)
-      * [Building with CLion](#building-with-clion)
-      * [Building with VSCode](#building-with-vscode)
-      * [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
-   * [Debugging](#debugging)
-      * [Debugging with CLion](#debugging-with-clion)
-      * [Debugging from the Command line](#debugging-from-the-command-line)
-   * [Profiling](#profiling)
-      * [Callgrind](#callgrind)
-      * [Tracy](#tracy)
-   * [Building for the robot](#building-for-the-robot)
-   * [Deploying Robot Software to the robot](#deploying-robot-software-to-the-robot)
-   * [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
-      * [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
-      * [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
-* [Workflow](#workflow)
-   * [Issue and Project Tracking](#issue-and-project-tracking)
-      * [Issues](#issues)
-   * [Git Workflow](#git-workflow)
-      * [Forking and Branching](#forking-and-branching)
-      * [Creating a new Branch](#creating-a-new-branch)
-      * [Making Commits](#making-commits)
-      * [Updating Your Branch and Resolving Conflicts](#updating-your-branch-and-resolving-conflicts)
-      * [Formatting Your Code](#formatting-your-code)
-      * [Pull Requests](#pull-requests)
-      * [Reviewing Pull Requests](#reviewing-pull-requests)
-   * [Example Workflow](#example-workflow)
-   * [Testing](#testing)
+# Table of Contents
 
-<!-- 
-    Created by https://github.com/ekalinin/github-markdown-toc
+<!--TOC-->
 
-    NOTE: when creating or re-creating a table of contents like this, you can
-    save a LOT of time by using this tool: 
-    https://github.com/ekalinin/github-markdown-toc
--->
+- [Table of Contents](#table-of-contents)
+- [Software Setup](#software-setup)
+  - [Introduction](#introduction)
+  - [Installation and Setup](#installation-and-setup)
+    - [Operating systems](#operating-systems)
+    - [Getting the Code](#getting-the-code)
+    - [Installing Software Dependencies](#installing-software-dependencies)
+    - [Installing an IDE](#installing-an-ide)
+      - [Installing an IDE: CLion](#installing-an-ide-clion)
+        - [Getting your Student License](#getting-your-student-license)
+        - [Installing CLion](#installing-clion)
+    - [Installing an IDE: VS Code](#installing-an-ide-vs-code)
+    - [Editing with Vim or NeoVim](#editing-with-vim-or-neovim)
+  - [Building and Running the Code](#building-and-running-the-code)
+    - [Building from the command line](#building-from-the-command-line)
+    - [Building from the command line using the fuzzy finder](#building-from-the-command-line-using-the-fuzzy-finder)
+    - [Building with CLion](#building-with-clion)
+    - [Building with VS Code](#building-with-vs-code)
+    - [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
+  - [Debugging](#debugging)
+    - [Debugging with CLion](#debugging-with-clion)
+    - [Debugging from the Command Line](#debugging-from-the-command-line)
+  - [Profiling](#profiling)
+    - [Callgrind](#callgrind)
+    - [Tracy](#tracy)
+  - [Building for the robot](#building-for-the-robot)
+  - [Deploying Robot Software to the robot](#deploying-robot-software-to-the-robot)
+  - [Testing Robot Software locally](#testing-robot-software-locally)
+  - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
+    - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
+- [Workflow](#workflow)
+  - [Issue and Project Tracking](#issue-and-project-tracking)
+    - [Issues](#issues)
+  - [Git Workflow](#git-workflow)
+    - [Forking and Branching](#forking-and-branching)
+    - [Creating a new Branch](#creating-a-new-branch)
+    - [Making Commits](#making-commits)
+    - [Updating Your Branch and Resolving Conflicts](#updating-your-branch-and-resolving-conflicts)
+    - [Formatting Your Code](#formatting-your-code)
+    - [Pull Requests](#pull-requests)
+    - [Reviewing Pull Requests](#reviewing-pull-requests)
+  - [Example Workflow](#example-workflow)
+  - [Testing](#testing)
+
+<!--TOC-->
 
 # Software Setup
 
 ## Introduction
 
 These instructions assume that you have the following accounts setup:
-- [Github](https://github.com/login)
+- [GitHub](https://github.com/login)
 - [Discord](https://discord.com). Please contact a Thunderbots lead to receive the invite link.
 
-These instructions assume you have a basic understanding of Linux and the command-line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem, and how to run programs or scripts.
+These instructions assume you have a basic understanding of Linux and the command line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem and how to run programs or scripts.
 
 ## Installation and Setup
 
@@ -68,13 +66,13 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 We currently only support Linux, specifically Ubuntu.
 
-If you have a X86_64 machine, we support Ubuntu 20.04 LTS, Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
+If you have a X86_64 machine, we support Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
 
 If you have a ARM64 (also known as AARCH64) machine, we support Ubuntu 24.04 LTS.
 
 You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
 
-You can use Ubuntu 20.04 LTS, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+You can use Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ### Getting the Code
 
@@ -84,18 +82,23 @@ You can use Ubuntu 20.04 LTS, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Window
 4. Click the `Fork` button in the top-right to fork the repository ([click here to learn about Forks](https://help.github.com/en/articles/fork-a-repo))
    1. Click on your user when prompted
    2. You should be automatically redirected to your new fork
-5. Clone your fork of the repository. As GitHub is forcing users to stop using usernames and passwords, we will be using the SSH link.  Returning members who are migrating to using SSH after cloning from a previous method can use the following instructions to set up a new local repository using SSH.
-   1. To connect to GitHub using SSH, if not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).  For each computer you contribute to GitHub with, you will need an additional SSH Key pair linked to your account.
-   2.  After you have successfully set up a SSH key for your device and added it to GitHub, you can clone the repository using the following command (you can put it wherever you like):
-        1.  Eg. `git clone git@github.com:<your_username>/Software.git`
-        2.  You can find this link under the green `Clone or Download` button on the main page of the Software repository, under the SSH tab.  (This should now be available after adding your SSH key to GitHub successfully.)
+5. Clone your fork of the repository. As GitHub is forcing users to stop using usernames and passwords for authorization, we will be using the SSH link. 
+
+   To clone using SSH:
+
+   1. If not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).  For each computer you contribute to GitHub with, you will need an additional SSH Key pair linked to your account.
+   2.  After you have successfully set up a SSH key for your device and added it to GitHub, you can clone the repository using the following command:
+        1.  e.g. `git clone git@github.com:<your_username>/Software.git`
+        2.  You can find this link under the green `Code` button on the main page of your fork on GitHub, under the SSH tab.  (This should now be available after adding your SSH key to GitHub successfully.)
+
+   Alternatively, you can clone using HTTPS. You'll need to either use a credential helper (Git Credential Manager, GitHub CLI, etc.) or a personal access token ([details here](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls)).
 6. Set up your git remotes ([what is a remote and how does it work?](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes))
    1. You should have a remote named `origin` that points to your fork of the repository. Git will have set this up automatically when you cloned your fork in the previous step.
    2. You will need to add a second remote, named `upstream`, that points to our main Software repository, which is where you created your fork from. (**Note:** This is _not_ your fork)
       1. Open a terminal and navigate to the folder you cloned (your fork): `cd path/to/the/repository/Software`
-      2. Navigate to our main Software repository in your browser and copy the url from the "Clone or Download" button. Copy the HTTPS url if you originally cloned with HTTPS, and use the SSH url if you previously cloned with SSH
+      2. Navigate to our main Software repository in your browser and copy the url from the green `Code` button. Copy the SSH url if you originally cloned with SSH, or use the HTTPS url if you previously cloned with HTTPS
       3. From your terminal, add the new remote by running `git remote add upstream <the url>` (without the angle brackets)
-         1. Eg. `git remote add upstream https://github.com/UBC-Thunderbots/Software.git`
+         1. e.g. `git remote add upstream git@github.com:UBC-Thunderbots/Software.git`
       4. That's it. If you want to double check your remotes are set up correctly, run `git remote -v` from your terminal (at the base of the repository folder again). You should see two entries: `origin` with the url for your fork of the repository, and `upstream` with the url for the main repository
 
 *See our [workflow](#workflow) for how to use git to make branches, submit Pull Requests, and track issues*
@@ -104,14 +107,14 @@ You can use Ubuntu 20.04 LTS, Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Window
 
 We have several setup scripts to help you easily install the necessary dependencies in order to build and run our code. You will want to run the following scripts, which can all be found in `Software/environment_setup`
 
-* Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
+* Inside a terminal, navigate to the environment_setup folder. e.g. `cd path/to/the/repository/Software/environment_setup`
 * Run `./setup_software.sh`
   * You will be prompted for your admin password
-  * This script will install everything necessary in order to build and run our main `AI` software 
+  * This script will install everything necessary in order to build and run our software 
 
 ### Installing an IDE
 
-For those who prefer working on C/C++ with an IDE, we provide two options: CLion for an integrated experience and VSCode for a more lightweight setup. Both support our build system `bazel`.
+For those who prefer working on C/C++ with an IDE, we provide two options: CLion for an integrated experience and VS Code for a more lightweight setup. Both support our build system `bazel`.
 
 #### Installing an IDE: CLion
 
@@ -127,20 +130,18 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 
 ##### Installing CLion
 
-* Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-* Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
-* When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
+1. Follow [the latest instructions from JetBrains](https://www.jetbrains.com/help/clion/installation-guide.html#toolbox) on installing CLion. We recommend installing CLion through the JetBrains Toolbox App which makes it easy to upgrade/downgrade your version of CLion if necessary.
+2. When you run CLion for the first time, you will be prompted to enter your JetBrains account or License credentials. Use your student account.
+3. Install the [Bazel plugin for CLion](https://plugins.jetbrains.com/plugin/9554-bazel-for-clion).
 
-### Installing an IDE: VSCode
+### Installing an IDE: VS Code
 
-VSCode is the more lightweight IDE, with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated into this IDE.
+VS Code is a more lightweight "IDE", with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated by default into VS Code.
 
-1. Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-2. Run `./install_vscode.sh` (* **DO NOT** download VSCode yourself unless you know what you're doing. The `install_vscode.sh` script will grab the most stable version of VSCode *)
-3. Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop.
-&. Click `Open Folder` and navigate to where you cloned software. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
-4. VSCode will prompt you to install recommended extensions, click `Install`, this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc..)
-5. Navigate to File -> Preferences -> Settings -> Workspace -> Extensions -> Bazel and select the `Bazel: Enable Code Lens` option.
+1. Follow the [latest instructions from the VS Code documentation](https://code.visualstudio.com/docs/setup/linux) on installing VS Code.
+2. Open VS Code. Go to File -> Open Folder and navigate to where you cloned the software repo. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
+3. VS Code will prompt you to install recommended extensions. Click `Install` — this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc.)
+4. Navigate to File -> Preferences -> Settings -> Workspace -> Extensions -> Bazel and select the `Bazel: Enable Code Lens` option.
 
 ### Editing with Vim or NeoVim
 
@@ -152,7 +153,7 @@ These tools require a `compile_commands.json` file, which can be generated by fo
 
 ## Building and Running the Code
 
-### Building from the command-line
+### Building from the command line
 
 1. Navigate to the root of this repository (wherever you have it cloned on your computer)
 2. Navigate to `src`.
@@ -165,9 +166,9 @@ These tools require a `compile_commands.json` file, which can be generated by fo
 *See the Bazel [command-line docs](https://bazel.build/reference/command-line-reference) for more info.*
 *Note: the targets are defined in the BUILD files in our repo*
 
-### Building from the command-line using the fuzzy finder
+### Building from the command line using the fuzzy finder
 
-We have a ./tbots.py test runner script in the src folder that will fuzzy find for targets. For example, 
+We have a `tbots.py` test runner script in the src folder that will fuzzy find for targets and call Bazel. For example, 
 
 1. Build a specific target for running (for example): `./tbots.py build angletest`
 2. Run a specific target by running (for example): `./tbots.py run goalietactictest -t`
@@ -177,7 +178,7 @@ where the `-t` flag indicates whether Thunderscope should be launched. Run `./tb
 
 ### Building with CLion
 
-First we need to setup CLion
+First, we need to setup CLion:
 1. Open CLion
 2. Select `Import Bazel Project`
 3. Set `Workspace` to wherever you cloned the repository + `/src`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src`.
@@ -187,7 +188,7 @@ First we need to setup CLion
 7. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
 
 Now that you're setup, if you can run it on the command line, you can run it in CLion. There are two main ways of doing so.
-1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
+1. Open any `BUILD` file and right click on a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
 2. Add a custom build configuration (more powerful, so make sure you understand this!)
     1. Select `Add Configuration` from the drop-down in the top-right of CLion
     2. Click on `+`, choose `Bazel Command`.
@@ -195,17 +196,17 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     4. For `Bazel Command` you can put any Bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
 
-### Building with VSCode
+### Building with VS Code
 
-1. Open VSCode
+1. Open VS Code
 2. Navigate to `Software/src/software/geom/BUILD`
 3. On top of every `cc_test`, `cc_library` and `cc_binary` there should be a `Test ...`, `Build ...` or `Run ...` for the respective target.
 4. Click `Test //software/geom:angle_test` to run the `angle_test`
 
 ### Running our AI, Simulator, SimulatedTests or Robot Diagnostics
 
-1. Run our AI on Thunderscope:
-    - Thunderscope is the software that coordinates our AI, Simulator, Visualizer and RobotDiagnostics
+1. Run our AI on [Thunderscope](./software-architecture-and-design.md#thunderscope-gui):
+    - [Thunderscope](./software-architecture-and-design.md#thunderscope-gui) is the software that coordinates and visualizes our AI, Simulator, and RobotDiagnostics.
     - After launching Thunderscope, we can see what the AI is currently "seeing" and interact with it through dynamic parameters. 
     - If we want to run with simulated AI vs AI:
         - `./tbots.py run thunderscope_main --enable_autoref` will start Thunderscope with a Simulator, a blue FullSystem, yellow FullSystem and a headless Autoref.
@@ -307,13 +308,13 @@ Debugging from the command line is certainly possible, but debugging in a full I
 
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
 
-### Debugging from the Command line
+### Debugging from the Command Line
 
 To debug from the command line, first you need to build your target with the debugging flag - `bazel build -c dbg //some/target:here`. When the target builds, you should see a path `bazel-bin/<target>`. Copy that path, and run `gdb <path>`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it. Alternatively, you could do `bazel run -c dbg --run_under="gdb" //some/target:here`, which will run the target in `gdb`. While this is taken directly from the Bazel docs, gdb may sometimes hang when using `--run_under`, so building the target first with debugging flags and running afterwards is preferred.
 
-## Profiling 
+## Profiling
 
-Profiling is an optimization tool used to identify the time and space used by code, with a detailed breakdown to help identify areas of potential performance improvements. Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence the only way is via command line. Use the following command:
+Profiling is an optimization tool used to identify the time and space used by code, with a detailed breakdown to help identify areas of potential performance improvements. Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence, the only way to profile our software is via the command line.
 
 ### Callgrind
 
@@ -356,7 +357,7 @@ Tracy also samples call stacks. If the profiled binary is run with root permissi
 
 ## Building for the robot
 
-To build for the robot computer, build the target with the `--platforms=//cc_toolchain:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//cc_toolchain:robot //software/geom/...`.
+To build for the robot computer, build the target with the `--platforms=//toolchains/cc:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//toolchains/cc:robot //software/geom/...`.
 
 ## Deploying Robot Software to the robot
 
@@ -364,7 +365,9 @@ We use Ansible to automatically update software running on the robot. [More info
 
 To update binaries on a working robot, you can run:
 
-`bazel run //software/embedded/ansible:run_ansible --platforms=//cc_toolchain:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+```bash
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
+```
 
 Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), and `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
 
@@ -373,21 +376,31 @@ Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), 
 It is possible to run Thunderloop without having a fully-working robot. Using this mode is useful when testing features that don't require the power board or motors.
 
 1. To run Thunderloop locally on your computer
-    1. First, you must ensure that `redis` is installed. Installation instructions can be found [here](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-linux/). The result of these installation directions will likely enable `redis-server` as a service that starts on boot. You may want to run `sudo systemctl disable redis-server` to prevent this.
-    2. Next, run the command `redis-server` in a terminal.
-    3. Set up the following required REDIS constants by running the following commands in the terminal:
-        - `redis-cli set /robot_id "{robot_id}"` where `{robot_id}` is the robot's ID (e.g. `1`, `2`, etc.)
-        - `redis-cli set /network_interface "{network_interface}"` where `{network_interface}` is one of the interfaces listed by `ip a`.
-        - `redis-cli set /channel_id "{channel_id}"` where `{channel_id}` is the channel id of the robot (e.g. `1`, `2`, etc.)
-        - `redis-cli set /kick_coeff "{kick_coeff}"` where `{kick_coeff}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-        - `redis-cli set /kick_constant "{kick_constant}"` where `{kick_constant}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-        - `redis-cli set /chip_pulse_width "{chip_pulse_width}"` where `{chip_pulse_width}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-    4. Now, run Thunderloop with the following command:
+    1. Create a TOML configuration file in the opt/tbotspython directory with the following content (replace values as needed):
+        ```toml
+        robot_id = "1"
+        channel_id = "0"
+        network_interface = "tbotswifi5"
+        kick_constant = "0"
+        kick_coeff = "0.0"
+        chip_pulse_width = "0"
+        battery_voltage = "0.0"
+        current_draw = "0.0"
+        cap_voltage = "0.0"
+        ```
+        Where:
+        - `robot_id` is the robot's ID (e.g. `1`, `2`, etc.)
+        - `network_interface` is one of the interfaces listed by `ip a`.
+        - `channel_id` is the channel id of the robot (e.g. `1`, `2`, etc.)
+        - `kick_coeff` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+        - `kick_constant` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+        - `chip_pulse_width` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
+    2. Now, run Thunderloop with the following command:
         - `bazel run //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED`
 
 2. If you have a robot PC that doesn't have proper communication with the power or motor board, you can still run Thunderloop in a limited capacity to test software features (eg. networking).
     1. First, build the Thunderloop binary:
-        - `bazel build //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED --platforms=//cc_toolchain:robot`
+        - `bazel build //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED --platforms=//toolchains/cc:robot`
     2. Find the `<robot_ip>` of the robot you want to run Thunderloop on. This guide may help you find the IP address of the robot: [Useful Robot Commands](useful-robot-commands.md#Wifi-Disclaimer).
     3. Copy the binary to the robot:
         - `scp bazel-bin/software/embedded/thunderloop_main robot@<robot_ip>:/home/robot/thunderloop_main`
@@ -408,7 +421,7 @@ It is possible to run Thunderloop without having a fully-working robot. Using th
 
 ## Issue and Project Tracking
 
-We try keep our issue and project tracking fairly simple, to reduce the overhead associated with tracking all the information and to make it easier to follow. If you are unfamiliar with GitHub issues, [this article](https://guides.github.com/features/issues/) gives a good overview.
+We try keep our issue and project tracking fairly simple to reduce the overhead associated with tracking all the information and to make it easier to follow. If you are unfamiliar with GitHub issues, [this article](https://guides.github.com/features/issues/) gives a good overview.
 
 ### Issues
 
@@ -432,20 +445,22 @@ In general, we follow the Forking Workflow
 
 ### Creating a new Branch
 
-For each Issue of project you are working on, you should have a separate branch. This helps keep work organized and separate.
+For each issue that you work on, you should have a separate branch. This helps keep work organized and separate.
 
 **Branches should always be created from the latest code on the `master` branch of our main Software repository**. If you followed the steps in [Installation and Setup](#installation-and-setup), this will be `upstream/master`. Once this branch is created, you can push it to your fork and update it with commits until it is ready to merge. 
 
 1. Navigate to the base folder of your Software repository: `cd path/to/the/repository/Software`
 2. Make git aware of any new changes to `upstream` by running `git fetch upstream`
 3. Create a new branch from `upstream/master` by running `git checkout upstream/master` then `git checkout -b your-branch-name`
-   1. Our branch naming convention is: `your_name/branch_name` (all lowercase, words separated by underscores). The branch name should be short and descriptive of the work being done on the branch.
    
-**Example:** if you were working on a new navigation system using RRT and your name was "Bob" your branch name might look like: `bob/new_rrt_navigator`
-4. You can now commit changes to this branch, and push them to your fork with `git push origin your_branch_name` or `git push -u`
+   Our branch naming convention is: `your_name/branch_name` (all lowercase, words separated by underscores). The branch name should be short and descriptive of the work being done on the branch.
+   
+   **Example:** if you were working on a new navigation system using RRT and your name was "Bob" your branch name might look like: `bob/new_rrt_navigator`
+
+4. You can now commit changes to this branch and push them to your fork with `git push origin your_branch_name` or `git push -u`
 
 <details>
-<summary>Aside: Why should you only create branches from "upstream/master"?</summary>
+<summary>Aside: Why should you only create branches from <code>upstream/master</code>?</summary>
 
 Because we squash our commits when we merge Pull Requests, a new commit with a new hash will be created, containing the multiple commits from the PR branch. Because the hashes are different, git will not recognize that the squashed commit and the series of commits that are inside the squashed commit contain the same changes, which can result in conflicts.
 
@@ -457,7 +472,7 @@ tl;dr Always create new branches from upstream/master. Do not create branches fr
 
 ### Making Commits
 
-We don't impose any rules for how you should be committing code, just keep the following general rules in mind:
+We don't impose any rules for how you should be committing code, just keep the following general guidelines in mind:
 
 1. Commits should represent logical steps in your workflow. Avoid making commits too large, and try keep related changes together
 2. Commit messages should give a good idea of the changes made. You don't have to go in-depth with technical details, but no one will know what you've done if your commit message is "fixed broken stuff"
@@ -471,13 +486,13 @@ To do this, you have 2 options: rebase or merge. [What's the difference?](https:
 
 Merging is generally recommended, because it is easier to handle conflicts and get stuff working. To merge, simply run `git pull upstream master`.
 
-Rebasing requires more knowledge of git and can cause crazy merge conflicts, so it isn't recommended. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`.
+Rebasing requires more knowledge of git and can cause crazy merge conflicts, so it isn't recommended. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`. The main benefit of rebasing is that you get a clean, linear commit history; however, we squash all the commits in each PR into a single commit before merging into master, so the extra effort involved in rebasing is somewhat pointless.
 
-If you do rebase or merge and get conflicts, you'll need to resolve them manually. [See here for a quick tutorials on what conflicts are and how to resolve them](https://www.atlassian.com/git/tutorials/using-branches/merge-conflicts). Feel free to do this in your IDE or with whatever tool you are most comfortable with. Updating your branch often helps keep conflicts to a minimum, and when they do appear they are usually smaller. Ask for help if you're really stuck!
+If you do rebase or merge and get conflicts, you'll need to resolve them manually. [See here for a quick tutorial on what conflicts are and how to resolve them](https://www.atlassian.com/git/tutorials/using-branches/merge-conflicts). Feel free to do this in your IDE or with whatever tool you are most comfortable with. Updating your branch often helps keep conflicts to a minimum, and when they do appear they are usually smaller. Ask for help if you're really stuck!
 
 ### Formatting Your Code
 
-We use [clang-format](https://electronjs.org/docs/development/clang-format) to automatically format our code. Using an automatic tool helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what it does.
+We use a variety of code formatters and linters to automatically format our code. Using automatic tools helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what these tools enforce.
 
 To format the code, from the `Software` directory run `./scripts/lint_and_format.sh`.
 
@@ -510,14 +525,14 @@ The Pull Request process usually looks like the following:
        5. Mark the Pull Request as "Approved" when you think it looks good
     2. **If you are the recipient of the review (the PR creator):**
        1. **Make sure to reply to the PR comments as you address / fix issues**. This helps the reviewers know you have made a change without having to go check the code diffs to see if you made a change.
-          1. Eg. Reply with "done" or "fixed" to comments as you address them
+          1. e.g. Reply with "done" or "fixed" to comments as you address them
           2. Leave comments unresolved, let the reviewer resolve them.
        2. Don't be afraid to ask for clarification regarding changes or suggest alternatives if you don't agree with what was suggested. The reviewers and reviewee should work together to come up with the best solution.
        3. **Do not resolve conversations as you address them** (but make sure to leave a comment as mentioned above). That is the responsibility of the reviewers.
        4. Once you have addressed all the comments, re-request review from reviewers.
-11. Make sure our automated tests with Github Actions are passing. There will be an indicator near the bottom of the Pull Request. If something fails, you can click on the links provided to get more information and debug the problems. More than likely, you'll just need to re-run clang-format on the code.
+11. Make sure our automated tests with Github Actions are passing. There will be an indicator near the bottom of the Pull Request. If something fails, you can click on the links provided to get more information and debug the problems.
 12. Once your Pull Request has been approved and the automated tests pass, you can merge the code. There will be a big 'merge" button at the bottom of the Pull Request with several options to choose from
-    1. We only allow "Squash and merge". This is because it keep the commit history on `upstream/master` shorter and cleaner, without losing any context from the commit messages (since they are combined in the squashed commit. A squashed commit also makes it easier to revert and entire change/feature, rather than having to "know" the range of commits to revert.
+    1. We only allow "Squash and merge". This is because it keeps the commit history on `upstream/master` shorter and cleaner, without losing any context from the commit messages (since they are combined in the squashed commit. A squashed commit also makes it easier to revert and entire change/feature, rather than having to "know" the range of commits to revert.
 13. That's it, your changes have been merged! You will be given the option to delete your remote branch. but are not required to do so. We recommend it since it will keep your fork cleaner, but you can do whatever you like.
 
 *Remember, code reviews can be tough. As a reviewer, it can be very tricky to give useful constructive criticism without coming off as condescending or degrading (emotions are hard to express through text!). As the recipient of a code review, it might feel like you are being criticized too harshly and that your hard work is being attacked. Remember that these are your teammates, who are not trying to arbitrarily devalue your contributions but are trying to help make the code as good as possible, for the good of the team.*

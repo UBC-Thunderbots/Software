@@ -2,6 +2,7 @@ from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.widget_setup_functions import *
 from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.robot_communication import RobotCommunication
 from typing import Sequence
 from dataclasses import dataclass
 from software.thunderscope.thunderscope_types import (
@@ -42,55 +43,48 @@ def initialize_application() -> None:
     qdarktheme.setup_theme()
 
 
-def configure_robot_view_fullsystem(
-    fullsystem_proto_unix_io: ProtoUnixIO,
+def configure_robot_view(
+    proto_unix_io: ProtoUnixIO, available_control_modes: list[IndividualRobotMode]
 ) -> TScopeWidget:
-    """Returns Widget Data for the Robot View Widget for FullSystem
+    """Returns Widget Data for the Robot View Widget
 
-    :param fullsystem_proto_unix_io: the proto unix io to configure the widget with
+    :param proto_unix_io: the proto unix io to configure the widget with
+    :param available_control_modes: the robot control modes to make available in the widget
     :return: the widget data
     """
     return TScopeWidget(
         name="Robot View",
-        widget=setup_robot_view(
-            **{
-                "proto_unix_io": fullsystem_proto_unix_io,
-                "available_control_modes": [
-                    IndividualRobotMode.NONE,
-                    IndividualRobotMode.MANUAL,
-                    IndividualRobotMode.AI,
-                ],
-            }
-        ),
+        widget=setup_robot_view(proto_unix_io, available_control_modes),
         anchor="Logs",
         position=WidgetPosition.ABOVE,
     )
 
 
-def configure_robot_view_diagnostics(
-    diagnostics_proto_unix_io: ProtoUnixIO,
-) -> TScopeWidget:
-    """Returns Widget Data for the Robot View Widget for Diagnostics
+def connect_robot_view_to_robot_communication(
+    robot_view_widget: RobotView,
+    robot_communication: RobotCommunication,
+):
+    """Connects a RobotView widget to RobotCommunication, synchronizing
+    robot control modes between the widget and RobotCommunication
 
-    :param diagnostics_proto_unix_io: the diagnostics proto unix io to
-                                      configure the widget with
-    :return: the widget data
+    :param robot_view_widget: the RobotView widget
+    :param robot_communication: the RobotCommunication instance to connect to
     """
-    return TScopeWidget(
-        name="Robot View",
-        widget=setup_robot_view(
-            **{
-                "proto_unix_io": diagnostics_proto_unix_io,
-                "available_control_modes": [
-                    IndividualRobotMode.NONE,
-                    IndividualRobotMode.MANUAL,
-                ],
-            }
-        ),
-        anchor="Logs",
-        stretch=WidgetStretchData(y=5),
-        position=WidgetPosition.ABOVE,
+    robot_view_widget.individual_robot_control_mode_signal.connect(
+        lambda robot_id,
+        robot_mode: robot_communication.toggle_individual_robot_control_mode(
+            robot_id, robot_mode
+        )
     )
+
+    # Set control mode for robot in RobotCommunication to
+    # initial mode set in widget
+    for component in robot_view_widget.components:
+        robot_info = component.robot_info
+        robot_communication.toggle_individual_robot_control_mode(
+            robot_info.robot_id,
+            IndividualRobotMode(robot_info.control_mode_menu.currentIndex()),
+        )
 
 
 def configure_estop(proto_unix_io):
@@ -141,25 +135,21 @@ def configure_base_fullsystem(
         TScopeWidget(
             name="Field",
             widget=setup_gl_widget(
-                **{
-                    "sandbox_mode": sandbox_mode,
-                    "replay": replay,
-                    "replay_log": replay_log,
-                    "full_system_proto_unix_io": full_system_proto_unix_io,
-                    "sim_proto_unix_io": sim_proto_unix_io,
-                    "friendly_colour_yellow": friendly_colour_yellow,
-                    "visualization_buffer_size": visualization_buffer_size,
-                    "frame_swap_counter": frame_swap_counter,
-                }
+                sandbox_mode=sandbox_mode,
+                replay=replay,
+                replay_log=replay_log,
+                full_system_proto_unix_io=full_system_proto_unix_io,
+                sim_proto_unix_io=sim_proto_unix_io,
+                friendly_colour_yellow=friendly_colour_yellow,
+                visualization_buffer_size=visualization_buffer_size,
+                frame_swap_counter=frame_swap_counter,
             ),
         ),
         TScopeWidget(
             name="Parameters",
             widget=setup_parameter_widget(
-                **{
-                    "proto_unix_io": full_system_proto_unix_io,
-                    "friendly_colour_yellow": friendly_colour_yellow,
-                }
+                proto_unix_io=full_system_proto_unix_io,
+                friendly_colour_yellow=friendly_colour_yellow,
             ),
             anchor="Field",
             position=WidgetPosition.LEFT,
@@ -169,7 +159,7 @@ def configure_base_fullsystem(
         TScopeWidget(
             name="Error Log",
             widget=setup_robot_error_log_view_widget(
-                **{"proto_unix_io": full_system_proto_unix_io}
+                proto_unix_io=full_system_proto_unix_io,
             ),
             anchor="Parameters",
             position=WidgetPosition.ABOVE,
@@ -177,23 +167,21 @@ def configure_base_fullsystem(
         ),
         TScopeWidget(
             name="Logs",
-            widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
+            widget=setup_log_widget(proto_unix_io=full_system_proto_unix_io),
             anchor="Parameters",
             position=WidgetPosition.ABOVE,
             stretch=WidgetStretchData(x=5),
         ),
         TScopeWidget(
             name="Referee Info",
-            widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
+            widget=setup_referee_info(proto_unix_io=full_system_proto_unix_io),
             anchor="Field",
             position=WidgetPosition.BOTTOM,
             stretch=WidgetStretchData(y=4),
         ),
         TScopeWidget(
-            name="Performance",
-            widget=setup_performance_plot(
-                **{"proto_unix_io": full_system_proto_unix_io}
-            ),
+            name="Ball Speed",
+            widget=setup_ball_speed_plot(proto_unix_io=full_system_proto_unix_io),
             # this is because this widget specifically has to be added like so:
             # dock.addWidget(widget.win) instead of dock.addWidget(widget)
             # otherwise, it opens in a new window
@@ -204,12 +192,18 @@ def configure_base_fullsystem(
             stretch=WidgetStretchData(y=4),
         ),
         TScopeWidget(
+            name="Performance",
+            widget=setup_performance_plot(proto_unix_io=full_system_proto_unix_io),
+            in_window=True,
+            anchor="Ball Speed",
+            position=WidgetPosition.BELOW,
+            stretch=WidgetStretchData(y=4),
+        ),
+        TScopeWidget(
             name="FPS Widget",
             widget=setup_fps_widget(
-                **{
-                    "frame_swap_counter": frame_swap_counter,
-                    "refresh_counter": refresh_counter,
-                }
+                frame_swap_counter=frame_swap_counter,
+                refresh_counter=refresh_counter,
             ),
             anchor="Performance",
             position=WidgetPosition.BELOW,
@@ -217,7 +211,7 @@ def configure_base_fullsystem(
         ),
         TScopeWidget(
             name="Play Info",
-            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
+            widget=setup_play_info(proto_unix_io=full_system_proto_unix_io),
             anchor="Referee Info",
             position=WidgetPosition.ABOVE,
             stretch=WidgetStretchData(y=4),
@@ -241,21 +235,19 @@ def configure_base_diagnostics(
     return [
         TScopeWidget(
             name="Logs",
-            widget=setup_log_widget(**{"proto_unix_io": diagnostics_proto_unix_io}),
+            widget=setup_log_widget(proto_unix_io=diagnostics_proto_unix_io),
         ),
         TScopeWidget(
             name="Error Log",
             widget=setup_robot_error_log_view_widget(
-                **{"proto_unix_io": current_proto_unix_io}
+                proto_unix_io=current_proto_unix_io
             ),
             position=WidgetPosition.BELOW,
             anchor="Logs",
         ),
         TScopeWidget(
             name="Diagnostics",
-            widget=setup_diagnostics_widget(
-                **{"proto_unix_io": diagnostics_proto_unix_io}
-            ),
+            widget=setup_diagnostics_widget(proto_unix_io=diagnostics_proto_unix_io),
             anchor="Logs",
             position=WidgetPosition.RIGHT,
         ),
@@ -513,40 +505,50 @@ def configure_ai_or_diagnostics(
     load_blue: bool,
     load_yellow: bool,
     load_diagnostics: bool,
-    visualization_buffer_size: int = 5,
-) -> TScopeConfig:
-    """Constructs a view with one of:
+    visualization_buffer_size: int,
+) -> (TScopeConfig, RobotView):
+    """Constructs a view designed for when we are running with real robots.
+
+    The view will contain one of the following combinations of tabs:
         - 1 Fullsystem (Blue or Yellow)
         - 1 Fullsystem (Blue or Yellow) and Diagnostics
         - Diagnostics
+
+    In any case, one of the tabs will include a RobotView widget for
+    viewing and controlling the status of the connected robots.
 
     :param load_blue: if blue fullsystem should be loaded
     :param load_yellow: if yellow fullsystem should be loaded
     :param load_diagnostics: if diagnostics should be loaded
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
-    :return: the Thunderscope Config for this view
+    :return: the Thunderscope Config and RobotView widget for this view
     """
+    proto_unix_io_map = {
+        ProtoUnixIOTypes.SIM: ProtoUnixIO(),
+        ProtoUnixIOTypes.CURRENT: ProtoUnixIO(),
+    }
 
-    def get_extra_widgets(proto_unix_io):
-        """Gets the extra widgets for the fullsystem tab
-        :param proto_unix_io: the proto unix io to configure widgets with
-        :return: list of widget data for the extra widgets
-        """
-        extra_widgets = [configure_robot_view_fullsystem(proto_unix_io)]
-        extra_widgets.append(configure_estop(proto_unix_io))
-        return extra_widgets
-
-    proto_unix_io_map = {ProtoUnixIOTypes.SIM: ProtoUnixIO()}
     tabs = []
 
     # Must be called before widgets are initialized below
     initialize_application()
 
+    available_control_modes = [
+        IndividualRobotMode.NONE,
+        IndividualRobotMode.MANUAL,
+    ]
+    if load_blue or load_yellow:
+        available_control_modes.append(IndividualRobotMode.AI)
+
+    robot_view = configure_robot_view(
+        proto_unix_io_map[ProtoUnixIOTypes.CURRENT],
+        available_control_modes,
+    )
+
     if load_blue:
-        proto_unix_io_map[ProtoUnixIOTypes.BLUE] = ProtoUnixIO()
-        proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
-            ProtoUnixIOTypes.BLUE
+        proto_unix_io_map[ProtoUnixIOTypes.BLUE] = proto_unix_io_map[
+            ProtoUnixIOTypes.CURRENT
         ]
         tabs.append(
             TScopeTab(
@@ -556,16 +558,16 @@ def configure_ai_or_diagnostics(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=get_extra_widgets(
-                        proto_unix_io_map[ProtoUnixIOTypes.BLUE]
-                    ),
+                    extra_widgets=[
+                        robot_view,
+                        configure_estop(proto_unix_io_map[ProtoUnixIOTypes.CURRENT]),
+                    ],
                 ),
             )
         )
     elif load_yellow:
-        proto_unix_io_map[ProtoUnixIOTypes.YELLOW] = ProtoUnixIO()
-        proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
-            ProtoUnixIOTypes.YELLOW
+        proto_unix_io_map[ProtoUnixIOTypes.YELLOW] = proto_unix_io_map[
+            ProtoUnixIOTypes.CURRENT
         ]
         tabs.append(
             TScopeTab(
@@ -577,36 +579,25 @@ def configure_ai_or_diagnostics(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=get_extra_widgets(
-                        proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
-                    ),
+                    extra_widgets=[
+                        robot_view,
+                        configure_estop(proto_unix_io_map[ProtoUnixIOTypes.CURRENT]),
+                    ],
                 ),
             )
         )
 
     if load_diagnostics:
-        proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS] = (
-            proto_unix_io_map[ProtoUnixIOTypes.BLUE]
-            if load_blue
-            else (
-                proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
-                if load_yellow
-                else ProtoUnixIO()
-            )
-        )
+        proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS] = proto_unix_io_map[
+            ProtoUnixIOTypes.CURRENT
+        ]
+
+        diagnostics_extra_widgets = [
+            configure_estop(proto_unix_io_map[ProtoUnixIOTypes.CURRENT])
+        ]
         if not load_blue and not load_yellow:
-            proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
-                ProtoUnixIOTypes.DIAGNOSTICS
-            ]
-        diagnostics_extra_widgets = (
-            []
-            if load_blue or load_yellow
-            else [
-                configure_robot_view_diagnostics(
-                    proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
-                ),
-            ]
-        )
+            diagnostics_extra_widgets.append(robot_view)
+
         tabs.append(
             TScopeTab(
                 name="Robot Diagnostics",
@@ -615,12 +606,11 @@ def configure_ai_or_diagnostics(
                         ProtoUnixIOTypes.DIAGNOSTICS
                     ],
                     current_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.CURRENT],
-                    extra_widgets=[
-                        configure_estop(proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS])
-                    ]
-                    + diagnostics_extra_widgets,
+                    extra_widgets=diagnostics_extra_widgets,
                 ),
             )
         )
 
-    return TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs)
+    config = TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs)
+
+    return config, robot_view.widget

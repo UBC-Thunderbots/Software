@@ -23,7 +23,8 @@ class CreaseDefenderTacticTest
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr =
+        std::make_shared<TbotsProto::AiConfig>();
 };
 
 TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
@@ -38,13 +39,13 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
         TestUtil::createStationaryRobotStatesWithId({initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config_ptr);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
+        [tactic](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -52,8 +53,8 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
+        [tactic](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             if (world_ptr->ball().velocity().length() > 0.01)
             {
                 yield("Ball was hit");
@@ -81,7 +82,7 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config_ptr);
 
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);
@@ -105,7 +106,8 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [target_defend_region, defender_regions, tactic](
-            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // Check that tactic is done
             while (!tactic->done())
             {

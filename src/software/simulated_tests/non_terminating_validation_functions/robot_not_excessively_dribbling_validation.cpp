@@ -5,7 +5,8 @@
 void robotNotExcessivelyDribbling(RobotId robot_id, std::shared_ptr<World> world_ptr,
                                   ValidationCoroutine::push_type& yield)
 {
-    auto robot_has_ball_in_dribbler = [robot_id](std::shared_ptr<World> world_ptr) {
+    auto robot_has_ball_in_dribbler = [robot_id](std::shared_ptr<World> world_ptr)
+    {
         std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
         CHECK(robot_optional.has_value())

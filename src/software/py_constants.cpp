@@ -8,6 +8,7 @@ PYBIND11_MODULE(py_constants, m)
 {
     m.attr("BALL_MAX_SPEED_METERS_PER_SECOND") = BALL_MAX_SPEED_METERS_PER_SECOND;
     m.attr("ROBOT_MAX_HEIGHT_METERS")          = ROBOT_MAX_HEIGHT_METERS;
+    m.attr("VIRTUAL_OBSTACLES_UNIX_PATH")      = VIRTUAL_OBSTACLES_UNIX_PATH;
     m.attr("ROBOT_MAX_RADIUS_METERS")          = ROBOT_MAX_RADIUS_METERS;
     m.attr("ROBOT_MAX_HEIGHT_MILLIMETERS") =
         ROBOT_MAX_HEIGHT_METERS * MILLIMETERS_PER_METER;
@@ -72,14 +73,16 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("WORLD_STATE_RECEIVED_TRIGGER_PATH") = WORLD_STATE_RECEIVED_TRIGGER_PATH;
 
     // Multicast Channels
-    m.def("getRobotMulticastChannel", [](py::args& args) {
-        if (args.size() != 1)
-        {
-            throw std::runtime_error("must provide channel number only");
-        }
+    m.def("getRobotMulticastChannel",
+          [](py::args& args)
+          {
+              if (args.size() != 1)
+              {
+                  throw std::runtime_error("must provide channel number only");
+              }
 
-        return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
-    });
+              return ROBOT_MULTICAST_CHANNELS.at(args[0].cast<int>());
+          });
 
     // Ports
     m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
@@ -140,13 +143,14 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("DIV_A_NUM_ROBOTS")       = DIV_A_NUM_ROBOTS;
     m.attr("DIV_B_NUM_ROBOTS")       = DIV_B_NUM_ROBOTS;
 
-    // Redis Keys
-    m.attr("ROBOT_ID_REDIS_KEY")                = ROBOT_ID_REDIS_KEY;
-    m.attr("ROBOT_MULTICAST_CHANNEL_REDIS_KEY") = ROBOT_MULTICAST_CHANNEL_REDIS_KEY;
-    m.attr("ROBOT_NETWORK_INTERFACE_REDIS_KEY") = ROBOT_NETWORK_INTERFACE_REDIS_KEY;
-    m.attr("ROBOT_BATTERY_VOLTAGE_REDIS_KEY")   = ROBOT_BATTERY_VOLTAGE_REDIS_KEY;
-    m.attr("ROBOT_CURRENT_DRAW_REDIS_KEY")      = ROBOT_CURRENT_DRAW_REDIS_KEY;
-    m.attr("CAPACITOR_VOLTAGE_REDIS_KEY")       = ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY;
+    // TOML Config Keys and File Path
+    m.attr("ROBOT_ID_CONFIG_KEY")                = ROBOT_ID_CONFIG_KEY;
+    m.attr("ROBOT_MULTICAST_CHANNEL_CONFIG_KEY") = ROBOT_MULTICAST_CHANNEL_CONFIG_KEY;
+    m.attr("ROBOT_NETWORK_INTERFACE_CONFIG_KEY") = ROBOT_NETWORK_INTERFACE_CONFIG_KEY;
+    m.attr("ROBOT_KICK_CONSTANT_CONFIG_KEY")     = ROBOT_KICK_CONSTANT_CONFIG_KEY;
+    m.attr("ROBOT_KICK_EXP_COEFF_CONFIG_KEY")    = ROBOT_KICK_EXP_COEFF_CONFIG_KEY;
+    m.attr("ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY")  = ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY;
+    m.attr("TOML_CONFIG_FILE_PATH")              = TOML_CONFIG_FILE_PATH;
 
     // Robot power constants
     m.attr("MIN_CAPACITOR_VOLTAGE")   = MIN_CAPACITOR_VOLTAGE;
@@ -158,4 +162,9 @@ PYBIND11_MODULE(py_constants, m)
     // Robot Communication
     m.attr("NUM_TIMES_SEND_STOP")    = NUM_TIMES_SEND_STOP;
     m.attr("DISCONNECT_DURATION_MS") = DISCONNECT_DURATION_MS;
+
+    // Robot Diagnostics Constants
+    m.attr("AUTO_CHIP_DISTANCE_DEFAULT_M")     = AUTO_CHIP_DISTANCE_DEFAULT_M;
+    m.attr("AUTO_KICK_SPEED_DEFAULT_M_PER_S")  = AUTO_KICK_SPEED_DEFAULT_M_PER_S;
+    m.attr("WHEEL_ROTATION_MAX_SPEED_M_PER_S") = WHEEL_ROTATION_MAX_SPEED_M_PER_S;
 }

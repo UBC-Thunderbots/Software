@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <iostream>
 #include <numeric>
+#include <optional>
 
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/parameters.pb.h"
@@ -45,6 +46,33 @@ void cleanup(int signal_num)
     exit(0);
 }
 
+/**
+ * Parses a string into a LEVELS enum value of DEBUG, INFO, WARNING, or FATAL.
+ * If the log level is not recognised, returns std::nullopt
+ *
+ * @param log_level The log level argument as a string
+ */
+std::optional<LEVELS> parseLogLevel(const std::string& log_level)
+{
+    if (log_level == "DEBUG")
+    {
+        return DEBUG;
+    }
+    else if (log_level == "INFO")
+    {
+        return INFO;
+    }
+    else if (log_level == "WARNING")
+    {
+        return WARNING;
+    }
+    else if (log_level == "FATAL")
+    {
+        return FATAL;
+    }
+    return std::nullopt;
+}
+
 int main(int argc, char** argv)
 {
     // Setup dynamic parameters
@@ -54,6 +82,7 @@ int main(int argc, char** argv)
         std::string runtime_dir     = "/tmp/tbots";
         bool friendly_colour_yellow = false;
         bool ci                     = false;
+        std::string log_level       = "DEBUG";
     };
 
     CommandLineArgs args;
@@ -70,6 +99,9 @@ int main(int argc, char** argv)
     desc.add_options()(
         "ci", boost::program_options::bool_switch(&args.ci),
         "If true, then the World timestamp will be used to as the time provider for ProtoLogger");
+    desc.add_options()(
+        "log_level", boost::program_options::value<std::string>(&args.log_level),
+        "The minimum g3log level that will be printed (DEBUG|INFO|WARNING|FATAL)");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -91,11 +123,21 @@ int main(int argc, char** argv)
             TracySetProgramName("Thunderbots: Yellow");
         }
 
+        std::optional<LEVELS> minimum_log_level = parseLogLevel(args.log_level);
+
+        if (!minimum_log_level.has_value())
+        {
+            std::cout << "error: --log_level=" << args.log_level
+                      << " is not a valid option." << std::endl;
+            return 1;
+        }
+
         std::function<double()> time_provider;
         if (!args.ci)
         {
             // Return the current time since epoch in seconds
-            time_provider = []() {
+            time_provider = []()
+            {
                 return std::chrono::duration<double>(
                            std::chrono::system_clock::now().time_since_epoch())
                     .count();
@@ -109,7 +151,8 @@ int main(int argc, char** argv)
         }
         proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, time_provider,
                                                      args.friendly_colour_yellow);
-        LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger);
+        LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger, true,
+                                          *minimum_log_level);
         TbotsProto::ThunderbotsConfig tbots_proto;
 
         // Override friendly color
@@ -121,8 +164,8 @@ int main(int argc, char** argv)
         if (args.ci)
         {
             // Update the time provider for ProtoLogger
-            proto_logger->updateTimeProvider(
-                [&backend]() { return backend->getLastWorldTimeSec(); });
+            proto_logger->updateTimeProvider([&backend]()
+                                             { return backend->getLastWorldTimeSec(); });
         }
 
         auto sensor_fusion =
@@ -133,9 +176,8 @@ int main(int argc, char** argv)
         auto tactic_override_listener =
             ThreadedProtoUnixListener<TbotsProto::AssignedTacticPlayControlParams>(
                 args.runtime_dir + TACTIC_OVERRIDE_PATH,
-                [&ai](TbotsProto::AssignedTacticPlayControlParams input) {
-                    ai->overrideTactics(input);
-                });
+                [&ai](TbotsProto::AssignedTacticPlayControlParams input)
+                { ai->overrideTactics(input); });
 
         auto play_override_listener = ThreadedProtoUnixListener<TbotsProto::Play>(
             args.runtime_dir + PLAY_OVERRIDE_PATH,
@@ -148,6 +190,7 @@ int main(int argc, char** argv)
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(ai);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(sensor_fusion);
+        backend->Subject<TbotsProto::VirtualObstacles>::registerObserver(sensor_fusion);
 
         // Handle some of the signals that we manually send when we want to shut down full
         // system cleanly. SIGTERM is sent by Thunderscope to stop full system

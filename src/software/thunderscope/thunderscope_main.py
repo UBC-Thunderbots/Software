@@ -8,6 +8,11 @@ import threading
 import google.protobuf
 from google.protobuf.internal import api_implementation
 
+from software.thunderscope.binary_context_managers.runtime_manager import (
+    runtime_manager_instance,
+)
+
+
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (
     f"Trying to use the {protobuf_impl_type} protobuf implementation. "
@@ -16,18 +21,20 @@ assert protobuf_impl_type == "upb", (
 )
 
 from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
+from software.thunderscope.constants import (
+    EstopMode,
+    ProtoUnixIOTypes,
+)
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import (
-    CI_DURATION_S,
-)
+from software.thunderscope.constants import CI_DURATION_S
 from software.thunderscope.util import *
 
 from software.thunderscope.binary_context_managers.full_system import FullSystem
@@ -35,7 +42,6 @@ from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
-
 
 ###########################################################################
 #                         Thunderscope Main                               #
@@ -101,6 +107,14 @@ if __name__ == "__main__":
         help="Visualize C++ Tests",
     )
     parser.add_argument(
+        "--log_level",
+        action="store",
+        help="Minimum g3log level for full_system logs",
+        choices=[level for level in LogLevels],
+        default=LogLevels.DEBUG,
+        type=LogLevels,
+    )
+    parser.add_argument(
         "--blue_log",
         action="store",
         help="Replay folder for the blue full_system",
@@ -153,12 +167,7 @@ if __name__ == "__main__":
         default=0,
         help="Which channel to communicate over",
     )
-    parser.add_argument(
-        "--enable_radio",
-        action="store_true",
-        default=False,
-        help="Whether to use radio (True) or Wi-Fi (False) for sending primitives to robots",
-    )
+
     parser.add_argument(
         "--visualization_buffer_size",
         action="store",
@@ -296,7 +305,7 @@ if __name__ == "__main__":
     # send/recv packets over the provided multicast channel.
 
     elif args.run_blue or args.run_yellow or args.run_diagnostics:
-        tscope_config = config.configure_ai_or_diagnostics(
+        tscope_config, robot_view_widget = config.configure_ai_or_diagnostics(
             args.run_blue,
             args.run_yellow,
             args.run_diagnostics,
@@ -350,17 +359,9 @@ if __name__ == "__main__":
                     robot_communication.toggle_keyboard_estop
                 )
 
-            if args.run_diagnostics:
-                for tab in tscope_config.tabs:
-                    if hasattr(tab, "widgets"):
-                        robot_view_widget = tab.find_widget("Robot View")
-                        if robot_view_widget is not None:
-                            robot_view_widget.individual_robot_control_mode_signal.connect(
-                                lambda robot_id,
-                                robot_mode: robot_communication.toggle_individual_robot_control_mode(
-                                    robot_id, robot_mode
-                                )
-                            )
+            config.connect_robot_view_to_robot_communication(
+                robot_view_widget, robot_communication
+            )
 
             if args.run_blue or args.run_yellow:
                 full_system_runtime_dir = (
@@ -374,6 +375,7 @@ if __name__ == "__main__":
                     friendly_colour_yellow=friendly_colour_yellow,
                     should_restart_on_crash=True,
                     run_sudo=args.sudo,
+                    log_level=args.log_level,
                 ) as full_system:
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
@@ -437,25 +439,32 @@ if __name__ == "__main__":
                     tick_rate_ms, tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], tscope
                 )
 
+        # Fetch the AI runtime/backends
+        runtime_config = runtime_manager_instance.fetch_runtime_config()
+
         # Launch all binaries
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
+            path_to_binary=runtime_config.get_blue_runtime_path(),
             full_system_runtime_dir=args.blue_full_system_runtime_dir,
             debug_full_system=args.debug_blue_full_system,
             friendly_colour_yellow=False,
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
+            log_level=args.log_level,
         ) as blue_fs, FullSystem(
+            path_to_binary=runtime_config.get_yellow_runtime_path(),
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
             friendly_colour_yellow=True,
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
+            log_level=args.log_level,
         ) as yellow_fs, Gamecontroller(
-            suppress_logs=(not args.verbose)
+            suppress_logs=(not args.verbose),
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -485,9 +494,14 @@ if __name__ == "__main__":
                 autoref_proto_unix_io,
             )
             gamecontroller.setup_proto_unix_io(
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
-                autoref_proto_unix_io,
+                blue_full_system_proto_unix_io=tscope.proto_unix_io_map[
+                    ProtoUnixIOTypes.BLUE
+                ],
+                yellow_full_system_proto_unix_io=tscope.proto_unix_io_map[
+                    ProtoUnixIOTypes.YELLOW
+                ],
+                autoref_proto_unix_io=autoref_proto_unix_io,
+                simulator_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
             )
             if args.enable_autoref:
                 autoref.setup_ssl_wrapper_packets(

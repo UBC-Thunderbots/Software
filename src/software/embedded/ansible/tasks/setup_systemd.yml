@@ -15,9 +15,21 @@
         dest: ~/thunderbots_binaries/
         copy_links: true
 
+    - name: Sync Thunderloop MD5 Hash
+      ansible.posix.synchronize:
+        src: "{{ playbook_dir }}/../../hash_thunderloop_binary.sh"
+        dest: "~/hash_thunderloop_binary.sh"
+        copy_links: true
+
+    - name: Make MD5 Hash Script Executable
+      ansible.builtin.file:
+        path: "~/hash_thunderloop_binary.sh"
+        mode: "0755"
+
     - name: Compute Thunderloop MD5 Hash
-      command: '/home/{{ ansible_user }}/hash_thunderloop_binary.sh'
+      ansible.builtin.command: "/home/{{ ansible_user }}/hash_thunderloop_binary.sh"
       register: result
+      changed_when: true
 
     - name: Sync Thunderloop systemd file
       become_method: ansible.builtin.sudo

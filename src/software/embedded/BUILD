@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+package(default_visibility = ["//visibility:public"])
 
 config_setting(
     name = "build_nano",
@@ -50,7 +50,9 @@ cc_library(
         "//software/ai/navigator/trajectory:trajectory_path",
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
-        "//software/world",
+        "//software/time:duration",
+        "//software/world:robot_state",
+        "//software/world:team_colour",
     ],
 )
 
@@ -61,14 +63,13 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
-        "//software/embedded/redis",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",
+        "//software/embedded/toml_config",
         "//software/logger:network_logger",
         "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",
-        "//software/world:team",
         "@tracy",
     ],
 )
@@ -107,6 +108,11 @@ cc_binary(
 sh_binary(
     name = "setup_robot_software_deps",
     srcs = ["setup_robot_software_deps.sh"],
+)
+
+filegroup(
+    name = "hash_thunderloop_binary",
+    srcs = ["hash_thunderloop_binary.sh"],
 )
 
 cc_test(

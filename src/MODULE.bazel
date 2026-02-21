@@ -1,1 +1,273 @@
-bazel_dep(name = "bazel_skylib", version = "1.5.0")
+module(
+    name = "thunderbots",
+    version = "head",
+    repo_name = "Thunderbots",
+)
+
+##############################################################
+# Import Dependencies available in the Bazel Central Registry
+##############################################################
+bazel_dep(name = "googletest", version = "1.15.2")
+bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "pybind11_bazel", version = "2.13.6")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "rules_pkg", version = "1.1.0")
+bazel_dep(name = "rules_foreign_cc", version = "0.14.0")
+bazel_dep(name = "rules_python", version = "1.4.1")
+bazel_dep(name = "eigen", version = "3.4.0.bcr.3")
+bazel_dep(name = "zlib", version = "1.3.1.bcr.6")
+bazel_dep(name = "nanopb", version = "0.4.9.1.bcr.2")
+bazel_dep(name = "protobuf", version = "31.1")
+bazel_dep(name = "rules_proto", version = "7.1.0")
+bazel_dep(name = "yaml-cpp", version = "0.8.0")
+bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
+bazel_dep(name = "pybind11_protobuf", version = "0.0.0-20250210-f02a2b7")
+bazel_dep(name = "bazel_lib", version = "3.1.0")
+
+##############################################
+# Load PIP packages and our Requirements
+##############################################
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.defaults(python_version = "3.12")
+python.toolchain(
+    is_default = True,
+    python_version = "3.12",
+)
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "thunderscope_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
+    requirements_lock = "//software/thunderscope:requirements_lock.txt",
+)
+use_repo(pip, "thunderscope_deps")
+pip.parse(
+    hub_name = "ansible_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
+    requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
+)
+use_repo(pip, "ansible_deps")
+pip.parse(
+    hub_name = "simulated_tests_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
+    requirements_lock = "//software/simulated_tests:requirements_lock.txt",
+)
+use_repo(pip, "simulated_tests_deps")
+pip.parse(
+    hub_name = "robot_diagnostics_cli_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
+    requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
+)
+use_repo(pip, "robot_diagnostics_cli_deps")
+pip.parse(
+    hub_name = "nanopb_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    python_version = "3.12",
+    requirements_lock = "//starlark/nanopb:requirements_lock.txt",
+)
+use_repo(pip, "nanopb_deps")
+
+##############################################
+# Configure Dependencies
+##############################################
+# Configure pybind11 since it is special!
+pybind11_configure = use_extension("@pybind11_bazel//:internal_configure.bzl", "internal_configure_extension")
+use_repo(pybind11_configure, "pybind11")
+
+###########################################################################
+# Setup non Bazel Central Registry dependencies & Non MODULE supported deps
+###########################################################################
+# HTTP Archives Background:
+# The below files are special repos as they are stored in the bazel REPO cache
+# across your system. This is a special feature of http_archive and archive_override
+# According to the new Bzlmod specifications, we should always prefer archive_override
+# over http_archive if possible as they are literally the same under the hood.
+# The exception to this is if the repo does not contain a MODULE.bazel support
+###########################################################################
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "tomlplusplus",
+    build_file = "@//extlibs:tomlplusplus.BUILD",
+    sha256 = "8517f65938a4faae9ccf8ebb36631a38c1cadfb5efa85d9a72e15b9e97d25155",
+    strip_prefix = "tomlplusplus-3.4.0",
+    urls = ["https://github.com/marzer/tomlplusplus/archive/refs/tags/v3.4.0.tar.gz"],
+)
+
+http_archive(
+    name = "g3log",
+    build_file = "@//extlibs:g3log.BUILD",
+    sha256 = "2177e6dfd86fa7465c44c8ef5c3b6ab98ffc94e1130355d6982f7d886cb7bec9",
+    strip_prefix = "g3log-2.4",
+    url = "https://github.com/KjellKod/g3log/archive/refs/tags/2.4.zip",
+)
+
+http_archive(
+    name = "g3sinks",
+    build_file = "@//extlibs:g3sinks.BUILD",
+    sha256 = "77632432de1ec456987c7d83c6eb163bb42f0eb9df6e0bdf63bcf7961c1f6c70",
+    strip_prefix = "g3sinks-1.1.3",
+    url = "https://github.com/KjellKod/g3sinks/archive/1.1.3.zip",
+)
+
+http_archive(
+    name = "base64",
+    build_file = "@//extlibs:base64.BUILD",
+    sha256 = "5e5366919938b834ca95fec4c2a80ad0c002872175d43226c933d25e40572883",
+    strip_prefix = "cpp-base64-2.rc.08",
+    url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
+)
+
+bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
+archive_override(
+    module_name = "rules_boost",
+    # Made with: shasum -a 256  rules_boost-2a003f812e9a13b970e4100d96856b09ee13a582.tar.gz
+    sha256 = "f3125bbcb4adb5863980562d6092f2c07571cc9b2d4510e3b7f829fd43b44607",
+    strip_prefix = "rules_boost-2a003f812e9a13b970e4100d96856b09ee13a582",
+    url = "https://github.com/nelhage/rules_boost/archive/2a003f812e9a13b970e4100d96856b09ee13a582.tar.gz",
+)
+
+non_module_boost_repositories = use_extension("@com_github_nelhage_rules_boost//:boost/repositories.bzl", "non_module_dependencies")
+use_repo(
+    non_module_boost_repositories,
+    "boost",
+)
+
+bazel_dep(name = "hedron_compile_commands", version = "1.0.5", dev_dependency = True)
+archive_override(
+    module_name = "hedron_compile_commands",
+    sha256 = "658122cfb1f25be76ea212b00f5eb047d8e2adc8bcf923b918461f2b1e37cdf2",
+    strip_prefix = "bazel-compile-commands-extractor-4f28899228fb3ad0126897876f147ca15026151e",
+    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/4f28899228fb3ad0126897876f147ca15026151e.tar.gz",
+)
+
+bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
+archive_override(
+    module_name = "platformio_rules",
+    sha256 = "a80357230e27b8b57b8deffaa82684d3ee88b2284e4a767a9d8a692e9034e125",
+    strip_prefix = "platformio_rules-3cd18c7c7bb2482fe3cbb58898245dd675421234",
+    url = "https://github.com/mum4k/platformio_rules/archive/3cd18c7c7bb2482fe3cbb58898245dd675421234.tar.gz",
+)
+
+# This is overridden despite being in BCR since it contains protoc v31.1. We can remove this once BCR updates
+archive_override(
+    module_name = "toolchains_protoc",
+    sha256 = "a694e39b16064011c11ce8719207736d1cd2ed5f56a4c73534174da7eea0dd2e",
+    strip_prefix = "toolchains_protoc-ea1a220e47b4c9c654f3bd198107c605ae27cf06",
+    url = "https://github.com/aspect-build/toolchains_protoc/archive/ea1a220e47b4c9c654f3bd198107c605ae27cf06.tar.gz",
+)
+
+http_archive(
+    name = "bullet",
+    build_file = "@//extlibs:bullet.BUILD",
+    sha256 = "0af974ece80e528182ac47a0c0b1506b5aeeb570fdb7d4fd7044efe67babc7a1",
+    strip_prefix = "bullet3-272c7099d3ba8ac9e8c142e361e8d4cf5d91b8f2",
+    url = "https://github.com/bulletphysics/bullet3/archive/272c7099d3ba8ac9e8c142e361e8d4cf5d91b8f2.tar.gz",
+)
+
+http_archive(
+    name = "sml",
+    build_file = "@//extlibs:sml.BUILD",
+    sha256 = "e3a8a76495d81b479fa53f2301b55d07251178ca3d5da781d5709814ec8baec3",
+    strip_prefix = "sml-07a503cc3f18de2b861ea15d8357d3b3c0c978d6",
+    url = "https://github.com/boost-ext/sml/archive/07a503cc3f18de2b861ea15d8357d3b3c0c978d6.tar.gz",
+)
+
+http_archive(
+    name = "tracy",
+    build_file = "@//extlibs:tracy.BUILD",
+    sha256 = "c24ce6179df7efb8a114fe409d197e26e4b937c6fc1258bea15840b15b1f79ff",
+    strip_prefix = "tracy-37aff70dfa50cf6307b3fee6074d627dc2929143",
+    url = "https://github.com/wolfpld/tracy/archive/37aff70dfa50cf6307b3fee6074d627dc2929143.tar.gz",
+)
+
+http_archive(
+    name = "munkres_cpp",
+    build_file = "@//extlibs:munkres_cpp.BUILD",
+    sha256 = "a59d8cb17b0776abb2c5b6341f6863e705406deb1f3dfb5a6e07af187c4203f4",
+    strip_prefix = "munkres-cpp-61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
+    url = "https://github.com/saebyn/munkres-cpp/archive/61086fcf5b3a8ad4bda578cdc2d1dca57b548786.tar.gz",
+)
+
+http_archive(
+    name = "LTC4151",
+    build_file = "@//extlibs:LTC4151.BUILD",
+    sha256 = "6aa2dd380a13b08366338cdf0fbbeeeed96887512ac7b0753ee6ea1e8856df31",
+    strip_prefix = "LTC4151-729952f10bcdcf359877b6f728565c17a8f17423",
+    url = "https://github.com/kerrydwong/LTC4151/archive/729952f10bcdcf359877b6f728565c17a8f17423.tar.gz",
+)
+
+http_archive(
+    name = "trinamic",
+    build_file = "@//extlibs:trinamic.BUILD",
+    sha256 = "4c1640a87347afdc4d5954752f0e773f6d9fbb0ea0fb1481dbdb3012ec00ef8b",
+    strip_prefix = "TMC-API-0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
+    url = "https://github.com/analogdevicesinc/TMC-API/archive/0cd695fab6d43ceb121af4b8608e5d92b14e1ce9.tar.gz",
+)
+
+##############################################
+# Register our Toolchains
+##############################################
+register_toolchains("//toolchains/python:py_toolchain")
+
+register_toolchains(
+    "//toolchains/python:k8_jetson_nano_cross_compile_py_cc_toolchain",
+    "//toolchains/python:py_cc_toolchain_host_x86_64",
+    "//toolchains/python:py_cc_toolchain_host_aarch64",
+)
+
+register_toolchains(
+    "//toolchains/cc:cc_toolchain_for_k8_jetson_nano_cross_compile",
+    "//toolchains/cc:cc_toolchain_for_k8",
+    "//toolchains/cc:cc_toolchain_for_aarch64",
+)
+
+##############################################
+# New local repos for our toolchains/compilers
+##############################################
+new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
+
+new_local_repository(
+    name = "linux_k8_gcc",
+    build_file = "@//extlibs:linux_k8_gcc.BUILD",
+    path = "/",
+)
+
+new_local_repository(
+    name = "linux_aarch64_gcc",
+    build_file = "@//extlibs:linux_aarch64_gcc.BUILD",
+    path = "/",
+)
+
+# libclang-dev is installed into the system through setup_software.sh
+new_local_repository(
+    name = "libclang",
+    build_file = "@//extlibs:libclang.BUILD",
+    path = "/usr/lib/llvm-6.0/",
+)
+
+new_local_repository(
+    name = "k8_jetson_nano_cross_compile_gcc",
+    build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
+    path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_host",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/opt/tbotspython/py_headers/include/python3.12/",
+)
+
+new_local_repository(
+    name = "py_cc_toolchain_for_k8_jetson_nano_cross_compile",
+    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
+)
+
+##############################################
+# Workarounds and Fixes Below (hacks)
+##############################################

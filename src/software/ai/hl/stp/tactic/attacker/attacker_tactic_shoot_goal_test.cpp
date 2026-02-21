@@ -40,14 +40,15 @@ TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
 
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({initial_robot_point});
-    auto tactic = std::make_shared<AttackerTactic>(ai_config);
+    auto tactic = std::make_shared<AttackerTactic>(
+        std::make_shared<TbotsProto::AiConfig>(ai_config));
     // Make it very obvious when we decide to chip
     tactic->updateControlParams(Point(0, field.fieldLines().yMin()));
     setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
+        [tactic](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic not done");

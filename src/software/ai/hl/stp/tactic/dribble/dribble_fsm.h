@@ -4,30 +4,18 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/time_to_travel.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 
-struct DribbleFSM
+/**
+ * Finite State Machine class for Dribbling
+ */
+struct DribbleFSM : TacticFSM<DribbleFSM>
 {
    public:
-    class GetPossession;
-    class Dribble;
-    class LoseBall;
-
-    /**
-     * Constructor for DribbleFSM
-     *
-     * @param dribble_tactic_config The config to fetch parameters from
-     */
-    explicit DribbleFSM(TbotsProto::DribbleTacticConfig dribble_tactic_config)
-        : dribble_tactic_config(dribble_tactic_config),
-          continuous_dribbling_start_point(Point())
-    {
-    }
-
     struct ControlParams
     {
         // The destination for dribbling the ball
@@ -38,7 +26,18 @@ struct DribbleFSM
         bool allow_excessive_dribbling;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    using Update = TacticFSM<DribbleFSM>::Update;
+
+    class GetPossession;
+    class Dribble;
+    class LoseBall;
+
+    /**
+     * Constructor for DribbleFSM
+     *
+     * @param ai_config_ptr shared ptr to ai_config
+     */
+    explicit DribbleFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -125,13 +124,6 @@ struct DribbleFSM
     void dribble(const Update &event);
 
     /**
-     * Start dribbling
-     *
-     * @param event DribbleFSM::Update
-     */
-    void startDribble(const Update &event);
-
-    /**
      * Action to lose possession of the ball
      *
      * @param event DribbleFSM::Update
@@ -189,28 +181,22 @@ struct DribbleFSM
         DEFINE_SML_GUARD(lostPossession)
         DEFINE_SML_GUARD(dribblingDone)
         DEFINE_SML_GUARD(shouldLoseBall)
-        DEFINE_SML_ACTION(startDribble)
         DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getPossession)
         DEFINE_SML_ACTION(dribble)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetPossession_S + Update_E[havePossession_G] / startDribble_A = Dribble_S,
+            *GetPossession_S + Update_E[havePossession_G] / dribble_A = Dribble_S,
             GetPossession_S + Update_E[!havePossession_G] / getPossession_A,
-            Dribble_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
             Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A      = LoseBall_S,
+            Dribble_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
             Dribble_S + Update_E[!dribblingDone_G] / dribble_A,
             Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
-            LoseBall_S + Update_E[!lostPossession_G] / loseBall_A,
-            LoseBall_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
-            X + Update_E[lostPossession_G] / getPossession_A          = GetPossession_S,
-            X + Update_E[!dribblingDone_G] / dribble_A                = Dribble_S,
-            X + Update_E / dribble_A                                  = X);
+            LoseBall_S + Update_E[shouldLoseBall_G] / loseBall_A,
+            LoseBall_S + Update_E[!shouldLoseBall_G] / getPossession_A = GetPossession_S,
+            X + Update_E[lostPossession_G] / getPossession_A           = GetPossession_S,
+            X + Update_E[!dribblingDone_G] / dribble_A                 = Dribble_S,
+            X + Update_E / dribble_A                                   = X);
     }
-
-   private:
-    // the dribble tactic config
-    TbotsProto::DribbleTacticConfig dribble_tactic_config;
-    Point continuous_dribbling_start_point;
 };

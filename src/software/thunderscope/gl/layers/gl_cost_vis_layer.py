@@ -4,7 +4,6 @@ from pyqtgraph.opengl import *
 import pyqtgraph as pg
 
 import time
-import queue
 import numpy as np
 
 from proto.world_pb2 import World
@@ -16,6 +15,7 @@ from software.thunderscope.gl.graphics.gl_heatmap import GLHeatmap
 from software.thunderscope.gl.graphics.gl_gradient_legend import GLGradientLegend
 
 from software.thunderscope.constants import DepthValues
+from typing import override
 
 
 class GLCostVisOverlayLayer(GLLayer):
@@ -32,6 +32,7 @@ class GLCostVisOverlayLayer(GLLayer):
         self.cost_vis_layer = cost_vis_layer
         self.legend_graphic: GLGradientLegend = None
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         if not self.legend_graphic:
@@ -97,15 +98,12 @@ class GLCostVisLayer(GLLayer):
 
         self.heatmap_graphic = GLHeatmap(parent_item=self, color_map=self.color_map)
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         self.cached_world = self.world_buffer.get(block=False)
         field = self.cached_world.field
-
-        try:
-            cost_vis = self.cost_visualization_buffer.queue.get_nowait()
-        except queue.Empty:
-            cost_vis = None
+        cost_vis = self.cost_visualization_buffer.get(block=False, return_cached=False)
 
         self.cost_vis_overlay_layer.refresh_graphics()
 

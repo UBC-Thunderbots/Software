@@ -1,5 +1,8 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
+#include <cmath>
+
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
@@ -62,9 +65,17 @@ MovePrimitive::generatePrimitiveProtoMessage(
         max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
-    // TODO (#3104): The fieldBounary should be shrunk by the robot radius before being
-    //  passed to the planner.
-    Rectangle navigable_area = world.field().fieldBoundary();
+    // Shrink the field by the radius of robot to ensure robot don't go out of bounds, if
+    // we are in a game Return normal field boundaries if not in a game
+    Rectangle field_boundary = world.field().fieldBoundary();
+
+    double shrink_amount = world.gameState().isPlaying() ? ROBOT_MAX_RADIUS_METERS : 0.0;
+    Point neg_x_neg_y_corner(field_boundary.negXNegYCorner().x() + shrink_amount,
+                             field_boundary.negXNegYCorner().y() + shrink_amount);
+    Point pos_x_pos_y_corner(field_boundary.posXPosYCorner().x() - shrink_amount,
+                             field_boundary.posXPosYCorner().y() - shrink_amount);
+    Rectangle navigable_area = Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
+
 
     // If the robot is in a static obstacle, then we should first move to the nearest
     // point out
@@ -112,8 +123,6 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     if (!traj_path.has_value())
     {
-        LOG(WARNING) << "Could not find trajectory path for robot " << robot.id()
-                     << " to move to " << destination;
         return std::make_pair(std::nullopt, std::move(createStopPrimitiveProto()));
     }
 
@@ -184,8 +193,25 @@ void MovePrimitive::updateObstacles(
     // Separately store the non-robot + non-ball obstacles
     field_obstacles =
         obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
-
     obstacles = field_obstacles;
+
+    // Adding virtual obstacles
+    auto virtual_obstacles = world.getVirtualObstacles().obstacles();
+    for (TbotsProto::Obstacle &obstacle : virtual_obstacles)
+    {
+        if (!obstacle.has_polygon())
+        {
+            LOG(WARNING)
+                << "Virtual Obstacles contain obstacle that is not a polygon. Shape ignored";
+
+            continue;
+        }
+
+        Polygon obstacle_polygon     = createPolygon(obstacle.polygon());
+        ObstaclePtr current_obstacle = obstacle_factory.createFromShape(obstacle_polygon);
+        obstacles.push_back(current_obstacle);
+    }
+
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {

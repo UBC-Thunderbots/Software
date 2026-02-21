@@ -23,7 +23,6 @@ class PenaltyKickTacticTest : public SimulatedErForceSimPlayTestFixture,
     Point initial_position   = field.friendlyPenaltyMark() + Vector(-0.1, 0);
     RobotStateWithId shooter = {
         0, RobotState(initial_position, Vector(0, 0), Angle::zero(), Angle::zero())};
-    TbotsProto::AiConfig ai_config;
 };
 
 // TODO (#2232): Improve dribbling control so the ball is not lost during this test
@@ -31,7 +30,8 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 {
     RobotStateWithId enemy_robot = GetParam();
 
-    auto tactic               = std::make_shared<PenaltyKickTactic>(ai_config);
+    auto tactic =
+        std::make_shared<PenaltyKickTactic>(std::make_shared<TbotsProto::AiConfig>());
     static RobotId shooter_id = 0;
     setTactic(shooter_id, tactic);
 
@@ -41,12 +41,10 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         ballInPlay,
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            ballNeverMovesBackward(world_ptr, yield);
-        },
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
-        }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { ballNeverMovesBackward(world_ptr, yield); },
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { robotNotExcessivelyDribbling(shooter_id, world_ptr, yield); }};
 
     runTest(field_type, ball, {shooter}, {enemy_robot}, terminating_validation_functions,
             non_terminating_validation_functions, Duration::fromSeconds(10));
@@ -55,7 +53,8 @@ TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 // TODO (#2519): fix and re-enable
 TEST_F(PenaltyKickTacticTest, DISABLED_penalty_no_goalie)
 {
-    auto tactic               = std::make_shared<PenaltyKickTactic>(ai_config);
+    auto tactic =
+        std::make_shared<PenaltyKickTactic>(std::make_shared<TbotsProto::AiConfig>());
     static RobotId shooter_id = 0;
     setTactic(shooter_id, tactic);
 
@@ -65,12 +64,10 @@ TEST_F(PenaltyKickTacticTest, DISABLED_penalty_no_goalie)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         ballInPlay,
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            ballNeverMovesBackward(world_ptr, yield);
-        },
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
-        }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { ballNeverMovesBackward(world_ptr, yield); },
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { robotNotExcessivelyDribbling(shooter_id, world_ptr, yield); }};
 
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(0, -2.5)});
 

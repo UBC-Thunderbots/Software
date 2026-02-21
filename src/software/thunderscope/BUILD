@@ -1,11 +1,12 @@
-package(default_visibility = ["//visibility:public"])
-
-load("@thunderscope_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 compile_pip_requirements(
     name = "requirements",
     src = "requirements.in",
+    requirements_darwin = "requirements_lock.darwin.txt",
     requirements_txt = "requirements_lock.txt",
 )
 
@@ -20,6 +21,7 @@ py_binary(
         ":util",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:runtime_manager",
         "//software/thunderscope/binary_context_managers:simulator",
     ],
 )
@@ -87,7 +89,9 @@ py_library(
         "//software/thunderscope/gl/layers:gl_attacker_layer",
         "//software/thunderscope/gl/layers:gl_cost_vis_layer",
         "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
+        "//software/thunderscope/gl/layers:gl_draw_polygon_obstacle",
         "//software/thunderscope/gl/layers:gl_max_dribble_layer",
+        "//software/thunderscope/gl/layers:gl_movement_field_test_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
         "//software/thunderscope/gl/layers:gl_path_layer",

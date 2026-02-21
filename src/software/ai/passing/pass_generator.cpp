@@ -125,14 +125,15 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
     // The objective function we minimize in gradient descent to improve each pass
     // that we're optimizing
     const auto objective_function =
-        [this, &world](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
-            // get a pass with the new appropriate speed using the new destination
-            return ratePass(world,
-                            Pass::fromDestReceiveSpeed(
-                                world.ball().position(),
-                                Point(pass_array[0], pass_array[1]), passing_config_),
-                            passing_config_);
-        };
+        [this, &world](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array)
+    {
+        // get a pass with the new appropriate speed using the new destination
+        return ratePass(world,
+                        Pass::fromDestReceiveSpeed(world.ball().position(),
+                                                   Point(pass_array[0], pass_array[1]),
+                                                   passing_config_),
+                        passing_config_);
+    };
 
     PassWithRating best_pass{Pass(Point(), Point(), 1.0), -1.0};
     for (const auto& [robot_id, receiving_positions] : receiving_positions_map)

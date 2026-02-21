@@ -103,16 +103,17 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     // Remove pass defender assignments with targets in the defense area
     assignments.erase(
         std::remove_if(assignments.begin(), assignments.end(),
-                       [&field](const auto &assignment) {
+                       [&field](const auto &assignment)
+                       {
                            return assignment.type == PASS_DEFENDER &&
                                   field.pointInFriendlyDefenseArea(assignment.target);
                        }),
         assignments.end());
 
     // Sort the potential assignments by coverage rating in descending order
-    std::sort(assignments.begin(), assignments.end(), [](const auto &a, const auto &b) {
-        return a.coverage_rating > b.coverage_rating;
-    });
+    std::sort(assignments.begin(), assignments.end(),
+              [](const auto &a, const auto &b)
+              { return a.coverage_rating > b.coverage_rating; });
 
     return assignments;
 }
@@ -179,9 +180,9 @@ std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
     }
 
     // Sort goal lanes by angle to the goal in increasing order
-    std::sort(goal_lanes.begin(), goal_lanes.end(), [](const auto &a, const auto &b) {
-        return a.angle_to_goal < b.angle_to_goal;
-    });
+    std::sort(goal_lanes.begin(), goal_lanes.end(),
+              [](const auto &a, const auto &b)
+              { return a.angle_to_goal < b.angle_to_goal; });
 
     std::vector<std::vector<GoalLane>> groups;
 

@@ -36,7 +36,7 @@ function run_clang_format () {
     # clang-format as arguments
     # We remove the last -o flag from the extension string
     find $CURR_DIR/../src/ ${EXTENSION_STRING::-2}  \
-        | xargs -I{} -n1000 $CLANG_BIN -i -style=file
+        | xargs -I{} -n1000 $CLANG_BIN -i -style=file:$CURR_DIR/../.clang-format
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to run clang-format over all files!***\n\n"
@@ -48,7 +48,7 @@ function run_clang_format () {
 function run_bazel_formatting () {
     printf "Running bazel buildifier to format all bazel BUILD files...\n\n"
     cd $BAZEL_ROOT_DIR
-    bazel run @com_github_bazelbuild_buildtools//:buildifier
+    bazel run //starlark/buildifier:buildifier.fix
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to format bazel BUILD files!***\n\n"
@@ -99,6 +99,14 @@ function run_code_spell(){
     fi
 }
 
+function run_md_toc() {
+    printf "Adding table of contents to Markdown files...\n\n"
+    for file in $CURR_DIR/../docs/*.md
+    do
+      /opt/tbotspython/bin/python3 -m md_toc --in-place --no-list-coherence --skip-lines 1 github $file
+    done
+}
+
 function run_git_diff_check(){
     printf "Checking for merge conflict markers...\n\n"
     cd $CURR_DIR && git -c "core.whitespace=-trailing-space" --no-pager diff --check
@@ -136,8 +144,15 @@ run_code_spell
 run_clang_format
 run_bazel_formatting
 run_ruff
+run_md_toc
 run_eof_new_line
 run_git_diff_check
 run_ansible_lint
+
+# Update markers, telling Git hooks that formatting has been done
+# (Per-branch, so switching branches doesn't confuse the hooks)
+branch="$(git rev-parse --abbrev-ref HEAD)"
+mkdir -p "$CURR_DIR/.format_markers/$(dirname "$branch")"
+touch "$CURR_DIR/.format_markers/${branch}"
 
 exit 0

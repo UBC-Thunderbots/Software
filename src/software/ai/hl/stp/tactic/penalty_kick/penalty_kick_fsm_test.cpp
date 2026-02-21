@@ -12,10 +12,10 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
                                 Timestamp::fromSeconds(0));
     Robot robot = ::TestUtil::createRobotAtPos(world->field().friendlyPenaltyMark());
 
-    TbotsProto::AiConfig ai_config;
-    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(),
-                            DribbleFSM(ai_config.dribble_tactic_config()),
-                            GetBehindBallFSM()};
+    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            KickFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>())};
 
     PenaltyKickFSM::ControlParams control_params{};
 
@@ -221,7 +221,7 @@ TEST(PenaltyKickFSMTest, enemy_goalie_left_shot_right)
 
     Point enemy_goalie_pos = Point(world->field().enemyGoalCenter().x(), 0.2);
     Robot enemy_goalie     = Robot(0, enemy_goalie_pos, Vector(0, 0), Angle::half(),
-                               AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     Point shot_position = PenaltyKickFSM::evaluateNextShotPosition(
         std::optional<Robot>(enemy_goalie), world->field());
@@ -238,7 +238,7 @@ TEST(PenaltyKickFSMTest, enemy_goalie_right_shot_left)
 
     Point enemy_goalie_pos = Point(world->field().enemyGoalCenter().x(), -0.2);
     Robot enemy_goalie     = Robot(0, enemy_goalie_pos, Vector(0, 0), Angle::half(),
-                               AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     Point shot_position = PenaltyKickFSM::evaluateNextShotPosition(
         std::optional<Robot>(enemy_goalie), world->field());

@@ -3,6 +3,9 @@
   hosts: THUNDERBOTS_HOSTS
 
   tasks:
+    - name: Copy SSH public key
+      ansible.builtin.import_tasks: ../tasks/copy_ssh_key.yml
+
     - name: Check internet connection
       tags: dependencies
       ansible.builtin.import_tasks:
@@ -102,6 +105,14 @@
           ansible.builtin.copy:
             src: ../../linux_configs/pi/config.txt
             dest: /boot/firmware/
+            mode: "0444"
+
+        - name: Update udev configs to map connected devices
+          become: true
+          become_method: ansible.builtin.sudo
+          ansible.builtin.copy:
+            src: ../../linux_configs/pi/10-local.rules
+            dest: /etc/udev/rules.d/
             mode: "0444"
 
     - name: Change hostname

@@ -17,16 +17,6 @@
   args:
     chdir: ~/
 
-- name: Configure Redis persistence setting
-  become: true
-  become_method: ansible.builtin.sudo
-  ansible.builtin.lineinfile:
-    path: /etc/redis/redis.conf
-    state: present
-    regexp: ^(appendonly)
-    line: "appendonly yes"
-    backrefs: true
-
 - name: Disable WiFi power management
   block:
     - name: Delete WiFi power management rule

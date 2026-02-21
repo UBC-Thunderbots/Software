@@ -6,6 +6,12 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/stadium.h"
 
+CreaseDefenderFSM::CreaseDefenderFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : DefenderFSMBase(), TacticFSM<CreaseDefenderFSM>(ai_config_ptr)
+{
+}
+
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
     const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
@@ -38,9 +44,8 @@ bool CreaseDefenderFSM::isAnyEnemyInZone(const Update& event, const Stadium& zon
 {
     std::vector<Robot> enemy_robots = event.common.world_ptr->enemyTeam().getAllRobots();
     return std::any_of(enemy_robots.begin(), enemy_robots.end(),
-                       [zone, enemy_robots](const Robot& robot) {
-                           return contains(zone, robot.position());
-                       });
+                       [zone, enemy_robots](const Robot& robot)
+                       { return contains(zone, robot.position()); });
 }
 
 void CreaseDefenderFSM::blockThreat(
@@ -51,7 +56,9 @@ void CreaseDefenderFSM::blockThreat(
     Angle robot_orientation = event.common.robot.orientation();
     // Use a slightly larger inflation factor to avoid the crease defenders from sitting
     double robot_obstacle_inflation_factor =
-        robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5;
+        ai_config_ptr->robot_navigation_obstacle_config()
+            .robot_obstacle_inflation_factor() +
+        0.5;
     double robot_radius_expansion_amount =
         ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
     Rectangle inflated_defense_area =
@@ -113,7 +120,7 @@ void CreaseDefenderFSM::blockThreat(
 
     AutoChipOrKick auto_chip_or_kick{AutoChipOrKickMode::OFF, 0};
     auto goal_post_offset_vector =
-        Vector(0, crease_defender_config.goal_post_offset_chipping());
+        Vector(0, ai_config_ptr->crease_defender_config().goal_post_offset_chipping());
     auto goal_line_segment =
         Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner() +
                     goal_post_offset_vector,
@@ -168,7 +175,7 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
     auto front_segment = Segment(inflated_defense_area.posXPosYCorner(),
                                  inflated_defense_area.posXNegYCorner());
     auto left_segment  = Segment(inflated_defense_area.posXPosYCorner(),
-                                inflated_defense_area.negXPosYCorner());
+                                 inflated_defense_area.negXPosYCorner());
     auto right_segment = Segment(inflated_defense_area.posXNegYCorner(),
                                  inflated_defense_area.negXNegYCorner());
     std::vector<Point> front_intersections = intersection(ray, front_segment);
@@ -201,10 +208,11 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
 bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
     bool ball_on_friendly_side = event.common.world_ptr->ball().position().x() < 0;
-    return ball_on_friendly_side && DefenderFSMBase::ballNearbyWithoutThreat(
-                                        event.common.world_ptr, event.common.robot,
-                                        event.control_params.ball_steal_mode,
-                                        crease_defender_config.defender_steal_config());
+    return ball_on_friendly_side &&
+           DefenderFSMBase::ballNearbyWithoutThreat(
+               event.common.world_ptr, event.common.robot,
+               event.control_params.ball_steal_mode,
+               ai_config_ptr->crease_defender_config().defender_steal_config());
 }
 
 void CreaseDefenderFSM::prepareGetPossession(

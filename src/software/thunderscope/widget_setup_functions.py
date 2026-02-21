@@ -1,3 +1,4 @@
+import math
 import os
 
 from typing import Any, Optional
@@ -7,6 +8,9 @@ from proto.import_all_protos import *
 from software.thunderscope.common.fps_widget import FPSWidget
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.common.proto_plotter import ProtoPlotter
+from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
+    GLDrawPolygonObstacleLayer,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
@@ -27,6 +31,7 @@ from software.thunderscope.gl.layers import (
     gl_tactic_layer,
     gl_cost_vis_layer,
     gl_trail_layer,
+    gl_movement_field_test_layer,
     gl_max_dribble_layer,
     gl_referee_info_layer,
 )
@@ -92,6 +97,7 @@ def setup_gl_widget(
         "Validation", visualization_buffer_size
     )
     path_layer = gl_path_layer.GLPathLayer("Paths", visualization_buffer_size)
+
     obstacle_layer = gl_obstacle_layer.GLObstacleLayer(
         "Obstacles", visualization_buffer_size
     )
@@ -122,6 +128,9 @@ def setup_gl_widget(
             visualization_buffer_size,
         )
     )
+    field_movement_layer = gl_movement_field_test_layer.GLMovementFieldTestLayer(
+        "Field Movement Layer", full_system_proto_unix_io
+    )
     simulator_layer = gl_simulator_layer.GLSimulatorLayer(
         "Simulator", friendly_colour_yellow, visualization_buffer_size
     )
@@ -134,10 +143,15 @@ def setup_gl_widget(
         "Referee Info", visualization_buffer_size
     )
 
+    draw_obstacle_layer = GLDrawPolygonObstacleLayer(
+        "Draw Obstacle Layer", full_system_proto_unix_io
+    )
+
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(path_layer)
     gl_widget.add_layer(obstacle_layer)
+    gl_widget.add_layer(draw_obstacle_layer, False)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(attacker_layer)
     gl_widget.add_layer(cost_vis_layer, True)
@@ -145,6 +159,7 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, True)
+    gl_widget.add_layer(field_movement_layer, False)
     gl_widget.add_layer(max_dribble_layer, True)
     gl_widget.add_layer(referee_layer)
 
@@ -180,6 +195,7 @@ def setup_gl_widget(
     for arg in [
         (World, world_layer.world_buffer),
         (World, cost_vis_layer.world_buffer),
+        (World, field_movement_layer.world_buffer),
         (World, max_dribble_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
@@ -267,6 +283,34 @@ def setup_performance_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
     return proto_plotter
 
 
+def setup_ball_speed_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
+    """Setup the ball speed plot
+
+    :param proto_unix_io: The proto unix io object
+    :return: The ball speed plot widget
+    """
+
+    def extract_ball_speed_data(world):
+        velocity = world.ball.current_state.global_velocity
+        if velocity is None:
+            return {}
+        return {
+            "Maximum Ball Speed": BALL_MAX_SPEED_METERS_PER_SECOND,
+            "Ball Speed": math.sqrt(
+                velocity.x_component_meters**2 + velocity.y_component_meters**2
+            ),
+        }
+
+    proto_plotter = ProtoPlotter(
+        min_y=0,
+        max_y=10,
+        window_secs=10,
+        configuration={World: extract_ball_speed_data},
+    )
+    proto_unix_io.register_observer(World, proto_plotter.buffers[World])
+    return proto_plotter
+
+
 def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
     """Setup the play info widget
 
@@ -320,7 +364,7 @@ def setup_robot_view(
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
-    proto_unix_io.register_observer(RobotStatistic, robot_view.round_trip_time_buffer)
+    proto_unix_io.register_observer(RobotStatistic, robot_view.robot_statistic_buffer)
     return robot_view
 
 

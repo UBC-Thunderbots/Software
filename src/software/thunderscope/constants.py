@@ -1,7 +1,7 @@
 from pyqtgraph.Qt import QtGui
 from OpenGL.GL import *
 from proto.import_all_protos import *
-from enum import Enum, IntEnum
+from enum import Enum, IntEnum, StrEnum
 from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
@@ -182,6 +182,14 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Ctrl + O:</code></b> Open layout<br>
     <b><code>Ctrl + R:</code></b> Remove the current layout file and reset the layout<br><br>
     Layout file (on save) is located at {SAVED_LAYOUT_PATH}<br>
+
+    <b><code>Shift+Alt+Double Click</code></b> Complete the current virtual obstacle. The Draw Obstacle Layer must be enabled.<br><br>
+    <b><code>Shift+Alt+Single Click</code></b> Add a point to the current virtual obstacle. The Draw Obstacle Layer must be enabled.<br><br>
+    <b><code>c</code></b> Clear all virtual obstacles. The Draw Obstacle Layer must be enabled.<br><br>
+
+    <h3>GL Field Movement Test Layer</h3>
+    <b><code>Shift+Alt+Control+Click</code></b> Select the robot that is going to be moved<br>
+    <b><code>Shift+Alt+Click</code></b>Move the selected robot to the clicked point<br>
 
     """
 )
@@ -373,3 +381,26 @@ class ProtoPlayerFlags(Enum):
 
     NO_ERROR_FLAG = 0
     UNCAUGHT_EXCEPTION_FLAG = 1 << 0
+
+
+class LogLevels(StrEnum):
+    """Log levels for FullSystem to indicate minimum logged level"""
+
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    FATAL = "FATAL"
+
+
+class RuntimeManagerConstants:
+    """Constants for Runtime Manager"""
+
+    RUNTIME_CONFIG_BLUE_KEY = "blue_runtime_name"
+    RUNTIME_CONFIG_YELLOW_KEY = "yellow_runtime_name"
+    DEFAULT_BINARY_PATH = "software/unix_full_system"
+    DEFAULT_BINARY_NAME = "Current Fullsystem"
+    EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
+    RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
+    RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
+    DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
+    MAX_RELEASES_FETCHED = 5

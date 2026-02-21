@@ -8,7 +8,6 @@ import os
 import pytest
 from proto.import_all_protos import *
 
-
 from software.simulated_tests import validation
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
@@ -20,6 +19,7 @@ from software.thunderscope.binary_context_managers.game_controller import Gameco
 from software.thunderscope.thunderscope_config import configure_simulated_test_view
 
 from software.logger.logger import create_logger
+from typing import override
 
 logger = create_logger(__name__)
 
@@ -60,6 +60,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
 
+    @override
     def set_worldState(self, worldstate: WorldState):
         """Sets the simulation worldstate
 
@@ -107,13 +108,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         :param tick_duration_s: The simulation step duration
-        :param ci_cmd_with_delay: A list consisting of a duration, and a
-                                tuple forming a ci command
-                                {
-                                    (time, command, team),
-                                    (time, command, team),
-                                    ...
-                                }
+        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+                                  [
+                                      (time, command, team),
+                                      (time, command, team),
+                                      ...
+                                  ]
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
@@ -130,7 +130,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
-                    self.gamecontroller.send_ci_input(cmd, team)
+                    self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
                     # remove command from the list
                     ci_cmd_with_delay.remove((delay, cmd, team))
 
@@ -226,6 +226,7 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         self.__stopper()
 
+    @override
     def run_test(
         self,
         always_validation_sequence_set,
@@ -233,6 +234,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         test_timeout_s=3,
         tick_duration_s=0.0166,
         index=0,
+        ci_cmd_with_delay=[],
         run_till_end=True,
         **kwargs,
     ):
@@ -244,6 +246,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param tick_duration_s: length of a tick
         :param index: index of the current test. default is 0 (invariant test)
                       values can be passed in during aggregate testing for different timeout durations
+        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+                                  [
+                                      (time, command, team),
+                                      (time, command, team),
+                                      ...
+                                  ]
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
@@ -271,7 +279,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                     eventually_validation_sequence_set,
                     test_timeout_duration,
                     tick_duration_s,
-                    [],
+                    ci_cmd_with_delay,
                     run_till_end,
                 ],
             )
@@ -289,6 +297,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 eventually_validation_sequence_set,
                 test_timeout_duration,
                 tick_duration_s,
+                ci_cmd_with_delay=ci_cmd_with_delay,
                 run_till_end=run_till_end,
             )
 
@@ -302,6 +311,7 @@ class InvariantTestRunner(SimulatedTestRunner):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @override
     def run_test(
         self,
         setup=(lambda x: None),
@@ -338,9 +348,10 @@ class AggregateTestRunner(SimulatedTestRunner):
     passing iterations to a predetermined acceptable threshold
     """
 
-    def __int__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @override
     def run_test(
         self,
         setup=(lambda arg: None),
@@ -384,11 +395,13 @@ class AggregateTestRunner(SimulatedTestRunner):
         assert failed_tests == 0
 
 
-def load_command_line_arguments():
-    """Load from command line arguments using argpase
+def load_command_line_arguments(allow_unrecognized: bool = False):
+    """Load in command-line arguments using argparse
 
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
+
+    :param allow_unrecognized: if true, does not raise an error for unrecognized arguments
     """
     parser = argparse.ArgumentParser(description="Run simulated pytests")
     parser.add_argument(
@@ -464,7 +477,7 @@ def load_command_line_arguments():
         default=False,
         help="Use realism in the simulator",
     )
-    return parser.parse_args()
+    return parser.parse_known_args()[0] if allow_unrecognized else parser.parse_args()
 
 
 def pytest_main(file):
@@ -472,7 +485,8 @@ def pytest_main(file):
 
     :param file: The test file to run
     """
-    args = load_command_line_arguments()
+    args = load_command_line_arguments(allow_unrecognized=True)
+
     # Run the test, -s disables all capturing at -vv increases verbosity
     # -W ignore::DeprecationWarning ignores deprecation warnings that spam the output
     sys.exit(
@@ -506,12 +520,14 @@ def simulated_test_runner():
         args.debug_simulator,
         args.enable_realism,
     ) as simulator, FullSystem(
+        "software/unix_full_system",
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,
         False,
         should_restart_on_crash=False,
         running_in_realtime=args.enable_thunderscope,
     ) as blue_fs, FullSystem(
+        "software/unix_full_system",
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         args.debug_yellow_full_system,
         True,
@@ -530,8 +546,9 @@ def simulated_test_runner():
                 ProtoUnixIO(),
             )
             gamecontroller.setup_proto_unix_io(
-                blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io,
+                blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                simulator_proto_unix_io=simulator_proto_unix_io,
             )
 
             # If we want to run thunderscope, inject the proto unix ios

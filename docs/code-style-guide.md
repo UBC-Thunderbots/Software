@@ -1,19 +1,24 @@
 # Code Style Guide
 
-## Table of Contents
-* [Names and Variables](#names-and-variables)
-* [Comments](#comments)
-* [Headers](#headers)
-* [Includes](#includes)
-* [Namespaces](#namespaces)
-* [Exceptions](#exceptions)
-* [Tests](#tests)
-* [Getter And Setter Functions](#getter-and-setter-functions)
-* [Static Creators](#static-creators)
-* [Spelling](#spelling)
-* [Miscellaneous](#miscellaneous)
-* [Protobuf](#protobuf)
+### Table of Contents
 
+<!--TOC-->
+
+- [Table of Contents](#table-of-contents)
+- [Names and Variables](#names-and-variables)
+- [Comments](#comments)
+- [Headers](#headers)
+- [Includes](#includes)
+- [Namespaces](#namespaces)
+- [Exceptions](#exceptions)
+- [Tests](#tests)
+- [Getter And Setter Functions](#getter-and-setter-functions)
+- [Static Creators](#static-creators)
+- [Spelling](#spelling)
+- [Miscellaneous](#miscellaneous)
+- [Protobuf](#protobuf)
+
+<!--TOC-->
 
 Our C++ coding style is based off of [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html). We use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to enforce most of the nit-picky parts of the style, such as brackets and alignment, so this document highlights the important rules to follow that clang-format cannot enforce.
 
@@ -39,7 +44,7 @@ If you want to know more about our coding style you can take a look at our [clan
 * All variable names are `lowercase_with_underscores`
   ```cpp
   // Incorrect
-  float calculatedDistnace;
+  float calculatedDistance;
 
   // Correct
   float calculated_distance;
@@ -174,7 +179,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
 
 ### Includes
 
-* Use `#include` sparingly and only include the necessary sources to build the file. Do not include headers whos class or implementation is not used.
+* Use `#include` sparingly and only include the necessary sources to build the file. Do not include headers whose class or implementation is not used.
 * Often `.cpp` files include its corresponding header `.h` file, it means the `.cpp` file include everything included in the header. Do not have duplicate `#include`'s in both `.h` and `.cpp` files.
 * `#include`s are generally preferred written on the `.cpp` side; use minimum `#include` in the header file. Use _forward declarations_ in headers if necessary.
 * Specify full path of the include file on the file system, relative to the top-level project directory or _WORKSPACE_ file. Do not use relative paths.
@@ -268,22 +273,6 @@ private functions for a class/file that should not be exposed to users. impl can
   // Correct
   using PointsArray = std::vector<std::pair<int, int>>;
   ```
-* Avoid initializing multiple variables on the same line.
-  ```cpp
-  // Incorrect
-  int x, y, z = 0;
-
-  // Correct
-  int x;
-  int y;
-  int z = 0;
-
-  // However, the author may have intended the following
-  // or a code reader may have assumed the following
-  int x = 0;
-  int y = 0;
-  int z = 0;
-  ```  
 * Avoid ternary operators. Clarity is more important than line count.
   ```cpp
   // Incorrect

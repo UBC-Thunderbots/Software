@@ -1,9 +1,9 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = [
     "//software/ai:__subpackages__",
     "//software/simulated_tests:__subpackages__",
 ])
-
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 cc_library(
     name = "kinematic_constraints",
@@ -101,6 +101,18 @@ cc_library(
         ":kinematic_constraints",
         ":trajectory_path",
         "//proto/message_translation:tbots_protobuf",
+        "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/trajectory:collision_evaluator",
+        "//software/ai/navigator/trajectory:trajectory_path_with_cost",
+    ],
+)
+
+cc_library(
+    name = "collision_evaluator",
+    srcs = ["collision_evaluator.cpp"],
+    hdrs = ["collision_evaluator.h"],
+    deps = [
+        ":trajectory_path",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/trajectory:trajectory_path_with_cost",
     ],

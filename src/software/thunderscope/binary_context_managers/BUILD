@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 py_library(
     name = "simulator",
@@ -22,6 +22,8 @@ py_library(
     deps = [
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
+        "//software/thunderscope:util",
+        "//software/thunderscope/common:thread_safe_circular_buffer",
     ],
 )
 
@@ -47,5 +49,14 @@ py_library(
     deps = [
         ":game_controller",
         "//software/thunderscope:time_provider",
+    ],
+)
+
+py_library(
+    name = "runtime_manager",
+    srcs = [
+        "runtime_installer.py",
+        "runtime_loader.py",
+        "runtime_manager.py",
     ],
 )

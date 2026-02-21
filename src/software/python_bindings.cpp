@@ -38,7 +38,6 @@
 #include "software/geom/segment.h"
 #include "software/geom/vector.h"
 #include "software/math/math_functions.h"
-#include "software/networking/radio/threaded_proto_radio_sender.hpp"
 #include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
@@ -72,23 +71,6 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
         .def("get_ip_address", &Class::getIpAddress)
         .def("send_proto", &Class::sendProto, py::arg("message"),
              py::arg("async") = false);
-}
-
-/**
- * Declares a Python binding for a ThreadedProtoRadioSender of type T
- *
- * @param m The module to define the sender/receiver in
- * @param The name to insert into the binded class name (ex. {name}ProtoRadioSender)
- */
-template <typename T>
-void declareThreadedProtoRadioSender(py::module& m, std::string name)
-{
-    using Class              = ThreadedProtoRadioSender<T>;
-    std::string pyclass_name = name + "ProtoRadioSender";
-    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
-                                              py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<>())
-        .def("send_proto", &Class::sendProto);
 }
 
 /**
@@ -158,11 +140,13 @@ PYBIND11_MODULE(python_bindings, m)
         .def(-py::self)
         .def(py::self == Point())
         .def(py::self != Point())
-        .def("__repr__", [](const Point& v) {
-            std::stringstream stream;
-            stream << v;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Point& v)
+             {
+                 std::stringstream stream;
+                 stream << v;
+                 return stream.str();
+             });
 
     py::class_<Vector>(m, "Vector")
         .def(py::init<float, float>())
@@ -174,6 +158,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("lengthSquared", &Vector::lengthSquared)
         .def("normalize", py::overload_cast<>(&Vector::normalize, py::const_))
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
+        .def("perpendicular", &Vector::perpendicular)
         .def("rotate", &Vector::rotate)
         .def("orientation", &Vector::orientation)
         .def("dot", &Vector::dot)
@@ -188,11 +173,13 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::self *= double())
         .def(py::self / double())
         .def(py::self /= double())
-        .def("__repr__", [](const Vector& v) {
-            std::stringstream stream;
-            stream << v;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Vector& v)
+             {
+                 std::stringstream stream;
+                 stream << v;
+                 return stream.str();
+             });
 
     py::class_<Polygon>(m, "Polygon")
         .def(py::init<std::vector<Point>>())
@@ -200,11 +187,13 @@ PYBIND11_MODULE(python_bindings, m)
         .def("getPoints", &Polygon::getPoints)
         .def("getSegments", &Polygon::getSegments)
         // Overloaded
-        .def("__repr__", [](const Polygon& v) {
-            std::stringstream stream;
-            stream << v;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Polygon& v)
+             {
+                 std::stringstream stream;
+                 stream << v;
+                 return stream.str();
+             });
 
     py::class_<Angle>(m, "Angle")
         .def(py::init<>())
@@ -212,18 +201,21 @@ PYBIND11_MODULE(python_bindings, m)
         .def_static("fromDegrees", &Angle::fromDegrees)
         .def("toRadians", &Angle::toRadians)
         // Overloaded
-        .def("__repr__", [](const Angle& a) {
-            std::stringstream stream;
-            stream << a;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Angle& a)
+             {
+                 std::stringstream stream;
+                 stream << a;
+                 return stream.str();
+             });
 
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
     py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
         .def(py::init<Point, Point>())
         // Overloaded
         .def("__repr__",
-             [](const Rectangle& r) {
+             [](const Rectangle& r)
+             {
                  std::stringstream stream;
                  stream << r;
                  return stream.str();
@@ -256,7 +248,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::init<Point, double>())
         // Overloaded
         .def("__repr__",
-             [](const Circle& c) {
+             [](const Circle& c)
+             {
                  std::stringstream stream;
                  stream << c;
                  return stream.str();
@@ -267,11 +260,13 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Stadium>(m, "Stadium")
         .def(py::init<Segment, double>())
-        .def("__repr__", [](const Stadium& s) {
-            std::stringstream stream;
-            stream << s;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Stadium& s)
+             {
+                 std::stringstream stream;
+                 stream << s;
+                 return stream.str();
+             });
 
     py::class_<RobotConstants>(m, "RobotConstants")
         .def_readwrite("max_force_dribbler_speed_rpm",
@@ -311,6 +306,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createPointProto", &createPointProto);
     m.def("createPolygonProto", &createPolygonProto);
     m.def("createCircleProto", &createCircleProto);
+    m.def("createAngleProto", &createAngleProto);
     m.def("createVectorProto", &createVectorProto);
     m.def("createSegmentProto", &createSegmentProto);
     m.def("createStadiumProto", &createStadiumProto);
@@ -336,12 +332,16 @@ PYBIND11_MODULE(python_bindings, m)
         .def("angularVelocity", &Robot::angularVelocity)
         .def("isNearDribbler", &Robot::isNearDribbler, py::arg("test_point"),
              py::arg("TOLERANCE") = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
-        .def("dribblerArea", &Robot::dribblerArea);
+        .def("dribblerArea", &Robot::dribblerArea)
+        .def("id", &Robot::id);
 
     py::class_<Team>(m, "Team")
+        .def(py::init<TbotsProto::Team>())
         .def(py::init<const std::vector<Robot>&>())
         .def("assignGoalie", &Team::assignGoalie)
-        .def("getAllRobots", &Team::getAllRobots);
+        .def("getAllRobots", &Team::getAllRobots)
+        .def("getNearestRobot",
+             py::overload_cast<const Point&>(&Team::getNearestRobot, py::const_));
 
     py::class_<Timestamp>(m, "Timestamp").def(py::init<>());
 
@@ -408,7 +408,6 @@ PYBIND11_MODULE(python_bindings, m)
 
     // Senders
     declareThreadedProtoUdpSender<TbotsProto::Primitive>(m, "Primitive");
-    declareThreadedProtoRadioSender<TbotsProto::Primitive>(m, "Primitive");
     declareThreadedProtoUdpSender<TbotsProto::IpNotification>(m, "FullsystemIpBroadcast");
 
     py::register_exception<TbotsNetworkException>(m, "TbotsNetworkException");

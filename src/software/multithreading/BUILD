@@ -40,6 +40,7 @@ cc_library(
         "//software/time:duration",
         "//software/util/typename",
         "@boost//:circular_buffer",
+        "@g3log",
     ],
 )
 
@@ -54,7 +55,6 @@ cc_library(
         ":observer",
         ":thread_safe_buffer",
         "//software/time:duration",
-        "@boost//:bind",
     ],
 )
 

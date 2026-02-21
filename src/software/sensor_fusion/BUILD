@@ -38,5 +38,6 @@ cc_library(
         ":sensor_fusion",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "@protobuf//:differencer",
     ],
 )

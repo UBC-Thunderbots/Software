@@ -1,7 +1,4 @@
-from typing import Optional
-
 from PyQt6 import QtGui
-from google.protobuf.json_format import MessageToDict
 from pyqtgraph.opengl.items.GLTextItem import GLTextItem
 
 from proto.import_all_protos import *
@@ -14,9 +11,9 @@ from software.thunderscope.constants import (
 )
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
-from software.thunderscope.gl.helpers.observable_list import ObservableList
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from typing import override
 
 
 class GLRefereeInfoLayer(GLLayer):
@@ -54,8 +51,6 @@ class GLRefereeInfoLayer(GLLayer):
         self.cached_world = None
         self.cached_referee_info = None
 
-        self.referee_text_graphics = ObservableList(self._graphics_changed)
-
         self.placement_tolerance_graphic = GLCircle(
             parent_item=self,
             radius=BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
@@ -74,11 +69,14 @@ class GLRefereeInfoLayer(GLLayer):
             outline_color=self.BALL_PLACEMENT_ROBOT_AVOID_AREA_VISUALIZATION_COLOR,
         )
 
-        # initialize the two text items to display
-        self.gamestate_type_text: Optional[GLLabel] = None
-        self.command_type_text: Optional[GLLabel] = None
+        self.gamestate_type_text = GLLabel(parent_item=self, offset=(-10, 50))
+        self.command_type_text = GLLabel(parent_item=self, offset=(-10, 70))
 
-        self.ball_placement_countdown_graphic: Optional[GLTextItem] = None
+        self.ball_placement_countdown_graphic = GLTextItem(
+            parentItem=self,
+            font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 7, weight=700),
+            color=self.COUNT_DOWN_TEXT_COLOR,
+        )
 
         self.ball_placement_point = None
         self.ball_placement_in_progress = False
@@ -90,13 +88,6 @@ class GLRefereeInfoLayer(GLLayer):
         ball_placement_vis_proto = self.ball_placement_vis_buffer.get(
             block=False, return_cached=False
         )
-
-        if not self.ball_placement_countdown_graphic:
-            self.ball_placement_countdown_graphic = GLTextItem(
-                parentItem=self,
-                font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 7, weight=700),
-                color=self.COUNT_DOWN_TEXT_COLOR,
-            )
 
         # if ball placement is in progress, update all the visuals
         if self.ball_placement_in_progress:
@@ -124,35 +115,19 @@ class GLRefereeInfoLayer(GLLayer):
         if not referee_proto:
             return
 
-        referee_msg_dict = MessageToDict(referee_proto)
-        if not referee_msg_dict:
-            return
-        self.cached_referee_info = referee_msg_dict
+        self.cached_referee_info = referee_proto
 
-        if not self.gamestate_type_text:
-            self.gamestate_type_text = GLLabel(
-                parent_item=self,
-                offset=(-10, 50),
-                text=GLRefereeInfoLayer.GAMESTATE_PREFIX + referee_msg_dict["stage"],
-            )
-            self.referee_text_graphics.append(self.gamestate_type_text)
-        else:
-            self.gamestate_type_text.set_text(
-                GLRefereeInfoLayer.GAMESTATE_PREFIX + referee_msg_dict["stage"]
-            )
+        self.gamestate_type_text.set_text(
+            GLRefereeInfoLayer.GAMESTATE_PREFIX
+            + Referee.Stage.Name(referee_proto.stage)
+        )
 
-        if not self.command_type_text:
-            self.command_type_text = GLLabel(
-                parent_item=self,
-                offset=(-10, 70),
-                text=GLRefereeInfoLayer.GAMESTATE_PREFIX + referee_msg_dict["command"],
-            )
-            self.referee_text_graphics.append(self.command_type_text)
-        else:
-            self.command_type_text.set_text(
-                GLRefereeInfoLayer.REFEREE_COMMAND_PREFIX + referee_msg_dict["command"]
-            )
+        self.command_type_text.set_text(
+            GLRefereeInfoLayer.REFEREE_COMMAND_PREFIX
+            + Referee.Command.Name(referee_proto.command)
+        )
 
+    @override
     def refresh_graphics(self) -> None:
         """Refresh all visuals for both ball placement and referee info"""
         self.cached_world = self.world_buffer.get(block=False, return_cached=True)
@@ -196,8 +171,7 @@ class GLRefereeInfoLayer(GLLayer):
         # update the count-down graphics
         if self.cached_referee_info:
             time_left = max(
-                int(self.cached_referee_info["currentActionTimeRemaining"]) // 1000000,
-                0,
+                self.cached_referee_info.current_action_time_remaining // 1000000, 0
             )
             self.ball_placement_countdown_graphic.setData(text=f"{time_left}s")
 

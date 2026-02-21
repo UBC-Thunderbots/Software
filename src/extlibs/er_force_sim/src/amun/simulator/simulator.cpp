@@ -45,7 +45,8 @@ Simulator::Simulator(const amun::SimulatorSetup &setup)
         m_data->solver.get(), m_data->collision.get());
     m_data->dynamicsWorld->setGravity(btVector3(0.0f, 0.0f, -9.81f * SIMULATOR_SCALE));
     m_data->dynamicsWorld->setInternalTickCallback(
-        [](btDynamicsWorld *world, btScalar timeStep) {
+        [](btDynamicsWorld *world, btScalar timeStep)
+        {
             Simulator *sim = reinterpret_cast<Simulator *>(world->getWorldUserInfo());
             sim->handleSimulatorTick(timeStep);
         },
@@ -170,7 +171,8 @@ void Simulator::handleSimulatorTick(double time_s)
     }
 
     // find out if ball and any robot collide
-    auto robot_ball_collision = [&](const auto &kv_pair) {
+    auto robot_ball_collision = [&](const auto &kv_pair)
+    {
         auto &[robotId, robot] = kv_pair;
         return robot->touchesBall(*m_data->ball);
     };
@@ -675,12 +677,13 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
 
             if (realism.has_vision_delay())
             {
-                m_visionDelay = std::max(0l, realism.vision_delay());
+                m_visionDelay = std::max<int64_t>(0l, realism.vision_delay());
             }
 
             if (realism.has_vision_processing_time())
             {
-                m_visionProcessingTime = std::max(0l, realism.vision_processing_time());
+                m_visionProcessingTime =
+                    std::max<int64_t>(0l, realism.vision_processing_time());
             }
 
             if (realism.has_simulate_dribbling())
@@ -723,7 +726,8 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
             {
                 m_data->ball->restoreState(sim.set_simulator_state().ball());
             }
-            const auto restoreRobots = [](RobotMap &map, auto robots) {
+            const auto restoreRobots = [](RobotMap &map, auto robots)
+            {
                 for (const auto &robot : robots)
                 {
                     if (map.contains(robot.id()))
