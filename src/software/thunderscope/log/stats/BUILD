@@ -9,10 +9,19 @@ py_library(
 )
 
 py_library(
+    name = "pass_results",
+    srcs = ["pass_results.py"],
+    deps = [
+        "//software/thunderscope/log/trackers:tracker_module",
+    ],
+)
+
+py_library(
     name = "stats",
     srcs = ["stats.py"],
     deps = [
         ":fullsystem_stats",
+        ":pass_results",
         "//software/thunderscope:thread_safe_buffer",
     ],
 )

@@ -1,4 +1,5 @@
 from software.thunderscope.log.stats.fullsystem_stats import FullSystemStats
+from software.thunderscope.log.stats.pass_results import PassResultsTracker
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.import_all_protos import *
 
@@ -22,12 +23,19 @@ class Stats:
             record_enemy_stats=record_enemy_stats,
         )
 
+        self.pass_results = PassResultsTracker(
+            proto_unix_io=proto_unix_io, friendly_colour_yellow=friendly_color_yellow
+        )
+
     def refresh(self):
         self.fs_stats.refresh()
+        self.pass_results.refresh()
 
     def __enter__(self):
         self.fs_stats.setup()
+        self.pass_results.setup()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.fs_stats.cleanup()
+        self.pass_results.cleanup()
