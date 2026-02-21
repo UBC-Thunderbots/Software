@@ -17,12 +17,6 @@ class DebugBinary(str, Enum):
     yellow = "yellow"
 
 
-class Platform(str, Enum):
-    PI = "PI"
-    NANO = "NANO"
-    LIMITED = "LIMITED"
-
-
 PrintCommandOption: type[bool] = Annotated[
     bool, Option("-p", "--print_command", help="Print the generated Bazel command")
 ]
@@ -80,10 +74,6 @@ InteractiveModeOption = Annotated[
 
 TracyOption = Annotated[
     bool, Option("--tracy", help="Run the binary with the TRACY_ENABLE macro defined")
-]
-
-PlatformOption = Annotated[
-    Platform, Option("-pl", "--platform", help="The platform to build Thunderloop for")
 ]
 
 EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]

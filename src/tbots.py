@@ -18,12 +18,10 @@ from cli.cli_params import (
     SSHPasswordOption,
     InteractiveModeOption,
     TracyOption,
-    PlatformOption,
     EnableThunderscopeOption,
     EnableVisualizerOption,
     StopAIOnStartOption,
     DebugBinary,
-    Platform,
     JobsOption,
 )
 
@@ -55,7 +53,6 @@ def main(
     ssh_password: SSHPasswordOption = None,
     interactive_search: InteractiveModeOption = False,
     tracy: TracyOption = False,
-    platform: PlatformOption = None,
     enable_thunderscope: EnableThunderscopeOption = False,
     enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
@@ -124,7 +121,7 @@ def main(
     if not debug_build and (not no_optimized_build or flash_robots):
         command += ["--copt=-O3"]
 
-    # Used for when flashing Jetsons
+    # Used for when flashing Raspberry Pi
     if flash_robots:
         command += ["--platforms=//toolchains/cc:robot"]
 
@@ -140,9 +137,6 @@ def main(
     # To run the Tracy profile, enable the TRACY_ENABLE macro
     if tracy:
         command += ["--cxxopt=-DTRACY_ENABLE"]
-
-    if platform:
-        command += ["--//software/embedded:host_platform=" + platform.value]
 
     # limit number of jobs
     if jobs_option:
@@ -162,13 +156,9 @@ def main(
     if enable_thunderscope:
         bazel_arguments += ["--enable_thunderscope"]
     if flash_robots:
-        if not platform:
-            print("No platform specified! Make sure to set the --platform argument.")
-            sys.exit(1)
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        platform_ip = "0" if platform == Platform.NANO else "6"
-        bazel_arguments += [f"192.168.{platform_ip}.20{id}" for id in flash_robots]
+        bazel_arguments += [f"192.168.6.20{id}" for id in flash_robots]
         bazel_arguments += ["-pwd", ssh_password]
 
     if action == ActionArgument.test:
