@@ -4,15 +4,6 @@ cc_library(
     name = "constants",
     hdrs = [
         "constants.h",
-        "limited_constants.h",
-        "pi_constants.h",
-    ],
-    defines = select({
-        "//software/embedded:build_pi": ["PI"],
-        "//software/embedded:build_limited": ["LIMITED"],
-    }),
-    deps = [
-        "//software/embedded:platform",
     ],
 )
 

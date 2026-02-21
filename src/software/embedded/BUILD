@@ -2,35 +2,6 @@ load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 
 package(default_visibility = ["//visibility:public"])
 
-config_setting(
-    name = "build_pi",
-    flag_values = {
-        ":host_platform": "PI",
-    },
-)
-
-config_setting(
-    name = "build_limited",
-    flag_values = {
-        ":host_platform": "LIMITED",
-    },
-)
-
-string_flag(
-    name = "host_platform",
-    build_setting_default = "PI",
-    values = [
-        "PI",
-        "LIMITED",
-    ],
-)
-
-cc_library(
-    name = "platform",
-    hdrs = ["platform.h"],
-    deps = ["//software/util/make_enum"],
-)
-
 cc_library(
     name = "primitive_executor",
     srcs = ["primitive_executor.cpp"],

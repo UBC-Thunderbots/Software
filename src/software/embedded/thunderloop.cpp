@@ -115,11 +115,6 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-    {
-        return;
-    }
-
     power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
@@ -412,11 +407,6 @@ TbotsProto::MotorStatus Thunderloop::pollMotorService(
 
     ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
 
-    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-    {
-        return TbotsProto::MotorStatus();
-    }
-
     double time_since_prev_iteration_s =
         getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
     return motor_service_->poll(motor_control, time_since_prev_iteration_s);
@@ -427,11 +417,6 @@ TbotsProto::PowerStatus Thunderloop::pollPowerService(struct timespec& poll_time
     ScopedTimespecTimer timer(&poll_time);
 
     ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
-
-    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-    {
-        return TbotsProto::PowerStatus();
-    }
 
     return power_service_->poll(direct_control_.power_control(), kick_coeff_,
                                 kick_constant_, chip_pulse_width_);

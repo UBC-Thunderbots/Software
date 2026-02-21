@@ -109,8 +109,7 @@ bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:ro
 
 You could also use the `tbots.py` script to flash robot software
 
-`./tbots.py run run_ansible -pl <platform> -f <robot_ids> -pwd <robot_password>` (Note that this uses robot IDs rather than full robot IP addresses)
-* \<platform\> is the host platform on the robot (either `PI` or `NANO`
+`./tbots.py run run_ansible -f <robot_ids> -pwd <robot_password>` (Note that this uses robot IDs rather than full robot IP addresses)
 * <robot_ids> is a list of robot IDs to flash
 * <robot_password> is the password of the `robot` user account
 
