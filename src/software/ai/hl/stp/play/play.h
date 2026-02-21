@@ -209,7 +209,7 @@ class PlayBase : public Play
 
     void updateTactics(const PlayUpdate& play_update) override
     {
-        fsm.process_event(FSM_T::Update(control_params, play_update));
+        fsm.process_event(typename FSM_T::Update(control_params, play_update));
     }
 
    protected:
