@@ -15,5 +15,10 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
 }
 
+void StopPlay::updateTactics(const PlayUpdate &play_update)
+{
+    fsm.process_event(StopPlayFSM::Update(control_params, play_update));
+}
+
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, StopPlay, TbotsProto::AiConfig> factory;
