@@ -5,13 +5,13 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/logger/logger.h"
 
-struct KickoffFriendlyPlayFSM
+struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
 {
     class SetupState;
     class ShootState;
@@ -21,13 +21,14 @@ struct KickoffFriendlyPlayFSM
     {
     };
 
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+
     /**
      * Creates a kickoff friendly play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr the play config for this play FSM
      */
-    explicit KickoffFriendlyPlayFSM(const TbotsProto::AiConfig& ai_config);
+    explicit KickoffFriendlyPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
 
     /**
      * create a vector of setup positions if not already existing.

@@ -1,11 +1,13 @@
 #include "software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 
-KickoffFriendlyPlay::KickoffFriendlyPlay(TbotsProto::AiConfig config)
-    : Play(config, true), fsm{KickoffFriendlyPlayFSM{config}}, control_params{}
+KickoffFriendlyPlay::KickoffFriendlyPlay(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        :PlayBase<KickoffFriendlyPlayFSM>(ai_config_ptr, true)
 {
 }
 
@@ -32,5 +34,5 @@ std::vector<std::string> KickoffFriendlyPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffFriendlyPlay, TbotsProto::AiConfig>
-    factory;
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay,
+        std::shared_ptr<const TbotsProto::AiConfig>> factory;

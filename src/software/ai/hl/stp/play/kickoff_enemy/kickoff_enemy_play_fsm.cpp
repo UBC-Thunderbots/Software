@@ -1,22 +1,22 @@
 #include "software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play_fsm.h"
 
-KickoffEnemyPlayFSM::KickoffEnemyPlayFSM(const TbotsProto::AiConfig &ai_config)
-    : ai_config(ai_config),
-      shadow_enemy_tactics(
-          {std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>()}),
-      move_tactics({
-          std::make_shared<MoveTactic>(),  // for robot 1
-          std::make_shared<MoveTactic>(),  // for robot 2
-          std::make_shared<MoveTactic>(),  // for robot 3
-          std::make_shared<MoveTactic>(),  // for robot 4
-          std::make_shared<MoveTactic>()   // for robot 5
-      })
+KickoffEnemyPlayFSM::KickoffEnemyPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : PlayFSM(ai_config_ptr),
+          shadow_enemy_tactics{std::make_shared<ShadowEnemyTactic>(ai_config_ptr),
+                               std::make_shared<ShadowEnemyTactic>(ai_config_ptr)},
+          move_tactics{std::make_shared<MoveTactic>(ai_config_ptr),
+                       std::make_shared<MoveTactic>(ai_config_ptr),
+                       std::make_shared<MoveTactic>(ai_config_ptr),
+                       std::make_shared<MoveTactic>(ai_config_ptr),
+                       std::make_shared<MoveTactic>(ai_config_ptr)}
 {
 }
 
+
 void KickoffEnemyPlayFSM::createKickoffSetupPositions(const WorldPtr &world_ptr)
 {
-    // these positions are picked according to the followicreateKickoffSetupPositions();ng
+    // these positions are picked according to the following: createKickoffSetupPositions();
     // slide https://images.slideplayer.com/32/9922349/slides/slide_2.jpg since we only
     // have 6 robots at the maximum, 3 robots will shadow threats up front, 1 robot is
     // dedicated as the goalie, and the other 2 robots will defend either post (as show in

@@ -5,7 +5,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
@@ -13,7 +13,7 @@
 
 
 
-struct KickoffEnemyPlayFSM
+struct KickoffEnemyPlayFSM: PlayFSM<KickoffEnemyPlayFSM>
 {
     class SetupState;
 
@@ -21,13 +21,14 @@ struct KickoffEnemyPlayFSM
     {
     };
 
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+
     /**
      * Creates a kickoff enemy play FSM
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit KickoffEnemyPlayFSM(const TbotsProto::AiConfig &ai_config);
+    explicit KickoffEnemyPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
 
     /**
      * create a vector of setup positions if not already existing.

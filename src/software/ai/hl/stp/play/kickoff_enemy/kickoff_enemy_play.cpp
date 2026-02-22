@@ -1,10 +1,12 @@
 #include "software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play.h"
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffEnemyPlay::KickoffEnemyPlay(TbotsProto::AiConfig config)
-    : Play(config, true), fsm{KickoffEnemyPlayFSM{config}}, control_params{}
+KickoffEnemyPlay::KickoffEnemyPlay(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : PlayBase<KickoffEnemyPlayFSM>(ai_config_ptr, false)
 {
 }
 
@@ -32,4 +34,5 @@ std::vector<std::string> KickoffEnemyPlay::getState()
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffEnemyPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, KickoffEnemyPlay,
+        std::shared_ptr<const TbotsProto::AiConfig>> factory;

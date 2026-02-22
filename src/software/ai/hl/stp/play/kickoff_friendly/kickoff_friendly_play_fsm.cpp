@@ -1,16 +1,17 @@
 #include "software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play_fsm.h"
 
-KickoffFriendlyPlayFSM::KickoffFriendlyPlayFSM(const TbotsProto::AiConfig &ai_config)
-    : ai_config(ai_config),
-      kickoff_chip_tactic(std::make_shared<KickoffChipTactic>()),
-      shoot_tactic(std::make_shared<KickTactic>()),
-      move_tactics({
-          std::make_shared<PrepareKickoffMoveTactic>(),  // for robot 1
-          std::make_shared<MoveTactic>(),                // for robot 2
-          std::make_shared<MoveTactic>(),                // for robot 3
-          std::make_shared<MoveTactic>(),                // for robot 4
-          std::make_shared<MoveTactic>()                 // for robot 5
-      })
+KickoffFriendlyPlayFSM::KickoffFriendlyPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+        : PlayFSM<KickoffFriendlyPlayFSM>(ai_config_ptr),
+          kickoff_chip_tactic(std::make_shared<KickoffChipTactic>(ai_config_ptr)),
+          shoot_tactic(std::make_shared<KickTactic>(ai_config_ptr)),
+          move_tactics{
+                  std::make_shared<PrepareKickoffMoveTactic>(ai_config_ptr),  // robot 1
+                  std::make_shared<MoveTactic>(ai_config_ptr),                // robot 2-5
+                  std::make_shared<MoveTactic>(ai_config_ptr),
+                  std::make_shared<MoveTactic>(ai_config_ptr),
+                  std::make_shared<MoveTactic>(ai_config_ptr)
+          }
 {
 }
 
