@@ -30,8 +30,8 @@ title: Robot Debugging Steps
 ---
 flowchart TD
     ssh("Can you SSH into the robot? 
-        `ssh robot@192.168.0.20RobotID` (for Nanos) OR `ssh robot@192.168.5.20RobotID` (for Pis) OR `ssh robot@robot_name.local`
-        e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.5.203` (for Pis) or `ssh robot@robert.local`
+        `ssh robot@192.168.5.20RobotID` OR `ssh robot@robot_name.local`
+        e.g. `ssh robot@192.168.5.203` or `ssh robot@robert.local`
         for a robot called robert with robot id 3")
     ssh ---> |Yes| tloop_status
     ssh --> |No - Second Try| monitor("Connect Pi to an external monitor and check wifi connection or SSH using an ethernet cable")
