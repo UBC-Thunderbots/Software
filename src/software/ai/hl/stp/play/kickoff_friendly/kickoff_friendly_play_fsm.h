@@ -99,38 +99,24 @@ struct KickoffFriendlyPlayFSM
         DEFINE_SML_GUARD(isPlaying)
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest_state
-            // PlaySelectionFSM will transition to OffensePlay after the kick.
-            *SetupState_S + Update_E[!isSetupDone_G] / setupKickoff_A = SetupState_S,
+                // src_state + event [guard] / action = dest_state
+                // PlaySelectionFSM will transition to OffensePlay after the kick.
+                *SetupState_S + Update_E[!isSetupDone_G] / setupKickoff_A = SetupState_S,
 
-            // shoot directly at net if possible.
-            SetupState_S + Update_E[shotFound_G]                = ShootState_S,
-            ShootState_S + Update_E[!isPlaying_G] / shootBall_A = ShootState_S,
-            ShootState_S + Update_E[isPlaying_G]                = X,
+                // shoot directly at net if possible.
+                SetupState_S + Update_E[shotFound_G]                = ShootState_S,
+                ShootState_S + Update_E[!isPlaying_G] / shootBall_A = ShootState_S,
+                ShootState_S + Update_E[isPlaying_G]                = X,
 
-<<<<<<< HEAD
-            // else chip over the defenders.
-            SetupState_S + Update_E                             = ChipState_S,
-            ChipState_S + Update_E[shotFound_G && !isPlaying_G] = ShootState_S,
-            ChipState_S + Update_E[!isPlaying_G] / chipBall_A   = ChipState_S,
-            ChipState_S + Update_E[isPlaying_G]                 = X,
-||||||| 197d7ff13 (mystery halt issue persists, adjusted fsm)
                 // else chip over the defenders.
-                SetupState_S + Update_E                  = ChipState_S,
-                ChipState_S  + Update_E[shotFound_G && !isPlaying_G]      = ShootState_S,
-                ChipState_S  + Update_E[!isPlaying_G] / chipBall_A      = ChipState_S,
-                ChipState_S  + Update_E[isPlaying_G]                     = X,
-=======
-                // else chip over the defenders.
-                SetupState_S + Update_E[!shotFound_G]                   = ChipState_S,
-                ChipState_S  + Update_E[!isPlaying_G] / chipBall_A      = ChipState_S,
-                ChipState_S  + Update_E[isPlaying_G]                     = X,
->>>>>>> parent of 197d7ff13 (mystery halt issue persists, adjusted fsm)
+                SetupState_S + Update_E[!shotFound_G]             = ChipState_S,
+                ChipState_S + Update_E[!isPlaying_G] / chipBall_A = ChipState_S,
+                ChipState_S + Update_E[isPlaying_G]               = X,
 
-            X + Update_E = X);
+                X + Update_E = X);
     }
 
-   private:
+private:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<KickoffChipTactic> kickoff_chip_tactic;
     std::shared_ptr<KickTactic> shoot_tactic;

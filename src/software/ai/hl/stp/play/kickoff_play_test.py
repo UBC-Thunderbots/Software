@@ -51,7 +51,6 @@ def init_world_state(runner, blue_bots, yellow_bots):
         ),
     )
 
-
 def init_plays(simulated_test_runner, is_friendly, force_out):
     blue_play = Play()
     yellow_play = Play()
@@ -82,34 +81,20 @@ def init_plays(simulated_test_runner, is_friendly, force_out):
             else PlayName.HaltPlay
         )
 
-<<<<<<< HEAD
     simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.KICKOFF, team=kicking_team
     )
     simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.KICKOFF, team=non_kicking_team
     )
-||||||| 197d7ff13 (mystery halt issue persists, adjusted fsm)
-    simulated_test_runner.gamecontroller.send_gc_command(gc_command=Command.Type.KICKOFF, team=kicking_team)
-    simulated_test_runner.gamecontroller.send_gc_command(gc_command=Command.Type.KICKOFF, team=non_kicking_team)
-=======
-    simulated_test_runner.gamecontroller.send_gc_command(gc_command=Command.Type.NORMAL_START, team=kicking_team)
-    simulated_test_runner.gamecontroller.send_gc_command(gc_command=Command.Type.KICKOFF, team=kicking_team)
->>>>>>> parent of 197d7ff13 (mystery halt issue persists, adjusted fsm)
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
 
-<<<<<<< HEAD
 @pytest.mark.parametrize(
     "is_friendly_test, force_open",
     [(True, False), (True, True), (False, False), (False, True)],
 )
-||||||| 197d7ff13 (mystery halt issue persists, adjusted fsm)
-@pytest.mark.parametrize("is_friendly_test, force_open", [(True, False), (True, True), (False, False), (False, True)])
-=======
-@pytest.mark.parametrize("is_friendly_test, force_open", [(True, False)])
->>>>>>> parent of 197d7ff13 (mystery halt issue persists, adjusted fsm)
 def test_kickoff_play(simulated_test_runner, is_friendly_test, force_open):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
