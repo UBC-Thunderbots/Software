@@ -149,7 +149,7 @@ def main(
         command += ["--jobs=" + jobs_option]
 
     if enable_thunderscope:
-        command += ["--spawn_strategy=standalone", "--test_env=DISPLAY=:0"]
+        command += ["--spawn_strategy=local", "--test_env=DISPLAY=:0"]
 
     # Don't cache test results
     if action == ActionArgument.test:
