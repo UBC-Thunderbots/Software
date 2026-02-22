@@ -7,7 +7,7 @@
     dest: ~/
     copy_links: true
 
-# Output is streamed to target host's (Jetson/Pi's /tmp/setup.log)
+# Output is streamed to target host's (Pi's /tmp/setup.log)
 - name: Running the setup script, this will take a while
   become_method: ansible.builtin.sudo
   become: true
@@ -16,16 +16,6 @@
   changed_when: true
   args:
     chdir: ~/
-
-- name: Configure Redis persistence setting
-  become: true
-  become_method: ansible.builtin.sudo
-  ansible.builtin.lineinfile:
-    path: /etc/redis/redis.conf
-    state: present
-    regexp: ^(appendonly)
-    line: "appendonly yes"
-    backrefs: true
 
 - name: Disable WiFi power management
   block:

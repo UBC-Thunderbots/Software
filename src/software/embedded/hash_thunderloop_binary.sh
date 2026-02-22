@@ -14,7 +14,7 @@ a60a083f11289d0904c9c4bf8fa59a59  thunderloop
 
 using the awk command filters out only the first argument passed to it, in this case the MD5 hash
     '
-hash=$(md5sum ~/thunderbots_binaries/thunderloop | awk '{ print $1}')
+hash=$(md5sum ~/thunderbots_binaries/thunderloop_main | awk '{ print $1}')
 run_date=$(date '+%x %H:%M')
 
 echo "$hash" > ~/thunderbots_hashes/thunderloop.hash
