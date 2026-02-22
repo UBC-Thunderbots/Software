@@ -147,6 +147,9 @@ def main(
     # limit number of jobs
     if jobs_option:
         command += ["--jobs=" + jobs_option]
+    
+    if enable_thunderscope:
+        command += ["--spawn_strategy=standalone", "--test_env=DISPLAY=:0"]
 
     # Don't cache test results
     if action == ActionArgument.test:
