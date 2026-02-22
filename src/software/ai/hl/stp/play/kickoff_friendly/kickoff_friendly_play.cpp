@@ -6,8 +6,8 @@
 
 
 KickoffFriendlyPlay::KickoffFriendlyPlay(
-        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        :PlayBase<KickoffFriendlyPlayFSM>(ai_config_ptr, true)
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayBase<KickoffFriendlyPlayFSM>(ai_config_ptr, true)
 {
 }
 
@@ -35,4 +35,5 @@ std::vector<std::string> KickoffFriendlyPlay::getState()
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, KickoffFriendlyPlay,
-        std::shared_ptr<const TbotsProto::AiConfig>> factory;
+                       std::shared_ptr<const TbotsProto::AiConfig>>
+    factory;

@@ -1,26 +1,27 @@
 #include "software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play_fsm.h"
 
 KickoffEnemyPlayFSM::KickoffEnemyPlayFSM(
-        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : PlayFSM(ai_config_ptr),
-          shadow_enemy_tactics{std::make_shared<ShadowEnemyTactic>(ai_config_ptr),
-                               std::make_shared<ShadowEnemyTactic>(ai_config_ptr)},
-          move_tactics{std::make_shared<MoveTactic>(ai_config_ptr),
-                       std::make_shared<MoveTactic>(ai_config_ptr),
-                       std::make_shared<MoveTactic>(ai_config_ptr),
-                       std::make_shared<MoveTactic>(ai_config_ptr),
-                       std::make_shared<MoveTactic>(ai_config_ptr)}
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM(ai_config_ptr),
+      shadow_enemy_tactics{std::make_shared<ShadowEnemyTactic>(ai_config_ptr),
+                           std::make_shared<ShadowEnemyTactic>(ai_config_ptr)},
+      move_tactics{std::make_shared<MoveTactic>(ai_config_ptr),
+                   std::make_shared<MoveTactic>(ai_config_ptr),
+                   std::make_shared<MoveTactic>(ai_config_ptr),
+                   std::make_shared<MoveTactic>(ai_config_ptr),
+                   std::make_shared<MoveTactic>(ai_config_ptr)}
 {
 }
 
 
 void KickoffEnemyPlayFSM::createKickoffSetupPositions(const WorldPtr &world_ptr)
 {
-    // these positions are picked according to the following: createKickoffSetupPositions();
-    // slide https://images.slideplayer.com/32/9922349/slides/slide_2.jpg since we only
-    // have 6 robots at the maximum, 3 robots will shadow threats up front, 1 robot is
-    // dedicated as the goalie, and the other 2 robots will defend either post (as show in
-    // the image)
+    // these positions are picked according to the following:
+    // createKickoffSetupPositions(); slide
+    // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg since we only have 6
+    // robots at the maximum, 3 robots will shadow threats up front, 1 robot is dedicated
+    // as the goalie, and the other 2 robots will defend either post (as show in the
+    // image)
     //
     // Positions 1,2 are the most important, 3,4,5 are a fallback
     // if there aren't as many threats to shadow. Robots will be assigned

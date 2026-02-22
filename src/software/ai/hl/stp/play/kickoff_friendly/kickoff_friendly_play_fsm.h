@@ -27,7 +27,8 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
      *
      * @param ai_config_ptr the play config for this play FSM
      */
-    explicit KickoffFriendlyPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    explicit KickoffFriendlyPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
 
     /**
@@ -100,24 +101,24 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
         DEFINE_SML_GUARD(isPlaying)
 
         return make_transition_table(
-                // src_state + event [guard] / action = dest_state
-                // PlaySelectionFSM will transition to OffensePlay after the kick.
-                *SetupState_S + Update_E[!isSetupDone_G] / setupKickoff_A = SetupState_S,
+            // src_state + event [guard] / action = dest_state
+            // PlaySelectionFSM will transition to OffensePlay after the kick.
+            *SetupState_S + Update_E[!isSetupDone_G] / setupKickoff_A = SetupState_S,
 
-                // shoot directly at net if possible.
-                SetupState_S + Update_E[shotFound_G]                = ShootState_S,
-                ShootState_S + Update_E[!isPlaying_G] / shootBall_A = ShootState_S,
-                ShootState_S + Update_E[isPlaying_G]                = X,
+            // shoot directly at net if possible.
+            SetupState_S + Update_E[shotFound_G]                = ShootState_S,
+            ShootState_S + Update_E[!isPlaying_G] / shootBall_A = ShootState_S,
+            ShootState_S + Update_E[isPlaying_G]                = X,
 
-                // else chip over the defenders.
-                SetupState_S + Update_E[!shotFound_G]             = ChipState_S,
-                ChipState_S + Update_E[!isPlaying_G] / chipBall_A = ChipState_S,
-                ChipState_S + Update_E[isPlaying_G]               = X,
+            // else chip over the defenders.
+            SetupState_S + Update_E[!shotFound_G]             = ChipState_S,
+            ChipState_S + Update_E[!isPlaying_G] / chipBall_A = ChipState_S,
+            ChipState_S + Update_E[isPlaying_G]               = X,
 
-                X + Update_E = X);
+            X + Update_E = X);
     }
 
-private:
+   private:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<KickoffChipTactic> kickoff_chip_tactic;
     std::shared_ptr<KickTactic> shoot_tactic;

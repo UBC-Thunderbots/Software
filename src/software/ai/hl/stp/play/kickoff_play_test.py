@@ -51,6 +51,7 @@ def init_world_state(runner, blue_bots, yellow_bots):
         ),
     )
 
+
 def init_plays(simulated_test_runner, is_friendly, force_out):
     blue_play = Play()
     yellow_play = Play()

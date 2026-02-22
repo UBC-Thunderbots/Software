@@ -13,7 +13,7 @@
 
 
 
-struct KickoffEnemyPlayFSM: PlayFSM<KickoffEnemyPlayFSM>
+struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
 {
     class SetupState;
 
@@ -27,7 +27,8 @@ struct KickoffEnemyPlayFSM: PlayFSM<KickoffEnemyPlayFSM>
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit KickoffEnemyPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    explicit KickoffEnemyPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
 
     /**

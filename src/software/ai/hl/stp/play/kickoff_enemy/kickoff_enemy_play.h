@@ -1,10 +1,10 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/play/play_fsm.hpp"
-#include "software/ai/hl/stp/play/play_base.hpp"
 #include "software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 
 /**
  * A play that runs when its currently the enemy kick off.
