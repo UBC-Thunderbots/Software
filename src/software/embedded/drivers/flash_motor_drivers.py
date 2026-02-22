@@ -1,9 +1,11 @@
 import subprocess
 import time
 from gpiozero import LED
+from rich import print
 
 # The reset pins for the motor drivers
-MOTOR_DRIVER_RESET_PINS = [5, 6, 7, 8]
+# MOTOR_DRIVER_RESET_PINS = [23, 12]
+MOTOR_DRIVER_RESET_PINS = [12]
 
 class MotorDriverFlasher:
     def __init__(self, pins):
@@ -34,9 +36,8 @@ class MotorDriverFlasher:
                 result = subprocess.run(
                     [
                         "openocd",
-                        "-f", "raspberrypi.cfg",
-                        "-f", "target/stm32f0x.cfg",
-                        "-c", "program mdv6_firmware_main.bin verify reset exit 0x08000000",
+                        "-f", "stm32_rpi.cfg",
+                        "-c", "program mdv6_firmware_main verify reset run exit",
                     ],
                     capture_output=True,
                     text=True,
@@ -56,7 +57,10 @@ class MotorDriverFlasher:
         # After flashing all, ensure all are set to High (Run)
         print("Flashing complete. Setting all drivers to RUN state.")
         for driver in self.drivers:
+            driver.off()
+            time.sleep(0.5)
             driver.on()
+        print("Reset complete.")
 
 
 if __name__ == "__main__":

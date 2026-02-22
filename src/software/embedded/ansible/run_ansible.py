@@ -29,9 +29,14 @@ def ansible_runner(playbook: str, options: dict = {}):
 
     # parse options
     vars = set(options.get("extra_vars", []))
+    if "BUILD_WORKSPACE_DIRECTORY" in os.environ:
+        vars.add(f"workspace_dir={os.environ['BUILD_WORKSPACE_DIRECTORY']}")
+    
+    ssh_pass = options.get("ssh_pass", "")
+    vars.add(f"ansible_sudo_pass={ssh_pass}")
+
     tags = set(options.get("tags", {}))
     skip_tags = set(options.get("skip_tags", {}))
-    ssh_pass = options.get("ssh_pass", "")
 
     hosts = set(options.get("hosts", []))
     host_aliases = hosts.copy()
@@ -105,7 +110,12 @@ def ansible_runner(playbook: str, options: dict = {}):
         passwords={"conn_pass": ssh_pass, "become_pass": ssh_pass},
     )
 
-    pbex.run()
+    try:
+        pbex.run()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise e
 
 
 def main():

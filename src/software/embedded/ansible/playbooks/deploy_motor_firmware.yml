@@ -3,13 +3,14 @@
   hosts: THUNDERBOTS_HOSTS
 
   vars:
-    repo_root: "{{ playbook_dir }}/../../../../"
+    repo_root: "{{ workspace_dir | default(playbook_dir + '/../../../../') }}"
     # Bazel output location (convenience symlink)
-    bazel_out_path: "bazel-bin/external/mdv6_firmware/mdv6_firmware_main"
-    firmware_bin_name: "mdv6_firmware_main.bin"
+    bazel_out_path: "bazel-bin/external/+_repo_rules2+mdv6_firmware/mdv6_firmware_main"
+    firmware_bin_name: "mdv6_firmware_main"
     firmware_archive_name: "mdv6_firmware.tar.gz"
     script_path: "software/embedded/drivers/flash_motor_drivers.py"
     cfg_path: "software/embedded/drivers/raspberrypi.cfg"
+    stm32_cfg_path: "software/embedded/drivers/stm32_rpi.cfg"
     remote_dir: "~/motor_firmware"
 
   tasks:
@@ -20,18 +21,11 @@
         chdir: "{{ repo_root }}"
       changed_when: false
 
-    - name: Convert ELF to Binary locally
-      delegate_to: localhost
-      ansible.builtin.command: "objcopy -O binary {{ bazel_out_path }} {{ firmware_bin_name }}"
-      args:
-        chdir: "{{ repo_root }}"
-      changed_when: false
-
     - name: Archive firmware binary locally
       delegate_to: localhost
-      ansible.builtin.command: "tar -czf {{ firmware_archive_name }} {{ firmware_bin_name }}" # noqa: command-instead-of-module
+      ansible.builtin.command: "tar -czf {{ firmware_archive_name }} {{ bazel_out_path | basename }}" # noqa: command-instead-of-module
       args:
-        chdir: "{{ repo_root }}"
+        chdir: "{{ repo_root }}/{{ bazel_out_path | dirname }}"
       changed_when: false
 
     - name: Remove existing remote directory
@@ -47,7 +41,7 @@
 
     - name: Copy firmware archive to remote
       ansible.builtin.copy:
-        src: "{{ repo_root }}/{{ firmware_archive_name }}"
+        src: "{{ repo_root }}/{{ bazel_out_path | dirname }}/{{ firmware_archive_name }}"
         dest: "{{ remote_dir }}/{{ firmware_archive_name }}"
         mode: "0644"
 
@@ -63,15 +57,24 @@
         dest: "{{ remote_dir }}/raspberrypi.cfg"
         mode: "0644"
 
+    - name: Copy STM32 OpenOCD config to remote
+      ansible.builtin.copy:
+        src: "{{ repo_root }}/{{ stm32_cfg_path }}"
+        dest: "{{ remote_dir }}/stm32_rpi.cfg"
+        mode: "0644"
+
     - name: Unarchive firmware on remote
       ansible.builtin.unarchive:
         src: "{{ remote_dir }}/{{ firmware_archive_name }}"
         dest: "{{ remote_dir }}"
         remote_src: true
 
+    - name: Configure Pinmux for SWD
+      ansible.builtin.shell: "echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 4 ip pu && echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 17 ip pu && echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 18 ip pu"
+      ignore_errors: true
+
     - name: Run flashing script
-      become: true
-      ansible.builtin.command: "python3 flash_motor_drivers.py"
+      ansible.builtin.shell: "echo {{ ansible_sudo_pass }} | sudo -S python3 flash_motor_drivers.py"
       args:
         chdir: "{{ remote_dir }}"
       changed_when: true
