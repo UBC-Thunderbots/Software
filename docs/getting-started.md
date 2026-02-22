@@ -31,7 +31,6 @@
     - [Tracy](#tracy)
   - [Building for the robot](#building-for-the-robot)
   - [Deploying Robot Software to the robot](#deploying-robot-software-to-the-robot)
-  - [Testing Robot Software locally](#testing-robot-software-locally)
   - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
     - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
 - [Workflow](#workflow)
@@ -366,48 +365,10 @@ We use Ansible to automatically update software running on the robot. [More info
 To update binaries on a working robot, you can run:
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
-Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), and `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
-
-## Testing Robot Software locally
-
-It is possible to run Thunderloop without having a fully-working robot. Using this mode is useful when testing features that don't require the power board or motors.
-
-1. To run Thunderloop locally on your computer
-    1. Create a TOML configuration file in the opt/tbotspython directory with the following content (replace values as needed):
-        ```toml
-        robot_id = "1"
-        channel_id = "0"
-        network_interface = "tbotswifi5"
-        kick_constant = "0"
-        kick_coeff = "0.0"
-        chip_pulse_width = "0"
-        battery_voltage = "0.0"
-        current_draw = "0.0"
-        cap_voltage = "0.0"
-        ```
-        Where:
-        - `robot_id` is the robot's ID (e.g. `1`, `2`, etc.)
-        - `network_interface` is one of the interfaces listed by `ip a`.
-        - `channel_id` is the channel id of the robot (e.g. `1`, `2`, etc.)
-        - `kick_coeff` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-        - `kick_constant` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-        - `chip_pulse_width` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-    2. Now, run Thunderloop with the following command:
-        - `bazel run //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED`
-
-2. If you have a robot PC that doesn't have proper communication with the power or motor board, you can still run Thunderloop in a limited capacity to test software features (eg. networking).
-    1. First, build the Thunderloop binary:
-        - `bazel build //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED --platforms=//toolchains/cc:robot`
-    2. Find the `<robot_ip>` of the robot you want to run Thunderloop on. This guide may help you find the IP address of the robot: [Useful Robot Commands](useful-robot-commands.md#Wifi-Disclaimer).
-    3. Copy the binary to the robot:
-        - `scp bazel-bin/software/embedded/thunderloop_main robot@<robot_ip>:/home/robot/thunderloop_main`
-    4. SSH into the robot using the following command:
-        - `ssh robot@<robot_ip>`
-    5. Run the Thunderloop binary on the robot:
-        - `sudo ./thunderloop_main`
+Where `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
 
 ## Setting up Virtual Robocup 2021
 
