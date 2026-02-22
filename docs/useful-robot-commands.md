@@ -21,7 +21,6 @@
 - [On Robot Commands](#on-robot-commands)
   - [Systemd Services](#systemd-services)
   - [Debugging Uart](#debugging-uart)
-  - [Redis](#redis)
 
 <!--TOC-->
 
@@ -63,14 +62,6 @@ flowchart TD
                                               `service thunderloop restart`)
     tloop_status --> |Running| tloop_logs(Check Thunderloop logs for errors
                                           `journalctl -fu thunderloop -n 300`)
-    tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface` return 'wlan0' or 'tbots', 
-    and does `redis-cli get /channel_id` return '0'?)
-    tloop_logs --> |Contains Errors| rip2("Fix errors or check errors with a lead")
-    check_redis --> |No| update_redis("Update Redis constants by running:
-                                      `redis-cli set /network_interface 'wlan0'` (for Nanos) OR `redis-cli set /network_interface 'tbots'` (for Pis)
-                                      `redis-cli set /channel_id '0'`")
-    check_redis --> |Yes| rip3(Check with a lead)
-    update_redis --> tloop_restart
     tloop_restart --> tloop_status
     end
 ```
@@ -256,36 +247,3 @@ If the serial_port is busy, screen will not launch and instead says `screen is t
 Powerloop uart communication is encoded so you can't read it from screen and will appear as a mix of foreign characters
 
 Pressing the reset button once will send a status msg over its connected port. This is useful for sanity checking.
-
-## Redis
-
-Current redis keys that are used are available in `software/constants.h`.  Official Documentation [here](https://redis.io/docs/manual/cli/).
-
-<b>Values should be strings. For example `set \ROBOT_ID "0"`</b>
-
-Redis repl can be accessed through the following command.
-
-```bash
-redis-cli
-```
-
-Other common commands (once inside redis repl):
-
-```bash
-get <redis_key>
-set <redis_key> <value>
-```
-
-To Exit:
-
-```bash
-quit
-```
-
-Alternative (without entering redis repl):
-
-```bash
-redis-cli get <redis_key>  
-redis-cli set <redis_key> <value>
-```
-
