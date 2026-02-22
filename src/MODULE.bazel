@@ -215,13 +215,13 @@ http_archive(
 register_toolchains("//toolchains/python:py_toolchain")
 
 register_toolchains(
-    "//toolchains/python:k8_jetson_nano_cross_compile_py_cc_toolchain",
+    "//toolchains/python:k8_aarch64_linux_py_cc_toolchain",
     "//toolchains/python:py_cc_toolchain_host_x86_64",
     "//toolchains/python:py_cc_toolchain_host_aarch64",
 )
 
 register_toolchains(
-    "//toolchains/cc:cc_toolchain_for_k8_jetson_nano_cross_compile",
+    "//toolchains/cc:cc_toolchain_for_k8_aarch64_linux",
     "//toolchains/cc:cc_toolchain_for_k8",
     "//toolchains/cc:cc_toolchain_for_aarch64",
 )
@@ -251,8 +251,8 @@ new_local_repository(
 )
 
 new_local_repository(
-    name = "k8_jetson_nano_cross_compile_gcc",
-    build_file = "@//extlibs:k8_jetson_nano_cross_compile_gcc.BUILD",
+    name = "k8_aarch64_linux_gcc",
+    build_file = "@//extlibs:k8_aarch64_linux_gcc.BUILD",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
 )
 
@@ -263,7 +263,7 @@ new_local_repository(
 )
 
 new_local_repository(
-    name = "py_cc_toolchain_for_k8_jetson_nano_cross_compile",
+    name = "py_cc_toolchain_for_k8_aarch64_linux",
     build_file = "@//extlibs:py_cc_toolchain.BUILD",
     path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
 )
