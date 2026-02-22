@@ -24,7 +24,7 @@ class KickoffFriendlyPlay : public Play
     void updateTactics(const PlayUpdate &play_update) override;
     std::vector<std::string> getState() override;
 
-   private:q
-    FSM<KickoffFriendlyPlayFSM> fsm;
+   private:
+    q FSM<KickoffFriendlyPlayFSM> fsm;
     KickoffFriendlyPlayFSM::ControlParams control_params;
 };

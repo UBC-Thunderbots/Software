@@ -183,11 +183,18 @@ SetupState --> SetupState : [!isSetupDone]\n<i>setupKickoff</i>
 SetupState --> ShootState : [shotFound]
 ShootState --> ShootState : [!isPlaying]\n<i>shootBall</i>
 ShootState --> Terminate:::terminate : [isPlaying]
-SetupState --> ChipState
+<<<<<<<HEADSetupState --> ChipState
 ChipState --> ShootState : [shotFound && !isPlaying]
 ChipState --> ChipState : [!isPlaying]\n<i>chipBall</i>
 ChipState --> Terminate:::terminate : [isPlaying]
-Terminate:::terminate --> Terminate:::terminate
+|||||||197d7ff13(mysteryhaltissuepersists,adjustedfsm)SetupState --> ChipState
+ChipState --> ShootState : [shotFound && !isPlaying]
+ChipState --> ChipState : [!isPlaying]\n<i>chipBall</i>
+ChipState --> Terminate:::terminate : [isPlaying]
+ --> ======SetupState_S+Update_E[!shotFound_G]=ChipState
+ChipState --> ChipState : [!isPlaying]\n<i>chipBall</i>
+ChipState --> Terminate:::terminate : [isPlaying]
+>>>>>>>parentof197d7ff13(mysteryhaltissuepersists,adjustedfsm)X --> Terminate:::terminate
 
 ```
 
