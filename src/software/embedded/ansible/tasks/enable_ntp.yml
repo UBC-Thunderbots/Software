@@ -2,16 +2,16 @@
 - name: Make sure NTP is enabled to sync time for setup_pi.yml
   block:
     - name: Check if NTP is enabled
-      ansible.builtin.command: timedatectl status
-      register: timedatectl_result
+      ansible.builtin.command: timedatectl show --property=NTP --value
+      register: ntp_enabled
 
-    - name: Enable automatic time synchronization
+    - name: Enable automatic time synchronization {{ntp_enabled.stdout}}
       ansible.builtin.command: timedatectl set-ntp on
-      when: "{{'NTP service: active' not in timedatectl_result.stdout}}"
+      when: ntp_enabled.stdout == "no"
       become: true
 
     - name: Ensure the systemd-timesyncd service is running and enabled
-      ansible.builtin.systemd_service:
+      ansible.builtin.systemd:
         name: systemd-timesyncd
         state: started
         enabled: true
