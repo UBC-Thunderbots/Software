@@ -11,6 +11,8 @@ MoveTestPlay::MoveTestPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config
 void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                   const WorldPtr &world_ptr)
 {
+    // This function doesn't get called, it should be removed once coroutines
+    // are phased out
 }
 
 void MoveTestPlay::updateTactics(const PlayUpdate &play_update)

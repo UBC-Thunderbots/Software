@@ -37,6 +37,7 @@ struct HaltTestPlayFSM : PlayFSM<HaltTestPlayFSM>
         DEFINE_SML_ACTION(updateHalt)
 
         return make_transition_table(
+            // src_state + event [guard] / action = dest_state
             *HaltTestState_S + Update_E / updateHalt_A = HaltTestState_S,
             X + Update_E / updateHalt_A                = X);
     }

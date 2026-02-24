@@ -56,6 +56,7 @@ struct MoveTestPlayFSM : PlayFSM<MoveTestPlayFSM>
         DEFINE_SML_GUARD(moveDone)
 
         return make_transition_table(
+            // src_state + event [guard] / action = dest_state
             *MoveTestState_S + Update_E[!moveDone_G] / updateMove_A = MoveTestState_S,
             MoveTestState_S + Update_E[moveDone_G] / updateMove_A   = X,
             X + Update_E / updateMove_A                             = X);
