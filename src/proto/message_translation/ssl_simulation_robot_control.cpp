@@ -97,7 +97,7 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
         case TbotsProto::PowerControl::ChickerControl::kChipPulseWidth:
         {
             LOG(FATAL)
-                << "Chiper control using pulse widths is not supported in simulation";
+                << "Chipper control using pulse widths is not supported in simulation";
             break;
         }
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:

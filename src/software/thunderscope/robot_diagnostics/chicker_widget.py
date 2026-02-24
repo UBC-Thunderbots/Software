@@ -104,22 +104,28 @@ class ChickerWidget(QWidget):
         )
 
         self.kicker_pulse_width_slider.valueChanged.connect(
-            lambda new_value: self.kicker_pulse_width_label.setText(str(new_value))
+            lambda new_value: self.kicker_pulse_width_label.setText(
+                str(new_value))
         )
 
         self.chipper_pulse_width_slider.valueChanged.connect(
-            lambda new_value: self.chipper_pulse_width_label.setText(str(new_value))
+            lambda new_value: self.chipper_pulse_width_label.setText(
+                str(new_value))
         )
 
         kick_chip_sliders_hbox_layout = QHBoxLayout()
         kick_chip_sliders_hbox_layout.addLayout(self.kick_power_slider_layout)
-        kick_chip_sliders_hbox_layout.addLayout(self.chip_distance_slider_layout)
-        kick_chip_sliders_hbox_layout.addLayout(self.kicker_pulse_width_slider_layout)
-        kick_chip_sliders_hbox_layout.addLayout(self.chipper_pulse_width_slider_layout)
+        kick_chip_sliders_hbox_layout.addLayout(
+            self.chip_distance_slider_layout)
+        kick_chip_sliders_hbox_layout.addLayout(
+            self.kicker_pulse_width_slider_layout)
+        kick_chip_sliders_hbox_layout.addLayout(
+            self.chipper_pulse_width_slider_layout)
 
         kick_chip_sliders_box = QGroupBox()
         kick_chip_sliders_box.setLayout(kick_chip_sliders_hbox_layout)
-        kick_chip_sliders_box.setTitle("Kick Power, Chip Distance, and Pulse Widths")
+        kick_chip_sliders_box.setTitle(
+            "Kick Power, Chip Distance, and Pulse Widths")
 
         chicker_widget_vbox_layout.addWidget(kick_chip_sliders_box)
 
@@ -133,8 +139,6 @@ class ChickerWidget(QWidget):
 
         self.kick_button = self.kick_chip_buttons[0]
         self.chip_button = self.kick_chip_buttons[1]
-
-        chicker_widget_vbox_layout.addWidget(self.kick_chip_buttons_box)
 
         # Initializing auto kick & chip buttons
         self.radio_buttons_group = QButtonGroup()
@@ -160,36 +164,40 @@ class ChickerWidget(QWidget):
             self.power_mode_buttons_box,
             self.power_mode_buttons,
         ) = common_widgets.create_radio(
-            ["Power (m/s or m)", "Power (Pulse Width)"], self.power_mode_buttons_group
+            ["Power (m/s or m)",
+             "Power (Pulse Width)"], self.power_mode_buttons_group
         )
         self.power_mode_buttons_box.setTitle("Power Mode")
 
         self.meters_per_second_button = self.power_mode_buttons[0]
         self.pulse_width_button = self.power_mode_buttons[1]
 
-        self.meters_per_second_button.clicked.connect(self.hide_pulse_width_show_power)
-        self.pulse_width_button.clicked.connect(self.hide_power_show_pulse_width)
+        self.meters_per_second_button.clicked.connect(
+            self.hide_pulse_width_show_power)
+        self.pulse_width_button.clicked.connect(
+            self.hide_power_show_pulse_width)
 
         self.meters_per_second_button.setChecked(True)
         self.hide_pulse_width_show_power()
 
         self.kick_button.clicked.connect(
             lambda: self.send_command_and_timeout(
-                lambda: ChickerCommandMode.KICK_PULSE_WIDTH
+                ChickerCommandMode.KICK_PULSE_WIDTH
                 if self.pulse_width_button.isChecked()
                 else ChickerCommandMode.KICK
             )
         )
         self.chip_button.clicked.connect(
             lambda: self.send_command_and_timeout(
-                lambda: ChickerCommandMode.CHIP_PULSE_WIDTH
+                ChickerCommandMode.CHIP_PULSE_WIDTH
                 if self.pulse_width_button.isChecked()
                 else ChickerCommandMode.CHIP
             )
         )
 
-        chicker_widget_vbox_layout.addWidget(self.auto_kick_chip_buttons_box)
         chicker_widget_vbox_layout.addWidget(self.power_mode_buttons_box)
+        chicker_widget_vbox_layout.addWidget(self.auto_kick_chip_buttons_box)
+        chicker_widget_vbox_layout.addWidget(self.kick_chip_buttons_box)
 
     def hide_pulse_width_show_power(self):
         """Replace the pulse_width kicker/chipper sliders with the m/s and m ones"""
