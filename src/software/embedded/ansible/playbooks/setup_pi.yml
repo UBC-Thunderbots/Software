@@ -12,7 +12,7 @@
         file: ../tasks/check_internet.yml
 
     - name: Time sync by enabling NTP
-      tags: configure_pi
+      tags: dependencies
       ansible.builtin.import_tasks:
         file: ../tasks/enable_ntp.yml
 
