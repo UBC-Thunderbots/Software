@@ -5,10 +5,9 @@
       ansible.builtin.command: timedatectl show --property=NTP --value
       register: ntp_enabled
 
-    - name: Enable automatic time synchronization {{ntp_enabled.stdout}}
-      ansible.builtin.command: timedatectl set-ntp on
+    - name: Enable automatic time synchronization
+      ansible.builtin.command: sudo timedatectl set-ntp on
       when: ntp_enabled.stdout == "no"
-      become: true
 
     - name: Ensure the systemd-timesyncd service is running and enabled
       ansible.builtin.systemd:
