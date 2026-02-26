@@ -48,7 +48,7 @@ class FullSystem:
             # We keep the path relative to match processes that might have been
             # started in different working directories, but keep the runtime dir
             # the same as this one so we don't kill other fullsystems
-            "unix_full_system",
+            self.path_to_binary,
             "--runtime_dir={}".format(self.full_system_runtime_dir),
         ]
         self.debug_full_system = debug_full_system
@@ -83,9 +83,6 @@ class FullSystem:
             "--ci" if not self.running_in_realtime else "",
             self.log_level.value,
         )
-
-        if not self.debug_full_system:
-            kill_cmd_if_running(self.generic_command)
 
         if self.should_run_under_sudo:
             if not is_cmd_running(self.generic_command):
@@ -137,6 +134,7 @@ gdb --args bazel-bin/{self.full_system}
                     time.sleep(1)
 
         else:
+            kill_cmd_if_running(self.generic_command)
             self.full_system_proc = Popen(self.full_system.split(" "))
             if self.should_restart_on_crash:
                 self.thread.start()
