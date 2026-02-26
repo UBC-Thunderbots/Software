@@ -12,9 +12,9 @@ def _find_cmd(command: list[str]) -> Iterator[psutil.Process]:
     :param command: Command to match against. List of strings.
     :yield: Processes that match the given command.
     """
-    for proc in psutil.process_iter(['cmdline']):
+    for proc in psutil.process_iter(["cmdline"]):
         try:
-            cmdline = proc.info['cmdline']
+            cmdline = proc.info["cmdline"]
             if not cmdline:
                 continue
 
@@ -27,6 +27,7 @@ def _find_cmd(command: list[str]) -> Iterator[psutil.Process]:
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
 
+
 def is_cmd_running(command: list[str]) -> bool:
     """Check if there is any running process that was launched with the given command.
 
@@ -37,6 +38,7 @@ def is_cmd_running(command: list[str]) -> bool:
         return True
     return False
 
+
 def kill_cmd_if_running(command: list[str]) -> None:
     """Kill (not terminate) all running processes that was launched with the given command.
 
@@ -46,6 +48,6 @@ def kill_cmd_if_running(command: list[str]) -> None:
         try:
             logging.info(f"Killing existing {command[0]} process PID={proc.pid}")
             proc.kill()
-            proc.wait(timeout = 3)
+            proc.wait(timeout=3)
         except (psutil.NoSuchProcess, psutil.TimeoutExpired):
             pass

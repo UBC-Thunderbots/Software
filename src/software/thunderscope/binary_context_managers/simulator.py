@@ -67,7 +67,9 @@ class Simulator:
         if self.debug_simulator:
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
-            if not is_cmd_running(self.generic_command): # used generic_command instead of hardcoding the array here
+            if not is_cmd_running(
+                self.generic_command
+            ):  # used generic_command instead of hardcoding the array here
                 logging.info(
                     (
                         f"""
