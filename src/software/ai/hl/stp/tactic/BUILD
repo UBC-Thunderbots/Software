@@ -1,15 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_test(
-    name = "penalty_setup_tactic_test",
-    srcs = ["penalty_setup_tactic_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/test_util",
-    ],
-)
-
 cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
