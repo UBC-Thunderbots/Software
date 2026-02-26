@@ -28,7 +28,7 @@ class MotorDriverFlasher:
             target_driver.on()
 
             # Short delay to ensure lines settle
-            time.sleep(0.1)
+            time.sleep(1)
 
             print(f"Flashing driver {i}...")
             try:
@@ -37,7 +37,7 @@ class MotorDriverFlasher:
                     [
                         "openocd",
                         "-f", "stm32_rpi.cfg",
-                        "-c", "program mdv6_firmware_main verify reset run exit",
+                        "-c", "program mdv6_firmware_main verify reset exit",
                     ],
                     capture_output=True,
                     text=True,

@@ -24,6 +24,8 @@
       ansible.builtin.import_tasks:
         file: ../tasks/setup_robot_software_deps.yml
 
+
+    # TODO ADD COMPILE OPENOCD FROM SOURCE OPTIONS
     - name: Setup systemd
       tags:
         - dependencies
