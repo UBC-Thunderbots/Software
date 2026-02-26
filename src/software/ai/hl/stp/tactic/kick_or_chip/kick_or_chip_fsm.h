@@ -19,16 +19,8 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
         // The direction the Robot will kick in
         Angle kick_or_chip_direction;
 
-	//True if chipping, false is kicking.
-	bool isChipping;
-	
-	// Unique for kick
-        // How fast the Robot will kick the ball in meters per second
-        double kick_speed_meters_per_second;
-
-	// Unique for chip
-        // The distance the robot will chip to
-        double chip_distance_meters;
+        // How the robot will chip or kick the ball and its associated parameter for that mode. For example, if the mode is AUTOKICK, then the parameter will be the speed of the kick, and if the mode is AUTOCHIP, then the parameter will be the distance of the chip.
+        AutoChipOrKick auto_chip_or_kick;
     };
 
     using Update = TacticFSM<KickOrChipFSM>::Update;
@@ -41,19 +33,11 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
     explicit KickOrChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
-     * Action that updates the MovePrimitive for kicking
+     * Action that updates the primitive to kick or chip the ball
      *
-     * @param event KickOrChipFSM::Update event
+     * @param event KickFSM::Update event
      */
-    void updateKick(const Update &event);
-
-
-    /**
-     * Action that updates the MovePrimitive for chippping
-     *
-     * @param event KickOrChipFSM::Update event
-     */
-    void updateChip(const Update &event);
+    void kickOrChipBall(const Update &event);
 
     /**
      * Action that updates the GetBehindBallFSM
@@ -83,14 +67,6 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
      */
     bool shouldRealignWithBall(const Update &event);
 
-    /**
-     * Guard that checks if ball should be chipped
-     *
-     * @param event KickFSM::Update event
-     *
-     * @return if the ball should be chipped
-     */
-    bool isChipping(const Update &event);
 
 
 
@@ -105,7 +81,6 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
 
         DEFINE_SML_GUARD(ballChicked)
         DEFINE_SML_GUARD(shouldRealignWithBall)
-	DEFINE_SML_GUARD(isChipping)
 
         DEFINE_SML_ACTION(updateKickOrChip)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
@@ -117,8 +92,7 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
 
             KickOrChipState_S + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A =
                 GetBehindBallFSM_S,
-            KickOrChipState_S + Update_E[!ballChicked_G && !isChipping] / updateKick_A = KickOrchipState_S,
-            KickOrChipState_S + Update_E[!ballChicked_G && isChipping] / updateChip_A = KickOrChipState_S,
+            KickOrChipState_S + Update_E[!ballChicked_G] / updateKickOrChip_A = KickOrChipState_S,
             KickOrChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }

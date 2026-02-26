@@ -2,7 +2,7 @@
 
 #include <queue>
 
-#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
+#include "software/ai/hl/stp/tactic/kick_or_chip_tactic/kick_or_chip_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
@@ -25,26 +25,19 @@ class KickOrChipTactic : public TacticBase<KickOrChipFSM, GetBehindBallFSM>
      *
      * @param kick_or_chip_origin The location where the kick will be taken
      * @param kick_or_chip_direction The direction the Robot will kick in
-     * @param isChipping Whether the ball should be chipped
-     * @param kick_speed_meters_per_second The speed of how fast the Robot
-     * will kick the ball in meters per second
-     * @param chip_distance_meters The distance of how far we want to chip the ball
+     * @param auto_chip_or_kick The mode of how the robot will chip or kick the ball, and the associated parameter for that modell
      */
     void updateControlParams(const Point& kick_or_chip_origin, const Angle& kick_or_chip_direction,
-			     bool isChipping, double kick_speed_meters_per_second,
-			     double chip_distance_meters);
+			     AutoChipOrKick auto_chip_or_kick);
     /**
      * Updates the control parameters for this KickTactic.
      *
      * @param kick_origin The location where the kick will be taken
      * @param kick_or_chip_target The target location where the kick or chip will aim for
-     * @param isChipping Whether the ball should be chipped
-     * @param kick_speed_meters_per_second The speed of how fast the Robot
-     * will kick the ball in meters per second
-     * @param chip_distance_meters The distance of how far we want to chip the ball
+     * @param auto_chip_or_kick The mode of how the robot will chip or kick the ball, and the associated parameter for that modell
      */
     void updateControlParams(const Point& kick_or_chip_origin, const Angle& kick_or_chip_target,
-			     bool isChipping, double kick_speed_meters_per_second);
+			     AutoChipOrKick auto_chip_or_kick);
 
     void accept(TacticVisitor& visitor) const override;
 };
