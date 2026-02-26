@@ -21,6 +21,8 @@ from cli.cli_params import (
     EnableThunderscopeOption,
     EnableVisualizerOption,
     StopAIOnStartOption,
+    SearchQueryArgument,
+    TestSuiteOption,
     DebugBinary,
     JobsOption,
 )
@@ -37,33 +39,11 @@ NUM_FILTERED_MATCHES_TO_SHOW = 10
 app = Typer()
 
 
-@app.command(
-    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
-    no_args_is_help=True,
-)
-def main(
-    ctx: Context,
+def fuzzy_find_target(
     action: ActionArgument,
-    search_query: str,
-    print_command: PrintCommandOption = False,
-    no_optimized_build: NoOptimizedBuildOption = False,
-    debug_build: DebugBuildOption = False,
-    select_debug_binaries: SelectDebugBinariesOption = None,
-    flash_robots: FlashRobotsOption = None,
-    ssh_password: SSHPasswordOption = None,
-    interactive_search: InteractiveModeOption = False,
-    tracy: TracyOption = False,
-    enable_thunderscope: EnableThunderscopeOption = False,
-    enable_visualizer: EnableVisualizerOption = False,
-    stop_ai_on_start: StopAIOnStartOption = False,
-    jobs_option: JobsOption = None,
-) -> None:
-    if bool(flash_robots) ^ bool(ssh_password):
-        print(
-            "If you want to flash robots, both the robot IDs and password must be provided"
-        )
-        sys.exit(1)
-
+    search_query: SearchQueryArgument,
+    interactive_search: InteractiveModeOption,
+) -> str:
     test_query = ["bazel", "query", "tests(//...)"]
     binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
     library_query = ["bazel", "query", "kind(.*_library,//...)"]
@@ -109,7 +89,53 @@ def main(
         target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
         print("User selected {}".format(target))
 
-    command = ["bazel", action.value, target]
+    return target
+
+
+@app.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+    no_args_is_help=True,
+)
+def main(
+    ctx: Context,
+    action: ActionArgument,
+    search_query: SearchQueryArgument = None,
+    print_command: PrintCommandOption = False,
+    no_optimized_build: NoOptimizedBuildOption = False,
+    debug_build: DebugBuildOption = False,
+    select_debug_binaries: SelectDebugBinariesOption = None,
+    flash_robots: FlashRobotsOption = None,
+    ssh_password: SSHPasswordOption = None,
+    interactive_search: InteractiveModeOption = False,
+    tracy: TracyOption = False,
+    enable_thunderscope: EnableThunderscopeOption = False,
+    enable_visualizer: EnableVisualizerOption = False,
+    stop_ai_on_start: StopAIOnStartOption = False,
+    test_suite: TestSuiteOption = False,
+    jobs_option: JobsOption = "",
+) -> None:
+    if bool(flash_robots) ^ bool(ssh_password):
+        print(
+            "If you want to flash robots, both the robot IDs and password must be provided"
+        )
+        sys.exit(1)
+
+    if search_query is None and (not test_suite or not action == ActionArgument.test):
+        print(
+            "You must specify a search query unless you are running the test suite, use ./tbots.py test --suite instead"
+        )
+        sys.exit(1)
+
+    if test_suite and action == ActionArgument.test:
+        target = """-- //...                              \\
+                      -//software/field_tests/...         \\
+                      -//toolchains/cc/...                \\
+                      -//software:unix_full_system_tar_gen"""
+        print("Running software and simulated gameplay test suite")
+    else:
+        target = fuzzy_find_target(action, search_query, interactive_search)
+
+    command = ["bazel", action.value]
     unknown_args = ctx.args
 
     # Trigger a debug build
@@ -150,6 +176,8 @@ def main(
         command += ["--cache_test_results=false"]
     if action == ActionArgument.run:
         command += ["--"]
+
+    command.append(target)
 
     bazel_arguments = unknown_args
     if stop_ai_on_start:
