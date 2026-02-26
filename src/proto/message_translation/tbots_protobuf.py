@@ -11,7 +11,7 @@ def create_world_state(
     blue_robot_locations: list[tbots_cpp.Point],
     ball_location: tbots_cpp.Point,
     ball_velocity: tbots_cpp.Vector,
-    blue_robot_orientations: list[float] = [],
+    blue_robot_orientations: list[tbots_cpp.Angle] = [],
 ) -> WorldState:
     """Initializes the world from a list of robot locations and ball location/velocity.
 
@@ -25,22 +25,24 @@ def create_world_state(
     """
     world_state = WorldState()
 
+    # TODO (#2558): add param for robot angular velocity since its used for some tests
+
     for robot_id, robot_location in enumerate(yellow_robot_locations):
         world_state.yellow_robots[robot_id].CopyFrom(
             RobotState(
                 global_position=Point(
                     x_meters=robot_location.x(), y_meters=robot_location.y()
                 ),
+                # Initialize angle of yellow robots the same cause its specified in any tests (yet)
                 global_orientation=Angle(radians=math.pi),
             )
         )
 
     for robot_id, robot_location in enumerate(blue_robot_locations):
-        orientation = 0
         try:
-            orientation = blue_robot_orientations[robot_id]
+            orientation = blue_robot_orientations[robot_id].toRadians()
         except IndexError:
-            pass
+            orientation = 0
         world_state.blue_robots[robot_id].CopyFrom(
             RobotState(
                 global_position=Point(

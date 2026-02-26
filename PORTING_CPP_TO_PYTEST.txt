@@ -1,0 +1,125 @@
+Notes for porting simulated c++ tests to python
+
+The notes follow the format of: c++ -> python
+
+Note: there may be some validation functions in c++ that don't exist in python,
+	   	mark with TODO (#2558): validate for (... c++ validation)
+
+example:
+
+eventually_validation_sequence_set = [
+		[
+				RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(destination, 0.05)]),
+				# TODO (#2558): validate robot is at orientation half
+				# TODO (#2558): validate robot is has angular velocity zero
+		]
+]
+
+---
+
+terminating_validation_functions -> eventually_validation_sequence_set
+
+std::vector<ValidationFunction> terminating_validation_functions = {
+		[destination, tactic](std::shared_ptr<World> world_ptr,
+													ValidationCoroutine::push_type& yield)
+		{
+				while (!tactic->done())
+				{
+						yield("Tactic not done");
+				}
+				robotAtPosition(1, world_ptr, destination, 0.05, yield);
+				// Check that conditions hold for 1000 ticks
+				unsigned num_ticks = 1000;
+				for (unsigned i = 0; i < num_ticks; i++)
+				{
+						robotAtPosition(1, world_ptr, destination, 0.05, yield);
+				}
+}};
+
+->
+
+eventually_validation_sequence_set = [
+		[
+				RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(destination, 0.05)]),
+		]
+]
+
+---
+
+non_terminating_validation_functions -> always_validation_sequence_set
+
+---
+
+auto tactic = std::make_shared<MoveTactic>(std::make_shared<TbotsProto::AiConfig>());
+tactic->updateControlParams(destination, Angle::zero());
+setTactic(1, tactic);
+
+->
+
+params = AssignedTacticPlayControlParams()
+params.assigned_tactics[1].move.CopyFrom(
+		MoveTactic(
+				destination=tbots_cpp.createPointProto(destination),
+				final_orientation=tbots_cpp.createAngleProto(tbots_cpp.Angle.zero()),
+				dribbler_mode=DribblerMode.OFF,
+				ball_collision_type=BallCollisionType.AVOID,
+				auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
+				max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+				obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+		)
+)
+simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
+		AssignedTacticPlayControlParams, params
+)
+
+params = AssignedTacticPlayControlParams()
+simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+		AssignedTacticPlayControlParams, params
+)
+
+---
+
+Point initial_position = Point(-3, 1.5);
+Point destination      = Point(2.5, -1.1);
+BallState ball_state(Point(4.5, -3), Vector(0, 0));
+auto friendly_robots =
+		TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
+auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+		{Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+		 field.enemyDefenseArea().negXNegYCorner(),
+		 field.enemyDefenseArea().negXPosYCorner()});
+
+...
+
+runTest(field_type, ball_state, friendly_robots, enemy_robots,
+				terminating_validation_functions, non_terminating_validation_functions,
+				Duration::fromSeconds(10));
+
+->
+
+simulated_test_runner.simulator_proto_unix_io.send_proto(
+		WorldState,
+		create_world_state(
+				blue_robot_locations=[initial_position],
+				blue_robot_orientations=[tbots_cpp.Angle.quarter()],
+				yellow_robot_locations=[tbots_cpp.Point(4, 0)],
+				ball_location=tbots_cpp.Point(1, 1),
+				ball_velocity=tbots_cpp.Vector(0, 0),
+		),
+)
+
+---
+
+runTest(field_type, ball_state, friendly_robots, enemy_robots,
+				terminating_validation_functions, non_terminating_validation_functions,
+				Duration::fromSeconds(10));
+
+->
+
+simulated_test_runner.run_test(
+		inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+		inv_always_validation_sequence_set=[[]],
+		ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+		ag_always_validation_sequence_set=[[]],
+		test_timeout_s=10,
+)
