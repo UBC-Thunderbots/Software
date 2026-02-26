@@ -1,7 +1,7 @@
 load(
     ":cc_toolchain_config.bzl",
     "cc_toolchain_config_fullsystem",
-    "cc_toolchain_config_k8_jetson_nano_cross_compile",
+    "cc_toolchain_config_k8_aarch64_linux",
     "make_builtin_include_directories",
 )
 
@@ -10,7 +10,7 @@ package(default_visibility = ["//visibility:public"])
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
 
-environment(name = "k8_jetson_nano_cross_compile")
+environment(name = "k8_aarch64_linux")
 
 environment(name = "aarch64")
 
@@ -19,12 +19,12 @@ environment_group(
     defaults = [
         ":aarch64",
         ":k8",
-        ":k8_jetson_nano_cross_compile",
+        ":k8_aarch64_linux",
     ],
     environments = [
         ":aarch64",
         ":k8",
-        ":k8_jetson_nano_cross_compile",
+        ":k8_aarch64_linux",
     ],
 )
 
@@ -39,8 +39,8 @@ config_setting(
 )
 
 config_setting(
-    name = "cpu_k8_jetson_nano_cross_compile",
-    values = {"cpu": "k8_jetson_nano_cross_compile"},
+    name = "cpu_k8_aarch64_linux",
+    values = {"cpu": "k8_aarch64_linux"},
 )
 
 # Create a constraint for the glibc version to target the correct glibc version for the robot
@@ -70,9 +70,9 @@ cc_toolchain_suite(
         # aarch64 is for ARM64 systems and the robot
         "aarch64": "cc_toolchain_linux_aarch64_gcc",
         "aarch64|compiler": "cc_toolchain_linux_aarch64_gcc",
-        # jetson nano 4GB system
-        "k8_jetson_nano_cross_compile": "cc_toolchain_k8_jetson_nano_cross_compile",
-        "k8_jetson_nano_cross_compile|compiler": "cc_toolchain_k8_jetson_nano_cross_compile",
+        # cross compile on x86 for arm64 (the robot)
+        "k8_aarch64_linux": "cc_toolchain_k8_aarch64_linux",
+        "k8_aarch64_linux|compiler": "cc_toolchain_k8_aarch64_linux",
     },
 )
 
@@ -82,10 +82,10 @@ filegroup(
 )
 
 filegroup(
-    name = "k8_jetson_nano_cross_compile_everything",
+    name = "k8_aarch64_linux_everything",
     srcs = [
-        "@k8_jetson_nano_cross_compile_gcc//:everything",
-    ] + glob(["wrapper/k8_jetson_nano_cross_compile_*"]),
+        "@k8_aarch64_linux_gcc//:everything",
+    ] + glob(["wrapper/k8_aarch64_linux_*"]),
 )
 
 filegroup(
@@ -177,13 +177,13 @@ cc_toolchain(
 )
 
 cc_toolchain(
-    name = "cc_toolchain_k8_jetson_nano_cross_compile",
-    all_files = ":k8_jetson_nano_cross_compile_everything",
-    ar_files = ":k8_jetson_nano_cross_compile_everything",
-    as_files = ":k8_jetson_nano_cross_compile_everything",
-    compiler_files = ":k8_jetson_nano_cross_compile_everything",
+    name = "cc_toolchain_k8_aarch64_linux",
+    all_files = ":k8_aarch64_linux_everything",
+    ar_files = ":k8_aarch64_linux_everything",
+    as_files = ":k8_aarch64_linux_everything",
+    compiler_files = ":k8_aarch64_linux_everything",
     dwp_files = ":empty",
-    linker_files = ":k8_jetson_nano_cross_compile_everything",
+    linker_files = ":k8_aarch64_linux_everything",
     objcopy_files = ":empty",
     strip_files = ":empty",
     supports_param_files = 0,
@@ -191,12 +191,12 @@ cc_toolchain(
     # when possible
     # https://github.com/bazelbuild/intellij/issues/486
     tags = ["no-ide"],
-    toolchain_config = ":gcc_k8_jetson_nano_cross_compile",
-    toolchain_identifier = "gcc-k8-jetson-nano-cross-compile",
+    toolchain_config = ":gcc_k8_aarch64_linux",
+    toolchain_identifier = "gcc-k8-aarch64-linux",
 )
 
-cc_toolchain_config_k8_jetson_nano_cross_compile(
-    name = "gcc_k8_jetson_nano_cross_compile",
+cc_toolchain_config_k8_aarch64_linux(
+    name = "gcc_k8_aarch64_linux",
     builtin_include_directories = [
         "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/include/",
         "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/sysroot/usr/include/",
@@ -204,28 +204,28 @@ cc_toolchain_config_k8_jetson_nano_cross_compile(
         "/opt/tbotspython/aarch64-tbots-linux-gnu/lib/gcc/aarch64-tbots-linux-gnu/8.5.0/include-fixed",
     ] + make_builtin_include_directories(),
     tool_paths = {
-        "ar": "wrapper/k8_jetson_nano_cross_compile_ar",
-        "cpp": "wrapper/k8_jetson_nano_cross_compile_cpp",
-        "dwp": "wrapper/k8_jetson_nano_cross_compile_dwp",
-        "gcc": "wrapper/k8_jetson_nano_cross_compile_gcc",
-        "gcov": "wrapper/k8_jetson_nano_cross_compile_gcov",
-        "ld": "wrapper/k8_jetson_nano_cross_compile_ld",
-        "nm": "wrapper/k8_jetson_nano_cross_compile_nm",
-        "objcopy": "wrapper/k8_jetson_nano_cross_compile_objcopy",
-        "objdump": "wrapper/k8_jetson_nano_cross_compile_objdump",
-        "strip": "wrapper/k8_jetson_nano_cross_compile_strip",
+        "ar": "wrapper/k8_aarch64_linux_ar",
+        "cpp": "wrapper/k8_aarch64_linux_cpp",
+        "dwp": "wrapper/k8_aarch64_linux_dwp",
+        "gcc": "wrapper/k8_aarch64_linux_gcc",
+        "gcov": "wrapper/k8_aarch64_linux_gcov",
+        "ld": "wrapper/k8_aarch64_linux_ld",
+        "nm": "wrapper/k8_aarch64_linux_nm",
+        "objcopy": "wrapper/k8_aarch64_linux_objcopy",
+        "objdump": "wrapper/k8_aarch64_linux_objdump",
+        "strip": "wrapper/k8_aarch64_linux_strip",
     },
-    toolchain_identifier = "gcc-k8-jetson_nano-cross-compile",
+    toolchain_identifier = "gcc-k8-aarch64-linux",
 )
 
 toolchain(
-    name = "cc_toolchain_for_k8_jetson_nano_cross_compile",
+    name = "cc_toolchain_for_k8_aarch64_linux",
     target_compatible_with = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
         ":glibc_2_27",
     ],
-    toolchain = ":cc_toolchain_k8_jetson_nano_cross_compile",
+    toolchain = ":cc_toolchain_k8_aarch64_linux",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
 

@@ -1,4 +1,4 @@
-from typer import Option
+from typer import Option, Argument
 from enum import Enum
 from typing import Annotated
 
@@ -17,11 +17,9 @@ class DebugBinary(str, Enum):
     yellow = "yellow"
 
 
-class Platform(str, Enum):
-    PI = "PI"
-    NANO = "NANO"
-    LIMITED = "LIMITED"
-
+SearchQueryArgument = Annotated[
+    str | None, Argument(help="Search query for bazel target")
+]
 
 PrintCommandOption: type[bool] = Annotated[
     bool, Option("-p", "--print_command", help="Print the generated Bazel command")
@@ -82,10 +80,13 @@ TracyOption = Annotated[
     bool, Option("--tracy", help="Run the binary with the TRACY_ENABLE macro defined")
 ]
 
-PlatformOption = Annotated[
-    Platform, Option("-pl", "--platform", help="The platform to build Thunderloop for")
+TestSuiteOption = Annotated[
+    bool,
+    Option("--suite", help="Run entire test suite instead of searching for a target"),
 ]
 
 EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]
 EnableVisualizerOption = Annotated[bool, Option("-v", "--enable_visualizer")]
-StopAIOnStartOption = Annotated[bool, Option("-t", "--stop_ai_on_start")]
+StopAIOnStartOption = Annotated[bool, Option("-s", "--stop_ai_on_start")]
+
+JobsOption = Annotated[str, Option("-j", "--jobs")]

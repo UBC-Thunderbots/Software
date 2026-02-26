@@ -34,15 +34,10 @@ jobs:
             -//toolchains/cc/...                    \
             -//software:unix_full_system_tar_gen
 
-      - name: Jetson Nano Build Test
-        run: |
-          cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//toolchains/cc:robot
-
       - name: Raspberry Pi Build Test
         run: |
           cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains/cc:robot
 
 
   software-tests:
@@ -69,31 +64,15 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/environment-setup
 
-      - name: Install and start redis server
+      - name: Environment Setup
         run: |
-          wget http://download.redis.io/redis-stable.tar.gz 
-          tar xvzf redis-stable.tar.gz >/dev/null 
-          cd redis-stable
-          make >/dev/null 
-          make install >/dev/null 
-          redis-server --daemonize yes          
-
-      - name: Stop redis server
-        run: |
-          redis-cli shutdown
-
-      - name: Jetson Nano Build
-        run: |
-         cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//toolchains/cc:robot
-
-
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+        
       - name: Raspberry Pi Build
         run: |
          cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains/cc:robot
 
 
   simulated-gameplay-tests:
