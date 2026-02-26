@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 
 import software.python_bindings as tbots_cpp
@@ -8,17 +10,10 @@ from software.simulated_tests.ball_moves_from_rest import *
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
-    pytest_main,
-)
 from software.simulated_tests.or_validation import OrValidation
 
 
-@pytest.mark.parametrize("is_friendly_test", [True, False])
-def test_kickoff_play(simulated_test_runner, is_friendly_test):
-    ball_initial_pos = tbots_cpp.Point(0, 0)
-
-    # Setup Bots
+def setup_kickoff_attacker():
     blue_bots = [
         tbots_cpp.Point(-3, 2.5),
         tbots_cpp.Point(-3, 1.5),
@@ -27,57 +22,88 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         tbots_cpp.Point(-3, -1.5),
         tbots_cpp.Point(-3, -2.5),
     ]
+    return blue_bots
 
+
+def setup_kickoff_defender():
+    # The defense has a hole in it from 0, 0 to the net.
+    # Robots that cannot move will allow the kicker to shoot directly into the net.
     yellow_bots = [
-        tbots_cpp.Point(1, 0),
+        tbots_cpp.Point(1, 0.5),
         tbots_cpp.Point(1, 2.5),
         tbots_cpp.Point(1, -2.5),
-        tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+        tbots_cpp.Point(2, -1.5),
         tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
         tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
+    return yellow_bots
 
-    blue_play = Play()
-    yellow_play = Play()
 
-    # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_gc_command(
-        gc_command=Command.Type.STOP, team=Team.UNKNOWN
-    )
-
-    if is_friendly_test:
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.KICKOFF, team=Team.BLUE
-        )
-        blue_play.name = PlayName.KickoffFriendlyPlay
-        yellow_play.name = PlayName.KickoffEnemyPlay
-    else:
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.KICKOFF, team=Team.YELLOW
-        )
-        blue_play.name = PlayName.KickoffEnemyPlay
-        yellow_play.name = PlayName.KickoffFriendlyPlay
-
-    simulated_test_runner.gamecontroller.send_gc_command(
-        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-    )
-
-    # Force play override here
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
-
-    # Create world state
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
+def init_world_state(runner, blue_bots, yellow_bots):
+    ball_initial = tbots_cpp.Point(0, 0)
+    runner.simulator_proto_unix_io.send_proto(
         WorldState,
         create_world_state(
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
-            ball_location=ball_initial_pos,
+            ball_location=ball_initial,
             ball_velocity=tbots_cpp.Vector(0, 0),
         ),
     )
 
-    # Always Validation
+
+def init_plays(simulated_test_runner, is_friendly, force_out):
+    blue_play = Play()
+    yellow_play = Play()
+
+    kicking_team = Team.BLUE if is_friendly else Team.YELLOW
+    non_kicking_team = Team.YELLOW if is_friendly else Team.BLUE
+
+    if not force_out:
+        blue_play.name = (
+            PlayName.KickoffFriendlyPlay
+            if kicking_team == Team.BLUE
+            else PlayName.KickoffEnemyPlay
+        )
+        yellow_play.name = (
+            PlayName.KickoffFriendlyPlay
+            if kicking_team == Team.YELLOW
+            else PlayName.KickoffEnemyPlay
+        )
+    else:
+        blue_play.name = (
+            PlayName.KickoffFriendlyPlay
+            if kicking_team == Team.BLUE
+            else PlayName.HaltPlay
+        )
+        yellow_play.name = (
+            PlayName.KickoffFriendlyPlay
+            if kicking_team == Team.YELLOW
+            else PlayName.HaltPlay
+        )
+
+    simulated_test_runner.gamecontroller.send_gc_command(
+        gc_command=Command.Type.KICKOFF, team=kicking_team
+    )
+    simulated_test_runner.gamecontroller.send_gc_command(
+        gc_command=Command.Type.KICKOFF, team=non_kicking_team
+    )
+    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+
+
+@pytest.mark.parametrize(
+    "is_friendly_test, force_open",
+    [(True, False), (True, True), (False, False), (False, True)],
+)
+def test_kickoff_play(simulated_test_runner, is_friendly_test, force_open):
+    ball_initial_pos = tbots_cpp.Point(0, 0)
+
+    init_world_state(
+        simulated_test_runner, setup_kickoff_attacker(), setup_kickoff_defender()
+    )
+    init_plays(simulated_test_runner, is_friendly_test, force_open)
+
     always_validation_sequence_set = [[]]
 
     ball_moves_at_rest_validation = BallAlwaysMovesFromRest(
@@ -140,9 +166,13 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
+        ci_cmd_with_delay=[
+            (4, Command.Type.NORMAL_START, Team.BLUE),
+        ],
         test_timeout_s=10,
     )
 
 
 if __name__ == "__main__":
-    pytest_main(__file__)
+    # Run the test, -s disables all capturing at -vv increases verbosity
+    sys.exit(pytest.main([__file__, "-svv"]))
