@@ -123,3 +123,48 @@ simulated_test_runner.run_test(
 		ag_always_validation_sequence_set=[[]],
 		test_timeout_s=10,
 )
+
+---
+
+INSTANTIATE_TEST_CASE_P(
+    BallLocations, PivotKickTacticTest,
+    ::testing::Values(
+        // place the ball directly to the left of the robot
+        std::make_tuple(Vector(0, 0.5), Angle::zero()),
+        // place the ball directly to the right of the robot
+        std::make_tuple(Vector(0, -0.5), Angle::zero()),
+        // place the ball directly infront of the robot
+        std::make_tuple(Vector(0.5, 0), Angle::zero()),
+        // place the ball directly behind the robot
+        std::make_tuple(Vector(-0.5, 0), Angle::zero()),
+        // place the ball in the robots dribbler
+        std::make_tuple(Vector(ROBOT_MAX_RADIUS_METERS, 0), Angle::zero()),
+
+->
+
+@pytest.mark.parametrize(
+    "blue_bots, yellow_bots, ball_initial_pos, ball_initial_velocity, should_chip",
+    [
+        # Test auto chip over enemy
+        (
+            friendly_defense_area_front_center + tbots_cpp.Vector(0.5, 0),
+            friendly_defense_area_front_center + tbots_cpp.Vector(1.1, 0),
+            friendly_defense_area_front_center + tbots_cpp.Vector(0.9, 0),
+            tbots_cpp.Vector(-2, 0),
+            True,
+        ),
+        # Test block, auto chip off, enemy far
+        (
+            friendly_defense_area_front_center + tbots_cpp.Vector(0.5, 0),
+            friendly_defense_area_front_center + tbots_cpp.Vector(5, 0),
+            tbots_cpp.Point(0, 0),
+            tbots_cpp.Vector(-6, 0),
+            False,
+        ),
+
+---
+
+in BUILD
+
+change name of existing c++ test from eg. pivot_kick_tactic_test -> pivot_kick_tactic_cpp_test,
+then, create a py_test with original name eg. pivot_kick_tactic_test
