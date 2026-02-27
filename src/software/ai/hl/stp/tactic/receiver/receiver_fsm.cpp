@@ -177,6 +177,15 @@ void ReceiverFSM::adjustReceive(const Update& event)
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }
+    else
+    {
+        event.common.set_primitive(std::make_unique<MovePrimitive>(
+            event.common.robot, robot_pos, event.common.robot.orientation(),
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
+    }
 }
 
 bool ReceiverFSM::passStarted(const Update& event)
