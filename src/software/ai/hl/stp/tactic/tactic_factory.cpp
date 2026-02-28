@@ -192,9 +192,9 @@ std::shared_ptr<Tactic> createTactic(
 {
     auto tactic              = std::make_shared<ReceiverTactic>(ai_config_ptr);
     std::optional<Pass> pass = std::nullopt;
-    if (tactic_proto.has_pass())
+    if (tactic_proto.has_pass_())
     {
-        pass = createPass(tactic_proto.pass());
+        pass = createPass(tactic_proto.pass_());
     }
 
     tactic->updateControlParams(pass, tactic_proto.disable_one_touch_shot());

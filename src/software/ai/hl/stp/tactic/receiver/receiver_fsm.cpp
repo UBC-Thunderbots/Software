@@ -179,6 +179,26 @@ void ReceiverFSM::adjustReceive(const Update& event)
     }
 }
 
+void ReceiverFSM::moveAwayFromShot(const Update& event)
+{
+    Point ball  = event.common.world_ptr->ball().position();
+    Point robot = event.common.robot.position();
+
+    Vector between_robot_and_ball = ball - robot;
+    Vector side_step_direction    = between_robot_and_ball.normalize().perpendicular();
+
+    Point side_step_position = robot + side_step_direction;
+
+    Angle orientation = (side_step_position - ball).orientation();
+
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, side_step_position, orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, {0}}));
+}
+
 bool ReceiverFSM::passStarted(const Update& event)
 {
     return event.common.world_ptr->ball().hasBallBeenKicked(
@@ -211,4 +231,19 @@ bool ReceiverFSM::strayPass(const Update& event)
         orientation_difference > MIN_STRAY_PASS_ANGLE;
 
     return stray_pass;
+}
+
+bool ReceiverFSM::shouldMoveAwayFromShot(const Update& event)
+{
+    Point ball = event.common.world_ptr->ball().position();
+    Point goal = event.common.world_ptr->field().enemyGoalpostPos();
+
+    Vector ball_expand = (ball - goal).normalize(0.5).perpendicular();
+    Vector goal_expand = Vector(0.5, 0.0);
+
+    Point robot = event.common.robot.position();
+
+    return contains(Polygon{ball - ball_expand, ball + ball_expand, goal + goal_expand,
+                            goal - goal_expand},
+                    robot);
 }
