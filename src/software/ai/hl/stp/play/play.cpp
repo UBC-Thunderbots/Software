@@ -298,6 +298,10 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
     // "jobs" (the Tactics).
     Matrix<double> matrix(num_rows, num_cols);
 
+    std::map<const RobotId, PreviousAssignment> prev_assignments;
+    std::map<const RobotId, PreviousAssignment> curr_assignments;
+    if (!prev_assignments.empty()) prev_assignments = assignments_cache.back();
+
     // Initialize the matrix with the cost of assigning each Robot to each Tactic
     for (size_t row = 0; row < num_rows; row++)
     {
@@ -305,11 +309,32 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
         {
             Robot robot                    = robots_to_assign.at(row);
             std::shared_ptr<Tactic> tactic = tactic_vector.at(col);
+            PreviousAssignment current_assignment;
+            current_assignment.previous_tactic = tactic;
+            current_assignment.penality_cost = static_cast<uint32_t>(8);
+
             auto primitives                = primitive_sets.at(col);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
             double robot_cost_for_tactic =
                 primitives.at(robot.id())->getEstimatedPrimitiveCost();
+
+
+            if (!prev_assignments.empty() && prev_assignments.contains(robot.id()) && tactic)
+            {
+                const PreviousAssignment& assignment = prev_assignments.at(robot.id());
+                if (typeid(*assignment.previous_tactic) == typeid(*tactic))
+                    // TODO: Decrement/increment the penalty
+                    current_assignment.penality_cost = std::max(current_assignment.penality_cost, assignment.penality_cost / 2);
+                else
+                {
+                    // TODO: Apply the penalty
+                    robot_cost_for_tactic += assignment.penality_cost;
+                    current_assignment.penality_cost = assignment.penality_cost * 2;
+                }
+            }
+
+            curr_assignments[robot.id()] = current_assignment;
 
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
@@ -335,6 +360,12 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
         }
     }
 
+    if (assignments_cache.size() > ASSIGNMENTS_CACHE_MAX_SIZE)
+    {
+        assignments_cache.pop_front();
+    }
+
+    assignments_cache.push_back(curr_assignments);
     // Apply the Munkres/Hungarian algorithm to the matrix.
     Munkres<double> m;
     m.solve(matrix);
