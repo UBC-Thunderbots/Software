@@ -12,7 +12,6 @@ from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
 
 
 @pytest.mark.parametrize(
@@ -115,7 +114,7 @@ def test_goalie_blocks_shot(
     simulated_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_worldState(
+        simulated_test_runner.set_world_state(
             create_world_state(
                 [],
                 blue_robot_locations=[robot_initial_position],
@@ -193,7 +192,7 @@ def test_goalie_clears_from_dead_zone(
     simulated_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_worldState(
+        simulated_test_runner.set_world_state(
             create_world_state(
                 [],
                 blue_robot_locations=[

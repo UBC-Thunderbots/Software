@@ -129,12 +129,12 @@ class TbotsTestRunner:
         fs_proto_unix_io.send_proto(Play, play)
 
     @abstractmethod
-    def set_worldState(self, worldstate: WorldState):
+    def set_world_state(self, worldstate: WorldState):
         """Sets the worldstate for the given team
 
         :param worldstate: the worldstate proto to use
         """
-        raise NotImplementedError("abstract class method called set_worldstate")
+        raise NotImplementedError("abstract class method called set_world_state")
 
     @abstractmethod
     def run_test(

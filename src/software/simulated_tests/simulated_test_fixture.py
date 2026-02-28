@@ -61,7 +61,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         self.simulator_proto_unix_io = simulator_proto_unix_io
 
     @override
-    def set_worldState(self, worldstate: WorldState):
+    def set_world_state(self, worldstate: WorldState):
         """Sets the simulation worldstate
 
         :param worldstate: proto containing the desired worldstate

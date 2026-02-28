@@ -47,7 +47,7 @@ def test_crease_positioning(
     simulated_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_worldState(
+        simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_bots],
                 yellow_robot_locations=[yellow_bots],
@@ -160,7 +160,7 @@ def test_crease_autochip(
     simulated_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_worldState(
+        simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_bots],
                 yellow_robot_locations=[yellow_bots],
@@ -235,7 +235,7 @@ def test_crease_get_ball(
     simulated_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_worldState(
+        simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_bots],
                 yellow_robot_locations=[yellow_bots],
