@@ -133,8 +133,10 @@ TEST(CreaseDefenderFSMTest, test_transitions)
         .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .ball_steal_mode           = TbotsProto::BallStealMode::STEAL};
 
-    FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{ai_config},
-                               DribbleFSM(ai_config.dribble_tactic_config()));
+    FSM<CreaseDefenderFSM> fsm(
+        CreaseDefenderFSM(std::make_shared<TbotsProto::AiConfig>(ai_config)),
+        MoveFSM(std::make_shared<TbotsProto::AiConfig>(ai_config)),
+        DribbleFSM(std::make_shared<TbotsProto::AiConfig>(ai_config)));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // robot far from destination, ball in friendly half

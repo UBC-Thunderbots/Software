@@ -71,18 +71,18 @@ extern "C"
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
     // TODO (#2495): Set the friendly team colour
-    : redis_client_(
-          std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
+    : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       motor_status_(std::nullopt),
       robot_constants_(robot_constants),
-      robot_id_(std::stoi(redis_client_->getSync(ROBOT_ID_REDIS_KEY))),
-      channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
-      network_interface_(redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
+      robot_id_(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY))),
+      channel_id_(
+          std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY))),
+      network_interface_(toml_config_client_->get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY)),
       loop_hz_(loop_hz),
-      kick_coeff_(std::stod(redis_client_->getSync(ROBOT_KICK_EXP_COEFF_REDIS_KEY))),
-      kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
+      kick_coeff_(std::stod(toml_config_client_->get(ROBOT_KICK_EXP_COEFF_CONFIG_KEY))),
+      kick_constant_(std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY))),
       chip_pulse_width_(
-          std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
+          std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
@@ -115,11 +115,6 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-    {
-        return;
-    }
-
     power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
@@ -133,7 +128,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
               << ", CHANNEL ID: " << channel_id_
               << ", and NETWORK INTERFACE: " << network_interface_;
     LOG(INFO)
-        << "THUNDERLOOP: to update Thunderloop configuration, change REDIS store and restart Thunderloop";
+        << "THUNDERLOOP: to update Thunderloop configuration, edit TOML config file and restart Thunderloop";
 }
 
 Thunderloop::~Thunderloop() {}
@@ -200,9 +195,6 @@ void Thunderloop::runLoop()
             FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 
             ScopedTimespecTimer iteration_timer(&iteration_time);
-
-            // Collect jetson status
-            jetson_status_.set_cpu_temperature(getCpuTemperature());
 
             // Network Service: receive newest primitives and send out the last
             // robot status
@@ -344,23 +336,10 @@ void Thunderloop::runLoop()
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
             *(robot_status_.mutable_motor_status())          = motor_status_.value();
             *(robot_status_.mutable_power_status())          = power_status_;
-            *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
             *(robot_status_.mutable_primitive_executor_status()) =
                 primitive_executor_status_;
-
-            // Update Redis
-            {
-                ZoneNamedN(_tracy_redis, "Thunderloop: Commit to REDIS", true);
-
-                redis_client_->setNoCommit(
-                    ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-                    std::to_string(power_status_.battery_voltage()));
-                redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
-                                           std::to_string(power_status_.current_draw()));
-                redis_client_->asyncCommit();
-            }
 
             updateErrorCodes();
         }
@@ -428,11 +407,6 @@ TbotsProto::MotorStatus Thunderloop::pollMotorService(
 
     ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
 
-    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-    {
-        return TbotsProto::MotorStatus();
-    }
-
     double time_since_prev_iteration_s =
         getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
     return motor_service_->poll(motor_control, time_since_prev_iteration_s);
@@ -443,11 +417,6 @@ TbotsProto::PowerStatus Thunderloop::pollPowerService(struct timespec& poll_time
     ScopedTimespecTimer timer(&poll_time);
 
     ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
-
-    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-    {
-        return TbotsProto::PowerStatus();
-    }
 
     return power_service_->poll(direct_control_.power_control(), kick_coeff_,
                                 kick_constant_, chip_pulse_width_);
@@ -494,10 +463,6 @@ void Thunderloop::updateErrorCodes()
     if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
-    }
-    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
-    {
-        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
     }
 
     if (!isPowerStable(log_file))

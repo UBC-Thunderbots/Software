@@ -3,12 +3,11 @@
 #include <g3sinks/LogRotate.h>
 #include <g3sinks/LogRotateWithFilter.h>
 
-#include <experimental/filesystem>
-#include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 #include <g3log/logmessage.hpp>
 #include <g3log/logworker.hpp>
 
+#include "compat_flags.h"
 #include "software/logger/coloured_cout_sink.h"
 #include "software/logger/csv_sink.h"
 #include "software/logger/custom_logging_levels.h"
@@ -63,16 +62,17 @@ class LoggerSingleton
      */
     static void initializeLogger(const std::string& runtime_dir,
                                  const std::shared_ptr<ProtoLogger>& proto_logger,
-                                 const bool reduce_repetition = true)
+                                 const bool reduce_repetition   = true,
+                                 const LEVELS minimum_log_level = DEBUG)
     {
-        static std::shared_ptr<LoggerSingleton> s(
-            new LoggerSingleton(runtime_dir, proto_logger, reduce_repetition));
+        static LoggerSingleton s(runtime_dir, proto_logger, reduce_repetition,
+                                 minimum_log_level);
     }
 
    private:
     LoggerSingleton(const std::string& runtime_dir,
                     const std::shared_ptr<ProtoLogger>& proto_logger,
-                    const bool reduce_repetition)
+                    const bool reduce_repetition, const LEVELS minimum_log_level)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
@@ -90,9 +90,9 @@ class LoggerSingleton
         // hermetic build principles
 
         // if log dir doesn't exist, create it
-        if (!std::experimental::filesystem::exists(runtime_dir))
+        if (!fs::exists(runtime_dir))
         {
-            std::experimental::filesystem::create_directories(runtime_dir);
+            fs::create_directories(runtime_dir);
         }
 
         auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(runtime_dir),
@@ -122,6 +122,13 @@ class LoggerSingleton
         // Sink for PlotJuggler plotting
         auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>(),
                                                      &PlotJugglerSink::sendToPlotJuggler);
+
+        g3::log_levels::setHighest(minimum_log_level);
+
+        // Add custom logging levels below setHighest to always enable
+        g3::only_change_at_initialization::addLogLevel(CSV);
+        g3::only_change_at_initialization::addLogLevel(VISUALIZE);
+        g3::only_change_at_initialization::addLogLevel(PLOTJUGGLER);
 
         g3::initializeLogging(logWorker.get());
     }

@@ -14,17 +14,13 @@ jobs:
   multiplatform-build:
     strategy:
       matrix:
-        platform: [ ubuntu-22.04, ubuntu-24.04-arm ]
+        platform: [ ubuntu-24.04-arm ]
 
     name: Ubuntu Alternate Builds
     runs-on: ${{ matrix.platform }}
     steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
 
       - name: Software Build Test
         run: |
@@ -35,36 +31,21 @@ jobs:
             -//software/ai/hl/...                   \
             -//software/field_tests/...             \
             -//software/embedded/...                \
-            -//toolchains/cc/...
-
-      - name: Jetson Nano Build Test
-        run: |
-          cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//toolchains/cc:robot
+            -//toolchains/cc/...                    \
+            -//software:unix_full_system_tar_gen
 
       - name: Raspberry Pi Build Test
         run: |
           cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains/cc:robot
 
 
   software-tests:
     name: Software Tests
     runs-on: ubuntu-24.04
     steps:
-      # remove the unused packages in the CI runner to free up disk space
-      # https://github.com/actions/runner-images/issues/2840
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
 
       - name: Software Test
         run: |
@@ -75,54 +56,31 @@ jobs:
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
             -//software/ai/navigator/...     \
-            -//toolchains/cc/...
+            -//toolchains/cc/...             \
+            -//software:unix_full_system_tar_gen
 
   robot-tests:
     name: Robot Software Tests
     runs-on: ubuntu-24.04
     steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
 
       - name: Environment Setup
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
-
-      - name: Install and start redis server
-        run: |
-          wget http://download.redis.io/redis-stable.tar.gz 
-          tar xvzf redis-stable.tar.gz >/dev/null 
-          cd redis-stable
-          make >/dev/null 
-          make install >/dev/null 
-          redis-server --daemonize yes          
-
-      - name: Stop redis server
-        run: |
-          redis-cli shutdown
-
-      - name: Jetson Nano Build
-        run: |
-         cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=NANO --platforms=//toolchains/cc:robot
-
-
+        
       - name: Raspberry Pi Build
         run: |
          cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --//software/embedded:host_platform=PI --platforms=//toolchains/cc:robot
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains/cc:robot
 
 
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
     runs-on: ubuntu-24.04
     steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
 
       - name: Simulated Test Run
         run: |
@@ -131,8 +89,8 @@ jobs:
             //software:unix_full_system       \
             //software/simulated_tests/...    \
             //software/ai/hl/...              \
-            //software/ai/navigator/...
-
+            //software/ai/navigator/...       
+            
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
         if: always()
@@ -155,12 +113,8 @@ jobs:
     name: AutoRef'd Game (3 Minutes)
     runs-on: ubuntu-24.04
     steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
 
       - name: AI vs AI (3 minutes)
         run: |

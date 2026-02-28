@@ -12,7 +12,7 @@
 class StopPlay : public PlayBase<StopPlayFSM>
 {
    public:
-    StopPlay(TbotsProto::AiConfig config);
+    StopPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

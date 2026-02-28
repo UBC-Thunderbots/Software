@@ -1,4 +1,6 @@
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -25,6 +27,13 @@ cc_binary(
         "@boost//:program_options",
         "@tracy",
     ],
+)
+
+pkg_tar(
+    name = "unix_full_system_tar_gen",
+    srcs = [":unix_full_system"],
+    extension = "tar.gz",
+    mode = "0755",
 )
 
 cc_binary(
@@ -96,7 +105,6 @@ pybind_library(
         "//software/geom:vector",
         "//software/geom/algorithms",
         "//software/math:math_functions",
-        "//software/networking/radio:threaded_proto_radio_sender",
         "//software/networking/udp:threaded_proto_udp_listener",
         "//software/networking/udp:threaded_proto_udp_sender",
         "//software/uart:boost_uart_communication",

@@ -11,6 +11,7 @@ from software.thunderscope.gl.graphics.gl_stadium import GLStadium
 
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLObstacleLayer(GLLayer):
@@ -32,6 +33,7 @@ class GLObstacleLayer(GLLayer):
         self.circle_obstacle_graphics = ObservableList(self._graphics_changed)
         self.stadium_obstacle_graphics = ObservableList(self._graphics_changed)
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         obstacles = self.obstacles_list_buffer.get(block=False).obstacles

@@ -2,11 +2,15 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtGui
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from typing import Callable
+from typing import Callable, override
 import webbrowser
+from software.thunderscope.gl.widgets.gl_runtime_selector import GLRuntimeSelectorDialog
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.thunderscope.gl.widgets.toolbar_icons.gamecontroller.icon_loader as icons
+from software.thunderscope.gl.widgets.gl_runtime_installer import (
+    GLRuntimeInstallerDialog,
+)
+import qtawesome as qta
 
 
 class GamecontrollerPlays:
@@ -49,28 +53,28 @@ class GLGamecontrollerToolbar(GLToolbar):
 
         # Setup Stop button for sending the STOP gamecontroller command
         self.stop_button = self.__setup_icon_button(
-            icons.get_stop_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("fa6s.pause"),
             "Stops gameplay, robots form circle around ball",
             self.__send_stop_command,
         )
 
         # Setup Force Start button for sending the FORCE_START gamecontroller command
         self.force_start_button = self.__setup_icon_button(
-            icons.get_force_start_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("ph.arrow-u-up-right-fill"),
             "Force Start, restarts the game",
             self.__send_force_start_command,
         )
 
         # Setup Halt button for sending the HALT gamecontroller command
         self.halt_button = self.__setup_icon_button(
-            icons.get_halt_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("fa5s.stop"),
             "Halt, stops all robots immediately",
             self.__send_halt_command,
         )
 
         # Setup Normal Start button for sending the NORMAL_START gamecontroller command
         self.normal_start_button = self.__setup_icon_button(
-            icons.get_normal_start_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("fa5s.play"),
             "Normal Start, resumes game from a set play (disabled when no play selected)",
             self.__send_normal_start_command,
         )
@@ -89,10 +93,24 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.__add_plays_menu_items(is_blue=False)
 
         self.gc_browser_button = self.__setup_icon_button(
-            icons.get_open_window_icon(self.BUTTON_ICON_COLOR),
+            qta.icon("mdi6.open-in-new"),
             "Opens the SSL Gamecontroller in a browser window",
             lambda: webbrowser.open(self.GAME_CONTROLLER_URL, new=0, autoraise=True),
             display_text="Open GC",
+        )
+
+        self.runtime_installer_button = self.__setup_icon_button(
+            qta.icon("mdi6.download"),
+            "Opens a runtime installer modal",
+            self.__open_runtime_installer_dialog,
+            display_text="Install Runtimes",
+        )
+
+        self.runtime_selector_button = self.__setup_icon_button(
+            qta.icon("mdi6.server"),
+            "Select runtimes for each team",
+            self.__open_runtime_selector_dialog,
+            display_text="Select Runtimes",
         )
 
         # disable the normal start button when no play is selected
@@ -110,7 +128,11 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.__add_separator(self.layout())
         self.layout().addWidget(self.gc_browser_button)
         self.layout().addStretch()
+        self.__add_separator(self.layout())
+        self.layout().addWidget(self.runtime_installer_button)
+        self.layout().addWidget(self.runtime_selector_button)
 
+    @override
     def refresh(self) -> None:
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
@@ -135,7 +157,9 @@ class GLGamecontrollerToolbar(GLToolbar):
             GamecontrollerPlays.KICKOFF,
             GamecontrollerPlays.PENALTY,
         ]:
-            icon = icons.get_blue_icon() if is_blue else icons.get_yellow_icon()
+            icon = qta.icon(
+                "mdi6.square-rounded", color="blue" if is_blue else "yellow"
+            )
             self.plays_menu.addAction(
                 icon,
                 arg,
@@ -178,10 +202,11 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.get_button_style(self.normal_start_enabled)
         )
         self.normal_start_button.setIcon(
-            icons.get_normal_start_icon(
-                self.BUTTON_ICON_COLOR
+            qta.icon(
+                "fa5s.play",
+                color=self.BUTTON_ICON_COLOR
                 if self.normal_start_enabled
-                else self.DISABLED_BUTTON_ICON_COLOR
+                else self.DISABLED_BUTTON_ICON_COLOR,
             )
         )
 
@@ -244,3 +269,17 @@ class GLGamecontrollerToolbar(GLToolbar):
         """
         command = ManualGCCommand(manual_command=Command(type=command, for_team=team))
         self.proto_unix_io.send_proto(ManualGCCommand, command)
+
+    def __open_runtime_installer_dialog(self) -> None:
+        """Opens the runtime installer modal, initializing if first time"""
+        if not hasattr(self, "runtime_installer_dialog"):
+            self.runtime_installer_dialog = GLRuntimeInstallerDialog(
+                parent=self.parent()
+            )
+
+        self.runtime_installer_dialog.show()
+
+    def __open_runtime_selector_dialog(self) -> None:
+        """Initializes and opens the runtime selector dialog"""
+        self.runtime_selector_dialog = GLRuntimeSelectorDialog(parent=self.parent())
+        self.runtime_selector_dialog.show()

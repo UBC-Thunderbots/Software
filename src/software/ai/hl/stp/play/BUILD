@@ -90,7 +90,8 @@ cc_library(
     srcs = ["play.cpp"],
     hdrs = [
         "play.h",
-        "play_fsm.h",
+        "play_base.hpp",
+        "play_fsm.hpp",
     ],
     deps = [
         "//software/ai/hl/stp/tactic",
@@ -121,10 +122,6 @@ cc_library(
         "//software/ai/hl/stp/play/example:example_play",
         "//software/ai/hl/stp/play/free_kick:free_kick_play",
         "//software/ai/hl/stp/play/halt_play",
-        "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
-        "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
-        "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
-        "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_with_static_defenders_play",
         "//software/ai/hl/stp/play/offense:offense_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",

@@ -21,6 +21,7 @@ from software.embedded.constants.py_constants import (
     ROBOT_MAX_SPEED_M_PER_S,
     MAX_FORCE_DRIBBLER_SPEED_RPM,
 )
+from software.py_constants import WHEEL_ROTATION_MAX_SPEED_M_PER_S
 
 
 class RobotDiagnosticsCLI:
@@ -48,7 +49,7 @@ class RobotDiagnosticsCLI:
         self.app.command(short_help="Chips the chipper")(self.chip)
         self.app.command(short_help="Kicks the kicker")(self.kick)
         self.app.command(short_help="Show Robot Status Info")(self.stats)
-        self.app.command(short_help="Shows Redis Values")(self.redis)
+        self.app.command(short_help="Shows TOML Config Values")(self.config)
         self.app.command(short_help="Prints Thunderloop Logs")(self.log)
         self.app.command(short_help="Prints Thunderloop Status")(self.status)
         self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
@@ -125,54 +126,54 @@ class RobotDiagnosticsCLI:
         )
         return table
 
-    def __generate_redis_table(self) -> Table:
-        """Make a new table with embedded_data.redis value information."""
+    def __generate_config_table(self) -> Table:
+        """Make a new table with embedded_data TOML config value information."""
         table = Table(show_header=True, header_style="bold blue")
-        table.add_column("Redis Value Name")
+        table.add_column("Config Value Name")
         table.add_column("Key", style="dim")
         table.add_column("Value")
 
         table.add_row(
-            "Robot ID", f"{ROBOT_ID_REDIS_KEY}", self.embedded_data.get_robot_id()
+            "Robot ID", f"{ROBOT_ID_CONFIG_KEY}", self.embedded_data.get_robot_id()
         )
         table.add_row(
             "Channel ID",
-            f"{ROBOT_MULTICAST_CHANNEL_REDIS_KEY}",
+            f"{ROBOT_MULTICAST_CHANNEL_CONFIG_KEY}",
             self.embedded_data.get_channel_id(),
         )
         table.add_row(
             "Network Interface",
-            f"{ROBOT_NETWORK_INTERFACE_REDIS_KEY}",
+            f"{ROBOT_NETWORK_INTERFACE_CONFIG_KEY}",
             self.embedded_data.get_network_interface(),
         )
         table.add_row(
             "Kick Constant",
-            f"{ROBOT_KICK_CONSTANT_REDIS_KEY}",
+            f"{ROBOT_KICK_CONSTANT_CONFIG_KEY}",
             self.embedded_data.get_kick_constant(),
         )
         table.add_row(
             "Kick Coefficient",
-            f"{ROBOT_KICK_EXP_COEFF_REDIS_KEY}",
+            f"{ROBOT_KICK_EXP_COEFF_CONFIG_KEY}",
             self.embedded_data.get_kick_coeff(),
         )
         table.add_row(
             "Chip Pulse Width",
-            f"{ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY}",
+            f"{ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY}",
             self.embedded_data.get_chip_pulse_width(),
         )
         table.add_row(
             "Battery Voltage",
-            f"{ROBOT_BATTERY_VOLTAGE_REDIS_KEY}",
+            f"{ROBOT_BATTERY_VOLTAGE_CONFIG_KEY}",
             self.embedded_data.get_battery_volt(),
         )
         table.add_row(
             "Battery Current Draw",
-            f"{ROBOT_CURRENT_DRAW_REDIS_KEY}",
+            f"{ROBOT_CURRENT_DRAW_CONFIG_KEY}",
             self.embedded_data.get_current_draw(),
         )
         table.add_row(
             "Capacitor Voltage",
-            f"{ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY}",
+            f"{ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY}",
             self.embedded_data.get_cap_volt(),
         )
         return table
@@ -183,9 +184,9 @@ class RobotDiagnosticsCLI:
             while True:
                 live.update(self.__generate_stats_table())
 
-    def redis(self):
-        """CLI Command to generate Onboard Redis information"""
-        self.console.print(self.__generate_redis_table())
+    def config(self):
+        """CLI Command to generate Onboard TOML config information"""
+        self.console.print(self.__generate_config_table())
 
     def status(self):
         """CLI Command to print Thunderloop service status"""
@@ -367,7 +368,7 @@ class RobotDiagnosticsCLI:
         velocity: Annotated[
             Optional[float],
             Typer.Option(
-                help=f"Clamped to {-ROBOT_MAX_SPEED_M_PER_S} & {ROBOT_MAX_SPEED_M_PER_S} m/s"
+                help=f"Clamped to {-WHEEL_ROTATION_MAX_SPEED_M_PER_S} & {WHEEL_ROTATION_MAX_SPEED_M_PER_S} m/s"
             ),
         ] = 0,
         duration_seconds: Annotated[
@@ -380,7 +381,7 @@ class RobotDiagnosticsCLI:
         :param velocity: Velocity to rotate the wheel
         :param duration_seconds: Duration to move
         """
-        # TODO (#3436): Confirm max speed for wheel rotation (it is currently net robot velocity)
+        # Using wheel-specific max speed constant instead of net robot velocity
         description = (
             f"Moving wheels {wheels} at {velocity} m/s for {duration_seconds} seconds"
         )

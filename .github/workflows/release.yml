@@ -1,0 +1,162 @@
+name: Release binary
+
+on: 
+  schedule:
+    - cron: '0 0 * * 0' # Weekly Patch (Sundays)
+    - cron: '0 0 1 * *' # Monthly Minor (1st of the month)
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Manual Release Level'
+        required: true
+        default: 'major'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      release_tag:
+        description: 'Specify the new release tag name (e.g., v1.2.3)'
+        required: false
+        type: string
+      
+      target_commit:
+        description: 'Optional commit SHA/branch to release (leave empty for current HEAD)'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  prepare_release:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.bump_logic.outputs.tag }}
+      should_release: ${{ steps.check.outputs.count > 0 }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.target_commit || github.sha }}
+
+      - name: Check for recent commits
+        id: check
+        run: |
+          git fetch --tags
+          
+          LATEST_TAG=$(git describe --tags --match "v[0-9]*" --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $LATEST_TAG"
+          
+          # Prevent double release on the same day (unless manual dispatch)
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$LATEST_TAG" != "v0.0.0" ]; then
+            TAG_DATE=$(git log -1 --format=%as "$LATEST_TAG")
+            TODAY=$(date +%Y-%m-%d)
+            echo "Tag Date: $TAG_DATE, Today: $TODAY"
+            
+            if [ "$TAG_DATE" = "$TODAY" ]; then
+              echo "Already released $LATEST_TAG today. Skipping."
+              echo "count=0" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "count=1" >> $GITHUB_OUTPUT
+          else
+            if [ "$LATEST_TAG" = "v0.0.0" ]; then
+               COUNT=$(git log --oneline | wc -l)
+            else
+               COUNT=$(git log "$LATEST_TAG"..HEAD --oneline | wc -l)
+            fi
+            echo "count=$COUNT" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Determine Version Bump
+        if: steps.check.outputs.count > 0 
+        id: bump_logic
+        run: |
+          LATEST_TAG=$(git describe --tags --match "v[0-9]*" --abbrev=0 2>/dev/null || echo "v1.0.0")
+          BASE_VERSION=${LATEST_TAG#v}
+          
+          IFS='.' read -r major minor patch <<< "$BASE_VERSION"
+          
+          if [ "${{ github.event.inputs.release_tag }}" != "" ]; then
+            NEW_TAG="${{ github.event.inputs.release_tag }}"
+          else 
+            BUMP="patch"
+            if [ "$(date +%d)" = "01" ]; then BUMP="minor"; fi
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              BUMP="${{ github.event.inputs.version_type }}"
+            fi
+            
+            if [ "$BUMP" = "major" ]; then
+              major=$((major + 1)); minor=0; patch=0
+            elif [ "$BUMP" = "minor" ]; then
+              minor=$((minor + 1)); patch=0
+            else
+              patch=$((patch + 1))
+            fi
+            
+            NEW_TAG="v$major.$minor.$patch"
+          fi
+          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          echo "Using version: $NEW_TAG"
+
+      - name: Draft Release Notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: release-drafter/release-drafter@v6
+        with:
+          version: ${{ steps.bump_logic.outputs.tag }}
+          tag: ${{ steps.bump_logic.outputs.tag }}
+
+  upload_assets:
+    needs: prepare_release
+    if: needs.prepare_release.outputs.should_release == 'true'
+    strategy:
+      matrix:
+        platform: [ubuntu-x86, mac-arm64]
+        include:
+          - platform: ubuntu-x86
+            runner: ubuntu-24.04
+          - platform: mac-arm64
+            runner: macos-latest
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.target_commit || github.ref }} 
+
+      - uses: ./.github/actions/environment-setup
+
+      - name: Build Binaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: | 
+          cd src
+          TAG="${{ needs.prepare_release.outputs.tag }}"
+          
+          bazel build --show_timestamps --copt=-O3 --verbose_failures \
+          -- //software:unix_full_system_tar_gen
+          
+          ARTIFACT_NAME="unix_full_system_${TAG}_${{ matrix.platform }}.tar.gz"
+          mv bazel-bin/software/unix_full_system_tar_gen.tar.gz "${{ runner.temp }}/$ARTIFACT_NAME" 
+          gh release upload "$TAG" "${{ runner.temp }}/$ARTIFACT_NAME"
+
+  publish_release:
+    needs: [prepare_release, upload_assets]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: 
+          ref: ${{ github.event.inputs.target_commit || github.sha }}
+      - name: Undraft Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ needs.prepare_release.outputs.tag }}" --draft=false

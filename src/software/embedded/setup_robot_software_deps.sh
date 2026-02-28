@@ -3,7 +3,6 @@
 set -ex
 
 host_software_packages=(
-    redis
     device-tree-compiler
     curl
 )
