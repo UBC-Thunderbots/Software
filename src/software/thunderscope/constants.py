@@ -379,13 +379,6 @@ class ProtoPlayerFlags(Enum):
     UNCAUGHT_EXCEPTION_FLAG = 1 << 0
 
 
-class DribblingConstants:
-    """Constants to be used to check whether the robot has dribbled beyond competition regulations"""
-
-    MAX_DRIBBLING_DISPLACEMENT = 1.0
-    DRIBBLING_ERROR_MARGIN = 0.06
-
-
 class LogLevels(StrEnum):
     """Log levels for FullSystem to indicate minimum logged level"""
 
