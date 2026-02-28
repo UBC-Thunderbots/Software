@@ -272,6 +272,51 @@ def configure_base_diagnostics(
     ] + extra_widgets
 
 
+def configure_base_simulated_test(
+    full_system_proto_unix_io: ProtoUnixIO,
+    sim_proto_unix_io: ProtoUnixIO,
+    friendly_colour_yellow: bool,
+) -> list:
+    """Returns a list of widget data for a FullSystem tab
+    along with any extra widgets passed in
+
+    :param full_system_proto_unix_io: the proto unix io to configure widgets with
+    :param sim_proto_unix_io: the proto unix io for the simulator
+    :param friendly_colour_yellow: if this is Yellow FullSystem (True) or Blue (False)
+    :param visualization_buffer_size: The size of the visualization buffer.
+            Increasing this will increase smoothness but will be less realtime.
+    :param frame_swap_counter: a FrameTimeCounter for the GLWidget to track
+                               the time between frame swaps
+    :param refresh_counter: a FrameTimeCounter for the refresh function
+    :return: list of widget data for FullSystem when running simulated tests
+    """
+    return [
+        TScopeWidget(
+            name="Field",
+            widget=setup_gl_widget(
+                sim_proto_unix_io=sim_proto_unix_io,
+                full_system_proto_unix_io=full_system_proto_unix_io,
+                friendly_colour_yellow=friendly_colour_yellow,
+                visualization_buffer_size=5,
+            ),
+        ),
+        TScopeWidget(
+            name="Logs",
+            widget=setup_log_widget(proto_unix_io=full_system_proto_unix_io),
+            anchor="Field",
+            position=WidgetPosition.LEFT,
+            stretch=WidgetStretchData(x=3),
+        ),
+        TScopeWidget(
+            name="Play Info",
+            widget=setup_play_info(proto_unix_io=full_system_proto_unix_io),
+            anchor="Field",
+            position=WidgetPosition.BOTTOM,
+            stretch=WidgetStretchData(y=3),
+        ),
+    ]
+
+
 def configure_two_ai_gamecontroller_view(
     visualization_buffer_size: int = 5,
 ) -> TScopeConfig:
@@ -339,7 +384,6 @@ def configure_simulated_test_view(
     simulator_proto_unix_io: ProtoUnixIO,
     blue_full_system_proto_unix_io: ProtoUnixIO,
     yellow_full_system_proto_unix_io: ProtoUnixIO,
-    visualization_buffer_size: int = 5,
 ) -> TScopeConfig:
     """Constructs the Thunderscope Config for simulated tests
     A view with 2 FullSystem tabs (Blue and Yellow)
@@ -366,24 +410,20 @@ def configure_simulated_test_view(
         tabs=[
             TScopeTab(
                 name="Blue FullSystem",
-                widgets=configure_base_fullsystem(
+                widgets=configure_base_simulated_test(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
-                    visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
                 ),
             ),
             TScopeTab(
                 name="Yellow FullSystem",
-                widgets=configure_base_fullsystem(
+                widgets=configure_base_simulated_test(
                     full_system_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.YELLOW
                     ],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
-                    visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
                 ),
             ),
         ],
