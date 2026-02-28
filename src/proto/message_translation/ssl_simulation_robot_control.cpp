@@ -88,6 +88,18 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
             kick_angle = chip_angle.toDegrees();
             break;
         }
+        case TbotsProto::PowerControl::ChickerControl::kKickPulseWidth:
+        {
+            LOG(FATAL)
+                << "Kicker control using pulse widths is not supported in simulation";
+            break;
+        }
+        case TbotsProto::PowerControl::ChickerControl::kChipPulseWidth:
+        {
+            LOG(FATAL)
+                << "Chipper control using pulse widths is not supported in simulation";
+            break;
+        }
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
         {
             switch (direct_control->power_control()
@@ -125,6 +137,18 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
 
                     kick_speed = chip_speed;
                     kick_angle = chip_angle.toDegrees();
+                    break;
+                }
+                case TbotsProto::AutoChipOrKick::kAutokickPulseWidth:
+                {
+                    LOG(FATAL)
+                        << "Autokick control using pulse widths is not supported in simulation";
+                    break;
+                }
+                case TbotsProto::AutoChipOrKick::kAutochipPulseWidth:
+                {
+                    LOG(FATAL)
+                        << "Autochip control using pulse widths is not supported in simulation";
                     break;
                 }
                 case TbotsProto::AutoChipOrKick::AUTO_CHIP_OR_KICK_NOT_SET:
