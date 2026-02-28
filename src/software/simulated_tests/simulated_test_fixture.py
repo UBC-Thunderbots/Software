@@ -90,10 +90,11 @@ class SimulatedTestRunner(TbotsTestRunner):
         if self.thunderscope:
             self.thunderscope.close()
 
-    def sync_setup(self, setup):
+    def sync_setup(self, setup, param):
         """Run setup until simulator has received game state
 
         :param setup: Function that sets up the world state
+        :param param: Parameter passed into setup
         """
         world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
         self.simulator_proto_unix_io.register_observer(
@@ -101,7 +102,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         )
 
         while True:
-            setup()
+            setup(param)
 
             try:
                 world_state_received_buffer.get(
@@ -348,7 +349,7 @@ class InvariantTestRunner(SimulatedTestRunner):
         """
         threading.excepthook = self.excepthook
 
-        super().sync_setup(lambda: setup(params[0]))
+        super().sync_setup(setup, params[0])
 
         super().run_test(
             inv_always_validation_sequence_set,
@@ -393,7 +394,7 @@ class AggregateTestRunner(SimulatedTestRunner):
         # Catches Assertion Error thrown by failing test and increments counter
         # Calculates overall results and prints them
         for x in range(len(params)):
-            super().sync_setup(lambda: setup(params[x]))
+            super().sync_setup(setup, params[x])
 
             try:
                 super().run_test(
