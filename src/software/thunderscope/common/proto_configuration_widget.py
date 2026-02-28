@@ -16,6 +16,8 @@ class ProtoConfigurationWidget(QWidget):
     """Creates a searchable parameter widget that can take any protobuf,
     and convert it into a pyqtgraph ParameterTree. This will allow users
     to modify the values.
+
+    NOTE: If this widget is initialized, it will send a config proto with params
     """
 
     DELAYED_CONFIGURATION_TIMEOUT_S = 5
