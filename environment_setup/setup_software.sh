@@ -37,6 +37,7 @@ sudo apt-get install -y software-properties-common # required for add-apt-reposi
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update
+sudo apt autoremove
 
 # Detect if running under WSL
 # See https://github.com/microsoft/WSL/issues/4071#issuecomment-1221588337
@@ -92,10 +93,7 @@ fi
 
 virtualenv_opt_args=""
 if [[ $(lsb_release -rs) == "24.04" ]]; then
-    host_software_packages+=(python3-pyqt6)
-    host_software_packages+=(pyqt6-dev-tools)
-    host_software_packages+=(python3-pyqt6.qtsvg)
-
+    sudo apt remove "python3-pyqt6" "pyqt6-dev-tools" "python3-pyqt6.qtsvg"
     virtualenv_opt_args="--system-site-packages"
 fi
 
