@@ -121,7 +121,7 @@ TEST(TbotsProtobufTest, robot_state_msg_test)
     auto position         = Point(4.20, 4.20);
     auto velocity         = Vector(4.20, 4.20);
     auto orientation      = Angle::fromRadians(4.20);
-    auto angular_velocity = Angle::fromRadians(4.20);
+    auto angular_velocity = AngularVelocity::fromRadians(4.20);
 
     Robot robot(0, position, velocity, orientation, angular_velocity,
                 Timestamp::fromSeconds(0));
