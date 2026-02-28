@@ -62,7 +62,7 @@ class ExcessivelyDribbling(Validation):
 
     @override
     def __repr__(self):
-        return "Check that the dribbling robot has not dribbled for more than 1m"
+        return "Check that the dribbling robot has not dribbled for more than 1m minus error margin (0.06m)"
 
 
 (
