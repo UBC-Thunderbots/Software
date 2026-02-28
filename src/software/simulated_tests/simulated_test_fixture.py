@@ -121,7 +121,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
         ci_cmd_with_delay=[],
-        run_till_end=True,
+        run_till_end=False,
     ):
         """Run a test
 
