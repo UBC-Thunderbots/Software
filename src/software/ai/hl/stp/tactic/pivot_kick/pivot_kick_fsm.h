@@ -57,6 +57,8 @@ struct PivotKickFSM : TacticFSM<PivotKickFSM>
      */
     bool ballKicked(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(ballKicked, PivotKickFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -67,6 +69,7 @@ struct PivotKickFSM : TacticFSM<PivotKickFSM>
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(ballKicked)
+
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossessionAndPivot, DribbleFSM)
         DEFINE_SML_ACTION(kickBall)
 

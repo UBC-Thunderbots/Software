@@ -65,6 +65,8 @@ struct KickFSM : TacticFSM<KickFSM>
      */
     bool shouldRealignWithBall(const Update &event);
 
+    DEFINE_SML_GUARD_CLASS(ballChicked, KickFSM)
+    DEFINE_SML_GUARD_CLASS(shouldRealignWithBall, KickFSM)
 
     auto operator()()
     {
@@ -76,6 +78,7 @@ struct KickFSM : TacticFSM<KickFSM>
 
         DEFINE_SML_GUARD(ballChicked)
         DEFINE_SML_GUARD(shouldRealignWithBall)
+
         DEFINE_SML_ACTION(updateKick)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
 

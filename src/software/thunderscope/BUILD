@@ -1,5 +1,6 @@
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
+load("@aspect_rules_py//py:defs.bzl", "py_library", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,6 +14,10 @@ compile_pip_requirements(
 py_binary(
     name = "thunderscope_main",
     srcs = ["thunderscope_main.py"],
+    package_collisions = "warning",
+    env = {
+        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
+    },
     deps = [
         ":config",
         ":constants",
@@ -50,9 +55,11 @@ py_library(
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/binary_context_managers:tigers_autoref",
+        requirement("pyqt6"),
         requirement("numpy"),
         requirement("pyqtdarktheme-fork"),
         requirement("pyqtgraph"),
+        requirement("setuptools"),
     ],
 )
 
@@ -153,6 +160,7 @@ py_library(
     srcs = ["constants.py"],
     deps = [
         requirement("protobuf"),
+        requirement("pyopengl"),
     ],
 )
 

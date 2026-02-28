@@ -92,9 +92,9 @@ fi
 
 virtualenv_opt_args=""
 if [[ $(lsb_release -rs) == "24.04" ]]; then
-    host_software_packages+=(python3-pyqt6)
-    host_software_packages+=(pyqt6-dev-tools)
-    host_software_packages+=(python3-pyqt6.qtsvg)
+    # host_software_packages+=(python3-pyqt6)
+    # host_software_packages+=(pyqt6-dev-tools)
+    # host_software_packages+=(python3-pyqt6.qtsvg)
 
     virtualenv_opt_args="--system-site-packages"
 fi

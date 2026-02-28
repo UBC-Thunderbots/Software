@@ -81,6 +81,7 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     void setTactics(const Update& event);
 
 
+    DEFINE_SML_GUARD_CLASS(shouldDefendAggressively, DefensePlayFSM)
 
     auto operator()()
     {
