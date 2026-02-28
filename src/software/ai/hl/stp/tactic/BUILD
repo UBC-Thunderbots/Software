@@ -117,6 +117,7 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:trajectory_planner",
         "//software/geom/algorithms:end_in_obstacle_sample",
+        ":vis_proto_deduper",
     ],
 )
 
@@ -142,3 +143,29 @@ cc_test(
         "//software/test_util",
     ],
 )
+
+cc_library(
+    name = "vis_proto_deduper",
+    srcs = ["vis_proto_deduper.cpp"],
+    hdrs = [
+        "vis_proto_deduper.h",
+    ],
+    deps = [
+        ":primitive",
+        "//proto/message_translation:tbots_protobuf",
+        "//software/util/hash:hash_combine",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+    ]
+)
+
+cc_test(
+    name = "vis_proto_deduper_test",
+    srcs = ["vis_proto_deduper_test.cpp"],
+    deps = [
+        ":primitive",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+        ":vis_proto_deduper",
+    ]
+)
+

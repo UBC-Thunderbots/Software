@@ -4,6 +4,7 @@
 
 #include "software/geom/segment.h"
 #include "software/geom/shape.h"
+#include "software/util/hash/hash_combine.h"
 
 /**
  * A shape composed of line segments.
@@ -100,3 +101,22 @@ bool operator!=(const Polygon& poly1, const Polygon& poly2);
  * @return The output stream with the string representation of the class appended
  */
 std::ostream& operator<<(std::ostream& os, const Polygon& poly);
+
+
+template <>
+struct std::hash<Polygon>
+{
+    std::size_t operator()(const Polygon &polygon) const
+    {
+        std::size_t seed = 0;
+        for (const auto& point : polygon.getPoints())
+        {
+            hashCombine(seed, point);
+        }
+        for (const auto& segment: polygon.getSegments())
+        {
+            hashCombine(seed, segment);
+        }
+        return seed;
+    }
+};
