@@ -1,7 +1,6 @@
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from proto.ssl_gc_common_pb2 import Team
 from abc import abstractmethod
 
 logger = create_logger(__name__)
@@ -72,7 +71,7 @@ class TbotsTestRunner:
     def send_gamecontroller_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
-        is_friendly: bool,
+        team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point=None,
     ):
         """Sends a gamecontroller command that is to be broadcasted to the given team
@@ -81,13 +80,6 @@ class TbotsTestRunner:
         :param is_friendly: whether the command should be sent to the friendly team
         :param final_ball_placement_point: where to place the ball in ball placement
         """
-        friendly_team, enemy_team = (
-            (Team.YELLOW, Team.BLUE)
-            if self.is_yellow_friendly
-            else (Team.BLUE, Team.YELLOW)
-        )
-        team = friendly_team if is_friendly else enemy_team
-
         self.gamecontroller.send_gc_command(
             gc_command=gc_command,
             team=team,
