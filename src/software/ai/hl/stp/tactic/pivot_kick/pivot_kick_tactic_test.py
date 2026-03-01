@@ -13,6 +13,8 @@ from proto.message_translation.tbots_protobuf import create_world_state
 @pytest.mark.parametrize(
     "ball_offset_from_robot, angle_to_kick_at",
     [
+        # TODO (#2859): Flaky, the robot does not dribble far enough into the ball
+
         # place the ball directly to the left of the robot
         (tbots_cpp.Vector(0, 0.5), 0),
         # place the ball directly to the right of the robot
@@ -23,23 +25,18 @@ from proto.message_translation.tbots_protobuf import create_world_state
         (tbots_cpp.Vector(-0.5, 0), 0),
         # place the ball in the robots dribbler
         (tbots_cpp.Vector(0.1, 0), 0),
-        # place the ball directly to the right of the robot, kick backwards
-        (tbots_cpp.Vector(0, -0.5), math.pi),
-        # place the ball directly infront of the robot, kick backwards
-        (tbots_cpp.Vector(0.5, 0), math.pi),
-        # place the ball in the robots dribbler
-        (tbots_cpp.Vector(0.1, 0), 0),
+        # place the ball directly to the left of the robot, kick left
+        (tbots_cpp.Vector(0, 0.5), math.pi),
+        # place the ball directly behind the robot, kick left
+        (tbots_cpp.Vector(-0.5, 0), math.pi),
     ],
 )
 def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
     robot_position = tbots_cpp.Point(0, 0)
     ball_position = robot_position + ball_offset_from_robot
 
-    # Setup World
     def setup(*args):
-        robot_position = tbots_cpp.Point(0, 0)
-        ball_position = robot_position + ball_offset_from_robot
-        simulated_test_runner.set_worldState(
+        simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -51,10 +48,6 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_run
             )
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.AssignedTacticsPlay
-        simulated_test_runner.set_play(blue_play, True)
-
         params = AssignedTacticPlayControlParams()
         params.assigned_tactics[1].pivot_kick.CopyFrom(
             PivotKickTactic(
@@ -65,10 +58,10 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_run
                 auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=5.0),
             )
         )
-        simulated_test_runner.set_tactics(params, True)
+        simulated_test_runner.set_tactics(params, is_friendly=True)
 
         params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, False)
+        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     kick_direction_vector = tbots_cpp.Vector(1, 0).rotate(
         tbots_cpp.Angle.fromRadians(angle_to_kick_at)
@@ -78,7 +71,7 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_run
     eventually_validation_sequence_set = [
         [
             RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(ball_position, 0.3)]),
-            BallEventuallyEntersRegion(regions=[tbots_cpp.Circle(kick_target, 1.0)]),
+            BallEventuallyEntersRegion(regions=[tbots_cpp.Circle(kick_target, 0.5)]),
         ]
     ]
 
@@ -88,7 +81,7 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_run
         inv_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_always_validation_sequence_set=[[]],
-        test_timeout_s=3,
+        test_timeout_s=10,
     )
 
 

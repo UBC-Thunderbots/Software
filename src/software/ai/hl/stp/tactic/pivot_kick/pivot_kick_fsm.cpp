@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
-#include "software/logger/logger.h"
 
 PivotKickFSM::PivotKickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticFSM<PivotKickFSM>(ai_config_ptr)
@@ -34,17 +33,13 @@ bool PivotKickFSM::ballKicked(const Update& event)
     if (event.control_params.auto_chip_or_kick.auto_chip_kick_mode ==
         AutoChipOrKickMode::AUTOKICK)
     {
-        bool kicked = event.common.world_ptr->ball().hasBallBeenKicked(
+        return event.common.world_ptr->ball().hasBallBeenKicked(
             event.control_params.kick_direction);
-        LOG(WARNING) << "using hasBallBeenKicked check " << kicked;
-        return kicked;
     }
     else
     {
         // check for separation for chipping since kick angle is not reliable
-        bool kicked = !event.common.robot.isNearDribbler(
+        return !event.common.robot.isNearDribbler(
             event.common.world_ptr->ball().position(), ROBOT_MAX_RADIUS_METERS);
-        LOG(WARNING) << "using isNearDribbler check " << kicked;
-        return kicked;
     }
 }
