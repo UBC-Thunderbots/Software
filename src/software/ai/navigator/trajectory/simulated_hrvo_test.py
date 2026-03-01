@@ -185,7 +185,15 @@ def hrvo_setup(
 
     ball_initial_vel = tbots.Point(0, 0)
 
-    # Game Controller Setup
+    simulated_test_runner.set_world_state(
+        create_world_state(
+            yellow_robot_locations=enemy_robots_positions,
+            blue_robot_locations=friendly_robots_positions,
+            ball_location=ball_initial_pos,
+            ball_velocity=ball_initial_vel,
+        )
+    )
+
     simulated_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.STOP, team=Team.BLUE
     )
@@ -212,7 +220,6 @@ def hrvo_setup(
 
     simulated_test_runner.set_tactics(blue_params, True)
 
-    # Setup no tactics on the enemy side
     yellow_params = AssignedTacticPlayControlParams()
 
     for index, destination in enumerate(enemy_robots_destinations):
@@ -221,17 +228,6 @@ def hrvo_setup(
         )
 
     simulated_test_runner.set_tactics(yellow_params, False)
-
-    # Setup Robots
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
-        create_world_state(
-            yellow_robot_locations=enemy_robots_positions,
-            blue_robot_locations=friendly_robots_positions,
-            ball_location=ball_initial_pos,
-            ball_velocity=ball_initial_vel,
-        ),
-    )
 
 
 @pytest.mark.parametrize(
