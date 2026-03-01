@@ -37,33 +37,24 @@ from software.simulated_tests.simulated_test_fixture import (
 )
 def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
     def setup(*args):
-        # Starting point must be Point
         ball_initial_pos = tbots_cpp.Point(0.93, 0)
-        # Placement point must be Vector2 to work with game controller
-        tbots_cpp.Point(-3, -2)
 
-        # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        # Force play override here
         blue_play = Play()
         blue_play.name = PlayName.DefensePlay
 
         params = AssignedTacticPlayControlParams()
 
-        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams, params
-        )
+        simulated_test_runner.set_play(blue_play, is_friendly=True)
+        simulated_test_runner.set_tactics(params, is_friendly=False)
 
-        # Create world state
-        simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState,
+        simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -115,34 +106,25 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
 )
 def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
     def setup(*args):
-        # Starting point must be Point
         ball_initial_pos = tbots_cpp.Point(0.9, 2.85)
-        # Placement point must be Vector2 to work with game controller
-        tbots_cpp.Point(-3, -2)
 
-        # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        # Force play override here
         blue_play = Play()
         blue_play.name = PlayName.DefensePlay
 
         yellow_play = Play()
         yellow_play.name = PlayName.ShootOrPassPlay
 
-        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
+        simulated_test_runner.set_play(blue_play, is_friendly=True)
+        simulated_test_runner.set_play(yellow_play, is_friendly=False)
 
-        # Create world state
-        simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState,
+        simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,

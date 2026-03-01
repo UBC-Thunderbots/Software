@@ -102,31 +102,24 @@ from software.simulated_tests.simulated_test_fixture import (
 def test_enemy_free_kick_play(
     simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
-    # Setup Bots
     def setup(*args):
-        # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.DIRECT, team=Team.YELLOW
         )
 
-        # Force play override here
         blue_play = Play()
         blue_play.name = PlayName.EnemyFreeKickPlay
 
         yellow_play = Play()
         yellow_play.name = PlayName.FreeKickPlay
 
-        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
+        simulated_test_runner.set_play(blue_play, is_friendly=True)
+        simulated_test_runner.set_play(yellow_play, is_friendly=False)
 
-        # Create world state
-        simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState,
+        simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,

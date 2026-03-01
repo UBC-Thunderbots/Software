@@ -11,10 +11,8 @@ from software.simulated_tests.simulated_test_fixture import (
 # @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_halt_play(simulated_test_runner):
     def setup(*args):
-        # starting point must be Point
         ball_initial_pos = tbots_cpp.Point(0, 0)
 
-        # Setup Bots
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
             tbots_cpp.Point(-3, 1.5),
@@ -37,20 +35,14 @@ def test_halt_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
-        # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
-        # No plays to override. AI does whatever for 3 seconds before HALT CMD
-        # is issued
-
-        # Create world state
-        simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState,
+        simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
