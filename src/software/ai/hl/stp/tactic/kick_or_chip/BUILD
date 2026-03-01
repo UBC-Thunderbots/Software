@@ -23,6 +23,19 @@ cc_library(
 )
 
 cc_test(
+    name = "kick_or_chip_tactic_test",
+    srcs = ["kick_or_chip_tactic_test.cpp"],
+    deps = [
+        ":kick_or_chip_tactic",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+    ],
+)
+
+cc_test(
     name = "kick_or_chip_fsm_test",
     srcs = ["kick_or_chip_fsm_test.cpp"],
     deps = [

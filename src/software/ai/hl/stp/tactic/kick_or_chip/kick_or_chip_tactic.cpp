@@ -21,7 +21,9 @@ void KickOrChipTactic::updateControlParams(const Point& kick_or_chip_origin, con
 void KickOrChipTactic::updateControlParams(const Point& kick_or_chip_origin, const Point& kick_or_chip_target,
 			    AutoChipOrKick auto_chip_or_kick)
 {
-    updateControlParams(kick_or_chip_origin, kick_or_chip_target, auto_chip_or_kick);
+    updateControlParams(kick_or_chip_origin,
+                        (kick_or_chip_target - kick_or_chip_origin).orientation(),
+                        auto_chip_or_kick);
 }
 
 void KickOrChipTactic::accept(TacticVisitor &visitor) const
