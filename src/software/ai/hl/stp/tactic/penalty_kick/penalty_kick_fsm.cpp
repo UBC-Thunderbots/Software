@@ -124,7 +124,8 @@ const Point PenaltyKickFSM::evaluateNextShotPosition(std::optional<Robot> enemy_
 void PenaltyKickFSM::shoot(const Update &event,
                            boost::sml::back::process<KickOrChipFSM::Update> processEvent)
 {
-    AutoChipOrKick auto_chip_or_kick       = {AutoChipOrKickMode::AUTOKICK, PENALTY_KICK_SHOT_SPEED};
+    AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK,
+                                        PENALTY_KICK_SHOT_SPEED};
     KickOrChipFSM::ControlParams control_params{
         .kick_or_chip_origin    = event.common.world_ptr->ball().position(),
         .kick_or_chip_direction = shot_angle,

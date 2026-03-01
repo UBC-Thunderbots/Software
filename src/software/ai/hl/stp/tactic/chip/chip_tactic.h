@@ -41,4 +41,3 @@ class ChipTactic : public TacticBase<ChipFSM, GetBehindBallFSM>
 
     void accept(TacticVisitor& visitor) const override;
 };
-

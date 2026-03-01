@@ -13,13 +13,16 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
 
     struct ControlParams
     {
-	// Control params for kick
+        // Control params for kick
         // The location where the kick will be taken from
         Point kick_or_chip_origin;
         // The direction the Robot will kick in
         Angle kick_or_chip_direction;
 
-        // How the robot will chip or kick the ball and its associated parameter for that mode. For example, if the mode is AUTOKICK, then the parameter will be the speed of the kick, and if the mode is AUTOCHIP, then the parameter will be the distance of the chip.
+        // How the robot will chip or kick the ball and its associated parameter for that
+        // mode. For example, if the mode is AUTOKICK, then the parameter will be the
+        // speed of the kick, and if the mode is AUTOCHIP, then the parameter will be the
+        // distance of the chip.
         AutoChipOrKick auto_chip_or_kick;
     };
 
@@ -69,8 +72,6 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
 
 
 
-
-
     auto operator()()
     {
         using namespace boost::sml;
@@ -90,10 +91,11 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
             *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
             GetBehindBallFSM_S = KickOrChipState_S,
 
-            KickOrChipState_S + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A =
-                GetBehindBallFSM_S,
-            KickOrChipState_S + Update_E[!ballChicked_G] / kickOrChipBall_A = KickOrChipState_S,
+            KickOrChipState_S + Update_E[shouldRealignWithBall_G] /
+                                    updateGetBehindBall_A = GetBehindBallFSM_S,
+            KickOrChipState_S + Update_E[!ballChicked_G] / kickOrChipBall_A =
+                KickOrChipState_S,
             KickOrChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION                                = X);
     }
 };

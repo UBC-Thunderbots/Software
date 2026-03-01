@@ -8,12 +8,12 @@ KickOrChipFSM::KickOrChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_conf
 {
 }
 
-void KickOrChipFSM::kickOrChipBall(const Update& event)
+void KickOrChipFSM::kickOrChipBall(const Update &event)
 {
-    Vector direction = Vector::createFromAngle(event.control_params.kick_or_chip_direction);
-    Point kick_or_chip_target =
-        event.control_params.kick_or_chip_origin -
-        direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01);
+    Vector direction =
+        Vector::createFromAngle(event.control_params.kick_or_chip_direction);
+    Point kick_or_chip_target = event.control_params.kick_or_chip_origin -
+                                direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01);
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, kick_or_chip_target,
@@ -54,4 +54,3 @@ bool KickOrChipFSM::shouldRealignWithBall(const Update &event)
     return !isRobotReadyToChick(robot, event.control_params.kick_or_chip_origin,
                                 event.control_params.kick_or_chip_direction);
 }
-
