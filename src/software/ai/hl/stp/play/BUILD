@@ -66,16 +66,20 @@ cc_library(
 
 cc_library(
     name = "stop_play",
-    srcs = ["stop_play.cpp"],
-    hdrs = ["stop_play.h"],
+    srcs = [
+        "stop_play.cpp",
+        "stop_play_fsm.cpp",
+    ],
+    hdrs = [
+        "stop_play.h",
+        "stop_play_fsm.h",
+    ],
     deps = [
         ":play",
         "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
         "//software/util/generic_factory",
     ],
     alwayslink = True,
