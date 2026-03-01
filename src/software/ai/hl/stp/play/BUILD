@@ -193,6 +193,23 @@ cc_test(
     ],
 )
 
+py_test(
+    name = "stop_play_py_test",
+    srcs = [
+        "stop_play_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests:speed_threshold_helpers",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
 cc_test(
     name = "shoot_or_chip_play_cpp_test",
     srcs = ["shoot_or_chip_play_test.cpp"],
