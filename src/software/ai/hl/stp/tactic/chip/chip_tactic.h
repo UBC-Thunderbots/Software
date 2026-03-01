@@ -41,6 +41,3 @@ class ChipTactic : public TacticBase<ChipFSM, GetBehindBallFSM>
 
     void accept(TacticVisitor& visitor) const override;
 };
-
-// Creates a new tactic called KickoffChipTactic that is a duplicate of ChipTactic
-COPY_TACTIC(KickoffChipTactic, ChipTactic)

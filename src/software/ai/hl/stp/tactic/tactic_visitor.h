@@ -31,6 +31,7 @@ class PlaceBallTactic;
 class PlaceBallMoveTactic;
 class WallKickoffTactic;
 class AvoidInterferenceTactic;
+class KickOrChipTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
@@ -73,4 +74,5 @@ class TacticVisitor
     virtual void visit(const PlaceBallMoveTactic &tactic)        = 0;
     virtual void visit(const WallKickoffTactic &tactic)          = 0;
     virtual void visit(const AvoidInterferenceTactic &tactic)    = 0;
+    virtual void visit(const KickOrChipTactic &tactic)           = 0;
 };

@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
@@ -116,10 +116,12 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // TODO (#2612): This needs to be adjusted post field testing, ball needs to land
         // exactly in the middle of the enemy field
+        AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::AUTOCHIP, 0};
         kickoff_chip_tactic->updateControlParams(
             world_ptr->ball().position(),
             world_ptr->field().centerPoint() +
-                Vector(world_ptr->field().xLength() / 6, 0));
+                Vector(world_ptr->field().xLength() / 6, 0),
+            auto_chip_or_kick);
         result[0].emplace_back(kickoff_chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from
