@@ -1,5 +1,7 @@
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
+
+from software.simulated_tests.excessive_dribbling import NeverExcessivelyDribbles
 from software.simulated_tests.friendly_team_scored import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_has_ball_possession import *
@@ -76,7 +78,8 @@ def test_offense_play(simulated_test_runner):
 
     # Always Validation
     inv_always_validation_sequence_set = [
-        [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])]
+        [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])],
+        [NeverExcessivelyDribbles()],
     ]
 
     ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
