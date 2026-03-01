@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
+#include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/closest_point.h"
@@ -59,7 +59,7 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
      * @param processEvent   processes the KickFSM::Update
      */
     void shoot(const Update &event,
-               boost::sml::back::process<KickFSM::Update> processEvent);
+               boost::sml::back::process<KickOrChipFSM::Update> processEvent);
 
     /**
      * Action that updates the shooter's approach to the opposition net.
@@ -105,23 +105,23 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
         using namespace boost::sml;
 
         DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_STATE(KickFSM)
+        DEFINE_SML_STATE(KickOrChipFSM)
 
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(takePenaltyShot)
         DEFINE_SML_GUARD(timeOutApproach)
 
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, KickFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, KickOrChipFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateApproachKeeper, DribbleFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(adjustOrientationForShot, DribbleFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
             *DribbleFSM_S + Update_E[!takePenaltyShot_G] / updateApproachKeeper_A,
-            DribbleFSM_S + Update_E[timeOutApproach_G] / shoot_A = KickFSM_S,
+            DribbleFSM_S + Update_E[timeOutApproach_G] / shoot_A = KickOrChipFSM_S,
             DribbleFSM_S + Update_E / adjustOrientationForShot_A,
-            DribbleFSM_S = KickFSM_S, KickFSM_S + Update_E / shoot_A, KickFSM_S = X,
+            DribbleFSM_S = KickOrChipFSM_S, KickOrChipFSM_S + Update_E / shoot_A, KickOrChipFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     };
 

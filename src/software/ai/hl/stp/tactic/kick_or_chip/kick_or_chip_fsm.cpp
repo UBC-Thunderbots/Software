@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
 KickOrChipFSM::KickOrChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
@@ -9,8 +10,13 @@ KickOrChipFSM::KickOrChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_conf
 
 void KickOrChipFSM::kickOrChipBall(const Update& event)
 {
+    Vector direction = Vector::createFromAngle(event.control_params.kick_or_chip_direction);
+    Point kick_or_chip_target =
+        event.control_params.kick_or_chip_origin -
+        direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01);
+
     event.common.set_primitive(std::make_unique<MovePrimitive>(
-        event.common.robot, event.control_params.kick_or_chip_origin,
+        event.common.robot, kick_or_chip_target,
         event.control_params.kick_or_chip_direction,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,

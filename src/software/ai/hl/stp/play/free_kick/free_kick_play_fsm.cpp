@@ -4,9 +4,8 @@ FreeKickPlayFSM::FreeKickPlayFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayFSM<FreeKickPlayFSM>(ai_config_ptr),
       align_to_ball_tactic(std::make_shared<MoveTactic>(ai_config_ptr)),
-      shoot_tactic(std::make_shared<KickTactic>(ai_config_ptr)),
-      chip_tactic(std::make_shared<ChipTactic>(ai_config_ptr)),
-      passer_tactic(std::make_shared<KickTactic>(ai_config_ptr)),
+      kick_or_chip_tactic(std::make_shared<KickOrChipTactic>(ai_config_ptr)),
+      passer_tactic(std::make_shared<KickOrChipTactic>(ai_config_ptr)),
       receiver_tactic(std::make_shared<ReceiverTactic>(ai_config_ptr)),
       receiver_positioning_tactics({std::make_shared<MoveTactic>(ai_config_ptr),
                                     std::make_shared<MoveTactic>(ai_config_ptr)}),
@@ -147,11 +146,12 @@ void FreeKickPlayFSM::shootBall(const Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     Point ball_pos = event.common.world_ptr->ball().position();
+    AutoChipOrKick auto_chip_or_kick       = {AutoChipOrKickMode::AUTOKICK, BALL_MAX_SPEED_METERS_PER_SECOND};
 
-    shoot_tactic->updateControlParams(
+    kick_or_chip_tactic->updateControlParams(
         ball_pos, (shot->getPointToShootAt() - ball_pos).orientation(),
-        BALL_MAX_SPEED_METERS_PER_SECOND);
-    tactics_to_run[0].emplace_back(shoot_tactic);
+        auto_chip_or_kick);
+    tactics_to_run[0].emplace_back(kick_or_chip_tactic);
 
     event.common.set_tactics(tactics_to_run);
 }
@@ -200,9 +200,10 @@ void FreeKickPlayFSM::chipBall(const Update &event)
         }
     }
 
-    chip_tactic->updateControlParams(event.common.world_ptr->ball().position(),
-                                     chip_target);
-    tactics_to_run[0].emplace_back(chip_tactic);
+    AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::AUTOCHIP,
+                                        (chip_target - ball_pos).length()};
+    kick_or_chip_tactic->updateControlParams(ball_pos, chip_target, auto_chip_or_kick);
+    tactics_to_run[0].emplace_back(kick_or_chip_tactic);
 
     event.common.set_tactics(tactics_to_run);
 }
@@ -289,7 +290,7 @@ void FreeKickPlayFSM::passBall(const Update &event)
     Pass pass = best_pass_and_score_so_far.pass;
 
     passer_tactic->updateControlParams(pass.passerPoint(), pass.passerOrientation(),
-                                       pass.speed());
+                                       AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, pass.speed()});
     receiver_tactic->updateControlParams(pass);
     tactics_to_run[0].emplace_back(passer_tactic);
     tactics_to_run[0].emplace_back(receiver_tactic);
@@ -304,7 +305,7 @@ void FreeKickPlayFSM::passBall(const Update &event)
 
 bool FreeKickPlayFSM::shotDone(const Update &event)
 {
-    return shoot_tactic->done();
+    return kick_or_chip_tactic->done();
 }
 
 bool FreeKickPlayFSM::passDone(const FreeKickPlayFSM::Update &event)
@@ -314,5 +315,5 @@ bool FreeKickPlayFSM::passDone(const FreeKickPlayFSM::Update &event)
 
 bool FreeKickPlayFSM::chipDone(const FreeKickPlayFSM::Update &event)
 {
-    return chip_tactic->done();
+    return kick_or_chip_tactic->done();
 }

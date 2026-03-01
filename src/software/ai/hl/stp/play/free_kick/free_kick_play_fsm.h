@@ -5,9 +5,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
+#include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
@@ -266,9 +265,8 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayFSM>
    private:
     std::optional<Shot> shot;
     std::shared_ptr<MoveTactic> align_to_ball_tactic;
-    std::shared_ptr<KickTactic> shoot_tactic;
-    std::shared_ptr<ChipTactic> chip_tactic;
-    std::shared_ptr<KickTactic> passer_tactic;
+    std::shared_ptr<KickOrChipTactic> kick_or_chip_tactic;
+    std::shared_ptr<KickOrChipTactic> passer_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> receiver_positioning_tactics;
     std::shared_ptr<DefensePlay> defense_play;
