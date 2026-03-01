@@ -22,3 +22,13 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "kick_or_chip_fsm_test",
+    srcs = ["kick_or_chip_fsm_test.cpp"],
+    deps = [
+        ":kick_or_chip_tactic",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
