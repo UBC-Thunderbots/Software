@@ -52,6 +52,8 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         world_state.yellow_robots[5].CopyFrom(last_robot)
 
+        simulated_test_runner.set_world_state(world_state)
+
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
@@ -61,10 +63,7 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         blue_play = Play()
         blue_play.name = PlayName.ShootOrChipPlay
-
         simulated_test_runner.set_play(blue_play, is_friendly=True)
-
-        simulated_test_runner.set_world_state(world_state)
 
     simulated_test_runner.run_test(
         setup=setup,

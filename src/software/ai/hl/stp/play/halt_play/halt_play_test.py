@@ -35,13 +35,6 @@ def test_halt_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
-        simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-        simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
-        )
-
         simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
@@ -49,6 +42,13 @@ def test_halt_play(simulated_test_runner):
                 ball_location=ball_initial_pos,
                 ball_velocity=tbots_cpp.Vector(0, 0),
             ),
+        )
+
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        )
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
     # params just have to be a list of length 1 to ensure the test runs at least once

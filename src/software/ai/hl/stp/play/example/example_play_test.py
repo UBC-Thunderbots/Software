@@ -38,6 +38,15 @@ def test_example_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                yellow_robot_locations=yellow_bots,
+                blue_robot_locations=blue_bots,
+                ball_location=ball_initial_pos,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
+
         blue_play = Play()
         blue_play.name = PlayName.ExamplePlay
 
@@ -55,15 +64,6 @@ def test_example_play(simulated_test_runner):
         )
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.DIRECT, team=Team.BLUE
-        )
-
-        simulated_test_runner.set_world_state(
-            create_world_state(
-                yellow_robot_locations=yellow_bots,
-                blue_robot_locations=blue_bots,
-                ball_location=ball_initial_pos,
-                ball_velocity=tbots_cpp.Vector(0, 0),
-            ),
         )
 
     # params just have to be a list of length 1 to ensure the test runs at least once

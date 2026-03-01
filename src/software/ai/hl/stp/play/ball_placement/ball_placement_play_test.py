@@ -110,6 +110,16 @@ def ball_placement_play_setup(
             .negXPosYCorner(),
         ]
 
+    # Create world state
+    simulated_test_runner.set_world_state(
+        create_world_state(
+            yellow_robot_locations=yellow_bots,
+            blue_robot_locations=blue_bots,
+            ball_location=ball_start_point,
+            ball_velocity=tbots_cpp.Vector(0, 0),
+        ),
+    )
+
     # Game Controller Setup
     simulated_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
@@ -131,16 +141,6 @@ def ball_placement_play_setup(
     simulated_test_runner.set_play(blue_play, is_friendly=True)
     if not blue_only:
         simulated_test_runner.set_play(yellow_play, is_friendly=False)
-
-    # Create world state
-    simulated_test_runner.set_world_state(
-        create_world_state(
-            yellow_robot_locations=yellow_bots,
-            blue_robot_locations=blue_bots,
-            ball_location=ball_start_point,
-            ball_velocity=tbots_cpp.Vector(0, 0),
-        ),
-    )
 
 
 def run_ball_placement_scenario(

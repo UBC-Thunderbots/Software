@@ -39,6 +39,15 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
     def setup(*args):
         ball_initial_pos = tbots_cpp.Point(0.93, 0)
 
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                yellow_robot_locations=yellow_bots,
+                blue_robot_locations=blue_bots,
+                ball_location=ball_initial_pos,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
+
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
@@ -53,15 +62,6 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
 
         simulated_test_runner.set_play(blue_play, is_friendly=True)
         simulated_test_runner.set_tactics(params, is_friendly=False)
-
-        simulated_test_runner.set_world_state(
-            create_world_state(
-                yellow_robot_locations=yellow_bots,
-                blue_robot_locations=blue_bots,
-                ball_location=ball_initial_pos,
-                ball_velocity=tbots_cpp.Vector(0, 0),
-            ),
-        )
 
     simulated_test_runner.run_test(
         setup=setup,
@@ -108,6 +108,15 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
     def setup(*args):
         ball_initial_pos = tbots_cpp.Point(0.9, 2.85)
 
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                yellow_robot_locations=yellow_bots,
+                blue_robot_locations=blue_bots,
+                ball_location=ball_initial_pos,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
+
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
@@ -123,15 +132,6 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
 
         simulated_test_runner.set_play(blue_play, is_friendly=True)
         simulated_test_runner.set_play(yellow_play, is_friendly=False)
-
-        simulated_test_runner.set_world_state(
-            create_world_state(
-                yellow_robot_locations=yellow_bots,
-                blue_robot_locations=blue_bots,
-                ball_location=ball_initial_pos,
-                ball_velocity=tbots_cpp.Vector(0, 0),
-            ),
-        )
 
     simulated_test_runner.run_test(
         setup=setup,

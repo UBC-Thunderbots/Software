@@ -41,6 +41,15 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             .negXPosYCorner(),
         ]
 
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                yellow_robot_locations=yellow_bots,
+                blue_robot_locations=blue_bots,
+                ball_location=ball_initial_pos,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
+
         blue_play = Play()
         yellow_play = Play()
 
@@ -67,15 +76,6 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
 
         simulated_test_runner.set_play(blue_play, is_friendly=True)
         simulated_test_runner.set_play(yellow_play, is_friendly=False)
-
-        simulated_test_runner.set_world_state(
-            create_world_state(
-                yellow_robot_locations=yellow_bots,
-                blue_robot_locations=blue_bots,
-                ball_location=ball_initial_pos,
-                ball_velocity=tbots_cpp.Vector(0, 0),
-            ),
-        )
 
     # Always Validation
     always_validation_sequence_set = [[]]

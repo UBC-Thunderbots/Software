@@ -45,6 +45,15 @@ def test_two_ai_ball_placement(
             .negXPosYCorner(),
         ]
 
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                yellow_robot_locations=yellow_bots,
+                blue_robot_locations=blue_bots,
+                ball_location=ball_start_point,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
+
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
@@ -63,15 +72,6 @@ def test_two_ai_ball_placement(
         yellow_play.name = PlayName.BallPlacementPlay
 
         simulated_test_runner.set_play(yellow_play, is_friendly=False)
-
-        simulated_test_runner.set_world_state(
-            create_world_state(
-                yellow_robot_locations=yellow_bots,
-                blue_robot_locations=blue_bots,
-                ball_location=ball_start_point,
-                ball_velocity=tbots_cpp.Vector(0, 0),
-            ),
-        )
 
     always_validation_sequence_set = [
         [RobotNeverEntersPlacementRegion(ball_placement_point)]
