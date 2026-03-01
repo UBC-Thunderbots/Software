@@ -1,0 +1,36 @@
+Found using: `rg SimulatedErForceSimPlayTestFixture` and manual sorting
+
+TACTIC TESTS TO PORT
+
+src/software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic_test.cpp
+src/software/ai/hl/stp/tactic/halt/halt_tactic_test.cpp
+src/software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic_test.cpp
+src/software/ai/hl/stp/tactic/move/move_tactic_test.cpp
+src/software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic_test.cpp
+src/software/ai/hl/stp/tactic/kick/kick_tactic_test.cpp
+src/software/ai/hl/stp/tactic/chip/chip_tactic_test.cpp
+src/software/ai/hl/stp/tactic/dribble/dribble_tactic_test.cpp
+src/software/ai/hl/stp/tactic/receiver/receiver_tactic_test.cpp
+
+
+(these are tests defined for specific tactics but separated for some reason... technically they test more specific interactions but could merge them)
+
+src/software/ai/hl/stp/tactic/attacker/attacker_tactic_passing_test.cpp
+src/software/ai/hl/stp/tactic/attacker/attacker_tactic_keep_away_test.cpp
+src/software/ai/hl/stp/tactic/attacker/attacker_tactic_shoot_goal_test.cpp
+src/software/ai/hl/stp/tactic/dribble/dribble_tactic_push_enemy_test.cpp
+
+PLAY TESTS TO PORT
+
+src/software/ai/hl/stp/play/kickoff_friendly_play_test.cpp
+src/software/ai/hl/stp/play/kickoff_enemy_play_test.cpp
+src/software/ai/hl/stp/play/penalty_kick/penalty_kick_play_test.cpp
+src/software/ai/hl/stp/play/stop_play_test.cpp
+src/software/ai/hl/stp/play/stop_play_test.cpp
+src/software/ai/hl/stp/play/example/example_play_test.cpp
+src/software/ai/hl/stp/play/free_kick/free_kick_play_test.cpp
+src/software/ai/hl/stp/play/shoot_or_chip_play_test.cpp
+src/software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_test.cpp
+src/software/ai/hl/stp/play/crease_defense/crease_defense_play_test.cpp
+src/software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_test.cpp
+src/software/ai/hl/stp/play/hardware_challenge_plays/pass_endurance_play_test.cpp

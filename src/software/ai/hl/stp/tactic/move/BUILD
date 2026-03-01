@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -29,7 +31,7 @@ cc_test(
 )
 
 cc_test(
-    name = "move_tactic_test",
+    name = "move_tactic_cpp_test",
     srcs = ["move_tactic_test.cpp"],
     deps = [
         ":move_tactic",
@@ -40,5 +42,18 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "move_tactic_test",
+    srcs = ["move_tactic_test.py"],
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
