@@ -26,8 +26,12 @@ def test_crease_defense_play(simulated_test_runner):
             tbots_cpp.Point(1, -0.25),
             tbots_cpp.Point(1, -1.25),
             tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXNegYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXPosYCorner(),
         ]
 
         simulated_test_runner.send_gamecontroller_command(
