@@ -44,7 +44,7 @@ def setup_pass_and_robots(
     blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
 
     # Setup the world state
-    simulated_test_runner.set_worldState(
+    simulated_test_runner.set_world_state(
         create_world_state(
             yellow_robot_locations=enemy_robot_positions,
             blue_robot_locations=blue_robot_locations,
