@@ -2,7 +2,7 @@
 
 #include <queue>
 
-#include "software/ai/hl/stp/tactic/kick_or_chip_tactic/kick_or_chip_fsm.h"
+#include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
@@ -36,8 +36,11 @@ class KickOrChipTactic : public TacticBase<KickOrChipFSM, GetBehindBallFSM>
      * @param kick_or_chip_target The target location where the kick or chip will aim for
      * @param auto_chip_or_kick The mode of how the robot will chip or kick the ball, and the associated parameter for that modell
      */
-    void updateControlParams(const Point& kick_or_chip_origin, const Angle& kick_or_chip_target,
+    void updateControlParams(const Point& kick_or_chip_origin, const Point& kickd_or_chip_target,
 			     AutoChipOrKick auto_chip_or_kick);
 
     void accept(TacticVisitor& visitor) const override;
 };
+
+// Creates a new tactic called KickoffChipTactic that is a duplicate of ChipTactic
+COPY_TACTIC(KickoffChipTactic, KickOrChipTactic)

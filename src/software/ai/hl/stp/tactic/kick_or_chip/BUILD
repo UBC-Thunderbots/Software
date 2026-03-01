@@ -16,6 +16,7 @@ cc_library(
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/geom/algorithms",
         "//software/logger",
     ],

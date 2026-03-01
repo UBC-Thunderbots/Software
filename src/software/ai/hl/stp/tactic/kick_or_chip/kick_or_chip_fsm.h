@@ -82,7 +82,7 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
         DEFINE_SML_GUARD(ballChicked)
         DEFINE_SML_GUARD(shouldRealignWithBall)
 
-        DEFINE_SML_ACTION(updateKickOrChip)
+        DEFINE_SML_ACTION(kickOrChipBall)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
 
         return make_transition_table(
@@ -92,7 +92,7 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
 
             KickOrChipState_S + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A =
                 GetBehindBallFSM_S,
-            KickOrChipState_S + Update_E[!ballChicked_G] / updateKickOrChip_A = KickOrChipState_S,
+            KickOrChipState_S + Update_E[!ballChicked_G] / kickOrChipBall_A = KickOrChipState_S,
             KickOrChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }

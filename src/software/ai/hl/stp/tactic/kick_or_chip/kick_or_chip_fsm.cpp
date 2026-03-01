@@ -10,8 +10,8 @@ KickOrChipFSM::KickOrChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_conf
 void KickOrChipFSM::kickOrChipBall(const Update& event)
 {
     event.common.set_primitive(std::make_unique<MovePrimitive>(
-        event.common.robot, event.control_params.kick_origin,
-        event.control_params.kick_direction,
+        event.common.robot, event.control_params.kick_or_chip_origin,
+        event.control_params.kick_or_chip_direction,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick));
@@ -31,7 +31,7 @@ void KickOrChipFSM::updateGetBehindBall(
 bool KickOrChipFSM::ballChicked(const Update &event)
 {
     return event.common.world_ptr->ball().hasBallBeenKicked(
-        event.control_params.kick_direction);
+        event.control_params.kick_or_chip_direction);
 }
 
 bool KickOrChipFSM::shouldRealignWithBall(const Update &event)
@@ -39,13 +39,13 @@ bool KickOrChipFSM::shouldRealignWithBall(const Update &event)
     const Robot &robot = event.common.robot;
 
     // First check to see if it's too late to realign with the ball
-    if (robot.isNearDribbler(event.control_params.kick_origin, 0.05))
+    if (robot.isNearDribbler(event.control_params.kick_or_chip_origin, 0.05))
     {
         return false;
     }
 
     // Check if the robot is already aligned to kick the ball
-    return !isRobotReadyToChick(robot, event.control_params.kick_origin,
-                                event.control_params.kick_direction);
+    return !isRobotReadyToChick(robot, event.control_params.kick_or_chip_origin,
+                                event.control_params.kick_or_chip_direction);
 }
 

@@ -11,20 +11,20 @@ KickOrChipTactic::KickOrChipTactic(std::shared_ptr<const TbotsProto::AiConfig> a
 
 
 void KickOrChipTactic::updateControlParams(const Point& kick_or_chip_origin, const Angle& kick_or_chip_direction,
-                                            AutoChipOrKick auto_chip_or_kick);
+                                            AutoChipOrKick auto_chip_or_kick)
 {
     control_params.kick_or_chip_origin          = kick_or_chip_origin;
     control_params.kick_or_chip_direction       = kick_or_chip_direction;
     control_params.auto_chip_or_kick = auto_chip_or_kick;
 }
 
-void KickOrChipTactic::updateControlParams(const Point& kick_or_chip_origin, const Angle& kick_or_chip_target,
-			    AutoChipOrKick auto_chip_or_kick);
+void KickOrChipTactic::updateControlParams(const Point& kick_or_chip_origin, const Point& kick_or_chip_target,
+			    AutoChipOrKick auto_chip_or_kick)
 {
     updateControlParams(kick_or_chip_origin, kick_or_chip_target, auto_chip_or_kick);
 }
 
-void ChipTactic::accept(TacticVisitor &visitor) const
+void KickOrChipTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
