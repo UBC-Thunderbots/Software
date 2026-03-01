@@ -27,15 +27,20 @@ class ExcessivelyDribbling(Validation):
         :return: FAILING when the robot is excessively dribbling
                  PASSING when the robot is not excessively dribbling
         """
-
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
-            if tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.dribbler_tolerance):
+            if tbots_cpp.Robot(robot).isNearDribbler(
+                ball_position, self.dribbler_tolerance
+            ):
                 if self.continuous_dribbling_start_point is None:
                     # Set the dribbling validation start point to the current ball position
                     self.continuous_dribbling_start_point = ball_position
-                elif (ball_position - self.continuous_dribbling_start_point).length() > (self.max_dribbling_displacement - self.dribbling_error_margin):
-                        return ValidationStatus.FAILING
+                elif (
+                    ball_position - self.continuous_dribbling_start_point
+                ).length() > (
+                    self.max_dribbling_displacement - self.dribbling_error_margin
+                ):
+                    return ValidationStatus.FAILING
                 return ValidationStatus.PASSING
 
         # Reset the dribbling validation start point if no robots are near the ball
