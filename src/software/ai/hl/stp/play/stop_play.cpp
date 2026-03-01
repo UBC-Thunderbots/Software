@@ -6,9 +6,8 @@
 StopPlay::StopPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<StopPlayFSM>(ai_config_ptr, true)
 {
-    goalie_tactic =
-        std::make_shared<GoalieTactic>(ai_config_ptr,
-                                       TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
+    goalie_tactic = std::make_shared<GoalieTactic>(ai_config_ptr);
+    goalie_tactic->updateMaxSpeedMode(TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
 }
 
 void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
