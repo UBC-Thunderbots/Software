@@ -16,34 +16,30 @@ class ExcessivelyDribbling(Validation):
         self.continuous_dribbling_start_point = None
         self.dribbler_tolerance = 0.05
         self.max_dribbling_displacement = 1.00
-        self.dribbling_error_margin = 0.06
+        self.dribbling_error_margin = 0.05
 
     @override
     def get_validation_status(self, world) -> ValidationStatus:
-        """Checks if any friendly robot is excessively dribbling the ball for over the max dribble displacement
+        """Checks if any friendly robot is excessively dribbling the ball past the max dribble displacement
         minus the dribbling error margin
 
         :param world: The world msg to validate
         :return: FAILING when the robot is excessively dribbling
                  PASSING when the robot is not excessively dribbling
         """
+
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
-            if not tbots_cpp.Robot(robot).isNearDribbler(
-                ball_position, self.dribbler_tolerance
-            ):
-                # if ball is not near dribbler then de-activate this validation
-                self.continuous_dribbling_start_point = None
-            elif (
-                ball_position - (self.continuous_dribbling_start_point or ball_position)
-            ).length() > (
-                self.max_dribbling_displacement - self.dribbling_error_margin
-            ):
-                return ValidationStatus.FAILING
-            elif self.continuous_dribbling_start_point is None:
-                # if ball is near dribbler and dribbling start point hasn't been set yet, set dribbling start point
-                self.continuous_dribbling_start_point = ball_position
+            if tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.dribbler_tolerance):
+                if self.continuous_dribbling_start_point is None:
+                    # Set the dribbling validation start point to the current ball position
+                    self.continuous_dribbling_start_point = ball_position
+                elif (ball_position - self.continuous_dribbling_start_point).length() > (self.max_dribbling_displacement - self.dribbling_error_margin):
+                        return ValidationStatus.FAILING
+                return ValidationStatus.PASSING
 
+        # Reset the dribbling validation start point if no robots are near the ball
+        self.continuous_dribbling_start_point = None
         return ValidationStatus.PASSING
 
     @override
@@ -54,7 +50,11 @@ class ExcessivelyDribbling(Validation):
                 tbots_cpp.Circle(
                     self.continuous_dribbling_start_point,
                     self.max_dribbling_displacement,
-                )
+                ),
+                tbots_cpp.Circle(
+                    self.continuous_dribbling_start_point,
+                    self.max_dribbling_displacement - self.dribbling_error_margin,
+                ),
             ]
             if self.continuous_dribbling_start_point is not None
             else []
@@ -62,7 +62,7 @@ class ExcessivelyDribbling(Validation):
 
     @override
     def __repr__(self):
-        return "Check that the dribbling robot has not dribbled for more than 1m minus error margin (0.06m)"
+        return f"Check that the dribbling robot has not dribbled for more than {self.max_dribbling_displacement} m minus error margin ({self.dribbling_error_margin} m)"
 
 
 (
