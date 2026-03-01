@@ -66,6 +66,7 @@ def test_ball_chipped_on_intercept(
                     tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
                 ]
             ),
+            # Defender should intercept ball and prevent it from entering the goal
             BallNeverEntersRegion(
                 regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
             ),

@@ -59,8 +59,10 @@ def test_crease_defense_play(simulated_test_runner):
         simulated_test_runner.set_play(blue_play, is_friendly=True)
         simulated_test_runner.set_play(yellow_play, is_friendly=False)
 
+    # TODO (#2778): actually add validations
     always_validation_sequence_set = [[]]
 
+    # TODO (#2778): actually add validations
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
