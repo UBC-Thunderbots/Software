@@ -2,12 +2,12 @@
 
 #include "shared/constants.h"
 
-StopPlayFSM::StopPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
+StopPlayFSM::StopPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : ai_config_ptr(ai_config_ptr),
       move_tactics{std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
                    std::make_shared<MoveTactic>()},
-      crease_defender_tactics{std::make_shared<CreaseDefenderTactic>(ai_config),
-                              std::make_shared<CreaseDefenderTactic>(ai_config)}
+      crease_defender_tactics{std::make_shared<CreaseDefenderTactic>(ai_config_ptr),
+                              std::make_shared<CreaseDefenderTactic>(ai_config_ptr)}
 {
 }
 

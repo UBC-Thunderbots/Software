@@ -1,8 +1,10 @@
 #pragma once
 
+#include <memory>
+
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 
@@ -26,9 +28,9 @@ struct StopPlayFSM
     /**
      * Creates a Stop Play FSM
      *
-     * @param ai_config the play config for this FSM
+     * @param ai_config_ptr shared pointer to the play config for this FSM
      */
-    explicit StopPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit StopPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to position robots during Stop (goalie handled by Play; this sets
@@ -56,7 +58,7 @@ struct StopPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
     std::vector<std::shared_ptr<MoveTactic>> move_tactics;
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
 };

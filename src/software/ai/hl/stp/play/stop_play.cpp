@@ -3,10 +3,11 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-StopPlay::StopPlay(TbotsProto::AiConfig config) : PlayBase<StopPlayFSM>(config, true)
+StopPlay::StopPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayBase<StopPlayFSM>(ai_config_ptr, true)
 {
     goalie_tactic =
-        std::make_shared<GoalieTactic>(ai_config,
+        std::make_shared<GoalieTactic>(ai_config_ptr,
                                        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
 }
 

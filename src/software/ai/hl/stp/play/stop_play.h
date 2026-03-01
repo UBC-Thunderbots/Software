@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
 #include "software/ai/hl/stp/play/stop_play_fsm.h"
 
 /**
