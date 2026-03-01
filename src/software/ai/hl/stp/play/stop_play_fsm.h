@@ -52,9 +52,7 @@ struct StopPlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StopState_S + Update_E / updateStopPosition_A = StopState_S,
-
-            X + Update_E / updateStopPosition_A = X);
+            *StopState_S + Update_E / updateStopPosition_A = StopState_S);
     }
 
    private:
