@@ -4,8 +4,9 @@
 
 StopPlayFSM::StopPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : ai_config_ptr(ai_config_ptr),
-      move_tactics{std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
-                   std::make_shared<MoveTactic>()},
+      move_tactics{std::make_shared<MoveTactic>(ai_config_ptr),
+                   std::make_shared<MoveTactic>(ai_config_ptr),
+                   std::make_shared<MoveTactic>(ai_config_ptr)},
       crease_defender_tactics{std::make_shared<CreaseDefenderTactic>(ai_config_ptr),
                               std::make_shared<CreaseDefenderTactic>(ai_config_ptr)}
 {
