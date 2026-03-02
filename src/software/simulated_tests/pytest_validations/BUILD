@@ -16,6 +16,7 @@ py_library(
         "friendly_receives_ball_slow.py",
         "friendly_team_scored.py",
         "or_validation.py",
+        "robot_at_orientation.py",
         "robot_enters_placement_region.py",
         "robot_enters_region.py",
         "robot_enters_region_and_stops.py",

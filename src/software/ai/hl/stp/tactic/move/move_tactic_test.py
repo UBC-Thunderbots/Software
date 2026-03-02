@@ -2,6 +2,7 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from software.simulated_tests.pytest_validations.robot_enters_region import *
+from software.simulated_tests.pytest_validations.robot_at_orientation import *
 from software.simulated_tests.pytest_validations.ball_enters_region import *
 from software.simulated_tests.pytest_validations.ball_moves_in_direction import *
 from software.simulated_tests.simulated_test_fixture import (
@@ -245,7 +246,9 @@ def test_spinning_move(
     eventually_validation_sequence_set = [
         [
             RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(destination, 0.05)]),
-            # TODO (#2558): validate robot is at orientation
+            RobotEventuallyAtOrientation(
+                robot_id=0, orientation=orientation
+            ),
             # TODO (#2558): validate robot is at angular velocity
             #               (bug with angular velocities so the original c++ test is actually wrong)
         ]
