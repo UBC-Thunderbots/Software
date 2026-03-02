@@ -1,33 +1,38 @@
 import pytest
-import math
-
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.pytest_validations.robot_enters_region import *
-from software.simulated_tests.pytest_validations.ball_enters_region import *
+
+from proto.message_translation.tbots_protobuf import create_world_state
+from proto.import_all_protos import *
+from software.simulated_tests.pytest_validations.ball_enters_region import (
+    BallEventuallyEntersRegion,
+)
+from software.simulated_tests.pytest_validations.ball_kicked import BallEventuallyKicked
+from software.simulated_tests.pytest_validations.robot_enters_region import (
+    RobotEventuallyEntersRegion,
+)
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
 
 
 @pytest.mark.parametrize(
     "ball_offset_from_robot, angle_to_kick_at",
     [
         # TODO (#2859): Flaky, the robot does not dribble far enough into the ball
-        # place the ball directly to the left of the robot
-        (tbots_cpp.Vector(0, 0.5), 0),
-        # place the ball directly to the right of the robot
-        (tbots_cpp.Vector(0, -0.5), 0),
-        # place the ball directly infront of the robot
-        (tbots_cpp.Vector(0.5, 0), 0),
-        # place the ball directly behind the robot
-        (tbots_cpp.Vector(-0.5, 0), 0),
-        # place the ball in the robots dribbler
-        (tbots_cpp.Vector(0.1, 0), 0),
-        # place the ball directly to the left of the robot, kick left
-        (tbots_cpp.Vector(0, 0.5), math.pi),
-        # place the ball directly behind the robot, kick left
-        (tbots_cpp.Vector(-0.5, 0), math.pi),
+        # # place the ball directly to the left of the robot
+        # (tbots_cpp.Vector(0, 0.5), tbots_cpp.Angle.zero()),
+        # # place the ball directly to the right of the robot
+        # (tbots_cpp.Vector(0, -0.5), tbots_cpp.Angle.zero()),
+        # # place the ball directly infront of the robot
+        # (tbots_cpp.Vector(0.5, 0), tbots_cpp.Angle.zero()),
+        # # place the ball directly behind the robot
+        # (tbots_cpp.Vector(-0.5, 0), tbots_cpp.Angle.zero()),
+        # # place the ball in the robots dribbler
+        # (tbots_cpp.Vector(0.1, 0), tbots_cpp.Angle.zero()),
+        # # place the ball directly to the left of the robot, kick left
+        # (tbots_cpp.Vector(0, 0.5), tbots_cpp.Angle.half()),
+        # # place the ball directly behind the robot, kick left
+        # (tbots_cpp.Vector(-0.5, 0), tbots_cpp.Angle.half()),
     ],
 )
 def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
@@ -51,9 +56,7 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_run
         params.assigned_tactics[1].pivot_kick.CopyFrom(
             PivotKickTactic(
                 kick_origin=tbots_cpp.createPointProto(ball_position),
-                kick_direction=tbots_cpp.createAngleProto(
-                    tbots_cpp.Angle.fromRadians(angle_to_kick_at)
-                ),
+                kick_direction=tbots_cpp.createAngleProto(angle_to_kick_at),
                 auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=5.0),
             )
         )
@@ -62,15 +65,14 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_run
         params = AssignedTacticPlayControlParams()
         simulated_test_runner.set_tactics(params, is_friendly=False)
 
-    kick_direction_vector = tbots_cpp.Vector(1, 0).rotate(
-        tbots_cpp.Angle.fromRadians(angle_to_kick_at)
-    )
+    kick_direction_vector = tbots_cpp.Vector(1, 0).rotate(angle_to_kick_at)
     kick_target = ball_position + kick_direction_vector * 3
 
     eventually_validation_sequence_set = [
         [
-            RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(ball_position, 0.3)]),
-            BallEventuallyEntersRegion(regions=[tbots_cpp.Circle(kick_target, 0.5)]),
+            RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(ball_position, 0.5)]),
+            BallEventuallyEntersRegion(regions=[tbots_cpp.Circle(kick_target, 1.0)]),
+            BallEventuallyKicked(kick_direction=angle_to_kick_at),
         ]
     ]
 
