@@ -349,7 +349,7 @@ if __name__ == "__main__":
 
         with (
             Gamecontroller(
-                suppress_logs=(not args.verbose), use_conventional_port=False, is_recording_stats=args.record_stats
+                suppress_logs=(not args.verbose), use_conventional_port=False, record_stats=args.record_stats
             )
             if args.launch_gc
             else contextlib.nullcontext()
@@ -477,7 +477,7 @@ if __name__ == "__main__":
             running_in_realtime=(not args.ci_mode and not args.record_stats),
             log_level=args.log_level,
         ) as yellow_fs, Gamecontroller(
-            suppress_logs=(not args.verbose), is_recording_stats=args.record_stats
+            suppress_logs=(not args.verbose), record_stats=args.record_stats
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
