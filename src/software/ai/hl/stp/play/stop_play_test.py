@@ -73,9 +73,7 @@ def test_stop_play(simulated_test_runner):
         setup=setup,
         params=[0],
         inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[
+        inv_eventually_validation_sequence_set=[
             [RobotSpeedEventuallyBelowThreshold(1.5)]
         ],
         test_timeout_s=10,
