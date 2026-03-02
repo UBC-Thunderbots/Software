@@ -3,6 +3,7 @@ import pytest
 import software.python_bindings as tbots_cpp
 from software.simulated_tests.pytest_validations.robot_enters_region import *
 from software.simulated_tests.pytest_validations.robot_at_orientation import *
+from software.simulated_tests.pytest_validations.robot_at_angular_velocity import *
 from software.simulated_tests.pytest_validations.ball_enters_region import *
 from software.simulated_tests.pytest_validations.ball_moves_in_direction import *
 from software.simulated_tests.simulated_test_fixture import (
@@ -205,14 +206,14 @@ def test_autokick_move(simulated_test_runner):
 
 
 @pytest.mark.parametrize(
-    "orientation, initial_position, destination",
+    "orientation, initial_position, destination, angular_velocity",
     [
-        (tbots_cpp.Angle.zero(), tbots_cpp.Point(-4, 2), tbots_cpp.Point(4, 2)),
-        (tbots_cpp.Angle.half(), tbots_cpp.Point(4, 2), tbots_cpp.Point(-4, 2)),
+        (tbots_cpp.Angle.zero(), tbots_cpp.Point(-4, 2), tbots_cpp.Point(4, 2), tbots_cpp.Angle.fromDegrees(360)),
+        (tbots_cpp.Angle.half(), tbots_cpp.Point(4, 2), tbots_cpp.Point(-4, 2), tbots_cpp.Angle.fromDegrees(-1440)),
     ],
 )
 def test_spinning_move(
-    orientation, initial_position, destination, simulated_test_runner
+    orientation, initial_position, destination, angular_velocity, simulated_test_runner
 ):
     def setup(*args):
         simulated_test_runner.set_world_state(
@@ -246,9 +247,8 @@ def test_spinning_move(
     eventually_validation_sequence_set = [
         [
             RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(destination, 0.05)]),
-            RobotEventuallyAtOrientation(robot_id=0, orientation=orientation),
-            # TODO (#2558): validate robot is at angular velocity
-            #               (bug with angular velocities so the original c++ test is actually wrong)
+            RobotEventuallyAtOrientation(robot_id=0, orientation=orientation, threshold=0.1),
+            # TODO (#2558): validate robot is at angular velocity (need to initialize robot angular velocity in Python first)
         ]
     ]
 
