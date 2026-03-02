@@ -246,9 +246,7 @@ def test_spinning_move(
     eventually_validation_sequence_set = [
         [
             RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(destination, 0.05)]),
-            RobotEventuallyAtOrientation(
-                robot_id=0, orientation=orientation
-            ),
+            RobotEventuallyAtOrientation(robot_id=0, orientation=orientation),
             # TODO (#2558): validate robot is at angular velocity
             #               (bug with angular velocities so the original c++ test is actually wrong)
         ]
