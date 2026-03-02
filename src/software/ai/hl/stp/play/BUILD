@@ -198,6 +198,8 @@ py_test(
     srcs = [
         "stop_play_test.py",
     ],
+    # The default main would be stop_play_py_test.py; override to our file.
+    main = "stop_play_test.py",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",
