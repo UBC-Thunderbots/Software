@@ -209,6 +209,12 @@ if __name__ == "__main__":
         default=False,
         help="Run unix_full_system under sudo",
     )
+    parser.add_argument(
+        "--record_stats_duration",
+        type=int, 
+        default = 60,
+        help="Run unix_full_system under sudo",
+    )
 
     estop_group = parser.add_mutually_exclusive_group()
     estop_group.add_argument(
@@ -343,7 +349,7 @@ if __name__ == "__main__":
 
         with (
             Gamecontroller(
-                suppress_logs=(not args.verbose), use_conventional_port=False
+                suppress_logs=(not args.verbose), use_conventional_port=False, is_recording_stats=args.record_stats
             )
             if args.launch_gc
             else contextlib.nullcontext()
@@ -433,7 +439,7 @@ if __name__ == "__main__":
                 0 if args.empty else DIV_B_NUM_ROBOTS,
             )
 
-            if args.ci_mode:
+            if args.ci_mode or args.record_stats:
                 async_sim_ticker(
                     tick_rate_ms,
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
@@ -459,7 +465,7 @@ if __name__ == "__main__":
             friendly_colour_yellow=False,
             should_restart_on_crash=False,
             run_sudo=args.sudo,
-            running_in_realtime=(not args.ci_mode),
+            running_in_realtime=(not args.ci_mode and not args.record_stats),
             log_level=args.log_level,
         ) as blue_fs, FullSystem(
             path_to_binary=runtime_config.get_yellow_runtime_path(),
@@ -468,10 +474,10 @@ if __name__ == "__main__":
             friendly_colour_yellow=True,
             should_restart_on_crash=False,
             run_sudo=args.sudo,
-            running_in_realtime=(not args.ci_mode),
+            running_in_realtime=(not args.ci_mode and not args.record_stats),
             log_level=args.log_level,
         ) as yellow_fs, Gamecontroller(
-            suppress_logs=(not args.verbose),
+            suppress_logs=(not args.verbose), is_recording_stats=args.record_stats
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -482,8 +488,9 @@ if __name__ == "__main__":
                 suppress_logs=(not args.verbose),
                 tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
                 show_gui=args.show_autoref_gui,
+                record_stats=args.record_stats
             )
-            if args.enable_autoref
+            if args.enable_autoref or args.record_stats
             else contextlib.nullcontext()
         ) as autoref, (
             Stats(
@@ -527,7 +534,7 @@ if __name__ == "__main__":
                 autoref_proto_unix_io=autoref_proto_unix_io,
                 simulator_proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
             )
-            if args.enable_autoref:
+            if args.enable_autoref or args.record_stats:
                 autoref.setup_ssl_wrapper_packets(
                     autoref_proto_unix_io,
                 )
@@ -547,6 +554,27 @@ if __name__ == "__main__":
                 exiter_thread = threading.Thread(
                     target=exit_poller,
                     args=(autoref, CI_DURATION_S, lambda: tscope.close()),
+                    daemon=True,
+                )
+
+                exiter_thread.start()  # start the exit countdown
+                sim_ticker_thread.start()  # start the simulation ticking
+
+                tscope.show()  # blocking!
+
+                # these resource cleanups occur after tscope.close() is called by the exiter_thread
+                exiter_thread.join()
+                sim_ticker_thread.join()
+
+                sys.exit(0)
+            elif args.record_stats:
+                # In CI mode, we want AI vs AI to end automatically after a given time (CI_DURATION_S). The exiter
+                # thread is passed an exit handler that will close the Thunderscope window
+                # This exit handler is necessary because Qt runs on the main thread, so tscope.show() is a blocking
+                # call so we need to somehow close it before doing our resource cleanup
+                exiter_thread = threading.Thread(
+                    target=exit_poller,
+                    args=(autoref, args.record_stats_duration, lambda: tscope.close()),
                     daemon=True,
                 )
 

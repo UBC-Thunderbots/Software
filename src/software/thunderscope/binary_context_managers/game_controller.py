@@ -37,6 +37,7 @@ class Gamecontroller:
         self,
         suppress_logs: bool = False,
         use_conventional_port: bool = False,
+        is_recording_stats: bool = False
     ) -> None:
         """Run Gamecontroller
 
@@ -44,6 +45,7 @@ class Gamecontroller:
         :param use_conventional_port: whether or not to use the conventional port!
         """
         self.suppress_logs = suppress_logs
+        self.is_recording_stats = is_recording_stats
 
         # We default to using a non-conventional port to avoid emitting
         # on the same port as what other teams may be listening on.
@@ -192,8 +194,8 @@ class Gamecontroller:
             block=False, return_cached=True
         )
 
-        max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
-        max_allowed_bots_blue: int = referee.blue.max_allowed_bots
+        max_allowed_bots_yellow: int = 6 if self.is_recording_stats else referee.yellow.max_allowed_bots
+        max_allowed_bots_blue: int = 6 if self.is_recording_stats else referee.blue.max_allowed_bots
         # Ignore if nothing needs to be updated
         if (
             len(self.latest_world.friendly_team.team_robots) == max_allowed_bots_blue
