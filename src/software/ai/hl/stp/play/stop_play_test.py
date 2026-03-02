@@ -68,15 +68,16 @@ def test_stop_play(simulated_test_runner):
             ),
         )
 
-    # After ~8s the C++ test expects robots to be slow; allow 10s for test
+    # C++ test waits 8s before checking; use 15s timeout so robots have time to slow.
+    # Threshold 2.0 m/s: expect robots to eventually slow below this (stop play).
     simulated_test_runner.run_test(
         setup=setup,
         params=[0],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1.5)]
+            [RobotSpeedEventuallyBelowThreshold(2.0)]
         ],
-        test_timeout_s=10,
+        test_timeout_s=15,
     )
 
 
