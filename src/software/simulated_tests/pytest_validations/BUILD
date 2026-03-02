@@ -20,6 +20,7 @@ py_library(
         "robot_enters_placement_region.py",
         "robot_enters_region.py",
         "robot_enters_region_and_stops.py",
+        "robot_received_ball.py",
         "robot_speed_threshold.py",
         "speed_threshold_helpers.py",
         "validation.py",
