@@ -210,7 +210,7 @@ if __name__ == "__main__":
         help="Run unix_full_system under sudo",
     )
     parser.add_argument(
-        "--record_stats_duration",
+        "--record_stats_duration_s",
         type=int, 
         default = 60,
         help="Run unix_full_system under sudo",
@@ -479,7 +479,7 @@ if __name__ == "__main__":
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose), record_stats=args.record_stats
         ) as gamecontroller, (
-            # Here we only initialize autoref if the --enable_autoref flag is requested.
+            # Here we only initialize autoref if the --enable_autoref flag is requested, or when we are recording stats.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
             # All calls to autoref should be guarded with args.enable_autoref
             TigersAutoref(
@@ -568,13 +568,13 @@ if __name__ == "__main__":
 
                 sys.exit(0)
             elif args.record_stats:
-                # In CI mode, we want AI vs AI to end automatically after a given time (CI_DURATION_S). The exiter
+                # In record stats mode mode, we want AI vs AI to end automatically after a given time (args.record_stats_duration_s). The exiter
                 # thread is passed an exit handler that will close the Thunderscope window
                 # This exit handler is necessary because Qt runs on the main thread, so tscope.show() is a blocking
                 # call so we need to somehow close it before doing our resource cleanup
                 exiter_thread = threading.Thread(
                     target=exit_poller,
-                    args=(autoref, args.record_stats_duration, lambda: tscope.close()),
+                    args=(autoref, args.record_stats_duration_s, lambda: tscope.close()),
                     daemon=True,
                 )
 
