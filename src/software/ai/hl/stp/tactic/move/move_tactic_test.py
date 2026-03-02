@@ -208,8 +208,18 @@ def test_autokick_move(simulated_test_runner):
 @pytest.mark.parametrize(
     "orientation, initial_position, destination, angular_velocity",
     [
-        (tbots_cpp.Angle.zero(), tbots_cpp.Point(-4, 2), tbots_cpp.Point(4, 2), tbots_cpp.Angle.fromDegrees(360)),
-        (tbots_cpp.Angle.half(), tbots_cpp.Point(4, 2), tbots_cpp.Point(-4, 2), tbots_cpp.Angle.fromDegrees(-1440)),
+        (
+            tbots_cpp.Angle.zero(),
+            tbots_cpp.Point(-4, 2),
+            tbots_cpp.Point(4, 2),
+            tbots_cpp.Angle.fromDegrees(360),
+        ),
+        (
+            tbots_cpp.Angle.half(),
+            tbots_cpp.Point(4, 2),
+            tbots_cpp.Point(-4, 2),
+            tbots_cpp.Angle.fromDegrees(-1440),
+        ),
     ],
 )
 def test_spinning_move(
@@ -247,7 +257,9 @@ def test_spinning_move(
     eventually_validation_sequence_set = [
         [
             RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(destination, 0.05)]),
-            RobotEventuallyAtOrientation(robot_id=0, orientation=orientation, threshold=0.1),
+            RobotEventuallyAtOrientation(
+                robot_id=0, orientation=orientation, threshold=0.1
+            ),
             # TODO (#2558): validate robot is at angular velocity (need to initialize robot angular velocity in Python first)
         ]
     ]
