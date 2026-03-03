@@ -18,27 +18,28 @@ void StopPlayFSM::updateStopPosition(const Update& event)
     //  - 1 robot will be the goalie
     //  - 2 robots will assist the goalie in blocking the ball, they will snap
     //      to the best fit semicircle around the defense area
-    //  - 3 robots will stay within 0.5m of the ball, evenly spaced, also blocking the
-    //  goal
+    //  - 2 robots will stay within 0.5m of the ball, curved around the goal-to-ball
+    //      line
+    //  - 1 robot will position more centrally in our half to help stretch the field
     //
-    //  If x represents the ball and G represents the goalie, the following, also blocking
-    //  the goal diagram depicts a possible outcome of this play
+    //  If x represents the ball and G represents the goalie, the following diagram
+    //  depicts a possible outcome of this play
     //
-    // 		+--------------------+--------------------+
-    // 		|                    |                    |
-    // 		|         4  x       |                    |
-    // 		| 0       2          |                    |
-    // 		+--+ 1     3         |                 +--+
-    // 		|  |                 |                 |  |
-    // 		|G |               +-+-+               |  |
-    // 		|  |               |   |               |  |
-    // 		|  |               +-+-+               |  |
-    // 		|  |                 |                 |  |
-    // 		+--+                 |                 +--+
-    // 		|                    |                    |
-    // 		|                    |                    |
-    // 		|                    |                    |
-    // 		+--------------------+--------------------+
+    //      +--------------------+--------------------+
+    //      |                    |                    |
+    //      |         4  x       |                    |
+    //      | 0       2          |                    |
+    //      +--+ 1               |                 +--+
+    //      |  |                 |                 |  |
+    //      |G |               +-+-+               |  |
+    //      |  |               |   |               |  |
+    //      |  |               +-+-+               |  |
+    //      |  |        3        |                 |  |
+    //      +--+                 |                 +--+
+    //      |                    |                    |
+    //      |                    |                    |
+    //      |                    |                    |
+    //      +--------------------+--------------------+
     const WorldPtr& world_ptr = event.common.world_ptr;
     TbotsProto::MaxAllowedSpeedMode stop_mode =
         TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND;
@@ -52,28 +53,31 @@ void StopPlayFSM::updateStopPosition(const Update& event)
     Vector robot_positioning_unit_vector = goal_to_ball_unit_vector.perpendicular();
 
     // Points on the circle around the ball: center on the goal-ball line,
-    // left and right offset. Extra robot radius buffer to stay within rules.
+    // and one offset. Extra robot radius buffer to stay within rules.
     Point ball_defense_point_center =
         world_ptr->ball().position() +
         (0.5 + 2 * ROBOT_MAX_RADIUS_METERS) * goal_to_ball_unit_vector;
-    Point ball_defense_point_left =
-        ball_defense_point_center -
-        robot_positioning_unit_vector * 4 * ROBOT_MAX_RADIUS_METERS;
     Point ball_defense_point_right =
         ball_defense_point_center +
         robot_positioning_unit_vector * 4 * ROBOT_MAX_RADIUS_METERS;
+
+    // A more central point in our half that is further from the ball than the
+    // curved defenders, to help keep the team spread out and prepared to
+    // receive or intercept a pass once play resumes.
+    Point central_support_point =
+        (world_ptr->field().friendlyGoalCenter() + world_ptr->ball().position()) * 0.5;
 
     move_tactics.at(0)->updateControlParams(
         ball_defense_point_center,
         (world_ptr->ball().position() - ball_defense_point_center).orientation(),
         stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
     move_tactics.at(1)->updateControlParams(
-        ball_defense_point_left,
-        (world_ptr->ball().position() - ball_defense_point_left).orientation(),
-        stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
-    move_tactics.at(2)->updateControlParams(
         ball_defense_point_right,
         (world_ptr->ball().position() - ball_defense_point_right).orientation(),
+        stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
+    move_tactics.at(2)->updateControlParams(
+        central_support_point,
+        (world_ptr->ball().position() - central_support_point).orientation(),
         stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
 
     std::get<0>(crease_defender_tactics)
