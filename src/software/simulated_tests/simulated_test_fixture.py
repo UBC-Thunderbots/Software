@@ -117,12 +117,12 @@ class SimulatedTestRunner(TbotsTestRunner):
 
     def runner(
         self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
-        ci_cmd_with_delay=[],
-        run_till_end=False,
+        always_validation_sequence_set,
+        eventually_validation_sequence_set,
+        test_timeout_s,
+        tick_duration_s,
+        ci_cmd_with_delay,
+        run_till_end,
     ):
         """Run a test
 
@@ -257,7 +257,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         always_validation_sequence_set,
         eventually_validation_sequence_set,
         test_timeout_s=3,
-        tick_duration_s=0.0166,
+        tick_duration_s=0.0166,  # Default to 60hz
         index=0,
         ci_cmd_with_delay=[],
         run_till_end=True,
