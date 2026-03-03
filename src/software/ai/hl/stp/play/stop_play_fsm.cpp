@@ -63,9 +63,12 @@ void StopPlayFSM::updateStopPosition(const Update& event)
 
     // A more central point in our half that is further from the ball than the
     // curved defenders, to help keep the team spread out and prepared to
-    // receive or intercept a pass once play resumes.
+    // receive or intercept a pass once play resumes. We place this point
+    // halfway between the friendly goal center and the ball along the line
+    // joining them.
     Point central_support_point =
-        (world_ptr->field().friendlyGoalCenter() + world_ptr->ball().position()) * 0.5;
+        world_ptr->field().friendlyGoalCenter() +
+        (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter()) * 0.5;
 
     move_tactics.at(0)->updateControlParams(
         ball_defense_point_center,
