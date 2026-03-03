@@ -13,20 +13,8 @@ struct HaltTestPlayFSM : PlayFSM<HaltTestPlayFSM>
 
     class HaltTestState;
 
-    explicit HaltTestPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-        : PlayFSM<HaltTestPlayFSM>(ai_config_ptr),
-          halt_tactics({{
-              std::make_shared<HaltTactic>(ai_config_ptr),
-              std::make_shared<HaltTactic>(ai_config_ptr),
-              std::make_shared<HaltTactic>(ai_config_ptr),
-          }})
-    {
-    }
-
-    void updateHalt(const Update& event)
-    {
-        event.common.set_tactics(halt_tactics);
-    }
+    explicit HaltTestPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    void updateHalt(const Update& event);
 
     auto operator()()
     {

@@ -4,6 +4,7 @@ cc_library(
     name = "halt_test_play",
     srcs = [
         "halt_test_play.cpp",
+        "halt_test_play_fsm.cpp",
     ],
     hdrs = [
         "halt_test_play.h",
@@ -19,7 +20,10 @@ cc_library(
 
 cc_library(
     name = "move_test_play",
-    srcs = ["move_test_play.cpp"],
+    srcs = [
+        "move_test_play.cpp",
+        "move_test_play_fsm.cpp",
+    ],
     hdrs = [
         "move_test_play.h",
         "move_test_play_fsm.h",
