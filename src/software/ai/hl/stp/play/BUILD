@@ -179,7 +179,7 @@ py_test(
 )
 
 cc_test(
-    name = "stop_play_test",
+    name = "stop_play_cpp_test",
     srcs = ["stop_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -194,11 +194,11 @@ cc_test(
 )
 
 py_test(
-    name = "stop_play_py_test",
+    name = "stop_play_test",
     srcs = [
         "stop_play_test.py",
     ],
-    # The default main would be stop_play_py_test.py; override to our file.
+    # The default main would be stop_play_test.py; override to our file.
     main = "stop_play_test.py",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
