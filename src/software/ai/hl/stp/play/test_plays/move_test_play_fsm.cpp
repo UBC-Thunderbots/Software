@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/test_plays/move_test_play_fsm.h"
 
-MoveTestPlayFSM::MoveTestPlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+MoveTestPlayFSM::MoveTestPlayFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayFSM<MoveTestPlayFSM>(ai_config_ptr),
       move_test_tactic_friendly_goal(std::make_shared<MoveTactic>(ai_config_ptr)),
       move_test_tactic_enemy_goal(std::make_shared<MoveTactic>(ai_config_ptr)),
