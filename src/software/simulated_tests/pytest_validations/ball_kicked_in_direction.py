@@ -9,7 +9,7 @@ from software.simulated_tests.pytest_validations.validation import (
 from typing import override
 
 
-class BallKicked(Validation):
+class BallKickedInDirection(Validation):
     """Checks if the ball has been kicked in a specific direction"""
 
     LINE_LENGTH = 0.5
@@ -17,20 +17,12 @@ class BallKicked(Validation):
     def __init__(
         self,
         kick_direction,
-        min_kick_speed=0.5,
-        max_angle_difference_degrees=20,
     ):
         """Constructs the validation object
 
         :param kick_direction: The expected direction the ball should be kicked (tbots_cpp.Angle)
-        :param min_kick_speed: Minimum speed for a valid kick in m/s
-        :param max_angle_difference_degrees: Maximum angle difference in degrees
         """
         self.kick_direction = kick_direction
-        self.min_kick_speed = min_kick_speed
-        self.max_angle_difference = tbots_cpp.Angle.fromDegrees(
-            max_angle_difference_degrees
-        )
 
     @override
     def get_validation_status(self, world) -> ValidationStatus:
@@ -40,21 +32,17 @@ class BallKicked(Validation):
         :return: FAILING if the ball has not been kicked in the expected direction
                  PASSING if the ball has been kicked in the expected direction
         """
-        ball_pos = world.ball.current_state.global_position
-        ball_vel = world.ball.current_state.global_velocity
+        # Convert ball proto to tbots_cpp ball
+        ball_pos = tbots_cpp.createPoint(world.ball.current_state.global_position)
+        ball_vel = tbots_cpp.createVector(world.ball.current_state.global_velocity)
 
-        point = tbots_cpp.Point(ball_pos.x_meters, ball_pos.y_meters)
-        vector = tbots_cpp.Vector(
-            ball_vel.x_component_meters, ball_vel.y_component_meters
+        ball = tbots_cpp.Ball(ball_pos, ball_vel, tbots_cpp.Timestamp())
+
+        return (
+            ValidationStatus.PASSING
+            if ball.hasBallBeenKicked(self.kick_direction)
+            else ValidationStatus.FAILING
         )
-
-        ball = tbots_cpp.Ball(point, vector, tbots_cpp.Timestamp())
-
-        if ball.hasBallBeenKicked(
-            self.kick_direction, self.min_kick_speed, self.max_angle_difference
-        ):
-            return ValidationStatus.PASSING
-        return ValidationStatus.FAILING
 
     @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
@@ -71,12 +59,12 @@ class BallKicked(Validation):
 
     @override
     def __repr__(self):
-        return f"Check that the ball was kicked at {self.kick_direction} (min_speed={self.min_kick_speed}, max_angle_diff={self.max_angle_difference})"
+        return f"Check that the ball is kicked in direction {self.kick_direction}"
 
 
 (
-    BallEventuallyKicked,
-    BallEventuallyNotKicked,
-    BallAlwaysKicked,
-    BallNeverKicked,
-) = create_validation_types(BallKicked)
+    BallEventuallyKickedInDirection,
+    _BallEventuallyNotKickedInDirection,  # Doesn't make sense
+    _BallAlwaysKickedInDirection,  # Doesn't make sense
+    BallNeverKickedInDirection,
+) = create_validation_types(BallKickedInDirection)

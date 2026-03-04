@@ -8,7 +8,7 @@ from software.simulated_tests.pytest_validations.ball_enters_region import (
     BallEventuallyEntersRegion,
 )
 from software.simulated_tests.pytest_validations.ball_kicked import (
-    BallEventuallyKicked,
+    BallEventuallyKickedInDirection,
 )
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
@@ -77,7 +77,7 @@ def test_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
     eventually_validation_sequence_set = [
         [
             BallEventuallyEntersRegion(regions=[tbots_cpp.Circle(kick_target, 0.5)]),
-            BallEventuallyKicked(kick_direction=angle_to_kick_at),
+            BallEventuallyKickedInDirection(kick_direction=angle_to_kick_at),
         ]
     ]
 
