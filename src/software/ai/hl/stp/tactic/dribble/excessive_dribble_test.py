@@ -5,10 +5,7 @@ from software.simulated_tests.pytest_validations.excessive_dribbling import (
     NeverExcessivelyDribbles,
     EventuallyStartsExcessivelyDribbling,
 )
-from proto.message_translation.tbots_protobuf import (
-    WorldState,
-    DribbleTactic,
-)
+from proto.message_translation.tbots_protobuf import DribbleTactic
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -128,6 +125,30 @@ def test_excessive_dribbling(
     simulated_test_runner,
     blue_robot_location,
 ):
+    def setup(*args):
+        blue_robot_locations = [blue_robot_location]
+
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                yellow_robot_locations=[],
+                blue_robot_locations=blue_robot_locations,
+                ball_location=initial_location,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            )
+        )
+
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: DribbleTactic(
+                    dribble_destination=tbots_cpp.createPointProto(dribble_destination),
+                    final_dribble_orientation=tbots_cpp.createAngleProto(
+                        final_dribble_orientation
+                    ),
+                    allow_excessive_dribbling=True,
+                )
+            }
+        )
+
     if should_excessively_dribble:
         # Always and Eventually validation sets for excessive dribbling
         always_validation_sequence_set = [[]]
@@ -137,32 +158,8 @@ def test_excessive_dribbling(
         always_validation_sequence_set = [[NeverExcessivelyDribbles()]]
         eventually_validation_sequence_set = [[]]
 
-    blue_robot_locations = [blue_robot_location]
-
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
-        create_world_state(
-            [],
-            blue_robot_locations=blue_robot_locations,
-            ball_location=initial_location,
-            ball_velocity=tbots_cpp.Vector(0, 0),
-        ),
-    )
-
-    # Setup Tactic
-    simulated_test_runner.set_tactics(
-        blue_tactics={
-            0: DribbleTactic(
-                dribble_destination=tbots_cpp.createPointProto(dribble_destination),
-                final_dribble_orientation=tbots_cpp.createAngleProto(
-                    final_dribble_orientation
-                ),
-                allow_excessive_dribbling=True,
-            )
-        }
-    )
-
     simulated_test_runner.run_test(
+        setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
