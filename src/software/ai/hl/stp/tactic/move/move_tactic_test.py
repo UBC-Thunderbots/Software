@@ -1,22 +1,31 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.pytest_validations.robot_enters_region import *
-from software.simulated_tests.pytest_validations.robot_at_orientation import *
-from software.simulated_tests.pytest_validations.robot_at_angular_velocity import *
-from software.simulated_tests.pytest_validations.ball_enters_region import *
-from software.simulated_tests.pytest_validations.ball_moves_in_direction import *
+from software.simulated_tests.pytest_validations.robot_at_position import (
+    RobotEventuallyAtPosition,
+)
+from software.simulated_tests.pytest_validations.ball_kicked_in_direction import (
+    BallEventuallyKickedInDirection,
+)
+from software.simulated_tests.pytest_validations.robot_at_orientation import (
+    RobotEventuallyAtOrientation,
+)
+from software.simulated_tests.pytest_validations.ball_is_off_ground import (
+    BallIsEventuallyOffGround,
+)
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
+from proto.import_all_protos import *
 
 
 def test_move_across_field(simulated_test_runner):
-    def setup(*args):
-        initial_position = tbots_cpp.Point(-3, 1.5)
-        destination = tbots_cpp.Point(2.5, -1.1)
+    initial_position = tbots_cpp.Point(-3, 1.5)
+    destination = tbots_cpp.Point(2.5, -1.1)
+    field = tbots_cpp.Field.createSSLDivisionBField()
 
+    def setup(*args):
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
@@ -27,13 +36,9 @@ def test_move_across_field(simulated_test_runner):
                     tbots_cpp.Point(1, 0),
                     tbots_cpp.Point(1, 2.5),
                     tbots_cpp.Point(1, -2.5),
-                    tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-                    tbots_cpp.Field.createSSLDivisionBField()
-                    .enemyDefenseArea()
-                    .negXNegYCorner(),
-                    tbots_cpp.Field.createSSLDivisionBField()
-                    .enemyDefenseArea()
-                    .negXPosYCorner(),
+                    field.enemyGoalCenter(),
+                    field.enemyDefenseArea().negXNegYCorner(),
+                    field.enemyDefenseArea().negXPosYCorner(),
                 ],
                 ball_location=tbots_cpp.Point(4.5, -3),
                 ball_velocity=tbots_cpp.Vector(0, 0),
@@ -47,39 +52,30 @@ def test_move_across_field(simulated_test_runner):
                     final_orientation=tbots_cpp.createAngleProto(
                         tbots_cpp.Angle.zero()
                     ),
-                    dribbler_mode=DribblerMode.OFF,
-                    ball_collision_type=BallCollisionType.AVOID,
-                    auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                    obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
                 )
             }
         )
 
     eventually_validation_sequence_set = [
         [
-            RobotEventuallyEntersRegion(
-                regions=[tbots_cpp.Circle(tbots_cpp.Point(2.5, -1.1), 0.05)]
-            ),
+            # TODO: should also validate that the robot stays at destination for 1000 ticks after
+            RobotEventuallyAtPosition(1, destination),
         ]
     ]
 
-    # TODO (#2558): should also validate that the robot stays at destination for 1000 ticks after
-    # TODO (#2558): check if there is better way to pass these arguments cleaner
     simulated_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=[[]],
     )
 
 
 def test_autochip_move(simulated_test_runner):
-    def setup(*args):
-        initial_position = tbots_cpp.Point(-3, 1.5)
-        destination = tbots_cpp.Point(0, 1.5)
+    initial_position = tbots_cpp.Point(-3, 1.5)
+    destination = tbots_cpp.Point(0, 1.5)
+    field = tbots_cpp.Field.createSSLDivisionBField()
 
+    def setup(*args):
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
@@ -90,13 +86,9 @@ def test_autochip_move(simulated_test_runner):
                     tbots_cpp.Point(1, 0),
                     tbots_cpp.Point(1, 2.5),
                     tbots_cpp.Point(1, -2.5),
-                    tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-                    tbots_cpp.Field.createSSLDivisionBField()
-                    .enemyDefenseArea()
-                    .negXNegYCorner(),
-                    tbots_cpp.Field.createSSLDivisionBField()
-                    .enemyDefenseArea()
-                    .negXPosYCorner(),
+                    field.enemyGoalCenter(),
+                    field.enemyDefenseArea().negXNegYCorner(),
+                    field.enemyDefenseArea().negXPosYCorner(),
                 ],
                 ball_location=destination,
                 ball_velocity=tbots_cpp.Vector(0, 0),
@@ -121,29 +113,27 @@ def test_autochip_move(simulated_test_runner):
 
     eventually_validation_sequence_set = [
         [
-            RobotEventuallyEntersRegion(
-                regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 1.5), 0.05)]
-            ),
-            # TODO (#2558): validate that ball gets kicked at an angle zero
+            # TODO (#2558): should also validate that the robot stays at destination for 1000 ticks after
+            RobotEventuallyAtPosition(1, destination),
+            BallEventuallyKickedInDirection(tbots_cpp.Angle.zero()),
+            BallIsEventuallyOffGround(),
         ]
     ]
 
-    # TODO (#2558): should also validate that the robot stays at destination for 1000 ticks after
     simulated_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
 
 
 def test_autokick_move(simulated_test_runner):
-    def setup(*args):
-        initial_position = tbots_cpp.Point(-1, -0.5)
-        destination = tbots_cpp.Point(-1, -1)
+    initial_position = tbots_cpp.Point(-1, -0.5)
+    destination = tbots_cpp.Point(-1, -1)
+    field = tbots_cpp.Field.createSSLDivisionBField()
 
+    def setup(*args):
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[initial_position],
@@ -152,13 +142,9 @@ def test_autokick_move(simulated_test_runner):
                     tbots_cpp.Point(1, 0),
                     tbots_cpp.Point(1, 2.5),
                     tbots_cpp.Point(1, -2.5),
-                    tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-                    tbots_cpp.Field.createSSLDivisionBField()
-                    .enemyDefenseArea()
-                    .negXNegYCorner(),
-                    tbots_cpp.Field.createSSLDivisionBField()
-                    .enemyDefenseArea()
-                    .negXPosYCorner(),
+                    field.enemyGoalCenter(),
+                    field.enemyDefenseArea().negXNegYCorner(),
+                    field.enemyDefenseArea().negXPosYCorner(),
                 ],
                 ball_location=destination,
                 ball_velocity=tbots_cpp.Vector(0, 0),
@@ -183,20 +169,17 @@ def test_autokick_move(simulated_test_runner):
 
     eventually_validation_sequence_set = [
         [
-            RobotEventuallyEntersRegion(
-                regions=[tbots_cpp.Circle(tbots_cpp.Point(-1, -1), 0.05)]
-            ),
-            # TODO (#2558): validate that ball gets kicked at an angle threeQuarter
+            # TODO (#2558): should also validate that the robot stays at destination for 1000 ticks after
+            RobotEventuallyAtPosition(0, destination),
+            BallEventuallyKickedInDirection(tbots_cpp.Angle.threeQuarter()),
         ]
     ]
 
-    # TODO (#2558): should also validate that the robot stays at destination for 1000 ticks after
     simulated_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=[[]],
+        test_timeout_s=10,
     )
 
 
@@ -248,20 +231,17 @@ def test_spinning_move(
 
     eventually_validation_sequence_set = [
         [
-            RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(destination, 0.05)]),
-            RobotEventuallyAtOrientation(
-                robot_id=0, orientation=orientation, threshold=0.1
-            ),
-            # TODO (#2558): validate robot is at angular velocity (need to initialize robot angular velocity in Python first)
+            RobotEventuallyAtPosition(0, destination),
+            RobotEventuallyAtOrientation(0, orientation, 0.1),
+            # TODO: validate robot is at angular velocity (need to initialize robot angular velocity in Python first)
+            # TODO: validate position and orientation for 1000 ticks
         ]
     ]
 
     simulated_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
 

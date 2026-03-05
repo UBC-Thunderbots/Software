@@ -17,6 +17,7 @@ py_library(
         "or_validation.py",
         "robot_at_angular_velocity.py",
         "robot_at_orientation.py",
+        "robot_at_position.py",
         "robot_enters_placement_region.py",
         "robot_enters_region.py",
         "robot_enters_region_and_stops.py",
