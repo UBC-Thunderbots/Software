@@ -41,9 +41,8 @@ def test_passing(field_test_runner):
     # Setup the passer's tactic
     # We use KickTactic since AttackerTactic shoots towards the goal instead if open
     # KickTactic just does the kick we want
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[passer_robot_id].kick.CopyFrom(
-        KickTactic(
+    tactics = {
+        passer_robot_id: KickTactic(
             kick_origin=Point(
                 x_meters=pass_to_test.passerPoint().x(),
                 y_meters=pass_to_test.passerPoint().y(),
@@ -51,11 +50,11 @@ def test_passing(field_test_runner):
             kick_direction=Angle(radians=kick_vec.orientation().toRadians()),
             kick_speed_meters_per_second=pass_to_test.speed(),
         )
-    )
+    }
 
     # if we want a friendly robot to receive the pass
     if should_receive_pass:
-        # arguments for a ReceiverTactic
+        # arguments for a ReceiverTactic, required since pass is a python keyword
         receiver_args = {
             "pass": Pass(
                 passer_point=Point(
@@ -71,9 +70,7 @@ def test_passing(field_test_runner):
             "disable_one_touch_shot": True,
         }
 
-        params.assigned_tactics[receiver_robot_id].receiver.CopyFrom(
-            ReceiverTactic(**receiver_args)
-        )
+        tactics[receiver_robot_id] = ReceiverTactic(**receiver_args)
 
     field = tbots_cpp.Field.createSSLDivisionBField()
     tbots_cpp.EighteenZonePitchDivision(field)
@@ -89,7 +86,7 @@ def test_passing(field_test_runner):
         ]
     ]
 
-    field_test_runner.set_tactics(params, True)
+    field_test_runner.set_tactics(blue_tactics=tactics)
     field_test_runner.run_test(
         always_validation_sequence_set=always_validation_sequence_set,
         eventually_validation_sequence_set=[[]],
@@ -98,10 +95,12 @@ def test_passing(field_test_runner):
 
     # Send a halt tactic after the test finishes
     halt_tactic = HaltTactic()
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[passer_robot_id].stop.CopyFrom(halt_tactic)
-    params.assigned_tactics[receiver_robot_id].stop.CopyFrom(halt_tactic)
-    field_test_runner.set_tactics(params, True)
+    field_test_runner.set_tactics(
+        blue_tactics={
+            passer_robot_id: halt_tactic,
+            receiver_robot_id: halt_tactic,
+        }
+    )
 
 
 if __name__ == "__main__":

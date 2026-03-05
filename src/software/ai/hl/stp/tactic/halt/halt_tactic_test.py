@@ -1,13 +1,7 @@
 import software.python_bindings as tbots_cpp
 
 from proto.import_all_protos import (
-    Angle,
-    AngularVelocity,
-    AssignedTacticPlayControlParams,
     HaltTactic,
-    Point,
-    RobotState,
-    Vector,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.pytest_validations.robot_speed_threshold import (
@@ -29,13 +23,7 @@ def test_robot_already_stopped(simulated_test_runner):
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].halt.CopyFrom(HaltTactic())
-
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-        simulated_test_runner.set_tactics(
-            AssignedTacticPlayControlParams(), is_friendly=False
-        )
+        simulated_test_runner.set_tactics(blue_tactics={1: HaltTactic()})
 
     eventually_validations = [
         [
@@ -65,13 +53,7 @@ def test_robot_start_moving(simulated_test_runner):
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].halt.CopyFrom(HaltTactic())
-
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-        simulated_test_runner.set_tactics(
-            AssignedTacticPlayControlParams(), is_friendly=False
-        )
+        simulated_test_runner.set_tactics(blue_tactics={1: HaltTactic()})
 
     eventually_validations = [
         [

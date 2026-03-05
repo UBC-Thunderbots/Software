@@ -1,7 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+from proto.import_all_protos import DribbleTactic
 from software.simulated_tests.pytest_validations.robot_enters_region import *
 from software.simulated_tests.pytest_validations.ball_enters_region import *
 from software.simulated_tests.pytest_validations.robot_received_ball import *
@@ -41,20 +41,19 @@ def test_intercept_ball_behind_enemy_robot(simulated_test_runner):
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].dribble.CopyFrom(
-            DribbleTactic(
-                dribble_destination=tbots_cpp.createPointProto(tbots_cpp.Point(0, 0)),
-                final_dribble_orientation=tbots_cpp.createAngleProto(
-                    tbots_cpp.Angle.zero()
-                ),
-                allow_excessive_dribbling=False,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                1: DribbleTactic(
+                    dribble_destination=tbots_cpp.createPointProto(
+                        tbots_cpp.Point(0, 0)
+                    ),
+                    final_dribble_orientation=tbots_cpp.createAngleProto(
+                        tbots_cpp.Angle.zero()
+                    ),
+                    allow_excessive_dribbling=False,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     eventually_validation_sequence_set = [
         [
@@ -91,20 +90,19 @@ def test_stopped_ball(simulated_test_runner):
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].dribble.CopyFrom(
-            DribbleTactic(
-                dribble_destination=tbots_cpp.createPointProto(tbots_cpp.Point(0, 0)),
-                final_dribble_orientation=tbots_cpp.createAngleProto(
-                    tbots_cpp.Angle.zero()
-                ),
-                allow_excessive_dribbling=False,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                1: DribbleTactic(
+                    dribble_destination=tbots_cpp.createPointProto(
+                        tbots_cpp.Point(0, 0)
+                    ),
+                    final_dribble_orientation=tbots_cpp.createAngleProto(
+                        tbots_cpp.Angle.zero()
+                    ),
+                    allow_excessive_dribbling=False,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     eventually_validation_sequence_set = [
         [
@@ -140,20 +138,19 @@ def test_ball_bounce_off_of_enemy_robot(simulated_test_runner):
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].dribble.CopyFrom(
-            DribbleTactic(
-                dribble_destination=tbots_cpp.createPointProto(tbots_cpp.Point(0, 0)),
-                final_dribble_orientation=tbots_cpp.createAngleProto(
-                    tbots_cpp.Angle.zero()
-                ),
-                allow_excessive_dribbling=False,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                1: DribbleTactic(
+                    dribble_destination=tbots_cpp.createPointProto(
+                        tbots_cpp.Point(0, 0)
+                    ),
+                    final_dribble_orientation=tbots_cpp.createAngleProto(
+                        tbots_cpp.Angle.zero()
+                    ),
+                    allow_excessive_dribbling=False,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     eventually_validation_sequence_set = [
         [
@@ -226,12 +223,7 @@ def test_moving_ball_dribble(
                 tbots_cpp.createAngleProto(dribble_orientation)
             )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].dribble.CopyFrom(dribble_params)
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
+        simulated_test_runner.set_tactics(blue_tactics={1: dribble_params})
 
     validations = [RobotEventuallyReceivedBall(robot_id=1, tolerance=0.05)]
 
@@ -281,20 +273,17 @@ def test_dribble_with_excessive_dribbling(simulated_test_runner):
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].dribble.CopyFrom(
-            DribbleTactic(
-                dribble_destination=tbots_cpp.createPointProto(dribble_destination),
-                final_dribble_orientation=tbots_cpp.createAngleProto(
-                    dribble_orientation
-                ),
-                allow_excessive_dribbling=True,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                1: DribbleTactic(
+                    dribble_destination=tbots_cpp.createPointProto(dribble_destination),
+                    final_dribble_orientation=tbots_cpp.createAngleProto(
+                        dribble_orientation
+                    ),
+                    allow_excessive_dribbling=True,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     eventually_validation_sequence_set = [
         [

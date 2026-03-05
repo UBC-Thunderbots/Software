@@ -7,7 +7,6 @@ from software.simulated_tests.pytest_validations.excessive_dribbling import (
 )
 from proto.message_translation.tbots_protobuf import (
     WorldState,
-    AssignedTacticPlayControlParams,
     DribbleTactic,
 )
 from software.simulated_tests.simulated_test_fixture import (
@@ -151,25 +150,16 @@ def test_excessive_dribbling(
     )
 
     # Setup Tactic
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].dribble.CopyFrom(
-        DribbleTactic(
-            dribble_destination=tbots_cpp.createPointProto(dribble_destination),
-            final_dribble_orientation=tbots_cpp.createAngleProto(
-                final_dribble_orientation
-            ),
-            allow_excessive_dribbling=True,
-        )
-    )
-
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
-
-    # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
+    simulated_test_runner.set_tactics(
+        blue_tactics={
+            0: DribbleTactic(
+                dribble_destination=tbots_cpp.createPointProto(dribble_destination),
+                final_dribble_orientation=tbots_cpp.createAngleProto(
+                    final_dribble_orientation
+                ),
+                allow_excessive_dribbling=True,
+            )
+        }
     )
 
     simulated_test_runner.run_test(

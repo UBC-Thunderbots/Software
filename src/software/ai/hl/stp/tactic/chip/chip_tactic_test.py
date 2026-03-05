@@ -10,7 +10,7 @@ from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.import_all_protos import AssignedTacticPlayControlParams, ChipTactic
+from proto.import_all_protos import ChipTactic
 
 
 @pytest.mark.parametrize(
@@ -62,18 +62,15 @@ def test_chip(ball_offset_from_robot, angle_to_chip_at, simulated_test_runner):
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].chip.CopyFrom(
-            ChipTactic(
-                chip_origin=tbots_cpp.createPointProto(ball_position),
-                chip_direction=tbots_cpp.createAngleProto(angle_to_chip_at),
-                chip_distance_meters=2.0,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                1: ChipTactic(
+                    chip_origin=tbots_cpp.createPointProto(ball_position),
+                    chip_direction=tbots_cpp.createAngleProto(angle_to_chip_at),
+                    chip_distance_meters=2.0,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     eventually_validation_sequence_set = [
         [

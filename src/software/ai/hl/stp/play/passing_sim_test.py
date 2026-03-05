@@ -109,9 +109,8 @@ def setup_pass_and_robots(
     # Setup the passer's tactic
     # We use KickTactic since AttackerTactic shoots towards the goal instead if open
     # KickTactic just does the kick we want
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].kick.CopyFrom(
-        KickTactic(
+    blue_tactics = {
+        0: KickTactic(
             kick_origin=Point(
                 x_meters=best_pass.passerPoint().x(),
                 y_meters=best_pass.passerPoint().y(),
@@ -119,7 +118,7 @@ def setup_pass_and_robots(
             kick_direction=Angle(radians=kick_vec.orientation().toRadians()),
             kick_speed_meters_per_second=best_pass.speed(),
         )
-    )
+    }
 
     # if we want a friendly robot to receive the pass
     if receive_pass:
@@ -139,12 +138,9 @@ def setup_pass_and_robots(
             "disable_one_touch_shot": True,
         }
 
-        params.assigned_tactics[1].receiver.CopyFrom(ReceiverTactic(**receiver_args))
-    simulated_test_runner.set_tactics(params, True)
+        blue_tactics[1] = ReceiverTactic(**receiver_args)
 
-    # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    simulated_test_runner.set_tactics(params, False)
+    simulated_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics={})
 
     return best_pass
 

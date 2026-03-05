@@ -52,18 +52,15 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_run
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].pivot_kick.CopyFrom(
-            PivotKickTactic(
-                kick_origin=tbots_cpp.createPointProto(ball_position),
-                kick_direction=tbots_cpp.createAngleProto(angle_to_kick_at),
-                auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=5.0),
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                1: PivotKickTactic(
+                    kick_origin=tbots_cpp.createPointProto(ball_position),
+                    kick_direction=tbots_cpp.createAngleProto(angle_to_kick_at),
+                    auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=5.0),
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     eventually_validation_sequence_set = [
         [

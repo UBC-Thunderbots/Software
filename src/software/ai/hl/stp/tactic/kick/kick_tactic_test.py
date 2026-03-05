@@ -2,7 +2,7 @@ import pytest
 import software.python_bindings as tbots_cpp
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
-from proto.import_all_protos import AssignedTacticPlayControlParams, KickTactic
+from proto.import_all_protos import KickTactic
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.pytest_validations.ball_enters_region import (
     BallEventuallyEntersRegion,
@@ -58,18 +58,15 @@ def test_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[1].kick.CopyFrom(
-            KickTactic(
-                kick_origin=tbots_cpp.createPointProto(ball_position),
-                kick_direction=tbots_cpp.createAngleProto(angle_to_kick_at),
-                kick_speed_meters_per_second=5.0,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                1: KickTactic(
+                    kick_origin=tbots_cpp.createPointProto(ball_position),
+                    kick_direction=tbots_cpp.createAngleProto(angle_to_kick_at),
+                    kick_speed_meters_per_second=5.0,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     kick_direction_vector = tbots_cpp.Vector(1, 0).rotate(angle_to_kick_at)
     kick_target = ball_position + kick_direction_vector * 3
