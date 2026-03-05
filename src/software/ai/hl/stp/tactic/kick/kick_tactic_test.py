@@ -7,7 +7,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.pytest_validations.ball_enters_region import (
     BallEventuallyEntersRegion,
 )
-from software.simulated_tests.pytest_validations.ball_kicked import (
+from software.simulated_tests.pytest_validations.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
 from software.simulated_tests.simulated_test_fixture import (
