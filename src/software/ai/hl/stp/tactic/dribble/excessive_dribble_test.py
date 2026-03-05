@@ -1,7 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.excessive_dribbling import (
+from software.simulated_tests.pytest_validations.excessive_dribbling import (
     NeverExcessivelyDribbles,
     EventuallyStartsExcessivelyDribbling,
 )
