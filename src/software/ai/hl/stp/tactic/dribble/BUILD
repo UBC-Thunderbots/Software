@@ -75,3 +75,20 @@ cc_test(
         "//software/world",
     ],
 )
+
+py_test(
+    name = "excessive_dribble_test",
+    srcs = [
+        "excessive_dribble_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests:speed_threshold_helpers",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
