@@ -6,6 +6,9 @@ from software.py_constants import ROBOT_MAX_RADIUS_METERS
 from software.simulated_tests.pytest_validations.ball_is_off_ground import (
     BallIsEventuallyOffGround,
 )
+from software.simulated_tests.pytest_validations.ball_kicked_in_direction import (
+    BallEventuallyKickedInDirection,
+)
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -72,20 +75,17 @@ def test_chip(ball_offset_from_robot, angle_to_chip_at, simulated_test_runner):
             }
         )
 
-    eventually_validation_sequence_set = [
+    eventually_validations = [
         [
             BallIsEventuallyOffGround(),
-            # TODO (#2588): check ball is chipped/kicked in target direction
+            BallEventuallyKickedInDirection(angle_to_chip_at),
         ]
     ]
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=[[]],
-        test_timeout_s=5,
+        inv_eventually_validation_sequence_set=eventually_validations,
+        ag_eventually_validation_sequence_set=eventually_validations,
     )
 
 
