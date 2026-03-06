@@ -121,8 +121,8 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
             *DribbleFSM_S + Update_E[!takePenaltyShot_G] / updateApproachKeeper_A,
             DribbleFSM_S + Update_E[timeOutApproach_G] / shoot_A = KickOrChipFSM_S,
             DribbleFSM_S + Update_E / adjustOrientationForShot_A,
-            DribbleFSM_S = KickOrChipFSM_S, KickOrChipFSM_S + Update_E / shoot_A, KickOrChipFSM_S = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+            DribbleFSM_S    = KickOrChipFSM_S, KickOrChipFSM_S + Update_E / shoot_A,
+            KickOrChipFSM_S = X, X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     };
 
    private:

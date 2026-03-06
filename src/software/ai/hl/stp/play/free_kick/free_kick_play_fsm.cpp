@@ -145,8 +145,9 @@ void FreeKickPlayFSM::shootBall(const Update &event)
     LOG(INFO) << "Shooting ball.";
     PriorityTacticVector tactics_to_run = {{}};
 
-    Point ball_pos = event.common.world_ptr->ball().position();
-    AutoChipOrKick auto_chip_or_kick       = {AutoChipOrKickMode::AUTOKICK, BALL_MAX_SPEED_METERS_PER_SECOND};
+    Point ball_pos                   = event.common.world_ptr->ball().position();
+    AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK,
+                                        BALL_MAX_SPEED_METERS_PER_SECOND};
 
     kick_or_chip_tactic->updateControlParams(
         ball_pos, (shot->getPointToShootAt() - ball_pos).orientation(),
@@ -289,8 +290,9 @@ void FreeKickPlayFSM::passBall(const Update &event)
 
     Pass pass = best_pass_and_score_so_far.pass;
 
-    passer_tactic->updateControlParams(pass.passerPoint(), pass.passerOrientation(),
-                                       AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, pass.speed()});
+    passer_tactic->updateControlParams(
+        pass.passerPoint(), pass.passerOrientation(),
+        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, pass.speed()});
     receiver_tactic->updateControlParams(pass);
     tactics_to_run[0].emplace_back(passer_tactic);
     tactics_to_run[0].emplace_back(receiver_tactic);

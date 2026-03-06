@@ -392,6 +392,23 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
+## [KickOrChipFSM](/src/software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> GetBehindBallFSM
+GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
+GetBehindBallFSM --> KickOrChipState
+KickOrChipState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
+KickOrChipState --> KickOrChipState : [!ballChicked]\n<i>kickOrChipBall</i>
+KickOrChipState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
+Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
+
+```
+
 ## [MoveFSM](/src/software/ai/hl/stp/tactic/move/move_fsm.h)
 
 ```mermaid
@@ -435,11 +452,11 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleFSM
 DribbleFSM --> DribbleFSM : [!takePenaltyShot]\n<i>updateApproachKeeper</i>
-DribbleFSM --> KickFSM : [timeOutApproach]\n<i>shoot</i>
+DribbleFSM --> KickOrChipFSM : [timeOutApproach]\n<i>shoot</i>
 DribbleFSM --> DribbleFSM : <i>adjustOrientationForShot</i>
-DribbleFSM --> KickFSM
-KickFSM --> KickFSM : <i>shoot</i>
-KickFSM --> Terminate:::terminate
+DribbleFSM --> KickOrChipFSM
+KickOrChipFSM --> KickOrChipFSM : <i>shoot</i>
+KickOrChipFSM --> Terminate:::terminate
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
