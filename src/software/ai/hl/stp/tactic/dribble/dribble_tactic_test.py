@@ -1,6 +1,6 @@
 import pytest
 import software.python_bindings as tbots_cpp
-from software.py_constants import ROBOT_MAX_RADIUS_METERS
+from software.py_constants import DIST_TO_FRONT_OF_ROBOT_METERS, ROBOT_MAX_RADIUS_METERS
 
 from proto.import_all_protos import DribbleTactic
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -91,6 +91,30 @@ def get_enemy_robot_positions():
             tbots_cpp.Point(4, 2.5),
             tbots_cpp.Angle.half(),
             tbots_cpp.Point(4, -2.5),
+            tbots_cpp.Vector(0, 0),
+        ),
+        # test_steal_ball_from_behind_enemy 1
+        (
+            tbots_cpp.Point(-2, 2.5),
+            tbots_cpp.Point(0, 2),
+            tbots_cpp.Angle.zero(),
+            tbots_cpp.Point(1 + DIST_TO_FRONT_OF_ROBOT_METERS, 2.5),
+            tbots_cpp.Vector(0, 0),
+        ),
+        # test_steal_ball_from_behind_enemy 2
+        (
+            tbots_cpp.Point(3.5, 2.5),
+            tbots_cpp.Point(0, 2),
+            tbots_cpp.Angle.zero(),
+            tbots_cpp.Point(1 + DIST_TO_FRONT_OF_ROBOT_METERS, 2.5),
+            tbots_cpp.Vector(0, 0),
+        ),
+        # test_steal_ball_from_behind_enemy 3
+        (
+            tbots_cpp.Point(1, 0),
+            tbots_cpp.Point(0, 2),
+            tbots_cpp.Angle.zero(),
+            tbots_cpp.Point(1 + DIST_TO_FRONT_OF_ROBOT_METERS, 2.5),
             tbots_cpp.Vector(0, 0),
         ),
     ],
