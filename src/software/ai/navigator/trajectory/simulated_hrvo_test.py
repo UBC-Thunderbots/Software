@@ -217,8 +217,6 @@ def hrvo_setup(
             ),
         )
 
-    simulated_test_runner.set_tactics(blue_tactics=blue_tactics)
-
     yellow_tactics = {}
 
     for index, destination in enumerate(enemy_robots_destinations):
@@ -226,7 +224,9 @@ def hrvo_setup(
             index, destination, tbots.Angle.fromRadians(0)
         )
 
-    simulated_test_runner.set_tactics(yellow_tactics=yellow_tactics)
+    simulated_test_runner.set_tactics(
+        blue_tactics=blue_tactics, yellow_tactics=yellow_tactics
+    )
 
 
 @pytest.mark.parametrize(
