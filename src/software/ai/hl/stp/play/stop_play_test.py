@@ -69,13 +69,16 @@ def test_stop_play(simulated_test_runner):
         )
 
     # C++ test waits 8s before checking; use 15s timeout so robots have time to slow.
-    # Threshold 2.0 m/s: expect robots to eventually slow below this (stop play).
+    # Threshold 1.4 m/s: expect robots to eventually slow below the 1.5 m/s STOP limit.
+    # TODO: add an eventually-validation that friendly robots stay at least 0.5 m away
+    # from the ball once pytest fixtures support delaying validations (to mirror the
+    # C++ robotsAvoidBall(0.5, ...) check).
     simulated_test_runner.run_test(
         setup=setup,
         params=[0],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(2.0)]
+            [RobotSpeedEventuallyBelowThreshold(1.4)]
         ],
         test_timeout_s=15,
     )
