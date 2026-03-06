@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "receiver_tactic",
     srcs = [
@@ -34,7 +36,7 @@ cc_test(
 )
 
 cc_test(
-    name = "receiver_tactic_test",
+    name = "receiver_tactic_cpp_test",
     srcs = ["receiver_tactic_test.cpp"],
     deps = [
         ":receiver_tactic",
@@ -45,5 +47,16 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "receiver_tactic_test",
+    srcs = ["receiver_tactic_test.py"],
+    tags = ["exclusive"],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests/pytest_validations:all_validations",
+        requirement("pytest"),
     ],
 )
