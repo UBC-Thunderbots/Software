@@ -9,7 +9,7 @@ src/software/ai/hl/stp/tactic/move/move_tactic_test.cpp (DONE 99%)
 src/software/ai/hl/stp/tactic/kick/kick_tactic_test.cpp (DONE 99%)
 src/software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic_test.cpp (DISABLED)
 src/software/ai/hl/stp/tactic/chip/chip_tactic_test.cpp (DONE 99%)
-src/software/ai/hl/stp/tactic/dribble/dribble_tactic_test.cpp (DONE)
+src/software/ai/hl/stp/tactic/dribble/dribble_tactic_test.cpp (DONE 98% need to implement thing)
 src/software/ai/hl/stp/tactic/receiver/receiver_tactic_test.cpp
 src/software/ai/hl/stp/tactic/attacker/attacker_tactic_passing_test.cpp
 src/software/ai/hl/stp/tactic/attacker/attacker_tactic_keep_away_test.cpp
