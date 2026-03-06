@@ -80,8 +80,8 @@ void StopPlayFSM::updateStopPosition(const Update& event)
         stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
     move_tactics.at(2)->updateControlParams(
         central_support_point,
-        (world_ptr->ball().position() - central_support_point).orientation(),
-        stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
+        (world_ptr->ball().position() - central_support_point).orientation(), stop_mode,
+        TbotsProto::ObstacleAvoidanceMode::SAFE);
 
     std::get<0>(crease_defender_tactics)
         ->updateControlParams(world_ptr->ball().position(),
