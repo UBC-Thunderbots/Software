@@ -119,7 +119,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Point ball_position =  world_ptr->ball().position();
         Point kick_target = world_ptr->field().centerPoint() +
                 Vector(world_ptr->field().xLength() / 6, 0);
-        AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::AUTOCHIP, kick_target - ball_position};
+        AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::AUTOCHIP, (kick_target - ball_position).length()};
         kickoff_chip_tactic->updateControlParams(
             ball_position,
             kick_target,
