@@ -38,7 +38,7 @@ class RobotAtOrientation(Validation):
                 robot_angle = tbots_cpp.Angle.fromRadians(
                     robot.current_state.global_orientation.radians
                 )
-                angle_diff = abs(robot_angle.toRadians() - self.orientation.toRadians())
+                angle_diff = robot_angle.minDiff(self.orientation).toRadians()
                 if angle_diff < self.threshold:
                     return ValidationStatus.PASSING
         return ValidationStatus.FAILING

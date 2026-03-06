@@ -5,7 +5,7 @@ TACTIC TESTS TO PORT
 src/software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic_test.cpp (DONE 99% ACCURACY)
 src/software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic_test.cpp (DONE 99% ACCURACY + ADDITIONAL)
 src/software/ai/hl/stp/tactic/halt/halt_tactic_test.cpp (DONE 99% ACCURACY)
-src/software/ai/hl/stp/tactic/move/move_tactic_test.cpp (DONE 98% ACCURACY NEED TO IMPLEMENT THING)
+src/software/ai/hl/stp/tactic/move/move_tactic_test.cpp (DONE 99%)
 src/software/ai/hl/stp/tactic/kick/kick_tactic_test.cpp (DONE)
 src/software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic_test.cpp (DISABLED)
 src/software/ai/hl/stp/tactic/chip/chip_tactic_test.cpp (DONE)

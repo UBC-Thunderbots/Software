@@ -13,6 +13,9 @@ from software.simulated_tests.pytest_validations.robot_at_orientation import (
 from software.simulated_tests.pytest_validations.ball_is_off_ground import (
     BallIsEventuallyOffGround,
 )
+from software.simulated_tests.pytest_validations.robot_at_angular_velocity import (
+    RobotEventuallyAtAngularVelocity,
+)
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -179,24 +182,54 @@ def test_autokick_move(simulated_test_runner):
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        test_timeout_s=10,
+        test_timeout_s=5,
     )
 
 
 @pytest.mark.parametrize(
     "orientation, initial_position, destination, angular_velocity",
     [
+        # Robot facing right, should rotate counter clockwise to face up
         (
-            tbots_cpp.Angle.zero(),
-            tbots_cpp.Point(-4, 2),
-            tbots_cpp.Point(4, 2),
+            tbots_cpp.Angle.quarter(),
+            tbots_cpp.Point(2, 0),
+            tbots_cpp.Point(-2, 0),
             tbots_cpp.Angle.fromDegrees(360),
         ),
+        # Robot facing right, should rotate clockwise to face down
         (
-            tbots_cpp.Angle.half(),
-            tbots_cpp.Point(4, 2),
-            tbots_cpp.Point(-4, 2),
-            tbots_cpp.Angle.fromDegrees(-1440),
+            tbots_cpp.Angle.threeQuarter(),
+            tbots_cpp.Point(2, 0),
+            tbots_cpp.Point(-2, 0),
+            tbots_cpp.Angle.fromDegrees(-360),
+        ),
+        # Robot facing right, should rotate counter clockwise to face up
+        (
+            tbots_cpp.Angle.quarter(),
+            tbots_cpp.Point(0, 0),
+            tbots_cpp.Point(0, 0),
+            tbots_cpp.Angle.fromDegrees(360),
+        ),
+        # Robot facing right, should rotate clockwise to face down
+        (
+            tbots_cpp.Angle.threeQuarter(),
+            tbots_cpp.Point(0, 0),
+            tbots_cpp.Point(0, 0),
+            tbots_cpp.Angle.fromDegrees(-360),
+        ),
+        # Robot facing right, should rotate counter clockwise to face left, slightly up
+        (
+            tbots_cpp.Angle.fromDegrees(175),
+            tbots_cpp.Point(3, -1),
+            tbots_cpp.Point(0, 1),
+            tbots_cpp.Angle.fromDegrees(360),
+        ),
+        # Robot facing right, should rotate clockwise to face down
+        (
+            tbots_cpp.Angle.fromDegrees(185),
+            tbots_cpp.Point(3, -1),
+            tbots_cpp.Point(0, 1),
+            tbots_cpp.Angle.fromDegrees(-360),
         ),
     ],
 )
@@ -207,8 +240,6 @@ def test_spinning_move(
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[initial_position],
-                # TODO (#2558): implement initializing robot angular velocities
-                # blue_robot_angular_velocities=[tbots_cpp.AngularVelocity.quarter()],
                 yellow_robot_locations=[tbots_cpp.Point(4, 0)],
                 ball_location=tbots_cpp.Point(1, 1),
                 ball_velocity=tbots_cpp.Vector(0, 0),
@@ -231,9 +262,10 @@ def test_spinning_move(
 
     eventually_validation_sequence_set = [
         [
+            # high threshold just to check direction of angular velocity
+            RobotEventuallyAtAngularVelocity(0, angular_velocity, 4),
             RobotEventuallyAtPosition(0, destination),
-            RobotEventuallyAtOrientation(0, orientation, 0.1),
-            # TODO: validate robot is at angular velocity (need to initialize robot angular velocity in Python first)
+            RobotEventuallyAtOrientation(0, orientation),
             # TODO: validate position and orientation for 1000 ticks
         ]
     ]
@@ -242,7 +274,6 @@ def test_spinning_move(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        test_timeout_s=10,
     )
 
 

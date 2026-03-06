@@ -209,6 +209,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def_static("threeQuarter", &Angle::threeQuarter)
         .def_static("full", &Angle::full)
         .def("toRadians", &Angle::toRadians)
+        .def("minDiff", &Angle::minDiff)
         // Overloaded
         .def("__repr__",
              [](const Angle& a)
