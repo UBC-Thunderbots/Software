@@ -214,6 +214,7 @@ def test_receiver(
                 receiver_point=tbots_cpp.createPointProto(receiver_point),
                 pass_speed_m_per_s=pass_speed,
             ),
+            "disable_one_touch_shot": not one_touch,
         }
 
         simulated_test_runner.set_tactics(
