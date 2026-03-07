@@ -113,10 +113,6 @@ struct std::hash<Polygon>
         {
             hashCombine(seed, point);
         }
-        for (const auto& segment: polygon.getSegments())
-        {
-            hashCombine(seed, segment);
-        }
         return seed;
     }
 };

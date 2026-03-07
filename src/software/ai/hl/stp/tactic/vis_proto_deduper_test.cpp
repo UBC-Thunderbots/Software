@@ -25,7 +25,7 @@ protected:
         {
             obstacles.push_back(obs);
         }
-        return obstacles;;
+        return obstacles;
     }
 
     // Helper to create a unique obstacle based on a position offset
