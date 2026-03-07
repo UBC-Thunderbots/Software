@@ -175,7 +175,7 @@ py_test(
 )
 
 cc_test(
-    name = "stop_play_test",
+    name = "stop_play_cpp_test",
     srcs = ["stop_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -186,6 +186,21 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "stop_play_test",
+    srcs = [
+        "stop_play_test.py",
+    ],
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests/pytest_validations:all_validations",
+        requirement("pytest"),
     ],
 )
 
