@@ -54,6 +54,9 @@ void BallPlacementPlayFSM::setPickOffDest(const Update &event)
     auto [orientation, dest]  = calculateWallPickOffDest(ball_pos, field_boundary);
     pickoff_final_orientation = orientation;
     pickoff_destination       = dest;
+
+    Vector approach_vector = Vector::createFromAngle(orientation);
+    pickoff_point = ball_pos - approach_vector.normalize(ALIGNMENT_VECTOR_LENGTH_M);
 }
 
 void BallPlacementPlayFSM::pickOffWall(const Update &event)
