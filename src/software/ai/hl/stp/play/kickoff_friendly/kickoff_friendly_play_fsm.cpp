@@ -111,6 +111,7 @@ void KickoffFriendlyPlayFSM::chipBall(const Update& event)
 
     const Rectangle chip_target_region(Point(min_chip_x, min_chip_y),
                                        Point(max_chip_x, max_chip_y));
+
     const Point fallback_target =
         field.centerPoint() + Vector(field.xLength() * fallback_target_x_fraction, 0.0);
     const std::vector<Circle> chip_targets =
@@ -118,6 +119,7 @@ void KickoffFriendlyPlayFSM::chipBall(const Update& event)
 
     Point selected_target = fallback_target;
 
+    // Chooses a viable open circle that is closest to the enemy goal.
     if (!chip_targets.empty())
     {
         const auto best_target_it =

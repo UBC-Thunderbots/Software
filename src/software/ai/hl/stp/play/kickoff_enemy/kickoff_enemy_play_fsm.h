@@ -12,11 +12,18 @@
 #include "software/logger/logger.h"
 
 
-
+/**
+ * This FSM implements the Kickoff Enemy Play. It manages kickoff when the enemy side is
+ * kicking.
+ * - Bots will shadow the enemy robots but stay on the correct side of the field.
+ */
 struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
 {
     class SetupState;
 
+    /**
+     * Control Parameters for a Kickoff Enemy Play
+     */
     struct ControlParams
     {
     };

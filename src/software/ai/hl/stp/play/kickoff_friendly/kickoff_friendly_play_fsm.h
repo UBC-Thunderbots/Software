@@ -10,11 +10,24 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/logger/logger.h"
 
+
+/**
+ * This FSM implements the Kickoff Friendly Play. It manages kickoff when the friendly
+ * side is kicking.
+ * - It positions robots to starting points.
+ * - It stays ready to start the game.
+ * - It chips the ball into the largest open circle that is sufficiently close to the
+ * enemy net, but also reasonably far from the edges of the field.
+ * - Terminates after the ball is touched, passing control to OffensePlay.
+ */
 struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
 {
     class SetupState;
     class ChipState;
 
+    /**
+     * Control Parameters for a Kickoff Friendly Play
+     */
     struct ControlParams
     {
     };
@@ -45,7 +58,10 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
 
     /**
      * Action to chip the ball forward over the defenders.
-     *
+     * - Creates a rectangle within the enemy half of the field with padding.
+     * - Finds the largest open circles between enemy bots.
+     * - Chooses the largest viable open circle that is closest to the enemy net.
+     * - Defaults to a short chip if no open circle returned.
      * @param event the FreeKickPlayFSM Update event
      */
     void chipBall(const Update& event);
