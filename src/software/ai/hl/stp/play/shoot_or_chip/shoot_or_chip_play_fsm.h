@@ -38,7 +38,7 @@ struct ShootOrChipPlayFSM : PlayFSM<ShootOrChipPlayFSM>
             *ShootOrChipState_S + Update_E[!attackerDone_G] / updateShootOrChip_A =
                 ShootOrChipState_S,
             ShootOrChipState_S + Update_E[attackerDone_G] / updateShootOrChip_A = X,
-            X + Update_E					                                    = X);
+            X + Update_E                                                        = X);
     }
 
    private:
