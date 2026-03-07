@@ -82,6 +82,8 @@ cc_library(
         "//software/ai/hl/stp/play/example:example_play",
         "//software/ai/hl/stp/play/free_kick:free_kick_play",
         "//software/ai/hl/stp/play/halt_play",
+        "//software/ai/hl/stp/play/kickoff_enemy:kickoff_enemy_play",
+        "//software/ai/hl/stp/play/kickoff_friendly:kickoff_friendly_play",
         "//software/ai/hl/stp/play/offense:offense_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
