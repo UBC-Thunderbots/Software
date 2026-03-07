@@ -180,10 +180,7 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> SetupState
 SetupState --> SetupState : [!isSetupDone]\n<i>setupKickoff</i>
-SetupState --> ShootState : [shotFound]
-ShootState --> ShootState : [!isPlaying]\n<i>shootBall</i>
-ShootState --> Terminate:::terminate : [isPlaying]
-SetupState --> ChipState : [!shotFound]
+SetupState --> ChipState : [isSetupDone]
 ChipState --> ChipState : [!isPlaying]\n<i>chipBall</i>
 ChipState --> Terminate:::terminate : [isPlaying]
 Terminate:::terminate --> Terminate:::terminate
