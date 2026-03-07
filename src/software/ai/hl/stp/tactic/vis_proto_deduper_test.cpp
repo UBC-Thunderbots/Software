@@ -1,24 +1,28 @@
 
 #include "software/ai/hl/stp/tactic/vis_proto_deduper.h"
-#include "software/ai/navigator/obstacle/obstacle.hpp"
-#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
-#include "software/geom/polygon.h"
-#include "software/geom/point.h"
 
 #include <gtest/gtest.h>
+
 #include <memory>
 #include <vector>
+
+#include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/geom/point.h"
+#include "software/geom/polygon.h"
 
 
 
 class VisProtoDeduperTest : public ::testing::Test
 {
-protected:
+   protected:
     RobotNavigationObstacleFactory obstacle_factory =
         RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig());
 
-    // Helper to extract the list of obstacles from the proto message for easy verification
-    std::vector<TbotsProto::Obstacle> getObstaclesFromProto(const TbotsProto::ObstacleList& msg)
+    // Helper to extract the list of obstacles from the proto message for easy
+    // verification
+    std::vector<TbotsProto::Obstacle> getObstaclesFromProto(
+        const TbotsProto::ObstacleList& msg)
     {
         std::vector<TbotsProto::Obstacle> obstacles;
         for (const auto& obs : msg.obstacles())
@@ -42,7 +46,7 @@ TEST_F(VisProtoDeduperTest, DeduplicatesRepeatedObstacles)
     VisProtoDeduper deduper(5);
     TbotsProto::ObstacleList output_msg;
 
-    auto obs1 = createTestObstacle(10, 10);
+    auto obs1                      = createTestObstacle(10, 10);
     std::vector<ObstaclePtr> input = {obs1};
 
     // First pass: Obstacle is new
@@ -54,7 +58,8 @@ TEST_F(VisProtoDeduperTest, DeduplicatesRepeatedObstacles)
 
     // Second pass: Same obstacle passed immediately again
     deduper.dedupeAndFill(input, output_msg);
-    EXPECT_EQ(output_msg.obstacles_size(), 0) << "Should filter out recently sent obstacle";
+    EXPECT_EQ(output_msg.obstacles_size(), 0)
+        << "Should filter out recently sent obstacle";
 }
 
 TEST_F(VisProtoDeduperTest, HandlesMixedNewAndOldObstacles)
@@ -81,10 +86,10 @@ TEST_F(VisProtoDeduperTest, WindowEvictionLogic)
     // Window size of 2
     // Frame 0: Send A (Stored in queue index 0)
     // Frame 1: Send empty (Stored in queue index 1)
-    // Frame 2: Send empty (Stored in queue index 2) -> Window exceeded? 
-    // Logic check: if queue.size() > window. 
-    // After Frame 0: size 1. 
-    // After Frame 1: size 2. 
+    // Frame 2: Send empty (Stored in queue index 2) -> Window exceeded?
+    // Logic check: if queue.size() > window.
+    // After Frame 0: size 1.
+    // After Frame 1: size 2.
     // After Frame 2: size 3. (3 > 2, so Frame 0 is evicted).
 
     VisProtoDeduper deduper(2);
@@ -102,7 +107,8 @@ TEST_F(VisProtoDeduperTest, WindowEvictionLogic)
     EXPECT_EQ(output_msg.obstacles_size(), 0);
 
     deduper.dedupeAndFill({obs}, output_msg);
-    EXPECT_EQ(output_msg.obstacles_size(), 1) << "Obstacle should be resent after window expiration";
+    EXPECT_EQ(output_msg.obstacles_size(), 1)
+        << "Obstacle should be resent after window expiration";
 }
 
 TEST_F(VisProtoDeduperTest, ZeroWindowAlwaysSends)
@@ -142,4 +148,3 @@ TEST_F(VisProtoDeduperTest, MultipleDistinctObstaclesInOneBatch)
 
     ASSERT_EQ(output_msg.obstacles_size(), 1);
 }
-

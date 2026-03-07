@@ -266,9 +266,9 @@ void MovePrimitive::getVisualizationProtos(
     TbotsProto::ObstacleList &obstacle_list_out,
     TbotsProto::PathVisualization &path_visualization_out) const
 {
-    // If we are sending lots of duplicated obstacles, then it will cause the system network buffer
-    // overflow. Therefore, we selectively populate some of the obstacles. See the implementation of 
-    // VisProtoDeduper
+    // If we are sending lots of duplicated obstacles, then it will cause the system
+    // network buffer overflow. Therefore, we selectively populate some of the obstacles.
+    // See the implementation of VisProtoDeduper
     vis_proto_deduper.dedupeAndFill(obstacles, obstacle_list_out);
 
     TbotsProto::Path path;

@@ -103,7 +103,7 @@ std::ostream &operator<<(std::ostream &os, const Stadium &stadium);
 template <>
 struct std::hash<Stadium>
 {
-    std::size_t operator()(const Stadium& stadium)
+    std::size_t operator()(const Stadium &stadium)
     {
         std::size_t seed = 0;
         hashCombine(seed, std::hash<Segment>{}(stadium.segment()));
@@ -111,4 +111,3 @@ struct std::hash<Stadium>
         return seed;
     }
 };
-

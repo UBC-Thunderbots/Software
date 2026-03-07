@@ -1,14 +1,15 @@
 #pragma once
 
-#include <unordered_set>
 #include <deque>
+#include <unordered_set>
 
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 
 /**
- * The VisProtoDeduper maintains a rolling history of obstacles that have already been transmitted. 
- * By using a combination of a sliding window (deque) and a fast lookup (hash set), 
- * it ensures that only "new" or "expired" information is added to the outgoing protobuf message.
+ * The VisProtoDeduper maintains a rolling history of obstacles that have already been
+ * transmitted. By using a combination of a sliding window (deque) and a fast lookup (hash
+ * set), it ensures that only "new" or "expired" information is added to the outgoing
+ * protobuf message.
  *
  *  For example:
  *  TIME STEP [t]                                     INTERNAL STATE
@@ -30,29 +31,30 @@
  *       so A is NEW again. E is NEW.
  *  Output Proto: { A, E }
  */
-class VisProtoDeduper {
-public:
+class VisProtoDeduper
+{
+   public:
     /**
-    * Creates a sliding window deduplicater
-    * 
-    * @param window_size size of the sliding window
-    */
+     * Creates a sliding window deduplicater
+     *
+     * @param window_size size of the sliding window
+     */
     VisProtoDeduper(unsigned int window_size);
 
     /**
-    * Given an input obstacle list 
-    * 
-    * @param obstacle_list input list of obstacle
-    * @param obstacle_list_out output list of obstacle after filtered
-    */
-    void dedupeAndFill(const std::vector<ObstaclePtr>& obstacle_list, TbotsProto::ObstacleList& obstacle_list_out);
+     * Given an input obstacle list
+     *
+     * @param obstacle_list input list of obstacle
+     * @param obstacle_list_out output list of obstacle after filtered
+     */
+    void dedupeAndFill(const std::vector<ObstaclePtr>& obstacle_list,
+                       TbotsProto::ObstacleList& obstacle_list_out);
 
 
-private:
+   private:
     unsigned int window_size_;
     std::unordered_set<std::size_t> sent_set_;
     std::deque<std::vector<std::size_t>> sent_queue_;
 
     std::hash<Obstacle> obstacle_hasher_;
 };
-

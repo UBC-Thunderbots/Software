@@ -5,4 +5,3 @@ cc_library(
     srcs = [],
     hdrs = ["hash_combine.h"],
 )
-

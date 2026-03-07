@@ -132,8 +132,8 @@ class Rectangle : public ConvexPolygon
 template <>
 struct std::hash<Rectangle>
 {
-   std::size_t operator()(const Rectangle &rectangle) const
-   {
+    std::size_t operator()(const Rectangle &rectangle) const
+    {
         std::hash<Point> hasher;
         std::size_t seed = 0;
         hashCombine(seed, hasher(rectangle.posXPosYCorner()));
@@ -143,4 +143,3 @@ struct std::hash<Rectangle>
         return seed;
     }
 };
-
