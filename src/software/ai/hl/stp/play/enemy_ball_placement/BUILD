@@ -29,10 +29,7 @@ py_test(
     srcs = [
         "enemy_ball_placement_play_test.py",
     ],
-    env = {
-        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
-        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
-    },
+    
     package_collisions = "warning",
     tags = ["exclusive"],
     deps = [

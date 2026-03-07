@@ -50,10 +50,7 @@ cc_test(
 py_test(
     name = "example_play_test_py",
     srcs = ["example_play_test.py"],
-    env = {
-        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
-        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
-    },
+    
     main = "example_play_test.py",
     package_collisions = "warning",
     # TODO (#2619) Remove tag to run in parallel

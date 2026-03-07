@@ -55,10 +55,7 @@ cc_test(
 py_test(
     name = "crease_defender_tactic_test",
     srcs = ["crease_defender_tactic_test.py"],
-    env = {
-        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
-        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
-    },
+    
     package_collisions = "warning",
     tags = [
         "exclusive",

@@ -53,10 +53,7 @@ py_test(
     srcs = [
         "goalie_tactic_test.py",
     ],
-    env = {
-        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
-        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
-    },
+    
     package_collisions = "warning",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
