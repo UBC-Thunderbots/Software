@@ -29,7 +29,6 @@ from software.thunderscope.constants import *
 from software.thunderscope.thunderscope_config import TScopeConfig
 
 
-
 class Thunderscope:
     """Thunderscope is our main visualizer that can visualize our field,
     obstacles, paths, performance metrics, logs, plots. Thunderscope also

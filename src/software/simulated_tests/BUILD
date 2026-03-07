@@ -15,7 +15,6 @@ py_test(
     srcs = [
         "simulated_test_ball_model.py",
     ],
-    
     package_collisions = "warning",
     # TODO (#2619) Remove tag to run in parallel
     tags = [

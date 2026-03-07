@@ -55,7 +55,6 @@ cc_test(
 py_test(
     name = "crease_defender_tactic_test",
     srcs = ["crease_defender_tactic_test.py"],
-    
     package_collisions = "warning",
     tags = [
         "exclusive",

@@ -41,7 +41,6 @@ py_test(
     srcs = [
         "enemy_free_kick_play_test.py",
     ],
-    
     package_collisions = "warning",
     tags = [
         "exclusive",

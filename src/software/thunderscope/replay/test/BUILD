@@ -11,7 +11,6 @@ py_test(
     data = [
         "//software:py_constants.so",
     ],
-    
     package_collisions = "warning",
     deps = [
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
@@ -35,7 +34,6 @@ py_test(
     data = [
         "//software:py_constants.so",
     ],
-    
     package_collisions = "warning",
     deps = [
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",

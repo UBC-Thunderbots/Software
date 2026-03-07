@@ -154,7 +154,6 @@ cc_test(
 py_test(
     name = "simulated_hrvo_test",
     srcs = ["simulated_hrvo_test.py"],
-    
     package_collisions = "warning",
     tags = ["exclusive"],
     deps = [

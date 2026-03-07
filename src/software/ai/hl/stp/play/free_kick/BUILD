@@ -52,7 +52,6 @@ cc_test(
 py_test(
     name = "free_kick_play_test",
     srcs = ["free_kick_play_test.py"],
-    
     package_collisions = "warning",
     tags = ["exclusive"],
     deps = [

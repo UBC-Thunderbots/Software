@@ -53,7 +53,6 @@ py_test(
     srcs = [
         "goalie_tactic_test.py",
     ],
-    
     package_collisions = "warning",
     # TODO (#2619) Remove tag to run in parallel
     tags = [

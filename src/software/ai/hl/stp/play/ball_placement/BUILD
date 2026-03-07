@@ -38,7 +38,6 @@ py_test(
     srcs = [
         "ball_placement_play_test.py",
     ],
-    
     package_collisions = "warning",
     tags = ["exclusive"],
     deps = [
