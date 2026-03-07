@@ -16,7 +16,6 @@ def test_example_play(simulated_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
     def setup(*args):
-        # Setup Bots
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
             tbots_cpp.Point(-3, 1.5),
@@ -39,38 +38,32 @@ def test_example_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
-        # Force play override here
-        blue_play = Play()
-        blue_play.name = PlayName.ExamplePlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.HaltPlay
-
-        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
-
-        # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-        )
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.DIRECT, team=Team.BLUE
-        )
-
-        # Create world state
-        simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState,
+        simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
                 ball_location=ball_initial_pos,
                 ball_velocity=tbots_cpp.Vector(0, 0),
             ),
+        )
+
+        blue_play = Play()
+        blue_play.name = PlayName.ExamplePlay
+
+        yellow_play = Play()
+        yellow_play.name = PlayName.HaltPlay
+
+        simulated_test_runner.set_play(blue_play, is_friendly=True)
+        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        )
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+        )
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.DIRECT, team=Team.BLUE
         )
 
     # params just have to be a list of length 1 to ensure the test runs at least once

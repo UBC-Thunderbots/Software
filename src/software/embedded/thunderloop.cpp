@@ -115,11 +115,6 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-    {
-        return;
-    }
-
     power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
@@ -200,9 +195,6 @@ void Thunderloop::runLoop()
             FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 
             ScopedTimespecTimer iteration_timer(&iteration_time);
-
-            // Collect jetson status
-            jetson_status_.set_cpu_temperature(getCpuTemperature());
 
             // Network Service: receive newest primitives and send out the last
             // robot status
@@ -344,7 +336,6 @@ void Thunderloop::runLoop()
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
             *(robot_status_.mutable_motor_status())          = motor_status_.value();
             *(robot_status_.mutable_power_status())          = power_status_;
-            *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
             *(robot_status_.mutable_primitive_executor_status()) =
@@ -416,11 +407,6 @@ TbotsProto::MotorStatus Thunderloop::pollMotorService(
 
     ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
 
-    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-    {
-        return TbotsProto::MotorStatus();
-    }
-
     double time_since_prev_iteration_s =
         getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
     return motor_service_->poll(motor_control, time_since_prev_iteration_s);
@@ -431,11 +417,6 @@ TbotsProto::PowerStatus Thunderloop::pollPowerService(struct timespec& poll_time
     ScopedTimespecTimer timer(&poll_time);
 
     ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
-
-    if constexpr (PLATFORM == Platform::LIMITED_BUILD)
-    {
-        return TbotsProto::PowerStatus();
-    }
 
     return power_service_->poll(direct_control_.power_control(), kick_coeff_,
                                 kick_constant_, chip_pulse_width_);
@@ -482,10 +463,6 @@ void Thunderloop::updateErrorCodes()
     if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
-    }
-    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
-    {
-        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
     }
 
     if (!isPowerStable(log_file))
