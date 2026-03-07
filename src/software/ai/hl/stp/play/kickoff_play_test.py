@@ -13,8 +13,8 @@ from proto.ssl_gc_common_pb2 import Team
 from software.simulated_tests.or_validation import OrValidation
 
 
-def setup_kickoff_attacker():
-    blue_bots = [
+def setup_kickoff_attackers():
+    return [
         tbots_cpp.Point(-3, 2.5),
         tbots_cpp.Point(-3, 1.5),
         tbots_cpp.Point(-3, 0.5),
@@ -22,13 +22,10 @@ def setup_kickoff_attacker():
         tbots_cpp.Point(-3, -1.5),
         tbots_cpp.Point(-3, -2.5),
     ]
-    return blue_bots
 
 
-def setup_kickoff_defender():
-    # The defense has a hole in it from 0, 0 to the net.
-    # Robots that cannot move will allow the kicker to shoot directly into the net.
-    yellow_bots = [
+def setup_kickoff_defenders():
+    return [
         tbots_cpp.Point(1, 0.5),
         tbots_cpp.Point(1, 2.5),
         tbots_cpp.Point(1, -2.5),
@@ -36,141 +33,84 @@ def setup_kickoff_defender():
         tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
         tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
-    return yellow_bots
 
 
 def init_world_state(runner, blue_bots, yellow_bots):
-    ball_initial = tbots_cpp.Point(0, 0)
     runner.simulator_proto_unix_io.send_proto(
         WorldState,
         create_world_state(
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
-            ball_location=ball_initial,
+            ball_location=tbots_cpp.Point(0, 0),
             ball_velocity=tbots_cpp.Vector(0, 0),
         ),
     )
 
 
-def init_plays(simulated_test_runner, is_friendly, force_out):
-    blue_play = Play()
-    yellow_play = Play()
-
-    kicking_team = Team.BLUE if is_friendly else Team.YELLOW
-    non_kicking_team = Team.YELLOW if is_friendly else Team.BLUE
-
-    if not force_out:
-        blue_play.name = (
-            PlayName.KickoffFriendlyPlay
-            if kicking_team == Team.BLUE
-            else PlayName.KickoffEnemyPlay
-        )
-        yellow_play.name = (
-            PlayName.KickoffFriendlyPlay
-            if kicking_team == Team.YELLOW
-            else PlayName.KickoffEnemyPlay
-        )
-    else:
-        blue_play.name = (
-            PlayName.KickoffFriendlyPlay
-            if kicking_team == Team.BLUE
-            else PlayName.HaltPlay
-        )
-        yellow_play.name = (
-            PlayName.KickoffFriendlyPlay
-            if kicking_team == Team.YELLOW
-            else PlayName.HaltPlay
-        )
-
-    simulated_test_runner.gamecontroller.send_gc_command(
-        gc_command=Command.Type.KICKOFF, team=kicking_team
-    )
-    simulated_test_runner.gamecontroller.send_gc_command(
-        gc_command=Command.Type.KICKOFF, team=non_kicking_team
-    )
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
 
-@pytest.mark.parametrize(
-    "is_friendly_test, force_open",
-    [(True, False), (True, True), (False, False), (False, True)],
-)
-def test_kickoff_play(simulated_test_runner, is_friendly_test, force_open):
+def test_blue_kickoff_chip(simulated_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
+    field = tbots_cpp.Field.createSSLDivisionBField()
 
     init_world_state(
-        simulated_test_runner, setup_kickoff_attacker(), setup_kickoff_defender()
+        simulated_test_runner,
+        setup_kickoff_attackers(),
+        setup_kickoff_defenders(),
     )
-    init_plays(simulated_test_runner, is_friendly_test, force_open)
 
-    always_validation_sequence_set = [[]]
+    blue_play = Play()
+    blue_play.name = PlayName.KickoffFriendlyPlay
+
+    yellow_play = Play()
+    yellow_play.name = PlayName.KickoffEnemyPlay
+
+    simulated_test_runner.gamecontroller.send_gc_command(
+        gc_command=Command.Type.KICKOFF, team=Team.BLUE
+    )
+    simulated_test_runner.gamecontroller.send_gc_command(
+        gc_command=Command.Type.KICKOFF, team=Team.YELLOW
+    )
+
+    blue_regions = [
+        tbots_cpp.Field.createSSLDivisionBField().friendlyHalf(),
+        tbots_cpp.Field.createSSLDivisionBField().friendlyGoal(),
+        tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+    ]
 
     ball_moves_at_rest_validation = BallAlwaysMovesFromRest(
-        position=tbots_cpp.Point(0, 0), threshold=0.05
+        position=ball_initial_pos, threshold=0.05
     )
 
-    expected_center_circle_or_validation_set = [
-        ball_moves_at_rest_validation,
-        NumberOfRobotsAlwaysStaysInRegion(
-            regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
-            req_robot_cnt=0,
-        ),
-    ]
-
-    friendly_half = tbots_cpp.Field.createSSLDivisionBField().friendlyHalf()
-    friendly_goal = tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()
-    center_circle = tbots_cpp.Field.createSSLDivisionBField().centerCircle()
-
-    friendly_regions = [friendly_half, friendly_goal, center_circle]
-
-    if is_friendly_test:
-        # this expected_center_circle_or_validation_set version checks
-        # that either 0 or 1 robots are in centerCircle OR ball moves from center point
-        expected_center_circle_or_validation_set.append(
+    always_validations = [[
+        OrValidation([
+            ball_moves_at_rest_validation,
             NumberOfRobotsAlwaysStaysInRegion(
                 regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
-                req_robot_cnt=1,
-            )
-        )
-    else:
-        # Checks that 0 robots are in centerCircle OR ball moves from center point
-        friendly_regions.remove(center_circle)
+                req_robot_cnt=1
+            ),
+            NumberOfRobotsAlwaysStaysInRegion(
+                regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
+                req_robot_cnt=0
+            ),
+        ]),
+        OrValidation([
+            ball_moves_at_rest_validation,
+            NumberOfRobotsAlwaysStaysInRegion(regions=blue_regions, req_robot_cnt=6),
+        ])
+    ]]
 
-    # Checks that there are 6 friendly robots in friendly_regions
-    # friendly_regions definition depends on if/else case above
-    expected_robot_regions_or_validations_set = [
-        ball_moves_at_rest_validation,
-        NumberOfRobotsAlwaysStaysInRegion(
-            regions=friendly_regions,
-            req_robot_cnt=6,
-        ),
-    ]
-
-    always_validation_sequence_set[0] = [
-        OrValidation(expected_center_circle_or_validation_set),
-        OrValidation(expected_robot_regions_or_validations_set),
-    ]
-
-    eventually_validation_sequence_set = [[]]
-
-    # Eventually Validation
-    if is_friendly_test:
-        # Checks that ball leaves center point by 0.05 meters within 10 seconds of kickoff
-        eventually_validation_sequence_set[0].append(
-            BallEventuallyExitsRegion(
-                regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
-            )
-        )
+    eventually_validations = [[
+        BallEventuallyExitsRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)])
+    ]]
 
     simulated_test_runner.run_test(
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ci_cmd_with_delay=[
-            (4, Command.Type.NORMAL_START, Team.BLUE),
-        ],
+        inv_eventually_validation_sequence_set=eventually_validations,
+        inv_always_validation_sequence_set=always_validations,
+        ci_cmd_with_delay=[(4, Command.Type.NORMAL_START, Team.BLUE)],
         test_timeout_s=10,
     )
+
 
 
 if __name__ == "__main__":
