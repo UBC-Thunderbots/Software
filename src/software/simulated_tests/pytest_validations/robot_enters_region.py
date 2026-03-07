@@ -57,7 +57,7 @@ class MinNumberOfRobotsEntersRegion(Validation):
             "Check for "
             + str(self.req_robot_cnt)
             + " robots in region "
-            + ",".join(repr(self.regions))
+            + ",".join(repr(region) for region in self.regions)
         )
 
 
