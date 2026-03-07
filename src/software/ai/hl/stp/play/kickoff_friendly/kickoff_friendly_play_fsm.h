@@ -26,7 +26,7 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
      * @param ai_config_ptr the play config for this play FSM
      */
     explicit KickoffFriendlyPlayFSM(
-            const std::shared_ptr<const TbotsProto::AiConfig>& ai_config_ptr);
+        const std::shared_ptr<const TbotsProto::AiConfig>& ai_config_ptr);
 
 
     /**
@@ -79,16 +79,15 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
         DEFINE_SML_GUARD(isSetupDone)
         DEFINE_SML_GUARD(isPlaying)
         return make_transition_table(
-                *SetupState_S + Update_E[!isSetupDone_G] / setupKickoff_A = SetupState_S,
-                SetupState_S + Update_E[isSetupDone_G]                  = ChipState_S,
-                ChipState_S  + Update_E[!isPlaying_G] / chipBall_A      = ChipState_S,
-                ChipState_S  + Update_E[isPlaying_G]                    = X,
+            *SetupState_S + Update_E[!isSetupDone_G] / setupKickoff_A = SetupState_S,
+            SetupState_S + Update_E[isSetupDone_G]                    = ChipState_S,
+            ChipState_S + Update_E[!isPlaying_G] / chipBall_A         = ChipState_S,
+            ChipState_S + Update_E[isPlaying_G]                       = X,
 
-                X + Update_E = X
-        );
+            X + Update_E = X);
     }
 
-private:
+   private:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<KickoffChipTactic> kickoff_chip_tactic;
     std::vector<std::shared_ptr<MoveTactic>> move_tactics;

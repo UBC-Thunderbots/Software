@@ -1,18 +1,18 @@
 #include "software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play_fsm.h"
 
 KickoffFriendlyPlayFSM::KickoffFriendlyPlayFSM(
-        const std::shared_ptr<const TbotsProto::AiConfig>& ai_config_ptr)
-        : PlayFSM<KickoffFriendlyPlayFSM>(ai_config_ptr),
-          kickoff_chip_tactic(std::make_shared<KickoffChipTactic>(ai_config_ptr)),
-          move_tactics{std::make_shared<PrepareKickoffMoveTactic>(ai_config_ptr),  // robot 1
-                       std::make_shared<MoveTactic>(ai_config_ptr),  // robot 2-5
-                       std::make_shared<MoveTactic>(ai_config_ptr),
-                       std::make_shared<MoveTactic>(ai_config_ptr),
-                       std::make_shared<MoveTactic>(ai_config_ptr)}
+    const std::shared_ptr<const TbotsProto::AiConfig>& ai_config_ptr)
+    : PlayFSM<KickoffFriendlyPlayFSM>(ai_config_ptr),
+      kickoff_chip_tactic(std::make_shared<KickoffChipTactic>(ai_config_ptr)),
+      move_tactics{std::make_shared<PrepareKickoffMoveTactic>(ai_config_ptr),  // robot 1
+                   std::make_shared<MoveTactic>(ai_config_ptr),  // robot 2-5
+                   std::make_shared<MoveTactic>(ai_config_ptr),
+                   std::make_shared<MoveTactic>(ai_config_ptr),
+                   std::make_shared<MoveTactic>(ai_config_ptr)}
 {
 }
 
-void KickoffFriendlyPlayFSM::createKickoffSetupPositions(const WorldPtr &world_ptr)
+void KickoffFriendlyPlayFSM::createKickoffSetupPositions(const WorldPtr& world_ptr)
 {
     // Since we only have 6 robots at the maximum, the number one priority
     // is the robot doing the kickoff up front. The goalie is the second most
@@ -40,37 +40,37 @@ void KickoffFriendlyPlayFSM::createKickoffSetupPositions(const WorldPtr &world_p
     if (kickoff_setup_positions.empty())
     {
         kickoff_setup_positions = {
-                // Robot 1
-                Point(world_ptr->field().centerPoint() +
-                      Vector(-world_ptr->field().centerCircleRadius(), 0)),
-                // Robot 2
-                // Goalie positions will be handled by the goalie tactic
-                // Robot 3
-                Point(world_ptr->field().centerPoint() +
-                      Vector(-world_ptr->field().centerCircleRadius() -
+            // Robot 1
+            Point(world_ptr->field().centerPoint() +
+                  Vector(-world_ptr->field().centerCircleRadius(), 0)),
+            // Robot 2
+            // Goalie positions will be handled by the goalie tactic
+            // Robot 3
+            Point(world_ptr->field().centerPoint() +
+                  Vector(-world_ptr->field().centerCircleRadius() -
                              4 * ROBOT_MAX_RADIUS_METERS,
-                             -1.0 / 3.0 * world_ptr->field().yLength())),
-                // Robot 4
-                Point(world_ptr->field().centerPoint() +
-                      Vector(-world_ptr->field().centerCircleRadius() -
+                         -1.0 / 3.0 * world_ptr->field().yLength())),
+            // Robot 4
+            Point(world_ptr->field().centerPoint() +
+                  Vector(-world_ptr->field().centerCircleRadius() -
                              4 * ROBOT_MAX_RADIUS_METERS,
-                             1.0 / 3.0 * world_ptr->field().yLength())),
-                // Robot 5
-                Point(world_ptr->field().friendlyGoalpostPos().x() +
+                         1.0 / 3.0 * world_ptr->field().yLength())),
+            // Robot 5
+            Point(world_ptr->field().friendlyGoalpostPos().x() +
                       world_ptr->field().defenseAreaXLength() +
                       2 * ROBOT_MAX_RADIUS_METERS,
-                      world_ptr->field().friendlyGoalpostPos().y()),
-                // Robot 6
-                Point(world_ptr->field().friendlyGoalpostNeg().x() +
+                  world_ptr->field().friendlyGoalpostPos().y()),
+            // Robot 6
+            Point(world_ptr->field().friendlyGoalpostNeg().x() +
                       world_ptr->field().defenseAreaXLength() +
                       2 * ROBOT_MAX_RADIUS_METERS,
-                      world_ptr->field().friendlyGoalpostNeg().y()),
+                  world_ptr->field().friendlyGoalpostNeg().y()),
         };
     }
 }
 
 
-void KickoffFriendlyPlayFSM::setupKickoff(const Update &event)
+void KickoffFriendlyPlayFSM::setupKickoff(const Update& event)
 {
     createKickoffSetupPositions(event.common.world_ptr);
 
@@ -95,13 +95,13 @@ void KickoffFriendlyPlayFSM::setupKickoff(const Update &event)
 void KickoffFriendlyPlayFSM::chipBall(const Update& event)
 {
     const WorldPtr& world_ptr = event.common.world_ptr;
-    const auto& field = world_ptr->field();
+    const auto& field         = world_ptr->field();
     const Point ball_position = world_ptr->ball().position();
 
     PriorityTacticVector tactics_to_run = {{}};
 
-    constexpr double enemy_x_padding_m = 2.0;
-    constexpr double sideline_padding_m = 0.3;
+    constexpr double enemy_x_padding_m          = 2.0;
+    constexpr double sideline_padding_m         = 0.3;
     constexpr double fallback_target_x_fraction = 1.0 / 6.0;
 
     const double min_chip_x = ball_position.x();
@@ -109,20 +109,24 @@ void KickoffFriendlyPlayFSM::chipBall(const Update& event)
     const double min_chip_y = field.enemyCornerNeg().y() + sideline_padding_m;
     const double max_chip_y = field.enemyCornerPos().y() - sideline_padding_m;
 
-    const Rectangle chip_target_region(Point(min_chip_x, min_chip_y),Point(max_chip_x, max_chip_y));
-    const Point fallback_target = field.centerPoint() + Vector(field.xLength() * fallback_target_x_fraction, 0.0);
-    const std::vector<Circle> chip_targets = findGoodChipTargets(*world_ptr, chip_target_region);
+    const Rectangle chip_target_region(Point(min_chip_x, min_chip_y),
+                                       Point(max_chip_x, max_chip_y));
+    const Point fallback_target =
+        field.centerPoint() + Vector(field.xLength() * fallback_target_x_fraction, 0.0);
+    const std::vector<Circle> chip_targets =
+        findGoodChipTargets(*world_ptr, chip_target_region);
 
     Point selected_target = fallback_target;
 
     if (!chip_targets.empty())
     {
-        const auto best_target_it = std::min_element(
-                chip_targets.begin(), chip_targets.end(),
-                [&field](const Circle& a, const Circle& b)
-                {
-                    return distance(field.enemyGoalCenter(), a.origin()) < distance(field.enemyGoalCenter(), b.origin());
-                });
+        const auto best_target_it =
+            std::min_element(chip_targets.begin(), chip_targets.end(),
+                             [&field](const Circle& a, const Circle& b)
+                             {
+                                 return distance(field.enemyGoalCenter(), a.origin()) <
+                                        distance(field.enemyGoalCenter(), b.origin());
+                             });
 
         selected_target = best_target_it->origin();
     }
@@ -133,12 +137,12 @@ void KickoffFriendlyPlayFSM::chipBall(const Update& event)
 }
 
 
-bool KickoffFriendlyPlayFSM::isSetupDone(const Update &event)
+bool KickoffFriendlyPlayFSM::isSetupDone(const Update& event)
 {
     return !event.common.world_ptr->gameState().isSetupState();
 }
 
-bool KickoffFriendlyPlayFSM::isPlaying(const Update &event)
+bool KickoffFriendlyPlayFSM::isPlaying(const Update& event)
 {
     return event.common.world_ptr->gameState().isPlaying();
 }

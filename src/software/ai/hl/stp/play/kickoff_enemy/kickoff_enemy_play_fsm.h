@@ -28,7 +28,7 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
      * @param ai_config the play config for this play FSM
      */
     explicit KickoffEnemyPlayFSM(
-        const std::shared_ptr<const TbotsProto::AiConfig>& ai_config_ptr);
+        const std::shared_ptr<const TbotsProto::AiConfig> &ai_config_ptr);
 
 
     /**

@@ -47,8 +47,6 @@ def init_world_state(runner, blue_bots, yellow_bots):
     )
 
 
-
-
 def test_blue_kickoff_chip(simulated_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
     field = tbots_cpp.Field.createSSLDivisionBField()
@@ -75,34 +73,46 @@ def test_blue_kickoff_chip(simulated_test_runner):
     blue_regions = [
         tbots_cpp.Field.createSSLDivisionBField().friendlyHalf(),
         tbots_cpp.Field.createSSLDivisionBField().friendlyGoal(),
-        tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+        tbots_cpp.Field.createSSLDivisionBField().centerCircle(),
     ]
 
     ball_moves_at_rest_validation = BallAlwaysMovesFromRest(
         position=ball_initial_pos, threshold=0.05
     )
 
-    always_validations = [[
-        OrValidation([
-            ball_moves_at_rest_validation,
-            NumberOfRobotsAlwaysStaysInRegion(
-                regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
-                req_robot_cnt=1
+    always_validations = [
+        [
+            OrValidation(
+                [
+                    ball_moves_at_rest_validation,
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=[
+                            tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+                        ],
+                        req_robot_cnt=1,
+                    ),
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=[
+                            tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+                        ],
+                        req_robot_cnt=0,
+                    ),
+                ]
             ),
-            NumberOfRobotsAlwaysStaysInRegion(
-                regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
-                req_robot_cnt=0
+            OrValidation(
+                [
+                    ball_moves_at_rest_validation,
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=blue_regions, req_robot_cnt=6
+                    ),
+                ]
             ),
-        ]),
-        OrValidation([
-            ball_moves_at_rest_validation,
-            NumberOfRobotsAlwaysStaysInRegion(regions=blue_regions, req_robot_cnt=6),
-        ])
-    ]]
+        ]
+    ]
 
-    eventually_validations = [[
-        BallEventuallyExitsRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)])
-    ]]
+    eventually_validations = [
+        [BallEventuallyExitsRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)])]
+    ]
 
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validations,
@@ -110,7 +120,6 @@ def test_blue_kickoff_chip(simulated_test_runner):
         ci_cmd_with_delay=[(4, Command.Type.NORMAL_START, Team.BLUE)],
         test_timeout_s=10,
     )
-
 
 
 if __name__ == "__main__":
