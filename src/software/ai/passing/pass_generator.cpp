@@ -197,9 +197,10 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
     // so we can get more varied data
     if (sample_pass_features_)
     {
-        if (num_picks_since_random_ == 0) 
+        if (num_picks_since_random_ == 0)
         {
-            std::uniform_int_distribution<std::size_t> distribution(0, considered_passes.size() - 1);
+            std::uniform_int_distribution<std::size_t> distribution(
+                0, considered_passes.size() - 1);
             std::size_t random_index = distribution(random_num_gen_);
 
             best_pass = considered_passes[random_index];
@@ -209,6 +210,6 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
         num_picks_since_random_ =
             (num_picks_since_random_ + 1) % BEST_PASS_OVERRIDE_FREQUENCY;
     }
-    
+
     return best_pass;
 }

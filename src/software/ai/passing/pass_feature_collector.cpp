@@ -6,8 +6,8 @@
 #include "cost_function.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
@@ -21,19 +21,23 @@ void PassFeatureCollector::logPassFeatures(const Pass& pass, const World& world,
     LOG(VISUALIZE) << *createPassFeaturesProto(pass, world, score);
 }
 
-double PassFeatureCollector::getEnemyInterceptTimeDelta(const Robot& enemy_robot, const Pass& pass, const TbotsProto::PassingConfig& passing_config)
+double PassFeatureCollector::getEnemyInterceptTimeDelta(
+    const Robot& enemy_robot, const Pass& pass,
+    const TbotsProto::PassingConfig& passing_config)
 {
     Point closest_interception_point = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
 
-    double enemy_robot_time_to_interception_point_sec = getEnemyTimeToInterceptPoint(enemy_robot, pass, closest_interception_point);
+    double enemy_robot_time_to_interception_point_sec =
+        getEnemyTimeToInterceptPoint(enemy_robot, pass, closest_interception_point);
 
     Duration ball_time_to_interception_point =
-    Duration::fromSeconds(distance(pass.passerPoint(), closest_interception_point) /
-                            pass.speed()) +
-    Duration::fromSeconds(passing_config.pass_delay_sec());
+        Duration::fromSeconds(distance(pass.passerPoint(), closest_interception_point) /
+                              pass.speed()) +
+        Duration::fromSeconds(passing_config.pass_delay_sec());
 
-    return enemy_robot_time_to_interception_point_sec - ball_time_to_interception_point.toSeconds();
+    return enemy_robot_time_to_interception_point_sec -
+           ball_time_to_interception_point.toSeconds();
 }
 
 double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
@@ -42,20 +46,21 @@ double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
     double score = NEUTRAL_SCORE;
 
     // if the pass has 0 speed
-    if (pass.speed() == 0) 
+    if (pass.speed() == 0)
         return DEFINITELY_BAD_SCORE;
 
     // if there are no receivers on the friendly team
-    if (world.friendlyTeam().getAllRobots().size() <= 0) 
+    if (world.friendlyTeam().getAllRobots().size() <= 0)
         return DEFINITELY_BAD_SCORE;
 
     const auto field = world.field();
 
-    // in_enemy_defense_area_quality -> if pass receive point is in the enemy defense area (illegal)
-    if (contains(field.enemyDefenseArea(), pass.receiverPoint())) 
+    // in_enemy_defense_area_quality -> if pass receive point is in the enemy defense area
+    // (illegal)
+    if (contains(field.enemyDefenseArea(), pass.receiverPoint()))
         return DEFINITELY_BAD_SCORE;
 
-    // on_field_quality -> Make a slightly smaller field, and check 
+    // on_field_quality -> Make a slightly smaller field, and check
     // if pass receive point not in the reduced field boundaries
     if (const auto reduced_size_field = getReducedField(field, passing_config);
         !contains(reduced_size_field, pass.receiverPoint()))
@@ -68,14 +73,15 @@ double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
     // robot arrives / turns too late
     if (friendlyReceiveCapabilitySigmoid < BAD_SIGMOID_SCORE)
         return DEFINITELY_BAD_SCORE;
-    else if (friendlyReceiveCapabilitySigmoid < NEUTRAL_SIGMOID_SCORE) 
+    else if (friendlyReceiveCapabilitySigmoid < NEUTRAL_SIGMOID_SCORE)
         score += BAD_SCORE;
 
     // how well any enemy can intercept the ball
-    for (const auto& robot: world.enemyTeam().getAllRobots())
+    for (const auto& robot : world.enemyTeam().getAllRobots())
     {
-        auto intercept_time_delta = getEnemyInterceptTimeDelta(robot, pass, passing_config);
-        
+        auto intercept_time_delta =
+            getEnemyInterceptTimeDelta(robot, pass, passing_config);
+
         // if any enemy can intercept successfully
         if (intercept_time_delta <= 0)
             return DEFINITELY_BAD_SCORE;

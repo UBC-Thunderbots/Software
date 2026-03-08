@@ -23,7 +23,7 @@
  * Ball Position x and y
  * Positions of friendly and enemy robots, x and y
  * The Score we assigned to the pass
- * 
+ *
  * These will all be sent within the PassFeatures proto to be consumed later
  *
  *
@@ -41,13 +41,13 @@
  *                      These are heuristics based and so have some bias
  *                      but that's unavoidable.
  *                      We make the score more negative the worse the pass is.
- *                     
+ *
  *                      Eg: a pass that the receive would reached just in time (risky)
  *
  * Everything else gets a score of 0, so a neutral pass.
  *
  *
- * A lot of the logic is ported over from existing cost functions. However, 
+ * A lot of the logic is ported over from existing cost functions. However,
  * we want to exclude the more "subjective" metrics when scoring passes. Specifically:
  *
  * 1. getStaticPositionQuality
@@ -87,9 +87,10 @@ class PassFeatureCollector
      * @return a numerical score to quantify if the pass is bad or neutral
      */
     double getPassScore(const Pass& pass, const World& world,
-                               const TbotsProto::PassingConfig passing_config);
+                        const TbotsProto::PassingConfig passing_config);
 
-    double getEnemyInterceptTimeDelta(const Robot& enemy_robot, const Pass& pass, const TbotsProto::PassingConfig& passing_config);
+    double getEnemyInterceptTimeDelta(const Robot& enemy_robot, const Pass& pass,
+                                      const TbotsProto::PassingConfig& passing_config);
 
     // Labels for bad passes
     static constexpr double DEFINITELY_BAD_SCORE    = -100;
@@ -99,10 +100,11 @@ class PassFeatureCollector
     static constexpr double NEUTRAL_SCORE           = 0;
 
     // Translating Sigmoid scores in [0, 1] into heuristics
-    static constexpr double BAD_SIGMOID_SCORE = 0.25;
+    static constexpr double BAD_SIGMOID_SCORE     = 0.25;
     static constexpr double NEUTRAL_SIGMOID_SCORE = 0.5;
-    static constexpr double GOOD_SIGMOID_SCORE = 0.75;
+    static constexpr double GOOD_SIGMOID_SCORE    = 0.75;
 
-    // If the enemy can get in the ball's path before the ball within n seconds, it's risky
+    // If the enemy can get in the ball's path before the ball within n seconds, it's
+    // risky
     static constexpr double RISKY_INTERCEPT_DELTA = 0.75;
 };
