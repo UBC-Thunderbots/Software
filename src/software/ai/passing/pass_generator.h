@@ -85,5 +85,6 @@ class PassGenerator
     // Pass Feature Collector
     PassFeatureCollector pass_feature_collector_;
     unsigned int num_passes_since_sample_ = 0;
+    unsigned int num_picks_since_random_ = 0;
     bool sample_pass_features_            = true;
 };

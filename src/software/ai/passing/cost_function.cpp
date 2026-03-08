@@ -144,6 +144,26 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
+double getEnemyTimeToInterceptPoint(const Robot& enemy_robot, const Pass& pass, const Point& interception_point)
+{
+    Vector enemy_interception_vector =
+        interception_point - enemy_robot.position();
+    // Take into account the enemy robot's radius for minimum min_interception_distance
+    // required to travel to intercept the pass.
+    double min_interception_distance =
+        std::max(0.0, enemy_interception_vector.length() - ROBOT_MAX_RADIUS_METERS);
+
+    const double ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND = 0.5;
+    double signed_1d_enemy_vel =
+        enemy_robot.velocity().dot(enemy_interception_vector.normalize());
+
+    return getTimeToTravelDistance(
+            min_interception_distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+            ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, signed_1d_enemy_vel,
+            ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND)
+            .toSeconds();
+}
+
 double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
                               const TbotsProto::PassingConfig& passing_config)
 {
@@ -157,22 +177,9 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // point on the pass before the ball
     Point closest_interception_point = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
-    Vector enemy_interception_vector =
-        closest_interception_point - enemy_robot.position();
-    // Take into account the enemy robot's radius for minimum min_interception_distance
-    // required to travel to intercept the pass.
-    double min_interception_distance =
-        std::max(0.0, enemy_interception_vector.length() - ROBOT_MAX_RADIUS_METERS);
+    
+    double enemy_robot_time_to_interception_point_sec = getEnemyTimeToInterceptPoint(enemy_robot, pass, closest_interception_point);
 
-    const double ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND = 0.5;
-    double signed_1d_enemy_vel =
-        enemy_robot.velocity().dot(enemy_interception_vector.normalize());
-    double enemy_robot_time_to_interception_point_sec =
-        getTimeToTravelDistance(
-            min_interception_distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, signed_1d_enemy_vel,
-            ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND)
-            .toSeconds();
     // Scale the time to interception point by the enemy robot's interception capability
     Duration enemy_robot_time_to_interception_point =
         Duration::fromSeconds(enemy_robot_time_to_interception_point_sec *

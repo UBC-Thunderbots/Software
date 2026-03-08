@@ -237,4 +237,9 @@ constexpr double WHEEL_ROTATION_MAX_SPEED_M_PER_S = 15.2;
 static const std::string PASS_FEATURE_DELIMITER       = ",";
 static const std::string PASS_FEATURE_DIR             = "/tmp/tbots/ml";
 static const std::string PASS_FEATURE_FILE            = "pass_features.csv";
+
+// how often to sample pass feature data, so once for every n passes considered
 static constexpr unsigned int PASS_SAMPLING_FREQUENCY = 10;
+
+// how often to commit to a random pass instead of the best pass, so once every n passes
+static constexpr unsigned int BEST_PASS_OVERRIDE_FREQUENCY = 10;
