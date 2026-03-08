@@ -413,3 +413,18 @@ class RuntimeManagerConstants:
     RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
     DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
     MAX_RELEASES_FETCHED = 5
+
+
+class PassResultsConstants:
+    PASS_RESULTS_DIRECTORY_PATH = "/tmp/tbots/ml"
+    PASS_RESULTS_FILE_NAME_TEMPLATE = "pass_results_{interval}.csv"
+
+    FRIENDLY_GOAL_SCORE = 10
+    ENEMY_GOAL_SCORE = -FRIENDLY_GOAL_SCORE
+    FRIENDLY_POSSESSION_SCORE = 2
+    ENEMY_POSSESSION_SCORE = -FRIENDLY_POSSESSION_SCORE
+    NEUTRAL_SCORE = 0
+
+    # the time intervals to log results for after each pass
+    # so after a pass, wait X seconds and then log game state
+    INTERVALS_S = [1, 5, 10]
