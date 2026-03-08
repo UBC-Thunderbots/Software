@@ -1,9 +1,9 @@
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_enters_region import (
+from software.simulated_tests.pytest_validations.robot_enters_region import (
     NumberOfRobotsEventuallyExitsRegion,
     NumberOfRobotsEventuallyEntersRegion,
 )
-from software.simulated_tests.robot_speed_threshold import *
+from software.simulated_tests.pytest_validations.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.play_pb2 import Play, PlayName

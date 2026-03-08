@@ -1,13 +1,14 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_enters_region import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_moves_in_direction import *
-from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
-from software.simulated_tests.excessive_dribbling import *
+from proto.import_all_protos import PassDefenderTactic, BallStealMode
+from software.simulated_tests.pytest_validations.robot_enters_region import *
+from software.simulated_tests.pytest_validations.ball_enters_region import *
+from software.simulated_tests.pytest_validations.ball_moves_in_direction import *
+from software.simulated_tests.pytest_validations.friendly_has_ball_possession import *
+from software.simulated_tests.pytest_validations.ball_speed_threshold import *
+from software.simulated_tests.pytest_validations.robot_speed_threshold import *
+from software.simulated_tests.pytest_validations.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -45,19 +46,16 @@ def test_ball_chipped_on_intercept(
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[0].pass_defender.CopyFrom(
-            PassDefenderTactic(
-                position_to_block_from=tbots_cpp.createPointProto(
-                    position_to_block_from
-                ),
-                ball_steal_mode=BallStealMode.STEAL,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: PassDefenderTactic(
+                    position_to_block_from=tbots_cpp.createPointProto(
+                        position_to_block_from
+                    ),
+                    ball_steal_mode=BallStealMode.STEAL,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     always_validation_sequence_set = [
         [
@@ -114,26 +112,23 @@ def test_avoid_intercept_scenario(
     def setup(*args):
         simulated_test_runner.set_world_state(
             create_world_state(
-                [],
+                yellow_robot_locations=[],
                 blue_robot_locations=[position_to_block_from],
                 ball_location=ball_initial_position,
                 ball_velocity=ball_initial_velocity,
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[0].pass_defender.CopyFrom(
-            PassDefenderTactic(
-                position_to_block_from=tbots_cpp.createPointProto(
-                    position_to_block_from
-                ),
-                ball_steal_mode=BallStealMode.STEAL,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: PassDefenderTactic(
+                    position_to_block_from=tbots_cpp.createPointProto(
+                        position_to_block_from
+                    ),
+                    ball_steal_mode=BallStealMode.STEAL,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     always_validation_sequence_set = [
         [
@@ -257,19 +252,16 @@ def test_steal_ball(
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[0].pass_defender.CopyFrom(
-            PassDefenderTactic(
-                position_to_block_from=tbots_cpp.createPointProto(
-                    position_to_block_from
-                ),
-                ball_steal_mode=BallStealMode.STEAL,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: PassDefenderTactic(
+                    position_to_block_from=tbots_cpp.createPointProto(
+                        position_to_block_from
+                    ),
+                    ball_steal_mode=BallStealMode.STEAL,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     always_validation_sequence_set = [
         [

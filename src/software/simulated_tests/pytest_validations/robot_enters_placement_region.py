@@ -2,7 +2,7 @@ import software.python_bindings as tbots_cpp
 from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 from proto.import_all_protos import *
 
-from software.simulated_tests.validation import (
+from software.simulated_tests.pytest_validations.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,

@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -28,7 +30,7 @@ cc_test(
 )
 
 cc_test(
-    name = "halt_tactic_test",
+    name = "halt_tactic_cpp_test",
     srcs = ["halt_tactic_test.cpp"],
     deps = [
         ":halt_tactic",
@@ -37,5 +39,18 @@ cc_test(
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
+    ],
+)
+
+py_test(
+    name = "halt_tactic_test",
+    srcs = ["halt_tactic_test.py"],
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests/pytest_validations:all_validations",
+        requirement("pytest"),
     ],
 )
