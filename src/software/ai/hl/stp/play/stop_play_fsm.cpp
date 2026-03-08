@@ -71,9 +71,8 @@ void StopPlayFSM::updateStopPosition(const Update& event)
         (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter()) *
             CENTRAL_SUPPORT_FRACTION;
 
-    Point field_center = world_ptr->field().centerPoint();
-    Point central_support_point =
-        field_center + (field_center - point_along_goal_ball);
+    Point field_center          = world_ptr->field().centerPoint();
+    Point central_support_point = field_center + (field_center - point_along_goal_ball);
 
     move_tactics.at(0)->updateControlParams(
         ball_defense_point_center,
