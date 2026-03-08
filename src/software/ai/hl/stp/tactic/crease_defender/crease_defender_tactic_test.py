@@ -19,10 +19,10 @@ from software.simulated_tests.pytest_validations.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )
+from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from software.simulated_tests.ball_is_off_ground import *
 
 
 @pytest.mark.parametrize(
