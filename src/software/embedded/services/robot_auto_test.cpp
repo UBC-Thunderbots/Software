@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 {
     LoggerSingleton::initializeLogger(runtime_dir, nullptr, false);
 
-    LOG(INFO) << "Running on the Jetson Nano!";
+    LOG(INFO) << "Running on the Raspberry Pi!";
 
     motor_service_ =
         std::make_unique<MotorService>(create2021RobotConstants(), THUNDERLOOP_HZ);
