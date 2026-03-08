@@ -214,6 +214,19 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
 
 /**
+ * Returns a pass features message with the given pass, game state, and score
+ *
+ * @param pass the pass to get features from
+ * @param world the current world state
+ * @param score the score for the pass in the current world
+ *
+ * @return The unique_ptr to a PassFeatures proto
+ */
+std::unique_ptr<TbotsProto::PassFeatures> createPassFeaturesProto(const Pass& pass,
+                                                                  const World& world,
+                                                                  double score);
+
+/**
  * Returns the WorldStateReceivedTrigger given the world state received trigger
  *
  * @return The unique_ptr to a TbotsProto::WorldStateReceivedTrigger proto containing
