@@ -61,16 +61,19 @@ void StopPlayFSM::updateStopPosition(const Update& event)
         ball_defense_point_center +
         robot_positioning_unit_vector * 4 * ROBOT_MAX_RADIUS_METERS;
 
-    // A more central point in our half that is further from the ball than the
-    // curved defenders, to help keep the team spread out and prepared to
-    // receive or intercept a pass once play resumes. We place this point
-    // between the friendly goal center and the ball along the line joining
-    // them.
+    // A spread-out position for the support robot: we take the point along the
+    // goal-to-ball line at CENTRAL_SUPPORT_FRACTION, then mirror it across the
+    // field center so the support robot is on the opposite side of the field
+    // from the ball (stretching the field).
     constexpr double CENTRAL_SUPPORT_FRACTION = 0.5;
-    Point central_support_point =
+    Point point_along_goal_ball =
         world_ptr->field().friendlyGoalCenter() +
         (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter()) *
             CENTRAL_SUPPORT_FRACTION;
+
+    Point field_center = world_ptr->field().centerPoint();
+    Point central_support_point =
+        field_center + (field_center - point_along_goal_ball);
 
     move_tactics.at(0)->updateControlParams(
         ball_defense_point_center,

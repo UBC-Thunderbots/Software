@@ -3,12 +3,52 @@ from proto.import_all_protos import *
 from proto.play_pb2 import Play, PlayName
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
 from software.simulated_tests.robot_speed_threshold import (
     RobotSpeedEventuallyBelowThreshold,
 )
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
+from software.simulated_tests.validation import (
+    Validation,
+    create_validation_geometry,
+)
+from software.simulated_tests.validation import ValidationStatus, ValidationType
+from typing import override
+
+
+class FriendlyRobotPositionsVisualization(Validation):
+    """Always-passing validation that draws circles at each friendly robot position.
+    Add to inv_always_validation_sequence_set and run with --enable_thunderscope to
+    visualize robot positions during the test.
+    """
+
+    @override
+    def get_validation_status(self, world) -> ValidationStatus:
+        return ValidationStatus.PASSING
+
+    @override
+    def get_validation_type(self, world) -> ValidationType:
+        return ValidationType.ALWAYS
+
+    @override
+    def get_validation_geometry(self, world) -> ValidationGeometry:
+        return create_validation_geometry(
+            [
+                tbots_cpp.Circle(
+                    tbots_cpp.Point(
+                        robot.current_state.global_position.x_meters,
+                        robot.current_state.global_position.y_meters,
+                    ),
+                    ROBOT_MAX_RADIUS_METERS + 0.05,
+                )
+                for robot in world.friendly_team.team_robots
+            ]
+        )
+
+    def __repr__(self):
+        return "Friendly robot positions (visualization only)"
 
 
 def test_stop_play(simulated_test_runner):
@@ -76,7 +116,9 @@ def test_stop_play(simulated_test_runner):
     simulated_test_runner.run_test(
         setup=setup,
         params=[0],
-        inv_always_validation_sequence_set=[[]],
+        inv_always_validation_sequence_set=[
+            [FriendlyRobotPositionsVisualization()],
+        ],
         inv_eventually_validation_sequence_set=[
             [RobotSpeedEventuallyBelowThreshold(1.4)]
         ],
