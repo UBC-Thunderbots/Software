@@ -7,7 +7,7 @@ import pytest
 import argparse
 from proto.import_all_protos import *
 
-from software.simulated_tests import validation
+from software.simulated_tests.pytest_validations import validation
 from software.thunderscope.constants import EstopMode, IndividualRobotMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO

@@ -9,23 +9,53 @@ compile_pip_requirements(
     requirements_txt = "requirements_lock.txt",
 )
 
-py_test(
-    name = "simulated_test_ball_model",
+py_library(
+    name = "tbots_test_runner",
     srcs = [
-        "simulated_test_ball_model.py",
+        "tbots_test_runner.py",
     ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
+    data = [
+        "//software:py_constants.so",
     ],
     deps = [
-        "//software:conftest",
-        "//software/simulated_tests:speed_threshold_helpers",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/networking/unix:threaded_unix_listener_py",
+        "//software/networking/unix:threaded_unix_sender_py",
+        "//software/simulated_tests/pytest_validations:all_validations",
+        "//software/thunderscope",
+        "//software/thunderscope:config",
+        "//software/thunderscope:constants",
+        "//software/thunderscope:time_provider",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
     ],
 )
 
+py_library(
+    name = "simulated_test_fixture",
+    srcs = [
+        "simulated_test_fixture.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+        ":tbots_test_runner",
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/networking/unix:threaded_unix_listener_py",
+        "//software/networking/unix:threaded_unix_sender_py",
+        "//software/simulated_tests/pytest_validations:all_validations",
+        "//software/thunderscope",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
+    ],
+)
+
+# TODO (#2581): remove
 cc_library(
     name = "simulated_er_force_sim_test_fixture",
     testonly = True,
@@ -49,6 +79,7 @@ cc_library(
     ],
 )
 
+# TODO (#2581): remove
 cc_library(
     name = "simulated_er_force_sim_play_test_fixture",
     testonly = True,
@@ -61,86 +92,18 @@ cc_library(
     ],
 )
 
-py_library(
-    name = "simulated_test_fixture",
+py_test(
+    name = "simulated_test_ball_model",
     srcs = [
-        "simulated_test_fixture.py",
+        "simulated_test_ball_model.py",
     ],
-    data = [
-        "//software:py_constants.so",
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
     ],
     deps = [
-        ":tbots_test_runner",
-        "//proto:import_all_protos",
-        "//software/logger:py_logger",
-        "//software/networking/unix:threaded_unix_listener_py",
-        "//software/networking/unix:threaded_unix_sender_py",
-        "//software/simulated_tests:validation",
-        "//software/thunderscope",
-        "//software/thunderscope/binary_context_managers:full_system",
-        "//software/thunderscope/binary_context_managers:game_controller",
-        "//software/thunderscope/binary_context_managers:simulator",
+        "//software:conftest",
+        "//software/simulated_tests/pytest_validations:all_validations",
+        requirement("pytest"),
     ],
-)
-
-py_library(
-    name = "tbots_test_runner",
-    srcs = [
-        "tbots_test_runner.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-    ],
-    deps = [
-        "//proto:import_all_protos",
-        "//software/logger:py_logger",
-        "//software/networking/unix:threaded_unix_listener_py",
-        "//software/networking/unix:threaded_unix_sender_py",
-        "//software/simulated_tests:validation",
-        "//software/thunderscope",
-        "//software/thunderscope:config",
-        "//software/thunderscope:constants",
-        "//software/thunderscope:time_provider",
-        "//software/thunderscope/binary_context_managers:full_system",
-        "//software/thunderscope/binary_context_managers:game_controller",
-        "//software/thunderscope/binary_context_managers:simulator",
-    ],
-)
-
-py_library(
-    name = "validation",
-    srcs = [
-        "avoid_collisions.py",
-        "ball_enters_region.py",
-        "ball_is_off_ground.py",
-        "ball_moves_forward.py",
-        "ball_moves_from_rest.py",
-        "ball_moves_in_direction.py",
-        "ball_speed_threshold.py",
-        "ball_stops_in_region.py",
-        "excessive_dribbling.py",
-        "friendly_has_ball_possession.py",
-        "friendly_receives_ball_slow.py",
-        "friendly_team_scored.py",
-        "or_validation.py",
-        "robot_enters_placement_region.py",
-        "robot_enters_region.py",
-        "robot_enters_region_and_stops.py",
-        "robot_speed_threshold.py",
-        "validation.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-        "//software:python_bindings.so",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
-        "//software/logger:py_logger",
-    ],
-)
-
-py_library(
-    name = "speed_threshold_helpers",
-    srcs = ["speed_threshold_helpers.py"],
 )

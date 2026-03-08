@@ -1,14 +1,14 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_enters_region import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_moves_in_direction import *
-from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
-from software.simulated_tests.ball_stops_in_region import *
-from software.simulated_tests.excessive_dribbling import *
+from software.simulated_tests.pytest_validations.robot_enters_region import *
+from software.simulated_tests.pytest_validations.ball_enters_region import *
+from software.simulated_tests.pytest_validations.ball_moves_in_direction import *
+from software.simulated_tests.pytest_validations.friendly_has_ball_possession import *
+from software.simulated_tests.pytest_validations.ball_speed_threshold import *
+from software.simulated_tests.pytest_validations.robot_speed_threshold import *
+from software.simulated_tests.pytest_validations.ball_stops_in_region import *
+from software.simulated_tests.pytest_validations.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,

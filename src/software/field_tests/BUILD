@@ -16,7 +16,7 @@ py_library(
         "//software/networking/unix:threaded_unix_listener_py",
         "//software/networking/unix:threaded_unix_sender_py",
         "//software/simulated_tests:tbots_test_runner",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/pytest_validations:all_validations",
         "//software/thunderscope",
         "//software/thunderscope:constants",
         "//software/thunderscope:estop_helpers",
@@ -39,7 +39,7 @@ py_test(
     deps = [
         "//software:conftest",
         "//software/simulated_tests:tbots_test_runner",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/pytest_validations:all_validations",
         requirement("pytest"),
     ],
 )
@@ -56,7 +56,7 @@ py_test(
     deps = [
         "//software:conftest",
         "//software/simulated_tests:tbots_test_runner",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/pytest_validations:all_validations",
         requirement("pytest"),
     ],
 )
@@ -68,7 +68,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/pytest_validations:all_validations",
         requirement("pytest"),
     ],
 )

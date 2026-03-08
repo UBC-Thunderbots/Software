@@ -3,14 +3,11 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 
-from software.simulated_tests.or_validation import OrValidation
+from software.simulated_tests.pytest_validations.or_validation import OrValidation
 
-from software.simulated_tests.ball_moves_from_rest import (
-    BallEventuallyMovesFromRest,
-)
-from software.simulated_tests.friendly_team_scored import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.robot_enters_region import (
+from software.simulated_tests.pytest_validations.friendly_team_scored import *
+from software.simulated_tests.pytest_validations.ball_enters_region import *
+from software.simulated_tests.pytest_validations.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )
@@ -136,11 +133,14 @@ def test_enemy_free_kick_play(
                     RobotNeverEntersRegion(
                         regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
                     ),
-                    BallEventuallyMovesFromRest(position=ball_initial_pos),
+                    BallEventuallyExitsRegion(
+                        regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
+                    ),
                 ]
             )
         ]
     ]
+
     # Eventually Validation
     eventually_validation_sequence_set = [
         [RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 1)])]

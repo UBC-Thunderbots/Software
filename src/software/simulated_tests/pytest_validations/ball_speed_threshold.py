@@ -1,9 +1,9 @@
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.simulated_tests.speed_threshold_helpers import *
+from software.simulated_tests.pytest_validations.speed_threshold_helpers import *
 
-from software.simulated_tests.validation import (
+from software.simulated_tests.pytest_validations.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,

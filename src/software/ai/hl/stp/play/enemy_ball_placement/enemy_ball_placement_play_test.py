@@ -2,7 +2,7 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.robot_enters_placement_region import *
+from software.simulated_tests.pytest_validations.robot_enters_placement_region import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )

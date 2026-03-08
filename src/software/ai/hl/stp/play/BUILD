@@ -169,7 +169,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/pytest_validations:all_validations",
         requirement("pytest"),
     ],
 )
@@ -214,7 +214,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/pytest_validations:all_validations",
         requirement("pytest"),
     ],
 )
@@ -270,7 +270,7 @@ py_test(
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/pytest_validations:all_validations",
         requirement("pytest"),
     ],
 )

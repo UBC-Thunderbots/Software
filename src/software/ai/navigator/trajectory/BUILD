@@ -157,7 +157,7 @@ py_test(
     deps = [
         "//proto/message_translation:py_tbots_protobuf",
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/pytest_validations:all_validations",
         requirement("pytest"),
     ],
 )

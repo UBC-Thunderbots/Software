@@ -2,16 +2,15 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.robot_enters_region import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_moves_from_rest import *
+from software.simulated_tests.pytest_validations.robot_enters_region import *
+from software.simulated_tests.pytest_validations.ball_enters_region import *
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from software.simulated_tests.or_validation import OrValidation
+from software.simulated_tests.pytest_validations.or_validation import OrValidation
 
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])
@@ -80,8 +79,8 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     # Always Validation
     always_validation_sequence_set = [[]]
 
-    ball_moves_at_rest_validation = BallAlwaysMovesFromRest(
-        position=tbots_cpp.Point(0, 0), threshold=0.05
+    ball_moves_at_rest_validation = BallNeverEntersRegion(
+        regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)]
     )
 
     expected_center_circle_or_validation_set = [

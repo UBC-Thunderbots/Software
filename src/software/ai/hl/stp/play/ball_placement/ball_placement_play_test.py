@@ -5,11 +5,13 @@ from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.ball_enters_region import (
+from software.simulated_tests.pytest_validations.ball_enters_region import (
     BallAlwaysStaysInRegion,
     BallEventuallyEntersRegion,
 )
-from software.simulated_tests.robot_enters_region import RobotEventuallyExitsRegion
+from software.simulated_tests.pytest_validations.robot_enters_region import (
+    RobotEventuallyExitsRegion,
+)
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
