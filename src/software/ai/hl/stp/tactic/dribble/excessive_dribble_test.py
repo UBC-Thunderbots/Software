@@ -1,15 +1,15 @@
 import pytest
-
 import software.python_bindings as tbots_cpp
+
+from proto.import_all_protos import *
+from proto.message_translation.tbots_protobuf import DribbleTactic, create_world_state
 from software.simulated_tests.pytest_validations.excessive_dribbling import (
-    NeverExcessivelyDribbles,
     EventuallyStartsExcessivelyDribbling,
+    NeverExcessivelyDribbles,
 )
-from proto.message_translation.tbots_protobuf import DribbleTactic
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
 
 
 @pytest.mark.parametrize(
