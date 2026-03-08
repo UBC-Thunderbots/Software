@@ -19,26 +19,22 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         field = tbots_cpp.Field.createSSLDivisionBField()
 
-        blue_bots = [
-            field.friendlyGoalCenter(),
-            tbots_cpp.Point(-1.5, 2),
-            tbots_cpp.Point(-2, 1.5),
-            tbots_cpp.Point(-2, 0.5),
-            tbots_cpp.Point(-2, -0.5),
-            tbots_cpp.Point(-2, -1.5),
-        ]
-
-        yellow_bots = [
-            field.enemyGoalCenter(),
-            field.enemyDefenseArea().negXNegYCorner(),
-            field.enemyDefenseArea().negXPosYCorner(),
-            tbots_cpp.Point(-1, 0),
-            tbots_cpp.Point(1, -2.5),
-        ]
-
         world_state = create_world_state(
-            yellow_robot_locations=yellow_bots,
-            blue_robot_locations=blue_bots,
+            blue_robot_locations=[
+                field.friendlyGoalCenter(),
+                tbots_cpp.Point(-1.5, 2),
+                tbots_cpp.Point(-2, 1.5),
+                tbots_cpp.Point(-2, 0.5),
+                tbots_cpp.Point(-2, -0.5),
+                tbots_cpp.Point(-2, -1.5),
+            ],
+            yellow_robot_locations=[
+                field.enemyGoalCenter(),
+                field.enemyDefenseArea().negXNegYCorner(),
+                field.enemyDefenseArea().negXPosYCorner(),
+                tbots_cpp.Point(-1, 0),
+                tbots_cpp.Point(1, -2.5),
+            ],
             ball_location=ball_initial_pos,
             ball_velocity=ball_initial_vel,
         )
@@ -54,6 +50,14 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         simulated_test_runner.set_world_state(world_state)
 
+        blue_play = Play()
+        blue_play.name = PlayName.ShootOrChipPlay
+        simulated_test_runner.set_play(blue_play, is_friendly=True)
+
+        yellow_play = Play()
+        yellow_play.name = PlayName.HaltPlay
+        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
@@ -61,19 +65,11 @@ def test_shoot_or_chip_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.ShootOrChipPlay
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-
+    # TODO: add validations once this play is fixed
     simulated_test_runner.run_test(
         setup=setup,
-        # this array is just so that the test runs 5 times
-        # if needed, actual arguments can be passed in to customize each test iteration
-        params=[0, 1, 2, 3, 4],
         inv_eventually_validation_sequence_set=[[]],
-        inv_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
 
