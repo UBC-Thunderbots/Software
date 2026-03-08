@@ -17,6 +17,9 @@ from software.simulated_tests.pytest_validations.robot_at_orientation import (
 from software.simulated_tests.pytest_validations.robot_received_ball import (
     RobotEventuallyReceivedBall,
 )
+from software.simulated_tests.pytest_validations.delay_validation import (
+    DelayValidation,
+)
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -166,7 +169,9 @@ def test_dribble(
             RobotEventuallyAtOrientation(1, dribble_orientation)
         )
 
-    eventually_validations[0].append(RobotEventuallyReceivedBall(1))
+    eventually_validations[0].append(
+        DelayValidation(delay_s=2, validation=RobotEventuallyReceivedBall(1))
+    )
 
     # TODO (#2514): tune dribbling and re-enable
     # Robot always not excessively dribbling
@@ -263,7 +268,7 @@ def test_run_into_enemy_robot_knock_ball_away(
             RobotEventuallyReceivedBall(1),
             BallEventuallyEntersRegion([tbots_cpp.Circle(dribble_destination, 0.3)]),
             RobotEventuallyAtOrientation(1, dribble_orientation),
-            RobotEventuallyReceivedBall(1),
+            DelayValidation(delay_s=2, validation=RobotEventuallyReceivedBall(1)),
         ]
     ]
 

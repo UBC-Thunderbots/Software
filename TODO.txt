@@ -2,20 +2,19 @@ Found using: `rg SimulatedErForceSimPlayTestFixture` and manual sorting
 
 TACTIC TESTS TO PORT
 
-src/software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic_test.cpp (DONE 99% ACCURACY)
-src/software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic_test.cpp (DONE 99% ACCURACY + ADDITIONAL)
-src/software/ai/hl/stp/tactic/halt/halt_tactic_test.cpp (DONE 99% ACCURACY)
-src/software/ai/hl/stp/tactic/move/move_tactic_test.cpp (DONE 99%)
-src/software/ai/hl/stp/tactic/kick/kick_tactic_test.cpp (DONE 99%)
+src/software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic_test.cpp (DONE 100%)
+src/software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic_test.cpp (DONE 100% + ADDITIONAL)
+src/software/ai/hl/stp/tactic/halt/halt_tactic_test.cpp (DONE 100%)
+src/software/ai/hl/stp/tactic/move/move_tactic_test.cpp (DONE 100%)
+src/software/ai/hl/stp/tactic/kick/kick_tactic_test.cpp (DONE 100%)
 src/software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic_test.cpp (DISABLED)
-src/software/ai/hl/stp/tactic/chip/chip_tactic_test.cpp (DONE 99%)
-src/software/ai/hl/stp/tactic/dribble/dribble_tactic_test.cpp (DONE 98% need to implement thing)
-src/software/ai/hl/stp/tactic/receiver/receiver_tactic_test.cpp (DONE 99%)
+src/software/ai/hl/stp/tactic/chip/chip_tactic_test.cpp (DONE 100%)
+src/software/ai/hl/stp/tactic/dribble/dribble_tactic_test.cpp (DONE 100%)
+src/software/ai/hl/stp/tactic/dribble/dribble_tactic_push_enemy_test.cpp (DONE 100%)
+src/software/ai/hl/stp/tactic/receiver/receiver_tactic_test.cpp (DONE 100%)
 src/software/ai/hl/stp/tactic/attacker/attacker_tactic_passing_test.cpp (DONE 98% need to implement thing)
 src/software/ai/hl/stp/tactic/attacker/attacker_tactic_keep_away_test.cpp (VERY COMPLEX VALIDATIONS)
 src/software/ai/hl/stp/tactic/attacker/attacker_tactic_shoot_goal_test.cpp (DONE 98% need to implement thing)
-src/software/ai/hl/stp/tactic/dribble/dribble_tactic_push_enemy_test.cpp (DONE 99%)
-src/software/ai/hl/stp/tactic/goalie/goalie_tactic_chip_test.cpp 
 
 PLAY TESTS TO PORT
 

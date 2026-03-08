@@ -1,24 +1,31 @@
 import pytest
-
 import software.python_bindings as tbots_cpp
+
 from proto.import_all_protos import (
-    CreaseDefenderTactic,
-    CreaseDefenderAlignment,
-    MaxAllowedSpeedMode,
     BallStealMode,
+    CreaseDefenderAlignment,
+    CreaseDefenderTactic,
+    MaxAllowedSpeedMode,
 )
-from software.simulated_tests.pytest_validations.robot_enters_region import *
-from software.simulated_tests.pytest_validations.ball_enters_region import *
-from software.simulated_tests.pytest_validations.ball_moves_in_direction import *
-from software.simulated_tests.pytest_validations.friendly_has_ball_possession import *
-from software.simulated_tests.pytest_validations.ball_speed_threshold import *
-from software.simulated_tests.pytest_validations.robot_speed_threshold import *
-from software.simulated_tests.pytest_validations.excessive_dribbling import *
+from proto.message_translation.tbots_protobuf import create_world_state
+from software.simulated_tests.pytest_validations.ball_is_off_ground import (
+    BallIsAlwaysOnGround,
+    BallIsEventuallyOffGround,
+)
+from software.simulated_tests.pytest_validations.ball_speed_threshold import (
+    BallSpeedAlwaysBelowThreshold,
+)
+from software.simulated_tests.pytest_validations.delay_validation import DelayValidation
+from software.simulated_tests.pytest_validations.excessive_dribbling import (
+    NeverExcessivelyDribbles,
+)
+from software.simulated_tests.pytest_validations.robot_enters_region import (
+    RobotEventuallyEntersRegion,
+    RobotNeverEntersRegion,
+)
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from software.simulated_tests.pytest_validations.ball_is_off_ground import *
-from proto.message_translation.tbots_protobuf import create_world_state
 
 
 def test_not_bumping_ball_towards_net(simulated_test_runner):
@@ -43,10 +50,12 @@ def test_not_bumping_ball_towards_net(simulated_test_runner):
             }
         )
 
+    always_validations = [[BallSpeedAlwaysBelowThreshold(0.001)]]
+
     simulated_test_runner.run_test(
         setup=setup,
-        inv_always_validation_sequence_set=[[BallSpeedAlwaysBelowThreshold(0.001)]],
-        ag_always_validation_sequence_set=[[BallSpeedAlwaysBelowThreshold(0.001)]],
+        inv_always_validation_sequence_set=always_validations,
+        ag_always_validation_sequence_set=always_validations,
     )
 
 
@@ -155,8 +164,13 @@ def test_crease_region_positioning(
 
     eventually_validations = [
         [
-            # TODO: check that it stays for 1000 ticks
-            RobotEventuallyEntersRegion(regions=[defender_regions[region_index]])
+            RobotEventuallyEntersRegion(regions=[defender_regions[region_index]]),
+            DelayValidation(
+                delay_s=3,
+                validation=RobotEventuallyEntersRegion(
+                    regions=[defender_regions[region_index]]
+                ),
+            ),
         ]
     ]
 
@@ -164,6 +178,7 @@ def test_crease_region_positioning(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validations,
         ag_eventually_validation_sequence_set=eventually_validations,
+        test_timeout_s=5,
     )
 
 
@@ -428,7 +443,6 @@ def test_crease_get_ball(
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=3,
     )
 
 

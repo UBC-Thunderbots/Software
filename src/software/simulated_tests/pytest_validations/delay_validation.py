@@ -15,9 +15,9 @@ class DelayValidation(Validation):
 
         self.delay_s = delay_s
         self.ticks_so_far = 0
-        self.delay_ticks = delay_s / tick_duration_s
+        self.delay_ticks = int(delay_s / tick_duration_s)
         self.validation = validation
-        self.first_time_check = None
+        # self.first_time_check = None
 
     @override
     def get_validation_status(self, world):

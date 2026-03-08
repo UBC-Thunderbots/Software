@@ -16,6 +16,7 @@ from software.simulated_tests.pytest_validations.ball_is_off_ground import (
 from software.simulated_tests.pytest_validations.robot_at_angular_velocity import (
     RobotEventuallyAtAngularVelocity,
 )
+from software.simulated_tests.pytest_validations.delay_validation import DelayValidation
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -61,15 +62,18 @@ def test_move_across_field(simulated_test_runner):
 
     eventually_validation_sequence_set = [
         [
-            # TODO: should also validate that the robot stays at destination for 1000 ticks after
-            RobotEventuallyAtPosition(1, destination),
+            DelayValidation(
+                delay_s=0.1, validation=RobotEventuallyAtPosition(1, destination)
+            )
         ]
+        * 10
     ]
 
     simulated_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        test_timeout_s=5,
     )
 
 
@@ -116,11 +120,16 @@ def test_autochip_move(simulated_test_runner):
 
     eventually_validation_sequence_set = [
         [
-            # TODO (#2558): should also validate that the robot stays at destination for 1000 ticks after
             RobotEventuallyAtPosition(1, destination),
             BallEventuallyKickedInDirection(tbots_cpp.Angle.zero()),
             BallIsEventuallyOffGround(),
         ]
+        + [
+            DelayValidation(
+                delay_s=0.1, validation=RobotEventuallyAtPosition(1, destination)
+            )
+        ]
+        * 10
     ]
 
     simulated_test_runner.run_test(
@@ -172,10 +181,15 @@ def test_autokick_move(simulated_test_runner):
 
     eventually_validation_sequence_set = [
         [
-            # TODO (#2558): should also validate that the robot stays at destination for 1000 ticks after
             RobotEventuallyAtPosition(0, destination),
             BallEventuallyKickedInDirection(tbots_cpp.Angle.threeQuarter()),
         ]
+        + [
+            DelayValidation(
+                delay_s=0.1, validation=RobotEventuallyAtPosition(0, destination)
+            )
+        ]
+        * 10
     ]
 
     simulated_test_runner.run_test(
@@ -264,10 +278,16 @@ def test_spinning_move(
         [
             # high threshold just to check direction of angular velocity
             RobotEventuallyAtAngularVelocity(0, angular_velocity, 4),
-            RobotEventuallyAtPosition(0, destination),
-            RobotEventuallyAtOrientation(0, orientation),
-            # TODO: validate position and orientation for 1000 ticks
         ]
+        + [
+            DelayValidation(
+                delay_s=0.1, validation=RobotEventuallyAtPosition(0, destination)
+            ),
+            DelayValidation(
+                delay_s=0.1, validation=RobotEventuallyAtOrientation(0, orientation)
+            ),
+        ]
+        * 10
     ]
 
     simulated_test_runner.run_test(
