@@ -58,7 +58,6 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
         blue_play = Play()
         blue_play.name = PlayName.DefensePlay
 
-        # TODO: fix having to set tactics first since it sets both teams
         simulated_test_runner.set_tactics()
         simulated_test_runner.set_play(blue_play, is_friendly=True)
 

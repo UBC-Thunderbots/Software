@@ -9,7 +9,6 @@ compile_pip_requirements(
     requirements_txt = "requirements_lock.txt",
 )
 
-# TODO: move somewhere else since its use in field test fixture so this makes no sense in simulated_tests
 py_library(
     name = "tbots_test_runner",
     srcs = [
