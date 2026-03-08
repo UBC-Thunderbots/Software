@@ -222,6 +222,7 @@ def test_crease_positioning(
                 ball_velocity=ball_initial_velocity,
             )
         )
+        simulated_test_runner.set_tactics(params, is_friendly=True)
 
         simulated_test_runner.set_tactics(
             blue_tactics={
@@ -332,6 +333,7 @@ def test_crease_autochip(
                 ball_velocity=ball_initial_velocity,
             )
         )
+        simulated_test_runner.set_tactics(params, is_friendly=True)
 
         simulated_test_runner.set_tactics(
             blue_tactics={
@@ -404,6 +406,7 @@ def test_crease_get_ball(
                 ball_velocity=ball_initial_velocity,
             )
         )
+        simulated_test_runner.set_tactics(params, is_friendly=True)
 
         simulated_test_runner.set_tactics(
             blue_tactics={
