@@ -93,7 +93,6 @@ cc_library(
     ],
 )
 
-# TODO (#2558): move this test somewhere else
 py_test(
     name = "simulated_test_ball_model",
     srcs = [

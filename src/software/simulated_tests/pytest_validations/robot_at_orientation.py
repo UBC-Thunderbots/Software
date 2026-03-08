@@ -50,7 +50,7 @@ class RobotAtOrientation(Validation):
         :param world: The world msg to create validation geometry from
         :return: ValidationGeometry containing the robot's orientation
         """
-        # TODO (#2558): create better validation geometry
+        # TODO (#3637): create better validation geometry
         for robot in world.friendly_team.team_robots:
             if robot.id == self.robot_id:
                 robot_pos = tbots_cpp.createPoint(robot.current_state.global_position)

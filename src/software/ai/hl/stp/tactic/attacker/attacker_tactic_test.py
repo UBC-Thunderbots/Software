@@ -139,9 +139,6 @@ def test_attacker_passing(
                     tbots_cpp.Point(-3, 2.5),
                     robot_pos,
                 ],
-                # TODO (#2558)
-                # In C++ test: Uses ai_config to set min_open_angle_for_shot_deg to force passing
-                # Temp fix by blocking off the enemy goal
                 yellow_robot_locations=[
                     tbots_cpp.Point(4, -0.4),
                     tbots_cpp.Point(4, -0.2),
@@ -237,14 +234,11 @@ def test_attacker_keep_away(
     ignore_score_checks,
     simulated_test_runner,
 ):
-    # TODO(#2558): Port C++ validation functions that don't exist in Python yet
+    # TODO (#3638): Port C++ validation functions that don't exist in Python yet
     # In C++ test:
-    # - Uses ai_config to set min_open_angle_for_shot_deg to 90 and
-    #   enemy_about_to_steal_ball_radius to 0.01
     # - Validates calculateProximityRisk improves over time
     # - Validates ratePassEnemyRisk improves over time
     # - Validates ball stays in field boundaries
-    # This test is skipped in C++ due to instability
 
     field = tbots_cpp.Field.createSSLDivisionBField()
     field_top_left = field.fieldLines().negXPosYCorner()
@@ -369,11 +363,6 @@ def test_attacker_keep_away(
 def test_attacker_shoot_goal(
     ball_pos, ball_velocity, robot_pos, enemy_positions, simulated_test_runner
 ):
-    # TODO (#2558)
-    # In C++ test:
-    # - Uses ai_config to set pass_delay_sec to 0.0
-    # - Uses motion constraint FRIENDLY_DEFENSE_AREA
-
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     def setup(*args):

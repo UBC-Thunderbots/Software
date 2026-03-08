@@ -27,8 +27,6 @@ def create_world_state(
     """
     world_state = WorldState()
 
-    # TODO (#2558): add param for robot angular velocity since its used for some tests
-
     for robot_id, robot_location in enumerate(yellow_robot_locations):
         world_state.yellow_robots[robot_id].CopyFrom(
             RobotState(

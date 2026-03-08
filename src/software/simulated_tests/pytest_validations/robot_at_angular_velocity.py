@@ -50,7 +50,7 @@ class RobotAtAngularVelocity(Validation):
         :param world: The world msg to create validation geometry from
         :return: ValidationGeometry showing the robot's angular velocity
         """
-        # TODO (#2558): create validation geometry
+        # TODO (#3637): create validation geometry
         return create_validation_geometry()
 
     @override

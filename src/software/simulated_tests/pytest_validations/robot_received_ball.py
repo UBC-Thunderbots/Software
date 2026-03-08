@@ -39,7 +39,7 @@ class RobotReceivedBall(Validation):
     @override
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """Highlights the dribbler area of the robot"""
-        # TODO (#2558): create better validation geometry
+        # TODO (#3637): create better validation geometry
         for robot in world.friendly_team.team_robots:
             if robot.id == self.robot_id:
                 return create_validation_geometry(
