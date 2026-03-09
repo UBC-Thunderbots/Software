@@ -100,6 +100,9 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
     void prepareGetPossession(const Update& event,
                               boost::sml::back::process<DribbleFSM::Update> processEvent);
 
+    DEFINE_SML_GUARD_CLASS(passStarted, PassDefenderFSM)
+    DEFINE_SML_GUARD_CLASS(ballDeflected, PassDefenderFSM)
+    DEFINE_SML_GUARD_CLASS(ballNearbyWithoutThreat, PassDefenderFSM)
 
     auto operator()()
     {
@@ -112,12 +115,13 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
 
         DEFINE_SML_GUARD(passStarted)
         DEFINE_SML_GUARD(ballDeflected)
+        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
 
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(interceptBall)
 
         DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
+
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
 
         return make_transition_table(

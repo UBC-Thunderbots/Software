@@ -58,6 +58,8 @@ struct MoveFSM : TacticFSM<MoveFSM>
      */
     bool moveDone(const Update &event);
 
+    DEFINE_SML_GUARD_CLASS(moveDone, MoveFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -68,6 +70,7 @@ struct MoveFSM : TacticFSM<MoveFSM>
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(moveDone)
+
         DEFINE_SML_ACTION(updateMove)
 
         return make_transition_table(
