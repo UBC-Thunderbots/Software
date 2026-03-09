@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -54,6 +55,7 @@ cc_test(
 py_test(
     name = "crease_defender_tactic_test",
     srcs = ["crease_defender_tactic_test.py"],
+    package_collisions = "warning",
     tags = [
         "exclusive",
     ],
@@ -62,5 +64,9 @@ py_test(
         "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
         requirement("pytest"),
+        requirement("pyqt6"),
+        requirement("numpy"),
+        requirement("pyqtdarktheme-fork"),
+        requirement("pyqtgraph"),
     ],
 )
