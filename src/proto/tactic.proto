@@ -13,9 +13,9 @@ message AssignedTacticPlayControlParams
 
 message Tactic
 {
+    reserved 2, 7;
     oneof tactic
     {
-        reserved 2, 7;
         AttackerTactic attacker                             = 1;
         CreaseDefenderTactic crease_defender                = 3;
         DribbleTactic dribble                               = 4;

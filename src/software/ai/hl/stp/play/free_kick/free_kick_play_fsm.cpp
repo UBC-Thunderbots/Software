@@ -289,7 +289,6 @@ void FreeKickPlayFSM::passBall(const Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     Pass pass = best_pass_and_score_so_far.pass;
-	LOG(INFO) << "looking for pass" << pass.speed() <<std::endl;
 
     AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK, pass.speed()};
     passer_tactic->updateControlParams(
