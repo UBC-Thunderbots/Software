@@ -2,6 +2,8 @@
 
 #include <boost/coroutine2/all.hpp>
 #include <vector>
+#include <typeindex>
+#include <typeinfo>
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.hpp"
@@ -192,29 +194,10 @@ class Play
 
     RobotNavigationObstacleFactory obstacle_factory;
 
-    static constexpr uint32_t ASSIGNMENTS_CACHE_MAX_SIZE = 5;
+    static constexpr uint32_t ASSIGNMENTS_CACHE_MAX_SIZE = 20;
 
-
-    struct PreviousAssignment
-    {
-        uint32_t penality_cost;
-        std::shared_ptr<const Tactic> previous_tactic;
-    };
-
-    std::deque<std::map<const RobotId, PreviousAssignment>> assignments_cache;
-
-    /**
-     * 1) matrix of each tactic
-     * 2) Robot w/ vector of prev tactics + costs (prune if out of threshold)
-     * 3)
-     *
-     * Info:
-     * - robot_cost_for_tactic for each robot
-     *
-     * Penalty Algorithms
-     * - give the same tactic a constant
-     * - Exponential punishment for matching tactics
-     * - Convolutions as a function of costs over time? For the given tactic? robot?
-     */
-
+    using TacticTypeDeque = std::deque<std::shared_ptr<std::type_index>>;
+    using RobotPreviousTactics = std::unordered_map<std::type_index, int>;
+    std::unordered_map<RobotId,TacticTypeDeque> previous_robot_tactics;
+    std::unordered_map<RobotId, RobotPreviousTactics> previous_robot_tactics_count;
 };
