@@ -16,21 +16,19 @@ message Tactic
     oneof tactic
     {
         AttackerTactic attacker                             = 1;
-        ChipTactic chip                                     = 2;
-        CreaseDefenderTactic crease_defender                = 3;
-        DribbleTactic dribble                               = 4;
-        GetBehindBallTactic get_behind_ball                 = 5;
-        GoalieTactic goalie                                 = 6;
-        KickTactic kick                                     = 7;
-        MoveGoalieToGoalLineTactic move_goalie_to_goal_line = 8;
-        MoveTactic move                                     = 9;
-        PenaltyKickTactic penalty_kick                      = 10;
-        PivotKickTactic pivot_kick                          = 11;
-        ReceiverTactic receiver                             = 12;
-        ShadowEnemyTactic shadow_enemy                      = 13;
-        HaltTactic halt                                     = 14;
-        PassDefenderTactic pass_defender                    = 15;
-        KickOrChipTactic kick_or_chip                       = 16;
+        CreaseDefenderTactic crease_defender                = 2;
+        DribbleTactic dribble                               = 3;
+        GetBehindBallTactic get_behind_ball                 = 4;
+        GoalieTactic goalie                                 = 5;
+        KickOrChipTactic kick_or_chip                       = 6;
+        MoveGoalieToGoalLineTactic move_goalie_to_goal_line = 7;
+        MoveTactic move                                     = 8;
+        PenaltyKickTactic penalty_kick                      = 9;
+        PivotKickTactic pivot_kick                          = 10;
+        ReceiverTactic receiver                             = 11;
+        ShadowEnemyTactic shadow_enemy                      = 12;
+        HaltTactic halt                                     = 13;
+        PassDefenderTactic pass_defender                    = 14;
     }
 }
 
@@ -43,16 +41,6 @@ message AttackerTactic
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     optional Point chip_target = 3;
-}
-
-message ChipTactic
-{
-    // The location where the chip will be taken from
-    required Point chip_origin = 1;
-    // The direction the Robot will chip in
-    required Angle chip_direction = 2;
-    // The distance the robot will chip to
-    required double chip_distance_meters = 3;
 }
 
 enum CreaseDefenderAlignment
@@ -107,14 +95,14 @@ message GoalieTactic
     required MaxAllowedSpeedMode max_allowed_speed_mode = 1;
 }
 
-message KickTactic
+message KickOrChipTactic
 {
-    // The location where the kick will be taken from
-    required Point kick_origin = 1;
-    // The direction the Robot will kick in
-    required Angle kick_direction = 2;
-    // How fast the Robot will kick the ball in meters per second
-    required double kick_speed_meters_per_second = 3;
+    // The location where the kick or chip will be taken from
+    required Point kick_or_chip_origin    = 1;
+    // The direction the Robot will kick or chip in
+    required Angle kick_or_chip_direction = 2;
+    // How the robot will chip or kick the ball
+    required AutoChipOrKick auto_chip_or_kick = 3;
 }
 
 message MoveGoalieToGoalLineTactic {}
@@ -179,12 +167,3 @@ message ShadowEnemyTactic
 
 message HaltTactic {}
 
-message KickOrChipTactic
-{
-    // The location where the kick or chip will be taken from
-    required Point kick_or_chip_origin    = 1;
-    // The direction the Robot will kick or chip in
-    required Angle kick_or_chip_direction = 2;
-    // How the robot will chip or kick the ball
-    required AutoChipOrKick auto_chip_or_kick = 3;
-}
