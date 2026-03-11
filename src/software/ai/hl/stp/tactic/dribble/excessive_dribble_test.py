@@ -3,7 +3,7 @@ import software.python_bindings as tbots_cpp
 
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import DribbleTactic, create_world_state
-from software.simulated_tests.pytest_validations.excessive_dribbling import (
+from software.simulated_tests.validation.excessive_dribbling import (
     EventuallyStartsExcessivelyDribbling,
     NeverExcessivelyDribbles,
 )

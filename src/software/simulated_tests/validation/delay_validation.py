@@ -2,7 +2,7 @@ from typing import override
 
 from proto.validation_pb2 import ValidationStatus, ValidationType
 
-from software.simulated_tests.pytest_validations.validation import (
+from software.simulated_tests.validation.validation import (
     Validation,
 )
 

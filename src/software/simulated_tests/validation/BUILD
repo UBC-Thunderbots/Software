@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 py_library(
-    name = "all_validations",
+    name = "validation",
     srcs = [
         "avoid_collisions.py",
         "ball_enters_region.py",

@@ -1,7 +1,7 @@
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
-from software.simulated_tests.pytest_validations.validation import (
+from software.simulated_tests.validation.validation import (
     Validation,
     ValidationStatus,
     create_validation_geometry,
