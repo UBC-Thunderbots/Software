@@ -9,7 +9,7 @@
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
-#include "software/simulated_tests/validation/validation_function.h"
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
