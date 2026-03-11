@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_never_moves_backward_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
@@ -9,7 +10,6 @@
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
-#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
