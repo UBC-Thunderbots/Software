@@ -1,4 +1,5 @@
 from __future__ import annotations
+import itertools
 
 import queue
 import random
@@ -23,7 +24,6 @@ from software.thunderscope.common.thread_safe_circular_buffer import (
 from software.thunderscope.util import is_current_platform_macos
 
 logger = logging.getLogger(__name__)
-import itertools
 
 
 class Gamecontroller:
@@ -68,6 +68,7 @@ class Gamecontroller:
         self.latest_world = None
         self.blue_removed_robot_ids = queue.Queue()
         self.yellow_removed_robot_ids = queue.Queue()
+        self.processed_events = set()
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -187,6 +188,8 @@ class Gamecontroller:
         if self.simulator_proto_unix_io is None:
             return
 
+        self.__automate_referee(referee)
+
         # Convert the latest blue world into a WorldState we can send to the simulator and update the robots
         self.latest_world = self.blue_team_world_buffer.get(
             block=False, return_cached=True
@@ -234,6 +237,49 @@ class Gamecontroller:
 
         # Send out updated world state
         self.simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+    def __automate_referee(self, referee: Referee):
+        possible_goal = False
+
+        for game_event in referee.game_events:
+            if (
+                game_event.type == GameEvent.Type.POSSIBLE_GOAL
+                and game_event.id not in self.processed_events
+            ):
+                possible_goal = True
+                self.processed_events.add(game_event.id)
+
+        if possible_goal:
+            print("goal scored")
+            scoring_team = game_event.possible_goal.by_team
+
+            ci_input = CiInput(timestamp=int(time.time_ns()))
+            api_input = Input()
+            change = Change()
+
+            add_game_event = Change.AddGameEvent()
+            game_event = GameEvent(
+                type=GameEvent.Type.GOAL,
+                origin=[
+                    "Majority"
+                ],  # Required or else ssl gamecontroller will convert game event to proposal
+                goal=GameEvent.Goal(by_team=scoring_team),
+            )
+            add_game_event.game_event.CopyFrom(game_event)
+            change.add_game_event_change.CopyFrom(add_game_event)
+
+            api_input.change.CopyFrom(change)
+            ci_input.api_inputs.append(api_input)
+
+            # Send game event where team actually scores goal
+            self.send_ci_input(ci_input)
+
+            # Then, start ball placement since robots are halted after possible goal
+            self.send_gc_command(
+                gc_command=Command.Type.BALL_PLACEMENT,
+                team=scoring_team,
+                final_ball_placement_point=tbots_cpp.Point(0, 0),
+            )
 
     def is_valid_port(self, port):
         """Determine whether or not a given port is valid
