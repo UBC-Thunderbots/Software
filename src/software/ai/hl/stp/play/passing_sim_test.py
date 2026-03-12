@@ -100,8 +100,7 @@ def setup_pass_and_robots(
     # this improves the passes generated over time
     robots_to_ignore = [0]  # Avoid sampling passes around the attacker robot
     for index in range(0, 100):
-        best_pass_with_score = pass_generator.getBestPass(
-            world, robots_to_ignore)
+        best_pass_with_score = pass_generator.getBestPass(world, robots_to_ignore)
 
     best_pass = best_pass_with_score.pass_value
     kick_vec = best_pass.receiverPoint() - best_pass.passerPoint()
@@ -116,11 +115,10 @@ def setup_pass_and_robots(
                 x_meters=best_pass.passerPoint().x(),
                 y_meters=best_pass.passerPoint().y(),
             ),
-            kick_or_chip_direction=Angle(
-                radians=kick_vec.orientation().toRadians()),
+            kick_or_chip_direction=Angle(radians=kick_vec.orientation().toRadians()),
             auto_chip_or_kick=AutoChipOrKick(
                 autokick_speed_m_per_s=best_pass.speed(),
-            )
+            ),
         )
     )
 
@@ -142,8 +140,7 @@ def setup_pass_and_robots(
             "disable_one_touch_shot": True,
         }
 
-        params.assigned_tactics[1].receiver.CopyFrom(
-            ReceiverTactic(**receiver_args))
+        params.assigned_tactics[1].receiver.CopyFrom(ReceiverTactic(**receiver_args))
     simulated_test_runner.set_tactics(params, True)
 
     # Setup no tactics on the enemy side
@@ -382,8 +379,7 @@ def test_passing_no_backwards_passes(
                 initial_ball_position=ball_initial_position,
                 regions=[
                     tbots_cpp.Rectangle(
-                        tbots_cpp.Point(-field.xLength() / 2,
-                                        field.yLength() / 2),
+                        tbots_cpp.Point(-field.xLength() / 2, field.yLength() / 2),
                         tbots_cpp.Point(0 - buffer_x, -field.yLength() / 2),
                     )
                 ],

@@ -14,15 +14,12 @@ def test_passing(field_test_runner):
     receiver_robot_id = 5
     should_receive_pass = True
 
-    world = field_test_runner.world_buffer.get(
-        block=True, timeout=WORLD_BUFFER_TIMEOUT)
-    passer_point = tbots_cpp.createPoint(
-        world.ball.current_state.global_position)
+    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+    passer_point = tbots_cpp.createPoint(world.ball.current_state.global_position)
     receiver_point = None
     for robot in world.friendly_team.team_robots:
         if robot.id == receiver_robot_id:
-            receiver_point = tbots_cpp.createPoint(
-                robot.current_state.global_position)
+            receiver_point = tbots_cpp.createPoint(robot.current_state.global_position)
 
     receive_speed_m_per_s = 2.0
     min_pass_speed_m_per_s = 1.0
@@ -51,11 +48,10 @@ def test_passing(field_test_runner):
                 x_meters=pass_to_test.passerPoint().x(),
                 y_meters=pass_to_test.passerPoint().y(),
             ),
-            kick_or_chip_direction=Angle(
-                radians=kick_vec.orientation().toRadians()),
+            kick_or_chip_direction=Angle(radians=kick_vec.orientation().toRadians()),
             auto_chip_or_kick=AutoChipOrKick(
                 autokick_speed_m_per_s=pass_to_test.speed(),
-            )
+            ),
         )
     )
 

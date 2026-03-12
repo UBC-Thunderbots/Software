@@ -13,7 +13,7 @@ message AssignedTacticPlayControlParams
 
 message Tactic
 {
-    reserved 2,7;
+    reserved 2, 7;
     oneof tactic
     {
         AttackerTactic attacker                             = 1;
@@ -161,7 +161,7 @@ message HaltTactic {}
 message KickOrChipTactic
 {
     // The location where the kick or chip will be taken from
-    required Point kick_or_chip_origin    = 1;
+    required Point kick_or_chip_origin = 1;
     // The direction the Robot will kick or chip in
     required Angle kick_or_chip_direction = 2;
     // How the robot will chip or kick the ball
