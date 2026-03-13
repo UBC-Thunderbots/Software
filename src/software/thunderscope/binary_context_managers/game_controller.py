@@ -296,9 +296,11 @@ class Gamecontroller:
             )
 
         if placement_failed is not None:
-            default_world_state = create_default_world_state(num_robots=6)
-            self.simulator_proto_unix_io.send_proto(WorldState, default_world_state)
-            self.latest_world = default_world_state
+            world_state = WorldState()
+            world_state.ball_state.global_position.CopyFrom(
+                self.latest_world.game_state.ball_placement_point
+            )
+            self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
     def is_valid_port(self, port):
         """Determine whether or not a given port is valid
