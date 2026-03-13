@@ -296,10 +296,9 @@ class Gamecontroller:
             )
 
         if placement_failed is not None:
-            # TODO: make sure team with yellow/red cards have less robots
-            self.simulator_proto_unix_io.send_proto(
-                WorldState, create_default_world_state(num_robots=6)
-            )
+            default_world_state = create_default_world_state(num_robots=6)
+            self.simulator_proto_unix_io.send_proto(WorldState, default_world_state)
+            self.latest_world = default_world_state
 
     def is_valid_port(self, port):
         """Determine whether or not a given port is valid
