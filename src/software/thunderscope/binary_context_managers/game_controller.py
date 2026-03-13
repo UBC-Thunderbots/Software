@@ -1,4 +1,5 @@
 from __future__ import annotations
+import itertools
 
 import queue
 import random
@@ -10,6 +11,7 @@ from typing import Any
 
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from proto.message_translation.tbots_protobuf import create_default_world_state
 from software.networking.ssl_proto_communication import *
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -23,7 +25,6 @@ from software.thunderscope.common.thread_safe_circular_buffer import (
 from software.thunderscope.util import is_current_platform_macos
 
 logger = logging.getLogger(__name__)
-import itertools
 
 
 class Gamecontroller:
@@ -177,6 +178,31 @@ class Gamecontroller:
                 robot_states[removed_robot_ids.get_nowait()].CopyFrom(place_state)
             except queue.Empty:
                 return
+
+    def __automate_stage_change(self, referee):
+        if referee.stage_time_left < 0:
+            print("should move on")
+
+            if referee.stage == Referee.Stage.NORMAL_FIRST_HALF:
+                new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
+            elif referee.stage == Referee.Stage.NORMAL_SECOND_HALF:
+                return  # perhaps start a new game
+            else:
+                return  # idk what to do here
+
+            default_world_state = create_default_world_state(num_robots=6)
+            self.simulator_proto_unix_io.send_proto(WorldState, default_world_state)
+
+            ci_input = CiInput(timestamp=int(time.time_ns()))
+            api_input = Input()
+            change = Change()
+            change.change_stage_change.new_stage.CopyFrom(new_stage)
+            api_input.change.CopyFrom(change)
+            ci_input.api_inputs.append(api_input)
+
+            self.send_ci_input(ci_input)
+
+            self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
 
     def handle_referee(self, referee: Referee) -> None:
         """Updates the world state based on the referee message
