@@ -209,7 +209,8 @@ class Gamecontroller:
         if self.simulator_proto_unix_io is None:
             return
 
-        self.__automate_referee(referee)
+        # TODO (#3633): automate referee events in record_stats mode
+        # self.__automate_referee(referee)
 
         # Convert the latest blue world into a WorldState we can send to the simulator and update the robots
         self.latest_world = self.blue_team_world_buffer.get(
@@ -285,15 +286,22 @@ class Gamecontroller:
         ci_input = CiInput(timestamp=int(time.time_ns()))
         api_input = Input()
         change = Change()
+
+        # Send goal game event to resolve the possible goal
         game_event = GameEvent(
             type=GameEvent.Type.GOAL,
-            origin=["Majority"],
+            origin=[
+                "Majority"
+            ],  # Required or else ssl-gamecontroller will convert game event to proposal
             goal=GameEvent.Goal(by_team=scoring_team),
         )
+
         change.add_game_event_change.game_event.CopyFrom(game_event)
         api_input.change.CopyFrom(change)
         ci_input.api_inputs.append(api_input)
         self.send_ci_input(ci_input)
+
+        # Send ball placement to (0,0) to reset game
         self.send_gc_command(
             gc_command=Command.Type.BALL_PLACEMENT,
             team=scoring_team,
