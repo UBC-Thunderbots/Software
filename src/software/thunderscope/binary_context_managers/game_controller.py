@@ -22,6 +22,7 @@ from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
 from software.thunderscope.util import is_current_platform_macos
+from proto.message_translation.tbots_protobuf import create_default_world_state
 
 logger = logging.getLogger(__name__)
 
@@ -249,6 +250,16 @@ class Gamecontroller:
             None,
         )
 
+        placement_failed = next(
+            (
+                event.placement_failed
+                for event in referee.game_events
+                if event.type == GameEvent.Type.PLACEMENT_FAILED
+                and event.id not in self.processed_event_ids
+            ),
+            None,
+        )
+
         for event in referee.game_events:
             self.processed_event_ids.add(event.id)
 
@@ -282,6 +293,12 @@ class Gamecontroller:
                 gc_command=Command.Type.BALL_PLACEMENT,
                 team=scoring_team,
                 final_ball_placement_point=tbots_cpp.Point(0, 0),
+            )
+
+        if placement_failed is not None:
+            # TODO: make sure team with yellow/red cards have less robots
+            self.simulator_proto_unix_io.send_proto(
+                WorldState, create_default_world_state(num_robots=6)
             )
 
     def is_valid_port(self, port):
