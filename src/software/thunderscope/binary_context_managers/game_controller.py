@@ -22,7 +22,6 @@ from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
 from software.thunderscope.util import is_current_platform_macos
-from proto.message_translation.tbots_protobuf import create_default_world_state
 
 logger = logging.getLogger(__name__)
 
