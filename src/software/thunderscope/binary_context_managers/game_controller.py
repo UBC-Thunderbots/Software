@@ -179,6 +179,27 @@ class Gamecontroller:
             except queue.Empty:
                 return
 
+    def __automate_referee(self, referee: Referee) -> None:
+        """Automate referee events by handling possible goals and ball placement failures.
+
+        :param referee: the referee protobuf message
+        """
+        possible_goal_event = self.__find_unprocessed_event(
+            referee, GameEvent.Type.POSSIBLE_GOAL
+        )
+        placement_failed_event = self.__find_unprocessed_event(
+            referee, GameEvent.Type.PLACEMENT_FAILED
+        )
+
+        if possible_goal_event:
+            self.__handle_possible_goal(possible_goal_event.possible_goal.by_team)
+
+        if placement_failed_event:
+            self.__handle_placement_failed()
+
+        for event in referee.game_events:
+            self.processed_event_ids.add(event.id)
+
     def handle_referee(self, referee: Referee) -> None:
         """Updates the world state based on the referee message
         :param referee: the referee protobuf message
@@ -238,68 +259,54 @@ class Gamecontroller:
         # Send out updated world state
         self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
-    def __automate_referee(self, referee: Referee):
-        possible_goal = next(
+    def __find_unprocessed_event(
+        self, referee: Referee, event_type: GameEvent.Type
+    ) -> GameEvent:
+        """Find an unprocessed game event of the specified type.
+
+        :param referee: the referee protobuf message
+        :param event_type: the type of game event to search for
+        :return: the first unprocessed event of the given type, or None if not found
+        """
+        return next(
             (
-                event.possible_goal
+                event
                 for event in referee.game_events
-                if event.type == GameEvent.Type.POSSIBLE_GOAL
-                and event.id not in self.processed_event_ids
+                if event.type == event_type and event.id not in self.processed_event_ids
             ),
             None,
         )
 
-        placement_failed = next(
-            (
-                event.placement_failed
-                for event in referee.game_events
-                if event.type == GameEvent.Type.PLACEMENT_FAILED
-                and event.id not in self.processed_event_ids
-            ),
-            None,
+    def __handle_possible_goal(self, scoring_team: SslTeam) -> None:
+        """Handle a possible goal event by approving the goal and starting ball placement.
+
+        :param scoring_team: the team that scored the goal
+        """
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        api_input = Input()
+        change = Change()
+        game_event = GameEvent(
+            type=GameEvent.Type.GOAL,
+            origin=["Majority"],
+            goal=GameEvent.Goal(by_team=scoring_team),
+        )
+        change.add_game_event_change.game_event.CopyFrom(game_event)
+        api_input.change.CopyFrom(change)
+        ci_input.api_inputs.append(api_input)
+        self.send_ci_input(ci_input)
+        self.send_gc_command(
+            gc_command=Command.Type.BALL_PLACEMENT,
+            team=scoring_team,
+            final_ball_placement_point=tbots_cpp.Point(0, 0),
         )
 
-        for event in referee.game_events:
-            self.processed_event_ids.add(event.id)
-
-        if possible_goal is not None:
-            print("goal scored")
-            scoring_team = possible_goal.by_team
-
-            ci_input = CiInput(timestamp=int(time.time_ns()))
-            api_input = Input()
-            change = Change()
-
-            add_game_event = Change.AddGameEvent()
-            game_event = GameEvent(
-                type=GameEvent.Type.GOAL,
-                origin=[
-                    "Majority"
-                ],  # Required or else ssl gamecontroller will convert game event to proposal
-                goal=GameEvent.Goal(by_team=scoring_team),
-            )
-            add_game_event.game_event.CopyFrom(game_event)
-            change.add_game_event_change.CopyFrom(add_game_event)
-
-            api_input.change.CopyFrom(change)
-            ci_input.api_inputs.append(api_input)
-
-            # Send game event where team actually scores goal
-            self.send_ci_input(ci_input)
-
-            # Then, start ball placement since robots are halted after possible goal
-            self.send_gc_command(
-                gc_command=Command.Type.BALL_PLACEMENT,
-                team=scoring_team,
-                final_ball_placement_point=tbots_cpp.Point(0, 0),
-            )
-
-        if placement_failed is not None:
-            world_state = WorldState()
-            world_state.ball_state.global_position.CopyFrom(
-                self.latest_world.game_state.ball_placement_point
-            )
-            self.simulator_proto_unix_io.send_proto(WorldState, world_state)
+    def __handle_placement_failed(self) -> None:
+        """Handle a placement failed event by moving the ball to the placement point."""
+        world_state = WorldState()
+        world_state.ball_state.global_position.CopyFrom(
+            self.latest_world.game_state.ball_placement_point
+        )
+        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
     def is_valid_port(self, port):
         """Determine whether or not a given port is valid
