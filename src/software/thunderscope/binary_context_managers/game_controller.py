@@ -218,6 +218,9 @@ class Gamecontroller:
             block=False, return_cached=True
         )
 
+        # TODO (#3633): only call when using record stats
+        self.__automate_stage_change(referee)
+
         max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
         max_allowed_bots_blue: int = referee.blue.max_allowed_bots
         # Ignore if nothing needs to be updated
