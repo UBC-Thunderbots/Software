@@ -68,7 +68,7 @@ class Gamecontroller:
         self.latest_world = None
         self.blue_removed_robot_ids = queue.Queue()
         self.yellow_removed_robot_ids = queue.Queue()
-        self.processed_events = set()
+        self.processed_event_ids = set()
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -239,19 +239,22 @@ class Gamecontroller:
         self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
     def __automate_referee(self, referee: Referee):
-        possible_goal = False
+        possible_goal = next(
+            (
+                event.possible_goal
+                for event in referee.game_events
+                if event.type == GameEvent.Type.POSSIBLE_GOAL
+                and event.id not in self.processed_event_ids
+            ),
+            None,
+        )
 
-        for game_event in referee.game_events:
-            if (
-                game_event.type == GameEvent.Type.POSSIBLE_GOAL
-                and game_event.id not in self.processed_events
-            ):
-                possible_goal = True
-                self.processed_events.add(game_event.id)
+        for event in referee.game_events:
+            self.processed_event_ids.add(event.id)
 
-        if possible_goal:
+        if possible_goal is not None:
             print("goal scored")
-            scoring_team = game_event.possible_goal.by_team
+            scoring_team = possible_goal.by_team
 
             ci_input = CiInput(timestamp=int(time.time_ns()))
             api_input = Input()
