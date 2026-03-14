@@ -52,6 +52,7 @@ class TigersAutoref(TimeProvider):
         buffer_size: int = 5,
         suppress_logs: bool = True,
         show_gui: bool = False,
+        record_stats: bool = False,
     ) -> None:
         """Constructor
 
@@ -62,6 +63,7 @@ class TigersAutoref(TimeProvider):
         :param buffer_size:     buffer size for the SSL wrapper and referee packets
         :param suppress_logs:   true silences logs from the Autoref binary, otherwise shows them (its very verbose)
         :param show_gui:        true shows the Tigers' autoref GUI, false runs it in headless mode
+        :param record_stats:    true if stats recording mode is enabled
         """
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
@@ -74,6 +76,7 @@ class TigersAutoref(TimeProvider):
         self.suppress_logs = suppress_logs
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
+        self.record_stats = record_stats
 
         self.current_timestamp = int(time.time_ns())
         self.timestamp_mutex = threading.Lock()
@@ -236,7 +239,7 @@ class TigersAutoref(TimeProvider):
         if not self.show_gui:
             autoref_cmd += " -hl"
 
-        if self.ci_mode:
+        if self.ci_mode or self.record_stats:
             autoref_cmd += " --ci"
 
         if self.suppress_logs:

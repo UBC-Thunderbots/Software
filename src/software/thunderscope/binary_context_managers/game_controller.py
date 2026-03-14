@@ -37,6 +37,7 @@ class Gamecontroller:
         self,
         suppress_logs: bool = False,
         use_conventional_port: bool = False,
+        record_stats: bool = False
     ) -> None:
         """Run Gamecontroller
 
@@ -44,6 +45,7 @@ class Gamecontroller:
         :param use_conventional_port: whether or not to use the conventional port!
         """
         self.suppress_logs = suppress_logs
+        self.record_stats = record_stats
 
         # We default to using a non-conventional port to avoid emitting
         # on the same port as what other teams may be listening on.
@@ -68,6 +70,7 @@ class Gamecontroller:
         self.latest_world = None
         self.blue_removed_robot_ids = queue.Queue()
         self.yellow_removed_robot_ids = queue.Queue()
+        self._max_robots_per_team = 6  # Tracks current max sent to SSL GC (for record_stats red card compensation)
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -192,8 +195,17 @@ class Gamecontroller:
             block=False, return_cached=True
         )
 
-        max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
-        max_allowed_bots_blue: int = referee.blue.max_allowed_bots
+        max_allowed_bots_yellow: int = 6 if self.record_stats else referee.yellow.max_allowed_bots
+        max_allowed_bots_blue: int = 6 if self.record_stats else referee.blue.max_allowed_bots
+
+        if self.record_stats:
+            # The SSL GC computes effective_max = max_robots_per_team - red_cards.
+            # Compensate so the GC's effective limit stays at 6 and it doesn't force halt.
+            max_red_cards = max(referee.blue.red_cards, referee.yellow.red_cards)
+            needed = 6 + max_red_cards
+            if needed != self._max_robots_per_team:
+                self._send_max_robots_update(needed)
+                self._max_robots_per_team = needed
         # Ignore if nothing needs to be updated
         if (
             len(self.latest_world.friendly_team.team_robots) == max_allowed_bots_blue
@@ -315,6 +327,20 @@ class Gamecontroller:
             World, self.blue_team_world_buffer
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
+
+    def _send_max_robots_update(self, max_robots: int) -> None:
+        """Send UpdateConfig to the SSL GC to set max_robots_per_team.
+        Used in record_stats mode to compensate for red cards so the GC doesn't force halt.
+
+        :param max_robots: the new max_robots_per_team value to send
+        """
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        update_config = Change.UpdateConfig()
+        update_config.max_robots_per_team.value = max_robots
+        api_input = Input()
+        api_input.change.update_config_change.CopyFrom(update_config)
+        ci_input.api_inputs.append(api_input)
+        self.send_ci_input(ci_input)
 
     def send_gc_command(
         self,
