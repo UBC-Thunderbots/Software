@@ -40,7 +40,7 @@ logger = create_logger(__name__)
 #         ball_location=tbots_cpp.Point(1, 1),
 #         ball_velocity=tbots_cpp.Point(0, 0),
 #     )
-#     simulated_test_runner.set_worldState(initial_worldstate)
+#     simulated_test_runner.set_world_state(initial_worldstate)
 #
 #     # Setup Tactic
 #     params = AssignedTacticPlayControlParams()
