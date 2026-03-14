@@ -9,6 +9,7 @@ class ActionArgument(str, Enum):
     build = "build"
     test = "test"
     run = "run"
+    flash = "flash"
 
 
 class DebugBinary(str, Enum):
@@ -17,14 +18,9 @@ class DebugBinary(str, Enum):
     yellow = "yellow"
 
 
-class Platform(str, Enum):
-    PI = "PI"
-    NANO = "NANO"
-    LIMITED = "LIMITED"
-
-
 PrintCommandOption: type[bool] = Annotated[
-    bool, Option("-p", "--print_command", help="Print the generated Bazel command")
+    bool, Option("-p", "--print_command",
+                 help="Print the generated Bazel command")
 ]
 
 NoOptimizedBuildOption: type[bool] = Annotated[
@@ -79,15 +75,17 @@ InteractiveModeOption = Annotated[
 ]
 
 TracyOption = Annotated[
-    bool, Option("--tracy", help="Run the binary with the TRACY_ENABLE macro defined")
+    bool, Option(
+        "--tracy", help="Run the binary with the TRACY_ENABLE macro defined")
 ]
 
-PlatformOption = Annotated[
-    Platform, Option("-pl", "--platform", help="The platform to build Thunderloop for")
-]
-
-EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]
+EnableThunderscopeOption = Annotated[bool,
+                                     Option("-t", "--enable_thunderscope")]
 EnableVisualizerOption = Annotated[bool, Option("-v", "--enable_visualizer")]
 StopAIOnStartOption = Annotated[bool, Option("-t", "--stop_ai_on_start")]
 
 JobsOption = Annotated[str, Option("-j", "--jobs")]
+RobotName = Annotated[str, Option(
+    "-rn", "--robot_name", help="Name of robot. E.g. balle")]
+AnsiblePlaybook = Annotated[str, Option(
+    "-ap", "--ansible_playbook", help="Ansible playbook name")]

@@ -18,13 +18,13 @@ from cli.cli_params import (
     SSHPasswordOption,
     InteractiveModeOption,
     TracyOption,
-    PlatformOption,
     EnableThunderscopeOption,
     EnableVisualizerOption,
     StopAIOnStartOption,
     DebugBinary,
-    Platform,
     JobsOption,
+    RobotName,
+    AnsiblePlaybook
 )
 
 # thefuzz is a fuzzy string matcher in python
@@ -40,7 +40,8 @@ app = Typer()
 
 
 @app.command(
-    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+    context_settings={"allow_extra_args": True,
+                      "ignore_unknown_options": True},
     no_args_is_help=True,
 )
 def main(
@@ -55,22 +56,24 @@ def main(
     ssh_password: SSHPasswordOption = None,
     interactive_search: InteractiveModeOption = False,
     tracy: TracyOption = False,
-    platform: PlatformOption = None,
     enable_thunderscope: EnableThunderscopeOption = False,
     enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
     jobs_option: JobsOption = None,
+    robot_name: RobotName = None,
+    ansible_playbook: AnsiblePlaybook = None,
 ) -> None:
-    if bool(flash_robots) ^ bool(ssh_password):
-        print(
-            "If you want to flash robots, both the robot IDs and password must be provided"
-        )
-        sys.exit(1)
+    if bool(flash_robots) or bool(ansible_playbook):
+        if not ssh_password:
+            print(
+                "If you want to flash robots or run ansible playbooks, both the robot IDs and password must be provided"
+            )
+            sys.exit(1)
+        isFlashing = True
 
     test_query = ["bazel", "query", "tests(//...)"]
     binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
     library_query = ["bazel", "query", "kind(.*_library,//...)"]
-
     bazel_queries = {
         "test": [test_query],
         "run": [test_query, binary_query],
@@ -113,6 +116,7 @@ def main(
         print("User selected {}".format(target))
 
     command = ["bazel", action.value, target]
+    command += ["--platforms=//toolchains/cc:robot"]
     unknown_args = ctx.args
 
     # Trigger a debug build
@@ -123,10 +127,6 @@ def main(
     # compiled with optimizations for best performance
     if not debug_build and (not no_optimized_build or flash_robots):
         command += ["--copt=-O3"]
-
-    # Used for when flashing Jetsons
-    if flash_robots:
-        command += ["--platforms=//toolchains/cc:robot"]
 
     # Select debug binaries to run
     if select_debug_binaries:
@@ -140,9 +140,6 @@ def main(
     # To run the Tracy profile, enable the TRACY_ENABLE macro
     if tracy:
         command += ["--cxxopt=-DTRACY_ENABLE"]
-
-    if platform:
-        command += ["--//software/embedded:host_platform=" + platform.value]
 
     # limit number of jobs
     if jobs_option:
@@ -161,14 +158,26 @@ def main(
         bazel_arguments += ["--enable_visualizer"]
     if enable_thunderscope:
         bazel_arguments += ["--enable_thunderscope"]
+
+    if ansible_playbook:
+        print(robot_name)
+        print(ssh_password)
+        print(ansible_playbook)
+        if not robot_name or not ssh_password:
+            print("please provided robot name and ssh password")
+            sys.exit(1)
+        bazel_arguments += ["--playbook", ansible_playbook]
+        bazel_arguments += ["--hosts", f"robot@{robot_name}.local"]
+        bazel_arguments += ["-pwd", ssh_password]
+
     if flash_robots:
         if not platform:
             print("No platform specified! Make sure to set the --platform argument.")
             sys.exit(1)
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        platform_ip = "0" if platform == Platform.NANO else "6"
-        bazel_arguments += [f"192.168.{platform_ip}.20{id}" for id in flash_robots]
+        bazel_arguments += [f"192.168.6.20{
+            id}" for id in flash_robots]
         bazel_arguments += ["-pwd", ssh_password]
 
     if action == ActionArgument.test:
@@ -196,6 +205,7 @@ def main(
     else:
         print(" ".join(command))
         code = os.system(" ".join(command))
+        print(command)
         # propagate exit code
         sys.exit(1 if code != 0 else 0)
 
