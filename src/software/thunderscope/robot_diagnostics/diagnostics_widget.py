@@ -1,17 +1,17 @@
-from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
-from proto.import_all_protos import *
+from pyqtgraph.Qt.QtWidgets import *
 
+from proto.import_all_protos import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import (
-    ChickerWidget,
     ChickerCommandMode,
-)
-from software.thunderscope.robot_diagnostics.handheld_controller_widget import (
-    HandheldControllerWidget,
+    ChickerWidget,
 )
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
+)
+from software.thunderscope.robot_diagnostics.handheld_controller_widget import (
+    HandheldControllerWidget,
 )
 
 

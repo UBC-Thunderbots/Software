@@ -1,17 +1,17 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.robot_enters_region import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_moves_from_rest import *
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
+from proto.play_pb2 import Play, PlayName
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.ball_moves_from_rest import *
+from software.simulated_tests.or_validation import OrValidation
+from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from software.simulated_tests.or_validation import OrValidation
 
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])

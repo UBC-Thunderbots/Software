@@ -1,12 +1,14 @@
-from proto.import_all_protos import *
-from software.embedded.robot_diagnostics_cli.embedded_data import EmbeddedData
-from google.protobuf.message import Message
-from software.embedded.constants.py_constants import get_estop_config, EstopMode
-from rich.progress import track
-from threading import Thread
-import software.python_bindings as tbots_cpp
-from software.py_constants import *
 import time
+from threading import Thread
+
+from google.protobuf.message import Message
+from rich.progress import track
+
+import software.python_bindings as tbots_cpp
+from proto.import_all_protos import *
+from software.embedded.constants.py_constants import EstopMode, get_estop_config
+from software.embedded.robot_diagnostics_cli.embedded_data import EmbeddedData
+from software.py_constants import *
 
 
 class EmbeddedCommunication:

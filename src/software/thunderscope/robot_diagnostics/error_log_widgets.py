@@ -1,14 +1,16 @@
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt.QtCore import Qt
-from pyqtgraph.Qt import QtGui
-from proto.import_all_protos import *
-from datetime import datetime
 import textwrap
-import software.thunderscope.robot_diagnostics.robot_error_log_icons.error_log_constants as error_constants
-from proto.robot_log_msg_pb2 import RobotLog
-from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
-from software.thunderscope.constants import LOG_LEVEL_STR_MAP
+from datetime import datetime
 from typing import override
+
+from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt.QtWidgets import *
+
+import software.thunderscope.robot_diagnostics.robot_error_log_icons.error_log_constants as error_constants
+from proto.import_all_protos import *
+from proto.robot_log_msg_pb2 import RobotLog
+from software.thunderscope.constants import LOG_LEVEL_STR_MAP
+from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 
 
 class RobotLogMessageWidget(QFrame):

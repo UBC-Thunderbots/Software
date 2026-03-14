@@ -1,10 +1,10 @@
 import pytest
-import software.python_bindings as tbots_cpp
-from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
-from proto.ssl_gc_common_pb2 import Team as SslTeam
 from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 from software.simulated_tests.ball_enters_region import (
     BallAlwaysStaysInRegion,
     BallEventuallyEntersRegion,

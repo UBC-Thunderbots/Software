@@ -1,7 +1,8 @@
+from abc import abstractmethod
+
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from abc import abstractmethod
 
 logger = create_logger(__name__)
 

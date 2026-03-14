@@ -1,17 +1,15 @@
+from typing import override
+
 from pyqtgraph.opengl import *
 
 from proto.visualization_pb2 import ObstacleList
-
 from software.thunderscope.constants import Colors, DepthValues
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.graphics.gl_stadium import GLStadium
-
-
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLObstacleLayer(GLLayer):

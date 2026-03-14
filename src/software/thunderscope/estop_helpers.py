@@ -1,5 +1,6 @@
 import os
-from software.thunderscope.constants import EstopMode, ESTOP_PATH_1, ESTOP_PATH_2
+
+from software.thunderscope.constants import ESTOP_PATH_1, ESTOP_PATH_2, EstopMode
 
 
 def get_estop_config(

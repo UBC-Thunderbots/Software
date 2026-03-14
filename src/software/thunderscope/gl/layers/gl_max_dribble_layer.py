@@ -1,16 +1,16 @@
-from pyqtgraph.opengl import *
+from typing import override
 
-from software.thunderscope.constants import DepthValues
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_circle import GLCircle
-from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from pyqtgraph.opengl import *
+from pyqtgraph.Qt import QtGui
+
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
-
-from pyqtgraph.Qt import QtGui
+from software.thunderscope.constants import DepthValues
+from software.thunderscope.gl.graphics.gl_circle import GLCircle
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.util import *
-from typing import override
 
 
 class GLMaxDribbleLayer(GLLayer):

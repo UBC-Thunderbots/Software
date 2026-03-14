@@ -1,8 +1,8 @@
-from proto.play_info_msg_pb2 import PlayInfo
 from pyqtgraph.Qt.QtWidgets import *
-from proto.import_all_protos import *
-from software.thunderscope.common.common_widgets import set_table_data
 
+from proto.import_all_protos import *
+from proto.play_info_msg_pb2 import PlayInfo
+from software.thunderscope.common.common_widgets import set_table_data
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 

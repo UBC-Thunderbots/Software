@@ -1,14 +1,14 @@
 import time
-
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt import QtCore, QtGui
 from functools import partial
+from typing import override
 
+from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt.QtWidgets import *
+
+from software.py_constants import *
+from software.thunderscope.common import common_widgets
 from software.thunderscope.replay.bookmark_marker import BookmarkMarker
 from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.common import common_widgets
-from software.py_constants import *
-from typing import override
 
 
 class ReplayControls(QWidget):

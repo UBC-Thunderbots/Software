@@ -1,6 +1,7 @@
-from typer import Option, Argument
 from enum import Enum
 from typing import Annotated
+
+from typer import Argument, Option
 
 from cli.multi_option import MultiOption
 

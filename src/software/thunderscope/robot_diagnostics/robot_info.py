@@ -1,15 +1,18 @@
 from __future__ import annotations
+
+import time as time
+from collections import deque
+from typing import Type, override
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
-from software.py_constants import *
-from proto.import_all_protos import *
+
 import software.thunderscope.common.common_widgets as common_widgets
+from proto.import_all_protos import *
+from software.py_constants import *
 from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
-import time as time
-from typing import Type, override
-from collections import deque
 
 
 class BreakbeamLabel(QLabel):

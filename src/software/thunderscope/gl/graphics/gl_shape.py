@@ -1,10 +1,11 @@
-from pyqtgraph.Qt import QtGui
+from typing import Optional
+
 from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
 
-from software.thunderscope.constants import Colors, LINE_WIDTH
+from software.thunderscope.constants import LINE_WIDTH, Colors
 from software.thunderscope.gl.graphics.gl_graphic import GLGraphic
-from typing import Optional
 
 
 class GLShape(GLGraphic):

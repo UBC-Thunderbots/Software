@@ -1,21 +1,19 @@
 from __future__ import annotations
 
-from pyqtgraph.opengl import *
-import pyqtgraph as pg
-
 import time
-import numpy as np
-
-from proto.world_pb2 import World
-from proto.visualization_pb2 import CostVisualization
-
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_heatmap import GLHeatmap
-from software.thunderscope.gl.graphics.gl_gradient_legend import GLGradientLegend
-
-from software.thunderscope.constants import DepthValues
 from typing import override
+
+import numpy as np
+import pyqtgraph as pg
+from pyqtgraph.opengl import *
+
+from proto.visualization_pb2 import CostVisualization
+from proto.world_pb2 import World
+from software.thunderscope.constants import DepthValues
+from software.thunderscope.gl.graphics.gl_gradient_legend import GLGradientLegend
+from software.thunderscope.gl.graphics.gl_heatmap import GLHeatmap
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLCostVisOverlayLayer(GLLayer):

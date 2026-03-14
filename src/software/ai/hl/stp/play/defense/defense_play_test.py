@@ -1,13 +1,13 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
+from proto.message_translation.tbots_protobuf import create_world_state
 from proto.play_pb2 import Play, PlayName
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )

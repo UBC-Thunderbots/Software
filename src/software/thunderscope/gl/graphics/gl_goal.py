@@ -1,13 +1,12 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.py_constants import ROBOT_MAX_HEIGHT_METERS
-from software.thunderscope.constants import Colors, LINE_WIDTH
-
 from typing import Optional
 
 import numpy as np
+from pyqtgraph.opengl import *
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
+
+from software.py_constants import ROBOT_MAX_HEIGHT_METERS
+from software.thunderscope.constants import LINE_WIDTH, Colors
 
 
 class GLGoal(GLMeshItem):

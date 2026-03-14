@@ -1,8 +1,10 @@
-import requests
-from pathlib import Path
-import tarfile
-import shutil
 import platform
+import shutil
+import tarfile
+from pathlib import Path
+
+import requests
+
 from software.thunderscope.constants import RuntimeManagerConstants
 
 

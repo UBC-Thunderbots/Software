@@ -1,7 +1,8 @@
+import math
+
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import SPEED_SEGMENT_SCALE
-import math
 
 """Helper functions for robot_speed_threshold and ball_speed_threshold"""
 

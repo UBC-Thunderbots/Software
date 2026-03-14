@@ -1,7 +1,7 @@
+from typing import Callable, Optional, override
+
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from pyqtgraph.Qt import QtCore, QtGui
-
-from typing import Optional, Callable, override
 
 
 class GLPainter(GLGraphicsItem):

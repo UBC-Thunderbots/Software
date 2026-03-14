@@ -1,26 +1,25 @@
-import threading
-import queue
 import argparse
-import time
-import sys
 import os
+import queue
+import sys
+import threading
+import time
+from typing import override
 
 import pytest
-from proto.import_all_protos import *
 
+from proto.import_all_protos import *
+from software.logger.logger import create_logger
+from software.py_constants import MILLISECONDS_PER_SECOND
 from software.simulated_tests import validation
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.thunderscope_config import configure_simulated_test_view
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
-from software.logger.logger import create_logger
-from typing import override
+from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.thunderscope_config import configure_simulated_test_view
 
 logger = create_logger(__name__)
 

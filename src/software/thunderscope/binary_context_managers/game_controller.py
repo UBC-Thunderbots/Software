@@ -1,25 +1,25 @@
 from __future__ import annotations
 
-import queue
-import random
 import logging
 import os
+import queue
+import random
 import time
 from subprocess import Popen
 from typing import Any
 
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import *
-import software.python_bindings as tbots_cpp
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.python_bindings import *
 from software.py_constants import *
+from software.python_bindings import *
 from software.thunderscope.binary_context_managers.util import *
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.util import is_current_platform_macos
 
 logger = logging.getLogger(__name__)

@@ -7,13 +7,11 @@ try:
 except ImportError:
     pass
 
-from proto.import_all_protos import *
-from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore
-
+from pyqtgraph.Qt.QtWidgets import *
 
 import software.python_bindings as tbots_cpp
-
+from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.robot_diagnostics.handheld_controller import (

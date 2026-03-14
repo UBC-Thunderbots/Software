@@ -1,8 +1,10 @@
 import time
-from PyQt6.QtWidgets import *
+
 import PyQt6.QtCore
-from software.thunderscope.common.frametime_counter import FrameTimeCounter
+from PyQt6.QtWidgets import *
+
 from software.py_constants import MILLISECONDS_PER_SECOND
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 
 class FPSWidget(QWidget):

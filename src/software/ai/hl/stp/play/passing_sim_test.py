@@ -1,21 +1,23 @@
-import pytest
 import math
+
+import pytest
+
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
-from software.simulated_tests.simulated_test_fixture import (
-    pytest_main,
-)
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.friendly_receives_ball_slow import (
-    FriendlyAlwaysReceivesBallSlow,
+from software.simulated_tests.ball_enters_region import (
+    BallEventuallyEntersRegion,
+    BallEventuallyExitsRegion,
 )
+from software.simulated_tests.ball_moves_in_direction import BallMovesForwardInRegions
 from software.simulated_tests.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
-from software.simulated_tests.ball_moves_in_direction import BallMovesForwardInRegions
-from software.simulated_tests.ball_enters_region import (
-    BallEventuallyExitsRegion,
-    BallEventuallyEntersRegion,
+from software.simulated_tests.friendly_receives_ball_slow import (
+    FriendlyAlwaysReceivesBallSlow,
+)
+from software.simulated_tests.simulated_test_fixture import (
+    pytest_main,
 )
 
 

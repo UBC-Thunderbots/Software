@@ -1,33 +1,30 @@
 import time
+from typing import Optional, override
 
+import numpy as np
 import pyqtgraph as pg
+from pyqtgraph.opengl import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.opengl import *
 
-import numpy as np
-from typing import Optional
+from proto.replay_bookmark_pb2 import ReplayBookmark
+from proto.tbots_timestamp_msg_pb2 import Timestamp
+from proto.world_pb2 import SimulationState
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
-
+from software.thunderscope.common.toast_msg_helper import success_toast
 from software.thunderscope.constants import *
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
-from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.replay.replay_controls import ReplayControls
-from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.replay.proto_player import ProtoPlayer
+from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from proto.world_pb2 import SimulationState
-from proto.replay_bookmark_pb2 import ReplayBookmark
-from proto.tbots_timestamp_msg_pb2 import Timestamp
-
-from software.thunderscope.common.toast_msg_helper import success_toast
-from typing import override
 
 
 class GLWidget(QWidget):

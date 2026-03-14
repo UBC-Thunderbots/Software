@@ -1,10 +1,10 @@
 from pyqtgraph.Qt.QtWidgets import (
-    QDialog,
-    QWidget,
-    QPushButton,
-    QListWidget,
     QAbstractItemView,
+    QDialog,
+    QListWidget,
+    QPushButton,
     QVBoxLayout,
+    QWidget,
 )
 
 from software.thunderscope.binary_context_managers.runtime_manager import (

@@ -7,6 +7,7 @@ from threading import Thread
 from typing import Generic, TypeVar
 
 from google.protobuf.message import EncodeError, Message
+
 from software.py_constants import UNIX_BUFFER_SIZE
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 

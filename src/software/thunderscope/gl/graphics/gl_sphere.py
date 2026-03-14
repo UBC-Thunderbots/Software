@@ -1,8 +1,8 @@
-from pyqtgraph.Qt import QtGui
+from typing import Optional
+
 from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from typing import Optional
+from pyqtgraph.Qt import QtGui
 
 from software.thunderscope.constants import Colors
 

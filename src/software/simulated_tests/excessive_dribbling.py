@@ -1,12 +1,12 @@
-import software.python_bindings as tbots_cpp
-from proto.import_all_protos import ValidationStatus, ValidationGeometry
+from typing import override
 
+import software.python_bindings as tbots_cpp
+from proto.import_all_protos import ValidationGeometry, ValidationStatus
 from software.simulated_tests.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
 )
-from typing import override
 
 
 class ExcessivelyDribbling(Validation):

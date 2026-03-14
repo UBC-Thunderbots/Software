@@ -1,15 +1,14 @@
 import math
 
-
 import software.python_bindings as tbots_cpp
+from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
+from proto.message_translation.tbots_protobuf import create_world_state
 from proto.play_pb2 import Play, PlayName
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team as SslTeam
-from proto.geometry_pb2 import Point, Vector, Angle, AngularVelocity
 
 
 def test_shoot_or_chip_play(simulated_test_runner):

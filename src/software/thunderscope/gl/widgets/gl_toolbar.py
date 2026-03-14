@@ -1,4 +1,5 @@
 import textwrap
+
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 

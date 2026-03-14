@@ -3,20 +3,21 @@ We are going to examine the index-building and index-loading functions.
 Those functions are first introduced to optimize the response time of the progress bar in the replay mode.
 """
 
-from typing import Callable
-import math
-import shutil
 import gzip
+import math
 import os
-from google.protobuf.message import Message
-from software.py_constants import *
+import shutil
+from typing import Callable
 
-from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+from google.protobuf.message import Message
+
+from software.py_constants import *
 from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.test.replay_corruption_test import (
-    create_valid_log_entry,
     create_random_proto,
+    create_valid_log_entry,
 )
 
 # location to store the generated files
