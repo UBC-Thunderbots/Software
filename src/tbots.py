@@ -98,7 +98,7 @@ def main(
     else:
         target = fuzzy_find_target(action, search_query, interactive_search)
 
-    command = ["bazel", action.value, target]
+    command = ["bazel", action.value]
     unknown_args = ctx.args
 
     # Trigger a debug build
@@ -137,6 +137,7 @@ def main(
     # Don't cache test results
     if action == ActionArgument.test:
         command += ["--cache_test_results=false"]
+    command += [target]
     if action == ActionArgument.run:
         command += ["--"]
 
