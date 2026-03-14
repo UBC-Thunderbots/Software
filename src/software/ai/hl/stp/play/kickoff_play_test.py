@@ -58,10 +58,14 @@ def test_blue_kickoff_chip(simulated_test_runner, is_friendly_test):
     )
 
     blue_play = Play()
-    blue_play.name = PlayName.KickoffFriendlyPlay if is_friendly_test else PlayName.KickoffEnemyPlay
+    blue_play.name = (
+        PlayName.KickoffFriendlyPlay if is_friendly_test else PlayName.KickoffEnemyPlay
+    )
 
     yellow_play = Play()
-    yellow_play.name = PlayName.KickoffEnemyPlay if is_friendly_test else PlayName.KickoffFriendlyPlay
+    yellow_play.name = (
+        PlayName.KickoffEnemyPlay if is_friendly_test else PlayName.KickoffFriendlyPlay
+    )
 
     simulated_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.KICKOFF, team=Team.BLUE
@@ -120,10 +124,15 @@ def test_blue_kickoff_chip(simulated_test_runner, is_friendly_test):
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validations_sequence_set,
         inv_always_validation_sequence_set=always_validations_sequence_set,
-        ci_cmd_with_delay=[(4, Command.Type.NORMAL_START, Team.BLUE if is_friendly_test else Team.YELLOW)],
+        ci_cmd_with_delay=[
+            (
+                4,
+                Command.Type.NORMAL_START,
+                Team.BLUE if is_friendly_test else Team.YELLOW,
+            )
+        ],
         test_timeout_s=10,
     )
-
 
 
 if __name__ == "__main__":
