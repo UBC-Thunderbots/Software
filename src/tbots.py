@@ -157,7 +157,7 @@ def main(
             print("please provided robot name and ssh password")
             sys.exit(1)
         bazel_arguments += ["--playbook", ansible_playbook]
-        bazel_arguments += ["--hosts", f"robot@{robot_name}.local"]
+        bazel_arguments += ["--hosts", f"{robot_name}.local"]
         bazel_arguments += ["-pwd", ssh_password]
 
     if flash_robots:
