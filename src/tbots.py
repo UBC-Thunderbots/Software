@@ -7,7 +7,7 @@ import iterfzf
 import itertools
 from subprocess import PIPE, run
 from thefuzz import process
-from typer import Typer, Context
+from typer import Typer, Context, Argument, prompt
 from cli.cli_params import (
     ActionArgument,
     PrintCommandOption,
@@ -24,7 +24,8 @@ from cli.cli_params import (
     DebugBinary,
     JobsOption,
     RobotName,
-    AnsiblePlaybook
+    AnsiblePlaybook,
+    InteractiveCLI,
 )
 
 # thefuzz is a fuzzy string matcher in python
@@ -46,8 +47,8 @@ app = Typer()
 )
 def main(
     ctx: Context,
-    action: ActionArgument,
-    search_query: str,
+    action: ActionArgument = Argument(None),
+    search_query: str = Argument(None),
     print_command: PrintCommandOption = False,
     no_optimized_build: NoOptimizedBuildOption = False,
     debug_build: DebugBuildOption = False,
@@ -62,7 +63,15 @@ def main(
     jobs_option: JobsOption = None,
     robot_name: RobotName = None,
     ansible_playbook: AnsiblePlaybook = None,
+    interactive_cli: InteractiveCLI = False,
 ) -> None:
+    if interactive_cli:
+        start_interactive_cli()
+        return
+    if action is None or search_query is None:
+        print(
+            "Error: 'action' and 'search_query' are required unless using --interactive-cli")
+        sys.exit(1)
     if bool(flash_robots) or bool(ansible_playbook):
         if not ssh_password:
             print(
@@ -171,9 +180,6 @@ def main(
         bazel_arguments += ["-pwd", ssh_password]
 
     if flash_robots:
-        if not platform:
-            print("No platform specified! Make sure to set the --platform argument.")
-            sys.exit(1)
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
         bazel_arguments += [f"192.168.6.20{
@@ -208,6 +214,52 @@ def main(
         print(command)
         # propagate exit code
         sys.exit(1 if code != 0 else 0)
+
+
+def start_interactive_cli():
+    goal = prompt(
+        "Please choose a number: 1. test  2. flash  3. run thunderscope ")
+    # Use sys.executable to ensure we use the same python interpreter
+    command = [sys.executable, sys.argv[0]]
+
+    match goal:
+        case '1':
+            test = prompt("Please enter a test name")
+            command.extend(["test", test])
+        case '2':
+            playbook = prompt(
+                "Please enter ansible playbook name (e.g. setup_pi.yml)")
+            robot = prompt("Please enter robot name (e.g. Balle)")
+            password = prompt("Please enter ssh password", hide_input=True)
+            # Match the argument flags defined in your cli_params
+            command.extend(["run", "ansible", "-ap", playbook,
+                           "-rn", robot, "-pwd", password])
+        case '3':
+            print("How would you like to launch thunderscope?")
+            command.extend(["run", "thunderscope"])
+            launch_option = prompt("1. Simulator  2. diagnostics")
+            match launch_option:
+                case '1':
+                    autoref = prompt("Enable autoref? [y/N]").lower() == 'y'
+                    ci_mode = prompt("Enable ci_mode? [y/N]").lower() == 'y'
+                    if autoref:
+                        command.append('--enable_autoref')
+                    if ci_mode:
+                        command.append('--ci_mode')
+                case '2':
+                    interface = prompt("What is your network interface?")
+                    command.extend(
+                        ['--run_diagnostics', '--interface', interface])
+                case _:
+                    print("Invalid option! Restarting...")
+                    return start_interactive_cli()
+        case _:
+            print("Invalid option!")
+            return start_interactive_cli()
+
+    print(f"Executing: {' '.join(command)}")
+    code = os.system(" ".join(command))
+    sys.exit(1 if code != 0 else 0)
 
 
 if __name__ == "__main__":

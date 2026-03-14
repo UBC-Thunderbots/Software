@@ -9,7 +9,6 @@ class ActionArgument(str, Enum):
     build = "build"
     test = "test"
     run = "run"
-    flash = "flash"
 
 
 class DebugBinary(str, Enum):
@@ -89,3 +88,5 @@ RobotName = Annotated[str, Option(
     "-rn", "--robot_name", help="Name of robot. E.g. balle")]
 AnsiblePlaybook = Annotated[str, Option(
     "-ap", "--ansible_playbook", help="Ansible playbook name")]
+InteractiveCLI = Annotated[bool, Option(
+    '-in', '--interactive_cli', help='enable interactive cli')]
