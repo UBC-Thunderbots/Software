@@ -18,16 +18,12 @@ from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.thunderscope_config import configure_simulated_test_view
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.constants import SimulatedTestConstants
 
 from software.logger.logger import create_logger
 from typing import override
 
 logger = create_logger(__name__)
-
-LAUNCH_DELAY_S = 0.1
-WORLD_BUFFER_TIMEOUT = 0.5
-PROCESS_BUFFER_DELAY_S = 0.01
-PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
 class SimulatedTestRunner(TbotsTestRunner):
@@ -75,11 +71,11 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         :param args: The args passed in from the hook
         """
-        self.__stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
+        self.__stopper(delay=SimulatedTestConstants.PAUSE_AFTER_FAIL_DELAY_S)
         self.last_exception = args.exc_value
         raise self.last_exception
 
-    def __stopper(self, delay=PROCESS_BUFFER_DELAY_S):
+    def __stopper(self, delay=SimulatedTestConstants.PROCESS_BUFFER_DELAY_S):
         """Stop running the test
 
         :param delay: How long to wait before closing everything, defaults
@@ -106,7 +102,7 @@ class SimulatedTestRunner(TbotsTestRunner):
 
             try:
                 world_state_received_buffer.get(
-                    block=True, timeout=WORLD_BUFFER_TIMEOUT
+                    block=True, timeout=SimulatedTestConstants.WORLD_BUFFER_TIMEOUT
                 )
             except queue.Empty:
                 # Did not receive a response within timeout period
@@ -166,7 +162,9 @@ class SimulatedTestRunner(TbotsTestRunner):
             while True:
                 try:
                     world = self.world_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                        block=True,
+                        timeout=SimulatedTestConstants.WORLD_BUFFER_TIMEOUT,
+                        return_cached=False,
                     )
 
                     # We block until the timeout for the new primitives from AI. if not found still,
@@ -174,7 +172,9 @@ class SimulatedTestRunner(TbotsTestRunner):
                     # Otherwise, if the AI misses the first SSL Wrapper packet and doesn't start
                     # the simulated test will continue to tick forward, causes syncing issues with the AI
                     self.primitive_set_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                        block=True,
+                        timeout=SimulatedTestConstants.WORLD_BUFFER_TIMEOUT,
+                        return_cached=False,
                     )
 
                     break
@@ -257,7 +257,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         always_validation_sequence_set,
         eventually_validation_sequence_set,
         test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
         index=0,
         ci_cmd_with_delay=[],
         run_till_end=True,
@@ -268,7 +267,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param always_validation_sequence_set: validation that should always be true
         :param eventually_validation_sequence_set: validation that should eventually be true
         :param test_timeout_s: how long the test should run before timing out
-        :param tick_duration_s: length of a tick
         :param index: index of the current test. default is 0 (invariant test)
                       values can be passed in during aggregate testing for different timeout durations
         :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
@@ -295,7 +293,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                     always_validation_sequence_set,
                     eventually_validation_sequence_set,
                     test_timeout_duration,
-                    tick_duration_s,
+                    SimulatedTestConstants.TICK_DURATION_S,
                     ci_cmd_with_delay,
                     run_till_end,
                 ],
@@ -313,7 +311,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 always_validation_sequence_set,
                 eventually_validation_sequence_set,
                 test_timeout_duration,
-                tick_duration_s,
+                SimulatedTestConstants.TICK_DURATION_S,
                 ci_cmd_with_delay=ci_cmd_with_delay,
                 run_till_end=run_till_end,
             )
@@ -532,25 +530,29 @@ def simulated_test_runner():
     test_name = current_test.split("-")[0]
 
     # Launch all binaries
-    with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}",
-        args.debug_simulator,
-        args.enable_realism,
-    ) as simulator, FullSystem(
-        "software/unix_full_system",
-        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
-        args.debug_blue_full_system,
-        False,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope,
-    ) as blue_fs, FullSystem(
-        "software/unix_full_system",
-        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
-        args.debug_yellow_full_system,
-        True,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope,
-    ) as yellow_fs:
+    with (
+        Simulator(
+            f"{args.simulator_runtime_dir}/test/{test_name}",
+            args.debug_simulator,
+            args.enable_realism,
+        ) as simulator,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+            args.debug_blue_full_system,
+            False,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope,
+        ) as blue_fs,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+            args.debug_yellow_full_system,
+            True,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope,
+        ) as yellow_fs,
+    ):
         with Gamecontroller(
             suppress_logs=(not args.show_gamecontroller_logs)
         ) as gamecontroller:
@@ -580,7 +582,7 @@ def simulated_test_runner():
                     layout_path=args.layout,
                 )
 
-            time.sleep(LAUNCH_DELAY_S)
+            time.sleep(SimulatedTestConstants.LAUNCH_DELAY_S)
 
             runner = None
 

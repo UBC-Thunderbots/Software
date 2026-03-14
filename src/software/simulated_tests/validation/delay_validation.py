@@ -5,29 +5,19 @@ from proto.validation_pb2 import ValidationStatus, ValidationType
 from software.simulated_tests.validation.validation import (
     Validation,
 )
+from software.thunderscope.constants import SimulatedTestConstants
 
 
 class DelayValidation(Validation):
     def __init__(self, delay_s, validation):
         """A validation wrapper that adds a delay to given validation before being evaluated"""
-        # TODO: resolve difference in world proto time (real time) and simulated time
-        tick_duration_s = 0.0166
-
         self.delay_s = delay_s
         self.ticks_so_far = 0
-        self.delay_ticks = int(delay_s / tick_duration_s)
+        self.delay_ticks = int(delay_s / SimulatedTestConstants.TICK_DURATION_S)
         self.validation = validation
-        # self.first_time_check = None
 
     @override
     def get_validation_status(self, world):
-        # if not self.first_time_check:
-        #     self.first_time_check = world.time_sent.epoch_timestamp_seconds
-
-        # if (
-        #     world.time_sent.epoch_timestamp_seconds - self.first_time_check
-        #     > self.delay_s
-        # ):
         self.ticks_so_far += 1
         if self.ticks_so_far > self.delay_ticks:
             return self.validation.get_validation_status(world)
