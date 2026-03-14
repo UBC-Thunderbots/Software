@@ -185,28 +185,7 @@ class Gamecontroller:
         :param referee: the referee protobuf message
         """
         if referee.stage_time_left < 0:
-            if referee.stage == Referee.Stage.NORMAL_FIRST_HALF:
-                # skip to pre second half
-                new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
-            else:
-                # reset game
-                new_stage = Referee.Stage.NORMAL_FIRST_HALF_PRE
-
-            # reset game state
-            self.simulator_proto_unix_io.send_proto(
-                WorldState, create_default_world_state(num_robots=6)
-            )
-
-            ci_input = CiInput(timestamp=int(time.time_ns()))
-            api_input = Input()
-            change = Change()
-            change.change_stage_change.new_stage = new_stage
-            api_input.change.CopyFrom(change)
-            ci_input.api_inputs.append(api_input)
-
-            self.send_ci_input(ci_input)
-
-            self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
+            self.__handle_game_stage_change(referee.stage)
 
     def handle_referee(self, referee: Referee) -> None:
         """Updates the world state based on the referee message
@@ -267,6 +246,30 @@ class Gamecontroller:
 
         # Send out updated world state
         self.simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+    def __handle_game_stage_change(self, game_stage: Referee.Stage):
+        if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
+            # skip to pre second half
+            new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
+        else:
+            # reset game
+            new_stage = Referee.Stage.NORMAL_FIRST_HALF_PRE
+
+        # reset game state
+        self.simulator_proto_unix_io.send_proto(
+            WorldState, create_default_world_state(num_robots=6)
+        )
+
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        api_input = Input()
+        change = Change()
+        change.change_stage_change.new_stage = new_stage
+        api_input.change.CopyFrom(change)
+        ci_input.api_inputs.append(api_input)
+
+        self.send_ci_input(ci_input)
+
+        self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
 
     def is_valid_port(self, port):
         """Determine whether or not a given port is valid
