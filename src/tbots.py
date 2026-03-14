@@ -71,9 +71,9 @@ def main(
     if interactive_cli:
         start_interactive_cli()
         return
-    if action is None or search_query is None:
+    if action is None:
         print(
-            "Error: 'action' and 'search_query' are required unless using --interactive-cli")
+            "Error: 'action' is required unless using --interactive-cli")
         sys.exit(1)
     if bool(flash_robots) or bool(ansible_playbook):
         if not ssh_password:
@@ -204,8 +204,8 @@ def start_interactive_cli():
 
     match goal:
         case '1':
-            test = prompt("Please enter a test name")
-            command.extend(["test", test])
+            test = prompt("Please enter a test name ('all' for entire suite)")
+            command.extend(["test", '--suite' if test == 'all' else test])
         case '2':
             playbook = prompt(
                 "Please enter ansible playbook name (e.g. setup_pi.yml)")
