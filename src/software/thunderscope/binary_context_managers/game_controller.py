@@ -196,7 +196,7 @@ class Gamecontroller:
             ci_input = CiInput(timestamp=int(time.time_ns()))
             api_input = Input()
             change = Change()
-            change.change_stage_change.new_stage.CopyFrom(new_stage)
+            change.change_stage_change.new_stage = new_stage
             api_input.change.CopyFrom(change)
             ci_input.api_inputs.append(api_input)
 
