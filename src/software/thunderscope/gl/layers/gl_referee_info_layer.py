@@ -1,19 +1,20 @@
+from typing import override
+
 from PyQt6 import QtGui
 from pyqtgraph.opengl.items.GLTextItem import GLTextItem
 
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
-import software.python_bindings as tbots_cpp
 from software.thunderscope.constants import (
-    DepthValues,
-    Colors,
     THUNDERSCOPE_UI_FONT_NAME,
+    Colors,
+    DepthValues,
 )
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from typing import override
 
 
 class GLRefereeInfoLayer(GLLayer):

@@ -1,17 +1,15 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.py_constants import ROBOT_MAX_RADIUS_METERS
-from software.thunderscope.constants import Colors, LINE_WIDTH
-
-from software.thunderscope.gl.graphics.gl_shape import GLShape
-import software.thunderscope.gl.helpers.triangulate as triangulate
-
+import math
 from typing import Optional, override
 
-import math
 import numpy as np
+from pyqtgraph.opengl import *
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
+
+import software.thunderscope.gl.helpers.triangulate as triangulate
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
+from software.thunderscope.constants import LINE_WIDTH, Colors
+from software.thunderscope.gl.graphics.gl_shape import GLShape
 
 
 class GLRobotOutline(GLShape):

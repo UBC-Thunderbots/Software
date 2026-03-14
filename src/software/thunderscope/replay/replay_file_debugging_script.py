@@ -1,12 +1,11 @@
-import traceback
+import argparse
 import glob
 import gzip
 import os
-import argparse
+import traceback
 
 from proto.import_all_protos import *
 from software.py_constants import *
-
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
 

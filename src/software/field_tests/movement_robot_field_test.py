@@ -1,9 +1,9 @@
+import math
+
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
-
-from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import create_logger
-import math
+from software.simulated_tests.simulated_test_fixture import *
 
 logger = create_logger(__name__)
 

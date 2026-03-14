@@ -1,9 +1,11 @@
+from enum import Enum
+
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtWidgets import *
-from software.py_constants import *
-from proto.import_all_protos import *
-from enum import Enum
+
 import software.thunderscope.common.common_widgets as common_widgets
+from proto.import_all_protos import *
+from software.py_constants import *
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 

@@ -1,8 +1,9 @@
+from typing import override
+
 from proto.validation_pb2 import *
 from software.simulated_tests.validation import (
     Validation,
 )
-from typing import override
 
 
 class OrValidation(Validation):

@@ -1,20 +1,21 @@
-import logging
-import time
-import threading
 import base64
-import os
-import gzip
 import glob
-from proto.import_all_protos import *
-from extlibs.er_force_sim.src.protobuf.world_pb2 import *
-from software.py_constants import *
+import gzip
+import logging
+import os
+import pickle
+import threading
+import time
+from typing import Callable, List, Type
 
+from google.protobuf.message import Message
+
+import software.python_bindings as tbots_cpp
+from extlibs.er_force_sim.src.protobuf.world_pb2 import *
+from proto.import_all_protos import *
+from software.py_constants import *
 from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.python_bindings as tbots_cpp
-from google.protobuf.message import Message
-from typing import Callable, Type, List
-import pickle
 
 
 class ProtoPlayer:

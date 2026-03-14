@@ -1,23 +1,21 @@
 from __future__ import annotations
 
-from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.opengl import *
-
 import time
+from typing import override
+
+from pyqtgraph.opengl import *
+from pyqtgraph.Qt import QtCore, QtGui
 
 from proto.import_all_protos import *
-
 from software.py_constants import *
 from software.thunderscope.constants import Colors, DepthValues
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
+from software.thunderscope.gl.graphics.gl_painter import GLPainter
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.graphics.gl_stadium import GLStadium
-from software.thunderscope.gl.graphics.gl_painter import GLPainter
-
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLValidationOverlayLayer(GLLayer):

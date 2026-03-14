@@ -1,11 +1,11 @@
-from typing import Optional, Sequence, Any
-from software.thunderscope.common.frametime_counter import FrameTimeCounter
-
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.dockarea import *
-
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Optional, Sequence
+
+from pyqtgraph.dockarea import *
+from pyqtgraph.Qt.QtWidgets import *
+
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 
 class WidgetPosition(Enum):

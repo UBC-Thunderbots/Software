@@ -1,39 +1,35 @@
+import math
+from typing import override
+
+from pyqtgraph.opengl import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
-from pyqtgraph.opengl import *
-
-import math
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import (
-    Colors,
-    DepthValues,
-    SPEED_SEGMENT_SCALE,
     DEFAULT_EMPTY_FIELD_WORLD,
-    is_field_message_empty,
-    SIMULATION_SPEEDS,
     LINE_WIDTH,
-    CustomGLOptions,
     ROBOT_NAMES_FROM_ID,
+    SIMULATION_SPEEDS,
+    SPEED_SEGMENT_SCALE,
+    Colors,
+    CustomGLOptions,
+    DepthValues,
+    is_field_message_empty,
 )
-
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
-from software.thunderscope.gl.graphics.gl_rect import GLRect
+from software.thunderscope.gl.graphics.gl_goal import GLGoal
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from software.thunderscope.gl.graphics.gl_rect import GLRect
 from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
-from software.thunderscope.gl.graphics.gl_goal import GLGoal
-
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-
-from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
-
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLWorldLayer(GLLayer):

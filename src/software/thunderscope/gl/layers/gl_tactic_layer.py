@@ -1,22 +1,19 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-
 import textwrap
+from typing import override
+
+from pyqtgraph.opengl import *
+from pyqtgraph.Qt import QtGui
 
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import (
+    THUNDERSCOPE_UI_FONT_NAME,
     Colors,
     DepthValues,
-    THUNDERSCOPE_UI_FONT_NAME,
 )
-
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLTacticLayer(GLLayer):

@@ -1,10 +1,11 @@
-from pyqtgraph.Qt import QtGui
-from OpenGL.GL import *
-from proto.import_all_protos import *
-from enum import Enum, IntEnum, StrEnum
-from proto.robot_log_msg_pb2 import LogLevel
-
 import textwrap
+from enum import Enum, IntEnum, StrEnum
+
+from OpenGL.GL import *
+from pyqtgraph.Qt import QtGui
+
+from proto.import_all_protos import *
+from proto.robot_log_msg_pb2 import LogLevel
 
 
 class ProtoUnixIOTypes(Enum):

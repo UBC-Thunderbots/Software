@@ -20,28 +20,26 @@ assert protobuf_impl_type == "upb", (
     f"The current version of protobuf is {google.protobuf.__version__}"
 )
 
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.constants import LogLevels
-from software.thunderscope.binary_context_managers import *
+import software.thunderscope.thunderscope_config as config
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.robot_communication import RobotCommunication
-from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
+from software.thunderscope.binary_context_managers import *
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 from software.thunderscope.constants import (
+    CI_DURATION_S,
     EstopMode,
+    LogLevels,
     ProtoUnixIOTypes,
 )
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import CI_DURATION_S
+from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.util import *
-
-from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-
-from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 
 ###########################################################################
 #                         Thunderscope Main                               #

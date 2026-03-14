@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import TypeVar, Iterable, Callable
-from typing import override
+
+from typing import Callable, Iterable, TypeVar, override
 
 T = TypeVar("T")
 

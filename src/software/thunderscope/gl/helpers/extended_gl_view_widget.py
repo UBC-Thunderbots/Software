@@ -1,9 +1,11 @@
+from typing import override
+
+from pyqtgraph.opengl import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.opengl import *
+
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import MULTI_PLANE_POINTS
-from typing import override
 
 
 class MouseInSceneEvent:

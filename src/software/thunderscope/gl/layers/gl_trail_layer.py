@@ -1,16 +1,15 @@
+from collections import defaultdict, deque
+from typing import override
+
 from pyqtgraph.opengl import *
 
-from collections import deque, defaultdict
+from proto.import_all_protos import Robot, Team
 from proto.world_pb2 import World
-from proto.import_all_protos import Team, Robot
-
 from software.thunderscope.constants import Colors, DepthValues, TrailValues
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
-
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLTrailLayer(GLLayer):

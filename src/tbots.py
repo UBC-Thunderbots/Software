@@ -1,30 +1,31 @@
 #!/opt/tbotspython/bin/python3
 
+import itertools
 import os
 import sys
+from subprocess import PIPE, run
 
 import iterfzf
-import itertools
-from subprocess import PIPE, run
 from thefuzz import process
-from typer import Typer, Context
+from typer import Context, Typer
+
 from cli.cli_params import (
     ActionArgument,
-    PrintCommandOption,
-    NoOptimizedBuildOption,
+    DebugBinary,
     DebugBuildOption,
-    SelectDebugBinariesOption,
-    FlashRobotsOption,
-    SSHPasswordOption,
-    InteractiveModeOption,
-    TracyOption,
     EnableThunderscopeOption,
     EnableVisualizerOption,
-    StopAIOnStartOption,
-    SearchQueryArgument,
-    TestSuiteOption,
-    DebugBinary,
+    FlashRobotsOption,
+    InteractiveModeOption,
     JobsOption,
+    NoOptimizedBuildOption,
+    PrintCommandOption,
+    SearchQueryArgument,
+    SelectDebugBinariesOption,
+    SSHPasswordOption,
+    StopAIOnStartOption,
+    TestSuiteOption,
+    TracyOption,
 )
 
 # thefuzz is a fuzzy string matcher in python

@@ -1,10 +1,11 @@
 from collections.abc import Callable
+from typing import override
 
 from PyQt6.QtCore import QRect
 from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QPushButton, QSlider, QLabel
+from PyQt6.QtWidgets import QLabel, QPushButton, QSlider
+
 from software.py_constants import *
-from typing import override
 
 
 class BookmarkMarker(QPushButton):

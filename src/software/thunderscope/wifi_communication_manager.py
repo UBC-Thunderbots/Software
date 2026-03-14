@@ -1,18 +1,17 @@
+import logging
+import time
+from threading import Lock, Thread
 from typing import Any, Callable, Self, Type
 
+from colorama import Fore, Style
+from google.protobuf.message import Message
+
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
-import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
-from google.protobuf.message import Message
-
-from colorama import Fore, Style
-import logging
-from threading import Lock, Thread
-import time
 
 DISCONNECTED = "DISCONNECTED"
 """A constant to represent a disconnected interface"""

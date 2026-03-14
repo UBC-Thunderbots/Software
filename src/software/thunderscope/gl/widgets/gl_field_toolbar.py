@@ -1,16 +1,18 @@
 from typing import Callable, override
+
+import qtawesome as qta
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtWidgets import *
+
 from proto.import_all_protos import *
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.constants import (
-    CameraView,
-    THUNDERSCOPE_HELP_TEXT,
-    SIMULATION_SPEEDS,
-)
 from software.thunderscope.common.common_widgets import ToggleableButton
+from software.thunderscope.constants import (
+    SIMULATION_SPEEDS,
+    THUNDERSCOPE_HELP_TEXT,
+    CameraView,
+)
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
-import qtawesome as qta
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLFieldToolbar(GLToolbar):

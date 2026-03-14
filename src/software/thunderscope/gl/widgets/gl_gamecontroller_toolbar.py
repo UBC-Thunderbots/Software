@@ -1,16 +1,18 @@
-from pyqtgraph.Qt.QtWidgets import *
+import webbrowser
+from typing import Callable, override
+
+import qtawesome as qta
 from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt.QtWidgets import *
+
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from typing import Callable, override
-import webbrowser
-from software.thunderscope.gl.widgets.gl_runtime_selector import GLRuntimeSelectorDialog
-from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.widgets.gl_runtime_installer import (
     GLRuntimeInstallerDialog,
 )
-import qtawesome as qta
+from software.thunderscope.gl.widgets.gl_runtime_selector import GLRuntimeSelectorDialog
+from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class GamecontrollerPlays:

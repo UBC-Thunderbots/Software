@@ -1,26 +1,26 @@
 from __future__ import annotations
 
+import logging
+import os
+import queue
+import threading
+import time
+from subprocess import Popen
+from typing import override
+
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import (
-    SslSocketProtoParseException,
     SslSocket,
+    SslSocketProtoParseException,
 )
 from software.py_constants import NANOSECONDS_PER_MILLISECOND, SECONDS_PER_NANOSECOND
-import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import TimeProvider
-from subprocess import Popen
-
-import queue
-import logging
-import os
-import threading
-import time
-from typing import override
 
 
 class TigersAutoref(TimeProvider):

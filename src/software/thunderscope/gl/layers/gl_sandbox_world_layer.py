@@ -1,12 +1,14 @@
 import math
 from typing import Optional, override
-from proto.import_all_protos import *
+
+from pyqtgraph.opengl import *
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtGui import *
-from pyqtgraph.opengl import *
+
+from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
+from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 

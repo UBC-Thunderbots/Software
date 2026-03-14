@@ -1,13 +1,15 @@
-import os
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from dataclasses import dataclass
-import software.python_bindings as tbots_cpp
-from software.thunderscope.constants import RuntimeManagerConstants
 import logging
-from proto.visualization_pb2 import AttackerVisualization
-from proto.import_all_protos import *
-from software.py_constants import ROBOT_MAX_RADIUS_METERS
+import os
+from dataclasses import dataclass
+
 from rich import print
+
+import software.python_bindings as tbots_cpp
+from proto.import_all_protos import *
+from proto.visualization_pb2 import AttackerVisualization
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
+from software.thunderscope.constants import RuntimeManagerConstants
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 @dataclass

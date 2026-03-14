@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import socket
-import google.protobuf.internal.encoder as encoder
+
 import google.protobuf.internal.decoder as decoder
+import google.protobuf.internal.encoder as encoder
 import google.protobuf.message as protobuf_message
 
 

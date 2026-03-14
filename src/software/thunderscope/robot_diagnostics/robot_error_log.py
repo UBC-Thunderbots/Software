@@ -1,24 +1,25 @@
-from pyqtgraph.Qt.QtWidgets import *
+import time
+
 from pyqtgraph.Qt.QtCore import Qt, QTimer
+from pyqtgraph.Qt.QtWidgets import *
+
 from proto.import_all_protos import *
+from proto.robot_log_msg_pb2 import LogLevel, RobotLog
 from software.py_constants import *
-from software.thunderscope.robot_diagnostics.error_log_widgets import (
-    RobotLogMessageWidget,
-    RobotCrashLogMessageWidget,
-    ErrorCodeLogMessageWidget,
-    LowBatteryLogMessageWidget,
-    FatalLogMessageWidget,
-)
-from proto.robot_log_msg_pb2 import RobotLog, LogLevel
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import (
     ERROR_CODE_MESSAGES,
     ROBOT_CRASH_TIMEOUT_S,
     ROBOT_FATAL_TIMEOUT_S,
     THUNDERSCOPE_REFRESH_INTERVAL_MS,
 )
-
-import time
+from software.thunderscope.robot_diagnostics.error_log_widgets import (
+    ErrorCodeLogMessageWidget,
+    FatalLogMessageWidget,
+    LowBatteryLogMessageWidget,
+    RobotCrashLogMessageWidget,
+    RobotLogMessageWidget,
+)
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class RobotErrorLog(QScrollArea):

@@ -1,9 +1,9 @@
-from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
 
-from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.gl.helpers.gl_patches import *
+from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 
 
 class GLLayer(GLGraphicsItem):

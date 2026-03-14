@@ -1,9 +1,9 @@
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph import parametertree
-from thefuzz import fuzz
-from proto.import_all_protos import *
 import netifaces
+from pyqtgraph import parametertree
+from pyqtgraph.Qt.QtWidgets import *
+from thefuzz import fuzz
 
+from proto.import_all_protos import *
 
 """
 Instead of the using the generic parameter parsing, this constant can be used to define custom handlers for specific

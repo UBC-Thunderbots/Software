@@ -1,18 +1,16 @@
-from pyqtgraph.opengl import *
-
 import math
+from typing import override
+
+from pyqtgraph.opengl import *
 
 from proto.tbots_software_msgs_pb2 import PrimitiveSet
 from proto.visualization_pb2 import PathVisualization
-
 from software.thunderscope.constants import Colors, DepthValues
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 from software.thunderscope.gl.graphics.gl_line_strip import GLLineStrip
-
+from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLPathLayer(GLLayer):

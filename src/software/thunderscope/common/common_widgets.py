@@ -1,9 +1,11 @@
+from typing import override
+
 from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
+from pyqtgraph.Qt.QtWidgets import *
+
 from software.py_constants import *
 from software.thunderscope.util import color_from_gradient
-from typing import override
 
 
 class FloatSlider(QSlider):

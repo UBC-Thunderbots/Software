@@ -1,8 +1,9 @@
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from collections import deque
-from typing import Type, Optional
+from typing import Optional, Type, override
+
 from google.protobuf.message import Message
-from typing import override
+
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class ThreadSafeCircularBuffer(ThreadSafeBuffer):

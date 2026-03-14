@@ -1,54 +1,51 @@
 import math
 import os
-
 from typing import Any, Optional
 
-from software.py_constants import *
+from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from proto.import_all_protos import *
+from proto.robot_log_msg_pb2 import RobotLog
+from software.py_constants import *
 from software.thunderscope.common.fps_widget import FPSWidget
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
-from software.thunderscope.common.proto_plotter import ProtoPlotter
-from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
-    GLDrawPolygonObstacleLayer,
+from software.thunderscope.common.proto_configuration_widget import (
+    ProtoConfigurationWidget,
 )
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from proto.robot_log_msg_pb2 import RobotLog
-from extlibs.er_force_sim.src.protobuf.world_pb2 import *
+from software.thunderscope.common.proto_plotter import ProtoPlotter
+from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.dock_style import *
 
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget
 from software.thunderscope.gl.layers import (
-    gl_obstacle_layer,
-    gl_path_layer,
-    gl_validation_layer,
-    gl_passing_layer,
     gl_attacker_layer,
-    gl_sandbox_world_layer,
-    gl_world_layer,
+    gl_cost_vis_layer,
     gl_debug_shapes_layer,
+    gl_max_dribble_layer,
+    gl_movement_field_test_layer,
+    gl_obstacle_layer,
+    gl_passing_layer,
+    gl_path_layer,
+    gl_referee_info_layer,
+    gl_sandbox_world_layer,
     gl_simulator_layer,
     gl_tactic_layer,
-    gl_cost_vis_layer,
     gl_trail_layer,
-    gl_movement_field_test_layer,
-    gl_max_dribble_layer,
-    gl_referee_info_layer,
+    gl_validation_layer,
+    gl_world_layer,
 )
-
-from software.thunderscope.common.proto_configuration_widget import (
-    ProtoConfigurationWidget,
+from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
+    GLDrawPolygonObstacleLayer,
 )
 from software.thunderscope.log.g3log_widget import g3logWidget
-from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
-from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
-from software.thunderscope.robot_diagnostics.robot_view import RobotView
-from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
-from software.thunderscope.robot_diagnostics.estop_view import EstopView
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.replay.proto_player import ProtoPlayer
-
+from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
+from software.thunderscope.robot_diagnostics.estop_view import EstopView
+from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
+from software.thunderscope.robot_diagnostics.robot_view import RobotView
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #

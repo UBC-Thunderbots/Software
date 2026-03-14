@@ -1,18 +1,20 @@
+import math
+
 import pytest
+
+import software.python_bindings as tbots
+from proto.import_all_protos import *
+from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.py_constants import *
+from software.simulated_tests.avoid_collisions import *
 from software.simulated_tests.simulated_test_fixture import (
+    SimulatedTestRunner,
     pytest_main,
 )
-from software.simulated_tests.avoid_collisions import *
-import software.python_bindings as tbots
-from software.py_constants import *
-from proto.message_translation.tbots_protobuf import create_world_state
-import math
-from proto.import_all_protos import *
-from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import SimulatedTestRunner
 from software.simulated_tests.validation import (
-    create_validation_types,
     create_validation_geometry,
+    create_validation_types,
 )
 
 
@@ -195,13 +197,13 @@ def hrvo_setup(
     )
 
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.STOP, team=Team.BLUE
+        gc_command=Command.Type.STOP, team=SslTeam.BLUE
     )
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.STOP, team=Team.YELLOW
+        gc_command=Command.Type.STOP, team=SslTeam.YELLOW
     )
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.FORCE_START, team=Team.BLUE
+        gc_command=Command.Type.FORCE_START, team=SslTeam.BLUE
     )
 
     blue_params = AssignedTacticPlayControlParams()

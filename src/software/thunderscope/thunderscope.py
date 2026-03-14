@@ -1,18 +1,16 @@
-import time
-import shelve
 import logging
-import pathlib
 import os
+import pathlib
+import shelve
+import time
+from typing import Callable
 
 import pyqtgraph
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
-from typing import Callable
-
 from software.py_constants import *
 from software.thunderscope.constants import *
-
 from software.thunderscope.thunderscope_config import TScopeConfig
 
 
