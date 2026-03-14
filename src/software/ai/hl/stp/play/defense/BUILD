@@ -42,7 +42,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/pytest_validations:all_validations",
+        "//software/simulated_tests/validation",
         requirement("pytest"),
     ],
 )
