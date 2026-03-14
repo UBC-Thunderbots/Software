@@ -179,7 +179,11 @@ class Gamecontroller:
             except queue.Empty:
                 return
 
-    def __automate_stage_change(self, referee):
+    def __automate_referee(self, referee: Referee) -> None:
+        """Automate referee events by handling game stage changes and starting new game.
+
+        :param referee: the referee protobuf message
+        """
         if referee.stage_time_left < 0:
             if referee.stage == Referee.Stage.NORMAL_FIRST_HALF:
                 # skip to pre second half
@@ -218,8 +222,8 @@ class Gamecontroller:
             block=False, return_cached=True
         )
 
-        # TODO (#3633): only call when using record stats
-        self.__automate_stage_change(referee)
+        # TODO (#3633): only automate referee events in record_stats mode
+        self.__automate_referee(referee)
 
         max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
         max_allowed_bots_blue: int = referee.blue.max_allowed_bots
