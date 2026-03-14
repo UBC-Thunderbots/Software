@@ -118,6 +118,19 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
                               const TbotsProto::PassingConfig& passing_config);
 
 /**
+ * Calculates the time taken by an enemy to get to a specific intercept point
+ *
+ * @param enemy_robot The robot that might intercept our pass
+ * @param pass The pass we want to get the intercept probability for
+ * @param interception_point The point on the pass's path that the enemy is trying to
+ *                           intercept the ball at
+ * @return A value in seconds, which is the time taken by the enemy to get to the
+ * interception point
+ */
+double getEnemyTimeToInterceptPoint(const Robot& enemy_robot, const Pass& pass,
+                                    const Point& interception_point);
+
+/**
  * Calculates the likelihood that the given pass will be intercepted by a given robot
  *
  * @param enemy_robot The robot that might intercept our pass
@@ -131,6 +144,15 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
 double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
                               const TbotsProto::PassingConfig& passing_config);
 
+Duration getBallTravelTime(const Pass& pass,
+                           const TbotsProto::PassingConfig& passing_config);
+
+const Robot* getClosestReceiverToPass(const Team& friendly_team, const Pass& pass);
+
+Timestamp getEarliestReceiveTime(const Robot* best_receiver, const Pass& pass,
+                                 const TbotsProto::PassingConfig& passing_config);
+
+Timestamp getEarliestTimeToAngle(const Robot* best_receiver, const Pass& pass);
 
 /**
  * Calculate the probability of a friendly robot receiving the given pass
@@ -148,6 +170,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  */
 double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
                                   const TbotsProto::PassingConfig& passing_config);
+
+Rectangle getReducedField(const Field& field, TbotsProto::PassingConfig passing_config);
 
 /**
  * Calculates the static position quality for a given position on a given field
