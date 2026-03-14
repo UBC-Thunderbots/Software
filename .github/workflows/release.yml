@@ -159,4 +159,4 @@ jobs:
       - name: Undraft Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release edit "${{ needs.prepare_release.outputs.tag }}" --draft=false
+        run: gh release edit "${{ needs.prepare_release.outputs.tag }}" --draft=false --latest
