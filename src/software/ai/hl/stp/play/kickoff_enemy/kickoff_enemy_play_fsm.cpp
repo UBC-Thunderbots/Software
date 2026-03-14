@@ -4,8 +4,10 @@ KickoffEnemyPlayFSM::KickoffEnemyPlayFSM(
     const std::shared_ptr<const TbotsProto::AiConfig> &ai_config_ptr)
     : PlayFSM(ai_config_ptr),
       shadow_enemy_tactics{std::make_shared<ShadowEnemyTactic>(ai_config_ptr),
+                           std::make_shared<ShadowEnemyTactic>(ai_config_ptr),
                            std::make_shared<ShadowEnemyTactic>(ai_config_ptr)},
       move_tactics{std::make_shared<MoveTactic>(ai_config_ptr),
+                   std::make_shared<MoveTactic>(ai_config_ptr),
                    std::make_shared<MoveTactic>(ai_config_ptr),
                    std::make_shared<MoveTactic>(ai_config_ptr),
                    std::make_shared<MoveTactic>(ai_config_ptr),
