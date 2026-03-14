@@ -14,10 +14,6 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       const WorldPtr &world_ptr)
 {
     // Does not get called.
-    while (true)
-    {
-        yield({{}});
-    }
 }
 
 void KickoffEnemyPlay::updateTactics(const PlayUpdate &play_update)

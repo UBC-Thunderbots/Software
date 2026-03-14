@@ -100,20 +100,16 @@ void KickoffFriendlyPlayFSM::chipBall(const Update& event)
 
     PriorityTacticVector tactics_to_run = {{}};
 
-    constexpr double enemy_x_padding_m          = 2.0;
-    constexpr double sideline_padding_m         = 0.3;
-    constexpr double fallback_target_x_fraction = 1.0 / 6.0;
-
     const double min_chip_x = ball_position.x();
-    const double max_chip_x = field.enemyGoalCenter().x() - enemy_x_padding_m;
-    const double min_chip_y = field.enemyCornerNeg().y() + sideline_padding_m;
-    const double max_chip_y = field.enemyCornerPos().y() - sideline_padding_m;
+    const double max_chip_x = field.enemyGoalCenter().x() - ENEMY_X_PADDING_M;
+    const double min_chip_y = field.enemyCornerNeg().y() + SIDELINE_PADDING_M;
+    const double max_chip_y = field.enemyCornerPos().y() - SIDELINE_PADDING_M;
 
     const Rectangle chip_target_region(Point(min_chip_x, min_chip_y),
                                        Point(max_chip_x, max_chip_y));
 
     const Point fallback_target =
-        field.centerPoint() + Vector(field.xLength() * fallback_target_x_fraction, 0.0);
+        field.centerPoint() + Vector(field.xLength() * FALLBACK_TARGET_X_FRACTION, 0.0);
     const std::vector<Circle> chip_targets =
         findGoodChipTargets(*world_ptr, chip_target_region);
 

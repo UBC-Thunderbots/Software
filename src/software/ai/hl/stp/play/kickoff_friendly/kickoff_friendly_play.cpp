@@ -15,10 +15,6 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                          const WorldPtr &world_ptr)
 {
     // Does not get called.
-    while (true)
-    {
-        yield({{}});
-    }
 }
 
 void KickoffFriendlyPlay::updateTactics(const PlayUpdate &play_update)

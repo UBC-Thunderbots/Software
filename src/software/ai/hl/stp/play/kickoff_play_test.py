@@ -80,7 +80,7 @@ def test_blue_kickoff_chip(simulated_test_runner):
         position=ball_initial_pos, threshold=0.05
     )
 
-    always_validations = [
+    always_validations_sequence_set = [
         [
             OrValidation(
                 [
@@ -110,13 +110,13 @@ def test_blue_kickoff_chip(simulated_test_runner):
         ]
     ]
 
-    eventually_validations = [
+    eventually_validations_sequence_set = [
         [BallEventuallyExitsRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)])]
     ]
 
     simulated_test_runner.run_test(
-        inv_eventually_validation_sequence_set=eventually_validations,
-        inv_always_validation_sequence_set=always_validations,
+        inv_eventually_validation_sequence_set=eventually_validations_sequence_set,
+        inv_always_validation_sequence_set=always_validations_sequence_set,
         ci_cmd_with_delay=[(4, Command.Type.NORMAL_START, Team.BLUE)],
         test_timeout_s=10,
     )

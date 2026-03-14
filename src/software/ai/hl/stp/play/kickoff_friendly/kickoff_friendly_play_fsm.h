@@ -22,6 +22,10 @@
  */
 struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
 {
+    static constexpr double ENEMY_X_PADDING_M          = 2.0;
+    static constexpr double SIDELINE_PADDING_M         = 0.3;
+    static constexpr double FALLBACK_TARGET_X_FRACTION = 1.0 / 6.0;
+
     class SetupState;
     class ChipState;
 
@@ -104,7 +108,6 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<KickoffChipTactic> kickoff_chip_tactic;
     std::vector<std::shared_ptr<MoveTactic>> move_tactics;
     std::vector<Point> kickoff_setup_positions;

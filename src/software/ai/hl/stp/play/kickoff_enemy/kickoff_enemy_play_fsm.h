@@ -32,7 +32,7 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
     /**
      * Creates a kickoff enemy play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr the play config pointer for this play FSM
      */
     explicit KickoffEnemyPlayFSM(
         const std::shared_ptr<const TbotsProto::AiConfig> &ai_config_ptr);
@@ -102,7 +102,6 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics;
     std::vector<std::shared_ptr<MoveTactic>> move_tactics;
     std::vector<Point> kickoff_setup_positions;
