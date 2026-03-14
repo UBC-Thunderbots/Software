@@ -98,9 +98,7 @@ def main(
     else:
         target = fuzzy_find_target(action, search_query, interactive_search)
 
-    command = ["bazel", action.value]
     command = ["bazel", action.value, target]
-    command += ["--platforms=//toolchains/cc:robot"]
     unknown_args = ctx.args
 
     # Trigger a debug build
@@ -113,7 +111,7 @@ def main(
         command += ["--copt=-O3"]
 
     # Used for when flashing Raspberry Pi
-    if flash_robots:
+    if flash_robots or ansible_playbook:
         command += ["--platforms=//toolchains/cc:robot"]
 
     # Select debug binaries to run
@@ -141,8 +139,6 @@ def main(
         command += ["--cache_test_results=false"]
     if action == ActionArgument.run:
         command += ["--"]
-
-    command.append(target)
 
     bazel_arguments = unknown_args
     if stop_ai_on_start:
