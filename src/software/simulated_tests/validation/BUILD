@@ -10,7 +10,6 @@ py_library(
         "ball_moves_in_direction.py",
         "ball_speed_threshold.py",
         "ball_stops_in_region.py",
-        "delay_validation.py",
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
         "friendly_receives_ball_slow.py",
