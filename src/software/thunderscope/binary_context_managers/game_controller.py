@@ -182,27 +182,27 @@ class Gamecontroller:
     def __automate_stage_change(self, referee):
         if referee.stage_time_left < 0:
             if referee.stage == Referee.Stage.NORMAL_FIRST_HALF:
-                # reset game state
-                self.simulator_proto_unix_io.send_proto(
-                    WorldState, create_default_world_state(num_robots=6)
-                )
-
-                ci_input = CiInput(timestamp=int(time.time_ns()))
-                api_input = Input()
-                change = Change()
                 # skip to pre second half
-                change.change_stage_change.new_stage = (
-                    Referee.Stage.NORMAL_SECOND_HALF_PRE
-                )
-                api_input.change.CopyFrom(change)
-                ci_input.api_inputs.append(api_input)
-
-                self.send_ci_input(ci_input)
-
-                self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
+                new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
             else:
-                # start new game
-                return
+                # reset game
+                new_stage = Referee.Stage.NORMAL_FIRST_HALF_PRE
+
+            # reset game state
+            self.simulator_proto_unix_io.send_proto(
+                WorldState, create_default_world_state(num_robots=6)
+            )
+
+            ci_input = CiInput(timestamp=int(time.time_ns()))
+            api_input = Input()
+            change = Change()
+            change.change_stage_change.new_stage = new_stage
+            api_input.change.CopyFrom(change)
+            ci_input.api_inputs.append(api_input)
+
+            self.send_ci_input(ci_input)
+
+            self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
 
     def handle_referee(self, referee: Referee) -> None:
         """Updates the world state based on the referee message
