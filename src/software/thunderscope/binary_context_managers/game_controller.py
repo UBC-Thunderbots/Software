@@ -23,6 +23,7 @@ from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
 from software.thunderscope.util import is_current_platform_macos
+from software.py_constants import DIV_B_NUM_ROBOTS
 
 logger = logging.getLogger(__name__)
 
@@ -262,7 +263,7 @@ class Gamecontroller:
 
         # reset game state
         self.simulator_proto_unix_io.send_proto(
-            WorldState, create_default_world_state(num_robots=6)
+            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
         )
 
         ci_input = CiInput(timestamp=int(time.time_ns()))
