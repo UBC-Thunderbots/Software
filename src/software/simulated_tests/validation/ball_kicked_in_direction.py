@@ -53,7 +53,7 @@ class BallKickedInDirection(Validation):
         """
         ball_pos = world.ball.current_state.global_position
         start = tbots_cpp.Point(ball_pos.x_meters, ball_pos.y_meters)
-        direction = tbots_cpp.Vector(1, 0).rotate(self.kick_direction)
+        direction = tbots_cpp.Vector.createFromAngle(self.kick_direction)
         end = start + direction * self.LINE_LENGTH
         return create_validation_geometry([tbots_cpp.Segment(start, end)])
 
