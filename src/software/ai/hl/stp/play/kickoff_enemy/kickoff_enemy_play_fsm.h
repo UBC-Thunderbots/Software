@@ -61,9 +61,11 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
      *
      * @param tactics_to_run vector of tactics to run.
      * @param defense_position_index index of robot for priority.
+     * @param shadower_count number of shadowing robots so some space is allowed for
+     * shadowers
      */
     void assignDefenders(PriorityTacticVector &tactics_to_run,
-                         size_t &defense_position_index);
+                         size_t &defense_position_index, size_t &shadower_count);
 
     /**
      * add a goal blocker to tactics to run.

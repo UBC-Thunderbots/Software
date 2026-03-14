@@ -90,10 +90,15 @@ void KickoffEnemyPlayFSM::assignShadowing(const std::vector<EnemyThreat> &enemy_
 }
 
 void KickoffEnemyPlayFSM::assignDefenders(PriorityTacticVector &tactics_to_run,
-                                          size_t &defense_position_index)
+                                          size_t &defense_position_index,
+                                          size_t &shadower_count)
 {
-    while (defense_position_index < move_tactics.size() - 1 &&
-           defense_position_index < kickoff_setup_positions.size())
+    // The total combined shadowers + defenders should be 4
+    // (kickoff_setup_positions.size() - 1)
+    const size_t target_total  = kickoff_setup_positions.size() - 1;
+    size_t defenders_to_assign = target_total - shadower_count;
+
+    for (size_t i = 0; i < defenders_to_assign; i++)
     {
         move_tactics.at(defense_position_index)
             ->updateControlParams(kickoff_setup_positions.at(defense_position_index),
@@ -107,12 +112,14 @@ void KickoffEnemyPlayFSM::assignGoalBlocker(const WorldPtr &world_ptr,
                                             PriorityTacticVector &tactics_to_run,
                                             size_t &defense_position_index)
 {
-    move_tactics.back()->updateControlParams(
-        calculateBlockCone(world_ptr->field().friendlyGoalpostPos(),
-                           world_ptr->field().friendlyGoalpostNeg(),
-                           world_ptr->field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
-        Angle::zero(), TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
+    move_tactics.at(defense_position_index)
+        ->updateControlParams(
+            calculateBlockCone(world_ptr->field().friendlyGoalpostPos(),
+                               world_ptr->field().friendlyGoalpostNeg(),
+                               world_ptr->field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
+            Angle::zero(), TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
+
     tactics_to_run[0].emplace_back(move_tactics.at(defense_position_index));
     defense_position_index++;
 }
@@ -148,8 +155,9 @@ void KickoffEnemyPlayFSM::kickoff(const Update &event)
                            world_ptr->enemyTeam(), world_ptr->ball(), false);
 
     size_t defense_position_index = 0;
+    size_t shadower_count         = std::min<size_t>(2, enemy_threats.size());
     assignShadowing(enemy_threats, tactics_to_run, defense_position_index);
-    assignDefenders(tactics_to_run, defense_position_index);
+    assignDefenders(tactics_to_run, defense_position_index, shadower_count);
     assignGoalBlocker(world_ptr, tactics_to_run, defense_position_index);
 
     event.common.set_tactics(tactics_to_run);
