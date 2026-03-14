@@ -209,13 +209,13 @@ class Gamecontroller:
         if self.simulator_proto_unix_io is None:
             return
 
-        # TODO (#3633): automate referee events in record_stats mode
-        # self.__automate_referee(referee)
-
         # Convert the latest blue world into a WorldState we can send to the simulator and update the robots
         self.latest_world = self.blue_team_world_buffer.get(
             block=False, return_cached=True
         )
+
+        # TODO (#3633): only automate referee events in record_stats mode
+        self.__automate_referee(referee)
 
         max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
         max_allowed_bots_blue: int = referee.blue.max_allowed_bots
