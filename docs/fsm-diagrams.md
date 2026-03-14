@@ -206,6 +206,20 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [ShootOrChipPlayFSM](/src/software/ai/hl/stp/play/shoot_or_chip/shoot_or_chip_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> ShootOrChipState
+ShootOrChipState --> ShootOrChipState : [!attackerDone]\n<i>updateShootOrChip</i>
+ShootOrChipState --> Terminate:::terminate : [attackerDone]\n<i>updateShootOrChip</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
 ## [ShootOrPassPlayFSM](/src/software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h)
 
 ```mermaid
