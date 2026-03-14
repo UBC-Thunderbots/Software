@@ -21,6 +21,8 @@ from cli.cli_params import (
     EnableThunderscopeOption,
     EnableVisualizerOption,
     StopAIOnStartOption,
+    SearchQueryArgument,
+    TestSuiteOption,
     DebugBinary,
     JobsOption,
     RobotName,
@@ -57,6 +59,7 @@ def main(
     ssh_password: SSHPasswordOption = None,
     interactive_search: InteractiveModeOption = False,
     tracy: TracyOption = False,
+    test_suite: TestSuiteOption = False,
     enable_thunderscope: EnableThunderscopeOption = False,
     enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
@@ -80,50 +83,22 @@ def main(
             sys.exit(1)
         isFlashing = True
 
-    test_query = ["bazel", "query", "tests(//...)"]
-    binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
-    library_query = ["bazel", "query", "kind(.*_library,//...)"]
-    bazel_queries = {
-        "test": [test_query],
-        "run": [test_query, binary_query],
-        "build": [library_query, test_query, binary_query],
-    }
-
-    # Run the appropriate bazel query and ask thefuzz to find the best matching
-    # target, guaranteed to return 1 result because we set limit=1
-    # Combine results of multiple queries with itertools.chain
-    targets = list(
-        itertools.chain.from_iterable(
-            [
-                run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
-                for query in bazel_queries[action]
-            ]
+    if search_query is None and (not test_suite or not action == ActionArgument.test):
+        print(
+            "You must specify a search query unless you are running the test suite, use ./tbots.py test --suite instead"
         )
-    )
-    # Create a dictionary to map target names to complete bazel targets
-    target_dict = {target.split(b":")[-1]: target for target in targets}
+        sys.exit(1)
 
-    # Use thefuzz to find the best matching target name
-    most_similar_target_name, confidence = process.extract(
-        search_query, list(target_dict.keys()), limit=1
-    )[0]
-    target = str(target_dict[most_similar_target_name], encoding="utf-8")
+    if test_suite and action == ActionArgument.test:
+        target = """-- //...                              \\
+                      -//software/field_tests/...         \\
+                      -//toolchains/cc/...                \\
+                      -//software:unix_full_system_tar_gen"""
+        print("Running software and simulated gameplay test suite")
+    else:
+        target = fuzzy_find_target(action, search_query, interactive_search)
 
-    print("Found target {} with confidence {}".format(target, confidence))
-
-    if interactive_search or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
-        filtered_targets = process.extract(
-            search_query,
-            list(target_dict.keys()),
-            limit=NUM_FILTERED_MATCHES_TO_SHOW,
-        )
-        targets = [
-            target_dict[filtered_target_name[0]]
-            for filtered_target_name in filtered_targets
-        ]
-        target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
-        print("User selected {}".format(target))
-
+    command = ["bazel", action.value]
     command = ["bazel", action.value, target]
     command += ["--platforms=//toolchains/cc:robot"]
     unknown_args = ctx.args
@@ -136,6 +111,10 @@ def main(
     # compiled with optimizations for best performance
     if not debug_build and (not no_optimized_build or flash_robots):
         command += ["--copt=-O3"]
+
+    # Used for when flashing Raspberry Pi
+    if flash_robots:
+        command += ["--platforms=//toolchains/cc:robot"]
 
     # Select debug binaries to run
     if select_debug_binaries:
@@ -154,11 +133,16 @@ def main(
     if jobs_option:
         command += ["--jobs=" + jobs_option]
 
+    if enable_thunderscope:
+        command += ["--spawn_strategy=local", "--test_env=DISPLAY=:0"]
+
     # Don't cache test results
     if action == ActionArgument.test:
         command += ["--cache_test_results=false"]
     if action == ActionArgument.run:
         command += ["--"]
+
+    command.append(target)
 
     bazel_arguments = unknown_args
     if stop_ai_on_start:
@@ -260,6 +244,58 @@ def start_interactive_cli():
     print(f"Executing: {' '.join(command)}")
     code = os.system(" ".join(command))
     sys.exit(1 if code != 0 else 0)
+
+
+def fuzzy_find_target(
+    action: ActionArgument,
+    search_query: SearchQueryArgument,
+    interactive_search: InteractiveModeOption,
+) -> str:
+    test_query = ["bazel", "query", "tests(//...)"]
+    binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
+    library_query = ["bazel", "query", "kind(.*_library,//...)"]
+    bazel_queries = {
+        "test": [test_query],
+        "run": [test_query, binary_query],
+        "build": [library_query, test_query, binary_query],
+    }
+
+    # Run the appropriate bazel query and ask thefuzz to find the best matching
+    # target, guaranteed to return 1 result because we set limit=1
+    # Combine results of multiple queries with itertools.chain
+    targets = list(
+        itertools.chain.from_iterable(
+            [
+                run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
+                for query in bazel_queries[action]
+            ]
+        )
+    )
+    # Create a dictionary to map target names to complete bazel targets
+    target_dict = {target.split(b":")[-1]: target for target in targets}
+
+    # Use thefuzz to find the best matching target name
+    most_similar_target_name, confidence = process.extract(
+        search_query, list(target_dict.keys()), limit=1
+    )[0]
+    target = str(target_dict[most_similar_target_name], encoding="utf-8")
+
+    print("Found target {} with confidence {}".format(target, confidence))
+
+    if interactive_search or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
+        filtered_targets = process.extract(
+            search_query,
+            list(target_dict.keys()),
+            limit=NUM_FILTERED_MATCHES_TO_SHOW,
+        )
+        targets = [
+            target_dict[filtered_target_name[0]]
+            for filtered_target_name in filtered_targets
+        ]
+        target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
+        print("User selected {}".format(target))
+
+    return target
 
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@ from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.thunderscope_config import configure_simulated_test_view
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 from software.logger.logger import create_logger
 from typing import override
@@ -26,7 +27,6 @@ logger = create_logger(__name__)
 LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
-TEST_START_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
@@ -61,7 +61,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         self.simulator_proto_unix_io = simulator_proto_unix_io
 
     @override
-    def set_worldState(self, worldstate: WorldState):
+    def set_world_state(self, worldstate: WorldState):
         """Sets the simulation worldstate
 
         :param worldstate: proto containing the desired worldstate
@@ -90,14 +90,39 @@ class SimulatedTestRunner(TbotsTestRunner):
         if self.thunderscope:
             self.thunderscope.close()
 
+    def sync_setup(self, setup, param):
+        """Run setup until simulator has received game state
+
+        :param setup: Function that sets up the world state
+        :param param: Parameter passed into setup
+        """
+        world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
+        self.simulator_proto_unix_io.register_observer(
+            WorldStateReceivedTrigger, world_state_received_buffer
+        )
+
+        while True:
+            setup(param)
+
+            try:
+                world_state_received_buffer.get(
+                    block=True, timeout=WORLD_BUFFER_TIMEOUT
+                )
+            except queue.Empty:
+                # Did not receive a response within timeout period
+                continue
+            else:
+                # Received a response from the simulator
+                break
+
     def runner(
         self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
-        ci_cmd_with_delay=[],
-        run_till_end=True,
+        always_validation_sequence_set,
+        eventually_validation_sequence_set,
+        test_timeout_s,
+        tick_duration_s,
+        ci_cmd_with_delay,
+        run_till_end,
     ):
         """Run a test
 
@@ -232,7 +257,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         always_validation_sequence_set,
         eventually_validation_sequence_set,
         test_timeout_s=3,
-        tick_duration_s=0.0166,
+        tick_duration_s=0.0166,  # Default to 60hz
         index=0,
         ci_cmd_with_delay=[],
         run_till_end=True,
@@ -258,14 +283,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         test_timeout_duration = (
             test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
         )
-
-        # Start the test with a delay to allow the simulator to receive
-        # the initial world state. Without this delay, the SimulatorTick
-        # message may be received before the initial world state, causing
-        # the world to be empty, failing some AlwaysValidations
-        # TODO (#2858): Replace delay with an actual feedback from the simulator
-        #  for when it has received the initial world state
-        time.sleep(TEST_START_DELAY_S)
 
         # If thunderscope is enabled, run the test in a thread and show
         # thunderscope on this thread. The excepthook is setup to catch
@@ -332,7 +349,7 @@ class InvariantTestRunner(SimulatedTestRunner):
         """
         threading.excepthook = self.excepthook
 
-        setup(params[0])
+        super().sync_setup(setup, params[0])
 
         super().run_test(
             inv_always_validation_sequence_set,
@@ -377,7 +394,7 @@ class AggregateTestRunner(SimulatedTestRunner):
         # Catches Assertion Error thrown by failing test and increments counter
         # Calculates overall results and prints them
         for x in range(len(params)):
-            setup(params[x])
+            super().sync_setup(setup, params[x])
 
             try:
                 super().run_test(
