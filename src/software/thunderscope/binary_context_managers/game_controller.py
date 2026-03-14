@@ -247,7 +247,12 @@ class Gamecontroller:
         # Send out updated world state
         self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
-    def __handle_game_stage_change(self, game_stage: Referee.Stage):
+    def __handle_game_stage_change(self, game_stage: Referee.Stage) -> None:
+        """Handle game stage change by advancing to the next half once first half is over
+        and starting a new game once the second half is over.
+
+        :param game_stage: The current game stage from the referee message
+        """
         if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
             # skip to pre second half
             new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
