@@ -7,7 +7,7 @@ from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 
 
 @pytest.mark.parametrize(
@@ -55,11 +55,11 @@ def test_two_ai_ball_placement(
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.BALL_PLACEMENT,
-            team=Team.YELLOW,
+            team=SslTeam.YELLOW,
             final_ball_placement_point=ball_placement_point,
         )
 

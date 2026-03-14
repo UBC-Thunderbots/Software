@@ -7,7 +7,7 @@ from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_moves_from_rest import *
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -54,24 +54,24 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         yellow_play = Play()
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN
         )
 
         if is_friendly_test:
             simulated_test_runner.send_gamecontroller_command(
-                gc_command=Command.Type.KICKOFF, team=Team.BLUE
+                gc_command=Command.Type.KICKOFF, team=SslTeam.BLUE
             )
             blue_play.name = PlayName.KickoffFriendlyPlay
             yellow_play.name = PlayName.KickoffEnemyPlay
         else:
             simulated_test_runner.send_gamecontroller_command(
-                gc_command=Command.Type.KICKOFF, team=Team.YELLOW
+                gc_command=Command.Type.KICKOFF, team=SslTeam.YELLOW
             )
             blue_play.name = PlayName.KickoffEnemyPlay
             yellow_play.name = PlayName.KickoffFriendlyPlay
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+            gc_command=Command.Type.NORMAL_START, team=SslTeam.BLUE
         )
 
         simulated_test_runner.set_play(blue_play, is_friendly=True)

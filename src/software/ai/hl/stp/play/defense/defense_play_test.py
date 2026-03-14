@@ -7,7 +7,7 @@ from software.simulated_tests.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -49,10 +49,10 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+            gc_command=Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
         blue_play = Play()
@@ -118,10 +118,10 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+            gc_command=Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
         blue_play = Play()
