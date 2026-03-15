@@ -10,8 +10,8 @@ from subprocess import Popen
 from typing import Any
 
 from proto.import_all_protos import *
-from proto.ssl_gc_common_pb2 import Team as SslTeam
 from proto.message_translation.tbots_protobuf import create_default_world_state
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import *
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -70,6 +70,7 @@ class Gamecontroller:
         self.latest_world = None
         self.blue_removed_robot_ids = queue.Queue()
         self.yellow_removed_robot_ids = queue.Queue()
+        self.processed_event_ids = set()
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -181,12 +182,29 @@ class Gamecontroller:
                 return
 
     def __automate_referee(self, referee: Referee) -> None:
-        """Automate referee events by handling game stage changes and starting new game.
+        """Automate referee events by handling possible goals, ball placement failures,
+        game stage changes, and starting new game.
 
         :param referee: the referee protobuf message
         """
         if referee.stage_time_left < 0:
             self.__handle_game_stage_change(referee.stage)
+
+        possible_goal_events = self.__find_unprocessed_events(
+            referee, GameEvent.Type.POSSIBLE_GOAL
+        )
+        placement_failed_events = self.__find_unprocessed_events(
+            referee, GameEvent.Type.PLACEMENT_FAILED
+        )
+
+        if len(possible_goal_events) >= 1:
+            self.__handle_possible_goal(possible_goal_events[0].possible_goal.by_team)
+            self.processed_event_ids.add(possible_goal_events[0].id)
+
+        if len(placement_failed_events) >= 2:
+            self.__handle_placement_failed()
+            self.processed_event_ids.add(placement_failed_events[0].id)
+            self.processed_event_ids.add(placement_failed_events[1].id)
 
     def handle_referee(self, referee: Referee) -> None:
         """Updates the world state based on the referee message
@@ -276,6 +294,58 @@ class Gamecontroller:
         self.send_ci_input(ci_input)
 
         self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
+
+    def __find_unprocessed_events(
+        self, referee: Referee, event_type: GameEvent.Type
+    ) -> list[GameEvent]:
+        """Find unprocessed game events of the specified type.
+
+        :param referee: the referee protobuf message
+        :param event_type: the type of game event to search for
+        :return: list of unprocessed events of the given type
+        """
+        return [
+            event
+            for event in referee.game_events
+            if event.type == event_type and event.id not in self.processed_event_ids
+        ]
+
+    def __handle_possible_goal(self, scoring_team: SslTeam) -> None:
+        """Handle a possible goal event by approving the goal and starting ball placement.
+
+        :param scoring_team: the team that scored the goal
+        """
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        api_input = Input()
+        change = Change()
+
+        # Send goal game event to resolve the possible goal
+        game_event = GameEvent(
+            type=GameEvent.Type.GOAL,
+            origin=[
+                "Majority"
+            ],  # Required or else ssl-gamecontroller will convert game event to proposal
+            goal=GameEvent.Goal(by_team=scoring_team),
+        )
+
+        change.add_game_event_change.game_event.CopyFrom(game_event)
+        api_input.change.CopyFrom(change)
+        ci_input.api_inputs.append(api_input)
+        self.send_ci_input(ci_input)
+
+        # reset the robot and ball positions
+        self.simulator_proto_unix_io.send_proto(
+            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+        )
+        self.send_gc_command(Command.Type.STOP, SslTeam.UNKNOWN)
+
+    def __handle_placement_failed(self) -> None:
+        """Handle a placement failed event by moving the ball to the placement point."""
+        world_state = WorldState()
+        world_state.ball_state.global_position.CopyFrom(
+            self.latest_world.game_state.ball_placement_point
+        )
+        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
     def is_valid_port(self, port):
         """Determine whether or not a given port is valid
