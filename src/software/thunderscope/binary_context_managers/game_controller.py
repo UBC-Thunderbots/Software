@@ -10,6 +10,7 @@ from subprocess import Popen
 from typing import Any
 
 from proto.import_all_protos import *
+from proto.message_translation.tbots_protobuf import create_default_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import *
 import software.python_bindings as tbots_cpp
@@ -22,6 +23,7 @@ from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
 from software.thunderscope.util import is_current_platform_macos
+from software.py_constants import DIV_B_NUM_ROBOTS
 
 logger = logging.getLogger(__name__)
 
@@ -180,25 +182,29 @@ class Gamecontroller:
                 return
 
     def __automate_referee(self, referee: Referee) -> None:
-        """Automate referee events by handling possible goals and ball placement failures.
+        """Automate referee events by handling possible goals, ball placement failures,
+        game stage changes, and starting new game.
 
         :param referee: the referee protobuf message
         """
-        possible_goal_event = self.__find_unprocessed_event(
+        if referee.stage_time_left < 0:
+            self.__handle_game_stage_change(referee.stage)
+
+        possible_goal_events = self.__find_unprocessed_events(
             referee, GameEvent.Type.POSSIBLE_GOAL
         )
-        placement_failed_event = self.__find_unprocessed_event(
+        placement_failed_events = self.__find_unprocessed_events(
             referee, GameEvent.Type.PLACEMENT_FAILED
         )
 
-        if possible_goal_event:
-            self.__handle_possible_goal(possible_goal_event.possible_goal.by_team)
+        if len(possible_goal_events) >= 1:
+            self.__handle_possible_goal(possible_goal_events[0].possible_goal.by_team)
+            self.processed_event_ids.add(possible_goal_events[0].id)
 
-        if placement_failed_event:
+        if len(placement_failed_events) >= 2:
             self.__handle_placement_failed()
-
-        for event in referee.game_events:
-            self.processed_event_ids.add(event.id)
+            self.processed_event_ids.add(placement_failed_events[0].id)
+            self.processed_event_ids.add(placement_failed_events[1].id)
 
     def handle_referee(self, referee: Referee) -> None:
         """Updates the world state based on the referee message
@@ -260,23 +266,49 @@ class Gamecontroller:
         # Send out updated world state
         self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
-    def __find_unprocessed_event(
+    def __handle_game_stage_change(self, game_stage: Referee.Stage) -> None:
+        """Handle game stage change by advancing to the next half once first half is over
+        and starting a new game once the second half is over.
+
+        :param game_stage: The current game stage from the referee message
+        """
+        if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
+            # skip to pre second half
+            new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
+        else:
+            # reset game
+            new_stage = Referee.Stage.NORMAL_FIRST_HALF_PRE
+
+        # reset game state
+        self.simulator_proto_unix_io.send_proto(
+            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+        )
+
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        api_input = Input()
+        change = Change()
+        change.change_stage_change.new_stage = new_stage
+        api_input.change.CopyFrom(change)
+        ci_input.api_inputs.append(api_input)
+
+        self.send_ci_input(ci_input)
+
+        self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
+
+    def __find_unprocessed_events(
         self, referee: Referee, event_type: GameEvent.Type
-    ) -> GameEvent:
-        """Find an unprocessed game event of the specified type.
+    ) -> list[GameEvent]:
+        """Find unprocessed game events of the specified type.
 
         :param referee: the referee protobuf message
         :param event_type: the type of game event to search for
-        :return: the first unprocessed event of the given type, or None if not found
+        :return: list of unprocessed events of the given type
         """
-        return next(
-            (
-                event
-                for event in referee.game_events
-                if event.type == event_type and event.id not in self.processed_event_ids
-            ),
-            None,
-        )
+        return [
+            event
+            for event in referee.game_events
+            if event.type == event_type and event.id not in self.processed_event_ids
+        ]
 
     def __handle_possible_goal(self, scoring_team: SslTeam) -> None:
         """Handle a possible goal event by approving the goal and starting ball placement.
@@ -301,12 +333,11 @@ class Gamecontroller:
         ci_input.api_inputs.append(api_input)
         self.send_ci_input(ci_input)
 
-        # Send ball placement to (0,0) to reset game
-        self.send_gc_command(
-            gc_command=Command.Type.BALL_PLACEMENT,
-            team=scoring_team,
-            final_ball_placement_point=tbots_cpp.Point(0, 0),
+        # reset the robot and ball positions
+        self.simulator_proto_unix_io.send_proto(
+            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
         )
+        self.send_gc_command(Command.Type.STOP, SslTeam.UNKNOWN)
 
     def __handle_placement_failed(self) -> None:
         """Handle a placement failed event by moving the ball to the placement point."""
