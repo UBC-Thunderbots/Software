@@ -137,6 +137,44 @@ def create_validation_types(validation_class):
     return eventually_true, eventually_false, always_true, always_false
 
 
+def create_validation_geometry(geometry=[]) -> ValidationGeometry:
+    """Creates a ValidationGeometry which is a visual representation of the
+    validation to be rendered as either green (PASSING) or red (FAILING)
+
+    Given a list of (vectors, polygons, circles), creates a ValidationGeometry
+    proto containing the protobuf representations.
+
+    :param geometry: A list of geom
+    :return: ValidationGeometry
+    """
+    validation_geometry = ValidationGeometry()
+
+    CREATE_PROTO_DISPATCH = {
+        tbots_cpp.Vector.__name__: tbots_cpp.createVectorProto,
+        tbots_cpp.Polygon.__name__: tbots_cpp.createPolygonProto,
+        tbots_cpp.Rectangle.__name__: tbots_cpp.createPolygonProto,
+        tbots_cpp.Circle.__name__: tbots_cpp.createCircleProto,
+        tbots_cpp.Segment.__name__: tbots_cpp.createSegmentProto,
+        tbots_cpp.Stadium.__name__: tbots_cpp.createStadiumProto,
+    }
+
+    ADD_TO_VALIDATION_GEOMETRY_DISPATCH = {
+        tbots_cpp.Vector.__name__: validation_geometry.vectors.append,
+        tbots_cpp.Polygon.__name__: validation_geometry.polygons.append,
+        tbots_cpp.Rectangle.__name__: validation_geometry.polygons.append,
+        tbots_cpp.Circle.__name__: validation_geometry.circles.append,
+        tbots_cpp.Segment.__name__: validation_geometry.segments.append,
+        tbots_cpp.Stadium.__name__: validation_geometry.stadiums.append,
+    }
+
+    for geom in geometry:
+        ADD_TO_VALIDATION_GEOMETRY_DISPATCH[type(geom).__name__](
+            CREATE_PROTO_DISPATCH[type(geom).__name__](geom)
+        )
+
+    return validation_geometry
+
+
 def run_validation_sequence_sets(
     world, eventually_validation_sequence_set, always_validation_sequence_set
 ):
@@ -219,41 +257,3 @@ def check_validation(validation_proto_set):
     for validation_proto in validation_proto_set.validations:
         if validation_proto.status == ValidationStatus.FAILING:
             raise AssertionError(validation_proto.failure_msg)
-
-
-def create_validation_geometry(geometry=[]) -> ValidationGeometry:
-    """Creates a ValidationGeometry which is a visual representation of the
-    validation to be rendered as either green (PASSING) or red (FAILING)
-
-    Given a list of (vectors, polygons, circles), creates a ValidationGeometry
-    proto containing the protobuf representations.
-
-    :param geometry: A list of geom
-    :return: ValidationGeometry
-    """
-    validation_geometry = ValidationGeometry()
-
-    CREATE_PROTO_DISPATCH = {
-        tbots_cpp.Vector.__name__: tbots_cpp.createVectorProto,
-        tbots_cpp.Polygon.__name__: tbots_cpp.createPolygonProto,
-        tbots_cpp.Rectangle.__name__: tbots_cpp.createPolygonProto,
-        tbots_cpp.Circle.__name__: tbots_cpp.createCircleProto,
-        tbots_cpp.Segment.__name__: tbots_cpp.createSegmentProto,
-        tbots_cpp.Stadium.__name__: tbots_cpp.createStadiumProto,
-    }
-
-    ADD_TO_VALIDATION_GEOMETRY_DISPATCH = {
-        tbots_cpp.Vector.__name__: validation_geometry.vectors.append,
-        tbots_cpp.Polygon.__name__: validation_geometry.polygons.append,
-        tbots_cpp.Rectangle.__name__: validation_geometry.polygons.append,
-        tbots_cpp.Circle.__name__: validation_geometry.circles.append,
-        tbots_cpp.Segment.__name__: validation_geometry.segments.append,
-        tbots_cpp.Stadium.__name__: validation_geometry.stadiums.append,
-    }
-
-    for geom in geometry:
-        ADD_TO_VALIDATION_GEOMETRY_DISPATCH[type(geom).__name__](
-            CREATE_PROTO_DISPATCH[type(geom).__name__](geom)
-        )
-
-    return validation_geometry

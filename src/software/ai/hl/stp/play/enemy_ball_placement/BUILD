@@ -31,7 +31,7 @@ py_test(
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/validation",
         requirement("pytest"),
     ],
 )

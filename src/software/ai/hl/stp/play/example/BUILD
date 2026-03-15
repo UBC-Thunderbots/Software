@@ -29,7 +29,7 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play/example:example_play",
         "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
+        "//software/simulated_tests/cpp_validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
@@ -56,8 +56,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:speed_threshold_helpers",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/validation",
         requirement("pytest"),
     ],
 )

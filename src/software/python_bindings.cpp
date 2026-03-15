@@ -152,6 +152,7 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Vector>(m, "Vector")
         .def(py::init<float, float>())
+        .def_static("createFromAngle", &Vector::createFromAngle)
         .def("x", &Vector::x)
         .def("y", &Vector::y)
         .def("setX", &Vector::setX)

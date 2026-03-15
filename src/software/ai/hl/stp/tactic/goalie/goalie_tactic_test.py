@@ -1,13 +1,14 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_enters_region import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_moves_in_direction import *
-from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
-from software.simulated_tests.excessive_dribbling import *
+from proto.import_all_protos import GoalieTactic, MaxAllowedSpeedMode
+from software.simulated_tests.validation.robot_enters_region import *
+from software.simulated_tests.validation.ball_enters_region import *
+from software.simulated_tests.validation.ball_moves_in_direction import *
+from software.simulated_tests.validation.friendly_has_ball_possession import *
+from software.simulated_tests.validation.ball_speed_threshold import *
+from software.simulated_tests.validation.robot_speed_threshold import *
+from software.simulated_tests.validation.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
