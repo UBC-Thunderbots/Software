@@ -126,8 +126,8 @@ class TbotsTestRunner:
 
         fs_proto_unix_io.send_proto(Play, play)
 
-    def _create_assigned_tactic_params(self, tactics):
-        """Converts dict to AssignedTacticPlayControlParams
+    def _create_assigned_tactic_params(self, tactics: dict[int, Any]):
+        """Converts dict of tactics to AssignedTacticPlayControlParams message
 
         :param tactics: dict of robot_id -> tactic
         """
