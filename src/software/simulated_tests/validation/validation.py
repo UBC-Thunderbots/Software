@@ -82,8 +82,9 @@ def create_validation_types(validation_class):
     # We simply pass the validation_geometry from the validation object through.
     common = {
         "__init__": constructor,
-        "get_validation_geometry": lambda self,
-        world: self.validation.get_validation_geometry(world),
+        "get_validation_geometry": lambda self, world: (
+            self.validation.get_validation_geometry(world)
+        ),
     }
 
     eventually_true = type(
@@ -91,11 +92,13 @@ def create_validation_types(validation_class):
         (Validation,),
         {
             **common,
-            "__repr__": lambda self: "EventuallyTrueValidation: "
-            + repr(self.validation),
+            "__repr__": lambda self: (
+                "EventuallyTrueValidation: " + repr(self.validation)
+            ),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
-            "get_validation_status": lambda self,
-            world: self.validation.get_validation_status(world),
+            "get_validation_status": lambda self, world: (
+                self.validation.get_validation_status(world)
+            ),
         },
     )
 
@@ -104,8 +107,9 @@ def create_validation_types(validation_class):
         (Validation,),
         {
             **common,
-            "__repr__": lambda self: "EventuallyFalseValidation: "
-            + repr(self.validation),
+            "__repr__": lambda self: (
+                "EventuallyFalseValidation: " + repr(self.validation)
+            ),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
             "get_validation_status": lambda self, world: flip_validation(self, world),
         },
@@ -118,8 +122,9 @@ def create_validation_types(validation_class):
             **common,
             "__repr__": lambda self: "AlwaysTrueValidation: " + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.ALWAYS,
-            "get_validation_status": lambda self,
-            world: self.validation.get_validation_status(world),
+            "get_validation_status": lambda self, world: (
+                self.validation.get_validation_status(world)
+            ),
         },
     )
 
@@ -135,44 +140,6 @@ def create_validation_types(validation_class):
     )
 
     return eventually_true, eventually_false, always_true, always_false
-
-
-def create_validation_geometry(geometry=[]) -> ValidationGeometry:
-    """Creates a ValidationGeometry which is a visual representation of the
-    validation to be rendered as either green (PASSING) or red (FAILING)
-
-    Given a list of (vectors, polygons, circles), creates a ValidationGeometry
-    proto containing the protobuf representations.
-
-    :param geometry: A list of geom
-    :return: ValidationGeometry
-    """
-    validation_geometry = ValidationGeometry()
-
-    CREATE_PROTO_DISPATCH = {
-        tbots_cpp.Vector.__name__: tbots_cpp.createVectorProto,
-        tbots_cpp.Polygon.__name__: tbots_cpp.createPolygonProto,
-        tbots_cpp.Rectangle.__name__: tbots_cpp.createPolygonProto,
-        tbots_cpp.Circle.__name__: tbots_cpp.createCircleProto,
-        tbots_cpp.Segment.__name__: tbots_cpp.createSegmentProto,
-        tbots_cpp.Stadium.__name__: tbots_cpp.createStadiumProto,
-    }
-
-    ADD_TO_VALIDATION_GEOMETRY_DISPATCH = {
-        tbots_cpp.Vector.__name__: validation_geometry.vectors.append,
-        tbots_cpp.Polygon.__name__: validation_geometry.polygons.append,
-        tbots_cpp.Rectangle.__name__: validation_geometry.polygons.append,
-        tbots_cpp.Circle.__name__: validation_geometry.circles.append,
-        tbots_cpp.Segment.__name__: validation_geometry.segments.append,
-        tbots_cpp.Stadium.__name__: validation_geometry.stadiums.append,
-    }
-
-    for geom in geometry:
-        ADD_TO_VALIDATION_GEOMETRY_DISPATCH[type(geom).__name__](
-            CREATE_PROTO_DISPATCH[type(geom).__name__](geom)
-        )
-
-    return validation_geometry
 
 
 def run_validation_sequence_sets(
@@ -246,6 +213,44 @@ def run_validation_sequence_sets(
             create_validation_proto_helper(always_validation_proto_set, validation)
 
     return eventually_validation_proto_set, always_validation_proto_set
+
+
+def create_validation_geometry(geometry=[]) -> ValidationGeometry:
+    """Creates a ValidationGeometry which is a visual representation of the
+    validation to be rendered as either green (PASSING) or red (FAILING)
+
+    Given a list of (vectors, polygons, circles), creates a ValidationGeometry
+    proto containing the protobuf representations.
+
+    :param geometry: A list of geom
+    :return: ValidationGeometry
+    """
+    validation_geometry = ValidationGeometry()
+
+    CREATE_PROTO_DISPATCH = {
+        tbots_cpp.Vector.__name__: tbots_cpp.createVectorProto,
+        tbots_cpp.Polygon.__name__: tbots_cpp.createPolygonProto,
+        tbots_cpp.Rectangle.__name__: tbots_cpp.createPolygonProto,
+        tbots_cpp.Circle.__name__: tbots_cpp.createCircleProto,
+        tbots_cpp.Segment.__name__: tbots_cpp.createSegmentProto,
+        tbots_cpp.Stadium.__name__: tbots_cpp.createStadiumProto,
+    }
+
+    ADD_TO_VALIDATION_GEOMETRY_DISPATCH = {
+        tbots_cpp.Vector.__name__: validation_geometry.vectors.append,
+        tbots_cpp.Polygon.__name__: validation_geometry.polygons.append,
+        tbots_cpp.Rectangle.__name__: validation_geometry.polygons.append,
+        tbots_cpp.Circle.__name__: validation_geometry.circles.append,
+        tbots_cpp.Segment.__name__: validation_geometry.segments.append,
+        tbots_cpp.Stadium.__name__: validation_geometry.stadiums.append,
+    }
+
+    for geom in geometry:
+        ADD_TO_VALIDATION_GEOMETRY_DISPATCH[type(geom).__name__](
+            CREATE_PROTO_DISPATCH[type(geom).__name__](geom)
+        )
+
+    return validation_geometry
 
 
 def check_validation(validation_proto_set):

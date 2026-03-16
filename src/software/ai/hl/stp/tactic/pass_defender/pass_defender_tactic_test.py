@@ -1,7 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import PassDefenderTactic, BallStealMode
+from proto.import_all_protos import *
 from software.simulated_tests.validation.robot_enters_region import *
 from software.simulated_tests.validation.ball_enters_region import *
 from software.simulated_tests.validation.ball_moves_in_direction import *

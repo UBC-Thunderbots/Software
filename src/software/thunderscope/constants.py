@@ -413,13 +413,3 @@ class RuntimeManagerConstants:
     RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
     DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
     MAX_RELEASES_FETCHED = 5
-
-
-class SimulatedTestConstants:
-    """Constants for Simulated Tests"""
-
-    LAUNCH_DELAY_S = 0.1
-    WORLD_BUFFER_TIMEOUT = 0.5
-    PROCESS_BUFFER_DELAY_S = 0.01
-    PAUSE_AFTER_FAIL_DELAY_S = 3
-    TICK_DURATION_S = 0.0166  # 60 Hz
