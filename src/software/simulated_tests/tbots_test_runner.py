@@ -88,22 +88,24 @@ class TbotsTestRunner:
 
     def set_tactics(
         self,
-        tactics: AssignedTacticPlayControlParams,
-        is_friendly: bool,
+        blue_tactics={},
+        yellow_tactics={},
     ):
-        """Overrides current AI tactic for the given team
+        """Overrides AI tactics for all robots on each team.
+        By default, assigns no tactic for all robots whose id is not specified.
 
-        :param tactic: the tactic params proto to use
-        :param is_friendly: whether the play should be applied to the "friendly" team
+        :param blue_tactics: dict of robot_id -> tactic for blue team
+        :param yellow_tactics: dict of robot_id -> tactic for yellow team
         """
-        fs_proto_unix_io = self.blue_full_system_proto_unix_io
-        # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
-        if (is_friendly and self.is_yellow_friendly) or not (
-            is_friendly or self.is_yellow_friendly
-        ):
-            fs_proto_unix_io = self.yellow_full_system_proto_unix_io
+        blue_params = self._create_assigned_tactic_params(blue_tactics)
+        yellow_params = self._create_assigned_tactic_params(yellow_tactics)
 
-        fs_proto_unix_io.send_proto(AssignedTacticPlayControlParams, tactics)
+        self.blue_full_system_proto_unix_io.send_proto(
+            AssignedTacticPlayControlParams, blue_params
+        )
+        self.yellow_full_system_proto_unix_io.send_proto(
+            AssignedTacticPlayControlParams, yellow_params
+        )
 
     def set_play(self, play: Play, is_friendly: bool):
         """Overrides current AI play for the given team
@@ -119,6 +121,23 @@ class TbotsTestRunner:
             fs_proto_unix_io = self.yellow_full_system_proto_unix_io
 
         fs_proto_unix_io.send_proto(Play, play)
+
+    def _create_assigned_tactic_params(self, tactics):
+        """Converts dict to AssignedTacticPlayControlParams
+
+        :param tactics: dict of robot_id -> tactic
+        """
+        params = AssignedTacticPlayControlParams()
+
+        # Checks which oneof field in Tactic to assign the specified tactic to
+        for robot_id, specific_tactic in tactics.items():
+            tactic = params.assigned_tactics[robot_id]
+            for field in tactic.DESCRIPTOR.oneofs_by_name["tactic"].fields:
+                if field.message_type == specific_tactic.DESCRIPTOR:
+                    getattr(tactic, field.name).CopyFrom(specific_tactic)
+                    break
+
+        return params
 
     @abstractmethod
     def set_world_state(self, worldstate: WorldState):
