@@ -58,10 +58,9 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
         blue_play = Play()
         blue_play.name = PlayName.DefensePlay
 
-        params = AssignedTacticPlayControlParams()
-
+        # assign no tactics for yellow team
+        simulated_test_runner.set_tactics(blue_tactics=None, yellow_tactics={})
         simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     simulated_test_runner.run_test(
         setup=setup,
