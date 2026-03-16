@@ -53,14 +53,9 @@ def test_offense_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.OffensePlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.HaltPlay
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.OffensePlay, yellow_play=PlayName.HaltPlay
+        )
 
     field = tbots_cpp.Field.createSSLDivisionBField()
 

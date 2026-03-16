@@ -49,9 +49,6 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             ),
         )
 
-        blue_play = Play()
-        yellow_play = Play()
-
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
@@ -60,21 +57,20 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             simulated_test_runner.send_gamecontroller_command(
                 gc_command=Command.Type.KICKOFF, team=Team.BLUE
             )
-            blue_play.name = PlayName.KickoffFriendlyPlay
-            yellow_play.name = PlayName.KickoffEnemyPlay
+            blue_play = PlayName.KickoffFriendlyPlay
+            yellow_play = PlayName.KickoffEnemyPlay
         else:
             simulated_test_runner.send_gamecontroller_command(
                 gc_command=Command.Type.KICKOFF, team=Team.YELLOW
             )
-            blue_play.name = PlayName.KickoffEnemyPlay
-            yellow_play.name = PlayName.KickoffFriendlyPlay
+            blue_play = PlayName.KickoffEnemyPlay
+            yellow_play = PlayName.KickoffFriendlyPlay
 
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.NORMAL_START, team=Team.BLUE
         )
 
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_play(blue_play=blue_play, yellow_play=yellow_play)
 
     # TODO (#3650): fix validation logic
 

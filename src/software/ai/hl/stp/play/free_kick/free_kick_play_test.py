@@ -34,14 +34,7 @@ def free_kick_play_setup(
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
-    blue_play = Play()
-    blue_play.name = play_name
-
-    yellow_play = Play()
-    yellow_play.name = PlayName.HaltPlay
-
-    simulated_test_runner.set_play(blue_play, is_friendly=True)
-    simulated_test_runner.set_play(yellow_play, is_friendly=False)
+    simulated_test_runner.set_plays(blue_play=play_name, yellow_play=PlayName.HaltPlay)
 
 
 # We want to test friendly half, enemy half, and at the border of the field

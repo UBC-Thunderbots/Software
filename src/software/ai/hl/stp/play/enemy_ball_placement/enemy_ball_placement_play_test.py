@@ -63,15 +63,10 @@ def test_two_ai_ball_placement(
             final_ball_placement_point=ball_placement_point,
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.EnemyBallPlacementPlay
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.BallPlacementPlay
-
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.EnemyBallPlacementPlay,
+            yellow_play=PlayName.BallPlacementPlay,
+        )
 
     always_validation_sequence_set = [
         [RobotNeverEntersPlacementRegion(ball_placement_point)]

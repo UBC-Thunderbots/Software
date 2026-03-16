@@ -47,14 +47,7 @@ def test_example_play(simulated_test_runner):
             ),
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.ExamplePlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.HaltPlay
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_plays(blue_play=PlayName.ExamplePlay, yellow_play=PlayName.HaltPlay)
 
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
