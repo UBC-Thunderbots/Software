@@ -73,8 +73,7 @@ MotorControllerStatus TmcMotorController::earlyPoll()
     return MotorControllerStatus::OK;
 }
 
-int TmcMotorController::readThenWriteVelocity(const MotorIndex& motor,
-                                              const int& target_velocity)
+int TmcMotorController::readThenWriteVelocity(MotorIndex motor, int target_velocity)
 {
     const int velocity_erpm = readThenWriteValue(
         motor, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET, target_velocity);
@@ -281,7 +280,7 @@ void TmcMotorController::configureHall(const MotorIndex& motor)
                                  TMC4671_VELOCITY_PHI_E_HAL);
 }
 
-MotorFaultIndicator TmcMotorController::checkDriverFault(const MotorIndex& motor)
+MotorFaultIndicator TmcMotorController::checkDriverFault(MotorIndex motor)
 {
     bool drive_enabled = true;
     std::unordered_set<TbotsProto::MotorFault> motor_faults;

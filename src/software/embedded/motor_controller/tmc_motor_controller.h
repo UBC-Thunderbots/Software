@@ -17,12 +17,11 @@ class TmcMotorController : public MotorController
 
     void reset() override;
 
-    MotorFaultIndicator checkDriverFault(const MotorIndex& motor) override;
+    MotorFaultIndicator checkDriverFault(MotorIndex motor) override;
 
     void immediatelyDisable() override;
 
-    int readThenWriteVelocity(const MotorIndex& motor,
-                              const int& target_velocity) override;
+    int readThenWriteVelocity(MotorIndex motor, int target_velocity) override;
 
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins appropriately and

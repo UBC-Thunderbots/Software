@@ -47,7 +47,7 @@ class StSpinMotorControllerTest
 
         LOG(INFO) << "Motor controller setup complete";
 
-        for (auto motor : args_.enabled_motors)
+        for (const MotorIndex motor : args_.enabled_motors)
         {
             if (args_.torque_pid.kp && args_.torque_pid.ki)
             {
@@ -77,7 +77,7 @@ class StSpinMotorControllerTest
         {
             LOG(INFO) << "Running speed profile";
 
-            for (auto motor : args_.enabled_motors)
+            for (const MotorIndex motor : args_.enabled_motors)
             {
                 motor_controller->sendAndReceiveFrame(
                     motor, SetResponseTypeFrame{StSpinResponseType::SPEED_AND_FAULTS});
@@ -87,14 +87,18 @@ class StSpinMotorControllerTest
             {
                 for (int i = 0; i < 2000; ++i)
                 {
-                    for (auto motor : args_.enabled_motors)
+                    for (const MotorIndex motor : args_.enabled_motors)
                     {
                         motor_controller->readThenWriteVelocity(motor, setpoint);
                         motor_controller->checkDriverFault(motor);
 
+                        std::stringstream target_speed_label;
+                        target_speed_label << "target_speed_rpm_" << motor;
+                        std::stringstream measured_speed_label;
+                        measured_speed_label << "measured_speed_rpm_" << motor;
                         LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                            {"target_speed_rpm", setpoint},
-                            {"measured_speed_rpm",
+                            {target_speed_label.str(), setpoint},
+                            {measured_speed_label.str(),
                              motor_controller->motor_status_.at(motor)
                                  .measured_speed_rpm},
                         });
@@ -107,7 +111,7 @@ class StSpinMotorControllerTest
         {
             LOG(INFO) << "Running torque profile";
 
-            for (auto motor : args_.enabled_motors)
+            for (const MotorIndex motor : args_.enabled_motors)
             {
                 motor_controller->sendAndReceiveFrame(
                     motor, SetResponseTypeFrame{StSpinResponseType::IQ_AND_ID});
@@ -117,7 +121,7 @@ class StSpinMotorControllerTest
             {
                 for (int i = 0; i < 2000; ++i)
                 {
-                    for (auto motor : args_.enabled_motors)
+                    for (const MotorIndex motor : args_.enabled_motors)
                     {
                         motor_controller->sendAndReceiveFrame(
                             motor, SetTargetTorqueFrame{
@@ -125,9 +129,15 @@ class StSpinMotorControllerTest
                                        .motor_target_torque = setpoint,
                                    });
 
+                        std::stringstream iq_label;
+                        iq_label << "Iq_" << motor;
+                        std::stringstream id_label;
+                        id_label << "Id_" << motor;
                         LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                            {"Iq", motor_controller->motor_status_.at(motor).iq},
-                            {"Id", motor_controller->motor_status_.at(motor).id},
+                            {iq_label.str(),
+                             motor_controller->motor_status_.at(motor).iq},
+                            {id_label.str(),
+                             motor_controller->motor_status_.at(motor).id},
                         });
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(2));

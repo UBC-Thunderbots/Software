@@ -72,7 +72,6 @@ cc_binary(
     ],
     deps = [
         ":motor_controller",
-        "//proto/message_translation:tbots_protobuf",
         "//software/logger",
         "//software/logger:network_logger",
         "@boost//:program_options",
