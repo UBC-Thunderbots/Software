@@ -70,7 +70,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             gc_command=Command.Type.NORMAL_START, team=Team.BLUE
         )
 
-        simulated_test_runner.set_play(blue_play=blue_play, yellow_play=yellow_play)
+        simulated_test_runner.set_plays(blue_play=blue_play, yellow_play=yellow_play)
 
     # TODO (#3650): fix validation logic
 
