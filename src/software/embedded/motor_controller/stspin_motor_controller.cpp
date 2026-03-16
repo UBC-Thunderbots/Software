@@ -13,6 +13,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/embedded/motor_controller/stspin_types.h"
 #include "software/embedded/spi_utils.h"
+#include "software/embedded/gpio/gpio_char_dev.h"
 #include "software/logger/logger.h"
 
 // AUTOSAR variant of CRC-8
@@ -21,7 +22,7 @@ using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
 StSpinMotorController::StSpinMotorController()
     : reset_gpio_(
-          setupGpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH))
+          std::make_unique<GpioCharDev>(RESET_GPIO_PIN, GpioDirection::OUTPUT, GpioState::HIGH))
 {
     for (const MotorIndex& motor : driveMotors())
     {

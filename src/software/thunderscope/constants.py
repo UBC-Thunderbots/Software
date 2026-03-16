@@ -388,3 +388,30 @@ class LogLevels(StrEnum):
     INFO = "INFO"
     WARNING = "WARNING"
     FATAL = "FATAL"
+
+
+class RuntimeManagerConstants:
+    """Constants for Runtime Manager"""
+
+    RUNTIME_CONFIG_BLUE_KEY = "blue_runtime_name"
+    RUNTIME_CONFIG_YELLOW_KEY = "yellow_runtime_name"
+    DEFAULT_BINARY_PATH = "software/unix_full_system"
+    DEFAULT_BINARY_NAME = "Current Fullsystem"
+    EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
+    RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
+
+    RUNTIME_STATS_DIRECTORY_PATH = "/tmp/tbots/stats"
+    RUNTIME_FRIENDLY_STATS_FILE = "blue.toml"
+    RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE = "yellow_from_blue.toml"
+    RUNTIME_ENEMY_STATS_FILE = "yellow.toml"
+    RUNTIME_FRIENDLY_FROM_ENEMY_STATS_FILE = "blue_from_yellow.toml"
+
+    RUNTIME_STATS_SCORE_KEY = "goals"
+    RUNTIME_STATS_RED_CARDS_KEY = "red_cards"
+    RUNTIME_STATS_YELLOW_CARDS_KEY = "yellow_cards"
+    RUNTIME_STATS_SHOTS_ON_NET = "shots_on_net"
+    RUNTIME_STATS_SHOTS_BLOCKED = "shots_blocked"
+
+    RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
+    DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
+    MAX_RELEASES_FETCHED = 5

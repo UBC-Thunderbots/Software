@@ -1,7 +1,6 @@
 #pragma once
 
-#include "software/embedded/constants/constants.h"
-#include "software/embedded/gpio/setup_gpio.hpp"
+#include "software/embedded/gpio/gpio.h"
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
 #include "software/embedded/motor_controller/motor_index.h"
@@ -268,4 +267,9 @@ class TmcMotorController : public MotorController
         1 / DRIVE_MOTOR_NUM_POLE_PAIRS;
     static constexpr double DRIBBLER_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM =
         1 / DRIBBLER_MOTOR_NUM_POLE_PAIRS;
+
+    static constexpr int SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = 16;
+    static constexpr int SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = 19;
+    static constexpr int MOTOR_DRIVER_RESET_GPIO                = 12;
+    static constexpr int DRIVER_CONTROL_ENABLE_GPIO             = 22;
 };

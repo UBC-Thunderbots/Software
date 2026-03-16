@@ -4,6 +4,7 @@ from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from typing import Callable, override
 import webbrowser
+from software.thunderscope.gl.widgets.gl_runtime_selector import GLRuntimeSelectorDialog
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.widgets.gl_runtime_installer import (
@@ -105,6 +106,13 @@ class GLGamecontrollerToolbar(GLToolbar):
             display_text="Install Runtimes",
         )
 
+        self.runtime_selector_button = self.__setup_icon_button(
+            qta.icon("mdi6.server"),
+            "Select runtimes for each team",
+            self.__open_runtime_selector_dialog,
+            display_text="Select Runtimes",
+        )
+
         # disable the normal start button when no play is selected
         self.normal_start_enabled = True
         self.__toggle_normal_start_button()
@@ -122,6 +130,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.layout().addStretch()
         self.__add_separator(self.layout())
         self.layout().addWidget(self.runtime_installer_button)
+        self.layout().addWidget(self.runtime_selector_button)
 
     @override
     def refresh(self) -> None:
@@ -261,7 +270,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         command = ManualGCCommand(manual_command=Command(type=command, for_team=team))
         self.proto_unix_io.send_proto(ManualGCCommand, command)
 
-    def __open_runtime_installer_dialog(self):
+    def __open_runtime_installer_dialog(self) -> None:
         """Opens the runtime installer modal, initializing if first time"""
         if not hasattr(self, "runtime_installer_dialog"):
             self.runtime_installer_dialog = GLRuntimeInstallerDialog(
@@ -269,3 +278,8 @@ class GLGamecontrollerToolbar(GLToolbar):
             )
 
         self.runtime_installer_dialog.show()
+
+    def __open_runtime_selector_dialog(self) -> None:
+        """Initializes and opens the runtime selector dialog"""
+        self.runtime_selector_dialog = GLRuntimeSelectorDialog(parent=self.parent())
+        self.runtime_selector_dialog.show()

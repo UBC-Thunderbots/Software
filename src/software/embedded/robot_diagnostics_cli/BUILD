@@ -31,7 +31,6 @@ py_binary(
         requirement("typer_shell"),
         requirement("rich"),
         requirement("protobuf"),
-        requirement("redis"),
         requirement("inquirerpy"),
     ],
 )
@@ -55,14 +54,10 @@ py_library(
     srcs = [":embedded_communication.py"],
     deps = [
         requirement("protobuf"),
-        requirement("redis"),
     ],
 )
 
 py_library(
     name = "embedded_data",
     srcs = [":embedded_data.py"],
-    deps = [
-        requirement("redis"),
-    ],
 )

@@ -10,10 +10,10 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
-#include "software/embedded/redis/redis_client.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
+#include "software/embedded/toml_config/toml_config_client.h"
 #include "software/logger/logger.h"
 
 class Thunderloop
@@ -61,8 +61,8 @@ class Thunderloop
     std::unique_ptr<NetworkService> network_service_;
     std::unique_ptr<PowerService> power_service_;
 
-    // Clients
-    std::unique_ptr<RedisClient> redis_client_;
+    // TOML config client
+    std::unique_ptr<TomlConfigClient> toml_config_client_;
 
    private:
     /*
@@ -131,7 +131,6 @@ class Thunderloop
 
     // Output Msg Buffers
     TbotsProto::RobotStatus robot_status_;
-    TbotsProto::JetsonStatus jetson_status_;
     TbotsProto::NetworkStatus network_status_;
     TbotsProto::PowerStatus power_status_;
     std::optional<TbotsProto::MotorStatus> motor_status_;
@@ -165,6 +164,9 @@ class Thunderloop
     const std::string PATH_TO_RINGBUFFER_LOG = "/var/log/dmesg";
 
     std::ifstream log_file = std::ifstream(PATH_TO_RINGBUFFER_LOG);
+
+    // Path to the CPU thermal zone temperature file
+    const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone0/temp";
 };
 
 /*

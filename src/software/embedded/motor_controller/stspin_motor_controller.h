@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/embedded/gpio/setup_gpio.hpp"
+#include "software/embedded/gpio/gpio.h"
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
 #include "software/embedded/motor_controller/motor_index.h"
@@ -46,8 +46,12 @@ class StSpinMotorController : public MotorController
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;
 
+    static constexpr int RESET_GPIO_PIN = 12;
+
     // SPI file descriptors
     std::unordered_map<MotorIndex, int> spi_fds_;
+
+    std::unique_ptr<Gpio> reset_gpio_;
 
     struct MotorStatus
     {
@@ -64,8 +68,6 @@ class StSpinMotorController : public MotorController
     };
 
     std::unordered_map<MotorIndex, MotorStatus> motor_status_;
-
-    std::unique_ptr<Gpio> reset_gpio_;
 
     /**
      * Opens a SPI file descriptor for the given motor
