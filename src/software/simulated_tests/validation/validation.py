@@ -82,9 +82,8 @@ def create_validation_types(validation_class):
     # We simply pass the validation_geometry from the validation object through.
     common = {
         "__init__": constructor,
-        "get_validation_geometry": lambda self, world: (
-            self.validation.get_validation_geometry(world)
-        ),
+        "get_validation_geometry": lambda self,
+        world: self.validation.get_validation_geometry(world),
     }
 
     eventually_true = type(
@@ -92,13 +91,11 @@ def create_validation_types(validation_class):
         (Validation,),
         {
             **common,
-            "__repr__": lambda self: (
-                "EventuallyTrueValidation: " + repr(self.validation)
-            ),
+            "__repr__": lambda self: "EventuallyTrueValidation: "
+            + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
-            "get_validation_status": lambda self, world: (
-                self.validation.get_validation_status(world)
-            ),
+            "get_validation_status": lambda self,
+            world: self.validation.get_validation_status(world),
         },
     )
 
@@ -107,9 +104,8 @@ def create_validation_types(validation_class):
         (Validation,),
         {
             **common,
-            "__repr__": lambda self: (
-                "EventuallyFalseValidation: " + repr(self.validation)
-            ),
+            "__repr__": lambda self: "EventuallyFalseValidation: "
+            + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
             "get_validation_status": lambda self, world: flip_validation(self, world),
         },
@@ -122,9 +118,8 @@ def create_validation_types(validation_class):
             **common,
             "__repr__": lambda self: "AlwaysTrueValidation: " + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.ALWAYS,
-            "get_validation_status": lambda self, world: (
-                self.validation.get_validation_status(world)
-            ),
+            "get_validation_status": lambda self,
+            world: self.validation.get_validation_status(world),
         },
     )
 
@@ -215,6 +210,17 @@ def run_validation_sequence_sets(
     return eventually_validation_proto_set, always_validation_proto_set
 
 
+def check_validation(validation_proto_set):
+    """Check validation and make sure its always true
+
+    :param validation_proto_set: Validation proto set
+    :raises: AssertionError
+    """
+    for validation_proto in validation_proto_set.validations:
+        if validation_proto.status == ValidationStatus.FAILING:
+            raise AssertionError(validation_proto.failure_msg)
+
+
 def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     """Creates a ValidationGeometry which is a visual representation of the
     validation to be rendered as either green (PASSING) or red (FAILING)
@@ -251,14 +257,3 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
         )
 
     return validation_geometry
-
-
-def check_validation(validation_proto_set):
-    """Check validation and make sure its always true
-
-    :param validation_proto_set: Validation proto set
-    :raises: AssertionError
-    """
-    for validation_proto in validation_proto_set.validations:
-        if validation_proto.status == ValidationStatus.FAILING:
-            raise AssertionError(validation_proto.failure_msg)
