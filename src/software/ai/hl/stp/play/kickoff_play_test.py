@@ -76,6 +76,8 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         simulated_test_runner.set_play(blue_play, is_friendly=True)
         simulated_test_runner.set_play(yellow_play, is_friendly=False)
 
+    # TODO (#3650): fix validation logic
+
     # Always Validation
     always_validation_sequence_set = [[]]
 
