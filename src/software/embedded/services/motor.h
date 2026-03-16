@@ -39,7 +39,7 @@ class MotorService
      * @param RobotConstants_t The robot constants
      * @param control_loop_frequency_hz The frequency the main loop will call poll at
      */
-    MotorService(const RobotConstants_t& robot_constants, int control_loop_frequency_hz);
+    MotorService(const RobotConstants& robot_constants, int control_loop_frequency_hz);
 
     virtual ~MotorService();
 
@@ -387,7 +387,7 @@ class MotorService
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors_;
 
-    RobotConstants_t robot_constants_;
+    RobotConstants robot_constants_;
 
     // Drive Motors
     EuclideanToWheel euclidean_to_four_wheel_;

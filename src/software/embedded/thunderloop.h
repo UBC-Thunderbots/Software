@@ -7,8 +7,8 @@
 #include <thread>
 
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
+#include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
@@ -49,7 +49,7 @@ class Thunderloop
      * @param enable_log_merging Whether to merge repeated log message or not
      * @param loop_hz The rate to run the loop
      */
-    Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
+    Thunderloop(const RobotConstants& robot_constants, bool enable_log_merging,
                 const int loop_hz);
 
     ~Thunderloop();
@@ -140,7 +140,7 @@ class Thunderloop
     TbotsProto::Timestamp time_sent_;
 
     // Current State
-    RobotConstants_t robot_constants_;
+    RobotConstants robot_constants_;
     Angle current_orientation_;
     int robot_id_;
     int channel_id_;

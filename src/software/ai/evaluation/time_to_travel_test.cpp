@@ -7,7 +7,7 @@
 class TimeToTravel : public ::testing::Test
 {
    protected:
-    RobotConstants_t robot_constants = create2021RobotConstants();
+    RobotConstants robot_constants = create2026RobotConstants();
 };
 
 TEST_F(TimeToTravel, getTimeToTravelDistance_already_at_dest)
