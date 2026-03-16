@@ -50,19 +50,16 @@ def test_crease_positioning(
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[0].crease_defender.CopyFrom(
-            CreaseDefenderTactic(
-                enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
-                crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
-                max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                ball_steal_mode=BallStealMode.STEAL,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: CreaseDefenderTactic(
+                    enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
+                    crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    ball_steal_mode=BallStealMode.STEAL,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     always_validation_sequence_set = [
         [
@@ -163,19 +160,16 @@ def test_crease_autochip(
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[0].crease_defender.CopyFrom(
-            CreaseDefenderTactic(
-                enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
-                crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
-                max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                ball_steal_mode=BallStealMode.STEAL,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: CreaseDefenderTactic(
+                    enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
+                    crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    ball_steal_mode=BallStealMode.STEAL,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     always_validation_sequence_set = [
         [
@@ -238,19 +232,16 @@ def test_crease_get_ball(
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[0].crease_defender.CopyFrom(
-            CreaseDefenderTactic(
-                enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
-                crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
-                max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                ball_steal_mode=BallStealMode.STEAL,
-            )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: CreaseDefenderTactic(
+                    enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
+                    crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    ball_steal_mode=BallStealMode.STEAL,
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     always_validation_sequence_set = [
         [

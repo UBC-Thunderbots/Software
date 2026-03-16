@@ -124,14 +124,13 @@ def test_goalie_blocks_shot(
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[0].goalie.CopyFrom(
-            GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: GoalieTactic(
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     always_validation_sequence_set = [
         [
@@ -206,14 +205,13 @@ def test_goalie_clears_from_dead_zone(
             )
         )
 
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[0].goalie.CopyFrom(
-            GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: GoalieTactic(
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                )
+            }
         )
-        simulated_test_runner.set_tactics(params, is_friendly=True)
-
-        params = AssignedTacticPlayControlParams()
-        simulated_test_runner.set_tactics(params, is_friendly=False)
 
     always_validation_sequence_set = [
         [
