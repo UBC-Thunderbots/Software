@@ -111,20 +111,14 @@ class TbotsTestRunner:
                 AssignedTacticPlayControlParams, yellow_params
             )
 
-    def set_play(self, play: Play, is_friendly: bool):
-        """Overrides current AI play for the given team
+    def set_plays(self, blue_play: PlayName, yellow_play: PlayName):
+        """Overrides current AI play for both teams
 
-        :param play: the play proto to use
-        :param is_blue: whether the play should be applied to the blue team
+        :param blue_play: the play name for the blue team to use
+        :param yellow_play: the play name for the yellow team to use
         """
-        fs_proto_unix_io = self.blue_full_system_proto_unix_io
-        # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
-        if (is_friendly and self.is_yellow_friendly) or not (
-            is_friendly or self.is_yellow_friendly
-        ):
-            fs_proto_unix_io = self.yellow_full_system_proto_unix_io
-
-        fs_proto_unix_io.send_proto(Play, play)
+        self.blue_full_system_proto_unix_io.send_proto(Play, Play(name=blue_play))
+        self.yellow_full_system_proto_unix_io.send_proto(Play, Play(name=yellow_play))
 
     def _create_assigned_tactic_params(self, tactics: dict[int, Any]):
         """Converts dict of tactics to AssignedTacticPlayControlParams message
