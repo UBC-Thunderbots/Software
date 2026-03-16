@@ -34,7 +34,7 @@ class MotorService
      *
      * @param robot_constants The robot constants
      */
-    MotorService(const RobotConstants_t& robot_constants);
+    MotorService(const RobotConstants& robot_constants);
 
     virtual ~MotorService() = default;
 
@@ -99,7 +99,7 @@ class MotorService
     // Flag indicating whether the motors have been calibrated
     bool is_initialized_ = false;
 
-    RobotConstants_t robot_constants_;
+    RobotConstants robot_constants_;
 
     EuclideanToWheel euclidean_to_four_wheel_;
 

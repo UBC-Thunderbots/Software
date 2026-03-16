@@ -21,7 +21,6 @@
 #include "proto/team.pb.h"
 #include "proto/world.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/robot_constants.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
@@ -272,10 +271,6 @@ PYBIND11_MODULE(python_bindings, m)
         .def_readwrite("max_force_dribbler_speed_rpm",
                        &RobotConstants::max_force_dribbler_speed_rpm)
         .def_readwrite("robot_radius_m", &RobotConstants::robot_radius_m)
-        .def_readwrite("mass_kg", &RobotConstants::mass_kg)
-        .def_readwrite("inertial_factor", &RobotConstants::inertial_factor)
-        .def_readwrite("jerk_limit_kg_m_per_s_3",
-                       &RobotConstants::jerk_limit_kg_m_per_s_3)
         .def_readwrite("front_wheel_angle_deg", &RobotConstants::front_wheel_angle_deg)
         .def_readwrite("back_wheel_angle_deg", &RobotConstants::back_wheel_angle_deg)
         .def_readwrite("front_of_robot_width_meters",
@@ -292,6 +287,7 @@ PYBIND11_MODULE(python_bindings, m)
                        &RobotConstants::robot_max_speed_m_per_s)
         .def_readwrite("robot_max_ang_speed_rad_per_s",
                        &RobotConstants::robot_max_ang_speed_rad_per_s);
+    m.def("create2026RobotConstants", &create2026RobotConstants);
     m.def("create2021RobotConstants", &create2021RobotConstants);
 
     m.def("createPoint", &createPoint);

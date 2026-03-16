@@ -11,8 +11,8 @@
 #include <boost/program_options.hpp>
 
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
+#include "shared/robot_constants.h"
 #include "software/embedded/thunderloop.h"
 #include "software/logger/network_logger.h"
 #include "software/world/robot_state.h"
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
     reserveProcessMemory(pre_allocation_size);
 
     auto thunderloop =
-        Thunderloop(create2021RobotConstants(), args.enable_log_merging, THUNDERLOOP_HZ);
+        Thunderloop(create2026RobotConstants(), args.enable_log_merging, THUNDERLOOP_HZ);
     thunderloop.runLoop();
 
     return 0;

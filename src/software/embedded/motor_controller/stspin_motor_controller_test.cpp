@@ -23,8 +23,8 @@ class StSpinMotorControllerTest
             std::optional<int16_t> ki;
         };
 
-        bool help        = false;
-        std::string mode = "speed";
+        bool help                = false;
+        std::string mode         = "speed";
         int setpoint_duration_ms = 2000;
         std::vector<int16_t> setpoints;
         std::unordered_set<MotorIndex> enabled_motors;
@@ -103,7 +103,7 @@ class StSpinMotorControllerTest
             }
 
             auto start_time = std::chrono::system_clock::now();
-            auto duration = std::chrono::milliseconds(args_.setpoint_duration_ms);
+            auto duration   = std::chrono::milliseconds(args_.setpoint_duration_ms);
             while (std::chrono::system_clock::now() - start_time < duration)
             {
                 if (g_stop_requested)

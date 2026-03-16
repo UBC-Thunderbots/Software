@@ -7,8 +7,8 @@
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
+#include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/motor.h"
 #include "software/logger/logger.h"
@@ -68,7 +68,7 @@ extern "C"
     }
 }
 
-Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
+Thunderloop::Thunderloop(const RobotConstants& robot_constants, bool enable_log_merging,
                          const int loop_hz)
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),

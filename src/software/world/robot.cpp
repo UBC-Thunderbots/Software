@@ -8,7 +8,7 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, bool breakbeam_tripped,
              const std::set<RobotCapability> &unavailable_capabilities,
-             const RobotConstants_t &robot_constants)
+             const RobotConstants &robot_constants)
     : id_(id),
       current_state_(position, velocity, orientation, angular_velocity,
                      breakbeam_tripped),
@@ -22,7 +22,7 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities,
-             const RobotConstants_t &robot_constants)
+             const RobotConstants &robot_constants)
     : id_(id),
       current_state_(position, velocity, orientation, angular_velocity, false),
       timestamp_(timestamp),
@@ -33,7 +33,7 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
 
 Robot::Robot(RobotId id, const RobotState &initial_state, const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities,
-             const RobotConstants_t &robot_constants)
+             const RobotConstants &robot_constants)
     : id_(id),
       current_state_(initial_state),
       timestamp_(timestamp),
@@ -171,7 +171,7 @@ std::set<RobotCapability> &Robot::getMutableRobotCapabilities()
     return unavailable_capabilities_;
 }
 
-const RobotConstants_t &Robot::robotConstants() const
+const RobotConstants &Robot::robotConstants() const
 {
     return robot_constants_;
 }
