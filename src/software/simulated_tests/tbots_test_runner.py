@@ -2,6 +2,7 @@ from proto.import_all_protos import *
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
+from typing import Any
 
 logger = create_logger(__name__)
 
@@ -88,24 +89,27 @@ class TbotsTestRunner:
 
     def set_tactics(
         self,
-        blue_tactics={},
-        yellow_tactics={},
+        blue_tactics: dict[int, Any] | None = {},
+        yellow_tactics: dict[int, Any] | None = {},
     ):
         """Overrides AI tactics for all robots on each team.
         By default, assigns no tactic for all robots whose id is not specified.
+        Pass in a None value for a team's tactics to not send tactics override.
 
-        :param blue_tactics: dict of robot_id -> tactic for blue team
-        :param yellow_tactics: dict of robot_id -> tactic for yellow team
+        :param blue_tactics: None or dict of robot_id -> tactic for blue team
+        :param yellow_tactics: None or dict of robot_id -> tactic for yellow team
         """
-        blue_params = self._create_assigned_tactic_params(blue_tactics)
-        yellow_params = self._create_assigned_tactic_params(yellow_tactics)
+        if blue_tactics is not None:
+            blue_params = self._create_assigned_tactic_params(blue_tactics)
+            self.blue_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, blue_params
+            )
 
-        self.blue_full_system_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams, blue_params
-        )
-        self.yellow_full_system_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams, yellow_params
-        )
+        if yellow_tactics is not None:
+            yellow_params = self._create_assigned_tactic_params(yellow_tactics)
+            self.yellow_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, yellow_params
+            )
 
     def set_play(self, play: Play, is_friendly: bool):
         """Overrides current AI play for the given team
