@@ -65,6 +65,7 @@ def test_shoot_or_chip_play(simulated_test_runner):
             blue_play=PlayName.ShootOrChipPlay, yellow_play=PlayName.UseAiSelection
         )
 
+    # TODO (#3651): create validations
     simulated_test_runner.run_test(
         setup=setup,
         # this array is just so that the test runs 5 times
