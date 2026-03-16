@@ -2,7 +2,7 @@ import math
 
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 from software.simulated_tests.validation.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
