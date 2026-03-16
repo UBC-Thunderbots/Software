@@ -38,6 +38,10 @@ enum class StSpinFaultCode
     DP_FAULT     = 0x0400
 };
 
+struct NoOpFrame
+{
+};
+
 struct SetTargetSpeedFrame
 {
     bool motor_enabled;

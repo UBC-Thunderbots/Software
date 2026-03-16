@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/embedded/constants/constants.h"
 #include "software/embedded/gpio/setup_gpio.hpp"
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
@@ -26,9 +25,9 @@ class StSpinMotorController : public MotorController
 
    private:
     using OutgoingFrame =
-        std::variant<SetResponseTypeFrame, SetTargetSpeedFrame, SetTargetTorqueFrame,
-                     SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame, SetPidSpeedKpKiFrame,
-                     SetPidSpeedKdFrame>;
+        std::variant<NoOpFrame, SetResponseTypeFrame, SetTargetSpeedFrame,
+                     SetTargetTorqueFrame, SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame,
+                     SetPidSpeedKpKiFrame, SetPidSpeedKdFrame>;
 
     // Length of frame (in number of bytes)
     static constexpr unsigned int FRAME_LEN = 6;
@@ -53,6 +52,7 @@ class StSpinMotorController : public MotorController
     struct MotorStatus
     {
         bool enabled;
+        int16_t target_speed_rpm;
         int16_t measured_speed_rpm;
         uint16_t faults;
         int16_t iq;
@@ -86,6 +86,8 @@ class StSpinMotorController : public MotorController
                     std::array<uint8_t, FRAME_LEN>& tx);
 
     void processRx(MotorIndex motor, const std::array<uint8_t, FRAME_LEN>& rx);
+
+    void sendMotorStatusToPlotJuggler(MotorIndex motor);
 
     friend class StSpinMotorControllerTest;
 };

@@ -167,15 +167,6 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 
     sendAndReceiveFrame(motor, outgoing_frame);
 
-    std::stringstream target_speed_label;
-    target_speed_label << "target_speed_rpm_" << motor;
-    std::stringstream measured_speed_label;
-    measured_speed_label << "measured_speed_rpm_" << motor;
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-        {target_speed_label.str(), target_velocity},
-        {measured_speed_label.str(), motor_status_.at(motor).measured_speed_rpm},
-    });
-
     return motor_status_.at(motor).measured_speed_rpm;
 }
 
@@ -240,7 +231,11 @@ void StSpinMotorController::populateTx(const OutgoingFrame& outgoing_frame,
         [&]<typename TFrame>(TFrame&& frame)
         {
             using T = std::decay_t<TFrame>;
-            if constexpr (std::is_same_v<T, SetTargetSpeedFrame>)
+            if constexpr (std::is_same_v<T, NoOpFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::NO_OP);
+            }
+            else if constexpr (std::is_same_v<T, SetTargetSpeedFrame>)
             {
                 tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_SPEED);
                 tx[1] = static_cast<uint8_t>(frame.motor_enabled);
@@ -333,4 +328,26 @@ void StSpinMotorController::processRx(const MotorIndex motor,
             break;
         }
     }
+}
+
+void StSpinMotorController::sendMotorStatusToPlotJuggler(const MotorIndex motor)
+{
+    for (const StSpinResponseType response_type :
+         {StSpinResponseType::IQ_AND_ID, StSpinResponseType::SPEED_AND_FAULTS})
+    {
+        sendAndReceiveFrame(motor, SetResponseTypeFrame{response_type});
+    }
+
+    // Response type changes only take effect *after* we request them,
+    // so send a no-op frame to receive a response of the last type we requested
+    sendAndReceiveFrame(motor, NoOpFrame{});
+
+    const MotorStatus& motor_status = motor_status_.at(motor);
+
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+        {"target_speed_rpm_" + motor, motor_status.target_speed_rpm},
+        {"measured_speed_rpm_" + motor, motor_status.measured_speed_rpm},
+        {"iq_" + motor, motor_status.iq},
+        {"id_" + motor, motor_status.id},
+    });
 }
