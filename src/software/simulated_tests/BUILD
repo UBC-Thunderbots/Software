@@ -22,7 +22,7 @@ py_library(
         "//software/logger:py_logger",
         "//software/networking/unix:threaded_unix_listener_py",
         "//software/networking/unix:threaded_unix_sender_py",
-        "//software/simulated_tests/validation",
+        "//software/simulated_tests/validation:validations",
         "//software/thunderscope",
         "//software/thunderscope:config",
         "//software/thunderscope:constants",
@@ -47,7 +47,7 @@ py_library(
         "//software/logger:py_logger",
         "//software/networking/unix:threaded_unix_listener_py",
         "//software/networking/unix:threaded_unix_sender_py",
-        "//software/simulated_tests/validation",
+        "//software/simulated_tests/validation:validations",
         "//software/thunderscope",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
@@ -103,7 +103,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/validation",
+        "//software/simulated_tests/validation:validations",
         requirement("pytest"),
     ],
 )
