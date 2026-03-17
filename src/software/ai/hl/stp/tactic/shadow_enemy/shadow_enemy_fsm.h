@@ -128,6 +128,11 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
      */
     void stealAndPull(const Update &event);
 
+    DEFINE_SML_GUARD_CLASS(enemyThreatHasBall, ShadowEnemyFSM)
+    DEFINE_SML_GUARD_CLASS(contestedBall, ShadowEnemyFSM)
+    DEFINE_SML_GUARD_CLASS(blockedShot, ShadowEnemyFSM)
+
+
     auto operator()()
     {
         using namespace boost::sml;

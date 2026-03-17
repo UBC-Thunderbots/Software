@@ -15,6 +15,10 @@ darkdetect==0.7.1 \
 evdev==1.7.0 ; sys_platform == "linux" \
     --hash=sha256:95bd2a1e0c6ce2cd7a2ecc6e6cd9736ff794b3ad5cb54d81d8cbc2e414d0b870
     # via -r software/thunderscope/requirements.in
+graphviz==0.21 \
+    --hash=sha256:20743e7183be82aaaa8ad6c93f8893c923bd6658a04c32ee115edb3c8a835f78 \
+    --hash=sha256:54f33de9f4f911d7e84e4191749cac8cc5653f815b06738c54db9a15ab8b1e42
+    # via -r software/thunderscope/requirements.in
 netifaces==0.11.0 \
     --hash=sha256:043a79146eb2907edf439899f262b3dfe41717d34124298ed281139a8b93ca32 \
     --hash=sha256:08e3f102a59f9eaef70948340aeb6c89bd09734e0dca0f3b82720305729f63ea \
@@ -102,19 +106,95 @@ protobuf==6.31.1 \
     --hash=sha256:a40fc12b84c154884d7d4c4ebd675d5b3b5283e155f324049ae396b95ddebc39 \
     --hash=sha256:d8cac4c982f0b957a4dc73a80e2ea24fab08e679c0de9deb835f4a12d69aca9a
     # via -r software/thunderscope/requirements.in
+psutil==5.9.0 \
+    --hash=sha256:072664401ae6e7c1bfb878c65d7282d4b4391f1bc9a56d5e03b5a490403271b5 \
+    --hash=sha256:1070a9b287846a21a5d572d6dddd369517510b68710fca56b0e9e02fd24bed9a \
+    --hash=sha256:1d7b433519b9a38192dfda962dd8f44446668c009833e1429a52424624f408b4 \
+    --hash=sha256:3151a58f0fbd8942ba94f7c31c7e6b310d2989f4da74fcbf28b934374e9bf841 \
+    --hash=sha256:32acf55cb9a8cbfb29167cd005951df81b567099295291bcfd1027365b36591d \
+    --hash=sha256:3611e87eea393f779a35b192b46a164b1d01167c9d323dda9b1e527ea69d697d \
+    --hash=sha256:3d00a664e31921009a84367266b35ba0aac04a2a6cad09c550a89041034d19a0 \
+    --hash=sha256:4e2fb92e3aeae3ec3b7b66c528981fd327fb93fd906a77215200404444ec1845 \
+    --hash=sha256:539e429da49c5d27d5a58e3563886057f8fc3868a5547b4f1876d9c0f007bccf \
+    --hash=sha256:55ce319452e3d139e25d6c3f85a1acf12d1607ddedea5e35fb47a552c051161b \
+    --hash=sha256:58c7d923dc209225600aec73aa2c4ae8ea33b1ab31bc11ef8a5933b027476f07 \
+    --hash=sha256:7336292a13a80eb93c21f36bde4328aa748a04b68c13d01dfddd67fc13fd0618 \
+    --hash=sha256:742c34fff804f34f62659279ed5c5b723bb0195e9d7bd9907591de9f8f6558e2 \
+    --hash=sha256:7641300de73e4909e5d148e90cc3142fb890079e1525a840cf0dfd39195239fd \
+    --hash=sha256:76cebf84aac1d6da5b63df11fe0d377b46b7b500d892284068bacccf12f20666 \
+    --hash=sha256:7779be4025c540d1d65a2de3f30caeacc49ae7a2152108adeaf42c7534a115ce \
+    --hash=sha256:7d190ee2eaef7831163f254dc58f6d2e2a22e27382b936aab51c835fc080c3d3 \
+    --hash=sha256:8293942e4ce0c5689821f65ce6522ce4786d02af57f13c0195b40e1edb1db61d \
+    --hash=sha256:869842dbd66bb80c3217158e629d6fceaecc3a3166d3d1faee515b05dd26ca25 \
+    --hash=sha256:90a58b9fcae2dbfe4ba852b57bd4a1dded6b990a33d6428c7614b7d48eccb492 \
+    --hash=sha256:9b51917c1af3fa35a3f2dabd7ba96a2a4f19df3dec911da73875e1edaf22a40b \
+    --hash=sha256:b2237f35c4bbae932ee98902a08050a27821f8f6dfa880a47195e5993af4702d \
+    --hash=sha256:c3400cae15bdb449d518545cbd5b649117de54e3596ded84aacabfbb3297ead2 \
+    --hash=sha256:c51f1af02334e4b516ec221ee26b8fdf105032418ca5a5ab9737e8c87dafe203 \
+    --hash=sha256:cb8d10461c1ceee0c25a64f2dd54872b70b89c26419e147a05a10b753ad36ec2 \
+    --hash=sha256:d62a2796e08dd024b8179bd441cb714e0f81226c352c802fca0fd3f89eeacd94 \
+    --hash=sha256:df2c8bd48fb83a8408c8390b143c6a6fa10cb1a674ca664954de193fdcab36a9 \
+    --hash=sha256:e5c783d0b1ad6ca8a5d3e7b680468c9c926b804be83a3a8e95141b05c39c9f64 \
+    --hash=sha256:e9805fed4f2a81de98ae5fe38b75a74c6e6ad2df8a5c479594c7629a1fe35f56 \
+    --hash=sha256:ea42d747c5f71b5ccaa6897b216a7dadb9f52c72a0fe2b872ef7d3e1eacf3ba3 \
+    --hash=sha256:ef216cc9feb60634bda2f341a9559ac594e2eeaadd0ba187a4c2eb5b5d40b91c \
+    --hash=sha256:ff0d41f8b3e9ebb6b6110057e40019a432e96aae2008951121ba4e56040b84f3
+    # via -r software/thunderscope/requirements.in
+pyopengl==3.1.6 \
+    --hash=sha256:57c597d989178e1413002df6b923619f6d29807501dece1c60cc6f12c0c8e8a7 \
+    --hash=sha256:8ea6c8773927eda7405bffc6f5bb93be81569a7b05c8cac50cd94e969dce5e27 \
+    --hash=sha256:a7139bc3e15d656feae1f7e3ef68c799941ed43fadc78177a23db7e946c20738
+    # via -r software/thunderscope/requirements.in
 pyqt-toast-notification==1.3.2 \
     --hash=sha256:135736ec0f16bff41104dee3c60ac318e5d55ae3378bf26892c6d08c36088ae6 \
     --hash=sha256:82688101202737736d51ab6c74a573b32266ecb7c8b0002f913407bd369737d9
     # via -r software/thunderscope/requirements.in
-pyqt6-qt6==6.8.1 \
-    --hash=sha256:006d786693d0511fbcf184a862edbd339c6ed1bb3bd9de363d73a19ed4b23dff \
-    --hash=sha256:08065d595f1e6fc2dde9f4450eeff89082f4bad26f600a8e9b9cc5966716bfcf \
-    --hash=sha256:1eb8460a1fdb38d0b2458c2974c01d471c1e59e4eb19ea63fc447aaba3ad530e \
-    --hash=sha256:20843cb86bd94942d1cd99e39bf1aeabb875b241a35a8ab273e4bbbfa63776db \
-    --hash=sha256:9f3790c4ce4dc576e48b8718d55fb8743057e6cbd53a6ca1dd253ffbac9b7287 \
-    --hash=sha256:a8bc2ed4ee5e7c6ff4dd1c7db0b27705d151fee5dc232bbd1bf17618f937f515 \
-    --hash=sha256:d6ca5d2b9d2ec0ee4a814b2175f641a5c4299cb80b45e0f5f8356632663f89b3
+pyqt6==6.10.0 \
+    --hash=sha256:0eb82f152a83a8ae39f7d3ba580829ff7c0e8179d19d70f396853c10c8ddc5ac \
+    --hash=sha256:357da0f1465557dde249a31bc1f152320b7628a644e1d55d2db09b635394f39f \
+    --hash=sha256:43e94a0ad4713055b47b4676d23432349845729912e4f3d20ac95935931c5e6f \
+    --hash=sha256:54b6b022369e4e6ade8cf79c0f988558839df7b2c285f814b4567d15a0fcb756 \
+    --hash=sha256:710ecfd720d9a03b2c684881ae37f528e11d17e8f1bf96431d00a6a73f308e36 \
+    --hash=sha256:8b5e4ea573733017a76bd12ea1b53351fd7f6dc57f8abf4329c4a41fea6dde04 \
+    --hash=sha256:c2b5fc1a028e95b096f3a5966611cc8194e8e9e69984c41477417e18b5ce1362
     # via -r software/thunderscope/requirements.in
+pyqt6-qt6==6.10.0 \
+    --hash=sha256:497df665091451ab7fde3355e262b243d2a2d97924b899a5cbb193a0cc573b7e \
+    --hash=sha256:768ced73dbb2c85e6d72ea63fd7409ba934d4b24580ef073a3eb16fd88d3fe70 \
+    --hash=sha256:7f3ae89337e905dba436c226027ebd8777d4cdeef386131ad9a1b0a53ecc1a81 \
+    --hash=sha256:9b48d9eba795a78d21393b1909e7a0406512038ea4667463e4882e284bf95817 \
+    --hash=sha256:cd38b281bb7229b8114f13126aacd77f831a97105fdb1d900260a48ead8c9fcd \
+    --hash=sha256:d11bc03908cacbd2e3426289ad51dcf6d2896af6ffec595626ce9cf9b93e770d
+    # via
+    #   -r software/thunderscope/requirements.in
+    #   pyqt6
+pyqt6-sip==13.10.3 \
+    --hash=sha256:0c7af45b0cc47484deb20f94d426d7f76beb141f86315d5ee5edc944ca88abea \
+    --hash=sha256:3286a98e93608d51048e9046f557117424c8366be266b33ff852ee54ffa7b9bf \
+    --hash=sha256:3ddaf8fd15d18b550d054d3e5b6bbb3ae227650caabd0953f4da2bde07c3bd1c \
+    --hash=sha256:3f3e2a79738319b795f0d1b2a555b1ea669b1a306b604bac876c84833cabb008 \
+    --hash=sha256:4fc6229ba7276266e3805b5517e7413cba79538f0c3ce7d2042a2027a90f99cf \
+    --hash=sha256:52c864e6977f1d45a98b8f694682fc545fd21b2432e84f552e8b16894f9b41ed \
+    --hash=sha256:580dcd25016f54fcee30663bac55534bdc2a1d1d06dd39850dc4573ae938b792 \
+    --hash=sha256:6122fe4ccba5a5023581c2c3c57deab6eab56d8e931beec20b05666a46a38e6a \
+    --hash=sha256:61e4e935f1d80dd107b0a97fbcbbf27e07046666f72663fa4b0d700514e8201c \
+    --hash=sha256:630895b3827e2c3b4e072089157985691fe4210d64340e71141f93775ea4ae51 \
+    --hash=sha256:7361b7005a375cd647f2d1e3ca7000967406831bef466003e6ead2af27d84a2b \
+    --hash=sha256:748758dfd7f77aeb1c5becfc934a722ce10de51bfdf9902f9cad19c27ba146e7 \
+    --hash=sha256:9e48e5d6ac9e1a61d5abdfb2191a0ffb19948eefd5adacdd0c1dedbed06222aa \
+    --hash=sha256:a6354ae91fcf7f8da116c921c77efd06e1a98d58d25a95c047991954394212fe \
+    --hash=sha256:a7cf030fd4a024ffc60d5d9ea10b443b5a8ca5e247036d72fc4e13f12f3670c6 \
+    --hash=sha256:a856b9b2a4700c8dded1c870811d5ba26722238d57c9098904a99570429d112b \
+    --hash=sha256:a8b5532398c0e6d0064d4dce4c096ff20bf710507dafefb036eff61c3f59cda8 \
+    --hash=sha256:d02c138c6eacb13ef668bfe6becfb6ab40bb40135f34a36ef31b7dc860976493 \
+    --hash=sha256:d2b26256fa4d4d042d699138d9bc1df0180b981cce020f59fae15d310eccf4ee \
+    --hash=sha256:dd21e6f70f7cfe81e1d9b96800652ffeb5947b41354c4fd58a5e3d3f02499a7a \
+    --hash=sha256:e234a3af9539f71bb566e7136317b92f189a89553970284d833cd63cca4dafdd \
+    --hash=sha256:e65a52b3e1228de2a0cd4051191dcbd36adefeb0db813c207a4b7516803d1c25 \
+    --hash=sha256:eb7afe41329ce2eca99118f01776a047a2a150c550258dff1746505af223f997 \
+    --hash=sha256:efef47667ca009557d7ecf985b15f0bf440584fd634ee0eab19ec296effc7cca \
+    --hash=sha256:f2828ab21a6686196f7b6f9507e2100cbe5c1f2c421519c0f522b5ebe83f359b
+    # via pyqt6
 pyqtdarktheme-fork==2.3.2 \
     --hash=sha256:3ea94fed5df262d960378409357c63032639f749794d766f41a45ad8558b2523 \
     --hash=sha256:d96ee64f0884678fad9b6bc352d5e37d84ca786fa60ed32ffaa7e6c6bc67e964
@@ -133,3 +213,13 @@ qtpy==2.4.2 \
     # via
     #   pyqt-toast-notification
     #   qtawesome
+thefuzz==0.19.0 \
+    --hash=sha256:4fcdde8e40f5ca5e8106bc7665181f9598a9c8b18b0a4d38c41a095ba6788972 \
+    --hash=sha256:6f7126db2f2c8a54212b05e3a740e45f4291c497d75d20751728f635bb74aa3d
+    # via -r software/thunderscope/requirements.in
+
+# The following packages are considered to be unsafe in a requirements file:
+setuptools==80.9.0 \
+    --hash=sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922 \
+    --hash=sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c
+    # via -r software/thunderscope/requirements.in
