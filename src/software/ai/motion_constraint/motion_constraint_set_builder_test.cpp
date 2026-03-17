@@ -34,7 +34,7 @@ std::vector<std::tuple<std::shared_ptr<Tactic>, std::set<TbotsProto::MotionConst
                              TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
                              TbotsProto::MotionConstraint::FRIENDLY_HALF}),
                         std::set<TbotsProto::MotionConstraint>()),
-        std::make_tuple(std::make_shared<ChipTactic>(ai_config_ptr),
+        std::make_tuple(std::make_shared<KickOrChipTactic>(ai_config_ptr),
                         std::set<TbotsProto::MotionConstraint>(),
                         std::set<TbotsProto::MotionConstraint>()),
         std::make_tuple(
