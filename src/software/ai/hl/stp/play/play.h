@@ -2,6 +2,8 @@
 
 #include <boost/coroutine2/all.hpp>
 #include <vector>
+#include <typeindex>
+#include <typeinfo>
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.hpp"
@@ -191,4 +193,11 @@ class Play
     uint64_t sequence_number = 0;
 
     RobotNavigationObstacleFactory obstacle_factory;
+
+    static constexpr uint32_t ASSIGNMENTS_CACHE_MAX_SIZE = 20;
+
+    using TacticTypeDeque = std::deque<std::shared_ptr<std::type_index>>;
+    using RobotPreviousTactics = std::unordered_map<std::type_index, int>;
+    std::unordered_map<RobotId,TacticTypeDeque> previous_robot_tactics;
+    std::unordered_map<RobotId, RobotPreviousTactics> previous_robot_tactics_count;
 };
