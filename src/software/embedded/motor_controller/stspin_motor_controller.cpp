@@ -168,7 +168,7 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 
     sendAndReceiveFrame(motor, outgoing_frame);
 
-    return motor_status_.at(motor).measured_speed_rpm;
+    return motor_status_.at(motor).speed;
 }
 
 void StSpinMotorController::immediatelyDisable()
@@ -298,7 +298,7 @@ void StSpinMotorController::processRx(const MotorIndex motor,
     {
         case StSpinResponseType::SPEED_AND_FAULTS:
         {
-            motor_status_[motor].measured_speed_rpm =
+            motor_status_[motor].speed =
                 static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
             motor_status_[motor].faults =
                 static_cast<uint16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
@@ -328,27 +328,50 @@ void StSpinMotorController::processRx(const MotorIndex motor,
                 static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
             break;
         }
+        case StSpinResponseType::IQ_AND_IQ_REF:
+        {
+            motor_status_[motor].iq =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_status_[motor].iq_ref =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
+        case StSpinResponseType::ID_AND_ID_REF:
+        {
+            motor_status_[motor].id =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_status_[motor].id_ref =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
+        case StSpinResponseType::SPEED_AND_SPEED_REF:
+        {
+            motor_status_[motor].speed =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_status_[motor].speed_ref =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
     }
 }
 
 void StSpinMotorController::sendMotorStatusToPlotJuggler(const MotorIndex motor)
 {
     for (const StSpinResponseType response_type :
-         {StSpinResponseType::IQ_AND_ID, StSpinResponseType::SPEED_AND_FAULTS})
+         {StSpinResponseType::SPEED_AND_SPEED_REF, StSpinResponseType::IQ_AND_IQ_REF,
+          StSpinResponseType::ID_AND_ID_REF, StSpinResponseType::SPEED_AND_FAULTS})
     {
         sendAndReceiveFrame(motor, SetResponseTypeFrame{response_type});
     }
 
-    // Response type changes only take effect *after* we request them,
-    // so send a no-op frame to receive a response of the last type we requested
-    sendAndReceiveFrame(motor, NoOpFrame{});
-
     const MotorStatus& motor_status = motor_status_.at(motor);
 
     LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-        {"target_speed_rpm_" + motor, motor_status.target_speed_rpm},
-        {"measured_speed_rpm_" + motor, motor_status.measured_speed_rpm},
+        {"speed_" + motor, motor_status.speed},
+        {"speed_ref_" + motor, motor_status.speed_ref},
         {"iq_" + motor, motor_status.iq},
+        {"iq_ref_" + motor, motor_status.iq_ref},
         {"id_" + motor, motor_status.id},
+        {"id_ref_" + motor, motor_status.id_ref},
     });
 }

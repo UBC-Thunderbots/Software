@@ -102,6 +102,11 @@ class StSpinMotorControllerTest
                 };
             }
 
+            for (const MotorIndex motor : args_.enabled_motors)
+            {
+                motor_controller->sendAndReceiveFrame(motor, command_frame);
+            }
+
             auto start_time = std::chrono::system_clock::now();
             auto duration   = std::chrono::milliseconds(args_.setpoint_duration_ms);
             while (std::chrono::system_clock::now() - start_time < duration)
@@ -109,11 +114,6 @@ class StSpinMotorControllerTest
                 if (g_stop_requested)
                 {
                     break;
-                }
-
-                for (const MotorIndex motor : args_.enabled_motors)
-                {
-                    motor_controller->sendAndReceiveFrame(motor, command_frame);
                 }
 
                 for (const MotorIndex motor : args_.enabled_motors)
