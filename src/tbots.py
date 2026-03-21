@@ -3,6 +3,8 @@
 import itertools
 import os
 import sys
+from dataclasses import dataclass
+from enum import Enum
 from subprocess import PIPE, run
 
 import iterfzf
@@ -41,6 +43,36 @@ from cli.cli_params import (
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
 
+
+@dataclass
+class BuildOptions:
+    action: ActionArgument
+    search_query: str | None
+    no_optimized_build: bool
+    debug_build: bool
+    select_debug_binaries: list | None
+    flash_robots: list | None
+    ssh_password: str | None
+    interactive_search: bool
+    tracy: bool
+    test_suite: bool
+    enable_thunderscope: bool
+    enable_visualizer: bool
+    stop_ai_on_start: bool
+    jobs_option: str | None
+    robot_name: str | None
+    ansible_playbook: str | None
+
+
+class BazelFlag(tuple, Enum):
+    DEBUG_BUILD    = ("-c", "dbg")
+    OPTIMIZED      = ("--copt=-O3",)
+    ROBOT_PLATFORM = ("--platforms=//toolchains/cc:robot",)
+    TRACY          = ("--cxxopt=-DTRACY_ENABLE",)
+    THUNDERSCOPE   = ("--spawn_strategy=local", "--test_env=DISPLAY=:0")
+    NO_CACHE_TESTS = ("--cache_test_results=false",)
+
+
 app = Typer()
 
 
@@ -72,6 +104,31 @@ def main(
     if interactive_cli:
         start_interactive_cli()
         return
+
+    validate(action, search_query, flash_robots, ssh_password, ansible_playbook, test_suite)
+
+    command = create_command(
+        ctx, action, search_query, no_optimized_build, debug_build,
+        select_debug_binaries, flash_robots, ssh_password, interactive_search,
+        tracy, test_suite, enable_thunderscope, enable_visualizer,
+        stop_ai_on_start, jobs_option, robot_name, ansible_playbook,
+    )
+
+    if print_command:
+        print(" ".join(command))
+    else:
+        print(
+            "\n================================= Running: ======================================\n"
+        )
+        print(" ".join(command))
+        print(
+            "\n=================================================================================\n"
+        )
+        code = os.system(" ".join(command))
+        sys.exit(1 if code != 0 else 0)
+
+
+def validate(action, search_query, flash_robots, ssh_password, ansible_playbook, test_suite):
     if action is None:
         print("Error: 'action' is required unless using --interactive-cli")
         sys.exit(1)
@@ -81,14 +138,19 @@ def main(
                 "If you want to flash robots or run ansible playbooks, both the robot IDs and password must be provided"
             )
             sys.exit(1)
-        isFlashing = True
-
-    if search_query is None and (not test_suite or not action == ActionArgument.test):
+    if search_query is None and (not test_suite or action != ActionArgument.test):
         print(
             "You must specify a search query unless you are running the test suite, use ./tbots.py test --suite instead"
         )
         sys.exit(1)
 
+
+def create_command(
+    ctx, action, search_query, no_optimized_build, debug_build,
+    select_debug_binaries, flash_robots, ssh_password, interactive_search,
+    tracy, test_suite, enable_thunderscope, enable_visualizer,
+    stop_ai_on_start, jobs_option, robot_name, ansible_playbook,
+):
     if test_suite and action == ActionArgument.test:
         target = """-- //...                              \\
                       -//software/field_tests/...         \\
@@ -101,20 +163,21 @@ def main(
     command = ["bazel", action.value]
     unknown_args = ctx.args
 
-    # Trigger a debug build
-    if debug_build or select_debug_binaries:
-        command += ["-c", "dbg"]
+    flag_conditions = {
+        BazelFlag.DEBUG_BUILD:    debug_build or bool(select_debug_binaries),
+        BazelFlag.OPTIMIZED:      not debug_build and (not no_optimized_build or bool(flash_robots)),
+        BazelFlag.ROBOT_PLATFORM: bool(flash_robots or ansible_playbook),
+        BazelFlag.TRACY:          tracy,
+        BazelFlag.THUNDERSCOPE:   enable_thunderscope,
+        BazelFlag.NO_CACHE_TESTS: action == ActionArgument.test,
+    }
+    for flag, condition in flag_conditions.items():
+        if condition:
+            command += list(flag.value)
 
-    # Trigger an optimized build by default. Note that Thunderloop should always be
-    # compiled with optimizations for best performance
-    if not debug_build and (not no_optimized_build or flash_robots):
-        command += ["--copt=-O3"]
+    if jobs_option:
+        command += ["--jobs=" + jobs_option]
 
-    # Used for when flashing Raspberry Pi
-    if flash_robots or ansible_playbook:
-        command += ["--platforms=//toolchains/cc:robot"]
-
-    # Select debug binaries to run
     if select_debug_binaries:
         if DebugBinary.sim in select_debug_binaries:
             unknown_args += ["--debug_simulator"]
@@ -123,20 +186,6 @@ def main(
         if DebugBinary.yellow in select_debug_binaries:
             unknown_args += ["--debug_yellow_full_system"]
 
-    # To run the Tracy profile, enable the TRACY_ENABLE macro
-    if tracy:
-        command += ["--cxxopt=-DTRACY_ENABLE"]
-
-    # limit number of jobs
-    if jobs_option:
-        command += ["--jobs=" + jobs_option]
-
-    if enable_thunderscope:
-        command += ["--spawn_strategy=local", "--test_env=DISPLAY=:0"]
-
-    # Don't cache test results
-    if action == ActionArgument.test:
-        command += ["--cache_test_results=false"]
     command += [target]
     if action == ActionArgument.run:
         command += ["--"]
@@ -150,9 +199,6 @@ def main(
         bazel_arguments += ["--enable_thunderscope"]
 
     if ansible_playbook:
-        print(robot_name)
-        print(ssh_password)
-        print(ansible_playbook)
         if not robot_name or not ssh_password:
             print("please provided robot name and ssh password")
             sys.exit(1)
@@ -167,8 +213,6 @@ def main(
         bazel_arguments += ["-pwd", ssh_password]
 
     if action == ActionArgument.test:
-        command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
-
         if (
             "--debug_blue_full_system" in unknown_args
             or "--debug_yellow_full_system" in unknown_args
@@ -178,27 +222,11 @@ def main(
                 "Do not run simulated pytests as a test when debugging, use ./tbots.py -d run instead"
             )
             sys.exit(1)
-
+        command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]
     else:
         command += bazel_arguments
 
-    # If the user requested a command dump, just print the command to run
-    if print_command:
-        print(" ".join(command))
-
-    # Otherwise, run the command! We use os.system here because we don't
-    # care about the output and subprocess doesn't seem to run qt for somereason
-    else:
-        print(
-            "\n================================= Running: ======================================\n"
-        )
-        print(" ".join(command))
-        print(
-            "\n=================================================================================\n"
-        )
-        code = os.system(" ".join(command))
-        # propagate exit code
-        sys.exit(1 if code != 0 else 0)
+    return command
 
 
 def start_interactive_cli():
@@ -217,31 +245,25 @@ def start_interactive_cli():
             ).ask()
             match launch_option:
                 case "Simulator":
-                    autoref = questionary.confirm(
-                        "Enable autoref?", default=False
-                    ).ask()
-                    ci_mode = questionary.confirm(
-                        "Enable ci_mode?", default=False
-                    ).ask()
+                    autoref = questionary.confirm("Enable autoref?", default=False).ask()
+                    ci_mode = questionary.confirm("Enable ci_mode?", default=False).ask()
                     if autoref:
                         command.append("--enable_autoref")
                     if ci_mode:
                         command.append("--ci_mode")
                 case "Diagnostics":
-                    interface = questionary.text(
-                        "What is your network interface?"
-                    ).ask()
+                    interface = questionary.text("What is your network interface?").ask()
                     command.extend(["--run_diagnostics", "--interface", interface])
         case "Test":
             test = questionary.text(
                 "Please enter a test name (leave empty for entire suite)"
             ).ask()
             test = "all" if not test else test
-            command.extend(["test", "--suite" if test == "all" else test])
+            command.extend(["test", "--suite" if test == "all" or test == "" else test])
         case "Flash":
             playbook = questionary.select(
                 "Please select an ansible playbook:",
-                choices=["setup_pi.yml", "deploy_robot_software.yml"],
+                choices=["setup_pi.yml", "deploy_robot_software.yml", "deploy_powerboard.yml"],
             ).ask()
             robot = questionary.text("Please enter robot name (e.g. balle)").ask()
             password = questionary.password("Please enter ssh password").ask()
@@ -262,13 +284,13 @@ def fuzzy_find_target(
     search_query: SearchQueryArgument,
     interactive_search: InteractiveModeOption,
 ) -> str:
-    test_query = ["bazel", "query", "tests(//...)"]
-    binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
+    test_query    = ["bazel", "query", "tests(//...)"]
+    binary_query  = ["bazel", "query", "kind(.*_binary,//...)"]
     library_query = ["bazel", "query", "kind(.*_library,//...)"]
     bazel_queries = {
-        "test": [test_query],
-        "run": [test_query, binary_query],
-        "build": [library_query, test_query, binary_query],
+        ActionArgument.test:  [test_query],
+        ActionArgument.run:   [test_query, binary_query],
+        ActionArgument.build: [library_query, test_query, binary_query],
     }
 
     # Run the appropriate bazel query and ask thefuzz to find the best matching
@@ -276,10 +298,8 @@ def fuzzy_find_target(
     # Combine results of multiple queries with itertools.chain
     targets = list(
         itertools.chain.from_iterable(
-            [
-                run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
-                for query in bazel_queries[action]
-            ]
+            run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
+            for query in bazel_queries[action]
         )
     )
     # Create a dictionary to map target names to complete bazel targets
@@ -299,10 +319,7 @@ def fuzzy_find_target(
             list(target_dict.keys()),
             limit=NUM_FILTERED_MATCHES_TO_SHOW,
         )
-        targets = [
-            target_dict[filtered_target_name[0]]
-            for filtered_target_name in filtered_targets
-        ]
+        targets = [target_dict[name] for name, _ in filtered_targets]
         target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
         print("User selected {}".format(target))
 
