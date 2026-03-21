@@ -188,7 +188,6 @@ py_test(
     ],
 )
 
-
 cc_library(
     name = "assigned_tactics_play",
     srcs = ["assigned_tactics_play.cpp"],
