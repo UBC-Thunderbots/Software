@@ -26,7 +26,6 @@ from cli.cli_params import (
     NoOptimizedBuildOption,
     PrintCommandOption,
     RobotName,
-    SearchQueryArgument,
     SelectDebugBinariesOption,
     SSHPasswordOption,
     StopAIOnStartOption,
@@ -214,7 +213,7 @@ def create_command(ctx: Context, opts: BuildOptions) -> list[str]:
         bazel_arguments += ["-pwd", opts.ssh_password]
 
     if opts.flash_robots:
-        bazel_arguments += ["-pb deploy_robot_software.yml"]
+        bazel_arguments += ["--playbook", "deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
         bazel_arguments += [f"192.168.6.{200 + int(id)}" for id in opts.flash_robots]
         bazel_arguments += ["-pwd", opts.ssh_password]
@@ -296,8 +295,8 @@ def start_interactive_cli():
 
 def fuzzy_find_target(
     action: ActionArgument,
-    search_query: SearchQueryArgument,
-    interactive_search: InteractiveModeOption,
+    search_query: str,
+    interactive_search: bool,
 ) -> str:
     test_query = ["bazel", "query", "tests(//...)"]
     binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
