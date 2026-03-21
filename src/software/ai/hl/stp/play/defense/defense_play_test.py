@@ -1,9 +1,9 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.friendly_has_ball_possession import (
+from proto.play_pb2 import PlayName
+from software.simulated_tests.validation.ball_enters_region import *
+from software.simulated_tests.validation.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -55,13 +55,9 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.DefensePlay
-
-        params = AssignedTacticPlayControlParams()
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_tactics(params, is_friendly=False)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.DefensePlay, yellow_play=PlayName.HaltPlay
+        )
 
     simulated_test_runner.run_test(
         setup=setup,
@@ -124,14 +120,9 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.DefensePlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.ShootOrPassPlay
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.DefensePlay, yellow_play=PlayName.ShootOrPassPlay
+        )
 
     simulated_test_runner.run_test(
         setup=setup,

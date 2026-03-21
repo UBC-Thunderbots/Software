@@ -1,7 +1,7 @@
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
-from software.simulated_tests.validation import (
+from software.simulated_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
@@ -57,7 +57,7 @@ class MinNumberOfRobotsEntersRegion(Validation):
             "Check for "
             + str(self.req_robot_cnt)
             + " robots in region "
-            + ",".join(repr(self.regions))
+            + ",".join(repr(region) for region in self.regions)
         )
 
 

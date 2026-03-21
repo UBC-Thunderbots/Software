@@ -1,19 +1,21 @@
 import pytest
-import math
 import software.python_bindings as tbots_cpp
+import math
 from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.friendly_receives_ball_slow import (
+from software.simulated_tests.validation.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
-from software.simulated_tests.friendly_has_ball_possession import (
+from software.simulated_tests.validation.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
-from software.simulated_tests.ball_moves_in_direction import BallMovesForwardInRegions
-from software.simulated_tests.ball_enters_region import (
+from software.simulated_tests.validation.ball_moves_in_direction import (
+    BallMovesForwardInRegions,
+)
+from software.simulated_tests.validation.ball_enters_region import (
     BallEventuallyExitsRegion,
     BallEventuallyEntersRegion,
 )
@@ -108,16 +110,14 @@ def setup_pass_and_robots(
     # Setup the passer's tactic
     # We use KickTactic since AttackerTactic shoots towards the goal instead if open
     # KickTactic just does the kick we want
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].kick.CopyFrom(
-        KickTactic(
-            kick_origin=Point(
-                x_meters=best_pass.passerPoint().x(),
-                y_meters=best_pass.passerPoint().y(),
-            ),
-            kick_direction=Angle(radians=kick_vec.orientation().toRadians()),
-            kick_speed_meters_per_second=best_pass.speed(),
-        )
+    blue_tactics = {}
+    blue_tactics[0] = KickTactic(
+        kick_origin=Point(
+            x_meters=best_pass.passerPoint().x(),
+            y_meters=best_pass.passerPoint().y(),
+        ),
+        kick_direction=Angle(radians=kick_vec.orientation().toRadians()),
+        kick_speed_meters_per_second=best_pass.speed(),
     )
 
     # if we want a friendly robot to receive the pass
@@ -138,12 +138,9 @@ def setup_pass_and_robots(
             "disable_one_touch_shot": True,
         }
 
-        params.assigned_tactics[1].receiver.CopyFrom(ReceiverTactic(**receiver_args))
-    simulated_test_runner.set_tactics(params, True)
+        blue_tactics[1] = ReceiverTactic(**receiver_args)
 
-    # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    simulated_test_runner.set_tactics(params, False)
+    simulated_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics=None)
 
     return best_pass
 

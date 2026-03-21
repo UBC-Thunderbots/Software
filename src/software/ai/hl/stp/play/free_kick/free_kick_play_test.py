@@ -1,11 +1,12 @@
 import pytest
-
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.friendly_team_scored import *
-from proto.message_translation.tbots_protobuf import create_world_state
+
+from proto.import_all_protos import *
+
+from proto.play_pb2 import PlayName
 from proto.ssl_gc_common_pb2 import Team
+
+from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -33,14 +34,7 @@ def free_kick_play_setup(
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
-    blue_play = Play()
-    blue_play.name = play_name
-
-    yellow_play = Play()
-    yellow_play.name = PlayName.HaltPlay
-
-    simulated_test_runner.set_play(blue_play, is_friendly=True)
-    simulated_test_runner.set_play(yellow_play, is_friendly=False)
+    simulated_test_runner.set_plays(blue_play=play_name, yellow_play=PlayName.HaltPlay)
 
 
 # We want to test friendly half, enemy half, and at the border of the field
