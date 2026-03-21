@@ -193,10 +193,6 @@ class TigersAutoref:
                     )
                 )
 
-            # time_provider_instance.tick_ns(
-            #     self.tick_rate_ms * NANOSECONDS_PER_MILLISECOND
-            # )
-
     def _forward_to_gamecontroller(
         self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
     ) -> list[CiOutput]:
