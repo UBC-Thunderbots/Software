@@ -1,6 +1,7 @@
-from typer import Option, Argument
 from enum import Enum
 from typing import Annotated
+
+from typer import Argument, Option
 
 from cli.multi_option import MultiOption
 
@@ -22,8 +23,7 @@ SearchQueryArgument = Annotated[
 ]
 
 PrintCommandOption: type[bool] = Annotated[
-    bool, Option("-p", "--print_command",
-                 help="Print the generated Bazel command")
+    bool, Option("-p", "--print_command", help="Print the generated Bazel command")
 ]
 
 NoOptimizedBuildOption: type[bool] = Annotated[
@@ -78,8 +78,7 @@ InteractiveModeOption = Annotated[
 ]
 
 TracyOption = Annotated[
-    bool, Option(
-        "--tracy", help="Run the binary with the TRACY_ENABLE macro defined")
+    bool, Option("--tracy", help="Run the binary with the TRACY_ENABLE macro defined")
 ]
 
 TestSuiteOption = Annotated[
@@ -87,15 +86,14 @@ TestSuiteOption = Annotated[
     Option("--suite", help="Run entire test suite instead of searching for a target"),
 ]
 
-EnableThunderscopeOption = Annotated[bool,
-                                     Option("-t", "--enable_thunderscope")]
+EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]
 EnableVisualizerOption = Annotated[bool, Option("-v", "--enable_visualizer")]
 StopAIOnStartOption = Annotated[bool, Option("-s", "--stop_ai_on_start")]
 
 JobsOption = Annotated[str, Option("-j", "--jobs")]
-RobotName = Annotated[str, Option(
-    "-rn", "--robot_name", help="Name of robot. E.g. balle")]
-AnsiblePlaybook = Annotated[str, Option(
-    "-ap", "--ansible_playbook", help="Ansible playbook name")]
-InteractiveCLI = Annotated[bool, Option(
-    '-in', '--interactive_cli', help='enable interactive cli')]
+RobotName = Annotated[
+    str, Option("-rn", "--robot_name", help="Name of robot. E.g. balle")
+]
+AnsiblePlaybook = Annotated[
+    str, Option("-ap", "--ansible_playbook", help="Ansible playbook name")
+]

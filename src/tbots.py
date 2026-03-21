@@ -20,7 +20,6 @@ from cli.cli_params import (
     EnableThunderscopeOption,
     EnableVisualizerOption,
     FlashRobotsOption,
-    InteractiveCLI,
     InteractiveModeOption,
     JobsOption,
     NoOptimizedBuildOption,
@@ -77,7 +76,6 @@ app = Typer()
 
 @app.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
-    no_args_is_help=True,
 )
 def main(
     ctx: Context,
@@ -98,9 +96,8 @@ def main(
     jobs_option: JobsOption = None,
     robot_name: RobotName = None,
     ansible_playbook: AnsiblePlaybook = None,
-    interactive_cli: InteractiveCLI = False,
 ) -> None:
-    if interactive_cli:
+    if not action and not search_query:
         start_interactive_cli()
         return
 
@@ -164,9 +161,7 @@ def create_command(ctx: Context, opts: BuildOptions) -> list[str]:
                       -//software:unix_full_system_tar_gen"""
         print("Running software and simulated gameplay test suite")
     else:
-        target = fuzzy_find_target(
-            opts.action, opts.search_query, opts.interactive_search
-        )
+        target = fuzzy_find_target(opts.action, opts.search_query, opts.interactive_search)
 
     command = ["bazel", opts.action.value]
     unknown_args = ctx.args
@@ -293,11 +288,7 @@ def start_interactive_cli():
     app(args)
 
 
-def fuzzy_find_target(
-    action: ActionArgument,
-    search_query: str,
-    interactive_search: bool,
-) -> str:
+def fuzzy_find_target(action: ActionArgument, search_query: str, interactive_search: bool) -> str:
     test_query = ["bazel", "query", "tests(//...)"]
     binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
     library_query = ["bazel", "query", "kind(.*_library,//...)"]
