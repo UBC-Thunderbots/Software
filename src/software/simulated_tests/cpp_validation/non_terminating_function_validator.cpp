@@ -1,4 +1,4 @@
-#include "software/simulated_tests/validation/non_terminating_function_validator.h"
+#include "software/simulated_tests/cpp_validation/non_terminating_function_validator.h"
 
 #include <gtest/gtest.h>
 

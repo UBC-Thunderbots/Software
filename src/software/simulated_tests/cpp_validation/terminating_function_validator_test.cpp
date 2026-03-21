@@ -1,11 +1,11 @@
-#include "software/simulated_tests/validation/terminating_function_validator.h"
+#include "software/simulated_tests/cpp_validation/terminating_function_validator.h"
 
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
 #include <boost/coroutine2/all.hpp>
 
-#include "software/simulated_tests/validation/validation_function.h"
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
 TEST(TerminatingFunctionValidatorTest,

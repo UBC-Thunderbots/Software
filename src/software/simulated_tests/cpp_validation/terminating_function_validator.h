@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/simulated_tests/validation/validation_function.h"
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 
 /**
  * This class is a wrapper to make it easier to work with ValidationFunctions. It provides
