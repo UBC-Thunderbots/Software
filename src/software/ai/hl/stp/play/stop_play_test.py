@@ -2,10 +2,10 @@ from typing import override
 
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
-from proto.ssl_gc_common_pb2 import Team
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 from proto.import_all_protos import *
+from proto.ssl_gc_common_pb2 import Team
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.robot_speed_threshold import (
     RobotSpeedEventuallyBelowThreshold,
@@ -113,7 +113,7 @@ def test_stop_play(simulated_test_runner):
 
     # C++ test waits 8s before checking; use 15s timeout so robots have time to slow.
     # Threshold 1.4 m/s: expect robots to eventually slow below the 1.5 m/s STOP limit.
-    # TODO (#3658): add an eventually-validation that friendly robots stay at least 0.5 m away
+    # TODO (#3638): add an eventually-validation that friendly robots stay at least 0.5 m away
     # from the ball once pytest fixtures support delaying validations (to mirror the
     # C++ robotsAvoidBall(0.5, ...) check).
     simulated_test_runner.run_test(
