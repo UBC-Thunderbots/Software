@@ -288,8 +288,32 @@ void StSpinMotorController::populateTx(const OutgoingFrame& outgoing_frame,
         },
         outgoing_frame);
 
-    tx[5] = Crc8Autosar::calc(tx.data(), FRAME_LEN - 1);
-}
+    tx[5] = Crc8Autosar::calc(tx, FRAME_LEN - 1);
+
+    spiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], tx, rx, FRAME_LEN,
+                SPI_SPEED_HZ);
+
+    // Frame integrity check
+    const uint8_t rx_crc = Crc8Autosar::calc(rx, FRAME_LEN - 1);
+    if (rx[5] != rx_crc)
+    {
+        motor_status_[motor].consecutive_crc_failures++;
+        LOG(WARNING) << "Received frame that failed integrity check. Expected CRC "
+                     << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[5])
+                     << " for motor " << motor << " (consecutive failures: "
+                     << motor_status_[motor].consecutive_crc_failures << "). RX: "
+                     << static_cast<int>(rx[0]) << " " << static_cast<int>(rx[1]) << " "
+                     << static_cast<int>(rx[2]) << " " << static_cast<int>(rx[3]) << " "
+                     << static_cast<int>(rx[4]) << " " << static_cast<int>(rx[5]);
+        if (motor_status_[motor].consecutive_crc_failures >= MAX_CONSECUTIVE_CRC_FAILURES)
+        {
+            LOG(ERROR) << "Too many consecutive CRC failures for motor " << motor
+                       << ". Resetting.";
+            reset();
+        }
+        return;
+    }
+    motor_status_[motor].consecutive_crc_failures = 0;
 
 void StSpinMotorController::processRx(const MotorIndex motor,
                                       const std::array<uint8_t, FRAME_LEN>& rx)
