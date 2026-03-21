@@ -169,7 +169,6 @@ cc_test(
     ],
 )
 
-<<<<<<< HEAD
 py_test(
     name = "stop_play_test",
     srcs = [
