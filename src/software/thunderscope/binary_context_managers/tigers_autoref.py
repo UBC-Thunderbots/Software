@@ -73,6 +73,7 @@ class TigersAutoref:
         self.suppress_logs = suppress_logs
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
+        self.initial_timestamp = time.time_ns()
 
     def __enter__(self) -> TigersAutoref:
         if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
@@ -206,7 +207,11 @@ class TigersAutoref:
 
         :return: a list of CiOutput protos received from the Gamecontroller
         """
-        ci_input = CiInput(timestamp=time_provider_instance.time_provider_ns())
+        ci_input = CiInput(
+            timestamp=int(
+                self.initial_timestamp + time_provider_instance.elapsed_time_ns()
+            )
+        )
         print(
             "autoref timestamp:",
             int(time_provider_instance.elapsed_time_ns() * SECONDS_PER_NANOSECOND),

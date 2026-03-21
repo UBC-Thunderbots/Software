@@ -73,8 +73,6 @@ def async_sim_ticker(
     blue_proto_unix_io.register_observer(PrimitiveSet, blue_primitive_set_buffer)
     yellow_proto_unix_io.register_observer(PrimitiveSet, yellow_primitive_set_buffer)
 
-    current_timestamp = time_provider_instance.time_provider_ns()
-
     while tscope.is_open():
         # flush primitive set buffers before sending the next tick
         while (
