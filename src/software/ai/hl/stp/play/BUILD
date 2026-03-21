@@ -6,29 +6,7 @@ package(default_visibility = ["//visibility:public"])
 # "factory" design pattern to work are linked in
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
-cc_library(
-    name = "shoot_or_chip_play",
-    srcs = ["shoot_or_chip_play.cpp"],
-    hdrs = ["shoot_or_chip_play.h"],
-    deps = [
-        ":play",
-        "//proto/message_translation:tbots_protobuf",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/evaluation:find_open_areas",
-        "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/halt:halt_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-        "//software/world:game_state",
-    ],
-    alwayslink = True,
-)
+
 
 cc_library(
     name = "stop_play",
@@ -72,7 +50,6 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
-        ":shoot_or_chip_play",
         ":stop_play",
         "//software/ai/hl/stp/play/ball_placement:ball_placement_play",
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
@@ -87,6 +64,7 @@ cc_library(
         "//software/ai/hl/stp/play/offense:offense_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
+        "//software/ai/hl/stp/play/shoot_or_chip:shoot_or_chip_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
     ],
 )
@@ -103,36 +81,6 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-    ],
-)
-
-cc_test(
-    name = "shoot_or_chip_play_cpp_test",
-    srcs = ["shoot_or_chip_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:shoot_or_chip_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-py_test(
-    name = "shoot_or_chip_play_test",
-    srcs = [
-        "shoot_or_chip_play_test.py",
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
-    deps = [
-        "//software:conftest",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
     ],
 )
 
