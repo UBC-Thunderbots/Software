@@ -1,33 +1,35 @@
 #!/opt/tbotspython/bin/python3
 
+import itertools
 import os
 import sys
+from subprocess import PIPE, run
 
 import iterfzf
-import itertools
-from subprocess import PIPE, run
+import questionary
 from thefuzz import process
-from typer import Typer, Context, Argument, prompt
+from typer import Argument, Context, Typer
+
 from cli.cli_params import (
     ActionArgument,
-    PrintCommandOption,
-    NoOptimizedBuildOption,
+    AnsiblePlaybook,
+    DebugBinary,
     DebugBuildOption,
-    SelectDebugBinariesOption,
-    FlashRobotsOption,
-    SSHPasswordOption,
-    InteractiveModeOption,
-    TracyOption,
     EnableThunderscopeOption,
     EnableVisualizerOption,
-    StopAIOnStartOption,
-    SearchQueryArgument,
-    TestSuiteOption,
-    DebugBinary,
-    JobsOption,
-    RobotName,
-    AnsiblePlaybook,
+    FlashRobotsOption,
     InteractiveCLI,
+    InteractiveModeOption,
+    JobsOption,
+    NoOptimizedBuildOption,
+    PrintCommandOption,
+    RobotName,
+    SearchQueryArgument,
+    SelectDebugBinariesOption,
+    SSHPasswordOption,
+    StopAIOnStartOption,
+    TestSuiteOption,
+    TracyOption,
 )
 
 # thefuzz is a fuzzy string matcher in python
@@ -43,8 +45,7 @@ app = Typer()
 
 
 @app.command(
-    context_settings={"allow_extra_args": True,
-                      "ignore_unknown_options": True},
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     no_args_is_help=True,
 )
 def main(
@@ -72,8 +73,7 @@ def main(
         start_interactive_cli()
         return
     if action is None:
-        print(
-            "Error: 'action' is required unless using --interactive-cli")
+        print("Error: 'action' is required unless using --interactive-cli")
         sys.exit(1)
     if bool(flash_robots) or bool(ansible_playbook):
         if not ssh_password:
@@ -163,8 +163,7 @@ def main(
     if flash_robots:
         bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        bazel_arguments += [f"192.168.6.20{
-            id}" for id in flash_robots]
+        bazel_arguments += [f"192.168.6.20{id}" for id in flash_robots]
         bazel_arguments += ["-pwd", ssh_password]
 
     if action == ActionArgument.test:
@@ -190,50 +189,65 @@ def main(
     # Otherwise, run the command! We use os.system here because we don't
     # care about the output and subprocess doesn't seem to run qt for somereason
     else:
+        print(
+            "\n================================= Running: ======================================\n"
+        )
         print(" ".join(command))
+        print(
+            "\n=================================================================================\n"
+        )
         code = os.system(" ".join(command))
-        print(command)
         # propagate exit code
         sys.exit(1 if code != 0 else 0)
 
 
 def start_interactive_cli():
-    goal = prompt(
-        "Please choose a number: 1. test  2. flash  3. run thunderscope ")
-    # Use sys.executable to ensure we use the same python interpreter
     command = [sys.executable, sys.argv[0]]
 
-    match goal:
-        case '1':
-            test = prompt("Please enter a test name ('all' for entire suite)")
-            command.extend(["test", '--suite' if test == 'all' else test])
-        case '2':
-            playbook = prompt(
-                "Please enter ansible playbook name (e.g. setup_pi.yml)")
-            robot = prompt("Please enter robot name (e.g. Balle)")
-            password = prompt("Please enter ssh password", hide_input=True)
-            # Match the argument flags defined in your cli_params
-            command.extend(["run", "ansible", "-ap", playbook,
-                           "-rn", robot, "-pwd", password])
-        case '3':
-            print("How would you like to launch thunderscope?")
+    category = questionary.select(
+        "What would you like to do?", choices=["Run thunderscope", "Test", "Flash"]
+    ).ask()
+
+    match category:
+        case "Run thunderscope":
             command.extend(["run", "thunderscope"])
-            launch_option = prompt("1. Simulator  2. diagnostics")
+            launch_option = questionary.select(
+                "How would you like to launch thunderscope?",
+                choices=["Simulator", "Diagnostics"],
+            ).ask()
             match launch_option:
-                case '1':
-                    autoref = prompt("Enable autoref? [y/N]").lower() == 'y'
-                    ci_mode = prompt("Enable ci_mode? [y/N]").lower() == 'y'
+                case "Simulator":
+                    autoref = questionary.confirm(
+                        "Enable autoref?", default=False
+                    ).ask()
+                    ci_mode = questionary.confirm(
+                        "Enable ci_mode?", default=False
+                    ).ask()
                     if autoref:
-                        command.append('--enable_autoref')
+                        command.append("--enable_autoref")
                     if ci_mode:
-                        command.append('--ci_mode')
-                case '2':
-                    interface = prompt("What is your network interface?")
-                    command.extend(
-                        ['--run_diagnostics', '--interface', interface])
-                case _:
-                    print("Invalid option! Restarting...")
-                    return start_interactive_cli()
+                        command.append("--ci_mode")
+                case "Diagnostics":
+                    interface = questionary.text(
+                        "What is your network interface?"
+                    ).ask()
+                    command.extend(["--run_diagnostics", "--interface", interface])
+        case "Test":
+            test = questionary.text(
+                "Please enter a test name (leave empty for entire suite)"
+            ).ask()
+            test = "all" if not test else test
+            command.extend(["test", "--suite" if test == "all" else test])
+        case "Flash":
+            playbook = questionary.select(
+                "Please select an ansible playbook:",
+                choices=["setup_pi.yml", "deploy_robot_software.yml"],
+            ).ask()
+            robot = questionary.text("Please enter robot name (e.g. balle)").ask()
+            password = questionary.password("Please enter ssh password").ask()
+            command.extend(
+                ["run", "ansible", "-ap", playbook, "-rn", robot, "-pwd", password]
+            )
         case _:
             print("Invalid option!")
             return start_interactive_cli()
