@@ -37,13 +37,17 @@ openocd_flash(
 cc_library(
     name = "mdv6_firmware",
     srcs = glob([
+        "Core/Src/**/*.c",
+        "Src/**/*.c",
+        "STM32CubeIDE/Application/Startup/*.s",
+        "STM32CubeIDE/Application/User/*.c",
         "*.c",
-        "Src/**/*.h",
         "Drivers/STM32F0xx_HAL_Driver/Src/*_ll_*.c",
         "Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c",
         "Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c",
     ]),
     hdrs = glob([
+        "Core/Inc/**/*.h",
         "*.h",
         "Inc/**/*.h",
         "Drivers/STM32F0xx_HAL_Driver/Inc/**/*.h",
@@ -51,6 +55,7 @@ cc_library(
         "Drivers/CMSIS/Include/**/*.h",
     ]),
     includes = [
+        "Core/Inc",
         "Drivers/STM32F0xx_HAL_Driver/Inc",
         "Drivers/CMSIS/Device/ST/STM32F0xx/Include",
         "Drivers/CMSIS/Include",
@@ -59,8 +64,8 @@ cc_library(
     defines = [
         # Our MCU is the STM32F0251: https://www.st.com/resource/en/datasheet/stspin32f0251.pdf
         "STM32F031x6",
-        # Use the Low-Layer APIs because it gives us more control over the hardware (as opposed to the HAL).
-        # https://www.st.com/content/ccc/resource/technical/document/user_manual/56/32/53/cb/69/86/49/0e/DM00223149.pdf/files/DM00223149.pdf/jcr:content/translations/en.DM00223149.pdf
+        # Use the HAL and Low-Layer APIs.
+        "USE_HAL_DRIVER",
         "USE_FULL_LL_DRIVER",
     ],
 )

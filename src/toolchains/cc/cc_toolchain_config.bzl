@@ -625,6 +625,10 @@ def _stm32_gcc_impl(ctx):
                         flags = [
                             # Compile for the Cortex M0
                             "-mcpu=cortex-m0",
+                            # Use Thumb-2 instruction set
+                            "-mthumb",
+                            # No floating point unit
+                            "-mfloat-abi=soft",
                         ],
                     ),
                 ],
@@ -647,6 +651,8 @@ def _stm32_gcc_impl(ctx):
                             # Places each function into its own section. If coupled with --gc-sections in the linker
                             # stage, this option strips out unused functions and reduces code size.
                             "-ffunction-sections",
+                            # Places each data item into its own section.
+                            "-fdata-sections",
                         ],
                     ),
                 ],
@@ -675,8 +681,12 @@ def _stm32_gcc_impl(ctx):
                 flag_groups = [
                     flag_group(
                         flags = [
+                            # Use Newlib Nano for smaller binary size, which is the default for STM32CubeIDE
+                            "--specs=nano.specs",
                             # No OS, so stub out the system calls
                             "--specs=nosys.specs",
+                            # Ensure the binary is static
+                            "-static",
                         ],
                     ),
                 ],
