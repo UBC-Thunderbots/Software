@@ -59,7 +59,7 @@ def test_stop_play(simulated_test_runner):
 
     def setup(*args):
         # Ball at centre (matches C++ test_stop_play_ball_at_centre_robots_spread_out)
-        ball_initial_pos = tbots_cpp.Point(0, 0)
+        ball_initial_pos = tbots_cpp.Point(-2, 2)
 
         field = tbots_cpp.Field.createSSLDivisionBField()
 

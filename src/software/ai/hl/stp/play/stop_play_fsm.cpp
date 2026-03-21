@@ -65,14 +65,12 @@ void StopPlayFSM::updateStopPosition(const Update& event)
     // goal-to-ball line at CENTRAL_SUPPORT_FRACTION, then mirror it across the
     // field center so the support robot is on the opposite side of the field
     // from the ball (stretching the field).
-    constexpr double CENTRAL_SUPPORT_FRACTION = 0.5;
     Point point_along_goal_ball =
         world_ptr->field().friendlyGoalCenter() +
         (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter()) *
             CENTRAL_SUPPORT_FRACTION;
 
-    Point field_center          = world_ptr->field().centerPoint();
-    Point central_support_point = field_center + (field_center - point_along_goal_ball);
+    Point central_support_point = Point(point_along_goal_ball.x(), -point_along_goal_ball.y());
 
     move_tactics.at(0)->updateControlParams(
         ball_defense_point_center,
