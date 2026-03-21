@@ -37,7 +37,6 @@ openocd_flash(
 cc_library(
     name = "mdv6_firmware",
     srcs = glob([
-        "Core/Src/**/*.c",
         "*.c",
         "Src/**/*.h",
         "Drivers/STM32F0xx_HAL_Driver/Src/*_ll_*.c",
@@ -45,7 +44,6 @@ cc_library(
         "Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c",
     ]),
     hdrs = glob([
-        "Core/Inc/**/*.h",
         "*.h",
         "Inc/**/*.h",
         "Drivers/STM32F0xx_HAL_Driver/Inc/**/*.h",
@@ -53,7 +51,6 @@ cc_library(
         "Drivers/CMSIS/Include/**/*.h",
     ]),
     includes = [
-        "Core/Inc",
         "Drivers/STM32F0xx_HAL_Driver/Inc",
         "Drivers/CMSIS/Device/ST/STM32F0xx/Include",
         "Drivers/CMSIS/Include",
