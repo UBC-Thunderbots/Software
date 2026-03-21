@@ -6,7 +6,11 @@ if TYPE_CHECKING:
 
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
-from software.py_constants import SECONDS_PER_MILLISECOND, SECONDS_PER_NANOSECOND
+from software.py_constants import (
+    SECONDS_PER_MILLISECOND,
+    SECONDS_PER_NANOSECOND,
+    NANOSECONDS_PER_MILLISECOND,
+)
 from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -69,7 +73,7 @@ def async_sim_ticker(
     blue_proto_unix_io.register_observer(PrimitiveSet, blue_primitive_set_buffer)
     yellow_proto_unix_io.register_observer(PrimitiveSet, yellow_primitive_set_buffer)
 
-    current_timestamp = 0
+    current_timestamp = time_provider_instance.time_provider_ns()
 
     while tscope.is_open():
         # flush primitive set buffers before sending the next tick
@@ -84,8 +88,11 @@ def async_sim_ticker(
         tick = SimulatorTick(milliseconds=tick_rate_ms)
         sim_proto_unix_io.send_proto(SimulatorTick, tick)
 
-        current_timestamp += tick_rate_ms
-        print("simulator timestamp:", int(current_timestamp / 1000))
+        time_provider_instance.tick_ns(tick_rate_ms * NANOSECONDS_PER_MILLISECOND)
+        print(
+            "simulator timestamp:",
+            int(time_provider_instance.elapsed_time_ns() * SECONDS_PER_NANOSECOND),
+        )
 
         while True:
             try:
@@ -93,6 +100,9 @@ def async_sim_ticker(
                 break
             except queue.Empty:
                 sim_proto_unix_io.send_proto(SimulatorTick, tick)
+                time_provider_instance.tick_ns(
+                    tick_rate_ms * NANOSECONDS_PER_MILLISECOND
+                )
 
         while True:
             try:
@@ -100,6 +110,9 @@ def async_sim_ticker(
                 break
             except queue.Empty:
                 sim_proto_unix_io.send_proto(SimulatorTick, tick)
+                time_provider_instance.tick_ns(
+                    tick_rate_ms * NANOSECONDS_PER_MILLISECOND
+                )
 
 
 def realtime_sim_ticker(
@@ -122,6 +135,7 @@ def realtime_sim_ticker(
         if simulation_state_message.is_playing:
             tick = SimulatorTick(milliseconds=tick_rate_ms)
             sim_proto_unix_io.send_proto(SimulatorTick, tick)
+            time_provider_instance.tick_ns(tick_rate_ms * NANOSECONDS_PER_MILLISECOND)
 
         time.sleep(per_tick_delay_s / simulation_state_message.simulation_speed)
 

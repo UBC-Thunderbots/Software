@@ -456,6 +456,7 @@ ErForceSimulator::getRampedVelocityPrimitive(
 void ErForceSimulator::stepSimulation(const Duration& time_step)
 {
     current_time = current_time + time_step;
+    LOG(INFO) << static_cast<int>(current_time.toSeconds());
 
     SSLSimulationProto::RobotControl yellow_robot_control =
         updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg,

@@ -6,7 +6,7 @@ from software.networking.ssl_proto_communication import (
     SslSocketProtoParseException,
     SslSocket,
 )
-from software.py_constants import NANOSECONDS_PER_MILLISECOND, SECONDS_PER_NANOSECOND
+from software.py_constants import SECONDS_PER_NANOSECOND
 import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.util import *
@@ -192,9 +192,9 @@ class TigersAutoref:
                     )
                 )
 
-            time_provider_instance.tick_ns(
-                self.tick_rate_ms * NANOSECONDS_PER_MILLISECOND
-            )
+            # time_provider_instance.tick_ns(
+            #     self.tick_rate_ms * NANOSECONDS_PER_MILLISECOND
+            # )
 
     def _forward_to_gamecontroller(
         self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
