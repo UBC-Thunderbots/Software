@@ -40,7 +40,6 @@ cc_library(
         ":stspin_types",
         "//proto/message_translation:tbots_protobuf",
         "//software/embedded:spi_utils",
-        "//software/embedded/constants",
         "//software/embedded/gpio",
         "//software/logger",
         "@cppcrc",
@@ -72,7 +71,6 @@ cc_binary(
     ],
     deps = [
         ":motor_controller",
-        "//proto/message_translation:tbots_protobuf",
         "//software/logger",
         "//software/logger:network_logger",
         "@boost//:program_options",

@@ -1,7 +1,11 @@
 import numpy
 
-import evdev
-from evdev import ecodes
+# TODO: remove the try-catch when we rewrite this with macOS-compatible lib
+try:
+    import evdev
+    from evdev import ecodes
+except ImportError:
+    pass
 
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtWidgets import *
@@ -33,7 +37,7 @@ class HandheldControllerWidget(QWidget):
         """Initialize the HandheldControllerWidget."""
         super().__init__()
 
-        self.constants = tbots_cpp.create2021RobotConstants()
+        self.constants = tbots_cpp.create2026RobotConstants()
 
         self.handheld_controller: HandheldController | None = None
 

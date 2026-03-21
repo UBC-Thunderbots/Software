@@ -6,6 +6,16 @@ py_library(
     name = "gl_runtime_installer",
     srcs = ["gl_runtime_installer.py"],
     deps = [
+        "//software/thunderscope/binary_context_managers:runtime_manager",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_runtime_selector",
+    srcs = ["gl_runtime_selector.py"],
+    deps = [
+        "//software/thunderscope/binary_context_managers:runtime_manager",
         requirement("pyqtgraph"),
     ],
 )
@@ -42,6 +52,7 @@ py_library(
     srcs = ["gl_gamecontroller_toolbar.py"],
     deps = [
         ":gl_runtime_installer",
+        ":gl_runtime_selector",
         ":gl_toolbar",
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",

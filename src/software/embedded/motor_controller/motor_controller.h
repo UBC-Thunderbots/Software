@@ -24,10 +24,9 @@ class MotorController
      * @return a struct containing the motor faults and whether the motor was disabled due
      * to the fault
      */
-    virtual MotorFaultIndicator checkDriverFault(const MotorIndex& motor) = 0;
+    virtual MotorFaultIndicator checkDriverFault(MotorIndex motor) = 0;
 
-    virtual int readThenWriteVelocity(const MotorIndex& motor,
-                                      const int& target_velocity) = 0;
+    virtual int readThenWriteVelocity(MotorIndex motor, int target_velocity) = 0;
 
     virtual void immediatelyDisable() = 0;
 };

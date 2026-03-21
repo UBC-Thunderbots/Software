@@ -8,13 +8,9 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
-#include "software/embedded/constants/constants.h"
 #include "software/embedded/gpio/gpio.h"
-#include "software/embedded/gpio/gpio_char_dev.h"
-#include "software/embedded/gpio/gpio_sysfs.h"
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
-#include "software/embedded/platform.h"
 #include "software/physics/euclidean_to_wheel.h"
 
 /**
@@ -34,7 +30,7 @@ class MotorService
      *
      * @param robot_constants The robot constants
      */
-    MotorService(const RobotConstants_t& robot_constants);
+    MotorService(const RobotConstants& robot_constants);
 
     virtual ~MotorService() = default;
 
@@ -99,7 +95,7 @@ class MotorService
     // Flag indicating whether the motors have been calibrated
     bool is_initialized_ = false;
 
-    RobotConstants_t robot_constants_;
+    RobotConstants robot_constants_;
 
     EuclideanToWheel euclidean_to_four_wheel_;
 

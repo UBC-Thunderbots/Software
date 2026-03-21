@@ -2,12 +2,15 @@
 
 #include <boost/program_options.hpp>
 #include <chrono>
+#include <csignal>
 #include <thread>
 #include <utility>
 
-#include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
+
+// Flag to indicate when a stop has been requested (e.g. via Ctrl+C)
+static volatile std::sig_atomic_t g_stop_requested = false;
 
 class StSpinMotorControllerTest
 {
@@ -20,8 +23,9 @@ class StSpinMotorControllerTest
             std::optional<int16_t> ki;
         };
 
-        bool help        = false;
-        std::string mode = "speed";
+        bool help                = false;
+        std::string mode         = "speed";
+        int setpoint_duration_ms = 2000;
         std::vector<int16_t> setpoints;
         std::unordered_set<MotorIndex> enabled_motors;
         PidOption torque_pid;
@@ -47,7 +51,7 @@ class StSpinMotorControllerTest
 
         LOG(INFO) << "Motor controller setup complete";
 
-        for (auto motor : args_.enabled_motors)
+        for (const MotorIndex motor : args_.enabled_motors)
         {
             if (args_.torque_pid.kp && args_.torque_pid.ki)
             {
@@ -73,65 +77,52 @@ class StSpinMotorControllerTest
 
         LOG(INFO) << "PID configuration complete";
 
-        if (args_.mode == "speed")
+        LOG(INFO) << "Running " << args_.mode << " profile";
+
+        for (const int16_t setpoint : args_.setpoints)
         {
-            LOG(INFO) << "Running speed profile";
-
-            for (auto motor : args_.enabled_motors)
+            if (g_stop_requested)
             {
-                motor_controller->sendAndReceiveFrame(
-                    motor, SetResponseTypeFrame{StSpinResponseType::SPEED_AND_FAULTS});
+                break;
             }
 
-            for (const int16_t setpoint : args_.setpoints)
+            StSpinMotorController::OutgoingFrame command_frame;
+            if (args_.mode == "speed")
             {
-                for (int i = 0; i < 2000; ++i)
+                command_frame = SetTargetSpeedFrame{
+                    .motor_enabled          = true,
+                    .motor_target_speed_rpm = setpoint,
+                };
+            }
+            else if (args_.mode == "torque")
+            {
+                command_frame = SetTargetTorqueFrame{
+                    .motor_enabled       = true,
+                    .motor_target_torque = setpoint,
+                };
+            }
+
+            for (const MotorIndex motor : args_.enabled_motors)
+            {
+                motor_controller->sendAndReceiveFrame(motor, command_frame);
+            }
+
+            auto start_time = std::chrono::system_clock::now();
+            auto duration   = std::chrono::milliseconds(args_.setpoint_duration_ms);
+            while (std::chrono::system_clock::now() - start_time < duration)
+            {
+                if (g_stop_requested)
                 {
-                    for (auto motor : args_.enabled_motors)
-                    {
-                        motor_controller->readThenWriteVelocity(motor, setpoint);
-                        motor_controller->checkDriverFault(motor);
-
-                        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                            {"target_speed_rpm", setpoint},
-                            {"measured_speed_rpm",
-                             motor_controller->motor_status_.at(motor)
-                                 .measured_speed_rpm},
-                        });
-                    }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                    break;
                 }
-            }
-        }
-        else if (args_.mode == "torque")
-        {
-            LOG(INFO) << "Running torque profile";
 
-            for (auto motor : args_.enabled_motors)
-            {
-                motor_controller->sendAndReceiveFrame(
-                    motor, SetResponseTypeFrame{StSpinResponseType::IQ_AND_ID});
-            }
-
-            for (const int16_t setpoint : args_.setpoints)
-            {
-                for (int i = 0; i < 2000; ++i)
+                for (const MotorIndex motor : args_.enabled_motors)
                 {
-                    for (auto motor : args_.enabled_motors)
-                    {
-                        motor_controller->sendAndReceiveFrame(
-                            motor, SetTargetTorqueFrame{
-                                       .motor_enabled       = true,
-                                       .motor_target_torque = setpoint,
-                                   });
-
-                        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                            {"Iq", motor_controller->motor_status_.at(motor).iq},
-                            {"Id", motor_controller->motor_status_.at(motor).id},
-                        });
-                    }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                    motor_controller->sendMotorStatusToPlotJuggler(motor);
+                    motor_controller->checkDriverFault(motor);
                 }
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(2));
             }
         }
 
@@ -211,14 +202,16 @@ int main(int argc, char** argv)
             "Control mode: speed | torque")
         ("setpoints", boost::program_options::value<std::string>(),
             "Comma-separated setpoints (required)")
+        ("setpoint_duration", boost::program_options::value<int>(&args.setpoint_duration_ms),
+            "Duration to hold each setpoint in milliseconds")
         ("enabled_motors", boost::program_options::value<std::string>(),
             "Motors to enable: 'all' (default) or comma-separated list (e.g. 'fl,fr,bl,br')")
-        ("torque_kp", boost::program_options::value<int16_t>(), "Torque PID kp")
-        ("torque_ki", boost::program_options::value<int16_t>(), "Torque PID ki")
-        ("flux_kp", boost::program_options::value<int16_t>(), "Flux PID kp")
-        ("flux_ki", boost::program_options::value<int16_t>(), "Flux PID ki")
-        ("speed_kp", boost::program_options::value<int16_t>(), "Speed PID kp")
-        ("speed_ki", boost::program_options::value<int16_t>(), "Speed PID ki");
+        ("torque_kp", boost::program_options::value<int16_t>(), "Torque PID Kp")
+        ("torque_ki", boost::program_options::value<int16_t>(), "Torque PID Ki")
+        ("flux_kp", boost::program_options::value<int16_t>(), "Flux PID Kp")
+        ("flux_ki", boost::program_options::value<int16_t>(), "Flux PID Ki")
+        ("speed_kp", boost::program_options::value<int16_t>(), "Speed PID Kp")
+        ("speed_ki", boost::program_options::value<int16_t>(), "Speed PID Ki");
     // clang-format on
 
     boost::program_options::variables_map vm;
@@ -278,6 +271,8 @@ int main(int argc, char** argv)
     {
         args.speed_pid.ki = vm.at("speed_ki").as<int16_t>();
     }
+
+    std::signal(SIGINT, [](int) { g_stop_requested = true; });
 
     StSpinMotorControllerTest stspin_motor_controller_test(args);
     stspin_motor_controller_test.runMotorTest();

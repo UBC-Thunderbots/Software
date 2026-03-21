@@ -11,7 +11,7 @@
 #pragma GCC diagnostic pop
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "shared/constants.h"
+#include "software/embedded/gpio/gpio_char_dev.h"
 #include "software/embedded/motor_controller/stspin_types.h"
 #include "software/embedded/spi_utils.h"
 #include "software/logger/logger.h"
@@ -21,15 +21,12 @@
 using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
 StSpinMotorController::StSpinMotorController()
-    : reset_gpio_(
-          setupGpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH))
+    : reset_gpio_(std::make_unique<GpioCharDev>(RESET_GPIO_PIN, GpioDirection::OUTPUT,
+                                                GpioState::HIGH))
 {
-    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    for (const MotorIndex& motor : driveMotors())
     {
-        if (ENABLED_MOTORS.at(motor))
-        {
-            openSpiFileDescriptor(motor);
-        }
+        openSpiFileDescriptor(motor);
     }
 }
 
@@ -43,16 +40,9 @@ void StSpinMotorController::setup()
 {
     reset();
 
-    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    for (const MotorIndex& motor : driveMotors())
     {
-        if (ENABLED_MOTORS.at(motor))
-        {
-            motor_status_[motor].enabled = true;
-
-            sendAndReceiveFrame(motor, SetPidTorqueKpKiFrame{.kp = 13530, .ki = 5772});
-            sendAndReceiveFrame(motor, SetPidFluxKpKiFrame{.kp = 13530, .ki = 5772});
-            sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 40, .ki = 30});
-        }
+        motor_status_[motor].enabled = true;
     }
 }
 
@@ -64,16 +54,14 @@ void StSpinMotorController::reset()
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
-MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& motor)
+MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex motor)
 {
     bool drive_enabled = true;
     std::unordered_set<TbotsProto::MotorFault> motor_faults;
 
-    if (!ENABLED_MOTORS.at(motor))
+    if (motor == MotorIndex::DRIBBLER)
     {
-        // Motor is disabled; pretend that the motor is working fine so
-        // that Thunderloop doesn't attempt to reset it and crash
-        return MotorFaultIndicator(drive_enabled, motor_faults);
+        return {drive_enabled, motor_faults};
     }
 
     const uint16_t faults = motor_status_.at(motor).faults;
@@ -81,7 +69,7 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
     if (faults == 0)
     {
         // No faults; early return
-        return MotorFaultIndicator(drive_enabled, motor_faults);
+        return {drive_enabled, motor_faults};
     }
 
     LOG(WARNING) << "======= Faults For Motor " << motor << "=======";
@@ -162,16 +150,14 @@ MotorFaultIndicator StSpinMotorController::checkDriverFault(const MotorIndex& mo
         drive_enabled = false;
     }
 
-    return MotorFaultIndicator(drive_enabled, motor_faults);
+    return {drive_enabled, motor_faults};
 }
 
-int StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
-                                                 const int& target_velocity)
+int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
+                                                 const int target_velocity)
 {
-    if (!ENABLED_MOTORS.at(motor))
+    if (motor == MotorIndex::DRIBBLER)
     {
-        // Motor is disabled; pretend that the motor is working fine so
-        // that Thunderloop doesn't attempt to reset it and crash
         return 0;
     }
 
@@ -182,54 +168,75 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex& motor,
 
     sendAndReceiveFrame(motor, outgoing_frame);
 
-    return motor_status_.at(motor).measured_speed_rpm;
+    return motor_status_.at(motor).speed;
 }
 
 void StSpinMotorController::immediatelyDisable()
 {
-    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    for (const MotorIndex& motor : driveMotors())
     {
-        if (ENABLED_MOTORS.at(motor))
-        {
-            motor_status_[motor].enabled = false;
-            readThenWriteVelocity(motor, 0);
-        }
+        motor_status_[motor].enabled = false;
+        readThenWriteVelocity(motor, 0);
     }
 }
 
-void StSpinMotorController::openSpiFileDescriptor(const MotorIndex& motor)
+void StSpinMotorController::openSpiFileDescriptor(const MotorIndex motor)
 {
-    file_descriptors_[CHIP_SELECTS.at(motor)] = open(SPI_PATHS.at(motor), O_RDWR);
-    CHECK(file_descriptors_[CHIP_SELECTS.at(motor)] >= 0)
+    spi_fds_[motor] = open(SPI_PATHS.at(motor), O_RDWR);
+    CHECK(spi_fds_[motor] >= 0)
         << "can't open device: " << motor << "error: " << strerror(errno);
 
-    int ret =
-        ioctl(file_descriptors_[CHIP_SELECTS.at(motor)], SPI_IOC_WR_MODE32, &SPI_MODE);
+    int ret = ioctl(spi_fds_[motor], SPI_IOC_WR_MODE32, &SPI_MODE);
     CHECK(ret != -1) << "can't set spi mode for: " << motor
                      << "error: " << strerror(errno);
 
-    ret = ioctl(file_descriptors_[CHIP_SELECTS.at(motor)], SPI_IOC_WR_BITS_PER_WORD,
-                &SPI_BITS);
+    ret = ioctl(spi_fds_[motor], SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);
     CHECK(ret != -1) << "can't set bits_per_word for: " << motor
                      << "error: " << strerror(errno);
 
-    ret = ioctl(file_descriptors_[CHIP_SELECTS.at(motor)], SPI_IOC_WR_MAX_SPEED_HZ,
-                &MAX_SPI_SPEED_HZ);
+    ret = ioctl(spi_fds_[motor], SPI_IOC_WR_MAX_SPEED_HZ, &MAX_SPI_SPEED_HZ);
     CHECK(ret != -1) << "can't set spi max speed hz for: " << motor
                      << "error: " << strerror(errno);
 }
 
-void StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
-                                                const OutgoingFrame outgoing_frame)
+void StSpinMotorController::sendAndReceiveFrame(const MotorIndex motor,
+                                                const OutgoingFrame& outgoing_frame)
 {
-    uint8_t tx[FRAME_LEN] = {};
-    uint8_t rx[FRAME_LEN] = {};
+    std::array<uint8_t, FRAME_LEN> tx{};
+    std::array<uint8_t, FRAME_LEN> rx{};
 
+    populateTx(outgoing_frame, tx);
+
+    spiTransfer(spi_fds_[motor], tx.data(), rx.data(), FRAME_LEN, SPI_SPEED_HZ);
+
+    // Frame integrity check
+    const uint8_t rx_crc = Crc8Autosar::calc(rx.data(), FRAME_LEN - 1);
+    if (rx[5] != rx_crc)
+    {
+        LOG(WARNING) << "Received frame that failed integrity check. Expected CRC "
+                     << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[5])
+                     << " for motor " << motor << ". RX: " << static_cast<int>(rx[0])
+                     << " " << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2])
+                     << " " << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4])
+                     << " " << static_cast<int>(rx[5]);
+        return;
+    }
+
+    processRx(motor, rx);
+}
+
+void StSpinMotorController::populateTx(const OutgoingFrame& outgoing_frame,
+                                       std::array<uint8_t, FRAME_LEN>& tx)
+{
     std::visit(
         [&]<typename TFrame>(TFrame&& frame)
         {
             using T = std::decay_t<TFrame>;
-            if constexpr (std::is_same_v<T, SetTargetSpeedFrame>)
+            if constexpr (std::is_same_v<T, NoOpFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::NO_OP);
+            }
+            else if constexpr (std::is_same_v<T, SetTargetSpeedFrame>)
             {
                 tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_SPEED);
                 tx[1] = static_cast<uint8_t>(frame.motor_enabled);
@@ -308,11 +315,14 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
     }
     motor_status_[motor].consecutive_crc_failures = 0;
 
+void StSpinMotorController::processRx(const MotorIndex motor,
+                                      const std::array<uint8_t, FRAME_LEN>& rx)
+{
     switch (static_cast<StSpinResponseType>(rx[0]))
     {
         case StSpinResponseType::SPEED_AND_FAULTS:
         {
-            motor_status_[motor].measured_speed_rpm =
+            motor_status_[motor].speed =
                 static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
             motor_status_[motor].faults =
                 static_cast<uint16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
@@ -342,5 +352,50 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex& motor,
                 static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
             break;
         }
+        case StSpinResponseType::IQ_AND_IQ_REF:
+        {
+            motor_status_[motor].iq =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_status_[motor].iq_ref =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
+        case StSpinResponseType::ID_AND_ID_REF:
+        {
+            motor_status_[motor].id =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_status_[motor].id_ref =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
+        case StSpinResponseType::SPEED_AND_SPEED_REF:
+        {
+            motor_status_[motor].speed =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[1]) << 8) | rx[2]);
+            motor_status_[motor].speed_ref =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+            break;
+        }
     }
+}
+
+void StSpinMotorController::sendMotorStatusToPlotJuggler(const MotorIndex motor)
+{
+    for (const StSpinResponseType response_type :
+         {StSpinResponseType::SPEED_AND_SPEED_REF, StSpinResponseType::IQ_AND_IQ_REF,
+          StSpinResponseType::ID_AND_ID_REF, StSpinResponseType::SPEED_AND_FAULTS})
+    {
+        sendAndReceiveFrame(motor, SetResponseTypeFrame{response_type});
+    }
+
+    const MotorStatus& motor_status = motor_status_.at(motor);
+
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+        {"speed_" + motor, motor_status.speed},
+        {"speed_ref_" + motor, motor_status.speed_ref},
+        {"iq_" + motor, motor_status.iq},
+        {"iq_ref_" + motor, motor_status.iq_ref},
+        {"id_" + motor, motor_status.id},
+        {"id_ref_" + motor, motor_status.id_ref},
+    });
 }

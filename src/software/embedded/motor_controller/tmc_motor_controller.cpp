@@ -1,6 +1,7 @@
 #include "software/embedded/motor_controller/tmc_motor_controller.h"
 
 #include "shared/constants.h"
+#include "software/embedded/gpio/gpio_char_dev.h"
 #include "software/embedded/spi_utils.h"
 #include "software/logger/logger.h"
 
@@ -38,14 +39,14 @@ extern "C"
 }
 
 TmcMotorController::TmcMotorController()
-    : spi_demux_select_0_(setupGpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO,
-                                    GpioDirection::OUTPUT, GpioState::LOW)),
-      spi_demux_select_1_(setupGpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO,
-                                    GpioDirection::OUTPUT, GpioState::LOW)),
-      driver_control_enable_gpio_(
-          setupGpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT, GpioState::HIGH)),
-      reset_gpio_(
-          setupGpio(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH))
+    : spi_demux_select_0_(std::make_unique<GpioCharDev>(
+          SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT, GpioState::LOW)),
+      spi_demux_select_1_(std::make_unique<GpioCharDev>(
+          SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT, GpioState::LOW)),
+      driver_control_enable_gpio_(std::make_unique<GpioCharDev>(
+          DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT, GpioState::HIGH)),
+      reset_gpio_(std::make_unique<GpioCharDev>(MOTOR_DRIVER_RESET_GPIO,
+                                                GpioDirection::OUTPUT, GpioState::HIGH))
 {
     openSpiFileDescriptor(MotorIndex::FRONT_LEFT);
     openSpiFileDescriptor(MotorIndex::FRONT_RIGHT);
@@ -73,8 +74,7 @@ MotorControllerStatus TmcMotorController::earlyPoll()
     return MotorControllerStatus::OK;
 }
 
-int TmcMotorController::readThenWriteVelocity(const MotorIndex& motor,
-                                              const int& target_velocity)
+int TmcMotorController::readThenWriteVelocity(MotorIndex motor, int target_velocity)
 {
     const int velocity_erpm = readThenWriteValue(
         motor, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET, target_velocity);
@@ -281,7 +281,7 @@ void TmcMotorController::configureHall(const MotorIndex& motor)
                                  TMC4671_VELOCITY_PHI_E_HAL);
 }
 
-MotorFaultIndicator TmcMotorController::checkDriverFault(const MotorIndex& motor)
+MotorFaultIndicator TmcMotorController::checkDriverFault(MotorIndex motor)
 {
     bool drive_enabled = true;
     std::unordered_set<TbotsProto::MotorFault> motor_faults;

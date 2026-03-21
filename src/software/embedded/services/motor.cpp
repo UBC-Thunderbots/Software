@@ -9,7 +9,7 @@
 static double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
 static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
 
-MotorService::MotorService(const RobotConstants_t& robot_constants)
+MotorService::MotorService(const RobotConstants& robot_constants)
     : motor_controller_(setupMotorController()),
       robot_constants_(robot_constants),
       euclidean_to_four_wheel_(robot_constants),
