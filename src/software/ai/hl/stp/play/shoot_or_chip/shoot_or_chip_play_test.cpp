@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/shoot_or_chip_play.h"
+#include "software/ai/hl/stp/play/shoot_or_chip/shoot_or_chip_play.h"
 
 #include <gtest/gtest.h>
 

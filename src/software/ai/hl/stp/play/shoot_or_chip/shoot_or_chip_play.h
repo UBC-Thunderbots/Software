@@ -2,16 +2,20 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play/play_base.hpp"
+#include "software/ai/hl/stp/play/shoot_or_chip/shoot_or_chip_play_fsm.h"
 
 /**
  * The Defense Play tries to grab the ball from the enemy that has it, and all other
  * robots shadow the enemy robots in order of how threatening they are.
  */
-class ShootOrChipPlay : public Play
+class ShootOrChipPlay : public PlayBase<ShootOrChipPlayFSM>
 {
    public:
     ShootOrChipPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
+
+    void updateTactics(const PlayUpdate &play_update) override;
 };
