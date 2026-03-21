@@ -1,8 +1,5 @@
-from typing import override
-
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
-from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
@@ -13,53 +10,12 @@ from software.simulated_tests.robot_speed_threshold import (
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from software.simulated_tests.validation import (
-    Validation,
-    ValidationStatus,
-    ValidationType,
-    create_validation_geometry,
-)
-
-
-class FriendlyRobotPositionsVisualization(Validation):
-    """Always-passing validation that draws circles at each friendly robot position.
-    Add to inv_always_validation_sequence_set and run with --enable_thunderscope to
-    visualize robot positions during the test.
-    """
-
-    @override
-    def get_validation_status(self, world) -> ValidationStatus:
-        return ValidationStatus.PASSING
-
-    @override
-    def get_validation_type(self, world) -> ValidationType:
-        return ValidationType.ALWAYS
-
-    @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
-        return create_validation_geometry(
-            [
-                tbots_cpp.Circle(
-                    tbots_cpp.Point(
-                        robot.current_state.global_position.x_meters,
-                        robot.current_state.global_position.y_meters,
-                    ),
-                    ROBOT_MAX_RADIUS_METERS + 0.05,
-                )
-                for robot in world.friendly_team.team_robots
-            ]
-        )
-
-    def __repr__(self):
-        return "Friendly robot positions (visualization only)"
 
 
 def test_stop_play(simulated_test_runner):
-    """Test stop play: robots slow down and avoid the ball (STOP referee state)."""
-
     def setup(*args):
         # Ball at centre (matches C++ test_stop_play_ball_at_centre_robots_spread_out)
-        ball_initial_pos = tbots_cpp.Point(-2, 2)
+        ball_initial_pos = tbots_cpp.Point(0, 0)
 
         field = tbots_cpp.Field.createSSLDivisionBField()
 
@@ -81,50 +37,43 @@ def test_stop_play(simulated_test_runner):
             field.enemyDefenseArea().negXPosYCorner(),
         ]
 
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                yellow_robot_locations=yellow_bots,
+                blue_robot_locations=blue_bots,
+                ball_location=ball_initial_pos,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            )
+        )
+
         # Game controller: STOP (both teams) - stop play behaviour
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.gamecontroller.send_gc_command(
+        simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
-        # Force play override: blue runs StopPlay, yellow runs HaltPlay
         blue_play = Play()
         blue_play.name = PlayName.StopPlay
 
         yellow_play = Play()
         yellow_play.name = PlayName.HaltPlay
 
-        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
-
-        simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState,
-            create_world_state(
-                yellow_robot_locations=yellow_bots,
-                blue_robot_locations=blue_bots,
-                ball_location=ball_initial_pos,
-                ball_velocity=tbots_cpp.Vector(0, 0),
-            ),
-        )
+        simulated_test_runner.set_play(blue_play, is_friendly=True)
+        simulated_test_runner.set_play(yellow_play, is_friendly=False)
 
     # C++ test waits 8s before checking; use 15s timeout so robots have time to slow.
     # Threshold 1.4 m/s: expect robots to eventually slow below the 1.5 m/s STOP limit.
     # TODO (#3638): add an eventually-validation that friendly robots stay at least 0.5 m away
     # from the ball once pytest fixtures support delaying validations (to mirror the
     # C++ robotsAvoidBall(0.5, ...) check).
+    eventually_validations = [[RobotSpeedEventuallyBelowThreshold(1.4)]]
+
     simulated_test_runner.run_test(
         setup=setup,
-        params=[0],
-        inv_always_validation_sequence_set=[
-            [FriendlyRobotPositionsVisualization()],
-        ],
-        inv_eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1.4)]
-        ],
+        inv_eventually_validation_sequence_set=eventually_validations,
+        ag_eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=15,
     )
 
