@@ -90,6 +90,8 @@ class StSpinMotorController : public MotorController
     // SPI File Descriptors mapping from Chip Select -> File Descriptor
     std::array<int, reflective_enum::size<MotorIndex>()> file_descriptors_;
 
+    static constexpr uint32_t MAX_CONSECUTIVE_CRC_FAILURES = 10;
+
     struct MotorStatus
     {
         bool enabled;
@@ -101,6 +103,7 @@ class StSpinMotorController : public MotorController
         int16_t vd;
         int16_t phase_current;
         int16_t phase_voltage;
+        uint32_t consecutive_crc_failures = 0;
     };
 
     std::unordered_map<MotorIndex, MotorStatus> motor_status_;
