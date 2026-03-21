@@ -1,4 +1,4 @@
-#include "software/simulated_tests/validation/terminating_function_validator.h"
+#include "software/simulated_tests/cpp_validation/terminating_function_validator.h"
 
 TerminatingFunctionValidator::TerminatingFunctionValidator(
     ValidationFunction validation_function,
