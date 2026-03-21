@@ -56,6 +56,7 @@ struct StopPlayFSM
     }
 
    private:
+    constexpr double CENTRAL_SUPPORT_FRACTION = 0.5;
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
     std::vector<std::shared_ptr<MoveTactic>> move_tactics;
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
