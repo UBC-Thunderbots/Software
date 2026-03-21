@@ -6,7 +6,6 @@ from software.networking.ssl_proto_communication import (
     SslSocketProtoParseException,
     SslSocket,
 )
-from software.py_constants import SECONDS_PER_NANOSECOND
 import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.util import *
