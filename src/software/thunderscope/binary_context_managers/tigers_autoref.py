@@ -212,10 +212,6 @@ class TigersAutoref:
                 self.initial_timestamp + time_provider_instance.elapsed_time_ns()
             )
         )
-        print(
-            "autoref timestamp:",
-            int(time_provider_instance.elapsed_time_ns() * SECONDS_PER_NANOSECOND),
-        )
 
         ci_input.api_inputs.append(Input())
         ci_input.tracker_packet.CopyFrom(tracker_wrapper)

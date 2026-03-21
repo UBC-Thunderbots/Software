@@ -85,12 +85,7 @@ def async_sim_ticker(
         # Tick simulation
         tick = SimulatorTick(milliseconds=tick_rate_ms)
         sim_proto_unix_io.send_proto(SimulatorTick, tick)
-
         time_provider_instance.tick_ns(tick_rate_ms * NANOSECONDS_PER_MILLISECOND)
-        print(
-            "simulator timestamp:",
-            int(time_provider_instance.elapsed_time_ns() * SECONDS_PER_NANOSECOND),
-        )
 
         while True:
             try:
