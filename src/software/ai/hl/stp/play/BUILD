@@ -6,8 +6,6 @@ package(default_visibility = ["//visibility:public"])
 # "factory" design pattern to work are linked in
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
-
-
 cc_library(
     name = "stop_play",
     srcs = ["stop_play.cpp"],
