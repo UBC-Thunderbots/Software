@@ -69,6 +69,8 @@ def async_sim_ticker(
     blue_proto_unix_io.register_observer(PrimitiveSet, blue_primitive_set_buffer)
     yellow_proto_unix_io.register_observer(PrimitiveSet, yellow_primitive_set_buffer)
 
+    current_timestamp = 0
+
     while tscope.is_open():
         # flush primitive set buffers before sending the next tick
         while (
@@ -81,6 +83,9 @@ def async_sim_ticker(
         # Tick simulation
         tick = SimulatorTick(milliseconds=tick_rate_ms)
         sim_proto_unix_io.send_proto(SimulatorTick, tick)
+
+        current_timestamp += tick_rate_ms
+        print("simulator timestamp:", int(current_timestamp / 1000))
 
         while True:
             try:

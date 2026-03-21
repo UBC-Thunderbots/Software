@@ -75,6 +75,7 @@ class TigersAutoref(TimeProvider):
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
 
+        self.initial_timestamp = int(time.time_ns())
         self.current_timestamp = int(time.time_ns())
         self.timestamp_mutex = threading.Lock()
 
@@ -218,6 +219,13 @@ class TigersAutoref(TimeProvider):
         """
         with self.timestamp_mutex:
             ci_input = CiInput(timestamp=self.current_timestamp)
+            print(
+                "autoref timestamp:",
+                int(
+                    (self.current_timestamp - self.initial_timestamp)
+                    * SECONDS_PER_NANOSECOND
+                ),
+            )
 
         ci_input.api_inputs.append(Input())
         ci_input.tracker_packet.CopyFrom(tracker_wrapper)
