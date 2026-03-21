@@ -61,11 +61,16 @@
     }                                                                                      \
     inline std::ostream& operator<<(std::ostream& os, name value)                          \
     {                                                                                      \
-        /* This index lookup relies on the assumption that the enum does not manually */   \
-        /* specify any values. If it did, the underlying integer of the given value */     \
-        /* may be out of range of the vector of strings */                                 \
-        os << reflective_enum::valueNames<name>().at(static_cast<int>(value));             \
+        os << reflective_enum::nameOf<name>(value);                                        \
         return os;                                                                         \
+    }                                                                                      \
+    inline std::string operator+(const std::string& lhs, name rhs)                         \
+    {                                                                                      \
+        return lhs + std::string(reflective_enum::nameOf<name>(rhs));                      \
+    }                                                                                      \
+    inline std::string operator+(name lhs, const std::string& rhs)                         \
+    {                                                                                      \
+        return std::string(reflective_enum::nameOf<name>(lhs)) + rhs;                      \
     }
 
 namespace reflective_enum
@@ -105,6 +110,22 @@ template <typename E>
 constexpr auto valueNames();
 
 /**
+ * Returns the string representation of the given enum value.
+ *
+ * @param value the enum value to get the name of
+ *
+ * @return the string representation of the enum value
+ */
+template <typename E>
+constexpr std::string_view nameOf(const E value)
+{
+    // This index lookup relies on the assumption that the enum does not manually
+    // specify any values. If it did, the underlying integer of the given value
+    // may be out of range of the vector of strings.
+    return reflective_enum::valueNames<E>().at(static_cast<int>(value));
+}
+
+/**
  * Returns the enum value with the given string representation.
  *
  * @param value_name the string representation of the enum value
@@ -112,7 +133,7 @@ constexpr auto valueNames();
  * @return the enum value
  */
 template <typename E>
-constexpr E fromName(const std::string value_name)
+constexpr E fromName(const std::string_view value_name)
 {
     constexpr size_t enum_size      = size<E>();
     constexpr auto enum_value_names = valueNames<E>();
@@ -123,6 +144,6 @@ constexpr E fromName(const std::string value_name)
             return static_cast<E>(i);
         }
     }
-    throw std::invalid_argument(value_name + " cannot be converted to enum value");
+    throw std::invalid_argument("Name cannot be converted to enum value");
 }
 }  // namespace reflective_enum

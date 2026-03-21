@@ -88,12 +88,12 @@ int main(int argc, char **argv)
         if (args.division == "div_a")
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_A, create2021RobotConstants(), realism_config);
+                TbotsProto::FieldType::DIV_A, create2026RobotConstants(), realism_config);
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_B, create2021RobotConstants(), realism_config);
+                TbotsProto::FieldType::DIV_B, create2026RobotConstants(), realism_config);
         }
 
         std::mutex simulator_mutex;
