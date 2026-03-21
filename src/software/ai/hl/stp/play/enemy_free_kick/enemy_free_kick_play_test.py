@@ -1,7 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 
 from software.simulated_tests.validation.or_validation import OrValidation
 
@@ -116,14 +116,9 @@ def test_enemy_free_kick_play(
             gc_command=Command.Type.DIRECT, team=Team.YELLOW
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.EnemyFreeKickPlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.FreeKickPlay
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.EnemyFreeKickPlay, yellow_play=PlayName.FreeKickPlay
+        )
 
     # Always Validation
     always_validation_sequence_set = [

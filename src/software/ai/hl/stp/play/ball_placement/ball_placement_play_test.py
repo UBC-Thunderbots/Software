@@ -134,15 +134,9 @@ def ball_placement_play_setup(
     )
 
     # Force play override here
-    blue_play = Play()
-    blue_play.name = PlayName.BallPlacementPlay
-
-    yellow_play = Play()
-    yellow_play.name = PlayName.HaltPlay
-
-    simulated_test_runner.set_play(blue_play, is_friendly=True)
-    if not blue_only:
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+    simulated_test_runner.set_plays(
+        blue_play=PlayName.BallPlacementPlay, yellow_play=PlayName.HaltPlay
+    )
 
 
 def run_ball_placement_scenario(

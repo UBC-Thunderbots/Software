@@ -2,7 +2,7 @@ import math
 
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 from software.simulated_tests.validation.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
@@ -61,10 +61,11 @@ def test_shoot_or_chip_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.ShootOrChipPlay
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.ShootOrChipPlay, yellow_play=PlayName.UseAiSelection
+        )
 
+    # TODO (#3651): create validations
     simulated_test_runner.run_test(
         setup=setup,
         # this array is just so that the test runs 5 times
