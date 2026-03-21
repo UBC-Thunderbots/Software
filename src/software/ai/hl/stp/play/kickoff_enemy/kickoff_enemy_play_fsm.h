@@ -99,7 +99,6 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            // PlaySelectionFSM will transition to OffensePlay after the kick.
             *SetupState_S + Update_E / kickoff_A = SetupState_S);
     }
 
