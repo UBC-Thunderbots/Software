@@ -239,9 +239,10 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--record_stats",
-        action="store_true",
-        default=False,
-        help="Whether to record stats about fullsystem performance (during AI vs AI)",
+        action="store",
+        type=int,
+        default=0,
+        help="Record stats about fullsystem performance (during AI vs AI) for a set amount of time in minutes",
     )
 
     args = parser.parse_args()
@@ -421,6 +422,10 @@ if __name__ == "__main__":
             layout_path=args.layout,
         )
 
+        if args.record_stats:
+            args.ci_mode = True
+            args.enable_autoref = True
+
         def __ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
 
@@ -545,7 +550,10 @@ if __name__ == "__main__":
                 # call so we need to somehow close it before doing our resource cleanup
                 exiter_thread = threading.Thread(
                     target=exit_poller,
-                    args=(CI_DURATION_S, lambda: tscope.close()),
+                    args=(
+                        args.record_stats if args.record_stats else CI_DURATION_S,
+                        lambda: tscope.close(),
+                    ),
                     daemon=True,
                 )
 
