@@ -15,16 +15,6 @@ AssignedTacticsPlay::AssignedTacticsPlay(
 {
 }
 
-void AssignedTacticsPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                         const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing
-    while (true)
-    {
-        yield({{}});
-    }
-}
-
 void AssignedTacticsPlay::updateControlParams(
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics,
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>> motion_constraints)
