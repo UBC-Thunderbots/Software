@@ -248,16 +248,24 @@ def start_interactive_cli():
             ).ask()
             match launch_option:
                 case "Simulator":
-                    autoref = questionary.confirm(
-                        "Enable autoref?", default=False
+                    options = questionary.checkbox(
+                        "Press space to select: ",
+                        [
+                            "enable_autoref",
+                            "ci_mode",
+                            "record_stats",
+                            "show_autoref_gui",
+                        ],
                     ).ask()
-                    ci_mode = questionary.confirm(
-                        "Enable ci_mode?", default=False
-                    ).ask()
-                    if autoref:
+                    if "autoref" in options:
                         args.append("--enable_autoref")
-                    if ci_mode:
+                    if "ci_mode" in options:
                         args.append("--ci_mode")
+                    if "record_stats" in options:
+                        args.append("--record_stats")
+                    if "show_autoref_gui" in options:
+                        args.append("--show_autoref_gui")
+
                 case "Diagnostics":
                     interface = questionary.text(
                         "What is your network interface?"
@@ -267,8 +275,7 @@ def start_interactive_cli():
             test = questionary.text(
                 "Please enter a test name (leave empty for entire suite)"
             ).ask()
-            test = "all" if not test else test
-            args.extend(["test", "--suite" if test == "all" else test])
+            args.extend(["test", "--suite" if not test else test])
         case "Flash":
             playbook = questionary.select(
                 "Please select an ansible playbook:",
