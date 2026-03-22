@@ -7,40 +7,6 @@ package(default_visibility = ["//visibility:public"])
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
 cc_library(
-    name = "kickoff_enemy_play",
-    srcs = ["kickoff_enemy_play.cpp"],
-    hdrs = ["kickoff_enemy_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
-    name = "kickoff_friendly_play",
-    srcs = ["kickoff_friendly_play.cpp"],
-    hdrs = ["kickoff_friendly_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "stop_play",
     srcs = [
         "stop_play.cpp",
@@ -86,8 +52,6 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
-        ":kickoff_enemy_play",
-        ":kickoff_friendly_play",
         ":stop_play",
         "//software/ai/hl/stp/play/ball_placement:ball_placement_play",
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
@@ -97,44 +61,13 @@ cc_library(
         "//software/ai/hl/stp/play/example:example_play",
         "//software/ai/hl/stp/play/free_kick:free_kick_play",
         "//software/ai/hl/stp/play/halt_play",
+        "//software/ai/hl/stp/play/kickoff_enemy:kickoff_enemy_play",
+        "//software/ai/hl/stp/play/kickoff_friendly:kickoff_friendly_play",
         "//software/ai/hl/stp/play/offense:offense_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
         "//software/ai/hl/stp/play/shoot_or_chip:shoot_or_chip_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
-    ],
-)
-
-cc_test(
-    name = "kickoff_friendly_play_cpp_test",
-    srcs = ["kickoff_friendly_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:kickoff_friendly_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "kickoff_enemy_play_cpp_test",
-    srcs = ["kickoff_enemy_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:kickoff_enemy_play",
-        "//software/geom/algorithms",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )
 
