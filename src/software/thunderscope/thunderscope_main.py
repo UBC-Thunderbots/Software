@@ -13,13 +13,6 @@ from software.thunderscope.binary_context_managers.runtime_manager import (
 )
 from software.thunderscope.log.stats.stats import Stats
 
-protobuf_impl_type = api_implementation.Type()
-assert protobuf_impl_type == "upb", (
-    f"Trying to use the {protobuf_impl_type} protobuf implementation. "
-    "Please use the upb implementation, available in python protobuf version 4.21.0 and above."
-    f"The current version of protobuf is {google.protobuf.__version__}"
-)
-
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers import *
@@ -40,8 +33,14 @@ from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+
+protobuf_impl_type = api_implementation.Type()
+assert protobuf_impl_type == "upb", (
+    f"Trying to use the {protobuf_impl_type} protobuf implementation. "
+    "Please use the upb implementation, available in python protobuf version 4.21.0 and above."
+    f"The current version of protobuf is {google.protobuf.__version__}"
+)
 
 ###########################################################################
 #                         Thunderscope Main                               #
