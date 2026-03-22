@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/stop_play.h"
+#include "software/ai/hl/stp/play/stop_play/stop_play.h"
 
 #include <gtest/gtest.h>
 

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/stop_play.h"
+#include "software/ai/hl/stp/play/stop_play/stop_play.h"
 
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"

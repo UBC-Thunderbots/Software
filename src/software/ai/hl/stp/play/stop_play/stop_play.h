@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play/play_base.hpp"
-#include "software/ai/hl/stp/play/stop_play_fsm.h"
+#include "software/ai/hl/stp/play/stop_play/stop_play_fsm.h"
 
 /**
  * This Play moves our robots in a formation while keeping them at least 0.5m from the
