@@ -551,7 +551,9 @@ if __name__ == "__main__":
                 exiter_thread = threading.Thread(
                     target=exit_poller,
                     args=(
-                        args.record_stats if args.record_stats else CI_DURATION_S,
+                        (args.record_stats * SECONDS_PER_MINUTE)
+                        if args.record_stats
+                        else CI_DURATION_S,
                         lambda: tscope.close(),
                     ),
                     daemon=True,
