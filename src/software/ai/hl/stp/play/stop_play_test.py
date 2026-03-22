@@ -1,10 +1,10 @@
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.robot_speed_threshold import (
+from software.simulated_tests.validation.robot_speed_threshold import (
     RobotSpeedEventuallyBelowThreshold,
 )
 from software.simulated_tests.simulated_test_fixture import (
@@ -54,14 +54,9 @@ def test_stop_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.StopPlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.HaltPlay
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.StopPlay, yellow_play=PlayName.HaltPlay
+        )
 
     # C++ test waits 8s before checking; use 15s timeout so robots have time to slow.
     # Threshold 1.4 m/s: expect robots to eventually slow below the 1.5 m/s STOP limit.
