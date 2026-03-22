@@ -235,7 +235,7 @@ git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "g
 
 git_repository(
     name = "mdv6_firmware",
-    branch = "master",
+    branch = "LEDtest",
     build_file = "@//extlibs:mdv6_firmware.bzl",
     remote = "https://github.com/UBC-Thunderbots/MDv6_Firmware.git",
 )

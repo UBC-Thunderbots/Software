@@ -647,7 +647,7 @@ def _stm32_gcc_impl(ctx):
                     flag_group(
                         flags = [
                             # Optimize for size
-                            "-Os",
+                            "-Ofast",
                             # Places each function into its own section. If coupled with --gc-sections in the linker
                             # stage, this option strips out unused functions and reduces code size.
                             "-ffunction-sections",

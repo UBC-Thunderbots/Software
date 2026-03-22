@@ -42,10 +42,24 @@ cc_library(
         "STM32CubeIDE/Application/Startup/*.s",
         "STM32CubeIDE/Application/User/*.c",
         "*.c",
-        "Drivers/STM32F0xx_HAL_Driver/Src/*_ll_*.c",
-        "Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c",
-        "Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c",
-    ]),
+        "Drivers/STM32F0xx_HAL_Driver/Src/*.c",
+    ], exclude = [
+        "Drivers/STM32F0xx_HAL_Driver/Src/*_template.c",
+    ]) + [
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/bus_voltage_sensor.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/circle_limitation.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/digital_output.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/feed_forward_ctrl.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/ntc_temperature_sensor.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/open_loop.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/pid_regulator.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/pqd_motor_power_measurement.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/r_divider_bus_voltage_sensor.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/ramp_ext_mngr.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/revup_ctrl.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/speed_pos_fdbk.c",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Src/virtual_speed_sensor.c",
+    ],
     hdrs = glob([
         "Core/Inc/**/*.h",
         "*.h",
@@ -53,12 +67,14 @@ cc_library(
         "Drivers/STM32F0xx_HAL_Driver/Inc/**/*.h",
         "Drivers/CMSIS/Device/ST/STM32F0xx/Include/**/*.h",
         "Drivers/CMSIS/Include/**/*.h",
+        "MCSDK_v6.4.1-Full/**/*.h",
     ]),
     includes = [
         "Core/Inc",
         "Drivers/STM32F0xx_HAL_Driver/Inc",
         "Drivers/CMSIS/Device/ST/STM32F0xx/Include",
         "Drivers/CMSIS/Include",
+        "MCSDK_v6.4.1-Full/MotorControl/MCSDK/MCLib/Any/Inc",
         "Inc",
     ],
     defines = [
@@ -67,5 +83,7 @@ cc_library(
         # Use the HAL and Low-Layer APIs.
         "USE_HAL_DRIVER",
         "USE_FULL_LL_DRIVER",
+        "ARM_MATH_CM0",
     ],
+    alwayslink = True,
 )
