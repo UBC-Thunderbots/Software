@@ -25,6 +25,18 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [StopPlayFSM](/src/software/ai/hl/stp/play/stop_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StopState
+StopState --> StopState : <i>updateStopPosition</i>
+
+```
+
 ## [BallPlacementPlayFSM](/src/software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h)
 
 ```mermaid

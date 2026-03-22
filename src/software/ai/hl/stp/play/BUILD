@@ -42,16 +42,20 @@ cc_library(
 
 cc_library(
     name = "stop_play",
-    srcs = ["stop_play.cpp"],
-    hdrs = ["stop_play.h"],
+    srcs = [
+        "stop_play.cpp",
+        "stop_play_fsm.cpp",
+    ],
+    hdrs = [
+        "stop_play.h",
+        "stop_play_fsm.h",
+    ],
     deps = [
         ":play",
         "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
         "//software/util/generic_factory",
     ],
     alwayslink = True,
@@ -151,7 +155,7 @@ py_test(
 )
 
 cc_test(
-    name = "stop_play_test",
+    name = "stop_play_cpp_test",
     srcs = ["stop_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -162,6 +166,24 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "stop_play_test",
+    srcs = [
+        "stop_play_test.py",
+    ],
+    # The default main would be stop_play_test.py; override to our file.
+    main = "stop_play_test.py",
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests/validation:validations",
+        requirement("pytest"),
     ],
 )
 
