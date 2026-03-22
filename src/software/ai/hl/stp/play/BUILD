@@ -67,7 +67,6 @@ cc_library(
     ],
 )
 
-cc_test(
 py_test(
     name = "kickoff_play_test",
     srcs = [
@@ -155,18 +154,3 @@ py_test(
     ],
 )
 
-py_test(
-    name = "kickoff_play_test",
-    srcs = [
-        "kickoff_play_test.py",
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
-    deps = [
-        "//software:conftest",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-    ],
-)
