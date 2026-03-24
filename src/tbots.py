@@ -254,15 +254,18 @@ def start_interactive_cli():
                             "enable_autoref",
                             "ci_mode",
                             "record_stats",
+                            "enable_realism",
                             "show_autoref_gui",
                         ],
                     ).ask()
-                    if "autoref" in options:
+                    if "enable_autoref" in options:
                         args.append("--enable_autoref")
                     if "ci_mode" in options:
                         args.append("--ci_mode")
                     if "record_stats" in options:
                         args.append("--record_stats")
+                    if "enable_realism" in options:
+                        args.append("--enable_realism")
                     if "show_autoref_gui" in options:
                         args.append("--show_autoref_gui")
 
