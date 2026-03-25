@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -50,14 +50,9 @@ def test_crease_defense_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.CreaseDefensePlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.HaltPlay
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.CreaseDefensePlay, yellow_play=PlayName.HaltPlay
+        )
 
     # TODO (#2778): actually add validations
     always_validation_sequence_set = [[]]
