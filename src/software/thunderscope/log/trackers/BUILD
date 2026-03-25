@@ -13,5 +13,5 @@ py_library(
         "tracker.py",
         "tracker_builder.py",
     ],
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
 )
