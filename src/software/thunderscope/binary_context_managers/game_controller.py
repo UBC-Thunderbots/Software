@@ -277,28 +277,19 @@ class Gamecontroller:
             WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
         )
 
-        ci_input = CiInput(timestamp=int(time.time_ns()))
-        api_input = Input()
-
         if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
-            # skip to pre second half
-            new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
-            change = Change()
-            change.change_stage_change.new_stage = new_stage
-            api_input.change.CopyFrom(change)
-        else:
-            # reset game
-            api_input.reset_match = True
-            ci_input.api_inputs.append(api_input)
+            ci_input = CiInput(timestamp=int(time.time_ns()))
             api_input = Input()
             change = Change()
-            change.update_config_change.division = Division.DIV_B
-            change.update_config_change.match_type = MatchType.FRIENDLY
+
+            # skip to pre second half
+            change.change_stage_change.new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
+
             api_input.change.CopyFrom(change)
-
-        ci_input.api_inputs.append(api_input)
-
-        self.send_ci_input(ci_input)
+            ci_input.api_inputs.append(api_input)
+            self.send_ci_input(ci_input)
+        else:
+            self.reset_team_info(Division.DIV_B)
 
         self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
 
