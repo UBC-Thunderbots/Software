@@ -275,11 +275,6 @@ class Gamecontroller:
 
         :param game_stage: The current game stage from the referee message
         """
-        # reset game state
-        self.simulator_proto_unix_io.send_proto(
-            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
-        )
-
         if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
             ci_input = CiInput(timestamp=int(time.time_ns()))
             api_input = Input()
@@ -292,7 +287,19 @@ class Gamecontroller:
             ci_input.api_inputs.append(api_input)
             self.send_ci_input(ci_input)
         else:
-            self.reset_team_info(Division.DIV_B)
+            ci_input = CiInput(timestamp=int(time.time_ns()))
+            input_game_update = Input()
+            input_game_update.reset_match = True
+            input_game_update.change.update_config_change.CopyFrom(
+                self.reset_game(Division.DIV_B)
+            )
+            ci_input.api_inputs.append(input_game_update)
+            self.send_ci_input(ci_input)
+
+        # reset game state
+        self.simulator_proto_unix_io.send_proto(
+            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+        )
 
         self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
 
