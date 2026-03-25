@@ -8,9 +8,8 @@ from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 
 class GoalieTracker(Tracker):
-    """
-    Tracker to track new shots on goal
-    """
+    """Tracker to track new shots on goal"""
+
     # tune these values to reduce noise in what is considered a kick
     # higher values exclude noise such as dribbling or small movements of the ball
     # but can exclude real kicks
@@ -22,16 +21,15 @@ class GoalieTracker(Tracker):
         callback: Callable[[bool, bool], None],
         buffer_size: int = 5,
     ):
-        """
-        Initializes the Goalie tracker
-        
+        """Initializes the Goalie tracker
+
         :param for_friendly: if we should track shots on goal for the friendly or enemy team
         :param callback: function to call when there is a new shot on goal
                          called with 2 booleans:
                              - If there is a shot on goal right now
                              - If there was a shot on goal before
                          lets us track new shots on goal + when shots are blocked
-        :param buffer_size: buffer size for the tracker's io 
+        :param buffer_size: buffer size for the tracker's io
         """
         super().__init__(callback=callback, buffer_size=buffer_size)
 
@@ -63,7 +61,7 @@ class GoalieTracker(Tracker):
         latest_is_shot_incoming = self._is_goal_shot_incoming(
             world.ball(), world.field(), for_friendly=self.for_friendly
         )
-        
+
         if self.callback:
             self.callback(latest_is_shot_incoming, self.is_shot_incoming)
 
