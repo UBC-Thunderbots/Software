@@ -6,12 +6,24 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class RefereeTracker(Tracker):
+    """
+    Tracks Referee events, like goals and yellow / red cards for the friendly team only
+    """
     def __init__(
         self,
         friendly_color_yellow: bool,
         callback: Callable[[int, int, int], None],
         buffer_size: int = 5,
     ):
+        """
+        Initializes the Referee tracker
+        
+        :param friendly_color_yellow: if the friendly color is yellow or not
+                                      determines which goals, etc. the tracker tracks
+        :param callback: function to call when there is any new Referee event
+                         called with the current goals, yellow cards, and red cards
+        :param buffer_size: buffer size for the tracker's io 
+        """
         super().__init__(callback=callback, buffer_size=buffer_size)
 
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)

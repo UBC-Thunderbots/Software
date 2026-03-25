@@ -3,60 +3,15 @@ load("@thunderscope_deps//:requirements.bzl", "requirement")
 package(default_visibility = ["//visibility:public"])
 
 py_library(
-    name = "tracker",
-    srcs = ["tracker.py"],
-    deps = [
-        "//software/thunderscope:thread_safe_buffer",
-    ],
-)
-
-py_library(
-    name = "goalie_tracker",
-    srcs = ["goalie_tracker.py"],
-    data = [
-        "//software:py_constants.so",
-    ],
-    deps = [
-        ":tracker",
-    ],
-)
-
-py_library(
-    name = "kick_tracker",
-    srcs = ["kick_tracker.py"],
-    deps = [
-        ":tracker",
-    ],
-)
-
-py_library(
-    name = "possession_tracker",
-    srcs = ["possession_tracker.py"],
-    deps = [
-        ":tracker",
-    ],
-)
-
-py_library(
-    name = "referee_tracker",
-    srcs = ["referee_tracker.py"],
-    deps = [
-        ":tracker",
-    ],
-)
-
-py_library(
-    name = "tracker_builder",
-    srcs = ["tracker_builder.py"],
-    deps = [
-        ":tracker",
-    ],
-)
-
-py_library(
     name = "tracker_module",
     srcs = [
         "__init__.py",
+        "tracker.py",
+        "kick_tracker.py",
+        "possession_tracker.py",
+        "goalie_tracker.py",
+        "referee_tracker.py",
+        "tracker_builder.py"
     ],
     visibility = ["//visibility:public"],
     deps = [

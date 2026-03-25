@@ -4,7 +4,16 @@ from typing import Callable, Any, Optional, Type, Self
 
 
 class TrackerBuilder:
+    """
+    Builder class to combine different trackers and update them together
+    """
+    
     def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
+        """
+        Initializes the builder
+        
+        :param proto_unix_io: the unix io that the trackers should listen on
+        """
         self.proto_unix_io = proto_unix_io
 
         self.trackers = []
@@ -13,14 +22,23 @@ class TrackerBuilder:
         self,
         tracker_cls: Type[Tracker],
         callback: Optional[Callable[[Any], None]] = None,
-        buffer_size: int = 5,
         **kwargs,
     ) -> Self:
+        """
+        Adds a single tracker to the list
+        
+        :param tracker_cls: The class of the tracker to instantiate
+        :param callback: function that the tracker should call when it tracks an event
+        :param **kwargs: tracker-specific arguments
+        """
         tracker = tracker_cls(callback=callback, **kwargs)
         tracker.set_proto_unix_io(self.proto_unix_io)
         self.trackers.append(tracker)
         return self
 
     def refresh(self) -> None:
+        """
+        Refreshes all the trackers
+        """
         for tracker in self.trackers:
             tracker.refresh()
