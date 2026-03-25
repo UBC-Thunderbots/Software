@@ -13,12 +13,5 @@ py_library(
         "tracker.py",
         "tracker_builder.py",
     ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":goalie_tracker",
-        ":kick_tracker",
-        ":possession_tracker",
-        ":referee_tracker",
-        ":tracker_builder",
-    ],
+    visibility = ["//visibility:public"]
 )
