@@ -39,13 +39,16 @@ class Gamecontroller:
         self,
         suppress_logs: bool = False,
         use_conventional_port: bool = False,
+        automate_referee: bool = False,
     ) -> None:
         """Run Gamecontroller
 
         :param suppress_logs: Whether to suppress the logs
         :param use_conventional_port: whether or not to use the conventional port!
+        :param automate_referee: whether or not referee commands should be automated
         """
         self.suppress_logs = suppress_logs
+        self.automate_referee = automate_referee
 
         # We default to using a non-conventional port to avoid emitting
         # on the same port as what other teams may be listening on.
@@ -220,8 +223,8 @@ class Gamecontroller:
             block=False, return_cached=True
         )
 
-        # TODO (#3633): only automate referee events in record_stats mode
-        self.__automate_referee(referee)
+        if self.automate_referee:
+            self.__automate_referee(referee)
 
         max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
         max_allowed_bots_blue: int = referee.blue.max_allowed_bots

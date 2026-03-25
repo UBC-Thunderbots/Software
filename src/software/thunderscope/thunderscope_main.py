@@ -343,7 +343,9 @@ if __name__ == "__main__":
 
         with (
             Gamecontroller(
-                suppress_logs=(not args.verbose), use_conventional_port=False
+                suppress_logs=(not args.verbose),
+                use_conventional_port=False,
+                automate_referee=args.ci_mode,
             )
             if args.launch_gc
             else contextlib.nullcontext()
