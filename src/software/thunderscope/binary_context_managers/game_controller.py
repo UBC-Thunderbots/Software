@@ -276,24 +276,29 @@ class Gamecontroller:
         :param game_stage: The current game stage from the referee message
         """
         if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
-            ci_input = CiInput(timestamp=int(time.time_ns()))
-            api_input = Input()
-            change = Change()
-
             # skip to pre second half
-            change.change_stage_change.new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
-
-            api_input.change.CopyFrom(change)
-            ci_input.api_inputs.append(api_input)
-            self.send_ci_input(ci_input)
+            self.__set_game_stage(Referee.Stage.NORMAL_SECOND_HALF_PRE)
         else:
+            # end game
+            self.__set_game_stage(Referee.Stage.POST_GAME)
+
+            # reset match (start new game)
             ci_input = CiInput(timestamp=int(time.time_ns()))
-            input_game_update = Input()
-            input_game_update.reset_match = True
-            input_game_update.change.update_config_change.CopyFrom(
-                self.reset_game(Division.DIV_B)
-            )
-            ci_input.api_inputs.append(input_game_update)
+            input_reset_match = Input()
+            input_reset_match.reset_match = True
+            ci_input.api_inputs.append(input_reset_match)
+            self.send_ci_input(ci_input)
+
+            ci_input = CiInput(timestamp=int(time.time_ns()))
+            input_reset_match = Input()
+            input_reset_match.change.update_config_change.division = Division.DIV_B
+            ci_input.api_inputs.append(input_reset_match)
+            self.send_ci_input(ci_input)
+
+            ci_input = CiInput(timestamp=int(time.time_ns()))
+            input_reset_match = Input()
+            input_reset_match.change.update_config_change.match_type = MatchType.FRIENDLY
+            ci_input.api_inputs.append(input_reset_match)
             self.send_ci_input(ci_input)
 
         # reset game state
@@ -302,6 +307,15 @@ class Gamecontroller:
         )
 
         self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
+
+    def __set_game_stage(self, new_stage: Referee.Stage) -> None:
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        api_input = Input()
+        change = Change()
+        change.change_stage_change.new_stage = new_stage
+        api_input.change.CopyFrom(change)
+        ci_input.api_inputs.append(api_input)
+        self.send_ci_input(ci_input)
 
     def __find_unprocessed_events(
         self, referee: Referee, event_type: GameEvent.Type
