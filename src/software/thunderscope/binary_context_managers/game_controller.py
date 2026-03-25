@@ -272,13 +272,6 @@ class Gamecontroller:
 
         :param game_stage: The current game stage from the referee message
         """
-        if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
-            # skip to pre second half
-            new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
-        else:
-            # reset game
-            new_stage = Referee.Stage.NORMAL_FIRST_HALF_PRE
-
         # reset game state
         self.simulator_proto_unix_io.send_proto(
             WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
@@ -286,9 +279,23 @@ class Gamecontroller:
 
         ci_input = CiInput(timestamp=int(time.time_ns()))
         api_input = Input()
-        change = Change()
-        change.change_stage_change.new_stage = new_stage
-        api_input.change.CopyFrom(change)
+
+        if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
+            # skip to pre second half
+            new_stage = Referee.Stage.NORMAL_SECOND_HALF_PRE
+            change = Change()
+            change.change_stage_change.new_stage = new_stage
+            api_input.change.CopyFrom(change)
+        else:
+            # reset game
+            api_input.reset_match = True
+            ci_input.api_inputs.append(api_input)
+            api_input = Input()
+            change = Change()
+            change.update_config_change.division = Division.DIV_B
+            change.update_config_change.match_type = MatchType.FRIENDLY
+            api_input.change.CopyFrom(change)
+
         ci_input.api_inputs.append(api_input)
 
         self.send_ci_input(ci_input)
