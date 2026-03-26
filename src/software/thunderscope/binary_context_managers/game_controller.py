@@ -282,6 +282,9 @@ class Gamecontroller:
             # end game
             self.__set_game_stage(Referee.Stage.POST_GAME)
 
+            # Race condition where events don't get resolved before setting new match settings
+            time.sleep(1)
+
             # reset match (start new game)
             ci_input = CiInput(timestamp=int(time.time_ns()))
             input_reset_match = Input()
@@ -297,7 +300,9 @@ class Gamecontroller:
 
             ci_input = CiInput(timestamp=int(time.time_ns()))
             input_reset_match = Input()
-            input_reset_match.change.update_config_change.match_type = MatchType.FRIENDLY
+            input_reset_match.change.update_config_change.match_type = (
+                MatchType.FRIENDLY
+            )
             ci_input.api_inputs.append(input_reset_match)
             self.send_ci_input(ci_input)
 
@@ -572,24 +577,26 @@ class Gamecontroller:
         :return: a list of CiOutput protos from the Gamecontroller
         """
         ci_input = CiInput(timestamp=int(time.time_ns()))
+
+        input_reset_match = Input()
+        input_reset_match.reset_match = True
+
         input_blue_update = Input()
-        input_blue_update.reset_match = True
         input_blue_update.change.update_team_state_change.CopyFrom(
             self.reset_team("BLUE", SslTeam.BLUE)
         )
 
         input_yellow_update = Input()
-        input_yellow_update.reset_match = True
         input_yellow_update.change.update_team_state_change.CopyFrom(
             self.reset_team("YELLOW", SslTeam.YELLOW)
         )
 
         input_game_update = Input()
-        input_game_update.reset_match = True
         input_game_update.change.update_config_change.CopyFrom(
             self.reset_game(division)
         )
 
+        ci_input.api_inputs.append(input_reset_match)
         ci_input.api_inputs.append(input_blue_update)
         ci_input.api_inputs.append(input_yellow_update)
         ci_input.api_inputs.append(input_game_update)
