@@ -30,7 +30,12 @@
     - name: Flashing... (this will take a while on the first run)
       become: true
       become_method: ansible.builtin.sudo
-      ansible.builtin.command: "/opt/tbotspython/bin/platformio run --disable-auto-clean -t nobuild -t upload -d /home/{{ ansible_user }}/powerloop/powerloop_main_workdir"
+      ansible.builtin.command: >
+        /opt/tbotspython/bin/platformio run
+        --disable-auto-clean
+        -t nobuild
+        -t upload
+        -d /home/{{ ansible_user }}/powerloop/powerloop_main_workdir
       register: result
       changed_when: true
 
