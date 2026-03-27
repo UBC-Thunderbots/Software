@@ -280,6 +280,14 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     Angle pickoff_final_orientation;
     Timestamp start_time;
 
+    bool is_placed = false;
+    std::optional<int> placing_robot_id = std::nullopt;
+
+    /**
+     * TODO: document
+     */
+    std::optional<Robot> getPlacingRobot(const WorldPtr& world);
+
     static constexpr double BACK_AWAY_FROM_CORNER_M                = 0.9;
     static constexpr double BACK_AWAY_FROM_WALL_M                  = 0.5;
     static constexpr double MIN_DISTANCE_FROM_WALL_FOR_ALIGN_M     = 0.35;
