@@ -34,10 +34,8 @@ static const unsigned int REPLAY_FILE_VERSION       = 2;
 
 #endif  // PLATFORMIO_BUILD
 
-// Redis default server connections properties
-#define REDIS_HOST_LENGTH 10
-static const char REDIS_DEFAULT_HOST[REDIS_HOST_LENGTH] = "127.0.0.1";
-static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
+// TOML config file path for robot configuration
+static const char TOML_CONFIG_FILE_PATH[] = "/opt/tbotspython/robot_config.toml";
 
 // the UDP port robots are listening to for primitives
 static const short unsigned int PRIMITIVE_PORT = 42070;
@@ -155,7 +153,7 @@ static const double SECONDS_PER_MINUTE           = 60.0;
 static const double DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK =
     1.0 / 60.0;  // corresponds to 60 Hz
 static const double DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK =
-    DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK * 1000;
+    DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK * MILLISECONDS_PER_SECOND;
 
 // The total number of robot ids on one team
 static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
@@ -225,9 +223,6 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 static const unsigned THUNDERLOOP_HZ = 300u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
-
-// Jetson Nano Constants
-static const double MAX_JETSON_TEMP_C = 97;
 
 // Robot diagnostics constants
 constexpr double AUTO_CHIP_DISTANCE_DEFAULT_M     = 1.5;

@@ -1,13 +1,14 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_enters_region import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_moves_in_direction import *
-from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
-from software.simulated_tests.excessive_dribbling import *
+from proto.import_all_protos import *
+from software.simulated_tests.validation.robot_enters_region import *
+from software.simulated_tests.validation.ball_enters_region import *
+from software.simulated_tests.validation.ball_moves_in_direction import *
+from software.simulated_tests.validation.friendly_has_ball_possession import *
+from software.simulated_tests.validation.ball_speed_threshold import *
+from software.simulated_tests.validation.robot_speed_threshold import *
+from software.simulated_tests.validation.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -35,36 +36,27 @@ def test_ball_chipped_on_intercept(
     position_to_block_from,
     simulated_test_runner,
 ):
-    # Setup Robot
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
-        create_world_state(
-            [],
-            blue_robot_locations=[position_to_block_from],
-            ball_location=ball_initial_position,
-            ball_velocity=ball_initial_velocity,
-        ),
-    )
-
-    # Setup Tactic
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].pass_defender.CopyFrom(
-        PassDefenderTactic(
-            position_to_block_from=tbots_cpp.createPointProto(position_to_block_from),
-            ball_steal_mode=BallStealMode.STEAL,
+    def setup(*args):
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                [],
+                blue_robot_locations=[position_to_block_from],
+                ball_location=ball_initial_position,
+                ball_velocity=ball_initial_velocity,
+            )
         )
-    )
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
 
-    # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: PassDefenderTactic(
+                    position_to_block_from=tbots_cpp.createPointProto(
+                        position_to_block_from
+                    ),
+                    ball_steal_mode=BallStealMode.STEAL,
+                )
+            }
+        )
 
-    # Always Validation
     always_validation_sequence_set = [
         [
             RobotNeverEntersRegion(
@@ -79,10 +71,10 @@ def test_ball_chipped_on_intercept(
         ]
     ]
 
-    # Eventually Validation
     eventually_validation_sequence_set = [[BallSpeedEventuallyBelowThreshold(0.4)]]
 
     simulated_test_runner.run_test(
+        setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -117,36 +109,27 @@ def test_avoid_intercept_scenario(
     position_to_block_from,
     simulated_test_runner,
 ):
-    # Setup Robot
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
-        create_world_state(
-            [],
-            blue_robot_locations=[position_to_block_from],
-            ball_location=ball_initial_position,
-            ball_velocity=ball_initial_velocity,
-        ),
-    )
-
-    # Setup Tactic
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].pass_defender.CopyFrom(
-        PassDefenderTactic(
-            position_to_block_from=tbots_cpp.createPointProto(position_to_block_from),
-            ball_steal_mode=BallStealMode.STEAL,
+    def setup(*args):
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                [],
+                blue_robot_locations=[position_to_block_from],
+                ball_location=ball_initial_position,
+                ball_velocity=ball_initial_velocity,
+            )
         )
-    )
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
 
-    # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: PassDefenderTactic(
+                    position_to_block_from=tbots_cpp.createPointProto(
+                        position_to_block_from
+                    ),
+                    ball_steal_mode=BallStealMode.STEAL,
+                )
+            }
+        )
 
-    # Always Validation
     always_validation_sequence_set = [
         [
             # Defender should remain near position_to_block_from
@@ -179,10 +162,10 @@ def test_avoid_intercept_scenario(
         ]
     ]
 
-    # Eventually Validation
     eventually_validation_sequence_set = [[BallSpeedEventuallyBelowThreshold(0.4)]]
 
     simulated_test_runner.run_test(
+        setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -259,35 +242,27 @@ def test_steal_ball(
     should_steal,
     simulated_test_runner,
 ):
-    # Setup Robot
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
-        create_world_state(
-            blue_robot_locations=[position_to_block_from],
-            yellow_robot_locations=[enemy_kicker_position],
-            ball_location=ball_initial_position,
-            ball_velocity=ball_initial_velocity,
-        ),
-    )
-
-    # Setup Tactic
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].pass_defender.CopyFrom(
-        PassDefenderTactic(
-            position_to_block_from=tbots_cpp.createPointProto(position_to_block_from),
-            ball_steal_mode=BallStealMode.STEAL,
+    def setup(*args):
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                blue_robot_locations=[position_to_block_from],
+                yellow_robot_locations=[enemy_kicker_position],
+                ball_location=ball_initial_position,
+                ball_velocity=ball_initial_velocity,
+            )
         )
-    )
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
 
-    # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
-    # Always Validation
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: PassDefenderTactic(
+                    position_to_block_from=tbots_cpp.createPointProto(
+                        position_to_block_from
+                    ),
+                    ball_steal_mode=BallStealMode.STEAL,
+                )
+            }
+        )
+
     always_validation_sequence_set = [
         [
             RobotNeverEntersRegion(
@@ -297,7 +272,7 @@ def test_steal_ball(
             ),
             NeverExcessivelyDribbles(),
         ]
-    ]  # Eventually Validation
+    ]
     eventually_validation_sequence_set = [[BallSpeedEventuallyBelowThreshold(0.4)]]
 
     if should_steal:
@@ -311,6 +286,7 @@ def test_steal_ball(
         )
 
     simulated_test_runner.run_test(
+        setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
