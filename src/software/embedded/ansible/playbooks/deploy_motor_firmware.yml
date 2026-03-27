@@ -5,8 +5,8 @@
   vars:
     repo_root: "{{ workspace_dir | default(playbook_dir + '/../../../../') }}"
     # Bazel output location (convenience symlink)
-    bazel_raw_out_path: "bazel-bin/external/+_repo_rules2+mdv6_firmware/mdv6_firmware_main"
-    bazel_out_path: "bazel-bin/external/+_repo_rules2+mdv6_firmware/mdv6_firmware_main.bin"
+    # bazel_raw_out_path: "bazel-bin/external/+_repo_rules2+mdv6_firmware/mdv6_firmware_main"
+    # bazel_out_path: "bazel-bin/external/+_repo_rules2+mdv6_firmware/mdv6_firmware_main.bin"
     firmware_bin_name: "mdv6_firmware_main.bin"
     firmware_archive_name: "mdv6_firmware.tar.gz"
     script_path: "software/embedded/drivers/flash_motor_drivers.py"
@@ -22,6 +22,23 @@
       args:
         chdir: "{{ repo_root }}"
       changed_when: false
+
+    - name: Get binary path
+      delegate_to: localhost
+      ansible.builtin.command: "bazel cquery @mdv6_firmware//:mdv6_firmware_main --output=files --platforms=//toolchains/cc:motor_board"
+      args:
+        chdir: "{{ repo_root }}"
+      register: cquery_result
+      changed_when: false
+
+    - name: Set path facts
+      set_fact:
+        bazel_raw_out_path: "{{ repo_root }}/{{ cquery_result.stdout.strip() }}"
+        bazel_out_path: "{{ repo_root }}/{{ cquery_result.stdout.strip() }}.bin"
+
+    - name: Debug resolved paths
+      debug:
+        msg: "ELF Path: {{bazel_raw_out_path }} | BIN Path: {{ bazel_out_path }}"
 
     - name: Convert .elf binary to .bin binary
       delegate_to: localhost
