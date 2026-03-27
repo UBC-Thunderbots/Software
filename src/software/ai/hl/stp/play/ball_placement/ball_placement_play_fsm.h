@@ -237,7 +237,8 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
                 AlignPlacementState_S,
 
             PickOffWallState_S + Update_E[ballLost_G] = StartState_S,
-            PickOffWallState_S + Update_E[!wallPickOffDone_G && !ballLost_G] / pickOffWall_A,
+            PickOffWallState_S +
+                Update_E[!wallPickOffDone_G && !ballLost_G] / pickOffWall_A,
             PickOffWallState_S + Update_E[wallPickOffDone_G] / startWait_A =
                 ReleaseBallState_S,
 
@@ -249,8 +250,9 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
                 PlaceBallState_S,
 
             PlaceBallState_S + Update_E[ballLost_G] = StartState_S,
-            PlaceBallState_S + Update_E[!ballPlaced_G && !ballLost_G] / placeBall_A = PlaceBallState_S,
-            PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = ReleaseBallState_S,
+            PlaceBallState_S + Update_E[!ballPlaced_G && !ballLost_G] / placeBall_A =
+                PlaceBallState_S,
+            PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A = ReleaseBallState_S,
 
             ReleaseBallState_S + Update_E[!waitDone_G && ballPlaced_G] / releaseBall_A =
                 ReleaseBallState_S,
@@ -280,7 +282,8 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     Angle pickoff_final_orientation;
     Timestamp start_time;
 
-    bool is_placed = false;
+    // TODO: use is_placed? not sure
+    // bool is_placed = false;
     std::optional<int> placing_robot_id = std::nullopt;
 
     /**
