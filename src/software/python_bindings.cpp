@@ -30,10 +30,12 @@
 #include "software/constants.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersection.h"
 #include "software/geom/circle.h"
 #include "software/geom/convex_polygon.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
+#include "software/geom/ray.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/vector.h"
@@ -197,6 +199,8 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Angle>(m, "Angle")
         .def(py::init<>())
+        .def(py::self - Angle())
+        .def(py::self > Angle())
         .def_static("fromRadians", &Angle::fromRadians)
         .def_static("fromDegrees", &Angle::fromDegrees)
         .def("toRadians", &Angle::toRadians)
@@ -243,6 +247,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("length", &Segment::length)
         .def("lengthSquared", &Segment::lengthSquared)
         .def("reverse", &Segment::reverse);
+
+    py::class_<Ray>(m, "Ray").def(py::init<Point, Vector>());
 
     py::class_<Circle>(m, "Circle")
         .def(py::init<Point, double>())
@@ -322,6 +328,8 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
     m.def("contains", py::overload_cast<const Stadium&, const Point&>(&contains));
 
+    m.def("intersection", py::overload_cast<const Ray&, const Segment&>(&intersection));
+
     py::class_<Robot>(m, "Robot")
         .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
         .def(py::init<TbotsProto::Robot>())
@@ -347,7 +355,12 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Ball>(m, "Ball")
         .def(py::init<Point, Vector, Timestamp>())
-        .def("position", &Ball::position);
+        .def("position", &Ball::position)
+        .def("velocity", &Ball::velocity)
+        .def("hasBallBeenKicked", &Ball::hasBallBeenKicked,
+             py::arg("expected_kick_direction"), py::arg("min_kick_speed") = 0.5,
+             py::arg("max_angle_difference") = Angle::fromDegrees(20))
+        .def("hasBallBeenKicked", &Ball::hasBallBeenKicked);
 
     // https://pybind11.readthedocs.io/en/stable/classes.html
     py::class_<Field>(m, "Field")
@@ -368,6 +381,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("defenseAreaXLength", &Field::defenseAreaXLength)
         .def("friendlyDefenseArea", &Field::friendlyDefenseArea)
         .def("enemyDefenseArea", &Field::enemyDefenseArea)
+        .def("pointInFriendlyHalf", &Field::pointInFriendlyHalf)
+        .def("pointInEnemyHalf", &Field::pointInEnemyHalf)
         .def("friendlyHalf", &Field::friendlyHalf)
         .def("friendlyPositiveYQuadrant", &Field::friendlyPositiveYQuadrant)
         .def("friendlyNegativeYQuadrant", &Field::friendlyNegativeYQuadrant)
@@ -388,7 +403,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("enemyCornerNeg", &Field::enemyCornerNeg)
         .def("friendlyGoalpostPos", &Field::friendlyGoalpostPos)
         .def("friendlyGoalpostNeg", &Field::friendlyGoalpostNeg)
-        .def("enemyGoalpostPos", &Field::enemyGoalpostPos);
+        .def("enemyGoalpostPos", &Field::enemyGoalpostPos)
+        .def("enemyGoalpostNeg", &Field::enemyGoalpostNeg);
 
     py::class_<World>(m, "World")
         .def(py::init<Field, Ball, Team, Team>())
