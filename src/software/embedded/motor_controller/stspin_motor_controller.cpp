@@ -310,10 +310,12 @@ void StSpinMotorController::populateTx(const OutgoingFrame& outgoing_frame,
             LOG(ERROR) << "Too many consecutive CRC failures for motor " << motor
                        << ". Resetting.";
             reset();
+	    motor_status_[motor].consecutive_crc_failures = 0
         }
         return;
     }
     motor_status_[motor].consecutive_crc_failures = 0;
+}
 
 void StSpinMotorController::processRx(const MotorIndex motor,
                                       const std::array<uint8_t, FRAME_LEN>& rx)
