@@ -50,7 +50,7 @@ class GLRuntimeInstallerDialog(QDialog):
         selected_items = self.runtime_select_list.selectedItems()
         selected_runtimes = [item.text() for item in selected_items]
 
-        # TODO (#3559): actually install the list of runtimes
-        print("Installing:", selected_runtimes)
+        for runtime in selected_runtimes:
+            runtime_manager_instance.install_runtime(runtime)
 
         self.close()

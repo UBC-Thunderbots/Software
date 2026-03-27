@@ -1,8 +1,9 @@
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.friendly_team_scored import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.friendly_has_ball_possession import *
+from proto.play_pb2 import PlayName
+from software.simulated_tests.validation.friendly_team_scored import *
+from software.simulated_tests.validation.ball_enters_region import *
+from software.simulated_tests.validation.friendly_has_ball_possession import *
+from software.simulated_tests.validation.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from software.simulated_tests.simulated_test_fixture import (
@@ -12,13 +13,8 @@ from software.simulated_tests.simulated_test_fixture import (
 
 def test_offense_play(simulated_test_runner):
     def setup(start_point):
-        # starting point must be Point
         ball_initial_pos = start_point
-        # placement point must be Vector2 to work with game controller
-        tbots_cpp.Point(-3, -2)
-        tbots_cpp.Field.createSSLDivisionBField()
 
-        # Setup Bots
         blue_bots = [
             tbots_cpp.Point(-4.5, 3.0),
             tbots_cpp.Point(-2, 1.5),
@@ -41,29 +37,7 @@ def test_offense_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
-        # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
-        )
-
-        # Force play override here
-        blue_play = Play()
-        blue_play.name = PlayName.OffensePlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.HaltPlay
-
-        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
-
-        # Create world state
-        simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState,
+        simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -72,11 +46,23 @@ def test_offense_play(simulated_test_runner):
             ),
         )
 
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        )
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+        )
+
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.OffensePlay, yellow_play=PlayName.HaltPlay
+        )
+
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     # Always Validation
     inv_always_validation_sequence_set = [
-        [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])]
+        [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])],
+        [NeverExcessivelyDribbles()],
     ]
 
     ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]

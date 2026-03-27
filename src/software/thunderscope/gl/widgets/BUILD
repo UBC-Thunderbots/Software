@@ -12,6 +12,15 @@ py_library(
 )
 
 py_library(
+    name = "gl_runtime_selector",
+    srcs = ["gl_runtime_selector.py"],
+    deps = [
+        "//software/thunderscope/binary_context_managers:runtime_manager",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "gl_toolbar",
     srcs = ["gl_toolbar.py"],
     deps = [
@@ -51,13 +60,5 @@ py_library(
         "//software/thunderscope/common:common_widgets",
         requirement("pyqtgraph"),
         requirement("qtawesome"),
-    ],
-)
-
-py_library(
-    name = "gl_runtime_selector",
-    srcs = ["gl_runtime_selector.py"],
-    deps = [
-        requirement("pyqtgraph"),
     ],
 )
