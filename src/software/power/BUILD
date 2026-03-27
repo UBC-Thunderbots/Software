@@ -68,7 +68,7 @@ platformio_project(
     build_flags = ["-DPB_FIELD_32BIT=1"],  #Makes platformio use 16 bit numbers for size
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
-    platform = "espressif32",
+    platform = "espressif32\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset",
     deps = [
         ":charger",
         ":chicker",
