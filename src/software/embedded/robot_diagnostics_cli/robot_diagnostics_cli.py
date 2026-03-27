@@ -14,6 +14,9 @@ from typing_extensions import Annotated
 from software.embedded.robot_diagnostics_cli.embedded_communication import (
     EmbeddedCommunication,
 )
+from software.embedded.robot_diagnostics_cli.primitive_factory import (
+    PrimitiveFactory,
+)
 from proto.import_all_protos import *
 from software.embedded.constants.py_constants import (
     DEFAULT_PRIMITIVE_DURATION,
@@ -223,7 +226,7 @@ class RobotDiagnosticsCLI:
         description = f"Rotating at {velocity} rad/s for {duration_seconds} seconds"
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
-            self.embedded_data.get_rotate_primitive(velocity),
+            PrimitiveFactory.get_primitive(self, rotate=[velocity]),
             description,
         )
 
@@ -252,7 +255,7 @@ class RobotDiagnosticsCLI:
         )
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
-            self.embedded_data.get_move_primitive(angle, speed),
+            PrimitiveFactory.get_primitive(self, move=[angle, speed]),
             description,
         )
 
@@ -280,7 +283,7 @@ class RobotDiagnosticsCLI:
             if not auto
             else f"Auto Chip Enabled for {duration_seconds} seconds"
         )
-        primitive = self.embedded_data.get_kick_primitive(auto, distance)
+        primitive = PrimitiveFactory.get_primitive(self, kick=[auto, distance])
         if auto:
             self.embedded_communication.run_primitive_over_time(
                 duration_seconds, primitive, description
@@ -313,15 +316,15 @@ class RobotDiagnosticsCLI:
             if not auto
             else f"Auto Kick Enabled for {duration_seconds} seconds"
         )
-        primitive = self.embedded_data.get_kick_primitive(auto, speed)
+        primitive = PrimitiveFactory.get_primitive(self, kick=[auto, speed])
         if auto:
             self.embedded_communication.run_primitive_over_time(
                 duration_seconds, primitive, description
             )
         else:
             zero_direct_control_primitive = DirectControlPrimitive(
-                motor_control=self.embedded_data.get_zero_motor_control_primitive(),
-                power_control=self.embedded_data.get_zero_power_control_primitive(),
+                motor_control=PrimitiveFactory.get_primitive(self, zero_motor=[]),
+                power_control=PrimitiveFactory.get_primitive(self, zero_power=[]),
             )
             self.embedded_communication.run_primitive(primitive)
             print(description)
@@ -354,7 +357,7 @@ class RobotDiagnosticsCLI:
         )
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
-            self.embedded_data.get_dribble_primitive(velocity),
+            PrimitiveFactory.get_primitive(self, dribble=[velocity]),
             description,
         )
 
@@ -387,7 +390,7 @@ class RobotDiagnosticsCLI:
         )
         self.embedded_communication.run_primitive_over_time(
             duration_seconds,
-            self.embedded_data.get_move_wheel_primitive(wheels, velocity),
+            PrimitiveFactory.get_primitive(self, move_wheels=[wheels, velocity]),
             description,
         )
 
