@@ -97,7 +97,7 @@ class Play
      * @param play_update The PlayUpdate struct that contains all the information for
      * updating the tactics
      */
-    virtual void updateTactics(const PlayUpdate& play_update)=0;
+    virtual void updateTactics(const PlayUpdate& play_update) = 0;
 
    private:
     /**

@@ -428,6 +428,12 @@ Boost-ext SML is a library that supports complex functionality with similarly co
   FSM<DriveForwardFSM> fsm(DriveForwardFSM(10.0));
   ```
 
+## Motion Planning
+
+Our **motion planning** (navigation) system is responsible for trajectory planning and obstacle avoidance.
+
+A **trajectory** (or **motion profile**) describes the ideal motion that the robot should follow to get from one point to another point. It is a function of time that returns the target (a.k.a. reference) position, velocity, and acceleration for the given timestep. For every `MovePrimitive` (see [Primitives](#primitives)) indicating a target destination, our trajectory planner generates and stores with the `MovePrimitive` a corresponding trajectory that the robot can take to reach that destination.
+
 ### Trajectory Planner
 
 Our trajectory planner is heavily based off of TIGERs Mannheim's trajectory planner (read their [2019 TDP](https://ssl.robocup.org/wp-content/uploads/2019/03/2019_ETDP_TIGERs_Mannheim.pdf)). At the most basic level, our trajector planner generates trapezoidal "bang-bang" trajectories. The name comes from the shape of the profile's speed vs. time graph (which is trapezoidal), and "bang-bang" refers to how the acceleration switches abruptly between zero and a fixed limit.
