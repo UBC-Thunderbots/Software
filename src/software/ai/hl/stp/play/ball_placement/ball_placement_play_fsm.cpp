@@ -26,6 +26,23 @@ static unsigned int subSat(unsigned int a, unsigned int b)
     }
 }
 
+static std::optional<Robot> getPlacingRobot(const WorldPtr& world)
+{
+    std::optional<Robot> best_robot = std::nullopt;
+    double min_dist = std::numeric_limits<double>::max();
+    for (const Robot& r : world->friendlyTeam().getAllRobots())
+    {
+        if (r.id() == world->friendlyTeam().getGoalieID()) continue;
+        double dist = (r.position() - world->ball().position()).length();
+        if (dist < min_dist)
+        {
+            min_dist = dist;
+            best_robot = r;
+        }
+    }
+    return best_robot;
+}
+
 void BallPlacementPlayFSM::alignWall(const Update &event)
 {
     PriorityTacticVector tactics_to_run = {{align_wall_tactic}};
@@ -90,8 +107,8 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
         Vector alignment_vector =
             (placement_point.value() - event.common.world_ptr->ball().position())
                 .normalize(ALIGNMENT_VECTOR_LENGTH_M);
-        Angle setup_angle = alignment_vector.orientation();
-        setup_point       = event.common.world_ptr->ball().position() - alignment_vector;
+        setup_angle = alignment_vector.orientation();
+        setup_point = event.common.world_ptr->ball().position() - alignment_vector;
 
         align_placement_tactic->updateControlParams(
             setup_point, setup_angle, TbotsProto::DribblerMode::OFF,
@@ -120,8 +137,7 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
     if (placement_point.has_value())
     {
         Point ball_pos = event.common.world_ptr->ball().position();
-        std::optional<Robot> robot_placing_ball =
-            event.common.world_ptr->friendlyTeam().getNearestRobot(ball_pos);
+        std::optional<Robot> robot_placing_ball = getPlacingRobot(event.common.world_ptr);
 
         if (robot_placing_ball.has_value())
         {
@@ -169,8 +185,7 @@ void BallPlacementPlayFSM::releaseBall(const Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     WorldPtr world_ptr = event.common.world_ptr;
-    std::optional<Robot> nearest_robot =
-        world_ptr->friendlyTeam().getNearestRobot(world_ptr->ball().position());
+    std::optional<Robot> nearest_robot = getPlacingRobot(world_ptr);
 
     if (nearest_robot.has_value())
     {
@@ -197,8 +212,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     WorldPtr world_ptr = event.common.world_ptr;
-    std::optional<Robot> nearest_robot =
-        world_ptr->friendlyTeam().getNearestRobot(world_ptr->ball().position());
+    std::optional<Robot> nearest_robot = getPlacingRobot(world_ptr);
 
     if (nearest_robot.has_value())
     {
@@ -248,19 +262,48 @@ bool BallPlacementPlayFSM::shouldPickOffWall(const Update &event)
 {
     const Point ball_pos        = event.common.world_ptr->ball().position();
     const Rectangle field_lines = event.common.world_ptr->field().fieldBoundary();
+
+    std::optional<Point> placement_point =
+        event.common.world_ptr->gameState().getBallPlacementPoint();
+
+    if (placement_point.has_value() &&
+        comparePoints(ball_pos, placement_point.value(), APPROACHING_PLACEMENT_DIST_THRESHOLD_M))
+    {
+        return false;
+    }
+
     return std::abs(signedDistance(ball_pos, field_lines)) <=
            MIN_DISTANCE_FROM_WALL_FOR_ALIGN_M;
 }
 
 bool BallPlacementPlayFSM::alignDone(const Update &event)
 {
-    std::optional<Robot> nearest_robot =
-        event.common.world_ptr->friendlyTeam().getNearestRobot(
-            event.common.world_ptr->ball().position());
+    std::optional<Robot> nearest_robot = getPlacingRobot(event.common.world_ptr);
 
     if (nearest_robot.has_value())
     {
-        return comparePoints(nearest_robot->position(), setup_point);
+        double dist = (nearest_robot->position() - setup_point).length();
+        bool pos_aligned = dist <= 0.1;
+
+        Vector robot_facing = Vector::createFromAngle(nearest_robot->orientation());
+        Vector target_facing = Vector::createFromAngle(setup_angle);
+        double dot_prod = robot_facing.dot(target_facing);
+        bool angle_aligned = dot_prod > 0.95;
+
+        if (pos_aligned && angle_aligned)
+        {
+            std::cout << "[DEBUG] alignDone: TRUE. Dist: " << dist << ", Dot: " << dot_prod << std::endl;
+        }
+        else
+        {
+            static int print_throttle = 0;
+            if (print_throttle++ % 30 == 0)
+            {
+                std::cout << "[DEBUG] alignDone check - Dist: " << dist << ", Dot: " << dot_prod << std::endl;
+            }
+        }
+
+        return pos_aligned && angle_aligned;
     }
 
     return false;
@@ -268,13 +311,32 @@ bool BallPlacementPlayFSM::alignDone(const Update &event)
 
 bool BallPlacementPlayFSM::wallAlignDone(const Update &event)
 {
-    std::optional<Robot> nearest_robot =
-        event.common.world_ptr->friendlyTeam().getNearestRobot(
-            event.common.world_ptr->ball().position());
+    std::optional<Robot> nearest_robot = getPlacingRobot(event.common.world_ptr);
 
     if (nearest_robot.has_value())
     {
-        return comparePoints(nearest_robot->position(), pickoff_point);
+        double dist = (nearest_robot->position() - pickoff_point).length();
+        bool pos_aligned = dist <= 0.1;
+
+        Vector robot_facing = Vector::createFromAngle(nearest_robot->orientation());
+        Vector target_facing = Vector::createFromAngle(pickoff_final_orientation);
+        double dot_prod = robot_facing.dot(target_facing);
+        bool angle_aligned = dot_prod > 0.95;
+
+        if (pos_aligned && angle_aligned)
+        {
+            std::cout << "[DEBUG] wallAlignDone: TRUE. Dist: " << dist << ", Dot: " << dot_prod << std::endl;
+        }
+        else
+        {
+            static int print_throttle = 0;
+            if (print_throttle++ % 30 == 0)
+            {
+                std::cout << "[DEBUG] wallAlignDone check - Dist: " << dist << ", Dot: " << dot_prod << std::endl;
+            }
+        }
+
+        return pos_aligned && angle_aligned;
     }
 
     return false;
@@ -306,6 +368,26 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
         return is_ball_at_placement_point && is_ball_stationary;
     }
 
+    return true;
+}
+
+bool BallPlacementPlayFSM::ballLost(const Update &event)
+{
+    std::optional<Robot> nearest_robot = getPlacingRobot(event.common.world_ptr);
+
+    if (nearest_robot.has_value())
+    {
+        double dist = (nearest_robot->position() - event.common.world_ptr->ball().position()).length();
+        bool lost = dist > 0.8; // TODO: parameterize
+
+        if (lost)
+        {
+            std::cout << "[DEBUG] isBallLost: TRUE! Separation Dist: " << dist << " > 0.8m" << std::endl;
+        }
+        return lost;
+    }
+
+    std::cout << "[DEBUG] isBallLost: TRUE! No nearest robot found." << std::endl;
     return true;
 }
 
@@ -405,13 +487,25 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event, unsigned int nu
             [&] { return std::make_shared<BallPlacementMoveTactic>(ai_config_ptr); });
     }
 
-    Vector waiting_line_vector =
-        event.common.world_ptr->field().friendlyDefenseArea().posXPosYCorner() -
-        event.common.world_ptr->field().friendlyDefenseArea().posXNegYCorner();
+    std::optional<Point> placement_point =
+        event.common.world_ptr->gameState().getBallPlacementPoint();
+    Point target_pos = placement_point.value_or(Point(0, 0));
 
-    Point waiting_line_start_point =
-        event.common.world_ptr->field().friendlyDefenseArea().posXNegYCorner() +
-        Vector(WAITING_LINE_OFFSET_M, 0);
+    // determine which horizontal half of the field the placement is occupying
+    // and send waiting robots to the opposite sideline
+    double waiting_y;
+    if (target_pos.y() >= 0)
+    {
+        waiting_y = event.common.world_ptr->field().fieldBoundary().yMin() + WAITING_LINE_OFFSET_M;
+    }
+    else
+    {
+        waiting_y = event.common.world_ptr->field().fieldBoundary().yMax() - WAITING_LINE_OFFSET_M;
+    }
+
+    // center the line on the X-axis and spread them out
+    Vector waiting_line_vector = Vector(ROBOT_MAX_RADIUS_METERS * 15, 0);
+    Point waiting_line_start_point = Point(-waiting_line_vector.x() / 2.0, waiting_y);
 
     for (unsigned int i = 0; i < move_tactics.size(); i++)
     {

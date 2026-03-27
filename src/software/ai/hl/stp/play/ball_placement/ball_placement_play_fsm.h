@@ -141,6 +141,15 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     bool ballPlaced(const Update& event);
 
     /**
+     * TODO document
+     *
+     * @param event the BallPlacementPlayFSM Update event
+     *
+     * @return whether the ball has been lost
+     */
+    bool ballLost(const Update& event);
+
+    /**
      * Guard on whether the robot has waited sufficiently for the dribbler to stop
      * spinning
      *
@@ -210,6 +219,7 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
         DEFINE_SML_GUARD(wallAlignDone)
         DEFINE_SML_GUARD(wallPickOffDone)
         DEFINE_SML_GUARD(ballPlaced)
+        DEFINE_SML_GUARD(ballLost)
         DEFINE_SML_GUARD(waitDone)
         DEFINE_SML_GUARD(retreatDone)
 
@@ -226,7 +236,8 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
             AlignWallState_S + Update_E[!shouldPickOffWall_G] / alignPlacement_A =
                 AlignPlacementState_S,
 
-            PickOffWallState_S + Update_E[!wallPickOffDone_G] / pickOffWall_A,
+            PickOffWallState_S + Update_E[ballLost_G] = StartState_S,
+            PickOffWallState_S + Update_E[!wallPickOffDone_G && !ballLost_G] / pickOffWall_A,
             PickOffWallState_S + Update_E[wallPickOffDone_G] / startWait_A =
                 ReleaseBallState_S,
 
@@ -237,7 +248,8 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
             AlignPlacementState_S + Update_E[alignDone_G] / placeBall_A =
                 PlaceBallState_S,
 
-            PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
+            PlaceBallState_S + Update_E[ballLost_G] = StartState_S,
+            PlaceBallState_S + Update_E[!ballPlaced_G && !ballLost_G] / placeBall_A = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = ReleaseBallState_S,
 
             ReleaseBallState_S + Update_E[!waitDone_G && ballPlaced_G] / releaseBall_A =
@@ -262,6 +274,7 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     std::vector<std::shared_ptr<BallPlacementMoveTactic>> move_tactics;
 
     Point setup_point;
+    Angle setup_angle;
     Point pickoff_point;
     Point pickoff_destination;
     Angle pickoff_final_orientation;
