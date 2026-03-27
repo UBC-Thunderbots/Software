@@ -23,6 +23,7 @@ from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
 from software.thunderscope.util import is_current_platform_macos
+from software.thunderscope.time_provider import time_provider_instance
 
 
 class Gamecontroller:
@@ -32,6 +33,7 @@ class Gamecontroller:
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
     REFEREE_IP = "224.5.23.1"
     RESET_MATCH_DELAY_S = 1
+    NO_GAME_PROGRESS_DURATION_S = 120
 
     def __init__(
         self,
@@ -72,6 +74,8 @@ class Gamecontroller:
         self.blue_removed_robot_ids = queue.Queue()
         self.yellow_removed_robot_ids = queue.Queue()
         self.processed_event_ids = set()
+        self.last_stage_time_left = None
+        self.pause_start_timestamp = None
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -366,10 +370,28 @@ class Gamecontroller:
 
     def __automate_referee(self, referee: Referee) -> None:
         """Automate referee events by handling possible goals, ball placement failures,
-        game stage changes, and starting new game.
+        game stage changes, starting new game, and resetting when there is no game progress.
 
         :param referee: the referee protobuf message
         """
+        if referee.stage_time_left == self.last_stage_time_left:
+            if (
+                self.pause_start_timestamp
+                and (
+                    time_provider_instance.elapsed_time_ns()
+                    - self.pause_start_timestamp
+                )
+                * SECONDS_PER_NANOSECOND
+                >= self.NO_GAME_PROGRESS_DURATION_S
+            ):
+                logging.warning(f"Gamecontroller: Ending game early due unknown issue stopping game progress for {
+                    self.NO_GAME_PROGRESS_DURATION_S} seconds")
+                self.__handle_game_stage_change(Referee.Stage.NORMAL_SECOND_HALF)
+                self.pause_start_timestamp = None
+        else:
+            self.last_stage_time_left = referee.stage_time_left
+            self.pause_start_timestamp = time_provider_instance.elapsed_time_ns()
+
         if referee.stage_time_left < 0:
             self.__handle_game_stage_change(referee.stage)
 
@@ -408,12 +430,7 @@ class Gamecontroller:
             # start new game
             self.reset_match()
 
-        # reset game state
-        self.simulator_proto_unix_io.send_proto(
-            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
-        )
-
-        self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
+        self.__reset_world_state()
 
     def __set_game_stage(self, new_stage: Referee.Stage) -> None:
         ci_input = CiInput(timestamp=int(time.time_ns()))
@@ -462,11 +479,7 @@ class Gamecontroller:
         ci_input.api_inputs.append(api_input)
         self.send_ci_input(ci_input)
 
-        # reset the robot and ball positions
-        self.simulator_proto_unix_io.send_proto(
-            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
-        )
-        self.send_gc_command(Command.Type.STOP, SslTeam.UNKNOWN)
+        self.__reset_world_state()
 
     def __handle_placement_failed(self) -> None:
         """Handle a placement failed event by moving the ball to the placement point."""
@@ -475,6 +488,13 @@ class Gamecontroller:
             self.latest_world.game_state.ball_placement_point
         )
         self.simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+    def __reset_world_state(self) -> None:
+        """Resets the robot and ball positions"""
+        self.simulator_proto_unix_io.send_proto(
+            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+        )
+        self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
 
     def __update_max_allowed_robots(self, referee: Referee) -> None:
         """Update the world state by adding or removing robots for each team to match
