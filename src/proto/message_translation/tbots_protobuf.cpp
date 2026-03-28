@@ -4,7 +4,7 @@
 #include "software/logger/logger.h"
 
 
-std::unique_ptr<TbotsProto::World> createWorld(const World& world)
+std::unique_ptr<TbotsProto::World> createWorldProto(const World& world)
 {
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
