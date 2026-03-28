@@ -10,6 +10,7 @@
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/world/world.h"
 
+/** testing */
 /**
  * Returns a TbotsProto::World proto given a World.
  *
@@ -18,7 +19,7 @@
  * @return The unique_ptr to a TbotsProto::World proto containing the field, friendly
  * team, enemy team, ball, and the game state.
  */
-std::unique_ptr<TbotsProto::World> createWorld(const World& world);
+std::unique_ptr<TbotsProto::World> createWorldProto(const World& world);
 
 /**
  * Returns a TbotsProto::World proto with a sequence number given a World and a sequence
@@ -30,7 +31,7 @@ std::unique_ptr<TbotsProto::World> createWorld(const World& world);
  * @return The unique_ptr to a TbotsProto::World proto containing the field, friendly
  * team, enemy team, ball, game state, and the sequence number.
  */
-std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
+std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
     const World& world, const uint64_t sequence_number);
 
 /**
@@ -41,7 +42,7 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
  * @return The unique_ptr to a TbotsProto::Team proto containing a list of robots and
  * goalie ID
  */
-std::unique_ptr<TbotsProto::Team> createTeam(const Team& team);
+std::unique_ptr<TbotsProto::Team> createTeamProto(const Team& team);
 
 /**
  * Returns a TbotsProto::Robot proto given a Robot.
@@ -51,7 +52,7 @@ std::unique_ptr<TbotsProto::Team> createTeam(const Team& team);
  * @return The unique_ptr to a TbotsProto::Robot proto containing the robot ID and robot
  * state
  */
-std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot);
+std::unique_ptr<TbotsProto::Robot> createRobotProto(const Robot& robot);
 
 /**
  * Returns a TbotsProto::Ball proto given a Ball.
@@ -61,7 +62,7 @@ std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot);
  * @return The unique_ptr to a TbotsProto::Ball proto containing the ball state and the
  * ball acceleration
  */
-std::unique_ptr<TbotsProto::Ball> createBall(const Ball& ball);
+std::unique_ptr<TbotsProto::Ball> createBallProto(const Ball& ball);
 
 /**
  * Returns a TbotsProto::Field proto given a Field.
@@ -71,7 +72,7 @@ std::unique_ptr<TbotsProto::Ball> createBall(const Ball& ball);
  * @return The unique_ptr to a TbotsProto::Field proto containing the Ball ID and Ball
  * state
  */
-std::unique_ptr<TbotsProto::Field> createField(const Field& field);
+std::unique_ptr<TbotsProto::Field> createFieldProto(const Field& field);
 
 /**
  * Returns (Robot, Game, Ball) State given a (Robot, Game, Ball)
@@ -83,8 +84,8 @@ std::unique_ptr<TbotsProto::Field> createField(const Field& field);
 std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(const Robot& robot);
 std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(
     const RobotState& robot_state);
-std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_state);
-std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);
+std::unique_ptr<TbotsProto::GameState> createGameStateProto(const GameState& game_state);
+std::unique_ptr<TbotsProto::BallState> createBallStateProto(const Ball& ball);
 
 /**
  * Returns a TbotsProto::Timestamp proto given a timestamp.
@@ -94,7 +95,7 @@ std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);
  * @return The unique_ptr to a TbotsProto::Timestamp proto containing the timestamp with
  * the same time zone as the timestamp argument.
  */
-std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestamp);
+std::unique_ptr<TbotsProto::Timestamp> createTimestampProto(const Timestamp& timestamp);
 
 /**
  * Returns a TbotsProto::NamedValue proto given a name and value.
@@ -105,15 +106,15 @@ std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestam
  * @return The unique_ptr to a TbotsProto::NamedValue proto containing data with
  *         specified name and value
  */
-std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
-                                                         float value);
+std::unique_ptr<TbotsProto::NamedValue> createNamedValueProto(const std::string name,
+                                                              float value);
 
 /**
  * Returns a TbotsProto::PlotJugglerValue proto containing the name
  * value pairs of the map.
  *
  * Could use LOG(PLOTJUGGLER) to plot the values. Example:
- *  LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+ *  LOG(PLOTJUGGLER) << *createPlotJugglerValueProto({
  *      {"vx", velocity.x()},
  *      {"vy", velocity.y()}
  *  });
@@ -123,7 +124,7 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
  * @return The unique_ptr to a TbotsProto::PlotJugglerValue proto containing data with
  *        specified names and values
  */
-std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
+std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValueProto(
     const std::map<std::string, double>& values);
 
 /**
@@ -141,7 +142,7 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
  * @return The unique_ptr to a TbotsProto::DebugShapes::DebugShape proto
  */
 template <class Shape>
-std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(
+std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShapeProto(
     const Shape& shape, const std::string& unique_id, const std::string& debug_text = "")
 {
     auto debug_shape = std::make_unique<TbotsProto::DebugShapes::DebugShape>();
@@ -155,10 +156,10 @@ std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(
  * Returns a TbotsProto::DebugShapes proto containing the debug shapes
  *
  * Could use LOG(VISUALIZE) to plot these values. Example:
- *  LOG(VISUALIZE) << *createDebugShapes({
- *       *createDebugShape(circle, unique_id1, optional_text),
- *       *createDebugShape(polygon, unique_id2, optional_text),
- *       *createDebugShape(stadium, unique_id3, optional_text)
+ *  LOG(VISUALIZE) << *createDebugShapesProto({
+ *       *createDebugShapeProto(circle, unique_id1, optional_text),
+ *       *createDebugShapeProto(polygon, unique_id2, optional_text),
+ *       *createDebugShapeProto(stadium, unique_id3, optional_text)
  *  });
  *
  * @param debug_shapes A list of debug shapes proto to plot
@@ -166,7 +167,7 @@ std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(
  * @return The unique_ptr to a TbotsProto::DebugShapes proto containing data with
  *        specified names and shapes
  */
-std::unique_ptr<TbotsProto::DebugShapes> createDebugShapes(
+std::unique_ptr<TbotsProto::DebugShapes> createDebugShapesProto(
     const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes);
 
 /**
@@ -185,7 +186,7 @@ std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& stadium);
  *
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time
  */
-std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp();
+std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestampProto();
 
 /**
  * Return RobotState given the TbotsProto::RobotState protobuf
@@ -210,7 +211,7 @@ BallState createBallState(const TbotsProto::BallState ball_state);
  *
  * @return The unique_ptr to a PassVisualization proto
  */
-std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
+std::unique_ptr<TbotsProto::PassVisualization> createPassVisualizationProto(
     const std::vector<PassWithRating>& passes_with_rating);
 
 /**
@@ -220,7 +221,8 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
  *         a boolean value for whether world state proto has been received
  *
  */
-std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger();
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger>
+createWorldStateReceivedTriggerProto();
 
 /**
  * Returns a cost visualization given a vector of costs
@@ -231,7 +233,7 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
  *
  * @return The unique_ptr to a CostVisualization proto
  */
-std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualizationProto(
     const std::vector<double>& costs, int num_rows, int num_cols);
 
 /**
