@@ -42,7 +42,7 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
  * @return The unique_ptr to a TbotsProto::Team proto containing a list of robots and
  * goalie ID
  */
-std::unique_ptr<TbotsProto::Team> createTeam(const Team& team);
+std::unique_ptr<TbotsProto::Team> createTeamProto(const Team& team);
 
 /**
  * Returns a TbotsProto::Robot proto given a Robot.

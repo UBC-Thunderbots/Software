@@ -10,8 +10,8 @@ std::unique_ptr<TbotsProto::World> createWorldProto(const World& world)
     auto world_msg                        = std::make_unique<TbotsProto::World>();
     *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
     *(world_msg->mutable_field())         = *createField(world.field());
-    *(world_msg->mutable_friendly_team()) = *createTeam(world.friendlyTeam());
-    *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
+    *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
+    *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBall(world.ball());
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
     if (world.getDribbleDisplacement().has_value())
@@ -29,8 +29,8 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
     auto world_msg                        = std::make_unique<TbotsProto::World>();
     *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
     *(world_msg->mutable_field())         = *createField(world.field());
-    *(world_msg->mutable_friendly_team()) = *createTeam(world.friendlyTeam());
-    *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
+    *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
+    *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBall(world.ball());
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
     world_msg->set_sequence_number(sequence_number);
@@ -43,7 +43,7 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
 }
 
 
-std::unique_ptr<TbotsProto::Team> createTeam(const Team& team)
+std::unique_ptr<TbotsProto::Team> createTeamProto(const Team& team)
 {
     // create msg
     auto team_msg      = std::make_unique<TbotsProto::Team>();
