@@ -203,6 +203,10 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::self > Angle())
         .def_static("fromRadians", &Angle::fromRadians)
         .def_static("fromDegrees", &Angle::fromDegrees)
+        .def_static("zero", &Angle::zero)
+        .def_static("quarter", &Angle::quarter)
+        .def_static("half", &Angle::half)
+        .def_static("threeQuarter", &Angle::threeQuarter)
         .def("toRadians", &Angle::toRadians)
         // Overloaded
         .def("__repr__",
