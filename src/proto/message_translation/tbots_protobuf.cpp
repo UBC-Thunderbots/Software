@@ -22,7 +22,7 @@ std::unique_ptr<TbotsProto::World> createWorldProto(const World& world)
     return world_msg;
 }
 
-std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
+std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
     const World& world, const uint64_t sequence_number)
 {
     // create msg
