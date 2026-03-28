@@ -1,3 +1,4 @@
+import time
 import pytest
 import software.python_bindings as tbots_cpp
 from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
@@ -43,24 +44,24 @@ def test_two_ai_ball_placement(
 @pytest.mark.parametrize(
     "ball_start_point, ball_placement_point",
     [
-        # TODO: Remove these ball placement tests until #3561 is resolved
-        # # 2023 RoboCup ball placement scenarios
-        # # Scenario 1
-        # (tbots_cpp.Point(-0.2, -2.8), tbots_cpp.Point(-0.2, 2.8)),
-        # # Scenario 2
-        # (tbots_cpp.Point(-3.5, -2.25), tbots_cpp.Point(0, 0)),
-        # # Scenario 3
-        # (tbots_cpp.Point(-1.5, -2.25), tbots_cpp.Point(-0.2, -2.8)),
-        # # Scenario 4
-        # (tbots_cpp.Point(-4.4, -2.9), tbots_cpp.Point(-0.2, 2.8)),
-        # # Scenario 5
-        # (tbots_cpp.Point(-0.5, -0), tbots_cpp.Point(-4.3, 2.8)),
-        # # Scenario 6
-        # (tbots_cpp.Point(-1, -3.15), tbots_cpp.Point(-3.5, -2.8)),
-        # # Scenario 7
-        # (tbots_cpp.Point(-1, 3.15), tbots_cpp.Point(-3.5, 2.8)),
-        # # Scenario 8
-        # (tbots_cpp.Point(-4.45, -0.1), tbots_cpp.Point(-0.5, 2.8)),
+        # 2023 RoboCup ball placement scenarios
+        # Scenario 1
+        (tbots_cpp.Point(-0.2, -2.8), tbots_cpp.Point(-0.2, 2.8)),
+        # Scenario 2
+        (tbots_cpp.Point(-3.5, -2.25), tbots_cpp.Point(0, 0)),
+        # Scenario 3
+        (tbots_cpp.Point(-1.5, -2.25), tbots_cpp.Point(-0.2, -2.8)),
+        # Scenario 4
+        (tbots_cpp.Point(-4.4, -2.9), tbots_cpp.Point(-0.2, 2.8)),
+        # Scenario 5
+        (tbots_cpp.Point(-0.5, -0), tbots_cpp.Point(-4.3, 2.8)),
+        # Scenario 6
+        (tbots_cpp.Point(-1, -3.15), tbots_cpp.Point(-3.5, -2.8)),
+        # Scenario 7
+        (tbots_cpp.Point(-1, 3.15), tbots_cpp.Point(-3.5, 2.8)),
+        # Scenario 8
+        # TODO: This case sometimes fails with placing robot oscillating
+        (tbots_cpp.Point(-4.45, -0.1), tbots_cpp.Point(-0.5, 2.8)),
     ],
 )
 def test_robocup_technical_challenge_placement(
@@ -126,6 +127,14 @@ def ball_placement_play_setup(
     simulated_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
+
+    # Sleep for a bit to allow the STOP to be received before we update the
+    # ball placement position. This prevents the issue where subsequent test
+    # runs don't properly get the ball placement point set properly and reuse
+    # the target point from the previous test case.
+    # TODO: replace with a better mechanism
+    time.sleep(0.5)
+
     # Pass in placement point here - not required for all play tests
     simulated_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.BALL_PLACEMENT,

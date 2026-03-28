@@ -33,5 +33,3 @@ class PivotKickTactic : public TacticBase<PivotKickFSM, DribbleFSM>
 
     void accept(TacticVisitor& visitor) const override;
 };
-
-COPY_TACTIC(WallKickoffTactic, PivotKickTactic)
