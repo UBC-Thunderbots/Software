@@ -6,6 +6,7 @@ py_library(
         "avoid_collisions.py",
         "ball_enters_region.py",
         "ball_is_off_ground.py",
+        "ball_kicked_in_direction.py",
         "ball_moves_in_direction.py",
         "ball_speed_threshold.py",
         "ball_stops_in_region.py",
