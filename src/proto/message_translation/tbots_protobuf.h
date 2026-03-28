@@ -95,7 +95,7 @@ std::unique_ptr<TbotsProto::BallState> createBallStateProto(const Ball& ball);
  * @return The unique_ptr to a TbotsProto::Timestamp proto containing the timestamp with
  * the same time zone as the timestamp argument.
  */
-std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestamp);
+std::unique_ptr<TbotsProto::Timestamp> createTimestampProto(const Timestamp& timestamp);
 
 /**
  * Returns a TbotsProto::NamedValue proto given a name and value.
