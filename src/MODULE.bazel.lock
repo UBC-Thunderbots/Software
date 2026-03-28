@@ -82,6 +82,8 @@
     "https://bcr.bazel.build/modules/grpc/1.41.0/MODULE.bazel": "5bcbfc2b274dabea628f0649dc50c90cf36543b1cfc31624832538644ad1aae8",
     "https://bcr.bazel.build/modules/grpc/1.56.3.bcr.1/MODULE.bazel": "cd5b1eb276b806ec5ab85032921f24acc51735a69ace781be586880af20ab33f",
     "https://bcr.bazel.build/modules/grpc/1.56.3.bcr.1/source.json": "093adf0c6f3ab2259fcb77e1aa4cb5ba6ef890b7388b328da41ece836814637f",
+    "https://bcr.bazel.build/modules/highway/1.2.0/MODULE.bazel": "605dc84b4931a409f16d920409dc38718798754c1afa4c80115a32118d67acb3",
+    "https://bcr.bazel.build/modules/highway/1.2.0/source.json": "01a2c7e56a1850a28c0026c0adc32e52db44c6a1df142b3f88b2a3747a5bff7d",
     "https://bcr.bazel.build/modules/jsoncpp/1.9.5/MODULE.bazel": "31271aedc59e815656f5736f282bb7509a97c7ecb43e927ac1a37966e0578075",
     "https://bcr.bazel.build/modules/jsoncpp/1.9.6/MODULE.bazel": "2f8d20d3b7d54143213c4dfc3d98225c42de7d666011528dc8fe91591e2e17b0",
     "https://bcr.bazel.build/modules/jsoncpp/1.9.6/source.json": "a04756d367a2126c3541682864ecec52f92cdee80a35735a3cb249ce015ca000",

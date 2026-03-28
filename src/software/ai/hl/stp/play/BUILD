@@ -44,7 +44,7 @@ cc_library(
         "//software/ai/passing:pass_with_rating",
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
-        "@munkres_cpp",
+        "@lapjv//src:lapjv",
         "@tracy",
     ],
 )

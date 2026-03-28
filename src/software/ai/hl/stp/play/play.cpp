@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/play.h"
 
-#include <munkres/munkres.h>
+#include <lap.h>
 
 #include <Tracy.hpp>
 
@@ -321,39 +321,32 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 robot_capabilities.begin(), robot_capabilities.end(),
                 std::inserter(missing_capabilities, missing_capabilities.begin()));
 
+            double cost;
             if (missing_capabilities.size() > 0)
             {
                 // We arbitrarily increase the cost, so that robots with missing
                 // capabilities are not assigned
-                matrix(row, col) = robot_cost_for_tactic * 10.0 + 10.0;
+                cost = robot_cost_for_tactic * 10.0 + 10.0;
             }
             else
             {
                 // capability requirements are satisfied, use real cost
-                matrix(row, col) = robot_cost_for_tactic;
+                cost = robot_cost_for_tactic;
             }
+            matrix(row, col) = cost;
         }
     }
 
-    // Apply the Munkres/Hungarian algorithm to the matrix.
-    Munkres<double> m;
-    m.solve(matrix);
+    // Apply the LAPJV algorithm to the matrix.
+    LAPJV<double> solver;
+    solver.solve(matrix);
 
-    // The Munkres matrix gets solved such that there will be exactly one 0 in every
-    // row and exactly one 0 in every column. All other values will be -1. The 0's
-    // indicate the "workers" and "jobs" (robots and tactics for us) that are most
-    // optimally paired together
-    //
-    // Example matrices:
-    //        -1, 0,-1,         and            0,-1,
-    //         0,-1,-1,                       -1, 0,
-    //        -1,-1, 0,
     for (size_t row = 0; row < num_rows; row++)
     {
         for (size_t col = 0; col < num_tactics; col++)
         {
             auto val = matrix(row, col);
-            if (val == 0)
+            if (val == 0.0)
             {
                 RobotId robot_id = robots_to_assign.at(row).id();
                 current_tactic_robot_id_assignment.emplace(tactic_vector.at(col),
@@ -399,7 +392,6 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
             }
         }
     }
-
     return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
                       std::map<std::shared_ptr<const Tactic>, RobotId>>{
         remaining_robots, std::move(primitives_to_run),

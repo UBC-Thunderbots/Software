@@ -193,6 +193,14 @@ http_archive(
     url = "https://github.com/saebyn/munkres-cpp/archive/61086fcf5b3a8ad4bda578cdc2d1dca57b548786.tar.gz",
 )
 
+bazel_dep(name = "lapjv")
+archive_override(
+    module_name = "lapjv",
+    sha256 = "a0987259c721739c5c2113ee766a6b02050aef652e53ad67d0a3c98e8527dc08",
+    strip_prefix = "fast-lapjv-59ee60dd8ba1bd613c476f7c768b4c5d459ba7bf",
+    url = "https://github.com/Andrewyx/fast-lapjv/archive/59ee60dd8ba1bd613c476f7c768b4c5d459ba7bf.tar.gz",
+)
+
 http_archive(
     name = "LTC4151",
     build_file = "@//extlibs:LTC4151.BUILD",
