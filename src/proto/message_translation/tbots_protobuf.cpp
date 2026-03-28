@@ -12,7 +12,7 @@ std::unique_ptr<TbotsProto::World> createWorldProto(const World& world)
     *(world_msg->mutable_field())         = *createField(world.field());
     *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
     *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
-    *(world_msg->mutable_ball())          = *createBall(world.ball());
+    *(world_msg->mutable_ball())          = *createBallProto(world.ball());
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
     if (world.getDribbleDisplacement().has_value())
     {
@@ -31,7 +31,7 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
     *(world_msg->mutable_field())         = *createField(world.field());
     *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
     *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
-    *(world_msg->mutable_ball())          = *createBall(world.ball());
+    *(world_msg->mutable_ball())          = *createBallProto(world.ball());
     *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
     world_msg->set_sequence_number(sequence_number);
     if (world.getDribbleDisplacement().has_value())
@@ -96,7 +96,7 @@ std::unique_ptr<TbotsProto::Robot> createRobotProto(const Robot& robot)
     return robot_msg;
 }
 
-std::unique_ptr<TbotsProto::Ball> createBall(const Ball& ball)
+std::unique_ptr<TbotsProto::Ball> createBallProto(const Ball& ball)
 {
     // create msg
     auto ball_msg                        = std::make_unique<TbotsProto::Ball>();
@@ -283,7 +283,7 @@ std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_sta
     auto ball_state = game_state.getBall();
     if (ball_state.has_value())
     {
-        *(game_state_msg->mutable_ball()) = *createBall(ball_state.value());
+        *(game_state_msg->mutable_ball()) = *createBallProto(ball_state.value());
     }
 
     auto ball_placement_point = game_state.getBallPlacementPoint();

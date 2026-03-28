@@ -62,7 +62,7 @@ std::unique_ptr<TbotsProto::Robot> createRobotProto(const Robot& robot);
  * @return The unique_ptr to a TbotsProto::Ball proto containing the ball state and the
  * ball acceleration
  */
-std::unique_ptr<TbotsProto::Ball> createBall(const Ball& ball);
+std::unique_ptr<TbotsProto::Ball> createBallProto(const Ball& ball);
 
 /**
  * Returns a TbotsProto::Field proto given a Field.
