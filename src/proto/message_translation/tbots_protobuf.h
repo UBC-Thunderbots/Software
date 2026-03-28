@@ -156,7 +156,7 @@ std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShapeProto(
  * Returns a TbotsProto::DebugShapes proto containing the debug shapes
  *
  * Could use LOG(VISUALIZE) to plot these values. Example:
- *  LOG(VISUALIZE) << *createDebugShapes({
+ *  LOG(VISUALIZE) << *createDebugShapesProto({
  *       *createDebugShapeProto(circle, unique_id1, optional_text),
  *       *createDebugShapeProto(polygon, unique_id2, optional_text),
  *       *createDebugShapeProto(stadium, unique_id3, optional_text)
@@ -167,7 +167,7 @@ std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShapeProto(
  * @return The unique_ptr to a TbotsProto::DebugShapes proto containing data with
  *        specified names and shapes
  */
-std::unique_ptr<TbotsProto::DebugShapes> createDebugShapes(
+std::unique_ptr<TbotsProto::DebugShapes> createDebugShapesProto(
     const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes);
 
 /**

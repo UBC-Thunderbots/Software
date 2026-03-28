@@ -225,7 +225,7 @@ void ReceiverPositionGenerator<ZoneEnum>::visualizeBestReceivingPositionsAndZone
             std::to_string(i + 1) + "rpg", std::to_string(i + 1) + "rpg"));
     }
 
-    LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
+    LOG(VISUALIZE) << *createDebugShapesProto(debug_shapes);
 }
 
 template <class ZoneEnum>

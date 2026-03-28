@@ -340,7 +340,7 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValueProto(
     return plot_juggler_value_msg;
 }
 
-std::unique_ptr<TbotsProto::DebugShapes> createDebugShapes(
+std::unique_ptr<TbotsProto::DebugShapes> createDebugShapesProto(
     const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes)
 {
     auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapes>();

@@ -47,7 +47,7 @@ PassWithRating PassGenerator::getBestPass(const World& world,
         debug_shapes.push_back(
             *createDebugShapeProto(Circle(best_pass.pass.receiverPoint(), 0.05),
                               std::to_string(debug_shapes.size()) + "pg", stream.str()));
-        LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
+        LOG(VISUALIZE) << *createDebugShapesProto(debug_shapes);
     }
 
     // Generate sample passes across the field for cost visualization
