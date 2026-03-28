@@ -378,7 +378,7 @@ BallState createBallState(const TbotsProto::BallState ball_state)
                      ball_state.distance_from_ground());
 }
 
-std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
+std::unique_ptr<TbotsProto::PassVisualization> createPassVisualizationProto(
     const std::vector<PassWithRating>& passes_with_rating)
 {
     auto pass_visualization_msg = std::make_unique<TbotsProto::PassVisualization>();
@@ -401,7 +401,7 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
-std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger()
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTriggerProto()
 {
     auto world_state_received_trigger_msg =
         std::make_unique<TbotsProto::WorldStateReceivedTrigger>();
@@ -409,7 +409,7 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
     return world_state_received_trigger_msg;
 }
 
-std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualizationProto(
     const std::vector<double>& costs, int num_rows, int num_cols)
 {
     auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();

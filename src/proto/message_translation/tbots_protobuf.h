@@ -211,7 +211,7 @@ BallState createBallState(const TbotsProto::BallState ball_state);
  *
  * @return The unique_ptr to a PassVisualization proto
  */
-std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
+std::unique_ptr<TbotsProto::PassVisualization> createPassVisualizationProto(
     const std::vector<PassWithRating>& passes_with_rating);
 
 /**
@@ -221,7 +221,7 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
  *         a boolean value for whether world state proto has been received
  *
  */
-std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger();
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTriggerProto();
 
 /**
  * Returns a cost visualization given a vector of costs
@@ -232,7 +232,7 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
  *
  * @return The unique_ptr to a CostVisualization proto
  */
-std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualizationProto(
     const std::vector<double>& costs, int num_rows, int num_cols);
 
 /**
