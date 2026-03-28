@@ -316,7 +316,7 @@ std::unique_ptr<TbotsProto::Timestamp> createTimestampProto(const Timestamp& tim
     return timestamp_msg;
 }
 
-std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
+std::unique_ptr<TbotsProto::NamedValue> createNamedValueProto(const std::string name,
                                                          float value)
 {
     auto named_value_msg = std::make_unique<TbotsProto::NamedValue>();
