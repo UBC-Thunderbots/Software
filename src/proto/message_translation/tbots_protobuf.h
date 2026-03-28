@@ -107,7 +107,7 @@ std::unique_ptr<TbotsProto::Timestamp> createTimestampProto(const Timestamp& tim
  *         specified name and value
  */
 std::unique_ptr<TbotsProto::NamedValue> createNamedValueProto(const std::string name,
-                                                         float value);
+                                                              float value);
 
 /**
  * Returns a TbotsProto::PlotJugglerValue proto containing the name
@@ -221,7 +221,8 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualizationProto(
  *         a boolean value for whether world state proto has been received
  *
  */
-std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTriggerProto();
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger>
+createWorldStateReceivedTriggerProto();
 
 /**
  * Returns a cost visualization given a vector of costs

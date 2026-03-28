@@ -214,9 +214,9 @@ void ReceiverPositionGenerator<ZoneEnum>::visualizeBestReceivingPositionsAndZone
 {
     for (unsigned int i = 0; i < top_zones.size(); i++)
     {
-        debug_shapes.push_back(*createDebugShapeProto(pitch_division_->getZone(top_zones[i]),
-                                                 std::to_string(i + 1),
-                                                 std::to_string(i + 1)));
+        debug_shapes.push_back(
+            *createDebugShapeProto(pitch_division_->getZone(top_zones[i]),
+                                   std::to_string(i + 1), std::to_string(i + 1)));
 
         debug_shapes.push_back(*createDebugShapeProto(
             Circle(
