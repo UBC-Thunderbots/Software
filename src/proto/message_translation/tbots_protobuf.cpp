@@ -100,7 +100,7 @@ std::unique_ptr<TbotsProto::Ball> createBallProto(const Ball& ball)
 {
     // create msg
     auto ball_msg                        = std::make_unique<TbotsProto::Ball>();
-    *(ball_msg->mutable_current_state()) = *createBallState(ball);
+    *(ball_msg->mutable_current_state()) = *createBallStateProto(ball);
     *(ball_msg->mutable_timestamp())     = *createTimestamp(ball.timestamp());
 
     return ball_msg;
@@ -296,7 +296,7 @@ std::unique_ptr<TbotsProto::GameState> createGameStateProto(const GameState& gam
     return game_state_msg;
 }
 
-std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)
+std::unique_ptr<TbotsProto::BallState> createBallStateProto(const Ball& ball)
 {
     auto position       = createPointProto(ball.position());
     auto velocity       = createVectorProto(ball.velocity());

@@ -85,7 +85,7 @@ std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(const Robot& robot
 std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(
     const RobotState& robot_state);
 std::unique_ptr<TbotsProto::GameState> createGameStateProto(const GameState& game_state);
-std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);
+std::unique_ptr<TbotsProto::BallState> createBallStateProto(const Ball& ball);
 
 /**
  * Returns a TbotsProto::Timestamp proto given a timestamp.
