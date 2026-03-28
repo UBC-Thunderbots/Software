@@ -51,7 +51,7 @@ std::unique_ptr<TbotsProto::Team> createTeamProto(const Team& team)
 
     std::for_each(robots.begin(), robots.end(),
                   [&](const Robot& robot)
-                  { *(team_msg->add_team_robots()) = *createRobot(robot); });
+                  { *(team_msg->add_team_robots()) = *createRobotProto(robot); });
 
     auto goalie_id = team.getGoalieId();
     if (goalie_id.has_value())
@@ -62,7 +62,7 @@ std::unique_ptr<TbotsProto::Team> createTeamProto(const Team& team)
     return team_msg;
 }
 
-std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot)
+std::unique_ptr<TbotsProto::Robot> createRobotProto(const Robot& robot)
 {
     // create msg
     auto robot_msg = std::make_unique<TbotsProto::Robot>();

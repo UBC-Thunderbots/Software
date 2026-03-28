@@ -52,7 +52,7 @@ std::unique_ptr<TbotsProto::Team> createTeamProto(const Team& team);
  * @return The unique_ptr to a TbotsProto::Robot proto containing the robot ID and robot
  * state
  */
-std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot);
+std::unique_ptr<TbotsProto::Robot> createRobotProto(const Robot& robot);
 
 /**
  * Returns a TbotsProto::Ball proto given a Ball.
