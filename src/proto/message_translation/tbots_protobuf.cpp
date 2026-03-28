@@ -13,7 +13,7 @@ std::unique_ptr<TbotsProto::World> createWorldProto(const World& world)
     *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
     *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBallProto(world.ball());
-    *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
+    *(world_msg->mutable_game_state())    = *createGameStateProto(world.gameState());
     if (world.getDribbleDisplacement().has_value())
     {
         *(world_msg->mutable_dribble_displacement()) =
@@ -32,7 +32,7 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
     *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
     *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBallProto(world.ball());
-    *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
+    *(world_msg->mutable_game_state())    = *createGameStateProto(world.gameState());
     world_msg->set_sequence_number(sequence_number);
     if (world.getDribbleDisplacement().has_value())
     {
@@ -146,7 +146,7 @@ std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(
     return robot_state_msg;
 }
 
-std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_state)
+std::unique_ptr<TbotsProto::GameState> createGameStateProto(const GameState& game_state)
 {
     auto game_state_msg = std::make_unique<TbotsProto::GameState>();
 

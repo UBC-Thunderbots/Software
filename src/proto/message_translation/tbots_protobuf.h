@@ -84,7 +84,7 @@ std::unique_ptr<TbotsProto::Field> createFieldProto(const Field& field);
 std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(const Robot& robot);
 std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(
     const RobotState& robot_state);
-std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_state);
+std::unique_ptr<TbotsProto::GameState> createGameStateProto(const GameState& game_state);
 std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);
 
 /**
