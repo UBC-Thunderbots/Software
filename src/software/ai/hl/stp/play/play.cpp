@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/play.h"
 
-#include <lapjv/lap.h>
+#include <lap.h>
 
 #include <Tracy.hpp>
 
@@ -296,17 +296,7 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
 
     // The rows of the matrix are the "workers" (the robots) and the columns are the
     // "jobs" (the Tactics).
-    // LAPJV requires a square matrix.
-    size_t dim = std::max(num_rows, num_cols);
-    
-    // We use a flat vector to store the cost matrix data, and a vector of pointers
-    // to pass to lapjv as 'double **'.
-    std::vector<double> cost_matrix_data(dim * dim, 0.0);
-    std::vector<double*> assigncost(dim);
-    for(size_t i = 0; i < dim; ++i)
-    {
-        assigncost[i] = &cost_matrix_data[i * dim];
-    }
+    Matrix<double> matrix(num_rows, num_cols);
 
     // Initialize the matrix with the cost of assigning each Robot to each Tactic
     for (size_t row = 0; row < num_rows; row++)
@@ -343,66 +333,63 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 // capability requirements are satisfied, use real cost
                 cost = robot_cost_for_tactic;
             }
-            assigncost[row][col] = cost;
+            matrix(row, col) = cost;
         }
     }
 
     // Apply the LAPJV algorithm to the matrix.
-    std::vector<int> rowsol(dim);
-    std::vector<int> colsol(dim);
-    std::vector<double> u(dim);
-    std::vector<double> v(dim);
+    LAPJV<double> solver;
+    solver.solve(matrix);
 
-    lap(dim, assigncost.data(), rowsol.data(), colsol.data(), u.data(), v.data());
-
-    // rowsol[i] is the column assigned to row i.
     for (size_t row = 0; row < num_rows; row++)
     {
-        int col = rowsol[row];
-        // Check if the assigned column is a valid tactic index
-        // If col >= num_tactics, it was assigned to a dummy tactic
-        if (col >= 0 && col < static_cast<int>(num_tactics))
+        for (size_t col = 0; col < num_tactics; col++)
         {
-            RobotId robot_id = robots_to_assign.at(row).id();
-            current_tactic_robot_id_assignment.emplace(tactic_vector.at(col),
-                                                       robot_id);
-            tactic_vector.at(col)->setLastExecutionRobot(robot_id);
-
-            auto primitives = primitive_sets.at(col);
-            CHECK(primitives.contains(robot_id))
-                << "Couldn't find a primitive for robot id " << robot_id;
-
-            // Create the list of obstacles
-            auto motion_constraints = buildMotionConstraintSet(
-                world_ptr->gameState(), *tactic_vector.at(col));
-
-            // Only generate primitive proto message for the final primitive to robot
-            // assignment
-            auto [traj_path, primitive_proto] =
-                primitives[robot_id]->generatePrimitiveProtoMessage(
-                    *world_ptr, motion_constraints, robot_trajectories,
-                    obstacle_factory);
-
-            if (traj_path.has_value())
+            auto val = matrix(row, col);
+            if (val == 0.0)
             {
-                robot_trajectories.insert_or_assign(robot_id, traj_path.value());
-            }
-            else
-            {
-                robot_trajectories.erase(robot_id);
-            }
+                RobotId robot_id = robots_to_assign.at(row).id();
+                current_tactic_robot_id_assignment.emplace(tactic_vector.at(col),
+                                                           robot_id);
+                tactic_vector.at(col)->setLastExecutionRobot(robot_id);
 
-            primitives_to_run->mutable_robot_primitives()->insert(
-                {robot_id, *primitive_proto});
-            remaining_robots.erase(
-                std::remove_if(remaining_robots.begin(), remaining_robots.end(),
-                               [robots_to_assign, row](const Robot &robot) {
-                                   return robot.id() == robots_to_assign.at(row).id();
-                               }),
-                remaining_robots.end());
+                auto primitives = primitive_sets.at(col);
+                CHECK(primitives.contains(robot_id))
+                    << "Couldn't find a primitive for robot id " << robot_id;
 
-            primitives[robot_id]->getVisualizationProtos(obstacle_list,
-                                                         path_visualization);
+                // Create the list of obstacles
+                auto motion_constraints = buildMotionConstraintSet(
+                    world_ptr->gameState(), *tactic_vector.at(col));
+
+                // Only generate primitive proto message for the final primitive to robot
+                // assignment
+                auto [traj_path, primitive_proto] =
+                    primitives[robot_id]->generatePrimitiveProtoMessage(
+                        *world_ptr, motion_constraints, robot_trajectories,
+                        obstacle_factory);
+
+                if (traj_path.has_value())
+                {
+                    robot_trajectories.insert_or_assign(robot_id, traj_path.value());
+                }
+                else
+                {
+                    robot_trajectories.erase(robot_id);
+                }
+
+                primitives_to_run->mutable_robot_primitives()->insert(
+                    {robot_id, *primitive_proto});
+                remaining_robots.erase(
+                    std::remove_if(remaining_robots.begin(), remaining_robots.end(),
+                                   [robots_to_assign, row](const Robot &robot) {
+                                       return robot.id() == robots_to_assign.at(row).id();
+                                   }),
+                    remaining_robots.end());
+
+                primitives[robot_id]->getVisualizationProtos(obstacle_list,
+                                                             path_visualization);
+                break;
+            }
         }
     }
     return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,

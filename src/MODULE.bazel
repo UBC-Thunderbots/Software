@@ -193,12 +193,12 @@ http_archive(
     url = "https://github.com/saebyn/munkres-cpp/archive/61086fcf5b3a8ad4bda578cdc2d1dca57b548786.tar.gz",
 )
 
-http_archive(
-    name = "lapjv_cpp",
-    build_file = "@//extlibs:lapjv_cpp.BUILD",
-    sha256 = "f4e180eee3eb683e38e4a394060080eabfa49749de7ac5617b55dffb9fee0667",
-    strip_prefix = "LAPJV-algorithm-c-40b5883b7492107e87ba8fb6abeb2aa05591dd34",
-    url = "https://github.com/yongyanghz/LAPJV-algorithm-c/archive/40b5883b7492107e87ba8fb6abeb2aa05591dd34.tar.gz",
+bazel_dep(name = "lapjv")
+archive_override(
+    module_name = "lapjv",
+    sha256 = "a0987259c721739c5c2113ee766a6b02050aef652e53ad67d0a3c98e8527dc08",
+    strip_prefix = "fast-lapjv-59ee60dd8ba1bd613c476f7c768b4c5d459ba7bf",
+    url = "https://github.com/Andrewyx/fast-lapjv/archive/59ee60dd8ba1bd613c476f7c768b4c5d459ba7bf.tar.gz",
 )
 
 http_archive(
