@@ -325,7 +325,7 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValueProto(const std::string 
     return named_value_msg;
 }
 
-std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
+std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValueProto(
     const std::map<std::string, double>& values)
 {
     auto plot_juggler_value_msg = std::make_unique<TbotsProto::PlotJugglerValue>();

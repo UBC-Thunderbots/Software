@@ -114,7 +114,7 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValueProto(const std::string 
  * value pairs of the map.
  *
  * Could use LOG(PLOTJUGGLER) to plot the values. Example:
- *  LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+ *  LOG(PLOTJUGGLER) << *createPlotJugglerValueProto({
  *      {"vx", velocity.x()},
  *      {"vy", velocity.y()}
  *  });
@@ -124,7 +124,7 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValueProto(const std::string 
  * @return The unique_ptr to a TbotsProto::PlotJugglerValue proto containing data with
  *        specified names and values
  */
-std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
+std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValueProto(
     const std::map<std::string, double>& values);
 
 /**
@@ -142,7 +142,7 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
  * @return The unique_ptr to a TbotsProto::DebugShapes::DebugShape proto
  */
 template <class Shape>
-std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(
+std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShapeProto(
     const Shape& shape, const std::string& unique_id, const std::string& debug_text = "")
 {
     auto debug_shape = std::make_unique<TbotsProto::DebugShapes::DebugShape>();
@@ -157,9 +157,9 @@ std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(
  *
  * Could use LOG(VISUALIZE) to plot these values. Example:
  *  LOG(VISUALIZE) << *createDebugShapes({
- *       *createDebugShape(circle, unique_id1, optional_text),
- *       *createDebugShape(polygon, unique_id2, optional_text),
- *       *createDebugShape(stadium, unique_id3, optional_text)
+ *       *createDebugShapeProto(circle, unique_id1, optional_text),
+ *       *createDebugShapeProto(polygon, unique_id2, optional_text),
+ *       *createDebugShapeProto(stadium, unique_id3, optional_text)
  *  });
  *
  * @param debug_shapes A list of debug shapes proto to plot
