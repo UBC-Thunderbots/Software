@@ -9,7 +9,7 @@ std::unique_ptr<TbotsProto::World> createWorldProto(const World& world)
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
     *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
-    *(world_msg->mutable_field())         = *createField(world.field());
+    *(world_msg->mutable_field())         = *createFieldProto(world.field());
     *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
     *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBallProto(world.ball());
@@ -28,7 +28,7 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
     *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
-    *(world_msg->mutable_field())         = *createField(world.field());
+    *(world_msg->mutable_field())         = *createFieldProto(world.field());
     *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
     *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
     *(world_msg->mutable_ball())          = *createBallProto(world.ball());
@@ -106,7 +106,7 @@ std::unique_ptr<TbotsProto::Ball> createBallProto(const Ball& ball)
     return ball_msg;
 }
 
-std::unique_ptr<TbotsProto::Field> createField(const Field& field)
+std::unique_ptr<TbotsProto::Field> createFieldProto(const Field& field)
 {
     // create msg
     auto field_msg = std::make_unique<TbotsProto::Field>();
