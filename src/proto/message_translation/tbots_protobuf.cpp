@@ -8,7 +8,7 @@ std::unique_ptr<TbotsProto::World> createWorldProto(const World& world)
 {
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
-    *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
+    *(world_msg->mutable_time_sent())     = *createCurrentTimestampProto();
     *(world_msg->mutable_field())         = *createFieldProto(world.field());
     *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
     *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
@@ -27,7 +27,7 @@ std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
 {
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
-    *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
+    *(world_msg->mutable_time_sent())     = *createCurrentTimestampProto();
     *(world_msg->mutable_field())         = *createFieldProto(world.field());
     *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
     *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
@@ -349,7 +349,7 @@ std::unique_ptr<TbotsProto::DebugShapes> createDebugShapesProto(
     return debug_shape_list_msg;
 }
 
-std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
+std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestampProto()
 {
     auto timestamp_msg    = std::make_unique<TbotsProto::Timestamp>();
     const auto clock_time = std::chrono::system_clock::now();

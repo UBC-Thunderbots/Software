@@ -186,7 +186,7 @@ std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& stadium);
  *
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time
  */
-std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp();
+std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestampProto();
 
 /**
  * Return RobotState given the TbotsProto::RobotState protobuf
