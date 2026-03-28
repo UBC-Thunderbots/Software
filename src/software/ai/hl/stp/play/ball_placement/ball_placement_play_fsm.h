@@ -141,7 +141,9 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     bool ballPlaced(const Update& event);
 
     /**
-     * TODO document
+     * Guard on whether the ball is sufficiently far away from the placing robot.
+     * During pickoff and placement, if this is true, then the ball can be considered
+     * dropped/lost. If there is no placing robot, returns true.
      *
      * @param event the BallPlacementPlayFSM Update event
      *
@@ -282,14 +284,25 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     Angle pickoff_final_orientation;
     Timestamp start_time;
 
-    // TODO: use is_placed? not sure
-    // bool is_placed = false;
     std::optional<int> placing_robot_id = std::nullopt;
 
     /**
-     * TODO: document
+     * Returns the robot assigned to ball placement. If no robot has already been
+     * assigned, assign the closest non-goalie robot to the ball.
+     *
+     * @param world shared pointer to world
      */
     std::optional<Robot> getPlacingRobot(const WorldPtr& world);
+
+    /**
+     * Check if the robot is aligned with the given point at the given angle
+     * with a sufficiently low velocity. Helper for alignDone and wallAlignDone.
+     *
+     * @param event a BallPlacementPlayFSM Update event
+     * @param point the BallPlacementPlayFSM Update event
+     * @param angle the BallPlacementPlayFSM Update event
+     */
+    bool alignmentCheck(const Update& event, const Point& point, const Angle& angle);
 
     static constexpr double BACK_AWAY_FROM_CORNER_M                = 0.9;
     static constexpr double BACK_AWAY_FROM_WALL_M                  = 0.5;
@@ -299,5 +312,11 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     static constexpr double APPROACHING_PLACEMENT_DIST_THRESHOLD_M = 0.3;
     static constexpr double WAITING_LINE_OFFSET_M     = ROBOT_MAX_RADIUS_METERS * 3;
     static constexpr double BALL_IS_PLACED_WAIT_S     = 2.0;
+    static constexpr double BALL_IS_LOST_DISTANCE_M   = 0.8;  // TODO: adjust?
     static constexpr double ALIGNMENT_VECTOR_LENGTH_M = ROBOT_MAX_RADIUS_METERS * 2.5;
+
+    // TODO: do these need adjustments?
+    static constexpr double ALIGNED_DISTANCE_THRESHOLD_M    = 0.08;
+    static constexpr double ALIGNED_ANGLE_THRESHOLD_DEG     = 20;
+    static constexpr double ALIGNED_SPEED_THRESHOLD_M_PER_S = 0.16;
 };
