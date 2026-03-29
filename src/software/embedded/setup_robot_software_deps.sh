@@ -39,13 +39,17 @@ if ! sudo /usr/local/bin/python3.12 -m venv /opt/tbotspython ; then
     exit 1
 fi
 
+sudo chown -R $USER:$USER /opt/tbotspython
+
 # install PlatformIO to global environment
-sudo curl -fsSL -o /tmp/tbots_download_cache/get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py
-if ! sudo /usr/local/bin/python3.12 /tmp/tbots_download_cache/./get-platformio.py; then
-    print_status_msg "Error: Installing PlatformIO failed"
+curl -fsSL -o /tmp/tbots_download_cache/get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py
+if ! /usr/local/bin/python3.12 /tmp/tbots_download_cache/get-platformio.py; then
+    echo "Error: Installing PlatformIO failed"
     exit 1
 fi
 
 # link platformio to /opt/tbotspython/bin so that bazel can find it
-sudo rm /opt/tbotspython/bin/platformio
-sudo ln -s /root/.platformio/penv/bin/platformio /opt/tbotspython/bin/platformio
+ln -s $HOME/.platformio/penv/bin/platformio /opt/tbotspython/bin/platformio
+
+sudo raspi-config nonint do_serial_hw 0
+sudo raspi-config nonint do_serial_cons 1
