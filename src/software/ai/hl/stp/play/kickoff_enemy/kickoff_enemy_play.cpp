@@ -10,12 +10,6 @@ KickoffEnemyPlay::KickoffEnemyPlay(
 {
 }
 
-void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                      const WorldPtr &world_ptr)
-{
-    // Does not get called.
-}
-
 void KickoffEnemyPlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm.process_event(KickoffEnemyPlayFSM::Update(control_params, play_update));
