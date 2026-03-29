@@ -51,8 +51,7 @@ def setup_free_kick_play(
 # FSM path: SetupPositionState -> ShootState -> X
 # Triggers: setupDone=True, shotFound=True, shotDone=True
 def test_free_kick_play_direct_shot(simulated_test_runner):
-    """
-    Ball in enemy half with no enemies blocking the goal so kicker shoots directly.
+    """Ball in enemy half with no enemies blocking the goal so kicker shoots directly.
     Validates FriendlyTeamEventuallyScored.
     """
     field = tbots_cpp.Field.createSSLDivisionBField()
@@ -98,8 +97,7 @@ def test_free_kick_play_direct_shot(simulated_test_runner):
 # FSM path: SetupPositionState -> AttemptPassState -> PassState -> X
 # Triggers: setupDone=True, shotFound=False, passFound=True, passDone=True
 def test_free_kick_play_pass_completes(simulated_test_runner):
-    """
-    Goal is blocked by enemy robots and blue receivers are open in the enemy half. Pass will be made.
+    """Goal is blocked by enemy robots and blue receivers are open in the enemy half. Pass will be made.
     Validates that a receiver eventually gets possession.
     """
     field = tbots_cpp.Field.createSSLDivisionBField()
@@ -153,8 +151,7 @@ def test_free_kick_play_pass_completes(simulated_test_runner):
 
 
 def test_free_kick_play_abort_pass_and_retry(simulated_test_runner):
-    """
-    Ball in friendly half so shotFound is reliably False.
+    """Ball in friendly half so shotFound is reliably False.
     A yellow robot sits directly on the pass lane from the ball to receiver B,
     so ratePass() scores the found pass below abs_min_pass_score (0.05).
     Validates ball eventually moves via chip or a cleared second-attempt pass.
@@ -207,8 +204,7 @@ def test_free_kick_play_abort_pass_and_retry(simulated_test_runner):
 # FSM path: SetupPositionState -> AttemptPassState -> ChipState -> X
 # Triggers: setupDone=True, shotFound=False, passFound=False (timeout), chipDone=True
 def test_free_kick_play_chip_on_timeout(simulated_test_runner):
-    """
-    Goal is blocked and all receiver zones are covered by enemies. passFound never becomes True,
+    """Goal is blocked and all receiver zones are covered by enemies. passFound never becomes True,
     so timeExpired fires and the FSM chips.
     Validates that the ball eventually moves from rest via the chip.
     """
@@ -271,8 +267,7 @@ def test_free_kick_play_chip_on_timeout(simulated_test_runner):
 def test_free_kick_play_near_sideline(
     simulated_test_runner, ball_initial_pos, must_score
 ):
-    """
-    Parametrized test covering ball positions at and near field edges. Requires score if must_score is True, otherwise
+    """Parametrized test covering ball positions at and near field edges. Requires score if must_score is True, otherwise
     moving the ball will pass the test.
     """
     field = tbots_cpp.Field.createSSLDivisionBField()
