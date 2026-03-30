@@ -1,8 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from enum import StrEnum, auto
 from proto.import_all_protos import *
 import software.python_bindings as tbots_cpp
-from typing import Iterable
+from typing import Iterable, get_args, get_origin, Any
+from software.py_constants import DIV_B_NUM_ROBOTS
 
 
 class EventType(StrEnum):
@@ -38,6 +39,17 @@ class RobotState:
     orientation: float
     velocity: tuple[float, float]
     angular_velocity: float
+
+    @classmethod
+    def get_flattened_length(cls) -> int:
+        count = 0
+        for field in fields(cls):
+            # Check if it's a tuple[float, float] etc.
+            if get_origin(field.type) is tuple:
+                count += len(get_args(field.type))
+            else:
+                count += 1
+        return count
 
 
 @dataclass
@@ -107,6 +119,33 @@ def get_event_from_world(
     )
 
 
+def add_robot_state_to_row(row: list[Any], robot_states: list[RobotState]) -> None:
+    """Serializes robot states into flattened columns within a list row
+
+    :param row: the existing list representing a CSV row to be appended to
+    :param robot_states: the list of RobotState objects to flatten and add
+    :return: None (the row list is modified in place)
+    """
+    num_cols_per_robot = RobotState.get_flattened_length()
+
+    # Add friendly robots: [count, r1_data, r2_data...]
+    for idx in range(DIV_B_NUM_ROBOTS):
+        if idx >= len(robot_states):
+            row.extend([None] * num_cols_per_robot)
+        else:
+            robot = robot_states[idx]
+            row.extend(
+                [
+                    robot.position[0],
+                    robot.position[1],
+                    robot.orientation,
+                    robot.velocity[0],
+                    robot.velocity[1],
+                    robot.angular_velocity,
+                ]
+            )
+
+
 def event_to_csv_row(event: TrackedEvent) -> str:
     """Serializes a TrackedEvent into a flat CSV string row
 
@@ -120,33 +159,8 @@ def event_to_csv_row(event: TrackedEvent) -> str:
         *event.ball_state.velocity,
     ]
 
-    # Add friendly robots: [count, r1_data, r2_data...]
-    row.append(str(len(event.friendly_robot_states)))
-    for r in event.friendly_robot_states:
-        row.extend(
-            [
-                r.position[0],
-                r.position[1],
-                r.orientation,
-                r.velocity[0],
-                r.velocity[1],
-                r.angular_velocity,
-            ]
-        )
-
-    # Add enemy robots: [count, r1_data, r2_data...]
-    row.append(str(len(event.enemy_robot_states)))
-    for r in event.enemy_robot_states:
-        row.extend(
-            [
-                r.position[0],
-                r.position[1],
-                r.orientation,
-                r.velocity[0],
-                r.velocity[1],
-                r.angular_velocity,
-            ]
-        )
+    add_robot_state_to_row(row, event.friendly_robot_states)
+    add_robot_state_to_row(row, event.enemy_robot_states)
 
     return ",".join(row)
 
@@ -172,16 +186,41 @@ def csv_row_to_event(row: Iterable[str]) -> TrackedEvent:
     ball_state = BallState(position=ball_pos, velocity=ball_vel)
 
     def parse_robots() -> list[RobotState]:
-        # First, read the count marker
-        count = int(next(row_iter))
+        """Parses flattened robot data from a CSV iterator, handling None entries.
 
+        :param row_iter: an iterator over the CSV columns
+        :return: a list of RobotState objects (skipping empty slots)
+        """
         robots = []
-        for _ in range(count):
-            pos = (float(next(row_iter)), float(next(row_iter)))
-            ori = float(next(row_iter))
-            vel = (float(next(row_iter)), float(next(row_iter)))
-            ang_vel = float(next(row_iter))
-            robots.append(RobotState(pos, ori, vel, ang_vel))
+
+        num_cols_per_robot = RobotState.get_flattened_length()
+
+        for _ in range(DIV_B_NUM_ROBOTS):
+            # Peek at the first field of the robot's data block
+            raw_val = next(row_iter, None)
+
+            # Check if the field is empty/null
+            if raw_val in (None, "", "None"):
+                # Consume the remaining columns for this "empty" robot slot
+                # (Length - 1 because we already consumed the first column via 'raw_val')
+                for _ in range(num_cols_per_robot - 1):
+                    next(row_iter, None)
+                continue
+
+            try:
+                # Reconstruct the RobotState now that we know data exists
+                position = (float(raw_val), float(next(row_iter)))
+                orientiation = float(next(row_iter))
+                velocity = (float(next(row_iter)), float(next(row_iter)))
+                angular_velocity = float(next(row_iter))
+
+                robots.append(
+                    RobotState(position, orientiation, velocity, angular_velocity)
+                )
+            except (ValueError, TypeError):
+                # Handle cases where data might be malformed
+                continue
+
         return robots
 
     friendly_robots = parse_robots()
