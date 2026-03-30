@@ -3,7 +3,7 @@ from enum import StrEnum, auto
 from proto.import_all_protos import *
 from typing import Any
 from software.py_constants import DIV_B_NUM_ROBOTS
-from google.protobuf.message import Message
+from google.protobuf.descriptor import Descriptor, FieldDescriptor
 
 
 class EventType(StrEnum):
@@ -31,15 +31,14 @@ class Team(StrEnum):
     YELLOW = auto()
 
 
-def count_primitive_fields(message: Message):
-    """Recursively counts the number of primitive fields in a Protobuf message.
+def count_primitive_fields(descriptor: Descriptor):
+    """Recursively counts the number of primitive fields in a Protobuf message
+    using its descriptor.
 
-    :param message: the message to count all leaf-level primitive fields for
+    :param message: the message descriptor to count all leaf-level primitive fields for
     :return: the count of primitive fields
     """
     count = 0
-    # Use the descriptor to see all fields defined in the schema
-    descriptor = message.DESCRIPTOR
 
     for field in descriptor.fields:
         # Check if the field is a nested message
@@ -47,7 +46,7 @@ def count_primitive_fields(message: Message):
             # Get the nested message class to recurse into its descriptor
             nested_message = field.message_type
             # Recurse using the nested message's descriptor
-            count += count_leaf_fields_by_descriptor(nested_message)
+            count += count_primitive_fields(nested_message)
         else:
             # It's a primitive type (double, float, int, bool, string, etc.)
             count += 1
@@ -71,8 +70,8 @@ class TrackedEvent:
     from_team: Team
     for_team: Team
     ball_state: BallState
-    friendly_robot_states: list[Robot]
-    enemy_robot_states: list[Robot]
+    friendly_robots: list[Robot]
+    enemy_robots: list[Robot]
 
 
 def get_event_from_world(
@@ -88,11 +87,11 @@ def get_event_from_world(
     """
     ball_state = world_msg.ball.current_state
 
-    friendly_states = [
+    friendly_robots = [
         Robot(id=robot.id, state=robot.current_state)
         for robot in world_msg.friendly_team.team_robots
     ]
-    enemy_states = [
+    enemy_robots = [
         Robot(id=robot.id, state=robot.current_state)
         for robot in world_msg.enemy_team.team_robots
     ]
@@ -103,8 +102,8 @@ def get_event_from_world(
         from_team=from_team,
         for_team=for_team,
         ball_state=ball_state,
-        friendly_robot_states=friendly_states,
-        enemy_robot_states=enemy_states,
+        friendly_robots=friendly_robots,
+        enemy_robots=enemy_robots,
     )
 
 
@@ -115,7 +114,7 @@ def add_robots_to_row(row: list[Any], robots: list[Robot]) -> None:
     :param robot_states: the list of RobotState objects to flatten and add
     :return: None (the row list is modified in place)
     """
-    num_cols_per_robot = count_primitive_fields(RobotState)
+    num_cols_per_robot = count_primitive_fields(RobotState.DESCRIPTOR)
 
     # robot state columns will be added based on robot id
     robot_state_map = {robot.id: robot.state for robot in robots}
@@ -144,14 +143,16 @@ def event_to_csv_row(event: TrackedEvent) -> str:
     :param event: the TrackedEvent object to convert
     :return: a comma-separated string of all event attributes and robot states
     """
-    row = [
-        event.event_type.value,
-        event.timestamp,
-        *event.ball_state.position,
-        *event.ball_state.velocity,
+    row = [event.event_type.value, event.timestamp]
+
+    row = row + [
+        event.ball_state.global_position.x_meters,
+        event.ball_state.global_position.y_meters,
+        event.ball_state.global_velocity.x_component_meters,
+        event.ball_state.global_velocity.y_component_meters,
     ]
 
     add_robots_to_row(row, event.friendly_robots)
     add_robots_to_row(row, event.enemy_robots)
 
-    return ",".join(row)
+    return ",".join([str(elem) for elem in row])
