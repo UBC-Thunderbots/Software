@@ -32,7 +32,11 @@ class Team(StrEnum):
 
 
 def count_primitive_fields(message: Message):
-    """Recursively counts the number of primitive fields in a Protobuf message."""
+    """Recursively counts the number of primitive fields in a Protobuf message.
+
+    :param message: the message to count all leaf-level primitive fields for
+    :return: the count of primitive fields
+    """
     count = 0
     # Use the descriptor to see all fields defined in the schema
     descriptor = message.DESCRIPTOR
