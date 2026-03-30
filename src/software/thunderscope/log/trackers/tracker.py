@@ -46,19 +46,25 @@ class Tracker:
         self.cached_world = None
 
     def refresh(self) -> None:
+        """Refreshes the tracker to get the latest world message"""
         world_msg = self.world_buffer.get(block=False, return_cached=True)
 
         if world_msg is None:
             return
 
+        self.cached_world_msg = world_msg
         self.cached_world = tbots_cpp.World(world_msg)
 
     def write_event(self, event_type: EventType) -> None:
+        """Writes a single event to the event queue of the given type
+        
+        :param event_type: the type of event to log
+        """
         if not self.cached_world:
             return
 
         event = get_event_from_world(
-            world=self.cached_world,
+            world_msg=self.cached_world_msg,
             event_type=event_type,
             from_team=self.from_team,
             for_team=self.for_team,
