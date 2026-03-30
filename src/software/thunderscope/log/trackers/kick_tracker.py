@@ -118,6 +118,11 @@ class KickTracker(Tracker):
 
 
 class PassTracker(KickTracker):
+<<<<<<< HEAD
+=======
+    """Tracker for tracking the attacker's passes"""
+
+>>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
     def __init__(self, callback: Callable[[Pass], None] = None, buffer_size: int = 5):
         """Initialize the pass tracker
         :param callback: an optional callback to call when there's a pass
@@ -165,6 +170,11 @@ class PassTracker(KickTracker):
 
 
 class ShotTracker(KickTracker):
+<<<<<<< HEAD
+=======
+    """Tracker for tracking the attacker's shots on goal"""
+
+>>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
     def __init__(self, callback: Callable[[Shot], None] = None, buffer_size: int = 5):
         """Initialize the shot tracker
         :param callback: an optional callback to call when there's a shot

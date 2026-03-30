@@ -238,6 +238,13 @@ if __name__ == "__main__":
         help="whether or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
     )
 
+    parser.add_argument(
+        "--record_stats",
+        action="store_true",
+        default=False,
+        help="Whether to record stats about fullsystem performance (during AI vs AI)",
+    )
+
     args = parser.parse_args()
 
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
@@ -478,21 +485,47 @@ if __name__ == "__main__":
             )
             if args.enable_autoref
             else contextlib.nullcontext()
+<<<<<<< HEAD
         ) as autoref, Stats(
             proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
             record_enemy_stats=True,
         ) as blue_stats:
+=======
+        ) as autoref, (
+            Stats(
+                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                record_enemy_stats=True,
+            )
+            if args.record_stats
+            else contextlib.nullcontext()
+        ) as blue_stats, (
+            Stats(proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+            if args.record_stats
+            else contextlib.nullcontext()
+        ) as yellow_stats:
+>>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
 
             blue_fs.setup_proto_unix_io(tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+<<<<<<< HEAD
             tscope.register_refresh_function(blue_stats.refresh)
+=======
+>>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
 
             yellow_fs.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
+<<<<<<< HEAD
             # no yellow stats for now
+=======
+
+            if args.record_stats:
+                tscope.register_refresh_function(blue_stats.refresh)
+                tscope.register_refresh_function(yellow_stats.refresh)
+
+>>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
             simulator.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
@@ -528,7 +561,7 @@ if __name__ == "__main__":
                 # call so we need to somehow close it before doing our resource cleanup
                 exiter_thread = threading.Thread(
                     target=exit_poller,
-                    args=(autoref, CI_DURATION_S, lambda: tscope.close()),
+                    args=(CI_DURATION_S, lambda: tscope.close()),
                     daemon=True,
                 )
 

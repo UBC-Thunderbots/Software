@@ -1,8 +1,8 @@
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from proto.ssl_gc_common_pb2 import Team
 from abc import abstractmethod
+from typing import Any
 
 logger = create_logger(__name__)
 
@@ -72,7 +72,7 @@ class TbotsTestRunner:
     def send_gamecontroller_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
-        is_friendly: bool,
+        team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point=None,
     ):
         """Sends a gamecontroller command that is to be broadcasted to the given team
@@ -81,13 +81,6 @@ class TbotsTestRunner:
         :param is_friendly: whether the command should be sent to the friendly team
         :param final_ball_placement_point: where to place the ball in ball placement
         """
-        friendly_team, enemy_team = (
-            (Team.YELLOW, Team.BLUE)
-            if self.is_yellow_friendly
-            else (Team.BLUE, Team.YELLOW)
-        )
-        team = friendly_team if is_friendly else enemy_team
-
         self.gamecontroller.send_gc_command(
             gc_command=gc_command,
             team=team,
@@ -96,45 +89,61 @@ class TbotsTestRunner:
 
     def set_tactics(
         self,
-        tactics: AssignedTacticPlayControlParams,
-        is_friendly: bool,
+        blue_tactics: dict[int, Any] | None = {},
+        yellow_tactics: dict[int, Any] | None = {},
     ):
-        """Overrides current AI tactic for the given team
+        """Overrides AI tactics for all robots on each team.
+        By default, assigns no tactic for all robots whose id is not specified.
+        Pass in a None value for a team's tactics to not send tactics override.
 
-        :param tactic: the tactic params proto to use
-        :param is_friendly: whether the play should be applied to the "friendly" team
+        :param blue_tactics: None or dict of robot_id -> tactic for blue team
+        :param yellow_tactics: None or dict of robot_id -> tactic for yellow team
         """
-        fs_proto_unix_io = self.blue_full_system_proto_unix_io
-        # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
-        if (is_friendly and self.is_yellow_friendly) or not (
-            is_friendly or self.is_yellow_friendly
-        ):
-            fs_proto_unix_io = self.yellow_full_system_proto_unix_io
+        if blue_tactics is not None:
+            blue_params = self._create_assigned_tactic_params(blue_tactics)
+            self.blue_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, blue_params
+            )
 
-        fs_proto_unix_io.send_proto(AssignedTacticPlayControlParams, tactics)
+        if yellow_tactics is not None:
+            yellow_params = self._create_assigned_tactic_params(yellow_tactics)
+            self.yellow_full_system_proto_unix_io.send_proto(
+                AssignedTacticPlayControlParams, yellow_params
+            )
 
-    def set_play(self, play: Play, is_friendly: bool):
-        """Overrides current AI play for the given team
+    def set_plays(self, blue_play: PlayName, yellow_play: PlayName):
+        """Overrides current AI play for both teams
 
-        :param play: the play proto to use
-        :param is_blue: whether the play should be applied to the blue team
+        :param blue_play: the play name for the blue team to use
+        :param yellow_play: the play name for the yellow team to use
         """
-        fs_proto_unix_io = self.blue_full_system_proto_unix_io
-        # If (friendly & yellow_friendly) or (~friendly & ~yellow_friendly), set command team to yellow
-        if (is_friendly and self.is_yellow_friendly) or not (
-            is_friendly or self.is_yellow_friendly
-        ):
-            fs_proto_unix_io = self.yellow_full_system_proto_unix_io
+        self.blue_full_system_proto_unix_io.send_proto(Play, Play(name=blue_play))
+        self.yellow_full_system_proto_unix_io.send_proto(Play, Play(name=yellow_play))
 
-        fs_proto_unix_io.send_proto(Play, play)
+    def _create_assigned_tactic_params(self, tactics: dict[int, Any]):
+        """Converts dict of tactics to AssignedTacticPlayControlParams message
+
+        :param tactics: dict of robot_id -> tactic
+        """
+        params = AssignedTacticPlayControlParams()
+
+        # Checks which oneof field in Tactic to assign the specified tactic to
+        for robot_id, specific_tactic in tactics.items():
+            tactic = params.assigned_tactics[robot_id]
+            for field in tactic.DESCRIPTOR.oneofs_by_name["tactic"].fields:
+                if field.message_type == specific_tactic.DESCRIPTOR:
+                    getattr(tactic, field.name).CopyFrom(specific_tactic)
+                    break
+
+        return params
 
     @abstractmethod
-    def set_worldState(self, worldstate: WorldState):
+    def set_world_state(self, worldstate: WorldState):
         """Sets the worldstate for the given team
 
         :param worldstate: the worldstate proto to use
         """
-        raise NotImplementedError("abstract class method called set_worldstate")
+        raise NotImplementedError("abstract class method called set_world_state")
 
     @abstractmethod
     def run_test(

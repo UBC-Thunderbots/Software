@@ -7,7 +7,22 @@ import software.python_bindings as tbots_cpp
 
 
 class PossessionTracker(Tracker):
+<<<<<<< HEAD
     def __init__(self, callback: Callable[[bool | None], None], buffer_size: int = 5):
+=======
+    """Tracker to track when ball possession changes"""
+
+    def __init__(self, callback: Callable[[bool | None], None], buffer_size: int = 5):
+        """Initializes the Possession tracker
+
+        :param callback: function to call when possession changes
+                         called with an optional bool value:
+                            - True: friendly possession
+                            - False: enemy possession
+                            - None: neither
+        :param buffer_size: buffer size for the tracker's io
+        """
+>>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
         super().__init__(callback=callback, buffer_size=buffer_size)
 
         self.world_buffer = ThreadSafeBuffer(self.buffer_size, World)
