@@ -10,14 +10,15 @@ from dataclasses import dataclass
 from software.thunderscope.constants import PassResultsConstants
 import os
 from proto.import_all_protos import *
+from software.thunderscope.log.trackers.tracked_event import (
+    EventType
+)
 
+class EventTypeWithPassResults(EventType):
+    RESULT_1S = auto()
+    RESULT_5S = auto()
+    RESULT_10S = auto()
 
-@dataclass
-class PassLog:
-    pass_: Pass
-    timestamp: datetime
-    friendly_score: int
-    enemy_score: int
 
 
 class PassResultsTracker:
@@ -25,13 +26,6 @@ class PassResultsTracker:
     i.e looking at if our position in the game got better or worse
     after certain time intervals
     """
-
-    PASS_RESULTS_TEMPLATE = (
-        "{pass_start_x},{pass_start_y},"
-        "{pass_end_x},{pass_end_y},"
-        "{speed},"
-        "{score}\n"
-    )
 
     def __init__(
         self,
