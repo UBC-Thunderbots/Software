@@ -1,11 +1,14 @@
 from dataclasses import dataclass
 from enum import StrEnum, auto
 from proto.import_all_protos import *
-import software.python_bindings as tbots_cpp
-from typing import Iterable
+from typing import Any
+from software.py_constants import DIV_B_NUM_ROBOTS
+from google.protobuf.message import Message
 
 
 class EventType(StrEnum):
+    """Enum for the different types of events we want to track"""
+
     PASS = auto()
     SHOT_ON_GOAL = auto()
     ENEMY_SHOT_ON_GOAL = auto()
@@ -22,82 +25,76 @@ class EventType(StrEnum):
 
 
 class Team(StrEnum):
+    """The teams present in the game"""
+
     BLUE = auto()
     YELLOW = auto()
 
 
-@dataclass
-class BallState:
-    position: tuple[float, float]
-    velocity: tuple[float, float]
+def count_primitive_fields(message: Message):
+    """Recursively counts the number of primitive fields in a Protobuf message."""
+    count = 0
+    # Use the descriptor to see all fields defined in the schema
+    descriptor = message.DESCRIPTOR
+
+    for field in descriptor.fields:
+        # Check if the field is a nested message
+        if field.type == FieldDescriptor.TYPE_MESSAGE:
+            # Get the nested message class to recurse into its descriptor
+            nested_message = field.message_type
+            # Recurse using the nested message's descriptor
+            count += count_leaf_fields_by_descriptor(nested_message)
+        else:
+            # It's a primitive type (double, float, int, bool, string, etc.)
+            count += 1
+    return count
 
 
 @dataclass
-class RobotState:
-    position: tuple[float, float]
-    orientation: float
-    velocity: tuple[float, float]
-    angular_velocity: float
+class Robot:
+    """Represents a single robot on the field, with ID and current state."""
+
+    id: int
+    state: RobotState
 
 
 @dataclass
 class TrackedEvent:
+    """Represents a single event being tracked, where and for whom the event is, and the game state at the time of the event"""
+
     event_type: EventType
     timestamp: float
     from_team: Team
     for_team: Team
     ball_state: BallState
-    friendly_robot_states: list[RobotState]
-    enemy_robot_states: list[RobotState]
-
-
-def get_tuple_from_coords(coords: any) -> tuple[float, float]:
-    """Converts a coordinate object into a float tuple
-
-    :param coords: the coordinate object (typically with .x() and .y() methods)
-    :return: a tuple of (x, y) coordinates as floats
-    """
-    return (coords.x(), coords.y())
-
-
-def get_robot_states_from_team(team: tbots_cpp.Team) -> list[RobotState]:
-    """Extracts state data for all robots in a given team
-
-    :param team: the team object containing robot data
-    :return: a list of RobotState dataclasses for every robot on the team
-    """
-    return [
-        RobotState(
-            position=get_tuple_from_coords(robot.position()),
-            orientation=robot.orientiation().toRadians(),
-            velocity=get_tuple_from_coords(robot.velocity()),
-            angular_velocity=robot.angularVelocity().toRadians(),
-        )
-        for robot in team.getAllRobots()
-    ]
+    friendly_robot_states: list[Robot]
+    enemy_robot_states: list[Robot]
 
 
 def get_event_from_world(
-    world: tbots_cpp.World, event_type: EventType, from_team: Team, for_team: Team
+    world_msg: World, event_type: EventType, from_team: Team, for_team: Team
 ) -> TrackedEvent:
-    """Creates a TrackedEvent from a world object
+    """Creates a TrackedEvent from a world protobuf message
 
     :param world_msg: the world object containing the state of the game
     :param event_type: the type of event being recorded
     :param from_team: the team that the event is coming from
+    :param for_team: the team that the event is for
     :return: a fully populated TrackedEvent including ball and robot states
     """
-    ball = world.ball()
-    ball_state = BallState(
-        position=get_tuple_from_coords(ball.position()),
-        velocity=get_tuple_from_coords(ball.velocity()),
-    )
+    ball_state = world_msg.ball.current_state
 
-    friendly_states = get_robot_states_from_team(world.friendlyTeam())
-    enemy_states = get_robot_states_from_team(world.enemyTeam())
+    friendly_states = [
+        Robot(id=robot.id, state=robot.current_state)
+        for robot in world_msg.friendly_team.team_robots
+    ]
+    enemy_states = [
+        Robot(id=robot.id, state=robot.current_state)
+        for robot in world_msg.enemy_team.team_robots
+    ]
 
     return TrackedEvent(
-        timestamp=world.getMostRecentTimestamp().toSeconds(),
+        timestamp=world_msg.time_sent.epoch_timestamp_seconds,
         event_type=event_type,
         from_team=from_team,
         for_team=for_team,
@@ -105,6 +102,36 @@ def get_event_from_world(
         friendly_robot_states=friendly_states,
         enemy_robot_states=enemy_states,
     )
+
+
+def add_robots_to_row(row: list[Any], robots: list[Robot]) -> None:
+    """Serializes robots into flattened columns within a list row
+
+    :param row: the existing list representing a CSV row to be appended to
+    :param robot_states: the list of RobotState objects to flatten and add
+    :return: None (the row list is modified in place)
+    """
+    num_cols_per_robot = count_primitive_fields(RobotState)
+
+    # robot state columns will be added based on robot id
+    robot_state_map = {robot.id: robot.state for robot in robots}
+
+    # Add friendly robots: [r1_data, r2_data...] based on id
+    for idx in range(DIV_B_NUM_ROBOTS):
+        if idx not in robot_state_map:
+            row.extend([None] * num_cols_per_robot)
+        else:
+            robot_state = robot_state_map[idx]
+            row.extend(
+                [
+                    robot_state.global_position.x_meters,
+                    robot_state.global_position.y_meters,
+                    robot_state.global_orientation.radians,
+                    robot_state.global_velocity.x_component_meters,
+                    robot_state.global_velocity.y_component_meters,
+                    robot_state.global_angular_velocity.radians_per_second,
+                ]
+            )
 
 
 def event_to_csv_row(event: TrackedEvent) -> str:
@@ -120,79 +147,7 @@ def event_to_csv_row(event: TrackedEvent) -> str:
         *event.ball_state.velocity,
     ]
 
-    # Add friendly robots: [count, r1_data, r2_data...]
-    row.append(str(len(event.friendly_robot_states)))
-    for r in event.friendly_robot_states:
-        row.extend(
-            [
-                r.position[0],
-                r.position[1],
-                r.orientation,
-                r.velocity[0],
-                r.velocity[1],
-                r.angular_velocity,
-            ]
-        )
-
-    # Add enemy robots: [count, r1_data, r2_data...]
-    row.append(str(len(event.enemy_robot_states)))
-    for r in event.enemy_robot_states:
-        row.extend(
-            [
-                r.position[0],
-                r.position[1],
-                r.orientation,
-                r.velocity[0],
-                r.velocity[1],
-                r.angular_velocity,
-            ]
-        )
+    add_robots_to_row(row, event.friendly_robots)
+    add_robots_to_row(row, event.enemy_robots)
 
     return ",".join(row)
-
-
-def csv_row_to_event(row: Iterable[str]) -> TrackedEvent:
-    """Parses a flat collection of CSV strings back into a TrackedEvent object
-
-    :param row: an iterable of strings representing a single CSV row
-    :return: a reconstructed TrackedEvent dataclass
-    """
-    # Convert strings to appropriate types
-    # row[0] is EventType (StrEnum), row[1] is timestamp (float)
-    row_iter = iter(row)
-
-    event_type = EventType(next(row_iter))
-    timestamp = float(next(row_iter))
-    from_team = Team(next(row_iter))
-    for_team = Team(next(row_iter))
-
-    # Reconstruct BallState (x, y, vx, vy)
-    ball_pos = (float(next(row_iter)), float(next(row_iter)))
-    ball_vel = (float(next(row_iter)), float(next(row_iter)))
-    ball_state = BallState(position=ball_pos, velocity=ball_vel)
-
-    def parse_robots() -> list[RobotState]:
-        # First, read the count marker
-        count = int(next(row_iter))
-
-        robots = []
-        for _ in range(count):
-            pos = (float(next(row_iter)), float(next(row_iter)))
-            ori = float(next(row_iter))
-            vel = (float(next(row_iter)), float(next(row_iter)))
-            ang_vel = float(next(row_iter))
-            robots.append(RobotState(pos, ori, vel, ang_vel))
-        return robots
-
-    friendly_robots = parse_robots()
-    enemy_robots = parse_robots()
-
-    return TrackedEvent(
-        event_type=event_type,
-        timestamp=timestamp,
-        from_team=from_team,
-        for_team=for_team,
-        ball_state=ball_state,
-        friendly_robot_states=friendly_robots,
-        enemy_robot_states=enemy_robots,
-    )

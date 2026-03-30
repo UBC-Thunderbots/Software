@@ -14,5 +14,9 @@ py_library(
         "tracker.py",
         "tracker_builder.py",
     ],
+    data = [
+        "//software:py_constants.so",
+        "//software:python_bindings.so",
+    ],
     visibility = ["//visibility:public"],
 )
