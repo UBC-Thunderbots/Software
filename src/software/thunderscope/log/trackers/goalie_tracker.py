@@ -5,7 +5,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
-
+from software.thunderscope.log.trackers.tracked_event import EventType
 
 class GoalieTracker(Tracker):
     """Tracker to track new shots on goal"""
@@ -15,57 +15,49 @@ class GoalieTracker(Tracker):
     # but can exclude real kicks
     MIN_SHOT_SPEED = 2.0
 
-    def __init__(
-        self,
-        for_friendly: bool,
-        callback: Callable[[bool, bool], None],
-        buffer_size: int = 5,
-    ):
+    def __init__(self, proto_unix_io: ProtoUnixIO, out_file_path: str, for_friendly: bool, buffer_size: int = 5):
         """Initializes the Goalie tracker
 
         :param for_friendly: if we should track shots on goal for the friendly or enemy team
-        :param callback: function to call when there is a new shot on goal
-                         called with 2 booleans:
-                             - If there is a shot on goal right now
-                             - If there was a shot on goal before
-                         lets us track new shots on goal + when shots are blocked
+        :param proto_unix_io: the proto unix io to get the game state from
+        :param out_file_path: the file to write tracked events to               
         :param buffer_size: buffer size for the tracker's io
         """
-        super().__init__(callback=callback, buffer_size=buffer_size)
-
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        super().__init__(proto_unix_io, out_file_path, buffer_size)
 
         self.for_friendly = for_friendly
 
         self.is_shot_incoming = False
 
     @override
-    def set_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
-        super().set_proto_unix_io(
-            proto_unix_io,
-            [
-                (World, self.world_buffer),
-            ],
-        )
-
-    @override
     def refresh(self):
-        """Refresh and update the callback with the latest shot on goal information"""
-        world_msg = self.world_buffer.get(block=False, return_cached=True)
-
-        if not world_msg:
+        """Refresh and log any new shots on goal"""
+        super().refresh()
+        
+        if self.cached_world is None:
             return
 
-        world = tbots_cpp.World(world_msg)
-
         latest_is_shot_incoming = self._is_goal_shot_incoming(
-            world.ball(), world.field(), for_friendly=self.for_friendly
+            self.cached_world.ball(), self.cached_world.field(), for_friendly=self.for_friendly
         )
 
-        if self.callback:
-            self.callback(latest_is_shot_incoming, self.is_shot_incoming)
+        self._log_incoming_shots(latest_is_shot_incoming)
 
         self.is_shot_incoming = latest_is_shot_incoming
+        
+    def _log_incoming_shots(self, new_shot_incoming):
+        event_type = None
+        
+        if not new_shot_incoming and self.is_shot_incoming:
+            event_type = EventType.SHOT_BLOCKED
+        
+        if new_shot_incoming and not self.is_shot_incoming:
+            event_type = EventType.ENEMY_SHOT_ON_GOAL
+                
+        if not event_type:
+            return
+        
+        self.write_event(event_type=event_type)            
 
     def _get_goal_shot_region(
         self, field: tbots_cpp.Field, for_friendly: bool

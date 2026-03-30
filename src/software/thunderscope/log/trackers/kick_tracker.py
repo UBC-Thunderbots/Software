@@ -7,7 +7,7 @@ from typing import Callable, Any, override
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.log.trackers.tracker import Tracker
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-
+from software.thunderscope.log.trackers.tracked_event import EventType
 
 class KickTracker(Tracker):
     """Base Class for tracking the attacker's kicks
@@ -36,31 +36,22 @@ class KickTracker(Tracker):
     MAX_KICK_ANGLE_DIFFERENCE = tbots_cpp.Angle.fromDegrees(5)
 
     def __init__(
-        self,
-        callback: Optional[Callable[[Any], None]] = None,
-        buffer_size: int = 5,
+        self, proto_unix_io: ProtoUnixIO, out_file_path: str, buffer_size: int = 5
     ):
         """Initialize the kick tracker
-        :param callback: an optional callback to call when there's a kick
+        :param proto_unix_io: the proto unix io to get the game state from
+        :param out_file_path: the file to write tracked events to               
+        :param buffer_size: buffer size for the tracker's io
         """
-        super().__init__(callback=callback, buffer_size=buffer_size)
+        super().__init__(proto_unix_io, out_file_path, buffer_size)
+        
         self.latest_kick_angle: tbots_cpp.Angle = tbots_cpp.Angle()
         self.kick_taken = False
 
         self.attacker_vis_buffer = ThreadSafeBuffer(
             self.buffer_size, AttackerVisualization
         )
-        self.world_buffer = ThreadSafeBuffer(self.buffer_size, World)
-
-    @override
-    def set_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
-        super().set_proto_unix_io(
-            proto_unix_io,
-            [
-                (AttackerVisualization, self.attacker_vis_buffer),
-                (World, self.world_buffer),
-            ],
-        )
+        self.proto_unix_io.register_observer(AttackerVisualization, self.attacker_vis_buffer)
 
     def _get_new_kick_angle(
         self, origin: Point, target: Point, latest_angle: tbots_cpp.Angle
@@ -98,18 +89,17 @@ class KickTracker(Tracker):
         """Refreshes the tracker by getting the current state of the world
         and the latest attacker visualization
         """
+        super().refresh()
+        
+        if self.cached_world is None:
+            return
+        
         attacker_vis_msg = self.attacker_vis_buffer.get(block=False)
 
         if not attacker_vis_msg:
             return
 
-        world_msg = self.world_buffer.get(block=False, return_cached=True)
-
-        if world_msg is None:
-            return
-        world = tbots_cpp.World(world_msg)
-
-        self._refresh_kicks(attacker_vis_msg, world)
+        self._refresh_kicks(attacker_vis_msg, self.cached_world)
 
     def _refresh_kicks(
         self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
@@ -120,18 +110,24 @@ class KickTracker(Tracker):
 class PassTracker(KickTracker):
     """Tracker for tracking the attacker's passes"""
 
-    def __init__(self, callback: Callable[[Pass], None] = None, buffer_size: int = 5):
+    def __init__(
+        self, proto_unix_io: ProtoUnixIO, out_file_path: str, buffer_size: int = 5
+    ):
         """Initialize the pass tracker
-        :param callback: an optional callback to call when there's a pass
+        :param proto_unix_io: the proto unix io to get the game state from
+        :param out_file_path: the file to write tracked events to               
+        :param buffer_size: buffer size for the tracker's io
         """
-        super().__init__(callback=callback, buffer_size=buffer_size)
-
+        super().__init__(proto_unix_io, out_file_path, buffer_size)
+        
     @override
     def _refresh_kicks(
         self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
     ) -> None:
         """Refreshes the pass tracker with the new attacker visualization
-        and the latest state of the world
+        and the latest state of the world.
+        
+        Logs any new pass events.
 
         :param attacker_vis_msg: the latest attacker visualization message
         :param world: the current world state
@@ -162,25 +158,30 @@ class PassTracker(KickTracker):
         ):
             self.kick_taken = True
 
-            if self.callback:
-                self.callback(attacker_vis_msg.pass_)
+            self.write_event(event_type=EventType.PASS)
 
 
 class ShotTracker(KickTracker):
     """Tracker for tracking the attacker's shots on goal"""
 
-    def __init__(self, callback: Callable[[Shot], None] = None, buffer_size: int = 5):
+    def __init__(
+        self, proto_unix_io: ProtoUnixIO, out_file_path: str, buffer_size: int = 5
+    ):
         """Initialize the shot tracker
-        :param callback: an optional callback to call when there's a shot
+        :param proto_unix_io: the proto unix io to get the game state from
+        :param out_file_path: the file to write tracked events to               
+        :param buffer_size: buffer size for the tracker's io
         """
-        super().__init__(callback=callback, buffer_size=buffer_size)
+        super().__init__(proto_unix_io, out_file_path, buffer_size)
 
     @override
     def _refresh_kicks(
         self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
     ) -> None:
         """Refreshes the shot tracker with the new attacker visualization
-        and the latest state of the world
+        and the latest state of the world.
+        
+        Logs any new shot events.
 
         :param attacker_vis_msg: the latest attacker visualization message
         :param world: the current world state
@@ -213,5 +214,4 @@ class ShotTracker(KickTracker):
         ):
             self.kick_taken = True
 
-            if self.callback:
-                self.callback(attacker_vis_msg.shot)
+            self.write_event(event_type=EventType.SHOT_ON_GOAL)
