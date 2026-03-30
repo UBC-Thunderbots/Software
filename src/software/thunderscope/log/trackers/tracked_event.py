@@ -63,7 +63,7 @@ class TrackedEvent:
     enemy_robot_states: list[RobotState]
 
 
-def get_tuple_from_coords(coords: any) -> tuple[float, float]:
+def get_tuple_from_coords(coords: Any) -> tuple[float, float]:
     """Converts a coordinate object into a float tuple
 
     :param coords: the coordinate object (typically with .x() and .y() methods)
