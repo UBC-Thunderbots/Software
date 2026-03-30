@@ -6,21 +6,23 @@ from typing import Iterable
 
 
 class EventType(StrEnum):
-  PASS = auto()
-  SHOT_ON_GOAL = auto()
-  ENEMY_SHOT_ON_GOAL = auto()
-  SHOT_BLOCKED = auto()
-  FRIENDLY_POSSESSION_START = auto()
-  FRIENDLY_POSSESSION_END = auto()
-  ENEMY_POSSESSION_START = auto()
-  ENEMY_POSSESSION_END = auto()
-  GAME_START = auto()
-  GAME_END = auto()
-  
+    PASS = auto()
+    SHOT_ON_GOAL = auto()
+    ENEMY_SHOT_ON_GOAL = auto()
+    SHOT_BLOCKED = auto()
+    FRIENDLY_POSSESSION_START = auto()
+    FRIENDLY_POSSESSION_END = auto()
+    ENEMY_POSSESSION_START = auto()
+    ENEMY_POSSESSION_END = auto()
+    GAME_START = auto()
+    GAME_END = auto()
+
+
 class Team(StrEnum):
-  BLUE = auto()
-  YELLOW = auto()
-  
+    BLUE = auto()
+    YELLOW = auto()
+
+
 @dataclass
 class BallState:
     position: tuple[float, float]
@@ -37,12 +39,13 @@ class RobotState:
 
 @dataclass
 class TrackedEvent:
-  event_type: EventType
-  timestamp: float
-  from_team: Team
-  ball_state: BallState
-  friendly_robot_states: list[RobotState]
-  enemy_robot_states: list[RobotState]
+    event_type: EventType
+    timestamp: float
+    from_team: Team
+    ball_state: BallState
+    friendly_robot_states: list[RobotState]
+    enemy_robot_states: list[RobotState]
+
 
 def get_tuple_from_coords(coords: any) -> tuple[float, float]:
     """Converts a coordinate object into a float tuple
@@ -69,32 +72,35 @@ def get_robot_states_from_team(team: tbots_cpp.Team) -> list[RobotState]:
         for robot in team.getAllRobots()
     ]
 
-def get_event_from_world(world: tbots_cpp.World, event_type: EventType, from_team: Team) -> TrackedEvent:
-  """
-  Creates a TrackedEvent from a world object
 
-  :param world_msg: the world object containing the state of the game
-  :param event_type: the type of event being recorded
-  :param from_team: the team that the event is coming from
-  :return: a fully populated TrackedEvent including ball and robot states
-  """ 
-  ball = world.ball()
-  ball_state = BallState(
-    position=get_tuple_from_coords(ball.position()),
-    velocity=get_tuple_from_coords(ball.velocity())
-  )
-  
-  friendly_states = get_robot_states_from_team(world.friendlyTeam())
-  enemy_states = get_robot_states_from_team(world.enemyTeam())
-  
-  return TrackedEvent(
-    timestamp=world.getMostRecentTimestamp().toSeconds(),
-    event_type=event_type,
-    from_team=from_team,
-    ball_state=ball_state,
-    friendly_robot_states=friendly_states,
-    enemy_robot_states=enemy_states
-  )
+def get_event_from_world(
+    world: tbots_cpp.World, event_type: EventType, from_team: Team
+) -> TrackedEvent:
+    """Creates a TrackedEvent from a world object
+
+    :param world_msg: the world object containing the state of the game
+    :param event_type: the type of event being recorded
+    :param from_team: the team that the event is coming from
+    :return: a fully populated TrackedEvent including ball and robot states
+    """
+    ball = world.ball()
+    ball_state = BallState(
+        position=get_tuple_from_coords(ball.position()),
+        velocity=get_tuple_from_coords(ball.velocity()),
+    )
+
+    friendly_states = get_robot_states_from_team(world.friendlyTeam())
+    enemy_states = get_robot_states_from_team(world.enemyTeam())
+
+    return TrackedEvent(
+        timestamp=world.getMostRecentTimestamp().toSeconds(),
+        event_type=event_type,
+        from_team=from_team,
+        ball_state=ball_state,
+        friendly_robot_states=friendly_states,
+        enemy_robot_states=enemy_states,
+    )
+
 
 def event_to_csv_row(event: TrackedEvent) -> str:
     """Serializes a TrackedEvent into a flat CSV string row
