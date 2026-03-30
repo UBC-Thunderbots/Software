@@ -554,23 +554,7 @@ std::unique_ptr<TbotsProto::PassFeatures> createPassFeaturesProto(const Pass& pa
     (*pass_features_msg->mutable_receiver_point()) =
         *createPointProto(pass.receiverPoint());
 
-    (*pass_features_msg->mutable_ball_position()) =
-        *createPointProto(world.ball().position());
-
-    const auto& friendly_robots = world.friendlyTeam().getAllRobots();
-    std::for_each(friendly_robots.begin(), friendly_robots.end(),
-                  [&](const Robot& robot)
-                  {
-                      *(pass_features_msg->add_friendly_positions()) =
-                          *createPointProto(robot.position());
-                  });
-
-    const auto& enemy_robots = world.enemyTeam().getAllRobots();
-    std::for_each(enemy_robots.begin(), enemy_robots.end(),
-                  [&](const Robot& robot) {
-                      *(pass_features_msg->add_enemy_positions()) =
-                          *createPointProto(robot.position());
-                  });
+    (*pass_features_msg->mutable_world_state()) = *createWorld(world);
 
     pass_features_msg->set_score(score);
 
