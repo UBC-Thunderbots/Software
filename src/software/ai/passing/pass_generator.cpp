@@ -160,12 +160,9 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
             {
                 if (num_passes_since_sample_ == 0)
                 {
-                    std::cout << "LOGGING PASS " << num_passes_since_sample_ << std::endl;
                     pass_feature_collector_.logPassFeatures(optimized_pass, world,
                                                             passing_config_);
                 }
-
-                std::cout << num_passes_since_sample_ << std::endl;
 
                 num_passes_since_sample_ =
                     (num_passes_since_sample_ + 1) % PASS_SAMPLING_FREQUENCY;
@@ -207,7 +204,6 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
             std::size_t random_index = distribution(random_num_gen_);
 
             best_pass = considered_passes[random_index];
-            std::cout << "PICKING RANDOM PASS " << std::endl;
         }
 
         num_picks_since_random_ =
