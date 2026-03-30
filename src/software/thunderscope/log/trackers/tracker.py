@@ -57,7 +57,7 @@ class Tracker:
 
     def write_event(self, event_type: EventType) -> None:
         """Writes a single event to the event queue of the given type
-        
+
         :param event_type: the type of event to log
         """
         if not self.cached_world:

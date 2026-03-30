@@ -5,6 +5,7 @@ from proto.import_all_protos import *
 import software.python_bindings as tbots_cpp
 from software.thunderscope.log.trackers.tracked_event import EventType, Team
 import queue
+from software.py_constants import BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING
 
 
 class PossessionTracker(Tracker):
@@ -106,7 +107,10 @@ class PossessionTracker(Tracker):
         :return: True if the team has possession, False otherwise
         """
         for robot in team.getAllRobots():
-            if robot.isNearDribbler(ball_position):
+            # higher tolerance to make possession a bit stickier
+            if robot.isNearDribbler(
+                ball_position, BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING * 2
+            ):
                 return True
 
         return False

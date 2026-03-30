@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import RuntimeManagerConstants
 from software.thunderscope.log.trackers.tracked_event import (
-    Team,
+    Team as TeamEnum,
     TrackedEvent,
     event_to_csv_row,
 )
@@ -65,7 +65,9 @@ class FullSystemStats:
         self.tracker = (
             TrackerBuilder(
                 proto_unix_io=proto_unix_io,
-                from_team=(Team.YELLOW if self.friendly_colour_yellow else Team.BLUE),
+                from_team=(
+                    TeamEnum.YELLOW if self.friendly_colour_yellow else TeamEnum.BLUE
+                ),
                 event_queue=self.event_queue,
                 buffer_size=buffer_size,
             )
@@ -83,10 +85,14 @@ class FullSystemStats:
                 TrackerBuilder(
                     proto_unix_io=proto_unix_io,
                     from_team=(
-                        Team.YELLOW if self.friendly_colour_yellow else Team.BLUE
+                        TeamEnum.YELLOW
+                        if self.friendly_colour_yellow
+                        else TeamEnum.BLUE
                     ),
                     for_team=(
-                        Team.BLUE if self.friendly_colour_yellow else Team.YELLOW
+                        TeamEnum.BLUE
+                        if self.friendly_colour_yellow
+                        else TeamEnum.YELLOW
                     ),
                     event_queue=self.event_queue,
                     buffer_size=buffer_size,
@@ -101,6 +107,18 @@ class FullSystemStats:
     def refresh(self) -> None:
         """Refreshes the events for the game so far"""
         self.tracker.refresh()
+
+        if not self.events_file_handle:
+            return
+
+        while not self.event_queue.empty():
+            try:
+                # Get item without blocking
+                event = self.event_queue.get_nowait()
+
+                self._write_event_to_file(event)
+            except queue.Empty:
+                return
 
     def setup(self):
         """Sets up the file resources for logging
@@ -130,5 +148,5 @@ class FullSystemStats:
             self.events_file_handle.write(csv_row + "\n")
             self.events_file_handle.flush()
 
-        except (FileNotFoundError, PermissionError):
+        except (IOError, FileNotFoundError, PermissionError):
             logging.warning("Failed to write event to file")
