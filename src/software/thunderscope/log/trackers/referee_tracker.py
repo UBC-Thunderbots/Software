@@ -1,51 +1,53 @@
-from typing import override, Callable
+from typing import override
 from software.thunderscope.log.trackers.tracker import Tracker
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.log.trackers.tracked_event import EventType, Team
+import queue
 
 
 class RefereeTracker(Tracker):
-<<<<<<< HEAD
-=======
     """Tracks Referee events, like goals and yellow / red cards for the friendly team only"""
 
->>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
     def __init__(
         self,
+        proto_unix_io: ProtoUnixIO,
+        from_team: Team,
+        for_team: Team,
+        event_queue: queue.Queue,
         friendly_color_yellow: bool,
-        callback: Callable[[int, int, int], None],
-        buffer_size: int = 5,
+        **kwargs,
     ):
-<<<<<<< HEAD
-=======
-        """Initializes the Referee tracker
+        """Initializes the RefereeTracker
 
-        :param friendly_color_yellow: if the friendly color is yellow or not
-                                      determines which goals, etc. the tracker tracks
-        :param callback: function to call when there is any new Referee event
-                         called with the current goals, yellow cards, and red cards
-        :param buffer_size: buffer size for the tracker's io
+        :param proto_unix_io: the proto unix io to get the game state from
+        :param from_team: the team that this tracker is tracking from (events are from this team)
+        :param for_team: the team that this tracker is tracking for (events are for this team)
+                          default is same as the from_team, but can be different
+        :param event_queue: the queue to write events to
+        :param friendly_color_yellow: if the friendly color is yellow or blue
         """
->>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
-        super().__init__(callback=callback, buffer_size=buffer_size)
+        super().__init__(
+            proto_unix_io=proto_unix_io,
+            from_team=from_team,
+            for_team=for_team,
+            event_queue=event_queue,
+            **kwargs,
+        )
 
-        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
+        self.referee_buffer = ThreadSafeBuffer(self.buffer_size, Referee)
+        self.proto_unix_io.register_observer(Referee, self.referee_buffer)
 
         self.friendly_color_yellow = friendly_color_yellow
 
-    @override
-    def set_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
-        super().set_proto_unix_io(
-            proto_unix_io,
-            [
-                (Referee, self.referee_buffer),
-            ],
-        )
+        self.num_yellow_cards = 0
+        self.num_red_cards = 0
+        self.num_goals = 0
 
     @override
     def refresh(self):
-        """Refresh and update the callback with the latest referee information"""
+        """Refresh and log the latest referee information"""
         refree_msg = self.referee_buffer.get(block=False, return_cached=True)
 
         if not refree_msg:
@@ -56,18 +58,25 @@ class RefereeTracker(Tracker):
                 refree_msg.yellow if self.friendly_color_yellow else refree_msg.blue
             )
 
-            num_goals = 0
-            num_yellow_cards = 0
-            num_red_cards = 0
-
             if team_info.HasField("score"):
-                num_goals = team_info.score
+                self.num_goals = self._log_event_if_change(
+                    team_info.score, self.num_goals, EventType.GOAL_SCORED
+                )
 
             if team_info.HasField("yellow_cards"):
-                num_yellow_cards = team_info.yellow_cards
+                self.num_yellow_cards = self._log_event_if_change(
+                    team_info.yellow_cards, self.num_yellow_cards, EventType.YELLOW_CARD
+                )
 
             if team_info.HasField("red_cards"):
-                num_red_cards = team_info.red_cards
+                self.num_red_cards = self._log_event_if_change(
+                    team_info.red_cards, self.num_red_cards, EventType.RED_CARD
+                )
 
-            if self.callback:
-                self.callback(num_goals, num_yellow_cards, num_red_cards)
+    def _log_event_if_change(
+        self, new_value: int, old_value: int, event_type: EventType
+    ) -> int:
+        if new_value != old_value:
+            self.write_event(event_type=event_type)
+
+        return new_value
