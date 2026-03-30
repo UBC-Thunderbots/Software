@@ -10,6 +10,7 @@ py_library(
         "kick_tracker.py",
         "possession_tracker.py",
         "referee_tracker.py",
+        "tracked_event.py",
         "tracker.py",
         "tracker_builder.py",
     ],
