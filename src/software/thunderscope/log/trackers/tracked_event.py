@@ -16,6 +16,9 @@ class EventType(StrEnum):
     ENEMY_POSSESSION_END = auto()
     GAME_START = auto()
     GAME_END = auto()
+    GOAL_SCORED = auto()
+    YELLOW_CARD = auto()
+    RED_CARD = auto()
 
 
 class Team(StrEnum):
@@ -42,6 +45,7 @@ class TrackedEvent:
     event_type: EventType
     timestamp: float
     from_team: Team
+    for_team: Team
     ball_state: BallState
     friendly_robot_states: list[RobotState]
     enemy_robot_states: list[RobotState]
@@ -72,8 +76,9 @@ def get_robot_states_from_team(team: tbots_cpp.Team) -> list[RobotState]:
         for robot in team.getAllRobots()
     ]
 
+
 def get_event_from_world(
-    world: tbots_cpp.World, event_type: EventType, from_team: Team
+    world: tbots_cpp.World, event_type: EventType, from_team: Team, for_team: Team
 ) -> TrackedEvent:
     """Creates a TrackedEvent from a world object
 
@@ -95,6 +100,7 @@ def get_event_from_world(
         timestamp=world.getMostRecentTimestamp().toSeconds(),
         event_type=event_type,
         from_team=from_team,
+        for_team=for_team,
         ball_state=ball_state,
         friendly_robot_states=friendly_states,
         enemy_robot_states=enemy_states,
@@ -158,6 +164,7 @@ def csv_row_to_event(row: Iterable[str]) -> TrackedEvent:
     event_type = EventType(next(row_iter))
     timestamp = float(next(row_iter))
     from_team = Team(next(row_iter))
+    for_team = Team(next(row_iter))
 
     # Reconstruct BallState (x, y, vx, vy)
     ball_pos = (float(next(row_iter)), float(next(row_iter)))
@@ -184,6 +191,7 @@ def csv_row_to_event(row: Iterable[str]) -> TrackedEvent:
         event_type=event_type,
         timestamp=timestamp,
         from_team=from_team,
+        for_team=for_team,
         ball_state=ball_state,
         friendly_robot_states=friendly_robots,
         enemy_robot_states=enemy_robots,

@@ -1,11 +1,12 @@
 from software.thunderscope.log.trackers.tracker import Tracker
-from typing import Callable, override
+from typing import override
 from proto.import_all_protos import *
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
-from software.thunderscope.log.trackers.tracked_event import EventType
+from software.thunderscope.log.trackers.tracked_event import EventType, Team
+import queue
+
 
 class GoalieTracker(Tracker):
     """Tracker to track new shots on goal"""
@@ -15,15 +16,31 @@ class GoalieTracker(Tracker):
     # but can exclude real kicks
     MIN_SHOT_SPEED = 2.0
 
-    def __init__(self, proto_unix_io: ProtoUnixIO, out_file_path: str, for_friendly: bool, buffer_size: int = 5):
+    def __init__(
+        self,
+        proto_unix_io: ProtoUnixIO,
+        from_team: Team,
+        for_team: Team,
+        event_queue: queue.Queue,
+        for_friendly: bool,
+        **kwargs,
+    ):
         """Initializes the Goalie tracker
 
         :param for_friendly: if we should track shots on goal for the friendly or enemy team
         :param proto_unix_io: the proto unix io to get the game state from
-        :param out_file_path: the file to write tracked events to               
-        :param buffer_size: buffer size for the tracker's io
+        :param from_team: the team that this tracker is tracking from (events are from this team)
+        :param for_team: the team that this tracker is tracking for (events are for this team)
+                          default is same as the from_team, but can be different
+        :param event_queue: the queue to write events to
         """
-        super().__init__(proto_unix_io, out_file_path, buffer_size)
+        super().__init__(
+            proto_unix_io=proto_unix_io,
+            from_team=from_team,
+            for_team=for_team,
+            event_queue=event_queue,
+            **kwargs,
+        )
 
         self.for_friendly = for_friendly
 
@@ -33,31 +50,33 @@ class GoalieTracker(Tracker):
     def refresh(self):
         """Refresh and log any new shots on goal"""
         super().refresh()
-        
+
         if self.cached_world is None:
             return
 
         latest_is_shot_incoming = self._is_goal_shot_incoming(
-            self.cached_world.ball(), self.cached_world.field(), for_friendly=self.for_friendly
+            self.cached_world.ball(),
+            self.cached_world.field(),
+            for_friendly=self.for_friendly,
         )
 
-        self._log_incoming_shots(latest_is_shot_incoming)
+        self._log_incoming_shot(latest_is_shot_incoming)
 
         self.is_shot_incoming = latest_is_shot_incoming
-        
-    def _log_incoming_shots(self, new_shot_incoming):
+
+    def _log_incoming_shot(self, new_shot_incoming):
         event_type = None
-        
+
         if not new_shot_incoming and self.is_shot_incoming:
             event_type = EventType.SHOT_BLOCKED
-        
+
         if new_shot_incoming and not self.is_shot_incoming:
             event_type = EventType.ENEMY_SHOT_ON_GOAL
-                
+
         if not event_type:
             return
-        
-        self.write_event(event_type=event_type)            
+
+        self.write_event(event_type=event_type)
 
     def _get_goal_shot_region(
         self, field: tbots_cpp.Field, for_friendly: bool

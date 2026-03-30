@@ -10,9 +10,14 @@ from software.thunderscope.log.trackers import (
 from dataclasses import dataclass
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import RuntimeManagerConstants
+from software.thunderscope.log.trackers.tracked_event import (
+    Team,
+    TrackedEvent,
+    event_to_csv_row,
+)
 import logging
 from proto.import_all_protos import *
-from rich import print
+import queue
 
 
 @dataclass
@@ -31,6 +36,8 @@ class FullSystemStats:
     # From GoalieTacticConfig
     INCOMING_SHOT_MIN_VELOCITY = 0.2
 
+    EVENT_BUFFER_SIZE = 100
+
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
@@ -46,194 +53,82 @@ class FullSystemStats:
         """
         self.friendly_colour_yellow = friendly_colour_yellow
 
-        # True if friendly had the last possession, False if enemy
-        # None if neither
-        self.last_possession_friendly: bool | None = None
+        self.events_file_path = os.path.join(
+            RuntimeManagerConstants.RUNTIME_EVENTS_DIRECTORY_PATH,
+            RuntimeManagerConstants.RUNTIME_EVENTS_FILE,
+        )
+        # initialized in setup()
+        self.events_file_handle = None
 
-        # use both trackers to keep track of shots on net
-        # take the min to avoid noise from the attacker tactic visualization
-        self.num_shots_on_net_attacker: int = 0
-        self.num_shots_on_net_goalie: int = 0
-
-        self.stats = FSStats()
-
-        # these should be set up using the setup method
-        self.stats_file = None
-        self.enemy_stats_file = None
-
-        # the python __del__ destructor isn't called reliably
-        # so printing this at the start instead
-        print(f"[bold red]Writing FS Stats to {self._get_stats_file()}")
+        self.event_queue = queue.Queue(self.EVENT_BUFFER_SIZE)
 
         self.tracker = (
-            TrackerBuilder(proto_unix_io=proto_unix_io)
-            .add_tracker(
-                ShotTracker, callback=self._update_shot_count, buffer_size=buffer_size
-            )
-            .add_tracker(
-                PossessionTracker,
-                callback=self._update_posession,
+            TrackerBuilder(
+                proto_unix_io=proto_unix_io,
+                from_team=(Team.YELLOW if self.friendly_colour_yellow else Team.BLUE),
+                event_queue=self.event_queue,
                 buffer_size=buffer_size,
             )
+            .add_tracker(ShotTracker)
+            .add_tracker(PossessionTracker)
             .add_tracker(
-                RefereeTracker,
-                callback=self._update_referee_info_friendly,
-                friendly_color_yellow=self.friendly_colour_yellow,
-                buffer_size=buffer_size,
+                RefereeTracker, friendly_color_yellow=self.friendly_colour_yellow
             )
-            .add_tracker(
-                GoalieTracker,
-                callback=self._update_goalie_shot_friendly,
-                for_friendly=True,
-                buffer_size=buffer_size,
-            )
+            .add_tracker(GoalieTracker, for_friendly=True)
         )
 
         self.record_enemy_stats = record_enemy_stats
         if self.record_enemy_stats:
-            self.enemy_stats = FSStats()
-            self.tracker = self.tracker.add_tracker(
-                RefereeTracker,
-                callback=self._update_referee_info_enemy,
-                friendly_color_yellow=(not self.friendly_colour_yellow),
-            ).add_tracker(
-                GoalieTracker,
-                callback=self._update_goalie_shot_enemy,
-                for_friendly=False,
-                buffer_size=buffer_size,
+            self.enemy_tracker = (
+                TrackerBuilder(
+                    proto_unix_io=proto_unix_io,
+                    from_team=(
+                        Team.YELLOW if self.friendly_colour_yellow else Team.BLUE
+                    ),
+                    for_team=(
+                        Team.BLUE if self.friendly_colour_yellow else Team.YELLOW
+                    ),
+                    event_queue=self.event_queue,
+                    buffer_size=buffer_size,
+                )
+                .add_tracker(
+                    RefereeTracker,
+                    friendly_color_yellow=(not self.friendly_colour_yellow),
+                )
+                .add_tracker(GoalieTracker, for_friendly=False)
             )
 
-            print(f"[bold red]Writing Enemy FS Stats to {self._get_enemy_stats_file()}")
-
     def refresh(self) -> None:
-        """Refreshes the stats for the game so far"""
+        """Refreshes the events for the game so far"""
         self.tracker.refresh()
-
-        self._flush_stats()
-
-    def _update_shot_count(self, _: Shot):
-        self.stats.num_shots_on_net += 1
-
-    def _update_posession(self, friendly_posession: bool | None):
-        self.last_possession_friendly = not friendly_posession
-
-    def _update_referee_info_friendly(
-        self, num_goals: int, num_yellow_cards: int, num_red_cards: int
-    ) -> None:
-        # the callback for tracking incoming shots can't differentiate between a blocked shot vs a goal
-        # so we subtract all "blocked" shots that were actually goals, so not blocked
-        if self.stats.num_scores < num_goals:
-            self.stats.num_enemy_shots_blocked -= 1
-
-        self.stats.num_scores = num_goals
-        self.stats.num_yellow_cards = num_yellow_cards
-        self.stats.num_red_cards = num_red_cards
-
-    def _update_referee_info_enemy(
-        self, num_goals: int, num_yellow_cards: int, num_red_cards: int
-    ) -> None:
-        # the callback for tracking incoming shots can't differentiate between a blocked shot vs a goal
-        # so we subtract all "blocked" shots that were actually goals, so not blocked
-        if self.enemy_stats.num_scores < num_goals:
-            self.enemy_stats.num_enemy_shots_blocked -= 1
-
-        self.enemy_stats.num_scores = num_goals
-        self.enemy_stats.num_yellow_cards = num_yellow_cards
-        self.enemy_stats.num_red_cards = num_red_cards
-
-    def _update_goalie_shot_friendly(
-        self, is_shot_incoming: bool, last_shot_incoming: bool
-    ) -> None:
-        if not is_shot_incoming and last_shot_incoming:
-            self.stats.num_enemy_shots_blocked += 1
-
-        if self.record_enemy_stats:
-            if is_shot_incoming and not last_shot_incoming:
-                self.enemy_stats.num_shots_on_net += 1
-
-    def _update_goalie_shot_enemy(
-        self, is_shot_incoming: bool, last_shot_incoming: bool
-    ) -> None:
-        if self.record_enemy_stats:
-            if not is_shot_incoming and last_shot_incoming:
-                self.enemy_stats.num_enemy_shots_blocked += 1
-
-    def _get_stats_file(self):
-        return os.path.join(
-            RuntimeManagerConstants.RUNTIME_STATS_DIRECTORY_PATH,
-            RuntimeManagerConstants.RUNTIME_ENEMY_STATS_FILE
-            if self.friendly_colour_yellow
-            else RuntimeManagerConstants.RUNTIME_FRIENDLY_STATS_FILE,
-        )
-
-    def _get_enemy_stats_file(self):
-        return os.path.join(
-            RuntimeManagerConstants.RUNTIME_STATS_DIRECTORY_PATH,
-            RuntimeManagerConstants.RUNTIME_FRIENDLY_FROM_ENEMY_STATS_FILE
-            if self.friendly_colour_yellow
-            else RuntimeManagerConstants.RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE,
-        )
 
     def setup(self):
         """Sets up the file resources for logging
         Creates any missing directories and stores the file handle
         """
-        stats_file_name = self._get_stats_file()
-
         # create temp stats directory if it doesn't exist
-        os.makedirs(os.path.dirname(stats_file_name), exist_ok=True)
+        os.makedirs(os.path.dirname(self.events_file_path), exist_ok=True)
 
-        self.stats_file = open(stats_file_name, "w")
-
-        if self.record_enemy_stats:
-            enemy_stats_file_name = self._get_enemy_stats_file()
-
-            # create temp stats directory if it doesn't exist
-            os.makedirs(os.path.dirname(enemy_stats_file_name), exist_ok=True)
-
-            self.enemy_stats_file = open(enemy_stats_file_name, "w")
+        self.events_file_handle = open(self.events_file_path, "a")
 
     def cleanup(self):
         """Writes all logs back to file, and cleans up any created file resources after logging"""
-        self._flush_stats()
+        if self.events_file_handle:
+            self.events_file_handle.flush()
+            self.events_file_handle.close()
 
-        if self.stats_file:
-            self.stats_file.flush()
-            self.stats_file.close()
-
-        if self.record_enemy_stats and self.enemy_stats_file:
-            self.enemy_stats_file.flush()
-            self.enemy_stats_file.close()
-
-    def _flush_stats(self):
-        """Write the current stats to disk"""
-        self._write_stats_to_file(self.stats, self.stats_file)
-
-        if self.record_enemy_stats:
-            self._write_stats_to_file(self.enemy_stats, self.enemy_stats_file)
-
-    def _write_stats_to_file(self, stats: FSStats, stats_file) -> None:
+    def _write_event_to_file(self, event: TrackedEvent) -> None:
         """Write the given stats to the given file
 
-        :param stats: the stats to write
-        :param stats_file: handle to the file to write to
+        :param event: the event to write
         """
-        if not stats_file:
+        if not self.events_file_handle:
             return
 
         try:
-            # formatted as key-value pairs in TOML
-            stats_to_write = (
-                f'{RuntimeManagerConstants.RUNTIME_STATS_SCORE_KEY} = "{stats.num_scores}"\n'
-                f'{RuntimeManagerConstants.RUNTIME_STATS_RED_CARDS_KEY} = "{stats.num_red_cards}"\n'
-                f'{RuntimeManagerConstants.RUNTIME_STATS_YELLOW_CARDS_KEY} = "{stats.num_yellow_cards}"\n'
-                f'{RuntimeManagerConstants.RUNTIME_STATS_SHOTS_ON_NET} = "{stats.num_shots_on_net}"\n'
-                f'{RuntimeManagerConstants.RUNTIME_STATS_SHOTS_BLOCKED} = "{stats.num_enemy_shots_blocked}"'
-            )
-
-            stats_file.seek(0)
-            stats_file.write(stats_to_write)
-            stats_file.truncate()
+            csv_row = event_to_csv_row(event=event)
+            self.events_file_handle.write(csv_row + "\n")
+            self.events_file_handle.flush()
 
         except (FileNotFoundError, PermissionError):
-            logging.warning("Failed to write TOML FS stats file")
+            logging.warning("Failed to write event to file")

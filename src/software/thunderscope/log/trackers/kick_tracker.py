@@ -3,11 +3,13 @@ from typing import Optional
 import software.python_bindings as tbots_cpp
 from proto.visualization_pb2 import AttackerVisualization
 from proto.import_all_protos import *
-from typing import Callable, Any, override
+from typing import override
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.log.trackers.tracker import Tracker
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.log.trackers.tracked_event import EventType
+from software.thunderscope.log.trackers.tracked_event import EventType, Team
+import queue
+
 
 class KickTracker(Tracker):
     """Base Class for tracking the attacker's kicks
@@ -36,22 +38,38 @@ class KickTracker(Tracker):
     MAX_KICK_ANGLE_DIFFERENCE = tbots_cpp.Angle.fromDegrees(5)
 
     def __init__(
-        self, proto_unix_io: ProtoUnixIO, out_file_path: str, buffer_size: int = 5
+        self,
+        proto_unix_io: ProtoUnixIO,
+        from_team: Team,
+        for_team: Team,
+        event_queue: queue.Queue,
+        **kwargs,
     ):
-        """Initialize the kick tracker
+        """Initializes the KickTracker
+
         :param proto_unix_io: the proto unix io to get the game state from
-        :param out_file_path: the file to write tracked events to               
-        :param buffer_size: buffer size for the tracker's io
+        :param from_team: the team that this tracker is tracking from (events are from this team)
+        :param for_team: the team that this tracker is tracking for (events are for this team)
+                          default is same as the from_team, but can be different
+        :param event_queue: the queue to write events to
         """
-        super().__init__(proto_unix_io, out_file_path, buffer_size)
-        
+        super().__init__(
+            proto_unix_io=proto_unix_io,
+            from_team=from_team,
+            for_team=for_team,
+            event_queue=event_queue,
+            **kwargs,
+        )
+
         self.latest_kick_angle: tbots_cpp.Angle = tbots_cpp.Angle()
         self.kick_taken = False
 
         self.attacker_vis_buffer = ThreadSafeBuffer(
             self.buffer_size, AttackerVisualization
         )
-        self.proto_unix_io.register_observer(AttackerVisualization, self.attacker_vis_buffer)
+        self.proto_unix_io.register_observer(
+            AttackerVisualization, self.attacker_vis_buffer
+        )
 
     def _get_new_kick_angle(
         self, origin: Point, target: Point, latest_angle: tbots_cpp.Angle
@@ -90,10 +108,10 @@ class KickTracker(Tracker):
         and the latest attacker visualization
         """
         super().refresh()
-        
+
         if self.cached_world is None:
             return
-        
+
         attacker_vis_msg = self.attacker_vis_buffer.get(block=False)
 
         if not attacker_vis_msg:
@@ -111,22 +129,36 @@ class PassTracker(KickTracker):
     """Tracker for tracking the attacker's passes"""
 
     def __init__(
-        self, proto_unix_io: ProtoUnixIO, out_file_path: str, buffer_size: int = 5
+        self,
+        proto_unix_io: ProtoUnixIO,
+        from_team: Team,
+        for_team: Team,
+        event_queue: queue.Queue,
+        **kwargs,
     ):
-        """Initialize the pass tracker
+        """Initializes the PassTracker
+
         :param proto_unix_io: the proto unix io to get the game state from
-        :param out_file_path: the file to write tracked events to               
-        :param buffer_size: buffer size for the tracker's io
+        :param from_team: the team that this tracker is tracking from (events are from this team)
+        :param for_team: the team that this tracker is tracking for (events are for this team)
+                          default is same as the from_team, but can be different
+        :param event_queue: the queue to write events to
         """
-        super().__init__(proto_unix_io, out_file_path, buffer_size)
-        
+        super().__init__(
+            proto_unix_io=proto_unix_io,
+            from_team=from_team,
+            for_team=for_team,
+            event_queue=event_queue,
+            **kwargs,
+        )
+
     @override
     def _refresh_kicks(
         self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
     ) -> None:
         """Refreshes the pass tracker with the new attacker visualization
         and the latest state of the world.
-        
+
         Logs any new pass events.
 
         :param attacker_vis_msg: the latest attacker visualization message
@@ -165,14 +197,28 @@ class ShotTracker(KickTracker):
     """Tracker for tracking the attacker's shots on goal"""
 
     def __init__(
-        self, proto_unix_io: ProtoUnixIO, out_file_path: str, buffer_size: int = 5
+        self,
+        proto_unix_io: ProtoUnixIO,
+        from_team: Team,
+        for_team: Team,
+        event_queue: queue.Queue,
+        **kwargs,
     ):
-        """Initialize the shot tracker
+        """Initializes the ShotTracker
+
         :param proto_unix_io: the proto unix io to get the game state from
-        :param out_file_path: the file to write tracked events to               
-        :param buffer_size: buffer size for the tracker's io
+        :param from_team: the team that this tracker is tracking from (events are from this team)
+        :param for_team: the team that this tracker is tracking for (events are for this team)
+                          default is same as the from_team, but can be different
+        :param event_queue: the queue to write events to
         """
-        super().__init__(proto_unix_io, out_file_path, buffer_size)
+        super().__init__(
+            proto_unix_io=proto_unix_io,
+            from_team=from_team,
+            for_team=for_team,
+            event_queue=event_queue,
+            **kwargs,
+        )
 
     @override
     def _refresh_kicks(
@@ -180,7 +226,7 @@ class ShotTracker(KickTracker):
     ) -> None:
         """Refreshes the shot tracker with the new attacker visualization
         and the latest state of the world.
-        
+
         Logs any new shot events.
 
         :param attacker_vis_msg: the latest attacker visualization message
