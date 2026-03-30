@@ -374,23 +374,7 @@ class Gamecontroller:
 
         :param referee: the referee protobuf message
         """
-        if referee.stage_time_left == self.last_stage_time_left:
-            if (
-                self.pause_start_timestamp
-                and (
-                    time_provider_instance.elapsed_time_ns()
-                    - self.pause_start_timestamp
-                )
-                * SECONDS_PER_NANOSECOND
-                >= self.NO_GAME_PROGRESS_DURATION_S
-            ):
-                logging.warning(f"Gamecontroller: Ending game early due unknown issue stopping game progress for {
-                    self.NO_GAME_PROGRESS_DURATION_S} seconds")
-                self.__handle_game_stage_change(Referee.Stage.NORMAL_SECOND_HALF)
-                self.pause_start_timestamp = None
-        else:
-            self.last_stage_time_left = referee.stage_time_left
-            self.pause_start_timestamp = time_provider_instance.elapsed_time_ns()
+        self.__handle_game_no_progress(referee)
 
         if referee.stage_time_left < 0:
             self.__handle_game_stage_change(referee.stage)
@@ -410,6 +394,34 @@ class Gamecontroller:
             self.__handle_placement_failed()
             self.processed_event_ids.add(placement_failed_events[0].id)
             self.processed_event_ids.add(placement_failed_events[1].id)
+
+    def __handle_game_no_progress(self, referee: Referee) -> None:
+        """Handle game stalling by ending early if there is no progress in game stage time for too long.
+
+        :param referee: the referee protobuf message
+        """
+        is_game_progressing = referee.stage_time_left != self.last_stage_time_left
+        self.last_stage_time_left = referee.stage_time_left
+
+        if is_game_progressing:
+            self.pause_start_timestamp = None
+            return
+
+        # First referee message after being paused
+        if self.pause_start_timestamp is None:
+            self.pause_start_timestamp = time_provider_instance.elapsed_time_ns()
+
+        pause_duration_s = (
+            time_provider_instance.elapsed_time_ns() - self.pause_start_timestamp
+        ) * SECONDS_PER_NANOSECOND
+
+        if pause_duration_s >= self.NO_GAME_PROGRESS_DURATION_S:
+            logging.warning(
+                f"Gamecontroller: Ending game early due unknown issue halting "
+                f"game progress for {self.NO_GAME_PROGRESS_DURATION_S} seconds"
+            )
+            self.__handle_game_stage_change(Referee.Stage.NORMAL_SECOND_HALF)
+            self.pause_start_timestamp = None
 
     def __handle_game_stage_change(self, game_stage: Referee.Stage) -> None:
         """Handle game stage change by advancing to the next half once first half is over
