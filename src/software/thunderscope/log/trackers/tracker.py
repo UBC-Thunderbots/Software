@@ -12,7 +12,7 @@ from software.thunderscope.log.trackers.tracked_event import (
 
 
 class Tracker:
-    """Generic tracker base class."""
+    """Generic tracker base class. Just tracks the world state."""
 
     def __init__(
         self,
