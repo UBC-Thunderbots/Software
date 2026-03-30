@@ -547,7 +547,7 @@ if __name__ == "__main__":
                 # call so we need to somehow close it before doing our resource cleanup
                 exiter_thread = threading.Thread(
                     target=exit_poller,
-                    args=(autoref, CI_DURATION_S, lambda: tscope.close()),
+                    args=(CI_DURATION_S, lambda: tscope.close()),
                     daemon=True,
                 )
 
