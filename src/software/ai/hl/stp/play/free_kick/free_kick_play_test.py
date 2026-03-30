@@ -1,18 +1,17 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.friendly_team_scored import *
-from software.simulated_tests.ball_moves_from_rest import *
-from software.simulated_tests.friendly_has_ball_possession import (
+from proto.import_all_protos import *
+from proto.play_pb2 import PlayName
+from proto.message_translation.tbots_protobuf import create_world_state
+from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.simulated_tests.validation.ball_enters_region import *
+from software.simulated_tests.validation.friendly_team_scored import *
+from software.simulated_tests.validation.ball_speed_threshold import *
+from software.simulated_tests.validation.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
-    pytest_main,
-)
 
 
 def setup_free_kick_play(
@@ -37,14 +36,9 @@ def setup_free_kick_play(
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
-    blue_play = Play()
-    blue_play.name = PlayName.FreeKickPlay
-
-    yellow_play = Play()
-    yellow_play.name = PlayName.HaltPlay
-
-    simulated_test_runner.set_play(blue_play, is_friendly=True)
-    simulated_test_runner.set_play(yellow_play, is_friendly=False)
+    simulated_test_runner.set_plays(
+        blue_play=PlayName.FreeKickPlay, yellow_play=PlayName.HaltPlay
+    )
 
 
 # Test 1: Direct Shot
@@ -190,11 +184,11 @@ def test_free_kick_play_abort_pass_and_retry(simulated_test_runner):
             [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])]
         ],
         inv_eventually_validation_sequence_set=[
-            [BallEventuallyMovesFromRest(position=ball_initial_pos)]
+            [BallSpeedEventuallyAtOrAboveThreshold(0.05)]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
-            [BallEventuallyMovesFromRest(position=ball_initial_pos)]
+            [BallSpeedEventuallyAtOrAboveThreshold(0.05)]
         ],
         test_timeout_s=25,
     )
@@ -239,11 +233,11 @@ def test_free_kick_play_chip_on_timeout(simulated_test_runner):
         params=[0],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
-            [BallEventuallyMovesFromRest(position=ball_initial_pos)]
+            [BallSpeedEventuallyAtOrAboveThreshold(0.05)]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
-            [BallEventuallyMovesFromRest(position=ball_initial_pos)]
+            [BallSpeedEventuallyAtOrAboveThreshold(0.05)]
         ],
         test_timeout_s=20,
     )
@@ -298,8 +292,8 @@ def test_free_kick_play_near_sideline(
         inv_eventually = [[FriendlyTeamEventuallyScored()]]
         ag_eventually = [[FriendlyTeamEventuallyScored()]]
     else:
-        inv_eventually = [[BallEventuallyMovesFromRest(position=ball_initial_pos)]]
-        ag_eventually = [[BallEventuallyMovesFromRest(position=ball_initial_pos)]]
+        inv_eventually = [[BallSpeedEventuallyAtOrAboveThreshold(0.05)]]
+        ag_eventually = [[BallSpeedEventuallyAtOrAboveThreshold(0.05)]]
 
     simulated_test_runner.run_test(
         setup=setup,

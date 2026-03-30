@@ -11,16 +11,6 @@ ShootOrPassPlay::ShootOrPassPlay(
 {
 }
 
-void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                     const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing
-    while (true)
-    {
-        yield({{}});
-    }
-}
-
 void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm.process_event(ShootOrPassPlayFSM::Update(control_params, play_update));

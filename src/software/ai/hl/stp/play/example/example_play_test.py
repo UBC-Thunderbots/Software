@@ -1,12 +1,12 @@
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_enters_region import (
+from software.simulated_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyExitsRegion,
     NumberOfRobotsEventuallyEntersRegion,
 )
-from software.simulated_tests.robot_speed_threshold import *
+from software.simulated_tests.validation.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -47,14 +47,9 @@ def test_example_play(simulated_test_runner):
             ),
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.ExamplePlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.HaltPlay
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.ExamplePlay, yellow_play=PlayName.HaltPlay
+        )
 
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
