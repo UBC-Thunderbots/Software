@@ -2,7 +2,7 @@
 #include <math.h>
 
 // Some platformio targets don't support STL, so we can't
-// use unordered_map, string, .... We guard all networking stuff with
+// use unordered_map, string, .... We guard all constants that need these types with
 #ifndef PLATFORMIO_BUILD
 #include <string>
 #include <unordered_map>
@@ -31,6 +31,10 @@ static const std::string REPLAY_FILE_EXTENSION      = "replay";
 static const std::string REPLAY_METADATA_DELIMITER  = ",";
 static const std::string REPLAY_FILE_VERSION_PREFIX = "version:";
 static const unsigned int REPLAY_FILE_VERSION       = 2;
+
+static const std::string PASS_FEATURE_DELIMITER = ",";
+static const std::string PASS_FEATURE_DIR       = "/tmp/tbots/ml";
+static const std::string PASS_FEATURE_FILE      = "pass_features.csv";
 
 #endif  // PLATFORMIO_BUILD
 
@@ -228,10 +232,6 @@ static const unsigned NUM_GENEVA_ANGLES = 5;
 constexpr double AUTO_CHIP_DISTANCE_DEFAULT_M     = 1.5;
 constexpr double AUTO_KICK_SPEED_DEFAULT_M_PER_S  = 1.5;
 constexpr double WHEEL_ROTATION_MAX_SPEED_M_PER_S = 15.2;
-
-static const std::string PASS_FEATURE_DELIMITER = ",";
-static const std::string PASS_FEATURE_DIR       = "/tmp/tbots/ml";
-static const std::string PASS_FEATURE_FILE      = "pass_features.csv";
 
 // how often to sample pass feature data, so once for every n passes considered
 static constexpr unsigned int PASS_SAMPLING_FREQUENCY = 10;
