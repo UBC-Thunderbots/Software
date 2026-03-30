@@ -97,3 +97,14 @@ message DebugShapes
     // Unique ID to a named shape
     repeated DebugShape debug_shapes = 1;
 }
+
+message PassFeatures
+{
+    Point passer_point        = 1;
+    Point receiver_point      = 2;
+    double pass_speed_m_per_s = 3;
+
+    World world_state = 4;
+
+    double score = 5;
+}
