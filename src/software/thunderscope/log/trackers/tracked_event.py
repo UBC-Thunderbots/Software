@@ -35,6 +35,7 @@ class BallState:
 
 @dataclass
 class RobotState:
+    id: int
     position: tuple[float, float]
     orientation: float
     velocity: tuple[float, float]
@@ -80,6 +81,7 @@ def get_robot_states_from_team(team: tbots_cpp.Team) -> list[RobotState]:
     """
     return [
         RobotState(
+            id=robot.id(),
             position=get_tuple_from_coords(robot.position()),
             orientation=robot.orientiation().toRadians(),
             velocity=get_tuple_from_coords(robot.velocity()),
@@ -128,12 +130,15 @@ def add_robot_state_to_row(row: list[Any], robot_states: list[RobotState]) -> No
     """
     num_cols_per_robot = RobotState.get_flattened_length()
 
-    # Add friendly robots: [count, r1_data, r2_data...]
+    # robot state columns will be added based on robot id
+    robot_state_map = {robot_state.id: robot_state for robot_state in robot_states}
+
+    # Add friendly robots: [r1_data, r2_data...] based on id
     for idx in range(DIV_B_NUM_ROBOTS):
-        if idx >= len(robot_states):
+        if idx not in robot_state_map:
             row.extend([None] * num_cols_per_robot)
         else:
-            robot = robot_states[idx]
+            robot = robot_state_map[idx]
             row.extend(
                 [
                     robot.position[0],
