@@ -11,3 +11,14 @@ py_library(
         "//software/thunderscope/log/trackers:tracker",
     ],
 )
+
+py_library(
+    name = "pass_results",
+    srcs = [
+        "pass_event.py",
+        "pass_results.py",
+    ],
+    deps = [
+        "//software/thunderscope/log/trackers:tracker",
+    ],
+)
