@@ -421,7 +421,3 @@ class PassResultsConstants:
     FRIENDLY_POSSESSION_SCORE = 2
     ENEMY_POSSESSION_SCORE = -FRIENDLY_POSSESSION_SCORE
     NEUTRAL_SCORE = 0
-
-    # the time intervals to log results for after each pass
-    # so after a pass, wait X seconds and then log game state
-    INTERVALS_S = [1, 5, 10]

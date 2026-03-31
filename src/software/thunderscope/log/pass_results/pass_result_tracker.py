@@ -50,8 +50,11 @@ class PassResultTracker(PassTracker):
 
         self.score = 0
 
+        self.intervals = [item.value for item in PassResultType]
+        self.interval_labels = [item.name for item in PassResultType]
+
         self.logged_passes_map: dict[int, list[LoggedPass]] = {
-            interval: [] for interval in PassResultsConstants.INTERVALS_S
+            interval: [] for interval in self.intervals
         }
 
     @override
@@ -149,12 +152,11 @@ class PassResultTracker(PassTracker):
         If so, log that pass result
         And move them to the next interval if exists
         """
-        pass_result_types = list(PassResultType)
 
-        for idx, interval in enumerate(PassResultsConstants.INTERVALS_S):
+        for idx, interval in enumerate(self.intervals):
             logged_passes = self.logged_passes_map[interval]
 
-            pass_result_type = pass_result_types[idx]
+            pass_result_type = self.interval_labels[idx]
 
             # passes are in the list in chronological order
             while self._log_if_over_interval(
@@ -162,7 +164,7 @@ class PassResultTracker(PassTracker):
             ):
                 logged_pass = logged_passes.pop(0)
 
-                if idx < len(PassResultsConstants.INTERVALS_S) - 1:
+                if idx < len(self.intervals) - 1:
                     self.logged_passes_map[
-                        PassResultsConstants.INTERVALS_S[idx + 1]
+                        self.intervals[idx + 1]
                     ].append(logged_pass)
