@@ -8,11 +8,10 @@ from proto.import_all_protos import *
 
 
 class PassEventType(StrEnum):
-    """Extension of the EventType enum for the new events we want for pass results"""
+    """Enum for the different types of pass result events we want to log"""
 
     RESULT_1S = auto()
     RESULT_5S = auto()
-    RESULT_10S = auto()
     RESULT_10S = auto()
 
 

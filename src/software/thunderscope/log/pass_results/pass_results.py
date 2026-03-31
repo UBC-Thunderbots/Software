@@ -43,15 +43,15 @@ class PassData:
         """
         self.friendly_colour_yellow = friendly_colour_yellow
 
-        # track new passes to this queue
-        self.pass_event_queue = queue.Queue(self.EVENT_BUFFER_SIZE)
+        # track pass results to this queuea
+        self.pass_result_queue = queue.Queue(self.EVENT_BUFFER_SIZE)
 
         self.pass_tracker = PassEventTracker(
             proto_unix_io=proto_unix_io,
             from_team=(
                 TeamEnum.YELLOW if self.friendly_colour_yellow else TeamEnum.BLUE
             ),
-            event_queue=self.pass_event_queue,
+            event_queue=self.pass_result_queue,
             buffer_size=buffer_size,
         )
 
@@ -82,12 +82,6 @@ class PassData:
             RefereeTracker,
             friendly_color_yellow=(not self.friendly_colour_yellow),
         )
-
-        self.curr_performance = 0
-
-        self.pass_events_map: dict[int, list[PassLog]] = {
-            interval: [] for interval in PassResultsConstants.INTERVALS_S
-        }
 
         self.events_file_path = os.path.join(
             PassResultsConstants.PASS_RESULTS_DIRECTORY_PATH,
@@ -127,8 +121,8 @@ class PassData:
         if not self.events_file_handle:
             return
 
-        self._check_queue(self.pass_event_queue, self._handle_pass_event)
         self._check_queue(self.performance_queue, self._handle_performance_event)
+        self._check_queue(self.pass_result_queue, self.self._log_pass_result)
 
     def _check_queue(queue: queue.Queue, callback: Callable[[Any], None]) -> None:
         while not queue.empty():
@@ -161,11 +155,7 @@ class PassData:
         elif event.event_type == EventType.ENEMY_POSSESSION_END:
             self.curr_performance -= PassResultsConstants.ENEMY_POSSESSION_SCORE
 
-    def _handle_pass_event(event: TrackedPassEvent) -> None:
-        if event.tracked_event.event_type == PassEventType.INITIAL:
-            self.pass_events_map[PassResultsConstants.INTERVALS_S[0]].append(event)
-        else:
-            self._log_pass_result(event)
+        self.pass_tracker.set_score(self.curr_performance)
 
     def _log_pass_result(event: TrackedPassEvent):
         if not self.events_file_handle:
@@ -178,25 +168,3 @@ class PassData:
 
         except (IOError, FileNotFoundError, PermissionError):
             logging.warning("Failed to write event to file")
-
-    def _update_pass_timestamps(self):
-        """For all currently logged passes, check if the interval they belong to has passed
-        If so, log that pass result
-        And move them to the next interval if exists
-        """
-        pass_event_types = list(map(str, EventType))
-
-        for idx, interval in enumerate(PassResultsConstants.INTERVALS_S):
-            pass_events = self.pass_events_map[interval]
-
-            pass_event_type = pass_event_types[idx]
-
-            while self.pass_tracker.log_if_over_interval(
-                pass_events[0], interval, pass_event_type
-            ):
-                pass_event = pass_events.pop(0)
-
-                if idx < len(PassResultsConstants.INTERVALS_S) - 1:
-                    self.pass_events_map[
-                        PassResultsConstants.INTERVALS_S[idx + 1]
-                    ].append(pass_event)
