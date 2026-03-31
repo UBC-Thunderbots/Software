@@ -173,7 +173,7 @@ std::optional<const Robot> getClosestReceiverToPass(const Team& friendly_team,
  * @param passing_config The passing config used for tuning
  * @return A Timestamp indicating the earliest receive time
  */
-Timestamp getEarliestReceiveTime(const Robot* best_receiver, const Pass& pass,
+Timestamp getEarliestReceiveTime(const Robot& best_receiver, const Pass& pass,
                                  const TbotsProto::PassingConfig& passing_config);
 
 /**
@@ -184,7 +184,7 @@ Timestamp getEarliestReceiveTime(const Robot* best_receiver, const Pass& pass,
  * @param pass the pass to find the receive timestamp for
  * @return A Timestamp indicating the earliest time to that orientation
  */
-Timestamp getEarliestTimeToAngle(const Robot* best_receiver, const Pass& pass);
+Timestamp getEarliestTimeToAngle(const Robot& best_receiver, const Pass& pass);
 
 /**
  * Calculate the probability of a friendly robot receiving the given pass
