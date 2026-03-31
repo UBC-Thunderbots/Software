@@ -6,14 +6,19 @@ from software.thunderscope.log.trackers.tracked_event import (
     Team,
 )
 from dataclasses import dataclass
-from enum import auto, StrEnum
+from enum import IntEnum
 from proto.import_all_protos import *
 
 
-class PassResultType(StrEnum):
+class PassResultType(IntEnum):
     """Enum for the different types of pass results we want to log"""
 
-    RESULT_PRE = auto()
+    RESULT_1S = 1
+    RESULT_5S = 5
+    RESULT_10S = 10
+    RESULT_20S = 20
+    RESULT_30S = 30
+    RESULT_PRE = 0
 
 
 @dataclass

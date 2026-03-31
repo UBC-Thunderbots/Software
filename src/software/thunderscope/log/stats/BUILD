@@ -14,5 +14,6 @@ py_library(
     deps = [
         ":fullsystem_stats",
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope/log/pass_results",
     ],
 )
