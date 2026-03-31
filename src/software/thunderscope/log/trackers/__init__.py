@@ -15,5 +15,4 @@ __all__ = [
     "GoalieTracker",
     "TrackedEvent",
     "EventType",
-    "csv_row_to_event",
 ]
