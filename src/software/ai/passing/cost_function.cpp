@@ -176,14 +176,12 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     Point closest_interception_point = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
 
-    double enemy_robot_time_to_interception_point =
-        getEnemyTimeToInterceptPoint(enemy_robot, pass, closest_interception_point)
-            .toSeconds();
+    double time_to_intercept_s =
+        getEnemyTimeToInterceptPoint(enemy_robot, closest_interception_point).toSeconds();
 
     // Scale the time to interception point by the enemy robot's interception capability
-    Duration enemy_robot_time_to_interception_point =
-        Duration::fromSeconds(enemy_robot_time_to_interception_point_sec *
-                              passing_config.enemy_interception_time_multiplier());
+    Duration scaled_time_to_intercept = Duration::fromSeconds(
+        time_to_intercept_s * passing_config.enemy_interception_time_multiplier());
 
     // TODO (#2988): We should generate a more realistic ball trajectory
     Duration ball_time_to_interception_point =
@@ -192,7 +190,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
         Duration::fromSeconds(passing_config.pass_delay_sec());
 
     Duration interception_delta_time =
-        ball_time_to_interception_point - enemy_robot_time_to_interception_point;
+        ball_time_to_interception_point - scaled_time_to_intercept;
 
     // Whether or not the enemy will be able to intercept the pass can be determined
     // by whether or not they will be able to reach the pass receive position before
@@ -232,7 +230,7 @@ Duration getBallTravelTime(const Pass& pass,
            Duration::fromSeconds(passing_config.pass_delay_sec());
 }
 
-Timestamp getEarliestReceiveTime(const Robot* best_receiver, const Pass& pass,
+Timestamp getEarliestReceiveTime(const Robot& best_receiver, const Pass& pass,
                                  const TbotsProto::PassingConfig& passing_config)
 {
     Duration min_robot_travel_time =
@@ -243,7 +241,7 @@ Timestamp getEarliestReceiveTime(const Robot* best_receiver, const Pass& pass,
     return earliest_time_to_receive_point;
 }
 
-Timestamp getEarliestTimeToAngle(const Robot* best_receiver, const Pass& pass)
+Timestamp getEarliestTimeToAngle(const Robot& best_receiver, const Pass& pass)
 {
     Angle receive_angle = (pass.passerPoint() - best_receiver->position()).orientation();
     Duration time_to_receive_angle = best_receiver->getTimeToOrientation(receive_angle);

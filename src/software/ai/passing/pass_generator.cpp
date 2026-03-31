@@ -168,7 +168,7 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
                 }
 
                 num_passes_since_sample_ =
-                    num_passes_since_sample_++ % PASS_SAMPLING_FREQUENCY;
+                    (num_passes_since_sample_ + 1) % PASS_SAMPLING_FREQUENCY;
             }
 
             if (score > best_pass_for_robot.rating)
