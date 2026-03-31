@@ -16,8 +16,8 @@ py_library(
     name = "pass_results",
     srcs = [
         "pass_event.py",
+        "pass_result_tracker.py",
         "pass_results.py",
-        "pass_result_tracker.py"
     ],
     deps = [
         "//software/thunderscope/log/trackers:tracker",

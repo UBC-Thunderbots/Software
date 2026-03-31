@@ -13,7 +13,7 @@ py_library(
     srcs = ["stats.py"],
     deps = [
         ":fullsystem_stats",
-        "//software/thunderscope/log/pass_results:pass_results",
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope/log/pass_results",
     ],
 )

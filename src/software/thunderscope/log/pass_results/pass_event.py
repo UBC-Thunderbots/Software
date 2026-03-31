@@ -6,7 +6,7 @@ from software.thunderscope.log.trackers.tracked_event import (
     Team,
 )
 from dataclasses import dataclass
-from enum import auto, IntEnum
+from enum import IntEnum
 from proto.import_all_protos import *
 
 

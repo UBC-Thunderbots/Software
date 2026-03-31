@@ -152,7 +152,6 @@ class PassResultTracker(PassTracker):
         If so, log that pass result
         And move them to the next interval if exists
         """
-
         for idx, interval in enumerate(self.intervals):
             logged_passes = self.logged_passes_map[interval]
 
@@ -165,6 +164,4 @@ class PassResultTracker(PassTracker):
                 logged_pass = logged_passes.pop(0)
 
                 if idx < len(self.intervals) - 1:
-                    self.logged_passes_map[
-                        self.intervals[idx + 1]
-                    ].append(logged_pass)
+                    self.logged_passes_map[self.intervals[idx + 1]].append(logged_pass)
