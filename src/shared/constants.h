@@ -106,6 +106,8 @@ static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
 static const double STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M = 0.5;
 // The maximum speed attainable by enemy robots
 static const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
+// The speed at which enemy robots can intercept a moving ball
+static const double ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND = 0.5;
 // The maximum acceleration achievable by enemy robots, in metres per seconds squared.
 static const double ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4.0;
 
