@@ -7,8 +7,8 @@ from enum import auto, StrEnum
 from proto.import_all_protos import *
 
 
-class PassEventType(StrEnum):
-    """Enum for the different types of pass result events we want to log"""
+class PassResultType(StrEnum):
+    """Enum for the different types of pass results we want to log"""
 
     RESULT_1S = auto()
     RESULT_5S = auto()
@@ -16,24 +16,29 @@ class PassEventType(StrEnum):
 
 
 @dataclass
-class TrackedPassEvent:
-    tracked_event: TrackedEvent
-    pass_event_type: PassEventType
+class TrackedPassResult:
+    """Class representing a Pass we are tracking
+    Contains the pass event itself within the nested TrackedEvent
+    along with information about the pass itself and its score
+    """
+
+    pass_event: TrackedEvent
+    pass_result_type: PassResultType
     pass_: Pass
     score: float
 
 
-def event_to_csv_row(pass_event: TrackedPassEvent) -> str:
-    base_csv_str = base_event_to_csv_row(pass_event.tracked_event)
+def result_to_csv_row(pass_result: TrackedPassResult) -> str:
+    base_csv_str = base_event_to_csv_row(pass_result.pass_event)
 
     pass_row = [
-        pass_event.pass_event_type,
-        pass_event.pass_.passer_point.x_meters,
-        pass_event.pass_.passer_point.y_meters,
-        pass_event.pass_.receiver_point.x_meters,
-        pass_event.pass_.receiver_point.y_meters,
-        pass_event.pass_.pass_speed_m_per_s,
-        pass_event.score,
+        pass_result.pass_result_type,
+        pass_result.pass_.passer_point.x_meters,
+        pass_result.pass_.passer_point.y_meters,
+        pass_result.pass_.receiver_point.x_meters,
+        pass_result.pass_.receiver_point.y_meters,
+        pass_result.pass_.pass_speed_m_per_s,
+        pass_result.score,
     ]
 
     return ",".join([str(elem) for elem in pass_row]) + "," + base_csv_str

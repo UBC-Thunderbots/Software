@@ -12,19 +12,19 @@ from software.thunderscope.log.trackers.tracked_event import (
     EventType,
     TrackedEvent,
 )
-from software.thunderscope.log.pass_results.pass_event_tracker import (
-    PassEventTracker,
-    event_to_csv_row,
+from software.thunderscope.log.pass_results.pass_result_tracker import PassResultTracker
+from software.thunderscope.log.pass_results.pass_event import (
+    result_to_csv_row,
+    TrackedPassResult,
 )
 from typing import Callable, Any
 import queue
 
 
 class PassData:
-    """Class to track pass data:
+    """Class to track pass results.
 
-    1. Considered passes that we sampled and their scores
-    2. Game results for actually taken passes after specific intervals
+    i.e Game results for actually taken passes after specific intervals
     """
 
     EVENT_BUFFER_SIZE = 100
@@ -43,10 +43,10 @@ class PassData:
         """
         self.friendly_colour_yellow = friendly_colour_yellow
 
-        # track pass results to this queuea
+        # track pass results to this queue
         self.pass_result_queue = queue.Queue(self.EVENT_BUFFER_SIZE)
 
-        self.pass_tracker = PassEventTracker(
+        self.pass_tracker = PassResultTracker(
             proto_unix_io=proto_unix_io,
             from_team=(
                 TeamEnum.YELLOW if self.friendly_colour_yellow else TeamEnum.BLUE
@@ -89,7 +89,12 @@ class PassData:
         )
         self.events_file_handle = None
 
-    def _get_team(is_friendly: bool) -> TeamEnum:
+    def _get_team(self, is_friendly: bool) -> TeamEnum:
+        """Gets the correct Team enum value for either the current friendly or enemy team
+
+        :param is_friendly: whether to return the team for friendly or enemy
+        :return: the corresponding Team Enum value
+        """
         return (
             TeamEnum.YELLOW
             if (self.friendly_colour_yellow == is_friendly)
@@ -97,16 +102,14 @@ class PassData:
         )
 
     def setup(self):
-        """Creates the relevant directories and a csv file for each of the
-        intervals in INTERVALS
-        """
+        """Creates any missing directories and opens an append file handle"""
         # create temp stats directory if it doesn't exist
         os.makedirs(os.path.dirname(self.events_file_path), exist_ok=True)
 
         self.events_file_handle = open(self.events_file_path, "a")
 
     def cleanup(self):
-        """Flushes content and closes all the files for all intervals"""
+        """Flushes content and closes the log file"""
         if self.events_file_handle:
             self.events_file_handle.flush()
             self.events_file_handle.close()
@@ -122,19 +125,31 @@ class PassData:
             return
 
         self._check_queue(self.performance_queue, self._handle_performance_event)
-        self._check_queue(self.pass_result_queue, self.self._log_pass_result)
+        self._check_queue(self.pass_result_queue, self._log_pass_result)
 
-    def _check_queue(queue: queue.Queue, callback: Callable[[Any], None]) -> None:
-        while not queue.empty():
+    def _check_queue(
+        self, queue_to_check: queue.Queue, callback: Callable[[Any], None]
+    ) -> None:
+        """Checks the given queue if it has elements, and if so
+        calls the callback with the element until the queue is empty
+
+        :param queue_to_check: the queue to check for elements
+        :param callback: the function to call with the queue elements
+        """
+        while not queue_to_check.empty():
             try:
                 # Get item without blocking
-                event = queue.get_nowait()
+                event = queue_to_check.get_nowait()
 
-                self.callback(event)
+                callback(event)
             except queue.Empty:
                 return
 
-    def _handle_performance_event(event: TrackedEvent) -> None:
+    def _handle_performance_event(self, event: TrackedEvent) -> None:
+        """Updates the current game performance score based on a new performance-related event
+
+        :param event: an event that updates game performance
+        """
         from_friendly = event.from_team == self._get_team(True)
 
         if event.event_type == EventType.GOAL_SCORED:
@@ -157,14 +172,18 @@ class PassData:
 
         self.pass_tracker.set_score(self.curr_performance)
 
-    def _log_pass_result(event: TrackedPassEvent):
+    def _log_pass_result(self, result: TrackedPassResult):
+        """Logs a single pass result to file
+
+        :param result: the result to log
+        """
         if not self.events_file_handle:
             return
 
         try:
-            csv_row = event_to_csv_row(event=event)
+            csv_row = result_to_csv_row(pass_result=result)
             self.events_file_handle.write(csv_row + "\n")
             self.events_file_handle.flush()
 
         except (IOError, FileNotFoundError, PermissionError):
-            logging.warning("Failed to write event to file")
+            pass
