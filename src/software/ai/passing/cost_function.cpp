@@ -144,8 +144,8 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double getEnemyTimeToInterceptPoint(const Robot& enemy_robot, const Pass& pass,
-                                    const Point& interception_point)
+Duration getEnemyTimeToInterceptPoint(const Robot& enemy_robot,
+                                      const Point& interception_point)
 {
     Vector enemy_interception_vector = interception_point - enemy_robot.position();
     // Take into account the enemy robot's radius for minimum min_interception_distance
@@ -153,15 +153,13 @@ double getEnemyTimeToInterceptPoint(const Robot& enemy_robot, const Pass& pass,
     double min_interception_distance =
         std::max(0.0, enemy_interception_vector.length() - ROBOT_MAX_RADIUS_METERS);
 
-    const double ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND = 0.5;
     double signed_1d_enemy_vel =
         enemy_robot.velocity().dot(enemy_interception_vector.normalize());
 
     return getTimeToTravelDistance(
-               min_interception_distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-               ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-               signed_1d_enemy_vel, ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND)
-        .toSeconds();
+        min_interception_distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, signed_1d_enemy_vel,
+        ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND);
 }
 
 double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
@@ -178,8 +176,9 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     Point closest_interception_point = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
 
-    double enemy_robot_time_to_interception_point_sec =
-        getEnemyTimeToInterceptPoint(enemy_robot, pass, closest_interception_point);
+    double enemy_robot_time_to_interception_point =
+        getEnemyTimeToInterceptPoint(enemy_robot, pass, closest_interception_point)
+            .toSeconds();
 
     // Scale the time to interception point by the enemy robot's interception capability
     Duration enemy_robot_time_to_interception_point =
@@ -203,20 +202,21 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
                       0.0, 1.0);
 }
 
-const Robot* getClosestReceiverToPass(const Team& friendly_team, const Pass& pass)
+std::optional<const Robot> getClosestReceiverToPass(const Team& friendly_team,
+                                                    const Pass& pass)
 {
     if (friendly_team.getAllRobots().empty())
-        return nullptr;
+        return std::nullopt;
 
-    const Robot* best_receiver = nullptr;
-    double curr_best_distance  = std::numeric_limits<double>::max();
+    auto best_receiver        = friendly_team.getAllRobots().at(0);
+    double curr_best_distance = std::numeric_limits<double>::max();
 
     for (const Robot& robot : friendly_team.getAllRobots())
     {
         double distance = (robot.position() - pass.receiverPoint()).length();
         if (distance < curr_best_distance)
         {
-            best_receiver      = &robot;
+            best_receiver      = robot;
             curr_best_distance = distance;
         }
     }
@@ -266,10 +266,17 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
     }
 
     // Get the robot that is closest to where the pass would be received
-    const Robot* best_receiver = getClosestReceiverToPass(friendly_team, pass);
+    auto best_receiver_opt = getClosestReceiverToPass(friendly_team, pass);
+
+    if (!best_receiver_opt.has_value())
+    {
+        return 0;
+    }
+
+    const Robot& best_receiver = best_receiver_opt.value();
 
     Duration ball_travel_time = getBallTravelTime(pass, passing_config);
-    Timestamp receive_time    = best_receiver->timestamp() + ball_travel_time;
+    Timestamp receive_time    = best_receiver.timestamp() + ball_travel_time;
 
     // Figure out what time the robot would have to receive the ball at
     // and how long it would take our robot to get there

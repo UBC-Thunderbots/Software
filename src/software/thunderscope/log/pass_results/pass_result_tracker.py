@@ -3,7 +3,7 @@ from software.thunderscope.log.pass_results.pass_event import (
     PassResultType,
     TrackedPassResult,
 )
-from software.thunderscope.log.trackers.pass_event import (
+from software.thunderscope.log.trackers.tracked_event import (
     EventType,
     Team,
     get_event_from_world,
@@ -50,7 +50,7 @@ class PassResultTracker(PassTracker):
 
         self.score = 0
 
-        self.logged_passes_map: dict[int, list[NewPass]] = {
+        self.logged_passes_map: dict[int, list[LoggedPass]] = {
             interval: [] for interval in PassResultsConstants.INTERVALS_S
         }
 

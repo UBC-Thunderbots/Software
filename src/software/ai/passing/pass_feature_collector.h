@@ -4,10 +4,6 @@
 #include "pass.h"
 #include "software/world/world.h"
 
-//
-// Created by thunderbots on 2/9/26.
-//
-
 /*
  * This class is responsible for collecting the features and the results
  * for each pass considered by the Pass Generator
@@ -75,7 +71,7 @@ class PassFeatureCollector
      * @param passing_config the static config for passes, to compare against for scoring
      */
     void logPassFeatures(const Pass& pass, const World& world,
-                         TbotsProto::PassingConfig passing_config);
+                         const TbotsProto::PassingConfig& passing_config);
 
    private:
     /**

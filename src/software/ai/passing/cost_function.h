@@ -121,14 +121,13 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
  * Calculates the time taken by an enemy to get to a specific intercept point
  *
  * @param enemy_robot The robot that might intercept our pass
- * @param pass The pass we want to get the intercept probability for
  * @param interception_point The point on the pass's path that the enemy is trying to
  *                           intercept the ball at
- * @return A value in seconds, which is the time taken by the enemy to get to the
+ * @return A Duration value, which is the time taken by the enemy to get to the
  * interception point
  */
-double getEnemyTimeToInterceptPoint(const Robot& enemy_robot, const Pass& pass,
-                                    const Point& interception_point);
+Duration getEnemyTimeToInterceptPoint(const Robot& enemy_robot,
+                                      const Point& interception_point);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted by a given robot
@@ -144,14 +143,47 @@ double getEnemyTimeToInterceptPoint(const Robot& enemy_robot, const Pass& pass,
 double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
                               const TbotsProto::PassingConfig& passing_config);
 
+/**
+ * Calculates the time it takes for the ball to travel the length of the given pass
+ *
+ * @param pass the pass to calculate travel time for
+ * @param passing_config The passing config used for tuning
+ * @return A Duration value, which is the travel time
+ */
 Duration getBallTravelTime(const Pass& pass,
                            const TbotsProto::PassingConfig& passing_config);
 
-const Robot* getClosestReceiverToPass(const Team& friendly_team, const Pass& pass);
+/**
+ * From the given team of robots, gets the closest receiver for the given pass
+ * i.e the robot closest to the receive point of the pass
+ *
+ * @param friendly_team the team of robots
+ * @param pass the pass to find the best receiver for
+ * @return A robot, or nullopt if no robot is found
+ */
+std::optional<const Robot> getClosestReceiverToPass(const Team& friendly_team,
+                                                    const Pass& pass);
 
+/**
+ * Gets the timestamp of the earliest time the given receiver can receive the pass
+ * i.e make it to the pass's receive point
+ *
+ * @param best_receiver the best receiver robot for this pass
+ * @param pass the pass to find the receive timestamp for
+ * @param passing_config The passing config used for tuning
+ * @return A Timestamp indicating the earliest receive time
+ */
 Timestamp getEarliestReceiveTime(const Robot* best_receiver, const Pass& pass,
                                  const TbotsProto::PassingConfig& passing_config);
 
+/**
+ * Gets the timestamp of the earliest time the given receiver can turn to the right
+ * orientation to receive the pass
+ *
+ * @param best_receiver the best receiver robot for this pass
+ * @param pass the pass to find the receive timestamp for
+ * @return A Timestamp indicating the earliest time to that orientation
+ */
 Timestamp getEarliestTimeToAngle(const Robot* best_receiver, const Pass& pass);
 
 /**
@@ -171,6 +203,15 @@ Timestamp getEarliestTimeToAngle(const Robot* best_receiver, const Pass& pass);
 double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
                                   const TbotsProto::PassingConfig& passing_config);
 
+/**
+ * Gets a smaller field according to the passing config
+ * to indicate the boundaries of where we'd ideally want our passes to be
+ *
+ * @param field The field object to shrink
+ * @param passing_config The passing config used for tuning
+ *
+ * @return A Rectangle representing the smaller field
+ */
 Rectangle getReducedField(const Field& field, TbotsProto::PassingConfig passing_config);
 
 /**

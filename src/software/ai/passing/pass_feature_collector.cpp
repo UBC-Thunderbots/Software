@@ -13,8 +13,8 @@
 
 PassFeatureCollector::PassFeatureCollector() {}
 
-void PassFeatureCollector::logPassFeatures(const Pass& pass, const World& world,
-                                           TbotsProto::PassingConfig passing_config)
+void PassFeatureCollector::logPassFeatures(
+    const Pass& pass, const World& world, const TbotsProto::PassingConfig& passing_config)
 {
     double score = getPassScore(pass, world, passing_config);
 
@@ -28,7 +28,7 @@ double PassFeatureCollector::getEnemyInterceptTimeDelta(
     Point closest_interception_point = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
 
-    double enemy_robot_time_to_interception_point_sec =
+    double time_to_interception_s =
         getEnemyTimeToInterceptPoint(enemy_robot, pass, closest_interception_point);
 
     Duration ball_time_to_interception_point =
@@ -36,8 +36,7 @@ double PassFeatureCollector::getEnemyInterceptTimeDelta(
                               pass.speed()) +
         Duration::fromSeconds(passing_config.pass_delay_sec());
 
-    return enemy_robot_time_to_interception_point_sec -
-           ball_time_to_interception_point.toSeconds();
+    return time_to_interception_s - ball_time_to_interception_point.toSeconds();
 }
 
 double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
@@ -53,7 +52,7 @@ double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
     if (world.friendlyTeam().getAllRobots().size() <= 0)
         return DEFINITELY_BAD_SCORE;
 
-    const auto field = world.field();
+    const Field& field = world.field();
 
     // in_enemy_defense_area_quality -> if pass receive point is in the enemy defense area
     // (illegal)
@@ -62,12 +61,11 @@ double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
 
     // on_field_quality -> Make a slightly smaller field, and check
     // if pass receive point not in the reduced field boundaries
-    if (const auto reduced_size_field = getReducedField(field, passing_config);
-        !contains(reduced_size_field, pass.receiverPoint()))
+    if (!contains(getReducedField(field, passing_config), pass.receiverPoint()))
         score += BAD_SCORE;
 
     // how well the receiver can receive the ball
-    auto friendlyReceiveCapabilitySigmoid =
+    double friendlyReceiveCapabilitySigmoid =
         ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
     // robot arrives / turns too late
@@ -79,7 +77,7 @@ double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
     // how well any enemy can intercept the ball
     for (const auto& robot : world.enemyTeam().getAllRobots())
     {
-        auto intercept_time_delta =
+        double intercept_time_delta =
             getEnemyInterceptTimeDelta(robot, pass, passing_config);
 
         // if any enemy can intercept successfully
@@ -90,7 +88,7 @@ double PassFeatureCollector::getPassScore(const Pass& pass, const World& world,
             score += SLIGHTLY_BAD_SCORE;
     }
 
-    auto passForwardSigmoid = ratePassForwardQuality(pass, passing_config);
+    double passForwardSigmoid = ratePassForwardQuality(pass, passing_config);
     if (passForwardSigmoid < BAD_SIGMOID_SCORE)
         score += BAD_SCORE;
 
