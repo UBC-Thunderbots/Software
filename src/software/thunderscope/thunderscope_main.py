@@ -486,12 +486,6 @@ if __name__ == "__main__":
             )
             if args.enable_autoref
             else contextlib.nullcontext()
-<<<<<<< HEAD
-        ) as autoref, Stats(
-            proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-            record_enemy_stats=True,
-        ) as blue_stats:
-=======
         ) as autoref, (
             Stats(
                 proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
@@ -504,29 +498,20 @@ if __name__ == "__main__":
             if args.record_stats
             else contextlib.nullcontext()
         ) as yellow_stats:
->>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
 
             blue_fs.setup_proto_unix_io(tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE])
-<<<<<<< HEAD
-            tscope.register_refresh_function(blue_stats.refresh)
-=======
->>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
 
             yellow_fs.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
-<<<<<<< HEAD
-            # no yellow stats for now
-=======
 
             if args.record_stats:
                 tscope.register_refresh_function(blue_stats.refresh)
                 tscope.register_refresh_function(yellow_stats.refresh)
 
->>>>>>> 2d65fc71c3016c5d9626754a7d5e5b30ab3395ae
             simulator.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],

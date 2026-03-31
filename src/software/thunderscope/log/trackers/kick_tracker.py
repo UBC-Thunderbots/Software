@@ -152,6 +152,8 @@ class PassTracker(KickTracker):
             **kwargs,
         )
 
+        self.curr_pass = None
+
     @override
     def _refresh_kicks(
         self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
@@ -179,6 +181,7 @@ class PassTracker(KickTracker):
             if new_pass_angle is not None:
                 self.latest_kick_angle = new_pass_angle
                 self.kick_taken = False
+                self.curr_pass = attacker_vis_msg.pass_
 
         ball = world.ball()
 
@@ -188,9 +191,10 @@ class PassTracker(KickTracker):
             self.MIN_SHOT_SPEED,
             self.MAX_KICK_ANGLE_DIFFERENCE,
         ):
-            self.kick_taken = True
-
             self.write_event(event_type=EventType.PASS)
+
+            self.kick_taken = True
+            self.curr_pass = None
 
 
 class ShotTracker(KickTracker):
