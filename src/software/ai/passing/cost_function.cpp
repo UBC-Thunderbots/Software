@@ -234,18 +234,18 @@ Timestamp getEarliestReceiveTime(const Robot& best_receiver, const Pass& pass,
                                  const TbotsProto::PassingConfig& passing_config)
 {
     Duration min_robot_travel_time =
-        best_receiver->getTimeToPosition(pass.receiverPoint());
+        best_receiver.getTimeToPosition(pass.receiverPoint());
     Timestamp earliest_time_to_receive_point =
-        best_receiver->timestamp() + min_robot_travel_time;
+        best_receiver.timestamp() + min_robot_travel_time;
 
     return earliest_time_to_receive_point;
 }
 
 Timestamp getEarliestTimeToAngle(const Robot& best_receiver, const Pass& pass)
 {
-    Angle receive_angle = (pass.passerPoint() - best_receiver->position()).orientation();
-    Duration time_to_receive_angle = best_receiver->getTimeToOrientation(receive_angle);
-    return best_receiver->timestamp() + time_to_receive_angle;
+    Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
+    Duration time_to_receive_angle = best_receiver.getTimeToOrientation(receive_angle);
+    return best_receiver.timestamp() + time_to_receive_angle;
 }
 
 double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
