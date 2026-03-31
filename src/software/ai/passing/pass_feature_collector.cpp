@@ -29,7 +29,7 @@ double PassFeatureCollector::getEnemyInterceptTimeDelta(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
 
     double time_to_interception_s =
-        getEnemyTimeToInterceptPoint(enemy_robot, pass, closest_interception_point);
+        getEnemyTimeToInterceptPoint(enemy_robot, closest_interception_point);
 
     Duration ball_time_to_interception_point =
         Duration::fromSeconds(distance(pass.passerPoint(), closest_interception_point) /
