@@ -11,16 +11,6 @@ CreaseDefensePlay::CreaseDefensePlay(
 {
 }
 
-void CreaseDefensePlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                       const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing
-    while (true)
-    {
-        yield({{}});
-    }
-}
-
 void CreaseDefensePlay::updateControlParams(
     const Point &enemy_threat_origin,
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)

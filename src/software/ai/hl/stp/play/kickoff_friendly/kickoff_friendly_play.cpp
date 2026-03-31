@@ -11,12 +11,6 @@ KickoffFriendlyPlay::KickoffFriendlyPlay(
 {
 }
 
-void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                         const WorldPtr &world_ptr)
-{
-    // Does not get called.
-}
-
 void KickoffFriendlyPlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm.process_event(KickoffFriendlyPlayFSM::Update(control_params, play_update));
