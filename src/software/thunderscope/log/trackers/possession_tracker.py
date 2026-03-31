@@ -83,17 +83,17 @@ class PossessionTracker(Tracker):
         if new_possession == self.curr_possession:
             return
 
-        event_type = None
-        if new_possession:
-            event_type = EventType.FRIENDLY_POSSESSION_START
-        elif self.curr_possession:
-            event_type = EventType.FRIENDLY_POSSESSION_END
-        elif new_possession == False:
-            event_type = EventType.ENEMY_POSSESSION_START
-        else:
-            event_type = EventType.ENEMY_POSSESSION_END
+        # mark the end of the last possession since it has changed
+        if self.curr_possession:
+            self.write_event(event_type=EventType.FRIENDLY_POSSESSION_END)
+        elif self.curr_possession == False:
+            self.write_event(event_type=EventType.ENEMY_POSSESSION_END)
 
-        self.write_event(event_type=event_type)
+        # log the start of the new, changed possession
+        if new_possession:
+            self.write_event(event_type=EventType.FRIENDLY_POSSESSION_START)
+        elif new_possession == False:
+            self.write_event(event_type=EventType.ENEMY_POSSESSION_START)
 
         self.curr_possession = new_possession
 
