@@ -11,7 +11,7 @@ from google.protobuf.internal import api_implementation
 from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )
-from software.thunderscope.log.stats.stats import Stats
+from software.evaluation.stats.stats import Stats
 
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (

@@ -1,4 +1,4 @@
-from software.thunderscope.log.stats.fullsystem_stats import FullSystemStats
+from software.evaluation.stats.fullsystem_stats import FullSystemStats
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.import_all_protos import *
 

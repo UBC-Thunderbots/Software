@@ -1,6 +1,6 @@
 import os
 
-from software.thunderscope.log.trackers import (
+from software.evaluation.trackers import (
     PossessionTracker,
     ShotTracker,
     TrackerBuilder,
@@ -10,7 +10,7 @@ from software.thunderscope.log.trackers import (
 from dataclasses import dataclass
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import RuntimeManagerConstants
-from software.thunderscope.log.trackers.tracked_event import (
+from software.evaluation.trackers.tracked_event import (
     Team as TeamEnum,
     TrackedEvent,
     event_to_csv_row,

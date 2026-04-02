@@ -5,9 +5,9 @@ from proto.visualization_pb2 import AttackerVisualization
 from proto.import_all_protos import *
 from typing import override
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.log.trackers.tracker import Tracker
+from software.evaluation.trackers.tracker import Tracker
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.log.trackers.tracked_event import EventType, Team
+from software.evaluation.trackers.tracked_event import EventType, Team
 import queue
 
 
@@ -70,6 +70,8 @@ class KickTracker(Tracker):
         self.proto_unix_io.register_observer(
             AttackerVisualization, self.attacker_vis_buffer
         )
+                
+        self.curr_pass = None
 
     def _get_new_kick_angle(
         self, origin: Point, target: Point, latest_angle: tbots_cpp.Angle
@@ -179,6 +181,7 @@ class PassTracker(KickTracker):
             if new_pass_angle is not None:
                 self.latest_kick_angle = new_pass_angle
                 self.kick_taken = False
+                self.curr_pass = attacker_vis_msg.pass_
 
         ball = world.ball()
 
@@ -188,9 +191,9 @@ class PassTracker(KickTracker):
             self.MIN_SHOT_SPEED,
             self.MAX_KICK_ANGLE_DIFFERENCE,
         ):
-            self.kick_taken = True
-
             self.write_event(event_type=EventType.PASS)
+            self.kick_taken = True
+            self.curr_pass = None
 
 
 class ShotTracker(KickTracker):

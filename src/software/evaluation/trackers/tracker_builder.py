@@ -1,7 +1,7 @@
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.log.trackers.tracker import Tracker
+from software.evaluation.trackers.tracker import Tracker
 from typing import Type, Self
-from software.thunderscope.log.trackers.tracked_event import Team
+from software.evaluation.trackers.tracked_event import Team
 import queue
 
 

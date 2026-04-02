@@ -1,10 +1,10 @@
-from software.thunderscope.log.trackers.tracker import Tracker
+from software.evaluation.trackers.tracker import Tracker
 from typing import override
 from proto.import_all_protos import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
-from software.thunderscope.log.trackers.tracked_event import EventType, Team
+from software.evaluation.trackers.tracked_event import EventType, Team
 import queue
 
 

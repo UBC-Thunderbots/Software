@@ -4,7 +4,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.import_all_protos import *
 import software.python_bindings as tbots_cpp
 import queue
-from software.thunderscope.log.trackers.tracked_event import (
+from software.evaluation.trackers.tracked_event import (
     EventType,
     get_event_from_world,
     Team,
