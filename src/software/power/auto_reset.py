@@ -25,14 +25,14 @@ def sysfs_gpio(pin, value):
     with open(f"/sys/class/gpio/gpio{pin}/direction", "w") as f:
         f.write("out")
     with open(f"/sys/class/gpio/gpio{pin}/value", "w") as f:
-        f.write(str(value))
+        f.write(str(value.value))
 
 
 def set_gpio(pin, value):
     try:
         sysfs_gpio(pin, value)
     except Exception:
-        v = "dh" if value == 1 else "dl"
+        v = "dh" if value == PinState.HIGH else "dl"
         try:
             subprocess.run(
                 ["pinctrl", "set", str(pin), "op", v],
