@@ -2,7 +2,7 @@
 
 - [ ] src/software/sensor_fusion/filter/ball_occlusion_test.cpp
 - [x] src/software/ai/hl/stp/play/shoot_or_chip/shoot_or_chip_play_test.cpp
-- [ ] src/software/ai/hl/stp/play/crease_defense/crease_defense_play_test.cpp
+- [x] src/software/ai/hl/stp/play/crease_defense/crease_defense_play_test.cpp
 - [ ] src/software/ai/hl/stp/play/stop_play_test.cpp
 - [ ] src/software/ai/hl/stp/play/free_kick/free_kick_play_test.cpp
 - [ ] src/software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_test.cpp
