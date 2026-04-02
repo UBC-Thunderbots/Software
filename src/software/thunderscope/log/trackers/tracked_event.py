@@ -4,6 +4,32 @@ from proto.import_all_protos import *
 from typing import Any
 from software.py_constants import DIV_B_NUM_ROBOTS
 from google.protobuf.descriptor import Descriptor, FieldDescriptor
+from software.thunderscope.time_provider import time_provider_instance
+
+
+def count_primitive_fields(descriptor: Descriptor):
+    """Recursively counts the number of primitive fields in a Protobuf message
+    using its descriptor.
+
+    :param message: the message descriptor to count all leaf-level primitive fields for
+    :return: the count of primitive fields
+    """
+    count = 0
+
+    for field in descriptor.fields:
+        # Check if the field is a nested message
+        if field.type == FieldDescriptor.TYPE_MESSAGE:
+            # Get the nested message class to recurse into its descriptor
+            nested_message = field.message_type
+            # Recurse using the nested message's descriptor
+            count += count_primitive_fields(nested_message)
+        else:
+            # It's a primitive type (double, float, int, bool, string, etc.)
+            count += 1
+    return count
+
+
+NUM_ROBOT_FIELDS = count_primitive_fields(RobotState.DESCRIPTOR)
 
 
 class EventType(StrEnum):
@@ -29,28 +55,6 @@ class Team(StrEnum):
 
     BLUE = auto()
     YELLOW = auto()
-
-
-def count_primitive_fields(descriptor: Descriptor):
-    """Recursively counts the number of primitive fields in a Protobuf message
-    using its descriptor.
-
-    :param message: the message descriptor to count all leaf-level primitive fields for
-    :return: the count of primitive fields
-    """
-    count = 0
-
-    for field in descriptor.fields:
-        # Check if the field is a nested message
-        if field.type == FieldDescriptor.TYPE_MESSAGE:
-            # Get the nested message class to recurse into its descriptor
-            nested_message = field.message_type
-            # Recurse using the nested message's descriptor
-            count += count_primitive_fields(nested_message)
-        else:
-            # It's a primitive type (double, float, int, bool, string, etc.)
-            count += 1
-    return count
 
 
 @dataclass
@@ -97,7 +101,7 @@ def get_event_from_world(
     ]
 
     return TrackedEvent(
-        timestamp=world_msg.time_sent.epoch_timestamp_seconds,
+        timestamp=time_provider_instance.elapsed_time_ns(),
         event_type=event_type,
         from_team=from_team,
         for_team=for_team,
@@ -114,27 +118,27 @@ def add_robots_to_row(row: list[Any], robots: list[Robot]) -> None:
     :param robot_states: the list of RobotState objects to flatten and add
     :return: None (the row list is modified in place)
     """
-    num_cols_per_robot = count_primitive_fields(RobotState.DESCRIPTOR)
-
     # robot state columns will be added based on robot id
     robot_state_map = {robot.id: robot.state for robot in robots}
 
     # Add friendly robots: [r1_data, r2_data...] based on id
     for idx in range(DIV_B_NUM_ROBOTS):
         if idx not in robot_state_map:
-            row.extend([None] * num_cols_per_robot)
+            row.extend([None] * NUM_ROBOT_FIELDS)
         else:
             robot_state = robot_state_map[idx]
-            row.extend(
-                [
-                    robot_state.global_position.x_meters,
-                    robot_state.global_position.y_meters,
-                    robot_state.global_orientation.radians,
-                    robot_state.global_velocity.x_component_meters,
-                    robot_state.global_velocity.y_component_meters,
-                    robot_state.global_angular_velocity.radians_per_second,
-                ]
-            )
+            robot_row = [
+                robot_state.global_position.x_meters,
+                robot_state.global_position.y_meters,
+                robot_state.global_orientation.radians,
+                robot_state.global_velocity.x_component_meters,
+                robot_state.global_velocity.y_component_meters,
+                robot_state.global_angular_velocity.radians_per_second,
+            ]
+
+            assert len(robot_row) == NUM_ROBOT_FIELDS
+
+            row.extend(robot_row)
 
 
 def event_to_csv_row(event: TrackedEvent) -> str:

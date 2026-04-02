@@ -19,4 +19,7 @@ py_library(
         "//software:python_bindings.so",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//software/thunderscope:time_provider",
+    ],
 )
