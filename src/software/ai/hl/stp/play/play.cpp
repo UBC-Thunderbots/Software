@@ -16,9 +16,6 @@ Play::Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config_ptr)),
       halt_tactics(),
       requires_goalie(requires_goalie),
-      tactic_sequence(
-          std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1)),
-      world_ptr_(std::nullopt),
       obstacle_factory(ai_config_ptr->robot_navigation_obstacle_config())
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
@@ -32,63 +29,6 @@ Play::Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
         previous_tactic.resize(ASSIGNMENTS_CACHE_MAX_SIZE);
     }
     previous_robot_tactics_count.reserve(MAX_ROBOT_IDS_PER_SIDE);
-}
-
-PriorityTacticVector Play::getTactics(const WorldPtr &world_ptr)
-{
-    // Update the member variable that stores the world. This will be used by the
-    // getNextTacticsWrapper function (inside the coroutine) to pass the World data to
-    // the getNextTactics function. This is easier than directly passing the World data
-    // into the coroutine
-    world_ptr_ = world_ptr;
-    // Check the coroutine status to see if it has any more work to do.
-    if (tactic_sequence)
-    {
-        // Run the coroutine. This will call the bound getNextTactics function
-        tactic_sequence();
-    }
-    else
-    {
-        // Make a new tactic_sequence
-        tactic_sequence = TacticCoroutine::pull_type(
-            std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1));
-        // Run the coroutine. This will call the bound getNextTactics function
-        tactic_sequence();
-    }
-
-    // Check if the coroutine is still valid before getting the result. This makes
-    // sure we don't try get the result after "running out the bottom" of the
-    // coroutine function
-    if (tactic_sequence)
-    {
-        // Extract the result from the coroutine. This will be whatever value was
-        // yielded by the getNextTactics function
-        auto next_tactics = tactic_sequence.get();
-        return next_tactics;
-    }
-    else
-    {
-        // Make a new tactic_sequence
-        tactic_sequence = TacticCoroutine::pull_type(
-            std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1));
-        // Run the coroutine. This will call the bound getNextTactics function
-        tactic_sequence();
-        if (tactic_sequence)
-        {
-            // Extract the result from the coroutine. This will be whatever value was
-            // yielded by the getNextTactics function
-            auto next_tactics = tactic_sequence.get();
-            return next_tactics;
-        }
-        else
-        {
-            LOG(WARNING) << "Failed to restart play" << std::endl;
-        }
-    }
-    // If the coroutine "iterator" is done, the getNextTactics function has completed
-    // and has no more work to do. Therefore, the Play is done so we return an empty
-    // vector
-    return PriorityTacticVector();
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
@@ -238,29 +178,6 @@ const std::map<std::shared_ptr<const Tactic>, RobotId> &Play::getTacticRobotIdAs
     const
 {
     return tactic_robot_id_assignment;
-}
-
-void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
-{
-    // Yield an empty vector the very first time the function is called. This value will
-    // never be seen/used by the rest of the system.
-    yield({});
-
-    // The getNextTactics function is given the World as a parameter rather than using
-    // the member variable since it's more explicit and obvious where the World
-    // comes from when implementing Plays. The World is passed as a reference, so when
-    // the world member variable is updated the implemented Plays will have access
-    // to the updated world as well.
-    if (world_ptr_)
-    {
-        getNextTactics(yield, world_ptr_.value());
-    }
-}
-
-// TODO (#2359): delete once all plays are not coroutines
-void Play::updateTactics(const PlayUpdate &play_update)
-{
-    play_update.set_tactics(getTactics(play_update.world_ptr));
 }
 
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
