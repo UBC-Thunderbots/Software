@@ -2,11 +2,11 @@ import math
 
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
-from software.simulated_tests.validation.ball_enters_region import *
+from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
+from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Vector, Angle, AngularVelocity
@@ -19,26 +19,22 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         field = tbots_cpp.Field.createSSLDivisionBField()
 
-        blue_bots = [
-            field.friendlyGoalCenter(),
-            tbots_cpp.Point(-1.5, 2),
-            tbots_cpp.Point(-2, 1.5),
-            tbots_cpp.Point(-2, 0.5),
-            tbots_cpp.Point(-2, -0.5),
-            tbots_cpp.Point(-2, -1.5),
-        ]
-
-        yellow_bots = [
-            field.enemyGoalCenter(),
-            field.enemyDefenseArea().negXNegYCorner(),
-            field.enemyDefenseArea().negXPosYCorner(),
-            tbots_cpp.Point(-1, 0),
-            tbots_cpp.Point(1, -2.5),
-        ]
-
         world_state = create_world_state(
-            yellow_robot_locations=yellow_bots,
-            blue_robot_locations=blue_bots,
+            blue_robot_locations=[
+                field.friendlyGoalCenter(),
+                tbots_cpp.Point(-1.5, 2),
+                tbots_cpp.Point(-2, 1.5),
+                tbots_cpp.Point(-2, 0.5),
+                tbots_cpp.Point(-2, -0.5),
+                tbots_cpp.Point(-2, -1.5),
+            ],
+            yellow_robot_locations=[
+                field.enemyGoalCenter(),
+                field.enemyDefenseArea().negXNegYCorner(),
+                field.enemyDefenseArea().negXPosYCorner(),
+                tbots_cpp.Point(-1, 0),
+                tbots_cpp.Point(1, -2.5),
+            ],
             ball_location=ball_initial_pos,
             ball_velocity=ball_initial_vel,
         )
@@ -54,6 +50,8 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         simulated_test_runner.set_world_state(world_state)
 
+        simulated_test_runner.set_plays(blue_play=PlayName.ShootOrChipPlay, yellow_play=PlayName.HaltPlay)
+
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
@@ -61,20 +59,11 @@ def test_shoot_or_chip_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        simulated_test_runner.set_plays(
-            blue_play=PlayName.ShootOrChipPlay, yellow_play=PlayName.UseAiSelection
-        )
-
-    # TODO (#3651): create validations
+    # TODO (#3632): add validations
     simulated_test_runner.run_test(
         setup=setup,
-        # this array is just so that the test runs 5 times
-        # if needed, actual arguments can be passed in to customize each test iteration
-        params=[0, 1, 2, 3, 4],
         inv_eventually_validation_sequence_set=[[]],
-        inv_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
 
