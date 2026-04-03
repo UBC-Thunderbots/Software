@@ -3,16 +3,27 @@
 #include <gtest/gtest.h>
 
 #include "proto/parameters.pb.h"
-#include "software/test_util/equal_within_tolerance.h"
+#include "shared/constants.h"
 #include "software/test_util/test_util.h"
 
-TEST(BallPlacementPlayFSMTest, test_transitions)
+static void update(FSM<BallPlacementPlayFSM>& fsm, std::shared_ptr<World> world_ptr,
+                   int num_tactics)
+{
+    fsm.process_event(BallPlacementPlayFSM::Update(
+        BallPlacementPlayFSM::ControlParams{},
+        PlayUpdate(
+            world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
+            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+}
+
+TEST(BallPlacementPlayFSMTest, test_align_placement)
 {
     int num_tactics = 5;
 
+    Point ball_point(2, 2);
     std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();
     // ball starts within the field lines
-    world_ptr->updateBall(Ball(Point(2, 2), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world_ptr->updateBall(Ball(ball_point, Vector(0, 0), Timestamp::fromSeconds(0)));
 
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::STOP);
@@ -26,24 +37,36 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
 
-    fsm.process_event(BallPlacementPlayFSM::Update(
-        BallPlacementPlayFSM::ControlParams{},
-        PlayUpdate(
-            world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
-            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+    update(fsm, world_ptr, num_tactics);
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignPlacementState>));
+
+    double ALIGNMENT_VECTOR_LENGTH_M = ROBOT_MAX_RADIUS_METERS * 2.5;
+    Vector alignment_vector =
+        (ball_placement_point - ball_point).normalize(ALIGNMENT_VECTOR_LENGTH_M);
+    Point expected_setup_point = ball_point - alignment_vector;
+
+    ::TestUtil::setFriendlyRobotPositions(world_ptr, {expected_setup_point},
+                                          Timestamp::fromSeconds(0));
+
+    update(fsm, world_ptr, num_tactics);
+
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::PlaceBallState>));
+
+    world_ptr->updateBall(
+        Ball(ball_placement_point, Vector(0, 0), Timestamp::fromSeconds(1)));
+
+    update(fsm, world_ptr, num_tactics);
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::ReleaseBallState>));
 }
 
-TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
+TEST(BallPlacementPlayFSMTest, test_align_wall)
 {
     int num_tactics = 5;
 
-    // default field type is DIV_B
     std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();
-    // ball starts outside the field lines, so FSM will enter KickOfWallState
-    world_ptr->updateBall(
-        Ball(Point(-2.0, 3.2), Vector(0, 0), Timestamp::fromSeconds(0)));
+    // ball starts outside the field lines
+    world_ptr->updateBall(Ball(Point(4.8, 3.3), Vector(0, 0), Timestamp::fromSeconds(0)));
 
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::STOP);
@@ -51,77 +74,97 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
     game_state.setBallPlacementPoint(ball_placement_point);
     world_ptr->updateGameState(game_state);
 
+    FSM<BallPlacementPlayFSM> fsm(
+        BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
+
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
+
+    update(fsm, world_ptr, num_tactics);
+
+    // ball in +X +Y corner
+    Angle expected_angle   = Angle::fromDegrees(45);
+    Vector approach_vector = Vector::createFromAngle(expected_angle);
+    Point expected_pickoff_point =
+        Point(4.8, 3.3) - approach_vector.normalize(ROBOT_MAX_RADIUS_METERS * 2.5);
+
+    ::TestUtil::setFriendlyRobotPositions(world_ptr, {expected_pickoff_point},
+                                          Timestamp::fromSeconds(0));
+
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignWallState>));
+
+    update(fsm, world_ptr, num_tactics);
+
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::PickOffWallState>));
+}
+
+TEST(BallPlacementPlayFSMTest, test_back_and_forth)
+{
+    int num_tactics = 5;
+
+    std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();
+    // ball starts outside the field lines
+    world_ptr->updateBall(Ball(Point(4.8, 3.3), Vector(0, 0), Timestamp::fromSeconds(0)));
+
+    GameState game_state;
+    game_state.updateRefereeCommand(RefereeCommand::STOP);
+    Point ball_placement_point(0, 0);
+    game_state.setBallPlacementPoint(ball_placement_point);
+    world_ptr->updateGameState(game_state);
 
     FSM<BallPlacementPlayFSM> fsm(
         BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
 
-    fsm.process_event(BallPlacementPlayFSM::Update(
-        BallPlacementPlayFSM::ControlParams{},
-        PlayUpdate(
-            world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
-            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+    update(fsm, world_ptr, num_tactics);
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignWallState>));
 
-    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::KickOffWallState>));
+    // put ball back inside field lines
+    world_ptr->updateBall(Ball(Point(4.4, 2.9), Vector(0, 0), Timestamp::fromSeconds(0)));
 
-    // After the ball is kicked off a wall, it ends up somewhere inside the field lines
-    // (but still needs to be moved to the ball placement point)
-    world_ptr->updateBall(Ball(Point(-1, 1), Vector(0, 0), Timestamp::fromSeconds(1)));
-
-    fsm.process_event(BallPlacementPlayFSM::Update(
-        BallPlacementPlayFSM::ControlParams{},
-        PlayUpdate(
-            world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
-            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
-
+    update(fsm, world_ptr, num_tactics);
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignPlacementState>));
+
+    // put ball back outside field lines
+    world_ptr->updateBall(Ball(Point(4.8, 3.3), Vector(0, 0), Timestamp::fromSeconds(0)));
+    update(fsm, world_ptr, num_tactics);
+
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignWallState>));
 }
 
-TEST(BallPlacementPlayFSMTest, test_kick_off_wall_angle)
+TEST(BallPlacementPlayFSMTest, test_reset_when_ball_dropped_during_release)
 {
-    BallPlacementPlayFSM fsm(std::make_shared<TbotsProto::AiConfig>());
+    int num_tactics = 5;
+    Point ball_placement_point(0, 0);
 
-    Field field           = Field::createField(TbotsProto::FieldType::DIV_B);
-    Rectangle field_lines = field.fieldLines();
+    std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();
+    GameState game_state;
+    game_state.updateRefereeCommand(RefereeCommand::STOP);
+    game_state.setBallPlacementPoint(ball_placement_point);
+    world_ptr->updateGameState(game_state);
 
-    // friendly half, ball outside left sideline
-    Point start_point(-2.0, 3.2);
-    Angle kick_angle = fsm.calculateWallKickoffAngle(start_point, field_lines);
-    EXPECT_TRUE(kick_angle.toDegrees() == 45);
+    FSM<BallPlacementPlayFSM> fsm(
+        BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
 
-    // friendly half, ball outside right sideline
-    start_point = Point(-2.0, -3.2);
-    kick_angle  = fsm.calculateWallKickoffAngle(start_point, field_lines);
-    EXPECT_TRUE(kick_angle.toDegrees() == -45);
+    world_ptr->updateBall(Ball(Point(2, 2), Vector(0, 0), Timestamp::fromSeconds(0)));
+    update(fsm, world_ptr, num_tactics);
 
-    // enemy half, ball outside left sideline
-    start_point = Point(2.0, 3.2);
-    kick_angle  = fsm.calculateWallKickoffAngle(start_point, field_lines);
-    EXPECT_TRUE(kick_angle.toDegrees() == 135);
+    Vector alignment_vector =
+        (ball_placement_point - Point(2, 2)).normalize(ROBOT_MAX_RADIUS_METERS * 2.5);
+    ::TestUtil::setFriendlyRobotPositions(world_ptr, {Point(2, 2) - alignment_vector},
+                                          Timestamp::fromSeconds(0));
+    update(fsm, world_ptr, num_tactics);
 
-    // enemy half, ball outside right sideline
-    start_point = Point(2.0, -3.2);
-    kick_angle  = fsm.calculateWallKickoffAngle(start_point, field_lines);
-    EXPECT_TRUE(kick_angle.toDegrees() == -135);
+    world_ptr->updateBall(
+        Ball(ball_placement_point, Vector(0, 0), Timestamp::fromSeconds(1)));
+    update(fsm, world_ptr, num_tactics);
 
-    // friendly half, ball outside friendly goal line (left of goal)
-    start_point = Point(-4.7, 1.6);
-    kick_angle  = fsm.calculateWallKickoffAngle(start_point, field_lines);
-    EXPECT_TRUE(kick_angle.toDegrees() == 135);
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::ReleaseBallState>));
 
-    // friendly half, ball outside friendly goal line (right of goal)
-    start_point = Point(-4.7, -1.6);
-    kick_angle  = fsm.calculateWallKickoffAngle(start_point, field_lines);
-    EXPECT_TRUE(kick_angle.toDegrees() == -135);
+    // ball bumped away during release
+    world_ptr->updateBall(
+        Ball(Point(1.0, 1.0), Vector(0.5, 0.5), Timestamp::fromSeconds(2)));
+    update(fsm, world_ptr, num_tactics);
 
-    // enemy half, ball outside enemy goal line (left of goal)
-    start_point = Point(4.7, 1.6);
-    kick_angle  = fsm.calculateWallKickoffAngle(start_point, field_lines);
-    EXPECT_TRUE(kick_angle.toDegrees() == 45);
-
-    // enemy half, ball outside enemy goal line (right of goal)
-    start_point = Point(4.7, -1.6);
-    kick_angle  = fsm.calculateWallKickoffAngle(start_point, field_lines);
-    EXPECT_TRUE(kick_angle.toDegrees() == -45);
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
 }
