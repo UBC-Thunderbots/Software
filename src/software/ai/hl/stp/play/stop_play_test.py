@@ -2,7 +2,7 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 from proto.ssl_gc_common_pb2 import Team
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.validation.robot_speed_threshold import (
