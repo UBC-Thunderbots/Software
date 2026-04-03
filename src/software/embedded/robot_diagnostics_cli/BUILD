@@ -61,3 +61,8 @@ py_library(
     name = "embedded_data",
     srcs = [":embedded_data.py"],
 )
+
+py_library(
+    name = "primitive_factory",
+    srcs = ["primitive_factory.py"],
+)
