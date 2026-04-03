@@ -8,13 +8,6 @@ EnemyBallPlacementPlay::EnemyBallPlacementPlay(
 {
 }
 
-void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                            const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing, will be removed once
-    // coroutines are phased out
-}
-
 void EnemyBallPlacementPlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm.process_event(EnemyBallPlacementPlayFSM::Update(control_params, play_update));

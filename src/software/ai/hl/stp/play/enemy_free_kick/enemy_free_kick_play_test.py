@@ -1,16 +1,13 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 
-from software.simulated_tests.or_validation import OrValidation
+from software.simulated_tests.validation.or_validation import OrValidation
 
-from software.simulated_tests.ball_moves_from_rest import (
-    BallEventuallyMovesFromRest,
-)
-from software.simulated_tests.friendly_team_scored import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.robot_enters_region import (
+from software.simulated_tests.validation.friendly_team_scored import *
+from software.simulated_tests.validation.ball_enters_region import *
+from software.simulated_tests.validation.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )
@@ -119,14 +116,9 @@ def test_enemy_free_kick_play(
             gc_command=Command.Type.DIRECT, team=Team.YELLOW
         )
 
-        blue_play = Play()
-        blue_play.name = PlayName.EnemyFreeKickPlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.FreeKickPlay
-
-        simulated_test_runner.set_play(blue_play, is_friendly=True)
-        simulated_test_runner.set_play(yellow_play, is_friendly=False)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.EnemyFreeKickPlay, yellow_play=PlayName.FreeKickPlay
+        )
 
     # Always Validation
     always_validation_sequence_set = [
@@ -136,11 +128,14 @@ def test_enemy_free_kick_play(
                     RobotNeverEntersRegion(
                         regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
                     ),
-                    BallEventuallyMovesFromRest(position=ball_initial_pos),
+                    BallEventuallyExitsRegion(
+                        regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
+                    ),
                 ]
             )
         ]
     ]
+
     # Eventually Validation
     eventually_validation_sequence_set = [
         [RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 1)])]

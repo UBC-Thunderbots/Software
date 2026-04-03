@@ -103,22 +103,18 @@ def test_basic_rotation(field_test_runner):
         move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
 
         # Setup Tactic
-        params = AssignedTacticPlayControlParams()
-
-        params.assigned_tactics[id].move.CopyFrom(move_tactic)
-
-        field_test_runner.set_tactics(params, True)
+        field_test_runner.set_tactics(
+            blue_tactics={id: move_tactic}, yellow_tactics=None
+        )
         field_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
             test_timeout_s=5,
         )
         # Send a halt tactic after the test finishes
-        halt_tactic = HaltTactic()
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[id].stop.CopyFrom(halt_tactic)
-        # send the halt tactic
-        field_test_runner.set_tactics(params, True)
+        field_test_runner.set_tactics(
+            blue_tactics={id: HaltTactic()}, yellow_tactics=None
+        )
 
         # validate by eye
         logger.info(f"robot set to {angle} orientation")
@@ -187,10 +183,13 @@ def test_one_robots_square(field_test_runner):
 
     for tactic in tactics:
         print(f"Going to {tactic.destination}")
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[id].move.CopyFrom(tactic)
 
-        field_test_runner.set_tactics(params, True)
+        field_test_runner.set_tactics(
+            blue_tactics={
+                id: tactic,
+            },
+            yellow_tactics=None,
+        )
         field_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
@@ -198,9 +197,7 @@ def test_one_robots_square(field_test_runner):
         )
 
     # Send a halt tactic after the test finishes
-    halt_tactic = HaltTactic()
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[id].stop.CopyFrom(halt_tactic)
+    field_test_runner.set_tactics(blue_tactics={id: HaltTactic()}, yellow_tactics=None)
 
 
 if __name__ == "__main__":

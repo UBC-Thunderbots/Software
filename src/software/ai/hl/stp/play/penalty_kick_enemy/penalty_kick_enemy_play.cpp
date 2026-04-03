@@ -10,13 +10,6 @@ PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(
     control_params.goalie_tactic = goalie_tactic;
 }
 
-void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                          const WorldPtr &world_ptr)
-{
-    // This function doesn't get called, it should be removed once coroutines
-    // are phased out
-}
-
 void PenaltyKickEnemyPlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm.process_event(PenaltyKickEnemyPlayFSM::Update(control_params, play_update));

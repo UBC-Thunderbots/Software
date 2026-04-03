@@ -3,7 +3,9 @@ package(default_visibility = ["//visibility:public"])
 py_library(
     name = "fullsystem_stats",
     srcs = ["fullsystem_stats.py"],
-    deps = [],
+    deps = [
+        "//software/thunderscope/log/trackers:tracker",
+    ],
 )
 
 py_library(
