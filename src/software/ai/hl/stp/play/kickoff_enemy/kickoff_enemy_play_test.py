@@ -58,13 +58,16 @@ def test_kickoff_enemy_play(simulated_test_runner):
         )
 
         # Let robots get ready before starting kickoff
-        threading.Timer(4.0, lambda:
-                        simulated_test_runner.send_gamecontroller_command(
-                            gc_command=Command.Type.NORMAL_START, team=Team.YELLOW
-                        )).start()
+        threading.Timer(
+            4.0,
+            lambda: simulated_test_runner.send_gamecontroller_command(
+                gc_command=Command.Type.NORMAL_START, team=Team.YELLOW
+            ),
+        ).start()
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.KickoffEnemyPlay, yellow_play=PlayName.KickoffFriendlyPlay
+            blue_play=PlayName.KickoffEnemyPlay,
+            yellow_play=PlayName.KickoffFriendlyPlay,
         )
 
     # Two friendly robots in position to shadow enemy robots. Rectangles are
@@ -89,11 +92,13 @@ def test_kickoff_enemy_play(simulated_test_runner):
         [
             NumberOfRobotsEventuallyEntersRegion(
                 regions=[shadowing_rect_1], req_robot_cnt=1
-            )],
+            )
+        ],
         [
             NumberOfRobotsEventuallyEntersRegion(
                 regions=[shadowing_rect_2], req_robot_cnt=1
-            )],
+            )
+        ],
         [
             NumberOfRobotsEventuallyEntersRegion(
                 regions=[shadowing_rect_3], req_robot_cnt=1
@@ -103,27 +108,35 @@ def test_kickoff_enemy_play(simulated_test_runner):
             NumberOfRobotsEventuallyEntersRegion(
                 regions=[robots_defending_rect], req_robot_cnt=2
             ),
-        ]
+        ],
     ]
 
     friendly_half = field.friendlyHalf()
     center_circle = field.centerCircle()
 
     # Validation RoboCup SSL rules: can't enter center circle nor enemy half when ball is not kicked yet
-    always_validation_sequence_set = [[
-        OrValidation([
-            RobotNeverEntersRegion(
-                regions=[center_circle]
+    always_validation_sequence_set = [
+        [
+            OrValidation(
+                [
+                    RobotNeverEntersRegion(regions=[center_circle]),
+                    BallNeverEntersRegion(
+                        regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)]
+                    ),
+                ]
             ),
-            BallNeverEntersRegion(regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)])
-        ]),
-        OrValidation([
-            NumberOfRobotsAlwaysStaysInRegion(
-                regions=[friendly_half], req_robot_cnt=6
+            OrValidation(
+                [
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=[friendly_half], req_robot_cnt=6
+                    ),
+                    BallNeverEntersRegion(
+                        regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)]
+                    ),
+                ]
             ),
-            BallNeverEntersRegion(regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)])
-        ])
-    ]]
+        ]
+    ]
 
     simulated_test_runner.run_test(
         setup=setup,

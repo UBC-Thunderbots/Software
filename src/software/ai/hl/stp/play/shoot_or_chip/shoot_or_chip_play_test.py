@@ -2,7 +2,7 @@ import math
 
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -50,7 +50,9 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         simulated_test_runner.set_world_state(world_state)
 
-        simulated_test_runner.set_plays(blue_play=PlayName.ShootOrChipPlay, yellow_play=PlayName.HaltPlay)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.ShootOrChipPlay, yellow_play=PlayName.HaltPlay
+        )
 
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN

@@ -10,8 +10,12 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
 )
-from software.simulated_tests.validation.robot_enters_region import RobotEventuallyEntersRegion
-from software.simulated_tests.validation.ball_kicked_in_direction import BallEventuallyKickedInDirection
+from software.simulated_tests.validation.robot_enters_region import (
+    RobotEventuallyEntersRegion,
+)
+from software.simulated_tests.validation.ball_kicked_in_direction import (
+    BallEventuallyKickedInDirection,
+)
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -68,13 +72,22 @@ def test_free_kick_play_friendly(ball_initial_pos, must_score, simulated_test_ru
             gc_command=Command.Type.DIRECT, team=Team.BLUE
         )
 
-        simulated_test_runner.set_plays(blue_play=PlayName.FreeKickPlay, yellow_play=PlayName.HaltPlay)
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.FreeKickPlay, yellow_play=PlayName.HaltPlay
+        )
 
-    eventually_validations = [[FriendlyTeamEventuallyScored()] if must_score else [], [
-        RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.1)]),
-        # Gets kicked in any direction
-        BallEventuallyKickedInDirection(tbots_cpp.Angle.zero(), max_angle_difference_degrees=360)
-    ]]
+    eventually_validations = [
+        [FriendlyTeamEventuallyScored()] if must_score else [],
+        [
+            RobotEventuallyEntersRegion(
+                regions=[tbots_cpp.Circle(ball_initial_pos, 0.1)]
+            ),
+            # Gets kicked in any direction
+            BallEventuallyKickedInDirection(
+                tbots_cpp.Angle.zero(), max_angle_difference_degrees=360
+            ),
+        ],
+    ]
 
     simulated_test_runner.run_test(
         setup=setup,

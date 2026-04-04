@@ -311,8 +311,7 @@ def test_excessive_dribbling_without_enemies(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0:
-                DribbleTactic(
+                0: DribbleTactic(
                     dribble_destination=tbots_cpp.createPointProto(dribble_destination),
                     final_dribble_orientation=tbots_cpp.createAngleProto(
                         final_dribble_orientation

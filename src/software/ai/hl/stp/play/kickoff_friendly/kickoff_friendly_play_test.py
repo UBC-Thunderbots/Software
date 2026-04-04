@@ -12,9 +12,7 @@ from software.simulated_tests.validation.robot_enters_region import (
 from software.simulated_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.simulated_tests.validation.ball_enters_region import (
-    BallNeverEntersRegion
-)
+from software.simulated_tests.validation.ball_enters_region import BallNeverEntersRegion
 from software.simulated_tests.validation.or_validation import OrValidation
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -65,13 +63,16 @@ def test_kickoff_friendly_play(simulated_test_runner):
         )
 
         # Let robots get ready before starting kickoff
-        threading.Timer(4.0, lambda:
-                        simulated_test_runner.send_gamecontroller_command(
-                            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-                        )).start()
+        threading.Timer(
+            4.0,
+            lambda: simulated_test_runner.send_gamecontroller_command(
+                gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+            ),
+        ).start()
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.KickoffFriendlyPlay, yellow_play=PlayName.KickoffEnemyPlay
+            blue_play=PlayName.KickoffFriendlyPlay,
+            yellow_play=PlayName.KickoffEnemyPlay,
         )
 
     field = tbots_cpp.Field.createSSLDivisionBField()
@@ -82,51 +83,60 @@ def test_kickoff_friendly_play(simulated_test_runner):
         [
             # Check robot enters center circle, then kicks ball towards enemy half
             RobotEventuallyEntersRegion(regions=[center_circle]),
-            BallEventuallyKickedInDirection(tbots_cpp.Angle.zero(), max_angle_difference_degrees=90),
+            BallEventuallyKickedInDirection(
+                tbots_cpp.Angle.zero(), max_angle_difference_degrees=90
+            ),
         ],
         [
             # Two friendly robots near the half line setting up for offense
             NumberOfRobotsEventuallyEntersRegion(
-                regions=[tbots_cpp.Rectangle(
-                    tbots_cpp.Point(-1.5, -2.5),
-                    tbots_cpp.Point(-0.5, 2.5)
-                )],
-                req_robot_cnt=2
+                regions=[
+                    tbots_cpp.Rectangle(
+                        tbots_cpp.Point(-1.5, -2.5), tbots_cpp.Point(-0.5, 2.5)
+                    )
+                ],
+                req_robot_cnt=2,
             ),
         ],
         [
             # Two Friendly robots defending the exterior of defense box
             NumberOfRobotsEventuallyEntersRegion(
-                regions=[tbots_cpp.Rectangle(
-                    tbots_cpp.Point(-3.2, 1.1),
-                    tbots_cpp.Point(-3.51, -1.1)
-                )],
-                req_robot_cnt=2
+                regions=[
+                    tbots_cpp.Rectangle(
+                        tbots_cpp.Point(-3.2, 1.1), tbots_cpp.Point(-3.51, -1.1)
+                    )
+                ],
+                req_robot_cnt=2,
             ),
-        ]
+        ],
     ]
 
     # Validation RoboCup SSL rules: can't enter enemy half when ball is not kicked yet
     # Only one robot allowed to enter center circle to kick
-    always_validation_sequence_set = [[
-        OrValidation(
-            [
-                NumberOfRobotsAlwaysStaysInRegion(
-                    regions=[friendly_half], req_robot_cnt=6
-
-                ),
-                BallNeverEntersRegion(regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)])
-            ]
-        ),
-        OrValidation(
-            [
-                NumberOfRobotsNeverEntersRegion(
-                    regions=[center_circle], req_robot_cnt=2
-                ),
-                BallNeverEntersRegion(regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)])
-            ]
-        )
-    ]]
+    always_validation_sequence_set = [
+        [
+            OrValidation(
+                [
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=[friendly_half], req_robot_cnt=6
+                    ),
+                    BallNeverEntersRegion(
+                        regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)]
+                    ),
+                ]
+            ),
+            OrValidation(
+                [
+                    NumberOfRobotsNeverEntersRegion(
+                        regions=[center_circle], req_robot_cnt=2
+                    ),
+                    BallNeverEntersRegion(
+                        regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)]
+                    ),
+                ]
+            ),
+        ]
+    ]
 
     simulated_test_runner.run_test(
         setup=setup,

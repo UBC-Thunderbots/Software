@@ -61,4 +61,3 @@ py_test(
         requirement("pytest"),
     ],
 )
-

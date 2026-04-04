@@ -51,7 +51,9 @@ from software.simulated_tests.simulated_test_fixture import (
 @pytest.mark.skip(
     "Disabling this test because of poor dribbling controls, does not consistently score goal. TODO (#2232)"
 )
-def test_penalty_kick(enemy_robot_location, enemy_robot_velocity, simulated_test_runner):
+def test_penalty_kick(
+    enemy_robot_location, enemy_robot_velocity, simulated_test_runner
+):
     field = tbots_cpp.Field.createSSLDivisionBField()
     ball_initial_pos = field.friendlyPenaltyMark()
 
@@ -67,19 +69,18 @@ def test_penalty_kick(enemy_robot_location, enemy_robot_velocity, simulated_test
             ),
         )
 
-        simulated_test_runner.set_tactics(
-            blue_tactics={0: PenaltyKickTactic()}
-        )
+        simulated_test_runner.set_tactics(blue_tactics={0: PenaltyKickTactic()})
 
-    eventually_validation_sequence_set = [[
-        FriendlyTeamEventuallyScored(),
-    ]]
+    eventually_validation_sequence_set = [
+        [
+            FriendlyTeamEventuallyScored(),
+        ]
+    ]
 
     # For RoboCup SSL rules: ball never moves backward
-    always_validation_sequence_set = [[
-        BallAlwaysMovesForward(ball_initial_pos),
-        NeverExcessivelyDribbles()
-    ]]
+    always_validation_sequence_set = [
+        [BallAlwaysMovesForward(ball_initial_pos), NeverExcessivelyDribbles()]
+    ]
 
     simulated_test_runner.run_test(
         setup=setup,
