@@ -1,3 +1,5 @@
+import threading
+
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
 
@@ -23,11 +25,11 @@ def test_kickoff_enemy_play(simulated_test_runner):
     def setup(*args):
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
-            tbots_cpp.Point(-3, 1.5),
-            tbots_cpp.Point(-3, 0.5),
-            tbots_cpp.Point(-3, -0.5),
-            tbots_cpp.Point(-3, -1.5),
+            tbots_cpp.Point(-2.8, 2.5),
+            tbots_cpp.Point(-2.6, 2.5),
             tbots_cpp.Point(-3, -2.5),
+            tbots_cpp.Point(-2.8, -2.5),
+            tbots_cpp.Point(-2.6, -2.5),
         ]
 
         yellow_bots = [
@@ -54,39 +56,58 @@ def test_kickoff_enemy_play(simulated_test_runner):
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.KICKOFF, team=Team.YELLOW
         )
-        simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.NORMAL_START, team=Team.UNKNOWN
-        )
+
+        # Let robots get ready before starting kickoff
+        threading.Timer(4.0, lambda:
+                        simulated_test_runner.send_gamecontroller_command(
+                            gc_command=Command.Type.NORMAL_START, team=Team.YELLOW
+                        )).start()
 
         simulated_test_runner.set_plays(
             blue_play=PlayName.KickoffEnemyPlay, yellow_play=PlayName.KickoffFriendlyPlay
         )
 
-    center_circle = field.centerCircle()
+    # Two friendly robots in position to shadow enemy robots. Rectangles are
+    # chosen to be generally in the way of the the front 3 enemy robots and the
+    # friendly goal, based on where the enemy robots are initialized in the test.
+    shadowing_rect_1 = tbots_cpp.Rectangle(
+        tbots_cpp.Point(-0.4, 1.0), tbots_cpp.Point(0, 1.5)
+    )
+    shadowing_rect_2 = tbots_cpp.Rectangle(
+        tbots_cpp.Point(-0.4, -1.5), tbots_cpp.Point(0, -1.0)
+    )
+    shadowing_rect_3 = tbots_cpp.Rectangle(
+        tbots_cpp.Point(-0.86, -0.1), tbots_cpp.Point(-0.60, 0.1)
+    )
 
-    # Three friendly robots surround center circle
-    around_center_circle = tbots_cpp.Circle(center_circle.origin(), center_circle.radius() * 2)
-
-    # Two friendly robots defending the exterior of defense box
+    # Two Friendly robots defending the exterior of defense box
     robots_defending_rect = tbots_cpp.Rectangle(
-        field.friendlyDefenseArea().posXNegYCorner() - tbots_cpp.Vector(0.2, 0.2),
-        field.friendlyDefenseArea().posXPosYCorner() + tbots_cpp.Vector(0.2, 0.2),
+        tbots_cpp.Point(-3.5, -1.1), tbots_cpp.Point(-3.2, 1.1)
     )
 
     eventually_validation_sequence_set = [
         [
             NumberOfRobotsEventuallyEntersRegion(
-                regions=[around_center_circle], req_robot_cnt=3
+                regions=[shadowing_rect_1], req_robot_cnt=1
+            )],
+        [
+            NumberOfRobotsEventuallyEntersRegion(
+                regions=[shadowing_rect_2], req_robot_cnt=1
+            )],
+        [
+            NumberOfRobotsEventuallyEntersRegion(
+                regions=[shadowing_rect_3], req_robot_cnt=1
             )
         ],
         [
             NumberOfRobotsEventuallyEntersRegion(
                 regions=[robots_defending_rect], req_robot_cnt=2
-            )
-        ],
+            ),
+        ]
     ]
 
     friendly_half = field.friendlyHalf()
+    center_circle = field.centerCircle()
 
     # Validation RoboCup SSL rules: can't enter center circle nor enemy half when ball is not kicked yet
     always_validation_sequence_set = [[
