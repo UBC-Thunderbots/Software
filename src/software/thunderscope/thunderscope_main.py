@@ -188,16 +188,16 @@ if __name__ == "__main__":
         help="Estop Baudrate",
     )
     parser.add_argument(
-        "--automate_referee",
-        action="store_true",
-        default=False,
-        help="Automatically handles gamecontroller referee events",
-    )
-    parser.add_argument(
         "--ci_mode",
         action="store_true",
         default=False,
         help="Runs the simulation with sped-up time",
+    )
+    parser.add_argument(
+        "--enable_autogc",
+        action="store_true",
+        default=False,
+        help="Automatically handles gamecontroller referee events",
     )
     parser.add_argument(
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
@@ -430,8 +430,8 @@ if __name__ == "__main__":
         )
 
         if args.record_stats:
-            args.automate_referee = True
             args.ci_mode = True
+            args.enable_autogc = True
             args.enable_autoref = True
 
         def __ticker(tick_rate_ms: int) -> None:
@@ -484,7 +484,7 @@ if __name__ == "__main__":
             log_level=args.log_level,
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose),
-            automate_referee=args.automate_referee,
+            automate_referee=args.enable_autogc,
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
