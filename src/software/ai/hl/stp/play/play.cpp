@@ -22,6 +22,13 @@ Play::Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
     {
         halt_tactics.push_back(std::make_shared<HaltTactic>(ai_config_ptr));
     }
+    previous_robot_tactics.reserve(MAX_ROBOT_IDS_PER_SIDE);
+
+    for (auto& previous_tactic : previous_robot_tactics | std::views::values)
+    {
+        previous_tactic.resize(ASSIGNMENTS_CACHE_MAX_SIZE);
+    }
+    previous_robot_tactics_count.reserve(MAX_ROBOT_IDS_PER_SIDE);
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
@@ -222,11 +229,27 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
         {
             Robot robot                    = robots_to_assign.at(row);
             std::shared_ptr<Tactic> tactic = tactic_vector.at(col);
+
             auto primitives                = primitive_sets.at(col);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
             double robot_cost_for_tactic =
                 primitives.at(robot.id())->getEstimatedPrimitiveCost();
+
+
+            /**
+             * We want to discourage changing away from a tactic over and over again it is chosen many times
+             * - penalty should range from 0 to 0.5
+             * - store last k assignment matrices
+             * We can add this flatly to the score
+             * - score + 0.5 * (# of matching_current)/k
+             * We can also increase based on a fraction of the current score e.g.
+             * - score( 1 + 0.15 * (# of matching_current)/k
+             */
+            int previous_tactic_count = previous_robot_tactics_count[robot.id()][std::type_index(typeid(*tactic))];
+            double similarity =  static_cast<double>(previous_tactic_count) / ASSIGNMENTS_CACHE_MAX_SIZE;
+            // LOG(DEBUG) << "COUNT:"<< previous_tactic_count <<" SIM:"<< similarity;
+            robot_cost_for_tactic = std::max(0.0, robot_cost_for_tactic - 0.5 * similarity);
 
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
@@ -254,6 +277,7 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
 
     // Apply the Munkres/Hungarian algorithm to the matrix.
     Munkres<double> m;
+    // LOG(DEBUG) << matrix;
     m.solve(matrix);
 
     // The Munkres matrix gets solved such that there will be exactly one 0 in every
@@ -276,6 +300,18 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 current_tactic_robot_id_assignment.emplace(tactic_vector.at(col),
                                                            robot_id);
                 tactic_vector.at(col)->setLastExecutionRobot(robot_id);
+
+                auto tactic = tactic_vector.at(col);
+                if (previous_robot_tactics[robot_id].size() >= ASSIGNMENTS_CACHE_MAX_SIZE)
+                {
+                    std::type_index tactic_type = *previous_robot_tactics[robot_id].front();
+                    previous_robot_tactics_count[robot_id][tactic_type]--;
+                    previous_robot_tactics[robot_id].pop_front();
+
+                }
+                std::type_index type = std::type_index(typeid(*tactic));
+                previous_robot_tactics[robot_id].push_back(std::make_shared<std::type_index>(type));
+                previous_robot_tactics_count[robot_id][type]++;
 
                 auto primitives = primitive_sets.at(col);
                 CHECK(primitives.contains(robot_id))
