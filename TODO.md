@@ -19,8 +19,8 @@
 - [x] src/software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/dribble/dribble_tactic_push_enemy_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/dribble/dribble_tactic_test.cpp
-- [ ] src/software/ai/hl/stp/tactic/move/move_tactic_test.cpp
-- [ ] src/software/ai/hl/stp/tactic/receiver/receiver_tactic_test.cpp
+- [x] src/software/ai/hl/stp/tactic/move/move_tactic_test.cpp
+- [x] src/software/ai/hl/stp/tactic/receiver/receiver_tactic_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/kick/kick_tactic_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/halt/halt_tactic_test.cpp
