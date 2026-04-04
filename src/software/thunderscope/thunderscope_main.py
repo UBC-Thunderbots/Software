@@ -188,6 +188,12 @@ if __name__ == "__main__":
         help="Estop Baudrate",
     )
     parser.add_argument(
+        "--automate_referee",
+        action="store_true",
+        default=False,
+        help="Automatically handles gamecontroller referee events",
+    )
+    parser.add_argument(
         "--ci_mode",
         action="store_true",
         default=False,
@@ -424,6 +430,7 @@ if __name__ == "__main__":
         )
 
         if args.record_stats:
+            args.automate_referee = True
             args.ci_mode = True
             args.enable_autoref = True
 
@@ -477,7 +484,7 @@ if __name__ == "__main__":
             log_level=args.log_level,
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose),
-            automate_referee=args.ci_mode,
+            automate_referee=args.automate_referee,
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
