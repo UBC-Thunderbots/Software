@@ -16,7 +16,7 @@ from software.simulated_tests.validation.ball_is_off_ground import (
 from software.simulated_tests.validation.robot_at_angular_velocity import (
     RobotEventuallyAtAngularVelocity,
 )
-from software.simulated_tests.validation.delay_validation import DelayValidation
+from software.simulated_tests.validation.duration_validation import DurationValidation
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -61,12 +61,12 @@ def test_move_across_field(simulated_test_runner):
         )
 
     eventually_validation_sequence_set = [
+        # Robot stays at destination for one second
         [
-            DelayValidation(
-                delay_s=0.1, validation=RobotEventuallyAtPosition(1, destination)
+            DurationValidation(
+                duration_s=1, validation=RobotEventuallyAtPosition(1, destination)
             )
         ]
-        * 10
     ]
 
     simulated_test_runner.run_test(
@@ -120,16 +120,15 @@ def test_autochip_move(simulated_test_runner):
 
     eventually_validation_sequence_set = [
         [
+            # Robot moves to position and chips ball
             RobotEventuallyAtPosition(1, destination),
             BallEventuallyKickedInDirection(tbots_cpp.Angle.zero()),
             BallIsEventuallyOffGround(),
+            # Robot stays at destination for one second
+            DurationValidation(
+                duration_s=1, validation=RobotEventuallyAtPosition(1, destination)
+            ),
         ]
-        + [
-            DelayValidation(
-                delay_s=0.1, validation=RobotEventuallyAtPosition(1, destination)
-            )
-        ]
-        * 10
     ]
 
     simulated_test_runner.run_test(
@@ -181,15 +180,14 @@ def test_autokick_move(simulated_test_runner):
 
     eventually_validation_sequence_set = [
         [
+            # Robot moves to destination and kicks
             RobotEventuallyAtPosition(0, destination),
             BallEventuallyKickedInDirection(tbots_cpp.Angle.threeQuarter()),
+            # Robot stays at destination for one second
+            DurationValidation(
+                duration_s=1, validation=RobotEventuallyAtPosition(0, destination)
+            ),
         ]
-        + [
-            DelayValidation(
-                delay_s=0.1, validation=RobotEventuallyAtPosition(0, destination)
-            )
-        ]
-        * 10
     ]
 
     simulated_test_runner.run_test(
@@ -276,24 +274,27 @@ def test_spinning_move(
 
     eventually_validation_sequence_set = [
         [
-            # high threshold just to check direction of angular velocity
+            # High threshold to check direction of angular velocity
             RobotEventuallyAtAngularVelocity(0, angular_velocity, 4),
-        ]
-        + [
-            DelayValidation(
-                delay_s=0.1, validation=RobotEventuallyAtPosition(0, destination)
+            # Robot stays at destination for one second
+            DurationValidation(
+                duration_s=1, validation=RobotEventuallyAtPosition(0, destination)
             ),
-            DelayValidation(
-                delay_s=0.1, validation=RobotEventuallyAtOrientation(0, orientation)
+        ],
+        [
+            # Robot stays at orientation for one second once it has reached the destination
+            RobotEventuallyAtPosition(0, destination),
+            DurationValidation(
+                duration_s=1, validation=RobotEventuallyAtOrientation(0, orientation)
             ),
-        ]
-        * 10
+        ],
     ]
 
     simulated_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        test_timeout_s=5,
     )
 
 
