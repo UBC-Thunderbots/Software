@@ -273,7 +273,7 @@ def test_passing_receive_speed(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(2.0, -2.0),
             [tbots_cpp.Point(-2.5, 2.0)],
-            [tbots_cpp.Angle.half(), tbots_cpp.Angle.zero()],  # TODO AVAH
+            [tbots_cpp.Angle.half(), tbots_cpp.Angle.zero()],
             [],
         ),
         (
