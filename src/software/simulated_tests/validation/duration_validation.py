@@ -26,6 +26,9 @@ class DurationValidation(Validation):
     def get_validation_status(self, world):
         if self.validation.get_validation_status(world) == ValidationStatus.PASSING:
             self.passing_ticks += 1
+        else:
+            self.passing_ticks = 0
+
         if self.passing_ticks > self.duration_ticks:
             return ValidationStatus.PASSING
         else:
