@@ -402,6 +402,9 @@ class RuntimeManagerConstants:
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
 
+    RUNTIME_EVENTS_DIRECTORY_PATH = "/tmp/tbots/stats"
+    RUNTIME_EVENTS_FILE = "game_events.csv"
+
     RUNTIME_STATS_DIRECTORY_PATH = "/tmp/tbots/stats"
     RUNTIME_FRIENDLY_STATS_FILE = "blue.toml"
     RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE = "yellow_from_blue.toml"
