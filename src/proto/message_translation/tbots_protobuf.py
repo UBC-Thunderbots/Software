@@ -11,7 +11,7 @@ def create_world_state(
     blue_robot_locations: list[tbots_cpp.Point],
     ball_location: tbots_cpp.Point,
     ball_velocity: tbots_cpp.Vector,
-    blue_robot_orientations: list[float] = [],
+    blue_robot_orientations: list[tbots_cpp.Angle] = [],
 ) -> WorldState:
     """Initializes the world from a list of robot locations and ball location/velocity.
 
@@ -36,7 +36,7 @@ def create_world_state(
         )
 
     for robot_id, robot_location in enumerate(blue_robot_locations):
-        orientation = 0
+        orientation = tbots_cpp.Angle.zero()
         try:
             orientation = blue_robot_orientations[robot_id]
         except IndexError:
@@ -46,7 +46,7 @@ def create_world_state(
                 global_position=Point(
                     x_meters=robot_location.x(), y_meters=robot_location.y()
                 ),
-                global_orientation=Angle(radians=orientation),
+                global_orientation=tbots_cpp.createAngleProto(orientation),
             )
         )
 
