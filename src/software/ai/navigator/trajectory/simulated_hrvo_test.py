@@ -2,14 +2,15 @@ import pytest
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from software.simulated_tests.avoid_collisions import *
+from software.simulated_tests.validation.avoid_collisions import *
 import software.python_bindings as tbots
 from software.py_constants import *
 from proto.message_translation.tbots_protobuf import create_world_state
 import math
 from proto.import_all_protos import *
+from proto.ssl_gc_common_pb2 import Team
 from software.simulated_tests.simulated_test_fixture import SimulatedTestRunner
-from software.simulated_tests.validation import (
+from software.simulated_tests.validation.validation import (
     create_validation_types,
     create_validation_geometry,
 )
@@ -184,21 +185,29 @@ def hrvo_setup(
 
     ball_initial_vel = tbots.Point(0, 0)
 
-    # Game Controller Setup
-    simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.STOP, is_friendly=True
-    )
-    simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.STOP, is_friendly=False
-    )
-    simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.FORCE_START, is_friendly=True
+    simulated_test_runner.set_world_state(
+        create_world_state(
+            yellow_robot_locations=enemy_robots_positions,
+            blue_robot_locations=friendly_robots_positions,
+            ball_location=ball_initial_pos,
+            ball_velocity=ball_initial_vel,
+        )
     )
 
-    blue_params = AssignedTacticPlayControlParams()
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.STOP, team=Team.BLUE
+    )
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.STOP, team=Team.YELLOW
+    )
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.FORCE_START, team=Team.BLUE
+    )
+
+    blue_tactics = {}
 
     for index, destination in enumerate(friendly_robots_destinations):
-        blue_params = get_move_update_control_params(
+        blue_tactics[index] = get_move_tactic(
             index,
             destination,
             (
@@ -206,30 +215,19 @@ def hrvo_setup(
                 if friendly_robots_final_orientations
                 else desired_orientation
             ),
-            params=blue_params,
         )
 
-    simulated_test_runner.set_tactics(blue_params, True)
-
-    # Setup no tactics on the enemy side
-    yellow_params = AssignedTacticPlayControlParams()
+    yellow_tactics = {}
 
     for index, destination in enumerate(enemy_robots_destinations):
-        yellow_params = get_move_update_control_params(
-            index, destination, tbots.Angle.fromRadians(0), params=yellow_params
+        yellow_tactics[index] = get_move_tactic(
+            index,
+            destination,
+            tbots.Angle.fromRadians(0),
         )
 
-    simulated_test_runner.set_tactics(yellow_params, False)
-
-    # Setup Robots
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
-        create_world_state(
-            yellow_robot_locations=enemy_robots_positions,
-            blue_robot_locations=friendly_robots_positions,
-            ball_location=ball_initial_pos,
-            ball_velocity=ball_initial_vel,
-        ),
+    simulated_test_runner.set_tactics(
+        blue_tactics=blue_tactics, yellow_tactics=yellow_tactics
     )
 
 
@@ -536,38 +534,27 @@ def get_reached_destination_validation(robot_destinations: list[tbots.Point]):
     ]
 
 
-def get_move_update_control_params(
+def get_move_tactic(
     robot_id: int,
     destination: tbots.Point,
     desired_orientation: tbots.Angle,
-    params: AssignedTacticPlayControlParams = None,
 ):
-    """Constructs the control params for a Move Tactic for a single robot
-    with the given data
-    And adds it to an existing or new AssignedTacticPlayControlParams message
+    """Constructs a Move Tactic for a single robot with the given data
 
     :param robot_id: the id of the robot who will be assigned these params
     :param destination: the destination of the robot
     :param desired_orientation: the desired orientation of the robot
-    :param params: AssignedTacticPlayControlParams message
-                   if not None, add this robot's params to this
-                   else, create a new message and add
-    :return: an AssignedTacticPlayControlParams message with this robot's params added
+    :return: a MoveTactic
     """
-    params = params if params else AssignedTacticPlayControlParams()
-    params.assigned_tactics[robot_id].move.CopyFrom(
-        MoveTactic(
-            destination=Point(x_meters=destination.x(), y_meters=destination.y()),
-            final_orientation=Angle(radians=desired_orientation.toRadians()),
-            dribbler_mode=DribblerMode.OFF,
-            ball_collision_type=BallCollisionType.ALLOW,
-            auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-            max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-            obstacle_avoidance_mode=ObstacleAvoidanceMode.AGGRESSIVE,
-        )
+    return MoveTactic(
+        destination=Point(x_meters=destination.x(), y_meters=destination.y()),
+        final_orientation=Angle(radians=desired_orientation.toRadians()),
+        dribbler_mode=DribblerMode.OFF,
+        ball_collision_type=BallCollisionType.ALLOW,
+        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=ObstacleAvoidanceMode.AGGRESSIVE,
     )
-
-    return params
 
 
 if __name__ == "__main__":

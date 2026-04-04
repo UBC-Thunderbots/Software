@@ -613,6 +613,7 @@ cc_toolchain_config_fullsystem = rule(
     executable = True,
 )
 
+<<<<<<< HEAD
 def _stm32_gcc_impl(ctx):
     cortex_feature = feature(
         name = "cortex_cpu",
@@ -801,6 +802,9 @@ cc_toolchain_config_stm32 = rule(
 )
 
 def _k8_jetson_nano_cross_compile_impl(ctx):
+=======
+def _k8_aarch64_linux_impl(ctx):
+>>>>>>> 8f36eaf7f7ece6fa298643c05c8aca8e36d01912
     host_system_name = "k8"
 
     action_configs = []
@@ -913,8 +917,8 @@ def _k8_jetson_nano_cross_compile_impl(ctx):
         ),
     ]
 
-cc_toolchain_config_k8_jetson_nano_cross_compile = rule(
-    implementation = _k8_jetson_nano_cross_compile_impl,
+cc_toolchain_config_k8_aarch64_linux = rule(
+    implementation = _k8_aarch64_linux_impl,
     attrs = {
         "builtin_include_directories": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),
