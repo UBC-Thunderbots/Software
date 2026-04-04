@@ -1,12 +1,8 @@
 load(
     ":cc_toolchain_config.bzl",
     "cc_toolchain_config_fullsystem",
-<<<<<<< HEAD
-    "cc_toolchain_config_k8_jetson_nano_cross_compile",
-    "cc_toolchain_config_stm32",
-=======
     "cc_toolchain_config_k8_aarch64_linux",
->>>>>>> 8f36eaf7f7ece6fa298643c05c8aca8e36d01912
+    "cc_toolchain_config_stm32",
     "make_builtin_include_directories",
 )
 

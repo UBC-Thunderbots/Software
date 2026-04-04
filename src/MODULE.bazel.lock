@@ -1340,11 +1340,7 @@
     },
     "@@rules_apple+//apple:apple.bzl%provisioning_profile_repository_extension": {
       "general": {
-<<<<<<< HEAD
-        "bzlTransitiveDigest": "mcCsIIjoQRjNZE35M3PDd8QGJY9tB1iBSRtyYu+R46M=",
-=======
         "bzlTransitiveDigest": "0owyZzufrcndNC+tsd4gvFRHhsHMpOkROsveC5nuiXc=",
->>>>>>> 8f36eaf7f7ece6fa298643c05c8aca8e36d01912
         "usagesDigest": "vsJl8Rw5NL+5Ag2wdUDoTeRF/5klkXO8545Iy7U1Q08=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
