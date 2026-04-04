@@ -546,3 +546,34 @@ TEST_F(BallFilterTest, ball_moving_along_y_axis)
         expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
         num_steps_to_ignore);
 }
+
+TEST_F(BallFilterTest, ball_moving_fast_with_vision_delay)
+{
+    // Setup a fast moving ball (e.g., 5.0 m/s)
+    Vector ball_velocity(5.0, 0.0);
+    Point ball_start(0, 0);
+    
+    // Simulate a 35ms SSL-Vision processing delay
+    Duration vision_delay = Duration::fromSeconds(0.035); 
+    
+    // Feed the filter a few frames to build up velocity
+    for(int i = 0; i < 10; i++) {
+        Timestamp t_capture = current_timestamp + Duration::fromSeconds(i * 0.016);
+        Point pos = ball_start + ball_velocity * (i * 0.016);
+        
+        std::vector<BallDetection> det = {BallDetection{pos, 0.0, t_capture, 1.0}};
+        
+        // The crucial change: we ask the filter for the state at t_capture + vision_delay
+        Timestamp t_now = t_capture + vision_delay; 
+        auto filtered_ball = ball_filter.estimateBallState(det, field.fieldBoundary(), t_now);
+    
+    
+		// THE ASSERTION:
+    	// Without latency compensation (current code), the ball will be 17.5cm behind (5.0m/s * 0.035s).
+    	// With your new Look-Ahead logic, the position should match the projected position.
+    	Point expected_projected_pos = ball_start + ball_velocity * (9 * 0.016 + 0.035);
+    	double error = (filtered_ball->position() - expected_projected_pos).length();
+		EXPECT_LT(error, 0.05); // Expect error to be less than 5cm
+	}
+    
+}

@@ -48,6 +48,7 @@ int main(int argc, char **argv)
     {
         std::string runtime_dir = args.runtime_dir;
         LoggerSingleton::initializeLogger(runtime_dir, nullptr);
+        LOG(CSV, "Failed_goalie_tactic_data.csv") << "timestamp_s,fused_x,fused_y,truth_x,truth_y, true_vel_x, true_vel_y,is_occluded\n";
 
         /**
          * Creates a ER force simulator and sets up the appropriate
@@ -220,7 +221,17 @@ int main(int argc, char **argv)
                     yellow_robot_status_output.sendProto(packet);
                 }
 
-                simulator_state_output.sendProto(er_force_sim->getSimulatorState());
+                auto sim_state = er_force_sim->getSimulatorState();
+                LOG(CSV, "Failed_goalie_tactic_data.csv")
+                    << yellow_vision.time_sent().epoch_timestamp_seconds() << ","
+                    << yellow_vision.ball().current_state().global_position().x_meters()
+                    << ","
+                    << yellow_vision.ball().current_state().global_position().y_meters()
+                    << "," << sim_state.ball().p_x() << "," << sim_state.ball().p_y()
+                    << "," << sim_state.ball().v_x() << "," << sim_state.ball().v_y()
+                    << "," << !er_force_sim->isBallVisible()
+                    << "\n";
+                simulator_state_output.sendProto(sim_state);
             });
 
         // This blocks forever without using the CPU

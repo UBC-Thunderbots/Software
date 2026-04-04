@@ -39,13 +39,17 @@ class Gamecontroller:
         self,
         suppress_logs: bool = False,
         use_conventional_port: bool = False,
+        should_automate_referee: bool = False,
     ) -> None:
         """Run Gamecontroller
 
         :param suppress_logs: Whether to suppress the logs
         :param use_conventional_port: whether or not to use the conventional port!
+        :param should_automate_referee: Whether to automate referee events (e.g. stage changes, goals).
+                                        Should only be True in record_stats mode.
         """
         self.suppress_logs = suppress_logs
+        self.should_automate_referee = should_automate_referee
 
         # We default to using a non-conventional port to avoid emitting
         # on the same port as what other teams may be listening on.
@@ -220,8 +224,8 @@ class Gamecontroller:
             block=False, return_cached=True
         )
 
-        # TODO (#3633): only automate referee events in record_stats mode
-        self.__automate_referee(referee)
+        if self.should_automate_referee:
+            self.__automate_referee(referee)
 
         max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
         max_allowed_bots_blue: int = referee.blue.max_allowed_bots
@@ -503,6 +507,8 @@ class Gamecontroller:
                     "error receiving CiOutput proto from the gamecontroller: "
                     + parse_err.args
                 )
+            except OSError:
+                break
 
         return ci_output_list
 

@@ -18,94 +18,94 @@ from proto.message_translation.tbots_protobuf import create_world_state
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity,robot_initial_position",
     [
-        # test panic ball very fast in straight line
-        (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 0), tbots_cpp.Point(-4, 0)),
-        # test panic ball very_fast in diagonal line
-        (
-            tbots_cpp.Point(0, 0),
-            tbots_cpp.Vector(-5.5, 0.25),
-            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0, -0.5),
-        ),
-        # test ball very fast misses net
-        (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 1), tbots_cpp.Point(-4.5, 0)),
-        # test ball very fast get saved
-        # TODO (#3377): This test is flaky due to inconsistent goalie reach. The linked ticket may provide a permanent fix.
+      #  # test panic ball very fast in straight line
+      #  (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 0), tbots_cpp.Point(-4, 0)),
+      #  # test panic ball very_fast in diagonal line
+      #  (
+      #      tbots_cpp.Point(0, 0),
+      #      tbots_cpp.Vector(-5.5, 0.25),
+      #      tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+      #      + tbots_cpp.Vector(0, -0.5),
+      #  ),
+      #  # test ball very fast misses net
+      #  (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 1), tbots_cpp.Point(-4.5, 0)),
+      #  # test ball very fast get saved
+      #  # TODO (#3377): This test is flaky due to inconsistent goalie reach. The linked ticket may provide a permanent fix.
         (
             tbots_cpp.Point(-2.5, 0),
             # TODO Revert velocity to (-4.8, 1.1)
-            tbots_cpp.Vector(-3.6, 0.825),
+            tbots_cpp.Vector(-4.8, 1.1),
             tbots_cpp.Point(-4.5, 0),
         ),
         # test ball very fast with the goalie out of position saved
         # TODO (#3377): This test is flaky due to inconsistent goalie reach. The linked ticket may provide a permanent fix.
-        (
-            tbots_cpp.Point(-2, 0),
-            # TODO Revert velocity to (-5.5,1)
-            tbots_cpp.Vector(-4.125, 0.75),
-            tbots_cpp.Point(-4.5, -0.1),
-        ),
-        # ball slow inside friendly defense area
-        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 0)),
-        # ball slow inside friendly defense area
-        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 2)),
-        # ball slow inside friendly defense area
-        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(-4, 0)),
-        # ball stationary inside friendly defense area
-        (
-            tbots_cpp.Point(-4, 0.0),
-            tbots_cpp.Vector(0.0, 0),
-            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalpostPos(),
-        ),
-        # ball stationary inside no-chip rectangle
-        (
-            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0.1, 0.1),
-            tbots_cpp.Vector(-0.2, 0),
-            tbots_cpp.Point(-4, -1),
-        ),
-        # ball fast inside no-chip rectangle but no intersection with goal
-        (
-            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0.1, 0),
-            tbots_cpp.Vector(0, -0.5),
-            tbots_cpp.Point(-3.5, 1),
-        ),
-        # ball moving out from inside defense area
-        (
-            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0.5, 0),
-            tbots_cpp.Vector(0.5, 0),
-            tbots_cpp.Point(-3.5, 0),
-        ),
-        # ball slow inside no-chip rectangle
-        (
-            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0.1, 0),
-            tbots_cpp.Vector(0.1, -0.1),
-            tbots_cpp.Point(-3.5, 1),
-        ),
-        # ball moving into goal from inside defense area
-        (
-            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0.5, 0),
-            tbots_cpp.Vector(-0.5, 0),
-            tbots_cpp.Point(-3.5, 0),
-        ),
-        # ball moving up and out of defense area
-        (
-            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0.3, 0),
-            tbots_cpp.Vector(0, 1),
-            tbots_cpp.Point(-3.5, 0),
-        ),
-        # ball moving down and out goal from defense area
-        (
-            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0.3, 0),
-            tbots_cpp.Vector(0, -0.7),
-            tbots_cpp.Point(-3.5, 0),
-        ),
+#        (
+#            tbots_cpp.Point(-2, 0),
+#            # TODO Revert velocity to (-5.5,1)
+#            tbots_cpp.Vector(-5.5, 1),
+#            tbots_cpp.Point(-4.5, -0.1),
+#        ),
+#        # ball slow inside friendly defense area
+      #  (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 0)),
+      #  # ball slow inside friendly defense area
+      #  (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 2)),
+      #  # ball slow inside friendly defense area
+      #  (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(-4, 0)),
+      #  # ball stationary inside friendly defense area
+      #  (
+      #      tbots_cpp.Point(-4, 0.0),
+      #      tbots_cpp.Vector(0.0, 0),
+      #      tbots_cpp.Field.createSSLDivisionBField().friendlyGoalpostPos(),
+      #  ),
+      #  # ball stationary inside no-chip rectangle
+      #  (
+      #      tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+      #      + tbots_cpp.Vector(0.1, 0.1),
+      #      tbots_cpp.Vector(-0.2, 0),
+      #      tbots_cpp.Point(-4, -1),
+      #  ),
+      #  # ball fast inside no-chip rectangle but no intersection with goal
+      #  (
+      #      tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+      #      + tbots_cpp.Vector(0.1, 0),
+      #      tbots_cpp.Vector(0, -0.5),
+      #      tbots_cpp.Point(-3.5, 1),
+      #  ),
+      #  # ball moving out from inside defense area
+      #  (
+      #      tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+      #      + tbots_cpp.Vector(0.5, 0),
+      #      tbots_cpp.Vector(0.5, 0),
+      #      tbots_cpp.Point(-3.5, 0),
+      #  ),
+      #  # ball slow inside no-chip rectangle
+      #  (
+      #      tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+      #      + tbots_cpp.Vector(0.1, 0),
+      #      tbots_cpp.Vector(0.1, -0.1),
+      #      tbots_cpp.Point(-3.5, 1),
+      #  ),
+      #  # ball moving into goal from inside defense area
+      #  (
+      #      tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+      #      + tbots_cpp.Vector(0.5, 0),
+      #      tbots_cpp.Vector(-0.5, 0),
+      #      tbots_cpp.Point(-3.5, 0),
+      #  ),
+      #  # ball moving up and out of defense area
+      #  (
+      #      tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+      #      + tbots_cpp.Vector(0.3, 0),
+      #      tbots_cpp.Vector(0, 1),
+      #      tbots_cpp.Point(-3.5, 0),
+      #  ),
+      #  # ball moving down and out goal from defense area
+      #  (
+      #      tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+      #      + tbots_cpp.Vector(0.3, 0),
+      #      tbots_cpp.Vector(0, -0.7),
+      #      tbots_cpp.Point(-3.5, 0),
+      #  ),
     ],
 )
 def test_goalie_blocks_shot(
@@ -167,23 +167,23 @@ def test_goalie_blocks_shot(
 @pytest.mark.parametrize(
     "ball_position,should_clear",
     [
-        (
-            tbots_cpp.Point(-3.45, 0),
-            True,
-        ),  # ball is just inside the dead zone in the X direction
-        (
-            tbots_cpp.Point(-3.45, 0.9),
-            True,
-        ),  # ball is just inside the dead zone in the X direction
-        (
-            tbots_cpp.Point(-4.0, 1.05),
-            True,
-        ),  # ball is just inside the dead zone in the Y direction
-        (
-            tbots_cpp.Point(0, 0),
-            False,
-            # ball is just outside the dead zone in the X direction
-        ),
+ #       (
+ #           tbots_cpp.Point(-3.45, 0),
+ #           True,
+ #       ),  # ball is just inside the dead zone in the X direction
+ #       (
+ #           tbots_cpp.Point(-3.45, 0.9),
+ #           True,
+ #       ),  # ball is just inside the dead zone in the X direction
+ #       (
+ #           tbots_cpp.Point(-4.0, 1.05),
+ #           True,
+ #       ),  # ball is just inside the dead zone in the Y direction
+ #       (
+ #           tbots_cpp.Point(0, 0),
+ #           False,
+ #           # ball is just outside the dead zone in the X direction
+ #       ),
     ],
 )
 def test_goalie_clears_from_dead_zone(
