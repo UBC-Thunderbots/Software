@@ -61,7 +61,7 @@ def test_shoot_or_chip_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-    # TODO (#3632): add validations
+    # TODO (#3651): add validations
     simulated_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=[[]],
