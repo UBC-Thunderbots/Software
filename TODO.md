@@ -10,12 +10,12 @@
 - [x] src/software/ai/hl/stp/play/example/example_play_test.cpp (not necessary)
 - [x] src/software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play_test.cpp
 - [x] src/software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play_test.cpp
-- [ ] src/software/ai/hl/stp/play/penalty_kick/penalty_kick_play_test.cpp
+- [x] src/software/ai/hl/stp/play/penalty_kick/penalty_kick_play_test.cpp (#3475)
 - [x] src/software/ai/hl/stp/tactic/chip/chip_tactic_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/attacker/attacker_tactic_shoot_goal_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/attacker/attacker_tactic_passing_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/attacker/attacker_tactic_keep_away_test.cpp
-- [ ] src/software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic_test.cpp
+- [x] src/software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/dribble/dribble_tactic_push_enemy_test.cpp
 - [ ] src/software/ai/hl/stp/tactic/dribble/dribble_tactic_test.cpp
