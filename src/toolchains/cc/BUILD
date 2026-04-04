@@ -211,7 +211,6 @@ cc_toolchain(
     toolchain_identifier = "gcc-k8-aarch64-linux",
 )
 
-<<<<<<< HEAD
 cc_toolchain_config_stm32(
     name = "gcc-arm-none-abi",
     builtin_include_directories = [
@@ -245,12 +244,9 @@ cc_toolchain(
     toolchain_identifier = "stm32_gcc",
 )
 
-cc_toolchain_config_k8_jetson_nano_cross_compile(
-    name = "gcc_k8_jetson_nano_cross_compile",
-=======
+
 cc_toolchain_config_k8_aarch64_linux(
     name = "gcc_k8_aarch64_linux",
->>>>>>> 8f36eaf7f7ece6fa298643c05c8aca8e36d01912
     builtin_include_directories = [
         "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/include/",
         "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/sysroot/usr/include/",
