@@ -1,7 +1,7 @@
 from typing import override
 
 from proto.validation_pb2 import ValidationStatus, ValidationType
-
+from software.py_constants import DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
 from software.simulated_tests.validation.validation import (
     Validation,
 )
@@ -15,11 +15,11 @@ class DurationValidation(Validation):
                 "Type of validation needs to be EVENTUALLY for DurationValidation"
             )
 
-        tick_duration_s = 0.0166
-
         self.duration_s = duration_s
         self.passing_ticks = 0
-        self.duration_ticks = int(duration_s / tick_duration_s)
+        self.duration_ticks = int(
+            duration_s / DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
+        )
         self.validation = validation
 
     @override
