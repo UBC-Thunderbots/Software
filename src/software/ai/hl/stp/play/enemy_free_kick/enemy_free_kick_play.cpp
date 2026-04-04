@@ -15,17 +15,6 @@ EnemyFreeKickPlay::EnemyFreeKickPlay(
 {
 }
 
-void EnemyFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                       const WorldPtr &world_ptr)
-{
-    // This function doesn't get called, it should be removed once coroutines
-    // are phased out
-    while (true)
-    {
-        yield({{}});
-    }
-}
-
 void EnemyFreeKickPlay::updateControlParams(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {

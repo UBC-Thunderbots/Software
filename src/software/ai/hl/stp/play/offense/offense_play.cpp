@@ -9,17 +9,6 @@ OffensePlay::OffensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_p
 {
 }
 
-void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                 const WorldPtr &world_ptr)
-{
-    // This function doesn't get called, it should be removed once coroutines
-    // are phased out
-    while (true)
-    {
-        yield({{}});
-    }
-}
-
 void OffensePlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm.process_event(OffensePlayFSM::Update(control_params, play_update));

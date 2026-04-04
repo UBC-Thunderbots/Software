@@ -10,13 +10,6 @@ BallPlacementPlay::BallPlacementPlay(
 {
 }
 
-void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                       const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing, will be removed once
-    // coroutines are phased out
-}
-
 void BallPlacementPlay::updateTactics(const PlayUpdate &play_update)
 {
     auto event = BallPlacementPlayFSM::Update(control_params, play_update);
