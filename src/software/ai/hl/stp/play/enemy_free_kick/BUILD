@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -40,6 +41,7 @@ py_test(
     srcs = [
         "enemy_free_kick_play_test.py",
     ],
+    package_collisions = "warning",
     tags = [
         "exclusive",
     ],
@@ -47,5 +49,9 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
+        requirement("pyqt6"),
+        requirement("numpy"),
+        requirement("pyqtdarktheme-fork"),
+        requirement("pyqtgraph"),
     ],
 )

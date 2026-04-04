@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
@@ -30,6 +31,21 @@ py_library(
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
+    ],
+    package_collisions = "warning",
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests:speed_threshold_helpers",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+        requirement("pyqt6"),
+        requirement("numpy"),
+        requirement("pyqtdarktheme-fork"),
+        requirement("pyqtgraph"),
     ],
 )
 

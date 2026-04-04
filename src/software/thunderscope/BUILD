@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
@@ -13,6 +14,7 @@ compile_pip_requirements(
 py_binary(
     name = "thunderscope_main",
     srcs = ["thunderscope_main.py"],
+    package_collisions = "warning",
     deps = [
         ":config",
         ":constants",
@@ -50,6 +52,7 @@ py_library(
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/binary_context_managers:tigers_autoref",
+        requirement("pyqt6"),
         requirement("numpy"),
         requirement("pyqtdarktheme-fork"),
         requirement("pyqtgraph"),
@@ -153,6 +156,7 @@ py_library(
     srcs = ["constants.py"],
     deps = [
         requirement("protobuf"),
+        requirement("pyopengl"),
     ],
 )
 
