@@ -39,6 +39,8 @@ def create_world_state(
 
     for robot_id, robot_location in enumerate(blue_robot_locations):
         orientation = tbots_cpp.Angle.zero()
+        velocity = tbots_cpp.Vector(0, 0)
+
         try:
             orientation = blue_robot_orientations[robot_id]
         except IndexError:
@@ -47,7 +49,7 @@ def create_world_state(
         try:
             velocity = blue_robot_velocities[robot_id]
         except IndexError:
-            velocity = tbots_cpp.Vector(0, 0)
+            pass
 
         world_state.blue_robots[robot_id].CopyFrom(
             RobotState(
