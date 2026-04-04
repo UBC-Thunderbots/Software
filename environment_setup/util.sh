@@ -121,6 +121,19 @@ install_python_dev_cross_compile_headers() {
     rm -rf /tmp/tbots_download_cache/python-3.12.0.tar.xz
 }
 
+install_stm32_cross_compiler() {
+    arch="aarch64"
+    if is_x86 $1; then
+        arch="x86_64"
+    fi
+    download_link=https://developer.arm.com/-/media/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-${arch}-arm-none-eabi.tar.xz
+
+    wget -N $download_link -O /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz
+    tar -xf /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz -C /tmp/tbots_download_cache/
+    sudo mv /tmp/tbots_download_cache/arm-gnu-toolchain-14.3.rel1-${arch}-arm-none-eabi /opt/tbotspython/arm-none-eabi-gcc
+    rm /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz
+}
+
 install_python_toolchain_headers() {
   sudo mkdir -p /opt/tbotspython/py_headers/include/
   sudo ln -sfn "$(python3.12-config --includes | awk '{for(i=1;i<=NF;++i) if ($i ~ /^-I/) print substr($i, 3)}' | head -n1)" /opt/tbotspython/py_headers/include/
