@@ -7,7 +7,7 @@
 - [x] src/software/ai/hl/stp/play/free_kick/free_kick_play_test.cpp
 - [x] src/software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_test.cpp (#3475)
 - [x] src/software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_test.cpp
-- [x] src/software/ai/hl/stp/play/example/example_play_test.cpp (not necessary)
+- [x] src/software/ai/hl/stp/play/example/example_play_test.cpp
 - [x] src/software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play_test.cpp
 - [x] src/software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play_test.cpp
 - [x] src/software/ai/hl/stp/play/penalty_kick/penalty_kick_play_test.cpp (#3475)
