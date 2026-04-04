@@ -70,7 +70,7 @@ class KickTracker(Tracker):
         self.proto_unix_io.register_observer(
             AttackerVisualization, self.attacker_vis_buffer
         )
-                
+
         self.curr_pass = None
 
     def _get_new_kick_angle(
