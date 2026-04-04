@@ -604,4 +604,6 @@ def simulated_test_runner():
                     gamecontroller,
                 )
 
+            runner.simulator_runtime_dir = f"{args.simulator_runtime_dir}/test/{test_name}"
+
             yield runner

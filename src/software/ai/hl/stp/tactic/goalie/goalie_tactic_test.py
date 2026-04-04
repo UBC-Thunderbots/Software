@@ -1,3 +1,4 @@
+import os
 import pytest
 
 import software.python_bindings as tbots_cpp
@@ -146,22 +147,43 @@ def test_goalie_blocks_shot(
 
     eventually_validation_sequence_set = [
         [
-            # Goalie should be in the defense area
-            RobotEventuallyEntersRegion(
-                regions=[
-                    tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
-                ]
-            ),
+            FriendlyEventuallyHasBallPossession(),
         ]
     ]
 
-    simulated_test_runner.run_test(
-        setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
-    )
+    _passed = True
+    try:
+        simulated_test_runner.run_test(
+            setup=setup,
+            inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+            inv_always_validation_sequence_set=always_validation_sequence_set,
+            ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+            ag_always_validation_sequence_set=always_validation_sequence_set,
+        )
+    except AssertionError:
+        _passed = False
+        raise
+    finally:
+        csv_path = os.path.join(
+            simulated_test_runner.simulator_runtime_dir, "goalie_tactic_data.csv"
+        )
+        if os.path.exists(csv_path):
+            failed_val = 0 if _passed else 1
+            with open(csv_path, "r") as _f:
+                lines = [l.rstrip("\n") for l in _f.readlines() if l.strip()]
+            header = lines[0] if lines else ""
+            already_has_failed = "failed" in header.split(",")
+            complete_cols = len(header.split(",")) if already_has_failed else len(header.split(",")) + 1
+            with open(csv_path, "w") as _f:
+                for i, line in enumerate(lines):
+                    if len(line.split(",")) < complete_cols:
+                        # Row from current run — not yet labeled
+                        if i == 0:
+                            _f.write(f"{line},failed\n")
+                        else:
+                            _f.write(f"{line},{failed_val}\n")
+                    else:
+                        _f.write(f"{line}\n")
 
 
 @pytest.mark.parametrize(
