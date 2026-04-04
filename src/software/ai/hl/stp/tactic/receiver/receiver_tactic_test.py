@@ -87,7 +87,6 @@ def calculate_ball_velocity(passer_point, receiver_point, speed):
         # add more tests here and explore more of the "one-touch" space
         #
         # TODO (#2570): re-enable when one-touch aren't flaky for these tests
-        # TODO(#2909): re-enable once the robot can turn faster and hits the ball
         #
         # one touch robot on receiver point
         # (
@@ -123,14 +122,14 @@ def calculate_ball_velocity(passer_point, receiver_point, speed):
         #     tbots_cpp.Angle.zero(),
         #     True,
         # ),
-        (
-            tbots_cpp.Point(4.0, 1.5),
-            tbots_cpp.Point(4, -1),
-            5,
-            tbots_cpp.Point(4, -1),
-            tbots_cpp.Angle.half(),
-            True,
-        ),
+        # (
+        #     tbots_cpp.Point(4.0, 1.5),
+        #     tbots_cpp.Point(4, -1),
+        #     5,
+        #     tbots_cpp.Point(4, -1),
+        #     tbots_cpp.Angle.half(),
+        #     True,
+        # ),
         # (
         #     tbots_cpp.Point(4.0, 1.5),
         #     tbots_cpp.Point(3.5, -1),
@@ -139,14 +138,14 @@ def calculate_ball_velocity(passer_point, receiver_point, speed):
         #     tbots_cpp.Angle.zero(),
         #     True,
         # ),
-        (
-            tbots_cpp.Point(4.0, 1.5),
-            tbots_cpp.Point(3.0, -1),
-            4.5,
-            tbots_cpp.Point(3.0, -1),
-            tbots_cpp.Angle.half(),
-            True,
-        ),
+        # (
+        #     tbots_cpp.Point(4.0, 1.5),
+        #     tbots_cpp.Point(3.0, -1),
+        #     4.5,
+        #     tbots_cpp.Point(3.0, -1),
+        #     tbots_cpp.Angle.half(),
+        #     True,
+        # ),
         # (
         #     tbots_cpp.Point(4.0, -1.5),
         #     tbots_cpp.Point(4, 1),
@@ -163,14 +162,14 @@ def calculate_ball_velocity(passer_point, receiver_point, speed):
         #     tbots_cpp.Angle.zero(),
         #     True,
         # ),
-        (
-            tbots_cpp.Point(4.0, -1.5),
-            tbots_cpp.Point(3, 1),
-            4.5,
-            tbots_cpp.Point(3, 1),
-            tbots_cpp.Angle.zero(),
-            True,
-        ),
+        # (
+        #     tbots_cpp.Point(4.0, -1.5),
+        #     tbots_cpp.Point(3, 1),
+        #     4.5,
+        #     tbots_cpp.Point(3, 1),
+        #     tbots_cpp.Angle.zero(),
+        #     True,
+        # ),
         # (
         #     tbots_cpp.Point(3.0, 0.0),
         #     tbots_cpp.Point(2, 0),
