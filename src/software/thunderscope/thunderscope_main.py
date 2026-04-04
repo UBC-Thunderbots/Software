@@ -254,49 +254,6 @@ if __name__ == "__main__":
         )
 
     ###########################################################################
-    #                      Visualize CPP Tests                                #
-    ###########################################################################
-    # TODO (#2581) remove this
-    if args.visualize_cpp_test:
-        runtime_dir = "/tmp/tbots/gtest_logs"
-
-        try:
-            os.makedirs(runtime_dir)
-        except OSError:
-            pass
-
-        tscope = Thunderscope(
-            config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size
-            ),
-            layout_path=args.layout,
-        )
-        proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE]
-
-        # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
-        # to true to decode from base64.
-        for arg in [
-            {"proto_class": ObstacleList},
-            {"proto_class": PathVisualization},
-            {"proto_class": PassVisualization},
-            {"proto_class": AttackerVisualization},
-            {"proto_class": CostVisualization},
-            {"proto_class": DebugShapes},
-            {"proto_class": NamedValue},
-            {"proto_class": PrimitiveSet},
-            {"proto_class": World},
-            {"proto_class": PlayInfo},
-            {"proto_class": BallPlacementVisualization},
-        ]:
-            proto_unix_io.attach_unix_receiver(
-                runtime_dir, from_log_visualize=True, **arg
-            )
-
-        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", proto_class=RobotLog)
-
-        tscope.show()
-
-    ###########################################################################
     #              AI + Robot Communication + Robot Diagnostics               #
     ###########################################################################
     #
