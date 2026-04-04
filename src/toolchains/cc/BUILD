@@ -244,7 +244,6 @@ cc_toolchain(
     toolchain_identifier = "stm32_gcc",
 )
 
-
 cc_toolchain_config_k8_aarch64_linux(
     name = "gcc_k8_aarch64_linux",
     builtin_include_directories = [

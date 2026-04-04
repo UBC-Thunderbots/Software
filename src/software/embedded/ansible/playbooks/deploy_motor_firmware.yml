@@ -32,13 +32,13 @@
       changed_when: false
 
     - name: Set path facts
-      set_fact:
+      ansible.builtin.set_fact:
         bazel_raw_out_path: "{{ cquery_result.stdout.strip() }}"
         bazel_out_path: "{{ cquery_result.stdout.strip() }}.bin"
 
     - name: Debug resolved paths
-      debug:
-        msg: "ELF Path: {{bazel_raw_out_path }} | BIN Path: {{ bazel_out_path }}"
+      ansible.builtin.debug:
+        msg: "ELF Path: {{ bazel_raw_out_path }} | BIN Path: {{ bazel_out_path }}"
 
     - name: Convert .elf binary to .bin binary
       delegate_to: localhost
@@ -95,7 +95,8 @@
         remote_src: true
 
     - name: Configure Pinmux for SWD
-      ansible.builtin.shell: "echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 4 ip pu && echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 17 ip pu && echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 18 ip pu"
+      ansible.builtin.shell: "echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 4 ip pu && echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 17 ip pu && echo {{
+        ansible_sudo_pass }} | sudo -S pinctrl set 18 ip pu"
       ignore_errors: true
 
     - name: Run flashing script for Motor Driver A
