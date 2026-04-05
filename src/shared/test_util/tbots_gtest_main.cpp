@@ -14,11 +14,49 @@ bool TbotsGtestMain::stop_ai_on_start    = false;
 std::string TbotsGtestMain::runtime_dir  = "/tmp/tbots/yellow_test";
 double TbotsGtestMain::test_speed        = 1.0;
 
+/**
+ * Portable wrapper for feenableexcept.
+ * Returns the previous set of enabled exceptions, or -1 on failure.
+ */
+int enable_fp_exceptions(unsigned int excepts)
+{
+#if defined(__linux__) && defined(__GNUC__)
+    return feenableexcept(excepts);
+
+#elif defined(__APPLE__)
+    fenv_t fenv;
+    if (fegetenv(&fenv) != 0)
+    {
+        return -1;
+    }
+    unsigned int old_excepts = (unsigned int)(fenv.__fpcr & FE_ALL_EXCEPT);
+
+    // On ARM64, setting bits in FPCR enables the trap
+    fenv.__fpcr |= (excepts & FE_ALL_EXCEPT);
+
+    return (fesetenv(&fenv) == 0) ? (int)old_excepts : -1;
+
+#else
+    // Unsupported platform
+    return -1;
+#endif
+}
 
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    feenableexcept(FE_INVALID | FE_OVERFLOW);
+
+    // Crash on invalid operations like division by zero and floating-point overflow
+    if (enable_fp_exceptions(FE_INVALID | FE_OVERFLOW) < 0)
+    {
+        std::cerr << "Warning: Could not enable floating-point exceptions." << std::endl;
+    }
+
+    // Crash on invalid operations like division by zero and floating-point overflow
+    if (enable_fp_exceptions(FE_INVALID | FE_OVERFLOW) < 0)
+    {
+        std::cerr << "Warning: Could not enable floating-point exceptions." << std::endl;
+    }
 
     boost::program_options::options_description desc{"Options"};
 
@@ -63,7 +101,8 @@ int main(int argc, char **argv)
         {
             // disable floating point errors when using visualizer due to potential
             // floating point errors in QT
-            fedisableexcept(FE_INVALID | FE_OVERFLOW);
+            // TODO #(2510) Remove this once we port over to simulated pytests entirely
+            // fedisableexcept(FE_INVALID | FE_OVERFLOW);
         }
         return RUN_ALL_TESTS();
     }
