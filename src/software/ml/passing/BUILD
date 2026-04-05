@@ -1,8 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
-py_library(
-    name = "train",
-    srcs = ["train.py"],
+py_binary(
+    name = "train_passing",
+    srcs = ["train_passing.py"],
     deps = [
         "//software/evaluation/logs:event_log",
         "//software/evaluation/logs:pass_log",
