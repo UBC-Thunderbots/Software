@@ -65,7 +65,7 @@ class EventLog(TimestampedEvalLog):
             world_state_log=world_state_log,
         )
 
-    @override    
+    @override
     @classmethod
     def get_num_cols(cls) -> int:
         return EventLog.num_cols

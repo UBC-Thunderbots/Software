@@ -5,6 +5,7 @@ from software.evaluation.logs.log_interface import IEvalLog, count_primitive_fie
 from software.py_constants import DIV_B_NUM_ROBOTS
 from typing import Any, Iterator, override
 
+
 @dataclass
 class RobotLog(IEvalLog):
     """Represents a single robot on the field, with ID and current state."""
@@ -13,7 +14,7 @@ class RobotLog(IEvalLog):
     state: RobotState
 
     num_cols: int = count_primitive_fields(RobotState.DESCRIPTOR)
-    
+
     @classmethod
     @override
     def get_num_cols(cls) -> int:
@@ -21,7 +22,8 @@ class RobotLog(IEvalLog):
 
     def get_position(self) -> list[float]:
         """Returns the current ball position as a [float, float] array
-        represnting x, y coordinates"""
+        represnting x, y coordinates
+        """
         return [
             self.state.global_position.x_meters,
             self.state.global_position.y_meters,
@@ -69,12 +71,13 @@ class BallLog(IEvalLog):
 
     def get_position(self) -> list[float]:
         """Returns the current ball position as a [float, float] array
-        represnting x, y coordinates"""
+        represnting x, y coordinates
+        """
         return [
             self.state.global_position.x_meters,
             self.state.global_position.y_meters,
         ]
-    
+
     @classmethod
     @override
     def get_num_cols(cls) -> int:
@@ -107,7 +110,7 @@ class BallLog(IEvalLog):
 @dataclass
 class WorldStateLog(IEvalLog):
     """Represents the current state of the world"""
-    
+
     ball_state: BallLog
     friendly_robots: list[RobotLog]
     enemy_robots: list[RobotLog]
@@ -139,7 +142,7 @@ class WorldStateLog(IEvalLog):
             friendly_robots=friendly_robots,
             enemy_robots=enemy_robots,
         )
-    
+
     @classmethod
     @override
     def get_num_cols(cls) -> int:

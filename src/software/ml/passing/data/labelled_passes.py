@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from software.evaluation.logs.pass_log import PassLog, PassLogType
-from software.ml.passing.pass_result import PassResult
+from software.ml.passing.data.pass_result import PassResult
 from software.ml.data_cleanup.stats_result import StatsResult
 import uuid
 

@@ -4,9 +4,19 @@ py_library(
     name = "stats_result",
     srcs = ["stats_result.py"],
     data = [
-        "//software:python_bindings.so"
-    ]
+        "//software:python_bindings.so",
+    ],
     deps = [
-        "//software/evaluation/logs:event_log"
+        ":result_interface",
+        "//software/evaluation/logs:event_log",
+        "//software/evaluation/logs:log_interface",
+    ],
+)
+
+py_library(
+    name = "result_interface",
+    srcs = ["result_interface.py"],
+    deps = [
+        "//software/evaluation/logs:log_interface",
     ],
 )

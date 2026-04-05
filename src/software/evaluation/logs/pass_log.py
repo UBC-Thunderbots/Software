@@ -1,5 +1,8 @@
 from __future__ import annotations
-from software.evaluation.logs.log_interface import TimestampedEvalLog, count_primitive_fields
+from software.evaluation.logs.log_interface import (
+    TimestampedEvalLog,
+    count_primitive_fields,
+)
 from software.evaluation.logs.event_log import EventLog, EventType
 from dataclasses import dataclass
 from enum import IntEnum
@@ -10,8 +13,9 @@ from typing import Any, override
 
 class PassLogType(IntEnum):
     """Enum for the different types of pass results we want to log
-    
-    Each value consists of a label and an interval in seconds"""
+
+    Each value consists of a label and an interval in seconds
+    """
 
     RESULT_1S = 1
     RESULT_5S = 5
@@ -28,24 +32,28 @@ class PassLog(TimestampedEvalLog):
     along with information about the pass itself
     """
 
-    # since the same pass is logged multiple times, 
+    # since the same pass is logged multiple times,
     # we assign an id to make it easier to correlate
     pass_id: uuid.UUID
-    
+
     pass_event: EventLog
     pass_log_type: PassLogType
     pass_: Pass
 
-    num_cols: int = EventLog.get_num_cols() + 2 + count_primitive_fields(Pass.DESCRIPTOR)
+    num_cols: int = (
+        EventLog.get_num_cols() + 2 + count_primitive_fields(Pass.DESCRIPTOR)
+    )
 
     def get_pass_start_point(self) -> list[Any]:
         """Returns the current pass start position as a [float, float] array
-        represnting x, y coordinates"""
+        represnting x, y coordinates
+        """
         return [self.pass_.passer_point.x_meters, self.pass_.passer_point.y_meters]
 
     def get_pass_end_point(self) -> list[Any]:
         """Returns the current pass end position as a [float, float] array
-        represnting x, y coordinates"""
+        represnting x, y coordinates
+        """
         return [self.pass_.receiver_point.x_meters, self.pass_.receiver_point.y_meters]
 
     @classmethod
