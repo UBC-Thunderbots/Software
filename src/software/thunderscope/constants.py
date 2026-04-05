@@ -402,9 +402,13 @@ class RuntimeManagerConstants:
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
 
-    RUNTIME_EVENTS_DIRECTORY_PATH = "/tmp/tbots/stats"
+    RUNTIME_EVENTS_DIRECTORY_PATH = "/home/thunderbots/Software/src/software/ml/datasets"
     RUNTIME_EVENTS_FILE = "game_events.csv"
 
     RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
     DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
     MAX_RELEASES_FETCHED = 5
+
+class PassResultsConstants:
+    PASS_RESULTS_DIRECTORY_PATH = "/home/thunderbots/Software/src/software/ml/datasets"
+    PASS_RESULTS_FILE_NAME = "pass_results.csv"

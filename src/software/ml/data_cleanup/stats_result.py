@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from software.evaluation.events.event import IEvalLog
-from software.ml.data.result_interface import IResult
-from software.evaluation.events.tracked_event import EventLog, Team, EventType
+from software.ml.data_cleanup.result_interface import IResult
+from software.evaluation.logs.event_log import EventLog, Team, EventType
 from typing import cast, Any, List
 import software.python_bindings as tbots_cpp
 
@@ -17,6 +17,7 @@ class StatsResult(IResult):
     shots_on_net: int = 0
     ball_in_enemy_half: bool = False
     passes: int = 0
+    blocked_enemy_shots: int = 0
 
     _field: tbots_cpp.Field = field(init=False, repr=False)
 
@@ -63,6 +64,9 @@ class StatsResult(IResult):
                 else:
                     self.enemy_score += 1
 
+            case EventType.SHOT_BLOCKED if for_friendly:
+                self.blocked_enemy_shots += 1
+
             case EventType.YELLOW_CARD if for_friendly:
                 self.yellow_cards += 1
 
@@ -79,6 +83,14 @@ class StatsResult(IResult):
             case EventType.ENEMY_POSSESSION_END:
                 self.has_possession = None
 
-            case EventType.GAME_END:
-                self.has_possession = False
+            case EventType.GAME_END | EventType.GAME_START:
+                self.has_possession = None
                 self.ball_in_enemy_half = False
+                self.passes = 0
+                self.score = 0
+                self.enemy_score = 0
+                self.yellow_cards = 0
+                self.red_cards = 0
+                self.shots_on_net = 0
+                self.blocked_enemy_shots = 0
+

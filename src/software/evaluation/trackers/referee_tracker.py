@@ -1,14 +1,26 @@
-from typing import override
+from typing import override, Callable
 from software.evaluation.trackers.tracker import Tracker
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.evaluation.trackers.tracked_event import EventType, Team
+from software.evaluation.logs.event_log import EventType, Team
 import queue
 
 
 class RefereeTracker(Tracker):
     """Tracks Referee events, like goals and yellow / red cards for the friendly team only"""
+
+    # we want to ignore all breaks, times before the game actually starts
+    # and all penalty related stages
+    STAGES_TO_IGNORE = [
+        Referee.Stage.PENALTY_SHOOTOUT_BREAK,
+        Referee.Stage.PENALTY_SHOOTOUT,
+        Referee.Stage.NORMAL_FIRST_HALF_PRE,
+        Referee.Stage.NORMAL_SECOND_HALF_PRE,
+        Referee.Stage.EXTRA_TIME_BREAK,
+        Referee.Stage.EXTRA_FIRST_HALF_PRE,
+        Referee.Stage.EXTRA_SECOND_HALF_PRE        
+    ]
 
     def __init__(
         self,
@@ -17,6 +29,7 @@ class RefereeTracker(Tracker):
         for_team: Team,
         event_queue: queue.Queue,
         friendly_color_yellow: bool,
+        toggle_logging: Callable[[bool], None] | None = None,
         **kwargs,
     ):
         """Initializes the RefereeTracker
@@ -41,21 +54,57 @@ class RefereeTracker(Tracker):
 
         self.friendly_color_yellow = friendly_color_yellow
 
+        # we can use this callback to turn on / off logging 
+        # during stages we don't care about
+        self.toggle_logging = toggle_logging
+
         self.num_yellow_cards = 0
         self.num_red_cards = 0
         self.num_goals = 0
 
-    @override
-    def refresh(self):
-        """Refresh and log the latest referee information"""
-        refree_msg = self.referee_buffer.get(block=False, return_cached=True)
+        self.curr_stage = None
 
-        if not refree_msg:
+    @override
+    def refresh_tracker(self) -> None:
+        """Refresh and log the latest referee information"""
+        referee_msg = self.referee_buffer.get(block=False, return_cached=True)
+
+        if not referee_msg:
             return
 
-        if refree_msg.HasField("yellow" if self.friendly_color_yellow else "blue"):
+        game_stage = referee_msg.stage
+
+        if game_stage in self.STAGES_TO_IGNORE:
+            if self.toggle_logging:
+                self.toggle_logging(False)
+            return
+
+        if self.toggle_logging:
+            self.toggle_logging(True)
+
+        # if game has just started, log a game start event once
+        if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
+            self.curr_stage = self._log_event_if_change(
+                new_value=game_stage,
+                old_value=self.curr_stage,
+                event_type=EventType.GAME_START
+            )
+            return
+
+        # if the game has just ended, log a game end event once
+        if game_stage == Referee.Stage.POST_GAME:
+            self.curr_stage = self._log_event_if_change(
+                new_value=game_stage,
+                old_value=self.curr_stage,
+                event_type=EventType.GAME_END
+            )
+            return
+
+        self.curr_stage = game_stage
+
+        if referee_msg.HasField("yellow" if self.friendly_color_yellow else "blue"):
             team_info = (
-                refree_msg.yellow if self.friendly_color_yellow else refree_msg.blue
+                referee_msg.yellow if self.friendly_color_yellow else referee_msg.blue
             )
 
             if team_info.HasField("score"):

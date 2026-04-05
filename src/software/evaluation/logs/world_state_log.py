@@ -1,32 +1,9 @@
-from dataclass import dataclass
+from __future__ import annotations
+from dataclasses import dataclass
 from proto.import_all_protos import *
-from software.evaluation.logs.log_interface import IEvalLog
-from google.protobuf.descriptor import Descriptor, FieldDescriptor
+from software.evaluation.logs.log_interface import IEvalLog, count_primitive_fields
 from software.py_constants import DIV_B_NUM_ROBOTS
-from typing import Any, Iterator
-
-
-def count_primitive_fields(descriptor: Descriptor):
-    """Recursively counts the number of primitive fields in a Protobuf message
-    using its descriptor.
-
-    :param message: the message descriptor to count all leaf-level primitive fields for
-    :return: the count of primitive fields
-    """
-    count = 0
-
-    for field in descriptor.fields:
-        # Check if the field is a nested message
-        if field.type == FieldDescriptor.TYPE_MESSAGE:
-            # Get the nested message class to recurse into its descriptor
-            nested_message = field.message_type
-            # Recurse using the nested message's descriptor
-            count += count_primitive_fields(nested_message)
-        else:
-            # It's a primitive type (double, float, int, bool, string, etc.)
-            count += 1
-    return count
-
+from typing import Any, Iterator, override
 
 @dataclass
 class RobotLog(IEvalLog):
@@ -36,10 +13,10 @@ class RobotLog(IEvalLog):
     state: RobotState
 
     num_cols: int = count_primitive_fields(RobotState.DESCRIPTOR)
-
+    
+    @classmethod
     @override
-    @staticmethod
-    def get_num_cols() -> int:
+    def get_num_cols(cls) -> int:
         return RobotLog.num_cols
 
     def get_position(self) -> list[float]:
@@ -61,7 +38,7 @@ class RobotLog(IEvalLog):
 
     @staticmethod
     @override
-    def from_csv_row(row_iter: Iterator[str], id: int = 0) -> IEvalLog | None:
+    def from_csv_row(row_iter: Iterator[str], id: int = 0) -> RobotLog | None:
         data = [next(row_iter) for _ in range(RobotLog.num_cols)]
 
         # Check if this was a placeholder (all 'None' strings)
@@ -97,9 +74,10 @@ class BallLog(IEvalLog):
             self.state.global_position.x_meters,
             self.state.global_position.y_meters,
         ]
-
-    @staticmethod
-    def get_num_cols() -> int:
+    
+    @classmethod
+    @override
+    def get_num_cols(cls) -> int:
         return BallLog.num_cols
 
     @override
@@ -135,7 +113,7 @@ class WorldStateLog(IEvalLog):
     enemy_robots: list[RobotLog]
 
     num_cols: int = (
-        DIV_B_NUM_ROBOTS * RobotLog.get_num_cols() * 2 + BallLog.get_num_cols
+        DIV_B_NUM_ROBOTS * RobotLog.get_num_cols() * 2 + BallLog.get_num_cols()
     )
 
     @staticmethod
@@ -161,9 +139,10 @@ class WorldStateLog(IEvalLog):
             friendly_robots=friendly_robots,
             enemy_robots=enemy_robots,
         )
-
+    
+    @classmethod
     @override
-    def get_num_cols() -> int:
+    def get_num_cols(cls) -> int:
         return WorldStateLog.num_cols
 
     def robots_to_array(self, robots: list[RobotLog]) -> list[Any]:
@@ -184,6 +163,7 @@ class WorldStateLog(IEvalLog):
             new_state = []
 
             if idx not in robot_state_map:
+                print(f"ROBOT {idx} NOT FOUND!!!!!!!!!!")
                 new_state = [None for _ in range(num_cols_per_robot)]
             else:
                 robot_state = robot_state_map[idx]

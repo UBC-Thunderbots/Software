@@ -4,10 +4,10 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.import_all_protos import *
 import software.python_bindings as tbots_cpp
 import queue
-from software.evaluation.trackers.tracked_event import (
+from software.evaluation.logs.event_log import (
     EventType,
-    get_event_from_world,
     Team,
+    EventLog
 )
 
 
@@ -55,6 +55,11 @@ class Tracker:
         self.cached_world_msg = world_msg
         self.cached_world = tbots_cpp.World(world_msg)
 
+        self.refresh_tracker()
+
+    def refresh_tracker(self) -> None:
+        pass
+
     def write_event(self, event_type: EventType) -> None:
         """Writes a single event to the event queue of the given type
 
@@ -63,7 +68,7 @@ class Tracker:
         if not self.cached_world:
             return
 
-        event = get_event_from_world(
+        event = EventLog.from_world(
             world_msg=self.cached_world_msg,
             event_type=event_type,
             from_team=self.from_team,

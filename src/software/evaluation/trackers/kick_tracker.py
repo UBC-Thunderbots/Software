@@ -7,7 +7,7 @@ from typing import override
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.evaluation.trackers.tracker import Tracker
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.evaluation.trackers.tracked_event import EventType, Team
+from software.evaluation.logs.event_log import EventType, Team
 import queue
 
 
@@ -105,12 +105,11 @@ class KickTracker(Tracker):
 
         return None
 
-    def refresh(self) -> None:
+    @override
+    def refresh_tracker(self) -> None:
         """Refreshes the tracker by getting the current state of the world
         and the latest attacker visualization
         """
-        super().refresh()
-
         if self.cached_world is None:
             return
 

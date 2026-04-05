@@ -1,14 +1,37 @@
+from __future__ import annotations
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from proto.import_all_protos import *
 from software.thunderscope.time_provider import time_provider_instance
-from typing import Iterator, Any
+from typing import Iterator, Any, override
+from google.protobuf.descriptor import Descriptor, FieldDescriptor
+
+def count_primitive_fields(descriptor: Descriptor):
+    """Recursively counts the number of primitive fields in a Protobuf message
+    using its descriptor.
+
+    :param message: the message descriptor to count all leaf-level primitive fields for
+    :return: the count of primitive fields
+    """
+    count = 0
+
+    for field in descriptor.fields:
+        # Check if the field is a nested message
+        if field.type == FieldDescriptor.TYPE_MESSAGE:
+            # Get the nested message class to recurse into its descriptor
+            nested_message = field.message_type
+            # Recurse using the nested message's descriptor
+            count += count_primitive_fields(nested_message)
+        else:
+            # It's a primitive type (double, float, int, bool, string, etc.)
+            count += 1
+    return count
 
 
 class IEvalLog(ABC):
+    @classmethod
     @abstractmethod
-    @staticmethod
-    def get_num_cols() -> int:
+    def get_num_cols(cls) -> int:
         """Gets the number of columns present in this log"""
         raise NotImplementedError("Please use the appropriate subclass of log!")
 
@@ -24,12 +47,12 @@ class IEvalLog(ABC):
         :return: a string of values separated by commas
         """
         row_array = self.to_array()
-        assert len(row_array) == self.get_num_cols()
+        assert len(row_array) == type(self).get_num_cols()
 
-        return ",".join(row_array)
+        return ",".join([str(elem) for elem in row_array])
 
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def from_csv_row(row_iter: Iterator[str], **kwargs) -> IEvalLog | None:
         """
         Converts a CSV row into an instance of this log
@@ -51,9 +74,10 @@ class TimestampedEvalLog(IEvalLog):
     def get_timestamp(self) -> float:
         """Get this log's timestamp"""
         return self.timestamp
-
-    @staticmethod
-    def get_num_cols() -> int:
+    
+    @classmethod
+    @override
+    def get_num_cols(cls) -> int:
         return 1
 
     @override

@@ -26,7 +26,7 @@ class PassLogTracker(PassTracker):
         for_team: Team | None = None,
         **kwargs,
     ):
-        """Initializes the PassResultTracker
+        """Initializes the PassLogTracker
 
         :param proto_unix_io: the proto unix io to get the game state from
         :param from_team: the team that this tracker is tracking from (events are from this team)
@@ -52,9 +52,11 @@ class PassLogTracker(PassTracker):
         }
 
     @override
-    def refresh(self) -> None:
+    def refresh_tracker(self) -> None:
         """Refreshes the logged passes to log interval states"""
-        super().refresh()
+
+        # IMPORTANT: to refresh and keep track of new passes from parent
+        super().refresh_tracker()
 
         self._update_pass_timestamps()
 
@@ -148,7 +150,7 @@ class PassLogTracker(PassTracker):
             pass_result_type = self.interval_labels[idx]
 
             # passes are in the list in chronological order
-            while self._log_if_over_interval(
+            while logged_passes and self._log_if_over_interval(
                 logged_passes[0], interval, pass_result_type
             ):
                 logged_pass = logged_passes.pop(0)

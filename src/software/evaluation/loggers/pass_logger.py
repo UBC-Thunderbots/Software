@@ -2,13 +2,13 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import PassResultsConstants
 import os
 from proto.import_all_protos import *
-from software.thunderscope.evaluation.logs.event_log import (
+from software.evaluation.logs.event_log import (
     Team as TeamEnum,
 )
-from software.thunderscope.evaluation.trackers.pass_result_tracker import (
-    PassResultTracker,
+from software.evaluation.trackers.pass_log_tracker import (
+    PassLogTracker,
 )
-from software.thunderscope.evaluation.logs.pass_log import (
+from software.evaluation.logs.pass_log import (
     PassLog,
 )
 import queue
@@ -41,7 +41,7 @@ class PassLogger:
         # track pass results to this queue
         self.pass_result_queue = queue.Queue(self.EVENT_BUFFER_SIZE)
 
-        self.pass_tracker = PassResultTracker(
+        self.pass_tracker = PassLogTracker(
             proto_unix_io=proto_unix_io,
             from_team=(
                 TeamEnum.YELLOW if self.friendly_colour_yellow else TeamEnum.BLUE

@@ -1,4 +1,4 @@
-from software.ml.data.result_interface import IResult
+from software.ml.data_cleanup.result_interface import IResult
 from software.evaluation.logs.log_interface import TimestampedEvalLog
 
 

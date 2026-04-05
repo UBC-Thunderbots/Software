@@ -4,6 +4,14 @@ py_library(
     name = "stats_logger",
     srcs = ["stats_logger.py"],
     deps = [
-        "//software/thunderscope/evaluation/trackers:tracker",
+        "//software/evaluation/trackers:tracker",
+    ],
+)
+
+py_library(
+    name = "pass_logger",
+    srcs = ["pass_logger.py"],
+    deps = [
+        "//software/evaluation/trackers:tracker",
     ],
 )

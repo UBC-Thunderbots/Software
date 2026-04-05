@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 import numpy as np
 import torch
@@ -7,7 +8,6 @@ import torch_geometric
 from torch_geometric.data import HeteroData
 from torch_geometric.nn import SAGEConv, GATConv, to_hetero
 from torch_geometric.loader import DataLoader
-from uuid import UUID
 import onnxruntime
 import torch.onnx
 from typing import List
@@ -15,20 +15,42 @@ from software.ml.models.hetero_gnn.hetero_gnn import GenericHeteroGNN
 from software.ml.models.hetero_gnn.config import HeteroGNNConfig
 from software.ml.passing.data.types import NodeType
 from software.ml.passing.data.build_graph import process_all_passes
-from software.ml.passing.data.labelled_passes import LabelledPass
+from software.ml.passing.data.pass_results import generate_pass_results
+from software.ml.passing.data.labelled_passes import LabelledPass, label_passes
+from software.evaluation.logs.event_log import EventLog, Team
+from software.evaluation.logs.pass_log import PassLog
+import csv
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 onnx_path = os.path.join(dir_path, "onnx")
 
 # --- 1. Data Hydration (CSV to Objects) ---
-# Assuming your loading functions from previous steps exist
-def load_and_label_data(pass_csv, event_csv, friendly_team) -> List[LabelledPass]:
-    # 1. Load raw rows
-    # 2. Convert to EventLog and PassLog objects (as discussed)
-    # 3. Sort by timestamp
-    # 4. Run 'generate_time_interval_labels'
-    # For this script, we assume 'labelled_passes' is a List[LabelledPass]
-    pass
+def load_and_label_data(pass_csv_file, event_csv_file, friendly_team) -> List[LabelledPass]:
+  pass_logs = []
+  
+  with open(pass_csv_file, mode='r', encoding='utf-8') as pass_csv:
+    reader = csv.reader(pass_csv)
+
+    for row in reader:
+        pass_logs.append(PassLog.from_csv_row(iter(row)))
+
+  event_logs = []
+  with open(event_csv_file, mode='r', encoding='utf-8') as event_csv:
+    reader = csv.reader(event_csv)
+
+    for row in reader:
+        event_logs.append(EventLog.from_csv_row(iter(row)))
+
+  pass_results = generate_pass_results(
+    event_logs=event_logs,
+    pass_logs=pass_logs,
+    friendly_team=friendly_team
+  )
+
+  labelled_passes = label_passes(pass_results)
+
+  return labelled_passes
+      
   
 def train_single_model(dataset: HeteroData, model: GenericHeteroGNN, epochs=50, learning_rate=0.01) -> GenericHeteroGNN:
   # 1. Setup the "Judge" (Loss Function) and the "Optimizer" (Weight Updater)
@@ -125,6 +147,9 @@ def train_and_export_models(dataset: HeteroData):
         print(f"Saved {model_name}.onnx")
 
 if __name__ == "__main__":
-    labelled_passes = load_and_label_data("passes.csv", "events.csv", MyTeam)
-    dataset = process_all_passes(labelled_passes=labelled_passes)
-    train_and_export_models(dataset=dataset)
+  if len(sys.argv) != 3:
+    print("Usage: python train.py <pass_logs_csv_file_path> <event_logs_csv_file_path>")
+
+  labelled_passes = load_and_label_data(sys.argv[1], sys.argv[2], Team.BLUE)
+  dataset = process_all_passes(labelled_passes=labelled_passes)
+  train_and_export_models(dataset=dataset)

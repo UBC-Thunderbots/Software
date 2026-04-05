@@ -58,6 +58,9 @@ class StatsLogger:
 
         self.event_queue = queue.Queue(self.EVENT_BUFFER_SIZE)
 
+        # flag to turn off logging stats if needed
+        self.logging_enabled = True
+
         self.tracker = (
             TrackerBuilder(
                 proto_unix_io=proto_unix_io,
@@ -70,7 +73,8 @@ class StatsLogger:
             .add_tracker(ShotTracker)
             .add_tracker(PossessionTracker)
             .add_tracker(
-                RefereeTracker, friendly_color_yellow=self.friendly_colour_yellow
+                RefereeTracker, friendly_color_yellow=self.friendly_colour_yellow, 
+                toggle_logging=self._toggle_logging
             )
             .add_tracker(GoalieTracker, for_friendly=True)
         )
@@ -95,7 +99,8 @@ class StatsLogger:
                 )
                 .add_tracker(
                     RefereeTracker,
-                    friendly_color_yellow=(not self.friendly_colour_yellow),
+                    friendly_color_yellow=(not self.friendly_colour_yellow), 
+                    toggle_logging=self._toggle_logging
                 )
                 .add_tracker(GoalieTracker, for_friendly=False)
             )
@@ -132,6 +137,9 @@ class StatsLogger:
         if self.events_file_handle:
             self.events_file_handle.flush()
             self.events_file_handle.close()
+
+    def _toggle_logging(self, should_log: bool) -> None:
+        self.logging_enabled = should_log
 
     def _write_event_to_file(self, event: EventLog) -> None:
         """Write the given stats to the given file

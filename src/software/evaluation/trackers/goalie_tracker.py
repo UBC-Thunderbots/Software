@@ -47,10 +47,8 @@ class GoalieTracker(Tracker):
         self.is_shot_incoming = False
 
     @override
-    def refresh(self):
+    def refresh_tracker(self) -> None:
         """Refresh and log any new shots on goal"""
-        super().refresh()
-
         if self.cached_world is None:
             return
 

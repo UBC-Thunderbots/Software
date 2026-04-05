@@ -1,0 +1,6 @@
+pandas
+numpy
+torch
+torch_geometric
+uuid
+onnxruntime

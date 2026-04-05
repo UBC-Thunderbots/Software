@@ -496,7 +496,7 @@ if __name__ == "__main__":
             StatsLogger(
                 proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                 record_enemy_stats=True,
-                friendly_colour_yellow=True,
+                friendly_colour_yellow=False,
             )
             if args.record_stats
             else contextlib.nullcontext()
@@ -520,6 +520,8 @@ if __name__ == "__main__":
             yellow_fs.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
+
+            print(args.record_stats)
 
             if args.record_stats and blue_stats_logger and yellow_stats_logger:
                 tscope.register_refresh_function(blue_stats_logger.refresh)

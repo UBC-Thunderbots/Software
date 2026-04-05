@@ -1,7 +1,8 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum, auto
 from proto.import_all_protos import *
-from typing import Any
+from typing import Any, override
 from software.evaluation.logs.log_interface import TimestampedEvalLog
 from software.evaluation.logs.world_state_log import WorldStateLog
 
@@ -64,8 +65,9 @@ class EventLog(TimestampedEvalLog):
             world_state_log=world_state_log,
         )
 
-    @override
-    def get_num_cols() -> int:
+    @override    
+    @classmethod
+    def get_num_cols(cls) -> int:
         return EventLog.num_cols
 
     @override
