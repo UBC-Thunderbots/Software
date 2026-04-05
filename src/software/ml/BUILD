@@ -1,5 +1,5 @@
-load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@ml_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,6 +8,7 @@ compile_pip_requirements(
     src = ":requirements.in",
     requirements_txt = ":requirements_lock.txt",
 )
+
 py_binary(
     name = "train_passing",
     srcs = ["passing/train_passing.py"],
