@@ -100,12 +100,6 @@ if __name__ == "__main__":
         help="Debug the simulator",
     )
     parser.add_argument(
-        "--visualize_cpp_test",
-        action="store_true",
-        default=False,
-        help="Visualize C++ Tests",
-    )
-    parser.add_argument(
         "--log_level",
         action="store",
         help="Minimum g3log level for full_system logs",
