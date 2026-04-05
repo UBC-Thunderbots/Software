@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from software.evaluation.events.event import IEvalLog
+from software.evaluation.logs.log_interface import IEvalLog
 from software.ml.data_cleanup.result_interface import IResult
 from software.evaluation.logs.event_log import EventLog, Team, EventType
 from typing import cast, Any, List
@@ -93,4 +93,3 @@ class StatsResult(IResult):
                 self.red_cards = 0
                 self.shots_on_net = 0
                 self.blocked_enemy_shots = 0
-

@@ -9,7 +9,7 @@ class GenericHeteroGNN(torch.nn.Module):
         super().__init__()
         self.config = config
         self.convs = torch.nn.ModuleList()
-        
+
         # Extract node_types and edge_types from metadata
         _, edge_types = metadata
 
@@ -23,12 +23,14 @@ class GenericHeteroGNN(torch.nn.Module):
 
             # Build the dictionary of convolutions for HeteroConv
             conv_dict = {}
-            
+
             if isinstance(config.edge_specs, dict):
                 # Specific mapping per edge type
                 for edge_type, (layer_class, layer_kwargs) in config.edge_specs.items():
                     # We use (-1, -1) for in_channels to handle heterogeneous node feature sizes
-                    conv_dict[edge_type] = layer_class((-1, -1), out_dim, **layer_kwargs)
+                    conv_dict[edge_type] = layer_class(
+                        (-1, -1), out_dim, **layer_kwargs
+                    )
 
                     # Wrap the individual edge layers into one HeteroConv
                     self.convs.append(HeteroConv(conv_dict, aggr=config.global_aggr))
@@ -36,7 +38,9 @@ class GenericHeteroGNN(torch.nn.Module):
                 # Single convolution for ALL edge types
                 layer_class, layer_kwargs = config.edge_specs
                 for edge_type in edge_types:
-                    conv_dict[edge_type] = layer_class((-1, -1), out_dim, **layer_kwargs)
+                    conv_dict[edge_type] = layer_class(
+                        (-1, -1), out_dim, **layer_kwargs
+                    )
 
     def forward(self, x_dict, edge_index_dict):
         for i, conv in enumerate(self.convs):

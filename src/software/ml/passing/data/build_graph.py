@@ -2,8 +2,8 @@ import torch
 import numpy as np
 from torch_geometric.data import HeteroData
 from typing import List
-from software.ml.passing.labelled_passes import LabelledPass
-from software.ml.passing.types import (
+from software.ml.passing.data.labelled_passes import LabelledPass
+from software.ml.passing.data.types import (
     NodeType,
     AttackerBallEdge,
     BallPassDestinationEdge,

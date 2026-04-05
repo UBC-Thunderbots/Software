@@ -6,6 +6,7 @@ from software.thunderscope.time_provider import time_provider_instance
 from typing import Iterator, Any, override
 from google.protobuf.descriptor import Descriptor, FieldDescriptor
 
+
 def count_primitive_fields(descriptor: Descriptor):
     """Recursively counts the number of primitive fields in a Protobuf message
     using its descriptor.
@@ -41,9 +42,8 @@ class IEvalLog(ABC):
         raise NotImplementedError("Please use the appropriate subclass of log!")
 
     def to_csv_row(self):
-        """
-        Converts this log into a Comma Separated Values string
-        
+        """Converts this log into a Comma Separated Values string
+
         :return: a string of values separated by commas
         """
         row_array = self.to_array()
@@ -54,9 +54,8 @@ class IEvalLog(ABC):
     @staticmethod
     @abstractmethod
     def from_csv_row(row_iter: Iterator[str], **kwargs) -> IEvalLog | None:
-        """
-        Converts a CSV row into an instance of this log
-        
+        """Converts a CSV row into an instance of this log
+
         :param row_iter: an iterator representing a csv row, which returns elements one by one
         :param **kwargs: any extra arguments needed for this log not present in the csv row
         """
@@ -74,7 +73,7 @@ class TimestampedEvalLog(IEvalLog):
     def get_timestamp(self) -> float:
         """Get this log's timestamp"""
         return self.timestamp
-    
+
     @classmethod
     @override
     def get_num_cols(cls) -> int:

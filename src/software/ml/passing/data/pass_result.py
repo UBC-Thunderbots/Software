@@ -13,8 +13,7 @@ class PassResult(IResult):
 
 
 def generate_pass_results(
-    event_logs: List[EventLog],
-    pass_logs: List[PassLog], friendly_team: Team
+    event_logs: List[EventLog], pass_logs: List[PassLog], friendly_team: Team
 ) -> List[PassResult]:
     """Processes a mixed list of logs chronologically to map the
     game state (StatsResult) to specific PassLogs.

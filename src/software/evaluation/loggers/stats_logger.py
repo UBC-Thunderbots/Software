@@ -73,8 +73,9 @@ class StatsLogger:
             .add_tracker(ShotTracker)
             .add_tracker(PossessionTracker)
             .add_tracker(
-                RefereeTracker, friendly_color_yellow=self.friendly_colour_yellow, 
-                toggle_logging=self._toggle_logging
+                RefereeTracker,
+                friendly_color_yellow=self.friendly_colour_yellow,
+                toggle_logging=self._toggle_logging,
             )
             .add_tracker(GoalieTracker, for_friendly=True)
         )
@@ -99,8 +100,8 @@ class StatsLogger:
                 )
                 .add_tracker(
                     RefereeTracker,
-                    friendly_color_yellow=(not self.friendly_colour_yellow), 
-                    toggle_logging=self._toggle_logging
+                    friendly_color_yellow=(not self.friendly_colour_yellow),
+                    toggle_logging=self._toggle_logging,
                 )
                 .add_tracker(GoalieTracker, for_friendly=False)
             )

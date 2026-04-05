@@ -19,7 +19,7 @@ class RefereeTracker(Tracker):
         Referee.Stage.NORMAL_SECOND_HALF_PRE,
         Referee.Stage.EXTRA_TIME_BREAK,
         Referee.Stage.EXTRA_FIRST_HALF_PRE,
-        Referee.Stage.EXTRA_SECOND_HALF_PRE        
+        Referee.Stage.EXTRA_SECOND_HALF_PRE,
     ]
 
     def __init__(
@@ -54,7 +54,7 @@ class RefereeTracker(Tracker):
 
         self.friendly_color_yellow = friendly_color_yellow
 
-        # we can use this callback to turn on / off logging 
+        # we can use this callback to turn on / off logging
         # during stages we don't care about
         self.toggle_logging = toggle_logging
 
@@ -87,7 +87,7 @@ class RefereeTracker(Tracker):
             self.curr_stage = self._log_event_if_change(
                 new_value=game_stage,
                 old_value=self.curr_stage,
-                event_type=EventType.GAME_START
+                event_type=EventType.GAME_START,
             )
             return
 
@@ -96,7 +96,7 @@ class RefereeTracker(Tracker):
             self.curr_stage = self._log_event_if_change(
                 new_value=game_stage,
                 old_value=self.curr_stage,
-                event_type=EventType.GAME_END
+                event_type=EventType.GAME_END,
             )
             return
 

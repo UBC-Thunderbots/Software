@@ -13,11 +13,11 @@ import uuid
 
 
 class PassLogTracker(PassTracker):
-    """
-    Tracker to keep track of all new passes
+    """Tracker to keep track of all new passes
     Logs the pass itself + world state at the time of pass
     Plus the world state at specific intervals after that pass
     """
+
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
@@ -54,7 +54,6 @@ class PassLogTracker(PassTracker):
     @override
     def refresh_tracker(self) -> None:
         """Refreshes the logged passes to log interval states"""
-
         # IMPORTANT: to refresh and keep track of new passes from parent
         super().refresh_tracker()
 
