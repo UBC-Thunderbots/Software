@@ -13,15 +13,20 @@ public:
 
 KalmanFilter(
 	const Eigen::Matrix<double, 4,1>& X,
-	const Eigen::Matrix<double, 4,4>& P,
+	const Eigen::Matrix<double, 4,4>& P_i,
 	const Eigen::Matrix<double, 2,2>& Q,
 	const Eigen::Matrix<double, 4,4>& R,
-	const Eigen::Matrix<double, 2,4>& C
+	const Eigen::Matrix<double, 2,4>& C,
+	double damping_term
 	);
 
-void predict(double delta_t);
+void predict(const double delta_t);
 
-void update(Eigen::Matrix<double,2,1> measurement);
+void update(const Eigen::Matrix<double,2,1> Z);
+
+void reset(const Eigen::Matrix<double,2,1> Z);
+
+double getMahalanobisDistance(const Eigen::Matrix<double,2,1>& Z) const;
 
 Eigen::Matrix<double, 4,1> getState();
 
@@ -30,10 +35,11 @@ Eigen::Matrix<double, 4,4> getCovariance();
 private:
 Eigen::Matrix<double, 4,1> X; // State
 Eigen::Matrix<double, 4,4> P; // State Covariance
+Eigen::Matrix<double, 4,4> P_i; // State Covariance
 Eigen::Matrix<double, 2,2> Q; // Measurement noise
 Eigen::Matrix<double, 4,4> R; // process noise
 Eigen::Matrix<double, 2,4> C; // State to measurement
-static constexpr damping_term = 0.9;
+double damping_term;
 
 };
 
