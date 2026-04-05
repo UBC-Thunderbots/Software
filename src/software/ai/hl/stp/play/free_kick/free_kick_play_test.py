@@ -41,12 +41,11 @@ def setup_free_kick_play(
     )
 
 
-# Test 1: Direct Shot
-# FSM path: SetupPositionState -> ShootState -> X
-# Triggers: setupDone=True, shotFound=True, shotDone=True
 def test_free_kick_play_direct_shot(simulated_test_runner):
     """Ball in enemy half with no enemies blocking the goal so kicker shoots directly.
-    Validates FriendlyTeamEventuallyScored.
+    FSM: SetupPositionState -> ShootState -> X
+    Triggers: setupDone=True, shotFound=True, shotDone=True
+    Validates: FriendlyTeamEventuallyScored.
     """
     field = tbots_cpp.Field.createSSLDivisionBField()
     ball_initial_pos = tbots_cpp.Point(1.5, 0.0)
@@ -87,12 +86,11 @@ def test_free_kick_play_direct_shot(simulated_test_runner):
     )
 
 
-# Test 2: Pass Completes
-# FSM path: SetupPositionState -> AttemptPassState -> PassState -> X
-# Triggers: setupDone=True, shotFound=False, passFound=True, passDone=True
 def test_free_kick_play_pass_completes(simulated_test_runner):
     """Goal is blocked by enemy robots and blue receivers are open in the enemy half. Pass will be made.
-    Validates that a receiver eventually gets possession.
+     FSM path: SetupPositionState -> AttemptPassState -> PassState -> X
+    Triggers: setupDone=True, shotFound=False, passFound=True, passDone=True
+    Validates: Receiver eventually gets possession.
     """
     field = tbots_cpp.Field.createSSLDivisionBField()
     ball_initial_pos = tbots_cpp.Point(-0.5, 0.0)
@@ -137,18 +135,13 @@ def test_free_kick_play_pass_completes(simulated_test_runner):
     )
 
 
-# Test 3: Abort Pass and Retry
-# FSM path: SetupPositionState -> AttemptPassState -> PassState
-#           -> AttemptPassState -> ... -> X (chip or second pass)
-# Triggers: passFound=True, shouldAbortPass=True
-# shouldAbortPass fires when ratePass() drops below abs_min_pass_score (0.05)
-
-
 def test_free_kick_play_abort_pass_and_retry(simulated_test_runner):
     """Ball in friendly half so shotFound is reliably False.
     A yellow robot sits directly on the pass lane from the ball to receiver B,
     so ratePass() scores the found pass below abs_min_pass_score (0.05).
-    Validates ball eventually moves via chip or a cleared second-attempt pass.
+    FSM path: SetupPositionState -> AttemptPassState -> PassState -> AttemptPassState -> ... -> X (chip or second pass)
+    Triggers: passFound=True, shouldAbortPass=True
+    Validates: ball eventually moves via chip or a cleared second-attempt pass.
     """
     field = tbots_cpp.Field.createSSLDivisionBField()
     # (-0.5, 0) shot angle to enemy goal about 4 < min_open_angle_for_shot_deg (6)
@@ -194,13 +187,12 @@ def test_free_kick_play_abort_pass_and_retry(simulated_test_runner):
     )
 
 
-# Test 4: Timeout -> Chip
-# FSM path: SetupPositionState -> AttemptPassState -> ChipState -> X
-# Triggers: setupDone=True, shotFound=False, passFound=False (timeout), chipDone=True
 def test_free_kick_play_chip_on_timeout(simulated_test_runner):
     """Goal is blocked and all receiver zones are covered by enemies. passFound never becomes True,
     so timeExpired fires and the FSM chips.
-    Validates that the ball eventually moves from rest via the chip.
+    FSM path: SetupPositionState -> AttemptPassState -> ChipState -> X
+    Triggers: setupDone=True, shotFound=False, passFound=False (timeout), chipDone=True
+    Validates: Ball eventually moves above a threshold speed.
     """
     field = tbots_cpp.Field.createSSLDivisionBField()
     ball_initial_pos = tbots_cpp.Point(-1.0, 0.0)
@@ -243,27 +235,22 @@ def test_free_kick_play_chip_on_timeout(simulated_test_runner):
     )
 
 
-# Test 5: Near-Sideline
-# Exercises all FSM paths with ball at field edges
 @pytest.mark.parametrize(
     "ball_initial_pos,must_score",
     [
-        # Enemy half, near sideline for direct shot
-        (tbots_cpp.Point(1.5, 0.0), True),
-        # Friendly half, near sideline for pass or chip
-        (tbots_cpp.Point(-1.5, -2.75), False),
-        # Near corner for pass or chip
-        (tbots_cpp.Point(1.5, -3.0), False),
-        # Enemy half, center for direct shot likely
-        (tbots_cpp.Point(1.5, -0.5), True),
+        (tbots_cpp.Point(1.5, 0.0), True),  # Enemy half, near sideline for direct shot
+        (
+            tbots_cpp.Point(-1.5, -2.75),
+            False,
+        ),  # Friendly half, near sideline for pass or chip
+        (tbots_cpp.Point(1.5, -3.0), False),  # Near corner for pass or chip
+        (tbots_cpp.Point(1.5, -0.5), True),  # Enemy half, center for direct shot likely
     ],
 )
 def test_free_kick_play_near_sideline(
     simulated_test_runner, ball_initial_pos, must_score
 ):
-    """Parametrized test covering ball positions at and near field edges. Requires score if must_score is True, otherwise
-    moving the ball will pass the test.
-    """
+    """Parametric generalized free kick tests. Requires score if must_score is True, otherwise moving the ball will pass the test."""
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     blue_bots = [
