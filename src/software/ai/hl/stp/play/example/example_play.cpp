@@ -8,7 +8,7 @@ ExamplePlay::ExamplePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_p
 {
 }
 
-void ExamplePlay::updateTactics(const PlayUpdate &play_update)
+void ExamplePlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(ExamplePlayFSM::Update(control_params, play_update));
 }

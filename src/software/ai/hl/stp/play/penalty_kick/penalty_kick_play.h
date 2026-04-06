@@ -17,6 +17,6 @@ class PenaltyKickPlay : public PlayBase<PenaltyKickPlayFSM>
      */
     PenaltyKickPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
-    void updateTactics(const PlayUpdate &play_update) override;
+    void updateTactics(const PlayUpdate& play_update) override;
     std::vector<std::string> getState() override;
 };

@@ -12,14 +12,14 @@ CreaseDefensePlay::CreaseDefensePlay(
 }
 
 void CreaseDefensePlay::updateControlParams(
-    const Point &enemy_threat_origin,
+    const Point& enemy_threat_origin,
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.enemy_threat_origin    = enemy_threat_origin;
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
 }
 
-void CreaseDefensePlay::updateTactics(const PlayUpdate &play_update)
+void CreaseDefensePlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(CreaseDefensePlayFSM::Update(control_params, play_update));
 }

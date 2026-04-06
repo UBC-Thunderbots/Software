@@ -26,5 +26,5 @@ class PenaltyKickTactic
 
     void updateControlParams();
 
-    void accept(TacticVisitor &visitor) const override;
+    void accept(TacticVisitor& visitor) const override;
 };

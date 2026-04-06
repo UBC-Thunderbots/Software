@@ -1,7 +1,7 @@
 #include "software/world/robot_state.h"
 
-RobotState::RobotState(const Point &position, const Vector &velocity,
-                       const Angle &orientation, const AngularVelocity &angular_velocity,
+RobotState::RobotState(const Point& position, const Vector& velocity,
+                       const Angle& orientation, const AngularVelocity& angular_velocity,
                        const bool breakbeam_tripped)
     : position_(position),
       velocity_(velocity),
@@ -11,7 +11,7 @@ RobotState::RobotState(const Point &position, const Vector &velocity,
 {
 }
 
-RobotState::RobotState(const TbotsProto::RobotState &robot_state_proto)
+RobotState::RobotState(const TbotsProto::RobotState& robot_state_proto)
     : position_(Point(robot_state_proto.global_position().x_meters(),
                       robot_state_proto.global_position().y_meters())),
       velocity_(Vector(robot_state_proto.global_velocity().x_component_meters(),
@@ -48,14 +48,14 @@ bool RobotState::breakbeamTripped() const
     return breakbeam_tripped_;
 }
 
-bool RobotState::operator==(const RobotState &other) const
+bool RobotState::operator==(const RobotState& other) const
 {
     return this->position() == other.position() && this->velocity() == other.velocity() &&
            this->orientation() == other.orientation() &&
            this->angularVelocity() == other.angularVelocity();
 }
 
-bool RobotState::operator!=(const RobotState &other) const
+bool RobotState::operator!=(const RobotState& other) const
 {
     return !(*this == other);
 }
