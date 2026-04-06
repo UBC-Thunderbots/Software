@@ -31,7 +31,7 @@ namespace {
 }
 
 BallFilter::BallFilter() :
-	mahalanobis_count(0),
+	consecutive_outliers(0),
 	kalman_filter(INITIAL_STATE, INITIAL_COV, Q, R, C,0.9)
 {
 }
@@ -43,14 +43,8 @@ std::optional<Ball> BallFilter::estimateBallState(
 
 	if (prev_detection_timestamp){
 		double delta_t;
-		if (best_ball_detection){
-			delta_t = (best_ball_detection->timestamp - *prev_detection_timestamp).toSeconds();
-			prev_detection_timestamp = best_ball_detection->timestamp;
-		}
-		else{
-			delta_t = (current_time - *prev_detection_timestamp).toSeconds();
-			prev_detection_timestamp = current_time;
-		}
+		delta_t = (current_time - *prev_detection_timestamp).toSeconds();
+		prev_detection_timestamp = current_time;
 		kalman_filter.predict(delta_t);
 	}
 	if (best_ball_detection){

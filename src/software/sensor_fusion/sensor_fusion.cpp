@@ -12,7 +12,7 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       game_state(),
       referee_stage(std::nullopt),
       dribble_displacement(std::nullopt),
-      ball_filter(0),
+      ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
       possession(TeamPossession::FRIENDLY_TEAM),
@@ -298,7 +298,9 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
             .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
             .confidence = 1}};
 
-        std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+		
+
+        std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
 
         if (new_ball)
         {
@@ -307,7 +309,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     }
     else
     {
-        std::optional<Ball> new_ball = createBall(ball_detections);
+        std::optional<Ball> new_ball = createBall(ball_detections, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
         if (new_ball)
         {
             // If vision detected a new ball, then use that one
@@ -349,12 +351,12 @@ void SensorFusion::updateBall(Ball new_ball)
 }
 
 std::optional<Ball> SensorFusion::createBall(
-    const std::vector<BallDetection> &ball_detections)
+    const std::vector<BallDetection> &ball_detections, const Timestamp& current_time)
 {
     if (field)
     {
         std::optional<Ball> new_ball =
-            ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary());
+            ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary(), current_time);
         return new_ball;
     }
     return std::nullopt;
@@ -512,7 +514,7 @@ void SensorFusion::resetWorldComponents()
     enemy_team           = Team();
     game_state           = GameState();
     referee_stage        = std::nullopt;
-    ball_filter          = BallFilter(0);
+    ball_filter          = BallFilter();
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     possession           = TeamPossession::FRIENDLY_TEAM;

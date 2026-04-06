@@ -1,4 +1,4 @@
-#include <software/sensor_fusion/filter/kalman_filter.h>
+#include "software/sensor_fusion/filter/kalman_filter.h"
 
 KalmanFilter::KalmanFilter(
 const Eigen::Matrix<double, 4,1>& X,
@@ -6,7 +6,7 @@ const Eigen::Matrix<double, 4,4>& P_i,
 const Eigen::Matrix<double, 2,2>& Q,
 const Eigen::Matrix<double, 4,4>& R,
 const Eigen::Matrix<double, 2,4>& C,
-double damping_term,
+double damping_term
 		): 
 X(X),
 P(P_i),
@@ -46,10 +46,10 @@ void KalmanFilter::reset(const Eigen::Matrix<double,2,1> Z){
 	P = P_i;
 }
 
-double KalmanFilter::getMahalanobisDistance(const Eigen::Matrix<double,2,1>& Z){
+double KalmanFilter::getMahalanobisDistance(const Eigen::Matrix<double,2,1>& Z) const {
 	Eigen::Matrix<double,2,2> S =C*P*C.transpose()+Q ;
 	// Calculate the mahalanobis distance for gating
-	double M = (Z - C*X).transpose() * S.inverse() * (Z-C*X);
+	double M = ((Z - C*X).transpose() * S.inverse() * (Z-C*X))(0,0);
 	return M;
 }
 

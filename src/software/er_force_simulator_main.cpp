@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     {
         std::string runtime_dir = args.runtime_dir;
         LoggerSingleton::initializeLogger(runtime_dir, nullptr);
-        LOG(CSV, "goalie_tactic_data.csv") << "timestamp_s,fused_x,fused_y,truth_x,truth_y, true_vel_x, true_vel_y,is_occluded\n";
+        LOG(CSV, "new_filter_data.csv") << "timestamp_s,fused_x,fused_y,truth_x,truth_y, true_vel_x, true_vel_y,is_occluded\n";
 
         /**
          * Creates a ER force simulator and sets up the appropriate
@@ -222,7 +222,7 @@ int main(int argc, char **argv)
                 }
 
                 auto sim_state = er_force_sim->getSimulatorState();
-                LOG(CSV, "goalie_tactic_data.csv")
+                LOG(CSV, "new_filter_data.csv")
                     << yellow_vision.time_sent().epoch_timestamp_seconds() << ","
                     << yellow_vision.ball().current_state().global_position().x_meters()
                     << ","
