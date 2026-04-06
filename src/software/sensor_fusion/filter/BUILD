@@ -19,11 +19,20 @@ cc_library(
     hdrs = ["ball_filter.h"],
     deps = [
         ":vision_detection",
+		":kalman_filter",
         "//software/geom/algorithms",
         "//software/math:math_functions",
         "//software/world:ball",
         "//software/world:field",
         "@boost//:circular_buffer",
+        "@eigen",
+    ],
+)
+cc_library(
+    name = "kalman_filter",
+    srcs = ["kalman_filter.cpp"],
+    hdrs = ["kalman_filter.h"],
+    deps = [
         "@eigen",
     ],
 )
