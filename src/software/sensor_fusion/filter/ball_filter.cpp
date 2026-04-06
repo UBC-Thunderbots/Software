@@ -39,14 +39,22 @@ BallFilter::BallFilter() :
 std::optional<Ball> BallFilter::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area, const Timestamp& current_time)
 {
-	BallDetection best_ball_detection = getBestBallDetection(new_ball_detections);	
+	std::optional<BallDetection> best_ball_detection = getBestBallDetection(new_ball_detections);	
 
 	if (prev_detection_timestamp){
-		double delta_t = (current_time - prev_detection_timestamp).toSeconds();
+		double delta_t;
+		if (best_ball_detection){
+			delta_t = (best_ball_detection->timestamp - *prev_detection_timestamp).toSeconds();
+			prev_detection_timestamp = best_ball_detection->timestamp;
+		}
+		else{
+			delta_t = (current_time - *prev_detection_timestamp).toSeconds();
+			prev_detection_timestamp = current_time;
+		}
 		kalman_filter.predict(delta_t);
 	}
 	if (best_ball_detection){
-		prev_detection_timestamp = best_ball_detection.timestamp;
+		prev_detection_timestamp = best_ball_detection->timestamp;
 		Eigen::Matrix<double,2,1> measurement;
 		measurement << best_ball_detection->position.x(), best_ball_detection->position.y();
 		double mahalanobis = kalman_filter.getMahalanobisDistance(measurement);
@@ -57,7 +65,7 @@ std::optional<Ball> BallFilter::estimateBallState(
 			consecutive_outliers++;
 		}
 
-		if (consecutive_outliers> mahalanobis_count_threshold){
+		if (consecutive_outliers> consecutive_outliers_threshold){
 			kalman_filter.reset(measurement);
 			consecutive_outliers=0;
 		}
@@ -67,7 +75,7 @@ std::optional<Ball> BallFilter::estimateBallState(
 	Eigen::Matrix<double,4,1> kalman_state = kalman_filter.getState();
 	Point ball_position = Point(kalman_state(0), kalman_state(1));
 	Vector ball_velocity = Vector(kalman_state(2), kalman_state(3));
-	double z_height = best_ball_detection->distance_from_ground if best_ball_detection else 0.0;
+	double z_height =  best_ball_detection ? best_ball_detection->distance_from_ground : 0.0;
 		
     BallState ball_state(ball_position, ball_velocity, z_height);
     return Ball(ball_state,current_time);
