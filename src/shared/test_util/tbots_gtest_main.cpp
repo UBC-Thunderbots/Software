@@ -15,30 +15,33 @@ std::string TbotsGtestMain::runtime_dir  = "/tmp/tbots/yellow_test";
 double TbotsGtestMain::test_speed        = 1.0;
 
 /**
- * Portable wrapper for feenableexcept.
- * Returns the previous set of enabled exceptions, or -1 on failure.
+ * Portable wrapper for feenableexcept. Use to specify which floating-point
+ * exceptions should crash the program when they occur.
+ *
+ * @param excepts A bitmask of floating-point exceptions to be enabled.
+ * @return True on success, false on failure to set floating-point exceptions.
  */
-int enable_fp_exceptions(unsigned int excepts)
+bool enable_fp_exceptions(unsigned int excepts)
 {
 #if defined(__linux__) && defined(__GNUC__)
-    return feenableexcept(excepts);
+    feenableexcept(excepts);
+    return true;
 
 #elif defined(__APPLE__)
-    fenv_t fenv;
-    if (fegetenv(&fenv) != 0)
+    // https://stackoverflow.com/questions/71821666/trapping-floating-point-exceptions-and-signal-handling-on-apple-silicon
+    fenv_t env;
+    if (fegetenv(&env) != 0)
     {
-        return -1;
+        return false;
     }
-    unsigned int old_excepts = (unsigned int)(fenv.__fpcr & FE_ALL_EXCEPT);
-
     // On ARM64, setting bits in FPCR enables the trap
-    fenv.__fpcr |= (excepts & FE_ALL_EXCEPT);
+    env.__fpcr |= (excepts & FE_ALL_EXCEPT);
 
-    return (fesetenv(&fenv) == 0) ? (int)old_excepts : -1;
+    return fesetenv(&env) == 0;
 
 #else
     // Unsupported platform
-    return -1;
+    return false;
 #endif
 }
 
@@ -47,13 +50,7 @@ int main(int argc, char **argv)
     testing::InitGoogleTest(&argc, argv);
 
     // Crash on invalid operations like division by zero and floating-point overflow
-    if (enable_fp_exceptions(FE_INVALID | FE_OVERFLOW) < 0)
-    {
-        std::cerr << "Warning: Could not enable floating-point exceptions." << std::endl;
-    }
-
-    // Crash on invalid operations like division by zero and floating-point overflow
-    if (enable_fp_exceptions(FE_INVALID | FE_OVERFLOW) < 0)
+    if (!enable_fp_exceptions(FE_INVALID | FE_OVERFLOW))
     {
         std::cerr << "Warning: Could not enable floating-point exceptions." << std::endl;
     }
