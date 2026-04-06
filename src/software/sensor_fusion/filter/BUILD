@@ -14,6 +14,14 @@ cc_library(
 )
 
 cc_library(
+    name = "kalman_filter",
+    srcs = ["kalman_filter.cpp"],
+    hdrs = ["kalman_filter.h"],
+    deps = [
+        "@eigen",
+    ],
+)
+cc_library(
     name = "ball_filter",
     srcs = ["ball_filter.cpp"],
     hdrs = ["ball_filter.h"],
@@ -25,14 +33,6 @@ cc_library(
         "//software/world:ball",
         "//software/world:field",
         "@boost//:circular_buffer",
-        "@eigen",
-    ],
-)
-cc_library(
-    name = "kalman_filter",
-    srcs = ["kalman_filter.cpp"],
-    hdrs = ["kalman_filter.h"],
-    deps = [
         "@eigen",
     ],
 )
