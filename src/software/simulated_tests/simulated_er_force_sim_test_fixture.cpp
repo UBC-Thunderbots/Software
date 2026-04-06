@@ -1,7 +1,5 @@
 #include "software/simulated_tests/simulated_er_force_sim_test_fixture.h"
 
-#include "proto/message_translation/tbots_protobuf.h"
-
 #include <cstdlib>
 #include <filesystem>
 
