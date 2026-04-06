@@ -51,7 +51,6 @@ print_status_msg "Setting Up Python Environment"
 
 # Create virtual environment
 sudo python3.12 -m venv /opt/tbotspython
-chmod
 source /opt/tbotspython/bin/activate
 
 # Install Python dependencies
