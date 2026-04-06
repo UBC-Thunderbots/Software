@@ -18,6 +18,10 @@ double TbotsGtestMain::test_speed        = 1.0;
  * Portable wrapper for feenableexcept. Use to specify which floating-point
  * exceptions should crash the program when they occur.
  *
+ * @note On MacOS ARM, there are no floating-point exception traps, so tests may
+ * pass on MacOS that wouldn't pass on other platforms if floating-point
+ * exceptions occur.
+ *
  * @param excepts A bitmask of floating-point exceptions to be enabled.
  * @return True on success, false on failure to set floating-point exceptions.
  */
@@ -26,19 +30,6 @@ bool enable_fp_exceptions(unsigned int excepts)
 #if defined(__linux__) && defined(__GNUC__)
     feenableexcept(excepts);
     return true;
-
-#elif defined(__APPLE__)
-    // https://stackoverflow.com/questions/71821666/trapping-floating-point-exceptions-and-signal-handling-on-apple-silicon
-    fenv_t env;
-    if (fegetenv(&env) != 0)
-    {
-        return false;
-    }
-    // On ARM64, setting bits in FPCR enables the trap
-    env.__fpcr |= (excepts & FE_ALL_EXCEPT);
-
-    return fesetenv(&env) == 0;
-
 #else
     // Unsupported platform
     return false;
@@ -49,7 +40,7 @@ int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
 
-    // Crash on invalid operations like division by zero and floating-point overflow
+    // Crash on invalid operations like sqrt of negative and floating-point overflow
     if (!enable_fp_exceptions(FE_INVALID | FE_OVERFLOW))
     {
         std::cerr << "Warning: Could not enable floating-point exceptions." << std::endl;
