@@ -3,16 +3,16 @@
 KalmanFilter::KalmanFilter(
 const Eigen::Matrix<double, 4,1>& X,
 const Eigen::Matrix<double, 4,4>& P_i,
+const Eigen::Matrix<double,4,4> & R,
 const Eigen::Matrix<double, 2,2>& Q,
-const Eigen::Matrix<double, 4,4>& R,
 const Eigen::Matrix<double, 2,4>& C,
 double damping_term
 		): 
 X(X),
 P(P_i),
 P_i(P_i),
-Q(Q),
 R(R),
+Q(Q),
 C(C),
 damping_term(damping_term)
 {

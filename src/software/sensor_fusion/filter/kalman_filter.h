@@ -14,8 +14,8 @@ public:
 KalmanFilter(
 	const Eigen::Matrix<double, 4,1>& X,
 	const Eigen::Matrix<double, 4,4>& P_i,
-	const Eigen::Matrix<double, 2,2>& Q,
 	const Eigen::Matrix<double, 4,4>& R,
+	const Eigen::Matrix<double, 2,2>& Q,
 	const Eigen::Matrix<double, 2,4>& C,
 	double damping_term
 	);
@@ -36,8 +36,8 @@ private:
 Eigen::Matrix<double, 4,1> X; // State
 Eigen::Matrix<double, 4,4> P; // State Covariance
 Eigen::Matrix<double, 4,4> P_i; // State Covariance
-Eigen::Matrix<double, 2,2> Q; // Measurement noise
 Eigen::Matrix<double, 4,4> R; // process noise
+Eigen::Matrix<double, 2,2> Q; // Measurement noise
 Eigen::Matrix<double, 2,4> C; // State to measurement
 double damping_term;
 

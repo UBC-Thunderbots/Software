@@ -15,24 +15,29 @@ namespace {
     
     const Eigen::Matrix<double,4,4> INITIAL_COV = Eigen::Matrix<double,4,4>::Identity() * 1000.0;
     
+    // Calculated friction in simualtor
+	const Eigen::Matrix<double,4,4> R = (Eigen::Matrix<double,4,4>() <<
+	    1.68e-8,  2.01e-6, 0,       0,
+	    2.01e-6,  2.42e-4, 0,       0,
+	    0,        0,       1.68e-8, 2.01e-6,
+	    0,        0,       2.01e-6, 2.42e-4).finished();
+
     const Eigen::Matrix<double,2,2> Q = (Eigen::Matrix<double,2,2>() << 
-        0.1, 0,
-        0, 0.1).finished();
-    
-    const Eigen::Matrix<double,4,4> R = (Eigen::Matrix<double,4,4>() <<
-        0.1, 0, 0, 0,
-        0, 0.1, 0, 0,
-        0, 0, 0.01, 0,
-        0, 0, 0, 0.01).finished();
+        0.0226, 0,
+        0, 0.00445).finished();
     
     const Eigen::Matrix<double,2,4> C = (Eigen::Matrix<double,2,4>() <<
         1, 0, 0, 0,
         0, 1, 0, 0).finished();
+
+    // Empirically measured
+	const double DAMPING = 0.9889;
+
 }
 
 BallFilter::BallFilter() :
 	consecutive_outliers(0),
-	kalman_filter(INITIAL_STATE, INITIAL_COV, Q, R, C,0.9)
+	kalman_filter(INITIAL_STATE, INITIAL_COV, R, Q, C, DAMPING)
 {
 }
 
