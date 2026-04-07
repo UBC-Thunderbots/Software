@@ -36,7 +36,7 @@ THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
 
 @dataclass
-class BuildOptions:
+class BuildConfig:
     action: ActionArgument
     search_query: str | None = None
     no_optimized_build: bool = False
@@ -91,7 +91,7 @@ def main(
         start_interactive_cli()
         return
 
-    opts = BuildOptions(
+    config = BuildConfig(
         action=action,
         search_query=search_query,
         no_optimized_build=no_optimized_build,
@@ -110,79 +110,79 @@ def main(
         ansible_playbook=ansible_playbook,
     )
 
-    validate(opts)
-    command = create_command(opts, ctx.args)
+    validate(config)
+    command = create_command(config, ctx.args)
     execute_command(command, print_only=print_command)
 
 
-def validate(opts: BuildOptions):
-    if bool(opts.flash_robots) or bool(opts.ansible_playbook):
-        if not opts.ssh_password:
+def validate(config: BuildConfig):
+    if bool(config.flash_robots) or bool(config.ansible_playbook):
+        if not config.ssh_password:
             print("Error: SSH password is required for flashing or ansible playbooks.")
             sys.exit(1)
-    if opts.search_query is None and (not opts.test_suite or opts.action != ActionArgument.test):
+    if config.search_query is None and (not config.test_suite or config.action != ActionArgument.test):
         print("Error: Specify a search query or use --suite with test.")
         sys.exit(1)
 
 
-def create_command(opts: BuildOptions, extra_args: list[str]) -> list[str]:
-    """Builds the bazel command list based on options and pass-through args."""
-    if opts.test_suite and opts.action == ActionArgument.test:
+def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
+    """Builds the bazel command list based on config and pass-through args."""
+    if config.test_suite and config.action == ActionArgument.test:
         target = """-- //...                              \\
                       -//software/field_tests/...         \\
                       -//toolchains/cc/...                \\
                       -//software:unix_full_system_tar_gen"""
     else:
-        target = fuzzy_find_target(opts.action, opts.search_query, opts.interactive_search)
+        target = fuzzy_find_target(config.action, config.search_query, config.interactive_search)
 
-    command = ["bazel", opts.action.value]
+    command = ["bazel", config.action.value]
     runtime_args = list(extra_args)
 
     # Apply Bazel Flags
     flag_conditions = {
-        BazelFlag.DEBUG_BUILD: opts.debug_build or bool(opts.select_debug_binaries),
-        BazelFlag.OPTIMIZED: not opts.debug_build and (not opts.no_optimized_build or bool(opts.flash_robots)),
-        BazelFlag.ROBOT_PLATFORM: bool(opts.flash_robots or opts.ansible_playbook),
-        BazelFlag.TRACY: opts.tracy,
-        BazelFlag.THUNDERSCOPE: opts.enable_thunderscope,
-        BazelFlag.NO_CACHE_TESTS: opts.action == ActionArgument.test,
+        BazelFlag.DEBUG_BUILD: config.debug_build or bool(config.select_debug_binaries),
+        BazelFlag.OPTIMIZED: not config.debug_build and (not config.no_optimized_build or bool(config.flash_robots)),
+        BazelFlag.ROBOT_PLATFORM: bool(config.flash_robots or config.ansible_playbook),
+        BazelFlag.TRACY: config.tracy,
+        BazelFlag.THUNDERSCOPE: config.enable_thunderscope,
+        BazelFlag.NO_CACHE_TESTS: config.action == ActionArgument.test,
     }
     for flag, condition in flag_conditions.items():
         if condition:
             command += list(flag.value)
 
-    if opts.jobs_option:
-        command += [f"--jobs={opts.jobs_option}"]
+    if config.jobs_option:
+        command += [f"--jobs={config.jobs_option}"]
 
     # Handle binary debugging flags
-    if opts.select_debug_binaries:
-        if DebugBinary.sim in opts.select_debug_binaries:
+    if config.select_debug_binaries:
+        if DebugBinary.sim in config.select_debug_binaries:
             runtime_args.append("--debug_simulator")
-        if DebugBinary.blue in opts.select_debug_binaries:
+        if DebugBinary.blue in config.select_debug_binaries:
             runtime_args.append("--debug_blue_full_system")
-        if DebugBinary.yellow in opts.select_debug_binaries:
+        if DebugBinary.yellow in config.select_debug_binaries:
             runtime_args.append("--debug_yellow_full_system")
 
     command += [target]
 
     # Separator for runtime arguments
-    if opts.action == ActionArgument.run:
+    if config.action == ActionArgument.run:
         command += ["--"]
 
     # Append runtime arguments
-    if opts.stop_ai_on_start: runtime_args.append("--stop_ai_on_start")
-    if opts.enable_visualizer: runtime_args.append("--enable_visualizer")
-    if opts.enable_thunderscope: runtime_args.append("--enable_thunderscope")
+    if config.stop_ai_on_start: runtime_args.append("--stop_ai_on_start")
+    if config.enable_visualizer: runtime_args.append("--enable_visualizer")
+    if config.enable_thunderscope: runtime_args.append("--enable_thunderscope")
 
-    if opts.ansible_playbook:
-        runtime_args += ["--playbook", opts.ansible_playbook, "--hosts", f"{opts.robot_name}.local", "-pwd", opts.ssh_password]
+    if config.ansible_playbook:
+        runtime_args += ["--playbook", config.ansible_playbook, "--hosts", f"{config.robot_name}.local", "-pwd", config.ssh_password]
 
-    if opts.flash_robots:
+    if config.flash_robots:
         runtime_args += ["--playbook", "deploy_robot_software.yml", "--hosts"]
-        runtime_args += [f"192.168.6.{200 + int(id)}" for id in opts.flash_robots]
-        runtime_args += ["-pwd", opts.ssh_password]
+        runtime_args += [f"192.168.6.{200 + int(id)}" for id in config.flash_robots]
+        runtime_args += ["-pwd", config.ssh_password]
 
-    if opts.action == ActionArgument.test:
+    if config.action == ActionArgument.test:
         # Safety check for pytest debugging
         if any(x in runtime_args for x in ["--debug_blue_full_system", "--debug_yellow_full_system", "--debug_simulator"]):
             print("Do not run simulated pytests as a test when debugging, use run instead.")
@@ -205,8 +205,8 @@ def execute_command(command: list[str], print_only: bool = False):
 
 
 def start_interactive_cli():
-    """Interactive mode that builds BuildOptions and calls execution directly."""
-    opts = BuildOptions()
+    """Interactive mode that builds BuildConfig and calls execution directly."""
+    config = BuildConfig(action=ActionArgument.run) # Default action
     extra_args = []
 
     category = questionary.select(
@@ -218,11 +218,11 @@ def start_interactive_cli():
 
     match category:
         case "Run thunderscope":
-            opts.action = ActionArgument.run
-            opts.search_query = "thunderscope"
+            config.action = ActionArgument.run
+            config.search_query = "thunderscope"
             launch = questionary.select("Launch mode?", choices=["Simulator", "Diagnostics"]).ask()
             if launch == "Simulator":
-                opts.enable_thunderscope = True
+                config.enable_thunderscope = True
                 selected = questionary.checkbox("Options:", 
                     choices=["enable_autoref", "ci_mode", "record_stats", "enable_realism", "show_autoref_gui"]).ask()
                 extra_args.extend([f"--{opt}" for opt in selected])
@@ -231,23 +231,23 @@ def start_interactive_cli():
                 extra_args.extend(["--run_diagnostics", "--interface", iface])
 
         case "Test":
-            opts.action = ActionArgument.test
+            config.action = ActionArgument.test
             test_name = questionary.text("Enter test name (leave empty for entire suite)").ask()
             if not test_name:
-                opts.test_suite = True
+                config.test_suite = True
             else:
-                opts.search_query = test_name
+                config.search_query = test_name
 
         case "Flash":
-            opts.action = ActionArgument.run
-            opts.search_query = "ansible"
-            opts.ansible_playbook = questionary.select("Select playbook:", 
+            config.action = ActionArgument.run
+            config.search_query = "ansible"
+            config.ansible_playbook = questionary.select("Select playbook:", 
                 choices=["setup_pi.yml", "deploy_robot_software.yml", "deploy_powerboard.yml"]).ask()
-            opts.robot_name = questionary.text("Robot name?").ask()
-            opts.ssh_password = questionary.password("SSH password?").ask()
+            config.robot_name = questionary.text("Robot name?").ask()
+            config.ssh_password = questionary.password("SSH password?").ask()
 
-    validate(opts)
-    command = create_command(opts, extra_args)
+    validate(config)
+    command = create_command(config, extra_args)
     execute_command(command)
 
 
