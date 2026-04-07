@@ -10,7 +10,7 @@ PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(
     control_params.goalie_tactic = goalie_tactic;
 }
 
-void PenaltyKickEnemyPlay::updateTactics(const PlayUpdate &play_update)
+void PenaltyKickEnemyPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(PenaltyKickEnemyPlayFSM::Update(control_params, play_update));
 }

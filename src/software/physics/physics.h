@@ -16,10 +16,10 @@
  *
  * @return future position of the object
  */
-Point calculateFuturePosition(const Point &initial_position,
-                              const Vector &intial_velocity,
-                              const Vector &constant_acceleration,
-                              const Duration &duration_in_future);
+Point calculateFuturePosition(const Point& initial_position,
+                              const Vector& intial_velocity,
+                              const Vector& constant_acceleration,
+                              const Duration& duration_in_future);
 
 /**
  * Calculates the future velocity of a moving object
@@ -33,6 +33,6 @@ Point calculateFuturePosition(const Point &initial_position,
  *
  * @return future velocity of the object
  */
-Vector calculateFutureVelocity(const Vector &intial_velocity,
-                               const Vector &constant_acceleration,
-                               const Duration &duration_in_future);
+Vector calculateFutureVelocity(const Vector& intial_velocity,
+                               const Vector& constant_acceleration,
+                               const Duration& duration_in_future);

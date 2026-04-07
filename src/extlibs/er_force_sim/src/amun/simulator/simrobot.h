@@ -42,29 +42,29 @@ class SimRobot;
 class camun::simulator::SimRobot
 {
    public:
-    SimRobot(const robot::Specs &specs, std::shared_ptr<btDiscreteDynamicsWorld> world,
-             const btVector3 &pos, float dir);
+    SimRobot(const robot::Specs& specs, std::shared_ptr<btDiscreteDynamicsWorld> world,
+             const btVector3& pos, float dir);
     ~SimRobot();
 
    public:
-    void begin(SimBall &ball, double time);
+    void begin(SimBall& ball, double time);
 
-    bool canKickBall(const SimBall &ball) const;
+    bool canKickBall(const SimBall& ball) const;
 
-    void tryKick(const SimBall &ball, float power, double time);
+    void tryKick(const SimBall& ball, float power, double time);
 
-    robot::RadioResponse setCommand(const SSLSimulationProto::RobotCommand &command,
-                                    const SimBall &ball, bool charge, float rxLoss,
+    robot::RadioResponse setCommand(const SSLSimulationProto::RobotCommand& command,
+                                    const SimBall& ball, bool charge, float rxLoss,
                                     float txLoss);
 
-    void update(SSLProto::SSL_DetectionRobot &robot, float stddev_p, float stddev_phi,
+    void update(SSLProto::SSL_DetectionRobot& robot, float stddev_p, float stddev_phi,
                 int64_t time, btVector3 positionOffset);
 
-    void update(world::SimRobot &robot, const SimBall &ball) const;
+    void update(world::SimRobot& robot, const SimBall& ball) const;
 
-    void restoreState(const world::SimRobot &robot);
+    void restoreState(const world::SimRobot& robot);
 
-    void move(const sslsim::TeleportRobot &robot);
+    void move(const sslsim::TeleportRobot& robot);
 
     bool isFlipped();
 
@@ -81,7 +81,7 @@ class camun::simulator::SimRobot
 
     void stopDribbling();
 
-    const robot::Specs &specs() const
+    const robot::Specs& specs() const
     {
         return m_specs;
     }
@@ -92,16 +92,16 @@ class camun::simulator::SimRobot
      * @param ball the ball in play
      * @return true if the ball is in contact with the robot, false otherwise
      */
-    bool touchesBall(const SimBall &ball) const;
+    bool touchesBall(const SimBall& ball) const;
 
 
    private:
-    btVector3 relativeBallSpeed(const SimBall &ball) const;
+    btVector3 relativeBallSpeed(const SimBall& ball) const;
     float bound(float acceleration, float oldSpeed, float speedupLimit,
                 float brakeLimit) const;
     void calculateDribblerMove(const btVector3 pos, const btQuaternion rot,
                                const btVector3 linVel, float omega);
-    void dribble(const SimBall &ball, float speed);
+    void dribble(const SimBall& ball, float speed);
 
     RNG m_rng;
     robot::Specs m_specs;

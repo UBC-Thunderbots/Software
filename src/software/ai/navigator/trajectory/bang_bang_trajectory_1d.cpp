@@ -203,8 +203,8 @@ double BangBangTrajectory1D::getAcceleration(double t_sec) const
 }
 
 void BangBangTrajectory1D::getTrajPartAndDeltaTime(
-    double t_sec, BangBangTrajectory1D::TrajectoryPart &out_traj_part,
-    double &out_t_delta_sec) const
+    double t_sec, BangBangTrajectory1D::TrajectoryPart& out_traj_part,
+    double& out_t_delta_sec) const
 {
     t_sec                   = std::clamp(t_sec, 0.0, getTotalTime());
     size_t trajectory_index = getTrajectoryIndexAtTime(t_sec);
@@ -274,7 +274,7 @@ std::pair<double, double> BangBangTrajectory1D::getMinMaxPositions() const
     // is 0.
     std::pair<double, double> min_max_pos = {std::numeric_limits<double>::max(),
                                              std::numeric_limits<double>::min()};
-    for (const TrajectoryPart &part : trajectory_parts)
+    for (const TrajectoryPart& part : trajectory_parts)
     {
         min_max_pos.first  = std::min(min_max_pos.first, part.position);
         min_max_pos.second = std::max(min_max_pos.second, part.position);
@@ -288,7 +288,7 @@ std::pair<double, double> BangBangTrajectory1D::getMinMaxPositions() const
 }
 
 inline void BangBangTrajectory1D::addTrajectoryPart(
-    const BangBangTrajectory1D::TrajectoryPart &part)
+    const BangBangTrajectory1D::TrajectoryPart& part)
 {
     CHECK(num_trajectory_parts < MAX_TRAJECTORY_PARTS)
         << "BangBangTrajectory1D::addTrajectoryPart was called when the trajectory_parts array was full";
@@ -300,7 +300,7 @@ size_t BangBangTrajectory1D::getNumTrajectoryParts() const
     return num_trajectory_parts;
 }
 
-const BangBangTrajectory1D::TrajectoryPart &BangBangTrajectory1D::getTrajectoryPart(
+const BangBangTrajectory1D::TrajectoryPart& BangBangTrajectory1D::getTrajectoryPart(
     size_t index) const
 {
     CHECK(index < num_trajectory_parts)

@@ -10,8 +10,8 @@ ChipTactic::ChipTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr
 }
 
 
-void ChipTactic::updateControlParams(const Point &chip_origin,
-                                     const Angle &chip_direction,
+void ChipTactic::updateControlParams(const Point& chip_origin,
+                                     const Angle& chip_direction,
                                      double chip_distance_meters)
 {
     control_params.chip_origin          = chip_origin;
@@ -19,13 +19,13 @@ void ChipTactic::updateControlParams(const Point &chip_origin,
     control_params.chip_distance_meters = chip_distance_meters;
 }
 
-void ChipTactic::updateControlParams(const Point &chip_origin, const Point &chip_target)
+void ChipTactic::updateControlParams(const Point& chip_origin, const Point& chip_target)
 {
     updateControlParams(chip_origin, (chip_target - chip_origin).orientation(),
                         (chip_target - chip_origin).length());
 }
 
-void ChipTactic::accept(TacticVisitor &visitor) const
+void ChipTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
