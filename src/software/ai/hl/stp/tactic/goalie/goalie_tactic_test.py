@@ -33,9 +33,27 @@ from proto.message_translation.tbots_protobuf import create_world_state
       #  # test ball very fast get saved
       #  # TODO (#3377): This test is flaky due to inconsistent goalie reach. The linked ticket may provide a permanent fix.
         (
-            tbots_cpp.Point(4.5, 0),
+            tbots_cpp.Point(4.5, -1.5),
             # TODO Revert velocity to (-4.8, 1.1)
             tbots_cpp.Vector(-3.0, 0.5),
+            tbots_cpp.Point(-4.5, 0),
+        ),
+        (
+            tbots_cpp.Point(4.5, 3),
+            # TODO Revert velocity to (-4.8, 1.1)
+            tbots_cpp.Vector(-1.0, -2.5),
+            tbots_cpp.Point(-4.5, 0),
+        ),
+        (
+            tbots_cpp.Point(4.5, -3.0),
+            # TODO Revert velocity to (-4.8, 1.1)
+            tbots_cpp.Vector(-4.0, 3),
+            tbots_cpp.Point(-4.5, 0),
+        ),
+        (
+            tbots_cpp.Point(4.5, 3),
+            # TODO Revert velocity to (-4.8, 1.1)
+            tbots_cpp.Vector(-3.0, -2.0),
             tbots_cpp.Point(-4.5, 0),
         ),
         # test ball very fast with the goalie out of position saved

@@ -16,11 +16,11 @@ namespace {
     const Eigen::Matrix<double,4,4> INITIAL_COV = Eigen::Matrix<double,4,4>::Identity() * 1000.0;
     
     // Calculated friction in simualtor
-	const Eigen::Matrix<double,4,4> R = (Eigen::Matrix<double,4,4>() <<
-	    1.68e-8,  2.01e-6, 0,       0,
-	    2.01e-6,  2.42e-4, 0,       0,
-	    0,        0,       1.68e-8, 2.01e-6,
-	    0,        0,       2.01e-6, 2.42e-4).finished();
+const Eigen::Matrix<double,4,4> R = (Eigen::Matrix<double,4,4>() <<
+    2.222e-8, 0,        2.000e-6, 0,
+    0,        2.222e-8, 0,        2.000e-6,
+    2.000e-6, 0,        2.400e-4, 0,
+    0,        2.000e-6, 0,        2.400e-4).finished();
 
     const Eigen::Matrix<double,2,2> Q = (Eigen::Matrix<double,2,2>() << 
         0.0226, 0,
