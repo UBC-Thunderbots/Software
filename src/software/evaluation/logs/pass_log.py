@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from proto.import_all_protos import *
 import uuid
-from typing import Any, override
+from typing import override
 
 
 class PassLogType(IntEnum):
@@ -44,17 +44,20 @@ class PassLog(TimestampedEvalLog):
         EventLog.get_num_cols() + 2 + count_primitive_fields(Pass.DESCRIPTOR)
     )
 
-    def get_pass_start_point(self) -> list[Any]:
+    def get_pass_start_point(self) -> list[float]:
         """Returns the current pass start position as a [float, float] array
         represnting x, y coordinates
         """
         return [self.pass_.passer_point.x_meters, self.pass_.passer_point.y_meters]
 
-    def get_pass_end_point(self) -> list[Any]:
+    def get_pass_end_point(self) -> list[float]:
         """Returns the current pass end position as a [float, float] array
         represnting x, y coordinates
         """
         return [self.pass_.receiver_point.x_meters, self.pass_.receiver_point.y_meters]
+
+    def get_pass_speed(self) -> float:
+        return self.pass_.pass_speed_m_per_s
 
     @classmethod
     @override

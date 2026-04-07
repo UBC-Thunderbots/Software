@@ -2,7 +2,9 @@ import torch
 import numpy as np
 from torch_geometric.data import HeteroData
 from typing import List
-from software.ml.passing.data.labelled_passes import LabelledPass
+from dataclasses import fields
+from software.evaluation.logs.pass_log import PassLogType
+from software.ml.passing.data.labelled_passes import LabelledPass, Label
 from software.ml.passing.data.types import (
     NodeType,
     AttackerBallEdge,
@@ -14,8 +16,8 @@ from software.ml.passing.data.types import (
 )
 
 
-def get_dist(pos_1, pos_2):
-    return np.linalg.norm(pos_1 - pos_2)
+def get_dist(pos_1: List[float], pos_2: List[float]):
+    return np.linalg.norm(np.array(pos_1) - np.array(pos_2))
 
 
 def create_pyg_data(labelled_pass: LabelledPass) -> HeteroData:
@@ -35,7 +37,7 @@ def create_pyg_data(labelled_pass: LabelledPass) -> HeteroData:
     # Attacker = Friendly robot closest to ball
     attacker_idx = min(
         range(len(world_state.friendly_robots)),
-        key=lambda i: get_dist(world_state.friendly_robots[i], ball_pos),
+        key=lambda i: get_dist(world_state.friendly_robots[i].get_position(), ball_pos),
     )
     attacker = world_state.friendly_robots[attacker_idx]
     data[NodeType.ATTACKER.value].x = torch.tensor(
@@ -65,16 +67,21 @@ def create_pyg_data(labelled_pass: LabelledPass) -> HeteroData:
     )
 
     # global stats as a node
-    global_features = labelled_pass.result.to_array()
+    global_features = [
+        x if x is not None else 0.0 for x in labelled_pass.result.to_array()
+    ]
     data[NodeType.GLOBAL.value].x = torch.tensor([global_features], dtype=torch.float)
 
     attacker_ball_edge = AttackerBallEdge(
-        distance=get_dist(attacker, ball_pos), from_index=0, to_index=0
+        distance=get_dist(attacker.get_position(), ball_pos), from_index=0, to_index=0
     )
     add_edge_to_data(attacker_ball_edge, data)
 
     ball_destination_edge = BallPassDestinationEdge(
-        is_shot_on_goal=False, from_index=0, to_index=0
+        pass_speed=labelled_pass.pass_log.get_pass_speed(),
+        is_shot_on_goal=False,
+        from_index=0,
+        to_index=0,
     )
     add_edge_to_data(ball_destination_edge, data)
 
@@ -105,14 +112,25 @@ def create_pyg_data(labelled_pass: LabelledPass) -> HeteroData:
 
         for idx in range(num_target_nodes):
             edge = GlobalToAnyEdge(
-                from_index=0, to_index=idx, destination_name=node_type
+                from_index=0, to_index=idx, destination_name=NodeType(node_type)
             )
             add_edge_to_data(edge, data)
 
     ## Building Labels for data
     # Convert Label dataclass to one-hot vector
-    label_dict = labelled_pass.label.__dict__
-    label_vector = np.array([int(v) for v in label_dict.values()], dtype=np.float32)
+    label_array = []
+
+    for label_type in PassLogType:
+        if label_type == PassLogType.RESULT_0S:
+            continue
+
+        if label_type in labelled_pass.labels:
+            label_dict = labelled_pass.labels[label_type].__dict__
+            label_array.extend([int(v) for v in label_dict.values()])
+        else:
+            label_array.extend([0.0 for _ in range(len(fields(Label)))])
+
+    label_vector = np.array(label_array, dtype=np.float32)
 
     data.y = torch.tensor(label_vector, dtype=torch.float)
 

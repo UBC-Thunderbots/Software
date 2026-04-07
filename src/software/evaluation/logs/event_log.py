@@ -41,7 +41,7 @@ class EventLog(TimestampedEvalLog):
     for_team: Team
     world_state_log: WorldStateLog
 
-    num_cols = TimestampedEvalLog.get_num_cols() + 2 + WorldStateLog.get_num_cols()
+    num_cols = TimestampedEvalLog.get_num_cols() + 3 + WorldStateLog.get_num_cols()
 
     @staticmethod
     def from_world(
@@ -72,11 +72,15 @@ class EventLog(TimestampedEvalLog):
 
     @override
     def to_array(self) -> list[Any]:
-        return [
-            self.event_type.value,
-            self.from_team.value,
-            self.for_team.value,
-        ] + self.world_state_log.to_array()
+        return (
+            super().to_array()
+            + [
+                self.event_type.value,
+                self.from_team.value,
+                self.for_team.value,
+            ]
+            + self.world_state_log.to_array()
+        )
 
     @staticmethod
     @override
