@@ -224,8 +224,12 @@ def start_interactive_cli():
             if launch == "Simulator":
                 config.enable_thunderscope = True
                 selected = questionary.checkbox("Options:", 
-                    choices=["enable_autoref", "ci_mode", "record_stats", "enable_realism", "show_autoref_gui"]).ask()
-                extra_args.extend([f"--{opt}" for opt in selected])
+                    choices=["enable_autoref", "ci_mode", "record_stats", "enable_realism", "enable_autogc"]).ask()
+                for opt in selected:
+                    extra_args.extend([f"--{opt}" for opt in selected])
+                    if opt=="record_state":
+                        time = questionary.text("Enter record stats duration (minutes):").ask()
+                        extra_args.extend(f"--{time}")
             else:
                 iface = questionary.text("Network interface?").ask()
                 extra_args.extend(["--run_diagnostics", "--interface", iface])
