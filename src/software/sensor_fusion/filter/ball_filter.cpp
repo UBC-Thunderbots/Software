@@ -15,12 +15,11 @@ namespace {
     
     const Eigen::Matrix<double,4,4> INITIAL_COV = Eigen::Matrix<double,4,4>::Identity() * 1000.0;
     
-    // Calculated friction in simualtor
-const Eigen::Matrix<double,4,4> R = (Eigen::Matrix<double,4,4>() <<
-    2.222e-8, 0,        2.000e-6, 0,
-    0,        2.222e-8, 0,        2.000e-6,
-    2.000e-6, 0,        2.400e-4, 0,
-    0,        2.000e-6, 0,        2.400e-4).finished();
+	const Eigen::Matrix<double,4,4> R = (Eigen::Matrix<double,4,4>() <<
+	    2.222e-8, 0,        2.000e-6, 0,
+	    0,        2.222e-8, 0,        2.000e-6,
+	    2.000e-6, 0,        2.400e-4, 0,
+	    0,        2.000e-6, 0,        2.400e-4).finished();
 
     const Eigen::Matrix<double,2,2> Q = (Eigen::Matrix<double,2,2>() << 
         0.0226, 0,
@@ -32,6 +31,9 @@ const Eigen::Matrix<double,4,4> R = (Eigen::Matrix<double,4,4>() <<
 
     // Empirically measured
 	const double DAMPING = 0.9889;
+
+	const double MAHANALOGIS_THRESHOLD=1;
+	const int CONSECUTIVE_OUTLIERS_THRESHOLD=3;
 
 }
 
@@ -53,18 +55,18 @@ std::optional<Ball> BallFilter::estimateBallState(
 		kalman_filter.predict(delta_t);
 	}
 	if (best_ball_detection){
-		prev_detection_timestamp = best_ball_detection->timestamp;
+		prev_detection_timestamp = current_time;
 		Eigen::Matrix<double,2,1> measurement;
 		measurement << best_ball_detection->position.x(), best_ball_detection->position.y();
 		double mahalanobis = kalman_filter.getMahalanobisDistance(measurement);
-		if (mahalanobis< mahalanobis_threshold){
+		if (mahalanobis< MAHANALOGIS_THRESHOLD){
 			kalman_filter.update(measurement);
 		}
 		else{
 			consecutive_outliers++;
 		}
 
-		if (consecutive_outliers> consecutive_outliers_threshold){
+		if (consecutive_outliers> CONSECUTIVE_OUTLIERS_THRESHOLD){
 			kalman_filter.reset(measurement);
 			consecutive_outliers=0;
 		}

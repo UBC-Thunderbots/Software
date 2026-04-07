@@ -37,8 +37,6 @@ class BallFilter
    private:
 	std::optional<BallDetection> getBestBallDetection(const std::vector<BallDetection> &new_ball_detections);
 	int consecutive_outliers;
-	double mahalanobis_threshold=1;
-	int consecutive_outliers_threshold=10;
 	KalmanFilter kalman_filter;
 	std::optional<Timestamp> prev_detection_timestamp;	
 };
