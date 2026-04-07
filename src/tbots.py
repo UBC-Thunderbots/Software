@@ -227,7 +227,7 @@ def start_interactive_cli():
                     choices=["enable_autoref", "ci_mode", "record_stats", "enable_realism", "enable_autogc"]).ask()
                 for opt in selected:
                     extra_args.extend([f"--{opt}" for opt in selected])
-                    if opt=="record_state":
+                    if opt=="record_stats":
                         time = questionary.text("Enter record stats duration (minutes):").ask()
                         extra_args.extend(f"--{time}")
             else:
