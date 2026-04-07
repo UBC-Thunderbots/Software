@@ -43,16 +43,15 @@ def test_passing(field_test_runner):
     # KickTactic just does the kick we want
     blue_tactics = {}
     blue_tactics[passer_robot_id] = KickOrChipTactic(
-            kick_or_chip_origin=Point(
-                x_meters=pass_to_test.passerPoint().x(),
-                y_meters=pass_to_test.passerPoint().y(),
-            ),
-            kick_or_chip_direction=Angle(radians=kick_vec.orientation().toRadians()),
-            auto_chip_or_kick=AutoChipOrKick(
-                autokick_speed_m_per_s=pass_to_test.speed(),
-            ),
-        )
-
+        kick_or_chip_origin=Point(
+            x_meters=pass_to_test.passerPoint().x(),
+            y_meters=pass_to_test.passerPoint().y(),
+        ),
+        kick_or_chip_direction=Angle(radians=kick_vec.orientation().toRadians()),
+        auto_chip_or_kick=AutoChipOrKick(
+            autokick_speed_m_per_s=pass_to_test.speed(),
+        ),
+    )
 
     # if we want a friendly robot to receive the pass
     if should_receive_pass:
