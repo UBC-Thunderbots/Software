@@ -35,6 +35,7 @@ from cli.cli_params import (
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
 
+
 @dataclass
 class BuildConfig:
     action: ActionArgument
@@ -54,6 +55,7 @@ class BuildConfig:
     robot_name: str | None = None
     ansible_playbook: str | None = None
 
+
 class BazelFlag(tuple, Enum):
     DEBUG_BUILD = ("-c", "dbg")
     OPTIMIZED = ("--copt=-O3",)
@@ -62,7 +64,9 @@ class BazelFlag(tuple, Enum):
     THUNDERSCOPE = ("--spawn_strategy=local", "--test_env=DISPLAY=:0")
     NO_CACHE_TESTS = ("--cache_test_results=false",)
 
+
 app = Typer()
+
 
 @app.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
@@ -120,7 +124,9 @@ def validate(config: BuildConfig):
         if not config.ssh_password:
             print("Error: SSH password is required for flashing or ansible playbooks.")
             sys.exit(1)
-    if config.search_query is None and (not config.test_suite or config.action != ActionArgument.test):
+    if config.search_query is None and (
+        not config.test_suite or config.action != ActionArgument.test
+    ):
         print("Error: Specify a search query or use --suite with test.")
         sys.exit(1)
 
@@ -133,7 +139,9 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
                       -//toolchains/cc/...                \\
                       -//software:unix_full_system_tar_gen"""
     else:
-        target = fuzzy_find_target(config.action, config.search_query, config.interactive_search)
+        target = fuzzy_find_target(
+            config.action, config.search_query, config.interactive_search
+        )
 
     command = ["bazel", config.action.value]
     runtime_args = list(extra_args)
@@ -141,7 +149,8 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
     # Apply Bazel Flags
     flag_conditions = {
         BazelFlag.DEBUG_BUILD: config.debug_build or bool(config.select_debug_binaries),
-        BazelFlag.OPTIMIZED: not config.debug_build and (not config.no_optimized_build or bool(config.flash_robots)),
+        BazelFlag.OPTIMIZED: not config.debug_build
+        and (not config.no_optimized_build or bool(config.flash_robots)),
         BazelFlag.ROBOT_PLATFORM: bool(config.flash_robots or config.ansible_playbook),
         BazelFlag.TRACY: config.tracy,
         BazelFlag.THUNDERSCOPE: config.enable_thunderscope,
@@ -170,12 +179,22 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         command += ["--"]
 
     # Append runtime arguments
-    if config.stop_ai_on_start: runtime_args.append("--stop_ai_on_start")
-    if config.enable_visualizer: runtime_args.append("--enable_visualizer")
-    if config.enable_thunderscope: runtime_args.append("--enable_thunderscope")
+    if config.stop_ai_on_start:
+        runtime_args.append("--stop_ai_on_start")
+    if config.enable_visualizer:
+        runtime_args.append("--enable_visualizer")
+    if config.enable_thunderscope:
+        runtime_args.append("--enable_thunderscope")
 
     if config.ansible_playbook:
-        runtime_args += ["--playbook", config.ansible_playbook, "--hosts", f"{config.robot_name}.local", "-pwd", config.ssh_password]
+        runtime_args += [
+            "--playbook",
+            config.ansible_playbook,
+            "--hosts",
+            f"{config.robot_name}.local",
+            "-pwd",
+            config.ssh_password,
+        ]
 
     if config.flash_robots:
         runtime_args += ["--playbook", "deploy_robot_software.yml", "--hosts"]
@@ -184,8 +203,17 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
 
     if config.action == ActionArgument.test:
         # Safety check for pytest debugging
-        if any(x in runtime_args for x in ["--debug_blue_full_system", "--debug_yellow_full_system", "--debug_simulator"]):
-            print("Do not run simulated pytests as a test when debugging, use run instead.")
+        if any(
+            x in runtime_args
+            for x in [
+                "--debug_blue_full_system",
+                "--debug_yellow_full_system",
+                "--debug_simulator",
+            ]
+        ):
+            print(
+                "Do not run simulated pytests as a test when debugging, use run instead."
+            )
             sys.exit(1)
         command += [f'--test_arg="{arg}"' for arg in runtime_args]
     else:
@@ -206,29 +234,41 @@ def execute_command(command: list[str], print_only: bool = False):
 
 def start_interactive_cli():
     """Interactive mode that builds BuildConfig and calls execution directly."""
-    config = BuildConfig(action=ActionArgument.run) # Default action
+    config = BuildConfig(action=ActionArgument.run)  # Default action
     extra_args = []
 
     category = questionary.select(
-        "What would you like to do?", 
-        choices=["Run thunderscope", "Test", "Flash"]
+        "What would you like to do?", choices=["Run thunderscope", "Test", "Flash"]
     ).ask()
 
-    if not category: return
+    if not category:
+        return
 
     match category:
         case "Run thunderscope":
             config.action = ActionArgument.run
             config.search_query = "thunderscope"
-            launch = questionary.select("Launch mode?", choices=["Simulator", "Diagnostics"]).ask()
+            launch = questionary.select(
+                "Launch mode?", choices=["Simulator", "Diagnostics"]
+            ).ask()
             if launch == "Simulator":
                 config.enable_thunderscope = True
-                selected = questionary.checkbox("Options:", 
-                    choices=["enable_autoref", "ci_mode", "record_stats", "enable_realism", "enable_autogc"]).ask()
+                selected = questionary.checkbox(
+                    "Options:",
+                    choices=[
+                        "enable_autoref",
+                        "ci_mode",
+                        "record_stats",
+                        "enable_realism",
+                        "enable_autogc",
+                    ],
+                ).ask()
                 for opt in selected:
                     extra_args.extend([f"--{opt}" for opt in selected])
-                    if opt=="record_stats":
-                        time = questionary.text("Enter record stats duration (minutes):").ask()
+                    if opt == "record_stats":
+                        time = questionary.text(
+                            "Enter record stats duration (minutes):"
+                        ).ask()
                         extra_args.extend(f"--{time}")
             else:
                 iface = questionary.text("Network interface?").ask()
@@ -236,7 +276,9 @@ def start_interactive_cli():
 
         case "Test":
             config.action = ActionArgument.test
-            test_name = questionary.text("Enter test name (leave empty for entire suite)").ask()
+            test_name = questionary.text(
+                "Enter test name (leave empty for entire suite)"
+            ).ask()
             if not test_name:
                 config.test_suite = True
             else:
@@ -245,8 +287,14 @@ def start_interactive_cli():
         case "Flash":
             config.action = ActionArgument.run
             config.search_query = "ansible"
-            config.ansible_playbook = questionary.select("Select playbook:", 
-                choices=["setup_pi.yml", "deploy_robot_software.yml", "deploy_powerboard.yml"]).ask()
+            config.ansible_playbook = questionary.select(
+                "Select playbook:",
+                choices=[
+                    "setup_pi.yml",
+                    "deploy_robot_software.yml",
+                    "deploy_powerboard.yml",
+                ],
+            ).ask()
             config.robot_name = questionary.text("Robot name?").ask()
             config.ssh_password = questionary.password("SSH password?").ask()
 
@@ -255,20 +303,25 @@ def start_interactive_cli():
     execute_command(command)
 
 
-def fuzzy_find_target(action: ActionArgument, search_query: str, interactive_search: bool) -> str:
+def fuzzy_find_target(
+    action: ActionArgument, search_query: str, interactive_search: bool
+) -> str:
     test_query = ["bazel", "query", "tests(//...)"]
     binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
     library_query = ["bazel", "query", "kind(.*_library,//...)"]
-    
+
     bazel_queries = {
         ActionArgument.test: [test_query],
         ActionArgument.run: [test_query, binary_query],
         ActionArgument.build: [library_query, test_query, binary_query],
     }
 
-    targets = list(itertools.chain.from_iterable(
-        run(q, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n") for q in bazel_queries[action]
-    ))
+    targets = list(
+        itertools.chain.from_iterable(
+            run(q, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
+            for q in bazel_queries[action]
+        )
+    )
     target_dict = {target.split(b":")[-1]: target for target in targets}
 
     most_similar_target_name, confidence = process.extract(
@@ -277,7 +330,9 @@ def fuzzy_find_target(action: ActionArgument, search_query: str, interactive_sea
     target = str(target_dict[most_similar_target_name], encoding="utf-8")
 
     if interactive_search or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
-        filtered = process.extract(search_query, list(target_dict.keys()), limit=NUM_FILTERED_MATCHES_TO_SHOW)
+        filtered = process.extract(
+            search_query, list(target_dict.keys()), limit=NUM_FILTERED_MATCHES_TO_SHOW
+        )
         selected_name = iterfzf.iterfzf(iter([name for name, _ in filtered]))
         target = str(target_dict[selected_name.encode()], encoding="utf-8")
     else:
