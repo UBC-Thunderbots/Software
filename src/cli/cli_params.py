@@ -1,4 +1,4 @@
-from typer import Option
+from typer import Option, Argument
 from enum import Enum
 from typing import Annotated
 
@@ -16,6 +16,10 @@ class DebugBinary(str, Enum):
     blue = "blue"
     yellow = "yellow"
 
+
+SearchQueryArgument = Annotated[
+    str | None, Argument(help="Search query for bazel target")
+]
 
 PrintCommandOption: type[bool] = Annotated[
     bool, Option("-p", "--print_command", help="Print the generated Bazel command")
@@ -74,6 +78,11 @@ InteractiveModeOption = Annotated[
 
 TracyOption = Annotated[
     bool, Option("--tracy", help="Run the binary with the TRACY_ENABLE macro defined")
+]
+
+TestSuiteOption = Annotated[
+    bool,
+    Option("--suite", help="Run entire test suite instead of searching for a target"),
 ]
 
 EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]
