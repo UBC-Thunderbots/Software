@@ -158,7 +158,7 @@ class TigersAutoref:
 
         self._force_gamecontroller_to_accept_all_events()
         self._send_geometry()
-        self.gamecontroller.reset_team_info(Division.DIV_B)
+        self.gamecontroller.reset_match()
 
         self.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN

@@ -13,13 +13,6 @@ from software.thunderscope.binary_context_managers.runtime_manager import (
 )
 from software.thunderscope.log.stats.stats import Stats
 
-protobuf_impl_type = api_implementation.Type()
-assert protobuf_impl_type == "upb", (
-    f"Trying to use the {protobuf_impl_type} protobuf implementation. "
-    "Please use the upb implementation, available in python protobuf version 4.21.0 and above."
-    f"The current version of protobuf is {google.protobuf.__version__}"
-)
-
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers import *
@@ -40,8 +33,14 @@ from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+
+protobuf_impl_type = api_implementation.Type()
+assert protobuf_impl_type == "upb", (
+    f"Trying to use the {protobuf_impl_type} protobuf implementation. "
+    "Please use the upb implementation, available in python protobuf version 4.21.0 and above."
+    f"The current version of protobuf is {google.protobuf.__version__}"
+)
 
 ###########################################################################
 #                         Thunderscope Main                               #
@@ -195,6 +194,12 @@ if __name__ == "__main__":
         help="Runs the simulation with sped-up time",
     )
     parser.add_argument(
+        "--enable_autogc",
+        action="store_true",
+        default=False,
+        help="Automatically handles gamecontroller referee events",
+    )
+    parser.add_argument(
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
     )
     parser.add_argument(
@@ -240,9 +245,10 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--record_stats",
-        action="store_true",
-        default=False,
-        help="Whether to record stats about fullsystem performance (during AI vs AI)",
+        action="store",
+        type=int,
+        default=0,
+        help="Record stats about fullsystem performance (during AI vs AI) for a set amount of time in minutes",
     )
 
     args = parser.parse_args()
@@ -343,7 +349,8 @@ if __name__ == "__main__":
 
         with (
             Gamecontroller(
-                suppress_logs=(not args.verbose), use_conventional_port=False
+                suppress_logs=(not args.verbose),
+                use_conventional_port=False,
             )
             if args.launch_gc
             else contextlib.nullcontext()
@@ -422,6 +429,11 @@ if __name__ == "__main__":
             layout_path=args.layout,
         )
 
+        if args.record_stats:
+            args.ci_mode = True
+            args.enable_autogc = True
+            args.enable_autoref = True
+
         def __ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
 
@@ -472,7 +484,7 @@ if __name__ == "__main__":
             log_level=args.log_level,
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose),
-            should_automate_referee=args.record_stats,
+            automate_referee=args.enable_autogc,
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -547,7 +559,12 @@ if __name__ == "__main__":
                 # call so we need to somehow close it before doing our resource cleanup
                 exiter_thread = threading.Thread(
                     target=exit_poller,
-                    args=(CI_DURATION_S, lambda: tscope.close()),
+                    args=(
+                        (args.record_stats * SECONDS_PER_MINUTE)
+                        if args.record_stats
+                        else CI_DURATION_S,
+                        lambda: tscope.close(),
+                    ),
                     daemon=True,
                 )
 
