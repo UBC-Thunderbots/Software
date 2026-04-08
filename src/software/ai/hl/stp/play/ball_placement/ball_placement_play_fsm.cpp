@@ -13,7 +13,12 @@ BallPlacementPlayFSM::BallPlacementPlayFSM(
 {
 }
 
-// Subtract b from a, or return 0 if b is larger than a
+/**
+ * Saturating subtraction
+ * @param a the left-hand side
+ * @param b the right-hand side
+ * @return a - b, or 0 if it would underflow
+ */
 static unsigned int subSat(unsigned int a, unsigned int b)
 {
     if (b > a)
@@ -28,7 +33,7 @@ static unsigned int subSat(unsigned int a, unsigned int b)
 
 void BallPlacementPlayFSM::alignWall(const Update &event)
 {
-    placing_robot_id = std::nullopt;
+    placing_robot_id                    = std::nullopt;
     PriorityTacticVector tactics_to_run = {{align_wall_tactic}};
 
     setPickOffDest(event);
@@ -79,7 +84,7 @@ void BallPlacementPlayFSM::pickOffWall(const Update &event)
 
 void BallPlacementPlayFSM::alignPlacement(const Update &event)
 {
-    placing_robot_id = std::nullopt;
+    placing_robot_id                    = std::nullopt;
     PriorityTacticVector tactics_to_run = {{}};
 
     std::optional<Point> placement_point =
@@ -347,57 +352,67 @@ std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffDest(
     {
         facing_angle = Angle::fromDegrees(45);
         backoff_point =
-            field_boundary.posXPosYCorner() -
-            Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_M);
+            makeBackoffPoint(field_boundary.posXPosYCorner(), facing_angle, true);
     }
     else if (near_positive_y_boundary && near_negative_x_boundary)
     {
         facing_angle = Angle::fromDegrees(135);
         backoff_point =
-            field_boundary.negXPosYCorner() -
-            Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_M);
+            makeBackoffPoint(field_boundary.negXPosYCorner(), facing_angle, true);
     }
     else if (near_negative_y_boundary && near_positive_x_boundary)
     {
         facing_angle = Angle::fromDegrees(-45);
         backoff_point =
-            field_boundary.posXNegYCorner() -
-            Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_M);
+            makeBackoffPoint(field_boundary.posXNegYCorner(), facing_angle, true);
     }
     else if (near_negative_y_boundary && near_negative_x_boundary)
     {
         facing_angle = Angle::fromDegrees(-135);
         backoff_point =
-            field_boundary.negXNegYCorner() -
-            Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_M);
+            makeBackoffPoint(field_boundary.negXNegYCorner(), facing_angle, true);
     }
     else if (near_positive_y_boundary)
     {
-        facing_angle = Angle::fromDegrees(90);
-        backoff_point =
-            Point(ball_pos.x(), field_boundary.yMax()) -
-            Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_WALL_M);
+        facing_angle  = Angle::fromDegrees(90);
+        backoff_point = makeBackoffPoint(Point(ball_pos.x(), field_boundary.yMax()),
+                                         facing_angle, false);
     }
     else if (near_positive_x_boundary)
     {
-        facing_angle = Angle::fromDegrees(0);
-        backoff_point =
-            Point(field_boundary.xMax(), ball_pos.y()) -
-            Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_WALL_M);
+        if (std::abs(ball_pos.y()) < GOAL_AVOIDANCE_ZONE_HALF_WIDTH_M)
+        {
+            facing_angle =
+                (ball_pos.y() > 0) ? Angle::fromDegrees(-90) : Angle::fromDegrees(90);
+            backoff_point = makeBackoffPoint(ball_pos, facing_angle, false);
+        }
+        else
+        {
+            facing_angle  = Angle::fromDegrees(0);
+            backoff_point = makeBackoffPoint(Point(field_boundary.xMax(), ball_pos.y()),
+                                             facing_angle, false);
+        }
     }
     else if (near_negative_y_boundary)
     {
-        facing_angle = Angle::fromDegrees(-90);
-        backoff_point =
-            Point(ball_pos.x(), field_boundary.yMin()) -
-            Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_WALL_M);
+        facing_angle  = Angle::fromDegrees(-90);
+        backoff_point = makeBackoffPoint(Point(ball_pos.x(), field_boundary.yMin()),
+                                         facing_angle, false);
     }
     else if (near_negative_x_boundary)
     {
-        facing_angle = Angle::fromDegrees(180);
-        backoff_point =
-            Point(field_boundary.xMin(), ball_pos.y()) -
-            Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_WALL_M);
+        if (std::abs(ball_pos.y()) < GOAL_AVOIDANCE_ZONE_HALF_WIDTH_M)
+        {
+            facing_angle =
+                (ball_pos.y() > 0) ? Angle::fromDegrees(-90) : Angle::fromDegrees(90);
+            backoff_point = makeBackoffPoint(ball_pos, facing_angle, false);
+        }
+        else
+        {
+            facing_angle  = Angle::fromDegrees(180);
+            backoff_point = makeBackoffPoint(Point(field_boundary.xMin(), ball_pos.y()),
+                                             facing_angle, false);
+        }
     }
 
     return {facing_angle, backoff_point};
@@ -405,7 +420,20 @@ std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffDest(
 
 void BallPlacementPlayFSM::setupMoveTactics(const Update &event, unsigned int num_tactics)
 {
-    if (move_tactics.size() != num_tactics)
+    // force assign placing robot
+    getPlacingRobot(event.common.world_ptr);
+
+    bool tactics_changed = move_tactics.size() != num_tactics;
+
+    // reassign waiting line position if tactics changed, placing robot got reassigned,
+    // or if the ball is lost
+    if (tactics_changed || placing_robot_id != last_placing_robot_id || ballLost(event))
+    {
+        last_placing_robot_id = placing_robot_id;
+        waiting_line_start    = std::nullopt;
+    }
+
+    if (tactics_changed)
     {
         move_tactics = std::vector<std::shared_ptr<BallPlacementMoveTactic>>(num_tactics);
         std::generate(
@@ -413,58 +441,62 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event, unsigned int nu
             [&] { return std::make_shared<BallPlacementMoveTactic>(ai_config_ptr); });
     }
 
-    std::optional<Point> placement_point =
-        event.common.world_ptr->gameState().getBallPlacementPoint();
-    Point target_pos = placement_point.value_or(Point(0, 0));
-    Point ball_pos   = event.common.world_ptr->ball().position();
-    Rectangle bounds = event.common.world_ptr->field().fieldBoundary();
-
-    // try to find a line location on the horizontal sidelines that maximizes distance
-    // to the ball and the ball placement point
-    double line_half_width = static_cast<double>(move_tactics.size() - 1) *
-                             ROBOT_MAX_RADIUS_METERS * 3.0 / 2.0;
-
-    // prevent line being out of bounds
-    double min_x = bounds.xMin() + WAITING_LINE_OFFSET_M + line_half_width;
-    double max_x = bounds.xMax() - WAITING_LINE_OFFSET_M - line_half_width;
-
-    std::vector<Point> candidate_centers;
-    if (min_x <= max_x)
+    if (!waiting_line_start.has_value())
     {
-        for (double x = min_x; x <= max_x; x += 0.5)
+        std::optional<Point> placement_point =
+            event.common.world_ptr->gameState().getBallPlacementPoint();
+        Point target_pos = placement_point.value_or(Point(0, 0));
+        Point ball_pos   = event.common.world_ptr->ball().position();
+        Rectangle bounds = event.common.world_ptr->field().fieldBoundary();
+
+        // try to find a line location on the horizontal sidelines that maximizes
+        // distance to the ball and the ball placement point
+        double line_half_width = static_cast<double>(move_tactics.size() - 1) *
+                                 ROBOT_MAX_RADIUS_METERS * 3.0 / 2.0;
+
+        // prevent line being out of bounds
+        double min_x = bounds.xMin() + WAITING_LINE_OFFSET_M + line_half_width;
+        double max_x = bounds.xMax() - WAITING_LINE_OFFSET_M - line_half_width;
+
+        std::vector<Point> candidate_centers;
+        if (min_x <= max_x)
         {
-            candidate_centers.emplace_back(x, bounds.yMax() - WAITING_LINE_OFFSET_M);
-            candidate_centers.emplace_back(x, bounds.yMin() + WAITING_LINE_OFFSET_M);
+            for (double x = min_x; x <= max_x; x += 0.5)
+            {
+                candidate_centers.emplace_back(x, bounds.yMax() - WAITING_LINE_OFFSET_M);
+                candidate_centers.emplace_back(x, bounds.yMin() + WAITING_LINE_OFFSET_M);
+            }
+            // guarantee extreme edges are evaluated
+            candidate_centers.emplace_back(max_x, bounds.yMax() - WAITING_LINE_OFFSET_M);
+            candidate_centers.emplace_back(max_x, bounds.yMin() + WAITING_LINE_OFFSET_M);
         }
-        // guarantee extreme edges are evaluated
-        candidate_centers.emplace_back(max_x, bounds.yMax() - WAITING_LINE_OFFSET_M);
-        candidate_centers.emplace_back(max_x, bounds.yMin() + WAITING_LINE_OFFSET_M);
-    }
-    else
-    {
-        candidate_centers.emplace_back(0, bounds.yMax() - WAITING_LINE_OFFSET_M);
-    }
-
-    Point best_center = candidate_centers.front();
-    double max_dist = -1.0;
-
-    for (const Point &p : candidate_centers)
-    {
-        // find the sideline coordinate that maximizes minimum distance to the ball and target
-        double d = std::min((p - ball_pos).length(), (p - target_pos).length());
-        if (d > max_dist)
+        else
         {
-            max_dist    = d;
-            best_center = p;
+            candidate_centers.emplace_back(0, bounds.yMax() - WAITING_LINE_OFFSET_M);
         }
-    }
 
-    Vector line_dir = Vector(1, 0);
-    Point line_start = best_center - line_dir * line_half_width;
+        Point best_center = candidate_centers.front();
+        double max_dist   = -1.0;
+
+        for (const Point &p : candidate_centers)
+        {
+            // find the sideline coordinate that maximizes minimum distance to the
+            // ball and target
+            double d = std::min((p - ball_pos).length(), (p - target_pos).length());
+            if (d > max_dist)
+            {
+                max_dist    = d;
+                best_center = p;
+            }
+        }
+
+        waiting_line_start = best_center - Vector(line_half_width, 0);
+    }
 
     for (unsigned int i = 0; i < move_tactics.size(); i++)
     {
-        Point dest = line_start + line_dir * (i * ROBOT_MAX_RADIUS_METERS * 3.0);
+        Point dest =
+            waiting_line_start.value() + Vector(i * ROBOT_MAX_RADIUS_METERS * 3.0, 0);
         move_tactics.at(i)->updateControlParams(
             dest, Angle::zero(), TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::ObstacleAvoidanceMode::SAFE);
@@ -483,7 +515,7 @@ std::optional<Robot> BallPlacementPlayFSM::getPlacingRobot(const WorldPtr &world
     }
 
     std::optional<Robot> best_robot = std::nullopt;
-    double min_dist = std::numeric_limits<double>::max();
+    double min_dist                 = std::numeric_limits<double>::max();
     for (const Robot &r : world->friendlyTeam().getAllRobots())
     {
         if (r.id() == world->friendlyTeam().getGoalieId())
@@ -492,7 +524,7 @@ std::optional<Robot> BallPlacementPlayFSM::getPlacingRobot(const WorldPtr &world
         double dist = (r.position() - world->ball().position()).length();
         if (dist < min_dist)
         {
-            min_dist = dist;
+            min_dist   = dist;
             best_robot = r;
         }
     }
@@ -522,4 +554,10 @@ bool BallPlacementPlayFSM::alignmentCheck(const Update &event, const Point &poin
     }
 
     return false;
+}
+
+Point BallPlacementPlayFSM::makeBackoffPoint(Point pos, Angle facing_angle, bool corner)
+{
+    double len = corner ? BACK_AWAY_FROM_CORNER_M : BACK_AWAY_FROM_WALL_M;
+    return pos - Vector::createFromAngle(facing_angle).normalize(len);
 }
