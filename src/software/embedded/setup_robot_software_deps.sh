@@ -5,6 +5,17 @@ set -ex
 host_software_packages=(
     device-tree-compiler
     curl
+    libssl-dev
+    libffi-dev
+    zlib1g-dev
+    libbz2-dev
+    libreadline-dev
+    libsqlite3-dev
+    libncursesw5-dev
+    tk-dev
+    libgdbm-dev
+    libc6-dev
+    liblzma-dev
 )
 
 # Install packages
@@ -25,4 +36,20 @@ sudo make altinstall
 
 if ! sudo /usr/local/bin/python3.12 -m venv /opt/tbotspython ; then
     echo "Error: Installing Python 3.12 failed"
+    exit 1
 fi
+
+sudo chown -R $USER:$USER /opt/tbotspython
+
+# install PlatformIO to global environment
+curl -fsSL -o /tmp/tbots_download_cache/get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py
+if ! /usr/local/bin/python3.12 /tmp/tbots_download_cache/get-platformio.py; then
+    echo "Error: Installing PlatformIO failed"
+    exit 1
+fi
+
+# link platformio to /opt/tbotspython/bin so that bazel can find it
+ln -s $HOME/.platformio/penv/bin/platformio /opt/tbotspython/bin/platformio
+
+sudo raspi-config nonint do_serial_hw 0
+sudo raspi-config nonint do_serial_cons 1
