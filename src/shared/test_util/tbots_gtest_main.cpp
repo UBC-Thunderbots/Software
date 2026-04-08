@@ -84,14 +84,6 @@ int main(int argc, char **argv)
     if (!TbotsGtestMain::help)
     {
         LoggerSingleton::initializeLogger(TbotsGtestMain::runtime_dir, nullptr);
-
-        if (TbotsGtestMain::enable_visualizer || TbotsGtestMain::run_sim_in_realtime)
-        {
-            // disable floating point errors when using visualizer due to potential
-            // floating point errors in QT
-            // TODO #(2510) Remove this once we port over to simulated pytests entirely
-            // fedisableexcept(FE_INVALID | FE_OVERFLOW);
-        }
         return RUN_ALL_TESTS();
     }
     else
