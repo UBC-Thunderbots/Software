@@ -82,7 +82,7 @@ void BallPlacementPlayFSM::pickOffWall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void BallPlacementPlayFSM::alignPlacement(const Update &event)
+void BallPlacementPlayFSM::alignPlacement(const Update& event)
 {
     placing_robot_id                    = std::nullopt;
     PriorityTacticVector tactics_to_run = {{}};
@@ -117,7 +117,7 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void BallPlacementPlayFSM::placeBall(const Update &event)
+void BallPlacementPlayFSM::placeBall(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -167,7 +167,7 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void BallPlacementPlayFSM::startWait(const Update &event)
+void BallPlacementPlayFSM::startWait(const Update& event)
 {
     start_time = event.common.world_ptr->getMostRecentTimestamp();
 }
@@ -250,7 +250,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-bool BallPlacementPlayFSM::shouldPickOffWall(const Update &event)
+bool BallPlacementPlayFSM::shouldPickOffWall(const Update& event)
 {
     const Point ball_pos        = event.common.world_ptr->ball().position();
     const Rectangle field_lines = event.common.world_ptr->field().fieldBoundary();
@@ -269,22 +269,22 @@ bool BallPlacementPlayFSM::shouldPickOffWall(const Update &event)
            MIN_DISTANCE_FROM_WALL_FOR_ALIGN_M;
 }
 
-bool BallPlacementPlayFSM::alignDone(const Update &event)
+bool BallPlacementPlayFSM::alignDone(const Update& event)
 {
     return alignmentCheck(event, setup_point, setup_angle);
 }
 
-bool BallPlacementPlayFSM::wallAlignDone(const Update &event)
+bool BallPlacementPlayFSM::wallAlignDone(const Update& event)
 {
     return alignmentCheck(event, pickoff_point, pickoff_final_orientation);
 }
 
-bool BallPlacementPlayFSM::wallPickOffDone(const Update &event)
+bool BallPlacementPlayFSM::wallPickOffDone(const Update& event)
 {
     return pickoff_wall_tactic->done();
 }
 
-bool BallPlacementPlayFSM::ballPlaced(const Update &event)
+bool BallPlacementPlayFSM::ballPlaced(const Update& event)
 {
     const Point ball_pos    = event.common.world_ptr->ball().position();
     const double ball_speed = event.common.world_ptr->ball().velocity().length();
@@ -322,19 +322,19 @@ bool BallPlacementPlayFSM::ballLost(const Update &event)
     return true;
 }
 
-bool BallPlacementPlayFSM::waitDone(const Update &event)
+bool BallPlacementPlayFSM::waitDone(const Update& event)
 {
     const Timestamp current_time = event.common.world_ptr->getMostRecentTimestamp();
     return (current_time - start_time) > Duration::fromSeconds(BALL_IS_PLACED_WAIT_S);
 }
 
-bool BallPlacementPlayFSM::retreatDone(const Update &event)
+bool BallPlacementPlayFSM::retreatDone(const Update& event)
 {
     return retreat_tactic->done();
 }
 
 std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffDest(
-    const Point &ball_pos, const Rectangle &field_boundary)
+    const Point& ball_pos, const Rectangle& field_boundary)
 {
     Angle facing_angle;
     Point backoff_point;

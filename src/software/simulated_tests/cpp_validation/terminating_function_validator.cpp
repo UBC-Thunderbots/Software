@@ -20,7 +20,7 @@ std::string TerminatingFunctionValidator::currentErrorMessage() const
 }
 
 void TerminatingFunctionValidator::executeAndCheckForSuccessWrapper(
-    ValidationCoroutine::push_type &yield, std::shared_ptr<World> world,
+    ValidationCoroutine::push_type& yield, std::shared_ptr<World> world,
     ValidationFunction validation_function)
 {
     // Yield the very first time the function is called, so that the validation_function

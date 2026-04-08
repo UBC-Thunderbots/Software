@@ -25,7 +25,7 @@
 using namespace camun::simulator;
 
 SimField::SimField(std::shared_ptr<btDiscreteDynamicsWorld> world,
-                   const world::Geometry &geometry)
+                   const world::Geometry& geometry)
     : m_world(world)
 {
     const float totalWidth  = geometry.field_width() / 2.0f + geometry.boundary_width();
@@ -100,13 +100,13 @@ SimField::SimField(std::shared_ptr<btDiscreteDynamicsWorld> world,
 
 SimField::~SimField()
 {
-    for (const auto &object : m_objects)
+    for (const auto& object : m_objects)
     {
         m_world->removeCollisionObject(object.get());
     }
 }
 
-void SimField::addObject(btCollisionShape *shape, const btTransform &transform,
+void SimField::addObject(btCollisionShape* shape, const btTransform& transform,
                          float restitution, float friction)
 {
     std::unique_ptr<btCollisionObject> object = std::make_unique<btCollisionObject>();

@@ -55,8 +55,8 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      * @return the point that the robot should be positioned to face the ball and dribble
      * the ball
      */
-    static Point robotPositionToFaceBall(const Point &ball_position,
-                                         const Angle &face_ball_angle,
+    static Point robotPositionToFaceBall(const Point& ball_position,
+                                         const Angle& face_ball_angle,
                                          double additional_offset = 0.0);
 
     /**
@@ -70,7 +70,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      */
     // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
     // evaluation folder
-    Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &field);
+    Point findInterceptionPoint(const Robot& robot, const Ball& ball, const Field& field);
 
     /**
      * Gets the destination to dribble the ball to from the update event
@@ -79,7 +79,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      *
      * @return the destination to dribble the ball to
      */
-    static Point getDribbleBallDestination(const Point &ball_position,
+    static Point getDribbleBallDestination(const Point& ball_position,
                                            std::optional<Point> dribble_destination);
 
     /**
@@ -90,7 +90,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      * @return the final orientation to finish dribbling facing
      */
     static Angle getFinalDribbleOrientation(
-        const Point &ball_position, const Point &robot_position,
+        const Point& ball_position, const Point& robot_position,
         std::optional<Angle> final_dribble_orientation);
 
     /**
@@ -104,7 +104,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      * @return the next dribble destination and orientation
      */
     static std::tuple<Point, Angle> calculateNextDribbleDestinationAndOrientation(
-        const Ball &ball, const Robot &robot,
+        const Ball& ball, const Robot& robot,
         std::optional<Point> dribble_destination_opt,
         std::optional<Angle> final_dribble_orientation_opt);
 
@@ -116,7 +116,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      *
      * @param event DribbleFSM::Update
      */
-    void getPossession(const Update &event);
+    void getPossession(const Update& event);
 
     /**
      * Action to dribble the ball
@@ -126,14 +126,14 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      *
      * @param event DribbleFSM::Update
      */
-    void dribble(const Update &event);
+    void dribble(const Update& event);
 
     /**
      * Action to lose possession of the ball
      *
      * @param event DribbleFSM::Update
      */
-    void loseBall(const Update &event);
+    void loseBall(const Update& event);
 
     /**
      * Guard that checks if the robot has possession of the ball
@@ -142,7 +142,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      *
      * @return if the ball has been have_possession
      */
-    bool havePossession(const Update &event);
+    bool havePossession(const Update& event);
 
     /**
      * Guard that checks if the robot has lost possession of the ball
@@ -151,7 +151,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      *
      * @return if the ball possession has been lost
      */
-    bool lostPossession(const Update &event);
+    bool lostPossession(const Update& event);
 
     /**
      * Guard that checks if the ball is at the dribble_destination and robot is facing
@@ -162,7 +162,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      * @return if the ball is at the dribble_destination, robot is facing the correct
      * direction and ahs possession of the ball
      */
-    bool dribblingDone(const Update &event);
+    bool dribblingDone(const Update& event);
 
     /**
      * Guard that checks if the the robot should lose possession to avoid excessive
@@ -172,7 +172,7 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
      *
      * @return if the ball possession should be lost
      */
-    bool shouldLoseBall(const Update &event);
+    bool shouldLoseBall(const Update& event);
 
     auto operator()()
     {

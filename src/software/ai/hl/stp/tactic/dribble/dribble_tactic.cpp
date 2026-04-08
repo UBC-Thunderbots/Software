@@ -22,7 +22,7 @@ void DribbleTactic::updateControlParams(
     control_params.max_speed_get_possession  = max_speed_get_possession;
 }
 
-void DribbleTactic::accept(TacticVisitor &visitor) const
+void DribbleTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

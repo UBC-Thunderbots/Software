@@ -5,7 +5,7 @@ LogMerger::LogMerger(bool enable_merging)
 {
 }
 
-std::list<g3::LogMessage> LogMerger::log(g3::LogMessage &log)
+std::list<g3::LogMessage> LogMerger::log(g3::LogMessage& log)
 {
     if (enable_merging)
     {
@@ -64,7 +64,7 @@ std::list<g3::LogMessage> LogMerger::_getOldMessages(Clock::time_point current_t
     return result;
 }
 
-g3::LogMessage LogMerger::_addRepeats(g3::LogMessage &log, int repeats)
+g3::LogMessage LogMerger::_addRepeats(g3::LogMessage& log, int repeats)
 {
     // if no repeats, do nothing
     if (repeats == 0)
