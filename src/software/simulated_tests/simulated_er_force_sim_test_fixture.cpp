@@ -1,10 +1,5 @@
 #include "software/simulated_tests/simulated_er_force_sim_test_fixture.h"
 
-#include "proto/message_translation/tbots_protobuf.h"
-
-// TODO (#2419): remove this
-#include <fenv.h>
-
 #include <cstdlib>
 #include <filesystem>
 
@@ -107,11 +102,7 @@ bool SimulatedErForceSimTestFixture::validateAndCheckCompletion(
 void SimulatedErForceSimTestFixture::updateSensorFusion(
     std::shared_ptr<ErForceSimulator> simulator)
 {
-    // TODO (#2419): remove this to re-enable sigfpe checks
-    fedisableexcept(FE_INVALID | FE_OVERFLOW);
     auto ssl_wrapper_packets = simulator->getSSLWrapperPackets();
-    // TODO (#2419): remove this to re-enable sigfpe checks
-    feenableexcept(FE_INVALID | FE_OVERFLOW);
 
     auto blue_robot_statuses   = simulator->getBlueRobotStatuses();
     auto yellow_robot_statuses = simulator->getYellowRobotStatuses();
@@ -183,15 +174,11 @@ void SimulatedErForceSimTestFixture::runTest(
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
         field_type, create2021RobotConstants(), realism_config, ramping));
 
-    // TODO (#2419): remove this to re-enable sigfpe checks
-    fedisableexcept(FE_INVALID | FE_OVERFLOW);
     simulator->setBallState(ball);
     // step the simulator to make sure the robots and the ball are in position
     simulator->stepSimulation(simulation_time_step);
     simulator->setYellowRobots(friendly_robots);
     simulator->setBlueRobots(enemy_robots);
-    // TODO (#2419): remove this to re-enable sigfpe checks
-    feenableexcept(FE_INVALID | FE_OVERFLOW);
 
     updateSensorFusion(simulator);
     std::shared_ptr<World> friendly_world;
@@ -521,11 +508,7 @@ bool SimulatedErForceSimTestFixture::tickTest(
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
 
-    // TODO (#2419): remove this to re-enable sigfpe checks
-    fedisableexcept(FE_INVALID | FE_OVERFLOW);
     simulator->stepSimulation(simulation_time_step);
-    // TODO (#2419): remove this to re-enable sigfpe checks
-    feenableexcept(FE_INVALID | FE_OVERFLOW);
     updateSensorFusion(simulator);
 
     if (friendly_sensor_fusion.getWorld().has_value() &&

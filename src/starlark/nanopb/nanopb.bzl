@@ -227,6 +227,9 @@ def _construct_cc_info(
         user_compile_flags = copts,
     )
 
+    # Linker flags required for macos, doesn't affect linux
+    link_flags = ["-Wl,-undefined,dynamic_lookup"]
+
     (linking_context, linking_outputs) = \
         cc_common.create_linking_context_from_compilation_outputs(
             name = "link_nanopb_outputs",
@@ -235,6 +238,7 @@ def _construct_cc_info(
             feature_configuration = feature_configuration,
             cc_toolchain = cc_toolchain,
             linking_contexts = nanopb_linking_contexts,
+            user_link_flags = link_flags,
         )
 
     extra_context = cc_common.create_compilation_context(

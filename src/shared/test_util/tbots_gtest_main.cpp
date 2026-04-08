@@ -14,11 +14,37 @@ bool TbotsGtestMain::stop_ai_on_start    = false;
 std::string TbotsGtestMain::runtime_dir  = "/tmp/tbots/yellow_test";
 double TbotsGtestMain::test_speed        = 1.0;
 
+/**
+ * Portable wrapper for feenableexcept. Use to specify which floating-point
+ * exceptions should crash the program when they occur.
+ *
+ * @note On MacOS ARM, there are no floating-point exception traps, so tests may
+ * pass on MacOS that wouldn't pass on other platforms if floating-point
+ * exceptions occur.
+ *
+ * @param excepts A bitmask of floating-point exceptions to be enabled.
+ * @return True on success, false on failure to set floating-point exceptions.
+ */
+bool enable_fp_exceptions(unsigned int excepts)
+{
+#if defined(__linux__) && defined(__GNUC__)
+    feenableexcept(excepts);
+    return true;
+#else
+    // Unsupported platform
+    return false;
+#endif
+}
 
 int main(int argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    feenableexcept(FE_INVALID | FE_OVERFLOW);
+
+    // Crash on invalid operations like sqrt of negative and floating-point overflow
+    if (!enable_fp_exceptions(FE_INVALID | FE_OVERFLOW))
+    {
+        std::cerr << "Warning: Could not enable floating-point exceptions." << std::endl;
+    }
 
     boost::program_options::options_description desc{"Options"};
 
@@ -58,13 +84,6 @@ int main(int argc, char** argv)
     if (!TbotsGtestMain::help)
     {
         LoggerSingleton::initializeLogger(TbotsGtestMain::runtime_dir, nullptr);
-
-        if (TbotsGtestMain::enable_visualizer || TbotsGtestMain::run_sim_in_realtime)
-        {
-            // disable floating point errors when using visualizer due to potential
-            // floating point errors in QT
-            fedisableexcept(FE_INVALID | FE_OVERFLOW);
-        }
         return RUN_ALL_TESTS();
     }
     else
