@@ -60,7 +60,6 @@ def test_two_ai_ball_placement(
         # Scenario 7
         (tbots_cpp.Point(-1, 3.15), tbots_cpp.Point(-3.5, 2.8)),
         # Scenario 8
-        # TODO: This case sometimes fails with placing robot oscillating
         (tbots_cpp.Point(-4.45, -0.1), tbots_cpp.Point(-0.5, 2.8)),
     ],
 )
@@ -132,7 +131,6 @@ def ball_placement_play_setup(
     # ball placement position. This prevents the issue where subsequent test
     # runs don't properly get the ball placement point set properly and reuse
     # the target point from the previous test case.
-    # TODO: replace with a better mechanism
     time.sleep(0.5)
 
     # Pass in placement point here - not required for all play tests

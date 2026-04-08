@@ -31,7 +31,7 @@ static unsigned int subSat(unsigned int a, unsigned int b)
     }
 }
 
-void BallPlacementPlayFSM::alignWall(const Update &event)
+void BallPlacementPlayFSM::alignWall(const Update& event)
 {
     placing_robot_id                    = std::nullopt;
     PriorityTacticVector tactics_to_run = {{align_wall_tactic}};
@@ -52,7 +52,7 @@ void BallPlacementPlayFSM::alignWall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void BallPlacementPlayFSM::setPickOffDest(const Update &event)
+void BallPlacementPlayFSM::setPickOffDest(const Update& event)
 {
     Point ball_pos           = event.common.world_ptr->ball().position();
     Rectangle field_boundary = event.common.world_ptr->field().fieldBoundary();
@@ -65,7 +65,7 @@ void BallPlacementPlayFSM::setPickOffDest(const Update &event)
     pickoff_point = ball_pos - approach_vector.normalize(ALIGNMENT_VECTOR_LENGTH_M);
 }
 
-void BallPlacementPlayFSM::pickOffWall(const Update &event)
+void BallPlacementPlayFSM::pickOffWall(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{pickoff_wall_tactic}};
 
@@ -172,7 +172,7 @@ void BallPlacementPlayFSM::startWait(const Update& event)
     start_time = event.common.world_ptr->getMostRecentTimestamp();
 }
 
-void BallPlacementPlayFSM::releaseBall(const Update &event)
+void BallPlacementPlayFSM::releaseBall(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -199,7 +199,7 @@ void BallPlacementPlayFSM::releaseBall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void BallPlacementPlayFSM::retreat(const Update &event)
+void BallPlacementPlayFSM::retreat(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -308,7 +308,7 @@ bool BallPlacementPlayFSM::ballPlaced(const Update& event)
     return true;
 }
 
-bool BallPlacementPlayFSM::ballLost(const Update &event)
+bool BallPlacementPlayFSM::ballLost(const Update& event)
 {
     std::optional<Robot> placing_robot = getPlacingRobot(event.common.world_ptr);
 
@@ -418,7 +418,7 @@ std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffDest(
     return {facing_angle, backoff_point};
 }
 
-void BallPlacementPlayFSM::setupMoveTactics(const Update &event, unsigned int num_tactics)
+void BallPlacementPlayFSM::setupMoveTactics(const Update& event, unsigned int num_tactics)
 {
     // force assign placing robot
     getPlacingRobot(event.common.world_ptr);
@@ -478,7 +478,7 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event, unsigned int nu
         Point best_center = candidate_centers.front();
         double max_dist   = -1.0;
 
-        for (const Point &p : candidate_centers)
+        for (const Point& p : candidate_centers)
         {
             // find the sideline coordinate that maximizes minimum distance to the
             // ball and target
@@ -503,7 +503,7 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event, unsigned int nu
     }
 }
 
-std::optional<Robot> BallPlacementPlayFSM::getPlacingRobot(const WorldPtr &world)
+std::optional<Robot> BallPlacementPlayFSM::getPlacingRobot(const WorldPtr& world)
 {
     if (placing_robot_id.has_value())
     {
@@ -516,7 +516,7 @@ std::optional<Robot> BallPlacementPlayFSM::getPlacingRobot(const WorldPtr &world
 
     std::optional<Robot> best_robot = std::nullopt;
     double min_dist                 = std::numeric_limits<double>::max();
-    for (const Robot &r : world->friendlyTeam().getAllRobots())
+    for (const Robot& r : world->friendlyTeam().getAllRobots())
     {
         if (r.id() == world->friendlyTeam().getGoalieId())
             continue;
@@ -536,8 +536,8 @@ std::optional<Robot> BallPlacementPlayFSM::getPlacingRobot(const WorldPtr &world
     return best_robot;
 }
 
-bool BallPlacementPlayFSM::alignmentCheck(const Update &event, const Point &point,
-                                          const Angle &angle)
+bool BallPlacementPlayFSM::alignmentCheck(const Update& event, const Point& point,
+                                          const Angle& angle)
 {
     std::optional<Robot> placing_robot = getPlacingRobot(event.common.world_ptr);
 
