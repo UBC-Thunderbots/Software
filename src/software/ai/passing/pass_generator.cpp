@@ -8,7 +8,10 @@
 PassGenerator::PassGenerator(const TbotsProto::PassingConfig& passing_config)
     : optimizer_(optimizer_param_weights),
       random_num_gen_(RNG_SEED),
-      passing_config_(passing_config)
+      passing_config_(passing_config),
+      num_passes_since_sample_(0),
+      num_picks_since_random_(0),
+      sample_pass_features_(false)
 {
 }
 
@@ -136,6 +139,10 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
     };
 
     PassWithRating best_pass{Pass(Point(), Point(), 1.0), -1.0};
+
+    // store all considered passes for later
+    std::vector<PassWithRating> considered_passes;
+
     for (const auto& [robot_id, receiving_positions] : receiving_positions_map)
     {
         PassWithRating best_pass_for_robot{Pass(Point(), Point(), 1.0), -1.0};
@@ -152,9 +159,22 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
                 passing_config_);
             double score = ratePass(world, optimized_pass, passing_config_);
 
+            if (sample_pass_features_)
+            {
+                if (num_passes_since_sample_ == 0)
+                {
+                    pass_feature_collector_.logPassFeatures(optimized_pass, world,
+                                                            passing_config_);
+                }
+
+                num_passes_since_sample_ =
+                    (num_passes_since_sample_ + 1) % PASS_SAMPLING_FREQUENCY;
+            }
+
             if (score > best_pass_for_robot.rating)
             {
                 best_pass_for_robot = PassWithRating{optimized_pass, score};
+                considered_passes.push_back(best_pass_for_robot);
             }
         }
 
@@ -174,6 +194,23 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
         {
             best_pass = best_pass_for_robot;
         }
+    }
+
+    // for sampling, we'll occasionally consider a random pass instead of the best one
+    // so we can get more varied data
+    if (sample_pass_features_)
+    {
+        if (num_picks_since_random_ == 0)
+        {
+            std::uniform_int_distribution<std::size_t> distribution(
+                0, considered_passes.size() - 1);
+            std::size_t random_index = distribution(random_num_gen_);
+
+            best_pass = considered_passes[random_index];
+        }
+
+        num_picks_since_random_ =
+            (num_picks_since_random_ + 1) % BEST_PASS_OVERRIDE_FREQUENCY;
     }
 
     return best_pass;
