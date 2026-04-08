@@ -28,7 +28,7 @@ static unsigned int subSat(unsigned int a, unsigned int b)
 
 void BallPlacementPlayFSM::alignWall(const Update &event)
 {
-    placing_robot_id                    = std::nullopt;
+    placing_robot_id = std::nullopt;
     PriorityTacticVector tactics_to_run = {{align_wall_tactic}};
 
     setPickOffDest(event);
@@ -79,7 +79,7 @@ void BallPlacementPlayFSM::pickOffWall(const Update &event)
 
 void BallPlacementPlayFSM::alignPlacement(const Update &event)
 {
-    placing_robot_id                    = std::nullopt;
+    placing_robot_id = std::nullopt;
     PriorityTacticVector tactics_to_run = {{}};
 
     std::optional<Point> placement_point =
@@ -230,15 +230,9 @@ void BallPlacementPlayFSM::retreat(const Update &event)
 
         retreat_tactic->updateControlParams(
             retreat_pos, final_orientation, TbotsProto::DribblerMode::OFF,
-            // TODO: Sometimes the robot avoiding the ball will cause strange physics
-            // issues when retreating. This is a "fix" for that but I'm not sure if it's a
-            // good idea
-            TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0},
+            TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
             TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
-        // TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-        // TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
-        // TbotsProto::ObstacleAvoidanceMode::SAFE);
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
 
         tactics_to_run[0].push_back(retreat_tactic);
     }
@@ -425,19 +419,38 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event, unsigned int nu
     Point ball_pos   = event.common.world_ptr->ball().position();
     Rectangle bounds = event.common.world_ptr->field().fieldBoundary();
 
-    // centers of 4 field edges
-    // TODO: this is flawed since it might cause friendly robots to try to go into the
-    // goals will fix in a later commit
-    std::vector<Point> edge_centers = {Point(0, bounds.yMax() - WAITING_LINE_OFFSET_M),
-                                       Point(0, bounds.yMin() + WAITING_LINE_OFFSET_M),
-                                       Point(bounds.xMax() - WAITING_LINE_OFFSET_M, 0),
-                                       Point(bounds.xMin() + WAITING_LINE_OFFSET_M, 0)};
+    // try to find a line location on the horizontal sidelines that maximizes distance
+    // to the ball and the ball placement point
+    double line_half_width = static_cast<double>(move_tactics.size() - 1) *
+                             ROBOT_MAX_RADIUS_METERS * 3.0 / 2.0;
 
-    Point best_center;
-    double max_dist = -1.0;
-    for (const Point &p : edge_centers)
+    // prevent line being out of bounds
+    double min_x = bounds.xMin() + WAITING_LINE_OFFSET_M + line_half_width;
+    double max_x = bounds.xMax() - WAITING_LINE_OFFSET_M - line_half_width;
+
+    std::vector<Point> candidate_centers;
+    if (min_x <= max_x)
     {
-        // find the edge whose distance to either the ball or target is maximized
+        for (double x = min_x; x <= max_x; x += 0.5)
+        {
+            candidate_centers.emplace_back(x, bounds.yMax() - WAITING_LINE_OFFSET_M);
+            candidate_centers.emplace_back(x, bounds.yMin() + WAITING_LINE_OFFSET_M);
+        }
+        // guarantee extreme edges are evaluated
+        candidate_centers.emplace_back(max_x, bounds.yMax() - WAITING_LINE_OFFSET_M);
+        candidate_centers.emplace_back(max_x, bounds.yMin() + WAITING_LINE_OFFSET_M);
+    }
+    else
+    {
+        candidate_centers.emplace_back(0, bounds.yMax() - WAITING_LINE_OFFSET_M);
+    }
+
+    Point best_center = candidate_centers.front();
+    double max_dist = -1.0;
+
+    for (const Point &p : candidate_centers)
+    {
+        // find the sideline coordinate that maximizes minimum distance to the ball and target
         double d = std::min((p - ball_pos).length(), (p - target_pos).length());
         if (d > max_dist)
         {
@@ -446,13 +459,8 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event, unsigned int nu
         }
     }
 
-    // spread robots out along the chosen edge
-    Vector line_dir = (std::abs(best_center.x()) > std::abs(best_center.y()))
-                          ? Vector(0, 1)
-                          : Vector(1, 0);
-    Point line_start =
-        best_center - line_dir * (static_cast<double>(move_tactics.size() - 1) *
-                                  ROBOT_MAX_RADIUS_METERS * 3.0 / 2.0);
+    Vector line_dir = Vector(1, 0);
+    Point line_start = best_center - line_dir * line_half_width;
 
     for (unsigned int i = 0; i < move_tactics.size(); i++)
     {
@@ -475,7 +483,7 @@ std::optional<Robot> BallPlacementPlayFSM::getPlacingRobot(const WorldPtr &world
     }
 
     std::optional<Robot> best_robot = std::nullopt;
-    double min_dist                 = std::numeric_limits<double>::max();
+    double min_dist = std::numeric_limits<double>::max();
     for (const Robot &r : world->friendlyTeam().getAllRobots())
     {
         if (r.id() == world->friendlyTeam().getGoalieId())
@@ -484,7 +492,7 @@ std::optional<Robot> BallPlacementPlayFSM::getPlacingRobot(const WorldPtr &world
         double dist = (r.position() - world->ball().position()).length();
         if (dist < min_dist)
         {
-            min_dist   = dist;
+            min_dist = dist;
             best_robot = r;
         }
     }
