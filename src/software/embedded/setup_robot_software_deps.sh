@@ -5,6 +5,7 @@ set -ex
 host_software_packages=(
     device-tree-compiler
     curl
+    openocd
 )
 
 # Install packages
