@@ -89,7 +89,7 @@ class FieldTestRunner(TbotsTestRunner):
     @override
     def send_gamecontroller_command(
         self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
+        gc_command: proto.ssl_gc_state_pb2.Command.Type,
         team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point=None,
     ):
@@ -99,7 +99,7 @@ class FieldTestRunner(TbotsTestRunner):
         :param team: The team which the command as attributed to
         :param final_ball_placement_point: The ball placement point
         """
-        self.gamecontroller.send_ci_input(
+        self.gamecontroller.send_gc_command(
             gc_command=gc_command,
             team=team,
             final_ball_placement_point=final_ball_placement_point,
