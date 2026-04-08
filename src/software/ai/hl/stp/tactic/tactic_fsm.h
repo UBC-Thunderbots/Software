@@ -16,8 +16,8 @@ using SetPrimitiveCallback = std::function<void(std::shared_ptr<Primitive>)>;
 // The tactic update struct is used to update tactics and set the new primitive
 struct TacticUpdate
 {
-    TacticUpdate(const Robot &robot, const WorldPtr &world_ptr,
-                 const SetPrimitiveCallback &set_primitive_fun)
+    TacticUpdate(const Robot& robot, const WorldPtr& world_ptr,
+                 const SetPrimitiveCallback& set_primitive_fun)
         : robot(robot), world_ptr(world_ptr), set_primitive(set_primitive_fun)
     {
     }
@@ -49,7 +49,7 @@ class TacticFSM
      */
     struct Update
     {
-        Update(const TFsm::ControlParams &control_params, const TacticUpdate &common)
+        Update(const TFsm::ControlParams& control_params, const TacticUpdate& common)
             : control_params(control_params), common(common)
         {
         }

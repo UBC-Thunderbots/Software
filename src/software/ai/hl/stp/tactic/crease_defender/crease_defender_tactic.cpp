@@ -16,14 +16,14 @@ CreaseDefenderTactic::CreaseDefenderTactic(
 {
 }
 
-void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
+void CreaseDefenderTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
 void CreaseDefenderTactic::updateControlParams(
-    const Point &enemy_threat_origin,
-    const TbotsProto::CreaseDefenderAlignment &alignment,
+    const Point& enemy_threat_origin,
+    const TbotsProto::CreaseDefenderAlignment& alignment,
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
     TbotsProto::BallStealMode ball_steal_mode)
 {
