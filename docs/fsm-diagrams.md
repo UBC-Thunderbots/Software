@@ -50,12 +50,14 @@ StartState --> AlignWallState : [shouldPickOffWall]\n<i>alignWall</i>
 AlignWallState --> AlignWallState : [!wallAlignDone && shouldPickOffWall]\n<i>alignWall</i>
 AlignWallState --> PickOffWallState : [wallAlignDone]\n<i>setPickOffDest, pickOffWall</i>
 AlignWallState --> AlignPlacementState : [!shouldPickOffWall]\n<i>alignPlacement</i>
-PickOffWallState --> PickOffWallState : [!wallPickOffDone]\n<i>pickOffWall</i>
+PickOffWallState --> StartState : [ballLost]
+PickOffWallState --> PickOffWallState : [!wallPickOffDone && !ballLost]\n<i>pickOffWall</i>
 PickOffWallState --> ReleaseBallState : [wallPickOffDone]\n<i>startWait</i>
 AlignPlacementState --> AlignWallState : [shouldPickOffWall]\n<i>alignWall</i>
 AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
 AlignPlacementState --> PlaceBallState : [alignDone]\n<i>placeBall</i>
-PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
+PlaceBallState --> StartState : [ballLost]
+PlaceBallState --> PlaceBallState : [!ballPlaced && !ballLost]\n<i>placeBall</i>
 PlaceBallState --> ReleaseBallState : [ballPlaced]\n<i>startWait</i>
 ReleaseBallState --> ReleaseBallState : [!waitDone && ballPlaced]\n<i>releaseBall</i>
 ReleaseBallState --> StartState : [!ballPlaced]
