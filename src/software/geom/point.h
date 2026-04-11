@@ -31,14 +31,14 @@ class Point final
      *
      * @param the Point to duplicate
      */
-    Point(const Point &p);
+    Point(const Point& p);
 
     /**
      * Creates a new Point from a Vector
      *
      * @param the Vector to create a Point from
      */
-    explicit Point(const Vector &v);
+    explicit Point(const Vector& v);
 
     /**
      * Returns the x coordinate of this Point
@@ -98,7 +98,7 @@ class Point final
      *
      * @return the new Point rotated by rot
      */
-    Point rotate(const Angle &rot) const;
+    Point rotate(const Angle& rot) const;
 
     /**
      * Assigns one Point to another
@@ -107,7 +107,7 @@ class Point final
      *
      * @return this Point
      */
-    Point &operator=(const Point &other);
+    Point& operator=(const Point& other);
 
    private:
     /**
@@ -131,7 +131,7 @@ class Point final
  *
  * @return the Point sum of the given Point and Vector
  */
-Point operator+(const Point &p, const Vector &v) __attribute__((warn_unused_result));
+Point operator+(const Point& p, const Vector& v) __attribute__((warn_unused_result));
 
 /**
  * Adds a vector to a point
@@ -141,7 +141,7 @@ Point operator+(const Point &p, const Vector &v) __attribute__((warn_unused_resu
  *
  * @return the Point sum of the given Point and Vector
  */
-Point operator+(const Vector &v, const Point &p) __attribute__((warn_unused_result));
+Point operator+(const Vector& v, const Point& p) __attribute__((warn_unused_result));
 
 /**
  * Adds the negation of a vector to a point
@@ -151,7 +151,7 @@ Point operator+(const Vector &v, const Point &p) __attribute__((warn_unused_resu
  *
  * @return the Point sum of the given Point and the negated Vector
  */
-Point operator-(const Point &p, const Vector &v) __attribute__((warn_unused_result));
+Point operator-(const Point& p, const Vector& v) __attribute__((warn_unused_result));
 
 /**
  * Adds a negated vector to a point and sets that point to the resulting sum
@@ -161,7 +161,7 @@ Point operator-(const Point &p, const Vector &v) __attribute__((warn_unused_resu
  *
  * @return the new value of Point p
  */
-Point &operator-=(Point &p, const Vector &v);
+Point& operator-=(Point& p, const Vector& v);
 
 /**
  * Adds a vector to a point and sets that point to the resulting sum
@@ -171,7 +171,7 @@ Point &operator-=(Point &p, const Vector &v);
  *
  * @return the new value of Point p
  */
-Point &operator+=(Point &p, const Vector &v);
+Point& operator+=(Point& p, const Vector& v);
 
 /**
  * Negates a Point
@@ -180,7 +180,7 @@ Point &operator+=(Point &p, const Vector &v);
  *
  * @return the point with its coordinates negated
  */
-Point operator-(const Point &p) __attribute__((warn_unused_result));
+Point operator-(const Point& p) __attribute__((warn_unused_result));
 
 /**
  * Subtracts one Point from another
@@ -190,7 +190,7 @@ Point operator-(const Point &p) __attribute__((warn_unused_result));
  *
  * @return the vector-difference of the two points
  */
-Vector operator-(const Point &p, const Point &q) __attribute__((warn_unused_result));
+Vector operator-(const Point& p, const Point& q) __attribute__((warn_unused_result));
 
 /**
  * Prints a point to a stream
@@ -200,7 +200,7 @@ Vector operator-(const Point &p, const Point &q) __attribute__((warn_unused_resu
  *
  * @return the stream with the point printed
  */
-std::ostream &operator<<(std::ostream &os, const Point &p);
+std::ostream& operator<<(std::ostream& os, const Point& p);
 
 /**
  * Compares two Points for equality
@@ -210,7 +210,7 @@ std::ostream &operator<<(std::ostream &os, const Point &p);
  *
  * @return true if the two points represent the same point, and false otherwise
  */
-bool operator==(const Point &p, const Point &q);
+bool operator==(const Point& p, const Point& q);
 
 /**
  * Compares two points for inequality
@@ -220,7 +220,7 @@ bool operator==(const Point &p, const Point &q);
  *
  * @return true if the two points represent different points, and false otherwise
  */
-bool operator!=(const Point &p, const Point &q);
+bool operator!=(const Point& p, const Point& q);
 
 // We need to define a hash function so that the Point class can be used in unordered STL
 // containers
@@ -231,7 +231,7 @@ namespace std
 template <>
 struct hash<Point> final
 {
-    size_t operator()(const Point &p) const
+    size_t operator()(const Point& p) const
     {
         hash<double> h;
         return h(p.x()) * 17 + h(p.y());

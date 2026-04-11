@@ -4,7 +4,7 @@
 #include "software/geom/algorithms/convex_angle.h"
 
 
-bool collinear(const Point &a, const Point &b, const Point &c)
+bool collinear(const Point& a, const Point& b, const Point& c)
 {
     // NOTE: the default value is 4 * FIXED_EPSILON because of accumulation of error from
     // subtracting 2 vectors twice and calculating convexAngle, but the PassGenerator
@@ -20,7 +20,7 @@ bool collinear(const Point &a, const Point &b, const Point &c)
                         ulps_epsilon));
 }
 
-bool collinear(const Segment &segment1, const Segment &segment2)
+bool collinear(const Segment& segment1, const Segment& segment2)
 {
     // Two segments are collinear if all Points are collinear
     if (collinear(segment1.getStart(), segment1.getEnd(), segment2.getStart()) &&

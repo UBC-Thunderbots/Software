@@ -10,7 +10,7 @@ KickoffEnemyPlay::KickoffEnemyPlay(
 {
 }
 
-void KickoffEnemyPlay::updateTactics(const PlayUpdate &play_update)
+void KickoffEnemyPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(KickoffEnemyPlayFSM::Update(control_params, play_update));
 }

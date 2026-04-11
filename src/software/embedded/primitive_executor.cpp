@@ -11,7 +11,7 @@
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
-                                     const RobotConstants_t &robot_constants,
+                                     const RobotConstants_t& robot_constants,
                                      const TeamColour friendly_team_colour,
                                      const RobotId robot_id)
     : current_primitive_(),
@@ -22,7 +22,7 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
 {
 }
 
-void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive &primitive_msg)
+void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_msg)
 {
     current_primitive_ = primitive_msg;
 
@@ -44,8 +44,8 @@ void PrimitiveExecutor::setStopPrimitive()
     current_primitive_ = *createStopPrimitiveProto();
 }
 
-void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
-                                       const AngularVelocity &angular_velocity)
+void PrimitiveExecutor::updateVelocity(const Vector& local_velocity,
+                                       const AngularVelocity& angular_velocity)
 {
     Vector actual_global_velocity = localToGlobalVelocity(local_velocity, orientation_);
     velocity_                     = actual_global_velocity;
@@ -89,7 +89,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    TbotsProto::PrimitiveExecutorStatus &status)
+    TbotsProto::PrimitiveExecutorStatus& status)
 {
     time_since_trajectory_creation_ += time_step_;
     status.set_running_primitive(true);

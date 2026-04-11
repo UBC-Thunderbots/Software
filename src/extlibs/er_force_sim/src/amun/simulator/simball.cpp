@@ -225,9 +225,9 @@ void SimBall::begin(bool robot_collision)
 
 // samples a plane rotated towards the camera, sets p to the average position of
 // the visible points and returns the relative amount of visible pixels
-static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulatorBallPosition,
-                                     const btVector3 &simulatorCameraPosition,
-                                     const btCollisionWorld *const m_world)
+static float positionOfVisiblePixels(btVector3& p, const btVector3& simulatorBallPosition,
+                                     const btVector3& simulatorCameraPosition,
+                                     const btCollisionWorld* const m_world)
 {
     const float simulatorBallRadius =
         static_cast<float>(BALL_MAX_RADIUS_METERS) * SIMULATOR_SCALE;
@@ -299,8 +299,8 @@ static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulatorBal
     return static_cast<float>(cameraHitCounter) / static_cast<float>(maxHits);
 }
 
-bool SimBall::update(SSLProto::SSL_DetectionBall &ball, float stddev, float stddevArea,
-                     const btVector3 &cameraPosition, bool enableInvisibleBall,
+bool SimBall::update(SSLProto::SSL_DetectionBall& ball, float stddev, float stddevArea,
+                     const btVector3& cameraPosition, bool enableInvisibleBall,
                      float visibilityThreshold, btVector3 positionOffset)
 {
     btTransform transform;
@@ -311,8 +311,8 @@ bool SimBall::update(SSLProto::SSL_DetectionBall &ball, float stddev, float stdd
                         enableInvisibleBall, visibilityThreshold, positionOffset);
 }
 
-bool SimBall::addDetection(SSLProto::SSL_DetectionBall &ball, btVector3 pos, float stddev,
-                           float stddevArea, const btVector3 &cameraPosition,
+bool SimBall::addDetection(SSLProto::SSL_DetectionBall& ball, btVector3 pos, float stddev,
+                           float stddevArea, const btVector3& cameraPosition,
                            bool enableInvisibleBall, float visibilityThreshold,
                            btVector3 positionOffset)
 {
@@ -382,7 +382,7 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall &ball, btVector3 pos, flo
     return true;
 }
 
-void SimBall::move(const sslsim::TeleportBall &ball)
+void SimBall::move(const sslsim::TeleportBall& ball)
 {
     m_move = ball;
 }
@@ -398,7 +398,7 @@ btVector3 SimBall::speed() const
     return m_body->getLinearVelocity();
 }
 
-void SimBall::writeBallState(world::SimBall &ball) const
+void SimBall::writeBallState(world::SimBall& ball) const
 {
     const btVector3 ballPosition =
         m_body->getWorldTransform().getOrigin() / SIMULATOR_SCALE;
@@ -415,7 +415,7 @@ void SimBall::writeBallState(world::SimBall &ball) const
     ball.set_angular_z(angularVelocity.z());
 }
 
-void SimBall::restoreState(const world::SimBall &ball)
+void SimBall::restoreState(const world::SimBall& ball)
 {
     btVector3 position(ball.p_x(), ball.p_y(), ball.p_z());
     m_body->getWorldTransform().setOrigin(position * SIMULATOR_SCALE);
@@ -440,7 +440,7 @@ bool SimBall::isInvalid() const
     return isNan || isBelowField;
 }
 
-void SimBall::kick(const btVector3 &power)
+void SimBall::kick(const btVector3& power)
 {
     m_body->activate();
     m_body->applyCentralForce(power);
