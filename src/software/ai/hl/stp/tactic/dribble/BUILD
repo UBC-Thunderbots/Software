@@ -69,11 +69,11 @@ py_test(
     srcs = [
         "excessive_dribble_test.py",
     ],
+    package_collisions = "warning",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",
     ],
-    package_collisions = "warning",
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
