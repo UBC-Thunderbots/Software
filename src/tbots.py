@@ -227,7 +227,7 @@ def execute_command(command: list[str], print_only: bool = False):
     if print_only:
         print(cmd_str)
     else:
-        print(f"\n{'='*33} Running: {'='*38}\n\n{cmd_str}\n\n{'='*81}\n")
+        print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{cmd_str}\n\n{'=' * 81}\n")
         code = os.system(cmd_str)
         sys.exit(1 if code != 0 else 0)
 
@@ -264,7 +264,7 @@ def start_interactive_cli():
                     ],
                 ).ask()
                 for opt in selected:
-                    extra_args.extend([f"--{opt}" for opt in selected])
+                    extra_args.extend([f"--{opt}"])
                     if opt == "record_stats":
                         time = questionary.text(
                             "Enter record stats duration (minutes):"
