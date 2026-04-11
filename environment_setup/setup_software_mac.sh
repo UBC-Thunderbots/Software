@@ -51,7 +51,6 @@ print_status_msg "Setting Up Python Environment"
 
 # Create virtual environment
 sudo python3.12 -m venv /opt/tbotspython
-chmod
 source /opt/tbotspython/bin/activate
 
 # Install Python dependencies
@@ -68,6 +67,10 @@ install_autoref $sys
 sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
 sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
 print_status_msg "Finished setting up AutoRef"
+
+print_status_msg "Install clang-format"
+install_clang_format $sys
+print_status_msg "Done installing clang-format"
 
 print_status_msg "Setting up cross compiler for robot software"
 install_cross_compiler $sys

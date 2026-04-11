@@ -18,7 +18,7 @@ class CreaseDefensePlay : public PlayBase<CreaseDefensePlayFSM>
      */
     CreaseDefensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
-    void updateTactics(const PlayUpdate &play_update) override;
+    void updateTactics(const PlayUpdate& play_update) override;
 
     /**
      * Update control params for this play
@@ -26,7 +26,7 @@ class CreaseDefensePlay : public PlayBase<CreaseDefensePlayFSM>
      * @param enemy_threat_origin The origin of the enemy threat
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
-    void updateControlParams(const Point &enemy_threat_origin,
+    void updateControlParams(const Point& enemy_threat_origin,
                              TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 };

@@ -10,7 +10,7 @@ StopPlay::StopPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     goalie_tactic->updateMaxSpeedMode(TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
 }
 
-void StopPlay::updateTactics(const PlayUpdate &play_update)
+void StopPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(StopPlayFSM::Update(control_params, play_update));
 }

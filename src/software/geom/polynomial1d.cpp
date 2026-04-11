@@ -9,9 +9,9 @@
 
 Polynomial1d::Polynomial1d() {}
 
-Polynomial1d::Polynomial1d(const std::vector<double> &coeffs) : coeffs(coeffs) {}
+Polynomial1d::Polynomial1d(const std::vector<double>& coeffs) : coeffs(coeffs) {}
 
-Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs)
+Polynomial1d::Polynomial1d(const std::initializer_list<double>& coeffs)
     : coeffs(std::vector<double>(coeffs))
 {
 }
@@ -110,7 +110,7 @@ double Polynomial1d::valueAt(double val) const
     return retval;
 }
 
-Polynomial1d operator+(const Polynomial1d &p1, const Polynomial1d &p2)
+Polynomial1d operator+(const Polynomial1d& p1, const Polynomial1d& p2)
 {
     Polynomial1d sum;
     unsigned int max_order = std::max(p1.getOrder(), p2.getOrder());
@@ -121,7 +121,7 @@ Polynomial1d operator+(const Polynomial1d &p1, const Polynomial1d &p2)
     return sum;
 }
 
-Polynomial1d operator-(const Polynomial1d &p1, const Polynomial1d &p2)
+Polynomial1d operator-(const Polynomial1d& p1, const Polynomial1d& p2)
 {
     Polynomial1d difference;
     unsigned int max_order = std::max(p1.getOrder(), p2.getOrder());
@@ -132,7 +132,7 @@ Polynomial1d operator-(const Polynomial1d &p1, const Polynomial1d &p2)
     return difference;
 }
 
-Polynomial1d operator*(const Polynomial1d &p1, const Polynomial1d &p2)
+Polynomial1d operator*(const Polynomial1d& p1, const Polynomial1d& p2)
 {
     Polynomial1d product;
     unsigned int p1_order = p1.getOrder();
@@ -148,22 +148,22 @@ Polynomial1d operator*(const Polynomial1d &p1, const Polynomial1d &p2)
     return product;
 }
 
-Polynomial1d &operator+=(Polynomial1d &p1, const Polynomial1d &p2)
+Polynomial1d& operator+=(Polynomial1d& p1, const Polynomial1d& p2)
 {
     return p1 = p1 + p2;
 }
 
-Polynomial1d &operator-=(Polynomial1d &p1, const Polynomial1d &p2)
+Polynomial1d& operator-=(Polynomial1d& p1, const Polynomial1d& p2)
 {
     return p1 = p1 - p2;
 }
 
-Polynomial1d &operator*=(Polynomial1d &p1, const Polynomial1d &p2)
+Polynomial1d& operator*=(Polynomial1d& p1, const Polynomial1d& p2)
 {
     return p1 = p1 * p2;
 }
 
-bool operator==(const Polynomial1d &p1, const Polynomial1d &p2)
+bool operator==(const Polynomial1d& p1, const Polynomial1d& p2)
 {
     unsigned int p1_order = p1.getOrder();
     unsigned int p2_order = p2.getOrder();
