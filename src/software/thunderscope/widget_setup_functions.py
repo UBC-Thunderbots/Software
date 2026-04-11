@@ -14,7 +14,7 @@ from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
-from software.thunderscope.dock_style import *
+from software.thunderscope.dock_style import apply_custom_dock_styles
 
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget
@@ -48,6 +48,9 @@ from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
+
+# NOTE: Custom dock styles must be applied before any widgets are created
+apply_custom_dock_styles()
 
 
 ################################
