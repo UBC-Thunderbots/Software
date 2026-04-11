@@ -32,21 +32,6 @@ py_library(
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
     ],
-    package_collisions = "warning",
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
-    deps = [
-        "//software:conftest",
-        "//software/simulated_tests:speed_threshold_helpers",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-        requirement("pyqt6"),
-        requirement("numpy"),
-        requirement("pyqtdarktheme-fork"),
-        requirement("pyqtgraph"),
-    ],
 )
 
 py_library(

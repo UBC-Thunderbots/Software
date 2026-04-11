@@ -4,3 +4,4 @@ PyQt6-Qt6==6.10.0
 pyqtgraph==0.13.7
 numpy==1.26.4
 pyqtdarktheme-fork==2.3.2
+rich==14.3.3

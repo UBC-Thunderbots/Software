@@ -5,17 +5,18 @@ import pathlib
 import os
 import sys
 
-qt_path = (
-    pathlib.Path(os.environ["VIRTUAL_ENV"])
-    / "lib"
-    / f"python{sys.version_info.major}.{sys.version_info.minor}"
-    / "site-packages"
-    / "PyQt6"
-    / "Qt6"
-)
+if virtual_env := os.environ.get("VIRTUAL_ENV"):
+    qt_path = (
+        pathlib.Path(virtual_env)
+        / "lib"
+        / f"python{sys.version_info.major}.{sys.version_info.minor}"
+        / "site-packages"
+        / "PyQt6"
+        / "Qt6"
+    )
+    os.environ["LD_LIBRARY_PATH"] = str(qt_path / "lib")
+    os.environ["QTWEBENGINEPROCESS_PATH"] = str(qt_path / "libexec" / "QtWebEngineProcess")
 
-os.environ["LD_LIBRARY_PATH"] = str(qt_path / "lib")
-os.environ["QTWEBENGINEPROCESS_PATH"] = str(qt_path / "libexec" / "QtWebEngineProcess")
 
 import pyqtgraph
 from pyqtgraph.Qt import QtCore, QtGui
