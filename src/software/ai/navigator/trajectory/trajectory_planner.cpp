@@ -28,7 +28,7 @@ std::vector<Vector> TrajectoryPlanner::getRelativeSubDestinations()
 }
 
 std::vector<Point> TrajectoryPlanner::getSubDestinations(
-    const Point &start, const Point &destination, const Rectangle &navigable_area) const
+    const Point& start, const Point& destination, const Rectangle& navigable_area) const
 {
     // Convert the relative sub destinations to actual sub destination points
     // and filter out undesirable sub destinations to reduce trajectory sampling.
@@ -36,7 +36,7 @@ std::vector<Point> TrajectoryPlanner::getSubDestinations(
     Angle direction = (destination - start).orientation();
     sub_destinations.reserve(relative_sub_destinations.size());
 
-    for (const Vector &relative_sub_dest : relative_sub_destinations)
+    for (const Vector& relative_sub_dest : relative_sub_destinations)
     {
         Angle sub_dest_angle_to_dest = relative_sub_dest.orientation().minDiff(direction);
         if (sub_dest_angle_to_dest < MIN_SUB_DESTINATION_ANGLE ||
@@ -56,9 +56,9 @@ std::vector<Point> TrajectoryPlanner::getSubDestinations(
 }
 
 std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
-    const Point &start, const Point &destination, const Vector &initial_velocity,
-    const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
-    const Rectangle &navigable_area, const std::optional<Point> &prev_sub_destination)
+    const Point& start, const Point& destination, const Vector& initial_velocity,
+    const KinematicConstraints& constraints, const std::vector<ObstaclePtr>& obstacles,
+    const Rectangle& navigable_area, const std::optional<Point>& prev_sub_destination)
 {
     if (constraints.getMaxVelocity() <= 0.0 || constraints.getMaxAcceleration() <= 0.0 ||
         constraints.getMaxDeceleration() <= 0.0)
@@ -77,7 +77,7 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
 
     // Sample trajectory paths by trying different sub destinations and connection times
     // and store the best trajectory path (min cost)
-    for (const Point &sub_dest : getSubDestinations(start, destination, navigable_area))
+    for (const Point& sub_dest : getSubDestinations(start, destination, navigable_area))
     {
         // Generate a direct trajectory to the sub destination
         TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
@@ -156,8 +156,8 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
-    const Point &start, const Point &destination, const Vector &initial_velocity,
-    const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles)
+    const Point& start, const Point& destination, const Vector& initial_velocity,
+    const KinematicConstraints& constraints, const std::vector<ObstaclePtr>& obstacles)
 {
     // Calculate full new cost regardless by passing in maximum max cost
     return getTrajectoryWithCost(
@@ -168,8 +168,8 @@ TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
-    const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
-    const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
+    const TrajectoryPath& trajectory, const std::vector<ObstaclePtr>& obstacles,
+    const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
     const std::optional<double> sub_traj_duration_s, double max_cost)
 {
     CollisionEvaluator evaluator(obstacles);

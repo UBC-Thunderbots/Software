@@ -94,7 +94,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      *
      * @return Trajectory parts
      */
-    const TrajectoryPart &getTrajectoryPart(size_t index) const;
+    const TrajectoryPart& getTrajectoryPart(size_t index) const;
 
     /**
      * Get the number of trajectory parts that make up the generated trajectory.
@@ -199,8 +199,8 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * trajectory part and time t
      */
     void getTrajPartAndDeltaTime(double t_sec,
-                                 BangBangTrajectory1D::TrajectoryPart &out_traj_part,
-                                 double &out_t_delta_sec) const;
+                                 BangBangTrajectory1D::TrajectoryPart& out_traj_part,
+                                 double& out_t_delta_sec) const;
 
     /**
      * Helper for adding a trajectory part to the end of the trajectory_parts
@@ -210,7 +210,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      *
      * @param part The trajectory part to add
      */
-    inline void addTrajectoryPart(const TrajectoryPart &part);
+    inline void addTrajectoryPart(const TrajectoryPart& part);
 
     // We use a fixed size array instead of a vector to avoid the overhead
     // of dynamic memory allocation + emplace_back, push_back, etc.

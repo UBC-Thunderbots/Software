@@ -5,7 +5,7 @@
 #include "software/networking/benchmarking_utils/latency_tester_primary_node.h"
 
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     struct CommandLineArgs
     {

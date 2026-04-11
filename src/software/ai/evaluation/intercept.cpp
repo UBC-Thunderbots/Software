@@ -5,9 +5,9 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/optimization/gradient_descent_optimizer.hpp"
 
-std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &ball,
-                                                                   const Field &field,
-                                                                   const Robot &robot)
+std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball& ball,
+                                                                   const Field& field,
+                                                                   const Robot& robot)
 {
     static const double gradient_approx_step_size = 0.000001;
 
@@ -88,8 +88,8 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     return std::make_pair(best_ball_intercept_pos, time_to_ball_pos);
 }
 
-Point findOvershootInterceptPosition(const Robot &robot, const Point intercept_position,
-                                     const Field &field, Duration ball_intercept_time,
+Point findOvershootInterceptPosition(const Robot& robot, const Point intercept_position,
+                                     const Field& field, Duration ball_intercept_time,
                                      double step_speed, bool restrict_to_defense_area)
 {
     Point new_destination = intercept_position;
