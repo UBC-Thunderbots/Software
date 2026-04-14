@@ -10,14 +10,7 @@ PenaltyKickPlay::PenaltyKickPlay(
 {
 }
 
-void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                     const WorldPtr &world_ptr)
-{
-    // This function doesn't get called, it should be removed once coroutines are phased
-    // out
-}
-
-void PenaltyKickPlay::updateTactics(const PlayUpdate &play_update)
+void PenaltyKickPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(PenaltyKickPlayFSM::Update(control_params, play_update));
 }

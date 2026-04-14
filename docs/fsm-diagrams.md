@@ -25,6 +25,18 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [StopPlayFSM](/src/software/ai/hl/stp/play/stop_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StopState
+StopState --> StopState : <i>updateStopPosition</i>
+
+```
+
 ## [BallPlacementPlayFSM](/src/software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h)
 
 ```mermaid
@@ -156,6 +168,34 @@ direction LR
 [*] --> HaltState
 HaltState --> HaltState : <i>updateStop</i>
 Terminate:::terminate --> Terminate:::terminate : <i>updateStop</i>
+
+```
+
+## [KickoffEnemyPlayFSM](/src/software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> SetupState
+SetupState --> SetupState : <i>kickoff</i>
+
+```
+
+## [KickoffFriendlyPlayFSM](/src/software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> SetupState
+SetupState --> SetupState : [!isSetupDone]\n<i>setupKickoff</i>
+SetupState --> ChipState : [isSetupDone]
+ChipState --> ChipState : [!isPlaying]\n<i>chipBall</i>
+ChipState --> Terminate:::terminate : [isPlaying]
+Terminate:::terminate --> Terminate:::terminate
 
 ```
 

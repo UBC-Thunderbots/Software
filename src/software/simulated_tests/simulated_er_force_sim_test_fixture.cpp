@@ -77,7 +77,7 @@ void SimulatedErForceSimTestFixture::SetUp()
 }
 
 void SimulatedErForceSimTestFixture::setCommonConfigs(
-    TbotsProto::ThunderbotsConfig &mutable_thunderbots_config)
+    TbotsProto::ThunderbotsConfig& mutable_thunderbots_config)
 {
     mutable_thunderbots_config.mutable_ai_config()
         ->mutable_ai_control_config()
@@ -85,10 +85,10 @@ void SimulatedErForceSimTestFixture::setCommonConfigs(
 }
 
 bool SimulatedErForceSimTestFixture::validateAndCheckCompletion(
-    std::vector<TerminatingFunctionValidator> &terminating_function_validators,
-    std::vector<NonTerminatingFunctionValidator> &non_terminating_function_validators)
+    std::vector<TerminatingFunctionValidator>& terminating_function_validators,
+    std::vector<NonTerminatingFunctionValidator>& non_terminating_function_validators)
 {
-    for (auto &function_validator : non_terminating_function_validators)
+    for (auto& function_validator : non_terminating_function_validators)
     {
         auto error_message = function_validator.executeAndCheckForFailures();
         if (error_message)
@@ -99,7 +99,7 @@ bool SimulatedErForceSimTestFixture::validateAndCheckCompletion(
 
     bool validation_successful = std::all_of(
         terminating_function_validators.begin(), terminating_function_validators.end(),
-        [](TerminatingFunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
+        [](TerminatingFunctionValidator& fv) { return fv.executeAndCheckForSuccess(); });
 
     return terminating_function_validators.empty() ? false : validation_successful;
 }
@@ -116,17 +116,17 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
     auto blue_robot_statuses   = simulator->getBlueRobotStatuses();
     auto yellow_robot_statuses = simulator->getYellowRobotStatuses();
 
-    for (const auto &packet : ssl_wrapper_packets)
+    for (const auto& packet : ssl_wrapper_packets)
     {
         auto blue_sensor_msg                          = SensorProto();
         auto yellow_sensor_msg                        = SensorProto();
         *(blue_sensor_msg.mutable_ssl_vision_msg())   = packet;
         *(yellow_sensor_msg.mutable_ssl_vision_msg()) = packet;
-        for (const auto &msg : blue_robot_statuses)
+        for (const auto& msg : blue_robot_statuses)
         {
             *(blue_sensor_msg.add_robot_status_msgs()) = msg;
         }
-        for (const auto &msg : yellow_robot_statuses)
+        for (const auto& msg : yellow_robot_statuses)
         {
             *(yellow_sensor_msg.add_robot_status_msgs()) = msg;
         }
@@ -152,8 +152,8 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
 }
 
 void SimulatedErForceSimTestFixture::sleep(
-    const std::chrono::steady_clock::time_point &wall_start_time,
-    const Duration &desired_wall_tick_time)
+    const std::chrono::steady_clock::time_point& wall_start_time,
+    const Duration& desired_wall_tick_time)
 {
     auto wall_time_now = std::chrono::steady_clock::now();
     auto current_tick_wall_time_duration =
@@ -169,12 +169,12 @@ void SimulatedErForceSimTestFixture::sleep(
 }
 
 void SimulatedErForceSimTestFixture::runTest(
-    const TbotsProto::FieldType &field_type, const BallState &ball,
-    const std::vector<RobotStateWithId> &friendly_robots,
-    const std::vector<RobotStateWithId> &enemy_robots,
-    const std::vector<ValidationFunction> &terminating_validation_functions,
-    const std::vector<ValidationFunction> &non_terminating_validation_functions,
-    const Duration &timeout, const bool ramping)
+    const TbotsProto::FieldType& field_type, const BallState& ball,
+    const std::vector<RobotStateWithId>& friendly_robots,
+    const std::vector<RobotStateWithId>& enemy_robots,
+    const std::vector<ValidationFunction>& terminating_validation_functions,
+    const std::vector<ValidationFunction>& non_terminating_validation_functions,
+    const Duration& timeout, const bool ramping)
 {
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
@@ -203,13 +203,13 @@ void SimulatedErForceSimTestFixture::runTest(
     friendly_world = std::make_shared<World>(friendly_sensor_fusion.getWorld().value());
     enemy_world    = std::make_shared<World>(enemy_sensor_fusion.getWorld().value());
 
-    for (const auto &validation_function : terminating_validation_functions)
+    for (const auto& validation_function : terminating_validation_functions)
     {
         terminating_function_validators.emplace_back(
             TerminatingFunctionValidator(validation_function, friendly_world));
     }
 
-    for (const auto &validation_function : non_terminating_validation_functions)
+    for (const auto& validation_function : non_terminating_validation_functions)
     {
         non_terminating_function_validators.emplace_back(
             NonTerminatingFunctionValidator(validation_function, friendly_world));
@@ -402,7 +402,7 @@ void SimulatedErForceSimTestFixture::runTest(
     {
         std::string failure_message =
             "Not all validation functions passed within the timeout duration:\n";
-        for (const auto &fun : terminating_function_validators)
+        for (const auto& fun : terminating_function_validators)
         {
             if (fun.currentErrorMessage() != "")
             {
@@ -432,9 +432,9 @@ void SimulatedErForceSimTestFixture::registerEnemyTickTime(double tick_time_ms)
 bool SimulatedErForceSimTestFixture::tickTest(
     Duration simulation_time_step, Duration ai_time_step,
     std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world,
-    std::shared_ptr<ErForceSimulator> simulator, double &ball_displacement,
-    double &ball_velocity_diff, std::vector<double> &robots_displacement,
-    std::vector<double> &robots_velocity_diff)
+    std::shared_ptr<ErForceSimulator> simulator, double& ball_displacement,
+    double& ball_velocity_diff, std::vector<double>& robots_displacement,
+    std::vector<double>& robots_velocity_diff)
 {
     /* extract world ball and robot */
     Ball world_ball                          = friendly_world->ball();

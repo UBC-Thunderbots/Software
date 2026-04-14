@@ -25,7 +25,7 @@ class CollisionEvaluator
      * @param obstacles A vector of obstacle pointers, where obstacles are calculated for
      * collision
      */
-    explicit CollisionEvaluator(const std::vector<ObstaclePtr> &obstacles);
+    explicit CollisionEvaluator(const std::vector<ObstaclePtr>& obstacles);
 
 
     /**
@@ -45,8 +45,8 @@ class CollisionEvaluator
      *         computed collision timing information and total cost.
      */
     TrajectoryPathWithCost evaluate(
-        const TrajectoryPath &trajectory,
-        const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
+        const TrajectoryPath& trajectory,
+        const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
         std::optional<double> sub_traj_duration_s, double max_cost);
 
    private:
@@ -61,7 +61,7 @@ class CollisionEvaluator
      * @return Earliest non-collision time, or traj_path.getTotalDuration() if the
      * trajectory is in a collision from start to search_end_time_s
      */
-    double getFirstNonCollisionTime(const TrajectoryPath &traj_path,
+    double getFirstNonCollisionTime(const TrajectoryPath& traj_path,
                                     const double search_end_time_s) const;
 
     /**
@@ -77,7 +77,7 @@ class CollisionEvaluator
      * nullptr.
      */
     std::pair<double, ObstaclePtr> getFirstCollisionTime(
-        const TrajectoryPath &traj_path, const double start_time_s,
+        const TrajectoryPath& traj_path, const double start_time_s,
         const double search_end_time_s) const;
 
     /**
@@ -91,6 +91,6 @@ class CollisionEvaluator
      * @return Time in seconds at which the trajectory is not in a collision. Result
      * will be in the range [0, search_end_time_s].
      */
-    double getLastNonCollisionTime(const TrajectoryPath &traj_path,
+    double getLastNonCollisionTime(const TrajectoryPath& traj_path,
                                    const double search_end_time_s) const;
 };

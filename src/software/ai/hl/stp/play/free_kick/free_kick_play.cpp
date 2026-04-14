@@ -8,14 +8,7 @@ FreeKickPlay::FreeKickPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config
 {
 }
 
-void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                  const WorldPtr &world_ptr)
-{
-    // This function doesn't get called and it will be removed once coroutines are phased
-    // out
-}
-
-void FreeKickPlay::updateTactics(const PlayUpdate &play_update)
+void FreeKickPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(FreeKickPlayFSM::Update(control_params, play_update));
 }

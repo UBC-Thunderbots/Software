@@ -7,9 +7,9 @@
 static constexpr double OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS = 0.01;
 
 
-std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacles,
-                                         const Point &point,
-                                         const Rectangle &navigable_area,
+std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacles,
+                                         const Point& point,
+                                         const Rectangle& navigable_area,
                                          int initial_count, double radius_step,
                                          int samples_per_radius_step,
                                          double max_search_radius)
@@ -18,7 +18,7 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
     bool point_in_obstacle = false;
     if (contains(navigable_area, point))
     {
-        for (auto const &obstacle : obstacles)
+        for (auto const& obstacle : obstacles)
         {
             if (obstacle->contains(point))
             {
@@ -36,7 +36,7 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
                 // outside navigable area
                 if (contains(navigable_area, closest_point))
                 {
-                    for (auto const &obstacle : obstacles)
+                    for (auto const& obstacle : obstacles)
                     {
                         // break out of loop if closest point outside first encroached
                         // obstacle happens to be inside another obstacle
@@ -93,7 +93,7 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
             // check if candidate sample point is in an obstacle or outside navigable area
             if (contains(navigable_area, sample_point))
             {
-                for (auto const &obstacle : obstacles)
+                for (auto const& obstacle : obstacles)
                 {
                     if (obstacle->contains(sample_point) ||
                         !contains(navigable_area, sample_point))

@@ -345,7 +345,9 @@ PYBIND11_MODULE(python_bindings, m)
         .def("getNearestRobot",
              py::overload_cast<const Point&>(&Team::getNearestRobot, py::const_));
 
-    py::class_<Timestamp>(m, "Timestamp").def(py::init<>());
+    py::class_<Timestamp>(m, "Timestamp")
+        .def(py::init<>())
+        .def("toSeconds", &Timestamp::toSeconds);
 
     py::class_<Ball>(m, "Ball")
         .def(py::init<Point, Vector, Timestamp>())
