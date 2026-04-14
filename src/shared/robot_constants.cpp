@@ -6,8 +6,8 @@ RobotConstants create2026RobotConstants()
 {
     return {
         .robot_radius_m        = static_cast<float>(ROBOT_MAX_RADIUS_METERS),
-        .front_wheel_angle_deg = 26.0f,
-        .back_wheel_angle_deg  = 40.0f,
+        .front_wheel_angle_deg = 32.0f,
+        .back_wheel_angle_deg  = 44.0f,
 
         .front_of_robot_width_meters = 0.11f,
         .dribbler_width_meters       = 0.07825f,

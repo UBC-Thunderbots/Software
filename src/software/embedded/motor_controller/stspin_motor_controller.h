@@ -52,8 +52,10 @@ class StSpinMotorController : public MotorController
     std::unordered_map<MotorIndex, int> spi_fds_;
 
     std::unique_ptr<Gpio> reset_gpio_;
+
     struct MotorStatus
     {
+        unsigned int frame_count;
         bool enabled;
         uint16_t faults;
         int16_t speed;
@@ -67,7 +69,6 @@ class StSpinMotorController : public MotorController
         int16_t phase_current;
         int16_t phase_voltage;
     };
-
 
     std::unordered_map<MotorIndex, MotorStatus> motor_status_;
 

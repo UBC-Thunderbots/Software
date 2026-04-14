@@ -43,6 +43,8 @@ void StSpinMotorController::setup()
     for (const MotorIndex& motor : driveMotors())
     {
         motor_status_[motor].enabled = true;
+
+        sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 806, .ki = 154});
     }
 }
 
@@ -168,6 +170,8 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 
     sendAndReceiveFrame(motor, outgoing_frame);
 
+    sendMotorStatusToPlotJuggler(motor);
+
     return motor_status_.at(motor).speed;
 }
 
@@ -209,16 +213,20 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex motor,
 
     spiTransfer(spi_fds_[motor], tx.data(), rx.data(), FRAME_LEN, SPI_SPEED_HZ);
 
+    motor_status_[motor].frame_count++;
+
     // Frame integrity check
     const uint8_t rx_crc = Crc8Autosar::calc(rx.data(), FRAME_LEN - 1);
     if (rx[5] != rx_crc)
     {
-        LOG(WARNING) << "Received frame that failed integrity check. Expected CRC "
+        LOG(WARNING) << "Frame #" << motor_status_[motor].frame_count
+                     << " received from motor " << motor
+                     << " failed integrity check. Expected CRC "
                      << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[5])
-                     << " for motor " << motor << ". RX: " << static_cast<int>(rx[0])
-                     << " " << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2])
-                     << " " << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4])
-                     << " " << static_cast<int>(rx[5]);
+                     << ". RX: " << static_cast<int>(rx[0]) << " "
+                     << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2]) << " "
+                     << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4]) << " "
+                     << static_cast<int>(rx[5]);
         return;
     }
 
