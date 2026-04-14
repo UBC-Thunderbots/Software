@@ -87,27 +87,29 @@ class DriveAndDribblerWidget(QWidget):
 
         :param motor_control: the MotorControl values to override the widget's sliders with
         """
-        self.x_velocity_slider.setValue(
-            motor_control.direct_velocity_control.velocity.x_component_meters
-        )
-        self.y_velocity_slider.setValue(
-            motor_control.direct_velocity_control.velocity.y_component_meters
-        )
-        self.angular_velocity_slider.setValue(
-            motor_control.direct_velocity_control.angular_velocity.radians_per_second
-        )
-        self.front_left_motor_slider.setValue(
-            motor_control.direct_velocity_control.front_left_wheel_velocity
-        )
-        self.front_right_motor_slider.setValue(
-            motor_control.direct_velocity_control.front_right_wheel_velocity
-        )
-        self.back_left_motor_slider.setValue(
-            motor_control.direct_velocity_control.back_left_wheel_velocity
-        )
-        self.back_right_motor_slider.setValue(
-            motor_control.direct_velocity_control.back_right_wheel_velocity
-        )
+        if motor_control.HasField("direct_velocity_control"):
+            self.x_velocity_slider.setValue(
+                motor_control.direct_velocity_control.velocity.x_component_meters
+            )
+            self.y_velocity_slider.setValue(
+                motor_control.direct_velocity_control.velocity.y_component_meters
+            )
+            self.angular_velocity_slider.setValue(
+                motor_control.direct_velocity_control.angular_velocity.radians_per_second
+            )
+        else:
+            self.front_left_motor_slider.setValue(
+                motor_control.direct_per_wheel_control.front_left_wheel_velocity
+            )
+            self.front_right_motor_slider.setValue(
+                motor_control.direct_per_wheel_control.front_right_wheel_velocity
+            )
+            self.back_left_motor_slider.setValue(
+                motor_control.direct_per_wheel_control.back_left_wheel_velocity
+            )
+            self.back_right_motor_slider.setValue(
+                motor_control.direct_per_wheel_control.back_right_wheel_velocity
+            )
 
         self.dribbler_speed_rpm_slider.setValue(motor_control.dribbler_speed_rpm)
 
