@@ -16,7 +16,7 @@ class TmcMotorController : public MotorController
 
     void reset() override;
 
-    MotorFaultIndicator checkDriverFault(MotorIndex motor) override;
+    const MotorFaultIndicator& checkFaults(MotorIndex motor) override;
 
     void immediatelyDisable() override;
 
@@ -75,7 +75,7 @@ class TmcMotorController : public MotorController
      *
      * @param motor_index The index of the motor to open
      */
-    void openSpiFileDescriptor(const MotorIndex& motor_name);
+    void openSpiFileDescriptor(MotorIndex motor_name);
 
     /**
      * A function which is written in the same style as the rest of the Trinamic API.
@@ -88,8 +88,8 @@ class TmcMotorController : public MotorController
      * @param write_data the data to write
      * @return the value read from the trinamic controller
      */
-    int readThenWriteValue(const MotorIndex& motor, const uint8_t& read_addr,
-                           const uint8_t& write_addr, const int& write_data);
+    int readThenWriteValue(MotorIndex motor, uint8_t read_addr, uint8_t write_addr,
+                           int write_data);
 
     /**
      * A lot of initialization parameters are necessary to function. Even if
@@ -104,8 +104,7 @@ class TmcMotorController : public MotorController
      * @param value The value to write
      *
      */
-    void writeToControllerOrDieTrying(const MotorIndex& motor, uint8_t address,
-                                      int32_t value);
+    void writeToControllerOrDieTrying(MotorIndex motor, uint8_t address, int32_t value);
     void writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int32_t value);
 
     /**
@@ -113,7 +112,7 @@ class TmcMotorController : public MotorController
      *
      * @param motor drive motor number
      */
-    void setupDriveMotor(const MotorIndex& motor);
+    void setupDriveMotor(MotorIndex motor);
 
     /**
      * Calls the configuration functions below in the right sequence
@@ -142,12 +141,12 @@ class TmcMotorController : public MotorController
      *
      * @param motor The motor to configure (the same value as the chip select)
      */
-    void configurePWM(const MotorIndex& motor);
-    void configureDribblerPI(const MotorIndex& motor);
-    void configureDrivePI(const MotorIndex& motor);
-    void configureADC(const MotorIndex& motor);
-    void configureEncoder(const MotorIndex& motor);
-    void configureHall(const MotorIndex& motor);
+    void configurePWM(MotorIndex motor);
+    void configureDribblerPI(MotorIndex motor);
+    void configureDrivePI(MotorIndex motor);
+    void configureADC(MotorIndex motor);
+    void configureEncoder(MotorIndex motor);
+    void configureHall(MotorIndex motor);
 
     /**
      * Trinamic API Binding function
@@ -176,8 +175,8 @@ class TmcMotorController : public MotorController
      *
      * @param motor The motor to initialize the encoder for
      */
-    void startEncoderCalibration(const MotorIndex& motor);
-    void endEncoderCalibration(const MotorIndex& motor);
+    void startEncoderCalibration(MotorIndex motor);
+    void endEncoderCalibration(MotorIndex motor);
 
     /**
      * Spin each drive motor in open loop mode to check if the encoder
@@ -197,13 +196,13 @@ class TmcMotorController : public MotorController
     std::unique_ptr<Gpio> reset_gpio_;
 
     // Transfer Buffers for spiTransfer
-    uint8_t tx_[5] = {0};
-    uint8_t rx_[5] = {0};
+    uint8_t tx_[5] = {};
+    uint8_t rx_[5] = {};
 
     // Transfer Buffers for readThenWriteSpiTransfer
-    uint8_t write_tx_[5] = {0};
-    uint8_t read_tx_[5]  = {0};
-    uint8_t read_rx_[5]  = {0};
+    uint8_t write_tx_[5] = {};
+    uint8_t read_tx_[5]  = {};
+    uint8_t read_rx_[5]  = {};
 
     // Transfer State
     bool transfer_started_  = false;
@@ -213,6 +212,17 @@ class TmcMotorController : public MotorController
 
     // Tracks whether each motor's encoder has been calibrated
     std::unordered_map<MotorIndex, bool> encoder_calibrated_;
+
+    // Cached faults for each motor
+    std::unordered_map<MotorIndex, MotorFaultIndicator> motor_faults_;
+
+    // Number of times we've polled each motor for faults,
+    // used to determine when to actually check for faults again
+    std::unordered_map<MotorIndex, int> num_motor_fault_checks_;
+
+    // The interval at which to check for motor faults, in number of polls.
+    // We avoid checking faults at every poll to reduce the number of SPI transactions.
+    static constexpr int MOTOR_FAULT_CHECK_INTERVAL = 5;
 
     // SPI Chip Selects
     static constexpr uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
@@ -264,9 +274,9 @@ class TmcMotorController : public MotorController
     //
     // RPM = eRPM / # of pole pairs
     static constexpr double DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM =
-        1 / DRIVE_MOTOR_NUM_POLE_PAIRS;
+        1.0 / DRIVE_MOTOR_NUM_POLE_PAIRS;
     static constexpr double DRIBBLER_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM =
-        1 / DRIBBLER_MOTOR_NUM_POLE_PAIRS;
+        1.0 / DRIBBLER_MOTOR_NUM_POLE_PAIRS;
 
     static constexpr int SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = 16;
     static constexpr int SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = 19;

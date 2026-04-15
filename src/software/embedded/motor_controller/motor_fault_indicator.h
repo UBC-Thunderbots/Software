@@ -11,7 +11,7 @@
 struct MotorFaultIndicator
 {
     bool drive_enabled;
-    std::unordered_set<TbotsProto::MotorFault> motor_faults;
+    std::unordered_set<TbotsProto::MotorFault> faults;
 
     /**
      * Construct a default indicator of no faults and running motors.
@@ -26,5 +26,7 @@ struct MotorFaultIndicator
      * @param motor_faults  a set of faults associated with this motor
      */
     MotorFaultIndicator(bool drive_enabled,
-                        std::unordered_set<TbotsProto::MotorFault>& motor_faults);
+                        const std::unordered_set<TbotsProto::MotorFault>& motor_faults);
+
+    bool requiresReset() const;
 };

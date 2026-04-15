@@ -17,7 +17,7 @@ class StSpinMotorController : public MotorController
 
     void reset() override;
 
-    MotorFaultIndicator checkDriverFault(MotorIndex motor) override;
+    const MotorFaultIndicator& checkFaults(MotorIndex motor) override;
 
     int readThenWriteVelocity(MotorIndex motor, int target_velocity) override;
 
@@ -57,7 +57,8 @@ class StSpinMotorController : public MotorController
     {
         unsigned int frame_count;
         bool enabled;
-        uint16_t faults;
+        MotorFaultIndicator faults;
+        uint16_t fault_flags;
         int16_t speed;
         int16_t speed_ref;
         int16_t iq;
@@ -91,6 +92,8 @@ class StSpinMotorController : public MotorController
                     std::array<uint8_t, FRAME_LEN>& tx);
 
     void processRx(MotorIndex motor, const std::array<uint8_t, FRAME_LEN>& rx);
+
+    void updateFaults(MotorIndex motor, uint16_t fault_flags);
 
     void sendMotorStatusToPlotJuggler(MotorIndex motor);
 

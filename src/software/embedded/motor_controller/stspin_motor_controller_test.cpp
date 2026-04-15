@@ -119,7 +119,7 @@ class StSpinMotorControllerTest
                 for (const MotorIndex motor : args_.enabled_motors)
                 {
                     motor_controller->sendMotorStatusToPlotJuggler(motor);
-                    motor_controller->checkDriverFault(motor);
+                    motor_controller->checkFaults(motor);
                 }
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(2));

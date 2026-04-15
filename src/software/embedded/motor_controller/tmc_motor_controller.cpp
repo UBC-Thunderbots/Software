@@ -63,7 +63,7 @@ MotorControllerStatus TmcMotorController::earlyPoll()
     auto motors = driveMotors();
     bool encoders_calibrated =
         std::accumulate(motors.begin(), motors.end(), false,
-                        [&](const bool& acc, const MotorIndex& motor)
+                        [&](const bool& acc, const MotorIndex motor)
                         { return acc || encoder_calibrated_[motor]; });
 
     if (!encoders_calibrated)
@@ -74,7 +74,8 @@ MotorControllerStatus TmcMotorController::earlyPoll()
     return MotorControllerStatus::OK;
 }
 
-int TmcMotorController::readThenWriteVelocity(MotorIndex motor, int target_velocity)
+int TmcMotorController::readThenWriteVelocity(const MotorIndex motor,
+                                              const int target_velocity)
 {
     const int velocity_erpm = readThenWriteValue(
         motor, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET, target_velocity);
@@ -87,8 +88,9 @@ int TmcMotorController::readThenWriteVelocity(MotorIndex motor, int target_veloc
     return velocity_erpm * DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
 }
 
-void TmcMotorController::writeToDriverOrDieTrying(uint8_t motor, uint8_t address,
-                                                  int32_t value)
+void TmcMotorController::writeToDriverOrDieTrying(const uint8_t motor,
+                                                  const uint8_t address,
+                                                  const int32_t value)
 {
     int num_retries_left = NUM_RETRIES_SPI;
     int read_value       = 0;
@@ -117,8 +119,9 @@ void TmcMotorController::writeToDriverOrDieTrying(uint8_t motor, uint8_t address
                                << " received: " << read_value;
 }
 
-void TmcMotorController::writeToControllerOrDieTrying(const MotorIndex& motor,
-                                                      uint8_t address, int32_t value)
+void TmcMotorController::writeToControllerOrDieTrying(const MotorIndex motor,
+                                                      const uint8_t address,
+                                                      const int32_t value)
 {
     int num_retries_left = NUM_RETRIES_SPI;
     int read_value       = 0;
@@ -146,7 +149,13 @@ void TmcMotorController::setup()
     reset_gpio_->setValue(GpioState::HIGH);
     usleep(MICROSECONDS_PER_MILLISECOND * 100);
 
-    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    for (const MotorIndex motor : reflective_enum::values<MotorIndex>())
+    {
+        motor_faults_[motor]           = MotorFaultIndicator();
+        num_motor_fault_checks_[motor] = 0;
+    }
+
+    for (const MotorIndex motor : reflective_enum::values<MotorIndex>())
     {
         LOG(INFO) << "Clearing RESET for " << motor;
         tmc6100_writeInt(CHIP_SELECTS.at(motor), TMC6100_GSTAT, 0x00000001);
@@ -154,28 +163,28 @@ void TmcMotorController::setup()
     }
 
     // Drive Motor Setup
-    for (const MotorIndex& motor : driveMotors())
+    for (const MotorIndex motor : driveMotors())
     {
         setupDriveMotor(motor);
     }
 
     // Dribbler Motor Setup
     startDriver(MotorIndex::DRIBBLER);
-    checkDriverFault(MotorIndex::DRIBBLER);
+    checkFaults(MotorIndex::DRIBBLER);
     startController(MotorIndex::DRIBBLER, true);
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
 
     checkEncoderConnections();
 
     // calibrate the encoders
-    for (const MotorIndex& motor : driveMotors())
+    for (const MotorIndex motor : driveMotors())
     {
         startEncoderCalibration(motor);
     }
 
     sleep(1);
 
-    for (const MotorIndex& motor : driveMotors())
+    for (const MotorIndex motor : driveMotors())
     {
         endEncoderCalibration(motor);
     }
@@ -183,13 +192,13 @@ void TmcMotorController::setup()
     auto motors = driveMotors();
     bool has_encoders_calibrated =
         std::accumulate(motors.begin(), motors.end(), false,
-                        [&](const bool& acc, const MotorIndex& motor)
+                        [&](const bool& acc, const MotorIndex motor)
                         { return acc || encoder_calibrated_[motor]; });
     CHECK(has_encoders_calibrated)
         << "Running without encoder calibration can cause serious harm, exiting";
 }
 
-void TmcMotorController::configurePWM(const MotorIndex& motor)
+void TmcMotorController::configurePWM(const MotorIndex motor)
 {
     LOG(INFO) << "Configuring PWM for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
@@ -199,7 +208,7 @@ void TmcMotorController::configurePWM(const MotorIndex& motor)
     writeToControllerOrDieTrying(motor, TMC4671_PWM_SV_CHOP, 0x00000107);
 }
 
-void TmcMotorController::configureDrivePI(const MotorIndex& motor)
+void TmcMotorController::configureDrivePI(const MotorIndex motor)
 {
     LOG(INFO) << "Configuring Drive PI for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
@@ -220,7 +229,7 @@ void TmcMotorController::configureDrivePI(const MotorIndex& motor)
     tmc4671_switchToMotionMode(CHIP_SELECTS.at(motor), TMC4671_MOTION_MODE_VELOCITY);
 }
 
-void TmcMotorController::configureDribblerPI(const MotorIndex& motor)
+void TmcMotorController::configureDribblerPI(const MotorIndex motor)
 {
     LOG(INFO) << "Configuring Dribbler PI for motor " << static_cast<uint32_t>(motor);
     // Please read the header file and the datasheet for more info
@@ -240,7 +249,7 @@ void TmcMotorController::configureDribblerPI(const MotorIndex& motor)
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 15000);
 }
 
-void TmcMotorController::configureADC(const MotorIndex& motor)
+void TmcMotorController::configureADC(const MotorIndex motor)
 {
     LOG(INFO) << "Configuring ADC for motor " << static_cast<uint32_t>(motor);
     // ADC configuration
@@ -260,7 +269,7 @@ void TmcMotorController::configureADC(const MotorIndex& motor)
     writeToControllerOrDieTrying(motor, TMC4671_ADC_I1_SCALE_OFFSET, 0x0009818E);
 }
 
-void TmcMotorController::configureEncoder(const MotorIndex& motor)
+void TmcMotorController::configureEncoder(const MotorIndex motor)
 {
     LOG(INFO) << "Configuring Encoder for motor " << static_cast<uint32_t>(motor);
     // ABN encoder settings
@@ -268,7 +277,7 @@ void TmcMotorController::configureEncoder(const MotorIndex& motor)
     writeToControllerOrDieTrying(motor, TMC4671_ABN_DECODER_PPR, 0x00001000);
 }
 
-void TmcMotorController::configureHall(const MotorIndex& motor)
+void TmcMotorController::configureHall(const MotorIndex motor)
 {
     LOG(INFO) << "Configuring Hall for motor " << static_cast<uint32_t>(motor);
     // Digital hall settings
@@ -281,13 +290,22 @@ void TmcMotorController::configureHall(const MotorIndex& motor)
                                  TMC4671_VELOCITY_PHI_E_HAL);
 }
 
-MotorFaultIndicator TmcMotorController::checkDriverFault(MotorIndex motor)
+const MotorFaultIndicator& TmcMotorController::checkFaults(const MotorIndex motor)
 {
-    bool drive_enabled = true;
-    std::unordered_set<TbotsProto::MotorFault> motor_faults;
+    num_motor_fault_checks_[motor]++;
 
-    int gstat = tmc6100_readInt(CHIP_SELECTS.at(motor), TMC6100_GSTAT);
-    std::bitset<32> gstat_bitset(gstat);
+    // To reduce the number of SPI transactions, we only check for faults every
+    // MOTOR_FAULT_CHECK_INTERVAL calls and return the cached faults otherwise.
+    if (num_motor_fault_checks_.at(motor) % MOTOR_FAULT_CHECK_INTERVAL == 0)
+    {
+        return motor_faults_.at(motor);
+    }
+
+    MotorFaultIndicator& motor_faults = motor_faults_.at(motor);
+    motor_faults.faults.clear();
+
+    const int gstat = tmc6100_readInt(CHIP_SELECTS.at(motor), TMC6100_GSTAT);
+    const std::bitset<32> gstat_bitset(gstat);
 
     if (gstat_bitset.any())
     {
@@ -299,7 +317,7 @@ MotorFaultIndicator TmcMotorController::checkDriverFault(MotorIndex motor)
         LOG(WARNING)
             << "Indicates that the IC has been reset. All registers have been cleared to reset values."
             << "Attention: DRV_EN must be high to allow clearing reset";
-        motor_faults.insert(TbotsProto::MotorFault::RESET);
+        motor_faults.faults.insert(TbotsProto::MotorFault::RESET);
     }
 
     if (gstat_bitset[1])
@@ -307,7 +325,8 @@ MotorFaultIndicator TmcMotorController::checkDriverFault(MotorIndex motor)
         LOG(WARNING)
             << "drv_otpw : Indicates, that the driver temperature has exceeded overtemperature prewarning-level."
             << "No action is taken. This flag is latched.";
-        motor_faults.insert(TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING);
+        motor_faults.faults.insert(
+            TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING);
     }
 
     if (gstat_bitset[2])
@@ -316,7 +335,7 @@ MotorFaultIndicator TmcMotorController::checkDriverFault(MotorIndex motor)
             << "drv_ot: Indicates, that the driver has been shut down due to overtemperature."
             << "This flag can only be cleared when the temperature is below the limit again."
             << "It is latched for information.";
-        motor_faults.insert(TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE);
+        motor_faults.faults.insert(TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE);
     }
 
     if (gstat_bitset[3])
@@ -324,85 +343,87 @@ MotorFaultIndicator TmcMotorController::checkDriverFault(MotorIndex motor)
         LOG(WARNING) << "uv_cp: Indicates an undervoltage on the charge pump."
                      << "The driver is disabled during undervoltage."
                      << "This flag is latched for information.";
-        motor_faults.insert(TbotsProto::MotorFault::UNDERVOLTAGE_CHARGEPUMP);
-        drive_enabled = false;
+        motor_faults.faults.insert(TbotsProto::MotorFault::UNDERVOLTAGE_CHARGEPUMP);
+        motor_faults.drive_enabled = false;
     }
 
     if (gstat_bitset[4])
     {
         LOG(WARNING) << "shortdet_u: Short to GND detected on phase U."
                      << "The driver becomes disabled until flag becomes cleared.";
-        motor_faults.insert(TbotsProto::MotorFault::PHASE_U_SHORT_COUNTER_DETECTED);
-        drive_enabled = false;
+        motor_faults.faults.insert(
+            TbotsProto::MotorFault::PHASE_U_SHORT_COUNTER_DETECTED);
+        motor_faults.drive_enabled = false;
     }
 
     if (gstat_bitset[5])
     {
         LOG(WARNING) << "s2gu: Short to GND detected on phase U."
                      << "The driver becomes disabled until flag becomes cleared.";
-        motor_faults.insert(TbotsProto::MotorFault::PHASE_U_SHORT_TO_GND_DETECTED);
-        drive_enabled = false;
+        motor_faults.faults.insert(TbotsProto::MotorFault::PHASE_U_SHORT_TO_GND_DETECTED);
+        motor_faults.drive_enabled = false;
     }
 
     if (gstat_bitset[6])
     {
         LOG(WARNING) << "s2vsu: Short to VS detected on phase U."
                      << "The driver becomes disabled until flag becomes cleared.";
-        motor_faults.insert(TbotsProto::MotorFault::PHASE_U_SHORT_TO_VS_DETECTED);
-        drive_enabled = false;
+        motor_faults.faults.insert(TbotsProto::MotorFault::PHASE_U_SHORT_TO_VS_DETECTED);
+        motor_faults.drive_enabled = false;
     }
 
     if (gstat_bitset[8])
     {
         LOG(WARNING) << "shortdet_v: V short counter has triggered at least once.";
-        motor_faults.insert(TbotsProto::MotorFault::PHASE_V_SHORT_COUNTER_DETECTED);
+        motor_faults.faults.insert(
+            TbotsProto::MotorFault::PHASE_V_SHORT_COUNTER_DETECTED);
     }
 
     if (gstat_bitset[9])
     {
         LOG(WARNING) << "s2gv: Short to GND detected on phase V."
                      << "The driver becomes disabled until flag becomes cleared.";
-        motor_faults.insert(TbotsProto::MotorFault::PHASE_V_SHORT_TO_GND_DETECTED);
-        drive_enabled = false;
+        motor_faults.faults.insert(TbotsProto::MotorFault::PHASE_V_SHORT_TO_GND_DETECTED);
+        motor_faults.drive_enabled = false;
     }
 
     if (gstat_bitset[10])
     {
         LOG(WARNING) << "s2vsv: Short to VS detected on phase V."
                      << "The driver becomes disabled until flag becomes cleared.";
-        motor_faults.insert(TbotsProto::MotorFault::PHASE_V_SHORT_TO_VS_DETECTED);
-        drive_enabled = false;
+        motor_faults.faults.insert(TbotsProto::MotorFault::PHASE_V_SHORT_TO_VS_DETECTED);
+        motor_faults.drive_enabled = false;
     }
 
     if (gstat_bitset[12])
     {
         LOG(WARNING) << "shortdet_w: short counter has triggered at least once.";
-        motor_faults.insert(TbotsProto::MotorFault::PHASE_W_SHORT_COUNTER_DETECTED);
+        motor_faults.faults.insert(
+            TbotsProto::MotorFault::PHASE_W_SHORT_COUNTER_DETECTED);
     }
 
     if (gstat_bitset[13])
     {
         LOG(WARNING) << "s2gw: Short to GND detected on phase W."
                      << "The driver becomes disabled until flag becomes cleared.";
-        motor_faults.insert(TbotsProto::MotorFault::PHASE_W_SHORT_TO_GND_DETECTED);
-        drive_enabled = false;
+        motor_faults.faults.insert(TbotsProto::MotorFault::PHASE_W_SHORT_TO_GND_DETECTED);
+        motor_faults.drive_enabled = false;
     }
 
     if (gstat_bitset[14])
     {
         LOG(WARNING) << "s2vsw: Short to VS detected on phase W."
                      << "The driver becomes disabled until flag becomes cleared.";
-        motor_faults.insert(TbotsProto::MotorFault::PHASE_W_SHORT_TO_VS_DETECTED);
-        drive_enabled = false;
+        motor_faults.faults.insert(TbotsProto::MotorFault::PHASE_W_SHORT_TO_VS_DETECTED);
+        motor_faults.drive_enabled = false;
     }
 
-    return MotorFaultIndicator(drive_enabled, motor_faults);
+    return motor_faults;
 }
 
-int TmcMotorController::readThenWriteValue(const MotorIndex& motor,
-                                           const uint8_t& read_addr,
-                                           const uint8_t& write_addr,
-                                           const int& write_data)
+int TmcMotorController::readThenWriteValue(const MotorIndex motor,
+                                           const uint8_t read_addr,
+                                           const uint8_t write_addr, const int write_data)
 {
     spi_demux_select_0_->setValue(GpioState::HIGH);
     spi_demux_select_1_->setValue(GpioState::LOW);
@@ -443,7 +464,7 @@ int TmcMotorController::readThenWriteValue(const MotorIndex& motor,
     return value;
 }
 
-void TmcMotorController::openSpiFileDescriptor(const MotorIndex& motor_index)
+void TmcMotorController::openSpiFileDescriptor(const MotorIndex motor_index)
 {
     file_descriptors_[CHIP_SELECTS.at(motor_index)] =
         open(SPI_PATHS.at(motor_index), O_RDWR);
@@ -466,16 +487,16 @@ void TmcMotorController::openSpiFileDescriptor(const MotorIndex& motor_index)
                      << "error: " << strerror(errno);
 }
 
-void TmcMotorController::setupDriveMotor(const MotorIndex& motor)
+void TmcMotorController::setupDriveMotor(const MotorIndex motor)
 {
     startDriver(motor);
-    checkDriverFault(motor);
+    checkFaults(motor);
     // Start all the controllers as drive motor controllers
     startController(motor, false);
     tmc4671_setTargetVelocity(CHIP_SELECTS.at(motor), 0);
 }
 
-void TmcMotorController::startDriver(MotorIndex motor)
+void TmcMotorController::startDriver(const MotorIndex motor)
 {
     uint8_t motor_cs = CHIP_SELECTS.at(motor);
 
@@ -493,7 +514,7 @@ void TmcMotorController::startDriver(MotorIndex motor)
     LOG(DEBUG) << "Driver " << motor << " accepted conf";
 }
 
-void TmcMotorController::startController(MotorIndex motor, bool dribbler)
+void TmcMotorController::startController(const MotorIndex motor, const bool dribbler)
 {
     // Read the chip ID to validate the SPI connection
     tmc4671_writeInt(CHIP_SELECTS.at(motor), TMC4671_CHIPINFO_ADDR, 0x000000000);
@@ -526,24 +547,25 @@ void TmcMotorController::startController(MotorIndex motor, bool dribbler)
     }
 }
 
-uint8_t TmcMotorController::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
-                                                 uint8_t last_transfer)
+uint8_t TmcMotorController::tmc4671ReadWriteByte(const uint8_t motor, const uint8_t data,
+                                                 const uint8_t last_transfer)
 {
     spi_demux_select_0_->setValue(GpioState::HIGH);
     spi_demux_select_1_->setValue(GpioState::LOW);
     return readWriteByte(motor, data, last_transfer, TMC4671_SPI_SPEED);
 }
 
-uint8_t TmcMotorController::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
-                                                 uint8_t last_transfer)
+uint8_t TmcMotorController::tmc6100ReadWriteByte(const uint8_t motor, const uint8_t data,
+                                                 const uint8_t last_transfer)
 {
     spi_demux_select_0_->setValue(GpioState::LOW);
     spi_demux_select_1_->setValue(GpioState::HIGH);
     return readWriteByte(motor, data, last_transfer, TMC6100_SPI_SPEED);
 }
 
-uint8_t TmcMotorController::readWriteByte(uint8_t motor, uint8_t data,
-                                          uint8_t last_transfer, uint32_t spi_speed)
+uint8_t TmcMotorController::readWriteByte(const uint8_t motor, const uint8_t data,
+                                          const uint8_t last_transfer,
+                                          const uint32_t spi_speed)
 {
     uint8_t ret_byte = 0;
 
@@ -611,7 +633,7 @@ void TmcMotorController::checkEncoderConnections()
     std::unordered_map<MotorIndex, bool> calibrated_motors;
     std::unordered_map<MotorIndex, int> initial_velocities;
 
-    for (const MotorIndex& motor : driveMotors())
+    for (const MotorIndex motor : driveMotors())
     {
         calibrated_motors[motor] = false;
 
@@ -643,7 +665,7 @@ void TmcMotorController::checkEncoderConnections()
                      { return !calibration_status_pair.second; });
          ++num_iterations)
     {
-        for (const MotorIndex& motor : driveMotors())
+        for (const MotorIndex motor : driveMotors())
         {
             if (calibrated_motors[motor])
             {
@@ -666,7 +688,7 @@ void TmcMotorController::checkEncoderConnections()
     }
 
     bool calibrated = true;
-    for (const MotorIndex& motor : driveMotors())
+    for (const MotorIndex motor : driveMotors())
     {
         if (!calibrated_motors[motor])
         {
@@ -682,7 +704,7 @@ void TmcMotorController::checkEncoderConnections()
     }
 
     // stop all motors, reset back to velocity control mode
-    for (const MotorIndex& motor : driveMotors())
+    for (const MotorIndex motor : driveMotors())
     {
         writeToControllerOrDieTrying(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
         tmc4671_switchToMotionMode(CHIP_SELECTS.at(motor), TMC4671_MOTION_MODE_VELOCITY);
@@ -696,7 +718,7 @@ void TmcMotorController::reset()
     reset_gpio_->setValue(GpioState::LOW);
 }
 
-void TmcMotorController::startEncoderCalibration(const MotorIndex& motor)
+void TmcMotorController::startEncoderCalibration(const MotorIndex motor)
 {
     LOG(WARNING) << "Calibrating the encoder, ensure the robot is lifted off the ground";
 
@@ -712,7 +734,7 @@ void TmcMotorController::startEncoderCalibration(const MotorIndex& motor)
     writeToControllerOrDieTrying(motor, TMC4671_UQ_UD_EXT, 0x00000FFF);
 }
 
-void TmcMotorController::endEncoderCalibration(const MotorIndex& motor)
+void TmcMotorController::endEncoderCalibration(const MotorIndex motor)
 {
     LOG(WARNING) << "Calibrating the encoder, wheels may move";
 

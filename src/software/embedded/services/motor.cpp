@@ -6,64 +6,21 @@
 #include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/logger/logger.h"
 
-static double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
-static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
-
 MotorService::MotorService(const RobotConstants& robot_constants)
     : motor_controller_(setupMotorController()),
       robot_constants_(robot_constants),
       euclidean_to_four_wheel_(robot_constants),
-      drive_motor_mps_per_rpm_(2 * M_PI * robot_constants.wheel_radius_meters / 60),
-      tracked_motor_fault_start_time_(std::nullopt)
+      drive_motor_mps_per_rpm_(2 * M_PI * robot_constants.wheel_radius_meters / 60)
 {
 }
 
 void MotorService::setup()
 {
-    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
-    {
-        cached_motor_faults_[motor] = MotorFaultIndicator();
-    }
-
-    const auto now                             = std::chrono::system_clock::now();
-    long int total_duration_since_last_fault_s = 0;
-    if (tracked_motor_fault_start_time_.has_value())
-    {
-        total_duration_since_last_fault_s =
-            std::chrono::duration_cast<std::chrono::seconds>(
-                now - tracked_motor_fault_start_time_.value())
-                .count();
-    }
-
-    if (tracked_motor_fault_start_time_.has_value() &&
-        total_duration_since_last_fault_s < MOTOR_FAULT_TIME_THRESHOLD_S)
-    {
-        num_tracked_motor_resets_++;
-    }
-    else
-    {
-        tracked_motor_fault_start_time_ = now;
-        num_tracked_motor_resets_       = 1;
-    }
-
-    if (tracked_motor_fault_start_time_.has_value() &&
-        num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD_COUNT)
-    {
-        LOG(FATAL) << "In the last " << total_duration_since_last_fault_s
-                   << "s, the motor board has reset " << num_tracked_motor_resets_
-                   << " times. Thunderloop crashing for safety.";
-    }
-
-    prev_wheel_velocities_ = {0.0, 0.0, 0.0, 0.0};
-    front_left_target_rpm  = 0;
-    front_right_target_rpm = 0;
-    back_left_target_rpm   = 0;
-    back_right_target_rpm  = 0;
-    dribbler_target_rpm_   = 0;
+    prev_wheel_velocities_   = WheelSpace_t::Zero();
+    target_wheel_velocities_ = WheelSpace_t::Zero();
+    dribbler_target_rpm_     = 0;
 
     motor_controller_->setup();
-
-    is_initialized_ = true;
 }
 
 void MotorService::reset()
@@ -83,26 +40,21 @@ std::unique_ptr<MotorController> MotorService::setupMotorController()
     }
 }
 
-TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_velocity_mps,
-                                                        double front_right_velocity_mps,
-                                                        double back_left_velocity_mps,
-                                                        double back_right_velocity_mps,
-                                                        double dribbler_rpm)
+TbotsProto::MotorStatus MotorService::createMotorStatus(
+    const WheelSpace_t& current_wheel_velocities, const double dribbler_rpm) const
 {
     TbotsProto::MotorStatus motor_status;
 
-    cached_motor_faults_[motor_fault_detector_] =
-        motor_controller_->checkDriverFault(motor_fault_detector_);
-
-    for (const MotorIndex& motor : reflective_enum::values<MotorIndex>())
+    for (const MotorIndex motor : reflective_enum::values<MotorIndex>())
     {
+        const MotorFaultIndicator& motor_faults = motor_controller_->checkFaults(motor);
+
         if (motor != MotorIndex::DRIBBLER)
         {
             TbotsProto::DriveUnit drive_status;
-            drive_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
+            drive_status.set_enabled(motor_faults.drive_enabled);
 
-            for (const TbotsProto::MotorFault& fault :
-                 cached_motor_faults_[motor].motor_faults)
+            for (const TbotsProto::MotorFault& fault : motor_faults.faults)
             {
                 drive_status.add_motor_faults(fault);
             }
@@ -128,9 +80,9 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
         {
             TbotsProto::DribblerStatus dribbler_status;
             dribbler_status.set_dribbler_rpm(static_cast<float>(dribbler_rpm));
-            dribbler_status.set_enabled(cached_motor_faults_[motor].drive_enabled);
-            for (const TbotsProto::MotorFault& fault :
-                 cached_motor_faults_[motor].motor_faults)
+            dribbler_status.set_enabled(motor_faults.drive_enabled);
+
+            for (const TbotsProto::MotorFault& fault : motor_faults.faults)
             {
                 dribbler_status.add_motor_faults(fault);
             }
@@ -140,17 +92,13 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
     }
 
     motor_status.mutable_front_left()->set_wheel_velocity(
-        static_cast<float>(front_left_velocity_mps));
+        static_cast<float>(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX]));
     motor_status.mutable_front_right()->set_wheel_velocity(
-        static_cast<float>(front_right_velocity_mps));
+        static_cast<float>(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX]));
     motor_status.mutable_back_left()->set_wheel_velocity(
-        static_cast<float>(back_left_velocity_mps));
+        static_cast<float>(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX]));
     motor_status.mutable_back_right()->set_wheel_velocity(
-        static_cast<float>(back_right_velocity_mps));
-
-    motor_fault_detector_ =
-        static_cast<MotorIndex>((static_cast<int>(motor_fault_detector_) + 1) %
-                                reflective_enum::size<MotorIndex>());
+        static_cast<float>(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX]));
 
     return motor_status;
 }
@@ -158,83 +106,68 @@ TbotsProto::MotorStatus MotorService::updateMotorStatus(double front_left_veloci
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
                                            double time_elapsed_since_last_poll_s)
 {
-    if (motor_controller_->earlyPoll() != MotorControllerStatus::OK)
+    if (motor_controller_->earlyPoll() != MotorControllerStatus::OK ||
+        anyMotorRequiresReset())
     {
-        is_initialized_ = false;
-    }
-
-    // checks if any motor has reset, sends a log message if so
-    for (const MotorIndex& motor_index : reflective_enum::values<MotorIndex>())
-    {
-        if (requiresMotorReinit(motor_index))
-        {
-            LOG(DEBUG) << "RESET DETECTED FOR MOTOR: " << motor_index;
-            is_initialized_ = false;
-        }
-    }
-
-    if (!is_initialized_)
-    {
-        LOG(INFO) << "MotorService re-initializing";
+        LOG(INFO) << "MotorService resetting";
+        trackMotorReset();
         setup();
     }
 
-    double front_right_velocity = motor_controller_->readThenWriteVelocity(
-                                      MotorIndex::FRONT_RIGHT, front_right_target_rpm) *
-                                  drive_motor_mps_per_rpm_;
-    double front_left_velocity = motor_controller_->readThenWriteVelocity(
-                                     MotorIndex::FRONT_LEFT, front_left_target_rpm) *
-                                 drive_motor_mps_per_rpm_;
-    double back_right_velocity = motor_controller_->readThenWriteVelocity(
-                                     MotorIndex::BACK_RIGHT, back_right_target_rpm) *
-                                 drive_motor_mps_per_rpm_;
-    double back_left_velocity = motor_controller_->readThenWriteVelocity(
-                                    MotorIndex::BACK_LEFT, back_left_target_rpm) *
-                                drive_motor_mps_per_rpm_;
-    double dribbler_rpm = motor_controller_->readThenWriteVelocity(MotorIndex::DRIBBLER,
-                                                                   dribbler_target_rpm_);
+    const Eigen::Vector4<int> target_wheel_rpms =
+        (target_wheel_velocities_ / drive_motor_mps_per_rpm_).cast<int>();
+
+    const Eigen::Vector4<int> current_wheel_rpms = {
+        motor_controller_->readThenWriteVelocity(
+            MotorIndex::FRONT_RIGHT, target_wheel_rpms[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
+        motor_controller_->readThenWriteVelocity(
+            MotorIndex::FRONT_LEFT, target_wheel_rpms[FRONT_LEFT_WHEEL_SPACE_INDEX]),
+        motor_controller_->readThenWriteVelocity(
+            MotorIndex::BACK_LEFT, target_wheel_rpms[BACK_LEFT_WHEEL_SPACE_INDEX]),
+        motor_controller_->readThenWriteVelocity(
+            MotorIndex::BACK_RIGHT, target_wheel_rpms[BACK_RIGHT_WHEEL_SPACE_INDEX]),
+    };
+
+    const double dribbler_rpm = motor_controller_->readThenWriteVelocity(
+        MotorIndex::DRIBBLER, dribbler_target_rpm_);
+
+    const WheelSpace_t current_wheel_velocities =
+        current_wheel_rpms.cast<double>() * drive_motor_mps_per_rpm_;
 
     TbotsProto::MotorStatus motor_status =
-        updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
-                          back_right_velocity, dribbler_rpm);
+        createMotorStatus(current_wheel_velocities, dribbler_rpm);
 
-    // This order needs to match euclidean_to_four_wheel converters order.
-    // We also want to work in the meters per second space rather than RPMs.
-    WheelSpace_t current_wheel_velocities = {front_right_velocity, front_left_velocity,
-                                             back_left_velocity, back_right_velocity};
-
-    // if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
-    //              prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
-    //     RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    // {
-    //     motor_controller_->immediatelyDisable();
-    //     LOG(FATAL) << "Front right motor runaway";
-    // }
-    // else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
-    //                   prev_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
-    //          RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    // {
-    //     motor_controller_->immediatelyDisable();
-    //     LOG(FATAL) << "Front left motor runaway";
-    // }
-    // else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
-    //                   prev_wheel_velocities_[BACK_LEFT_WHEEL_SPACE_INDEX]) >
-    //          RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    // {
-    //     motor_controller_->immediatelyDisable();
-    //     LOG(FATAL) << "Back left motor runaway";
-    // }
-    // else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
-    //                   prev_wheel_velocities_[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
-    //          RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    // {
-    //     motor_controller_->immediatelyDisable();
-    //     LOG(FATAL) << "Back right motor runaway";
-    // }
-    (void)RUNAWAY_PROTECTION_THRESHOLD_MPS;
+    if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
+                 prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
+        RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        motor_controller_->immediatelyDisable();
+        LOG(FATAL) << "Front right motor runaway";
+    }
+    else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
+                      prev_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
+             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        motor_controller_->immediatelyDisable();
+        LOG(FATAL) << "Front left motor runaway";
+    }
+    else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
+                      prev_wheel_velocities_[BACK_LEFT_WHEEL_SPACE_INDEX]) >
+             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        motor_controller_->immediatelyDisable();
+        LOG(FATAL) << "Back left motor runaway";
+    }
+    else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
+                      prev_wheel_velocities_[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
+             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        motor_controller_->immediatelyDisable();
+        LOG(FATAL) << "Back right motor runaway";
+    }
 
     // Convert to Euclidean velocity_delta
-    EuclideanSpace_t current_euclidean_velocity =
+    const EuclideanSpace_t current_euclidean_velocity =
         euclidean_to_four_wheel_.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
@@ -244,14 +177,12 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     motor_status.mutable_angular_velocity()->set_radians_per_second(
         current_euclidean_velocity[2]);
 
-    WheelSpace_t target_wheel_velocities = WheelSpace_t::Zero();
-
     // Get target wheel velocities from the primitive
     if (motor.has_direct_per_wheel_control())
     {
-        TbotsProto::MotorControl_DirectPerWheelControl direct_per_wheel =
-            motor.direct_per_wheel_control();
-        target_wheel_velocities = {
+        const auto& direct_per_wheel = motor.direct_per_wheel_control();
+
+        target_wheel_velocities_ = {
             direct_per_wheel.front_right_wheel_velocity(),
             direct_per_wheel.front_left_wheel_velocity(),
             direct_per_wheel.back_left_wheel_velocity(),
@@ -260,34 +191,23 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     }
     else if (motor.has_direct_velocity_control())
     {
-        TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
-            motor.direct_velocity_control();
-        EuclideanSpace_t target_euclidean_velocity = {
+        const auto& direct_velocity = motor.direct_velocity_control();
+
+        const EuclideanSpace_t target_euclidean_velocity = {
             -direct_velocity.velocity().y_component_meters(),
             direct_velocity.velocity().x_component_meters(),
             direct_velocity.angular_velocity().radians_per_second()};
 
-        target_wheel_velocities =
+        target_wheel_velocities_ =
             euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
     }
 
     // Ramp the target velocities to keep acceleration compared to current velocities
     // within safe bounds
-    target_wheel_velocities = euclidean_to_four_wheel_.rampWheelVelocity(
-        prev_wheel_velocities_, target_wheel_velocities, time_elapsed_since_last_poll_s);
+    target_wheel_velocities_ = euclidean_to_four_wheel_.rampWheelVelocity(
+        prev_wheel_velocities_, target_wheel_velocities_, time_elapsed_since_last_poll_s);
 
-    prev_wheel_velocities_ = target_wheel_velocities;
-
-    // Calculate speeds accounting for acceleration
-    front_right_target_rpm =
-        static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] /
-                         drive_motor_mps_per_rpm_);
-    front_left_target_rpm = static_cast<int>(
-        target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] / drive_motor_mps_per_rpm_);
-    back_left_target_rpm = static_cast<int>(
-        target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] / drive_motor_mps_per_rpm_);
-    back_right_target_rpm = static_cast<int>(
-        target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] / drive_motor_mps_per_rpm_);
+    prev_wheel_velocities_ = target_wheel_velocities_;
 
     // Get target dribbler rpm from the primitive
     int target_dribbler_rpm;
@@ -314,16 +234,49 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     dribbler_target_rpm_ =
         std::clamp(dribbler_target_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
 
-    motor_status.mutable_dribbler()->set_dribbler_rpm(dribbler_target_rpm_);
+    motor_status.mutable_dribbler()->set_dribbler_rpm(
+        static_cast<float>(dribbler_target_rpm_));
 
     return motor_status;
 }
 
-bool MotorService::requiresMotorReinit(const MotorIndex& motor)
+void MotorService::trackMotorReset()
 {
-    auto reset_search =
-        cached_motor_faults_[motor].motor_faults.find(TbotsProto::MotorFault::RESET);
+    const auto now = std::chrono::system_clock::now();
 
-    return !cached_motor_faults_[motor].drive_enabled ||
-           (reset_search != cached_motor_faults_[motor].motor_faults.end());
+    if (num_tracked_motor_resets_ == 0)
+    {
+        tracked_motor_fault_start_time_ = now;
+        num_tracked_motor_resets_       = 1;
+        return;
+    }
+
+    const auto elapsed_s = std::chrono::duration_cast<std::chrono::seconds>(
+                               now - tracked_motor_fault_start_time_)
+                               .count();
+
+    if (elapsed_s < MOTOR_FAULT_TIME_THRESHOLD_S)
+    {
+        num_tracked_motor_resets_++;
+    }
+    else
+    {
+        tracked_motor_fault_start_time_ = now;
+        num_tracked_motor_resets_       = 1;
+    }
+
+    if (num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD_COUNT)
+    {
+        LOG(FATAL) << "Motor board reset too frequently (" << num_tracked_motor_resets_
+                   << " times in " << elapsed_s
+                   << " seconds). Thunderloop crashing for safety.";
+    }
+}
+
+bool MotorService::anyMotorRequiresReset() const
+{
+    return std::any_of(reflective_enum::values<MotorIndex>().begin(),
+                       reflective_enum::values<MotorIndex>().end(),
+                       [this](const MotorIndex motor)
+                       { return motor_controller_->checkFaults(motor).requiresReset(); });
 }

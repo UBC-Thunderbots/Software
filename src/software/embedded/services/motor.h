@@ -1,16 +1,12 @@
 #pragma once
 
-#include <Eigen/Dense>
 #include <memory>
-#include <optional>
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/gpio/gpio.h"
 #include "software/embedded/motor_controller/motor_controller.h"
-#include "software/embedded/motor_controller/motor_fault_indicator.h"
 #include "software/physics/euclidean_to_wheel.h"
 
 /**
@@ -30,7 +26,7 @@ class MotorService
      *
      * @param robot_constants The robot constants
      */
-    MotorService(const RobotConstants& robot_constants);
+    explicit MotorService(const RobotConstants& robot_constants);
 
     virtual ~MotorService() = default;
 
@@ -64,62 +60,37 @@ class MotorService
      * Return a MotorStatus proto filled with motor faults. Some values of the proto are
      * previously cached velocities due to SPI transaction costs.
      *
-     * @param front_left_velocity_mps  the front left motor's velocity in m/s
-     * @param front_right_velocity_mps the front right motor's velocity in m/s
-     * @param back_left_velocity_mps   the back left motor's velocity in m/s
-     * @param back_right_velocity_mps  the back right motor's velocity in m/s
+     * @param current_wheel_velocities  the current wheel velocities in m/s
      * @param dribbler_rpm             the dribbler motor's rotations per minute
      *
      * @return a MotorStatus proto with the velocity of each motor as well as their fault
      * statuses (some faults may be cached)
      */
-    TbotsProto::MotorStatus updateMotorStatus(double front_left_velocity_mps,
-                                              double front_right_velocity_mps,
-                                              double back_left_velocity_mps,
-                                              double back_right_velocity_mps,
-                                              double dribbler_rpm);
+    TbotsProto::MotorStatus createMotorStatus(
+        const WheelSpace_t& current_wheel_velocities, double dribbler_rpm) const;
 
-    /**
-     * Returns true if we've detected a RESET in our cached motor faults indicators or if
-     * we have a fault that disables drive.
-     *
-     * @param motor chip select to check for RESETs
-     *
-     * @return true if the motor has returned a cached RESET fault, false otherwise
-     */
-    bool requiresMotorReinit(const MotorIndex& motor);
+    void trackMotorReset();
 
-    // Controller for communicating with the motor driver board(s)
+    bool anyMotorRequiresReset() const;
+
     std::unique_ptr<MotorController> motor_controller_;
-
-    // Flag indicating whether the motors have been calibrated
-    bool is_initialized_ = false;
 
     RobotConstants robot_constants_;
 
     EuclideanToWheel euclidean_to_four_wheel_;
 
     WheelSpace_t prev_wheel_velocities_;
+    WheelSpace_t target_wheel_velocities_;
 
-    int front_left_target_rpm  = 0;
-    int front_right_target_rpm = 0;
-    int back_left_target_rpm   = 0;
-    int back_right_target_rpm  = 0;
-    int dribbler_target_rpm_   = 0;
+    int dribbler_target_rpm_ = 0;
 
     double drive_motor_mps_per_rpm_;
 
-    // The current motor to check for motor faults; this is updated every poll
-    // and will cycle through all the MotorIndex values (only one motor is checked
-    // for faults each poll to reduce number of SPI transactions)
-    MotorIndex motor_fault_detector_;
-
-    std::unordered_map<MotorIndex, MotorFaultIndicator> cached_motor_faults_;
-
-    std::optional<std::chrono::time_point<std::chrono::system_clock>>
-        tracked_motor_fault_start_time_;
+    std::chrono::time_point<std::chrono::system_clock> tracked_motor_fault_start_time_;
     int num_tracked_motor_resets_;
 
-    static constexpr int MOTOR_FAULT_TIME_THRESHOLD_S = 60;
-    static constexpr int MOTOR_FAULT_THRESHOLD_COUNT  = 3;
+    static constexpr int MOTOR_FAULT_TIME_THRESHOLD_S                = 60;
+    static constexpr int MOTOR_FAULT_THRESHOLD_COUNT                 = 3;
+    static constexpr double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
+    static constexpr int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
 };

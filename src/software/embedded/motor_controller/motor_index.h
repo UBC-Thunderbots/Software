@@ -14,4 +14,4 @@ constexpr std::array<MotorIndex, 4> driveMotors()
         MotorIndex::BACK_LEFT,
         MotorIndex::BACK_RIGHT,
     };
-};
+}
