@@ -3,6 +3,7 @@
 #include <linux/spi/spidev.h>
 
 #include <chrono>
+#include <iomanip>
 #include <thread>
 
 #pragma GCC diagnostic push
@@ -223,14 +224,19 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex motor,
     const uint8_t rx_crc = Crc8Autosar::calc(rx.data(), FRAME_LEN - 1);
     if (rx[5] != rx_crc)
     {
+        // Log RX buffer and expected vs. actual CRC
+        std::ostringstream oss;
+        oss << std::hex << std::uppercase << std::setfill('0') << "Expected CRC 0x"
+            << std::setw(2) << static_cast<int>(rx[5]) << " but got 0x" << std::setw(2)
+            << static_cast<int>(rx_crc) << ". RX: ";
+        for (size_t i = 0; i < FRAME_LEN; ++i)
+        {
+            oss << "0x" << std::setw(2) << static_cast<int>(rx[i]) << " ";
+        }
+
         LOG(WARNING) << "Frame #" << motor_status_[motor].frame_count
-                     << " received from motor " << motor
-                     << " failed integrity check. Expected CRC "
-                     << static_cast<int>(rx_crc) << " but got " << static_cast<int>(rx[5])
-                     << ". RX: " << static_cast<int>(rx[0]) << " "
-                     << static_cast<int>(rx[1]) << " " << static_cast<int>(rx[2]) << " "
-                     << static_cast<int>(rx[3]) << " " << static_cast<int>(rx[4]) << " "
-                     << static_cast<int>(rx[5]);
+                     << " received from motor " << motor << " failed integrity check. "
+                     << oss.str();
         return;
     }
 

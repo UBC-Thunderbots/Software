@@ -103,8 +103,8 @@ TbotsProto::MotorStatus MotorService::createMotorStatus(
     return motor_status;
 }
 
-TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor,
-                                           double time_elapsed_since_last_poll_s)
+TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor_control,
+                                           const double time_elapsed_since_last_poll_s)
 {
     if (motor_controller_->earlyPoll() != MotorControllerStatus::OK ||
         anyMotorRequiresReset())
@@ -178,9 +178,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         current_euclidean_velocity[2]);
 
     // Get target wheel velocities from the primitive
-    if (motor.has_direct_per_wheel_control())
+    if (motor_control.has_direct_per_wheel_control())
     {
-        const auto& direct_per_wheel = motor.direct_per_wheel_control();
+        const auto& direct_per_wheel = motor_control.direct_per_wheel_control();
 
         target_wheel_velocities_ = {
             direct_per_wheel.front_right_wheel_velocity(),
@@ -189,9 +189,9 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
             direct_per_wheel.back_right_wheel_velocity(),
         };
     }
-    else if (motor.has_direct_velocity_control())
+    else if (motor_control.has_direct_velocity_control())
     {
-        const auto& direct_velocity = motor.direct_velocity_control();
+        const auto& direct_velocity = motor_control.direct_velocity_control();
 
         const EuclideanSpace_t target_euclidean_velocity = {
             -direct_velocity.velocity().y_component_meters(),
@@ -211,14 +211,14 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
     // Get target dribbler rpm from the primitive
     int target_dribbler_rpm;
-    if (motor.drive_control_case() ==
+    if (motor_control.drive_control_case() ==
         TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
     {
         target_dribbler_rpm = 0;
     }
     else
     {
-        target_dribbler_rpm = motor.dribbler_speed_rpm();
+        target_dribbler_rpm = motor_control.dribbler_speed_rpm();
     }
 
     // Ramp the dribbler velocity
