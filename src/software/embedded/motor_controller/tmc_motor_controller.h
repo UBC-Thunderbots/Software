@@ -10,8 +10,6 @@ class TmcMotorController : public MotorController
    public:
     TmcMotorController();
 
-    MotorControllerStatus earlyPoll() override;
-
     void setup() override;
 
     void reset() override;

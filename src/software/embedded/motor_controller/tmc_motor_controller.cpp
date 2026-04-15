@@ -25,7 +25,7 @@ extern "C"
     //
     // The motor service exclusively calls the trinamic API which triggers these
     // functions. The motor service will set this variable in the constructor.
-    static TmcMotorController* g_motor_controller = NULL;
+    static TmcMotorController* g_motor_controller = nullptr;
 
     uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer)
     {
@@ -56,22 +56,6 @@ TmcMotorController::TmcMotorController()
 
     // Make this instance available to the static functions above
     g_motor_controller = this;
-}
-
-MotorControllerStatus TmcMotorController::earlyPoll()
-{
-    auto motors = driveMotors();
-    bool encoders_calibrated =
-        std::accumulate(motors.begin(), motors.end(), false,
-                        [&](const bool& acc, const MotorIndex motor)
-                        { return acc || encoder_calibrated_[motor]; });
-
-    if (!encoders_calibrated)
-    {
-        return MotorControllerStatus::CALIBRATION_FAILURE;
-    }
-
-    return MotorControllerStatus::OK;
 }
 
 int TmcMotorController::readThenWriteVelocity(const MotorIndex motor,

@@ -106,10 +106,9 @@ TbotsProto::MotorStatus MotorService::createMotorStatus(
 TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor_control,
                                            const double time_elapsed_since_last_poll_s)
 {
-    if (motor_controller_->earlyPoll() != MotorControllerStatus::OK ||
-        anyMotorRequiresReset())
+    if (anyMotorRequiresReset())
     {
-        LOG(INFO) << "MotorService resetting";
+        LOG(INFO) << "Resetting motors due to fault indicators requiring reset";
         trackMotorReset();
         setup();
     }
@@ -267,7 +266,7 @@ void MotorService::trackMotorReset()
 
     if (num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD_COUNT)
     {
-        LOG(FATAL) << "Motor board reset too frequently (" << num_tracked_motor_resets_
+        LOG(FATAL) << "Motors reset too frequently (" << num_tracked_motor_resets_
                    << " times in " << elapsed_s
                    << " seconds). Thunderloop crashing for safety.";
     }

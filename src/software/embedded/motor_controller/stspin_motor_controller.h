@@ -11,8 +11,6 @@ class StSpinMotorController : public MotorController
    public:
     explicit StSpinMotorController();
 
-    MotorControllerStatus earlyPoll() override;
-
     void setup() override;
 
     void reset() override;

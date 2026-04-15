@@ -31,12 +31,6 @@ StSpinMotorController::StSpinMotorController()
     }
 }
 
-MotorControllerStatus StSpinMotorController::earlyPoll()
-{
-    // No encoders to calibrate, so just return OK
-    return MotorControllerStatus::OK;
-}
-
 void StSpinMotorController::setup()
 {
     reset();
@@ -79,85 +73,95 @@ void StSpinMotorController::updateFaults(const MotorIndex motor,
 
     motor_status.fault_flags          = fault_flags;
     MotorFaultIndicator& motor_faults = motor_status.faults;
+    motor_faults.drive_enabled        = true;
     motor_faults.faults.clear();
 
-    LOG(WARNING) << "======= Faults For Motor " << motor << "=======";
+    if (fault_flags == 0)
+    {
+        // No faults; early return
+        return;
+    }
+
+    std::ostringstream oss;
+    oss << "======= Faults For Motor " << motor << "=======\n";
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::DURATION))
     {
-        LOG(WARNING) << "DURATION: FOC rate too high";
+        oss << "DURATION: FOC rate too high\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::DURATION);
         motor_faults.drive_enabled = false;
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::OVER_VOLT))
     {
-        LOG(WARNING) << "OVER_VOLT: Over voltage";
+        oss << "OVER_VOLT: Over voltage\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::OVER_VOLT);
         motor_faults.drive_enabled = false;
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::UNDER_VOLT))
     {
-        LOG(WARNING) << "UNDER_VOLT: Under voltage";
+        oss << "UNDER_VOLT: Under voltage\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::UNDER_VOLT);
         motor_faults.drive_enabled = false;
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::OVER_TEMP))
     {
-        LOG(WARNING) << "OVER_TEMP: Over temperature";
+        oss << "OVER_TEMP: Over temperature\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::OVER_TEMP);
         motor_faults.drive_enabled = false;
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::START_UP))
     {
-        LOG(WARNING) << "START_UP: Start up failed";
+        oss << "START_UP: Start up failed\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::START_UP);
         motor_faults.drive_enabled = false;
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::SPEED_FDBK))
     {
-        LOG(WARNING) << "SPEED_FDBK: Speed feedback fault";
+        oss << "SPEED_FDBK: Speed feedback fault\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::SPEED_FDBK);
         motor_faults.drive_enabled = false;
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::OVER_CURR))
     {
-        LOG(WARNING) << "OVER_CURR: Over current";
+        oss << "OVER_CURR: Over current\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::OVER_CURR);
         motor_faults.drive_enabled = false;
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::SW_ERROR))
     {
-        LOG(WARNING) << "SW_ERROR: Software error";
+        oss << "SW_ERROR: Software error\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::SW_ERROR);
         motor_faults.drive_enabled = false;
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::SAMPLE_FAULT))
     {
-        LOG(WARNING) << "SAMPLE_FAULT: Sample fault for testing purposes";
+        oss << "SAMPLE_FAULT: Sample fault for testing purposes\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::SAMPLE_FAULT);
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::OVERCURR_SW))
     {
-        LOG(INFO) << "OVERCURR_SW: Software over current";
+        oss << "OVERCURR_SW: Software over current\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::OVERCURR_SW);
         motor_faults.drive_enabled = false;
     }
 
     if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::DP_FAULT))
     {
-        LOG(WARNING) << "DP_FAULT: Driver protection fault";
+        oss << "DP_FAULT: Driver protection fault\n";
         motor_faults.faults.insert(TbotsProto::MotorFault::DP_FAULT);
         motor_faults.drive_enabled = false;
     }
+
+    LOG(WARNING) << oss.str();
 }
 
 int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
