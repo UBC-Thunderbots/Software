@@ -33,9 +33,9 @@ class StSpinMotorController : public MotorController
     // clang-format off
     static const inline std::unordered_map<MotorIndex, const char*> SPI_PATHS = {
         {MotorIndex::FRONT_LEFT,  "/dev/spidev0.2"},
+        {MotorIndex::FRONT_RIGHT, "/dev/spidev0.4"},
         {MotorIndex::BACK_LEFT,   "/dev/spidev0.3"},
         {MotorIndex::BACK_RIGHT,  "/dev/spidev0.0"},
-        {MotorIndex::FRONT_RIGHT, "/dev/spidev0.4"},
     };
     // clang-format on
 

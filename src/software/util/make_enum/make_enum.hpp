@@ -50,12 +50,12 @@
         return enum_size_##name;                                                           \
     }                                                                                      \
     template <>                                                                            \
-    constexpr auto reflective_enum::values<name>()                                         \
+    constexpr auto& reflective_enum::values<name>()                                         \
     {                                                                                      \
         return enum_values_##name;                                                         \
     }                                                                                      \
     template <>                                                                            \
-    constexpr auto reflective_enum::valueNames<name>()                                     \
+    constexpr auto& reflective_enum::valueNames<name>()                                     \
     {                                                                                      \
         return enum_value_names_##name;                                                    \
     }                                                                                      \
@@ -98,7 +98,7 @@ constexpr size_t size();
  * @return an array with the values of the enum
  */
 template <typename E>
-constexpr auto values();
+constexpr auto& values();
 
 /**
  * Returns an array contain the string representations of each value
@@ -107,7 +107,7 @@ constexpr auto values();
  * @return an array with the names of the values in the enum
  */
 template <typename E>
-constexpr auto valueNames();
+constexpr auto& valueNames();
 
 /**
  * Returns the string representation of the given enum value.

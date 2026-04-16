@@ -276,6 +276,6 @@ bool MotorService::anyMotorRequiresReset() const
 {
     return std::any_of(reflective_enum::values<MotorIndex>().begin(),
                        reflective_enum::values<MotorIndex>().end(),
-                       [this](const MotorIndex motor)
+                       [&](const MotorIndex motor)
                        { return motor_controller_->checkFaults(motor).requiresReset(); });
 }
