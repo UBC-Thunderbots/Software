@@ -3,7 +3,7 @@
 MotorFaultIndicator::MotorFaultIndicator() : drive_enabled(true) {}
 
 MotorFaultIndicator::MotorFaultIndicator(
-    bool drive_enabled, const std::unordered_set<TbotsProto::MotorFault>& motor_faults)
+    const bool drive_enabled, const std::unordered_set<TbotsProto::MotorFault>& motor_faults)
     : drive_enabled(drive_enabled), faults(motor_faults)
 {
 }

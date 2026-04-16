@@ -86,11 +86,11 @@ class MotorService
 
     double drive_motor_mps_per_rpm_;
 
-    std::chrono::time_point<std::chrono::system_clock> tracked_motor_fault_start_time_;
+    std::chrono::time_point<std::chrono::system_clock> tracked_motor_reset_start_time_;
     int num_tracked_motor_resets_;
 
-    static constexpr int MOTOR_FAULT_TIME_THRESHOLD_S                = 60;
-    static constexpr int MOTOR_FAULT_THRESHOLD_COUNT                 = 3;
+    static constexpr int MOTOR_RESET_TIME_THRESHOLD_S                = 60;
+    static constexpr int MOTOR_RESET_THRESHOLD_COUNT                 = 3;
     static constexpr double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
     static constexpr int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
 };

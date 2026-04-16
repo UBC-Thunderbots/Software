@@ -245,26 +245,26 @@ void MotorService::trackMotorReset()
 
     if (num_tracked_motor_resets_ == 0)
     {
-        tracked_motor_fault_start_time_ = now;
+        tracked_motor_reset_start_time_ = now;
         num_tracked_motor_resets_       = 1;
         return;
     }
 
     const auto elapsed_s = std::chrono::duration_cast<std::chrono::seconds>(
-                               now - tracked_motor_fault_start_time_)
+                               now - tracked_motor_reset_start_time_)
                                .count();
 
-    if (elapsed_s < MOTOR_FAULT_TIME_THRESHOLD_S)
+    if (elapsed_s < MOTOR_RESET_TIME_THRESHOLD_S)
     {
         num_tracked_motor_resets_++;
     }
     else
     {
-        tracked_motor_fault_start_time_ = now;
+        tracked_motor_reset_start_time_ = now;
         num_tracked_motor_resets_       = 1;
     }
 
-    if (num_tracked_motor_resets_ > MOTOR_FAULT_THRESHOLD_COUNT)
+    if (num_tracked_motor_resets_ > MOTOR_RESET_THRESHOLD_COUNT)
     {
         LOG(FATAL) << "Motors reset too frequently (" << num_tracked_motor_resets_
                    << " times in " << elapsed_s
