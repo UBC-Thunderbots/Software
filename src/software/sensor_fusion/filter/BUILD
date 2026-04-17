@@ -22,9 +22,9 @@ cc_library(
     ],
 )
 cc_library(
-    name = "ball_filter",
-    srcs = ["ball_filter.cpp"],
-    hdrs = ["ball_filter.h"],
+    name = "ball_tracker",
+    srcs = ["ball_tracker.cpp"],
+    hdrs = ["ball_tracker.h"],
     deps = [
         ":vision_detection",
 		":kalman_filter",
@@ -38,10 +38,10 @@ cc_library(
 )
 
 cc_test(
-    name = "ball_filter_test",
-    srcs = ["ball_filter_test.cpp"],
+    name = "ball_tracker_test",
+    srcs = ["ball_tracker_test.cpp"],
     deps = [
-        ":ball_filter",
+        ":ball_tracker",
         "//shared/test_util:tbots_gtest_main",
         "//software/world:field",
     ],
@@ -90,7 +90,7 @@ cc_test(
 cc_library(
     name = "sensor_fusion_filters",
     deps = [
-        ":ball_filter",
+        ":ball_tracker",
         ":robot_team_filter",
     ],
 )

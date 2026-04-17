@@ -3,23 +3,23 @@
 KalmanFilter::KalmanFilter(
 const Eigen::Matrix<double, 4,1>& X,
 const Eigen::Matrix<double, 4,4>& P_i,
-const Eigen::Matrix<double,4,4> & R,
-const Eigen::Matrix<double, 2,2>& Q,
+const Eigen::Matrix<double,4,4> & Q,
+const Eigen::Matrix<double, 2,2>& R,
 const Eigen::Matrix<double, 2,4>& C,
 double damping_term
-		): 
+		):
 X(X),
 P(P_i),
 P_i(P_i),
-R(R),
 Q(Q),
+R(R),
 C(C),
 damping_term(damping_term)
 {
 }
 
 void KalmanFilter::predict(const double delta_t){
-	
+
 	Eigen::Matrix<double, 4,4> A;
 
 	// Using the constant velocity model as motion model
@@ -30,12 +30,12 @@ void KalmanFilter::predict(const double delta_t){
 
 	X = A*X;
 
-	P = A*P*A.transpose() + R;
+	P = A*P*A.transpose() + Q;
 }
 
 void KalmanFilter::update(const Eigen::Matrix<double,2,1> Z){
 	Eigen::Matrix<double, 4,2> Kg;
-	Eigen::Matrix<double,2,2> S =C*P*C.transpose()+Q;
+	Eigen::Matrix<double,2,2> S =C*P*C.transpose()+R;
 	Kg = P*C.transpose() * S.inverse();
 	X = X + Kg*(Z-C*X);
 	P = (Eigen::Matrix<double,4,4>::Identity()-Kg*C)*P;
@@ -47,7 +47,7 @@ void KalmanFilter::reset(const Eigen::Matrix<double,2,1> Z){
 }
 
 double KalmanFilter::getMahalanobisDistance(const Eigen::Matrix<double,2,1>& Z) const {
-	Eigen::Matrix<double,2,2> S =C*P*C.transpose()+Q ;
+	Eigen::Matrix<double,2,2> S =C*P*C.transpose()+R ;
 	// Calculate the mahalanobis distance for gating
 	double M = ((Z - C*X).transpose() * S.inverse() * (Z-C*X))(0,0);
 	return M;
@@ -60,5 +60,4 @@ Eigen::Matrix<double, 4,1> KalmanFilter::getState(){
 Eigen::Matrix<double, 4,4> KalmanFilter::getCovariance(){
 	return P;
 }
-
 

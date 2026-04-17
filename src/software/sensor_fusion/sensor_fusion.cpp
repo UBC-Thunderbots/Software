@@ -12,7 +12,7 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       game_state(),
       referee_stage(std::nullopt),
       dribble_displacement(std::nullopt),
-      ball_filter(),
+      ball_tracker(),
       friendly_team_filter(),
       enemy_team_filter(),
       possession(TeamPossession::FRIENDLY_TEAM),
@@ -356,7 +356,7 @@ std::optional<Ball> SensorFusion::createBall(
     if (field)
     {
         std::optional<Ball> new_ball =
-            ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary(), current_time);
+            ball_tracker.estimateBallState(ball_detections, field.value().fieldBoundary(), current_time);
         return new_ball;
     }
     return std::nullopt;
@@ -514,7 +514,7 @@ void SensorFusion::resetWorldComponents()
     enemy_team           = Team();
     game_state           = GameState();
     referee_stage        = std::nullopt;
-    ball_filter          = BallFilter();
+    ball_tracker         = BallTracker();
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     possession           = TeamPossession::FRIENDLY_TEAM;

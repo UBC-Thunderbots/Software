@@ -1,4 +1,4 @@
-#include "software/sensor_fusion/filter/ball_filter.h"
+#include "software/sensor_fusion/filter/ball_tracker.h"
 
 #include <Eigen/Dense>
 #include <algorithm>
@@ -12,19 +12,19 @@
 
 namespace {
     const Eigen::Matrix<double,4,1> INITIAL_STATE = Eigen::Matrix<double,4,1>::Zero();
-    
+
     const Eigen::Matrix<double,4,4> INITIAL_COV = Eigen::Matrix<double,4,4>::Identity() * 1000.0;
-    
-	const Eigen::Matrix<double,4,4> R = (Eigen::Matrix<double,4,4>() <<
+
+	const Eigen::Matrix<double,4,4> Q = (Eigen::Matrix<double,4,4>() <<
 	    2.222e-8, 0,        2.000e-6, 0,
 	    0,        2.222e-8, 0,        2.000e-6,
 	    2.000e-6, 0,        2.400e-4, 0,
 	    0,        2.000e-6, 0,        2.400e-4).finished();
 
-    const Eigen::Matrix<double,2,2> Q = (Eigen::Matrix<double,2,2>() << 
+    const Eigen::Matrix<double,2,2> R = (Eigen::Matrix<double,2,2>() <<
         0.0226, 0,
         0, 0.00445).finished();
-    
+
     const Eigen::Matrix<double,2,4> C = (Eigen::Matrix<double,2,4>() <<
         1, 0, 0, 0,
         0, 1, 0, 0).finished();
@@ -37,16 +37,16 @@ namespace {
 
 }
 
-BallFilter::BallFilter() :
+BallTracker::BallTracker() :
 	consecutive_outliers(0),
-	kalman_filter(INITIAL_STATE, INITIAL_COV, R, Q, C, DAMPING)
+	kalman_filter(INITIAL_STATE, INITIAL_COV, Q, R, C, DAMPING)
 {
 }
 
-std::optional<Ball> BallFilter::estimateBallState(
+std::optional<Ball> BallTracker::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area, const Timestamp& current_time)
 {
-	std::optional<BallDetection> best_ball_detection = getBestBallDetection(new_ball_detections);	
+	std::optional<BallDetection> best_ball_detection = getBestBallDetection(new_ball_detections);
 
 	if (prev_detection_timestamp){
 		double delta_t;
@@ -77,12 +77,12 @@ std::optional<Ball> BallFilter::estimateBallState(
 	Point ball_position = Point(kalman_state(0), kalman_state(1));
 	Vector ball_velocity = Vector(kalman_state(2), kalman_state(3));
 	double z_height =  best_ball_detection ? best_ball_detection->distance_from_ground : 0.0;
-		
+
     BallState ball_state(ball_position, ball_velocity, z_height);
     return Ball(ball_state,current_time);
-	
+
 }
-std::optional<BallDetection> BallFilter::getBestBallDetection(const std::vector<BallDetection> &new_ball_detections){
+std::optional<BallDetection> BallTracker::getBestBallDetection(const std::vector<BallDetection> &new_ball_detections){
 	if (new_ball_detections.empty()){
 		return std::nullopt;
 	}
@@ -92,5 +92,3 @@ std::optional<BallDetection> BallFilter::getBestBallDetection(const std::vector<
 				});
 	}
 }
-
-

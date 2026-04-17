@@ -1,4 +1,4 @@
-#include "software/sensor_fusion/filter/ball_filter.h"
+#include "software/sensor_fusion/filter/ball_tracker.h"
 
 #include <gtest/gtest.h>
 
@@ -12,12 +12,12 @@
 #include "software/geom/segment.h"
 #include "software/world/field.h"
 
-class BallFilterTest : public ::testing::Test
+class BallTrackerTest : public ::testing::Test
 {
    protected:
-    BallFilterTest()
+    BallTrackerTest()
         : field(Field::createSSLDivisionBField()),
-          ball_filter(),
+          ball_tracker(),
           current_timestamp(Timestamp::fromSeconds(123)),
           time_step(Duration::fromSeconds(1.0 / 60.0))
     {
@@ -201,7 +201,7 @@ class BallFilterTest : public ::testing::Test
 
             // Get the filtered result given the new detection information
             auto filtered_ball =
-                ball_filter.estimateBallState(ball_detections, field.fieldBoundary());
+                ball_tracker.estimateBallState(ball_detections, field.fieldBoundary());
             if (i < num_steps_to_ignore)
             {
                 continue;
@@ -237,7 +237,7 @@ class BallFilterTest : public ::testing::Test
     }
 
     Field field;
-    BallFilter ball_filter;
+    BallTracker ball_tracker;
     Timestamp current_timestamp;
     Duration time_step;
     std::mt19937 random_generator;
@@ -246,7 +246,7 @@ class BallFilterTest : public ::testing::Test
     static constexpr double BALL_DISTANCE_FROM_GROUND = 0.0;
 };
 
-TEST_F(BallFilterTest, ball_sitting_still_with_low_noise)
+TEST_F(BallTrackerTest, ball_sitting_still_with_low_noise)
 {
     Ray ball_trajectory                = Ray(Point(0, 0), Vector(0, 0));
     double ball_velocity_magnitude     = 0;
@@ -269,7 +269,7 @@ TEST_F(BallFilterTest, ball_sitting_still_with_low_noise)
         num_simulation_steps, num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_sitting_still_with_moderate_noise)
+TEST_F(BallTrackerTest, ball_sitting_still_with_moderate_noise)
 {
     Ray ball_trajectory                = Ray(Point(0, 0), Vector(0, 0));
     double ball_velocity_magnitude     = 0;
@@ -292,7 +292,7 @@ TEST_F(BallFilterTest, ball_sitting_still_with_moderate_noise)
         num_simulation_steps, num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_no_noise_in_data)
+TEST_F(BallTrackerTest, ball_moving_slow_in_a_straight_line_with_no_noise_in_data)
 {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
     double ball_velocity_magnitude               = 0.31;
@@ -311,7 +311,7 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_no_noise_in_data
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_data)
+TEST_F(BallTrackerTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_data)
 {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
     double ball_velocity_magnitude               = 0.3;
@@ -330,7 +330,7 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_d
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_medium_noise_in_data)
+TEST_F(BallTrackerTest, ball_moving_slow_in_a_straight_line_with_medium_noise_in_data)
 {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
     double ball_velocity_magnitude               = 0.3;
@@ -349,7 +349,7 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_medium_noise_in_
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data)
+TEST_F(BallTrackerTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data)
 {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
     double ball_velocity_magnitude               = 6.2;
@@ -368,7 +368,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_data)
+TEST_F(BallTrackerTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_data)
 {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
     double ball_velocity_magnitude               = 5.72;
@@ -387,7 +387,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_d
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_data)
+TEST_F(BallTrackerTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_data)
 {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
     double ball_velocity_magnitude               = 5.04;
@@ -406,7 +406,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest,
+TEST_F(BallTrackerTest,
        ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data)
 {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
@@ -440,7 +440,7 @@ TEST_F(BallFilterTest,
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest,
+TEST_F(BallTrackerTest,
        ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data_2)
 {
     Segment ball_path =
@@ -475,7 +475,7 @@ TEST_F(BallFilterTest,
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest,
+TEST_F(BallTrackerTest,
        ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data_3)
 {
     Segment ball_path                            = Segment(Point(-3, -1), Point(0, 0));
@@ -509,7 +509,7 @@ TEST_F(BallFilterTest,
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_moving_along_x_axis)
+TEST_F(BallTrackerTest, ball_moving_along_x_axis)
 {
     Segment ball_path = Segment(field.friendlyGoalCenter(), field.enemyGoalCenter());
     double ball_velocity_magnitude               = 5;
@@ -528,7 +528,7 @@ TEST_F(BallFilterTest, ball_moving_along_x_axis)
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_moving_along_y_axis)
+TEST_F(BallTrackerTest, ball_moving_along_y_axis)
 {
     Segment ball_path                            = field.halfwayLine();
     double ball_velocity_magnitude               = 5;
@@ -547,7 +547,7 @@ TEST_F(BallFilterTest, ball_moving_along_y_axis)
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest, ball_moving_fast_with_vision_delay)
+TEST_F(BallTrackerTest, ball_moving_fast_with_vision_delay)
 {
     // Setup a fast moving ball (e.g., 5.0 m/s)
     Vector ball_velocity(5.0, 0.0);
@@ -565,7 +565,7 @@ TEST_F(BallFilterTest, ball_moving_fast_with_vision_delay)
         
         // The crucial change: we ask the filter for the state at t_capture + vision_delay
         Timestamp t_now = t_capture + vision_delay; 
-        auto filtered_ball = ball_filter.estimateBallState(det, field.fieldBoundary(), t_now);
+        auto filtered_ball = ball_tracker.estimateBallState(det, field.fieldBoundary(), t_now);
     
     
 		// THE ASSERTION:
