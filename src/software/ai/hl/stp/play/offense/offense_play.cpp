@@ -9,7 +9,7 @@ OffensePlay::OffensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_p
 {
 }
 
-void OffensePlay::updateTactics(const PlayUpdate &play_update)
+void OffensePlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(OffensePlayFSM::Update(control_params, play_update));
 }

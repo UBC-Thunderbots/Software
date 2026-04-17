@@ -10,8 +10,8 @@
 #include "software/world/team.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPairs(
-    const std::vector<Robot> &possible_passers,
-    const std::vector<Robot> &possible_receivers, const std::vector<Robot> &all_robots)
+    const std::vector<Robot>& possible_passers,
+    const std::vector<Robot>& possible_receivers, const std::vector<Robot>& all_robots)
 {
     // Store a map of robots that can receive the ball, and the list of all robots
     // that could pass to them. The custom comparator is necessary to use the Robot
@@ -19,9 +19,9 @@ std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPa
     std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> receiver_passer_pairs;
 
     // For each of the passers, check which robots they could pass to
-    for (const auto &passer : possible_passers)
+    for (const auto& passer : possible_passers)
     {
-        for (const auto &receiver : possible_receivers)
+        for (const auto& receiver : possible_receivers)
         {
             // Create a vector of obstacles that includes all robots except the
             // current passer and receiver
@@ -35,7 +35,7 @@ std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPa
             // robots
             bool pass_blocked =
                 std::any_of(obstacles.begin(), obstacles.end(),
-                            [passer, receiver](const Robot &obstacle)
+                            [passer, receiver](const Robot& obstacle)
                             {
                                 return intersects(
                                     Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
@@ -66,8 +66,8 @@ std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPa
 }
 
 std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
-    const Robot &initial_passer, const Robot &final_receiver, const Team &passing_team,
-    const Team &other_team)
+    const Robot& initial_passer, const Robot& final_receiver, const Team& passing_team,
+    const Team& other_team)
 {
     if (initial_passer == final_receiver)
     {
@@ -161,11 +161,11 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
     return std::nullopt;
 }
 
-void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats)
+void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats)
 {
     // A lambda function that implements the '<' operator for the EnemyThreat struct
     // so it can be sorted. Lower threats are "less than" higher threats.
-    auto enemyThreatLessThanComparator = [](const EnemyThreat &a, const EnemyThreat &b)
+    auto enemyThreatLessThanComparator = [](const EnemyThreat& a, const EnemyThreat& b)
     {
         // Robots with the ball are more threatening than robots without the ball, and
         // robots with the ball are the most threatening since they can shoot or move
@@ -220,8 +220,8 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats)
     std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
 }
 
-std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &friendly_team,
-                                            Team enemy_team, const Ball &ball,
+std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& friendly_team,
+                                            Team enemy_team, const Ball& ball,
                                             bool include_goalie)
 {
     if (!include_goalie && enemy_team.getGoalieId())
@@ -231,7 +231,7 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
 
     std::vector<EnemyThreat> threats;
 
-    for (const auto &robot : enemy_team.getAllRobots())
+    for (const auto& robot : enemy_team.getAllRobots())
     {
         bool has_ball = robot.isNearDribbler(ball.position());
 

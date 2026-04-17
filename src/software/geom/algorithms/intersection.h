@@ -26,8 +26,8 @@
  *
  * @return the point of intersection, if it exists
  */
-std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
-                                  const Point &d, double fixed_epsilon = FIXED_EPSILON,
+std::optional<Point> intersection(const Point& a, const Point& b, const Point& c,
+                                  const Point& d, double fixed_epsilon = FIXED_EPSILON,
                                   int ulps_epsilon = ULPS_EPSILON_TEN);
 
 /**
@@ -42,7 +42,7 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
  *          - a vector containing two points representing the line segment of the overlap
  * if both segments are collinear and overlapping
  */
-std::vector<Point> intersection(const Segment &first, const Segment &second);
+std::vector<Point> intersection(const Segment& first, const Segment& second);
 
 /**
  * Computes the points of intersection between a polygon and a line segment.
@@ -53,7 +53,7 @@ std::vector<Point> intersection(const Segment &first, const Segment &second);
  * @return a set containing the points of intersection between a polygon and a
  * segment
  */
-std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment);
+std::unordered_set<Point> intersection(const Polygon& polygon, const Segment& segment);
 
 /**
  * Computes the points of intersection between a ray and a line segment.
@@ -67,7 +67,7 @@ std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &se
  *          - a vector containing two points representing the line segment of the overlap
  * if the ray and segment are collinear and overlapping
  */
-std::vector<Point> intersection(const Ray &ray, const Segment &segment);
+std::vector<Point> intersection(const Ray& ray, const Segment& segment);
 
 /**
  * Computes the point of intersection between two lines.
@@ -79,7 +79,7 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment);
  *
  * @return the point of intersection between the two lines, if it exists
  */
-std::optional<Point> intersection(const Line &first, const Line &second);
+std::optional<Point> intersection(const Line& first, const Line& second);
 
 /**
  * Computes the points of intersection between a polygon and a ray.
@@ -89,7 +89,7 @@ std::optional<Point> intersection(const Line &first, const Line &second);
  *
  * @return a set containing the points of intersection between a polygon and a ray
  */
-std::unordered_set<Point> intersection(const Polygon &polygon, const Ray &ray);
+std::unordered_set<Point> intersection(const Polygon& polygon, const Ray& ray);
 
 /**
  * Computes the point of intersection between two rays.
@@ -100,4 +100,4 @@ std::unordered_set<Point> intersection(const Polygon &polygon, const Ray &ray);
  *
  * @return the point of intersection, if it exists
  */
-std::optional<Point> intersection(const Ray &first, const Ray &second);
+std::optional<Point> intersection(const Ray& first, const Ray& second);
