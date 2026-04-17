@@ -252,7 +252,6 @@ def start_interactive_cli():
                 "Launch mode?", choices=["Simulator", "Diagnostics"]
             ).ask()
             if launch == "Simulator":
-                config.enable_thunderscope = True
                 selected = questionary.checkbox(
                     "Options:",
                     choices=[
