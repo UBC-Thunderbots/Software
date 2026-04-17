@@ -269,7 +269,7 @@ def start_interactive_cli():
                         time = questionary.text(
                             "Enter record stats duration (minutes):"
                         ).ask()
-                        extra_args.extend(f"--{time}")
+                        extra_args.extend(time)
             else:
                 iface = questionary.text("Network interface?").ask()
                 extra_args.extend(["--run_diagnostics", "--interface", iface])
