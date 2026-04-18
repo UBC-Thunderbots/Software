@@ -1,11 +1,13 @@
 #!/bin/bash
 
+USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+
 # Configuration
-AUTH_KEYS="$HOME/.ssh/authorized_keys"
+AUTH_KEYS="$USER_HOME/.ssh/authorized_keys"
 SERVER_SCRIPT="./mezzsh_server.sh"
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: sudo ./register_user.sh \"PUBLIC_KEY_STRING\""
+if [ "$#" -ne 1 ]; then
+    echo "Usage: sudo ./mezzsh_keystore.sh \"PUBLIC_KEY_STRING\""
     exit 1
 fi
 
