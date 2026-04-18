@@ -301,11 +301,13 @@ void StSpinMotorController::populateTx(const OutgoingFrame& outgoing_frame,
                 tx[3] = static_cast<uint8_t>(0xFF & (frame.ki >> 8));
                 tx[4] = static_cast<uint8_t>(0xFF & frame.ki);
             }
-            else if constexpr (std::is_same_v<T, SetPidSpeedKdFrame>)
+            else if constexpr (std::is_same_v<T, SetSpeedFeedForwardKaKvFrame>)
             {
-                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_PID_SPEED_KD);
-                tx[1] = static_cast<uint8_t>(0xFF & (frame.kd >> 8));
-                tx[2] = static_cast<uint8_t>(0xFF & frame.kd);
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_SPEED_FEED_FORWARD_KA_KV);
+                tx[1] = static_cast<uint8_t>(0xFF & (frame.ka >> 8));
+                tx[2] = static_cast<uint8_t>(0xFF & frame.ka);
+                tx[3] = static_cast<uint8_t>(0xFF & (frame.kv >> 8));
+                tx[4] = static_cast<uint8_t>(0xFF & frame.kv);
             }
         },
         outgoing_frame);

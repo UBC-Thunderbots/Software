@@ -25,7 +25,7 @@ class StSpinMotorController : public MotorController
     using OutgoingFrame =
         std::variant<NoOpFrame, SetResponseTypeFrame, SetTargetSpeedFrame,
                      SetTargetTorqueFrame, SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame,
-                     SetPidSpeedKpKiFrame, SetPidSpeedKdFrame>;
+                     SetPidSpeedKpKiFrame, SetSpeedFeedForwardKaKvFrame>;
 
     // Length of frame (in number of bytes)
     static constexpr unsigned int FRAME_LEN = 6;

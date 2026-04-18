@@ -4,14 +4,14 @@
 
 enum class StSpinOpcode
 {
-    NO_OP                = 0x00,
-    SET_TARGET_SPEED     = 0x01,
-    SET_TARGET_TORQUE    = 0x02,
-    SET_RESPONSE_TYPE    = 0x03,
-    SET_PID_TORQUE_KP_KI = 0x04,
-    SET_PID_FLUX_KP_KI   = 0x05,
-    SET_PID_SPEED_KP_KI  = 0x06,
-    SET_PID_SPEED_KD     = 0x07,
+    NO_OP                        = 0x00,
+    SET_TARGET_SPEED             = 0x01,
+    SET_TARGET_TORQUE            = 0x02,
+    SET_RESPONSE_TYPE            = 0x03,
+    SET_PID_TORQUE_KP_KI         = 0x04,
+    SET_PID_FLUX_KP_KI           = 0x05,
+    SET_PID_SPEED_KP_KI          = 0x06,
+    SET_SPEED_FEED_FORWARD_KA_KV = 0x07,
 };
 
 enum class StSpinResponseType
@@ -80,7 +80,8 @@ struct SetPidSpeedKpKiFrame
     int16_t ki;
 };
 
-struct SetPidSpeedKdFrame
+struct SetSpeedFeedForwardKaKvFrame
 {
-    int16_t kd;
+    int16_t ka;
+    int16_t kv;
 };

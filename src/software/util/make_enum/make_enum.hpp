@@ -50,12 +50,12 @@
         return enum_size_##name;                                                           \
     }                                                                                      \
     template <>                                                                            \
-    constexpr auto& reflective_enum::values<name>()                                         \
+    constexpr auto& reflective_enum::values<name>()                                        \
     {                                                                                      \
         return enum_values_##name;                                                         \
     }                                                                                      \
     template <>                                                                            \
-    constexpr auto& reflective_enum::valueNames<name>()                                     \
+    constexpr auto& reflective_enum::valueNames<name>()                                    \
     {                                                                                      \
         return enum_value_names_##name;                                                    \
     }                                                                                      \
