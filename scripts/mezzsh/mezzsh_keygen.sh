@@ -6,6 +6,8 @@ ALIAS="mezzsh"
 GREEN='\e[1;32m'
 NC='\e[0m'
 
+USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+
 # Check for root privileges
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root (use sudo)"
@@ -25,13 +27,13 @@ fi
 read -p "Enter a username for yourself. Please make it somewhat recognizable, preferably just your first name: " USERNAME
 
 KEY_NAME="id_rsa_$ALIAS"
-KEY_PATH="$HOME/.ssh/$KEY_NAME"
+KEY_PATH="$USER_HOME/.ssh/$KEY_NAME"
 
 echo -e "\n--- Generating SSH Key Pair ---"
 ssh-keygen -t rsa -b 4096 -f "$KEY_PATH" -C "$USERNAME" -N ""
 
 echo -e "\n--- Configuring SSH Alias ---"
-cat <<EOF >> "$HOME/.ssh/config"
+cat <<EOF >> "$USER_HOME/.ssh/config"
 
 Host $ALIAS
     HostName $PC_NAME
