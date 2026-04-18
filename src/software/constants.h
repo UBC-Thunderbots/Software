@@ -53,7 +53,7 @@ const std::string ROBOT_KICK_EXP_COEFF_CONFIG_KEY    = "kick_coeff";
 const std::string ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY  = "chip_pulse_width";
 
 const std::string SSL_VISION_ADDRESS          = "224.5.23.2";
-static constexpr unsigned int SSL_VISION_PORT = 10020;
+static constexpr unsigned int SSL_VISION_PORT = 10006;
 
 const std::string SSL_REFEREE_ADDRESS          = "224.5.23.1";
 static constexpr unsigned int SSL_REFEREE_PORT = 10003;

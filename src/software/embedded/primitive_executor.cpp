@@ -11,7 +11,7 @@
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
-                                     const RobotConstants_t& robot_constants,
+                                     const RobotConstants& robot_constants,
                                      const TeamColour friendly_team_colour,
                                      const RobotId robot_id)
     : current_primitive_(),

@@ -21,9 +21,7 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
     {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
 // PlotJuggler's default host and port
-// Should be updated to your local machine's IP address if
-// you want to plot from the robot
-static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "ff02::c3d0:42d2:aaaa";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
 // ProtoLogger constants for replay files
