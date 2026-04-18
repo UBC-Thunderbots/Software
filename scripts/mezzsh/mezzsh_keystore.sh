@@ -15,7 +15,7 @@ echo "--- Registering New Remote User ---"
 
 # Add to authorized_keys with a command restriction
 # We prepend the SERVER_SCRIPT command to the key
-ENTRY="command=\"$SERVER_SCRIPT\",environment=\"SSH_CHECK_MODE=1\" $PUB_KEY"
+ENTRY="command=\"$SERVER_SCRIPT\",environment=\"SSH_CHECK_MODE=1 FORCE_CONNECT=1\" $PUB_KEY"
 
 if grep -q "$PUB_KEY" "$AUTH_KEYS"; then
     echo "Error: This public key is already registered."

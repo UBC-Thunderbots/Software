@@ -33,13 +33,13 @@ cp $SSHD_CONFIG "${SSHD_CONFIG}.bak"
 
 # This step uses a match block to modify these ssh settings for only 1 user
 # Clean up any previous global ForceCommand we might have added
-sed -i '/Match User $TARGET_USER/,/AcceptEnv USERNAME SSH_CHECK_MODE FORCE_CONNECT/d' $SSHD_CONFIG
+sed -i '/Match User $TARGET_USER/,/AcceptEnv SSH_CHECK_MODE FORCE_CONNECT/d' $SSHD_CONFIG
 
 # Append the Match block to the end of the file
 cat <<EOF >> $SSHD_CONFIG
 Match User $TARGET_USER
     ForceCommand $SERVER_SCRIPT
-    AcceptEnv USERNAME SSH_CHECK_MODE FORCE_CONNECT
+    AcceptEnv SSH_CHECK_MODE FORCE_CONNECT
 EOF
 
 echo "[4/5] Setting 1-hour shell timeout..."

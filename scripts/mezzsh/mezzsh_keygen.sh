@@ -41,7 +41,8 @@ Host $ALIAS
     SendEnv SSH_CHECK_MODE FORCE_CONNECT
 EOF
 
-echo -e "\n--- Adding SSH Key to Mezz PC ---"
-ssh-copy-id -i $KEY_PATH $PC_NAME@$TARGET_IP
+echo -e "\n--- PUBLIC KEY ---"
+cat "${KEY_PATH}.pub"
+echo "--------------------------------------------"
 
-echo "Setup Done! Connect to the Mezz PC using the mezzsh_connect.sh script!"
+echo -e "{GREEN}Success!{NC} Please provide the whole public key above (at "$KEY_PATH.pub") to a software lead to finish setup\n"
