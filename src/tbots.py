@@ -25,6 +25,7 @@ from cli.cli_params import (
     NoOptimizedBuildOption,
     PrintCommandOption,
     RobotName,
+    RunsOption,
     SelectDebugBinariesOption,
     SSHPasswordOption,
     StopAIOnStartOption,
@@ -52,6 +53,7 @@ class BuildConfig:
     enable_visualizer: bool = False
     stop_ai_on_start: bool = False
     jobs_option: str | None = None
+    runs: int | None = None
     robot_name: str | None = None
     ansible_playbook: str | None = None
 
@@ -88,6 +90,7 @@ def main(
     enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
     jobs_option: JobsOption = None,
+    runs: RunsOption = None,
     robot_name: RobotName = None,
     ansible_playbook: AnsiblePlaybook = None,
 ) -> None:
@@ -110,6 +113,7 @@ def main(
         enable_visualizer=enable_visualizer,
         stop_ai_on_start=stop_ai_on_start,
         jobs_option=jobs_option,
+        runs=runs,
         robot_name=robot_name,
         ansible_playbook=ansible_playbook,
     )
@@ -162,6 +166,9 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
 
     if config.jobs_option:
         command += [f"--jobs={config.jobs_option}"]
+
+    if config.runs:
+        command += [f"--runs_per_test={config.runs}"]
 
     # Handle binary debugging flags
     if config.select_debug_binaries:
@@ -282,6 +289,11 @@ def start_interactive_cli():
                 config.test_suite = True
             else:
                 config.search_query = test_name
+                runs_str = questionary.text(
+                    "Number of times to run each test (leave empty for 1):"
+                ).ask()
+                if runs_str and runs_str.isdigit() and int(runs_str) > 1:
+                    config.runs = int(runs_str)
 
         case "Flash":
             config.action = ActionArgument.run
