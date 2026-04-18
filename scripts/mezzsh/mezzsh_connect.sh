@@ -7,16 +7,7 @@
 
 TAILSCALE_HOSTNAME="thunderbots"
 
-# 1. Check if tailscale is installed
-if ! command -v tailscale &> /dev/null; then
-    echo "Tailscale not found. Installing..."
-    curl -fsSL https://tailscale.com/install.sh | sh
-fi
-
-read -p "Enter the auth key. Please contact a software lead if you don't have one: " AUTH_KEY
-
-echo "Starting Tailscale..."
-sudo tailscale up --auth-key=$AUTH_KEY
+bash ./utils/check_tailscale.sh
 
 # 2. Get the Tailscale IP of the Main PC
 TARGET_IP=$(tailscale ip -4 $TAILSCALE_HOSTNAME)

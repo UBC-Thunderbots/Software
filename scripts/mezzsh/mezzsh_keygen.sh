@@ -1,6 +1,7 @@
 #!/bin/bash
 
-PC_ALIAS="mezzsh"
+PC_NAME="thunderbots"
+ALIAS="mezzsh"
 
 GREEN='\e[1;32m'
 NC='\e[0m'
@@ -11,10 +12,19 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-read -p "Enter the PC's IP address: " PC_IP
+bash ./utils/check_tailscale.sh
+
+# Get the Tailscale IP of the Main PC
+TARGET_IP=$(tailscale ip -4 $TAILSCALE_HOSTNAME)
+
+if [ -z "$TARGET_IP" ]; then
+    echo "Could not find Main PC on Tailscale. Are you logged in?"
+    exit 1
+fi
+
 read -p "Enter a username for yourself. Please make it somewhat recognizable, preferably just your first name: " USERNAME
 
-KEY_NAME="id_rsa_$PC_ALIAS"
+KEY_NAME="id_rsa_$ALIAS"
 KEY_PATH="$HOME/.ssh/$KEY_NAME"
 
 echo -e "\n--- Generating SSH Key Pair ---"
@@ -23,19 +33,15 @@ ssh-keygen -t rsa -b 4096 -f "$KEY_PATH" -C "$USERNAME" -N ""
 echo -e "\n--- Configuring SSH Alias ---"
 cat <<EOF >> "$HOME/.ssh/config"
 
-Host $PC_ALIAS
-    HostName $PC_IP
-    User $USERNAME
+Host $ALIAS
+    HostName $PC_NAME
+    User $PC_NAME
     IdentityFile $KEY_PATH
-    SetEnv USERNAME=$USERNAME
-    SendEnv USERNAME SSH_CHECK_MODE FORCE_CONNECT
+    IdentitiesOnly yes
+    SendEnv SSH_CHECK_MODE FORCE_CONNECT
 EOF
 
-echo "Adding $PC_IP $PC_ALIAS to /etc/hosts..."
-echo "$PC_IP $PC_ALIAS" | sudo tee -a /etc/hosts
+echo -e "\n--- Adding SSH Key to Mezz PC ---"
+ssh-copy-id -i $KEY_PATH $PC_NAME@$TARGET_IP
 
-echo -e "\n--- PUBLIC KEY ---"
-cat "${KEY_PATH}.pub"
-echo "--------------------------------------------"
-
-echo -e "{GREEN}Success!{NC} Please provide the whole public key above (at "$KEY_PATH.pub") to a software lead to finish setup\n"
+echo "Setup Done! Connect to the Mezz PC using the mezzsh_connect.sh script!"
