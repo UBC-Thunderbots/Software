@@ -91,7 +91,12 @@ EnableVisualizerOption = Annotated[bool, Option("-v", "--enable_visualizer")]
 StopAIOnStartOption = Annotated[bool, Option("-s", "--stop_ai_on_start")]
 
 JobsOption = Annotated[str, Option("-j", "--jobs")]
-RunsOption = Annotated[int, Option("-r", "--runs", help="Number of times to run each test (bazel --runs_per_test)")]
+RunsOption = Annotated[
+    int,
+    Option(
+        "-r", "--runs", help="Number of times to run each test (bazel --runs_per_test)"
+    ),
+]
 RobotName = Annotated[
     str, Option("-rn", "--robot_name", help="Name of robot. E.g. balle")
 ]
