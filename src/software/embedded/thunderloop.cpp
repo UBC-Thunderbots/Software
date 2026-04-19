@@ -130,7 +130,6 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
 
     imu_service_ = std::make_unique<ImuService>();
-
     LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
