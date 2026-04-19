@@ -2,7 +2,12 @@
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
-void MoveFSM::updateMove(const Update &event)
+MoveFSM::MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<MoveFSM>(ai_config_ptr)
+{
+}
+
+void MoveFSM::updateMove(const Update& event)
 {
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, event.control_params.destination,
@@ -13,7 +18,7 @@ void MoveFSM::updateMove(const Update &event)
         event.control_params.auto_chip_or_kick));
 }
 
-bool MoveFSM::moveDone(const Update &event)
+bool MoveFSM::moveDone(const Update& event)
 {
     return robotReachedDestination(event.common.robot, event.control_params.destination,
                                    event.control_params.final_orientation);

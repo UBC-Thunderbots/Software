@@ -2,11 +2,11 @@
 
 #include <gtest/gtest.h>
 
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
-#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -35,8 +35,8 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
     });
     setEnemyGoalie(0);
 
-    std::unique_ptr<CreaseDefensePlay> play =
-        std::make_unique<CreaseDefensePlay>(getAiConfig());
+    std::unique_ptr<CreaseDefensePlay> play = std::make_unique<CreaseDefensePlay>(
+        std::make_shared<TbotsProto::AiConfig>(getAiConfig()));
     play->updateControlParams(Point(1, 3));
 
     setAiPlay(std::move(play));

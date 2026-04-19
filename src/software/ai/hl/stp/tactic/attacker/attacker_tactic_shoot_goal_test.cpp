@@ -5,11 +5,11 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
-#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -40,7 +40,8 @@ TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
 
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({initial_robot_point});
-    auto tactic = std::make_shared<AttackerTactic>(ai_config);
+    auto tactic = std::make_shared<AttackerTactic>(
+        std::make_shared<TbotsProto::AiConfig>(ai_config));
     // Make it very obvious when we decide to chip
     tactic->updateControlParams(Point(0, field.fieldLines().yMin()));
     setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});

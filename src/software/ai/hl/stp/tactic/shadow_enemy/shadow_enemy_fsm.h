@@ -3,17 +3,18 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
-struct ShadowEnemyFSM
+/**
+ * Finite State Machine Class for Shadow Enemy
+ */
+struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
 {
    public:
-    class BlockPassState;
-    class GoAndStealState;
-    class StealAndPullState;
+    using Update = TacticFSM<ShadowEnemyFSM>::Update;
 
     // this struct defines the unique control parameters that the ShadowEnemyFSM requires
     // in its update
@@ -28,7 +29,16 @@ struct ShadowEnemyFSM
         double shadow_distance;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    class BlockPassState;
+    class GoAndStealState;
+    class StealAndPullState;
+
+    /**
+     * Constructor for ShadowEnemyFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Calculates the point to block the pass to the robot we are shadowing
@@ -38,8 +48,8 @@ struct ShadowEnemyFSM
      * @param shadow_distance The distance our friendly robot will position itself away
      * from the shadowee
      */
-    static Point findBlockPassPoint(const Point &ball_position, const Robot &shadowee,
-                                    const double &shadow_distance);
+    static Point findBlockPassPoint(const Point& ball_position, const Robot& shadowee,
+                                    const double& shadow_distance);
 
     /**
      * Calculates the point to block the shot from the robot we are shadowing
@@ -52,9 +62,9 @@ struct ShadowEnemyFSM
      * @param shadow_distance The distance our friendly robot will position itself away
      * from the shadowee
      */
-    static Point findBlockShotPoint(const Robot &robot, const Field &field,
-                                    const Team &friendlyTeam, const Team &enemyTeam,
-                                    const Robot &shadowee, const double &shadow_distance);
+    static Point findBlockShotPoint(const Robot& robot, const Field& field,
+                                    const Team& friendlyTeam, const Team& enemyTeam,
+                                    const Robot& shadowee, const double& shadow_distance);
 
     /**
      * Guard that checks if the enemy threat has ball
@@ -63,7 +73,7 @@ struct ShadowEnemyFSM
      *
      * @return if the ball has been have_possession
      */
-    bool enemyThreatHasBall(const Update &event);
+    bool enemyThreatHasBall(const Update& event);
 
     /**
      * Guard that checks if we may have contested the ball
@@ -72,7 +82,7 @@ struct ShadowEnemyFSM
      *
      * @return if we are within dribbling range of ball
      */
-    bool contestedBall(const Update &event);
+    bool contestedBall(const Update& event);
 
     /**
      * Guard that checks if we have essentially blocked the shot
@@ -81,7 +91,7 @@ struct ShadowEnemyFSM
      *
      * @return if we are blocking a shot
      */
-    bool blockedShot(const Update &event);
+    bool blockedShot(const Update& event);
 
     /**
      * Action to block the pass to our shadowee
@@ -89,7 +99,7 @@ struct ShadowEnemyFSM
      *
      * @param event ShadowEnemyFSM::Update
      */
-    void blockPass(const Update &event);
+    void blockPass(const Update& event);
 
     /**
      * Action to block the shot from our shadowee
@@ -97,7 +107,7 @@ struct ShadowEnemyFSM
      *
      * @param event ShadowEnemyFSM::Update
      */
-    void blockShot(const Update &event,
+    void blockShot(const Update& event,
                    boost::sml::back::process<MoveFSM::Update> processEvent);
 
     /**
@@ -107,7 +117,7 @@ struct ShadowEnemyFSM
      *
      * @param event ShadowEnemyFSM::Update
      */
-    void goAndSteal(const Update &event);
+    void goAndSteal(const Update& event);
 
     /**
      * Action to pull the ball
@@ -116,7 +126,7 @@ struct ShadowEnemyFSM
      *
      * @param event ShadowEnemyFSM::Update
      */
-    void stealAndPull(const Update &event);
+    void stealAndPull(const Update& event);
 
     auto operator()()
     {

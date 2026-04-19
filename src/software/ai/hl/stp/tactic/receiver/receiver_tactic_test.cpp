@@ -6,12 +6,12 @@
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
-#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -36,7 +36,8 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>(TbotsProto::ReceiverTacticConfig());
+    auto tactic =
+        std::make_shared<ReceiverTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(pass);
     setTactic(1, tactic);
 
@@ -127,7 +128,8 @@ TEST_P(ReceiverTacticTestOneTouch, test_one_touch)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>(TbotsProto::ReceiverTacticConfig());
+    auto tactic =
+        std::make_shared<ReceiverTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(pass);
     setTactic(1, tactic);
 

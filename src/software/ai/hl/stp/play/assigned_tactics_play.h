@@ -9,11 +9,14 @@
 class AssignedTacticsPlay : public Play
 {
    public:
-    AssignedTacticsPlay(TbotsProto::AiConfig config);
+    /**
+     * Constructor for AssignedTacticsPlay
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    AssignedTacticsPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
-    void getNextTactics(TacticCoroutine::push_type &yield,
-                        const WorldPtr &world_ptr) override;
-    void updateTactics(const PlayUpdate &play_update) override;
+    void updateTactics(const PlayUpdate& play_update) override;
 
     /**
      * Update assigned tactics for this play
@@ -28,8 +31,8 @@ class AssignedTacticsPlay : public Play
             std::map<RobotId, std::set<TbotsProto::MotionConstraint>>());
 
     std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const WorldPtr &world_ptr, const InterPlayCommunication &,
-        const SetInterPlayCommunicationCallback &) override;
+        const WorldPtr& world_ptr, const InterPlayCommunication&,
+        const SetInterPlayCommunicationCallback&) override;
 
    private:
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics;

@@ -102,6 +102,18 @@ cc_library(
         ":trajectory_path",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/trajectory:collision_evaluator",
+        "//software/ai/navigator/trajectory:trajectory_path_with_cost",
+    ],
+)
+
+cc_library(
+    name = "collision_evaluator",
+    srcs = ["collision_evaluator.cpp"],
+    hdrs = ["collision_evaluator.h"],
+    deps = [
+        ":trajectory_path",
+        "//software/ai/navigator/obstacle",
         "//software/ai/navigator/trajectory:trajectory_path_with_cost",
     ],
 )
@@ -145,7 +157,7 @@ py_test(
     deps = [
         "//proto/message_translation:py_tbots_protobuf",
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/validation:validations",
         requirement("pytest"),
     ],
 )

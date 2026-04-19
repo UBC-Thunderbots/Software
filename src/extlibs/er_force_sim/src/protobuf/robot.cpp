@@ -20,7 +20,7 @@
 
 #include "robot.h"
 
-void robotSetDefault(robot::Specs *specs)
+void robotSetDefault(robot::Specs* specs)
 {
     specs->set_radius(0.09f);
     specs->set_height(0.15f);
@@ -38,7 +38,7 @@ void robotSetDefault(robot::Specs *specs)
     specs->set_ir_param(40);
     specs->set_shoot_radius(0.067f);
     specs->set_dribbler_height(0.04f);
-    robot::LimitParameters *acceleration = specs->mutable_acceleration();
+    robot::LimitParameters* acceleration = specs->mutable_acceleration();
     acceleration->set_a_speedup_f_max(7);
     acceleration->set_a_speedup_s_max(6);
     acceleration->set_a_speedup_phi_max(60);
@@ -46,7 +46,7 @@ void robotSetDefault(robot::Specs *specs)
     acceleration->set_a_brake_s_max(6);
     acceleration->set_a_brake_phi_max(60);
 
-    robot::LimitParameters *strategy = specs->mutable_strategy();
+    robot::LimitParameters* strategy = specs->mutable_strategy();
     strategy->set_a_speedup_f_max(4);
     strategy->set_a_speedup_s_max(3);
     strategy->set_a_speedup_phi_max(45);

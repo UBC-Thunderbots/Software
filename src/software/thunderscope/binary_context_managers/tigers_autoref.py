@@ -6,12 +6,12 @@ from software.networking.ssl_proto_communication import (
     SslSocketProtoParseException,
     SslSocket,
 )
-from software.py_constants import NANOSECONDS_PER_MILLISECOND, SECONDS_PER_NANOSECOND
 import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.time_provider import TimeProvider
+from software.thunderscope.time_provider import time_provider_instance
 from subprocess import Popen
 
 import queue
@@ -19,10 +19,9 @@ import logging
 import os
 import threading
 import time
-from typing import override
 
 
-class TigersAutoref(TimeProvider):
+class TigersAutoref:
     """A wrapper over the TigersAutoref binary. It coordinates communication between the
     Simulator, TigersAutoref and Gamecontroller.
 
@@ -66,16 +65,14 @@ class TigersAutoref(TimeProvider):
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
         self.ci_mode = ci_mode
-        self.end_autoref = False
+        self.end_autoref = threading.Event()
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.gamecontroller = gc
         self.suppress_logs = suppress_logs
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
-
-        self.current_timestamp = int(time.time_ns())
-        self.timestamp_mutex = threading.Lock()
+        self.initial_timestamp = time.time_ns()
 
     def __enter__(self) -> TigersAutoref:
         if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
@@ -95,11 +92,6 @@ class TigersAutoref(TimeProvider):
         self.auto_ref_wrapper_thread.start()
 
         return self
-
-    @override
-    def time_provider(self):
-        with self.timestamp_mutex:
-            return self.current_timestamp * SECONDS_PER_NANOSECOND
 
     def _force_gamecontroller_to_accept_all_events(self) -> list[CiOutput]:
         """Force the Gamecontroller to accept all game events proposed by the Autoref
@@ -166,13 +158,13 @@ class TigersAutoref(TimeProvider):
 
         self._force_gamecontroller_to_accept_all_events()
         self._send_geometry()
-        self.gamecontroller.reset_team_info(Division.DIV_B)
+        self.gamecontroller.reset_match()
 
         self.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN
         )
 
-        while not self.end_autoref:
+        while not self.end_autoref.is_set():
             try:
                 ssl_wrapper = self.wrapper_buffer.get(
                     block=True, timeout=TigersAutoref.BUFFER_TIMEOUT
@@ -200,11 +192,6 @@ class TigersAutoref(TimeProvider):
                     )
                 )
 
-            with self.timestamp_mutex:
-                self.current_timestamp += int(
-                    self.tick_rate_ms * NANOSECONDS_PER_MILLISECOND
-                )
-
     def _forward_to_gamecontroller(
         self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
     ) -> list[CiOutput]:
@@ -215,8 +202,11 @@ class TigersAutoref(TimeProvider):
 
         :return: a list of CiOutput protos received from the Gamecontroller
         """
-        with self.timestamp_mutex:
-            ci_input = CiInput(timestamp=self.current_timestamp)
+        ci_input = CiInput(
+            timestamp=int(
+                self.initial_timestamp + time_provider_instance.elapsed_time_ns()
+            )
+        )
 
         ci_input.api_inputs.append(Input())
         ci_input.tracker_packet.CopyFrom(tracker_wrapper)
@@ -228,7 +218,10 @@ class TigersAutoref(TimeProvider):
         env = os.environ.copy()
         env["JAVA_HOME"] = self.AUTOREF_JAVA_HOME
 
-        autoref_cmd = "bin/autoReferee -a"
+        autoref_cmd = "bin/autoReferee"
+        kill_cmd_if_running([autoref_cmd])
+        autoref_cmd += " -a"
+
         if not self.show_gui:
             autoref_cmd += " -hl"
 
@@ -259,7 +252,7 @@ class TigersAutoref(TimeProvider):
         autoref_proto_unix_io.register_observer(Referee, self.referee_buffer)
 
     def __exit__(self, type, value, traceback) -> None:
-        self.end_autoref = True
+        self.end_autoref.set()
         if self.tigers_autoref_proc:
             self.tigers_autoref_proc.terminate()
             self.tigers_autoref_proc.wait()

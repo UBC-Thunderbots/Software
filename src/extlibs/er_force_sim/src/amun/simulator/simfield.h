@@ -37,11 +37,11 @@ class camun::simulator::SimField
 {
    public:
     SimField(std::shared_ptr<btDiscreteDynamicsWorld> world,
-             const world::Geometry &geometry);
+             const world::Geometry& geometry);
     ~SimField();
 
    private:
-    void addObject(btCollisionShape *shape, const btTransform &transform,
+    void addObject(btCollisionShape* shape, const btTransform& transform,
                    float restitution, float friction);
 
    private:

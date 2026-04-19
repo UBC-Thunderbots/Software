@@ -21,7 +21,7 @@ class PrimitiveExecutor
      * @param robot_id The id of the robot which uses this primitive executor
      */
     explicit PrimitiveExecutor(const Duration time_step,
-                               const RobotConstants_t &robot_constants,
+                               const RobotConstants_t& robot_constants,
                                const TeamColour friendly_team_colour,
                                const RobotId robot_id);
 
@@ -29,7 +29,7 @@ class PrimitiveExecutor
      * Update primitive executor with a new Primitive
      * @param primitive_msg The primitive to start
      */
-    void updatePrimitive(const TbotsProto::Primitive &primitive_msg);
+    void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
 
     /**
      * Set the current primitive to the stop primitive
@@ -43,8 +43,8 @@ class PrimitiveExecutor
      * @param angular_velocity The current angular velocity
      * @param orientation The current orientation of the robot
      */
-    void updateState(const Vector &local_velocity,
-                     const AngularVelocity &angular_velocity, const Angle &orientation);
+    void updateState(const Vector& local_velocity,
+                     const AngularVelocity& angular_velocity, const Angle &orientation);
 
     /**
      * Set the robot id
@@ -61,7 +61,7 @@ class PrimitiveExecutor
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus &status);
+        TbotsProto::PrimitiveExecutorStatus& status);
 
     /*
      * Get the target angular acceleration that the robot should be at.

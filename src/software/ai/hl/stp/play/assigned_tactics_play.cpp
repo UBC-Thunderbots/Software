@@ -6,22 +6,13 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-AssignedTacticsPlay::AssignedTacticsPlay(TbotsProto::AiConfig config)
-    : Play(config, false),
+AssignedTacticsPlay::AssignedTacticsPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : Play(ai_config_ptr, false),
       assigned_tactics(),
       override_motion_constraints(),
-      obstacle_factory(config.robot_navigation_obstacle_config())
+      obstacle_factory(ai_config_ptr->robot_navigation_obstacle_config())
 {
-}
-
-void AssignedTacticsPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                         const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing
-    while (true)
-    {
-        yield({{}});
-    }
 }
 
 void AssignedTacticsPlay::updateControlParams(
@@ -33,14 +24,14 @@ void AssignedTacticsPlay::updateControlParams(
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
-    const WorldPtr &world_ptr, const InterPlayCommunication &,
-    const SetInterPlayCommunicationCallback &)
+    const WorldPtr& world_ptr, const InterPlayCommunication&,
+    const SetInterPlayCommunicationCallback&)
 {
     obstacle_list.Clear();
     path_visualization.Clear();
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
-    for (const auto &robot : world_ptr->friendlyTeam().getAllRobots())
+    for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
     {
         if (assigned_tactics.contains(robot.id()))
         {
@@ -86,8 +77,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
     return primitives_to_run;
 }
 
-void AssignedTacticsPlay::updateTactics(const PlayUpdate &play_update) {}
+void AssignedTacticsPlay::updateTactics(const PlayUpdate& play_update) {}
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, AssignedTacticsPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, AssignedTacticsPlay,
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

@@ -30,12 +30,12 @@ class Robot
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      * @param robot_constants The robot constants for this robot
      */
-    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
-                   const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp, bool breakbeam_tripped = false,
-                   const std::set<RobotCapability> &unavailable_capabilities =
+    explicit Robot(RobotId id, const Point& position, const Vector& velocity,
+                   const Angle& orientation, const AngularVelocity& angular_velocity,
+                   const Timestamp& timestamp, bool breakbeam_tripped = false,
+                   const std::set<RobotCapability>& unavailable_capabilities =
                        std::set<RobotCapability>(),
-                   const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
+                   const RobotConstants_t& robot_constants = DEFAULT_ROBOT_CONSTANTS);
 
     /**
      * Creates a new robot given robot data
@@ -51,11 +51,11 @@ class Robot
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      * @param robot_constants The robot constants for this robot
      */
-    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
-                   const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp,
-                   const std::set<RobotCapability> &unavailable_capabilities,
-                   const RobotConstants_t &robot_constants);
+    explicit Robot(RobotId id, const Point& position, const Vector& velocity,
+                   const Angle& orientation, const AngularVelocity& angular_velocity,
+                   const Timestamp& timestamp,
+                   const std::set<RobotCapability>& unavailable_capabilities,
+                   const RobotConstants_t& robot_constants);
 
 
     /**
@@ -68,11 +68,11 @@ class Robot
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      * @param robot_constants The robot constants for this robot
      */
-    explicit Robot(RobotId id, const RobotState &initial_state,
-                   const Timestamp &timestamp,
-                   const std::set<RobotCapability> &unavailable_capabilities =
+    explicit Robot(RobotId id, const RobotState& initial_state,
+                   const Timestamp& timestamp,
+                   const std::set<RobotCapability>& unavailable_capabilities =
                        std::set<RobotCapability>(),
-                   const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
+                   const RobotConstants_t& robot_constants = DEFAULT_ROBOT_CONSTANTS);
 
 
     /**
@@ -84,7 +84,7 @@ class Robot
      * @param robot_proto The TbotsProto::Robot protobuf which this robot should be based
      * on
      */
-    explicit Robot(const TbotsProto::Robot &robot_proto);
+    explicit Robot(const TbotsProto::Robot& robot_proto);
 
     /**
      * Updates the robot with new data
@@ -92,7 +92,7 @@ class Robot
      * @param robot_state A robot state containing new robot data
      * @param timestamp New timestamp
      */
-    void updateState(const RobotState &state, const Timestamp &timestamp);
+    void updateState(const RobotState& state, const Timestamp& timestamp);
 
     /**
      * Gets the current state of the robot
@@ -155,7 +155,7 @@ class Robot
      *
      * @return the missing capabilities of the robot
      */
-    const std::set<RobotCapability> &getUnavailableCapabilities() const;
+    const std::set<RobotCapability>& getUnavailableCapabilities() const;
 
     /**
      * Creates and returns a rectangle representing the dribbler area
@@ -176,14 +176,14 @@ class Robot
      *
      * @return the mutable hardware capabilities of the robot
      */
-    std::set<RobotCapability> &getMutableRobotCapabilities();
+    std::set<RobotCapability>& getMutableRobotCapabilities();
 
     /**
      * Returns the robot constants for this robot
      *
      * @return the robot constants for this robot
      */
-    const RobotConstants_t &robotConstants() const;
+    const RobotConstants_t& robotConstants() const;
 
     /**
      * Decides if a point is near the dribbler of the robot
@@ -194,7 +194,7 @@ class Robot
      * @return whether the test_point is near the dribbler of the robot
      */
     bool isNearDribbler(
-        const Point &test_point,
+        const Point& test_point,
         double TOLERANCE = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING) const;
 
     /**
@@ -207,8 +207,8 @@ class Robot
      * @return The time required for this robot to rotate to the given orientation
      */
     Duration getTimeToOrientation(
-        const Angle &desired_orientation,
-        const AngularVelocity &final_angular_velocity = AngularVelocity::zero()) const;
+        const Angle& desired_orientation,
+        const AngularVelocity& final_angular_velocity = AngularVelocity::zero()) const;
 
     /**
      * Estimate the minimum time it would take to reach the desired point
@@ -220,8 +220,8 @@ class Robot
      * @return The minimum theoretical time it would take this robot to reach the
      * destination
      */
-    Duration getTimeToPosition(const Point &destination,
-                               const Vector &final_velocity = Vector()) const;
+    Duration getTimeToPosition(const Point& destination,
+                               const Vector& final_velocity = Vector()) const;
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
@@ -231,7 +231,7 @@ class Robot
      * @param other The robot to compare against for equality
      * @return True if the other robot is equal to this robot, and false otherwise
      */
-    bool operator==(const Robot &other) const;
+    bool operator==(const Robot& other) const;
 
     /**
      * Defines the inequality operator for a Robot.
@@ -239,7 +239,7 @@ class Robot
      * @param other The robot to compare against for inequality
      * @return True if the other robot is not equal to this robots, and false otherwise
      */
-    bool operator!=(const Robot &other) const;
+    bool operator!=(const Robot& other) const;
 
     // A comparator for the Robot class that compares Robots by ID. This is equivalent
     // to the "less-than" operator.
@@ -255,7 +255,7 @@ class Robot
     // ways of comparing robots
     struct cmpRobotByID
     {
-        bool operator()(const Robot &r1, const Robot &r2) const
+        bool operator()(const Robot& r1, const Robot& r2) const
         {
             return r1.id() < r2.id();
         }

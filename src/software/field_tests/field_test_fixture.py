@@ -7,7 +7,7 @@ import pytest
 import argparse
 from proto.import_all_protos import *
 
-from software.simulated_tests import validation
+from software.simulated_tests.validation import validation
 from software.thunderscope.constants import EstopMode, IndividualRobotMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -357,6 +357,7 @@ def field_test_runner():
 
     # Launch all binaries
     with FullSystem(
+        "software/unix_full_system",
         full_system_runtime_dir=runtime_dir,
         debug_full_system=debug_full_sys,
         friendly_colour_yellow=args.run_yellow,

@@ -2,34 +2,34 @@
 
 #include "software/geom/algorithms/contains.h"
 
-double distance(const Line &first, const Point &second)
+double distance(const Line& first, const Point& second)
 {
     Line::Coeffs coeffs = first.getCoeffs();
     return std::abs(coeffs.a * second.x() + coeffs.b * second.y() + coeffs.c) /
            hypot(coeffs.a, coeffs.b);
 }
 
-double distance(const Point &first, const Line &second)
+double distance(const Point& first, const Line& second)
 {
     return distance(second, first);
 }
 
-double distance(const Point &first, const Point &second)
+double distance(const Point& first, const Point& second)
 {
     return (first - second).length();
 }
 
-double distance(const Point &first, const Segment &second)
+double distance(const Point& first, const Segment& second)
 {
     return std::sqrt(distanceSquared(first, second));
 }
 
-double distance(const Segment &first, const Point &second)
+double distance(const Segment& first, const Point& second)
 {
     return distance(second, first);
 }
 
-double distance(const Point &first, const Polygon &second)
+double distance(const Point& first, const Polygon& second)
 {
     if (contains(second, first))
     {
@@ -39,7 +39,7 @@ double distance(const Point &first, const Polygon &second)
     double min_dist = std::numeric_limits<double>::max();
 
     // Calculate the distance from the point to each edge
-    for (auto &segment : second.getSegments())
+    for (auto& segment : second.getSegments())
     {
         double current_dist = distance(first, segment);
         if (current_dist < min_dist)
@@ -50,33 +50,33 @@ double distance(const Point &first, const Polygon &second)
     return min_dist;
 }
 
-double distance(const Polygon &first, const Point &second)
+double distance(const Polygon& first, const Point& second)
 {
     return distance(second, first);
 }
 
-double distance(const Point &first, const Circle &second)
+double distance(const Point& first, const Circle& second)
 {
     double distance_from_edge = (distance(first, second.origin()) - second.radius());
     return distance_from_edge > 0 ? distance_from_edge : 0;
 }
 
-double distance(const Circle &first, const Point &second)
+double distance(const Circle& first, const Point& second)
 {
     return distance(second, first);
 }
 
-double distance(const Point &first, const Stadium &second)
+double distance(const Point& first, const Stadium& second)
 {
     return std::max(distance(first, second.segment()) - second.radius(), 0.0);
 }
 
-double distance(const Stadium &first, const Point &second)
+double distance(const Stadium& first, const Point& second)
 {
     return distance(second, first);
 }
 
-double distanceSquared(const Point &first, const Segment &second)
+double distanceSquared(const Point& first, const Segment& second)
 {
     Vector seg_vec            = second.toVector();
     Vector seg_start_to_point = first - second.getStart();
@@ -98,12 +98,12 @@ double distanceSquared(const Point &first, const Segment &second)
     return std::fabs(cross * cross / seg_vec.lengthSquared());
 }
 
-double distanceSquared(const Segment &first, const Point &second)
+double distanceSquared(const Segment& first, const Point& second)
 {
     return distanceSquared(second, first);
 }
 
-double distanceSquared(const Point &first, const Point &second)
+double distanceSquared(const Point& first, const Point& second)
 {
     return (first - second).lengthSquared();
 }

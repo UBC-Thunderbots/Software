@@ -11,7 +11,7 @@
 #include "software/networking/unix/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     struct CommandLineArgs
     {

@@ -1,21 +1,18 @@
-import sys
-
-import pytest
-
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_speed_threshold import *
+from software.simulated_tests.validation.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+from software.simulated_tests.simulated_test_fixture import (
+    pytest_main,
+)
 
 
 # TODO issue  #2599 - Remove Duration parameter from test
 # @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_halt_play(simulated_test_runner):
     def setup(*args):
-        # starting point must be Point
         ball_initial_pos = tbots_cpp.Point(0, 0)
 
-        # Setup Bots
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
             tbots_cpp.Point(-3, 1.5),
@@ -38,26 +35,20 @@ def test_halt_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
-        # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
-        )
-
-        # No plays to override. AI does whatever for 3 seconds before HALT CMD
-        # is issued
-
-        # Create world state
-        simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState,
+        simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
                 ball_location=ball_initial_pos,
                 ball_velocity=tbots_cpp.Vector(0, 0),
             ),
+        )
+
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        )
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
     # params just have to be a list of length 1 to ensure the test runs at least once
@@ -81,5 +72,4 @@ def test_halt_play(simulated_test_runner):
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)

@@ -33,13 +33,14 @@ cc_library(
 
 py_test(
     name = "ball_placement_play_test",
+    timeout = "long",
     srcs = [
         "ball_placement_play_test.py",
     ],
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/validation:validations",
         requirement("pytest"),
     ],
 )

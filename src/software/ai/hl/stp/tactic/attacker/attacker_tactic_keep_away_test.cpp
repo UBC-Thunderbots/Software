@@ -6,9 +6,9 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/cost_function.h"
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
-#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -41,7 +41,8 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
     ai_config.mutable_attacker_tactic_config()->set_enemy_about_to_steal_ball_radius(
         0.01);
 
-    auto tactic = std::make_shared<AttackerTactic>(ai_config);
+    auto tactic = std::make_shared<AttackerTactic>(
+        std::make_shared<TbotsProto::AiConfig>(ai_config));
 
     // force the keep away state
     tactic->updateControlParams(pass, false);

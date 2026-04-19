@@ -4,12 +4,12 @@
 
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_at_point_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
-#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -47,8 +47,6 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-
-    TbotsProto::AiConfig ai_config;
 };
 
 // TODO (#2573): re-enable once fixed
@@ -61,7 +59,8 @@ TEST_P(DribbleTacticPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, -2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic =
+        std::make_shared<DribbleTactic>(std::make_shared<TbotsProto::AiConfig>());
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(1, tactic, {TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
 

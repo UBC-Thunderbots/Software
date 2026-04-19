@@ -3,20 +3,22 @@
 #include <queue>
 
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The KickTactic will move the assigned robot to the given kick origin and then
  * kick the ball to the kick target.
  */
 
-class KickTactic : public Tactic
+class KickTactic : public TacticBase<KickFSM, GetBehindBallFSM>
 {
    public:
     /**
      * Creates a new KickTactic
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit KickTactic();
+    explicit KickTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the params for this tactic that cannot be derived from the world
@@ -41,14 +43,4 @@ class KickTactic : public Tactic
                              double kick_speed_meters_per_second);
 
     void accept(TacticVisitor& visitor) const override;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<KickFSM>>> fsm_map;
-
-    // Tactic parameters
-    KickFSM::ControlParams control_params;
 };

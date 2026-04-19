@@ -1,11 +1,13 @@
 #include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_fsm.h"
 
-PenaltyKickEnemyPlayFSM::PenaltyKickEnemyPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config), move_tactics(std::vector<std::shared_ptr<MoveTactic>>())
+PenaltyKickEnemyPlayFSM::PenaltyKickEnemyPlayFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM<PenaltyKickEnemyPlayFSM>(ai_config_ptr),
+      move_tactics(std::vector<std::shared_ptr<MoveTactic>>())
 {
 }
 
-void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
+void PenaltyKickEnemyPlayFSM::setupPosition(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -15,7 +17,7 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
     {
         move_tactics = std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
         std::generate(move_tactics.begin(), move_tactics.end(),
-                      []() { return std::make_shared<MoveTactic>(); });
+                      [this]() { return std::make_shared<MoveTactic>(ai_config_ptr); });
     }
 
     // Move all robots behind the penalty mark
@@ -37,13 +39,13 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void PenaltyKickEnemyPlayFSM::defendKick(const Update &event)
+void PenaltyKickEnemyPlayFSM::defendKick(const Update& event)
 {
     // Allow goalie to move freely and defend against penalty kick
     event.control_params.goalie_tactic->updateControlParams(false);
 }
 
-bool PenaltyKickEnemyPlayFSM::setupPositionDone(const Update &event)
+bool PenaltyKickEnemyPlayFSM::setupPositionDone(const Update& event)
 {
     return !event.common.world_ptr->gameState().isSetupState();
 }

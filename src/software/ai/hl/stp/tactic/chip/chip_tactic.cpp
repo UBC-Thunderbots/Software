@@ -3,17 +3,15 @@
 #include <algorithm>
 
 
-ChipTactic::ChipTactic()
-    : Tactic({RobotCapability::Chip, RobotCapability::Move}), fsm_map()
+ChipTactic::ChipTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticBase<ChipFSM, GetBehindBallFSM>(
+          {RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr)
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<ChipFSM>>(GetBehindBallFSM());
-    }
 }
 
-void ChipTactic::updateControlParams(const Point &chip_origin,
-                                     const Angle &chip_direction,
+
+void ChipTactic::updateControlParams(const Point& chip_origin,
+                                     const Angle& chip_direction,
                                      double chip_distance_meters)
 {
     control_params.chip_origin          = chip_origin;
@@ -21,24 +19,13 @@ void ChipTactic::updateControlParams(const Point &chip_origin,
     control_params.chip_distance_meters = chip_distance_meters;
 }
 
-void ChipTactic::updateControlParams(const Point &chip_origin, const Point &chip_target)
+void ChipTactic::updateControlParams(const Point& chip_origin, const Point& chip_target)
 {
     updateControlParams(chip_origin, (chip_target - chip_origin).orientation(),
                         (chip_target - chip_origin).length());
 }
 
-void ChipTactic::accept(TacticVisitor &visitor) const
+void ChipTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
-}
-
-void ChipTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
-{
-    if (reset_fsm)
-    {
-        fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<ChipFSM>>(GetBehindBallFSM());
-    }
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(ChipFSM::Update(control_params, tactic_update));
 }

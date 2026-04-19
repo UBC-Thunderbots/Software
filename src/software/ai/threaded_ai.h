@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <mutex>
 
 #include "proto/parameters.pb.h"
@@ -28,7 +29,7 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
     /**
      * Constructs a new ThreadedAi object.
      *
-     * @param tbots_proto The AI configuration
+     * @param ai_config the ai configuration
      */
     explicit ThreadedAi(const TbotsProto::AiConfig& ai_config);
 
@@ -58,8 +59,8 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
      */
     void runAiAndSendPrimitives(const WorldPtr& world_ptr);
 
+    std::shared_ptr<TbotsProto::AiConfig> ai_config_ptr;
     Ai ai;
-    TbotsProto::AiConfig ai_config;
     TbotsProto::AiControlConfig ai_control_config;
     std::mutex ai_mutex;
 };

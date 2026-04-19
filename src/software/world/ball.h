@@ -21,8 +21,8 @@ class Ball final
      * given position and velocity
      * @param acceleration acceleration being applied to the ball
      */
-    explicit Ball(const Point &position, const Vector &velocity,
-                  const Timestamp &timestamp, const Vector &acceleration = Vector(0, 0));
+    explicit Ball(const Point& position, const Vector& velocity,
+                  const Timestamp& timestamp, const Vector& acceleration = Vector(0, 0));
 
     /**
      * Creates a new ball with the given initial state
@@ -31,15 +31,15 @@ class Ball final
      * @param timestamp the initial timestamp
      * @param acceleration acceleration being applied to the ball
      */
-    explicit Ball(const BallState &initial_state, const Timestamp &timestamp,
-                  const Vector &acceleration = Vector(0, 0));
+    explicit Ball(const BallState& initial_state, const Timestamp& timestamp,
+                  const Vector& acceleration = Vector(0, 0));
 
     /**
      * Creates a new ball based on the TbotsProto::Ball protobuf representation
      *
      * @param ball_proto The TbotsProto::Ball protobuf which this ball should be based on
      */
-    explicit Ball(const TbotsProto::Ball &ball_proto);
+    explicit Ball(const TbotsProto::Ball& ball_proto);
 
     /**
      * Returns the current state of the ball
@@ -55,8 +55,8 @@ class Ball final
      * @param new_timestamp the new timestamp
      * @param new_acceleration acceleration being applied to the ball
      */
-    void updateState(const BallState &new_state, const Timestamp &new_timestamp,
-                     const Vector &new_acceleration = Vector(0, 0));
+    void updateState(const BallState& new_state, const Timestamp& new_timestamp,
+                     const Vector& new_acceleration = Vector(0, 0));
 
     /**
      * Returns the current timestamp for this ball
@@ -95,7 +95,7 @@ class Ball final
      *
      * @return The future state of the ball
      */
-    BallState estimateFutureState(const Duration &duration_in_future) const;
+    BallState estimateFutureState(const Duration& duration_in_future) const;
 
     /**
      * Software approximation that finds if a ball has been kicked, regardless of whether
@@ -112,8 +112,8 @@ class Ball final
      * otherwise
      */
     bool hasBallBeenKicked(
-        const Angle &expected_kick_direction, double min_kick_speed = 0.5,
-        const Angle &max_angle_difference = Angle::fromDegrees(20)) const;
+        const Angle& expected_kick_direction, double min_kick_speed = 0.5,
+        const Angle& max_angle_difference = Angle::fromDegrees(20)) const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
@@ -122,7 +122,7 @@ class Ball final
      * @param other The Ball to compare against for equality
      * @return True if the other ball is equal to this ball, and false otherwise
      */
-    bool operator==(const Ball &other) const;
+    bool operator==(const Ball& other) const;
 
     /**
      * Defines the inequality operator for a Ball.
@@ -130,7 +130,7 @@ class Ball final
      * @param other The ball to compare against for inequality
      * @return True if the other ball is not equal to this ball, and false otherwise
      */
-    bool operator!=(const Ball &other) const;
+    bool operator!=(const Ball& other) const;
 
    private:
     BallState current_state_;

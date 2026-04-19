@@ -142,6 +142,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     kick_constant = std::min(kick_constant, MAX_KICK_CONSTANT);
     kick_coeff    = std::min(kick_coeff, MAX_KICK_COEFFICIENT);
 
+    nanopb_control.has_chicker = true;
+
     switch (power_control.chicker().chicker_command_case())
     {
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
@@ -157,6 +159,18 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
             nanopb_control.chicker.chicker_command.chip_pulse_width = chip_pulse_width;
+            break;
+        case TbotsProto::PowerControl::ChickerControl::kKickPulseWidth:
+            nanopb_control.chicker.which_chicker_command =
+                TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
+            nanopb_control.chicker.chicker_command.kick_pulse_width =
+                static_cast<uint32_t>(power_control.chicker().kick_pulse_width());
+            break;
+        case TbotsProto::PowerControl::ChickerControl::kChipPulseWidth:
+            nanopb_control.chicker.which_chicker_command =
+                TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
+            nanopb_control.chicker.chicker_command.chip_pulse_width =
+                static_cast<uint32_t>(power_control.chicker().chip_pulse_width());
             break;
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
             nanopb_control.chicker.which_chicker_command =
@@ -181,7 +195,26 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
                         .auto_chip_or_kick.autochip_pulse_width = chip_pulse_width;
                     break;
-
+                case TbotsProto::AutoChipOrKick::kAutokickPulseWidth:
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .which_auto_chip_or_kick =
+                        TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .auto_chip_or_kick.autokick_pulse_width =
+                        static_cast<uint32_t>(power_control.chicker()
+                                                  .auto_chip_or_kick()
+                                                  .autokick_pulse_width());
+                    break;
+                case TbotsProto::AutoChipOrKick::kAutochipPulseWidth:
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .which_auto_chip_or_kick =
+                        TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag;
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .auto_chip_or_kick.autokick_pulse_width =
+                        static_cast<uint32_t>(power_control.chicker()
+                                                  .auto_chip_or_kick()
+                                                  .autochip_pulse_width());
+                    break;
                 default:
                     break;
             }
@@ -229,17 +262,17 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     switch (chicker_command)
     {
         case ChickerCommandMode::CHIP:
-            control.chicker.which_chicker_command =
+            chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
             chicker.chicker_command.chip_pulse_width = chip_pulse_width;
             break;
         case ChickerCommandMode::KICK:
-            control.chicker.which_chicker_command =
+            chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             chicker.chicker_command.kick_pulse_width = kick_pulse_width;
             break;
         case ChickerCommandMode::AUTOCHIPORKICK:
-            control.chicker.which_chicker_command =
+            chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_auto_chip_or_kick_tag;
             switch (auto_chip_or_kick)
             {
@@ -263,6 +296,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             break;
     }
 
+    control.has_chicker = true;
     control.chicker     = chicker;
     control.geneva_slot = geneva_slot;
 

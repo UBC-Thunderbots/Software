@@ -4,29 +4,18 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/time_to_travel.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/distance.h"
 
-struct DribbleFSM
+/**
+ * Finite State Machine class for Dribbling
+ */
+struct DribbleFSM : TacticFSM<DribbleFSM>
 {
    public:
-    class GetPossession;
-    class Dribble;
-    class LoseBall;
-
-    /**
-     * Constructor for DribbleFSM
-     *
-     * @param dribble_tactic_config The config to fetch parameters from
-     */
-    explicit DribbleFSM(TbotsProto::DribbleTacticConfig dribble_tactic_config)
-        : dribble_tactic_config(dribble_tactic_config)
-    {
-    }
-
     struct ControlParams
     {
         // The destination for dribbling the ball
@@ -37,7 +26,18 @@ struct DribbleFSM
         bool allow_excessive_dribbling;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    using Update = TacticFSM<DribbleFSM>::Update;
+
+    class GetPossession;
+    class Dribble;
+    class LoseBall;
+
+    /**
+     * Constructor for DribbleFSM
+     *
+     * @param ai_config_ptr shared ptr to ai_config
+     */
+    explicit DribbleFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -50,8 +50,8 @@ struct DribbleFSM
      * @return the point that the robot should be positioned to face the ball and dribble
      * the ball
      */
-    static Point robotPositionToFaceBall(const Point &ball_position,
-                                         const Angle &face_ball_angle,
+    static Point robotPositionToFaceBall(const Point& ball_position,
+                                         const Angle& face_ball_angle,
                                          double additional_offset = 0.0);
 
     /**
@@ -65,7 +65,7 @@ struct DribbleFSM
      */
     // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
     // evaluation folder
-    Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &field);
+    Point findInterceptionPoint(const Robot& robot, const Ball& ball, const Field& field);
 
     /**
      * Gets the destination to dribble the ball to from the update event
@@ -74,7 +74,7 @@ struct DribbleFSM
      *
      * @return the destination to dribble the ball to
      */
-    static Point getDribbleBallDestination(const Point &ball_position,
+    static Point getDribbleBallDestination(const Point& ball_position,
                                            std::optional<Point> dribble_destination);
 
     /**
@@ -85,7 +85,7 @@ struct DribbleFSM
      * @return the final orientation to finish dribbling facing
      */
     static Angle getFinalDribbleOrientation(
-        const Point &ball_position, const Point &robot_position,
+        const Point& ball_position, const Point& robot_position,
         std::optional<Angle> final_dribble_orientation);
 
     /**
@@ -99,7 +99,7 @@ struct DribbleFSM
      * @return the next dribble destination and orientation
      */
     static std::tuple<Point, Angle> calculateNextDribbleDestinationAndOrientation(
-        const Ball &ball, const Robot &robot,
+        const Ball& ball, const Robot& robot,
         std::optional<Point> dribble_destination_opt,
         std::optional<Angle> final_dribble_orientation_opt);
 
@@ -111,7 +111,7 @@ struct DribbleFSM
      *
      * @param event DribbleFSM::Update
      */
-    void getPossession(const Update &event);
+    void getPossession(const Update& event);
 
     /**
      * Action to dribble the ball
@@ -121,14 +121,14 @@ struct DribbleFSM
      *
      * @param event DribbleFSM::Update
      */
-    void dribble(const Update &event);
+    void dribble(const Update& event);
 
     /**
      * Action to lose possession of the ball
      *
      * @param event DribbleFSM::Update
      */
-    void loseBall(const Update &event);
+    void loseBall(const Update& event);
 
     /**
      * Guard that checks if the robot has possession of the ball
@@ -137,7 +137,7 @@ struct DribbleFSM
      *
      * @return if the ball has been have_possession
      */
-    bool havePossession(const Update &event);
+    bool havePossession(const Update& event);
 
     /**
      * Guard that checks if the robot has lost possession of the ball
@@ -146,7 +146,7 @@ struct DribbleFSM
      *
      * @return if the ball possession has been lost
      */
-    bool lostPossession(const Update &event);
+    bool lostPossession(const Update& event);
 
     /**
      * Guard that checks if the ball is at the dribble_destination and robot is facing
@@ -157,7 +157,7 @@ struct DribbleFSM
      * @return if the ball is at the dribble_destination, robot is facing the correct
      * direction and ahs possession of the ball
      */
-    bool dribblingDone(const Update &event);
+    bool dribblingDone(const Update& event);
 
     /**
      * Guard that checks if the the robot should lose possession to avoid excessive
@@ -167,7 +167,7 @@ struct DribbleFSM
      *
      * @return if the ball possession should be lost
      */
-    bool shouldLoseBall(const Update &event);
+    bool shouldLoseBall(const Update& event);
 
     auto operator()()
     {
@@ -199,8 +199,4 @@ struct DribbleFSM
             X + Update_E[!dribblingDone_G] / dribble_A                 = Dribble_S,
             X + Update_E / dribble_A                                   = X);
     }
-
-   private:
-    // the dribble tactic config
-    TbotsProto::DribbleTacticConfig dribble_tactic_config;
 };

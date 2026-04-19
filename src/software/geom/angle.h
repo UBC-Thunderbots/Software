@@ -121,7 +121,7 @@ class Angle final
      *
      * @return the remainder of this Angle ÷ divisor.
      */
-    constexpr Angle remainder(const Angle &divisor) const;
+    constexpr Angle remainder(const Angle& divisor) const;
 
     /**
      * Returns the absolute value of this angle.
@@ -176,7 +176,7 @@ class Angle final
      *
      * @return the angle between this Angle and other, in the range [0, π].
      */
-    constexpr Angle minDiff(const Angle &other) const;
+    constexpr Angle minDiff(const Angle& other) const;
 
     /**
      * Returns the smallest possible rotational difference from this angle to another
@@ -204,7 +204,7 @@ class Angle final
  *
  * @return the negated angle
  */
-constexpr Angle operator-(const Angle &angle) __attribute__((warn_unused_result));
+constexpr Angle operator-(const Angle& angle) __attribute__((warn_unused_result));
 
 /**
  * Adds two angles.
@@ -214,7 +214,7 @@ constexpr Angle operator-(const Angle &angle) __attribute__((warn_unused_result)
  *
  * @return the sum of the angles
  */
-constexpr Angle operator+(const Angle &x, const Angle &y)
+constexpr Angle operator+(const Angle& x, const Angle& y)
     __attribute__((warn_unused_result));
 
 /**
@@ -226,7 +226,7 @@ constexpr Angle operator+(const Angle &x, const Angle &y)
  *
  * @return the difference between the minuend and subtrahend.
  */
-constexpr Angle operator-(const Angle &x, const Angle &y)
+constexpr Angle operator-(const Angle& x, const Angle& y)
     __attribute__((warn_unused_result));
 
 /**
@@ -237,7 +237,7 @@ constexpr Angle operator-(const Angle &x, const Angle &y)
  *
  * @return the product of the angle and the scalar factor
  */
-constexpr Angle operator*(const Angle &angle, double scale)
+constexpr Angle operator*(const Angle& angle, double scale)
     __attribute__((warn_unused_result));
 
 /**
@@ -248,7 +248,7 @@ constexpr Angle operator*(const Angle &angle, double scale)
  *
  * @return the product of the angle and the scalar factor
  */
-constexpr Angle operator*(double scale, const Angle &angle)
+constexpr Angle operator*(double scale, const Angle& angle)
     __attribute__((warn_unused_result));
 
 /**
@@ -259,7 +259,7 @@ constexpr Angle operator*(double scale, const Angle &angle)
  *
  * @return the quotient of this Angle ÷ the divisor.
  */
-constexpr Angle operator/(const Angle &angle, double divisor)
+constexpr Angle operator/(const Angle& angle, double divisor)
     __attribute__((warn_unused_result));
 
 /**
@@ -270,7 +270,7 @@ constexpr Angle operator/(const Angle &angle, double divisor)
  *
  * @return the quotient of the divident ÷ the divisor.
  */
-constexpr double operator/(const Angle &x, const Angle &y)
+constexpr double operator/(const Angle& x, const Angle& y)
     __attribute__((warn_unused_result));
 
 /**
@@ -281,7 +281,7 @@ constexpr double operator/(const Angle &x, const Angle &y)
  *
  * @return the new angle x
  */
-Angle &operator+=(Angle &x, const Angle &y);
+Angle& operator+=(Angle& x, const Angle& y);
 
 /**
  * Subtracts an angle from an angle.
@@ -291,7 +291,7 @@ Angle &operator+=(Angle &x, const Angle &y);
  *
  * @return the new angle x
  */
-Angle &operator-=(Angle &x, const Angle &y);
+Angle& operator-=(Angle& x, const Angle& y);
 
 /**
  * Scales an angle by a factor.
@@ -301,7 +301,7 @@ Angle &operator-=(Angle &x, const Angle &y);
  *
  * @return the scaled angle.
  */
-Angle &operator*=(Angle &angle, double scale);
+Angle& operator*=(Angle& angle, double scale);
 
 /**
  * Divides an angle by a scalar divisor.
@@ -312,7 +312,7 @@ Angle &operator*=(Angle &angle, double scale);
  *
  * @return the scaled angle.
  */
-Angle &operator/=(Angle &angle, double divisor);
+Angle& operator/=(Angle& angle, double divisor);
 
 /**
  * Compares two angles.
@@ -323,7 +323,7 @@ Angle &operator/=(Angle &angle, double divisor);
  *
  * @return true if x is strictly less than y, and false otherwise
  */
-constexpr bool operator<(const Angle &x, const Angle &y);
+constexpr bool operator<(const Angle& x, const Angle& y);
 
 /**
  * Compares two angles.
@@ -333,7 +333,7 @@ constexpr bool operator<(const Angle &x, const Angle &y);
  *
  * @return true if x is strictly greater than y, and false otherwise.
  */
-constexpr bool operator>(const Angle &x, const Angle &y);
+constexpr bool operator>(const Angle& x, const Angle& y);
 
 /**
  * Compares two angles.
@@ -343,7 +343,7 @@ constexpr bool operator>(const Angle &x, const Angle &y);
  *
  * @return true if x is less than or equal to y, and false otherwise.
  */
-constexpr bool operator<=(const Angle &x, const Angle &y);
+constexpr bool operator<=(const Angle& x, const Angle& y);
 
 /**
  * Compares two angles.
@@ -353,7 +353,7 @@ constexpr bool operator<=(const Angle &x, const Angle &y);
  *
  * @return true if x is greater than or equal to y, and false otherwise.
  */
-constexpr bool operator>=(const Angle &x, const Angle &y);
+constexpr bool operator>=(const Angle& x, const Angle& y);
 
 /**
  * Compares two angles for equality
@@ -363,7 +363,7 @@ constexpr bool operator>=(const Angle &x, const Angle &y);
  *
  * @return true if x is equal to y, and false otherwise.
  */
-bool operator==(const Angle &x, const Angle &y);
+bool operator==(const Angle& x, const Angle& y);
 
 /**
  * Compares two angles for inequality.
@@ -373,7 +373,7 @@ bool operator==(const Angle &x, const Angle &y);
  *
  * @return true if x is not equal to y, and false otherwise
  */
-constexpr bool operator!=(const Angle &x, const Angle &y);
+constexpr bool operator!=(const Angle& x, const Angle& y);
 
 /**
  * Prints an Angle to a stream
@@ -383,7 +383,7 @@ constexpr bool operator!=(const Angle &x, const Angle &y);
  *
  * @return the stream with the Angle printed
  */
-inline std::ostream &operator<<(std::ostream &os, const Angle &a);
+inline std::ostream& operator<<(std::ostream& os, const Angle& a);
 
 inline constexpr Angle Angle::zero()
 {
@@ -461,7 +461,7 @@ inline constexpr Angle Angle::mod(Angle divisor) const
     }
 }
 
-inline constexpr Angle Angle::remainder(const Angle &divisor) const
+inline constexpr Angle Angle::remainder(const Angle& divisor) const
 {
     return Angle::fromRadians(toRadians() -
                               static_cast<double>(static_cast<long>(
@@ -501,7 +501,7 @@ inline constexpr Angle Angle::clamp() const
     return remainder(Angle::full());
 }
 
-inline constexpr Angle Angle::minDiff(const Angle &other) const
+inline constexpr Angle Angle::minDiff(const Angle& other) const
 {
     return (*this - other).clamp().abs();
 }
@@ -523,93 +523,93 @@ inline constexpr Angle Angle::minSignedDiff(const Angle &to) const
 
 inline constexpr Angle::Angle(double rads) : rads(rads) {}
 
-inline constexpr Angle operator-(const Angle &angle)
+inline constexpr Angle operator-(const Angle& angle)
 {
     return Angle::fromRadians(-angle.toRadians());
 }
 
-inline constexpr Angle operator+(const Angle &x, const Angle &y)
+inline constexpr Angle operator+(const Angle& x, const Angle& y)
 {
     return Angle::fromRadians(x.toRadians() + y.toRadians());
 }
 
-inline constexpr Angle operator-(const Angle &x, const Angle &y)
+inline constexpr Angle operator-(const Angle& x, const Angle& y)
 {
     return Angle::fromRadians(x.toRadians() - y.toRadians());
 }
 
-inline constexpr Angle operator*(const Angle &angle, double scale)
+inline constexpr Angle operator*(const Angle& angle, double scale)
 {
     return Angle::fromRadians(angle.toRadians() * scale);
 }
 
-inline constexpr Angle operator*(double scale, const Angle &angle)
+inline constexpr Angle operator*(double scale, const Angle& angle)
 {
     return Angle::fromRadians(scale * angle.toRadians());
 }
 
-inline constexpr Angle operator/(const Angle &angle, double divisor)
+inline constexpr Angle operator/(const Angle& angle, double divisor)
 {
     return Angle::fromRadians(angle.toRadians() / divisor);
 }
 
-inline constexpr double operator/(const Angle &x, const Angle &y)
+inline constexpr double operator/(const Angle& x, const Angle& y)
 {
     return x.toRadians() / y.toRadians();
 }
 
-inline Angle &operator+=(Angle &x, const Angle &y)
+inline Angle& operator+=(Angle& x, const Angle& y)
 {
     return x = x + y;
 }
 
-inline Angle &operator-=(Angle &x, const Angle &y)
+inline Angle& operator-=(Angle& x, const Angle& y)
 {
     return x = x - y;
 }
 
-inline Angle &operator*=(Angle &angle, double scale)
+inline Angle& operator*=(Angle& angle, double scale)
 {
     return angle = angle * scale;
 }
 
-inline Angle &operator/=(Angle &angle, double divisor)
+inline Angle& operator/=(Angle& angle, double divisor)
 {
     return angle = angle / divisor;
 }
 
-inline constexpr bool operator<(const Angle &x, const Angle &y)
+inline constexpr bool operator<(const Angle& x, const Angle& y)
 {
     return x.toRadians() < y.toRadians();
 }
 
-inline constexpr bool operator>(const Angle &x, const Angle &y)
+inline constexpr bool operator>(const Angle& x, const Angle& y)
 {
     return x.toRadians() > y.toRadians();
 }
 
-inline constexpr bool operator<=(const Angle &x, const Angle &y)
+inline constexpr bool operator<=(const Angle& x, const Angle& y)
 {
     return x.toRadians() <= y.toRadians();
 }
 
-inline constexpr bool operator>=(const Angle &x, const Angle &y)
+inline constexpr bool operator>=(const Angle& x, const Angle& y)
 {
     return x.toRadians() >= y.toRadians();
 }
 
-inline bool operator==(const Angle &x, const Angle &y)
+inline bool operator==(const Angle& x, const Angle& y)
 {
     Angle diff = x.clamp().minDiff(y.clamp());
     return diff.toRadians() <= FIXED_EPSILON;
 }
 
-inline constexpr bool operator!=(const Angle &x, const Angle &y)
+inline constexpr bool operator!=(const Angle& x, const Angle& y)
 {
     return x.toRadians() != y.toRadians();
 }
 
-inline std::ostream &operator<<(std::ostream &os, const Angle &a)
+inline std::ostream& operator<<(std::ostream& os, const Angle& a)
 {
     os << a.toRadians() << "R";
     return os;

@@ -2,7 +2,6 @@
 
 #include <Eigen/Dense>
 #include <algorithm>
-#include <limits>
 #include <vector>
 
 #include "shared/constants.h"
@@ -14,21 +13,21 @@
 BallFilter::BallFilter() : ball_detection_buffer(MAX_BUFFER_SIZE) {}
 
 std::optional<Ball> BallFilter::estimateBallState(
-    const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area)
+    const std::vector<BallDetection>& new_ball_detections, const Rectangle& filter_area)
 {
     addNewDetectionsToBuffer(new_ball_detections, filter_area);
     return estimateBallStateFromBuffer(ball_detection_buffer);
 }
 
 void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
-                                          const Rectangle &filter_area)
+                                          const Rectangle& filter_area)
 {
     // Sort the detections in increasing order before processing. This places the oldest
     // detections (with the smallest timestamp) at the front of the buffer, and the most
     // recent detections (largest timestamp) at the end of the buffer.
     std::sort(new_ball_detections.begin(), new_ball_detections.end());
 
-    for (const auto &detection : new_ball_detections)
+    for (const auto& detection : new_ball_detections)
     {
         // Remove any detections outside the filter area
         if (!contains(filter_area, detection.position))
@@ -210,7 +209,7 @@ BallFilter::LinearRegressionResults BallFilter::calculateLineOfBestFit(
     // one with x and y swapped, so any vertical line becomes horizontal. Then we take the
     // line of the two that fit the best.
     boost::circular_buffer<BallDetection> swapped_ball_detections = ball_detections;
-    for (auto &detection : swapped_ball_detections)
+    for (auto& detection : swapped_ball_detections)
     {
         detection.position = Point(detection.position.y(), detection.position.x());
     }
@@ -264,17 +263,9 @@ BallFilter::LinearRegressionResults BallFilter::calculateLinearRegression(
         A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
     // How to calculate the error is from
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
-    double regression_error = std::numeric_limits<double>::max();
-
-    if ((A * regression_vector - b).norm() == 0 && b.norm() == 0)
-    {
-        regression_error = 0;
-    }
-    if (b.norm() != 0)
-    {
-        regression_error =
-            (A * regression_vector - b).norm() / (b.norm());  // norm() is L2 norm
-    }
+    // NOTE: using absolute error instead of relative because coordinates
+    // values should not affect error, also handles divide by 0 error
+    double regression_error = (A * regression_vector - b).norm();  // norm() is L2 norm
 
     // Find 2 points on the regression line that we solved for, and use this to construct
     // our own Line class
@@ -290,7 +281,7 @@ BallFilter::LinearRegressionResults BallFilter::calculateLinearRegression(
 }
 
 Point BallFilter::estimateBallPosition(
-    boost::circular_buffer<BallDetection> ball_detections, const Line &regression_line)
+    boost::circular_buffer<BallDetection> ball_detections, const Line& regression_line)
 {
     if (ball_detections.empty())
     {
@@ -309,7 +300,7 @@ Point BallFilter::estimateBallPosition(
 
 std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity(
     boost::circular_buffer<BallDetection> ball_detections,
-    const std::optional<Line> &ball_regression_line)
+    const std::optional<Line>& ball_regression_line)
 {
     // Sort the detections in increasing order before processing. This places the oldest
     // detections (smallest timestamp) at the front of the buffer, and the most recent
@@ -364,7 +355,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
     }
 
     double velocity_magnitude_sum = 0;
-    for (const auto &velocity_magnitude : ball_velocity_magnitudes)
+    for (const auto& velocity_magnitude : ball_velocity_magnitudes)
     {
         velocity_magnitude_sum += velocity_magnitude;
     }
@@ -377,7 +368,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
     double min_max_average = (velocity_magnitude_min + velocity_magnitude_max) / 2.0;
 
     Vector velocity_vector_sum = Vector(0, 0);
-    for (const auto &velocity : ball_velocities)
+    for (const auto& velocity : ball_velocities)
     {
         velocity_vector_sum += velocity;
     }

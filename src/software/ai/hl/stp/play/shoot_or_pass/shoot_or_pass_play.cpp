@@ -5,22 +5,13 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ShootOrPassPlay::ShootOrPassPlay(TbotsProto::AiConfig config)
-    : Play(config, true), fsm{ShootOrPassPlayFSM{config}}, control_params{}
+ShootOrPassPlay::ShootOrPassPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayBase<ShootOrPassPlayFSM>(ai_config_ptr, true)
 {
 }
 
-void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                     const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing
-    while (true)
-    {
-        yield({{}});
-    }
-}
-
-void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)
+void ShootOrPassPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(ShootOrPassPlayFSM::Update(control_params, play_update));
 }
@@ -33,4 +24,6 @@ std::vector<std::string> ShootOrPassPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrPassPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, ShootOrPassPlay,
+                       std::shared_ptr<const TbotsProto::AiConfig>>
+    factory;
