@@ -2,7 +2,7 @@
 
 # The `who` command returns all logged in users (IRL and remote)
 # Finds IRL users by looking for the physical monitor
-LOCAL_USER=$(who | grep -E '(:0|tty2)')
+LOCAL_USER=$(who | grep -E '(tty2)')
 
 # Finds remote users, who are marked with `pts`
 # for each one, finds their username, to make identifying them easier
@@ -38,7 +38,7 @@ if ([ ! -z "$LOCAL_USER" ] || [ ! -z "$REMOTE_USERS" ]) && [ "$FORCE_CONNECT" !=
 fi
 
 # Trigger the visual warning dialog if someone is using the PC IRL
-bash /home/thunderbots/Software/scripts/mezzsh/mezzsh_warn.sh &
+bash /home/thunderbots/Software/scripts/mezzsh/utils/connection_warn.sh &
 
 # if we get here, start a normal shell
 exec $SHELL
