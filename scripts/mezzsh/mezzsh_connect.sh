@@ -29,7 +29,7 @@ NC='\e[0m'
 
 # someone is using IRL
 if [[ "$RESPONSE" == *"STATUS_BUSY_LOCAL"* ]]; then
-    echo -e "⚠️  {RED}WARNING{NC}: Someone is physically logged into the PC onsite."
+    echo -e "⚠️  ${RED}WARNING${NC}: Someone is physically logged into the PC onsite."
     read -p "Do you want to force the connection? (y/n): " choice
 
     # exits if user does not want to force
@@ -37,7 +37,7 @@ if [[ "$RESPONSE" == *"STATUS_BUSY_LOCAL"* ]]; then
 
 # someone is connected remotely
 elif [[ "$RESPONSE" == *"STATUS_BUSY_REMOTE"* ]]; then
-    echo -e "⚠️  {RED}WARNING{NC}: Other SSH users are connected:"
+    echo -e "⚠️  ${RED}WARNING${NC}: Other SSH users are connected:"
     echo "$RESPONSE" | grep "Connected:"
     read -p "Do you want to force the connection? (y/n): " choice
 

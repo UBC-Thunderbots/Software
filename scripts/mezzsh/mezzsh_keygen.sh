@@ -50,4 +50,4 @@ echo -e "\n--- PUBLIC KEY ---"
 cat "${KEY_PATH}.pub"
 echo "--------------------------------------------"
 
-echo -e "{GREEN}Success!{NC} Please provide the whole public key above (at "$KEY_PATH.pub") to a software lead to finish setup\n"
+echo -e "${GREEN}Success!${NC} Please provide the whole public key above (at "$KEY_PATH.pub") to a software lead to finish setup\n"

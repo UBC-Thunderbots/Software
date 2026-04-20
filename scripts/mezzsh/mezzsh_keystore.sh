@@ -1,6 +1,6 @@
 #!/bin/bash
 
-USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+USER_HOME=$(tmp=$(getent passwd "$SUDO_USER" | cut -d: -f6); echo "${tmp:-/home/thunderbots}")
 
 # Configuration
 AUTH_KEYS="$USER_HOME/.ssh/authorized_keys"
@@ -17,7 +17,9 @@ echo "--- Registering New Remote User ---"
 
 # Add to authorized_keys with a command restriction
 # We prepend the SERVER_SCRIPT command to the key
-ENTRY="command=\"$SERVER_SCRIPT\",environment=\"SSH_CHECK_MODE=1 FORCE_CONNECT=1\" $PUB_KEY"
+ENTRY="$PUB_KEY
+command=\"$SERVER_SCRIPT\"
+environment=\"SSH_CHECK_MODE=1 FORCE_CONNECT=1\""
 
 if grep -q "$PUB_KEY" "$AUTH_KEYS"; then
     echo "Error: This public key is already registered."
