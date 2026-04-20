@@ -9,12 +9,12 @@ if [ -z "$LOCAL_USER" ]; then
     exit 0
 fi
 
-# get the User ID of the local user to access their "session bus"
+# get the User ID of the local user
 LOCAL_UID=$(id -u "$LOCAL_USER")
 
 # Trigger the dialog
-# We must set DISPLAY and DBUS_SESSION_BUS_ADDRESS so the script knows 
-# WHICH screen to pop up on.
+# these environment variables must be set to trigger the dialog
+# specifically on our wayland setup
 sudo -u "$LOCAL_USER" DISPLAY=tty2 \
     DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$LOCAL_UID/bus \
     XDG_RUNTIME_DIR="/run/user/$LOCAL_UID" \

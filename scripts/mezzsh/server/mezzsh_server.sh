@@ -7,7 +7,7 @@
 # and also warns any IRL users if present
 
 # The `who` command returns all logged in users (IRL and remote)
-# Finds IRL users by looking for the physical monitor
+# Finds IRL users by looking for the physical monitor (tty2)
 LOCAL_USER=$(who | grep -E '(tty2)')
 
 # Finds remote users, who are marked with `pts`
