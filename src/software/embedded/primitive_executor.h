@@ -44,7 +44,7 @@ class PrimitiveExecutor
      * @param orientation The current orientation of the robot
      */
     void updateState(const Vector& local_velocity,
-                     const AngularVelocity& angular_velocity, const Angle &orientation);
+                     const AngularVelocity& angular_velocity, const Angle& orientation);
 
     /**
      * Set the robot id

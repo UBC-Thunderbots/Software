@@ -46,7 +46,7 @@ void PrimitiveExecutor::setStopPrimitive()
 
 void PrimitiveExecutor::updateState(const Vector& local_velocity,
                                     const AngularVelocity& angular_velocity,
-                                    const Angle &orientation)
+                                    const Angle& orientation)
 {
     orientation_ = orientation.clamp();
     Vector actual_global_velocity =

@@ -88,7 +88,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       robot_localizer_(
           robot_constants.kalman_process_noise_variance_rad_per_s_4,
           robot_constants.kalman_vision_noise_variance_rad_2,
-          robot_constants.kalman_encoder_noise_variance_rad_per_s_2,
+          robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2,
           robot_constants.kalman_target_angular_velocity_variance_rad_per_sec_2)
 {
     waitForNetworkUp();
@@ -268,7 +268,7 @@ void Thunderloop::runLoop()
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
-                robot_localizer_.updateEncoders(
+                robot_localizer_.updateMotorSensors(
                     createAngularVelocity(status.angular_velocity()));
 
                 // step the robot localizer

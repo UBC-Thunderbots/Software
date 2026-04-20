@@ -88,10 +88,9 @@ def test_basic_rotation(field_test_runner):
 
     robot = world.friendly_team.team_robots[0]
     rob_pos_p = robot.current_state.global_position
-    # logger.info("staying in pos {rob_pos_p}")
+    logger.info("staying in pos {rob_pos_p}")
 
     for angle in test_angles:
-        print("Angle")
         move_tactic = MoveTactic()
         move_tactic.destination.CopyFrom(rob_pos_p)
         move_tactic.dribbler_mode = DribblerMode.OFF
@@ -118,9 +117,9 @@ def test_basic_rotation(field_test_runner):
         )
 
         # validate by eye
-        # logger.info(f"robot set to {angle} orientation")
+        logger.info(f"robot set to {angle} orientation")
 
-        time.sleep(0.2)
+        time.sleep(2)
 
 
 def test_one_robots_square(field_test_runner):
@@ -202,4 +201,4 @@ def test_one_robots_square(field_test_runner):
 
 
 if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)

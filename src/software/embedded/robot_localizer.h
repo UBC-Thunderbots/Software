@@ -2,41 +2,48 @@
 
 #include <Eigen/Dense>
 #include <deque>
+#include <optional>
 
 #include "proto/world.pb.h"
 #include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
-#include "software/geom/angular_velocity.h"
 #include "software/sensor_fusion/filter/kalman_filter.hpp"
-#include "time.h"
+#include "software/util/make_enum/make_enum.hpp"
+
+MAKE_ENUM(StateIndex, ORIENTATION, ANGULAR_VELOCITY, ANGULAR_ACCELERATION);
+
+MAKE_ENUM(MeasurementIndex, VISION_ORIENTATION, MOTOR_ANGULAR_VELOCITY,
+          IMU_ANGULAR_VELOCITY, TARGET_ANGULAR_ACCELERATION);
 
 /**
- * This class implements the KalmanFilter class to track robot orientation. It keeps a
- * rolling history of the robot's state, so when vision updates come in, the filter can
- * roll back and recompute with them.
+ * Estimates robot orientation, angular velocity, and angular acceleration
+ * using a Kalman filter.
  *
- * For information on the math and design of kalman filters, see relevant links in
- * kalman_filter.h
+ * The filter keeps a history of recent predict/update operations. When delayed
+ * vision data arrives, the localizer rewinds to the matching historical state,
+ * applies the delayed measurement, then replays newer steps to recover the
+ * current estimate.
  */
 class RobotLocalizer
 {
    public:
     /**
-     * Creates a new robot localizer. The variances given determine how much we trust each
-     * source of feedback
+     * Creates a new robot localizer.
      *
-     * @param process_noise_variance
-     * @param vision_noise_variance
-     * @param encoder_noise_variance
-     * @param target_angular_acceleration_variance
+     * The variances determine how strongly each source influences the estimate.
+     *
+     * @param process_noise_variance Variance applied to the process noise model.
+     * @param vision_noise_variance Variance of camera heading measurements.
+     * @param motor_sensor_noise_variance Variance of motor sensor angular velocity.
+     * @param target_angular_acceleration_variance Variance of commanded
+     * angular acceleration measurements.
      */
     RobotLocalizer(double process_noise_variance, double vision_noise_variance,
-                   double encoder_noise_variance,
+                   double motor_sensor_noise_variance,
                    double target_angular_acceleration_variance);
 
     /**
-     * Innovates the state according to the time since the last time this function was
-     * called.
+     * Runs one prediction step using elapsed time since the previous call.
      *
      * @param target_acceleration The target acceleration the robot is trying to attain
      * right now.
@@ -49,7 +56,7 @@ class RobotLocalizer
      * @param orientation Vision reading of the orientation of the robot in world space
      * @param age_seconds Age in seconds of the vision snapshot (time since it was taken)
      */
-    void rollbackVision(const Angle& orientation, const double& age_seconds);
+    void rollbackVision(const Angle& orientation, double age_seconds);
 
     /**
      * Update the orientation from vision.
@@ -59,11 +66,12 @@ class RobotLocalizer
     void updateVision(const Angle& orientation);
 
     /**
-     * Update the angular velocity from encoders.
+     * Update the angular velocity from velocity reported by motor sensors
+     * (i.e. encoders or Hall sensors).
      *
      * @param angular_velocity angular velocity of the robot
      */
-    void updateEncoders(const AngularVelocity& angular_velocity);
+    void updateMotorSensors(const AngularVelocity& angular_velocity);
 
     /**
      * Update the angular velocity from IMU.
@@ -75,72 +83,71 @@ class RobotLocalizer
     /**
      * Update the target acceleration.
      *
-     * @param angular_acceleration Target angular acceleration of the robot.
+     * @param angular_acceleration Target angular acceleration of the robot
      */
     void updateTargetAcceleration(const AngularVelocity& angular_acceleration);
 
     /**
      * Gets estimated orientation of the robot.
-     * @return estimated orientation of the robot.
+     *
+     * @return estimated orientation of the robot
      */
-    Angle getOrientation();
+    Angle getOrientation() const;
 
     /**
      * Gets estimated angular velocity of the robot.
-     * @return estimated angular velocity of the robot.
+     *
+     * @return estimated angular velocity of the robot
      */
-    AngularVelocity getAngularVelocity();
+    AngularVelocity getAngularVelocity() const;
 
     /**
      * Gets estimated angular acceleration of the robot.
-     * @return estimated angular acceleration of the robot.
+     *
+     * @return estimated angular acceleration of the robot
      */
-    double getAngularAccelerationRadians();
+    double getAngularAccelerationRadians() const;
 
    private:
+    static constexpr unsigned int STATE_SIZE = reflective_enum::size<StateIndex>();
+    static constexpr unsigned int MEASUREMENT_SIZE =
+        reflective_enum::size<MeasurementIndex>();
+
     /**
-     * Structures for storing history of filter states.
+     * Snapshot of a Kalman filter predict/update step needed for rollback/replay.
      */
-    struct Predict
-    {
-        Eigen::Matrix<double, 3, 3> F;
-        Eigen::Matrix<double, 3, 3> Q;
-        Eigen::Matrix<double, 3, 1> B;
-        Eigen::Matrix<double, 1, 1> u;
-    };
-    struct Update
-    {
-        Eigen::Matrix<double, 4, 3> H;
-        Eigen::Matrix<double, 4, 1> z;
-    };
     struct FilterStep
     {
-        Eigen::Matrix<double, 3, 1> pre_mean;
-        Eigen::Matrix<double, 3, 3> pre_covariance;
+        struct Predict
+        {
+            Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_model;
+            Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_covariance;
+            Eigen::Vector<double, STATE_SIZE> control_model;
+            Eigen::Vector<double, 1> control_input;
+        };
+
+        struct Update
+        {
+            Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> measurement_model;
+            Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
+        };
+
         std::optional<Predict> prediction;
         std::optional<Update> update;
-        timespec birthday;  // time at which step was executed
-    };
-    // The kalman filter has two main vectors, currently we are tracking in 3 dimensions
-    // and measuring in 4. State space vector: x = [
-    //    Orientation,
-    //    Angular velocity,
-    //    Angular acceleration
-    // ]
-    // Measurement space vector:
-    // z = [
-    //    Camera orientation,
-    //    Wheel encoder angular velocity,
-    //    IMU angular velocity,
-    //    Target angular acceleration
-    // ]
-    KalmanFilter<3, 4, 1> filter_;
 
-    // The variance of the process. The process is our prediction of the future.
+        Eigen::Vector<double, STATE_SIZE> state_estimate;
+        Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
+
+        std::chrono::time_point<std::chrono::system_clock> time;
+    };
+
+    KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, 1> filter_;
+
+    // Process noise variance used in prediction
     double process_noise_variance_;
 
-    timespec current_time_;
-    timespec last_step_;
+    std::chrono::time_point<std::chrono::system_clock> last_step_time_;
 
-    std::deque<FilterStep> history;  // where 1st entry = newest
+    // History is ordered newest-first (front is the most recent step)
+    std::deque<FilterStep> history;
 };

@@ -186,7 +186,7 @@ class Angle final
      *
      * @return the angle between this Angle and other, in the range [-π, π].
      */
-    constexpr Angle minSignedDiff(const Angle &to) const;
+    constexpr Angle minSignedDiff(const Angle& to) const;
 
    private:
     /**
@@ -506,7 +506,7 @@ inline constexpr Angle Angle::minDiff(const Angle& other) const
     return (*this - other).clamp().abs();
 }
 
-inline constexpr Angle Angle::minSignedDiff(const Angle &to) const
+inline constexpr Angle Angle::minSignedDiff(const Angle& to) const
 {
     Angle delta =
         (to.clamp() - this->clamp());  // this will be clamped between [-2pi, 2pi].
