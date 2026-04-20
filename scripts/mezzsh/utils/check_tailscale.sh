@@ -21,8 +21,5 @@ if ! tailscale status >/dev/null 2>&1; then
 
     read -p "Enter the auth key. Please contact a software lead if you don't have one: " AUTH_KEY
 
-    # Replace with your actual auth key and desired hostname
     sudo tailscale up --auth-key=$AUTH_KEY
-else
-    echo "Tailscale is already up and running."
 fi
