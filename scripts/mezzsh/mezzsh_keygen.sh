@@ -27,18 +27,20 @@ fi
 read -p "Enter a username for yourself. Please make it somewhat recognizable, preferably just your first name: " USERNAME
 
 KEY_NAME="id_rsa_$ALIAS"
-KEY_PATH="$USER_HOME/.ssh/$KEY_NAME"
+KEY_PATH="/.ssh/$KEY_NAME"
+USER_KEY_PATH="$USER_HOME/.ssh/$KEY_NAME"
 
 echo -e "\n--- Generating SSH Key Pair ---"
-ssh-keygen -t rsa -b 4096 -f "$KEY_PATH" -C "$USERNAME" -N ""
+ssh-keygen -t rsa -b 4096 -f "$USER_KEY_PATH" -C "$USERNAME" -N ""
+
+sudo chown $SUDO_USER:$SUDO_USER $USER_KEY_PATH
 
 echo -e "\n--- Configuring SSH Alias ---"
 cat <<EOF >> "$USER_HOME/.ssh/config"
 
-Host $ALIAS
-    HostName $PC_NAME
+Host $TARGET_IP
     User $PC_NAME
-    IdentityFile $KEY_PATH
+    IdentityFile ~/$KEY_PATH
     IdentitiesOnly yes
     SendEnv SSH_CHECK_MODE FORCE_CONNECT
 EOF

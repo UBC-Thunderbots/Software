@@ -42,6 +42,8 @@ Match User $TARGET_USER
     AcceptEnv SSH_CHECK_MODE FORCE_CONNECT
 EOF
 
+sudo chmod +x $SERVER_SCRIPT
+
 echo "[4/5] Setting 1-hour shell timeout..."
 
 USER_HOME=$(eval echo "~$TARGET_USER")

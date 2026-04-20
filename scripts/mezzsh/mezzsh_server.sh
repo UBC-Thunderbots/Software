@@ -2,21 +2,21 @@
 
 # The `who` command returns all logged in users (IRL and remote)
 # Finds IRL users by looking for the physical monitor
-LOCAL_USER=$(who | grep -E '(:0|tty7)')
+LOCAL_USER=$(who | grep -E '(:0|tty2)')
 
 # Finds remote users, who are marked with `pts`
 # for each one, finds their username, to make identifying them easier
 # excludes the current user, otherwise server will always seem busy
-REMOTE_USERS_LIST=$(who | grep pts | grep -v "$(basename $(tty))" | awk '{print $1}')
+#REMOTE_USERS_LIST=$(who | grep pts | grep -v "$(basename $(tty))" | awk '{print $1}')
 
 # if the client requested a check, return the user info from above
 if [ "$SSH_CHECK_MODE" == "1" ]; then
     if [ ! -z "$LOCAL_USER" ]; then
         echo "STATUS_BUSY_LOCAL"
         exit 0
-    elif [ ! -z "$REMOTE_USERS" ]; then
+    elif [ ! -z "$REMOTE_USERS_LIST" ]; then
         echo "STATUS_BUSY_REMOTE"
-        echo "Connected: $REMOTE_USERS"
+        echo "Connected: $REMOTE_USERS_LIST"
         exit 0
     fi
     exit 0

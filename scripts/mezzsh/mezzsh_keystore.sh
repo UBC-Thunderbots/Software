@@ -4,7 +4,7 @@ USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
 
 # Configuration
 AUTH_KEYS="$USER_HOME/.ssh/authorized_keys"
-SERVER_SCRIPT="./mezzsh_server.sh"
+SERVER_SCRIPT="/home/thunderbots/Software/scripts/mezzsh/mezzsh_server.sh"
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: sudo ./mezzsh_keystore.sh \"PUBLIC_KEY_STRING\""
