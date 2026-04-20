@@ -11,6 +11,7 @@ ALIAS="mezzsh"
 GREEN='\e[1;32m'
 NC='\e[0m'
 
+# get the actual current user despite running in sudo
 USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
 
 # Check for root privileges
@@ -36,8 +37,12 @@ KEY_PATH="/.ssh/$KEY_NAME"
 USER_KEY_PATH="$USER_HOME/.ssh/$KEY_NAME"
 
 echo -e "\n--- Generating SSH Key Pair ---"
+
+# username is appended as a comment to the key
 ssh-keygen -t rsa -b 4096 -f "$USER_KEY_PATH" -C "$USERNAME" -N ""
 
+# ssh is particular about permissions on the key file
+# specifically, the private key file should be owned and should only be readable by the current user
 sudo chown $SUDO_USER:$SUDO_USER $USER_KEY_PATH
 sudo chmod 400 $USER_KEY_PATH
 sudo chmod 400 "$USER_KEY_PATH.pub"

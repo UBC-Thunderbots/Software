@@ -46,6 +46,7 @@ Match User $TARGET_USER
     AcceptEnv SSH_CHECK_MODE FORCE_CONNECT
 EOF
 
+# Script has to be executable for it to be triggered on new connections
 sudo chmod +x $SERVER_SCRIPT
 
 echo "[4/5] Setting 1-hour shell timeout..."
@@ -63,6 +64,5 @@ else
     echo "ERROR: Home directory for $TARGET_USER not found. Timeout not set."
 fi
 
-# 4. Finalizing and Restarting Service
 echo "[5/5] Restarting SSH service to apply changes..."
 systemctl restart ssh

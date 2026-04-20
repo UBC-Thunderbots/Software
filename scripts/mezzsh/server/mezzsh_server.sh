@@ -10,13 +10,14 @@
 # Finds IRL users by looking for the physical monitor (tty2)
 LOCAL_USER=$(who | grep -E '(tty2)')
 
-# Finds remote users, who are marked with `pts`
+# Finds remote users currently connected
 # for each one, finds their username, to make identifying them easier
 # excludes the current user, otherwise server will always seem busy
 REMOTE_USERS_LIST=$(bash /home/thunderbots/Software/scripts/mezzsh/utils/get_connected_users.sh)
 
 # if the client requested a check, return the user info from above
 if [ "$SSH_CHECK_MODE" == "1" ]; then
+    # local user check takes priority
     if [ ! -z "$LOCAL_USER" ]; then
         echo "STATUS_BUSY_LOCAL"
         exit 0
