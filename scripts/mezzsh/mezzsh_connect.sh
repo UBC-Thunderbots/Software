@@ -22,7 +22,7 @@ FORCE_FLAG="NORMAL"
 SSH_TARGET="thunderbots@$TARGET_IP"
 
 # first, check server status (if other users are using the PC)
-RESPONSE=$(ssh -o SendEnv=SSH_CHECK_MODE -t $SSH_TARGET "check_status" 2>&1)
+RESPONSE=$(SSH_CHECK_MODE=1 ssh -o SendEnv=SSH_CHECK_MODE -t $SSH_TARGET "check_status" 2>&1)
 
 RED='\e[1;31m'
 NC='\e[0m'
@@ -48,7 +48,7 @@ fi
 # if the user wanted to force the connection, does it here
 if [ "$FORCE_FLAG" == "FORCE" ]; then
     echo "Force connecting..."
-    ssh -o SendEnv=FORCE_CONNECT=1 -t $SSH_TARGET
+    FORCE_CONNECT=1 ssh -o SendEnv=FORCE_CONNECT -t $SSH_TARGET
 else
     ssh -t $SSH_TARGET
 fi

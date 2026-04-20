@@ -17,7 +17,7 @@ fi
 bash ./utils/check_tailscale.sh
 
 # Get the Tailscale IP of the Main PC
-TARGET_IP=$(tailscale ip -4 $TAILSCALE_HOSTNAME)
+TARGET_IP=$(tailscale ip -4 $PC_NAME)
 
 if [ -z "$TARGET_IP" ]; then
     echo "Could not find Main PC on Tailscale. Are you logged in?"
@@ -35,13 +35,14 @@ ssh-keygen -t rsa -b 4096 -f "$USER_KEY_PATH" -C "$USERNAME" -N ""
 
 sudo chown $SUDO_USER:$SUDO_USER $USER_KEY_PATH
 sudo chmod 400 $USER_KEY_PATH
+sudo chmod 400 "$USER_KEY_PATH.pub"
 
 echo -e "\n--- Configuring SSH Alias ---"
 cat <<EOF >> "$USER_HOME/.ssh/config"
 
 Host $TARGET_IP
     User $PC_NAME
-    IdentityFile ~/$KEY_PATH
+    IdentityFile ~$KEY_PATH
     IdentitiesOnly yes
     SendEnv SSH_CHECK_MODE FORCE_CONNECT
 EOF
