@@ -38,7 +38,7 @@ if [[ "$RESPONSE" == *"STATUS_BUSY_LOCAL"* ]]; then
 # someone is connected remotely
 elif [[ "$RESPONSE" == *"STATUS_BUSY_REMOTE"* ]]; then
     echo -e "⚠️  ${RED}WARNING${NC}: Other SSH users are connected:"
-    echo "$RESPONSE" | grep "Connected:"
+    echo "$RESPONSE" | grep "List"
     read -p "Do you want to force the connection? (y/n): " choice
 
     # exits if user does not want to force

@@ -7,10 +7,7 @@ LOCAL_USER=$(who | grep -E '(:0|tty2)')
 # Finds remote users, who are marked with `pts`
 # for each one, finds their username, to make identifying them easier
 # excludes the current user, otherwise server will always seem busy
-#REMOTE_USERS_LIST=$(who | grep pts | grep -v "$(basename $(tty))" | awk '{print $1}')
-
-echo $SSH_CHECK_MODE
-echo "????"
+REMOTE_USERS_LIST=$(bash /home/thunderbots/Software/scripts/mezzsh/utils/get_connected_users.sh)
 
 # if the client requested a check, return the user info from above
 if [ "$SSH_CHECK_MODE" == "1" ]; then
@@ -19,7 +16,7 @@ if [ "$SSH_CHECK_MODE" == "1" ]; then
         exit 0
     elif [ ! -z "$REMOTE_USERS_LIST" ]; then
         echo "STATUS_BUSY_REMOTE"
-        echo "Connected: $REMOTE_USERS_LIST"
+        echo "List of Users: $REMOTE_USERS_LIST"
         exit 0
     fi
     exit 0
@@ -41,7 +38,7 @@ if ([ ! -z "$LOCAL_USER" ] || [ ! -z "$REMOTE_USERS" ]) && [ "$FORCE_CONNECT" !=
 fi
 
 # Trigger the visual warning dialog if someone is using the PC IRL
-./mezzsh_warn.sh &
+bash /home/thunderbots/Software/scripts/mezzsh/mezzsh_warn.sh &
 
 # if we get here, start a normal shell
 exec $SHELL
