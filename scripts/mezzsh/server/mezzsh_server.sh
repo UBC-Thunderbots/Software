@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Script to intercept all incoming ssh connections to the Mezz PC
+# Checks for both IRL users and any connected remote users who are currently using the PC
+# and warns the new connection accordingly
+# If the new connection wants to force, opens the connection
+# and also warns any IRL users if present
+
 # The `who` command returns all logged in users (IRL and remote)
 # Finds IRL users by looking for the physical monitor
 LOCAL_USER=$(who | grep -E '(tty2)')

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Gets the names of all currently connected SSH users
+# Each user has their name attached to their SSH public key in authorized_keys
+# So we find the key each person used to connect, and then the corresponding name
+
 # Get fingerprints and comments from authorized_keys
 KEYS_FILE="/home/thunderbots/.ssh/authorized_keys"
 declare -A key_comments

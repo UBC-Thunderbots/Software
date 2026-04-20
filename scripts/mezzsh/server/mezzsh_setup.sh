@@ -1,6 +1,10 @@
 #!/bin/bash
 
-SERVER_SCRIPT="/home/thunderbots/Software/scripts/mezzsh/mezzsh_server.sh"
+# Sets up the Mezz PC to accept new SSH connections
+# Uses Tailscale as a VPN to get around connections being blocked at the router level
+# Sets up Tailscale, ssh, and links the server script to intercept new connections
+
+SERVER_SCRIPT="/home/thunderbots/Software/scripts/mezzsh/server/mezzsh_server.sh"
 TIMEOUT_SECONDS=3600  # 1 hour
 SSHD_CONFIG="/etc/ssh/sshd_config"
 TARGET_USER="thunderbots"
@@ -26,7 +30,7 @@ echo "[2/5] Configuring SSH service to start on boot..."
 systemctl enable --now ssh
 systemctl start ssh
 
-echo "[3/5] Modifying sshd_config for custom Environment variables, and to perform safety checks on new connections......"
+echo "[3/5] Modifying sshd_config for custom Environment variables, and links script to perform safety checks on new connections......"
 
 # Backup original config
 cp $SSHD_CONFIG "${SSHD_CONFIG}.bak"

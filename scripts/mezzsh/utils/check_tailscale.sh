@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Checks if Tailscale is installed, the daemon is up and running, and we are logged in (connected) to the VPN
+
 # Check if tailscale is installed
 if ! command -v tailscale &> /dev/null; then
     echo "Tailscale not found. Installing..."

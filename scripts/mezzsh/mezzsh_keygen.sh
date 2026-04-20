@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Generates a private / public key pair for connecting via ssh
+# Adds the Mezz PC's IP to the ssh config file, and sets the new key as the identity to use
+# And sets the key file's permissions correctly
+# Each key also has a username attached to it for easier identification
+
 PC_NAME="thunderbots"
 ALIAS="mezzsh"
 

@@ -5,11 +5,12 @@
 # the user if other users are currently connected remotely or using in person
 # Allows user to force a connection
 
-TAILSCALE_HOSTNAME="thunderbots"
+PC_NAME="thunderbots"
+TAILSCALE_HOSTNAME="$PC_NAME"
 
 bash ./utils/check_tailscale.sh
 
-# 2. Get the Tailscale IP of the Main PC
+# Get the Tailscale IP of the Main PC
 TARGET_IP=$(tailscale ip -4 $TAILSCALE_HOSTNAME)
 
 if [ -z "$TARGET_IP" ]; then
@@ -45,7 +46,7 @@ elif [[ "$RESPONSE" == *"STATUS_BUSY_REMOTE"* ]]; then
     [[ "$choice" == [yY] ]] && FORCE_FLAG="FORCE" || exit 1
 fi
 
-# if the user wanted to force the connection, does it here
+# if the user wanted to force the connection
 if [ "$FORCE_FLAG" == "FORCE" ]; then
     echo "Force connecting..."
     FORCE_CONNECT=1 ssh -o SendEnv=FORCE_CONNECT -t $SSH_TARGET
