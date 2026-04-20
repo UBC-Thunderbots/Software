@@ -34,6 +34,7 @@ echo -e "\n--- Generating SSH Key Pair ---"
 ssh-keygen -t rsa -b 4096 -f "$USER_KEY_PATH" -C "$USERNAME" -N ""
 
 sudo chown $SUDO_USER:$SUDO_USER $USER_KEY_PATH
+sudo chmod 400 $USER_KEY_PATH
 
 echo -e "\n--- Configuring SSH Alias ---"
 cat <<EOF >> "$USER_HOME/.ssh/config"
