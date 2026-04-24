@@ -4,6 +4,8 @@ from software.field_tests.field_test_fixture import *
 from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import create_logger
 import math
+from proto.message_translation.tbots_protobuf import create_world_state
+import software.python_bindings as tbots_cpp
 
 logger = create_logger(__name__)
 
@@ -83,24 +85,14 @@ def test_basic_rotation(field_test_runner):
         ]
     )
 
-    id = world.friendly_team.team_robots[0].id
-    print(f"Running test on robot {id}")
-
-    robot = world.friendly_team.team_robots[0]
-    rob_pos_p = robot.current_state.global_position
-    logger.info("staying in pos {rob_pos_p}")
-
-    for angle in test_angles:
-        move_tactic = MoveTactic()
-        move_tactic.destination.CopyFrom(rob_pos_p)
-        move_tactic.dribbler_mode = DribblerMode.OFF
-        move_tactic.final_orientation.CopyFrom(Angle(radians=angle / 180.0 * math.pi))
-        move_tactic.ball_collision_type = BallCollisionType.AVOID
-        move_tactic.auto_chip_or_kick.CopyFrom(
-            AutoChipOrKick(autokick_speed_m_per_s=0.0)
-        )
-        move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
-        move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
+    move_tactic = MoveTactic()
+    move_tactic.destination.CopyFrom(rob_pos_p)
+    move_tactic.dribbler_mode = DribblerMode.OFF
+    move_tactic.final_orientation.CopyFrom(Angle(radians=angle / 180.0 * math.pi))
+    move_tactic.ball_collision_type = BallCollisionType.AVOID
+    move_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=0.0))
+    move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
+    move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
 
         # Setup Tactic
         field_test_runner.set_tactics(
@@ -135,13 +127,6 @@ def test_one_robots_square(field_test_runner):
         ]
     )
 
-    id = world.friendly_team.team_robots[0].id
-    print(f"Running test on robot {id}")
-
-    point1 = Point(x_meters=-0.3, y_meters=0.6)
-    point2 = Point(x_meters=-0.3, y_meters=-0.6)
-    point3 = Point(x_meters=-1.5, y_meters=-0.6)
-    point4 = Point(x_meters=-1.5, y_meters=0.6)
 
     tactic_0 = MoveTactic(
         destination=point1,

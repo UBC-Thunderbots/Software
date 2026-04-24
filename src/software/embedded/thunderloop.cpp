@@ -43,7 +43,7 @@ extern "C"
     {
         if (g_motor_service)
         {
-            g_motor_service->resetMotorBoard();
+            g_motor_service->reset();
         }
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
@@ -71,7 +71,6 @@ extern "C"
 
 Thunderloop::Thunderloop(const RobotConstants& robot_constants, bool enable_log_merging,
                          const int loop_hz)
-    // TODO (#2495): Set the friendly team colour
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       motor_status_(std::nullopt),
       robot_constants_(robot_constants),
@@ -121,11 +120,11 @@ Thunderloop::Thunderloop(const RobotConstants& robot_constants, bool enable_log_
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    power_service_ = std::make_unique<PowerService>();
+    // power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
-    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    motor_service_  = std::make_unique<MotorService>(robot_constants);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
     LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
@@ -307,7 +306,7 @@ void Thunderloop::runLoop()
                 getMilliseconds(poll_time));
 
             // Power Service: execute the power control command
-            power_status_ = pollPowerService(poll_time);
+            // power_status_ = pollPowerService(poll_time);
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
