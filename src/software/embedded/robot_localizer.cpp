@@ -25,6 +25,7 @@ void RobotLocalizer::step(const AngularVelocity& target_acceleration)
 {
     FilterStep step{
         .prediction       = FilterStep::Predict{},
+        .update           = std::nullopt,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time             = std::chrono::system_clock::now(),
@@ -141,24 +142,26 @@ void RobotLocalizer::updateFilterWithVision(const Angle& orientation)
 
 void RobotLocalizer::updateMotorSensors(const AngularVelocity& angular_velocity)
 {
-    FilterStep step{
-        .state_estimate   = filter_.state_estimate,
-        .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::system_clock::now(),
-    };
-
     filter_.measurement_model.setZero();
     filter_.measurement_model(
         static_cast<Eigen::Index>(MeasurementIndex::MOTOR_ANGULAR_VELOCITY),
         static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
 
-    step.update = FilterStep::Update{
+    FilterStep::Update update{
         .measurement_model = filter_.measurement_model,
         .measurement       = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
     };
 
-    step.update->measurement(static_cast<Eigen::Index>(
+    update.measurement(static_cast<Eigen::Index>(
         MeasurementIndex::MOTOR_ANGULAR_VELOCITY)) = angular_velocity.toRadians();
+
+    const FilterStep step{
+        .prediction       = std::nullopt,
+        .update           = update,
+        .state_estimate   = filter_.state_estimate,
+        .state_covariance = filter_.state_covariance,
+        .time             = std::chrono::system_clock::now(),
+    };
 
     history.push_front(step);
     filter_.update(step.update->measurement);
@@ -166,24 +169,26 @@ void RobotLocalizer::updateMotorSensors(const AngularVelocity& angular_velocity)
 
 void RobotLocalizer::updateImu(const AngularVelocity& angular_velocity)
 {
-    FilterStep step{
-        .state_estimate   = filter_.state_estimate,
-        .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::system_clock::now(),
-    };
-
     filter_.measurement_model.setZero();
     filter_.measurement_model(
         static_cast<Eigen::Index>(MeasurementIndex::IMU_ANGULAR_VELOCITY),
         static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
 
-    step.update = FilterStep::Update{
+    FilterStep::Update update{
         .measurement_model = filter_.measurement_model,
         .measurement       = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
     };
 
-    step.update->measurement(static_cast<Eigen::Index>(
+    update.measurement(static_cast<Eigen::Index>(
         MeasurementIndex::IMU_ANGULAR_VELOCITY)) = angular_velocity.toRadians();
+
+    const FilterStep step{
+        .prediction       = std::nullopt,
+        .update           = update,
+        .state_estimate   = filter_.state_estimate,
+        .state_covariance = filter_.state_covariance,
+        .time             = std::chrono::system_clock::now(),
+    };
 
     history.push_front(step);
     filter_.update(step.update->measurement);
@@ -191,25 +196,27 @@ void RobotLocalizer::updateImu(const AngularVelocity& angular_velocity)
 
 void RobotLocalizer::updateTargetAcceleration(const AngularVelocity& angular_acceleration)
 {
-    FilterStep step{
-        .state_estimate   = filter_.state_estimate,
-        .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::system_clock::now(),
-    };
-
     filter_.measurement_model.setZero();
     filter_.measurement_model(
         static_cast<Eigen::Index>(MeasurementIndex::TARGET_ANGULAR_ACCELERATION),
         static_cast<Eigen::Index>(StateIndex::ANGULAR_ACCELERATION)) = 1;
 
-    step.update = FilterStep::Update{
+    FilterStep::Update update{
         .measurement_model = filter_.measurement_model,
         .measurement       = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
     };
 
-    step.update->measurement(
+    update.measurement(
         static_cast<Eigen::Index>(MeasurementIndex::TARGET_ANGULAR_ACCELERATION)) =
         angular_acceleration.toRadians();
+
+    const FilterStep step{
+        .prediction       = std::nullopt,
+        .update           = update,
+        .state_estimate   = filter_.state_estimate,
+        .state_covariance = filter_.state_covariance,
+        .time             = std::chrono::system_clock::now(),
+    };
 
     history.push_front(step);
     filter_.update(step.update->measurement);
