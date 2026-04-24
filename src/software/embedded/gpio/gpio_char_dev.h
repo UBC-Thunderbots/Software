@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-#include "software/embedded/gpio.h"
+#include "software/embedded/gpio/gpio.h"
 
 /**
  * GPIO with the character device interface
@@ -24,7 +24,7 @@ class GpioCharDev : public Gpio
      * @param char_dev_path The path to the gpio character device
      */
     GpioCharDev(uint32_t gpio_number, GpioDirection direction, GpioState state,
-                std::string char_dev_path = "/dev/gpiochip0");
+                std::string char_dev_path = "/dev/gpiochip4");
 
     /**
      * Destructor
