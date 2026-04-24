@@ -51,19 +51,12 @@ class RobotLocalizer
     void step(const AngularVelocity& target_acceleration);
 
     /**
-     * Update the orientation from vision based on an old reading.
+     * Update the orientation from vision.
      *
      * @param orientation Vision reading of the orientation of the robot in world space
      * @param age_seconds Age in seconds of the vision snapshot (time since it was taken)
      */
-    void rollbackVision(const Angle& orientation, double age_seconds);
-
-    /**
-     * Update the orientation from vision.
-     *
-     * @param orientation Vision reading of the orientation of the robot in world space
-     */
-    void updateVision(const Angle& orientation);
+    void updateVision(const Angle& orientation, double age_seconds);
 
     /**
      * Update the angular velocity from velocity reported by motor sensors
@@ -109,6 +102,13 @@ class RobotLocalizer
     double getAngularAccelerationRadians() const;
 
    private:
+    /**
+     * Update the Kalman filter with the orientation from vision.
+     *
+     * @param orientation Vision reading of the orientation of the robot in world space
+     */
+    void updateFilterWithVision(const Angle& orientation);
+
     static constexpr unsigned int STATE_SIZE = reflective_enum::size<StateIndex>();
     static constexpr unsigned int MEASUREMENT_SIZE =
         reflective_enum::size<MeasurementIndex>();

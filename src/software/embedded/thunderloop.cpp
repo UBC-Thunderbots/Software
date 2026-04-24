@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -238,9 +239,12 @@ void Thunderloop::runLoop()
                 // Save new primitive
                 primitive_ = new_primitive;
 
-                TbotsProto::Angle orientation_msg = primitive_.orientation();
-                robot_localizer_.rollbackVision(createAngle(orientation_msg), RTT_S / 2);
-
+                if (primitive_.has_move())
+                {
+                    const Angle current_orientation =
+                        createAngle(primitive_.move().w_traj_params().start_angle());
+                    robot_localizer_.updateVision(current_orientation, RTT_S / 2);
+                }
 
                 // Update primitive executor's primitive set
                 {
@@ -271,8 +275,6 @@ void Thunderloop::runLoop()
                 robot_localizer_.updateMotorSensors(
                     createAngularVelocity(status.angular_velocity()));
 
-                // step the robot localizer
-
                 primitive_executor_.updateState(createVector(status.local_velocity()),
                                                 robot_localizer_.getAngularVelocity(),
                                                 robot_localizer_.getOrientation());
@@ -286,7 +288,7 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
 
-                ZoneNamedN(_tracy_step_primitive, "Thunderloop: step Primitive", true);
+                ZoneNamedN(_tracy_step_primitive, "Thunderloop: Step Primitive", true);
 
                 // Handle emergency stop override
                 auto nanoseconds_elapsed_since_last_primitive =
@@ -294,7 +296,7 @@ void Thunderloop::runLoop()
 
                 if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
-                    primitive_executor_.setStopPrimitive();
+                    primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
                 }
 
                 direct_control_ =

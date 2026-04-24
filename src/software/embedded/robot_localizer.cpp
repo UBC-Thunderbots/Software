@@ -67,11 +67,11 @@ void RobotLocalizer::step(const AngularVelocity& target_acceleration)
     filter_.predict(step.prediction->control_input);
 }
 
-void RobotLocalizer::rollbackVision(const Angle& orientation, const double age_seconds)
+void RobotLocalizer::updateVision(const Angle& orientation, const double age_seconds)
 {
     if (history.empty())
     {
-        updateVision(orientation);
+        updateFilterWithVision(orientation);
         return;
     }
 
@@ -85,7 +85,7 @@ void RobotLocalizer::rollbackVision(const Angle& orientation, const double age_s
     if (rollback_point == history.begin())
     {
         // All history predates the sample, no need to rollback
-        updateVision(orientation);
+        updateFilterWithVision(orientation);
         return;
     }
 
@@ -97,7 +97,7 @@ void RobotLocalizer::rollbackVision(const Angle& orientation, const double age_s
     filter_.state_estimate   = replay_iter->state_estimate;
     filter_.state_covariance = replay_iter->state_covariance;
 
-    updateVision(orientation);
+    updateFilterWithVision(orientation);
 
     // Replay from the rollback point back to the current estimate
     for (; replay_iter != history.rbegin(); --replay_iter)
@@ -120,7 +120,7 @@ void RobotLocalizer::rollbackVision(const Angle& orientation, const double age_s
     }
 }
 
-void RobotLocalizer::updateVision(const Angle& orientation)
+void RobotLocalizer::updateFilterWithVision(const Angle& orientation)
 {
     const double orientation_estimate =
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION));

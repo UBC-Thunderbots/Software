@@ -32,11 +32,6 @@ class PrimitiveExecutor
     void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
 
     /**
-     * Set the current primitive to the stop primitive
-     */
-    void setStopPrimitive();
-
-    /**
      * Update primitive executor with the current velocity and orientation of the robot
      *
      * @param local_velocity The current _local_ velocity
@@ -45,12 +40,6 @@ class PrimitiveExecutor
      */
     void updateState(const Vector& local_velocity,
                      const AngularVelocity& angular_velocity, const Angle& orientation);
-
-    /**
-     * Set the robot id
-     * @param robot_id The id of the robot which uses this primitive executor
-     */
-    void setRobotId(RobotId robot_id);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
@@ -63,36 +52,34 @@ class PrimitiveExecutor
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
         TbotsProto::PrimitiveExecutorStatus& status);
 
-    /*
-     * Get the target angular acceleration that the robot should be at.
-     * @returns AngularVelocity The target angular acceleration
-     */
-    AngularVelocity getTargetAngularAcceleration();
-
    private:
     /*
      * Compute the next target linear _local_ velocity the robot should be at.
      * @returns Vector The target linear _local_ velocity
      */
-    Vector getTargetLinearVelocity();
+    Vector getTargetLinearVelocity() const;
 
     /*
      * Returns the next target angular velocity the robot
      *
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity getTargetAngularVelocity();
+    AngularVelocity getTargetAngularVelocity() const;
 
     TbotsProto::Primitive current_primitive_;
+
+    std::optional<TrajectoryPath> trajectory_path_;
+    std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
+
     Duration time_since_angular_trajectory_creation_;
     Duration time_since_linear_trajectory_creation_;
+
     Vector velocity_;
     AngularVelocity angular_velocity_;
     Angle orientation_;
+
     TeamColour friendly_team_colour_;
     RobotConstants_t robot_constants_;
-    std::optional<TrajectoryPath> trajectory_path_;
-    std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
     // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds
@@ -107,5 +94,9 @@ class PrimitiveExecutor
 
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.
-    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
+    static constexpr double MAX_DAMPENING_LINEAR_VELOCITY_DISTANCE_M = 0.05;
+
+    // The angular distance away from the destination at which we start dampening
+    // the angular velocity to avoid jittering around the destination.
+    static constexpr double MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES = 5;
 };
