@@ -21,7 +21,7 @@ class PrimitiveExecutor
      * @param robot_id The id of the robot which uses this primitive executor
      */
     explicit PrimitiveExecutor(const Duration time_step,
-                               const RobotConstants_t& robot_constants,
+                               const RobotConstants& robot_constants,
                                const TeamColour friendly_team_colour,
                                const RobotId robot_id);
 
@@ -79,7 +79,7 @@ class PrimitiveExecutor
     Angle orientation_;
 
     TeamColour friendly_team_colour_;
-    RobotConstants_t robot_constants_;
+    RobotConstants robot_constants_;
 
     // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds

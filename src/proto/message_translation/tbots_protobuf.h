@@ -269,7 +269,7 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
  * @return the dribbler speed in RPM
  */
 int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
-                                       RobotConstants_t robot_constants);
+                                       RobotConstants robot_constants);
 
 /**
  * Convert max allowed speed mode to max allowed speed
@@ -281,4 +281,4 @@ int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
  */
 double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
-    RobotConstants_t robot_constants);
+    RobotConstants robot_constants);

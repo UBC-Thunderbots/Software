@@ -4,11 +4,11 @@
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/primitive/primitive_msg_factory.h"
-#include "shared/2021_robot_constants.h"
+#include "shared/robot_constants.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/vector.h"
 
-EuclideanToWheel::EuclideanToWheel(const RobotConstants_t& robot_constants)
+EuclideanToWheel::EuclideanToWheel(const RobotConstants& robot_constants)
     : robot_center_to_wheel_m_(robot_constants.robot_center_to_wheel_center_m),
       robot_constants_(robot_constants)
 {

@@ -32,7 +32,7 @@ class DriveAndDribblerWidget(QWidget):
 
         self.proto_unix_io = proto_unix_io
 
-        self.constants = tbots_cpp.create2021RobotConstants()
+        self.constants = tbots_cpp.create2026RobotConstants()
 
         self.enabled = True
         self.control_mode = ControlMode.VELOCITY
