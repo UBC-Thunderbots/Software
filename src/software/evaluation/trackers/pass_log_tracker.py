@@ -67,6 +67,8 @@ class PassLogTracker(PassTracker):
 
         :param event_type: (unused)
         """
+        super().write_event(event_type=event_type)
+        
         if not self.curr_pass:
             return
 
