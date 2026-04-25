@@ -43,7 +43,7 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const WallKickoffTactic &tactic) override;
     void visit(const AvoidInterferenceTactic &tactic) override;
     void visit(const PassDefenderTactic &tactic) override;
-    void visit(const KickOrChipTactic &Tactic) override;
+    void visit(const KickOrChipTactic &tactic) override;
 
     /**
      * Gets the motion constraints updated with the requirements of the tactics
@@ -55,8 +55,8 @@ class MotionConstraintVisitor : public TacticVisitor
      * @return set of MotionConstraints
      */
     std::set<TbotsProto::MotionConstraint> getUpdatedMotionConstraints(
-        const Tactic &tactic,
-        const std::set<TbotsProto::MotionConstraint> &existing_motion_constraints);
+        const Tactic& tactic,
+        const std::set<TbotsProto::MotionConstraint>& existing_motion_constraints);
 
    private:
     std::set<TbotsProto::MotionConstraint> current_motion_constraints;

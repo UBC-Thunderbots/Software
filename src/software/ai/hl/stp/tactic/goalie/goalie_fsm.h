@@ -52,7 +52,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      * @return the position that the goalie should move to
      */
     static Point getGoaliePositionToBlock(
-        const Ball &ball, const Field &field,
+        const Ball& ball, const Field& field,
         TbotsProto::GoalieTacticConfig goalie_tactic_config);
 
     /**
@@ -64,14 +64,14 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      * @return the intersections between the ball velocity ray and the full goal segment
      */
     static std::vector<Point> getIntersectionsBetweenBallVelocityAndFullGoalSegment(
-        const Ball &ball, const Field &field);
+        const Ball& ball, const Field& field);
 
     /**
      * Gets the area within the friendly goalie's no-chip rectangle
      *
      * @return the area within the friendly goalie's no-chip rectangle
      */
-    static Rectangle getNoChipRectangle(const Field &field);
+    static Rectangle getNoChipRectangle(const Field& field);
 
     /**
      * Finds a good point to chip the ball to from its current position
@@ -82,7 +82,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      * @return a point on the field that is a good place to chip to
      */
     static Point findGoodChipTarget(
-        const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
+        const World& world, const TbotsProto::GoalieTacticConfig& goalie_tactic_config);
 
     /**
      * Guard that checks if the goalie should leave the crease the intercept the ball
@@ -91,7 +91,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      * @param event
      * @return if the goalie should leave the crease
      */
-    bool shouldEvacuateCrease(const Update &event);
+    bool shouldEvacuateCrease(const Update& event);
 
     /**
      * Guard that checks if the ball is moving faster than the time_to_panic threshold
@@ -102,9 +102,9 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      *
      * @return if the goalie should panic
      */
-    bool shouldPanic(const Update &event);
+    bool shouldPanic(const Update& event);
 
-    bool shouldMoveToGoalLine(const Update &event);
+    bool shouldMoveToGoalLine(const Update& event);
 
     /**
      * Guard that checks if the ball is moving slower than the panic threshold and is
@@ -115,7 +115,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      *
      * @return if the goalie should pivot chip the ball
      */
-    bool shouldPivotChip(const Update &event);
+    bool shouldPivotChip(const Update& event);
 
     /**
      * Guard that checks if the ball is moving slower than the panic threshold
@@ -126,14 +126,14 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      *
      * @return if the goalie should stop panicking
      */
-    bool panicDone(const Update &event);
+    bool panicDone(const Update& event);
 
     /**
      * Action that updates the MovePrimitive to time_to_panic and stop the ball
      *
      * @param event GoalieFSM::Update event
      */
-    void panic(const Update &event);
+    void panic(const Update& event);
 
     /**
      * Guard that checks whether the goalie has finished retrieving the ball from the dead
@@ -141,7 +141,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      *
      * @param event GoalieFSM::Update event
      */
-    bool retrieveDone(const Update &event);
+    bool retrieveDone(const Update& event);
 
     /**
      * Action that prompts the goalie to leave the crease momentarily to chip the ball
@@ -149,7 +149,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      *
      * @param event GoalieFSM::Update event
      */
-    void retrieveFromDeadZone(const Update &event,
+    void retrieveFromDeadZone(const Update& event,
                               boost::sml::back::process<DribbleFSM::Update> processEvent);
 
     /**
@@ -157,7 +157,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      *
      * @param event GoalieFSM::Update event
      */
-    void moveToGoalLine(const Update &event);
+    void moveToGoalLine(const Update& event);
 
     /**
      * Action that updates the PivotKickFSM
@@ -165,7 +165,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      * @param event GoalieFSM::Update event
      * @param processEvent processes the PivotKickFSM::Update
      */
-    void updatePivotKick(const Update &event,
+    void updatePivotKick(const Update& event,
                          boost::sml::back::process<PivotKickFSM::Update> processEvent);
 
     /**
@@ -174,14 +174,14 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      *
      * @param event GoalieFSM::Update event
      */
-    void positionToBlock(const Update &event);
+    void positionToBlock(const Update& event);
 
     /**
      * Checks if ball is in the friendly defense area
      *
      * @param event GoalieFSM::Update event
      */
-    bool ballInInflatedDefenseArea(const Update &event);
+    bool ballInInflatedDefenseArea(const Update& event);
 
     auto operator()()
     {

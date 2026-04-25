@@ -8,14 +8,14 @@ GetBehindBallTactic::GetBehindBallTactic(
 {
 }
 
-void GetBehindBallTactic::updateControlParams(const Point &ball_location,
+void GetBehindBallTactic::updateControlParams(const Point& ball_location,
                                               Angle chick_direction)
 {
     control_params.ball_location   = ball_location;
     control_params.chick_direction = chick_direction;
 }
 
-void GetBehindBallTactic::accept(TacticVisitor &visitor) const
+void GetBehindBallTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

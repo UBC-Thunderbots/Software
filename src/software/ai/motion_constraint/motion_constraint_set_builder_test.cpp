@@ -138,7 +138,7 @@ class CheckMotionConstraints
 TEST_P(CheckMotionConstraints, CycleStoppageOrThemGameStatesTest)
 {
     correct_motion_constraints = stoppage_or_them_motion_constraints;
-    auto &[tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
+    auto& [tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
 
     for (TbotsProto::MotionConstraint c : remove_motion_constraints)
     {
@@ -181,7 +181,7 @@ TEST_P(CheckMotionConstraints, CycleStoppageOrThemGameStatesTest)
 TEST_P(CheckMotionConstraints, CycleGameStartOrUsGameStatesTest)
 {
     correct_motion_constraints = gamestart_or_us_motion_constraints;
-    auto &[tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
+    auto& [tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
 
     for (TbotsProto::MotionConstraint c : remove_motion_constraints)
     {
@@ -209,7 +209,7 @@ TEST_P(CheckMotionConstraints, CycleGameStartOrUsGameStatesTest)
 TEST_P(CheckMotionConstraints, CycleKickoffGameStatesTest)
 {
     correct_motion_constraints = kickoff_motion_constraints;
-    auto &[tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
+    auto& [tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
 
     for (TbotsProto::MotionConstraint c : remove_motion_constraints)
     {
@@ -231,7 +231,7 @@ TEST_P(CheckMotionConstraints, CycleKickoffGameStatesTest)
 TEST_P(CheckMotionConstraints, CycleOurPenaltyGameStatesTest)
 {
     correct_motion_constraints = our_penalty_motion_constraints;
-    auto &[tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
+    auto& [tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
 
     for (TbotsProto::MotionConstraint c : remove_motion_constraints)
     {
@@ -250,7 +250,7 @@ TEST_P(CheckMotionConstraints, CycleOurPenaltyGameStatesTest)
 TEST_P(CheckMotionConstraints, CycleThemPenaltyGameStatesTest)
 {
     correct_motion_constraints = them_penalty_motion_constraints;
-    auto &[tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
+    auto& [tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
 
     for (TbotsProto::MotionConstraint c : remove_motion_constraints)
     {
@@ -269,7 +269,7 @@ TEST_P(CheckMotionConstraints, CycleThemPenaltyGameStatesTest)
 TEST_P(CheckMotionConstraints, CycleThemBallPlacementTest)
 {
     correct_motion_constraints = them_ball_placement;
-    auto &[tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
+    auto& [tactic, remove_motion_constraints, insert_motion_constraints] = GetParam();
 
     for (TbotsProto::MotionConstraint c : remove_motion_constraints)
     {

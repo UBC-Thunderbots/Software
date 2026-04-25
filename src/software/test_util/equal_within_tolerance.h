@@ -31,8 +31,8 @@ namespace TestUtil
  * @return AssertionSuccess if the two durations are within tolerance of each other
  */
 ::testing::AssertionResult equalWithinTolerance(
-    const Duration &duration1, const Duration &duration2,
-    const Duration &tolerance = Duration::fromMilliseconds(0.001));
+    const Duration& duration1, const Duration& duration2,
+    const Duration& tolerance = Duration::fromMilliseconds(0.001));
 
 /**
  * Checks if two polygons are within tolerance of each other
@@ -45,8 +45,8 @@ namespace TestUtil
  *
  * @return AssertionSuccess if the two polygons are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(const Polygon &poly1,
-                                                const Polygon &poly2,
+::testing::AssertionResult equalWithinTolerance(const Polygon& poly1,
+                                                const Polygon& poly2,
                                                 double tolerance = METERS_PER_MILLIMETER);
 
 /**
@@ -60,8 +60,8 @@ namespace TestUtil
  *
  * @return AssertionSuccess if the two polygons are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(const Stadium &stadium1,
-                                                const Stadium &stadium2,
+::testing::AssertionResult equalWithinTolerance(const Stadium& stadium1,
+                                                const Stadium& stadium2,
                                                 double tolerance = METERS_PER_MILLIMETER);
 
 /**
@@ -75,7 +75,7 @@ namespace TestUtil
  *
  * @return AssertionSuccess if the two circles are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(const Circle &c1, const Circle &c2,
+::testing::AssertionResult equalWithinTolerance(const Circle& c1, const Circle& c2,
                                                 double tolerance = METERS_PER_MILLIMETER);
 
 /**
@@ -86,8 +86,8 @@ namespace TestUtil
  *
  * @return AssertionSuccess if the two Angles are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(const Angle &a1, const Angle &a2,
-                                                const Angle &tolerance);
+::testing::AssertionResult equalWithinTolerance(const Angle& a1, const Angle& a2,
+                                                const Angle& tolerance);
 
 /**
  * Checks if two vectors are within tolerance of each other
@@ -100,7 +100,7 @@ namespace TestUtil
  *
  * @return AssertionSuccess if the two points are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(const Vector &v1, const Vector &v2,
+::testing::AssertionResult equalWithinTolerance(const Vector& v1, const Vector& v2,
                                                 double tolerance);
 
 /**
@@ -114,7 +114,7 @@ namespace TestUtil
  *
  * @return AssertionSuccess if the two points are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(const Point &pt1, const Point &pt2,
+::testing::AssertionResult equalWithinTolerance(const Point& pt1, const Point& pt2,
                                                 double tolerance);
 
 /**
@@ -139,10 +139,10 @@ namespace TestUtil
  *
  * @return AssertionSuccess if the two values are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(const RobotState &state1,
-                                                const RobotState &state2,
+::testing::AssertionResult equalWithinTolerance(const RobotState& state1,
+                                                const RobotState& state2,
                                                 double linear_tolerance,
-                                                const Angle &angular_tolerance);
+                                                const Angle& angular_tolerance);
 
 /**
  * Checks if two RobotStateWithIds are within tolerance of each other.
@@ -156,10 +156,10 @@ namespace TestUtil
  *
  * @return AssertionSuccess if the two values are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(const RobotStateWithId &state1,
-                                                const RobotStateWithId &state2,
+::testing::AssertionResult equalWithinTolerance(const RobotStateWithId& state1,
+                                                const RobotStateWithId& state2,
                                                 double linear_tolerance,
-                                                const Angle &angular_tolerance);
+                                                const Angle& angular_tolerance);
 
 /**
  * Checks if two BallStates are within tolerance of each other.
@@ -173,8 +173,8 @@ namespace TestUtil
  *
  * @return AssertionSuccess if the two values are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(const BallState &state1,
-                                                const BallState &state2,
+::testing::AssertionResult equalWithinTolerance(const BallState& state1,
+                                                const BallState& state2,
                                                 double tolerance);
 
 /**
@@ -186,7 +186,7 @@ namespace TestUtil
  * @param tolerance The tolerance to check velocities with.
  * @return AssertionSuccess if the two states are within tolerance of each other.
  */
-::testing::AssertionResult equalWithinTolerance(const Eigen::MatrixXd &matrix1,
-                                                const Eigen::MatrixXd &matrix2,
+::testing::AssertionResult equalWithinTolerance(const Eigen::MatrixXd& matrix1,
+                                                const Eigen::MatrixXd& matrix2,
                                                 double tolerance);
 };  // namespace TestUtil
