@@ -8,13 +8,6 @@ ExamplePlay::ExamplePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_p
 {
 }
 
-void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                 const WorldPtr &world_ptr)
-{
-    // This function doesn't get called and it will be removed once coroutines are phased
-    // out
-}
-
 void ExamplePlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm.process_event(ExamplePlayFSM::Update(control_params, play_update));

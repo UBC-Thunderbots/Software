@@ -29,7 +29,7 @@ cc_library(
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/geom/algorithms",
-        "//software/simulated_tests/validation:validation_function",
+        "//software/simulated_tests/cpp_validation:validation_function",
         "//software/world",
         "@boost//:coroutine2",
     ],

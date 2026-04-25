@@ -24,9 +24,9 @@ class KickOrChipTacticTest
 
 TEST_P(KickOrChipTacticTest, kick_or_chip_test)
 {
-    Vector ball_offset_from_robot        = std::get<0>(GetParam());
-    Angle angle_to_kick_at               = std::get<1>(GetParam());
-    AutoChipOrKick auto_chip_or_kick     = std::get<2>(GetParam());
+    Vector ball_offset_from_robot    = std::get<0>(GetParam());
+    Angle angle_to_kick_at           = std::get<1>(GetParam());
+    AutoChipOrKick auto_chip_or_kick = std::get<2>(GetParam());
 
     Point robot_position = Point(0, 0);
     BallState ball_state(robot_position + ball_offset_from_robot, Vector(0, 0));
@@ -61,28 +61,28 @@ TEST_P(KickOrChipTacticTest, kick_or_chip_test)
 
 INSTANTIATE_TEST_CASE_P(
     AutokickBallLocations, KickOrChipTacticTest,
-    ::testing::Values(
-        std::make_tuple(Vector(0, 0.5), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5.0}),
-        std::make_tuple(Vector(0, -0.5), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5.0}),
-        std::make_tuple(Vector(0.5, 0), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5.0}),
-        std::make_tuple(Vector(-0.5, 0), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5.0}),
-        std::make_tuple(Vector(ROBOT_MAX_RADIUS_METERS, 0), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5.0})));
+    ::testing::Values(std::make_tuple(Vector(0, 0.5), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5.0}),
+                      std::make_tuple(Vector(0, -0.5), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5.0}),
+                      std::make_tuple(Vector(0.5, 0), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5.0}),
+                      std::make_tuple(Vector(-0.5, 0), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 5.0}),
+                      std::make_tuple(Vector(ROBOT_MAX_RADIUS_METERS, 0), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                                     5.0})));
 
 INSTANTIATE_TEST_CASE_P(
     AutochipBallLocations, KickOrChipTacticTest,
-    ::testing::Values(
-        std::make_tuple(Vector(0, 0.5), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0}),
-        std::make_tuple(Vector(0, -0.5), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0}),
-        std::make_tuple(Vector(0.5, 0), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0}),
-        std::make_tuple(Vector(-0.5, 0), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0}),
-        std::make_tuple(Vector(ROBOT_MAX_RADIUS_METERS, 0), Angle::zero(),
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0})));
+    ::testing::Values(std::make_tuple(Vector(0, 0.5), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0}),
+                      std::make_tuple(Vector(0, -0.5), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0}),
+                      std::make_tuple(Vector(0.5, 0), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0}),
+                      std::make_tuple(Vector(-0.5, 0), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0}),
+                      std::make_tuple(Vector(ROBOT_MAX_RADIUS_METERS, 0), Angle::zero(),
+                                      AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                                     2.0})));
