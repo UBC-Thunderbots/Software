@@ -6,6 +6,7 @@ from typing import Iterator, Any, override
 from google.protobuf.descriptor import Descriptor, FieldDescriptor
 from software.thunderscope.time_provider import time_provider_instance
 
+
 def count_primitive_fields(descriptor: Descriptor):
     """Recursively counts the number of primitive fields in a Protobuf message
     using its descriptor.

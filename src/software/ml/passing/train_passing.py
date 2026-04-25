@@ -2,6 +2,7 @@ import random
 import sys
 import torch
 import os
+from sklearn.metrics import f1_score
 from torch_geometric.data import HeteroData
 from torch_geometric.nn import SAGEConv, GATConv
 from torch_geometric.loader import DataLoader
@@ -54,10 +55,6 @@ def load_and_label_data(
         event_logs=event_logs[0:10000], pass_logs=pass_logs, friendly_team=friendly_team
     )
 
-    results = [result.result.to_array() for result in pass_results]
-    results = [result for result in results if result[0] != 0]
-    print(results)
-
     print("Pass Results Generated!")
 
     labelled_passes = label_passes(pass_results)
@@ -66,6 +63,47 @@ def load_and_label_data(
 
     return labelled_passes
 
+def undersample_passes(all_passes: list[LabelledPass], boring_keep_ratio: float = 0.1):
+    """
+    Filters the dataset to keep all 'interesting' passes and a 
+    fraction of the 'boring' ones.
+    """
+    interesting_passes = []
+    boring_passes = []
+
+    for labelled_pass in all_passes:
+        # Check if ANY label in ANY interval is True
+        # Note: We exclude 'is_enemy_possession' and 'is_ball_in_enemy_half' 
+        # from the 'interesting' check because they are static states, not events.
+        is_interesting = False
+        for interval_label in labelled_pass.labels.values():
+            # We check specific event-based flags
+            if any([
+                interval_label.has_score_changed,
+                interval_label.has_enemy_score_changed,
+                interval_label.have_yellow_cards_changed,
+                interval_label.have_red_cards_changed,
+                interval_label.has_possession_changed,
+                interval_label.have_shots_on_net_changed,
+                interval_label.has_ball_in_half_changed
+            ]):
+                is_interesting = True
+                break
+        
+        if is_interesting:
+            interesting_passes.append(labelled_pass)
+        else:
+            boring_passes.append(labelled_pass)
+
+    # Sample a percentage of the boring passes
+    num_boring_to_keep = int(len(boring_passes) * boring_keep_ratio)
+    sampled_boring = random.sample(boring_passes, num_boring_to_keep)
+
+    combined = interesting_passes + sampled_boring
+    random.shuffle(combined) # Shuffle so the model doesn't see all goals at once
+    
+    print(f"Original: {len(all_passes)} | Interesting: {len(interesting_passes)} | Boring Kept: {len(sampled_boring)}")
+    return combined
 
 def train_single_model(
     loader: DataLoader, model: GenericHeteroGNN, epochs=50, learning_rate=0.01
@@ -117,17 +155,14 @@ TRAIN_DATA_CROSS_RATIO = 0.8
 
 
 def evaluate_model(loader: DataLoader, model: GenericHeteroGNN):
-    criterion = torch.nn.BCEWithLogitsLoss()
     model.eval()
 
     intervals = [
         interval for interval in PassLogType if interval != PassLogType.RESULT_0S
     ]
 
-    stats = {
-        interval: {"total_loss": 0.0, "correct_bits": 0.0, "count": 0}
-        for interval in intervals
-    }
+    interval_preds = {interval: [] for interval in intervals}
+    interval_targets = {interval: [] for interval in intervals}
 
     with torch.no_grad():
         for data in loader:
@@ -146,30 +181,22 @@ def evaluate_model(loader: DataLoader, model: GenericHeteroGNN):
                 interval_logits = logits[:, logits_start:logits_end]
                 interval_target = target[:, logits_start:logits_end]
 
-                # Loss for this interval
-                loss = criterion(interval_logits, interval_target)
+                interval_targets[interval].append(interval_target)
 
-                # Accuracy for this interval
-                probs = torch.sigmoid(interval_logits)
                 preds = (probs > 0.5).float()
-                # Compare all 8 bits for all items in batch
-                correct = (preds == interval_target).float().mean()
+                interval_preds[interval].append(preds)
+    
+    label_names = [label.name for label in fields(Label)]
 
-                stats[interval]["total_loss"] += loss.item()
-                stats[interval]["correct_bits"] += correct.item()
-                stats[interval]["count"] += 1
+    for i, interval in enumerate(intervals):
+        preds = interval_preds[interval]
+        targets = interval_targets[interval]
+   
+        print(f"\n--- Interval: {interval.name} ---")
 
-    # 3. Finalize averages
-    results = {}
-    for interval, data in stats.items():
-        avg_loss = data["total_loss"] / data["count"]
-        avg_acc = data["correct_bits"] / data["count"]
-        results[interval] = {"loss": avg_loss, "accuracy": avg_acc}
-
-        print(
-            f"Interval {interval.name}: Loss {avg_loss:.4f}, Bit-Accuracy {avg_acc:.2%}"
-        )
-
+        for j, name in enumerate(label_names):
+            f1 = f1_score(targets[:, idx], preds[:, idx], zero_division=0)
+            print(f"{name:20} | F1-Score: {f1:.4f}")
 
 def train_and_export_models(graphs: List[HeteroData], labels: List[List[any]]):
     for graph, label in zip(graphs, labels):
@@ -242,8 +269,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     labelled_passes = load_and_label_data(sys.argv[1], sys.argv[2], Team.BLUE)
-    # graphs, labels = process_all_passes(labelled_passes=labelled_passes)
+    undersampled_passes = undersample_passes(labelled_passes)
+    graphs, labels = process_all_passes(labelled_passes=undersampled_passes)
 
-    # print("Dataset generated!")
+    print("Dataset generated!")
 
-    # train_and_export_models(graphs, labels)
+    train_and_export_models(graphs, labels)
