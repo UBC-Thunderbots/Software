@@ -66,9 +66,7 @@ class PassLogTracker(PassTracker):
         Adds the pass to the first list of logged passes, at the smallest interval
 
         :param event_type: (unused)
-        """
-        super().write_event(event_type=event_type)
-        
+        """        
         if not self.curr_pass:
             return
 

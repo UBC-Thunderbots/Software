@@ -21,7 +21,7 @@ def generate_pass_results(
     all_logs = event_logs + pass_logs
 
     # 1. Sort everything by timestamp.
-    all_logs.sort(key=lambda x: x.timestamp)
+    all_logs.sort(key=lambda x: x.get_timestamp())
 
     # 2. Initialize our running state
     current_stats = StatsResult(friendly_team=friendly_team)
@@ -31,11 +31,15 @@ def generate_pass_results(
     for log in all_logs:
         if isinstance(log, EventLog):
             # Update the cumulative stats based on the EventLog
+            prev_score = current_stats.score
             current_stats.update_result(log)
+            if (prev_score != current_stats.score):
+                print(current_stats)
 
         elif isinstance(log, PassLog):
             # Create a snapshot of the stats AT THIS MOMENT.
             snapshot = replace(current_stats)
+
 
             pass_results.append(PassResult(pass_log=log, result=snapshot))
 

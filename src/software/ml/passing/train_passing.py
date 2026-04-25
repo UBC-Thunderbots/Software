@@ -51,8 +51,12 @@ def load_and_label_data(
     print("Events loaded!")
 
     pass_results = generate_pass_results(
-        event_logs=event_logs, pass_logs=pass_logs, friendly_team=friendly_team
+        event_logs=event_logs[0:10000], pass_logs=pass_logs, friendly_team=friendly_team
     )
+
+    results = [result.result.to_array() for result in pass_results]
+    results = [result for result in results if result[0] != 0]
+    print(results)
 
     print("Pass Results Generated!")
 
@@ -238,8 +242,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     labelled_passes = load_and_label_data(sys.argv[1], sys.argv[2], Team.BLUE)
-    graphs, labels = process_all_passes(labelled_passes=labelled_passes)
+    # graphs, labels = process_all_passes(labelled_passes=labelled_passes)
 
-    print("Dataset generated!")
+    # print("Dataset generated!")
 
-    train_and_export_models(graphs, labels)
+    # train_and_export_models(graphs, labels)

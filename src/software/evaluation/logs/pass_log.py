@@ -25,7 +25,7 @@ class PassLogType(IntEnum):
     RESULT_0S = 0
 
 
-@dataclass
+@dataclass(kw_only=True)
 class PassLog(TimestampedEvalLog):
     """Class representing a Pass we are tracking
     Contains the pass event itself within the nested EventLog

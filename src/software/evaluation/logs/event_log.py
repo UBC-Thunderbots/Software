@@ -32,7 +32,7 @@ class Team(StrEnum):
     YELLOW = auto()
 
 
-@dataclass
+@dataclass(kw_only=True)
 class EventLog(TimestampedEvalLog):
     """Represents a single event being tracked, where and for whom the event is, and the game state at the time of the event"""
 
@@ -58,7 +58,6 @@ class EventLog(TimestampedEvalLog):
         world_state_log = WorldStateLog.from_world(world_msg=world_msg)
 
         return EventLog(
-            timestamp=0,
             event_type=event_type,
             from_team=from_team,
             for_team=for_team,
