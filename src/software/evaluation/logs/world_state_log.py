@@ -166,7 +166,6 @@ class WorldStateLog(IEvalLog):
             new_state = []
 
             if idx not in robot_state_map:
-                print(f"ROBOT {idx} NOT FOUND!!!!!!!!!!")
                 new_state = [None for _ in range(num_cols_per_robot)]
             else:
                 robot_state = robot_state_map[idx]
