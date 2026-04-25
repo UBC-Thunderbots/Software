@@ -49,6 +49,8 @@ class StSpinMotorController : public MotorController
     // SPI file descriptors
     std::unordered_map<MotorIndex, int> spi_fds_;
 
+    static constexpr uint32_t MAX_CONSECUTIVE_CRC_FAILURES = 10;
+
     std::unique_ptr<Gpio> reset_gpio_;
 
     struct MotorStatus
@@ -67,6 +69,7 @@ class StSpinMotorController : public MotorController
         int16_t vd;
         int16_t phase_current;
         int16_t phase_voltage;
+        uint32_t consecutive_crc_failures = 0;
     };
 
     std::unordered_map<MotorIndex, MotorStatus> motor_status_;
