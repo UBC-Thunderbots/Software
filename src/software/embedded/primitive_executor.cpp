@@ -11,11 +11,10 @@
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
-                                     const RobotConstants_t& robot_constants,
+                                     const RobotConstants& robot_constants,
                                      const TeamColour friendly_team_colour,
                                      const RobotId robot_id)
-    : current_primitive_(),
-      friendly_team_colour_(friendly_team_colour),
+    : friendly_team_colour_(friendly_team_colour),
       robot_constants_(robot_constants),
       time_step_(time_step),
       robot_id_(robot_id)
@@ -30,58 +29,64 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
     {
         trajectory_path_ = createTrajectoryPathFromParams(
             current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
+        angular_trajectory_ = createAngularTrajectoryFromParams(
+            current_primitive_.move().w_traj_params(), orientation_, angular_velocity_,
+            robot_constants_);
 
-        angular_trajectory_ =
-            createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
-                                              angular_velocity_, robot_constants_);
-
-        time_since_trajectory_creation_ = Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        time_since_linear_trajectory_creation_  = Duration::fromSeconds(RTT_S / 2);
+        time_since_angular_trajectory_creation_ = Duration::fromSeconds(RTT_S / 2);
     }
 }
 
-void PrimitiveExecutor::setStopPrimitive()
+void PrimitiveExecutor::updateState(const Vector& local_velocity,
+                                    const AngularVelocity& angular_velocity,
+                                    const Angle& orientation)
 {
-    current_primitive_ = *createStopPrimitiveProto();
+    orientation_      = orientation.clamp();
+    velocity_         = localToGlobalVelocity(local_velocity, orientation_);
+    angular_velocity_ = angular_velocity;
 }
 
-void PrimitiveExecutor::updateVelocity(const Vector& local_velocity,
-                                       const AngularVelocity& angular_velocity)
-{
-    Vector actual_global_velocity = localToGlobalVelocity(local_velocity, orientation_);
-    velocity_                     = actual_global_velocity;
-    angular_velocity_             = angular_velocity;
-}
-
-Vector PrimitiveExecutor::getTargetLinearVelocity()
+Vector PrimitiveExecutor::getTargetLinearVelocity() const
 {
     Vector local_velocity = globalToLocalVelocity(
-        trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
-        orientation_);
-    Point position =
-        trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
-    double distance_to_destination =
+        trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds()),
+        orientation_ + angular_velocity_ * time_step_.toSeconds() / 2 * LEAN_BIAS);
+
+    const Point position =
+        trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds());
+    const double distance_to_destination =
         distance(position, trajectory_path_->getDestination());
 
     // Dampen velocity as we get closer to the destination to reduce jittering
-    if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
+    if (distance_to_destination < MAX_DAMPENING_LINEAR_VELOCITY_DISTANCE_M)
     {
-        local_velocity *= distance_to_destination / MAX_DAMPENING_VELOCITY_DISTANCE_M;
+        local_velocity *=
+            distance_to_destination / MAX_DAMPENING_LINEAR_VELOCITY_DISTANCE_M;
     }
+
     return local_velocity;
 }
 
-AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
+AngularVelocity PrimitiveExecutor::getTargetAngularVelocity() const
 {
-    orientation_ =
-        angular_trajectory_->getPosition(time_since_trajectory_creation_.toSeconds());
+    AngularVelocity angular_velocity = angular_trajectory_->getVelocity(
+        time_since_angular_trajectory_creation_.toSeconds());
 
-    AngularVelocity angular_velocity =
-        angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds());
-    Angle orientation_to_destination =
+    const Angle expected_orientation = angular_trajectory_->getPosition(
+        time_since_angular_trajectory_creation_.toSeconds());
+    const Angle error = (orientation_ - expected_orientation).clamp();
+    angular_velocity  = angular_velocity + error * ORIENTATION_KP;
+
+    const Angle orientation_to_destination =
         orientation_.minDiff(angular_trajectory_->getDestination());
-    if (orientation_to_destination.toDegrees() < 5)
+
+    // Dampen velocity as we get closer to the destination to reduce jittering
+    if (orientation_to_destination.toDegrees() <
+        MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES)
     {
-        angular_velocity *= orientation_to_destination.toDegrees() / 5;
+        angular_velocity *= orientation_to_destination.toDegrees() /
+                            MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES;
     }
 
     return angular_velocity;
@@ -91,19 +96,19 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
     TbotsProto::PrimitiveExecutorStatus& status)
 {
-    time_since_trajectory_creation_ += time_step_;
+    time_since_angular_trajectory_creation_ += time_step_;
+    time_since_linear_trajectory_creation_ += time_step_;
     status.set_running_primitive(true);
 
     switch (current_primitive_.primitive_case())
     {
         case TbotsProto::Primitive::kStop:
         {
-            auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
-                                                       TbotsProto::AutoChipOrKick());
-            auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
-                prim->direct_control());
+            const auto prim = createDirectControlPrimitive(
+                Vector(), AngularVelocity(), 0.0, TbotsProto::AutoChipOrKick());
             status.set_running_primitive(false);
-            return output;
+            return std::make_unique<TbotsProto::DirectControlPrimitive>(
+                prim->direct_control());
         }
         case TbotsProto::Primitive::kDirectControl:
         {
@@ -114,26 +119,25 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         {
             if (!trajectory_path_.has_value() || !angular_trajectory_.has_value())
             {
-                auto prim = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
-                                                         TbotsProto::AutoChipOrKick());
-                auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
-                    prim->direct_control());
+                const auto prim = createDirectControlPrimitive(
+                    Vector(), AngularVelocity(), 0.0, TbotsProto::AutoChipOrKick());
                 LOG(INFO)
                     << "Not moving because trajectory_path_ or angular_trajectory_ is not set";
-                return output;
+                return std::make_unique<TbotsProto::DirectControlPrimitive>(
+                    prim->direct_control());
             }
 
-            Vector local_velocity            = getTargetLinearVelocity();
-            AngularVelocity angular_velocity = getTargetAngularVelocity();
+            const Vector target_linear_velocity           = getTargetLinearVelocity();
+            const AngularVelocity target_angular_velocity = getTargetAngularVelocity();
 
-            auto output = createDirectControlPrimitive(
-                local_velocity, angular_velocity,
+            const auto prim = createDirectControlPrimitive(
+                target_linear_velocity, target_angular_velocity,
                 convertDribblerModeToDribblerSpeed(
                     current_primitive_.move().dribbler_mode(), robot_constants_),
                 current_primitive_.move().auto_chip_or_kick());
 
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
-                output->direct_control());
+                prim->direct_control());
         }
         case TbotsProto::Primitive::PRIMITIVE_NOT_SET:
         {
@@ -145,9 +149,4 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
-}
-
-void PrimitiveExecutor::setRobotId(const RobotId robot_id)
-{
-    robot_id_ = robot_id;
 }

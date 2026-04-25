@@ -17,7 +17,7 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
-                                   const RobotConstants_t& robot_constants,
+                                   const RobotConstants& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
                                    const bool ramping,
                                    double primitive_executor_time_step)
@@ -343,7 +343,7 @@ void ErForceSimulator::setRobotPrimitive(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
     const TbotsProto::World& world_msg, const Vector& local_velocity,
-    const AngularVelocity angular_velocity)
+    const AngularVelocity& angular_velocity, const Angle& orientation)
 {
     // Set to NEG_X because the world msg in this simulator is normalized
     // correctly
@@ -352,8 +352,8 @@ void ErForceSimulator::setRobotPrimitive(
     if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
+        primitive_executor->updateState(local_velocity, angular_velocity, orientation);
         primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
-        primitive_executor->updateVelocity(local_velocity, angular_velocity);
     }
     else
     {

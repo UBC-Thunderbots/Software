@@ -1,63 +1,39 @@
 #pragma once
 
-/**
- * This struct represents robot constants
- */
-typedef struct RobotConstants
+struct RobotConstants
 {
-    // The mass of the entire robot including batteries [kg]
-    // Determined experimentally by weighing the robot and battery
-    float mass_kg;
-
-    // The inertial factor
-    float inertial_factor;
-
     // The radius of the robot [m]
     float robot_radius_m;
 
-    // The maximum jerk this robot may safely undergo [m/s^3]
-    float jerk_limit_kg_m_per_s_3;
-
-    // The front_wheel_angle_deg and back_wheel_angle_deg are measured as absolute angle
-    // to each of the wheels from the front y axis of the robot. In the ASCII art below,
-    // front_wheel_angle_deg = A and back_wheel_angle_deg = A + B. The angles are assumed
-    // to be left/right symmetrical
+    // The front_wheel_angle_deg and back_wheel_angle_deg are measured as absolute
+    // angles from the robot's y-axis to each wheel axle.
     //
+    // In the ASCII diagram below:
+    //  - front_wheel_angle_deg = A
+    //  - back_wheel_angle_deg  = B
+    //
+    // The angles are assumed to be symmetric for the left and right sides of the robot.
+    //
+    //                        y
     //                        ▲
-    //                        │
-    //                        │
-    //                        │
-    //                        │
-    //                        │
-    //                        │
-    //                        │
-    //                        │
-    //                        │
-    //           *#### ### ###│### ### ####*
-    //        *##             │              ##*
-    //      *##               │                ##*   wheel
-    //    *##                 │                  ##*   │
-    //   *##                  │                xx##*◄──┘
-    //  *##                   │   A         xxx   ##*
-    // *##                    │         xxxx       ##*
-    // *##                    │    xxxx            ##*
-    // *##                    │xxxx                ##*
-    // *##                     xx       B          ##*
-    // *##                       xx                ##*
-    // *##                         xx              ##*
-    //  *##                          xx           ##*
-    //   *##                           xx        ##*
-    //    *##                            xx     ##*
-    //      *##                            x  ##*
-    //        *##                           ##*◄──┐
-    //           *##                     ##*      │
-    //              *##               ##*       wheel
-    //                 *** ### ### ***
+    //                        |
+    //    Back wheel          │         Front wheel
+    //        └────────►  , - │ - ,  ◄───────┘
+    //                , '\    │    /' ,
+    //              ,     \ B │ A /    │
+    //             ,       \  │  /     │
+    //            ,         \ │ /      │
+    //            ,           └────────┼───────► x   Front of robot
+    //            ,                    │
+    //             ,                   │
+    //              ,                  │
+    //                ,              .'
+    //                  ' - , _  , '
 
-    // angle between each front wheel and the front y axis of the robot [degrees]
+    // The angle between y-axis of the robot and the front wheel axles [degrees]
     float front_wheel_angle_deg;
 
-    // angle between each back wheel and the front y axis of the robot [degrees]
+    // The angle between y-axis of the robot and the rear wheel axles [degrees]
     float back_wheel_angle_deg;
 
     // The total width of the entire flat face on the front of the robot [meters]
@@ -94,8 +70,26 @@ typedef struct RobotConstants
     // The radius of the wheel, in meters
     float wheel_radius_meters;
 
-    // The gear ratio between the motor shaft and wheel shaft
-    // [# of wheel rotations / 1 motor rotation]
-    float wheel_rotations_per_motor_rotation;
+    // Various variances for the robot localizer
+    float kalman_process_noise_variance_rad_per_s_4;
 
-} RobotConstants_t;
+    float kalman_vision_noise_variance_rad_2;
+
+    float kalman_motor_sensor_noise_variance_rad_per_s_2;
+
+    float kalman_target_angular_velocity_variance_rad_per_sec_2;
+};
+
+/**
+ * Creates robot constants for the 2026 robot
+ *
+ * @return robot constants for the 2026 robot
+ */
+RobotConstants create2026RobotConstants();
+
+/**
+ * Creates robot constants for the 2021 robot
+ *
+ * @return robot constants for the 2021 robot
+ */
+RobotConstants create2021RobotConstants();
