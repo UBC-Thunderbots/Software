@@ -12,8 +12,8 @@ KickoffFriendlyPlay::KickoffFriendlyPlay(
 {
 }
 
-void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                         const WorldPtr &world_ptr)
+void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type& yield,
+                                         const WorldPtr& world_ptr)
 {
     // Since we only have 6 robots at the maximum, the number one priority
     // is the robot doing the kickoff up front. The goalie is the second most

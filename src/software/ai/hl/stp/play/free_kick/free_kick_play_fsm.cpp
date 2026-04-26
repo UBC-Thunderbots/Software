@@ -291,10 +291,9 @@ void FreeKickPlayFSM::passBall(const Update& event)
     Pass pass = best_pass_and_score_so_far.pass;
 
     AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK, pass.speed()};
-    passer_tactic->updateControlParams(
-        pass.passerPoint(), pass.passerOrientation(),
-        auto_chip_or_kick);
-	receiver_tactic->updateControlParams(pass);
+    passer_tactic->updateControlParams(pass.passerPoint(), pass.passerOrientation(),
+                                       auto_chip_or_kick);
+    receiver_tactic->updateControlParams(pass);
     tactics_to_run[0].emplace_back(passer_tactic);
     tactics_to_run[0].emplace_back(receiver_tactic);
 
