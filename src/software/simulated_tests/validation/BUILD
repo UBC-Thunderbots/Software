@@ -5,10 +5,13 @@ py_library(
     srcs = [
         "avoid_collisions.py",
         "ball_enters_region.py",
+        "ball_enters_region_true.py",
         "ball_is_off_ground.py",
         "ball_moves_in_direction.py",
         "ball_speed_threshold.py",
+        "ball_speed_threshold_true.py",
         "ball_stops_in_region.py",
+        "ball_stops_in_region_true.py",
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
         "friendly_receives_ball_slow.py",
@@ -26,6 +29,7 @@ py_library(
         "//software:python_bindings.so",
     ],
     deps = [
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
         "//software/logger:py_logger",

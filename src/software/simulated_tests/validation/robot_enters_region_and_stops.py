@@ -32,7 +32,7 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
         self.passing_robot_id = None
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if a robot is in the provided region
         Then checks if that robot is stationary within a threshold for the provided number of ticks
 
