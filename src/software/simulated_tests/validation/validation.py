@@ -8,7 +8,7 @@ class Validation:
     """A validation function"""
 
     @abstractmethod
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         raise NotImplementedError("get_validation_status is not implemented")
 
     @abstractmethod
@@ -66,15 +66,16 @@ def create_validation_types(validation_class):
         """
         self.validation = validation_class(*args, **kwargs)
 
-    def flip_validation(self, world):
+    def flip_validation(self, world, simulator_state=None):
         """Flip the validation status
 
         :param world: The world msg to validate on
+        :param simulator_state: The simulator state with true positions, or None
         """
         return {
             ValidationStatus.FAILING: ValidationStatus.PASSING,
             ValidationStatus.PASSING: ValidationStatus.FAILING,
-        }[self.validation.get_validation_status(world)]
+        }[self.validation.get_validation_status(world, simulator_state=simulator_state)]
 
     # Generate the types: specifically, all Eventually validations will return
     # EVENTUALLY when get_validation_type is called, and all Always validations
@@ -95,7 +96,10 @@ def create_validation_types(validation_class):
             + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
             "get_validation_status": lambda self,
-            world: self.validation.get_validation_status(world),
+            world,
+            simulator_state=None: self.validation.get_validation_status(
+                world, simulator_state=simulator_state
+            ),
         },
     )
 
@@ -107,7 +111,11 @@ def create_validation_types(validation_class):
             "__repr__": lambda self: "EventuallyFalseValidation: "
             + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
-            "get_validation_status": lambda self, world: flip_validation(self, world),
+            "get_validation_status": lambda self,
+            world,
+            simulator_state=None: flip_validation(
+                self, world, simulator_state=simulator_state
+            ),
         },
     )
 
@@ -119,7 +127,10 @@ def create_validation_types(validation_class):
             "__repr__": lambda self: "AlwaysTrueValidation: " + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.ALWAYS,
             "get_validation_status": lambda self,
-            world: self.validation.get_validation_status(world),
+            world,
+            simulator_state=None: self.validation.get_validation_status(
+                world, simulator_state=simulator_state
+            ),
         },
     )
 
@@ -130,7 +141,11 @@ def create_validation_types(validation_class):
             **common,
             "__repr__": lambda self: "AlwaysFalseValidation: " + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.ALWAYS,
-            "get_validation_status": lambda self, world: flip_validation(self, world),
+            "get_validation_status": lambda self,
+            world,
+            simulator_state=None: flip_validation(
+                self, world, simulator_state=simulator_state
+            ),
         },
     )
 
@@ -138,7 +153,10 @@ def create_validation_types(validation_class):
 
 
 def run_validation_sequence_sets(
-    world, eventually_validation_sequence_set, always_validation_sequence_set
+    world,
+    eventually_validation_sequence_set,
+    always_validation_sequence_set,
+    simulator_state=None,
 ):
     """Given both eventually and always validation sequence sets, (and world)
     run validation and aggregate the results in a validation proto set.
@@ -170,7 +188,7 @@ def run_validation_sequence_sets(
         validation_proto = ValidationProto()
 
         # Get status
-        status = validation.get_validation_status(world)
+        status = validation.get_validation_status(world, simulator_state=simulator_state)
 
         # Create validation proto
         validation_proto.status = status

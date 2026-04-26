@@ -1,4 +1,5 @@
 from proto.import_all_protos import *
+from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
@@ -46,12 +47,18 @@ class TbotsTestRunner:
         self.robot_status_buffer = ThreadSafeBuffer(
             buffer_size=1, protobuf_type=RobotStatus
         )
+        self.simulator_state_buffer = ThreadSafeBuffer(
+            buffer_size=20, protobuf_type=SimulatorState
+        )
 
         self.blue_full_system_proto_unix_io.register_observer(
             SSL_WrapperPacket, self.ssl_wrapper_buffer
         )
         self.blue_full_system_proto_unix_io.register_observer(
             RobotStatus, self.robot_status_buffer
+        )
+        self.blue_full_system_proto_unix_io.register_observer(
+            SimulatorState, self.simulator_state_buffer
         )
         if self.is_yellow_friendly:
             self.yellow_full_system_proto_unix_io.register_observer(
