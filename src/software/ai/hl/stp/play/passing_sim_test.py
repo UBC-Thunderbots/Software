@@ -111,13 +111,15 @@ def setup_pass_and_robots(
     # We use KickTactic since AttackerTactic shoots towards the goal instead if open
     # KickTactic just does the kick we want
     blue_tactics = {}
-    blue_tactics[0] = KickTactic(
-        kick_origin=Point(
+    blue_tactics[0] = KickOrChipTactic(
+        kick_or_chip_origin=Point(
             x_meters=best_pass.passerPoint().x(),
             y_meters=best_pass.passerPoint().y(),
         ),
-        kick_direction=Angle(radians=kick_vec.orientation().toRadians()),
-        kick_speed_meters_per_second=best_pass.speed(),
+        kick_or_chip_direction=Angle(radians=kick_vec.orientation().toRadians()),
+        auto_chip_or_kick=AutoChipOrKick(
+            autokick_speed_m_per_s=best_pass.speed(),
+        ),
     )
 
     # if we want a friendly robot to receive the pass
