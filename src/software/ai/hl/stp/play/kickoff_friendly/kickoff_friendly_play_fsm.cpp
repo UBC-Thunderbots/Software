@@ -129,7 +129,10 @@ void KickoffFriendlyPlayFSM::chipBall(const Update& event)
         selected_target = best_target_it->origin();
     }
 
-    kickoff_chip_tactic->updateControlParams(ball_position, selected_target);
+    kickoff_chip_tactic->updateControlParams(
+        ball_position, selected_target,
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                       (selected_target - ball_position).length()});
     tactics_to_run[0].emplace_back(kickoff_chip_tactic);
     event.common.set_tactics(tactics_to_run);
 }
