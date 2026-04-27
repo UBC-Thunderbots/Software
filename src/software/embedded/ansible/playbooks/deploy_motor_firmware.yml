@@ -50,7 +50,7 @@
       delegate_to: localhost
       ansible.builtin.command: "tar -czf {{ firmware_archive_name }} {{ bazel_out_path | basename }}" # noqa: command-instead-of-module
       args:
-        chdir: "{{ repo_root }}/{{ bazel_out_path | dirname }}"
+        chdir: "{{ bazel_out_path | dirname }}"
       changed_when: false
 
     - name: Remove existing remote directory
@@ -66,7 +66,7 @@
 
     - name: Copy firmware archive to remote
       ansible.builtin.copy:
-        src: "{{ repo_root }}/{{ bazel_out_path | dirname }}/{{ firmware_archive_name }}"
+        src: "{{ bazel_out_path | dirname }}/{{ firmware_archive_name }}"
         dest: "{{ remote_dir }}/{{ firmware_archive_name }}"
         mode: "0644"
 
@@ -98,14 +98,9 @@
       ansible.builtin.shell: "echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 4 ip pu && echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 17 ip pu && echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 18 ip pu"
       ignore_errors: true
 
-    - name: Run flashing script for Motor Driver A
-      ansible.builtin.shell: "echo {{ ansible_sudo_pass }} | sudo -S python3 flash_motor_drivers.py 12"
+    - name: Run flashing script for Motor Drivers (A B C D)
+      ansible.builtin.shell: "echo {{ ansible_sudo_pass }} | sudo -S python3 flash_motor_drivers.py A B C D"
       args:
         chdir: "{{ remote_dir }}"
       changed_when: true
 
-    - name: Run flashing script for Motor Driver C
-      ansible.builtin.shell: "echo {{ ansible_sudo_pass }} | sudo -S python3 flash_motor_drivers.py 23"
-      args:
-        chdir: "{{ remote_dir }}"
-      changed_when: true
