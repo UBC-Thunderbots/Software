@@ -10,10 +10,10 @@ MOTOR_DRIVER_RESET_PIN = 12
 S0_PIN = 23
 S1_PIN = 24
 
-SWD_DISABLE_PIN = 0 # Pull HIGH to disable SWD multiplexing
-SWCLK_DISABLE_PIN = 1 # Pull HIGH to disable SWCLK multiplexing
+SWD_DISABLE_PIN = 0  # Pull HIGH to disable SWD multiplexing
+SWCLK_DISABLE_PIN = 1  # Pull HIGH to disable SWCLK multiplexing
 
-# Big thing is that Depending on the arguments you flash them. 
+# Big thing is that Depending on the arguments you flash them.
 
 
 class MotorDriverFlasher:
@@ -24,12 +24,11 @@ class MotorDriverFlasher:
         # 1 -> 1 0
         # 2 -> 0 1
         # 3 -> 1 1
-        switch_case_num = ord(board_letter) - ord('A')
+        switch_case_num = ord(board_letter) - ord("A")
         self.board_letter = board_letter
         self.multiplex = [switch_case_num % 2, switch_case_num // 2]
 
         self.drivers = drivers
-
 
     def flash(self):
         for i in range(2):
@@ -38,23 +37,21 @@ class MotorDriverFlasher:
             else:
                 self.drivers[i].off()
 
-
-        print(
-            f"Preparing to flash driver on board {self.board_letter}..."
-        )
-
-
+        print(f"Preparing to flash driver on board {self.board_letter}...")
 
         # Short delay to ensure lines settle
-        time.sleep(.5)
+        time.sleep(0.5)
 
         try:
             # Run OpenOCD
             result = subprocess.run(
                 [
-                    "sudo", "openocd",
-                    "-c", f"set RESET_PIN {MOTOR_DRIVER_RESET_PIN}",
-                    "-f", "stm32_rpi.cfg",
+                    "sudo",
+                    "openocd",
+                    "-c",
+                    f"set RESET_PIN {MOTOR_DRIVER_RESET_PIN}",
+                    "-f",
+                    "stm32_rpi.cfg",
                     # Force the Pi to hold the reset line down during connection
                     "-c",
                     "reset_config srst_only srst_nogate connect_assert_srst",
@@ -80,7 +77,7 @@ class MotorDriverFlasher:
             # We raise to stop the process if one fails, or we could continue.
             # Usually best to know immediately.
             raise e
-    
+
         # After flashing all, ensure all are set to High (Run)
         print(f"Flash to board {self.board_letter} complete.")
         # Let line settle rq
@@ -88,15 +85,19 @@ class MotorDriverFlasher:
 
 
 if __name__ == "__main__":
-    # If no arguments given, 
+    # If no arguments given,
     if not (2 <= len(sys.argv) <= 5):
-        print("Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)")
+        print(
+            "Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)"
+        )
         sys.exit(1)
-    
+
     # Check before attempting to flash if every argument is "A" "B" "C" or "D"
     for i in range(1, len(sys.argv)):
-        if sys.argv[i] not in ['A', 'B', 'C', 'D']:
-            print("Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)")
+        if sys.argv[i] not in ["A", "B", "C", "D"]:
+            print(
+                "Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)"
+            )
             sys.exit(1)
 
     # Initialize pins as LEDs since we only need high/low logic.
@@ -108,9 +109,7 @@ if __name__ == "__main__":
     SWD_DISABLE.off()
     SWCLK_DISABLE.off()
 
-
     for i in range(1, len(sys.argv)):
-
         flasher = MotorDriverFlasher(sys.argv[i], drivers)
         flasher.flash()
 

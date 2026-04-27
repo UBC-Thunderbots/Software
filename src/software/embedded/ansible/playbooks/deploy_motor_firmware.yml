@@ -104,4 +104,3 @@
       args:
         chdir: "{{ remote_dir }}"
       changed_when: true
-
