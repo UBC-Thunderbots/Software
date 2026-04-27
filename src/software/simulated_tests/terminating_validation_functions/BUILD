@@ -25,7 +25,7 @@ cc_library(
     ],
     deps = [
         "//software/geom/algorithms",
-        "//software/simulated_tests/validation:validation_function",
+        "//software/simulated_tests/cpp_validation:validation_function",
         "//software/world",
         "@boost//:coroutine2",
         "@googletest//:gtest",

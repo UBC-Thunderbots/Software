@@ -15,6 +15,7 @@ SWCLK_DISABLE_PIN = 1 # Pull HIGH to disable SWCLK multiplexing
 
 # Big thing is that Depending on the arguments you flash them. 
 
+
 class MotorDriverFlasher:
     def __init__(self, board_letter, drivers):
         # A: (S0’ . S1’), B: (S0 . S1’), C: (S0’ . S1), D: (S0 . S1)
@@ -37,9 +38,11 @@ class MotorDriverFlasher:
             else:
                 self.drivers[i].off()
 
+
         print(
             f"Preparing to flash driver on board {self.board_letter}..."
         )
+
 
 
         # Short delay to ensure lines settle
@@ -53,11 +56,15 @@ class MotorDriverFlasher:
                     "-c", f"set RESET_PIN {MOTOR_DRIVER_RESET_PIN}",
                     "-f", "stm32_rpi.cfg",
                     # Force the Pi to hold the reset line down during connection
-                    "-c", "reset_config srst_only srst_nogate connect_assert_srst",
-                    "-c", "adapter srst delay 100", 
-                    "-c", "init",
+                    "-c",
+                    "reset_config srst_only srst_nogate connect_assert_srst",
+                    "-c",
+                    "adapter srst delay 100",
+                    "-c",
+                    "init",
                     # Modern atomic command
-                    "-c", "program mdv6_firmware_main.bin verify reset exit 0x08000000",
+                    "-c",
+                    "program mdv6_firmware_main.bin verify reset exit 0x08000000",
                 ],
                 capture_output=True,
                 text=True,

@@ -31,7 +31,7 @@ def ansible_runner(playbook: str, options: dict = {}):
     vars = set(options.get("extra_vars", []))
     if "BUILD_WORKSPACE_DIRECTORY" in os.environ:
         vars.add(f"workspace_dir={os.environ['BUILD_WORKSPACE_DIRECTORY']}")
-    
+
     ssh_pass = options.get("ssh_pass", "")
     vars.add(f"ansible_sudo_pass={ssh_pass}")
 
@@ -114,6 +114,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         pbex.run()
     except Exception as e:
         import traceback
+
         traceback.print_exc()
         raise e
 
