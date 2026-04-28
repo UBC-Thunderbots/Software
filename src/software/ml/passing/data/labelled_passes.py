@@ -35,22 +35,25 @@ def label_passes(pass_results: list[PassResult]) -> list[LabelledPass]:
 
     pass_labels: dict[uuid.UUID, dict[PassLogType, Label]] = {}
 
+    # start with the t0 baselines as the previous interval state
+    baselines = t0_baselines.copy()
+
     # 2. assign labels to all of the other pass results from other intervals
-    # comparing them to their time 0 baseline
+    # comparing them to the previous interval's state
     for result in pass_results:
         pass_id = result.pass_log.pass_id
         log_type = result.pass_log.pass_log_type
 
         if log_type != PassLogType.RESULT_0S:
             # Look up the t0_baseline for this specific pass
-            t0_baseline = t0_baselines.get(pass_id)
+            baseline = baselines.get(pass_id)
 
-            if not t0_baseline:
-                # Handle edge case where a 0s log might be missing for an ID
+            if not baseline:
+                # Handle edge case where the previous interval log might be missing for an ID
                 continue
 
             pass_result = result.result
-            baseline_result = t0_baseline.result
+            baseline_result = baseline.result
 
             # Calculate deltas relative to the 0s mark
             label = Label(
@@ -76,6 +79,9 @@ def label_passes(pass_results: list[PassResult]) -> list[LabelledPass]:
                 pass_labels[result.pass_log.pass_id] = {}
 
             pass_labels[result.pass_log.pass_id][result.pass_log.pass_log_type] = label
+
+            # update the baseline to the current interval's result for future intervals
+            baselines[result.pass_log.pass_id] = pass_result
 
     labelled_passes = []
 
