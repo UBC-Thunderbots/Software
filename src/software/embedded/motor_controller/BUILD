@@ -36,6 +36,7 @@ cc_library(
         "//software/embedded:spi_utils",
         "//software/embedded/gpio",
         "//software/logger",
+        "//software/physics:euclidean_to_wheel",
         "@cppcrc",
         "@trinamic",
     ],

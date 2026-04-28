@@ -21,8 +21,9 @@
 // (https://reveng.sourceforge.io/crc-catalogue/all.htm#crc.cat.crc-8-autosar)
 using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
-StSpinMotorController::StSpinMotorController()
-    : reset_gpio_(std::make_unique<GpioCharDev>(RESET_GPIO_PIN, GpioDirection::OUTPUT,
+StSpinMotorController::StSpinMotorController(const RobotConstants& robot_constants)
+    : robot_constants_(robot_constants),
+      reset_gpio_(std::make_unique<GpioCharDev>(RESET_GPIO_PIN, GpioDirection::OUTPUT,
                                                 GpioState::HIGH))
 {
     for (const MotorIndex motor : driveMotors())
@@ -43,7 +44,11 @@ void StSpinMotorController::setup()
 
     for (const MotorIndex motor : driveMotors())
     {
+        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 0, .ki = 0});
+
         sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 806, .ki = 154});
+        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 600, .ki = 0});
+        sendAndReceiveFrame(motor, SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = 100});
     }
 }
 
@@ -184,6 +189,40 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
     return motor_status_.at(motor).speed;
 }
 
+void StSpinMotorController::updateEuclideanVelocity(
+    EuclideanSpace_t target_euclidean_velocity)
+{
+    const Vector local_velocity(target_euclidean_velocity[1],
+                                -target_euclidean_velocity[0]);
+    const Angle direction = local_velocity.orientation();
+
+    const int16_t front_left_ks  = static_cast<int16_t>(std::abs(
+         (direction - Angle::fromDegrees(90 - robot_constants_.front_wheel_angle_deg))
+             .sin() *
+         750));
+    const int16_t front_right_ks = static_cast<int16_t>(std::abs(
+        (direction + Angle::fromDegrees(90 - robot_constants_.front_wheel_angle_deg))
+            .sin() *
+        750));
+    const int16_t back_right_ks  = static_cast<int16_t>(std::abs(
+         (direction + Angle::fromDegrees(90 + robot_constants_.back_wheel_angle_deg))
+             .sin() *
+         750));
+    const int16_t back_left_ks   = static_cast<int16_t>(std::abs(
+          (direction - Angle::fromDegrees(90 + robot_constants_.back_wheel_angle_deg))
+              .sin() *
+          750));
+
+    sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
+                        SetSpeedFeedForwardKsFrame{.ks = front_left_ks});
+    sendAndReceiveFrame(MotorIndex::FRONT_RIGHT,
+                        SetSpeedFeedForwardKsFrame{.ks = front_right_ks});
+    sendAndReceiveFrame(MotorIndex::BACK_RIGHT,
+                        SetSpeedFeedForwardKsFrame{.ks = back_right_ks});
+    sendAndReceiveFrame(MotorIndex::BACK_LEFT,
+                        SetSpeedFeedForwardKsFrame{.ks = back_left_ks});
+}
+
 void StSpinMotorController::immediatelyDisable()
 {
     for (const MotorIndex motor : reflective_enum::values<MotorIndex>())
@@ -308,6 +347,12 @@ void StSpinMotorController::populateTx(const OutgoingFrame& outgoing_frame,
                 tx[2] = static_cast<uint8_t>(0xFF & frame.ka);
                 tx[3] = static_cast<uint8_t>(0xFF & (frame.kv >> 8));
                 tx[4] = static_cast<uint8_t>(0xFF & frame.kv);
+            }
+            else if constexpr (std::is_same_v<T, SetSpeedFeedForwardKsFrame>)
+            {
+                tx[0] = static_cast<uint8_t>(StSpinOpcode::SET_SPEED_FEED_FORWARD_KS);
+                tx[1] = static_cast<uint8_t>(0xFF & (frame.ks >> 8));
+                tx[2] = static_cast<uint8_t>(0xFF & frame.ks);
             }
         },
         outgoing_frame);

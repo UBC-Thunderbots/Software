@@ -73,9 +73,9 @@ class MotorService
 
     bool anyMotorRequiresReset() const;
 
-    std::unique_ptr<MotorController> motor_controller_;
-
     RobotConstants robot_constants_;
+
+    std::unique_ptr<MotorController> motor_controller_;
 
     EuclideanToWheel euclidean_to_four_wheel_;
 
