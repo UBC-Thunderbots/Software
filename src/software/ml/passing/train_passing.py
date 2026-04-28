@@ -65,57 +65,62 @@ def load_and_label_data(
 
     return labelled_passes
 
+
 def calculate_label_weights(labelled_passes: list[LabelledPass]):
-    """
-    Calculates the positive weights for BCEWithLogitsLoss for each label type
+    """Calculates the positive weights for BCEWithLogitsLoss for each label type
     based on the actual frequency of events in the dataset.
     """
     # 1. Flatten all labels into a single large 2D array [num_samples, num_bits]
     all_label_tensors = []
-    
+
     for labelled_pass in labelled_passes:
-        # Concatenate labels for all intervals (1s, 5s, 10s, etc.) 
+        # Concatenate labels for all intervals (1s, 5s, 10s, etc.)
         # into one long vector for this pass
         pass_bits = []
-        
+
         # iterate through intervals in order
         for interval in sorted(labelled_pass.labels.keys(), key=lambda x: x.value):
             label = labelled_pass.labels[interval]
-            pass_bits.extend([
-                label.has_score_changed,
-                label.has_enemy_score_changed,
-                label.have_yellow_cards_changed,
-                label.have_red_cards_changed,
-                label.has_possession_changed,
-                label.have_shots_on_net_changed,
-                label.is_enemy_possession,
-                label.has_ball_in_half_changed,
-                label.is_ball_in_enemy_half
-            ])
+            pass_bits.extend(
+                [
+                    label.has_score_changed,
+                    label.has_enemy_score_changed,
+                    label.have_yellow_cards_changed,
+                    label.have_red_cards_changed,
+                    label.has_possession_changed,
+                    label.have_shots_on_net_changed,
+                    label.is_enemy_possession,
+                    label.has_ball_in_half_changed,
+                    label.is_ball_in_enemy_half,
+                ]
+            )
         all_label_tensors.append(pass_bits)
 
     # Convert to numpy for easy counting
     labels_np = np.array(all_label_tensors, dtype=np.float32)
-    
+
     # 2. Calculate weights for each bit
     # pos_weight = (num_negative_samples) / (num_positive_samples)
     num_positives = np.sum(labels_np, axis=0)
     num_negatives = labels_np.shape[0] - num_positives
-    
+
     # Avoid division by zero if an event never happened in the dataset
     # We use 1.0 as a default weight for those cases
-    label_weights = np.divide(num_negatives, num_positives, 
-                            out=np.ones_like(num_positives), 
-                            where=num_positives != 0)
-    
+    label_weights = np.divide(
+        num_negatives,
+        num_positives,
+        out=np.ones_like(num_positives),
+        where=num_positives != 0,
+    )
+
     print(f"Weights are: {label_weights}")
 
     # 3. Convert to Torch Tensor
     return torch.tensor(label_weights, dtype=torch.float32)
 
+
 def undersample_passes(all_passes: list[LabelledPass], boring_keep_ratio: float = 0.1):
-    """
-    Filters the dataset to keep all 'interesting' passes and a 
+    """Filters the dataset to keep all 'interesting' passes and a
     fraction of the 'boring' ones.
     """
     interesting_passes = []
@@ -123,23 +128,25 @@ def undersample_passes(all_passes: list[LabelledPass], boring_keep_ratio: float 
 
     for labelled_pass in all_passes:
         # Check if ANY label in ANY interval is True
-        # Note: We exclude 'is_enemy_possession' and 'is_ball_in_enemy_half' 
+        # Note: We exclude 'is_enemy_possession' and 'is_ball_in_enemy_half'
         # from the 'interesting' check because they are static states, not events.
         is_interesting = False
         for interval_label in labelled_pass.labels.values():
             # We check specific event-based flags
-            if any([
-                interval_label.has_score_changed,
-                interval_label.has_enemy_score_changed,
-                interval_label.have_yellow_cards_changed,
-                interval_label.have_red_cards_changed,
-                interval_label.has_possession_changed,
-                interval_label.have_shots_on_net_changed,
-                interval_label.has_ball_in_half_changed
-            ]):
+            if any(
+                [
+                    interval_label.has_score_changed,
+                    interval_label.has_enemy_score_changed,
+                    interval_label.have_yellow_cards_changed,
+                    interval_label.have_red_cards_changed,
+                    interval_label.has_possession_changed,
+                    interval_label.have_shots_on_net_changed,
+                    interval_label.has_ball_in_half_changed,
+                ]
+            ):
                 is_interesting = True
                 break
-        
+
         if is_interesting:
             interesting_passes.append(labelled_pass)
         else:
@@ -150,17 +157,20 @@ def undersample_passes(all_passes: list[LabelledPass], boring_keep_ratio: float 
     sampled_boring = random.sample(boring_passes, num_boring_to_keep)
 
     combined = interesting_passes + sampled_boring
-    random.shuffle(combined) # Shuffle so the model doesn't see all goals at once
-    
-    print(f"Original: {len(all_passes)} | Interesting: {len(interesting_passes)} | Boring Kept: {len(sampled_boring)}")
+    random.shuffle(combined)  # Shuffle so the model doesn't see all goals at once
+
+    print(
+        f"Original: {len(all_passes)} | Interesting: {len(interesting_passes)} | Boring Kept: {len(sampled_boring)}"
+    )
     return combined
 
+
 def train_single_model(
-    loader: DataLoader, 
-    model: GenericHeteroGNN, 
+    loader: DataLoader,
+    model: GenericHeteroGNN,
     label_weights: torch.Tensor,
-    epochs=50, 
-    learning_rate=0.01
+    epochs=50,
+    learning_rate=0.01,
 ) -> GenericHeteroGNN:
     # 1. Setup the "Judge" (Loss Function) and the "Optimizer" (Weight Updater)
     # BCEWithLogitsLoss combines a Sigmoid layer and the BCELoss in one single class.
@@ -239,23 +249,26 @@ def evaluate_model(loader: DataLoader, model: GenericHeteroGNN):
 
                 preds = (torch.sigmoid(interval_logits) > 0.5).float()
                 interval_preds[interval].append(preds)
-    
+
     label_names = [label.name for label in fields(Label)]
 
     for _, interval in enumerate(intervals):
         preds = interval_preds[interval]
         targets = interval_targets[interval]
-        
+
         pred_matrix = torch.cat(preds, dim=0).cpu().numpy()
         target_matrix = torch.cat(targets, dim=0).cpu().numpy()
-   
+
         print(f"\n--- Interval: {interval.name} ---")
 
         for j, name in enumerate(label_names):
             f1 = f1_score(target_matrix[:, j], pred_matrix[:, j], zero_division=0)
             print(f"{name:20} | F1-Score: {f1:.4f}")
 
-def train_and_export_models(graphs: List[HeteroData], labels: List[List[Any]], label_weights: torch.Tensor):
+
+def train_and_export_models(
+    graphs: List[HeteroData], labels: List[List[Any]], label_weights: torch.Tensor
+):
     for graph, label in zip(graphs, labels):
         graph.y = torch.tensor(label, dtype=torch.float)
 
@@ -292,7 +305,9 @@ def train_and_export_models(graphs: List[HeteroData], labels: List[List[Any]], l
 
                 model = GenericHeteroGNN(config=config, metadata=metadata)
 
-                train_single_model(loader=training_loader, model=model, label_weights=label_weights)
+                train_single_model(
+                    loader=training_loader, model=model, label_weights=label_weights
+                )
 
                 print(f"Trained {model_name}")
 
@@ -326,11 +341,11 @@ if __name__ == "__main__":
         sys.exit(1)
 
     labelled_passes = load_and_label_data(sys.argv[1], sys.argv[2], Team.BLUE)
-    
+
     label_weights = calculate_label_weights(labelled_passes=labelled_passes)
-    
+
     undersampled_passes = undersample_passes(labelled_passes)
-    
+
     graphs, labels = process_all_passes(labelled_passes=undersampled_passes)
 
     print("Dataset generated!")
