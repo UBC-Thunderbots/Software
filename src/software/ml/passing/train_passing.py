@@ -7,13 +7,15 @@ from torch_geometric.data import HeteroData
 from torch_geometric.nn import SAGEConv, GATConv
 from torch_geometric.loader import DataLoader
 import torch.onnx
-from typing import List
+import numpy as np
+from typing import List, Any
+from dataclasses import fields
 from software.ml.models.hetero_gnn.hetero_gnn import GenericHeteroGNN
 from software.ml.models.hetero_gnn.config import HeteroGNNConfig
 from software.ml.passing.data.types import NodeType
 from software.ml.passing.data.build_graph import process_all_passes
 from software.ml.passing.data.pass_result import generate_pass_results
-from software.ml.passing.data.labelled_passes import LabelledPass, label_passes
+from software.ml.passing.data.labelled_passes import LabelledPass, label_passes, Label
 from software.evaluation.logs.event_log import EventLog, Team
 from software.evaluation.logs.pass_log import PassLog, PassLogType
 import csv
@@ -63,6 +65,54 @@ def load_and_label_data(
 
     return labelled_passes
 
+def calculate_label_weights(labelled_passes: list[LabelledPass]):
+    """
+    Calculates the positive weights for BCEWithLogitsLoss for each label type
+    based on the actual frequency of events in the dataset.
+    """
+    # 1. Flatten all labels into a single large 2D array [num_samples, num_bits]
+    all_label_tensors = []
+    
+    for labelled_pass in labelled_passes:
+        # Concatenate labels for all intervals (1s, 5s, 10s, etc.) 
+        # into one long vector for this pass
+        pass_bits = []
+        
+        # iterate through intervals in order
+        for interval in sorted(labelled_pass.labels.keys(), key=lambda x: x.value):
+            label = labelled_pass.labels[interval]
+            pass_bits.extend([
+                label.has_score_changed,
+                label.has_enemy_score_changed,
+                label.have_yellow_cards_changed,
+                label.have_red_cards_changed,
+                label.has_possession_changed,
+                label.have_shots_on_net_changed,
+                label.is_enemy_possession,
+                label.has_ball_in_half_changed,
+                label.is_ball_in_enemy_half
+            ])
+        all_label_tensors.append(pass_bits)
+
+    # Convert to numpy for easy counting
+    labels_np = np.array(all_label_tensors, dtype=np.float32)
+    
+    # 2. Calculate weights for each bit
+    # pos_weight = (num_negative_samples) / (num_positive_samples)
+    num_positives = np.sum(labels_np, axis=0)
+    num_negatives = labels_np.shape[0] - num_positives
+    
+    # Avoid division by zero if an event never happened in the dataset
+    # We use 1.0 as a default weight for those cases
+    label_weights = np.divide(num_negatives, num_positives, 
+                            out=np.ones_like(num_positives), 
+                            where=num_positives != 0)
+    
+    print(f"Weights are: {label_weights}")
+
+    # 3. Convert to Torch Tensor
+    return torch.tensor(label_weights, dtype=torch.float32)
+
 def undersample_passes(all_passes: list[LabelledPass], boring_keep_ratio: float = 0.1):
     """
     Filters the dataset to keep all 'interesting' passes and a 
@@ -106,12 +156,16 @@ def undersample_passes(all_passes: list[LabelledPass], boring_keep_ratio: float 
     return combined
 
 def train_single_model(
-    loader: DataLoader, model: GenericHeteroGNN, epochs=50, learning_rate=0.01
+    loader: DataLoader, 
+    model: GenericHeteroGNN, 
+    label_weights: torch.Tensor,
+    epochs=50, 
+    learning_rate=0.01
 ) -> GenericHeteroGNN:
     # 1. Setup the "Judge" (Loss Function) and the "Optimizer" (Weight Updater)
     # BCEWithLogitsLoss combines a Sigmoid layer and the BCELoss in one single class.
     # It's more numerically stable than using a plain Sigmoid followed by BCELoss.
-    criterion = torch.nn.BCEWithLogitsLoss()
+    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=label_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     model.train()
@@ -183,22 +237,25 @@ def evaluate_model(loader: DataLoader, model: GenericHeteroGNN):
 
                 interval_targets[interval].append(interval_target)
 
-                preds = (probs > 0.5).float()
+                preds = (torch.sigmoid(interval_logits) > 0.5).float()
                 interval_preds[interval].append(preds)
     
     label_names = [label.name for label in fields(Label)]
 
-    for i, interval in enumerate(intervals):
+    for _, interval in enumerate(intervals):
         preds = interval_preds[interval]
         targets = interval_targets[interval]
+        
+        pred_matrix = torch.cat(preds, dim=0).cpu().numpy()
+        target_matrix = torch.cat(targets, dim=0).cpu().numpy()
    
         print(f"\n--- Interval: {interval.name} ---")
 
         for j, name in enumerate(label_names):
-            f1 = f1_score(targets[:, idx], preds[:, idx], zero_division=0)
+            f1 = f1_score(target_matrix[:, j], pred_matrix[:, j], zero_division=0)
             print(f"{name:20} | F1-Score: {f1:.4f}")
 
-def train_and_export_models(graphs: List[HeteroData], labels: List[List[any]]):
+def train_and_export_models(graphs: List[HeteroData], labels: List[List[Any]], label_weights: torch.Tensor):
     for graph, label in zip(graphs, labels):
         graph.y = torch.tensor(label, dtype=torch.float)
 
@@ -235,7 +292,7 @@ def train_and_export_models(graphs: List[HeteroData], labels: List[List[any]]):
 
                 model = GenericHeteroGNN(config=config, metadata=metadata)
 
-                train_single_model(loader=training_loader, model=model)
+                train_single_model(loader=training_loader, model=model, label_weights=label_weights)
 
                 print(f"Trained {model_name}")
 
@@ -269,9 +326,13 @@ if __name__ == "__main__":
         sys.exit(1)
 
     labelled_passes = load_and_label_data(sys.argv[1], sys.argv[2], Team.BLUE)
+    
+    label_weights = calculate_label_weights(labelled_passes=labelled_passes)
+    
     undersampled_passes = undersample_passes(labelled_passes)
+    
     graphs, labels = process_all_passes(labelled_passes=undersampled_passes)
 
     print("Dataset generated!")
 
-    train_and_export_models(graphs, labels)
+    train_and_export_models(graphs, labels, label_weights)

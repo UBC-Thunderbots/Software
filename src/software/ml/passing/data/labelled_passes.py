@@ -26,7 +26,7 @@ class LabelledPass:
 
 
 def label_passes(pass_results: list[PassResult]) -> list[LabelledPass]:
-    # 1. Map Pass IDs to their 0s result (game performance at the moment of the pass) for quick lookup
+    # Map Pass IDs to their 0s result (game performance at the moment of the pass) for quick lookup
     # {pass_id: StatsResult at t0}
     t0_baselines: dict[uuid.UUID, PassResult] = {}
     for result in pass_results:
@@ -38,14 +38,14 @@ def label_passes(pass_results: list[PassResult]) -> list[LabelledPass]:
     # start with the t0 baselines as the previous interval state
     baselines = t0_baselines.copy()
 
-    # 2. assign labels to all of the other pass results from other intervals
+    # assign labels to all of the other pass results from other intervals
     # comparing them to the previous interval's state
     for result in pass_results:
         pass_id = result.pass_log.pass_id
         log_type = result.pass_log.pass_log_type
 
         if log_type != PassLogType.RESULT_0S:
-            # Look up the t0_baseline for this specific pass
+            # Look up the baseline for this specific pass
             baseline = baselines.get(pass_id)
 
             if not baseline:
@@ -81,7 +81,7 @@ def label_passes(pass_results: list[PassResult]) -> list[LabelledPass]:
             pass_labels[result.pass_log.pass_id][result.pass_log.pass_log_type] = label
 
             # update the baseline to the current interval's result for future intervals
-            baselines[result.pass_log.pass_id] = pass_result
+            baselines[result.pass_log.pass_id] = result
 
     labelled_passes = []
 
