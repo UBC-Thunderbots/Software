@@ -4,6 +4,7 @@ py_library(
     name = "log_interface",
     srcs = ["log_interface.py"],
     deps = [
+        "//proto:import_all_protos",
         "//software/thunderscope:time_provider",
     ],
 )

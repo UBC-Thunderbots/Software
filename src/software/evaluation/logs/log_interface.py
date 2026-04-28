@@ -1,10 +1,10 @@
 from __future__ import annotations
 from abc import abstractmethod, ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from proto.import_all_protos import *
-from software.thunderscope.time_provider import time_provider_instance
 from typing import Iterator, Any, override
 from google.protobuf.descriptor import Descriptor, FieldDescriptor
+from software.thunderscope.time_provider import time_provider_instance
 
 
 def count_primitive_fields(descriptor: Descriptor):
@@ -64,11 +64,7 @@ class IEvalLog(ABC):
 
 @dataclass
 class TimestampedEvalLog(IEvalLog):
-    timestamp: float
-
-    def __post_init__(self):
-        """Sets the timestamp from the singleton"""
-        self.timestamp = time_provider_instance.elapsed_time_ns()
+    timestamp: float = field(default_factory=time_provider_instance.elapsed_time_ns)
 
     def get_timestamp(self) -> float:
         """Get this log's timestamp"""

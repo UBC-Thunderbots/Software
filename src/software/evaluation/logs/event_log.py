@@ -32,7 +32,7 @@ class Team(StrEnum):
     YELLOW = auto()
 
 
-@dataclass
+@dataclass(kw_only=True)
 class EventLog(TimestampedEvalLog):
     """Represents a single event being tracked, where and for whom the event is, and the game state at the time of the event"""
 
@@ -41,7 +41,7 @@ class EventLog(TimestampedEvalLog):
     for_team: Team
     world_state_log: WorldStateLog
 
-    num_cols = TimestampedEvalLog.get_num_cols() + 2 + WorldStateLog.get_num_cols()
+    num_cols = TimestampedEvalLog.get_num_cols() + 3 + WorldStateLog.get_num_cols()
 
     @staticmethod
     def from_world(
@@ -58,7 +58,6 @@ class EventLog(TimestampedEvalLog):
         world_state_log = WorldStateLog.from_world(world_msg=world_msg)
 
         return EventLog(
-            timestamp=0,
             event_type=event_type,
             from_team=from_team,
             for_team=for_team,
@@ -72,11 +71,15 @@ class EventLog(TimestampedEvalLog):
 
     @override
     def to_array(self) -> list[Any]:
-        return [
-            self.event_type.value,
-            self.from_team.value,
-            self.for_team.value,
-        ] + self.world_state_log.to_array()
+        return (
+            super().to_array()
+            + [
+                self.event_type.value,
+                self.from_team.value,
+                self.for_team.value,
+            ]
+            + self.world_state_log.to_array()
+        )
 
     @staticmethod
     @override

@@ -2,8 +2,9 @@ from dataclasses import dataclass, field
 from software.evaluation.logs.log_interface import IEvalLog
 from software.ml.data_cleanup.result_interface import IResult
 from software.evaluation.logs.event_log import EventLog, Team, EventType
-from typing import cast, Any, List
+from typing import cast, Any, List, override
 import software.python_bindings as tbots_cpp
+from proto.import_all_protos import *
 
 
 @dataclass
@@ -19,7 +20,7 @@ class StatsResult(IResult):
     passes: int = 0
     blocked_enemy_shots: int = 0
 
-    _field: tbots_cpp.Field = field(init=False, repr=False)
+    _field: tbots_cpp.Field = field(init=False, repr=False, default=None)
 
     def to_array(self) -> List[Any]:
         return [
@@ -31,13 +32,14 @@ class StatsResult(IResult):
             self.shots_on_net,
             self.ball_in_enemy_half,
             self.passes,
+            self.blocked_enemy_shots,
         ]
 
-    def _is_in_enemy_half(self, point_to_check: Point):
-        if not self._field:
+    def _is_in_enemy_half(self, point_to_check: List[float]):
+        if self._field is None:
             self._field = tbots_cpp.Field.createSSLDivisionBField()
 
-        point = tbots_cpp.Point(point_to_check.x_meters, point_to_check.y_meters)
+        point = tbots_cpp.Point(point_to_check[0], point_to_check[1])
 
         return tbots_cpp.contains(self._field.enemyHalf(), point)
 
@@ -48,7 +50,7 @@ class StatsResult(IResult):
         for_friendly = tracked_event.for_team == self.friendly_team
 
         self.ball_in_enemy_half = self._is_in_enemy_half(
-            tracked_event.world_state.ball_state.global_position
+            tracked_event.world_state_log.ball_state.get_position()
         )
 
         match tracked_event.event_type:

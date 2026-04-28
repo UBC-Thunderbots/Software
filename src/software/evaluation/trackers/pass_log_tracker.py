@@ -10,6 +10,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 import queue
 from software.thunderscope.time_provider import time_provider_instance
 import uuid
+from software.py_constants import NANOSECONDS_PER_SECOND
 
 
 class PassLogTracker(PassTracker):
@@ -126,7 +127,7 @@ class PassLogTracker(PassTracker):
         """
         if (
             time_provider_instance.elapsed_time_ns() - tracked_pass.get_timestamp()
-            > interval
+            > interval * NANOSECONDS_PER_SECOND
         ):
             self._log_pass(
                 pass_id=tracked_pass.pass_id,

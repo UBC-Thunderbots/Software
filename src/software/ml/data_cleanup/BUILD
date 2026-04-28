@@ -8,6 +8,7 @@ py_library(
     ],
     deps = [
         ":result_interface",
+        "//proto:import_all_protos",
         "//software/evaluation/logs:event_log",
         "//software/evaluation/logs:log_interface",
     ],

@@ -3,6 +3,7 @@ import os
 from software.evaluation.trackers import (
     PossessionTracker,
     ShotTracker,
+    PassTracker,
     TrackerBuilder,
     RefereeTracker,
     GoalieTracker,
@@ -70,6 +71,7 @@ class StatsLogger:
                 event_queue=self.event_queue,
                 buffer_size=buffer_size,
             )
+            .add_tracker(PassTracker)
             .add_tracker(ShotTracker)
             .add_tracker(PossessionTracker)
             .add_tracker(

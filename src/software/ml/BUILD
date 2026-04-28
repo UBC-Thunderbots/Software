@@ -13,6 +13,10 @@ py_binary(
     name = "train_passing",
     srcs = ["passing/train_passing.py"],
     deps = [
+        requirement("torch"),
+        requirement("pandas"),
+        requirement("numpy"),
+        requirement("torch_geometric"),
         "//software/evaluation/logs:event_log",
         "//software/evaluation/logs:pass_log",
         "//software/ml/models/hetero_gnn",

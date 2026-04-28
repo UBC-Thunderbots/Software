@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch_geometric.nn import HeteroConv
 from software.ml.models.hetero_gnn.config import HeteroGNNConfig
+from typing import override
 
 
 class GenericHeteroGNN(torch.nn.Module):
@@ -31,9 +32,6 @@ class GenericHeteroGNN(torch.nn.Module):
                     conv_dict[edge_type] = layer_class(
                         (-1, -1), out_dim, **layer_kwargs
                     )
-
-                    # Wrap the individual edge layers into one HeteroConv
-                    self.convs.append(HeteroConv(conv_dict, aggr=config.global_aggr))
             else:
                 # Single convolution for ALL edge types
                 layer_class, layer_kwargs = config.edge_specs
@@ -42,10 +40,22 @@ class GenericHeteroGNN(torch.nn.Module):
                         (-1, -1), out_dim, **layer_kwargs
                     )
 
+            self.convs.append(HeteroConv(conv_dict, aggr=config.global_aggr))
+
+        self.head_1s = torch.nn.Linear(config.hidden_channels, config.out_channels)
+        self.head_5s = torch.nn.Linear(config.hidden_channels, config.out_channels)
+        self.head_10s = torch.nn.Linear(config.hidden_channels, config.out_channels)
+
+    @override
     def forward(self, x_dict, edge_index_dict):
         for i, conv in enumerate(self.convs):
-            # Apply the heterogeneous convolution
-            x_dict = conv(x_dict, edge_index_dict)
+            new_x_dict = conv(x_dict, edge_index_dict)
+
+            for node_type, x in x_dict.items():
+                if node_type not in new_x_dict:
+                    new_x_dict[node_type] = x
+
+            x_dict = new_x_dict
 
             # Apply activation/dropout except for the final layer
             if i < len(self.convs) - 1:

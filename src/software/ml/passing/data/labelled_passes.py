@@ -22,57 +22,76 @@ class Label:
 class LabelledPass:
     pass_log: PassLog
     result: StatsResult
-    label: Label
+    labels: dict[PassLogType, Label]
 
 
 def label_passes(pass_results: list[PassResult]) -> list[LabelledPass]:
     # 1. Map Pass IDs to their 0s result (game performance at the moment of the pass) for quick lookup
     # {pass_id: StatsResult at t0}
-    t0_baselines: dict[uuid.UUID, StatsResult] = {}
+    t0_baselines: dict[uuid.UUID, PassResult] = {}
     for result in pass_results:
         if result.pass_log.pass_log_type == PassLogType.RESULT_0S:
-            t0_baselines[result.pass_log.pass_id] = result.result
+            t0_baselines[result.pass_log.pass_id] = result
 
-    labelled_passes: list[LabelledPass] = []
+    pass_labels: dict[uuid.UUID, dict[PassLogType, Label]] = {}
+
+    # start with the t0 baselines as the previous interval state
+    baselines = t0_baselines.copy()
 
     # 2. assign labels to all of the other pass results from other intervals
-    # comparing them to their time 0 baseline
+    # comparing them to the previous interval's state
     for result in pass_results:
         pass_id = result.pass_log.pass_id
         log_type = result.pass_log.pass_log_type
 
-        # If it's the t0_baseline itself, give it a "zeroed" or default label
         if log_type != PassLogType.RESULT_0S:
             # Look up the t0_baseline for this specific pass
-            t0_baseline = t0_baselines.get(pass_id)
+            baseline = baselines.get(pass_id)
 
-            if not t0_baseline:
-                # Handle edge case where a 0s log might be missing for an ID
+            if not baseline:
+                # Handle edge case where the previous interval log might be missing for an ID
                 continue
 
             pass_result = result.result
+            baseline_result = baseline.result
 
             # Calculate deltas relative to the 0s mark
             label = Label(
-                has_score_changed=pass_result.score > t0_baseline.score,
+                has_score_changed=pass_result.score > baseline_result.score,
                 has_enemy_score_changed=pass_result.enemy_score
-                > t0_baseline.enemy_score,
+                > baseline_result.enemy_score,
                 have_yellow_cards_changed=pass_result.yellow_cards
-                > t0_baseline.yellow_cards,
-                have_red_cards_changed=pass_result.red_cards > t0_baseline.red_cards,
+                > baseline_result.yellow_cards,
+                have_red_cards_changed=pass_result.red_cards
+                > baseline_result.red_cards,
                 has_possession_changed=pass_result.has_possession
-                != t0_baseline.has_possession,
+                != baseline_result.has_possession,
                 have_shots_on_net_changed=pass_result.shots_on_net
-                > t0_baseline.shots_on_net,
+                > baseline_result.shots_on_net,
                 # State at current interval
                 is_enemy_possession=pass_result.has_possession is False,
                 has_ball_in_half_changed=pass_result.ball_in_enemy_half
-                != t0_baseline.ball_in_enemy_half,
+                != baseline_result.ball_in_enemy_half,
                 is_ball_in_enemy_half=pass_result.ball_in_enemy_half,
             )
 
+            if result.pass_log.pass_id not in pass_labels:
+                pass_labels[result.pass_log.pass_id] = {}
+
+            pass_labels[result.pass_log.pass_id][result.pass_log.pass_log_type] = label
+
+            # update the baseline to the current interval's result for future intervals
+            baselines[result.pass_log.pass_id] = pass_result
+
+    labelled_passes = []
+
+    for pass_result in t0_baselines.values():
         labelled_passes.append(
-            LabelledPass(pass_log=result.pass_log, result=result.result, label=label)
+            LabelledPass(
+                pass_log=pass_result.pass_log,
+                result=pass_result.result,
+                labels=pass_labels[pass_result.pass_log.pass_id],
+            )
         )
 
     return labelled_passes
