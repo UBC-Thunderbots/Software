@@ -12,6 +12,7 @@ enum class StSpinOpcode
     SET_PID_FLUX_KP_KI           = 0x05,
     SET_PID_SPEED_KP_KI          = 0x06,
     SET_SPEED_FEED_FORWARD_KA_KV = 0x07,
+    SET_SPEED_FEED_FORWARD_KS    = 0x08,
 };
 
 enum class StSpinResponseType
@@ -84,4 +85,9 @@ struct SetSpeedFeedForwardKaKvFrame
 {
     int16_t ka;
     int16_t kv;
+};
+
+struct SetSpeedFeedForwardKsFrame
+{
+    int16_t ks;
 };
