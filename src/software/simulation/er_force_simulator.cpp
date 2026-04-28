@@ -299,10 +299,10 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
-    auto sim_state                   = getSimulatorState();
-    const auto& sim_robots           = sim_state.yellow_robots();
-    const auto robot_to_vel_pair = getRobotIdToLocalVelocityMap(sim_robots);
-    const auto robot_to_orientation  = getRobotIdToOrientationMap(sim_robots);
+    auto sim_state                  = getSimulatorState();
+    const auto& sim_robots          = sim_state.yellow_robots();
+    const auto robot_to_vel_pair    = getRobotIdToLocalVelocityMap(sim_robots);
+    const auto robot_to_orientation = getRobotIdToOrientationMap(sim_robots);
 
     yellow_team_world_msg               = std::move(world_msg);
     const TbotsProto::World world_proto = *yellow_team_world_msg;
@@ -311,7 +311,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
         if (robot_to_vel_pair.contains(robot_id))
         {
             const auto& [local_vel, angular_vel] = robot_to_vel_pair.at(robot_id);
-            const auto& orientation = robot_to_orientation.at(robot_id);
+            const auto& orientation              = robot_to_orientation.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
                               world_proto, local_vel, angular_vel, orientation);
         }
@@ -322,10 +322,10 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
-    auto sim_state                   = getSimulatorState();
-    const auto& sim_robots           = sim_state.blue_robots();
-    const auto robot_to_vel_pair     = getRobotIdToLocalVelocityMap(sim_robots);
-    const auto robot_to_orientation  = getRobotIdToOrientationMap(sim_robots);
+    auto sim_state                  = getSimulatorState();
+    const auto& sim_robots          = sim_state.blue_robots();
+    const auto robot_to_vel_pair    = getRobotIdToLocalVelocityMap(sim_robots);
+    const auto robot_to_orientation = getRobotIdToOrientationMap(sim_robots);
 
     blue_team_world_msg                 = std::move(world_msg);
     const TbotsProto::World world_proto = *blue_team_world_msg;
@@ -335,7 +335,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
         if (robot_to_vel_pair.contains(robot_id))
         {
             const auto& [local_vel, angular_vel] = robot_to_vel_pair.at(robot_id);
-            const auto& orientation = robot_to_orientation.at(robot_id);
+            const auto& orientation              = robot_to_orientation.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
                               world_proto, local_vel, angular_vel, orientation);
         }
@@ -584,8 +584,7 @@ ErForceSimulator::getRobotIdToLocalVelocityMap(
     return robot_to_local_velocity;
 }
 
-std::map<RobotId, Angle>
-ErForceSimulator::getRobotIdToOrientationMap(
+std::map<RobotId, Angle> ErForceSimulator::getRobotIdToOrientationMap(
     const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots)
 {
     std::map<RobotId, Angle> robot_to_orientation;

@@ -17,7 +17,7 @@ RobotConstants create2026RobotConstants()
         .max_force_dribbler_speed_rpm  = -12000,
 
         // Motor constant
-        .motor_max_acceleration_m_per_s_2 = 2.0f,
+        .motor_max_acceleration_m_per_s_2 = 4.5f,
 
         // Robot's linear movement constants
         .robot_max_speed_m_per_s          = 3.0f,
