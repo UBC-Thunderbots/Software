@@ -4,7 +4,8 @@
 # Uses Tailscale as a VPN to get around connections being blocked at the router level
 # Sets up Tailscale, ssh, and links the server script to intercept new connections
 
-SERVER_SCRIPT="/home/thunderbots/Software/scripts/mezzsh/server/mezzsh_server.sh"
+SCRIPT_PATH="/home/thunderbots/Software/scripts/mezzsh/server/mezzsh_server.sh"
+SERVER_SCRIPT="/usr/local/bin/mezzsh_server.sh"
 TIMEOUT_SECONDS=3600  # 1 hour
 SSHD_CONFIG="/etc/ssh/sshd_config"
 TARGET_USER="thunderbots"
@@ -38,6 +39,9 @@ cp $SSHD_CONFIG "${SSHD_CONFIG}.bak"
 # This step uses a match block to modify these ssh settings for only 1 user
 # Clean up any previous global ForceCommand we might have added
 sed -i '/Match User $TARGET_USER/,/AcceptEnv SSH_CHECK_MODE FORCE_CONNECT/d' $SSHD_CONFIG
+
+# copies the script from repo to script location
+cp $SCRIPT_PATH $SERVER_SCRIPT
 
 # Append the Match block to the end of the file
 cat <<EOF >> $SSHD_CONFIG
