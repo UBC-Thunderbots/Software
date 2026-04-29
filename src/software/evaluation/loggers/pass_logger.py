@@ -35,7 +35,7 @@ class PassLogger:
 
         :param proto_unix_io: the proto unix io to use
         :param friendly_colour_yellow: if the friendly color is yellow or not
-        :param out_file_name: name of file to write pass results to. 
+        :param out_file_name: name of file to write pass results to.
                               If None, uses the value from constants
         :param buffer_size: buffer size to use
         """
@@ -55,7 +55,9 @@ class PassLogger:
 
         self.events_file_path = os.path.join(
             PassResultsConstants.PASS_RESULTS_DIRECTORY_PATH,
-            PassResultsConstants.PASS_RESULTS_FILE_NAME if out_file_name is None else out_file_name,
+            PassResultsConstants.PASS_RESULTS_FILE_NAME
+            if out_file_name is None
+            else out_file_name,
         )
         self.events_file_handle = None
 
