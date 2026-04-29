@@ -118,41 +118,40 @@ def calculate_label_weights(labelled_passes: list[LabelledPass]):
     # 3. Convert to Torch Tensor
     return torch.tensor(label_weights, dtype=torch.float32)
 
+
 PRIORITY_EVENTS = [
-    "has_score_changed", 
-    "has_enemy_score_changed", 
-    "have_yellow_cards_changed", 
+    "has_score_changed",
+    "has_enemy_score_changed",
+    "have_yellow_cards_changed",
     "have_red_cards_changed",
-    "have_shots_on_net_changed"
+    "have_shots_on_net_changed",
 ]
+
 
 def scale_label_weights(
     label_weights: torch.Tensor,
     multiplier: float = 5.0,
 ) -> torch.Tensor:
-    """
-    Scales the weights for specific fields across all time intervals.
-    """
+    """Scales the weights for specific fields across all time intervals."""
     # 1. Get the list of field names from the Label dataclass in order
     label_field_names = [f.name for f in fields(Label)]
     num_labels_per_interval = len(label_field_names)
-    
+
     # Clone to avoid modifying the original tensor in-place if desired
     scaled_weights = label_weights.clone()
-    
+
     # 2. Find the local indices of the fields we want to boost
     priority_event_indices = [
-        i for i, name in enumerate(label_field_names) 
-        if name in PRIORITY_EVENTS
+        i for i, name in enumerate(label_field_names) if name in PRIORITY_EVENTS
     ]
-    
+
     # 3. Apply the multiplier to those indices across every interval block
     for idx in range(num_intervals):
         offset = idx * num_labels_per_interval
         for priority_idx in priority_event_indices:
             global_idx = offset + priority_idx
             scaled_weights[global_idx] *= multiplier
-            
+
     return scaled_weights
 
 
