@@ -44,10 +44,7 @@ void StSpinMotorController::setup()
 
     for (const MotorIndex motor : driveMotors())
     {
-        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 0, .ki = 0});
-
         sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 806, .ki = 154});
-        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 600, .ki = 0});
         sendAndReceiveFrame(motor, SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = 100});
     }
 }
@@ -196,22 +193,23 @@ void StSpinMotorController::updateEuclideanVelocity(
                                 -target_euclidean_velocity[0]);
     const Angle direction = local_velocity.orientation();
 
-    const int16_t front_left_ks  = static_cast<int16_t>(std::abs(
-         (direction - Angle::fromDegrees(90 - robot_constants_.front_wheel_angle_deg))
-             .sin() *
-         750));
-    const int16_t front_right_ks = static_cast<int16_t>(std::abs(
-        (direction + Angle::fromDegrees(90 - robot_constants_.front_wheel_angle_deg))
-            .sin() *
-        750));
-    const int16_t back_right_ks  = static_cast<int16_t>(std::abs(
-         (direction + Angle::fromDegrees(90 + robot_constants_.back_wheel_angle_deg))
-             .sin() *
-         750));
-    const int16_t back_left_ks   = static_cast<int16_t>(std::abs(
-          (direction - Angle::fromDegrees(90 + robot_constants_.back_wheel_angle_deg))
-              .sin() *
-          750));
+    const Angle front_wheel_angle =
+        Angle::fromDegrees(robot_constants_.front_wheel_angle_deg);
+    const Angle back_wheel_angle =
+        Angle::fromDegrees(robot_constants_.back_wheel_angle_deg);
+
+    const int16_t front_left_ks = static_cast<int16_t>(
+        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
+        std::abs((direction - Angle::quarter() + front_wheel_angle).sin()));
+    const int16_t front_right_ks = static_cast<int16_t>(
+        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
+        std::abs((direction + Angle::quarter() - front_wheel_angle).sin()));
+    const int16_t back_right_ks = static_cast<int16_t>(
+        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
+        std::abs((direction + Angle::quarter() + back_wheel_angle).sin()));
+    const int16_t back_left_ks = static_cast<int16_t>(
+        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
+        std::abs((direction - Angle::quarter() - back_wheel_angle).sin()));
 
     sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
                         SetSpeedFeedForwardKsFrame{.ks = front_left_ks});
