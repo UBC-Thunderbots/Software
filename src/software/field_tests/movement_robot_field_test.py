@@ -3,7 +3,6 @@ from software.field_tests.field_test_fixture import *
 
 from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import create_logger
-import math
 
 logger = create_logger(__name__)
 
