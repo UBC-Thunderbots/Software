@@ -246,6 +246,22 @@ if __name__ == "__main__":
         help="Record stats about fullsystem performance (during AI vs AI) for a set amount of time in minutes",
     )
 
+    parser.add_argument(
+        "--pass_results_file",
+        action="store",
+        type=str,
+        default="pass_results.csv",
+        help="File name within ml/datasets to store pass results",
+    )
+
+    parser.add_argument(
+        "--game_events_file",
+        action="store",
+        type=str,
+        default="game_events.csv",
+        help="File name within ml/datasets to store game events",
+    )
+
     args = parser.parse_args()
 
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
@@ -497,6 +513,7 @@ if __name__ == "__main__":
                 proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                 record_enemy_stats=True,
                 friendly_colour_yellow=False,
+                out_file_name=args.game_events_file,
             )
             if args.record_stats
             else contextlib.nullcontext()
@@ -510,6 +527,7 @@ if __name__ == "__main__":
         ) as yellow_stats_logger, PassLogger(
             proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
             friendly_colour_yellow=True,
+            out_file_name=args.pass_results_file,
         ) as blue_pass_logger:
             tscope.register_refresh_function(gamecontroller.refresh)
 

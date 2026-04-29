@@ -39,12 +39,15 @@ class StatsLogger:
         self,
         proto_unix_io: ProtoUnixIO,
         friendly_colour_yellow: bool,
+        out_file_name: str | None = None,
         buffer_size: int = 5,
         record_enemy_stats: bool = False,
     ):
         """Initializes the FullSystem Stats Tracker
 
         :param friendly_colour_yellow: if the friendly colour is yellow
+        :param out_file_name: name of file to write stats to.
+                              If None, uses the value from constants
         :param buffer_size: the buffer size for protocol buffers
         :param record_enemy_stats: if this should record both friendly and enemy stats or just friendly
         """
@@ -52,7 +55,9 @@ class StatsLogger:
 
         self.events_file_path = os.path.join(
             RuntimeManagerConstants.RUNTIME_EVENTS_DIRECTORY_PATH,
-            RuntimeManagerConstants.RUNTIME_EVENTS_FILE,
+            RuntimeManagerConstants.RUNTIME_EVENTS_FILE
+            if out_file_name is None
+            else out_file_name,
         )
         # initialized in setup()
         self.events_file_handle = None
