@@ -521,6 +521,7 @@ if __name__ == "__main__":
             StatsLogger(
                 proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
                 friendly_colour_yellow=True,
+                out_file_name=args.game_events_file
             )
             if args.record_stats
             else contextlib.nullcontext()
