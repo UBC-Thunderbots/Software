@@ -5,10 +5,12 @@
 # the user if other users are currently connected remotely or using in person
 # Allows user to force a connection
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
 PC_NAME="thunderbots"
 TAILSCALE_HOSTNAME="$PC_NAME"
 
-bash ./utils/check_tailscale.sh
+bash "$SCRIPT_DIR/utils/check_tailscale.sh"
 
 # Get the Tailscale IP of the Main PC
 TARGET_IP=$(tailscale ip -4 $TAILSCALE_HOSTNAME)

@@ -20,7 +20,9 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-bash ./utils/check_tailscale.sh
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+bash "$SCRIPT_DIR/utils/check_tailscale.sh"
 
 # Get the Tailscale IP of the Main PC
 TARGET_IP=$(tailscale ip -4 $PC_NAME)
