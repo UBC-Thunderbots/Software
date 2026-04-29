@@ -243,7 +243,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
 void MotorService::trackMotorReset()
 {
-    const auto now = std::chrono::system_clock::now();
+    const auto now = std::chrono::steady_clock::now();
 
     if (num_tracked_motor_resets_ == 0)
     {

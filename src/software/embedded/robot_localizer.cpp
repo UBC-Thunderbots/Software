@@ -18,7 +18,7 @@ RobotLocalizer::RobotLocalizer(const double process_noise_variance,
             target_angular_acceleration_variance)
             .asDiagonal();
 
-    last_step_time_ = std::chrono::system_clock::now();
+    last_step_time_ = std::chrono::steady_clock::now();
 }
 
 void RobotLocalizer::step(const AngularVelocity& target_acceleration)
@@ -28,7 +28,7 @@ void RobotLocalizer::step(const AngularVelocity& target_acceleration)
         .update           = std::nullopt,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::system_clock::now(),
+        .time             = std::chrono::steady_clock::now(),
     };
 
     const std::chrono::duration<double> delta_time = step.time - last_step_time_;
@@ -76,7 +76,7 @@ void RobotLocalizer::updateVision(const Angle& orientation, const double age_sec
         return;
     }
 
-    const auto current_time = std::chrono::system_clock::now();
+    const auto current_time = std::chrono::steady_clock::now();
     const auto sample_age   = std::chrono::duration<double>(age_seconds);
 
     const auto rollback_point = std::find_if(
@@ -160,7 +160,7 @@ void RobotLocalizer::updateMotorSensors(const AngularVelocity& angular_velocity)
         .update           = update,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::system_clock::now(),
+        .time             = std::chrono::steady_clock::now(),
     };
 
     history.push_front(step);
@@ -187,7 +187,7 @@ void RobotLocalizer::updateImu(const AngularVelocity& angular_velocity)
         .update           = update,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::system_clock::now(),
+        .time             = std::chrono::steady_clock::now(),
     };
 
     history.push_front(step);
@@ -215,7 +215,7 @@ void RobotLocalizer::updateTargetAcceleration(const AngularVelocity& angular_acc
         .update           = update,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::system_clock::now(),
+        .time             = std::chrono::steady_clock::now(),
     };
 
     history.push_front(step);

@@ -138,7 +138,7 @@ class RobotLocalizer
         Eigen::Vector<double, STATE_SIZE> state_estimate;
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
 
-        std::chrono::time_point<std::chrono::system_clock> time;
+        std::chrono::time_point<std::chrono::steady_clock> time;
     };
 
     KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, 1> filter_;
@@ -146,7 +146,7 @@ class RobotLocalizer
     // Process noise variance used in prediction
     double process_noise_variance_;
 
-    std::chrono::time_point<std::chrono::system_clock> last_step_time_;
+    std::chrono::time_point<std::chrono::steady_clock> last_step_time_;
 
     // History is ordered newest-first (front is the most recent step)
     std::deque<FilterStep> history;

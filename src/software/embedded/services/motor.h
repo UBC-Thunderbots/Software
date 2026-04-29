@@ -86,7 +86,7 @@ class MotorService
 
     double drive_motor_mps_per_rpm_;
 
-    std::chrono::time_point<std::chrono::system_clock> tracked_motor_reset_start_time_;
+    std::chrono::time_point<std::chrono::steady_clock> tracked_motor_reset_start_time_;
     int num_tracked_motor_resets_;
 
     static constexpr int MOTOR_RESET_TIME_THRESHOLD_S                = 60;
