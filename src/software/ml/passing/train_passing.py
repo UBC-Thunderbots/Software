@@ -24,7 +24,10 @@ ml_dir_path = os.path.dirname(dir_path)
 datasets_path = os.path.join(ml_dir_path, "datasets")
 onnx_path = os.path.join(dir_path, "onnx")
 
-def load_labelled_passes(labelled_pass_file: str, friendly_team: Team) -> List[LabelledPass]:
+
+def load_labelled_passes(
+    labelled_pass_file: str, friendly_team: Team
+) -> List[LabelledPass]:
     input_path = os.path.join(datasets_path, labelled_pass_file)
     labelled_passes = []
 
@@ -35,13 +38,18 @@ def load_labelled_passes(labelled_pass_file: str, friendly_team: Team) -> List[L
         reader = csv.reader(f)
         for row in reader:
             try:
-                labelled_pass = LabelledPass.from_csv_row(iter(row), friendly_team=friendly_team)
+                labelled_pass = LabelledPass.from_csv_row(
+                    iter(row), friendly_team=friendly_team
+                )
                 labelled_passes.append(labelled_pass)
             except Exception as e:
                 print(f"Skipping row due to error: {e}")
 
-    print(f"Successfully loaded {len(labelled_passes)} labelled passes from {input_path}")
+    print(
+        f"Successfully loaded {len(labelled_passes)} labelled passes from {input_path}"
+    )
     return labelled_passes
+
 
 def calculate_label_weights(labelled_passes: list[LabelledPass]):
     """Calculates the positive weights for BCEWithLogitsLoss for each label type
@@ -350,12 +358,12 @@ def train_and_export_models(
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print(
-            "Usage: python train_passing.py <labelled_passes_csv_file_name>"
-        )
+        print("Usage: python train_passing.py <labelled_passes_csv_file_name>")
         sys.exit(1)
 
-    labelled_passes = load_labelled_passes(labelled_pass_file=sys.argv[1], friendly_team=Team.BLUE)
+    labelled_passes = load_labelled_passes(
+        labelled_pass_file=sys.argv[1], friendly_team=Team.BLUE
+    )
 
     label_weights = calculate_label_weights(labelled_passes=labelled_passes)
 

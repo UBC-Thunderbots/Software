@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from software.evaluation.logs.log_interface import IEvalLog
 from software.ml.data_cleanup.result_interface import IResult
 from software.evaluation.logs.event_log import EventLog, Team, EventType
-from software.evaluation.logs.log_interface import IEvalLog
 from typing import cast, Any, List, override, Iterator
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
@@ -104,20 +103,18 @@ class StatsResult(IResult, IEvalLog):
                 self.red_cards = 0
                 self.shots_on_net = 0
                 self.blocked_enemy_shots = 0
-    
+
     @staticmethod
     def _parse_bool(val: str) -> bool | None:
         val = val.strip().lower()
-        if val in ("none", ""): return None
+        if val in ("none", ""):
+            return None
         return val == "true"
 
     @staticmethod
     @override
     def from_csv_row(row_iter: Iterator[str], friendly_team: Team) -> StatsResult:
-        """
-        Converts a CSV row back into a StatsResult instance.
-        """
-
+        """Converts a CSV row back into a StatsResult instance."""
         return StatsResult(
             friendly_team=friendly_team,
             score=int(next(row_iter)),
@@ -127,7 +124,7 @@ class StatsResult(IResult, IEvalLog):
             # Handling 'None' string or empty values for Optional bool
             has_possession=StatsResult._parse_bool(next(row_iter)),
             shots_on_net=int(next(row_iter)),
-            ball_in_enemy_half=next(row_iter).lower() == 'true',
+            ball_in_enemy_half=next(row_iter).lower() == "true",
             passes=int(next(row_iter)),
-            blocked_enemy_shots=int(next(row_iter))
+            blocked_enemy_shots=int(next(row_iter)),
         )

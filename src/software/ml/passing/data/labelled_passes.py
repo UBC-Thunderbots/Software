@@ -39,13 +39,13 @@ class Label(IEvalLog):
             self.has_ball_in_half_changed,
             self.is_ball_in_enemy_half,
         ]
-  
+
     @staticmethod
     @override
     def from_csv_row(row_iter: Iterator[str]) -> Label:
         def _parse(val: str) -> bool:
             return val.strip().lower() == "true"
-            
+
         return Label(
             has_score_changed=_parse(next(row_iter)),
             has_enemy_score_changed=_parse(next(row_iter)),
@@ -81,38 +81,38 @@ class LabelledPass(IEvalLog):
         arr = []
         arr.extend(self.pass_log.to_array())
         arr.extend(self.result.to_array())
-       
+
         for log_type in PassLogType:
             if log_type == PassLogType.RESULT_0S:
                 continue
 
-            label = self.labels.get(log_type, Label()) # Default to empty label if missing
+            label = self.labels.get(
+                log_type, Label()
+            )  # Default to empty label if missing
             arr.extend(label.to_array())
         return arr
-    
+
     @staticmethod
-    def from_csv_row(row_iter: Iterator[str], friendly_team: Team) -> LabelledPass | None:
+    def from_csv_row(
+        row_iter: Iterator[str], friendly_team: Team
+    ) -> LabelledPass | None:
         pass_log = PassLog.from_csv_row(row_iter)
-        
+
         if pass_log is None:
             return None
-        
+
         result = StatsResult.from_csv_row(row_iter, friendly_team=friendly_team)
-        
+
         labels = {}
         for log_type in PassLogType:
             if log_type == PassLogType.RESULT_0S:
                 continue
-            
-            labels[log_type] = Label.from_csv_row(row_iter)
-            
-        return LabelledPass(
-            pass_log=pass_log,
-            result=result,
-            labels=labels
-        )
 
-    
+            labels[log_type] = Label.from_csv_row(row_iter)
+
+        return LabelledPass(pass_log=pass_log, result=result, labels=labels)
+
+
 def label_passes(pass_results: list[PassResult]) -> list[LabelledPass]:
     # Map Pass IDs to their 0s result (game performance at the moment of the pass) for quick lookup
     # {pass_id: StatsResult at t0}

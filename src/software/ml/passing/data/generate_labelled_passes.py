@@ -13,6 +13,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 ml_dir_path = os.path.dirname(dir_path)
 datasets_path = os.path.join(ml_dir_path, "datasets")
 
+
 def load_and_label_passes(
     pass_csv_file, event_csv_file, friendly_team
 ) -> List[LabelledPass]:
@@ -51,15 +52,17 @@ def load_and_label_passes(
 
     return labelled_passes
 
+
 def save_labelled_passes(labelled_passes: List[LabelledPass], out_file_name: str):
     """Saves a list of LabelledPass objects to a CSV file in the datasets directory."""
     output_path = os.path.join(datasets_path, out_file_name)
-    
+
     with open(output_path, mode="w", encoding="utf-8", newline="") as file:
         for labelled_pass in labelled_passes:
             file.write(labelled_pass.to_csv_row() + "\n")
-            
+
     print(f"Successfully saved {len(labelled_passes)} labelled passes to {output_path}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
@@ -69,5 +72,5 @@ if __name__ == "__main__":
         sys.exit(1)
 
     labelled_passes = load_and_label_passes(sys.argv[1], sys.argv[2], Team.BLUE)
-    
+
     save_labelled_passes(labelled_passes=labelled_passes, out_file_name=sys.argv[3])
