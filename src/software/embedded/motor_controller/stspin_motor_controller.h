@@ -49,6 +49,8 @@ class StSpinMotorController : public MotorController
 
     static constexpr int RESET_GPIO_PIN = 12;
 
+    static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
+
     RobotConstants robot_constants_;
 
     // SPI file descriptors
