@@ -18,6 +18,7 @@ py_binary(
         requirement("numpy"),
         requirement("torch_geometric"),
         requirement("scikit-learn"),
+        requirement("onnxscript"),
         "//software/evaluation/logs:event_log",
         "//software/evaluation/logs:pass_log",
         "//software/ml/models/hetero_gnn",

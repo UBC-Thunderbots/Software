@@ -127,10 +127,12 @@ PRIORITY_EVENTS = [
     "have_shots_on_net_changed",
 ]
 
+PRIORITY_SCALE = 10.0
+
 
 def scale_label_weights(
     label_weights: torch.Tensor,
-    multiplier: float = 5.0,
+    multiplier: float = PRIORITY_SCALE,
 ) -> torch.Tensor:
     """Scales the weights for specific fields across all time intervals."""
     # 1. Get the list of field names from the Label dataclass in order

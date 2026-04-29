@@ -2,13 +2,14 @@ from dataclasses import dataclass, field
 from software.evaluation.logs.log_interface import IEvalLog
 from software.ml.data_cleanup.result_interface import IResult
 from software.evaluation.logs.event_log import EventLog, Team, EventType
+from software.evaluation.logs.log_interface import IEvalLog
 from typing import cast, Any, List, override
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
 
 @dataclass
-class StatsResult(IResult):
+class StatsResult(IResult, IEvalLog):
     friendly_team: Team
     score: int = 0
     enemy_score: int = 0
@@ -21,6 +22,11 @@ class StatsResult(IResult):
     blocked_enemy_shots: int = 0
 
     _field: tbots_cpp.Field = field(init=False, repr=False, default=None)
+
+    @classmethod
+    def get_num_cols(cls) -> int:
+        """Returns the number of elements in the to_array output (9 fields)"""
+        return 9
 
     def to_array(self) -> List[Any]:
         return [
@@ -95,3 +101,29 @@ class StatsResult(IResult):
                 self.red_cards = 0
                 self.shots_on_net = 0
                 self.blocked_enemy_shots = 0
+    
+    @staticmethod
+    def _parse_bool(val: str) -> bool | None:
+        val = val.strip().lower()
+        if val in ("none", ""): return None
+        return val == "true"
+
+    @staticmethod
+    def from_csv_row(row_iter: Iterator[str], friendly_team: Team) -> "StatsResult":
+        """
+        Converts a CSV row back into a StatsResult instance.
+        """
+
+        return StatsResult(
+            friendly_team=friendly_team,
+            score=int(next(row_iter)),
+            enemy_score=int(next(row_iter)),
+            yellow_cards=int(next(row_iter)),
+            red_cards=int(next(row_iter)),
+            # Handling 'None' string or empty values for Optional bool
+            has_possession=cls._parse_bool(next(row_iter)),
+            shots_on_net=int(next(row_iter)),
+            ball_in_enemy_half=next(row_iter).lower() == 'true',
+            passes=int(next(row_iter)),
+            blocked_enemy_shots=int(next(row_iter))
+        )
