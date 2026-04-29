@@ -17,6 +17,7 @@ py_binary(
         requirement("pandas"),
         requirement("numpy"),
         requirement("torch_geometric"),
+        requirement("scikit-learn"),
         "//software/evaluation/logs:event_log",
         "//software/evaluation/logs:pass_log",
         "//software/ml/models/hetero_gnn",
