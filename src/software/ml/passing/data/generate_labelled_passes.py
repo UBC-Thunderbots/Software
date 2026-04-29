@@ -1,5 +1,6 @@
 import os
 import csv
+import sys
 
 from typing import List
 
@@ -50,11 +51,23 @@ def load_and_label_passes(
 
     return labelled_passes
 
+def save_labelled_passes(labelled_passes: List[LabelledPass], out_file_name: str):
+    """Saves a list of LabelledPass objects to a CSV file in the datasets directory."""
+    output_path = os.path.join(datasets_path, out_file_name)
+    
+    with open(output_path, mode="w", encoding="utf-8", newline="") as file:
+        for labelled_pass in labelled_passes:
+            file.write(labelled_pass.to_csv_row() + "\n")
+            
+    print(f"Successfully saved {len(labelled_passes)} labelled passes to {output_path}")
+
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         print(
-            "Usage: python generate_labelled_passes.py <pass_logs_csv_file_path> <event_logs_csv_file_path>"
+            "Usage: python generate_labelled_passes.py <pass_logs_csv_file_path> <event_logs_csv_file_path> <out_file_name>"
         )
         sys.exit(1)
 
-    labelled_passes = load_and_label_data(sys.argv[1], sys.argv[2], Team.BLUE)
+    labelled_passes = load_and_label_passes(sys.argv[1], sys.argv[2], Team.BLUE)
+    
+    save_labelled_passes(labelled_passes=labelled_passes, out_file_name=sys.argv[3])

@@ -14,10 +14,9 @@ from software.ml.models.hetero_gnn.hetero_gnn import GenericHeteroGNN
 from software.ml.models.hetero_gnn.config import HeteroGNNConfig
 from software.ml.passing.data.types import NodeType
 from software.ml.passing.data.build_graph import process_all_passes
-from software.ml.passing.data.pass_result import generate_pass_results
-from software.ml.passing.data.labelled_passes import LabelledPass, label_passes, Label
-from software.evaluation.logs.event_log import EventLog, Team
-from software.evaluation.logs.pass_log import PassLog, PassLogType
+from software.ml.passing.data.labelled_passes import LabelledPass, Label
+from software.evaluation.logs.event_log import Team
+from software.evaluation.logs.pass_log import PassLogType
 import csv
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -25,46 +24,24 @@ ml_dir_path = os.path.dirname(dir_path)
 datasets_path = os.path.join(ml_dir_path, "datasets")
 onnx_path = os.path.join(dir_path, "onnx")
 
+def load_labelled_passes(labelled_pass_file: str, friendly_team: Team) -> List[LabelledPass]:
+    input_path = os.path.join(datasets_path, labelled_pass_file)
+    labelled_passes = []
 
-# --- 1. Data Hydration (CSV to Objects) ---
-def load_and_label_data(
-    pass_csv_file, event_csv_file, friendly_team
-) -> List[LabelledPass]:
-    pass_logs = []
+    if not os.path.exists(input_path):
+        raise Exception(f"Error: File {input_path} does not exist.")
 
-    with open(
-        os.path.join(datasets_path, pass_csv_file), mode="r", encoding="utf-8"
-    ) as pass_csv:
-        reader = csv.reader(pass_csv)
-
+    with open(input_path, mode="r", encoding="utf-8") as f:
+        reader = csv.reader(f)
         for row in reader:
-            pass_logs.append(PassLog.from_csv_row(iter(row)))
+            try:
+                labelled_pass = LabelledPass.from_csv_row(iter(row), friendly_team=friendly_team)
+                labelled_passes.append(labelled_pass)
+            except Exception as e:
+                print(f"Skipping row due to error: {e}")
 
-    print("Passes loaded!")
-
-    event_logs = []
-    with open(
-        os.path.join(datasets_path, event_csv_file), mode="r", encoding="utf-8"
-    ) as event_csv:
-        reader = csv.reader(event_csv)
-
-        for row in reader:
-            event_logs.append(EventLog.from_csv_row(iter(row)))
-
-    print("Events loaded!")
-
-    pass_results = generate_pass_results(
-        event_logs=event_logs[0:10000], pass_logs=pass_logs, friendly_team=friendly_team
-    )
-
-    print("Pass Results Generated!")
-
-    labelled_passes = label_passes(pass_results)
-
-    print("Passes labelled!")
-
+    print(f"Successfully loaded {len(labelled_passes)} labelled passes from {input_path}")
     return labelled_passes
-
 
 def calculate_label_weights(labelled_passes: list[LabelledPass]):
     """Calculates the positive weights for BCEWithLogitsLoss for each label type
@@ -374,11 +351,11 @@ def train_and_export_models(
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print(
-            "Usage: python train.py <pass_logs_csv_file_path> <event_logs_csv_file_path>"
+            "Usage: python train_passing.py <labelled_passes_csv_file_name>"
         )
         sys.exit(1)
 
-    labelled_passes = load_and_label_data(sys.argv[1], sys.argv[2], Team.BLUE)
+    labelled_passes = load_labelled_passes(labelled_pass_file=sys.argv[1], friendly_team=Team.BLUE)
 
     label_weights = calculate_label_weights(labelled_passes=labelled_passes)
 

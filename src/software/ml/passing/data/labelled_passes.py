@@ -1,13 +1,16 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from software.evaluation.logs.pass_log import PassLog, PassLogType
 from software.evaluation.logs.log_interface import IEvalLog
+from software.evaluation.logs.event_log import Team
 from software.ml.passing.data.pass_result import PassResult
 from software.ml.data_cleanup.stats_result import StatsResult
 import uuid
+from typing import List, Any, Iterator, override
 
 
 @dataclass
-class Label:
+class Label(IEvalLog):
     has_score_changed: bool = False
     has_enemy_score_changed: bool = False
     have_yellow_cards_changed: bool = False
@@ -19,9 +22,11 @@ class Label:
     is_ball_in_enemy_half: bool = False
 
     @classmethod
+    @override
     def get_num_cols(cls) -> int:
         return 9
 
+    @override
     def to_array(self) -> List[Any]:
         return [
             self.has_score_changed,
@@ -36,7 +41,8 @@ class Label:
         ]
   
     @staticmethod
-    def from_csv_row(row_iter: Iterator[str], **kwargs) -> "Label":
+    @override
+    def from_csv_row(row_iter: Iterator[str]) -> Label:
         def _parse(val: str) -> bool:
             return val.strip().lower() == "true"
             
@@ -54,21 +60,23 @@ class Label:
 
 
 @dataclass
-class LabelledPass:
+class LabelledPass(IEvalLog):
     pass_log: PassLog
     result: StatsResult
     labels: dict[PassLogType, Label]
 
-    @classmethod
+    @staticmethod
     def get_num_labels() -> int:
         # exclude the 0s interval label
         return len(PassLogType) - 1
 
     @classmethod
+    @override
     def get_num_cols(cls) -> int:
-        labels_count = Label.get_num_labels() * Label.get_num_cols()
+        labels_count = LabelledPass.get_num_labels() * Label.get_num_cols()
         return PassLog.get_num_cols() + StatsResult.get_num_cols() + labels_count
 
+    @override
     def to_array(self) -> List[Any]:
         arr = []
         arr.extend(self.pass_log.to_array())
@@ -81,6 +89,28 @@ class LabelledPass:
             label = self.labels.get(log_type, Label()) # Default to empty label if missing
             arr.extend(label.to_array())
         return arr
+    
+    @staticmethod
+    def from_csv_row(row_iter: Iterator[str], friendly_team: Team) -> LabelledPass | None:
+        pass_log = PassLog.from_csv_row(row_iter)
+        
+        if pass_log is None:
+            return None
+        
+        result = StatsResult.from_csv_row(row_iter, friendly_team=friendly_team)
+        
+        labels = {}
+        for log_type in PassLogType:
+            if log_type == PassLogType.RESULT_0S:
+                continue
+            
+            labels[log_type] = Label.from_csv_row(row_iter)
+            
+        return LabelledPass(
+            pass_log=pass_log,
+            result=result,
+            labels=labels
+        )
 
     
 def label_passes(pass_results: list[PassResult]) -> list[LabelledPass]:

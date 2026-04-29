@@ -1,9 +1,10 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
 from software.evaluation.logs.log_interface import IEvalLog
 from software.ml.data_cleanup.result_interface import IResult
 from software.evaluation.logs.event_log import EventLog, Team, EventType
 from software.evaluation.logs.log_interface import IEvalLog
-from typing import cast, Any, List, override
+from typing import cast, Any, List, override, Iterator
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
@@ -24,10 +25,12 @@ class StatsResult(IResult, IEvalLog):
     _field: tbots_cpp.Field = field(init=False, repr=False, default=None)
 
     @classmethod
+    @override
     def get_num_cols(cls) -> int:
         """Returns the number of elements in the to_array output (9 fields)"""
         return 9
 
+    @override
     def to_array(self) -> List[Any]:
         return [
             self.score,
@@ -109,7 +112,8 @@ class StatsResult(IResult, IEvalLog):
         return val == "true"
 
     @staticmethod
-    def from_csv_row(row_iter: Iterator[str], friendly_team: Team) -> "StatsResult":
+    @override
+    def from_csv_row(row_iter: Iterator[str], friendly_team: Team) -> StatsResult:
         """
         Converts a CSV row back into a StatsResult instance.
         """
@@ -121,7 +125,7 @@ class StatsResult(IResult, IEvalLog):
             yellow_cards=int(next(row_iter)),
             red_cards=int(next(row_iter)),
             # Handling 'None' string or empty values for Optional bool
-            has_possession=cls._parse_bool(next(row_iter)),
+            has_possession=StatsResult._parse_bool(next(row_iter)),
             shots_on_net=int(next(row_iter)),
             ball_in_enemy_half=next(row_iter).lower() == 'true',
             passes=int(next(row_iter)),
