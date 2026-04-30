@@ -194,7 +194,7 @@ void StSpinMotorController::updateEuclideanVelocity(
     const Vector local_velocity(target_euclidean_velocity[1],
                                 -target_euclidean_velocity[0]);
 
-    if (local_velocity.length() <= 0.01) 
+    if (local_velocity.length() <= 0.01)
     {
         sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
                             SetSpeedFeedForwardKsFrame{.ks = 270});
@@ -202,8 +202,7 @@ void StSpinMotorController::updateEuclideanVelocity(
                             SetSpeedFeedForwardKsFrame{.ks = 270});
         sendAndReceiveFrame(MotorIndex::BACK_RIGHT,
                             SetSpeedFeedForwardKsFrame{.ks = 270});
-        sendAndReceiveFrame(MotorIndex::BACK_LEFT,
-                            SetSpeedFeedForwardKsFrame{.ks = 270});
+        sendAndReceiveFrame(MotorIndex::BACK_LEFT, SetSpeedFeedForwardKsFrame{.ks = 270});
         return;
     }
 
