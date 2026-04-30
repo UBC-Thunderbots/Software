@@ -44,8 +44,10 @@ void StSpinMotorController::setup()
 
     for (const MotorIndex motor : driveMotors())
     {
+        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 500, .ki = 60});
+
         sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 806, .ki = 154});
-        sendAndReceiveFrame(motor, SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = 100});
+        sendAndReceiveFrame(motor, SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = 0});
     }
 }
 
@@ -191,6 +193,20 @@ void StSpinMotorController::updateEuclideanVelocity(
 {
     const Vector local_velocity(target_euclidean_velocity[1],
                                 -target_euclidean_velocity[0]);
+
+    if (local_velocity.length() <= 0.01) 
+    {
+        sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
+                            SetSpeedFeedForwardKsFrame{.ks = 270});
+        sendAndReceiveFrame(MotorIndex::FRONT_RIGHT,
+                            SetSpeedFeedForwardKsFrame{.ks = 270});
+        sendAndReceiveFrame(MotorIndex::BACK_RIGHT,
+                            SetSpeedFeedForwardKsFrame{.ks = 270});
+        sendAndReceiveFrame(MotorIndex::BACK_LEFT,
+                            SetSpeedFeedForwardKsFrame{.ks = 270});
+        return;
+    }
+
     const Angle direction = local_velocity.orientation();
 
     const Angle front_wheel_angle =
