@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, patch
 from software.ml.data_cleanup.stats_result import StatsResult
 from software.evaluation.logs.event_log import Team, EventType
 
+
 class TestStatsResult:
-    
     FRIENDLY_TEAM = Team.BLUE
     ENEMY_TEAM = Team.YELLOW
 
@@ -12,6 +12,7 @@ class TestStatsResult:
     def stats(self, friendly_team):
         # Initialize the dataclass
         return StatsResult(friendly_team=self.FRIENDLY_TEAM)
+
     def create_mock_event(self, event_type, for_team, ball_pos=(0, 0)):
         mock_event = MagicMock()
         mock_event.event_type = event_type
@@ -31,8 +32,12 @@ class TestStatsResult:
         assert stats.passes == 1  # Still 1
 
     def test_goal_scoring(self, stats, friendly_team):
-        friendly_goal = self.create_mock_event(EventType.GOAL_SCORED, for_team=self.FRIENDLY_TEAM)
-        enemy_goal = self.create_mock_event(EventType.GOAL_SCORED, for_team=self.ENEMY_TEAM)
+        friendly_goal = self.create_mock_event(
+            EventType.GOAL_SCORED, for_team=self.FRIENDLY_TEAM
+        )
+        enemy_goal = self.create_mock_event(
+            EventType.GOAL_SCORED, for_team=self.ENEMY_TEAM
+        )
 
         stats.update_result(friendly_goal)
         assert stats.score == 1
@@ -43,16 +48,22 @@ class TestStatsResult:
         assert stats.enemy_score == 1
 
     def test_possession(self, stats):
-        stats.update_result(self.create_mock_event(EventType.FRIENDLY_POSSESSION_START, None))
+        stats.update_result(
+            self.create_mock_event(EventType.FRIENDLY_POSSESSION_START, None)
+        )
         assert stats.has_possession is True
 
-        stats.update_result(self.create_mock_event(EventType.FRIENDLY_POSSESSION_END, None))
+        stats.update_result(
+            self.create_mock_event(EventType.FRIENDLY_POSSESSION_END, None)
+        )
         assert stats.has_possession is None
 
-        stats.update_result(self.create_mock_event(EventType.ENEMY_POSSESSION_START, None))
+        stats.update_result(
+            self.create_mock_event(EventType.ENEMY_POSSESSION_START, None)
+        )
         assert stats.has_possession is False
 
-    @patch.object(StatsResult, '_is_in_enemy_half')
+    @patch.object(StatsResult, "_is_in_enemy_half")
     def test_ball_position_update(self, mock_is_in_half, stats):
         mock_is_in_half.return_value = True
         event = self.create_mock_event(EventType.PASS, self.FRIENDLY_TEAM)
@@ -74,6 +85,7 @@ class TestStatsResult:
         assert stats.passes == 0
         assert stats.has_possession is None
         assert stats.ball_in_enemy_half is False
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

@@ -23,7 +23,7 @@ py_test(
     ],
     deps = [
         requirement("pytest"),
-        ":stats_result"
+        ":stats_result",
     ],
 )
 

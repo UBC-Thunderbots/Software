@@ -42,9 +42,9 @@ py_binary(
     name = "generate_labelled_passes",
     srcs = ["generate_labelled_passes.py"],
     deps = [
+        ":labelled_passes",
+        ":pass_result",
         "//software/evaluation/logs:event_log",
         "//software/evaluation/logs:pass_log",
-        ":labelled_passes",
-        ":pass_result"
     ],
 )
