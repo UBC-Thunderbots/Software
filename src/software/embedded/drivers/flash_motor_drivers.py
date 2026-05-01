@@ -4,27 +4,20 @@ import sys
 from gpiozero import LED
 from rich import print
 
-# The reset pin for the motor drivers do i even need this?
+# The reset pin for the motor drivers
 MOTOR_DRIVER_RESET_PIN = 12
 
-S0_PIN = 23
-S1_PIN = 24
+S0_PIN = 21
+S1_PIN = 16
 
-SWD_DISABLE_PIN = 0 # Pull HIGH to disable SWD multiplexing
-SWCLK_DISABLE_PIN = 1 # Pull HIGH to disable SWCLK multiplexing
+DEMUX_DISABLE_PIN = 0 # Pull HIGH to disable SWD and SWCLK multiplexing
 
-# Big thing is that Depending on the arguments you flash them. 
-
+# Put these in order of board 0, 1, 2, 3
+BOARD_NAMES = ['A', 'B', 'C', 'D']
 
 class MotorDriverFlasher:
     def __init__(self, board_letter, drivers):
-        # A: (S0’ . S1’), B: (S0 . S1’), C: (S0’ . S1), D: (S0 . S1)
-        # I know this is not very readable but it was a fun exercise
-        # 0 -> 0 0
-        # 1 -> 1 0
-        # 2 -> 0 1
-        # 3 -> 1 1
-        switch_case_num = ord(board_letter) - ord('A')
+        switch_case_num = BOARD_NAMES.index(board_letter)
         self.board_letter = board_letter
         self.multiplex = [switch_case_num % 2, switch_case_num // 2]
 
@@ -93,20 +86,18 @@ if __name__ == "__main__":
         print("Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)")
         sys.exit(1)
     
-    # Check before attempting to flash if every argument is "A" "B" "C" or "D"
+    # Check before attempting to flash if every argument is in BOARD_NAMES
     for i in range(1, len(sys.argv)):
-        if sys.argv[i] not in ['A', 'B', 'C', 'D']:
-            print("Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)")
+        if sys.argv[i] not in BOARD_NAMES:
+            print(f"Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (Valid Letters: {BOARD_NAMES})")
             sys.exit(1)
 
     # Initialize pins as LEDs since we only need high/low logic.
     drivers = [LED(S0_PIN), LED(S1_PIN)]
 
     # Enable the multiplexers
-    SWD_DISABLE = LED(SWD_DISABLE_PIN)
-    SWCLK_DISABLE = LED(SWCLK_DISABLE_PIN)
-    SWD_DISABLE.off()
-    SWCLK_DISABLE.off()
+    DEMUX_DISABLE = LED(DEMUX_DISABLE_PIN)
+    DEMUX_DISABLE.off()
 
 
     for i in range(1, len(sys.argv)):
@@ -115,5 +106,4 @@ if __name__ == "__main__":
         flasher.flash()
 
     # Once done flashing, disable multiplexing just in case
-    SWD_DISABLE.on()
-    SWCLK_DISABLE.on()
+    DEMUX_DISABLE.on()
