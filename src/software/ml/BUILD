@@ -25,7 +25,6 @@ py_binary(
         "//software/ml/models/hetero_gnn:config",
         "//software/ml/passing/data:build_graph",
         "//software/ml/passing/data:labelled_passes",
-        "//software/ml/passing/data:pass_result",
         "//software/ml/passing/data:types",
     ],
 )

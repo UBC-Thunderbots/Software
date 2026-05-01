@@ -10,7 +10,7 @@ from software.ml.passing.data.labelled_passes import LabelledPass, label_passes
 from software.ml.passing.data.pass_result import generate_pass_results
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-ml_dir_path = os.path.dirname(dir_path)
+ml_dir_path = os.path.dirname(os.path.dirname(dir_path))
 datasets_path = os.path.join(ml_dir_path, "datasets")
 
 

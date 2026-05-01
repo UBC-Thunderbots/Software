@@ -37,3 +37,14 @@ py_library(
         ":types",
     ],
 )
+
+py_binary(
+    name = "generate_labelled_passes",
+    srcs = ["generate_labelled_passes.py"],
+    deps = [
+        "//software/evaluation/logs:event_log",
+        "//software/evaluation/logs:pass_log",
+        ":labelled_passes",
+        ":pass_result"
+    ],
+)

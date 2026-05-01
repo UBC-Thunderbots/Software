@@ -540,8 +540,6 @@ if __name__ == "__main__":
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
 
-            print(args.record_stats)
-
             if args.record_stats and blue_stats_logger and yellow_stats_logger:
                 tscope.register_refresh_function(blue_stats_logger.refresh)
                 tscope.register_refresh_function(yellow_stats_logger.refresh)
