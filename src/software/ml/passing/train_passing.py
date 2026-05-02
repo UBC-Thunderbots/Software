@@ -193,13 +193,17 @@ def train_single_model(
     model: GenericHeteroGNN,
     label_weights: torch.Tensor,
     epochs=50,
-    learning_rate=0.01,
+    learning_rate=0.001,
 ) -> GenericHeteroGNN:
     # 1. Setup the "Judge" (Loss Function) and the "Optimizer" (Weight Updater)
     # BCEWithLogitsLoss combines a Sigmoid layer and the BCELoss in one single class.
     # It's more numerically stable than using a plain Sigmoid followed by BCELoss.
     criterion = torch.nn.BCEWithLogitsLoss(pos_weight=label_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+    # dynamic learning rate, adapts by looking at how loss changes over `patience` epochs, 
+    # and adjusts learning rate down if loss is not changing (i.e we are missing the min) 
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.75, patience=10)
 
     model.train()
 
@@ -222,7 +226,11 @@ def train_single_model(
             # 6. Backward Pass: Calculate gradients
             loss.backward()
 
-            # 7. Optimization: Nudge weights to reduce loss
+            # optimization: to prevent the scaled gradient update from being too large
+            # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
+
+            # 7. Optimization: Nudge weights to reduce loss using the scheduler
+            # scheduler.step(loss)
             optimizer.step()
 
             total_loss += loss.item()
@@ -233,8 +241,8 @@ def train_single_model(
 
 
 LAYER_OPTIONS = [2, 4]
-CONVOLUTION_OPTIONS = [(SAGEConv, {"aggr": "mean"}), (GATConv, {"heads": 8})]
-HIDDEN_DIMENSION_OPTIONS = [32, 64]
+CONVOLUTION_OPTIONS = [(SAGEConv, {"aggr": "mean"}), (GATConv, {"heads": 8, "add_self_loops": False})]
+HIDDEN_DIMENSION_OPTIONS = [64, 128]
 
 MODEL_NAME_TEMPLATE = "hetero_gnn_L{num_layers}_C{conv_type}_H{num_hidden_dims}"
 
@@ -341,23 +349,23 @@ def train_and_export_models(
                 x_dict = training_data[0].x_dict
                 edge_dict = training_data[0].edge_index_dict
 
-                file_name = os.path.join(onnx_path, f"{model_name}.onnx")
+                # file_name = os.path.join(onnx_path, f"{model_name}.onnx")
 
-                torch.onnx.export(
-                    model,
-                    (x_dict, edge_dict),
-                    file_name,
-                    input_names=["x_dict", "edge_dict"],
-                    output_names=["output"],
-                    dynamic_axes={"x_dict": {0: "batch"}, "output": {0: "batch"}},
-                    opset_version=15,  # Important for complex GNN ops
-                )
+                # torch.onnx.export(
+                #    model,
+                #    (x_dict, edge_dict),
+                #    file_name,
+                #    input_names=["x_dict", "edge_dict"],
+                #    output_names=["output"],
+                #    dynamic_axes={"x_dict": {0: "batch"}, "output": {0: "batch"}},
+                #    opset_version=15,  # Important for complex GNN ops
+                #)
 
                 print(f"Saved {model_name}.onnx")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 2:
         print("Usage: python train_passing.py <labelled_passes_csv_file_name>")
         sys.exit(1)
 

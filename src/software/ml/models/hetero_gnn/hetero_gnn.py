@@ -61,7 +61,7 @@ class GenericHeteroGNN(torch.nn.Module):
             if i < len(self.convs) - 1:
                 x_dict = {key: F.relu(x) for key, x in x_dict.items()}
                 x_dict = {
-                    key: F.dropout(x, p=0.5, training=self.training)
+                    key: F.dropout(x, p=0.3, training=self.training)
                     for key, x in x_dict.items()
                 }
 
