@@ -30,7 +30,7 @@ class GLMovementFieldTestLayer(GLLayer):
         self.selected_robot_id = 0
         self.cached_team: tbots_cpp.Team = None
         self.is_selected = False
-        
+
         # State for drag-to-orient movement
         self.is_dragging_to_orient = False
         self.target_point = None
@@ -80,7 +80,7 @@ class GLMovementFieldTestLayer(GLLayer):
             if not self.is_selected:
                 logger.warning("No robot selected to be moved")
                 return
-            
+
             self.target_point = point
             self.current_orientation = -math.pi / 2
             self.is_dragging_to_orient = True
@@ -97,7 +97,7 @@ class GLMovementFieldTestLayer(GLLayer):
             return
 
         robot_id = self.selected_robot_id
-        
+
         if orientation is None:
             orientation = -math.pi / 2
 
@@ -120,37 +120,37 @@ class GLMovementFieldTestLayer(GLLayer):
     @override
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Handle mouse drag events to update orientation.
-        
+
         :param event: The event
         """
         if not self.visible():
             return
-        
+
         if not self.is_dragging_to_orient or self.target_point is None:
             return
-        
+
         # Calculate the angle from the target point to the current mouse position
         dx = event.point_in_scene.x() - self.target_point.x()
         dy = event.point_in_scene.y() - self.target_point.y()
-        
+
         # Calculate angle using atan2 (y, x)
         self.current_orientation = math.atan2(dy, dx)
 
     @override
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Handle mouse release events to finalize movement with the calculated orientation.
-        
+
         :param event: The event
         """
         if not self.visible():
             return
-        
+
         if not self.is_dragging_to_orient or self.target_point is None:
             return
-        
+
         # Move to the target point with the calculated orientation
         self.move_to_point(self.target_point, self.current_orientation)
-        
+
         # Reset drag-to-orient state
         self.is_dragging_to_orient = False
         self.target_point = None

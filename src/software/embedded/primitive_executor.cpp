@@ -27,8 +27,10 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
     if (current_primitive_.has_move())
     {
-        trajectory_path_ = createTrajectoryPathFromParams(
-            current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
+        trajectory_path_ =
+            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
+                                           position_, velocity_, robot_constants_);
+
         angular_trajectory_ = createAngularTrajectoryFromParams(
             current_primitive_.move().w_traj_params(), orientation_, angular_velocity_,
             robot_constants_);
@@ -38,12 +40,13 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
     }
 }
 
-void PrimitiveExecutor::updateState(const Vector& local_velocity,
-                                    const AngularVelocity& angular_velocity,
-                                    const Angle& orientation)
+void PrimitiveExecutor::updateState(const Point& position, const Vector& velocity,
+                                    const Angle& orientation,
+                                    const AngularVelocity& angular_velocity)
 {
+    position_         = position;
+    velocity_         = velocity;
     orientation_      = orientation.clamp();
-    velocity_         = localToGlobalVelocity(local_velocity, orientation_);
     angular_velocity_ = angular_velocity;
 }
 
@@ -53,10 +56,10 @@ Vector PrimitiveExecutor::getTargetLinearVelocity() const
         trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds()),
         orientation_ + angular_velocity_ * time_step_.toSeconds() / 2 * LEAN_BIAS);
 
-    const Point position =
+    const Point expected_position =
         trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds());
     const double distance_to_destination =
-        distance(position, trajectory_path_->getDestination());
+        distance(expected_position, trajectory_path_->getDestination());
 
     // Dampen velocity as we get closer to the destination to reduce jittering
     if (distance_to_destination < MAX_DAMPENING_LINEAR_VELOCITY_DISTANCE_M)
@@ -73,20 +76,21 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity() const
     AngularVelocity angular_velocity = angular_trajectory_->getVelocity(
         time_since_angular_trajectory_creation_.toSeconds());
 
+    // const Angle expected_orientation = angular_trajectory_->getPosition(
+    //     time_since_angular_trajectory_creation_.toSeconds());
+    // const Angle error = (orientation_ - expected_orientation).clamp();
+    // angular_velocity  = angular_velocity + error * ORIENTATION_KP;
+
     const Angle expected_orientation = angular_trajectory_->getPosition(
         time_since_angular_trajectory_creation_.toSeconds());
-    const Angle error = (orientation_ - expected_orientation).clamp();
-    angular_velocity  = angular_velocity + error * ORIENTATION_KP;
-
-    const Angle orientation_to_destination =
-        orientation_.minDiff(angular_trajectory_->getDestination());
+    const double distance_to_destination =
+        expected_orientation.minDiff(angular_trajectory_->getDestination()).toDegrees();
 
     // Dampen velocity as we get closer to the destination to reduce jittering
-    if (orientation_to_destination.toDegrees() <
-        MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES)
+    if (distance_to_destination < MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES)
     {
-        angular_velocity *= orientation_to_destination.toDegrees() /
-                            MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES;
+        angular_velocity *=
+            distance_to_destination / MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES;
     }
 
     return angular_velocity;

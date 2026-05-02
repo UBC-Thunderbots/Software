@@ -2,26 +2,28 @@
 
 RobotLocalizer::RobotLocalizer(const double process_noise_variance,
                                const double vision_noise_variance,
-                               const double motor_sensor_noise_variance,
-                               const double target_angular_acceleration_variance)
-    : process_noise_variance_(process_noise_variance)
+                               const double motor_sensor_noise_variance)
+    : process_linear_acceleration_noise_variance_(process_noise_variance),
+      process_angular_acceleration_noise_variance_(process_noise_variance)
 {
-    // Initial covariance is tuned for orientation, angular velocity, and acceleration
-    filter_.state_covariance = Eigen::Vector<double, STATE_SIZE>(30, 4, 5).asDiagonal();
+    filter_.state_covariance =
+        Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
 
     filter_.control_model.setZero();
-    filter_.control_model(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
 
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
-            vision_noise_variance, motor_sensor_noise_variance, ImuService::IMU_VARIANCE,
-            target_angular_acceleration_variance)
+            vision_noise_variance, vision_noise_variance, vision_noise_variance,
+            vision_noise_variance, vision_noise_variance, vision_noise_variance,
+            motor_sensor_noise_variance, motor_sensor_noise_variance,
+            motor_sensor_noise_variance, ImuService::IMU_VARIANCE)
             .asDiagonal();
 
     last_step_time_ = std::chrono::steady_clock::now();
 }
 
-void RobotLocalizer::step(const AngularVelocity& target_acceleration)
+void RobotLocalizer::step(const Vector& target_linear_acceleration,
+                          const AngularVelocity& target_angular_acceleration)
 {
     FilterStep step{
         .prediction       = FilterStep::Predict{},
@@ -37,29 +39,75 @@ void RobotLocalizer::step(const AngularVelocity& target_acceleration)
 
     // clang-format off
     step.prediction->process_model <<
-        1, delta_time_seconds, delta_time_seconds * delta_time_seconds * 0.5,
-        0, 1, delta_time_seconds,
-        0, 0, 1;
+        1, 0, 0, delta_time_seconds, 0, 0,
+        0, 1, 0, 0, delta_time_seconds, 0,
+        0, 0, 1, 0, 0, delta_time_seconds,
+        0, 0, 0, 1, 0, 0,
+        0, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 1;
     // clang-format on
 
     const double delta_time_squared = delta_time_seconds * delta_time_seconds;
     const double delta_time_cubed   = delta_time_squared * delta_time_seconds;
     const double delta_time_fourth  = delta_time_cubed * delta_time_seconds;
 
-    // clang-format off
-    step.prediction->process_covariance <<
-        delta_time_fourth / 4, delta_time_cubed / 3, delta_time_squared / 2,
-        delta_time_cubed / 3, delta_time_squared, delta_time_seconds,
-        delta_time_squared / 2, delta_time_seconds, 1;
-    // clang-format on
+    auto& process_covariance = step.prediction->process_covariance;
+    process_covariance.setZero();
 
-    step.prediction->process_covariance *= process_noise_variance_;
+    process_covariance(static_cast<int>(StateIndex::X_POSITION),
+                       static_cast<int>(StateIndex::X_POSITION)) =
+        delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::X_POSITION),
+                       static_cast<int>(StateIndex::X_VELOCITY)) =
+        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::X_VELOCITY),
+                       static_cast<int>(StateIndex::X_POSITION)) =
+        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::X_VELOCITY),
+                       static_cast<int>(StateIndex::X_VELOCITY)) =
+        delta_time_squared * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::Y_POSITION),
+                       static_cast<int>(StateIndex::Y_POSITION)) =
+        delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::Y_POSITION),
+                       static_cast<int>(StateIndex::Y_VELOCITY)) =
+        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::Y_VELOCITY),
+                       static_cast<int>(StateIndex::Y_POSITION)) =
+        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::Y_VELOCITY),
+                       static_cast<int>(StateIndex::Y_VELOCITY)) =
+        delta_time_squared * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::ORIENTATION),
+                       static_cast<int>(StateIndex::ORIENTATION)) =
+        delta_time_fourth / 4 * process_angular_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::ORIENTATION),
+                       static_cast<int>(StateIndex::ANGULAR_VELOCITY)) =
+        delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::ANGULAR_VELOCITY),
+                       static_cast<int>(StateIndex::ORIENTATION)) =
+        delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
+
+    process_covariance(static_cast<int>(StateIndex::ANGULAR_VELOCITY),
+                       static_cast<int>(StateIndex::ANGULAR_VELOCITY)) =
+        delta_time_squared * process_angular_acceleration_noise_variance_;
 
     step.prediction->control_model = filter_.control_model;
 
-    // Control input represents change in angular velocity over this step.
-    step.prediction->control_input
-        << target_acceleration.toRadians() * delta_time_seconds;
+    // Control input represents change in velocity over this step.
+    step.prediction->control_input << target_linear_acceleration.x() * delta_time_seconds,
+        target_linear_acceleration.y() * delta_time_seconds,
+        target_angular_acceleration.toRadians() * delta_time_seconds;
 
     filter_.process_model      = step.prediction->process_model;
     filter_.process_covariance = step.prediction->process_covariance;
@@ -68,11 +116,14 @@ void RobotLocalizer::step(const AngularVelocity& target_acceleration)
     filter_.predict(step.prediction->control_input);
 }
 
-void RobotLocalizer::updateVision(const Angle& orientation, const double age_seconds)
+void RobotLocalizer::updateVision(const Point& position, const Vector& velocity,
+                                  const Angle& orientation,
+                                  const AngularVelocity& angular_velocity,
+                                  const double age_seconds)
 {
     if (history.empty())
     {
-        updateFilterWithVision(orientation);
+        updateFilterWithVision(position, velocity, orientation, angular_velocity);
         return;
     }
 
@@ -86,7 +137,7 @@ void RobotLocalizer::updateVision(const Angle& orientation, const double age_sec
     if (rollback_point == history.begin())
     {
         // All history predates the sample, no need to rollback
-        updateFilterWithVision(orientation);
+        updateFilterWithVision(position, velocity, orientation, angular_velocity);
         return;
     }
 
@@ -98,7 +149,7 @@ void RobotLocalizer::updateVision(const Angle& orientation, const double age_sec
     filter_.state_estimate   = replay_iter->state_estimate;
     filter_.state_covariance = replay_iter->state_covariance;
 
-    updateFilterWithVision(orientation);
+    updateFilterWithVision(position, velocity, orientation, angular_velocity);
 
     // Replay from the rollback point back to the current estimate
     for (; replay_iter != history.rbegin(); --replay_iter)
@@ -121,28 +172,72 @@ void RobotLocalizer::updateVision(const Angle& orientation, const double age_sec
     }
 }
 
-void RobotLocalizer::updateFilterWithVision(const Angle& orientation)
+void RobotLocalizer::updateFilterWithVision(const Point& position, const Vector& velocity,
+                                            const Angle& orientation,
+                                            const AngularVelocity& angular_velocity)
 {
     const double orientation_estimate =
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION));
+    const double angular_velocity_estimate =
+        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY));
 
     Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
     measurement.setZero();
+
+    measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_X_POSITION)) =
+        position.x();
+    measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION)) =
+        position.y();
+    measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_X_VELOCITY)) =
+        velocity.x();
+    measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_VELOCITY)) =
+        velocity.y();
+
+    // Coterminal angle that is closest to current estimate
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION)) =
         orientation_estimate +
         (orientation - Angle::fromRadians(orientation_estimate)).clamp().toRadians();
 
+    // Coterminal angle that is closest to current estimate
+    measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_ANGULAR_VELOCITY)) =
+        angular_velocity_estimate +
+        (angular_velocity - Angle::fromRadians(angular_velocity_estimate))
+            .clamp()
+            .toRadians();
+
     filter_.measurement_model.setZero();
+    filter_.measurement_model(
+        static_cast<Eigen::Index>(MeasurementIndex::VISION_X_POSITION),
+        static_cast<Eigen::Index>(StateIndex::X_POSITION)) = 1;
+    filter_.measurement_model(
+        static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION),
+        static_cast<Eigen::Index>(StateIndex::Y_POSITION)) = 1;
+    filter_.measurement_model(
+        static_cast<Eigen::Index>(MeasurementIndex::VISION_X_VELOCITY),
+        static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) = 1;
+    filter_.measurement_model(
+        static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_VELOCITY),
+        static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) = 1;
     filter_.measurement_model(
         static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
         static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
+    filter_.measurement_model(
+        static_cast<Eigen::Index>(MeasurementIndex::VISION_ANGULAR_VELOCITY),
+        static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
 
     filter_.update(measurement);
 }
 
-void RobotLocalizer::updateMotorSensors(const AngularVelocity& angular_velocity)
+void RobotLocalizer::updateMotorSensors(const Vector& velocity,
+                                        const AngularVelocity& angular_velocity)
 {
     filter_.measurement_model.setZero();
+    filter_.measurement_model(
+        static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY),
+        static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) = 1;
+    filter_.measurement_model(
+        static_cast<Eigen::Index>(MeasurementIndex::MOTOR_Y_VELOCITY),
+        static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) = 1;
     filter_.measurement_model(
         static_cast<Eigen::Index>(MeasurementIndex::MOTOR_ANGULAR_VELOCITY),
         static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
@@ -152,6 +247,10 @@ void RobotLocalizer::updateMotorSensors(const AngularVelocity& angular_velocity)
         .measurement       = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
     };
 
+    update.measurement(static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY)) =
+        velocity.x();
+    update.measurement(static_cast<Eigen::Index>(MeasurementIndex::MOTOR_Y_VELOCITY)) =
+        velocity.y();
     update.measurement(static_cast<Eigen::Index>(
         MeasurementIndex::MOTOR_ANGULAR_VELOCITY)) = angular_velocity.toRadians();
 
@@ -194,32 +293,18 @@ void RobotLocalizer::updateImu(const AngularVelocity& angular_velocity)
     filter_.update(step.update->measurement);
 }
 
-void RobotLocalizer::updateTargetAcceleration(const AngularVelocity& angular_acceleration)
+Point RobotLocalizer::getPosition() const
 {
-    filter_.measurement_model.setZero();
-    filter_.measurement_model(
-        static_cast<Eigen::Index>(MeasurementIndex::TARGET_ANGULAR_ACCELERATION),
-        static_cast<Eigen::Index>(StateIndex::ANGULAR_ACCELERATION)) = 1;
+    return Point(
+        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::X_POSITION)),
+        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::Y_POSITION)));
+}
 
-    FilterStep::Update update{
-        .measurement_model = filter_.measurement_model,
-        .measurement       = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
-    };
-
-    update.measurement(
-        static_cast<Eigen::Index>(MeasurementIndex::TARGET_ANGULAR_ACCELERATION)) =
-        angular_acceleration.toRadians();
-
-    const FilterStep step{
-        .prediction       = std::nullopt,
-        .update           = update,
-        .state_estimate   = filter_.state_estimate,
-        .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::steady_clock::now(),
-    };
-
-    history.push_front(step);
-    filter_.update(step.update->measurement);
+Vector RobotLocalizer::getVelocity() const
+{
+    return Vector(
+        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::X_VELOCITY)),
+        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)));
 }
 
 Angle RobotLocalizer::getOrientation() const
@@ -232,10 +317,4 @@ AngularVelocity RobotLocalizer::getAngularVelocity() const
 {
     return AngularVelocity::fromRadians(
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)));
-}
-
-double RobotLocalizer::getAngularAccelerationRadians() const
-{
-    return filter_.state_estimate(
-        static_cast<Eigen::Index>(StateIndex::ANGULAR_ACCELERATION));
 }

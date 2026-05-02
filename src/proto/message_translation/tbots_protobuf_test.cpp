@@ -208,8 +208,8 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
         *(params.add_sub_destinations()) = sub_destination_proto;
     }
 
-    auto converted_trajectory_path_opt =
-        createTrajectoryPathFromParams(params, initial_velocity, robot_constants);
+    auto converted_trajectory_path_opt = createTrajectoryPathFromParams(
+        params, createPoint(params.start_position()), initial_velocity, robot_constants);
     ASSERT_TRUE(converted_trajectory_path_opt.has_value());
 
     TrajectoryPath converted_trajectory_path = converted_trajectory_path_opt.value();

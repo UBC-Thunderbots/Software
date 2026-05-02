@@ -34,12 +34,13 @@ class PrimitiveExecutor
     /**
      * Update primitive executor with the current velocity and orientation of the robot
      *
-     * @param local_velocity The current _local_ velocity
-     * @param angular_velocity The current angular velocity
+     * @param position The current position
+     * @param velocity The current velocity
      * @param orientation The current orientation of the robot
+     * @param angular_velocity The current angular velocity
      */
-    void updateState(const Vector& local_velocity,
-                     const AngularVelocity& angular_velocity, const Angle& orientation);
+    void updateState(const Point& position, const Vector& velocity,
+                     const Angle& orientation, const AngularVelocity& angular_velocity);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
@@ -74,6 +75,7 @@ class PrimitiveExecutor
     Duration time_since_angular_trajectory_creation_;
     Duration time_since_linear_trajectory_creation_;
 
+    Point position_;
     Vector velocity_;
     AngularVelocity angular_velocity_;
     Angle orientation_;

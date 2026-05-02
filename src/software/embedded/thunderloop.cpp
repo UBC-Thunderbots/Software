@@ -85,11 +85,9 @@ Thunderloop::Thunderloop(const RobotConstants& robot_constants, bool enable_log_
           std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_),
-      robot_localizer_(
-          robot_constants.kalman_process_noise_variance_rad_per_s_4,
-          robot_constants.kalman_vision_noise_variance_rad_2,
-          robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2,
-          robot_constants.kalman_target_angular_velocity_variance_rad_per_sec_2)
+      robot_localizer_(robot_constants.kalman_process_noise_variance_rad_per_s_4,
+                       robot_constants.kalman_vision_noise_variance_rad_2,
+                       robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2)
 {
     waitForNetworkUp();
 
@@ -240,9 +238,20 @@ void Thunderloop::runLoop()
 
                 if (primitive_.has_move())
                 {
-                    const Angle current_orientation =
+                    const Point position =
+                        createPoint(primitive_.move().xy_traj_params().start_position());
+
+                    const Vector velocity = createVector(
+                        primitive_.move().xy_traj_params().initial_velocity());
+
+                    const Angle orientation =
                         createAngle(primitive_.move().w_traj_params().start_angle());
-                    robot_localizer_.updateVision(current_orientation, RTT_S / 2);
+
+                    const AngularVelocity angular_velocity = createAngularVelocity(
+                        primitive_.move().w_traj_params().initial_velocity());
+
+                    robot_localizer_.updateVision(position, velocity, orientation,
+                                                  angular_velocity, RTT_S / 2);
                 }
 
                 // Update primitive executor's primitive set
@@ -260,7 +269,7 @@ void Thunderloop::runLoop()
                 }
             }
 
-            robot_localizer_.step(AngularVelocity::zero());
+            robot_localizer_.step(Vector(), AngularVelocity::zero());
             std::optional<Angle> imu_poll = imu_service_->pollHeadingRate();
 
             if (imu_poll.has_value())
@@ -271,12 +280,15 @@ void Thunderloop::runLoop()
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
-                robot_localizer_.updateMotorSensors(
-                    createAngularVelocity(status.angular_velocity()));
 
-                primitive_executor_.updateState(createVector(status.local_velocity()),
-                                                robot_localizer_.getAngularVelocity(),
-                                                robot_localizer_.getOrientation());
+                // robot_localizer_.updateMotorSensors(
+                //     createVector(status.local_velocity()),
+                //     createAngularVelocity(status.angular_velocity()));
+
+                primitive_executor_.updateState(robot_localizer_.getPosition(),
+                                                robot_localizer_.getVelocity(),
+                                                robot_localizer_.getOrientation(),
+                                                robot_localizer_.getAngularVelocity());
             }
 
             // Timeout Overrides for Primitives

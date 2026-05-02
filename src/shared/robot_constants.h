@@ -76,8 +76,6 @@ struct RobotConstants
     float kalman_vision_noise_variance_rad_2;
 
     float kalman_motor_sensor_noise_variance_rad_per_s_2;
-
-    float kalman_target_angular_velocity_variance_rad_per_sec_2;
 };
 
 /**

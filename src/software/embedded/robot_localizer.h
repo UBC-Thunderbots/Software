@@ -7,13 +7,19 @@
 #include "proto/world.pb.h"
 #include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
 #include "software/sensor_fusion/filter/kalman_filter.hpp"
 #include "software/util/make_enum/make_enum.hpp"
 
-MAKE_ENUM(StateIndex, ORIENTATION, ANGULAR_VELOCITY, ANGULAR_ACCELERATION);
+MAKE_ENUM(StateIndex, X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
+          ANGULAR_VELOCITY);
 
-MAKE_ENUM(MeasurementIndex, VISION_ORIENTATION, MOTOR_ANGULAR_VELOCITY,
-          IMU_ANGULAR_VELOCITY, TARGET_ANGULAR_ACCELERATION);
+MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTATION,
+          VISION_X_VELOCITY, VISION_Y_VELOCITY, VISION_ANGULAR_VELOCITY, MOTOR_X_VELOCITY,
+          MOTOR_Y_VELOCITY, MOTOR_ANGULAR_VELOCITY, IMU_ANGULAR_VELOCITY);
+
+MAKE_ENUM(ControlIndex, X_ACCELERATION, Y_ACCELERATION, ANGULAR_ACCELERATION);
 
 /**
  * Estimates robot orientation, angular velocity, and angular acceleration
@@ -35,36 +41,43 @@ class RobotLocalizer
      * @param process_noise_variance Variance applied to the process noise model.
      * @param vision_noise_variance Variance of camera heading measurements.
      * @param motor_sensor_noise_variance Variance of motor sensor angular velocity.
-     * @param target_angular_acceleration_variance Variance of commanded
-     * angular acceleration measurements.
      */
-    RobotLocalizer(double process_noise_variance, double vision_noise_variance,
-                   double motor_sensor_noise_variance,
-                   double target_angular_acceleration_variance);
+    explicit RobotLocalizer(double process_noise_variance, double vision_noise_variance,
+                            double motor_sensor_noise_variance);
 
     /**
      * Runs one prediction step using elapsed time since the previous call.
      *
-     * @param target_acceleration The target acceleration the robot is trying to attain
-     * right now.
+     * @param target_linear_acceleration The current target linear acceleration of the
+     * robot
+     * @param target_angular_acceleration The current target angular acceleration of the
+     * robot
      */
-    void step(const AngularVelocity& target_acceleration);
+    void step(const Vector& target_linear_acceleration,
+              const AngularVelocity& target_angular_acceleration);
 
     /**
-     * Update the orientation from vision.
+     * Update the robot's position and velocity from data reported by vision.
      *
-     * @param orientation Vision reading of the orientation of the robot in world space
+     * @param position Vision reading of the robot's position in world space
+     * @param velocity Vision reading of the robot's velocity in world space
+     * @param orientation Vision reading of the robot's orientation in world space
+     * @param angular_velocity Vision reading of the robot's angular velocity
      * @param age_seconds Age in seconds of the vision snapshot (time since it was taken)
      */
-    void updateVision(const Angle& orientation, double age_seconds);
+    void updateVision(const Point& position, const Vector& velocity,
+                      const Angle& orientation, const AngularVelocity& angular_velocity,
+                      double age_seconds);
 
     /**
-     * Update the angular velocity from velocity reported by motor sensors
+     * Update the robot's velocity from data reported by motor sensors
      * (i.e. encoders or Hall sensors).
      *
-     * @param angular_velocity angular velocity of the robot
+     * @param velocity Motor sensor reading of the robot's velocity in local space
+     * @param angular_velocity Motor sensor reading of the robot's angular velocity
      */
-    void updateMotorSensors(const AngularVelocity& angular_velocity);
+    void updateMotorSensors(const Vector& velocity,
+                            const AngularVelocity& angular_velocity);
 
     /**
      * Update the angular velocity from IMU.
@@ -74,44 +87,50 @@ class RobotLocalizer
     void updateImu(const AngularVelocity& angular_velocity);
 
     /**
-     * Update the target acceleration.
+     * Gets the estimated position of the robot in world space.
      *
-     * @param angular_acceleration Target angular acceleration of the robot
+     * @return the estimated position of the robot in world space
      */
-    void updateTargetAcceleration(const AngularVelocity& angular_acceleration);
+    Point getPosition() const;
 
     /**
-     * Gets estimated orientation of the robot.
+     * Gets the estimated velocity of the robot in world space.
      *
-     * @return estimated orientation of the robot
+     * @return the estimated velocity of the robot in world space
+     */
+    Vector getVelocity() const;
+
+    /**
+     * Gets the estimated orientation of the robot in world space.
+     *
+     * @return estimated orientation of the robot in world space
      */
     Angle getOrientation() const;
 
     /**
-     * Gets estimated angular velocity of the robot.
+     * Gets the estimated angular velocity of the robot.
      *
      * @return estimated angular velocity of the robot
      */
     AngularVelocity getAngularVelocity() const;
 
-    /**
-     * Gets estimated angular acceleration of the robot.
-     *
-     * @return estimated angular acceleration of the robot
-     */
-    double getAngularAccelerationRadians() const;
-
    private:
     /**
-     * Update the Kalman filter with the orientation from vision.
+     * Update the Kalman filter with the robot's position and velocity from vision.
      *
-     * @param orientation Vision reading of the orientation of the robot in world space
+     * @param position Vision reading of the robot's position in world space
+     * @param velocity Vision reading of the robot's velocity in world space
+     * @param orientation Vision reading of the robot's orientation in world space
+     * @param angular_velocity Vision reading of the robot's angular velocity
      */
-    void updateFilterWithVision(const Angle& orientation);
+    void updateFilterWithVision(const Point& position, const Vector& velocity,
+                                const Angle& orientation,
+                                const AngularVelocity& angular_velocity);
 
     static constexpr unsigned int STATE_SIZE = reflective_enum::size<StateIndex>();
     static constexpr unsigned int MEASUREMENT_SIZE =
         reflective_enum::size<MeasurementIndex>();
+    static constexpr unsigned int CONTROL_SIZE = reflective_enum::size<ControlIndex>();
 
     /**
      * Snapshot of a Kalman filter predict/update step needed for rollback/replay.
@@ -122,8 +141,8 @@ class RobotLocalizer
         {
             Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_model;
             Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_covariance;
-            Eigen::Vector<double, STATE_SIZE> control_model;
-            Eigen::Vector<double, 1> control_input;
+            Eigen::Matrix<double, STATE_SIZE, CONTROL_SIZE> control_model;
+            Eigen::Vector<double, CONTROL_SIZE> control_input;
         };
 
         struct Update
@@ -141,10 +160,11 @@ class RobotLocalizer
         std::chrono::time_point<std::chrono::steady_clock> time;
     };
 
-    KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, 1> filter_;
+    KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
 
     // Process noise variance used in prediction
-    double process_noise_variance_;
+    double process_linear_acceleration_noise_variance_;
+    double process_angular_acceleration_noise_variance_;
 
     std::chrono::time_point<std::chrono::steady_clock> last_step_time_;
 

@@ -113,6 +113,8 @@ cc_library(
         "//software/embedded/services:imu",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
         "//software/sensor_fusion/filter:kalman_filter",
         "//software/util/scoped_timespec_timer",
         "@eigen",
