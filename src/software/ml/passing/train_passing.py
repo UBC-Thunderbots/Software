@@ -144,16 +144,14 @@ def scale_priority_labels(
 
     return scaled_weights
 
-PRIORITY_INTERVALS = [
-    PassLogType.RESULT_10S,
-    PassLogType.RESULT_20S
-]
-
-PRIORITY_INTERVAL_SCALE = 5.0
+PRIORITY_INTERVALS = {
+    PassLogType.RESULT_5S: 10.0,
+    PassLogType.RESULT_10S: 7.0,
+    PassLogType.RESULT_20S: 7.0
+}
 
 def scale_priority_intervals(
-    label_weights: torch.Tensor,
-    multiplier: float = PRIORITY_INTERVAL_SCALE,
+    label_weights: torch.Tensor
 ):    
     scaled_weights = label_weights.clone()
 
@@ -162,7 +160,7 @@ def scale_priority_intervals(
             start_idx = idx * NUM_LABELS_PER_INTERVAL
             end_idx = start_idx + NUM_LABELS_PER_INTERVAL
             
-            scaled_weights[start_idx:end_idx] *= multiplier
+            scaled_weights[start_idx:end_idx] *= PRIORITY_INTERVALS[interval_type]
             
     return scaled_weights
 
@@ -401,11 +399,13 @@ if __name__ == "__main__":
     label_weights = calculate_label_weights(labelled_passes=labelled_passes)
     
     event_scaled_weights = scale_priority_labels(label_weights=label_weights)
-
+    
+    interval_scaled_weights = scale_priority_intervals(label_weights=event_scaled_weights)
+    
     undersampled_passes = undersample_passes(labelled_passes)
 
     graphs, labels = process_all_passes(labelled_passes=undersampled_passes)
 
     print("Dataset generated!")
 
-    train_and_export_models(graphs, labels, label_weights)
+    train_and_export_models(graphs, labels, event_scaled_weights)
