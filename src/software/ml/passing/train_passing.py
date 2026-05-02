@@ -24,6 +24,10 @@ ml_dir_path = os.path.dirname(dir_path)
 datasets_path = os.path.join(ml_dir_path, "datasets")
 onnx_path = os.path.join(dir_path, "onnx")
 
+NUM_INTERVALS = len(PassLogType) - 1
+LABEL_FIELD_NAMES = [f.name for f in fields(Label)]
+NUM_LABELS_PER_INTERVAL = len(LABEL_FIELD_NAMES)
+
 
 def load_labelled_passes(
     labelled_pass_file: str, friendly_team: Team
@@ -112,33 +116,54 @@ PRIORITY_EVENTS = [
     "have_shots_on_net_changed",
 ]
 
-PRIORITY_SCALE = 10.0
+PRIORITY_EVENT_SCALE = 10.0
 
 
-def scale_label_weights(
+def scale_priority_labels(
     label_weights: torch.Tensor,
-    multiplier: float = PRIORITY_SCALE,
+    multiplier: float = PRIORITY_EVENT_SCALE,
 ) -> torch.Tensor:
     """Scales the weights for specific fields across all time intervals."""
     # 1. Get the list of field names from the Label dataclass in order
-    label_field_names = [f.name for f in fields(Label)]
-    num_labels_per_interval = len(label_field_names)
+    
 
     # Clone to avoid modifying the original tensor in-place if desired
     scaled_weights = label_weights.clone()
 
     # 2. Find the local indices of the fields we want to boost
     priority_event_indices = [
-        i for i, name in enumerate(label_field_names) if name in PRIORITY_EVENTS
+        i for i, name in enumerate(LABEL_FIELD_NAMES) if name in PRIORITY_EVENTS
     ]
 
     # 3. Apply the multiplier to those indices across every interval block
-    for idx in range(num_intervals):
-        offset = idx * num_labels_per_interval
+    for idx in range(NUM_INTERVALS):
+        offset = idx * NUM_LABELS_PER_INTERVAL
         for priority_idx in priority_event_indices:
             global_idx = offset + priority_idx
             scaled_weights[global_idx] *= multiplier
 
+    return scaled_weights
+
+PRIORITY_INTERVALS = [
+    PassLogType.RESULT_10S,
+    PassLogType.RESULT_20S
+]
+
+PRIORITY_INTERVAL_SCALE = 5.0
+
+def scale_priority_intervals(
+    label_weights: torch.Tensor,
+    multiplier: float = PRIORITY_INTERVAL_SCALE,
+):    
+    scaled_weights = label_weights.clone()
+
+    for idx, interval_type in enumerate(PassLogType):
+        if interval_type in PRIORITY_INTERVALS:
+            start_idx = idx * NUM_LABELS_PER_INTERVAL
+            end_idx = start_idx + NUM_LABELS_PER_INTERVAL
+            
+            scaled_weights[start_idx:end_idx] *= multiplier
+            
     return scaled_weights
 
 
@@ -281,8 +306,6 @@ def evaluate_model(loader: DataLoader, model: GenericHeteroGNN):
                 preds = (torch.sigmoid(interval_logits) > 0.5).float()
                 interval_preds[interval].append(preds)
 
-    label_names = [label.name for label in fields(Label)]
-
     for _, interval in enumerate(intervals):
         preds = interval_preds[interval]
         targets = interval_targets[interval]
@@ -292,7 +315,7 @@ def evaluate_model(loader: DataLoader, model: GenericHeteroGNN):
 
         print(f"\n--- Interval: {interval.name} ---")
 
-        for j, name in enumerate(label_names):
+        for j, name in enumerate(LABEL_FIELD_NAMES):
             f1 = f1_score(target_matrix[:, j], pred_matrix[:, j], zero_division=0)
             print(f"{name:20} | F1-Score: {f1:.4f}")
 
@@ -374,6 +397,8 @@ if __name__ == "__main__":
     )
 
     label_weights = calculate_label_weights(labelled_passes=labelled_passes)
+    
+    event_scaled_weights = scale_priority_labels(label_weights=label_weights)
 
     undersampled_passes = undersample_passes(labelled_passes)
 
