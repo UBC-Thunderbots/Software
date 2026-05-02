@@ -212,13 +212,15 @@ def undersample_passes(all_passes: list[LabelledPass], boring_keep_ratio: float 
     )
     return combined
 
+NUM_EPOCHS = 200
+LEARNING_RATE = 0.001
 
 def train_single_model(
     loader: DataLoader,
     model: GenericHeteroGNN,
     label_weights: torch.Tensor,
-    epochs=50,
-    learning_rate=0.001,
+    epochs=NUM_EPOCHS,
+    learning_rate=LEARNING_RATE,
 ) -> GenericHeteroGNN:
     # 1. Setup the "Judge" (Loss Function) and the "Optimizer" (Weight Updater)
     # BCEWithLogitsLoss combines a Sigmoid layer and the BCELoss in one single class.
