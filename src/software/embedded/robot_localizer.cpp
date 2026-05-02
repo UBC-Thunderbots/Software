@@ -7,7 +7,7 @@ RobotLocalizer::RobotLocalizer(const double process_noise_variance,
       process_angular_acceleration_noise_variance_(process_noise_variance)
 {
     filter_.state_covariance =
-        Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
+        Eigen::Vector<double, STATE_SIZE>(1, 1, 30, 1, 1, 20).asDiagonal();
 
     filter_.control_model.setZero();
 
