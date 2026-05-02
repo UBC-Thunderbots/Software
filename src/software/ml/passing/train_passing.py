@@ -116,7 +116,7 @@ PRIORITY_EVENTS = [
     "have_shots_on_net_changed",
 ]
 
-PRIORITY_EVENT_SCALE = 10.0
+PRIORITY_EVENT_SCALE = 5.0
 
 
 def scale_priority_labels(
@@ -400,7 +400,7 @@ if __name__ == "__main__":
     
     event_scaled_weights = scale_priority_labels(label_weights=label_weights)
     
-    interval_scaled_weights = scale_priority_intervals(label_weights=event_scaled_weights)
+    interval_scaled_weights = scale_priority_intervals(label_weights=label_weights)
     
     undersampled_passes = undersample_passes(labelled_passes)
 
@@ -408,4 +408,4 @@ if __name__ == "__main__":
 
     print("Dataset generated!")
 
-    train_and_export_models(graphs, labels, event_scaled_weights)
+    train_and_export_models(graphs, labels, interval_scaled_weights)
