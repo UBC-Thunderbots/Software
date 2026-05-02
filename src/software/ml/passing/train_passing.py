@@ -145,9 +145,9 @@ def scale_priority_labels(
     return scaled_weights
 
 PRIORITY_INTERVALS = {
-    PassLogType.RESULT_5S: 10.0,
-    PassLogType.RESULT_10S: 7.0,
-    PassLogType.RESULT_20S: 7.0
+    PassLogType.RESULT_5S: 5.0,
+    PassLogType.RESULT_10S: 2.0,
+    PassLogType.RESULT_20S: 2.0
 }
 
 def scale_priority_intervals(
