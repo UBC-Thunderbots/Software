@@ -408,4 +408,4 @@ if __name__ == "__main__":
 
     print("Dataset generated!")
 
-    train_and_export_models(graphs, labels, interval_scaled_weights)
+    train_and_export_models(graphs, labels, label_weights)
