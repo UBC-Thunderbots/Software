@@ -54,52 +54,52 @@ void RobotLocalizer::step(const Vector& target_linear_acceleration,
     auto& process_covariance = step.prediction->process_covariance;
     process_covariance.setZero();
 
-    process_covariance(static_cast<int>(StateIndex::X_POSITION),
-                       static_cast<int>(StateIndex::X_POSITION)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::X_POSITION),
+                       static_cast<Eigen::Index>(StateIndex::X_POSITION)) =
         delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::X_POSITION),
-                       static_cast<int>(StateIndex::X_VELOCITY)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::X_POSITION),
+                       static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
         delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::X_VELOCITY),
-                       static_cast<int>(StateIndex::X_POSITION)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::X_POSITION)) =
         delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::X_VELOCITY),
-                       static_cast<int>(StateIndex::X_VELOCITY)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
         delta_time_squared * process_linear_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::Y_POSITION),
-                       static_cast<int>(StateIndex::Y_POSITION)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
+                       static_cast<Eigen::Index>(StateIndex::Y_POSITION)) =
         delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::Y_POSITION),
-                       static_cast<int>(StateIndex::Y_VELOCITY)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
+                       static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
         delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::Y_VELOCITY),
-                       static_cast<int>(StateIndex::Y_POSITION)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::Y_POSITION)) =
         delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::Y_VELOCITY),
-                       static_cast<int>(StateIndex::Y_VELOCITY)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
         delta_time_squared * process_linear_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::ORIENTATION),
-                       static_cast<int>(StateIndex::ORIENTATION)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
+                       static_cast<Eigen::Index>(StateIndex::ORIENTATION)) =
         delta_time_fourth / 4 * process_angular_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::ORIENTATION),
-                       static_cast<int>(StateIndex::ANGULAR_VELOCITY)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
+                       static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
         delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::ANGULAR_VELOCITY),
-                       static_cast<int>(StateIndex::ORIENTATION)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::ORIENTATION)) =
         delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
 
-    process_covariance(static_cast<int>(StateIndex::ANGULAR_VELOCITY),
-                       static_cast<int>(StateIndex::ANGULAR_VELOCITY)) =
+    process_covariance(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
         delta_time_squared * process_angular_acceleration_noise_variance_;
 
     step.prediction->control_model = filter_.control_model;
@@ -178,8 +178,6 @@ void RobotLocalizer::updateFilterWithVision(const Point& position, const Vector&
 {
     const double orientation_estimate =
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION));
-    const double angular_velocity_estimate =
-        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY));
 
     Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
     measurement.setZero();
@@ -198,12 +196,8 @@ void RobotLocalizer::updateFilterWithVision(const Point& position, const Vector&
         orientation_estimate +
         (orientation - Angle::fromRadians(orientation_estimate)).clamp().toRadians();
 
-    // Coterminal angle that is closest to current estimate
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_ANGULAR_VELOCITY)) =
-        angular_velocity_estimate +
-        (angular_velocity - Angle::fromRadians(angular_velocity_estimate))
-            .clamp()
-            .toRadians();
+        angular_velocity.toRadians();
 
     filter_.measurement_model.setZero();
     filter_.measurement_model(
@@ -310,7 +304,7 @@ Vector RobotLocalizer::getVelocity() const
 Angle RobotLocalizer::getOrientation() const
 {
     return Angle::fromRadians(
-        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION)));
+        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION))).clamp();
 }
 
 AngularVelocity RobotLocalizer::getAngularVelocity() const

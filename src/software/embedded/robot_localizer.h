@@ -127,10 +127,9 @@ class RobotLocalizer
                                 const Angle& orientation,
                                 const AngularVelocity& angular_velocity);
 
-    static constexpr unsigned int STATE_SIZE = reflective_enum::size<StateIndex>();
-    static constexpr unsigned int MEASUREMENT_SIZE =
-        reflective_enum::size<MeasurementIndex>();
-    static constexpr unsigned int CONTROL_SIZE = reflective_enum::size<ControlIndex>();
+    static constexpr size_t STATE_SIZE = reflective_enum::size<StateIndex>();
+    static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
+    static constexpr size_t CONTROL_SIZE = reflective_enum::size<ControlIndex>();
 
     /**
      * Snapshot of a Kalman filter predict/update step needed for rollback/replay.

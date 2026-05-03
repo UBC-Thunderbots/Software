@@ -46,7 +46,7 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
 {
     position_         = position;
     velocity_         = velocity;
-    orientation_      = orientation.clamp();
+    orientation_      = orientation;
     angular_velocity_ = angular_velocity;
 }
 
