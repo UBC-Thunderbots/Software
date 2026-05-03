@@ -15,6 +15,7 @@
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
+#include "software/physics/velocity_conversion_util.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 
@@ -269,7 +270,6 @@ void Thunderloop::runLoop()
                 }
             }
 
-            robot_localizer_.step(Vector(), AngularVelocity::zero());
             std::optional<Angle> imu_poll = imu_service_->pollHeadingRate();
 
             if (imu_poll.has_value())
@@ -281,14 +281,39 @@ void Thunderloop::runLoop()
             {
                 auto status = motor_status_.value();
 
-                // robot_localizer_.updateMotorSensors(
-                //     createVector(status.local_velocity()),
-                //     createAngularVelocity(status.angular_velocity()));
+                robot_localizer_.updateMotorSensors(
+                    localToGlobalVelocity(createVector(status.local_velocity()),
+                                          robot_localizer_.getOrientation()),
+                    createAngularVelocity(status.angular_velocity()));
 
-                primitive_executor_.updateState(robot_localizer_.getPosition(),
-                                                robot_localizer_.getVelocity(),
-                                                robot_localizer_.getOrientation(),
-                                                robot_localizer_.getAngularVelocity());
+                const Vector target_velocity =
+                    localToGlobalVelocity(createVector(status.target_local_velocity()),
+                                          robot_localizer_.getOrientation());
+                const AngularVelocity target_angular_velocity =
+                    createAngularVelocity(status.target_angular_velocity());
+
+                const Vector delta_velocity = target_velocity - last_target_velocity_;
+                const AngularVelocity delta_angular_velocity =
+                    target_angular_velocity - last_target_angular_velocity_;
+
+                last_target_velocity_         = target_velocity;
+                last_target_angular_velocity_ = target_angular_velocity;
+
+                robot_localizer_.step(delta_velocity, delta_angular_velocity);
+
+                primitive_executor_.updateState(
+                    robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
+                    robot_localizer_.getOrientation(),
+                    robot_localizer_.getAngularVelocity());
+
+                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                    {"position_x", robot_localizer_.getPosition().x()},
+                    {"position_y", robot_localizer_.getPosition().y()},
+                    {"velocity_x", robot_localizer_.getVelocity().x()},
+                    {"velocity_y", robot_localizer_.getVelocity().y()},
+                    {"orientation", robot_localizer_.getOrientation().toRadians()},
+                    {"angular_velocity", robot_localizer_.getAngularVelocity().toRadians()},
+                });
             }
 
             // Timeout Overrides for Primitives

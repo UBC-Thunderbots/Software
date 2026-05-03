@@ -25,15 +25,15 @@ RobotConstants create2026RobotConstants()
         .robot_max_deceleration_m_per_s_2 = 3.0f,
 
         // Robot's angular movement constants
-        .robot_max_ang_speed_rad_per_s          = 10.0f,
-        .robot_max_ang_acceleration_rad_per_s_2 = 30.0f,
+        .robot_max_ang_speed_rad_per_s          = 4.0f,
+        .robot_max_ang_acceleration_rad_per_s_2 = 2.0f,
 
         .wheel_radius_meters = 0.03f,
 
         // Kalman filter variances for robot localizer
-        .kalman_process_noise_variance_rad_per_s_4      = 0.5f,
+        .kalman_process_noise_variance_rad_per_s_4      = 1.0f,
         .kalman_vision_noise_variance_rad_2             = 0.01f * 0.01f,
-        .kalman_motor_sensor_noise_variance_rad_per_s_2 = 0.5f * 0.5f};
+        .kalman_motor_sensor_noise_variance_rad_per_s_2 = 0.5};
 }
 
 RobotConstants create2021RobotConstants()

@@ -144,7 +144,6 @@ class Thunderloop
 
     // Current State
     RobotConstants robot_constants_;
-    Angle current_orientation_;
     int robot_id_;
     int channel_id_;
     std::string network_interface_;
@@ -173,6 +172,9 @@ class Thunderloop
 
     // Path to the CPU thermal zone temperature file
     const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone0/temp";
+
+    Vector last_target_velocity_;
+    AngularVelocity last_target_angular_velocity_;
 };
 
 /*

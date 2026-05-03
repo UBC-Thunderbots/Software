@@ -7,9 +7,7 @@ RobotLocalizer::RobotLocalizer(const double process_noise_variance,
       process_angular_acceleration_noise_variance_(process_noise_variance)
 {
     filter_.state_covariance =
-        Eigen::Vector<double, STATE_SIZE>(1, 1, 30, 1, 1, 20).asDiagonal();
-
-    filter_.control_model.setZero();
+        Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
 
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
@@ -102,15 +100,36 @@ void RobotLocalizer::step(const Vector& target_linear_acceleration,
                        static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
         delta_time_squared * process_angular_acceleration_noise_variance_;
 
-    step.prediction->control_model = filter_.control_model;
+    auto& control_model = step.prediction->control_model;
+    control_model.setZero();
 
-    // Control input represents change in velocity over this step.
-    step.prediction->control_input << target_linear_acceleration.x() * delta_time_seconds,
-        target_linear_acceleration.y() * delta_time_seconds,
-        target_angular_acceleration.toRadians() * delta_time_seconds;
+    control_model(static_cast<Eigen::Index>(StateIndex::X_POSITION),
+                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) =
+        delta_time_seconds / 2;
+
+    control_model(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
+                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
+        delta_time_seconds / 2;
+
+    control_model(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
+                  static_cast<Eigen::Index>(ControlIndex::ANGULAR_ACCELERATION)) =
+        delta_time_seconds / 2;
+
+    control_model(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
+                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) = 1;
+
+    control_model(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
+                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) = 1;
+
+    control_model(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
+                  static_cast<Eigen::Index>(ControlIndex::ANGULAR_ACCELERATION)) = 1;
+
+    step.prediction->control_input << target_linear_acceleration.x(),
+        target_linear_acceleration.y(), target_angular_acceleration.toRadians();
 
     filter_.process_model      = step.prediction->process_model;
     filter_.process_covariance = step.prediction->process_covariance;
+    filter_.control_model      = step.prediction->control_model;
 
     history.push_front(step);
     filter_.predict(step.prediction->control_input);
