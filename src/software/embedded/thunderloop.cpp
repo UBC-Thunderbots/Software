@@ -301,10 +301,10 @@ void Thunderloop::runLoop()
 
                 robot_localizer_.step(delta_velocity, delta_angular_velocity);
 
-                primitive_executor_.updateState(
-                    robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
-                    robot_localizer_.getOrientation(),
-                    robot_localizer_.getAngularVelocity());
+                primitive_executor_.updateState(robot_localizer_.getPosition(),
+                                                robot_localizer_.getVelocity(),
+                                                robot_localizer_.getOrientation(),
+                                                robot_localizer_.getAngularVelocity());
 
                 LOG(PLOTJUGGLER) << *createPlotJugglerValue({
                     {"position_x", robot_localizer_.getPosition().x()},
@@ -312,7 +312,8 @@ void Thunderloop::runLoop()
                     {"velocity_x", robot_localizer_.getVelocity().x()},
                     {"velocity_y", robot_localizer_.getVelocity().y()},
                     {"orientation", robot_localizer_.getOrientation().toRadians()},
-                    {"angular_velocity", robot_localizer_.getAngularVelocity().toRadians()},
+                    {"angular_velocity",
+                     robot_localizer_.getAngularVelocity().toRadians()},
                 });
             }
 
