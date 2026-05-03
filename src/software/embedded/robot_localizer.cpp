@@ -304,7 +304,8 @@ Vector RobotLocalizer::getVelocity() const
 Angle RobotLocalizer::getOrientation() const
 {
     return Angle::fromRadians(
-        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION))).clamp();
+               filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION)))
+        .clamp();
 }
 
 AngularVelocity RobotLocalizer::getAngularVelocity() const

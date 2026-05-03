@@ -55,7 +55,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity() const
     Vector local_velocity = globalToLocalVelocity(
         trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds()),
         orientation_);
-        // orientation_ + angular_velocity_ * time_step_.toSeconds() / 2 * LEAN_BIAS);
+    // orientation_ + angular_velocity_ * time_step_.toSeconds() / 2 * LEAN_BIAS);
 
     const Point expected_position =
         trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds());
