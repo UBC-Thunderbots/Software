@@ -238,25 +238,27 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
  * Generate a 2D Trajectory Path given 2D trajectory parameters
  *
  * @param params 2D Trajectory Path
+ * @param start_position Initial position to use for the trajectory
  * @param initial_velocity Initial velocity to use for the trajectory
  * @param robot_constants Constants to use for the trajectory
  * @return TrajectoryPath, or std::nullopt if the trajectory path could not be created
  * from the given parameters
  */
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
-    const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
-    const RobotConstants& robot_constants);
+    const TbotsProto::TrajectoryPathParams2D& params, const Point& start_position,
+    const Vector& initial_velocity, const RobotConstants& robot_constants);
 
 /**
- * Generate an angular trajectory Path given angular trajectory proto parameters
+ * Generate an angular trajectory path given angular trajectory proto parameters
  *
- * @param params angular Trajectory Path
+ * @param params Angular trajectory path
+ * @param start_angle Initial angle to use for the trajectory
  * @param initial_velocity Initial velocity to use for the trajectory
  * @param robot_constants Constants to use for the trajectory
  * @return Generate angular trajectory
  */
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
-    const TbotsProto::TrajectoryParamsAngular1D& params,
+    const TbotsProto::TrajectoryParamsAngular1D& params, const Angle& start_angle,
     const AngularVelocity& initial_velocity, const RobotConstants& robot_constants);
 
 /**
@@ -268,7 +270,7 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
  * @return the dribbler speed in RPM
  */
 int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
-                                       RobotConstants_t robot_constants);
+                                       RobotConstants robot_constants);
 
 /**
  * Convert max allowed speed mode to max allowed speed
@@ -280,4 +282,4 @@ int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
  */
 double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
-    RobotConstants_t robot_constants);
+    RobotConstants robot_constants);

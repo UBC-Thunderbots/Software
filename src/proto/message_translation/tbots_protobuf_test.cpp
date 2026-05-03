@@ -152,7 +152,7 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
     // Generate a trajectory, and then generate a TbotsProto::TrajectoryPathParams2D
     // with the same parameters as the trajectory, finally, generate a second trajectory
     // from the parameters and make sure the two trajectories are equal.
-    RobotConstants robot_constants = create2021RobotConstants();
+    RobotConstants robot_constants = create2026RobotConstants();
     Point start_position(0.0, 0.0);
     Point destination(0.0, 0.0);
 
@@ -208,8 +208,8 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
         *(params.add_sub_destinations()) = sub_destination_proto;
     }
 
-    auto converted_trajectory_path_opt =
-        createTrajectoryPathFromParams(params, initial_velocity, robot_constants);
+    auto converted_trajectory_path_opt = createTrajectoryPathFromParams(
+        params, createPoint(params.start_position()), initial_velocity, robot_constants);
     ASSERT_TRUE(converted_trajectory_path_opt.has_value());
 
     TrajectoryPath converted_trajectory_path = converted_trajectory_path_opt.value();

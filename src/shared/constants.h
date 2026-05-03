@@ -21,9 +21,7 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
     {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
 // PlotJuggler's default host and port
-// Should be updated to your local machine's IP address if
-// you want to plot from the robot
-static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "ff02::c3d0:42d2:aaaa";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
 // ProtoLogger constants for replay files
@@ -223,6 +221,8 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 static const unsigned THUNDERLOOP_HZ = 300u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
+
+static constexpr double RTT_S = 0.03;
 
 // Robot diagnostics constants
 constexpr double AUTO_CHIP_DISTANCE_DEFAULT_M     = 1.5;

@@ -28,7 +28,7 @@ class ErForceSimulator
      * @param realism_config realism configuration
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const RobotConstants_t& robot_constants,
+                              const RobotConstants& robot_constants,
                               std::unique_ptr<RealismConfigErForce>& realism_config,
                               const bool ramping = false,
                               double primitive_executor_time_step_s =
@@ -159,7 +159,7 @@ class ErForceSimulator
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
         const TbotsProto::World& world_msg, const Vector& local_velocity,
-        const AngularVelocity angular_velocity);
+        const AngularVelocity& angular_velocity, const Angle& orientation);
 
     /**
      * Gets a map from robot id to local and angular velocity from repeated sim robots
@@ -170,6 +170,16 @@ class ErForceSimulator
      */
     static std::map<RobotId, std::pair<Vector, AngularVelocity>>
     getRobotIdToLocalVelocityMap(
+        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
+
+    /**
+     * Gets a map from robot id to orientation from repeated sim robots
+     *
+     * @param sim_robots Repeated er force sim robot protos
+     *
+     * @return a map from robot id to orientation
+     */
+    static std::map<RobotId, Angle> getRobotIdToOrientationMap(
         const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
 
     /**
@@ -222,7 +232,7 @@ class ErForceSimulator
     std::unique_ptr<camun::simulator::Simulator> er_force_sim;
     EuclideanToWheel euclidean_to_four_wheel;
 
-    RobotConstants_t robot_constants;
+    RobotConstants robot_constants;
     Field field;
 
     std::optional<RobotId> blue_robot_with_ball;
