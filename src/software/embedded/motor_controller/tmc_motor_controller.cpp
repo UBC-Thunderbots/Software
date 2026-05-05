@@ -61,16 +61,27 @@ TmcMotorController::TmcMotorController()
 int TmcMotorController::readThenWriteVelocity(const MotorIndex motor,
                                               const int target_velocity)
 {
-    const int velocity_erpm = readThenWriteValue(
-        motor, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET, target_velocity);
-
     if (motor == MotorIndex::DRIBBLER)
     {
+        const int velocity_erpm = readThenWriteValue(
+            motor, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET,
+            target_velocity * DRIBBLER_MOTOR_ELECTRICAL_RPM_PER_MECHANICAL_RPM);
         return velocity_erpm * DRIBBLER_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
     }
-
-    return velocity_erpm * DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
+    else
+    {
+        const int velocity_erpm = readThenWriteValue(
+            motor, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET,
+            target_velocity * DRIVE_MOTOR_ELECTRICAL_RPM_PER_MECHANICAL_RPM);
+        return velocity_erpm * DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
+    }
 }
+
+void TmcMotorController::updateEuclideanVelocity(
+    EuclideanSpace_t target_euclidean_velocity)
+{
+}
+
 
 void TmcMotorController::writeToDriverOrDieTrying(const uint8_t motor,
                                                   const uint8_t address,
