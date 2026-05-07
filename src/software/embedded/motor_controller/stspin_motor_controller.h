@@ -50,7 +50,7 @@ class StSpinMotorController : public MotorController
     static constexpr int RESET_GPIO_PIN = 12;
 
     static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
-    static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 270;
+    static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 300;
 
     RobotConstants robot_constants_;
 

@@ -94,6 +94,14 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity() const
             distance_to_destination / MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES;
     }
 
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+        {"orientation", orientation_.toRadians()},
+        {"angular_velocity", angular_velocity_.toRadians()},
+        {"target_angular_velocity", angular_velocity.toRadians()},
+        {"expected_orientation", expected_orientation.toRadians()},
+        {"acceleration", angular_trajectory_->getAcceleration(time_since_linear_trajectory_creation_.toSeconds()).toRadians()},
+    });
+
     return angular_velocity;
 }
 

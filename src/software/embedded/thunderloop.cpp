@@ -286,35 +286,31 @@ void Thunderloop::runLoop()
                                           robot_localizer_.getOrientation()),
                     createAngularVelocity(status.angular_velocity()));
 
-                const Vector target_velocity =
-                    localToGlobalVelocity(createVector(status.target_local_velocity()),
-                                          robot_localizer_.getOrientation());
-                const AngularVelocity target_angular_velocity =
-                    createAngularVelocity(status.target_angular_velocity());
+                // const Vector target_velocity =
+                //     localToGlobalVelocity(createVector(status.target_local_velocity()),
+                //                           robot_localizer_.getOrientation());
+                // const AngularVelocity target_angular_velocity =
+                //     createAngularVelocity(status.target_angular_velocity());
 
-                const Vector delta_velocity = target_velocity - last_target_velocity_;
-                const AngularVelocity delta_angular_velocity =
-                    target_angular_velocity - last_target_angular_velocity_;
+                // const Vector delta_velocity = target_velocity - last_target_velocity_;
+                // const AngularVelocity delta_angular_velocity =
+                //     target_angular_velocity - last_target_angular_velocity_;
 
-                last_target_velocity_         = target_velocity;
-                last_target_angular_velocity_ = target_angular_velocity;
+                // last_target_velocity_         = target_velocity;
+                // last_target_angular_velocity_ = target_angular_velocity;
 
-                robot_localizer_.step(delta_velocity, delta_angular_velocity);
+                robot_localizer_.step(Vector(), AngularVelocity::zero());
 
                 primitive_executor_.updateState(robot_localizer_.getPosition(),
                                                 robot_localizer_.getVelocity(),
                                                 robot_localizer_.getOrientation(),
                                                 robot_localizer_.getAngularVelocity());
 
-                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                    {"position_x", robot_localizer_.getPosition().x()},
-                    {"position_y", robot_localizer_.getPosition().y()},
-                    {"velocity_x", robot_localizer_.getVelocity().x()},
-                    {"velocity_y", robot_localizer_.getVelocity().y()},
-                    {"orientation", robot_localizer_.getOrientation().toRadians()},
-                    {"angular_velocity",
-                     robot_localizer_.getAngularVelocity().toRadians()},
-                });
+                // LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                //     {"orientation", robot_localizer_.getOrientation().toRadians()},
+                //     {"angular_velocity",
+                //      robot_localizer_.getAngularVelocity().toRadians()},
+                // });
             }
 
             // Timeout Overrides for Primitives

@@ -32,7 +32,7 @@ RobotConstants create2026RobotConstants()
 
         // Kalman filter variances for robot localizer
         .kalman_process_noise_variance_rad_per_s_4      = 1.0f,
-        .kalman_vision_noise_variance_rad_2             = 0.01f * 0.01f,
+        .kalman_vision_noise_variance_rad_2             = 0.01f,
         .kalman_motor_sensor_noise_variance_rad_per_s_2 = 0.5};
 }
 

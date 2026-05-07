@@ -44,9 +44,10 @@ void StSpinMotorController::setup()
 
     for (const MotorIndex motor : driveMotors())
     {
-        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 500, .ki = 60});
-
-        sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 806, .ki = 154});
+        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 0, .ki = 0});
+        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 300, .ki = 10});
+        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 500, .ki = 30});
+        sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 700, .ki = 30});
         sendAndReceiveFrame(motor, SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = 0});
     }
 }
