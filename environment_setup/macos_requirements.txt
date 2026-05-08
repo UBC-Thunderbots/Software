@@ -2,9 +2,6 @@ ansible-lint==26.4.0
 thefuzz==0.19.0
 iterfzf==0.5.0.20.0
 python-Levenshtein==0.25.1
-
-
 ruff==0.5.5
-
 grpcio-tools==1.71.0
 platformio==6.1.18
