@@ -13,7 +13,7 @@
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_vertex;
 
-VoronoiDiagram::VoronoiDiagram(const std::vector<Point> &points)
+VoronoiDiagram::VoronoiDiagram(const std::vector<Point>& points)
     : diagram(std::make_shared<boost::polygon::voronoi_diagram<double>>())
 {
     construct_voronoi(points.begin(), points.end(), diagram.get());
@@ -21,7 +21,7 @@ VoronoiDiagram::VoronoiDiagram(const std::vector<Point> &points)
 }
 
 std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(
-    const Rectangle &bounding_box)
+    const Rectangle& bounding_box)
 {
     std::vector<Point> intersects;
 
@@ -70,7 +70,7 @@ std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(
 }
 
 std::vector<Circle> VoronoiDiagram::voronoiVerticesToOpenCircles(
-    const Rectangle &bounding_box)
+    const Rectangle& bounding_box)
 {
     // For each vertex, construct it's delauney triangle and then compute the largest
     // empty circle around it
@@ -107,7 +107,7 @@ std::vector<Circle> VoronoiDiagram::voronoiVerticesToOpenCircles(
                     // Find the smallest distance from the vertex to a vertex on it's
                     // corresponding delauney triangle
                     std::vector<double> radii;
-                    for (auto const &triangle_vertex : triangle)
+                    for (auto const& triangle_vertex : triangle)
                     {
                         radii.emplace_back(
                             (Point(vertex.x(), vertex.y()) - triangle_vertex).length());

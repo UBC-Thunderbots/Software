@@ -42,11 +42,6 @@
     - [Boost-ext SML Library](#boost-ext-sml-library)
     - [How Do We Use SML?](#how-do-we-use-sml)
     - [SML Best Practices](#sml-best-practices)
-  - [Coroutines](#coroutines)
-    - [What Are Coroutines?](#what-are-coroutines)
-    - [What Coroutines Do We Use?](#what-coroutines-do-we-use)
-    - [How Do We Use Coroutines?](#how-do-we-use-coroutines)
-    - [Coroutine Best Practices](#coroutine-best-practices)
   - [Motion Planning](#motion-planning)
     - [Trajectory Planner](#trajectory-planner)
     - [Trajectory Generation and Obstacle Avoidance](#trajectory-generation-and-obstacle-avoidance)
@@ -78,7 +73,9 @@
 
 # Architecture Overview
 
-At a high-level, our system is split into several independent processes that [communicate with each other](#inter-process-communication). Our architecture is designed in this manner to promote decoupling of different features, making our system easier to expand, maintain, and test.
+![High-Level Architecture Diagram](images/high_level_architecture.svg)
+
+At a high-level, our system is split into several independent processes that [communicate with each other](#inter-process-communication). Our architecture is designed in this manner to promote decoupling of different features, making our software easier to expand, maintain, and test.
 
 - [**Fullsystem**](#fullsystem) is the program that processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [**Sensor Fusion**](#sensor-fusion), which is responsible for processing and filtering raw data, and the [**AI**](#ai) that makes gameplay decisions.
 
@@ -431,101 +428,6 @@ Boost-ext SML is a library that supports complex functionality with similarly co
   FSM<DriveForwardFSM> fsm(DriveForwardFSM(10.0));
   ```
 
-## Coroutines
-
-> [!IMPORTANT]  
-> We are currently in the process of moving away from using coroutines and transitioning to using [finite-state machines](#finite-state-machines) for all our STP logic.
-
-### What Are Coroutines?
-Coroutines are a general control structure where the flow control is cooperatively passed between two different routines without returning, by allowing execution to be suspended and resumed. This is very similar to the `yield` statement and generators in `Python`.
-
-Rather than using the `return` keyword to return data, coroutines use the `yield` keyword. The main difference is that when `return` is encountered, the data is returned and the function terminates. If the function is called again, it starts back from the beginning. On the other hand, when `yield` is encountered some data is returned, but the state of the function / coroutine is saved and the function does not terminate. This means that when the function is called again, execution resumes immediately after the `yield` statement that previously returned the data, with all the previous context (variables, etc) as if the function never stopped running. This is the "suspend and resume" functionality of coroutines.
-
-See the following C++ pseudocode for an example. This coroutine function computes and returns the fibonacci sequence.
-```c++
-int fib(Coroutine::push_type& yield) 
-{
-    int f1 = 1;
-    int f2 = 0;
-    while (true) 
-    {
-        int fn = f1 + f2; // Compute the next value in the sequence
-        f2 = f1; // Save the previous 2 values
-        f1 = fn;
-        yield(fn);
-    }
-}
-
-int main() 
-{
-    // Coroutine setup stuff
-    // Lets pretend that we have created the Coroutine and called it `yield`
-    std::cout << fib(yield) << std::endl; // Prints 1
-    std::cout << fib(yield) << std::endl; // Prints 2
-    std::cout << fib(yield) << std::endl; // Prints 3
-    std::cout << fib(yield) << std::endl; // Prints 5
-    std::cout << fib(yield) << std::endl; // Prints 8
-    // and so on...
-}
-```
-Lets walk through what's happening here:
-1. The first time the `fib` function is called, the variables `f1` and `f2` are initialized, and we go through the first iteration of the loop until `yield` is encountered
-2. The `yield` statement is going to return the currently computed value of the fibonacci sequence (the variable `fn`) and save the state of the `fib` function
-* "yielding" the data here is effectively returning it so that the code in the `main` function can print the result
-3. The second time `main()` calls the `fib()` function, the function will resume immediately after the `yield()` statement. This means that execution will go back to the top of the loop, *and still remember the values of `f1` and `f2` from the last time the function was called*. Since the coroutine saved the function state, it still has the previous values of `f1` and `f2` which it uses to compute the next value in the sequence.
-4. Once again when the `yield()` statement is reached, the newly computed value is returned and the function state is saved. You can think of this as "pausing" the function.
-5. As `main()` keeps calling the `fib()` function, it is computing and returning the values of the fibonacci sequence, and this only works because the coroutine "remembers" the values from each previous fibonacci computation which it uses to compute the next value the next time the function is called.
-* If the `yield` was replaced with a regular `return` statement, the function would only ever return the value `1`. This is because using `return` would not save the function state, so the next time it's called the function would start at the beginning again, and only ever compute the first value of the sequence.
-
-
-This example / pseudocode does hide away some details about how coroutines are set up and how we extract values from them, but it's most important to understand how coroutines change the flow of control in the program.
-
-
-### What Coroutines Do We Use?
-We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs/coroutine2/doc/html/index.html). Specifically, we use Asymmetric Coroutines.
-
-[This Stack Overflow answer](https://stackoverflow.com/a/42042904) gives a decent explanation of the difference between Symmetric and Asymmetric Coroutines, but understanding the difference is not critical for our purposes. We use Asymmetric Coroutines because boost does not provide Symmetric Coroutines, and the hierarchical structure of Asymmetric Coroutines is more useful to us.
-
-
-### How Do We Use Coroutines?
-
-We use Coroutines to write some of our [strategy logic](#strategy). The "pause and resume" functionality of Coroutines makes it much easier to write [Plays](#plays).
-
-Specifically, we use Coroutines as a way to break down our strategy into "stages". Once a "stage" completes we generally don't want to re-evaluate it, and would rather commit to a decision and move on. Coroutines makes it much easier to write "stages" of strategy without requiring complex state machine logic to check what stage we are in, and it's easier for developers to see what the intended order of operations is (eg. "Line up to take the shot" -> "shoot").
-
-In the past, we had issues with our gameplay logic "committing" to decisions if we were near certain edge cases. This caused robots to behave oddly, and sometimes get significantly slowed down in "analysis paralysis". Coroutines solve this problem by allowing us to write "stages" that execute top-to-bottom in a function, and once we make a decision we commit to it and move on to the next stage.
-
-Here's a more specific example. In this example we are going to pretend to write a [Tactic](#tactic) that will pass the ball.
-```c++
-def executeStrategy(IntentCoroutine::push_type& yield, Pass pass) 
-{
-    do 
-    {
-        yield(/* align the robot to make the pass */)
-    } while (current_time < pass.start_time);
-    
-    do 
-    {
-        yield(/* kick the ball at the pass location */)
-    } while (/* robot has not kicked the ball */)
-}
-```
-We will pretend that this function is getting called 30 times per second to get the most up-to-date gameplay decision.
-
-In this example, each `do while()` loop is a "stage". When the function is first called, we enter the first stage. In this stage, we will keep telling the robot to line up behind the ball to be ready to make the pass. The robot will continue to do this until it is time to start the pass.
-
-Once it is time to start the pass, the condition for the loop will become false and we will exit the loop. Then we enter the second loop / stage. The second stage tells the robot to kick the ball, and this continues until the ball has been kicked. Once the ball has been kicked, the loop will terminate and the function will end because the execution reaches the end of the function.
-
-Once we have entered the second stage, we know we don't have to look at the first stage again. Because the coroutine "remembers" where the execution is each time the function is called, we will resume inside the second stage and therefore never execute the first stage again! This makes it much easier to write and read this strategy code, because we can clearly see the 2 stages of the strategy, and we know they will be executed in order.
-
-### Coroutine Best Practices
-Coroutines are a complex feature, and the boost coroutines we use don't always behave in was we expect. We have done extensive testing on how coroutines are safe (or not safe) to us, and derived some best practices from these examples. See [coroutine_test_exmaples.cpp](coroutine_test_examples.cpp) for the full code and more detailed explanantions.
-
-To summarize, the best practices are as follows:
-1. Avoid moving coroutines. If the absolutely must be moved, make sure they are not moved between the stack and heap.
-2. Avoid using coroutines with resizable containers. If they must be used, make sure that the coroutines are allocated on the heap.
-3. Pass data to the coroutine on creation as much as possible, avoid using member variables.
-
 ## Motion Planning
 
 Our **motion planning** (navigation) system is responsible for trajectory planning and obstacle avoidance.
@@ -550,7 +452,7 @@ Trajectories are generated by sampling intermediate *sub-destinations* around th
 
 # Thunderscope
 
-**Thunderscope** chiefly refers to the [GUI application](#thunderscope-gui) we use to visualize and interact with our robots and software. Some non-UI related functionality (namely, Robot Communication) is implemented as part of Thunderscope since it acts as a central point in our architecture, making it convenient for coordinating activities between different modules.
+**Thunderscope** refers to the [GUI application](#thunderscope-gui) we use to visualize and interact with our robots and software. Some non-UI related functionality (namely, Robot Communication) is implemented as part of Thunderscope since it acts as a central point in our architecture, making it convenient for coordinating activities between different modules.
 
 [`thunderscope_main.py`](/src/software/thunderscope/thunderscope_main.py) serves as the main entry point ("launcher") for our entire system. You can run the script to start up the [Thunderscope GUI](#thunderscope-gui) and a number of other optional processes, such as a [Fullsystem](#fullsystem) for each [AI](#ai) team, the [Simulator](#simulator), and [SSL Gamecontroller](#ssl-gamecontroller).
 
@@ -617,7 +519,7 @@ Our simulator is what we use for physics simulation to do testing when we don't 
 * [SSL-Vision](#ssl-vision) by publishing new vision data
 * the robots by accepting new [Primitives](#primitives)
 
-Using the current state of the simulated world, the simulator simulates the new [Primitives](#primitives) over some time step and publishes new SSL vision data based on the updated simulated world. Since the simulator interfaces with the our software over the network, it is essentially indistinguishible from robots receiving [Primitives](#primitives) and an [SSL-Vision](#ssl-vision) client publishing data over the network.
+Using the current state of the simulated world, the simulator simulates the new [Primitives](#primitives) over some time step and publishes new SSL vision data based on the updated simulated world. Since the simulator interfaces with the our software over the network, it is essentially indistinguishable from robots receiving [Primitives](#primitives) and an [SSL-Vision](#ssl-vision) client publishing data over the network.
 
 The simulation can also be configured with "realism" parameters that control the amount of noise added to vision detections, simulate missed vision detections and packet loss, and add artificial vision/processing delay, all with some degree of randomness. 
 
@@ -650,7 +552,7 @@ A `Validation Function` comes in two types:
 2. Non-terminating: Some condition that must be met for the entire duration of the test, i.e. "for all time". (*Eg. The ball never leaves the field or all friendly robots follows SSL rules*).
 
 Benefits of `Validation Functions`:
-1. They are reuseable. We can write a function that validates the ball never leaves the field, and use it for multiple tests.
+1. They are reusable. We can write a function that validates the ball never leaves the field, and use it for multiple tests.
 2. They can represent assertions for more complex behaviour. For example, we can build up simpler `Validation Functions` until we have a single `Validation` function for a specific [Tactic](#tactics).
 3. They let us validate independent sequences of behaviour. For example, we create a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
 

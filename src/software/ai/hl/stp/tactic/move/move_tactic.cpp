@@ -2,22 +2,9 @@
 
 #include <algorithm>
 
-MoveTactic::MoveTactic()
-    : Tactic({RobotCapability::Move}),
-      fsm_map(),
-      control_params{
-          .destination             = Point(),
-          .final_orientation       = Angle::zero(),
-          .dribbler_mode           = TbotsProto::DribblerMode::OFF,
-          .ball_collision_type     = TbotsProto::BallCollisionType::AVOID,
-          .auto_chip_or_kick       = {AutoChipOrKickMode::OFF, 0},
-          .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-          .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE}
+MoveTactic::MoveTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticBase<MoveFSM>({RobotCapability::Move}, ai_config_ptr)
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<MoveFSM>>();
-    }
 }
 
 void MoveTactic::updateControlParams(
@@ -51,17 +38,7 @@ void MoveTactic::updateControlParams(
     control_params.obstacle_avoidance_mode = obstacle_avoidance_mode;
 }
 
-void MoveTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
-{
-    if (reset_fsm)
-    {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<MoveFSM>>();
-    }
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(MoveFSM::Update(control_params, tactic_update));
-}
-
-void MoveTactic::accept(TacticVisitor &visitor) const
+void MoveTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

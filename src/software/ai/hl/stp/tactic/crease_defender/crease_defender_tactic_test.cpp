@@ -5,12 +5,12 @@
 #include <utility>
 
 #include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
-#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -23,7 +23,8 @@ class CreaseDefenderTacticTest
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr =
+        std::make_shared<TbotsProto::AiConfig>();
 };
 
 TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
@@ -38,7 +39,7 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
         TestUtil::createStationaryRobotStatesWithId({initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config_ptr);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);
 
@@ -81,7 +82,7 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config_ptr);
 
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);

@@ -4,19 +4,13 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 
-BallPlacementPlay::BallPlacementPlay(TbotsProto::AiConfig config)
-    : Play(config, true), fsm{BallPlacementPlayFSM{config}}, control_params{}
+BallPlacementPlay::BallPlacementPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayBase<BallPlacementPlayFSM>(ai_config_ptr, true)
 {
 }
 
-void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                       const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing, will be removed once
-    // coroutines are phased out
-}
-
-void BallPlacementPlay::updateTactics(const PlayUpdate &play_update)
+void BallPlacementPlay::updateTactics(const PlayUpdate& play_update)
 {
     auto event = BallPlacementPlayFSM::Update(control_params, play_update);
     fsm.process_event(event);
@@ -41,5 +35,6 @@ std::vector<std::string> BallPlacementPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, BallPlacementPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, BallPlacementPlay,
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

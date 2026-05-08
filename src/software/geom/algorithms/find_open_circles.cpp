@@ -6,7 +6,7 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/voronoi_diagram.h"
 
-std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
+std::vector<Circle> findOpenCircles(const Rectangle& bounding_box,
                                     std::vector<Point> points)
 {
     // We use a Voronoi Diagram and it's Delaunay triangulation to find the largest
@@ -25,10 +25,10 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
     // on the triangle that this vertex was created from
 
     // Filters out points that are outside of the bounding box
-    points.erase(
-        std::remove_if(points.begin(), points.end(), [&bounding_box](const Point &p)
-                       { return !contains(bounding_box, p); }),
-        points.end());
+    points.erase(std::remove_if(points.begin(), points.end(),
+                                [&bounding_box](const Point& p)
+                                { return !contains(bounding_box, p); }),
+                 points.end());
 
     std::vector<Circle> empty_circles;
 
@@ -44,7 +44,7 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
     {
         // If there is only 1 point, return circles centered at all four corners of the
         // bounding bounding_box.
-        for (const Point &corner : bounding_box.getPoints())
+        for (const Point& corner : bounding_box.getPoints())
         {
             empty_circles.emplace_back(
                 Circle(corner, (points.front() - corner).length()));
@@ -71,7 +71,7 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
         std::vector<Point> corners = bounding_box.getPoints();
         std::copy(corners.begin(), corners.end(),
                   std::inserter(intersections, intersections.end()));
-        for (const Point &intersect : intersections)
+        for (const Point& intersect : intersections)
         {
             double radius =
                 (findClosestPoint(intersect, points).value() - intersect).length();
@@ -85,7 +85,7 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
 
     // The corners of the rectangles are locations for the centre of circles with their
     // radius being the distance to the corner's closest point.
-    for (const Point &corner : bounding_box.getPoints())
+    for (const Point& corner : bounding_box.getPoints())
     {
         Point closest = findClosestPoint(corner, points).value();
         empty_circles.emplace_back(Circle(corner, (corner - closest).length()));
@@ -95,10 +95,10 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
 
     // Radius of the circle will be the distance from the interception point
     // to the nearest input point.
-    for (const Point &p : intersects)
+    for (const Point& p : intersects)
     {
         double radius = (points[0] - p).length();
-        for (const Point &inputP : points)
+        for (const Point& inputP : points)
         {
             radius = std::min(radius, (inputP - p).length());
         }
@@ -117,8 +117,8 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
     return empty_circles;
 }
 
-std::optional<Point> findClosestPoint(const Point &origin_point,
-                                      const std::vector<Point> &test_points)
+std::optional<Point> findClosestPoint(const Point& origin_point,
+                                      const std::vector<Point>& test_points)
 {
     std::optional<Point> closest_point = std::nullopt;
 
@@ -126,7 +126,7 @@ std::optional<Point> findClosestPoint(const Point &origin_point,
     {
         closest_point =
             *std::min_element(test_points.begin(), test_points.end(),
-                              [&](const Point &test_point1, const Point &test_point2)
+                              [&](const Point& test_point1, const Point& test_point2)
                               {
                                   return (origin_point - test_point1).lengthSquared() <
                                          (origin_point - test_point2).lengthSquared();

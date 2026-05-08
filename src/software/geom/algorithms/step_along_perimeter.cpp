@@ -1,10 +1,12 @@
 #include "software/geom/algorithms/step_along_perimeter.h"
 
 #include <algorithm>
+#include <cmath>
 #include <vector>
 
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/geom/geom_constants.h"
 #include "software/geom/segment.h"
 
 
@@ -21,7 +23,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     // finds the point closest to start point on the segment
     Point closest_start = closestPoint(start, polygon_segments[start_segment_index]);
 
-    if (travel_distance == 0.0)
+    if (std::abs(travel_distance) < FIXED_EPSILON)
     {
         return closest_start;
     }

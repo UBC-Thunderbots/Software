@@ -5,10 +5,10 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
-#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -36,7 +36,8 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
     // force passing for this test by setting min acceptable shot angle very high
     ai_config.mutable_attacker_tactic_config()->set_min_open_angle_for_shot_deg(90);
 
-    auto tactic = std::make_shared<AttackerTactic>(ai_config);
+    auto tactic = std::make_shared<AttackerTactic>(
+        std::make_shared<TbotsProto::AiConfig>(ai_config));
     tactic->updateControlParams(pass, true);
     setTactic(1, tactic);
 

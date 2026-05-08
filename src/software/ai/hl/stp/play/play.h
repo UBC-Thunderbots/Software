@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
@@ -35,10 +35,11 @@ class Play
     /**
      * Creates a new Play
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
+    explicit Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
+                  bool requires_goalie);
 
     /**
      * Gets Primitives from the Play given the the world, and inter-play communication
@@ -72,8 +73,9 @@ class Play
     virtual std::vector<std::string> getState();
 
    protected:
-    // The Play configuration
-    TbotsProto::AiConfig ai_config;
+    // A shared pointer to the ai configuration to configure ai behaviour, shared by all
+    // Plays, Tactics, and FSMs
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
@@ -95,7 +97,7 @@ class Play
      * @param play_update The PlayUpdate struct that contains all the information for
      * updating the tactics
      */
-    virtual void updateTactics(const PlayUpdate& play_update);
+    virtual void updateTactics(const PlayUpdate& play_update) = 0;
 
    private:
     /**
@@ -114,77 +116,12 @@ class Play
     assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
                   const std::vector<Robot>& robots_to_assign);
 
-    /**
-     * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
-     * order of priority. The Tactic at the beginning of the vector has the highest
-     * priority, and the Tactic at the end has the lowest priority.
-     *
-     * shared_ptrs are used so that the Play can own the objects (and have control over
-     * updating the Tactic parameters, etc), but callers of this function can still
-     * access their updated state. Using unique_ptrs wouldn't allow the Play to maintain
-     * the Tactic's state because the objects would have to be constructed and moved every
-     * time the function is called.
-     *
-     * TODO (#2359): delete once all plays are not coroutines
-     *
-     * @param world The current state of the world
-     * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
-     * order of priority
-     */
-    PriorityTacticVector getTactics(const WorldPtr& world_ptr);
-
-    /**
-     * A wrapper function for the getNextTactics function.
-     *
-     * This function exists because when the coroutine (tactic_sequence) is first
-     * constructed the coroutine is called/entered. This would normally cause the
-     * getNextTactics to be run once and potentially return incorrect results
-     * due to default constructed values.
-     *
-     * This wrapper function will yield an empty vector the first time it's called and
-     * otherwise use the getNextTactics function. This first "empty" value will never
-     * be seen/used by the rest of the system since this will be during construction,
-     * and the coroutine will be called again with valid parameters before any values are
-     * returned. This effectively "shields" the logic from any errors caused by default
-     * values during construction.
-     *
-     * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
-     * this time, in order of priority. This yield happens in place of a return.
-     *
-     * TODO (#2359): delete once all plays are not coroutines
-     *
-     * @param yield The coroutine push_type for the Play
-     */
-    void getNextTacticsWrapper(TacticCoroutine::push_type& yield);
-
-    /**
-     * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
-     * this time, in order of priority. This yield happens in place of a return.
-     *
-     * TODO (#2359): delete once all plays are not coroutines
-     *
-     * @param yield The coroutine push_type for the Play
-     * @param world The current state of the world
-     */
-    virtual void getNextTactics(TacticCoroutine::push_type& yield,
-                                const WorldPtr& world_ptr) = 0;
 
     // HaltTactics common to all plays for robots that don't have tactics assigned
     TacticVector halt_tactics;
 
     // Whether this play requires a goalie
     const bool requires_goalie;
-
-    // TODO (#2359): remove this
-    // The coroutine that sequentially returns the Tactics the Play wants to run
-    TacticCoroutine::pull_type tactic_sequence;
-
-    // TODO (#2359): remove this
-    // The Play's knowledge of the most up-to-date World
-    std::optional<WorldPtr> world_ptr_;
-
-    // TODO (#2359): remove this
-    PriorityTacticVector priority_tactics;
 
     uint64_t sequence_number = 0;
 

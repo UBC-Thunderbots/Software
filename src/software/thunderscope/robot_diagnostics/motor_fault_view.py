@@ -7,7 +7,7 @@ from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_
 )
 from software.thunderscope.common.proto_parameter_tree_util import get_string_val
 from software.thunderscope.common.common_widgets import display_tooltip
-from typing import Any
+from typing import Any, override
 from proto.import_all_protos import *
 
 
@@ -59,6 +59,7 @@ class MotorFaultView(QWidget):
 
         self.setLayout(self.layout)
 
+    @override
     def event(self, event: QEvent) -> bool:
         """Overridden event function which intercepts all events
         On hover, displays a tooltip with all the current motor faults if any

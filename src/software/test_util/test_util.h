@@ -6,7 +6,7 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive.pb.h"
-#include "proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 #include "software/geom/algorithms/almost_equal.h"
 #include "software/geom/geom_constants.h"
@@ -61,9 +61,9 @@ std::shared_ptr<World> createBlankTestingWorld(TbotsProto::Field field_proto);
  * @param robot_positions The positions to place friendly robots in
  * @return A new world object with friendly robots in the given positions
  */
-void setFriendlyRobotPositions(const std::shared_ptr<World> &world,
+void setFriendlyRobotPositions(const std::shared_ptr<World>& world,
                                std::vector<Point> robot_positions,
-                               const Timestamp &timestamp);
+                               const Timestamp& timestamp);
 
 /**
  * Returns a new World object with enemy robots in the positions specified
@@ -75,9 +75,9 @@ void setFriendlyRobotPositions(const std::shared_ptr<World> &world,
  * @param robot_positions The positions to place enemy robots in
  * @return A new world object with enemy robots in the given positions
  */
-void setEnemyRobotPositions(const std::shared_ptr<World> &world,
+void setEnemyRobotPositions(const std::shared_ptr<World>& world,
                             std::vector<Point> robot_positions,
-                            const Timestamp &timestamp);
+                            const Timestamp& timestamp);
 
 /**
  * Returns a new World object with the Ball placed in the new position
@@ -87,7 +87,7 @@ void setEnemyRobotPositions(const std::shared_ptr<World> &world,
  * @param ball_position The new position for the ball
  * @return A new World object with the ball placed in the given position
  */
-void setBallPosition(const std::shared_ptr<World> &world, Point ball_position,
+void setBallPosition(const std::shared_ptr<World>& world, Point ball_position,
                      Timestamp timestamp);
 
 /**
@@ -97,7 +97,7 @@ void setBallPosition(const std::shared_ptr<World> &world, Point ball_position,
  * @param ball_velocity The new velocity for the ball
  * @return A new World object with the ball's velocity set to the new velocity
  */
-void setBallVelocity(const std::shared_ptr<World> &world, Vector ball_velocity,
+void setBallVelocity(const std::shared_ptr<World>& world, Vector ball_velocity,
                      Timestamp timestamp);
 
 /**
@@ -108,7 +108,7 @@ void setBallVelocity(const std::shared_ptr<World> &world, Vector ball_velocity,
  * @param pt the point
  * @return a robot at the point
  */
-Robot createRobotAtPos(const Point &pt);
+Robot createRobotAtPos(const Point& pt);
 
 /**
  * Gets the number of milliseconds since the start_time
@@ -137,8 +137,8 @@ double secondsSince(std::chrono::time_point<std::chrono::system_clock> start_tim
  * @param robot_positions The positions of the robots
  * @return A new team with robots placed at the given positions
  */
-Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,
-                             const Timestamp &timestamp);
+Team setRobotPositionsHelper(Team team, const std::vector<Point>& robot_positions,
+                             const Timestamp& timestamp);
 
 /**
  * Creates a list of RobotStateWithId at given positions with 0 velocity, 0 angular
@@ -147,7 +147,7 @@ Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_position
  * @param positions The positions to create robots at
  */
 std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
-    const std::vector<Point> &positions);
+    const std::vector<Point>& positions);
 
 /**
  * Creates a list of RobotStateWithId at given positions with input velocity, 0
@@ -158,7 +158,7 @@ std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
  * @param velocity The velocities given to each robot
  */
 std::vector<RobotStateWithId> createMovingRobotStatesWithId(
-    const std::vector<Point> &positions, const std::vector<Vector> &velocity);
+    const std::vector<Point>& positions, const std::vector<Vector>& velocity);
 
 /**
  * Create a new GameState and update it with the previous_referee_command
@@ -169,6 +169,6 @@ std::vector<RobotStateWithId> createMovingRobotStatesWithId(
  * @param previous_referee_command The name of the previous referee command to set
  * @return the new GameState
  */
-GameState createGameState(const RefereeCommand &current_referee_command,
-                          const RefereeCommand &previous_referee_command);
+GameState createGameState(const RefereeCommand& current_referee_command,
+                          const RefereeCommand& previous_referee_command);
 };  // namespace TestUtil

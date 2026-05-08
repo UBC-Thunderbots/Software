@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "goalie_tactic",
@@ -58,8 +58,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:speed_threshold_helpers",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/validation:validations",
         requirement("pytest"),
     ],
 )

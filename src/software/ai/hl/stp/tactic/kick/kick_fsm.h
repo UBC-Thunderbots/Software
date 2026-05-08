@@ -1,11 +1,14 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/geom/point.h"
 
-struct KickFSM
+/**
+ * Finite State Machine class for Kicks
+ */
+struct KickFSM : TacticFSM<KickFSM>
 {
-   public:
     class KickState;
 
     struct ControlParams
@@ -18,14 +21,21 @@ struct KickFSM
         double kick_speed_meters_per_second;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    using Update = TacticFSM<KickFSM>::Update;
+
+    /**
+     * Constructor for KickFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit KickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that updates the MovePrimitive
      *
      * @param event KickFSM::Update event
      */
-    void updateKick(const Update &event);
+    void updateKick(const Update& event);
 
     /**
      * Action that updates the GetBehindBallFSM
@@ -34,7 +44,7 @@ struct KickFSM
      * @param processEvent processes the GetBehindBallFSM::Update
      */
     void updateGetBehindBall(
-        const Update &event,
+        const Update& event,
         boost::sml::back::process<GetBehindBallFSM::Update> processEvent);
 
     /**
@@ -44,7 +54,7 @@ struct KickFSM
      *
      * @return if the ball has been chicked
      */
-    bool ballChicked(const Update &event);
+    bool ballChicked(const Update& event);
 
     /**
      * Guard that checks if the robot is aligned for the kick
@@ -53,7 +63,7 @@ struct KickFSM
      *
      * @return if the robot is aligned for the kick
      */
-    bool shouldRealignWithBall(const Update &event);
+    bool shouldRealignWithBall(const Update& event);
 
 
     auto operator()()

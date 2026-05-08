@@ -16,7 +16,7 @@ template <typename T>
 class FirstInFirstOutThreadedObserver : public ThreadedObserver<T>
 {
    public:
-    FirstInFirstOutThreadedObserver() : ThreadedObserver<T>() {};
+    FirstInFirstOutThreadedObserver() : ThreadedObserver<T>(){};
 
     /**
      * Creates a new FirstInFirstOutThreadedObserver

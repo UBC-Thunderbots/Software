@@ -1,4 +1,4 @@
-#include "shared/uart_framing/uart_framing.hpp"
+#include "uart_framing.hpp"
 
 #include <gtest/gtest.h>
 extern "C"
@@ -100,7 +100,8 @@ class UartFramingTest : public ::testing::Test
     }
 
     TbotsProto_PowerPulseControl test_message;
-    const uint16_t TEST_MESSAGE_CRC = 14297;  // From online calculator
+
+    const uint16_t TEST_MESSAGE_CRC = 60410;
 };
 
 bool operator==(const TbotsProto_PowerPulseControl& lhs,
@@ -147,5 +148,9 @@ TEST_F(UartFramingTest, marshalling_test)
     EXPECT_EQ(test_frame_unmarshalled.length, TbotsProto_PowerPulseControl_size);
     EXPECT_EQ(test_frame_unmarshalled.crc, TEST_MESSAGE_CRC);
     EXPECT_EQ(test_frame_unmarshalled.power_msg.power_control, test_message);
+    EXPECT_EQ(test_frame_unmarshalled.power_msg.power_control.chicker.chicker_command
+                  .auto_chip_or_kick.auto_chip_or_kick.autochip_pulse_width,
+              test_message.chicker.chicker_command.auto_chip_or_kick.auto_chip_or_kick
+                  .autochip_pulse_width);
     EXPECT_TRUE(verifyLengthAndCrc(test_frame_unmarshalled));
 }

@@ -1,0 +1,88 @@
+#pragma once
+
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/ai/passing/pass_with_rating.h"
+#include "software/util/sml_fsm/sml_fsm.h"
+#include "software/world/world.h"
+
+using TacticVector              = std::vector<std::shared_ptr<Tactic>>;
+using PriorityTacticVector      = std::vector<TacticVector>;
+using ConstTacticVector         = std::vector<std::shared_ptr<const Tactic>>;
+using ConstPriorityTacticVector = std::vector<ConstTacticVector>;
+
+// Struct used to communicate between plays
+struct InterPlayCommunication
+{
+    std::optional<PassWithRating> last_committed_pass;
+};
+
+// This callback is used to return tactics from the fsm
+using SetTacticsCallback                = std::function<void(PriorityTacticVector)>;
+using SetInterPlayCommunicationCallback = std::function<void(InterPlayCommunication)>;
+
+// The play update struct is used to update plays and set the new tactics
+struct PlayUpdate
+{
+    PlayUpdate(const WorldPtr& world_ptr, unsigned int num_tactics,
+               const SetTacticsCallback& set_tactics_fun,
+               const InterPlayCommunication& inter_play_communication,
+               const SetInterPlayCommunicationCallback& set_inter_play_communication_fun)
+        : world_ptr(world_ptr),
+          num_tactics(num_tactics),
+          set_tactics(set_tactics_fun),
+          inter_play_communication(inter_play_communication),
+          set_inter_play_communication_fun(set_inter_play_communication_fun)
+    {
+    }
+    // updated world
+    WorldPtr world_ptr;
+    // Number of tactics to set
+    unsigned int num_tactics;
+    // callback to return the next tactics
+    SetTacticsCallback set_tactics;
+    // inter-play communication
+    InterPlayCommunication inter_play_communication;
+    // callback to return inter-play communication
+    SetInterPlayCommunicationCallback set_inter_play_communication_fun;
+};
+
+/**
+ * A general FSM class with some utilities for plays.
+ *
+ * @tparam PFsm the Play FSM that inherits from an instance of this template.
+ * See https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
+ */
+template <class PFsm>
+class PlayFSM
+{
+   public:
+    /**
+     * The Update struct is the only event that a play FSM should respond to and it is
+     * composed of the following structs:
+     *
+     * control_params - uniquely defined by each play to control the FSM
+     * common - common struct that contains World and SetTacticsCallback
+     */
+    struct Update
+    {
+        Update(const PFsm::ControlParams& control_params, const PlayUpdate& common)
+            : control_params(control_params), common(common)
+        {
+        }
+        PFsm::ControlParams control_params;
+        PlayUpdate common;
+    };
+
+    explicit PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
+   protected:
+    // A shared pointer to the ai configuration to configure ai behaviour, shared by all
+    // Plays, Tactics, and FSMs
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
+};
+
+template <class PFsm>
+PlayFSM<PFsm>::PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : ai_config_ptr(ai_config_ptr)
+{
+}

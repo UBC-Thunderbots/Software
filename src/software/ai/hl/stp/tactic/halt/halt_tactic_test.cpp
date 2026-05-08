@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include "software/simulated_tests/cpp_validation/validation_function.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
-#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
 class HaltTacticTest : public SimulatedErForceSimPlayTestFixture
@@ -23,7 +23,7 @@ TEST_F(HaltTacticTest, robot_already_stopped)
         {Point(-3, 2.5), Point()}, {Vector(), Vector()});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<HaltTactic>();
+    auto tactic = std::make_shared<HaltTactic>(std::make_shared<TbotsProto::AiConfig>());
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -50,7 +50,7 @@ TEST_F(HaltTacticTest, robot_start_moving)
         {Point(-3, 2.5), Point()}, {Vector(), Vector(4, 4)});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<HaltTactic>();
+    auto tactic = std::make_shared<HaltTactic>(std::make_shared<TbotsProto::AiConfig>());
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

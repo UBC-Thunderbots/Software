@@ -17,6 +17,7 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.graphics.gl_stadium import GLStadium
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLDebugShapesLayer(GLLayer):
@@ -46,6 +47,7 @@ class GLDebugShapesLayer(GLLayer):
         self.stadium_shape_graphics = ObservableList(self._graphics_changed)
         self.stadium_shape_name_graphics = ObservableList(self._graphics_changed)
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         # Add all new shapes to the map

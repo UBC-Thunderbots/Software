@@ -6,8 +6,8 @@
 #include "software/math/math_functions.h"
 
 std::vector<DefenderAssignment> getAllDefenderAssignments(
-    const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball,
-    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig &config)
+    const std::vector<EnemyThreat>& threats, const Field& field, const Ball& ball,
+    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig& config)
 {
     if (threats.size() == 0)
     {
@@ -77,7 +77,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         groupGoalLanesByDensity(goal_lanes, config.goal_lane_density_threshold());
 
     // Determine crease defender assignments based on goal lanes
-    for (const auto &goal_lanes_group : grouped_goal_lanes)
+    for (const auto& goal_lanes_group : grouped_goal_lanes)
     {
         // We include a non-dense bonus when rating crease defender assignment
         // if the goal lane is not part of a dense cluster
@@ -87,7 +87,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
             nondense_bonus = config.goal_lane_nondense_bonus();
         }
 
-        for (const auto &goal_lane : goal_lanes_group)
+        for (const auto& goal_lane : goal_lanes_group)
         {
             auto threat_position   = goal_lane.lane.getStart();
             double coverage_rating = goal_lane.threat_rating + nondense_bonus;
@@ -103,7 +103,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     // Remove pass defender assignments with targets in the defense area
     assignments.erase(
         std::remove_if(assignments.begin(), assignments.end(),
-                       [&field](const auto &assignment)
+                       [&field](const auto& assignment)
                        {
                            return assignment.type == PASS_DEFENDER &&
                                   field.pointInFriendlyDefenseArea(assignment.target);
@@ -111,15 +111,16 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         assignments.end());
 
     // Sort the potential assignments by coverage rating in descending order
-    std::sort(assignments.begin(), assignments.end(), [](const auto &a, const auto &b)
+    std::sort(assignments.begin(), assignments.end(),
+              [](const auto& a, const auto& b)
               { return a.coverage_rating > b.coverage_rating; });
 
     return assignments;
 }
 
-std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats,
+std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat>& threats,
                                                  double min_distance,
-                                                 const Angle &min_angle)
+                                                 const Angle& min_angle)
 {
     std::vector<EnemyThreat> filtered_threats;
 
@@ -127,7 +128,7 @@ std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> 
     auto primary_threat = threats.front();
     filtered_threats.emplace_back(primary_threat);
 
-    for (const auto &threat : threats)
+    for (const auto& threat : threats)
     {
         double distance_between_threats =
             distance(threat.robot.position(), primary_threat.robot.position());
@@ -171,7 +172,7 @@ std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> 
 }
 
 std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
-    std::vector<GoalLane> &goal_lanes, double density_threshold)
+    std::vector<GoalLane>& goal_lanes, double density_threshold)
 {
     if (goal_lanes.size() == 0)
     {
@@ -179,7 +180,8 @@ std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
     }
 
     // Sort goal lanes by angle to the goal in increasing order
-    std::sort(goal_lanes.begin(), goal_lanes.end(), [](const auto &a, const auto &b)
+    std::sort(goal_lanes.begin(), goal_lanes.end(),
+              [](const auto& a, const auto& b)
               { return a.angle_to_goal < b.angle_to_goal; });
 
     std::vector<std::vector<GoalLane>> groups;

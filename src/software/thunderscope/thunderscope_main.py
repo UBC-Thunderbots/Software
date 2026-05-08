@@ -8,20 +8,22 @@ import threading
 import google.protobuf
 from google.protobuf.internal import api_implementation
 
-protobuf_impl_type = api_implementation.Type()
-assert protobuf_impl_type == "upb", (
-    f"Trying to use the {protobuf_impl_type} protobuf implementation. "
-    "Please use the upb implementation, available in python protobuf version 4.21.0 and above."
-    f"The current version of protobuf is {google.protobuf.__version__}"
+from software.thunderscope.binary_context_managers.runtime_manager import (
+    runtime_manager_instance,
 )
+from software.thunderscope.log.stats.stats import Stats
 
 from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
+from software.thunderscope.constants import (
+    EstopMode,
+    ProtoUnixIOTypes,
+)
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
@@ -31,9 +33,14 @@ from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
+protobuf_impl_type = api_implementation.Type()
+assert protobuf_impl_type == "upb", (
+    f"Trying to use the {protobuf_impl_type} protobuf implementation. "
+    "Please use the upb implementation, available in python protobuf version 4.21.0 and above."
+    f"The current version of protobuf is {google.protobuf.__version__}"
+)
 
 ###########################################################################
 #                         Thunderscope Main                               #
@@ -99,6 +106,14 @@ if __name__ == "__main__":
         help="Visualize C++ Tests",
     )
     parser.add_argument(
+        "--log_level",
+        action="store",
+        help="Minimum g3log level for full_system logs",
+        choices=[level for level in LogLevels],
+        default=LogLevels.DEBUG,
+        type=LogLevels,
+    )
+    parser.add_argument(
         "--blue_log",
         action="store",
         help="Replay folder for the blue full_system",
@@ -151,12 +166,7 @@ if __name__ == "__main__":
         default=0,
         help="Which channel to communicate over",
     )
-    parser.add_argument(
-        "--enable_radio",
-        action="store_true",
-        default=False,
-        help="Whether to use radio (True) or Wi-Fi (False) for sending primitives to robots",
-    )
+
     parser.add_argument(
         "--visualization_buffer_size",
         action="store",
@@ -182,6 +192,12 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Runs the simulation with sped-up time",
+    )
+    parser.add_argument(
+        "--enable_autogc",
+        action="store_true",
+        default=False,
+        help="Automatically handles gamecontroller referee events",
     )
     parser.add_argument(
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
@@ -225,6 +241,14 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="whether or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
+    )
+
+    parser.add_argument(
+        "--record_stats",
+        action="store",
+        type=int,
+        default=0,
+        help="Record stats about fullsystem performance (during AI vs AI) for a set amount of time in minutes",
     )
 
     args = parser.parse_args()
@@ -325,7 +349,8 @@ if __name__ == "__main__":
 
         with (
             Gamecontroller(
-                suppress_logs=(not args.verbose), use_conventional_port=False
+                suppress_logs=(not args.verbose),
+                use_conventional_port=False,
             )
             if args.launch_gc
             else contextlib.nullcontext()
@@ -364,6 +389,7 @@ if __name__ == "__main__":
                     friendly_colour_yellow=friendly_colour_yellow,
                     should_restart_on_crash=True,
                     run_sudo=args.sudo,
+                    log_level=args.log_level,
                 ) as full_system:
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
@@ -403,6 +429,11 @@ if __name__ == "__main__":
             layout_path=args.layout,
         )
 
+        if args.record_stats:
+            args.ci_mode = True
+            args.enable_autogc = True
+            args.enable_autoref = True
+
         def __ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
 
@@ -427,25 +458,33 @@ if __name__ == "__main__":
                     tick_rate_ms, tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], tscope
                 )
 
+        # Fetch the AI runtime/backends
+        runtime_config = runtime_manager_instance.fetch_runtime_config()
+
         # Launch all binaries
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
+            path_to_binary=runtime_config.get_blue_runtime_path(),
             full_system_runtime_dir=args.blue_full_system_runtime_dir,
             debug_full_system=args.debug_blue_full_system,
             friendly_colour_yellow=False,
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
+            log_level=args.log_level,
         ) as blue_fs, FullSystem(
+            path_to_binary=runtime_config.get_yellow_runtime_path(),
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
             friendly_colour_yellow=True,
             should_restart_on_crash=False,
             run_sudo=args.sudo,
             running_in_realtime=(not args.ci_mode),
+            log_level=args.log_level,
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose),
+            automate_referee=args.enable_autogc,
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -459,15 +498,32 @@ if __name__ == "__main__":
             )
             if args.enable_autoref
             else contextlib.nullcontext()
-        ) as autoref:
+        ) as autoref, (
+            Stats(
+                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                record_enemy_stats=True,
+            )
+            if args.record_stats
+            else contextlib.nullcontext()
+        ) as blue_stats, (
+            Stats(proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+            if args.record_stats
+            else contextlib.nullcontext()
+        ) as yellow_stats:
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
 
             blue_fs.setup_proto_unix_io(tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+
             yellow_fs.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
+
+            if args.record_stats:
+                tscope.register_refresh_function(blue_stats.refresh)
+                tscope.register_refresh_function(yellow_stats.refresh)
+
             simulator.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
@@ -503,7 +559,12 @@ if __name__ == "__main__":
                 # call so we need to somehow close it before doing our resource cleanup
                 exiter_thread = threading.Thread(
                     target=exit_poller,
-                    args=(autoref, CI_DURATION_S, lambda: tscope.close()),
+                    args=(
+                        (args.record_stats * SECONDS_PER_MINUTE)
+                        if args.record_stats
+                        else CI_DURATION_S,
+                        lambda: tscope.close(),
+                    ),
                     daemon=True,
                 )
 

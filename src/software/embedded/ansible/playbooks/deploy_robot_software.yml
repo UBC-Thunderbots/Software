@@ -14,6 +14,9 @@
       robot_diagnostics_cli_tar: ../../robot_diagnostics_cli/robot_diagnostics_cli_tar.tar.gz
 
   tasks:
+    - name: Copy SSH public key
+      ansible.builtin.import_tasks: ../tasks/copy_ssh_key.yml
+
     - name: Log Robot ID
       ansible.builtin.debug:
         msg: "[Robot ID = {{ inventory_hostname }}]"

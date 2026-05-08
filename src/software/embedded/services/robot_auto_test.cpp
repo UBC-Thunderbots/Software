@@ -10,9 +10,9 @@
 
 extern "C"
 {
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
-#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
-#include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
+#include "tmc/ic/TMC4671/TMC4671.h"
+#include "tmc/ic/TMC4671/TMC4671_Variants.h"
+#include "tmc/ic/TMC6100/TMC6100.h"
 }
 
 std::unique_ptr<MotorService> motor_service_;
@@ -32,11 +32,11 @@ constexpr double THRESHOLD              = 0.0001;
 constexpr int DELAY_NS                  = 10000;
 std::string runtime_dir                 = "/tmp/tbots/yellow_test";
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     LoggerSingleton::initializeLogger(runtime_dir, nullptr, false);
 
-    LOG(INFO) << "Running on the Jetson Nano!";
+    LOG(INFO) << "Running on the Raspberry Pi!";
 
     motor_service_ =
         std::make_unique<MotorService>(create2021RobotConstants(), THUNDERLOOP_HZ);
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
             LOG(WARNING) << "Sequence number is zero";
         }
     }
-    catch (std::runtime_error &e)
+    catch (std::runtime_error& e)
     {
         LOG(WARNING) << "Unable to communicate with the power board";
     }

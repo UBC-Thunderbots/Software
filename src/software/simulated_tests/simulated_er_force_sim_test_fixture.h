@@ -4,8 +4,8 @@
 #include "shared/test_util/tbots_gtest_main.h"
 #include "software/ai/hl/stp/play/halt_play/halt_play.h"
 #include "software/sensor_fusion/sensor_fusion.h"
-#include "software/simulated_tests/validation/non_terminating_function_validator.h"
-#include "software/simulated_tests/validation/terminating_function_validator.h"
+#include "software/simulated_tests/cpp_validation/non_terminating_function_validator.h"
+#include "software/simulated_tests/cpp_validation/terminating_function_validator.h"
 #include "software/simulation/er_force_simulator.h"
 
 /**
@@ -56,12 +56,12 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * will fail.
      */
     void runTest(
-        const TbotsProto::FieldType &field_type, const BallState &ball,
-        const std::vector<RobotStateWithId> &friendly_robots,
-        const std::vector<RobotStateWithId> &enemy_robots,
-        const std::vector<ValidationFunction> &terminating_validation_functions,
-        const std::vector<ValidationFunction> &non_terminating_validation_functions,
-        const Duration &timeout, const bool ramping = false);
+        const TbotsProto::FieldType& field_type, const BallState& ball,
+        const std::vector<RobotStateWithId>& friendly_robots,
+        const std::vector<RobotStateWithId>& enemy_robots,
+        const std::vector<ValidationFunction>& terminating_validation_functions,
+        const std::vector<ValidationFunction>& non_terminating_validation_functions,
+        const Duration& timeout, const bool ramping = false);
 
     /**
      * Registers a new tick time for calculating friendly tick time statistics
@@ -100,9 +100,9 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     bool tickTest(Duration simulation_time_step, Duration ai_time_step,
                   std::shared_ptr<World> friendly_world,
                   std::shared_ptr<World> enemy_world,
-                  std::shared_ptr<ErForceSimulator> simulator, double &ball_displacement,
-                  double &ball_velocity_diff, std::vector<double> &robots_displacement,
-                  std::vector<double> &robots_velocity_diff);
+                  std::shared_ptr<ErForceSimulator> simulator, double& ball_displacement,
+                  double& ball_velocity_diff, std::vector<double>& robots_displacement,
+                  std::vector<double>& robots_velocity_diff);
 
     /**
      * Sets configs that are common to the friendly and enemy teams
@@ -110,7 +110,7 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @param mutable_thunderbots_config A mutable thunderbots config
      */
     static void setCommonConfigs(
-        TbotsProto::ThunderbotsConfig &mutable_thunderbots_config);
+        TbotsProto::ThunderbotsConfig& mutable_thunderbots_config);
 
     /**
      * A helper function that updates SensorFusion with the latest data from the
@@ -128,7 +128,7 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @param simulator_to_update The simulator to update
      */
     virtual void updatePrimitives(
-        const World &friendly_world, const World &enemy_world,
+        const World& friendly_world, const World& enemy_world,
         std::shared_ptr<ErForceSimulator> simulator_to_update) = 0;
 
     /**
@@ -151,9 +151,9 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * TerminatingFunctionValidators have completed, and false otherwise
      */
     static bool validateAndCheckCompletion(
-        std::vector<TerminatingFunctionValidator> &terminating_function_validators,
-        std::vector<NonTerminatingFunctionValidator>
-            &non_terminating_function_validators);
+        std::vector<TerminatingFunctionValidator>& terminating_function_validators,
+        std::vector<NonTerminatingFunctionValidator>&
+            non_terminating_function_validators);
 
     /**
      * Puts the current thread to sleep such that each simulation step will take
@@ -164,8 +164,8 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @param desired_wall_tick_time How long each simulation step should take
      * in wall-clock time
      */
-    static void sleep(const std::chrono::steady_clock::time_point &wall_start_time,
-                      const Duration &desired_wall_tick_time);
+    static void sleep(const std::chrono::steady_clock::time_point& wall_start_time,
+                      const Duration& desired_wall_tick_time);
 
     // The simulator needs to be a pointer so that we can destroy and re-create
     // the object in the SetUp function. Because the simulator has no

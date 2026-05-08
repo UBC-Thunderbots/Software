@@ -12,7 +12,6 @@ cc_library(
         "test_util.h",
     ],
     deps = [
-        "//proto:tbots_cc_proto",
         "//proto:tbots_nanopb_proto",
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",

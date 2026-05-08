@@ -13,7 +13,7 @@ template <typename T>
 class LastInFirstOutThreadedObserver : public ThreadedObserver<T>
 {
    public:
-    LastInFirstOutThreadedObserver() : ThreadedObserver<T>() {};
+    LastInFirstOutThreadedObserver() : ThreadedObserver<T>(){};
     explicit LastInFirstOutThreadedObserver<T>(size_t buffer_size)
         : ThreadedObserver<T>(buffer_size){};
     std::optional<T> getNextValue(const Duration& max_wait_time) final;

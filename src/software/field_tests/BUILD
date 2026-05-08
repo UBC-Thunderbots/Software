@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
 
 py_library(
     name = "field_test_fixture",
@@ -16,7 +16,7 @@ py_library(
         "//software/networking/unix:threaded_unix_listener_py",
         "//software/networking/unix:threaded_unix_sender_py",
         "//software/simulated_tests:tbots_test_runner",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/validation:validations",
         "//software/thunderscope",
         "//software/thunderscope:constants",
         "//software/thunderscope:estop_helpers",
@@ -39,7 +39,7 @@ py_test(
     deps = [
         "//software:conftest",
         "//software/simulated_tests:tbots_test_runner",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/validation:validations",
         requirement("pytest"),
     ],
 )
@@ -56,7 +56,7 @@ py_test(
     deps = [
         "//software:conftest",
         "//software/simulated_tests:tbots_test_runner",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/validation:validations",
         requirement("pytest"),
     ],
 )
@@ -68,7 +68,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/simulated_tests/validation:validations",
         requirement("pytest"),
     ],
 )

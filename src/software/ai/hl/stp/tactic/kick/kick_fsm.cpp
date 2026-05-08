@@ -2,7 +2,12 @@
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
-void KickFSM::updateKick(const Update &event)
+KickFSM::KickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<KickFSM>(ai_config_ptr)
+{
+}
+
+void KickFSM::updateKick(const Update& event)
 {
     Vector direction_to_kick =
         Vector::createFromAngle(event.control_params.kick_direction);
@@ -19,7 +24,7 @@ void KickFSM::updateKick(const Update &event)
 }
 
 void KickFSM::updateGetBehindBall(
-    const Update &event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
 {
     GetBehindBallFSM::ControlParams control_params{
         .ball_location   = event.control_params.kick_origin,
@@ -29,15 +34,15 @@ void KickFSM::updateGetBehindBall(
     processEvent(GetBehindBallFSM::Update(control_params, event.common));
 }
 
-bool KickFSM::ballChicked(const Update &event)
+bool KickFSM::ballChicked(const Update& event)
 {
     return event.common.world_ptr->ball().hasBallBeenKicked(
         event.control_params.kick_direction);
 }
 
-bool KickFSM::shouldRealignWithBall(const Update &event)
+bool KickFSM::shouldRealignWithBall(const Update& event)
 {
-    const Robot &robot = event.common.robot;
+    const Robot& robot = event.common.robot;
 
     // First check to see if it's too late to realign with the ball
     if (robot.isNearDribbler(event.control_params.kick_origin, 0.05))

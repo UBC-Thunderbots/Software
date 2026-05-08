@@ -62,7 +62,7 @@ TEST(FindOpenCirclesTest, test_find_open_circles_two_points_in_rectangle)
         Point expected_origin  = expected_origin_and_radius.first;
         double expected_radius = expected_origin_and_radius.second;
 
-        for (const Circle &empty_circle : empty_circles)
+        for (const Circle& empty_circle : empty_circles)
         {
             if (expected_origin == empty_circle.origin())
             {

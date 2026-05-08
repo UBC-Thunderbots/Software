@@ -5,9 +5,11 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-std::unique_ptr<Play> createPlay(const TbotsProto::Play& play_proto,
-                                 TbotsProto::AiConfig ai_config)
+std::unique_ptr<Play> createPlay(
+    const TbotsProto::Play& play_proto,
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
-    return GenericFactory<std::string, Play, TbotsProto::AiConfig>::create(
-        TbotsProto::PlayName_Name(play_proto.name()), ai_config);
+    return GenericFactory<std::string, Play,
+                          std::shared_ptr<const TbotsProto::AiConfig>>::
+        create(TbotsProto::PlayName_Name(play_proto.name()), ai_config_ptr);
 }

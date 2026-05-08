@@ -17,16 +17,17 @@ struct EnemyFreeKickPlayFSM : public DefensePlayFSMBase
     /**
      * Creates a enemy free kick play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit EnemyFreeKickPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit EnemyFreeKickPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action to configure the play for defensive gameplay for enemy free kick
      *
      * @param event the FSM event
      */
-    void blockEnemyKicker(const Update &event);
+    void blockEnemyKicker(const Update& event);
 
     /**
      * Helper function to set the tactics for the play depending on the
@@ -35,7 +36,7 @@ struct EnemyFreeKickPlayFSM : public DefensePlayFSMBase
      * @param event the FSM event
      * @param num_tactics the number of tactics available to assign
      */
-    void setTactics(const Update &event, unsigned int num_tactics);
+    void setTactics(const Update& event, unsigned int num_tactics);
 
     auto operator()()
     {

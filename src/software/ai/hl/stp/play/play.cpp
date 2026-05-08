@@ -10,82 +10,23 @@
 #include "software/logger/logger.h"
 
 
-Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
-    : ai_config(ai_config),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
+Play::Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
+           bool requires_goalie)
+    : ai_config_ptr(ai_config_ptr),
+      goalie_tactic(std::make_shared<GoalieTactic>(ai_config_ptr)),
       halt_tactics(),
       requires_goalie(requires_goalie),
-      tactic_sequence(
-          std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1)),
-      world_ptr_(std::nullopt),
-      obstacle_factory(ai_config.robot_navigation_obstacle_config())
+      obstacle_factory(ai_config_ptr->robot_navigation_obstacle_config())
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
-        halt_tactics.push_back(std::make_shared<HaltTactic>());
+        halt_tactics.push_back(std::make_shared<HaltTactic>(ai_config_ptr));
     }
-}
-
-PriorityTacticVector Play::getTactics(const WorldPtr &world_ptr)
-{
-    // Update the member variable that stores the world. This will be used by the
-    // getNextTacticsWrapper function (inside the coroutine) to pass the World data to
-    // the getNextTactics function. This is easier than directly passing the World data
-    // into the coroutine
-    world_ptr_ = world_ptr;
-    // Check the coroutine status to see if it has any more work to do.
-    if (tactic_sequence)
-    {
-        // Run the coroutine. This will call the bound getNextTactics function
-        tactic_sequence();
-    }
-    else
-    {
-        // Make a new tactic_sequence
-        tactic_sequence = TacticCoroutine::pull_type(
-            std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1));
-        // Run the coroutine. This will call the bound getNextTactics function
-        tactic_sequence();
-    }
-
-    // Check if the coroutine is still valid before getting the result. This makes
-    // sure we don't try get the result after "running out the bottom" of the
-    // coroutine function
-    if (tactic_sequence)
-    {
-        // Extract the result from the coroutine. This will be whatever value was
-        // yielded by the getNextTactics function
-        auto next_tactics = tactic_sequence.get();
-        return next_tactics;
-    }
-    else
-    {
-        // Make a new tactic_sequence
-        tactic_sequence = TacticCoroutine::pull_type(
-            std::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1));
-        // Run the coroutine. This will call the bound getNextTactics function
-        tactic_sequence();
-        if (tactic_sequence)
-        {
-            // Extract the result from the coroutine. This will be whatever value was
-            // yielded by the getNextTactics function
-            auto next_tactics = tactic_sequence.get();
-            return next_tactics;
-        }
-        else
-        {
-            LOG(WARNING) << "Failed to restart play" << std::endl;
-        }
-    }
-    // If the coroutine "iterator" is done, the getNextTactics function has completed
-    // and has no more work to do. Therefore, the Play is done so we return an empty
-    // vector
-    return PriorityTacticVector();
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
-    const WorldPtr &world_ptr, const InterPlayCommunication &inter_play_communication,
-    const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
+    const WorldPtr& world_ptr, const InterPlayCommunication& inter_play_communication,
+    const SetInterPlayCommunicationCallback& set_inter_play_communication_fun)
 {
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
@@ -99,9 +40,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         ZoneNamedN(_tracy_tactics, "Play: Get Tactics from Play", true);
 
         updateTactics(PlayUpdate(
-            world_ptr, num_tactics, [&priority_tactics](PriorityTacticVector new_tactics)
-            { priority_tactics = std::move(new_tactics); }, inter_play_communication,
-            set_inter_play_communication_fun));
+            world_ptr, num_tactics,
+            [&priority_tactics](PriorityTacticVector new_tactics)
+            { priority_tactics = std::move(new_tactics); },
+            inter_play_communication, set_inter_play_communication_fun));
     }
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
@@ -201,11 +143,12 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
             tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
-            for (auto &[robot_id, primitive] :
+            for (auto& [robot_id, primitive] :
                  new_primitives_to_assign->robot_primitives())
             {
                 primitives_to_run->mutable_robot_primitives()->insert(
-                    google::protobuf::MapPair(robot_id, primitive));
+                    google::protobuf::MapPair<uint32_t, TbotsProto::Primitive>(
+                        robot_id, primitive));
             }
 
             robots = remaining_robots;
@@ -224,39 +167,16 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     return primitives_to_run;
 }
 
-const std::map<std::shared_ptr<const Tactic>, RobotId> &Play::getTacticRobotIdAssignment()
+const std::map<std::shared_ptr<const Tactic>, RobotId>& Play::getTacticRobotIdAssignment()
     const
 {
     return tactic_robot_id_assignment;
 }
 
-void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
-{
-    // Yield an empty vector the very first time the function is called. This value will
-    // never be seen/used by the rest of the system.
-    yield({});
-
-    // The getNextTactics function is given the World as a parameter rather than using
-    // the member variable since it's more explicit and obvious where the World
-    // comes from when implementing Plays. The World is passed as a reference, so when
-    // the world member variable is updated the implemented Plays will have access
-    // to the updated world as well.
-    if (world_ptr_)
-    {
-        getNextTactics(yield, world_ptr_.value());
-    }
-}
-
-// TODO (#2359): delete once all plays are not coroutines
-void Play::updateTactics(const PlayUpdate &play_update)
-{
-    play_update.set_tactics(getTactics(play_update.world_ptr));
-}
-
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
            std::map<std::shared_ptr<const Tactic>, RobotId>>
-Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
-                    const std::vector<Robot> &robots_to_assign)
+Play::assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
+                    const std::vector<Robot>& robots_to_assign)
 {
     std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();
@@ -384,10 +304,10 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 primitives_to_run->mutable_robot_primitives()->insert(
                     {robot_id, *primitive_proto});
                 remaining_robots.erase(
-                    std::remove_if(
-                        remaining_robots.begin(), remaining_robots.end(),
-                        [robots_to_assign, row](const Robot &robot)
-                        { return robot.id() == robots_to_assign.at(row).id(); }),
+                    std::remove_if(remaining_robots.begin(), remaining_robots.end(),
+                                   [robots_to_assign, row](const Robot& robot) {
+                                       return robot.id() == robots_to_assign.at(row).id();
+                                   }),
                     remaining_robots.end());
 
                 primitives[robot_id]->getVisualizationProtos(obstacle_list,

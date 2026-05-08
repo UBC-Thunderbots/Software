@@ -27,10 +27,10 @@ class Primitive
     virtual std::pair<std::optional<TrajectoryPath>,
                       std::unique_ptr<TbotsProto::Primitive>>
     generatePrimitiveProtoMessage(
-        const World &world,
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const std::map<RobotId, TrajectoryPath> &robot_trajectories,
-        const RobotNavigationObstacleFactory &obstacle_factory) = 0;
+        const World& world,
+        const std::set<TbotsProto::MotionConstraint>& motion_constraints,
+        const std::map<RobotId, TrajectoryPath>& robot_trajectories,
+        const RobotNavigationObstacleFactory& obstacle_factory) = 0;
 
     /**
      * Fill the obstacle list and path visualization with the obstacles and path
@@ -40,8 +40,8 @@ class Primitive
      * @param path_visualization_out Reference to the PathVisualization proto to add path
      */
     virtual void getVisualizationProtos(
-        TbotsProto::ObstacleList &obstacle_list_out,
-        TbotsProto::PathVisualization &path_visualization_out) const = 0;
+        TbotsProto::ObstacleList& obstacle_list_out,
+        TbotsProto::PathVisualization& path_visualization_out) const = 0;
 
     /**
      * Gets the estimated cost of the primitive

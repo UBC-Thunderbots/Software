@@ -1,9 +1,10 @@
 #pragma once
 
-#include <pb_decode.h>
-
 #include <cstdint>
+#include <iostream>
 #include <vector>
+
+#include "pb_decode.h"
 
 #ifdef PLATFORMIO_BUILD
 #include <power_frame_msg_platformio.h>
@@ -209,14 +210,14 @@ bool inline unmarshalUartPacket(const std::vector<uint8_t>& data,
     {
         return false;
     }
-    if (decoded.size() != TbotsProto_PowerFrame_size)
+    if (decoded.size() > TbotsProto_PowerFrame_size)
     {
         return false;
     }
     frame = TbotsProto_PowerFrame_init_default;
     pb_istream_t stream =
         pb_istream_from_buffer(static_cast<uint8_t*>(decoded.data()), decoded.size());
-    if (!pb_decode(&stream, TbotsProto_PowerFrame_fields, &frame))
+    if (!pb_decode_nullterminated(&stream, TbotsProto_PowerFrame_fields, &frame))
     {
         return false;
     }

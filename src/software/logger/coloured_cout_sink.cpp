@@ -1,5 +1,6 @@
 #include "software/logger/coloured_cout_sink.h"
 
+#include "g3log/loglevels.hpp"
 #include "software/logger/custom_logging_levels.h"
 
 ColouredCoutSink::ColouredCoutSink(bool print_detailed, bool reduce_repetition)
@@ -69,7 +70,7 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     }
 }
 
-void ColouredCoutSink::displaySingleLog(g3::LogMessage &log)
+void ColouredCoutSink::displaySingleLog(g3::LogMessage& log)
 {
     auto level  = log._level;
     auto colour = colourToString(getColour(level));

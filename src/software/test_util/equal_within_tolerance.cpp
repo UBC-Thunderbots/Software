@@ -4,9 +4,9 @@
 
 namespace TestUtil
 {
-::testing::AssertionResult equalWithinTolerance(const Duration &duration1,
-                                                const Duration &duration2,
-                                                const Duration &tolerance)
+::testing::AssertionResult equalWithinTolerance(const Duration& duration1,
+                                                const Duration& duration2,
+                                                const Duration& tolerance)
 {
     if (std::abs((duration1 - duration2).toMilliseconds()) <
         std::abs(tolerance.toMilliseconds()))
@@ -20,13 +20,13 @@ namespace TestUtil
     }
 }
 
-::testing::AssertionResult equalWithinTolerance(const Polygon &poly1,
-                                                const Polygon &poly2, double tolerance)
+::testing::AssertionResult equalWithinTolerance(const Polygon& poly1,
+                                                const Polygon& poly2, double tolerance)
 {
     auto ppts1 = poly1.getPoints();
     auto ppts2 = poly2.getPoints();
     if (std::equal(ppts1.begin(), ppts1.end(), ppts2.begin(),
-                   [tolerance](const Point &p1, const Point &p2)
+                   [tolerance](const Point& p1, const Point& p2)
                    { return equalWithinTolerance(p1, p2, tolerance); }))
     {
         return ::testing::AssertionSuccess();
@@ -38,8 +38,8 @@ namespace TestUtil
     }
 }
 
-::testing::AssertionResult equalWithinTolerance(const Stadium &stadium1,
-                                                const Stadium &stadium2, double tolerance)
+::testing::AssertionResult equalWithinTolerance(const Stadium& stadium1,
+                                                const Stadium& stadium2, double tolerance)
 {
     if (((equalWithinTolerance(stadium1.segment().getStart(),
                                stadium2.segment().getStart(), tolerance) &&
@@ -60,7 +60,7 @@ namespace TestUtil
     }
 }
 
-::testing::AssertionResult equalWithinTolerance(const Circle &c1, const Circle &c2,
+::testing::AssertionResult equalWithinTolerance(const Circle& c1, const Circle& c2,
                                                 double tolerance)
 {
     if (equalWithinTolerance(c1.origin(), c2.origin(), tolerance) &&
@@ -75,8 +75,8 @@ namespace TestUtil
     }
 }
 
-::testing::AssertionResult equalWithinTolerance(const Angle &a1, const Angle &a2,
-                                                const Angle &tolerance)
+::testing::AssertionResult equalWithinTolerance(const Angle& a1, const Angle& a2,
+                                                const Angle& tolerance)
 {
     // subtract a fixed epsilon for error in:
     // - angle subtraction (internal to minDiff)
@@ -96,7 +96,7 @@ namespace TestUtil
 }
 
 
-::testing::AssertionResult equalWithinTolerance(const Vector &v1, const Vector &v2,
+::testing::AssertionResult equalWithinTolerance(const Vector& v1, const Vector& v2,
                                                 double tolerance)
 {
     double distance = (v1 - v2).length();
@@ -111,7 +111,7 @@ namespace TestUtil
     }
 }
 
-::testing::AssertionResult equalWithinTolerance(const Point &pt1, const Point &pt2,
+::testing::AssertionResult equalWithinTolerance(const Point& pt1, const Point& pt2,
                                                 double tolerance)
 {
     double dist = distance(pt1, pt2);
@@ -143,10 +143,10 @@ namespace TestUtil
     }
 }
 
-::testing::AssertionResult equalWithinTolerance(const RobotState &state1,
-                                                const RobotState &state2,
+::testing::AssertionResult equalWithinTolerance(const RobotState& state1,
+                                                const RobotState& state2,
                                                 const double linear_tolerance,
-                                                const Angle &angular_tolerance)
+                                                const Angle& angular_tolerance)
 {
     auto position_equality_result =
         equalWithinTolerance(state1.position(), state2.position(), linear_tolerance);
@@ -196,10 +196,10 @@ namespace TestUtil
     return assertion_result;
 }
 
-::testing::AssertionResult equalWithinTolerance(const RobotStateWithId &state1,
-                                                const RobotStateWithId &state2,
+::testing::AssertionResult equalWithinTolerance(const RobotStateWithId& state1,
+                                                const RobotStateWithId& state2,
                                                 const double linear_tolerance,
-                                                const Angle &angular_tolerance)
+                                                const Angle& angular_tolerance)
 {
     if (state1.id != state2.id)
     {
@@ -217,8 +217,8 @@ namespace TestUtil
     return ::testing::AssertionSuccess();
 }
 
-::testing::AssertionResult equalWithinTolerance(const BallState &state1,
-                                                const BallState &state2, double tolerance)
+::testing::AssertionResult equalWithinTolerance(const BallState& state1,
+                                                const BallState& state2, double tolerance)
 {
     auto position_equality_result =
         equalWithinTolerance(state1.position(), state2.position(), tolerance);
@@ -247,8 +247,8 @@ namespace TestUtil
     return assertion_result;
 }
 
-::testing::AssertionResult equalWithinTolerance(const Eigen::MatrixXd &matrix1,
-                                                const Eigen::MatrixXd &matrix2,
+::testing::AssertionResult equalWithinTolerance(const Eigen::MatrixXd& matrix1,
+                                                const Eigen::MatrixXd& matrix2,
                                                 double tolerance)
 {
     auto distance = matrix1 - matrix2;

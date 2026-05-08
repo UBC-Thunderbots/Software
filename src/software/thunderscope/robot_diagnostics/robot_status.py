@@ -3,6 +3,7 @@ from pyqtgraph import parametertree
 from proto.import_all_protos import *
 from software.thunderscope.common import proto_parameter_tree_util
 from google.protobuf.message import Message
+from typing import override
 
 
 class RobotStatusView(QWidget):
@@ -40,6 +41,7 @@ class RobotStatusView(QWidget):
 
         self.toggle_visibility()
 
+    @override
     def update(self, new_message: Message, *path: str) -> None:
         """Updates the tree with new values from a new message if the tree is visible
 

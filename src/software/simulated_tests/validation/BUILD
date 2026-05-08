@@ -1,59 +1,33 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "validation_function",
-    testonly = True,
-    hdrs = ["validation_function.h"],
-    deps = [
-        "//software/world",
-        "@boost//:coroutine2",
-        "@gtest",
+py_library(
+    name = "validations",
+    srcs = [
+        "avoid_collisions.py",
+        "ball_enters_region.py",
+        "ball_is_off_ground.py",
+        "ball_moves_in_direction.py",
+        "ball_speed_threshold.py",
+        "ball_stops_in_region.py",
+        "excessive_dribbling.py",
+        "friendly_has_ball_possession.py",
+        "friendly_receives_ball_slow.py",
+        "friendly_team_scored.py",
+        "or_validation.py",
+        "robot_enters_placement_region.py",
+        "robot_enters_region.py",
+        "robot_enters_region_and_stops.py",
+        "robot_speed_threshold.py",
+        "speed_threshold_helpers.py",
+        "validation.py",
     ],
-)
-
-cc_library(
-    name = "terminating_function_validator",
-    testonly = True,
-    srcs = ["terminating_function_validator.cpp"],
-    hdrs = ["terminating_function_validator.h"],
-    deps = [
-        ":validation_function",
-        "@boost//:coroutine2",
+    data = [
+        "//software:py_constants.so",
+        "//software:python_bindings.so",
     ],
-)
-
-cc_test(
-    name = "terminating_function_validator_test",
-    srcs = ["terminating_function_validator_test.cpp"],
     deps = [
-        ":terminating_function_validator",
-        ":validation_function",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "non_terminating_function_validator",
-    testonly = True,
-    srcs = ["non_terminating_function_validator.cpp"],
-    hdrs = ["non_terminating_function_validator.h"],
-    deps = [
-        ":validation_function",
-        "@boost//:coroutine2",
-        "@gtest",
-    ],
-)
-
-cc_test(
-    name = "non_terminating_function_validator_test",
-    srcs = ["non_terminating_function_validator_test.cpp"],
-    deps = [
-        ":non_terminating_function_validator",
-        ":validation_function",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-        "//software/world",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+        "//software/logger:py_logger",
     ],
 )

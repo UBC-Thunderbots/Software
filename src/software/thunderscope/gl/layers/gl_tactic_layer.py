@@ -16,6 +16,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from typing import override
 
 
 class GLTacticLayer(GLLayer):
@@ -37,6 +38,7 @@ class GLTacticLayer(GLLayer):
 
         self.tactic_fsm_info_graphics = ObservableList(self._graphics_changed)
 
+    @override
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         self.cached_world = self.world_buffer.get(block=False)

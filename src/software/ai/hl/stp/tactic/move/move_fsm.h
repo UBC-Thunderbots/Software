@@ -1,10 +1,13 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/geom/point.h"
 
-struct MoveFSM
+/**
+ * Finite State Machine class for Moving
+ */
+struct MoveFSM : TacticFSM<MoveFSM>
 {
-   public:
     // these classes define the states used in the transition table
     // they are exposed so that tests can check if the FSM is in a particular state
     class MoveState;
@@ -29,8 +32,14 @@ struct MoveFSM
         TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
     };
 
-    // this struct defines the only event that the MoveFSM responds to
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    using Update = TacticFSM<MoveFSM>::Update;
+
+    /**
+     * Constructor for MoveFSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    explicit MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * This is an Action that sets the primitive to a move primitive corresponding to the
@@ -38,7 +47,7 @@ struct MoveFSM
      *
      * @param event MoveFSM::Update event
      */
-    void updateMove(const Update &event);
+    void updateMove(const Update& event);
 
     /**
      * This guard is used to check if the robot is done moving
@@ -47,7 +56,7 @@ struct MoveFSM
      *
      * @return if robot has reached the destination
      */
-    bool moveDone(const Update &event);
+    bool moveDone(const Update& event);
 
     auto operator()()
     {

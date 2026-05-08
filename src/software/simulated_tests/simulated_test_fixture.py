@@ -8,8 +8,7 @@ import os
 import pytest
 from proto.import_all_protos import *
 
-
-from software.simulated_tests import validation
+from software.simulated_tests.validation import validation
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -18,15 +17,16 @@ from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.thunderscope_config import configure_simulated_test_view
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 from software.logger.logger import create_logger
+from typing import override
 
 logger = create_logger(__name__)
 
 LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
-TEST_START_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
@@ -60,7 +60,8 @@ class SimulatedTestRunner(TbotsTestRunner):
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
 
-    def set_worldState(self, worldstate: WorldState):
+    @override
+    def set_world_state(self, worldstate: WorldState):
         """Sets the simulation worldstate
 
         :param worldstate: proto containing the desired worldstate
@@ -89,14 +90,39 @@ class SimulatedTestRunner(TbotsTestRunner):
         if self.thunderscope:
             self.thunderscope.close()
 
+    def sync_setup(self, setup, param):
+        """Run setup until simulator has received game state
+
+        :param setup: Function that sets up the world state
+        :param param: Parameter passed into setup
+        """
+        world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
+        self.simulator_proto_unix_io.register_observer(
+            WorldStateReceivedTrigger, world_state_received_buffer
+        )
+
+        while True:
+            setup(param)
+
+            try:
+                world_state_received_buffer.get(
+                    block=True, timeout=WORLD_BUFFER_TIMEOUT
+                )
+            except queue.Empty:
+                # Did not receive a response within timeout period
+                continue
+            else:
+                # Received a response from the simulator
+                break
+
     def runner(
         self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
-        ci_cmd_with_delay=[],
-        run_till_end=True,
+        always_validation_sequence_set,
+        eventually_validation_sequence_set,
+        test_timeout_s,
+        tick_duration_s,
+        ci_cmd_with_delay,
+        run_till_end,
     ):
         """Run a test
 
@@ -107,13 +133,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         :param tick_duration_s: The simulation step duration
-        :param ci_cmd_with_delay: A list consisting of a duration, and a
-                                tuple forming a ci command
-                                {
-                                    (time, command, team),
-                                    (time, command, team),
-                                    ...
-                                }
+        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+                                  [
+                                      (time, command, team),
+                                      (time, command, team),
+                                      ...
+                                  ]
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
@@ -130,7 +155,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
-                    self.gamecontroller.send_ci_input(cmd, team)
+                    self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
                     # remove command from the list
                     ci_cmd_with_delay.remove((delay, cmd, team))
 
@@ -226,13 +251,15 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         self.__stopper()
 
+    @override
     def run_test(
         self,
         always_validation_sequence_set,
         eventually_validation_sequence_set,
         test_timeout_s=3,
-        tick_duration_s=0.0166,
+        tick_duration_s=0.0166,  # Default to 60hz
         index=0,
+        ci_cmd_with_delay=[],
         run_till_end=True,
         **kwargs,
     ):
@@ -244,20 +271,18 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param tick_duration_s: length of a tick
         :param index: index of the current test. default is 0 (invariant test)
                       values can be passed in during aggregate testing for different timeout durations
+        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+                                  [
+                                      (time, command, team),
+                                      (time, command, team),
+                                      ...
+                                  ]
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
         test_timeout_duration = (
             test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
         )
-
-        # Start the test with a delay to allow the simulator to receive
-        # the initial world state. Without this delay, the SimulatorTick
-        # message may be received before the initial world state, causing
-        # the world to be empty, failing some AlwaysValidations
-        # TODO (#2858): Replace delay with an actual feedback from the simulator
-        #  for when it has received the initial world state
-        time.sleep(TEST_START_DELAY_S)
 
         # If thunderscope is enabled, run the test in a thread and show
         # thunderscope on this thread. The excepthook is setup to catch
@@ -271,7 +296,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                     eventually_validation_sequence_set,
                     test_timeout_duration,
                     tick_duration_s,
-                    [],
+                    ci_cmd_with_delay,
                     run_till_end,
                 ],
             )
@@ -289,6 +314,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 eventually_validation_sequence_set,
                 test_timeout_duration,
                 tick_duration_s,
+                ci_cmd_with_delay=ci_cmd_with_delay,
                 run_till_end=run_till_end,
             )
 
@@ -302,6 +328,7 @@ class InvariantTestRunner(SimulatedTestRunner):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @override
     def run_test(
         self,
         setup=(lambda x: None),
@@ -322,7 +349,7 @@ class InvariantTestRunner(SimulatedTestRunner):
         """
         threading.excepthook = self.excepthook
 
-        setup(params[0])
+        super().sync_setup(setup, params[0])
 
         super().run_test(
             inv_always_validation_sequence_set,
@@ -338,9 +365,10 @@ class AggregateTestRunner(SimulatedTestRunner):
     passing iterations to a predetermined acceptable threshold
     """
 
-    def __int__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @override
     def run_test(
         self,
         setup=(lambda arg: None),
@@ -366,7 +394,7 @@ class AggregateTestRunner(SimulatedTestRunner):
         # Catches Assertion Error thrown by failing test and increments counter
         # Calculates overall results and prints them
         for x in range(len(params)):
-            setup(params[x])
+            super().sync_setup(setup, params[x])
 
             try:
                 super().run_test(
@@ -509,12 +537,14 @@ def simulated_test_runner():
         args.debug_simulator,
         args.enable_realism,
     ) as simulator, FullSystem(
+        "software/unix_full_system",
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",
         args.debug_blue_full_system,
         False,
         should_restart_on_crash=False,
         running_in_realtime=args.enable_thunderscope,
     ) as blue_fs, FullSystem(
+        "software/unix_full_system",
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         args.debug_yellow_full_system,
         True,
