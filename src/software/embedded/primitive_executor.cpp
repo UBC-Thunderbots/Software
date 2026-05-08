@@ -103,7 +103,10 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
         // {"angular_velocity", angular_velocity_.toRadians()},
         {"target_angular_velocity", angular_velocity.toRadians()},
         {"expected_orientation", expected_orientation.toRadians()},
-        {"acceleration", angular_trajectory_->getAcceleration(time_since_linear_trajectory_creation_.toSeconds()).toRadians()},
+        {"acceleration",
+         angular_trajectory_
+             ->getAcceleration(time_since_linear_trajectory_creation_.toSeconds())
+             .toRadians()},
     });
 
     return angular_velocity;
