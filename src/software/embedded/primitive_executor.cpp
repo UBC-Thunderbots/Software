@@ -35,8 +35,8 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
             current_primitive_.move().w_traj_params(), orientation_, angular_velocity_,
             robot_constants_);
 
-        time_since_linear_trajectory_creation_  = Duration::fromSeconds(RTT_S / 2);
-        time_since_angular_trajectory_creation_ = Duration::fromSeconds(RTT_S / 2);
+        time_since_linear_trajectory_creation_  = Duration::fromSeconds(RTT_S);
+        time_since_angular_trajectory_creation_ = Duration::fromSeconds(RTT_S);
     }
 }
 
@@ -45,12 +45,12 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
                                     const AngularVelocity& angular_velocity)
 {
     position_         = position;
-    velocity_         = velocity;
+    // velocity_         = velocity;
     orientation_      = orientation;
-    angular_velocity_ = angular_velocity;
+    // angular_velocity_ = angular_velocity;
 }
 
-Vector PrimitiveExecutor::getTargetLinearVelocity() const
+Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
     Vector local_velocity = globalToLocalVelocity(
         trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds()),
@@ -69,10 +69,12 @@ Vector PrimitiveExecutor::getTargetLinearVelocity() const
             distance_to_destination / MAX_DAMPENING_LINEAR_VELOCITY_DISTANCE_M;
     }
 
+    velocity_ = localToGlobalVelocity(local_velocity, orientation_);
+
     return local_velocity;
 }
 
-AngularVelocity PrimitiveExecutor::getTargetAngularVelocity() const
+AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 {
     AngularVelocity angular_velocity = angular_trajectory_->getVelocity(
         time_since_angular_trajectory_creation_.toSeconds());
@@ -94,9 +96,11 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity() const
             distance_to_destination / MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES;
     }
 
+    angular_velocity_ = angular_velocity;
+
     LOG(PLOTJUGGLER) << *createPlotJugglerValue({
         {"orientation", orientation_.toRadians()},
-        {"angular_velocity", angular_velocity_.toRadians()},
+        // {"angular_velocity", angular_velocity_.toRadians()},
         {"target_angular_velocity", angular_velocity.toRadians()},
         {"expected_orientation", expected_orientation.toRadians()},
         {"acceleration", angular_trajectory_->getAcceleration(time_since_linear_trajectory_creation_.toSeconds()).toRadians()},

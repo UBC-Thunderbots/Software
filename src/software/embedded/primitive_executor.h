@@ -58,14 +58,14 @@ class PrimitiveExecutor
      * Compute the next target linear _local_ velocity the robot should be at.
      * @returns Vector The target linear _local_ velocity
      */
-    Vector getTargetLinearVelocity() const;
+    Vector getTargetLinearVelocity();
 
     /*
      * Returns the next target angular velocity the robot
      *
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity getTargetAngularVelocity() const;
+    AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
 
