@@ -15,7 +15,9 @@ if virtual_env := os.environ.get("VIRTUAL_ENV"):
         / "Qt6"
     )
     os.environ["LD_LIBRARY_PATH"] = str(qt_path / "lib")
-    os.environ["QTWEBENGINEPROCESS_PATH"] = str(qt_path / "libexec" / "QtWebEngineProcess")
+    os.environ["QTWEBENGINEPROCESS_PATH"] = str(
+        qt_path / "libexec" / "QtWebEngineProcess"
+    )
 
 
 import pyqtgraph
