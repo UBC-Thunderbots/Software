@@ -482,8 +482,7 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
         AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
         AngularVelocity::fromRadians(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2),
-        AngularVelocity::fromRadians(
-            robot_constants.robot_max_ang_acceleration_rad_per_s_2));
+        AngularVelocity::fromRadians(3));
 }
 
 int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
