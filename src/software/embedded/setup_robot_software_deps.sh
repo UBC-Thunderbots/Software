@@ -51,5 +51,6 @@ fi
 # link platformio to /opt/tbotspython/bin so that bazel can find it
 ln -s $HOME/.platformio/penv/bin/platformio /opt/tbotspython/bin/platformio
 
+# Programmatically enable serial communication for UART
 sudo raspi-config nonint do_serial_hw 0
 sudo raspi-config nonint do_serial_cons 1
