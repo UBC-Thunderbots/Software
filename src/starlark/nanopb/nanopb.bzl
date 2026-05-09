@@ -227,8 +227,10 @@ def _construct_cc_info(
         user_compile_flags = copts,
     )
 
-    # Linker flags required for macos, doesn't affect linux
-    link_flags = ["-Wl,-undefined,dynamic_lookup"]
+    # Flags required for macos linker which allow symbols to be resolved at runtime
+    link_flags = []
+    if "darwin" in cc_toolchain.cpu:
+        link_flags = ["-Wl,-undefined,dynamic_lookup"]
 
     (linking_context, linking_outputs) = \
         cc_common.create_linking_context_from_compilation_outputs(
