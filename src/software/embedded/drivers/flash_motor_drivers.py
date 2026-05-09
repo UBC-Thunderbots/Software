@@ -23,7 +23,6 @@ class MotorDriverFlasher:
 
         self.drivers = drivers
 
-
     def flash(self):
         for i in range(2):
             if self.multiplex[i] == 1:
@@ -31,23 +30,21 @@ class MotorDriverFlasher:
             else:
                 self.drivers[i].off()
 
-
-        print(
-            f"Preparing to flash driver on board {self.board_letter}..."
-        )
-
-
+        print(f"Preparing to flash driver on board {self.board_letter}...")
 
         # Short delay to ensure lines settle
-        time.sleep(.5)
+        time.sleep(0.5)
 
         try:
             # Run OpenOCD
             result = subprocess.run(
                 [
-                    "sudo", "openocd",
-                    "-c", f"set RESET_PIN {MOTOR_DRIVER_RESET_PIN}",
-                    "-f", "stm32_rpi.cfg",
+                    "sudo",
+                    "openocd",
+                    "-c",
+                    f"set RESET_PIN {MOTOR_DRIVER_RESET_PIN}",
+                    "-f",
+                    "stm32_rpi.cfg",
                     # Force the Pi to hold the reset line down during connection
                     "-c",
                     "reset_config srst_only srst_nogate connect_assert_srst",
@@ -73,7 +70,7 @@ class MotorDriverFlasher:
             # We raise to stop the process if one fails, or we could continue.
             # Usually best to know immediately.
             raise e
-    
+
         # After flashing all, ensure all are set to High (Run)
         print(f"Flash to board {self.board_letter} complete.")
         # Let line settle rq
@@ -81,9 +78,11 @@ class MotorDriverFlasher:
 
 
 if __name__ == "__main__":
-    # If no arguments given, 
+    # If no arguments given,
     if not (2 <= len(sys.argv) <= 5):
-        print("Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)")
+        print(
+            "Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)"
+        )
         sys.exit(1)
     
     # Check before attempting to flash if every argument is in BOARD_NAMES
@@ -99,9 +98,7 @@ if __name__ == "__main__":
     DEMUX_DISABLE = LED(DEMUX_DISABLE_PIN)
     DEMUX_DISABLE.off()
 
-
     for i in range(1, len(sys.argv)):
-
         flasher = MotorDriverFlasher(sys.argv[i], drivers)
         flasher.flash()
 
