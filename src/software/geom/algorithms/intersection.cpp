@@ -5,8 +5,8 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/convex_angle.h"
 
-std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
-                                  const Point &d, double fixed_epsilon, int ulps_epsilon)
+std::optional<Point> intersection(const Point& a, const Point& b, const Point& c,
+                                  const Point& d, double fixed_epsilon, int ulps_epsilon)
 {
     double x1 = a.x();
     double y1 = a.y();
@@ -37,7 +37,7 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     return std::make_optional(intersection);
 }
 
-std::vector<Point> intersection(const Segment &first, const Segment &second)
+std::vector<Point> intersection(const Segment& first, const Segment& second)
 {
     if (first == second)
     {
@@ -85,13 +85,13 @@ std::vector<Point> intersection(const Segment &first, const Segment &second)
     return intersections;
 }
 
-std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment)
+std::unordered_set<Point> intersection(const Polygon& polygon, const Segment& segment)
 {
     std::unordered_set<Point> intersections;
 
-    for (const Segment &seg : polygon.getSegments())
+    for (const Segment& seg : polygon.getSegments())
     {
-        for (const Point &p : intersection(seg, segment))
+        for (const Point& p : intersection(seg, segment))
         {
             intersections.insert(p);
         }
@@ -100,7 +100,7 @@ std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &se
     return intersections;
 }
 
-std::vector<Point> intersection(const Ray &ray, const Segment &segment)
+std::vector<Point> intersection(const Ray& ray, const Segment& segment)
 {
     std::vector<Point> intersections;
 
@@ -148,7 +148,7 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
     }
 }
 
-std::optional<Point> intersection(const Line &first, const Line &second)
+std::optional<Point> intersection(const Line& first, const Line& second)
 {
     double a1          = first.getCoeffs().a;
     double b1          = first.getCoeffs().b;
@@ -172,13 +172,13 @@ std::optional<Point> intersection(const Line &first, const Line &second)
     }
 }
 
-std::unordered_set<Point> intersection(const Polygon &polygon, const Ray &ray)
+std::unordered_set<Point> intersection(const Polygon& polygon, const Ray& ray)
 {
     std::unordered_set<Point> intersections;
 
-    for (const Segment &seg : polygon.getSegments())
+    for (const Segment& seg : polygon.getSegments())
     {
-        for (const Point &p : intersection(ray, seg))
+        for (const Point& p : intersection(ray, seg))
         {
             intersections.insert(p);
         }
@@ -187,7 +187,7 @@ std::unordered_set<Point> intersection(const Polygon &polygon, const Ray &ray)
     return intersections;
 }
 
-std::optional<Point> intersection(const Ray &first, const Ray &second)
+std::optional<Point> intersection(const Ray& first, const Ray& second)
 {
     // Calculate if an intersection exists between line representations of the rays
     std::optional<Point> point_of_intersection =

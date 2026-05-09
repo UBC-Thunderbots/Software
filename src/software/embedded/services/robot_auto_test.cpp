@@ -32,7 +32,7 @@ constexpr double THRESHOLD              = 0.0001;
 constexpr int DELAY_NS                  = 10000;
 std::string runtime_dir                 = "/tmp/tbots/yellow_test";
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     LoggerSingleton::initializeLogger(runtime_dir, nullptr, false);
 
@@ -98,7 +98,7 @@ int main(int argc, char **argv)
             LOG(WARNING) << "Sequence number is zero";
         }
     }
-    catch (std::runtime_error &e)
+    catch (std::runtime_error& e)
     {
         LOG(WARNING) << "Unable to communicate with the power board";
     }

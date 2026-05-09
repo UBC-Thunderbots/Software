@@ -14,8 +14,8 @@
  * @param l the Line
  * @return the Point closest to Point p on Line l
  */
-Point closestPoint(const Point &p, const Line &l);
-Point closestPoint(const Line &l, const Point &p);
+Point closestPoint(const Point& p, const Line& l);
+Point closestPoint(const Line& l, const Point& p);
 
 /**
  * Finds the Point on line segment closest to point.
@@ -25,8 +25,8 @@ Point closestPoint(const Line &l, const Point &p);
  *
  * @return the Point on line segment closest to point.
  */
-Point closestPoint(const Point &p, const Segment &segment);
-Point closestPoint(const Segment &segment, const Point &p);
+Point closestPoint(const Point& p, const Segment& segment);
+Point closestPoint(const Segment& segment, const Point& p);
 
 /**
  * Finds the Point on polygon closest to point.
@@ -36,8 +36,8 @@ Point closestPoint(const Segment &segment, const Point &p);
  *
  * @return the Point on polygon closest to point.
  */
-Point closestPoint(const Polygon &polygon, const Point &p);
-Point closestPoint(const Point &p, const Polygon &polygon);
+Point closestPoint(const Polygon& polygon, const Point& p);
+Point closestPoint(const Point& p, const Polygon& polygon);
 
 /**
  * Finds the Point on circle closest to point.
@@ -47,8 +47,8 @@ Point closestPoint(const Point &p, const Polygon &polygon);
  *
  * @return the Point on circle closest to point.
  */
-Point closestPoint(const Circle &circle, const Point &p);
-Point closestPoint(const Point &p, const Circle &circle);
+Point closestPoint(const Circle& circle, const Point& p);
+Point closestPoint(const Point& p, const Circle& circle);
 
 /**
  * Finds the Point on stadium closest to point.
@@ -58,5 +58,5 @@ Point closestPoint(const Point &p, const Circle &circle);
  *
  * @return the Point on stadium closest to point.
  */
-Point closestPoint(const Stadium &stadium, const Point &p);
-Point closestPoint(const Point &p, const Stadium &stadium);
+Point closestPoint(const Stadium& stadium, const Point& p);
+Point closestPoint(const Point& p, const Stadium& stadium);

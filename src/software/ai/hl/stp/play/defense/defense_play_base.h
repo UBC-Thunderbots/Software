@@ -56,8 +56,8 @@ class DefensePlayFSMBase : public PlayFSM<DefensePlayFSMBase>
      * @param crease_defender_assignments crease defender assignments to be aligned
      * @param ball_steal_mode crease defender ball steal behaviour/aggressiveness
      */
-    void setAlignment(const Update &event,
-                      const std::vector<DefenderAssignment> &crease_defender_assignments,
+    void setAlignment(const Update& event,
+                      const std::vector<DefenderAssignment>& crease_defender_assignments,
                       TbotsProto::BallStealMode ball_steal_mode);
 
     /**
@@ -67,7 +67,7 @@ class DefensePlayFSMBase : public PlayFSM<DefensePlayFSMBase>
      * @param ball_steal_mode The pass defender's aggressiveness towards the ball
      */
     void updatePassDefenderControlParams(
-        std::vector<DefenderAssignment> &pass_defender_assignments,
+        std::vector<DefenderAssignment>& pass_defender_assignments,
         TbotsProto::BallStealMode ball_steal_mode);
 
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
