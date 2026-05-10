@@ -161,7 +161,7 @@ class Thunderloop
     // Timeout after a failed ping request
     const int PING_RETRY_DELAY_S = 1;
 
-    const std::string PATH_TO_RINGBUFFER_LOG = "/var/log/dmesg";
+    const std::string PATH_TO_RINGBUFFER_LOG = "/usr/bin/dmesg";
 
     std::ifstream log_file = std::ifstream(PATH_TO_RINGBUFFER_LOG);
 };
