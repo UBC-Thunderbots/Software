@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -74,5 +76,16 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "attacker_tactic_test",
+    srcs = ["attacker_tactic_test.py"],
+    tags = ["exclusive"],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests/validation:validations",
+        requirement("pytest"),
     ],
 )
