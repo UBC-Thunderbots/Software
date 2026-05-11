@@ -10,10 +10,11 @@ MOTOR_DRIVER_RESET_PIN = 12
 S0_PIN = 21
 S1_PIN = 16
 
-DEMUX_DISABLE_PIN = 0 # Pull HIGH to disable SWD and SWCLK multiplexing
+DEMUX_DISABLE_PIN = 0  # Pull HIGH to disable SWD and SWCLK multiplexing
 
 # Put these in order of board 0, 1, 2, 3
-BOARD_NAMES = ['A', 'B', 'C', 'D']
+BOARD_NAMES = ["A", "B", "C", "D"]
+
 
 class MotorDriverFlasher:
     def __init__(self, board_letter, drivers):
@@ -84,11 +85,13 @@ if __name__ == "__main__":
             "Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)"
         )
         sys.exit(1)
-    
+
     # Check before attempting to flash if every argument is in BOARD_NAMES
     for i in range(1, len(sys.argv)):
         if sys.argv[i] not in BOARD_NAMES:
-            print(f"Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (Valid Letters: {BOARD_NAMES})")
+            print(
+                f"Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (Valid Letters: {BOARD_NAMES})"
+            )
             sys.exit(1)
 
     # Initialize pins as LEDs since we only need high/low logic.
