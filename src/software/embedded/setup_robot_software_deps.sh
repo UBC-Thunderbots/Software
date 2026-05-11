@@ -22,6 +22,6 @@ curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/develop/
 sudo mkdir -p /opt/tbotspython
 sudo chown $(whoami):$(whoami) /opt/tbotspython
 
-if ! sudo /usr/local/bin/python3.12 -m venv /opt/tbotspython ; then
-    echo "Error: Installing Python 3.12 failed"
+if ! sudo /usr/local/bin/python3 -m venv /opt/tbotspython ; then
+    echo "Error: Installing Python 3 failed"
 fi

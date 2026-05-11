@@ -29,7 +29,12 @@
       ansible.builtin.import_tasks:
         file: ../tasks/setup_robot_software_deps.yml
 
-    # TODO ADD COMPILE OPENOCD FROM SOURCE OPTIONS
+    - name: Setup OpenOCD dependencies
+      tags:
+        - dependencies
+      ansible.builtin.import_tasks:
+        file: ../tasks/setup_openocd_deps.yml
+
     - name: Setup systemd
       tags:
         - dependencies
