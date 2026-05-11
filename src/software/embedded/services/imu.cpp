@@ -56,9 +56,9 @@ ImuService::ImuService() : initialized_(false)
             << "Failed to initialize the IMU: failed to establish i2c connection.";
         return;
     }
-    if (i2c_smbus_read_byte_data(file_descriptor_, WHOAMI_REG) != 108)
+    if (i2c_smbus_read_byte_data(file_descriptor_, WHOAMI_REG) != 106)
     {
-        LOG(WARNING) << "Failed to initialize the IMU: WHOAMI register " << WHOAMI_REG
+        LOG(WARNING) << "Failed to initialize the IMU: WHOAMI register " << static_cast<int>(WHOAMI_REG)
                      << " read incorrectly.";
         return;
     }
@@ -69,7 +69,7 @@ ImuService::ImuService() : initialized_(false)
     {  // write unsuccessful
         LOG(WARNING)
             << "Failed to initialize the IMU: writing to accelerometer config register "
-            << ACCEL_CONTROL_REG << " unsuccessful";
+            << static_cast<int>(ACCEL_CONTROL_REG) << " unsuccessful";
         return;
     }
     // Set Gyroscope output data rate to 208 Hz, setting FS to 1000 dps (pg 61 of
@@ -79,7 +79,7 @@ ImuService::ImuService() : initialized_(false)
     {  // write unsuccessful
         LOG(WARNING)
             << "Failed to initialize the IMU: writing to gyroscope config register "
-            << ACCEL_CONTROL_REG << " unsuccessful";
+            << static_cast<int>(ACCEL_CONTROL_REG) << " unsuccessful";
         return;
     }
 
@@ -111,12 +111,11 @@ std::optional<AngularVelocity> ImuService::pollHeadingRate()
         return std::nullopt;
     }
     // Two separate registers for the Gyro output data.
-    int least_significant = i2c_smbus_read_byte_data(file_descriptor_, YAW_LEAST_SIG_REG);
-    int most_significant  = i2c_smbus_read_byte_data(file_descriptor_, YAW_MOST_SIG_REG);
+    uint8_t least_significant = i2c_smbus_read_byte_data(file_descriptor_, YAW_LEAST_SIG_REG);
+    uint8_t most_significant  = i2c_smbus_read_byte_data(file_descriptor_, YAW_MOST_SIG_REG);
 
-    int foo       = most_significant << 8;
-    int full_word = foo + least_significant;
+    int16_t full_word = (most_significant << 8) | least_significant;
 
-    double degrees_per_sec = double(full_word) / double(SHRT_MAX) * IMU_FULL_SCALE_DPS;
+    double degrees_per_sec = static_cast<double>(full_word) / static_cast<double>(SHRT_MAX) * IMU_FULL_SCALE_DPS;
     return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
 }

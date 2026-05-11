@@ -274,6 +274,9 @@ void Thunderloop::runLoop()
 
             if (imu_poll.has_value())
             {
+                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                    {"imu_ang_vel", imu_poll.value().toDegrees()},
+                });
                 robot_localizer_.updateImu(imu_poll.value());
             }
 
