@@ -24,7 +24,7 @@ cc_library(
 )
 
 cc_test(
-    name = "example_play_test",
+    name = "example_play_cpp_test",
     srcs = ["example_play_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
@@ -48,9 +48,8 @@ cc_test(
 )
 
 py_test(
-    name = "example_play_test_py",
+    name = "example_play_test",
     srcs = ["example_play_test.py"],
-    main = "example_play_test.py",
     package_collisions = "warning",
     # TODO (#2619) Remove tag to run in parallel
     tags = [

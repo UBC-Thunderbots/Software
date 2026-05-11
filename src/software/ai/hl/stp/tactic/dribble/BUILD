@@ -33,7 +33,7 @@ cc_test(
 )
 
 cc_test(
-    name = "dribble_tactic_test",
+    name = "dribble_tactic_cpp_test",
     srcs = ["dribble_tactic_test.cpp"],
     deps = [
         ":dribble_tactic",
@@ -65,9 +65,9 @@ cc_test(
 )
 
 py_test(
-    name = "excessive_dribble_test",
+    name = "dribble_tactic_test",
     srcs = [
-        "excessive_dribble_test.py",
+        "dribble_tactic_test.py",
     ],
     package_collisions = "warning",
     # TODO (#2619) Remove tag to run in parallel
