@@ -56,6 +56,11 @@ def test_move_across_field(simulated_test_runner):
                     final_orientation=tbots_cpp.createAngleProto(
                         tbots_cpp.Angle.zero()
                     ),
+                    dribbler_mode=DribblerMode.OFF,
+                    ball_collision_type=BallCollisionType.ALLOW,
+                    auto_chip_or_kick=AutoChipOrKick(autochip_distance_meters=2.0),
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
                 )
             }
         )
