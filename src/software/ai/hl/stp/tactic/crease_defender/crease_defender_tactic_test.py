@@ -105,6 +105,8 @@ def test_crease_region_positioning(
                 0: CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(enemy_threat_point),
                     crease_defender_alignment=crease_alignment,
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    ball_steal_mode=BallStealMode.STEAL,
                 )
             }
         )
