@@ -77,26 +77,50 @@ ImuService::ImuService() : initialized_(false)
     i2c_smbus_write_byte_data(file_descriptor_, GYRO_CONTROL_REG, 0b01011000);
     if (i2c_smbus_read_byte_data(file_descriptor_, GYRO_CONTROL_REG) != 0b01011000)
     {  // write unsuccessful
-        LOG(WARNING)
-            << "Failed to initialize the IMU: writing to gyroscope config register "
-            << static_cast<int>(ACCEL_CONTROL_REG) << " unsuccessful";
+        LOG(WARNING) << "Failed to initialize the IMU: writing to gyroscope config register "
+                     << "unsuccessful";
         return;
     }
+
+    // Enable Gyro digital LPF1 and set bandwidth to ~65Hz (FTYPE=000)
+    // CTRL4_C: bit 1 (LPF1_SEL_G) = 1
+    i2c_smbus_write_byte_data(file_descriptor_, CTRL4_C, 0b00000010);
+    // CTRL6_C: bits 2:0 (FTYPE) = 000
+    i2c_smbus_write_byte_data(file_descriptor_, CTRL6_C, 0b00000000);
+
+    // Enable Accelerometer digital LPF2
+    // CTRL8_XL: bit 7 (LPF2_XL_EN) = 1
+    i2c_smbus_write_byte_data(file_descriptor_, CTRL8_XL, 0b10000000);
 
     initialized_ = true;
     LOG(INFO) << "Initialized IMU! Calibrating...";
     degrees_error_ = 0;
-    // get 50 sample average of stationary reading, so all future readings can be
+    // get 100 sample average of stationary reading, so all future readings can be
     // corrected
-    double sum = 0;
+    double sum        = 0;
+    int valid_samples = 0;
     for (int i = 0; i < 100; i++)
     {
-        double poll = pollHeadingRate()->toDegrees();
-        sum += poll;
+        auto poll = pollHeadingRate();
+        if (poll.has_value())
+        {
+            sum += poll->toDegrees();
+            valid_samples++;
+        }
         usleep(50000);
     }
-    double avg     = sum / 100;
-    degrees_error_ = avg;
+
+    if (valid_samples > 0)
+    {
+        degrees_error_ = sum / valid_samples;
+        LOG(INFO) << "IMU Calibration complete. Offset: " << degrees_error_ << " dps";
+    }
+    else
+    {
+        LOG(WARNING) << "IMU Calibration failed: no valid samples received. Heading "
+                        "stability will be poor.";
+        initialized_ = false;
+    }
 }
 
 std::optional<AngularVelocity> ImuService::pollHeadingRate()
@@ -105,17 +129,20 @@ std::optional<AngularVelocity> ImuService::pollHeadingRate()
     {
         return std::nullopt;
     }
-    int ret = ioctl(file_descriptor_, I2C_SLAVE_FORCE, 0x6b);
-    if (ret < 0)
+
+    // Two separate registers for the Gyro output data.
+    int least_significant = i2c_smbus_read_byte_data(file_descriptor_, YAW_LEAST_SIG_REG);
+    int most_significant  = i2c_smbus_read_byte_data(file_descriptor_, YAW_MOST_SIG_REG);
+
+    if (least_significant < 0 || most_significant < 0)
     {
         return std::nullopt;
     }
-    // Two separate registers for the Gyro output data.
-    uint8_t least_significant = i2c_smbus_read_byte_data(file_descriptor_, YAW_LEAST_SIG_REG);
-    uint8_t most_significant  = i2c_smbus_read_byte_data(file_descriptor_, YAW_MOST_SIG_REG);
 
-    int16_t full_word = (most_significant << 8) | least_significant;
+    int16_t full_word = (static_cast<uint8_t>(most_significant) << 8) |
+                        static_cast<uint8_t>(least_significant);
 
-    double degrees_per_sec = static_cast<double>(full_word) / static_cast<double>(SHRT_MAX) * IMU_FULL_SCALE_DPS;
+    double degrees_per_sec = static_cast<double>(full_word) /
+                             static_cast<double>(SHRT_MAX) * IMU_FULL_SCALE_DPS;
     return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
 }

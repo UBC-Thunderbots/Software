@@ -26,11 +26,10 @@ class ImuService
      */
     std::optional<AngularVelocity> pollHeadingRate();
 
-    // Variance from datasheet
+    // Variance from datasheet (in rad^2/s^2)
     static constexpr double IMU_VARIANCE =
-        (4.0 * 14.4222 / 1000.0) *
-        (4.0 * 14.4222 /
-         1000.0);  // stdev = 4mdeg/Hz noise density * sqrt(208) Hz * 1/1000 deg/mdeg
+        (4.0 * 14.4222 / 1000.0 * M_PI / 180.0) *
+        (4.0 * 14.4222 / 1000.0 * M_PI / 180.0);  // stdev = 4mdeg/Hz noise density * sqrt(208) Hz * 1/1000 deg/mdeg * pi/180 rad/deg
    private:
     bool initialized_    = false;
     int file_descriptor_ = 0;
@@ -51,6 +50,9 @@ class ImuService
     static const uint8_t WHOAMI_REG        = 0xf;
     static const uint8_t ACCEL_CONTROL_REG = 0x10;
     static const uint8_t GYRO_CONTROL_REG  = 0x11;
+    static const uint8_t CTRL4_C           = 0x13;
+    static const uint8_t CTRL6_C           = 0x15;
+    static const uint8_t CTRL8_XL          = 0x17;
     static const uint8_t YAW_LEAST_SIG_REG = 0x26;
     static const uint8_t YAW_MOST_SIG_REG  = 0x27;
 };
