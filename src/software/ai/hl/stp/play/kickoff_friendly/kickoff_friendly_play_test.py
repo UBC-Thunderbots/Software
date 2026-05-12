@@ -1,5 +1,3 @@
-import threading
-
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
 
@@ -137,7 +135,9 @@ def test_kickoff_friendly_play(simulated_test_runner):
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
-        ci_cmd_with_delay=[(4.0,Command.Type.NORMAL_START,Team.BLUE)], # Let robots get ready before starting kickoff
+        ci_cmd_with_delay=[
+            (4.0, Command.Type.NORMAL_START, Team.BLUE)
+        ],  # Let robots get ready before starting kickoff
     )
 
 
