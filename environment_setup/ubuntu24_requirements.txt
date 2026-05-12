@@ -1,7 +1,7 @@
 ansible-lint==26.4.0
 pyqtgraph==0.13.7
 thefuzz==0.19.0
-iterfzf==0.5.0.20.0
+iterfzf==1.9.0.67.0
 python-Levenshtein==0.25.1
 psutil==5.9.0
 PyOpenGL==3.1.6

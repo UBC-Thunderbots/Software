@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//software/sensor_fusion:__subpackages__"])
 
 cc_library(

@@ -33,9 +33,8 @@ cc_test(
 )
 
 py_test(
-    name = "example_play_test_py",
+    name = "example_play_test",
     srcs = ["example_play_test.py"],
-    main = "example_play_test.py",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",

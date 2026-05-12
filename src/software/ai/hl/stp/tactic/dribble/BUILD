@@ -32,9 +32,9 @@ cc_test(
 )
 
 py_test(
-    name = "excessive_dribble_test",
+    name = "dribble_tactic_test",
     srcs = [
-        "excessive_dribble_test.py",
+        "dribble_tactic_test.py",
     ],
     # TODO (#2619) Remove tag to run in parallel
     tags = [
