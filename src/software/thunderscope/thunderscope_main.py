@@ -250,7 +250,7 @@ if __name__ == "__main__":
         default=0,
         help="Record stats about fullsystem performance (during AI vs AI) for a set amount of time in minutes",
     )
-    
+
     args = parser.parse_args()
 
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
