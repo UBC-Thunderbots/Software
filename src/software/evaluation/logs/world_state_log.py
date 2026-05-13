@@ -41,9 +41,8 @@ class RobotLog(IEvalLog):
     @staticmethod
     @override
     def from_csv_row(row_iter: Iterator[str], id: int = 0) -> RobotLog | None:
-        """
-        Parses a full CSV row into an RobotLog
-        
+        """Parses a full CSV row into an RobotLog
+
         :param id: the id of the robot
         :return: the RobotLog object represented by the csv row
         """
@@ -61,7 +60,7 @@ class RobotLog(IEvalLog):
             ),
             global_angular_velocity=AngularVelocity(radians_per_second=float(data[5])),
         )
-        
+
         return RobotLog(id=id, state=state)
 
 

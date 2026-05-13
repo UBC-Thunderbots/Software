@@ -34,8 +34,7 @@ class Team(StrEnum):
 
 @dataclass(kw_only=True)
 class EventLog(TimestampedEvalLog):
-    """
-    Represents a single event being tracked, where and for whom the event is, 
+    """Represents a single event being tracked, where and for whom the event is,
     and the game state at the time of the event
     """
 

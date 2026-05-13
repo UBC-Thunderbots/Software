@@ -10,5 +10,5 @@ __all__ = [
     "PassTracker",
     "TrackerBuilder",
     "RefereeTracker",
-    "GoalieTracker"
+    "GoalieTracker",
 ]
