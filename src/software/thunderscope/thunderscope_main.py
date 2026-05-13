@@ -11,7 +11,8 @@ from google.protobuf.internal import api_implementation
 from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )
-from software.thunderscope.log.stats.stats import Stats
+from software.evaluation.loggers.stats_logger import StatsLogger
+from software.evaluation.loggers.pass_logger import PassLogger
 
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
@@ -194,12 +195,6 @@ if __name__ == "__main__":
         help="Runs the simulation with sped-up time",
     )
     parser.add_argument(
-        "--enable_autogc",
-        action="store_true",
-        default=False,
-        help="Automatically handles gamecontroller referee events",
-    )
-    parser.add_argument(
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
     )
     parser.add_argument(
@@ -249,6 +244,22 @@ if __name__ == "__main__":
         type=int,
         default=0,
         help="Record stats about fullsystem performance (during AI vs AI) for a set amount of time in minutes",
+    )
+
+    parser.add_argument(
+        "--pass_results_file",
+        action="store",
+        type=str,
+        default="pass_results.csv",
+        help="File name within ml/datasets to store pass results",
+    )
+
+    parser.add_argument(
+        "--game_events_file",
+        action="store",
+        type=str,
+        default="game_events.csv",
+        help="File name within ml/datasets to store game events",
     )
 
     args = parser.parse_args()
@@ -431,7 +442,6 @@ if __name__ == "__main__":
 
         if args.record_stats:
             args.ci_mode = True
-            args.enable_autogc = True
             args.enable_autoref = True
 
         def __ticker(tick_rate_ms: int) -> None:
@@ -484,7 +494,7 @@ if __name__ == "__main__":
             log_level=args.log_level,
         ) as yellow_fs, Gamecontroller(
             suppress_logs=(not args.verbose),
-            automate_referee=args.enable_autogc,
+            automate_referee=args.ci_mode,
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -499,17 +509,27 @@ if __name__ == "__main__":
             if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref, (
-            Stats(
+            StatsLogger(
                 proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                 record_enemy_stats=True,
+                friendly_colour_yellow=False,
+                out_file_name=args.game_events_file,
             )
             if args.record_stats
             else contextlib.nullcontext()
-        ) as blue_stats, (
-            Stats(proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+        ) as blue_stats_logger, (
+            StatsLogger(
+                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                friendly_colour_yellow=True,
+                out_file_name=args.game_events_file,
+            )
             if args.record_stats
             else contextlib.nullcontext()
-        ) as yellow_stats:
+        ) as yellow_stats_logger, PassLogger(
+            proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+            friendly_colour_yellow=True,
+            out_file_name=args.pass_results_file,
+        ) as blue_pass_logger:
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
@@ -520,9 +540,11 @@ if __name__ == "__main__":
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
 
-            if args.record_stats:
-                tscope.register_refresh_function(blue_stats.refresh)
-                tscope.register_refresh_function(yellow_stats.refresh)
+            if args.record_stats and blue_stats_logger and yellow_stats_logger:
+                tscope.register_refresh_function(blue_stats_logger.refresh)
+                tscope.register_refresh_function(yellow_stats_logger.refresh)
+
+            tscope.register_refresh_function(blue_pass_logger.refresh)
 
             simulator.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
