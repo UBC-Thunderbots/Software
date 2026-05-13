@@ -70,13 +70,6 @@ pip.parse(
     requirements_lock = "//starlark/nanopb:requirements_lock.txt",
 )
 use_repo(pip, "nanopb_deps")
-pip.parse(
-    hub_name = "ml_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
-    requirements_lock = "//software/ml:requirements_lock.txt",
-)
-use_repo(pip, "ml_deps")
 
 ##############################################
 # Configure Dependencies
