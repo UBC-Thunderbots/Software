@@ -80,6 +80,9 @@ class PrimitiveExecutor
     AngularVelocity angular_velocity_;
     Angle orientation_;
 
+    Point last_position_;
+    Angle last_orientation_;
+
     TeamColour friendly_team_colour_;
     RobotConstants robot_constants_;
 

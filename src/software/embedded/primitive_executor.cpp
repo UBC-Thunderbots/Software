@@ -147,9 +147,28 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     prim->direct_control());
             }
 
-            const Vector target_linear_velocity           = getTargetLinearVelocity();
-            const AngularVelocity target_angular_velocity = getTargetAngularVelocity();
+            // const Vector target_linear_velocity           = getTargetLinearVelocity();
+            // AngularVelocity target_angular_velocity = getTargetAngularVelocity();
+            const Point target_position = trajectory_path_->getDestination();
+            const Angle target_orientation = angular_trajectory_->getDestination();
+            Vector error_lateral = target_position - position_;
+            Angle error_angular = (target_orientation - orientation_).clamp();
+            Angle derivative_angular = (last_orientation_ - orientation_).clamp();
 
+            double linear_kp = 1;
+            double linear_kd = 1.5;
+            double angular_kp = 3.5;
+            double angular_kd = 1.5;
+            Vector target_linear_velocity = globalToLocalVelocity(error_lateral * linear_kp + (last_position_ - position_) * linear_kd, orientation_);
+            target_linear_velocity.normalize(std::min(target_linear_velocity.lengthSquared(), static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
+            AngularVelocity target_angular_velocity = AngularVelocity::fromRadians(error_angular.toRadians()) * angular_kp + AngularVelocity::fromRadians(derivative_angular.toRadians()) * angular_kd;
+
+
+                
+
+
+            last_position_ = position_;
+            last_orientation_ = orientation_;
             const auto prim = createDirectControlPrimitive(
                 target_linear_velocity, target_angular_velocity,
                 convertDribblerModeToDribblerSpeed(

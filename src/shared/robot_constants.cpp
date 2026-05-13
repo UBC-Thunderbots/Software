@@ -7,7 +7,7 @@ RobotConstants create2026RobotConstants()
     return {
         .robot_radius_m        = static_cast<float>(ROBOT_MAX_RADIUS_METERS),
         .front_wheel_angle_deg = 32.0f,
-        .back_wheel_angle_deg  = 44.0f,
+        .back_wheel_angle_deg  = 46.0f,
 
         .front_of_robot_width_meters = 0.11f,
         .dribbler_width_meters       = 0.07825f,
@@ -17,7 +17,7 @@ RobotConstants create2026RobotConstants()
         .max_force_dribbler_speed_rpm  = -12000,
 
         // Motor constant
-        .motor_max_acceleration_m_per_s_2 = 4.5f,
+        .motor_max_acceleration_m_per_s_2 = 2.0f,
 
         // Robot's linear movement constants
         .robot_max_speed_m_per_s          = 3.0f,
