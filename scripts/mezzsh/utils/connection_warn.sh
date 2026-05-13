@@ -3,9 +3,8 @@
 # Script to trigger a dialog on the Mezz PC monitor that someone
 # has just connected remotely
 
-# find the username of the person logged in physically
-# we look for someone attached to the main display (:0)
-LOCAL_USER=$(who | grep -m 1 "(tty2)" | awk '{print $1}')
+# Finds IRL users
+LOCAL_USER=$(bash /home/thunderbots/Software/scripts/mezzsh/utils/get_local_user.sh)
 
 # if no one is logged in locally, just exit
 if [ -z "$LOCAL_USER" ]; then

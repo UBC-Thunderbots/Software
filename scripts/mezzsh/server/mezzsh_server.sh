@@ -33,14 +33,8 @@ fi
 # 1. no other users (IRL or remote) are using the PC 
 # OR
 # 2. the force flag is provided
-if ([ ! -z "$LOCAL_USER" ] || [ ! -z "$REMOTE_USERS" ]) && [ "$FORCE_CONNECT" != "1" ]; then
+if ([ ! -z "$LOCAL_USER" ] || [ ! -z "$REMOTE_USERS_LIST" ]) && [ "$FORCE_CONNECT" != "1" ]; then
     echo "The Mezz Computer is in use! Please use the connect script to see who is currently using it."
-    
-    # we technically hae already have an active connection at this point
-    # just no shell is provided
-    # close the connection after 1 min
-    sleep 60
-    echo "Connection timed out."
     exit 1
 fi
 
