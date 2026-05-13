@@ -8,6 +8,48 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/vector.h"
 
+#ifdef DEBUG_WHEEL
+EuclideanToWheel::EuclideanToWheel(const RobotConstants& robot_constants)
+    : robot_constants_(robot_constants)
+{
+    // Angles [rads]
+    auto p = robot_constants_.front_wheel_angle_deg * M_PI / 180.;
+    auto t = robot_constants_.back_wheel_angle_deg * M_PI / 180.;
+
+    auto cos_p = std::cos(p);
+    auto sin_p = std::sin(p);
+    auto cos_t = std::cos(t);
+    auto sin_t = std::sin(t);
+
+    // 1. Physical wheel coordinates in meters
+    // Mapped to the robot frame: +X = Right, +Y = Forward
+    double fr_x = 0.06632, fr_y =  0.03485;
+    double br_x = 0.05592, br_y = -0.04985;
+
+    // 2. Unit drive vectors (extracted directly from the matrix's linear columns)
+    double fr_dx = -sin_p, fr_dy = cos_p;
+    double br_dx =  sin_t, br_dy = cos_t;
+
+    // 3. Dynamically calculate the rotational lever arms using the 2D cross product
+    // Lever Arm = | X * Dy - Y * Dx |
+    double rot_f = std::abs((fr_x * fr_dy) - (fr_y * fr_dx));
+    double rot_b = std::abs((br_x * br_dy) - (br_y * br_dx));
+
+    // clang-format off
+    euclidean_to_wheel_velocity_D_ <<
+        -sin_p,  cos_p, rot_f,
+        -sin_p, -cos_p, rot_f,
+         sin_t, -cos_t, rot_b,
+         sin_t,  cos_t, rot_b;
+    // clang-format on
+
+    // Calculate Pseudo-inverse dynamically
+    wheel_to_euclidean_velocity_D_inverse_ =
+        (euclidean_to_wheel_velocity_D_.transpose() * euclidean_to_wheel_velocity_D_).inverse() * euclidean_to_wheel_velocity_D_.transpose();
+}
+
+#else
+
 EuclideanToWheel::EuclideanToWheel(const RobotConstants& robot_constants)
     : robot_constants_(robot_constants)
 {
@@ -56,6 +98,26 @@ EuclideanToWheel::EuclideanToWheel(const RobotConstants& robot_constants)
     // clang-format on
 }
 
+#endif
+
+#ifdef DEBUG_WHEEL
+WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_velocity) const
+{
+    // The generalized D matrix natively handles the w -> tangential velocity
+    // conversion because its third column already represents the lever arm in meters.
+    return euclidean_to_wheel_velocity_D_ * euclidean_velocity;
+}
+
+
+EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
+    const WheelSpace_t& wheel_velocity) const
+{
+    // The D inverse matrix natively outputs w in rad/s.
+    return wheel_to_euclidean_velocity_D_inverse_ * wheel_velocity;
+}
+
+#else
+
 WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_velocity) const
 {
     // need to multiply the angular velocity by the robot radius to
@@ -80,6 +142,7 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
 
     return euclidean_velocity;
 }
+#endif
 
 WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     const WheelSpace_t& current_wheel_velocity, const WheelSpace_t& target_wheel_velocity,
