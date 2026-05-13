@@ -147,6 +147,11 @@ class StatsLogger:
             self.events_file_handle.close()
 
     def _toggle_logging(self, should_log: bool) -> None:
+        """
+        Turns logging off or on based on the given boolean
+        
+        ;param should_log: True if logging should continue, False if not
+        """
         self.logging_enabled = should_log
 
     def _write_event_to_file(self, event: EventLog) -> None:

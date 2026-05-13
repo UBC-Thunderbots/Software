@@ -20,4 +20,3 @@ bazel run //software/embedded/ansible:requirements.update
 bazel run //software/simulated_tests:requirements.update
 bazel run //software/embedded/robot_diagnostics_cli:requirements.update
 bazel run //starlark/nanopb:requirements.update
-bazel run //software/ml:requirements.update

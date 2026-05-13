@@ -34,7 +34,10 @@ class Team(StrEnum):
 
 @dataclass(kw_only=True)
 class EventLog(TimestampedEvalLog):
-    """Represents a single event being tracked, where and for whom the event is, and the game state at the time of the event"""
+    """
+    Represents a single event being tracked, where and for whom the event is, 
+    and the game state at the time of the event
+    """
 
     event_type: EventType
     from_team: Team
@@ -85,15 +88,12 @@ class EventLog(TimestampedEvalLog):
     @override
     def from_csv_row(row_iter: Iterator[str]) -> EventLog | None:
         """Parses a full CSV row into an EventLog."""
-        # 1. Handle Timestamp (inherited from TimestampedEvalLog)
         timestamp = float(next(row_iter))
 
-        # 2. Parse Enums/Metadata
         event_type = EventType(next(row_iter))
         from_team = Team(next(row_iter))
         for_team = Team(next(row_iter))
 
-        # 3. Delegate the remaining iterator to WorldStateLog
         world_state = WorldStateLog.from_csv_row(row_iter)
 
         if not world_state:

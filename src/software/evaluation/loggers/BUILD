@@ -7,11 +7,3 @@ py_library(
         "//software/evaluation/trackers:tracker",
     ],
 )
-
-py_library(
-    name = "pass_logger",
-    srcs = ["pass_logger.py"],
-    deps = [
-        "//software/evaluation/trackers:tracker",
-    ],
-)

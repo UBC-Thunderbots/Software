@@ -8,7 +8,6 @@ py_library(
         "__init__.py",
         "goalie_tracker.py",
         "kick_tracker.py",
-        "pass_log_tracker.py",
         "possession_tracker.py",
         "referee_tracker.py",
         "tracker.py",

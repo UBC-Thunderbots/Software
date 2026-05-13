@@ -125,6 +125,14 @@ class RefereeTracker(Tracker):
     def _log_event_if_change(
         self, new_value: int, old_value: int, event_type: EventType
     ) -> int:
+        """
+        Logs an event of the given type if the given value has changed between old and new
+        
+        :param new_value: the new value
+        :param old_value: the old value to compare with
+        :param event_type: the type of event to log if a change is detected
+        :return: the new value unchanged
+        """
         if new_value != old_value:
             self.write_event(event_type=event_type)
 

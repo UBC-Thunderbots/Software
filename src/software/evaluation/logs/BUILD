@@ -30,15 +30,6 @@ py_library(
 )
 
 py_library(
-    name = "pass_log",
-    srcs = ["pass_log.py"],
-    deps = [
-        ":event_log",
-        ":log_interface",
-    ],
-)
-
-py_library(
     name = "logs",
     deps = [
         ":event_log",

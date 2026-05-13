@@ -41,9 +41,15 @@ class RobotLog(IEvalLog):
     @staticmethod
     @override
     def from_csv_row(row_iter: Iterator[str], id: int = 0) -> RobotLog | None:
+        """
+        Parses a full CSV row into an RobotLog
+        
+        :param id: the id of the robot
+        :return: the RobotLog object represented by the csv row
+        """
         data = [next(row_iter) for _ in range(RobotLog.num_cols)]
 
-        # Check if this was a placeholder (all 'None' strings)
+        # for missing robots
         if all(val == "None" for val in data):
             return None
 
@@ -55,9 +61,7 @@ class RobotLog(IEvalLog):
             ),
             global_angular_velocity=AngularVelocity(radians_per_second=float(data[5])),
         )
-
-        # Since we don't store ID in the CSV row per your to_csv_row,
-        # the ID is usually inferred by the caller based on index
+        
         return RobotLog(id=id, state=state)
 
 
@@ -93,7 +97,7 @@ class BallLog(IEvalLog):
     @staticmethod
     @override
     def from_csv_row(row_iter: Iterator[str]) -> BallLog | None:
-        """Consumes columns from the iterator to reconstruct the Ball."""
+        """Parses a full CSV row into an BallLog"""
         data = [next(row_iter) for _ in range(BallLog.num_cols)]
 
         state = BallState(
@@ -185,17 +189,14 @@ class WorldStateLog(IEvalLog):
 
     @staticmethod
     def from_csv_row(row_iter: Iterator[str]) -> WorldStateLog | None:
-        # 1. Parse Ball
         ball_state = BallLog.from_csv_row(row_iter)
 
-        # 2. Parse Friendly Robots
         friendly_robots = []
         for id in range(DIV_B_NUM_ROBOTS):
             robot = RobotLog.from_csv_row(row_iter, id=id)
             if robot:
                 friendly_robots.append(robot)
 
-        # 3. Parse Enemy Robots
         enemy_robots = []
         for id in range(DIV_B_NUM_ROBOTS):
             robot = RobotLog.from_csv_row(row_iter, id=id)
