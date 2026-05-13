@@ -31,6 +31,9 @@ const uint8_t TXD2 = 22;
 const uint8_t PM_SDA = 13;
 const uint8_t PM_SCL = 14;
 
+// Dribbler
+const uint8_t DRIBBLER_PIN = 0; // When elec has a pin for this
+
 // Timers
 const uint8_t CHICKER_PULSE_TIMER     = 0;
 const uint8_t CHICKER_COOLDOWN_TIMER  = 3;
