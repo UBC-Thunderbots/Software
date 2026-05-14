@@ -29,6 +29,7 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
 
 std::optional<World> SensorFusion::getWorld() const
 {
+    LOG(WARNING) << "TIMESTAMP";
     if (field && ball)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);

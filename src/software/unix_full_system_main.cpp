@@ -155,6 +155,8 @@ int main(int argc, char** argv)
                                           *minimum_log_level);
         TbotsProto::ThunderbotsConfig tbots_proto;
 
+	LOG(WARNING) << "INITLAIZE";
+
         // Override friendly color
         tbots_proto.mutable_sensor_fusion_config()->set_friendly_color_yellow(
             args.friendly_colour_yellow);

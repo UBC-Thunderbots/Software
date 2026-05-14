@@ -89,6 +89,7 @@ void UnixSimulatorBackend::receiveThunderbotsConfig(TbotsProto::ThunderbotsConfi
 void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
+    LOG(WARNING) << "SEND";
 
     LOG(VISUALIZE) << *createNamedValue(
         "Primitive Hz",
