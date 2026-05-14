@@ -285,7 +285,9 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
     {
         // friendly_robot_id_with_ball_in_dribbler will always have a value since this is
         // checked by the member function shouldTrustRobotStatus
-        std::optional<Ball> new_ball = createBall({}, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
+        std::optional<Robot> robot_with_ball_in_dribbler =
+            friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
+        std::optional<Ball> new_ball = createBall({}, Timestamp::fromSeconds(ssl_detection_frame.t_capture()), robot_with_ball_in_dribbler);
 
         if (new_ball)
         {
@@ -336,13 +338,14 @@ void SensorFusion::updateBall(Ball new_ball)
 }
 
 std::optional<Ball> SensorFusion::createBall(
-    const std::vector<BallDetection> &ball_detections, const Timestamp& current_time)
+    const std::vector<BallDetection> &ball_detections, const Timestamp& current_time,
+    std::optional<Robot> dribbling_robot)
 {
     if (field)
     {
         std::optional<Ball> new_ball =
             ball_tracker.estimateBallState(ball_detections, field.value().fieldBoundary(),
-                                           current_time);
+                                           current_time, dribbling_robot);
         return new_ball;
     }
     return std::nullopt;

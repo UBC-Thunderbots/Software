@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     {
         std::string runtime_dir = args.runtime_dir;
         LoggerSingleton::initializeLogger(runtime_dir, nullptr);
-        LOG(CSV, "realism_kalman_filter_v4.csv") << "timestamp_s,fused_x,fused_y,fused_vel_x, fused_vel_y, truth_x,truth_y, true_vel_x, true_vel_y,is_occluded\n";
+        LOG(CSV, "realism_kalman_filter_v7.csv") << "timestamp_s,fused_x,fused_y,fused_vel_x, fused_vel_y, truth_x,truth_y, true_vel_x, true_vel_y,is_occluded\n";
 
         /**
          * Creates a ER force simulator and sets up the appropriate
@@ -228,7 +228,7 @@ int main(int argc, char** argv)
                 {
                     start_timestamp_s = current_ts;
                 }
-                LOG(CSV, "realism_kalman_filter_v4.csv")
+                LOG(CSV, "realism_kalman_filter_v7.csv")
                     << (current_ts - start_timestamp_s) << ","
                     << yellow_vision.ball().current_state().global_position().x_meters()
                     << ","
