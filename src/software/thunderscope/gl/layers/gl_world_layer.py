@@ -325,13 +325,13 @@ class GLWorldLayer(GLLayer):
         """Update graphics in this layer"""
         self.cached_world = self.world_buffer.get(block=False, return_cached=True)
 
-        if len(self.cached_world.friendly_team.team_robots) > 0:
+        for i in range(len(self.cached_world.friendly_team.team_robots)):
             world_time = self.cached_world.time_sent.epoch_timestamp_seconds
-            robot_time = self.cached_world.friendly_team.team_robots[0].timestamp.epoch_timestamp_seconds
+            robot_time = self.cached_world.friendly_team.team_robots[i].timestamp.epoch_timestamp_seconds
             diff = world_time - robot_time
 
             # Send diff to PlotJuggler
-            payload = {"timestamp": world_time, "data": {"vision_latency_diff": diff}}
+            payload = {"timestamp": world_time, "data": {f"vision_latency_diff_{i}": diff}}
             self.pj_sender.send_string(json.dumps(payload))
 
         # if not receiving worlds, just render an empty field
