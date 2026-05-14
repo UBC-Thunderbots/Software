@@ -44,11 +44,11 @@ void StSpinMotorController::setup()
 
     for (const MotorIndex motor : driveMotors())
     {
-        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 0, .ki = 0});
+        sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 0, .ki = 0});
         // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 300, .ki = 10});
         // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 500, .ki = 30});
-        sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 700, .ki = 30});
-        sendAndReceiveFrame(motor, SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = 0});
+        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 700, .ki = 30});
+        sendAndReceiveFrame(motor, SetSpeedFeedForwardKaKvFrame{.ka = 1700, .kv = 13});
     }
 }
 
@@ -184,7 +184,7 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 
     sendAndReceiveFrame(motor, outgoing_frame);
 
-    // sendMotorStatusToPlotJuggler(motor);
+    sendMotorStatusToPlotJuggler(motor);
 
     return motor_status_.at(motor).speed;
 }
