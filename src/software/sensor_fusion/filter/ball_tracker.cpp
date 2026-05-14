@@ -106,6 +106,13 @@ std::optional<Ball> BallTracker::estimateBallState(
 		Eigen::Vector<double, 2> measurement;
 		measurement << best_ball_detection->position.x(), best_ball_detection->position.y();
 
+		Point predicted_pos(kalman_filter.state_estimate(0), kalman_filter.state_estimate(1));
+		if (!contains(filter_area, predicted_pos)){
+			kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
+			kalman_filter.state_covariance = INITIAL_COV;
+			consecutive_outliers = 0;
+		}
+
 		const Eigen::Vector<double, 2> innovation =
 		    measurement - kalman_filter.measurement_model * kalman_filter.state_estimate;
 		const Eigen::Matrix<double, 2, 2> S =
