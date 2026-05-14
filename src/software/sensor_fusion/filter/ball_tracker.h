@@ -9,7 +9,6 @@
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
-#include "software/world/robot.h"
 #include "software/sensor_fusion/filter/kalman_filter.h"
 
 /**
@@ -47,8 +46,7 @@ class BallTracker
     std::optional<Ball> estimateBallState(
         const std::vector<BallDetection>& new_ball_detections,
         const Rectangle& filter_area,
-		const Timestamp& current_time,
-        std::optional<Robot> dribbling_robot = std::nullopt);
+        const Timestamp& current_time);
 
    private:
     /**
@@ -63,6 +61,4 @@ class BallTracker
 	int consecutive_outliers;
 	KalmanFilter<4, 2, 1> kalman_filter;
 	std::optional<Timestamp> prev_detection_timestamp;
-	// Position from the first detection — used to seed velocity on the second detection
-	std::optional<Eigen::Vector<double, 2>> initial_detection_pos_;
 };

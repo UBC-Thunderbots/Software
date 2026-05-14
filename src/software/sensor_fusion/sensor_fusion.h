@@ -96,8 +96,7 @@ class SensorFusion
      * @return Ball if filtered from ball detections
      */
     std::optional<Ball> createBall(const std::vector<BallDetection> &ball_detections,
-                                   const Timestamp& current_time,
-                                   std::optional<Robot> dribbling_robot = std::nullopt);
+                                   const Timestamp& current_time);
 
     /**
      * Create team from a list of robot detections

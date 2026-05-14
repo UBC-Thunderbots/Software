@@ -36,9 +36,6 @@ namespace {
 	const double MAHANALOGIS_THRESHOLD = 1;
 	const int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
 
-    // Max distance from the dribbler position for a vision detection to be trusted
-    // while a robot is dribbling. Detections farther away are likely spurious.
-    const double DRIBBLING_MEASUREMENT_MAX_DISTANCE_METERS = 0.15;
 }
 
 BallTracker::BallTracker() :
@@ -53,18 +50,8 @@ BallTracker::BallTracker() :
 
 std::optional<Ball> BallTracker::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area,
-    const Timestamp& current_time, std::optional<Robot> dribbling_robot)
+    const Timestamp& current_time)
 {
-    Point dribbler_pos;
-    if (dribbling_robot.has_value())
-    {
-        dribbler_pos =
-            dribbling_robot->position() +
-            Vector::createFromAngle(dribbling_robot->orientation())
-                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                           BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING);
-    }
-
 	std::optional<BallDetection> best_ball_detection = getBestBallDetection(new_ball_detections);
 
     double dt = 0.0;
@@ -81,50 +68,9 @@ std::optional<Ball> BallTracker::estimateBallState(
 		kalman_filter.predict(Eigen::Vector<double,1>::Zero());
 	}
 
-    if (dribbling_robot.has_value())
-    {
-        // When dribbling, only trust a vision measurement if it shows the ball
-        // close to the dribbler. Otherwise reset to the kinematic dribbler position.
-        bool near_dribbler =
-            best_ball_detection.has_value() &&
-            (best_ball_detection->position - dribbler_pos).length() <=
-                DRIBBLING_MEASUREMENT_MAX_DISTANCE_METERS;
-
-        Eigen::Vector<double, 2> measurement;
-        if (near_dribbler)
-        {
-            measurement << best_ball_detection->position.x(),
-                best_ball_detection->position.y();
-            kalman_filter.update(measurement);
-        }
-        else
-        {
-            measurement << dribbler_pos.x(), dribbler_pos.y();
-            kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
-            kalman_filter.state_covariance = INITIAL_COV;
-        }
-        prev_detection_timestamp = current_time;
-        consecutive_outliers     = 0;
-    }
-	else if (best_ball_detection){
+	if (best_ball_detection){
 		Eigen::Vector<double, 2> measurement;
 		measurement << best_ball_detection->position.x(), best_ball_detection->position.y();
-
-        if (!prev_detection_timestamp){
-            // First detection: store position to compute velocity on the next frame
-            initial_detection_pos_ = measurement;
-            prev_detection_timestamp = current_time;
-            return std::nullopt;
-        }
-
-        // Second detection: seed Kalman velocity from finite-difference
-        if (initial_detection_pos_.has_value() && dt > 0){
-            double vx = (measurement(0) - (*initial_detection_pos_)(0)) / dt;
-            double vy = (measurement(1) - (*initial_detection_pos_)(1)) / dt;
-            kalman_filter.state_estimate << measurement(0), measurement(1), vx, vy;
-            kalman_filter.state_covariance = INITIAL_COV;
-            initial_detection_pos_ = std::nullopt;
-        }
 
 		const Eigen::Vector<double, 2> innovation =
 		    measurement - kalman_filter.measurement_model * kalman_filter.state_estimate;
@@ -145,9 +91,10 @@ std::optional<Ball> BallTracker::estimateBallState(
 			kalman_filter.state_covariance = INITIAL_COV;
 			consecutive_outliers = 0;
 		}
+		prev_detection_timestamp = current_time;
 	}
 
-	if (!prev_detection_timestamp && !dribbling_robot.has_value()){
+	if (!prev_detection_timestamp){
 		return std::nullopt;
 	}
 
