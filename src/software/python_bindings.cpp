@@ -424,6 +424,13 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::IpNotification>(m, "RobotIpNotification");
 
     // Senders
+    py::class_<ThreadedUdpSender, std::shared_ptr<ThreadedUdpSender>>(m, "ThreadedUdpSender")
+        .def(py::init<const std::string&, unsigned short, const std::string&, bool>())
+        .def("get_interface", &ThreadedUdpSender::getInterface)
+        .def("get_ip_address", &ThreadedUdpSender::getIpAddress)
+        .def("send_string", &ThreadedUdpSender::sendString, py::arg("message"),
+             py::arg("async") = false);
+
     declareThreadedProtoUdpSender<TbotsProto::Primitive>(m, "Primitive");
     declareThreadedProtoUdpSender<TbotsProto::IpNotification>(m, "FullsystemIpBroadcast");
 
