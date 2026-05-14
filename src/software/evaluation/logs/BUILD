@@ -34,7 +34,6 @@ py_library(
     deps = [
         ":event_log",
         ":log_interface",
-        ":pass_log",
         ":world_state_log",
     ],
 )

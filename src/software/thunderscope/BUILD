@@ -19,7 +19,6 @@ py_binary(
         ":estop_helpers",
         ":thunderscope",
         ":util",
-        "//software/evaluation/loggers:pass_logger",
         "//software/evaluation/loggers:stats_logger",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
