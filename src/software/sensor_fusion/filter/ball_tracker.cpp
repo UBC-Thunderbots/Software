@@ -113,6 +113,10 @@ std::optional<Ball> BallTracker::estimateBallState(
 	}
 
 
+	if (!prev_detection_timestamp && !dribbling_robot.has_value()){
+		return std::nullopt;
+	}
+
 	Eigen::Matrix<double,4,1> kalman_state = kalman_filter.getState();
 	Point ball_position = Point(kalman_state(0), kalman_state(1));
 	Vector ball_velocity = Vector(kalman_state(2), kalman_state(3));

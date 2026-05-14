@@ -233,9 +233,10 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
             Panic_S + Update_E / panic_A,
             PivotKickFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            PivotKickFSM_S + Update_E[ballInInflatedDefenseArea_G] / updatePivotKick_A,
-            PivotKickFSM_S + Update_E[!ballInInflatedDefenseArea_G] / positionToBlock_A =
-                PositionToBlock_S,
+            PivotKickFSM_S +
+                Update_E[ballInInflatedDefenseArea_G &&
+                         (shouldPivotChip_G || shouldPanic_G)] / updatePivotKick_A,
+            PivotKickFSM_S + Update_E / positionToBlock_A = PositionToBlock_S,
             MoveToGoalLine_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
             MoveToGoalLine_S + Update_E[!shouldMoveToGoalLine_G] / positionToBlock_A =
