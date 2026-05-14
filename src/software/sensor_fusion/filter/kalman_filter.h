@@ -1,95 +1,76 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <cmath>
 
 /**
- * A Kalman filter for tracking a 2D object using a constant velocity motion model.
+ * Linear Kalman filter for discrete-time state estimation.
  *
- * The state vector is [x, y, vx, vy]^T. Measurements are 2D positions [x, y]^T.
- * The filter supports predict/update steps as well as Mahalanobis-distance-based
- * gating and a hard reset when the tracked object jumps unexpectedly.
- */
-class KalmanFilter{
-
-
-public:
-
-/**
- * Creates a new KalmanFilter
+ * A Kalman filter combines a process model (how the state evolves over time)
+ * with noisy measurements (what sensors report) to produce an optimal estimate
+ * of the system state over time (assuming system model and noise are Gaussian).
  *
- * @param X The initial state vector [x, y, vx, vy]^T
- * @param P_i The initial state covariance matrix (4x4)
- * @param Q The process noise covariance matrix (4x4), representing uncertainty
- *          introduced by the motion model at each prediction step
- * @param R The measurement noise covariance matrix (2x2), representing
- *          uncertainty in position measurements
- * @param C The measurement matrix that maps the state space to the measurement
- *          space (2x4)
- * @param damping_term A scalar in [0, 1] applied to the velocity states each
- *                     predict step to model drag/friction
- */
-KalmanFilter(
-	const Eigen::Matrix<double, 4,1>& X,
-	const Eigen::Matrix<double, 4,4>& P_i,
-	const Eigen::Matrix<double, 4,4>& Q,
-	const Eigen::Matrix<double, 2,2>& R,
-	const Eigen::Matrix<double, 2,4>& C,
-	double damping_term
-	);
-
-/**
- * Propagates the state estimate forward in time using the constant-velocity
- * motion model and adds process noise to the covariance.
+ * It alternates between two steps:
+ * 1) predict: propagate state/covariance forward through the process model
+ * 2) update: correct that prediction with a new measurement
  *
- * @param delta_t Time elapsed since the last predict step, in seconds
- */
-void predict(const double delta_t);
-
-/**
- * Corrects the state estimate using a new position measurement.
+ * Resources:
+ * - https://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/
+ * - https://kalmanfilter.net/
+ * - https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python
+ * - https://web.mit.edu/kirtley/kirtley/binlustuff/literature/control/Kalman%20filter.pdf
  *
- * @param Z The measurement vector [x, y]^T
+ * @tparam DimX The dimension of the state
+ * @tparam DimY The dimension of measurement space
+ * @tparam DimU The dimension of control space
  */
-void update(const Eigen::Matrix<double,2,1> Z);
+template <int DimX, int DimY, int DimU>
+class KalmanFilter
+{
+   public:
+    /**
+     * Creates a Kalman filter with all internal matrices and vectors set to zero.
+     */
+    KalmanFilter();
 
-/**
- * Resets the filter to the given measurement, zeroing velocities and
- * restoring the initial covariance.
- *
- * @param Z The measurement vector [x, y]^T to reset the state to
- */
-void reset(const Eigen::Matrix<double,2,1> Z);
+    /**
+     * Creates a Kalman filter with the given initial state and model parameters.
+     *
+     * @param initial_state Initial state estimate (x)
+     * @param initial_state_covariance Initial state covariance (P)
+     * @param initial_process_model Initial process/state transition model (F)
+     * @param initial_process_covariance Initial process noise covariance (Q)
+     * @param initial_control_model Initial control-to-state transformation (B)
+     * @param initial_measurement_model Initial state-to-measurement transformation (H)
+     * @param initial_measurement_covariance Initial measurement noise covariance (R)
+     */
+    KalmanFilter(Eigen::Vector<double, DimX> initial_state,
+                 Eigen::Matrix<double, DimX, DimX> initial_state_covariance,
+                 Eigen::Matrix<double, DimX, DimX> initial_process_model,
+                 Eigen::Matrix<double, DimX, DimX> initial_process_covariance,
+                 Eigen::Matrix<double, DimX, DimU> initial_control_model,
+                 Eigen::Matrix<double, DimY, DimX> initial_measurement_model,
+                 Eigen::Matrix<double, DimY, DimY> initial_measurement_covariance);
 
-/**
- * Returns the squared Mahalanobis distance between the given measurement and
- * the current predicted measurement. Used for gating outlier detections.
- *
- * @param Z The measurement vector [x, y]^T to evaluate
- * @return The squared Mahalanobis distance
- */
-double getMahalanobisDistance(const Eigen::Matrix<double,2,1>& Z) const;
+    /**
+     * Predict the next state estimate.
+     *
+     * @param control_input Control input vector
+     */
+    void predict(Eigen::Vector<double, DimU> control_input);
 
-/**
- * Returns the current state estimate vector [x, y, vx, vy]^T.
- *
- * @return The current state vector (4x1)
- */
-Eigen::Matrix<double, 4,1> getState();
+    /**
+     * Correct the current state estimate with the given measurement.
+     *
+     * @param measurement Measurement vector
+     */
+    void update(Eigen::Vector<double, DimY> measurement);
 
-/**
- * Returns the current state covariance matrix.
- *
- * @return The current covariance matrix (4x4)
- */
-Eigen::Matrix<double, 4,4> getCovariance();
-
-private:
-Eigen::Matrix<double, 4,1> X; // State
-Eigen::Matrix<double, 4,4> P; // State Covariance
-Eigen::Matrix<double, 4,4> P_i; // Initial state covariance
-Eigen::Matrix<double, 4,4> Q; // Process noise covariance
-Eigen::Matrix<double, 2,2> R; // Measurement noise covariance
-Eigen::Matrix<double, 2,4> C; // State to measurement matrix
-double damping_term;
-
+    Eigen::Vector<double, DimX> state_estimate;
+    Eigen::Matrix<double, DimX, DimX> state_covariance;
+    Eigen::Matrix<double, DimX, DimX> process_model;
+    Eigen::Matrix<double, DimX, DimX> process_covariance;
+    Eigen::Matrix<double, DimX, DimU> control_model;
+    Eigen::Matrix<double, DimY, DimX> measurement_model;
+    Eigen::Matrix<double, DimY, DimY> measurement_covariance;
 };

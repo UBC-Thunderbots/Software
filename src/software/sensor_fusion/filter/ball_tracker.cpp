@@ -12,7 +12,7 @@
 #include "software/sensor_fusion/filter/kalman_filter.h"
 
 namespace {
-    const Eigen::Matrix<double,4,1> INITIAL_STATE = Eigen::Matrix<double,4,1>::Zero();
+    const Eigen::Vector<double, 4> INITIAL_STATE = Eigen::Vector<double, 4>::Zero();
 
     const Eigen::Matrix<double,4,4> INITIAL_COV = Eigen::Matrix<double,4,4>::Identity() * 1000.0;
 
@@ -33,8 +33,8 @@ namespace {
     // Empirically measured
 	const double DAMPING = 0.9889;
 
-	const double MAHANALOGIS_THRESHOLD=1;
-	const int CONSECUTIVE_OUTLIERS_THRESHOLD=3;
+	const double MAHANALOGIS_THRESHOLD = 1;
+	const int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
 
     // Max distance from the dribbler position for a vision detection to be trusted
     // while a robot is dribbling. Detections farther away are likely spurious.
@@ -43,7 +43,11 @@ namespace {
 
 BallTracker::BallTracker() :
 	consecutive_outliers(0),
-	kalman_filter(INITIAL_STATE, INITIAL_COV, Q, R, C, DAMPING)
+	kalman_filter(INITIAL_STATE, INITIAL_COV,
+	              Eigen::Matrix<double,4,4>::Identity(),
+	              Q,
+	              Eigen::Matrix<double,4,1>::Zero(),
+	              C, R)
 {
 }
 
@@ -64,10 +68,16 @@ std::optional<Ball> BallTracker::estimateBallState(
 	std::optional<BallDetection> best_ball_detection = getBestBallDetection(new_ball_detections);
 
 	if (prev_detection_timestamp){
-		double delta_t;
-		delta_t = (current_time - *prev_detection_timestamp).toSeconds();
+		double delta_t = (current_time - *prev_detection_timestamp).toSeconds();
 		prev_detection_timestamp = current_time;
-		kalman_filter.predict(delta_t);
+
+		Eigen::Matrix<double,4,4> A;
+		A << 1, 0, delta_t, 0,
+		     0, 1, 0,       delta_t,
+		     0, 0, DAMPING, 0,
+		     0, 0, 0,       DAMPING;
+		kalman_filter.process_model = A;
+		kalman_filter.predict(Eigen::Vector<double,1>::Zero());
 	}
 
     if (dribbling_robot.has_value())
@@ -79,7 +89,7 @@ std::optional<Ball> BallTracker::estimateBallState(
             (best_ball_detection->position - dribbler_pos).length() <=
                 DRIBBLING_MEASUREMENT_MAX_DISTANCE_METERS;
 
-        Eigen::Matrix<double, 2, 1> measurement;
+        Eigen::Vector<double, 2> measurement;
         if (near_dribbler)
         {
             measurement << best_ball_detection->position.x(),
@@ -89,43 +99,50 @@ std::optional<Ball> BallTracker::estimateBallState(
         else
         {
             measurement << dribbler_pos.x(), dribbler_pos.y();
-            kalman_filter.reset(measurement);
+            kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
+            kalman_filter.state_covariance = INITIAL_COV;
         }
         prev_detection_timestamp = current_time;
         consecutive_outliers     = 0;
     }
 	else if (best_ball_detection){
 		prev_detection_timestamp = current_time;
-		Eigen::Matrix<double,2,1> measurement;
+		Eigen::Vector<double, 2> measurement;
 		measurement << best_ball_detection->position.x(), best_ball_detection->position.y();
-		double mahalanobis = kalman_filter.getMahalanobisDistance(measurement);
-		if (mahalanobis< MAHANALOGIS_THRESHOLD){
+
+		const Eigen::Vector<double, 2> innovation =
+		    measurement - kalman_filter.measurement_model * kalman_filter.state_estimate;
+		const Eigen::Matrix<double, 2, 2> S =
+		    kalman_filter.measurement_model * kalman_filter.state_covariance *
+		    kalman_filter.measurement_model.transpose() + kalman_filter.measurement_covariance;
+		double mahalanobis = (innovation.transpose() * S.inverse() * innovation)(0, 0);
+
+		if (mahalanobis < MAHANALOGIS_THRESHOLD){
 			kalman_filter.update(measurement);
 		}
 		else{
 			consecutive_outliers++;
 		}
 
-		if (consecutive_outliers> CONSECUTIVE_OUTLIERS_THRESHOLD){
-			kalman_filter.reset(measurement);
-			consecutive_outliers=0;
+		if (consecutive_outliers > CONSECUTIVE_OUTLIERS_THRESHOLD){
+			kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
+			kalman_filter.state_covariance = INITIAL_COV;
+			consecutive_outliers = 0;
 		}
 	}
-
 
 	if (!prev_detection_timestamp && !dribbling_robot.has_value()){
 		return std::nullopt;
 	}
 
-	Eigen::Matrix<double,4,1> kalman_state = kalman_filter.getState();
-	Point ball_position = Point(kalman_state(0), kalman_state(1));
-	Vector ball_velocity = Vector(kalman_state(2), kalman_state(3));
-	double z_height =  best_ball_detection ? best_ball_detection->distance_from_ground : 0.0;
+	Point ball_position = Point(kalman_filter.state_estimate(0), kalman_filter.state_estimate(1));
+	Vector ball_velocity = Vector(kalman_filter.state_estimate(2), kalman_filter.state_estimate(3));
+	double z_height = best_ball_detection ? best_ball_detection->distance_from_ground : 0.0;
 
     BallState ball_state(ball_position, ball_velocity, z_height);
-    return Ball(ball_state,current_time);
-
+    return Ball(ball_state, current_time);
 }
+
 std::optional<BallDetection> BallTracker::getBestBallDetection(const std::vector<BallDetection> &new_ball_detections){
 	if (new_ball_detections.empty()){
 		return std::nullopt;

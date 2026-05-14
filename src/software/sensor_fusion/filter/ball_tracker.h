@@ -61,6 +61,6 @@ class BallTracker
      */
 	std::optional<BallDetection> getBestBallDetection(const std::vector<BallDetection> &new_ball_detections);
 	int consecutive_outliers;
-	KalmanFilter kalman_filter;
+	KalmanFilter<4, 2, 1> kalman_filter;
 	std::optional<Timestamp> prev_detection_timestamp;
 };

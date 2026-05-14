@@ -1,63 +1,71 @@
 #include "software/sensor_fusion/filter/kalman_filter.h"
 
-KalmanFilter::KalmanFilter(
-const Eigen::Matrix<double, 4,1>& X,
-const Eigen::Matrix<double, 4,4>& P_i,
-const Eigen::Matrix<double,4,4> & Q,
-const Eigen::Matrix<double, 2,2>& R,
-const Eigen::Matrix<double, 2,4>& C,
-double damping_term
-		):
-X(X),
-P(P_i),
-P_i(P_i),
-Q(Q),
-R(R),
-C(C),
-damping_term(damping_term)
+template <int DimX, int DimY, int DimU>
+KalmanFilter<DimX, DimY, DimU>::KalmanFilter()
+    : state_estimate(Eigen::Vector<double, DimX>::Zero()),
+      state_covariance(Eigen::Matrix<double, DimX, DimX>::Zero()),
+      process_model(Eigen::Matrix<double, DimX, DimX>::Zero()),
+      process_covariance(Eigen::Matrix<double, DimX, DimX>::Zero()),
+      control_model(Eigen::Matrix<double, DimX, DimU>::Zero()),
+      measurement_model(Eigen::Matrix<double, DimY, DimX>::Zero()),
+      measurement_covariance(Eigen::Matrix<double, DimY, DimY>::Zero())
 {
 }
 
-void KalmanFilter::predict(const double delta_t){
-
-	Eigen::Matrix<double, 4,4> A;
-
-	// Using the constant velocity model as motion model
-	A << 1, 0, delta_t, 0,
-		 0, 1, 0, delta_t,
-		 0, 0, damping_term, 0,
-		 0, 0, 0, damping_term;
-
-	X = A*X;
-
-	P = A*P*A.transpose() + Q;
+template <int DimX, int DimY, int DimU>
+KalmanFilter<DimX, DimY, DimU>::KalmanFilter(
+    Eigen::Vector<double, DimX> initial_state,
+    Eigen::Matrix<double, DimX, DimX> initial_state_covariance,
+    Eigen::Matrix<double, DimX, DimX> initial_process_model,
+    Eigen::Matrix<double, DimX, DimX> initial_process_covariance,
+    Eigen::Matrix<double, DimX, DimU> initial_control_model,
+    Eigen::Matrix<double, DimY, DimX> initial_measurement_model,
+    Eigen::Matrix<double, DimY, DimY> initial_measurement_covariance)
+    : state_estimate(initial_state),
+      state_covariance(initial_state_covariance),
+      process_model(initial_process_model),
+      process_covariance(initial_process_covariance),
+      control_model(initial_control_model),
+      measurement_model(initial_measurement_model),
+      measurement_covariance(initial_measurement_covariance)
+{
 }
 
-void KalmanFilter::update(const Eigen::Matrix<double,2,1> Z){
-	Eigen::Matrix<double, 4,2> Kg;
-	Eigen::Matrix<double,2,2> S =C*P*C.transpose()+R;
-	Kg = P*C.transpose() * S.inverse();
-	X = X + Kg*(Z-C*X);
-	P = (Eigen::Matrix<double,4,4>::Identity()-Kg*C)*P;
+template <int DimX, int DimY, int DimU>
+void KalmanFilter<DimX, DimY, DimU>::predict(Eigen::Vector<double, DimU> control_input)
+{
+    state_estimate = process_model * state_estimate + control_model * control_input;
+    state_covariance =
+        process_model * state_covariance * process_model.transpose() + process_covariance;
 }
 
-void KalmanFilter::reset(const Eigen::Matrix<double,2,1> Z){
-	X << Z(0), Z(1), 0, 0;
-	P = P_i;
+template <int DimX, int DimY, int DimU>
+void KalmanFilter<DimX, DimY, DimU>::update(Eigen::Vector<double, DimY> measurement)
+{
+    const Eigen::Vector<double, DimY> innovation =
+        measurement - measurement_model * state_estimate;
+
+    const Eigen::Matrix<double, DimY, DimY> innovation_covariance =
+        measurement_model * state_covariance * measurement_model.transpose() +
+        measurement_covariance;
+    const Eigen::Matrix<double, DimY, DimY> regularized_innovation_covariance =
+        innovation_covariance.unaryExpr(
+            [](double value) { return (std::abs(value) < 1.0e-20) ? 0.0 : value; });
+
+    const Eigen::Matrix<double, DimX, DimY> kalman_gain =
+        state_covariance *
+        (measurement_model.transpose() *
+         regularized_innovation_covariance.completeOrthogonalDecomposition()
+             .pseudoInverse());
+
+    state_estimate = state_estimate + kalman_gain * innovation;
+
+    // Joseph form — more numerically stable than P = (I - K*H) * P
+    const Eigen::Matrix<double, DimX, DimX> factor =
+        Eigen::Matrix<double, DimX, DimX>::Identity() - kalman_gain * measurement_model;
+    state_covariance = factor * state_covariance * factor.transpose() +
+                       kalman_gain * measurement_covariance * kalman_gain.transpose();
 }
 
-double KalmanFilter::getMahalanobisDistance(const Eigen::Matrix<double,2,1>& Z) const {
-	Eigen::Matrix<double,2,2> S =C*P*C.transpose()+R ;
-	// Calculate the mahalanobis distance for gating
-	double M = ((Z - C*X).transpose() * S.inverse() * (Z-C*X))(0,0);
-	return M;
-}
-
-Eigen::Matrix<double, 4,1> KalmanFilter::getState(){
-	return X;
-}
-
-Eigen::Matrix<double, 4,4> KalmanFilter::getCovariance(){
-	return P;
-}
-
+// Explicit instantiation for the ball tracker
+template class KalmanFilter<4, 2, 1>;
