@@ -63,4 +63,6 @@ class BallTracker
 	int consecutive_outliers;
 	KalmanFilter<4, 2, 1> kalman_filter;
 	std::optional<Timestamp> prev_detection_timestamp;
+	// Position from the first detection — used to seed velocity on the second detection
+	std::optional<Eigen::Vector<double, 2>> initial_detection_pos_;
 };

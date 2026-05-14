@@ -67,13 +67,14 @@ std::optional<Ball> BallTracker::estimateBallState(
 
 	std::optional<BallDetection> best_ball_detection = getBestBallDetection(new_ball_detections);
 
+    double dt = 0.0;
 	if (prev_detection_timestamp){
-		double delta_t = (current_time - *prev_detection_timestamp).toSeconds();
+		dt = (current_time - *prev_detection_timestamp).toSeconds();
 		prev_detection_timestamp = current_time;
 
 		Eigen::Matrix<double,4,4> A;
-		A << 1, 0, delta_t, 0,
-		     0, 1, 0,       delta_t,
+		A << 1, 0, dt, 0,
+		     0, 1, 0,  dt,
 		     0, 0, DAMPING, 0,
 		     0, 0, 0,       DAMPING;
 		kalman_filter.process_model = A;
@@ -106,9 +107,24 @@ std::optional<Ball> BallTracker::estimateBallState(
         consecutive_outliers     = 0;
     }
 	else if (best_ball_detection){
-		prev_detection_timestamp = current_time;
 		Eigen::Vector<double, 2> measurement;
 		measurement << best_ball_detection->position.x(), best_ball_detection->position.y();
+
+        if (!prev_detection_timestamp){
+            // First detection: store position to compute velocity on the next frame
+            initial_detection_pos_ = measurement;
+            prev_detection_timestamp = current_time;
+            return std::nullopt;
+        }
+
+        // Second detection: seed Kalman velocity from finite-difference
+        if (initial_detection_pos_.has_value() && dt > 0){
+            double vx = (measurement(0) - (*initial_detection_pos_)(0)) / dt;
+            double vy = (measurement(1) - (*initial_detection_pos_)(1)) / dt;
+            kalman_filter.state_estimate << measurement(0), measurement(1), vx, vy;
+            kalman_filter.state_covariance = INITIAL_COV;
+            initial_detection_pos_ = std::nullopt;
+        }
 
 		const Eigen::Vector<double, 2> innovation =
 		    measurement - kalman_filter.measurement_model * kalman_filter.state_estimate;
