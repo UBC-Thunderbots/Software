@@ -9,6 +9,7 @@
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
+#include "software/world/robot.h"
 #include "software/sensor_fusion/filter/kalman_filter.h"
 
 /**
@@ -46,7 +47,8 @@ class BallTracker
     std::optional<Ball> estimateBallState(
         const std::vector<BallDetection>& new_ball_detections,
         const Rectangle& filter_area,
-		const Timestamp& current_time);
+		const Timestamp& current_time,
+        std::optional<Robot> dribbling_robot = std::nullopt);
 
    private:
     /**

@@ -32,6 +32,8 @@ cc_library(
         "//software/math:math_functions",
         "//software/world:ball",
         "//software/world:field",
+        "//software/world:robot",
+        "//software:constants",
         "@boost//:circular_buffer",
         "@eigen",
     ],

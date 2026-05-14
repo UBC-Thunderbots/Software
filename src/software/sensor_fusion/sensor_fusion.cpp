@@ -288,19 +288,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
         std::optional<Robot> robot_with_ball_in_dribbler =
             friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
 
-        std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
-            .position =
-                robot_with_ball_in_dribbler->position() +
-                Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                               BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
-            .distance_from_ground = 0,
-            .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-            .confidence = 1}};
-
-		
-
-        std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
+        std::optional<Ball> new_ball = createBall({}, Timestamp::fromSeconds(ssl_detection_frame.t_capture()), robot_with_ball_in_dribbler);
 
         if (new_ball)
         {
@@ -351,12 +339,14 @@ void SensorFusion::updateBall(Ball new_ball)
 }
 
 std::optional<Ball> SensorFusion::createBall(
-    const std::vector<BallDetection> &ball_detections, const Timestamp& current_time)
+    const std::vector<BallDetection> &ball_detections, const Timestamp& current_time,
+    std::optional<Robot> dribbling_robot)
 {
     if (field)
     {
         std::optional<Ball> new_ball =
-            ball_tracker.estimateBallState(ball_detections, field.value().fieldBoundary(), current_time);
+            ball_tracker.estimateBallState(ball_detections, field.value().fieldBoundary(),
+                                           current_time, dribbling_robot);
         return new_ball;
     }
     return std::nullopt;

@@ -7,7 +7,6 @@ from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from software.simulated_tests.validation.ball_enters_region import *
-from software.simulated_tests.validation.ball_enters_region_true import *
 from software.simulated_tests.validation.ball_moves_in_direction import *
 from software.simulated_tests.validation.ball_speed_threshold import *
 from software.simulated_tests.validation.excessive_dribbling import *
@@ -138,7 +137,7 @@ def test_goalie_blocks_shot(
             RobotNeverEntersRegion(
                 regions=[tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea()]
             ),
-            BallNeverEntersRegionTrue(
+            BallNeverEntersRegion(
                 regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
             ),
             NeverExcessivelyDribbles(),
@@ -216,7 +215,7 @@ def test_goalie_clears_from_dead_zone(
 
     always_validation_sequence_set = [
         [
-            BallNeverEntersRegionTrue(
+            BallNeverEntersRegion(
                 regions=[
                     tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
                 ]
@@ -231,7 +230,7 @@ def test_goalie_clears_from_dead_zone(
         eventually_validation_sequence_set = [
             [
                 # Goalie should be in the defense area
-                BallEventuallyExitsRegionTrue(
+                BallEventuallyExitsRegion(
                     regions=[
                         tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
                     ]

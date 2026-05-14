@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "shared/constants.h"
+#include "software/constants.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/math/math_functions.h"
@@ -35,6 +36,9 @@ namespace {
 	const double MAHANALOGIS_THRESHOLD=1;
 	const int CONSECUTIVE_OUTLIERS_THRESHOLD=3;
 
+    // Max distance from the dribbler position for a vision detection to be trusted
+    // while a robot is dribbling. Detections farther away are likely spurious.
+    const double DRIBBLING_MEASUREMENT_MAX_DISTANCE_METERS = 0.15;
 }
 
 BallTracker::BallTracker() :
@@ -44,8 +48,19 @@ BallTracker::BallTracker() :
 }
 
 std::optional<Ball> BallTracker::estimateBallState(
-    const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area, const Timestamp& current_time)
+    const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area,
+    const Timestamp& current_time, std::optional<Robot> dribbling_robot)
 {
+    Point dribbler_pos;
+    if (dribbling_robot.has_value())
+    {
+        dribbler_pos =
+            dribbling_robot->position() +
+            Vector::createFromAngle(dribbling_robot->orientation())
+                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                           BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING);
+    }
+
 	std::optional<BallDetection> best_ball_detection = getBestBallDetection(new_ball_detections);
 
 	if (prev_detection_timestamp){
@@ -54,7 +69,32 @@ std::optional<Ball> BallTracker::estimateBallState(
 		prev_detection_timestamp = current_time;
 		kalman_filter.predict(delta_t);
 	}
-	if (best_ball_detection){
+
+    if (dribbling_robot.has_value())
+    {
+        // When dribbling, only trust a vision measurement if it shows the ball
+        // close to the dribbler. Otherwise reset to the kinematic dribbler position.
+        bool near_dribbler =
+            best_ball_detection.has_value() &&
+            (best_ball_detection->position - dribbler_pos).length() <=
+                DRIBBLING_MEASUREMENT_MAX_DISTANCE_METERS;
+
+        Eigen::Matrix<double, 2, 1> measurement;
+        if (near_dribbler)
+        {
+            measurement << best_ball_detection->position.x(),
+                best_ball_detection->position.y();
+            kalman_filter.update(measurement);
+        }
+        else
+        {
+            measurement << dribbler_pos.x(), dribbler_pos.y();
+            kalman_filter.reset(measurement);
+        }
+        prev_detection_timestamp = current_time;
+        consecutive_outliers     = 0;
+    }
+	else if (best_ball_detection){
 		prev_detection_timestamp = current_time;
 		Eigen::Matrix<double,2,1> measurement;
 		measurement << best_ball_detection->position.x(), best_ball_detection->position.y();
