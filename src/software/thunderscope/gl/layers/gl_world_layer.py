@@ -328,20 +328,11 @@ class GLWorldLayer(GLLayer):
         if len(self.cached_world.friendly_team.team_robots) > 0:
             world_time = self.cached_world.time_sent.epoch_timestamp_seconds
             robot_time = self.cached_world.friendly_team.team_robots[0].timestamp.epoch_timestamp_seconds
-            # diff = int(abs(abs(world_time - robot_time) - 18.5) * 100) # PLOT THIS PLEASE
             diff = world_time - robot_time
 
             # Send diff to PlotJuggler
             payload = {"timestamp": world_time, "data": {"vision_latency_diff": diff}}
             self.pj_sender.send_string(json.dumps(payload))
-            # print(world_time - robot_time)
-            # diff = world_time - robot_time + 18
-            # print(diff)
-
-        # if len(self.cached_world.friendly_team.team_robots) == 0:
-        #     print("#" * 20)
-        # else:
-        #     print("")
 
         # if not receiving worlds, just render an empty field
         if is_field_message_empty(self.cached_world.field):
