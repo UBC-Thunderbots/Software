@@ -16,7 +16,7 @@ class DelayValidation(Validation):
         self.validation = validation
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks validation after delay finished. If during delay, returns default validation status.
 
         :param world: The world msg to validate
