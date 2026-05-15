@@ -188,7 +188,9 @@ def run_validation_sequence_sets(
         validation_proto = ValidationProto()
 
         # Get status
-        status = validation.get_validation_status(world, simulator_state=simulator_state)
+        status = validation.get_validation_status(
+            world, simulator_state=simulator_state
+        )
 
         # Create validation proto
         validation_proto.status = status

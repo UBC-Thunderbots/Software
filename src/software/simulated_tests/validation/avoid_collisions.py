@@ -21,7 +21,9 @@ class RobotsDoNotCollide(Validation):
         self.fouled_robots = []
 
     @override
-    def get_validation_status(self, world: World, simulator_state=None) -> ValidationStatus:
+    def get_validation_status(
+        self, world: World, simulator_state=None
+    ) -> ValidationStatus:
         """Checks if any 2 robots in the world have collided
 
         :param world: the World message to validate
