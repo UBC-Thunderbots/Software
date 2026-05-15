@@ -56,43 +56,6 @@ py_library(
     ],
 )
 
-# TODO (#2581): remove
-cc_library(
-    name = "simulated_er_force_sim_test_fixture",
-    testonly = True,
-    srcs = ["simulated_er_force_sim_test_fixture.cpp"],
-    hdrs = ["simulated_er_force_sim_test_fixture.h"],
-    deps = [
-        "//software/logger",
-        "//proto/message_translation:tbots_protobuf",
-        "//proto:play_info_msg_cc_proto",
-        "//software/sensor_fusion",
-        "//software/simulated_tests/cpp_validation:non_terminating_function_validator",
-        "//software/simulated_tests/cpp_validation:terminating_function_validator",
-        "//software/simulation:er_force_simulator",
-        "//software/test_util",
-        "//software/time:duration",
-        "//shared/test_util:tbots_gtest_main",
-        "//shared/test_util",
-        # TODO (#1889) Remove this dep after optional params are implemented
-        "//software/ai/hl/stp/play/halt_play",
-        "//proto/message_translation:er_force_world",
-    ],
-)
-
-# TODO (#2581): remove
-cc_library(
-    name = "simulated_er_force_sim_play_test_fixture",
-    testonly = True,
-    srcs = ["simulated_er_force_sim_play_test_fixture.cpp"],
-    hdrs = ["simulated_er_force_sim_play_test_fixture.h"],
-    deps = [
-        ":simulated_er_force_sim_test_fixture",
-        "//software/ai",
-        "@googletest//:gtest",
-    ],
-)
-
 py_test(
     name = "simulated_test_ball_model",
     srcs = [
