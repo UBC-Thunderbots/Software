@@ -19,7 +19,7 @@ class ExcessivelyDribbling(Validation):
         self.dribbling_error_margin = 0.05
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball past the max dribble displacement
         minus the dribbling error margin
 
