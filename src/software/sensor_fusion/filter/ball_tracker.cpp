@@ -26,6 +26,10 @@ namespace {
         0.0226, 0,
         0, 0.00445).finished();
 
+    const Eigen::Matrix<double,2,2> R_DRIBBLING = (Eigen::Matrix<double,2,2>() <<
+        0.0001, 0,
+        0, 0.0001).finished();
+
     const Eigen::Matrix<double,2,4> C = (Eigen::Matrix<double,2,4>() <<
         1, 0, 0, 0,
         0, 1, 0, 0).finished();
@@ -91,7 +95,9 @@ std::optional<Ball> BallTracker::estimateBallState(
         {
             measurement << best_ball_detection->position.x(),
                 best_ball_detection->position.y();
+            kalman_filter.measurement_covariance = R_DRIBBLING;
             kalman_filter.update(measurement);
+            kalman_filter.measurement_covariance = R;
         }
         else
         {
