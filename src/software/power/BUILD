@@ -68,7 +68,7 @@ platformio_project(
     build_flags = ["-DPB_FIELD_32BIT=1"],  #Makes platformio use 16 bit numbers for size
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
-    platform = "espressif32",
+    platform = "espressif32\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset",
     deps = [
         ":charger",
         ":chicker",
@@ -82,11 +82,17 @@ platformio_project(
     ],
 )
 
+# Integrates automatic bootloader mode / completion reset
 genrule(
     name = "powerloop_tar",
+    srcs = ["auto_reset.py"],
     outs = ["powerloop.tar.gz"],
     cmd = """
         TARGET_DIR=$$(dirname $(location :powerloop_main))
+        cp $(location :auto_reset.py) "$$TARGET_DIR/powerloop_main_workdir/"
+        chmod +w "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
+        echo "" >> "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
+        echo "extra_scripts = pre:auto_reset.py" >> "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
         tar -C "$$TARGET_DIR" -czhf $@ "powerloop_main_workdir"
     """,
     local = True,
