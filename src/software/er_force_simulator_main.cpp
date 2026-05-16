@@ -48,6 +48,7 @@ int main(int argc, char** argv)
     {
         std::string runtime_dir = args.runtime_dir;
         LoggerSingleton::initializeLogger(runtime_dir, nullptr);
+        LOG(CSV, "realism_kalman_filter_v8_2.csv") << "timestamp_s,fused_x,fused_y,fused_vel_x, fused_vel_y, truth_x,truth_y, true_vel_x, true_vel_y,is_occluded\n";
 
         /**
          * Creates a ER force simulator and sets up the appropriate
@@ -132,6 +133,7 @@ int main(int argc, char** argv)
                 runtime_dir + WORLD_STATE_RECEIVED_TRIGGER_PATH);
 
         bool has_sent_world_state_trigger = false;
+        double start_timestamp_s          = 0.0;
 
         // Inputs
         // World State Input: Configures the ERForceSimulator
@@ -220,7 +222,26 @@ int main(int argc, char** argv)
                     yellow_robot_status_output.sendProto(packet);
                 }
 
-                simulator_state_output.sendProto(er_force_sim->getSimulatorState());
+                auto sim_state = er_force_sim->getSimulatorState();
+                double current_ts = yellow_vision.time_sent().epoch_timestamp_seconds();
+                if (start_timestamp_s == 0.0)
+                {
+                    start_timestamp_s = current_ts;
+                }
+                LOG(CSV, "realism_kalman_filter_v8_2.csv")
+                    << (current_ts - start_timestamp_s) << ","
+                    << yellow_vision.ball().current_state().global_position().x_meters()
+                    << ","
+                    << yellow_vision.ball().current_state().global_position().y_meters()
+                    << ","
+                    << yellow_vision.ball().current_state().global_velocity().x_component_meters()
+                    << ","
+                    << yellow_vision.ball().current_state().global_velocity().y_component_meters()
+                    << "," << sim_state.ball().p_x() << "," << sim_state.ball().p_y()
+                    << "," << sim_state.ball().v_x() << "," << sim_state.ball().v_y()
+                    << "," << !er_force_sim->isBallVisible()
+                    << "\n";
+                simulator_state_output.sendProto(sim_state);
             });
 
         // This blocks forever without using the CPU

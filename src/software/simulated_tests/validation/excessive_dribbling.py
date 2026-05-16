@@ -5,6 +5,7 @@ from software.simulated_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
+    get_ball_pos,
 )
 from typing import override
 
@@ -19,7 +20,7 @@ class ExcessivelyDribbling(Validation):
         self.dribbling_error_margin = 0.05
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball past the max dribble displacement
         minus the dribbling error margin
 
@@ -27,7 +28,8 @@ class ExcessivelyDribbling(Validation):
         :return: FAILING when the robot is excessively dribbling
                  PASSING when the robot is not excessively dribbling
         """
-        ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
+        bx, by = get_ball_pos(world, simulator_state)
+        ball_position = tbots_cpp.Point(bx, by)
         for robot in world.friendly_team.team_robots:
             if tbots_cpp.Robot(robot).isNearDribbler(
                 ball_position, self.dribbler_tolerance

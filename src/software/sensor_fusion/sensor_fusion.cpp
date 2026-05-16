@@ -12,7 +12,7 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       game_state(),
       referee_stage(std::nullopt),
       dribble_displacement(std::nullopt),
-      ball_filter(),
+      ball_tracker(),
       friendly_team_filter(),
       enemy_team_filter(),
       possession(TeamPossession::FRIENDLY_TEAM),
@@ -287,18 +287,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
         // checked by the member function shouldTrustRobotStatus
         std::optional<Robot> robot_with_ball_in_dribbler =
             friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
-
-        std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
-            .position =
-                robot_with_ball_in_dribbler->position() +
-                Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                               BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
-            .distance_from_ground = 0,
-            .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-            .confidence = 1}};
-
-        std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+        std::optional<Ball> new_ball = createBall({}, Timestamp::fromSeconds(ssl_detection_frame.t_capture()), robot_with_ball_in_dribbler);
 
         if (new_ball)
         {
@@ -307,7 +296,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
     }
     else
     {
-        std::optional<Ball> new_ball = createBall(ball_detections);
+        std::optional<Ball> new_ball = createBall(ball_detections, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
         if (new_ball)
         {
             // If vision detected a new ball, then use that one
@@ -349,12 +338,14 @@ void SensorFusion::updateBall(Ball new_ball)
 }
 
 std::optional<Ball> SensorFusion::createBall(
-    const std::vector<BallDetection>& ball_detections)
+    const std::vector<BallDetection> &ball_detections, const Timestamp& current_time,
+    std::optional<Robot> dribbling_robot)
 {
     if (field)
     {
         std::optional<Ball> new_ball =
-            ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary());
+            ball_tracker.estimateBallState(ball_detections, field.value().fieldBoundary(),
+                                           current_time, dribbling_robot);
         return new_ball;
     }
     return std::nullopt;
@@ -512,7 +503,7 @@ void SensorFusion::resetWorldComponents()
     enemy_team           = Team();
     game_state           = GameState();
     referee_stage        = std::nullopt;
-    ball_filter          = BallFilter();
+    ball_tracker         = BallTracker();
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     possession           = TeamPossession::FRIENDLY_TEAM;

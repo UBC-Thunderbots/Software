@@ -49,7 +49,7 @@ class HRVORobotEntersRegionAndStops:
 
         self.is_stationary = True
 
-    def get_validation_status(self, world: tbots.World) -> ValidationStatus:
+    def get_validation_status(self, world: tbots.World, simulator_state=None) -> ValidationStatus:
         """Checks if a specific robot id is in the provided region
         Then checks if that robot is stationary within a threshold for the provided number of ticks
 

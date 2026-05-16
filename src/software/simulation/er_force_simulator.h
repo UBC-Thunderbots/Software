@@ -131,6 +131,11 @@ class ErForceSimulator
     void resetCurrentTime();
 
     /**
+     * Returns whether the ball is currently visible (not occluded by a robot)
+     */
+    bool isBallVisible() const;
+
+    /**
      * Creates the default realism config using erforce simulator's default config
      * @return a pointer to default realism config
      */
@@ -229,7 +234,9 @@ class ErForceSimulator
     std::optional<RobotId> yellow_robot_with_ball;
 
     bool ramping;
+    bool ball_is_visible_ = true;
 
     const std::string CONFIG_FILE      = "simulator/2020";
     const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
+	bool is_ball_visible;
 };

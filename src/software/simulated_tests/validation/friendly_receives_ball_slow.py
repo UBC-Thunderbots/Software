@@ -24,7 +24,7 @@ class FriendlyReceivesBallSlow(FriendlyHasBallPossession):
         self.max_receive_speed = max_receive_speed
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if the specified robot receives the ball too fast
 
         :param world: The world msg to validate

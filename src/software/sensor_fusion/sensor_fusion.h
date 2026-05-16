@@ -7,7 +7,7 @@
 #include "proto/message_translation/ssl_referee.h"
 #include "proto/parameters.pb.h"
 #include "proto/sensor_msg.pb.h"
-#include "software/sensor_fusion/filter/ball_filter.h"
+#include "software/sensor_fusion/filter/ball_tracker.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/sensor_fusion/possession/possession_tracker.h"
@@ -95,7 +95,9 @@ class SensorFusion
      *
      * @return Ball if filtered from ball detections
      */
-    std::optional<Ball> createBall(const std::vector<BallDetection>& ball_detections);
+    std::optional<Ball> createBall(const std::vector<BallDetection> &ball_detections,
+                                   const Timestamp& current_time,
+                                   std::optional<Robot> dribbling_robot = std::nullopt);
 
     /**
      * Create team from a list of robot detections
@@ -191,7 +193,7 @@ class SensorFusion
     std::optional<Segment> dribble_displacement;
 
 
-    BallFilter ball_filter;
+    BallTracker ball_tracker;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
 

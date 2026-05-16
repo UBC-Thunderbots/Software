@@ -22,7 +22,7 @@ class FriendlyHasBallPossession(Validation):
         self.tolerance = tolerance
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if friendly robot has possession of the ball
 
         :param world: The world msg to validate

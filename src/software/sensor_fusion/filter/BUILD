@@ -16,25 +16,36 @@ cc_library(
 )
 
 cc_library(
-    name = "ball_filter",
-    srcs = ["ball_filter.cpp"],
-    hdrs = ["ball_filter.h"],
+    name = "kalman_filter",
+    srcs = ["kalman_filter.cpp"],
+    hdrs = ["kalman_filter.h"],
+    deps = [
+        "@eigen",
+    ],
+)
+cc_library(
+    name = "ball_tracker",
+    srcs = ["ball_tracker.cpp"],
+    hdrs = ["ball_tracker.h"],
     deps = [
         ":vision_detection",
+		":kalman_filter",
         "//software/geom/algorithms",
         "//software/math:math_functions",
         "//software/world:ball",
         "//software/world:field",
+        "//software/world:robot",
+        "//software:constants",
         "@boost//:circular_buffer",
         "@eigen",
     ],
 )
 
 cc_test(
-    name = "ball_filter_test",
-    srcs = ["ball_filter_test.cpp"],
+    name = "ball_tracker_test",
+    srcs = ["ball_tracker_test.cpp"],
     deps = [
-        ":ball_filter",
+        ":ball_tracker",
         "//shared/test_util:tbots_gtest_main",
         "//software/world:field",
     ],
@@ -83,33 +94,7 @@ cc_test(
 cc_library(
     name = "sensor_fusion_filters",
     deps = [
-        ":ball_filter",
+        ":ball_tracker",
         ":robot_team_filter",
-    ],
-)
-
-cc_test(
-    name = "ball_occlusion_cpp_test",
-    srcs = ["ball_occlusion_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play/halt_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-py_test(
-    name = "ball_occlusion_test",
-    srcs = ["ball_occlusion_test.py"],
-    tags = ["exclusive"],
-    deps = [
-        "//software:conftest",
-        "//software/simulated_tests/validation:validations",
-        requirement("pytest"),
     ],
 )

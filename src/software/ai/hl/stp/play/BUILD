@@ -87,21 +87,6 @@ py_test(
     ],
 )
 
-cc_test(
-    name = "stop_play_cpp_test",
-    srcs = ["stop_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:stop_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
 py_test(
     name = "stop_play_test",
     srcs = [
