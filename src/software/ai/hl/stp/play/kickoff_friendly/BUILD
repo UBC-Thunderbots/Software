@@ -45,15 +45,11 @@ cc_test(
 py_test(
     name = "kickoff_friendly_play_test",
     srcs = ["kickoff_friendly_play_test.py"],
-    package_collisions = "warning",
+    package_collisions = "ignore",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-        requirement("pyqt6"),
-        requirement("numpy"),
-        requirement("pyqtdarktheme-fork"),
-        requirement("pyqtgraph"),
     ],
 )

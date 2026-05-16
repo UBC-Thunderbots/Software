@@ -154,16 +154,13 @@ cc_test(
 py_test(
     name = "simulated_hrvo_test",
     srcs = ["simulated_hrvo_test.py"],
-    package_collisions = "warning",
+    package_collisions = "ignore",
     tags = ["exclusive"],
     deps = [
         "//proto/message_translation:py_tbots_protobuf",
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-        requirement("pyqt6"),
-        requirement("numpy"),
-        requirement("pyqtdarktheme-fork"),
-        requirement("pyqtgraph"),
+
     ],
 )

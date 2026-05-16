@@ -34,7 +34,7 @@ py_test(
     srcs = [
         "offense_play_test.py",
     ],
-    package_collisions = "warning",
+    package_collisions = "ignore",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",
@@ -43,9 +43,6 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-        requirement("pyqt6"),
-        requirement("numpy"),
-        requirement("pyqtdarktheme-fork"),
-        requirement("pyqtgraph"),
+
     ],
 )

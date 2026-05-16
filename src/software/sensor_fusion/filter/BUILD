@@ -107,15 +107,12 @@ cc_test(
 py_test(
     name = "ball_occlusion_test",
     srcs = ["ball_occlusion_test.py"],
-    package_collisions = "warning",
+    package_collisions = "ignore",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-        requirement("pyqt6"),
-        requirement("numpy"),
-        requirement("pyqtdarktheme-fork"),
-        requirement("pyqtgraph"),
+
     ],
 )

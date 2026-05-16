@@ -77,11 +77,8 @@ py_test(
     srcs = [
         "kickoff_play_test.py",
     ],
-    env = {
-        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
-        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
-    },
-    package_collisions = "warning",
+
+    package_collisions = "ignore",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",
@@ -90,10 +87,7 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-        requirement("pyqt6"),
-        requirement("numpy"),
-        requirement("pyqtdarktheme-fork"),
-        requirement("pyqtgraph"),
+
     ],
 )
 
@@ -117,13 +111,10 @@ py_test(
     srcs = [
         "stop_play_test.py",
     ],
-    env = {
-        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
-        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
-    },
+
     # The default main would be stop_play_test.py; override to our file.
     main = "stop_play_test.py",
-    package_collisions = "warning",
+    package_collisions = "ignore",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",
@@ -132,10 +123,7 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-        requirement("pyqt6"),
-        requirement("numpy"),
-        requirement("pyqtdarktheme-fork"),
-        requirement("pyqtgraph"),
+
     ],
 )
 
@@ -184,11 +172,7 @@ py_test(
     data = [
         "//software:py_constants.so",
     ],
-    env = {
-        "LD_LIBRARY_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/lib",
-        "QTWEBENGINEPROCESS_PATH": "../.thunderscope_main.venv/lib/python3.12/site-packages/PyQt6/Qt6/libexec/QtWebEngineProcess",
-    },
-    package_collisions = "warning",
+    package_collisions = "ignore",
     tags = ["exclusive"],
     deps = [
         "//proto:import_all_protos",
@@ -197,9 +181,6 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-        requirement("pyqt6"),
-        requirement("numpy"),
-        requirement("pyqtdarktheme-fork"),
-        requirement("pyqtgraph"),
+
     ],
 )

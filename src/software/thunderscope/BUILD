@@ -14,7 +14,7 @@ compile_pip_requirements(
 py_binary(
     name = "thunderscope_main",
     srcs = ["thunderscope_main.py"],
-    package_collisions = "warning",
+    package_collisions = "ignore",
     deps = [
         ":config",
         ":constants",

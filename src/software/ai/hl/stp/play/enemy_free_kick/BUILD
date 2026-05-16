@@ -41,7 +41,7 @@ py_test(
     srcs = [
         "enemy_free_kick_play_test.py",
     ],
-    package_collisions = "warning",
+    package_collisions = "ignore",
     tags = [
         "exclusive",
     ],
@@ -49,9 +49,5 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-        requirement("pyqt6"),
-        requirement("numpy"),
-        requirement("pyqtdarktheme-fork"),
-        requirement("pyqtgraph"),
     ],
 )
