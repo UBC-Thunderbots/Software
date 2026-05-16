@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -76,6 +77,7 @@ py_test(
     srcs = [
         "kickoff_play_test.py",
     ],
+    package_collisions = "ignore",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",
@@ -107,8 +109,10 @@ py_test(
     srcs = [
         "stop_play_test.py",
     ],
+
     # The default main would be stop_play_test.py; override to our file.
     main = "stop_play_test.py",
+    package_collisions = "ignore",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",
@@ -165,6 +169,7 @@ py_test(
     data = [
         "//software:py_constants.so",
     ],
+    package_collisions = "ignore",
     tags = ["exclusive"],
     deps = [
         "//proto:import_all_protos",

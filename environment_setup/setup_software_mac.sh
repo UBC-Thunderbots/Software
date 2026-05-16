@@ -27,8 +27,6 @@ host_software_packages=(
     python@3.12
     bazelisk
     openjdk@21
-    pyqt@6
-    qt@6
     node@20
     go@1.24
     clang-format@20

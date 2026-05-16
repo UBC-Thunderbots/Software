@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -48,9 +49,8 @@ cc_test(
 py_test(
     name = "move_tactic_test",
     srcs = ["move_tactic_test.py"],
-    tags = [
-        "exclusive",
-    ],
+    package_collisions = "ignore",
+    tags = ["exclusive"],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",

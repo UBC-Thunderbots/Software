@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -46,6 +47,7 @@ cc_test(
 py_test(
     name = "kickoff_enemy_play_test",
     srcs = ["kickoff_enemy_play_test.py"],
+    package_collisions = "ignore",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",

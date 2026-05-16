@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -33,6 +34,7 @@ py_test(
     srcs = [
         "offense_play_test.py",
     ],
+    package_collisions = "ignore",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",

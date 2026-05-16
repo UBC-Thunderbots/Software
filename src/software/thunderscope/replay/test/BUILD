@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,6 +11,7 @@ py_test(
     data = [
         "//software:py_constants.so",
     ],
+    package_collisions = "ignore",
     deps = [
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:import_all_protos",
@@ -28,6 +30,7 @@ py_test(
     data = [
         "//software:py_constants.so",
     ],
+    package_collisions = "ignore",
     deps = [
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:import_all_protos",

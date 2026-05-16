@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_test")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
@@ -97,6 +98,7 @@ py_test(
     srcs = [
         "simulated_test_ball_model.py",
     ],
+    package_collisions = "ignore",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
         "exclusive",
