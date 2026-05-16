@@ -49,7 +49,7 @@ class Thunderloop
      * @param enable_log_merging Whether to merge repeated log message or not
      * @param loop_hz The rate to run the loop
      */
-    Thunderloop(const RobotConstants_t &robot_constants, bool enable_log_merging,
+    Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                 const int loop_hz);
 
     ~Thunderloop();
@@ -72,7 +72,7 @@ class Thunderloop
      *
      * @param ts timespec to modify
      */
-    void timespecNorm(struct timespec &ts);
+    void timespecNorm(struct timespec& ts);
 
     /**
      * Get the CPU temp thunderloop is running on
@@ -106,8 +106,8 @@ class Thunderloop
      * @param time_since_prev_iteration Stores the time difference since the last call
      */
     TbotsProto::MotorStatus pollMotorService(
-        struct timespec &poll_time, const TbotsProto::MotorControl &motor_control,
-        const struct timespec &time_since_prev_iteration);
+        struct timespec& poll_time, const TbotsProto::MotorControl& motor_control,
+        const struct timespec& time_since_prev_iteration);
 
     /**
      * Poll the power service
@@ -116,7 +116,7 @@ class Thunderloop
      *
      * @return The polled power status message
      */
-    TbotsProto::PowerStatus pollPowerService(struct timespec &poll_time);
+    TbotsProto::PowerStatus pollPowerService(struct timespec& poll_time);
 
     /**
      * Wait for networking communication to be established. This function is blocking.
@@ -161,7 +161,7 @@ class Thunderloop
     // Timeout after a failed ping request
     const int PING_RETRY_DELAY_S = 1;
 
-    const std::string PATH_TO_RINGBUFFER_LOG = "/var/log/dmesg";
+    const std::string PATH_TO_RINGBUFFER_LOG = "/usr/bin/dmesg";
 
     std::ifstream log_file = std::ifstream(PATH_TO_RINGBUFFER_LOG);
 };
@@ -174,4 +174,4 @@ class Thunderloop
  *
  * @return True if the power is stable, false otherwise
  */
-bool isPowerStable(std::ifstream &log_file);
+bool isPowerStable(std::ifstream& log_file);

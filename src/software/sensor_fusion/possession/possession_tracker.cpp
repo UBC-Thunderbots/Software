@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/geom/algorithms/distance.h"
 
-PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &config)
+PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig& config)
     : distance_near_tolerance_meters(config.distance_near_tolerance_meters()),
       distance_far_tolerance_meters(config.distance_far_tolerance_meters()),
       time_near_threshold(Duration::fromSeconds(config.time_near_threshold_s())),
@@ -18,10 +18,10 @@ PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &
 {
 }
 
-TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_team,
-                                                        const Team &enemy_team,
-                                                        const Ball &ball,
-                                                        const Field &field)
+TeamPossession PossessionTracker::getTeamWithPossession(const Team& friendly_team,
+                                                        const Team& enemy_team,
+                                                        const Ball& ball,
+                                                        const Field& field)
 {
     // Based on CMDragons TDP 2015
     // http://www.cs.cmu.edu/~jmendoza/papers/cmdragons_robocup15.pdf
@@ -48,7 +48,7 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
         auto enemy_team_robots = enemy_team.getAllRobotsExceptGoalie();
         auto num_enemies_in_friendly_half =
             std::count_if(enemy_team_robots.begin(), enemy_team_robots.end(),
-                          [&field](const auto &enemy)
+                          [&field](const auto& enemy)
                           { return field.pointInFriendlyHalf(enemy.position()); });
 
         if (field.pointInFriendlyHalf(ball.position()) ||
@@ -73,8 +73,8 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
     return possession;
 }
 
-void PossessionTracker::updateTimes(const Team &friendly_team, const Team &enemy_team,
-                                    const Ball &ball, const Field &field)
+void PossessionTracker::updateTimes(const Team& friendly_team, const Team& enemy_team,
+                                    const Ball& ball, const Field& field)
 {
     Duration delta_time = ball.timestamp() - last_timestamp;
     last_timestamp      = ball.timestamp();

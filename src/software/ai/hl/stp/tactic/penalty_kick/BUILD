@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -34,17 +36,28 @@ cc_test(
 )
 
 cc_test(
-    name = "penalty_kick_tactic_test",
+    name = "penalty_kick_tactic_cpp_test",
     srcs = ["penalty_kick_tactic_test.cpp"],
     deps = [
         ":penalty_kick_tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
+        "//software/simulated_tests/cpp_validation:validation_function",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "penalty_kick_tactic_test",
+    srcs = ["penalty_kick_tactic_test.py"],
+    tags = ["exclusive"],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests/validation:validations",
+        requirement("pytest"),
     ],
 )

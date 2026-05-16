@@ -49,9 +49,9 @@ class ReceiverPositionGenerator
      * positions that the receivers could use.
      */
     std::vector<Point> getBestReceivingPositions(
-        const World &world, unsigned int num_positions,
-        const std::vector<Point> &existing_receiver_positions = {},
-        const std::optional<Point> &pass_origin_override      = std::nullopt);
+        const World& world, unsigned int num_positions,
+        const std::vector<Point>& existing_receiver_positions = {},
+        const std::optional<Point>& pass_origin_override      = std::nullopt);
 
 
    private:
@@ -67,8 +67,8 @@ class ReceiverPositionGenerator
      * @param num_samples_per_zone The number of samples to take per zone
      */
     void updateBestReceiverPositions(
-        std::map<ZoneEnum, PassWithRating> &best_receiving_positions, const World &world,
-        const Point &pass_origin, const std::vector<ZoneEnum> &zones_to_sample,
+        std::map<ZoneEnum, PassWithRating>& best_receiving_positions, const World& world,
+        const Point& pass_origin, const std::vector<ZoneEnum>& zones_to_sample,
         unsigned int num_samples_per_zone);
 
     /**
@@ -84,9 +84,9 @@ class ReceiverPositionGenerator
      * @return A vector of the top num_positions zones
      */
     std::vector<ZoneEnum> getTopZones(
-        const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
-        unsigned int num_positions, const Point &pass_origin,
-        const std::vector<Point> &existing_receiver_positions);
+        const std::map<ZoneEnum, PassWithRating>& best_receiving_positions,
+        unsigned int num_positions, const Point& pass_origin,
+        const std::vector<Point>& existing_receiver_positions);
 
     /**
      * Helper method for visualizing the best receiving positions and zones
@@ -94,8 +94,8 @@ class ReceiverPositionGenerator
      * @param top_zones The ranked top zones to visualize
      */
     void visualizeBestReceivingPositionsAndZones(
-        const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
-        const std::vector<ZoneEnum> &top_zones);
+        const std::map<ZoneEnum, PassWithRating>& best_receiving_positions,
+        const std::vector<ZoneEnum>& top_zones);
 
     // Pitch division
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
@@ -128,15 +128,15 @@ ReceiverPositionGenerator<ZoneEnum>::ReceiverPositionGenerator(
 
 template <class ZoneEnum>
 std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(
-    const World &world, unsigned int num_positions,
-    const std::vector<Point> &existing_receiver_positions,
-    const std::optional<Point> &pass_origin_override)
+    const World& world, unsigned int num_positions,
+    const std::vector<Point>& existing_receiver_positions,
+    const std::optional<Point>& pass_origin_override)
 {
     std::map<ZoneEnum, PassWithRating> best_receiving_positions;
     debug_shapes.clear();
 
     Point pass_origin           = pass_origin_override.value_or(world.ball().position());
-    const auto &receiver_config = passing_config_.receiver_position_generator_config();
+    const auto& receiver_config = passing_config_.receiver_position_generator_config();
 
     // Verify that the number of receiver positions requested is valid
     if (num_positions >
@@ -152,7 +152,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     }
 
     // Add the previous best sampled receiving positions with their updated rating
-    for (const auto &[zone, prev_best_receiving_position] : prev_best_receiving_positions)
+    for (const auto& [zone, prev_best_receiving_position] : prev_best_receiving_positions)
     {
         Pass pass = Pass::fromDestReceiveSpeed(pass_origin, prev_best_receiving_position,
                                                passing_config_);
@@ -180,7 +180,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     updateBestReceiverPositions(best_receiving_positions, world, pass_origin, top_zones,
                                 receiver_config.num_additional_samples_per_top_zone());
     std::sort(top_zones.begin(), top_zones.end(),
-              [&](const ZoneEnum &z1, const ZoneEnum &z2)
+              [&](const ZoneEnum& z1, const ZoneEnum& z2)
               {
                   return best_receiving_positions.find(z1)->second.rating >
                          best_receiving_positions.find(z2)->second.rating;
@@ -209,8 +209,8 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
 
 template <class ZoneEnum>
 void ReceiverPositionGenerator<ZoneEnum>::visualizeBestReceivingPositionsAndZones(
-    const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
-    const std::vector<ZoneEnum> &top_zones)
+    const std::map<ZoneEnum, PassWithRating>& best_receiving_positions,
+    const std::vector<ZoneEnum>& top_zones)
 {
     for (unsigned int i = 0; i < top_zones.size(); i++)
     {
@@ -230,11 +230,11 @@ void ReceiverPositionGenerator<ZoneEnum>::visualizeBestReceivingPositionsAndZone
 
 template <class ZoneEnum>
 void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
-    std::map<ZoneEnum, PassWithRating> &best_receiving_positions, const World &world,
-    const Point &pass_origin, const std::vector<ZoneEnum> &zones_to_sample,
+    std::map<ZoneEnum, PassWithRating>& best_receiving_positions, const World& world,
+    const Point& pass_origin, const std::vector<ZoneEnum>& zones_to_sample,
     unsigned int num_samples_per_zone)
 {
-    for (const auto &zone_id : zones_to_sample)
+    for (const auto& zone_id : zones_to_sample)
     {
         auto zone = pitch_division_->getZone(zone_id);
         std::uniform_real_distribution x_distribution(zone.xMin(), zone.xMax());
@@ -243,7 +243,7 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
         PassWithRating best_pass_for_receiving{Pass(Point(0, 0), Point(0, 0), 1.0), -1.0};
 
         // Check if we have already sampled some passes for this zone
-        const auto &best_sampled_pass_iter = best_receiving_positions.find(zone_id);
+        const auto& best_sampled_pass_iter = best_receiving_positions.find(zone_id);
         if (best_sampled_pass_iter != best_receiving_positions.end())
         {
             best_pass_for_receiving = best_sampled_pass_iter->second;
@@ -270,16 +270,16 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
 
 template <class ZoneEnum>
 std::vector<ZoneEnum> ReceiverPositionGenerator<ZoneEnum>::getTopZones(
-    const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
-    unsigned int num_positions, const Point &pass_origin,
-    const std::vector<Point> &existing_receiver_positions)
+    const std::map<ZoneEnum, PassWithRating>& best_receiving_positions,
+    unsigned int num_positions, const Point& pass_origin,
+    const std::vector<Point>& existing_receiver_positions)
 {
     std::vector<ZoneEnum> top_zones;
 
     // Sort the zones based on initial ratings
     auto all_zones = pitch_division_->getAllZoneIds();
     std::sort(all_zones.begin(), all_zones.end(),
-              [&](const ZoneEnum &z1, const ZoneEnum &z2)
+              [&](const ZoneEnum& z1, const ZoneEnum& z2)
               {
                   return best_receiving_positions.find(z1)->second.rating >
                          best_receiving_positions.find(z2)->second.rating;
@@ -301,7 +301,7 @@ std::vector<ZoneEnum> ReceiverPositionGenerator<ZoneEnum>::getTopZones(
         // candidate zone
         bool no_prev_receivers_close = std::none_of(
             top_zones.begin(), top_zones.end(),
-            [&](const ZoneEnum &zone)
+            [&](const ZoneEnum& zone)
             {
                 return curr_pass_angle.minDiff(best_receiving_positions.find(zone)
                                                    ->second.pass.passerOrientation()) <
@@ -314,7 +314,7 @@ std::vector<ZoneEnum> ReceiverPositionGenerator<ZoneEnum>::getTopZones(
             no_prev_receivers_close &&
             std::none_of(
                 existing_receiver_positions.begin(), existing_receiver_positions.end(),
-                [&](const Point &existing_receiver_position)
+                [&](const Point& existing_receiver_position)
                 {
                     return curr_pass_angle.minDiff(
                                (existing_receiver_position - pass_origin).orientation()) <

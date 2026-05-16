@@ -26,7 +26,7 @@ class LogMerger
      * with the given log (if it isn't a repeat)
      * @param msg The LogMessage to be logged
      */
-    std::list<g3::LogMessage> log(g3::LogMessage &log);
+    std::list<g3::LogMessage> log(g3::LogMessage& log);
 
     /**
      * Adds LOG_MERGE_DURATION amount of time to the merger's currently tracked time. Used
@@ -37,7 +37,7 @@ class LogMerger
     /**
      * Add number of repeats to a log
      */
-    g3::LogMessage _addRepeats(g3::LogMessage &log, int repeats);
+    g3::LogMessage _addRepeats(g3::LogMessage& log, int repeats);
 
     /**
      * Looks through the message list for expired messages, removes them from the list and
@@ -57,7 +57,7 @@ class LogMerger
         std::string msg;
         Clock::time_point timestamp;
 
-        Message(g3::LogMessage &log, std::string msg, Clock::time_point timestamp)
+        Message(g3::LogMessage& log, std::string msg, Clock::time_point timestamp)
             : log(log), msg(msg), timestamp(timestamp)
         {
         }
