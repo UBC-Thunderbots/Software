@@ -73,6 +73,11 @@ sh_binary(
     srcs = ["setup_robot_software_deps.sh"],
 )
 
+sh_binary(
+    name = "setup_openocd_deps",
+    srcs = ["setup_openocd_deps.sh"],
+)
+
 filegroup(
     name = "hash_thunderloop_binary",
     srcs = ["hash_thunderloop_binary.sh"],
