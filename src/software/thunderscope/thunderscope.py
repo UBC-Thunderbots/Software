@@ -5,7 +5,7 @@ import pathlib
 import os
 import sys
 
-# We need to set the environment variable describing the location 
+# We need to set the environment variable describing the location
 # of all pyqt6 libraries provided by the Bazel virtual environment
 # BEFORE importing any of the pyqt related libraries.
 if virtual_env := os.environ.get("VIRTUAL_ENV"):

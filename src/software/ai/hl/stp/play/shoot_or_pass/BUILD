@@ -77,6 +77,5 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-
     ],
 )

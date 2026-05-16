@@ -77,7 +77,6 @@ py_test(
     srcs = [
         "kickoff_play_test.py",
     ],
-
     package_collisions = "ignore",
     # TODO (#2619) Remove tag to run in parallel
     tags = [
@@ -87,7 +86,6 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-
     ],
 )
 
@@ -123,7 +121,6 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-
     ],
 )
 
@@ -181,6 +178,5 @@ py_test(
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
         requirement("pytest"),
-
     ],
 )

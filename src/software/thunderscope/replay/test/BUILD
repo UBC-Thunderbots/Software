@@ -19,7 +19,6 @@ py_test(
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope/replay:proto_player",
         requirement("pytest"),
-
     ],
 )
 
@@ -40,6 +39,5 @@ py_test(
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/replay/test:replay_corruption_test",
         requirement("pytest"),
-
     ],
 )
