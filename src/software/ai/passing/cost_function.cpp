@@ -144,6 +144,24 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
+Duration getEnemyTimeToInterceptPoint(const Robot& enemy_robot,
+                                      const Point& interception_point)
+{
+    Vector enemy_interception_vector = interception_point - enemy_robot.position();
+    // Take into account the enemy robot's radius for minimum min_interception_distance
+    // required to travel to intercept the pass.
+    double min_interception_distance =
+        std::max(0.0, enemy_interception_vector.length() - ROBOT_MAX_RADIUS_METERS);
+
+    double signed_1d_enemy_vel =
+        enemy_robot.velocity().dot(enemy_interception_vector.normalize());
+
+    return getTimeToTravelDistance(
+        min_interception_distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, signed_1d_enemy_vel,
+        ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND);
+}
+
 double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
                               const TbotsProto::PassingConfig& passing_config)
 {
@@ -157,26 +175,13 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // point on the pass before the ball
     Point closest_interception_point = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
-    Vector enemy_interception_vector =
-        closest_interception_point - enemy_robot.position();
-    // Take into account the enemy robot's radius for minimum min_interception_distance
-    // required to travel to intercept the pass.
-    double min_interception_distance =
-        std::max(0.0, enemy_interception_vector.length() - ROBOT_MAX_RADIUS_METERS);
 
-    const double ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND = 0.5;
-    double signed_1d_enemy_vel =
-        enemy_robot.velocity().dot(enemy_interception_vector.normalize());
-    double enemy_robot_time_to_interception_point_sec =
-        getTimeToTravelDistance(
-            min_interception_distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, signed_1d_enemy_vel,
-            ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND)
-            .toSeconds();
+    double time_to_intercept_s =
+        getEnemyTimeToInterceptPoint(enemy_robot, closest_interception_point).toSeconds();
+
     // Scale the time to interception point by the enemy robot's interception capability
-    Duration enemy_robot_time_to_interception_point =
-        Duration::fromSeconds(enemy_robot_time_to_interception_point_sec *
-                              passing_config.enemy_interception_time_multiplier());
+    Duration scaled_time_to_intercept = Duration::fromSeconds(
+        time_to_intercept_s * passing_config.enemy_interception_time_multiplier());
 
     // TODO (#2988): We should generate a more realistic ball trajectory
     Duration ball_time_to_interception_point =
@@ -185,7 +190,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
         Duration::fromSeconds(passing_config.pass_delay_sec());
 
     Duration interception_delta_time =
-        ball_time_to_interception_point - enemy_robot_time_to_interception_point;
+        ball_time_to_interception_point - scaled_time_to_intercept;
 
     // Whether or not the enemy will be able to intercept the pass can be determined
     // by whether or not they will be able to reach the pass receive position before
@@ -193,6 +198,54 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     return std::clamp(interception_delta_time.toSeconds() *
                           passing_config.enemy_interception_risk_importance(),
                       0.0, 1.0);
+}
+
+std::optional<const Robot> getClosestReceiverToPass(const Team& friendly_team,
+                                                    const Pass& pass)
+{
+    if (friendly_team.getAllRobots().empty())
+        return std::nullopt;
+
+    auto best_receiver        = friendly_team.getAllRobots().at(0);
+    double curr_best_distance = std::numeric_limits<double>::max();
+
+    for (const Robot& robot : friendly_team.getAllRobots())
+    {
+        double distance = (robot.position() - pass.receiverPoint()).length();
+        if (distance < curr_best_distance)
+        {
+            best_receiver      = robot;
+            curr_best_distance = distance;
+        }
+    }
+
+    return best_receiver;
+}
+
+Duration getBallTravelTime(const Pass& pass,
+                           const TbotsProto::PassingConfig& passing_config)
+{
+    return Duration::fromSeconds((pass.receiverPoint() - pass.passerPoint()).length() /
+                                 pass.speed()) +
+           Duration::fromSeconds(passing_config.pass_delay_sec());
+}
+
+Timestamp getEarliestReceiveTime(const Robot& best_receiver, const Pass& pass,
+                                 const TbotsProto::PassingConfig& passing_config)
+{
+    Duration min_robot_travel_time =
+        best_receiver.getTimeToPosition(pass.receiverPoint());
+    Timestamp earliest_time_to_receive_point =
+        best_receiver.timestamp() + min_robot_travel_time;
+
+    return earliest_time_to_receive_point;
+}
+
+Timestamp getEarliestTimeToAngle(const Robot& best_receiver, const Pass& pass)
+{
+    Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
+    Duration time_to_receive_angle = best_receiver.getTimeToOrientation(receive_angle);
+    return best_receiver.timestamp() + time_to_receive_angle;
 }
 
 double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
@@ -211,37 +264,27 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
     }
 
     // Get the robot that is closest to where the pass would be received
-    Robot best_receiver = friendly_team.getAllRobots()[0];
-    for (const Robot& robot : friendly_team.getAllRobots())
+    auto best_receiver_opt = getClosestReceiverToPass(friendly_team, pass);
+
+    if (!best_receiver_opt.has_value())
     {
-        double distance = (robot.position() - pass.receiverPoint()).length();
-        double curr_best_distance =
-            (best_receiver.position() - pass.receiverPoint()).length();
-        if (distance < curr_best_distance)
-        {
-            best_receiver = robot;
-        }
+        return 0;
     }
 
-    // Figure out what time the robot would have to receive the ball at
-    // TODO (#2988): We should generate a more realistic ball trajectory
-    Duration ball_travel_time =
-        Duration::fromSeconds((pass.receiverPoint() - pass.passerPoint()).length() /
-                              pass.speed()) +
-        Duration::fromSeconds(passing_config.pass_delay_sec());
-    Timestamp receive_time = best_receiver.timestamp() + ball_travel_time;
+    const Robot& best_receiver = best_receiver_opt.value();
 
-    // Figure out how long it would take our robot to get there
-    Duration min_robot_travel_time =
-        best_receiver.getTimeToPosition(pass.receiverPoint());
-    Timestamp earliest_time_to_receive_point =
-        best_receiver.timestamp() + min_robot_travel_time;
+    Duration ball_travel_time = getBallTravelTime(pass, passing_config);
+    Timestamp receive_time    = best_receiver.timestamp() + ball_travel_time;
+
+    // Figure out what time the robot would have to receive the ball at
+    // and how long it would take our robot to get there
+    // TODO (#2988): We should generate a more realistic ball trajectory
+    const Timestamp earliest_time_to_receive_point =
+        getEarliestReceiveTime(best_receiver, pass, passing_config);
 
     // Figure out what angle the robot would have to be at to receive the ball
-    Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
-    Duration time_to_receive_angle = best_receiver.getTimeToOrientation(receive_angle);
-    Timestamp earliest_time_to_receive_angle =
-        best_receiver.timestamp() + time_to_receive_angle;
+    const Timestamp earliest_time_to_receive_angle =
+        getEarliestTimeToAngle(best_receiver, pass);
 
     // Figure out if rotation or moving will take us longer
     Timestamp latest_time_to_receiver_state =
@@ -259,30 +302,36 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
         sigmoid_width);
 }
 
+Rectangle getReducedField(const Field& field, TbotsProto::PassingConfig passing_config)
+{
+    // The offset from the sides of the field for the center of the sigmoid functions
+    double x_offset = passing_config.static_field_position_quality_x_offset();
+    double y_offset = passing_config.static_field_position_quality_y_offset();
+
+    double half_field_length = field.xLength() / 2;
+    double half_field_width  = field.yLength() / 2;
+    Rectangle reduced_size_field(
+        Point(-half_field_length + x_offset, -half_field_width + y_offset),
+        Point(half_field_length - x_offset, half_field_width - y_offset));
+    return reduced_size_field;
+}
+
 double getStaticPositionQuality(const Field& field, const Point& position,
                                 const TbotsProto::PassingConfig& passing_config)
 {
     // This constant is used to determine how steep the sigmoid slopes below are
     static const double sig_width = 0.1;
 
-    // The offset from the sides of the field for the center of the sigmoid functions
-    double x_offset = passing_config.static_field_position_quality_x_offset();
-    double y_offset = passing_config.static_field_position_quality_y_offset();
-    double friendly_goal_weight =
-        passing_config.static_field_position_quality_friendly_goal_distance_weight();
-
     // Make a slightly smaller field, and positive weight values in this reduced field
-    double half_field_length = field.xLength() / 2;
-    double half_field_width  = field.yLength() / 2;
-    Rectangle reduced_size_field(
-        Point(-half_field_length + x_offset, -half_field_width + y_offset),
-        Point(half_field_length - x_offset, half_field_width - y_offset));
+    const auto reduced_size_field = getReducedField(field, passing_config);
     double on_field_quality = rectangleSigmoid(reduced_size_field, position, sig_width);
 
     // Add a negative weight for positions closer to our goal
     Vector vec_to_friendly_goal = Vector(field.friendlyGoalCenter().x() - position.x(),
                                          field.friendlyGoalCenter().y() - position.y());
     double distance_to_friendly_goal = vec_to_friendly_goal.length();
+    double friendly_goal_weight =
+        passing_config.static_field_position_quality_friendly_goal_distance_weight();
     double near_friendly_goal_quality =
         (1 -
          std::exp(-friendly_goal_weight * (std::pow(5, -2 + distance_to_friendly_goal))));
