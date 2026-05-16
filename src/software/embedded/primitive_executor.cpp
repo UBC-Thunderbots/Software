@@ -21,7 +21,7 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
 {
 }
 
-bool PrimitiveExecutor::isLateralTrajectoryNew(const std::optional<TrajectoryPath>& new_trajectory)
+bool PrimitiveExecutor::isLateralTrajectoryNew(const std::optional<TrajectoryPath>& new_trajectory) const
 {
     if (new_trajectory.has_value() != trajectory_path_.has_value())
     {
@@ -35,7 +35,7 @@ bool PrimitiveExecutor::isLateralTrajectoryNew(const std::optional<TrajectoryPat
     return distance(new_trajectory->getDestination(), trajectory_path_->getDestination()) > LATERAL_DESTINATION_THRESHOLD_METERS;
 }
 
-bool PrimitiveExecutor::isAngularTrajectoryNew(const std::optional<BangBangTrajectory1DAngular>& new_trajectory)
+bool PrimitiveExecutor::isAngularTrajectoryNew(const std::optional<BangBangTrajectory1DAngular>& new_trajectory) const
 {
     if (new_trajectory.has_value() != trajectory_path_.has_value())
     {
@@ -64,6 +64,8 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         {
             trajectory_path_ = new_trajectory_path;
             time_since_linear_trajectory_creation_  = Duration::fromSeconds(RTT_S);
+            x_pid.reset();
+            y_pid.reset();
         }
 
         const std::optional new_angular_trajectory = createAngularTrajectoryFromParams(
@@ -74,6 +76,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         {
             angular_trajectory_ = new_angular_trajectory;
             time_since_angular_trajectory_creation_ = Duration::fromSeconds(RTT_S);
+            w_pid.reset();
         }
     }
 }
@@ -88,14 +91,13 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
     // angular_velocity_ = angular_velocity;
     // If we are lagging behind trajectory too much, we have stalled! We need to regenerate trajectory.
     // TODO: Add a timeout to following error
-    double lateral_following_error = (position_ - trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds())).length();
+    const double lateral_following_error = (position_ - trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds())).length();
     if (lateral_following_error > LATERAL_STALL_ERROR_MAX_METERS)
     {
         // regenerate lateral trajectory
         trajectory_path_ = createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(), position_, velocity_, robot_constants_);
-
     }
-    double angular_following_error = angular_trajectory_->getPosition(time_since_angular_trajectory_creation_.toSeconds()).minDiff(orientation_).toDegrees();
+    const double angular_following_error = angular_trajectory_->getPosition(time_since_angular_trajectory_creation_.toSeconds()).minDiff(orientation_).toDegrees();
     if (angular_following_error > ANGULAR_STALL_ERROR_MAX_DEGREES)
     {
         // regenerate angular trajectory
@@ -201,28 +203,22 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     prim->direct_control());
             }
 
-            // const Vector target_linear_velocity           = getTargetLinearVelocity();
-            // AngularVelocity target_angular_velocity = getTargetAngularVelocity();
+            // FEEDFORWARD velocities from the trajectory
+            const Vector trajectory_linear_velocity     = getTargetLinearVelocity();
+            const AngularVelocity trajectory_angular_velocity = getTargetAngularVelocity();
+
             const Point target_position = trajectory_path_->getDestination();
             const Angle target_orientation = angular_trajectory_->getDestination();
-            Vector error_lateral = target_position - position_;
-            Angle error_angular = (target_orientation - orientation_).clamp();
-            Angle derivative_angular = (last_orientation_ - orientation_).clamp();
+            const Vector error_lateral = target_position - position_;
+            const Angle error_angular = (target_orientation - orientation_).clamp();
+            const Vector pid_effort_lateral(x_pid.step(error_lateral.x()), y_pid.step(error_lateral.y()));
+            const AngularVelocity pid_effort_angular = AngularVelocity::fromRadians(
+                w_pid.step(error_angular.toRadians()));
 
-            double linear_kp = 1;
-            double linear_kd = 1.5;
-            double angular_kp = 3.5;
-            double angular_kd = 1.5;
-            Vector target_linear_velocity = globalToLocalVelocity(error_lateral * linear_kp + (last_position_ - position_) * linear_kd, orientation_);
-            target_linear_velocity.normalize(std::min(target_linear_velocity.lengthSquared(), static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
-            AngularVelocity target_angular_velocity = AngularVelocity::fromRadians(error_angular.toRadians()) * angular_kp + AngularVelocity::fromRadians(derivative_angular.toRadians()) * angular_kd;
+            Vector target_linear_velocity = globalToLocalVelocity(trajectory_linear_velocity + pid_effort_lateral, orientation_);
+            target_linear_velocity = target_linear_velocity.normalize(std::min(target_linear_velocity.lengthSquared(), static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
+            const AngularVelocity target_angular_velocity = (trajectory_angular_velocity + pid_effort_angular);
 
-
-                
-
-
-            last_position_ = position_;
-            last_orientation_ = orientation_;
             const auto prim = createDirectControlPrimitive(
                 target_linear_velocity, target_angular_velocity,
                 convertDribblerModeToDribblerSpeed(

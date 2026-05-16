@@ -479,7 +479,7 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
 {
     return BangBangTrajectory1DAngular(
         start_angle, createAngle(params.final_angle()), initial_velocity,
-        AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
+        AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_trajectory_rad_per_s),
         AngularVelocity::fromRadians(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2),
         AngularVelocity::fromRadians(3));
@@ -509,7 +509,7 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     switch (max_allowed_speed_mode)
     {
         case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
-            return robot_constants.robot_max_speed_m_per_s;
+            return robot_constants.robot_max_speed_trajectory_m_per_s;
         case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND -
                    STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND;

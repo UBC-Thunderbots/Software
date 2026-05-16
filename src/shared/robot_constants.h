@@ -55,6 +55,10 @@ struct RobotConstants
     // The maximum speed achievable by our robots, in metres per second [m/s]
     float robot_max_speed_m_per_s;
 
+    // The maximum speed that the trajectory planner is allowed to command the robot to
+    // move at, while still leaving headroom for the PID to apply correction on lag. [m/s]
+    float robot_max_speed_trajectory_m_per_s;
+
     // The maximum acceleration achievable by our robots [m/s^2]
     float robot_max_acceleration_m_per_s_2;
 
@@ -63,6 +67,11 @@ struct RobotConstants
 
     // The maximum angular speed achievable by our robots [rad/s]
     float robot_max_ang_speed_rad_per_s;
+
+    // The maximum speed that the trajectory planner is allowed to command the robot to
+    // move at, while still leaving headroom for the PID to apply correction on lag.
+    // [rad/s]
+    float robot_max_ang_speed_trajectory_rad_per_s;
 
     // The maximum angular acceleration achievable by our robots [rad/s^2]
     float robot_max_ang_acceleration_rad_per_s_2;

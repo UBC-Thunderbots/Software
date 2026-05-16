@@ -67,7 +67,7 @@ class PrimitiveExecutor
      * @return True if the new trajectory requested is meaningfully different from the current trajectory. That is,
      * if the destinations are new.
      */
-    bool isLateralTrajectoryNew(const std::optional<TrajectoryPath>& new_trajectory);
+    bool isLateralTrajectoryNew(const std::optional<TrajectoryPath>& new_trajectory) const;
 
     /**
      *
@@ -75,7 +75,7 @@ class PrimitiveExecutor
      * @return True if the new trajectory requested is meaningfully different from the current trajectory. That is,
      * if the destinations are new.
      */
-    bool isAngularTrajectoryNew(const std::optional<BangBangTrajectory1DAngular>& new_trajectory);
+    bool isAngularTrajectoryNew(const std::optional<BangBangTrajectory1DAngular>& new_trajectory) const;
 
     /*
      * Returns the next target angular velocity the robot

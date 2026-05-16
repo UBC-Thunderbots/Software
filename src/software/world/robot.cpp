@@ -218,7 +218,7 @@ Duration Robot::getTimeToPosition(const Point& destination,
     double initial_velocity_1d = velocity().dot(dist_vector.normalize());
     double final_velocity_1d   = final_velocity.dot(dist_vector.normalize());
 
-    return getTimeToTravelDistance(dist, robot_constants_.robot_max_speed_m_per_s,
+    return getTimeToTravelDistance(dist, robot_constants_.robot_max_speed_trajectory_m_per_s,
                                    robot_constants_.robot_max_acceleration_m_per_s_2,
                                    initial_velocity_1d, final_velocity_1d);
 }
