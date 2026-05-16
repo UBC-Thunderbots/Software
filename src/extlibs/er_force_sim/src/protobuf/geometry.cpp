@@ -25,8 +25,8 @@
 void geometrySetDefault(world::Geometry* geometry, bool useQuadField)
 {
     geometry->set_line_width(0.01f);
-    geometry->set_field_width((useQuadField) ? 9.00f : 6.00f);
-    geometry->set_field_height((useQuadField) ? 12.00f : 9.00f);
+    geometry->set_field_width((useQuadField) ? 9.00f : 12.00f);
+    geometry->set_field_height((useQuadField) ? 12.00f : 27.00f);
     geometry->set_boundary_width((useQuadField) ? 0.30f : 0.25f);
     geometry->set_goal_width((useQuadField) ? 1.20f : 1.00f);
     geometry->set_goal_depth(0.18f);
