@@ -25,12 +25,18 @@ TEST_F(KickoffEnemyPlayTest, DISABLED_test_kickoff_enemy_play)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(-3, -2.5)});
+        {Point(-field.xLength() / 3.0, 5.0 * field.yLength() / 12.0),
+         Point(-field.xLength() / 3.0, field.yLength() / 4.0),
+         Point(-field.xLength() / 3.0, field.yLength() / 12.0),
+         Point(-field.xLength() / 3.0, -field.yLength() / 12.0),
+         Point(-field.xLength() / 3.0, -field.yLength() / 4.0),
+         Point(-field.xLength() / 3.0, -5.0 * field.yLength() / 12.0)});
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
-         field.enemyDefenseArea().negXNegYCorner(),
+        {Point(field.xLength() / 9.0, 0),
+         Point(field.xLength() / 9.0, 5.0 * field.yLength() / 12.0),
+         Point(field.xLength() / 9.0, -5.0 * field.yLength() / 12.0),
+         field.enemyGoalCenter(), field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
     setAiPlay(TbotsProto::PlayName::KickoffEnemyPlay);
@@ -39,18 +45,34 @@ TEST_F(KickoffEnemyPlayTest, DISABLED_test_kickoff_enemy_play)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
         {
+            const Field test_field = world_ptr->field();
             // Two friendly robots in position to shadow enemy robots. Rectangles are
             // chosen to be generally in the way of the the front 3 enemy robots and the
             // friendly goal, based on where the enemy robots are initialized in the test.
-            Rectangle shadowing_rect_1(Point(0, 1.5), Point(-0.4, 1.3));
-            Rectangle shadowing_rect_2(Point(0, -1.5), Point(-0.4, -1.3));
-            Rectangle shadowing_rect_3(Point(-0.60, 0.1), Point(-0.86, -0.1));
+            Rectangle shadowing_rect_1(
+                Point(0.0, 1.5 * test_field.yLength() / 6.0),
+                Point(-0.4 * test_field.xLength() / 9.0,
+                      1.3 * test_field.yLength() / 6.0));
+            Rectangle shadowing_rect_2(
+                Point(0.0, -1.5 * test_field.yLength() / 6.0),
+                Point(-0.4 * test_field.xLength() / 9.0,
+                      -1.3 * test_field.yLength() / 6.0));
+            Rectangle shadowing_rect_3(
+                Point(-0.60 * test_field.xLength() / 9.0,
+                      0.1 * test_field.yLength() / 6.0),
+                Point(-0.86 * test_field.xLength() / 9.0,
+                      -0.1 * test_field.yLength() / 6.0));
             robotInPolygon(shadowing_rect_1, 1, world_ptr, yield);
             robotInPolygon(shadowing_rect_2, 1, world_ptr, yield);
             robotInPolygon(shadowing_rect_3, 1, world_ptr, yield);
 
             // Two Friendly robots defending the exterior of defense box
-            Rectangle robotsDefendingRect(Point(-3.2, 1.1), Point(-3.5, -1.1));
+            Rectangle robotsDefendingRect(
+                Point(test_field.friendlyDefenseArea().xMax() +
+                          0.3 * test_field.xLength() / 9.0,
+                      1.1 * test_field.yLength() / 6.0),
+                Point(test_field.friendlyDefenseArea().xMax(),
+                      -1.1 * test_field.yLength() / 6.0));
             robotInPolygon(robotsDefendingRect, 2, world_ptr, yield);
         }};
 

@@ -26,12 +26,18 @@ TEST_F(KickoffFriendlyPlayTest, DISABLED_test_kickoff_friendly_play)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(-3, -2.5)});
+        {Point(-field.xLength() / 3.0, 5.0 * field.yLength() / 12.0),
+         Point(-field.xLength() / 3.0, field.yLength() / 4.0),
+         Point(-field.xLength() / 3.0, field.yLength() / 12.0),
+         Point(-field.xLength() / 3.0, -field.yLength() / 12.0),
+         Point(-field.xLength() / 3.0, -field.yLength() / 4.0),
+         Point(-field.xLength() / 3.0, -5.0 * field.yLength() / 12.0)});
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
-         field.enemyDefenseArea().negXNegYCorner(),
+        {Point(field.xLength() / 9.0, 0),
+         Point(field.xLength() / 9.0, 5.0 * field.yLength() / 12.0),
+         Point(field.xLength() / 9.0, -5.0 * field.yLength() / 12.0),
+         field.enemyGoalCenter(), field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
     setAiPlay(TbotsProto::PlayName::KickoffEnemyPlay);
@@ -46,13 +52,24 @@ TEST_F(KickoffFriendlyPlayTest, DISABLED_test_kickoff_friendly_play)
             robotReceivedBall(world_ptr, yield);
             ballKicked(Angle::zero(), world_ptr, yield);
 
+            const Field test_field = world_ptr->field();
             // Two friendly robots near the half line setting up for offense
-            Rectangle robotsOffensiveRect(Point(-0.5, 2.5), Point(-1.5, -2.5));
+            Rectangle robotsOffensiveRect(
+                Point(-test_field.xLength() / 18.0,
+                      5.0 * test_field.yLength() / 12.0),
+                Point(-test_field.xLength() / 6.0,
+                      -5.0 * test_field.yLength() / 12.0));
             robotInPolygon(robotsOffensiveRect, 2, world_ptr, yield);
 
 
             // Two Friendly robots defending the exterior of defense box and one goalie
-            Rectangle robotsDefensiveRect(Point(-3.2, 1.1), Point(-3.51, -1.1));
+            Rectangle robotsDefensiveRect(
+                Point(test_field.friendlyDefenseArea().xMax() +
+                          0.3 * test_field.xLength() / 9.0,
+                      1.1 * test_field.yLength() / 6.0),
+                Point(test_field.friendlyDefenseArea().xMax() -
+                          0.01 * test_field.xLength() / 9.0,
+                      -1.1 * test_field.yLength() / 6.0));
             robotInPolygon(robotsDefensiveRect, 3, world_ptr, yield);
         }};
 
