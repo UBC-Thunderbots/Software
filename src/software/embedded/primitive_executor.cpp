@@ -203,21 +203,38 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     prim->direct_control());
             }
 
-            // FEEDFORWARD velocities from the trajectory
-            const Vector trajectory_linear_velocity     = getTargetLinearVelocity();
-            const AngularVelocity trajectory_angular_velocity = getTargetAngularVelocity();
-
             const Point target_position = trajectory_path_->getDestination();
             const Angle target_orientation = angular_trajectory_->getDestination();
             const Vector error_lateral = target_position - position_;
             const Angle error_angular = (target_orientation - orientation_).clamp();
-            const Vector pid_effort_lateral(x_pid.step(error_lateral.x()), y_pid.step(error_lateral.y()));
-            const AngularVelocity pid_effort_angular = AngularVelocity::fromRadians(
-                w_pid.step(error_angular.toRadians()));
 
-            Vector target_linear_velocity = globalToLocalVelocity(trajectory_linear_velocity + pid_effort_lateral, orientation_);
+            Vector target_linear_velocity;
+            AngularVelocity target_angular_velocity;
+            // if close enough, use special PID to destination
+            if (error_lateral.lengthSquared() < LATERAL_PURE_PID_THRESHOLD_METERS)
+            {
+                target_linear_velocity = {x_pid_close.step(error_lateral.x()), y_pid_close.step(error_lateral.y())};
+            } else
+            {
+                // FEEDFORWARD velocities from the trajectory
+                const Vector trajectory_linear_velocity     = getTargetLinearVelocity();
+                const Vector pid_effort_lateral(x_pid.step(error_lateral.x()), y_pid.step(error_lateral.y()));
+                target_linear_velocity = globalToLocalVelocity(trajectory_linear_velocity + pid_effort_lateral, orientation_);
+            }
+            if (error_angular.abs().toDegrees() < ANGULAR_PURE_PID_THRESHOLD_DEGREES)
+            {
+                target_angular_velocity = AngularVelocity::fromRadians(w_pid_close.step(error_angular.toRadians()));
+            } else
+            {
+                // FEEDFORWARD velocities from the trajectory
+                const AngularVelocity trajectory_angular_velocity = getTargetAngularVelocity();
+                const AngularVelocity pid_effort_angular = AngularVelocity::fromRadians(
+                w_pid.step(error_angular.toRadians()));
+                target_angular_velocity = (trajectory_angular_velocity + pid_effort_angular);
+            }
+
+            // Make sure target linear velocity is clamped
             target_linear_velocity = target_linear_velocity.normalize(std::min(target_linear_velocity.lengthSquared(), static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
-            const AngularVelocity target_angular_velocity = (trajectory_angular_velocity + pid_effort_angular);
 
             const auto prim = createDirectControlPrimitive(
                 target_linear_velocity, target_angular_velocity,

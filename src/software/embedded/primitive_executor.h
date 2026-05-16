@@ -112,6 +112,12 @@ class PrimitiveExecutor
     controls::PIDController<double> y_pid = {1, 0, 1.5};
     controls::PIDController<double> w_pid = {3.5, 0, 1.5};
 
+    // When close to target position, ignore trajectory velocity and use pure PID control.
+    // These PIDs should be used in that case.
+    controls::PIDController<double> x_pid_close = {2, 0, 3};
+    controls::PIDController<double> y_pid_close = {2, 0, 3};
+    controls::PIDController<double> w_pid_close = {5, 0, 3};
+
     // When driving, the robot will rotate the direction its driving away from its angular
     // velocity, if this number is higher, it will lean away more from the turn.
     static constexpr double LEAN_BIAS = 2;
@@ -120,11 +126,14 @@ class PrimitiveExecutor
 
     // If distance between current lateral trajectory destination and new one is larger than this, we change
     // trajectories.
-    static constexpr double LATERAL_DESTINATION_THRESHOLD_METERS = 0.01;
-    static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 2;
+    static constexpr double LATERAL_DESTINATION_THRESHOLD_METERS = 0.03;
+    static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
 
     static constexpr double LATERAL_STALL_ERROR_MAX_METERS = 0.4;
     static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 40;
+
+    static constexpr double LATERAL_PURE_PID_THRESHOLD_METERS = 0.4;
+    static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 8;
 
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.
