@@ -100,7 +100,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket& packet)
 
         updateWorld(packet.detection());
 
-        LOG(WARNING) << "ROBOTS DETECTED: "<< packet.detection().robots_blue().size();
+        //LOG(WARNING) << "ROBOTS DETECTED: "<< packet.detection().robots_blue().size();
         if (!ball && (packet.detection().robots_blue().size() != 0 ||
                       packet.detection().robots_yellow().size() != 0))
         {

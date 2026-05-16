@@ -97,10 +97,10 @@ def test_one_robots_square(field_test_runner):
     id = world.friendly_team.team_robots[0].id
     print(f"Running test on robot {id}")
 
-    point1 = Point(x_meters=0.5, y_meters=0.5)
-    point2 = Point(x_meters=0.5, y_meters=-0.5)
-    point3 = Point(x_meters=-0.5, y_meters=-0.5)
-    point4 = Point(x_meters=-0.5, y_meters=0.5)
+    point1 = Point(x_meters=0.5, y_meters=0.4)
+    point2 = Point(x_meters=0.5, y_meters=-0.4)
+    point3 = Point(x_meters=-0.5, y_meters=-0.4)
+    point4 = Point(x_meters=-0.5, y_meters=0.4)
 
     tactic_0 = MoveTactic(
         destination=point1,

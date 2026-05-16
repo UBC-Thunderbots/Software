@@ -430,7 +430,6 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
 {
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         params.max_speed_mode(), robot_constants);
-
     if (max_speed == 0)
     {
         return std::nullopt;
