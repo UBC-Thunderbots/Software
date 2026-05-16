@@ -24,7 +24,7 @@ class BallMovesForward(Validation):
         self.tolerance = tolerance
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if ball is moving forward
 
         :param world: The world msg to validate
@@ -84,7 +84,7 @@ class BallMovesForwardInRegions(BallMovesForward):
         self.regions = regions
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         for region in self.regions:
             if tbots.contains(
                 region, tbots.createPoint(world.ball.current_state.global_position)

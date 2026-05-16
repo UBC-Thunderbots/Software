@@ -18,6 +18,7 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/networking/unix:threaded_unix_listener_py",

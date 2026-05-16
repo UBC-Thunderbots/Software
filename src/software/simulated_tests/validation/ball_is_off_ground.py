@@ -21,7 +21,7 @@ class BallIsOffGround(Validation):
         self.threshold = threshold
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if the ball has is threshold meters off the ground
 
         :param world: The world msg to validate
