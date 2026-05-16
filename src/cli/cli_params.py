@@ -1,6 +1,7 @@
-from typer import Option, Argument
 from enum import Enum
 from typing import Annotated
+
+from typer import Argument, Option
 
 from cli.multi_option import MultiOption
 
@@ -90,3 +91,15 @@ EnableVisualizerOption = Annotated[bool, Option("-v", "--enable_visualizer")]
 StopAIOnStartOption = Annotated[bool, Option("-s", "--stop_ai_on_start")]
 
 JobsOption = Annotated[str, Option("-j", "--jobs")]
+RunsOption = Annotated[
+    int,
+    Option(
+        "-r", "--runs", help="Number of times to run each test (bazel --runs_per_test)"
+    ),
+]
+RobotName = Annotated[
+    str, Option("-rn", "--robot_name", help="Name of robot. E.g. balle")
+]
+AnsiblePlaybook = Annotated[
+    str, Option("-ap", "--ansible_playbook", help="Ansible playbook name")
+]
