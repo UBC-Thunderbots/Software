@@ -39,6 +39,7 @@ cc_library(
         "//software/time:duration",
         "//software/world:robot_state",
         "//software/world:team_colour",
+        "//software/util/pid:pid",
     ],
 )
 

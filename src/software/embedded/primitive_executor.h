@@ -8,6 +8,7 @@
 #include "software/time/duration.h"
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
+#include "software/util/pid/pid_controller.hpp"
 
 class PrimitiveExecutor
 {
