@@ -161,21 +161,6 @@ class RobotDiagnosticsCLI:
             f"{ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY}",
             self.embedded_data.get_chip_pulse_width(),
         )
-        table.add_row(
-            "Battery Voltage",
-            f"{ROBOT_BATTERY_VOLTAGE_CONFIG_KEY}",
-            self.embedded_data.get_battery_volt(),
-        )
-        table.add_row(
-            "Battery Current Draw",
-            f"{ROBOT_CURRENT_DRAW_CONFIG_KEY}",
-            self.embedded_data.get_current_draw(),
-        )
-        table.add_row(
-            "Capacitor Voltage",
-            f"{ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY}",
-            self.embedded_data.get_cap_volt(),
-        )
         return table
 
     def stats(self) -> None:
