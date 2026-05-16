@@ -1,8 +1,6 @@
 #include "software/simulation/er_force_simulator.h"
 
 #include <gtest/gtest.h>
-// TODO (#2419): remove this
-#include <fenv.h>
 
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/tbots_protobuf.h"
@@ -15,8 +13,6 @@ class ErForceSimulatorTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        // TODO (#2419): remove this to re-enable sigfpe checks
-        fedisableexcept(FE_INVALID | FE_OVERFLOW);
         auto realism_config = ErForceSimulator::createDefaultRealismConfig();
         simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
                                                        robot_constants, realism_config);
