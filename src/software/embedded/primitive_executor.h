@@ -6,6 +6,7 @@
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
+#include "software/util/pid/pid_controller.hpp"
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 
@@ -32,24 +33,15 @@ class PrimitiveExecutor
     void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
 
     /**
-     * Set the current primitive to the stop primitive
-     */
-    void setStopPrimitive();
-
-    /**
-     * Update primitive executor with the current velocity of the robot
+     * Update primitive executor with the current velocity and orientation of the robot
      *
-     * @param local_velocity The current _local_ velocity
+     * @param position The current position
+     * @param velocity The current velocity
+     * @param orientation The current orientation of the robot
      * @param angular_velocity The current angular velocity
      */
-    void updateVelocity(const Vector& local_velocity,
-                        const AngularVelocity& angular_velocity);
-
-    /**
-     * Set the robot id
-     * @param robot_id The id of the robot which uses this primitive executor
-     */
-    void setRobotId(RobotId robot_id);
+    void updateState(const Point& position, const Vector& velocity,
+                     const Angle& orientation, const AngularVelocity& angular_velocity);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
@@ -69,6 +61,23 @@ class PrimitiveExecutor
      */
     Vector getTargetLinearVelocity();
 
+    /**
+     *
+     * @param new_trajectory The new trajectory requested by the AI.
+     * @return True if the new trajectory requested is meaningfully different from the
+     * current trajectory. That is, if the destinations are new.
+     */
+    bool isLateralTrajectoryNew(
+        const std::optional<TrajectoryPath>& new_trajectory) const;
+
+    /**
+     *
+     * @param new_trajectory The new trajectory requested by the AI.
+     * @return True if the new trajectory requested is meaningfully different from the
+     * current trajectory. That is, if the destinations are new.
+     */
+    bool isAngularTrajectoryNew(const BangBangTrajectory1DAngular& new_trajectory) const;
+
     /*
      * Returns the next target angular velocity the robot
      *
@@ -77,24 +86,55 @@ class PrimitiveExecutor
     AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
-    Duration time_since_trajectory_creation_;
+
+    std::optional<TrajectoryPath> trajectory_path_;
+    std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
+
+    Duration time_since_angular_trajectory_creation_;
+    Duration time_since_linear_trajectory_creation_;
+
+    Point position_;
     Vector velocity_;
     AngularVelocity angular_velocity_;
     Angle orientation_;
+
+    Point last_position_;
+    Angle last_orientation_;
+
     TeamColour friendly_team_colour_;
     robot_constants::RobotConstants robot_constants_;
-    std::optional<TrajectoryPath> trajectory_path_;
-    std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
     // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds
     Duration time_step_;
     RobotId robot_id_;
 
-    // Estimated delay between a vision frame to AI processing to robot executing
-    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+    controls::PIDController<double> x_pid = {0.8, 0, 0, 0};
+    controls::PIDController<double> y_pid = {0.8, 0, 0, 0};
+    controls::PIDController<double> w_pid = {.7, 0.000, 2, 0000};
+
+    // When close to target position, ignore trajectory velocity and use pure PID control.
+    // These PIDs should be used in that case.
+    controls::PIDController<double> x_pid_close = {2, 0, 0, 0};
+    controls::PIDController<double> y_pid_close = {2, 0, 0, 0};
+    controls::PIDController<double> w_pid_close = {2, 0, 4, 0};
+
+    // If distance between current lateral trajectory destination and new one is larger
+    // than this, we change trajectories.
+    static constexpr double LATERAL_DESTINATION_THRESHOLD_METERS  = 0.03;
+    static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
+
+    static constexpr double LATERAL_STALL_ERROR_MAX_METERS  = .4;
+    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 13;
+
+    static constexpr double LATERAL_PURE_PID_THRESHOLD_METERS  = 0.5;
+    static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 25;
 
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.
-    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
+    static constexpr double MAX_DAMPENING_LINEAR_VELOCITY_DISTANCE_M = 0.05;
+
+    // The angular distance away from the destination at which we start dampening
+    // the angular velocity to avoid jittering around the destination.
+    static constexpr double MAX_DAMPENING_ANGULAR_VELOCITY_DISTANCE_DEGREES = 5;
 };

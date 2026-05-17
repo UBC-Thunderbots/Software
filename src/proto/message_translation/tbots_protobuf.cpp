@@ -425,7 +425,8 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
 }
 
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
-    const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
+    const TbotsProto::TrajectoryPathParams2D& params, const Point& start_position,
+    const Vector& initial_velocity,
     const robot_constants::RobotConstants& robot_constants)
 {
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
@@ -449,8 +450,7 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     }
 
     auto trajectory = std::make_shared<BangBangTrajectory2D>(
-        createPoint(params.start_position()), initial_destination, initial_velocity,
-        constraints);
+        start_position, initial_destination, initial_velocity, constraints);
 
     TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
 
@@ -475,14 +475,14 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
 }
 
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
-    const TbotsProto::TrajectoryParamsAngular1D& params,
+    const TbotsProto::TrajectoryParamsAngular1D& params, const Angle& start_angle,
     const AngularVelocity& initial_velocity,
     const robot_constants::RobotConstants& robot_constants)
 {
     return BangBangTrajectory1DAngular(
-        createAngle(params.start_angle()), createAngle(params.final_angle()),
-        initial_velocity,
-        AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
+        start_angle, createAngle(params.final_angle()), initial_velocity,
+        AngularVelocity::fromRadians(
+            robot_constants.robot_max_ang_speed_trajectory_rad_per_s),
         AngularVelocity::fromRadians(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2),
         AngularVelocity::fromRadians(
@@ -513,7 +513,7 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     switch (max_allowed_speed_mode)
     {
         case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
-            return robot_constants.robot_max_speed_m_per_s;
+            return robot_constants.robot_max_speed_trajectory_m_per_s;
         case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND -
                    STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND;
