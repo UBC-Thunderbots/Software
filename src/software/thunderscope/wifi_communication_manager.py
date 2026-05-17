@@ -409,7 +409,7 @@ class WifiCommunicationManager:
             primitive_sender = self.primitive_senders[robot_id][1]
             if primitive_sender is not None:
                 primitive_sender.send_proto(primitive, True)
-            # else:
-            #     logger.warning(
-            #         f"Robot {robot_id} is not connected. Unable to send a primitive to it."
-            #     )
+            else:
+                logger.warning(
+                    f"Robot {robot_id} is not connected. Unable to send a primitive to it."
+                )
