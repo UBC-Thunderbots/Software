@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -14,6 +15,7 @@
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
+#include "software/physics/velocity_conversion_util.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 
@@ -83,7 +85,10 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
       chip_pulse_width_(
           std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
-                          TeamColour::YELLOW, robot_id_)
+                          TeamColour::YELLOW, robot_id_),
+      robot_localizer_(robot_constants.kalman_process_noise_variance_rad_per_s_4,
+                       robot_constants.kalman_vision_noise_variance_rad_2,
+                       robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2)
 {
     waitForNetworkUp();
 
@@ -121,7 +126,10 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     motor_service_  = std::make_unique<MotorService>(robot_constants);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
-    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
+
+    imu_service_ = std::make_unique<ImuService>();
+    LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -229,6 +237,24 @@ void Thunderloop::runLoop()
                 // Save new primitive
                 primitive_ = new_primitive;
 
+                if (primitive_.has_move())
+                {
+                    const Point position =
+                        createPoint(primitive_.move().xy_traj_params().start_position());
+
+                    const Vector velocity = createVector(
+                        primitive_.move().xy_traj_params().initial_velocity());
+
+                    const Angle orientation =
+                        createAngle(primitive_.move().w_traj_params().start_angle());
+
+                    const AngularVelocity angular_velocity = createAngularVelocity(
+                        primitive_.move().w_traj_params().initial_velocity());
+
+                    robot_localizer_.updateVision(position, velocity, orientation,
+                                                  angular_velocity, RTT_S / 2);
+                }
+
                 // Update primitive executor's primitive set
                 {
                     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
@@ -244,12 +270,44 @@ void Thunderloop::runLoop()
                 }
             }
 
+            std::optional<Angle> imu_poll = imu_service_->pollHeadingRate();
+
+            if (imu_poll.has_value())
+            {
+                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                    {"imu_ang_vel", imu_poll.value().toDegrees()},
+                });
+                robot_localizer_.updateImu(imu_poll.value());
+            }
+
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
-                primitive_executor_.updateVelocity(
-                    createVector(status.local_velocity()),
+
+                robot_localizer_.updateMotorSensors(
+                    localToGlobalVelocity(createVector(status.local_velocity()),
+                                          robot_localizer_.getOrientation()),
                     createAngularVelocity(status.angular_velocity()));
+
+                // const Vector target_velocity =
+                //     localToGlobalVelocity(createVector(status.target_local_velocity()),
+                //                           robot_localizer_.getOrientation());
+                // const AngularVelocity target_angular_velocity =
+                //     createAngularVelocity(status.target_angular_velocity());
+
+                // const Vector delta_velocity = target_velocity - last_target_velocity_;
+                // const AngularVelocity delta_angular_velocity =
+                //     target_angular_velocity - last_target_angular_velocity_;
+
+                // last_target_velocity_         = target_velocity;
+                // last_target_angular_velocity_ = target_angular_velocity;
+
+                robot_localizer_.step(Vector(), AngularVelocity::zero());
+
+                primitive_executor_.updateState(robot_localizer_.getPosition(),
+                                                robot_localizer_.getVelocity(),
+                                                robot_localizer_.getOrientation(),
+                                                robot_localizer_.getAngularVelocity());
             }
 
             // Timeout Overrides for Primitives
@@ -268,7 +326,7 @@ void Thunderloop::runLoop()
 
                 if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
-                    primitive_executor_.setStopPrimitive();
+                    primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
                 }
 
                 direct_control_ =

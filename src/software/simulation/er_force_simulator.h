@@ -158,18 +158,19 @@ class ErForceSimulator
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg, const Vector& local_velocity,
-        const AngularVelocity angular_velocity);
+        const TbotsProto::World& world_msg, const Point& position,
+        const Angle& orientation, const Vector& velocity,
+        const AngularVelocity& angular_velocity);
 
     /**
-     * Gets a map from robot id to local and angular velocity from repeated sim robots
+     * Gets a map from robot id to position and velocity from repeated sim robots
      *
      * @param sim_robots Repeated er force sim robot protos
      *
-     * @return a map from robot id to local velocity and angular velocity
+     * @return a map from robot id to position and velocity
      */
-    static std::map<RobotId, std::pair<Vector, AngularVelocity>>
-    getRobotIdToLocalVelocityMap(
+    static std::map<RobotId, std::tuple<Point, Angle, Vector, AngularVelocity>>
+    getRobotIdToStateMap(
         const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
 
     /**

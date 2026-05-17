@@ -100,6 +100,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket& packet)
 
         updateWorld(packet.detection());
 
+        // LOG(WARNING) << "ROBOTS DETECTED: "<< packet.detection().robots_blue().size();
         if (!ball && (packet.detection().robots_blue().size() != 0 ||
                       packet.detection().robots_yellow().size() != 0))
         {
@@ -364,6 +365,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_d
 {
     Team new_friendly_team = friendly_team_filter.getFilteredData(
         friendly_team, robot_detections, friendly_robot_id_with_ball_in_dribbler);
+
     return new_friendly_team;
 }
 
