@@ -37,7 +37,7 @@ class HandheldControllerWidget(QWidget):
         """Initialize the HandheldControllerWidget."""
         super().__init__()
 
-        self.constants = tbots_cpp.create2021RobotConstants()
+        self.constants = tbots_cpp.robot_constants.createRobotConstants()
 
         self.handheld_controller: HandheldController | None = None
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "shared/2021_robot_constants.h"
+#include "shared/robot_constants.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/ai/hl/stp/tactic/stop_primitive.h"
 #include "software/geom/algorithms/contains.h"
@@ -16,9 +16,9 @@ class PrimitiveTest : public testing::Test
     }
 
    protected:
-    RobotConstants_t robot_constants = create2021RobotConstants();
-    Robot robot                      = TestUtil::createRobotAtPos(Point(0, 0));
-    std::shared_ptr<World> world     = TestUtil::createBlankTestingWorld();
+    robot_constants::RobotConstants robot_constants = robot_constants::createRobotConstants();
+    Robot robot                    = TestUtil::createRobotAtPos(Point(0, 0));
+    std::shared_ptr<World> world   = TestUtil::createBlankTestingWorld();
     RobotNavigationObstacleFactory obstacle_factory =
         RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig());
 };

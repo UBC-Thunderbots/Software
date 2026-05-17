@@ -2,15 +2,14 @@
 
 #include <gtest/gtest.h>
 
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
+#include "shared/robot_constants.h"
 #include "software/test_util/test_util.h"
 
 class PrimitiveFactoryTest : public testing::Test
 {
    protected:
-    RobotConstants_t robot_constants = create2021RobotConstants();
-};
+    robot_constants::RobotConstants robot_constants = robot_constants::createRobotConstants();};
 
 TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
 {

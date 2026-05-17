@@ -7,6 +7,8 @@
 #include <string>
 #include <unordered_map>
 
+#define CHECK_VERSION(v) (CURRENT_ROBOT_VERSION == v)
+
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
@@ -21,9 +23,7 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
     {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
 // PlotJuggler's default host and port
-// Should be updated to your local machine's IP address if
-// you want to plot from the robot
-static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "ff02::c3d0:42d2:aaaa";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
 // ProtoLogger constants for replay files
@@ -70,7 +70,7 @@ static const double BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS = 0.05;
 // The max allowed height of the robots, in metres
 static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
-static const double ROBOT_MAX_RADIUS_METERS = 0.09;
+constexpr double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
 static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.078;
 // The approximate radius of the ball according to the SSL rulebook

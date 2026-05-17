@@ -75,6 +75,9 @@ build --cxxopt="-DG3_DYNAMIC_LOGGING"
 build --per_file_copt=.*\.pb\.(h|cc|cpp)$@-w
 build --per_file_copt=./external/.*,./bazel-out/.*@-w
 
+# Define Robot Versions
+build --copt="-DCURRENT_ROBOT_VERSION=2026"
+
 ############## External Deps Compatibility ##############
 build --noincompatible_disallow_ctx_resolve_tools
 build --check_direct_dependencies=off

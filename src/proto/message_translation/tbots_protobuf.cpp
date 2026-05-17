@@ -426,7 +426,7 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
 
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
-    const RobotConstants& robot_constants)
+    const robot_constants::RobotConstants& robot_constants)
 {
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         params.max_speed_mode(), robot_constants);
@@ -476,7 +476,7 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
 
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const TbotsProto::TrajectoryParamsAngular1D& params,
-    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants)
+    const AngularVelocity& initial_velocity, const robot_constants::RobotConstants& robot_constants)
 {
     return BangBangTrajectory1DAngular(
         createAngle(params.start_angle()), createAngle(params.final_angle()),
@@ -489,7 +489,7 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
 }
 
 int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
-                                       RobotConstants_t robot_constants)
+                                       robot_constants::RobotConstants robot_constants)
 {
     switch (dribbler_mode)
     {
@@ -507,7 +507,7 @@ int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
 
 double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
-    RobotConstants_t robot_constants)
+    robot_constants::RobotConstants robot_constants)
 {
     switch (max_allowed_speed_mode)
     {
