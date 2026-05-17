@@ -12,7 +12,7 @@
   - [Robot Diagnostics](#robot-diagnostics)
     - [For Just Diagnostics](#for-just-diagnostics)
     - [For AI + Diagnostics](#for-ai--diagnostics)
-  - [Robot Auto Test](#robot-auto-test)
+  - [STSPIN Motor Controller Test](#stspin-motor-controller-test)
 - [On Robot Commands](#on-robot-commands)
   - [Systemd Services](#systemd-services)
   - [Debugging Uart](#debugging-uart)
@@ -76,9 +76,10 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:motor_board=<motor_board> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
+* <motor_board> is the type of motor driver board on the robot (either `STSPIN` or `TRINAMIC`)
 * <robot_ip> is the IP address of the robot
 * <robot_password> is the password of the `robot` user account
 
@@ -140,13 +141,13 @@ From Software/src
 
 network_interface can be found with `ifconfig` commonly `wlp59s0` for wifi.
 
-## Robot Auto Test
-Runs the robot auto test fixture on a robot through Ansible, which tests the motor board and power board SPI and UART transfer respectively.
+## STSPIN Motor Controller Test
+Deploys the STSPIN Motor Controller Test binary onto a robot through Ansible.
 
 From Software/src:
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook robot_auto_test_playbook.yml --hosts <robot_name> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:motor_board=STSPIN -- --playbook deploy_stspin_motor_controller_test.yml --hosts <robot_name> --ssh_pass <robot_password>
 ```
 
 * replace the \<robot_ip\> with the actual ip address of the Raspberry Pi for the ssh connection.

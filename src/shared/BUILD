@@ -22,12 +22,7 @@ cc_library(
 
 cc_library(
     name = "robot_constants",
-    srcs = [
-        "2021_robot_constants.cpp",
-    ],
-    hdrs = [
-        "2021_robot_constants.h",
-        "robot_constants.h",
-    ],
+    srcs = [],
+    hdrs = [":robot_constants.h"],
     deps = [":constants"],
 )
