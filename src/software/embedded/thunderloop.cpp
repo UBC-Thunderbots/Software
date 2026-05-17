@@ -308,16 +308,6 @@ void Thunderloop::runLoop()
                                                 robot_localizer_.getVelocity(),
                                                 robot_localizer_.getOrientation(),
                                                 robot_localizer_.getAngularVelocity());
-
-                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                    {"loc_pos_x", robot_localizer_.getPosition().x()},
-                    {"loc_pos_y", robot_localizer_.getPosition().y()},
-                    {"loc_vel_x", robot_localizer_.getVelocity().x()},
-                    {"loc_vel_y", robot_localizer_.getVelocity().y()},
-                    {"loc_orientation", robot_localizer_.getOrientation().toRadians()},
-                    {"loc_angular_velocity",
-                     robot_localizer_.getAngularVelocity().toRadians()},
-                });
             }
 
             // Timeout Overrides for Primitives

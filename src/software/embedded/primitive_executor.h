@@ -108,15 +108,16 @@ class PrimitiveExecutor
     Duration time_step_;
     RobotId robot_id_;
 
-    controls::PIDController<double> x_pid = {0.8, 0, 0};
-    controls::PIDController<double> y_pid = {0.8, 0, 0};
-    controls::PIDController<double> w_pid = {.7, 0, -2};
+    controls::PIDController<double> x_pid = {0.8, 0, 0, 0};
+    controls::PIDController<double> y_pid = {0.8, 0, 0, 0};
+    controls::PIDController<double> w_pid = {.7, 0.000, 2, 0000};
+    //controls::PIDController<double> w_pid = {0, 0.000, 0, 2000};
 
     // When close to target position, ignore trajectory velocity and use pure PID control.
     // These PIDs should be used in that case.
-    controls::PIDController<double> x_pid_close = {2, 0, 0};
-    controls::PIDController<double> y_pid_close = {2, 0, 0};
-    controls::PIDController<double> w_pid_close = {3.5, 0, -4};
+    controls::PIDController<double> x_pid_close = {2, 0, 0, 0};
+    controls::PIDController<double> y_pid_close = {2, 0, 0, 0};
+    controls::PIDController<double> w_pid_close = {2, 0, 4, 0};
 
     // When driving, the robot will rotate the direction its driving away from its angular
     // velocity, if this number is higher, it will lean away more from the turn.
@@ -132,7 +133,7 @@ class PrimitiveExecutor
     //static constexpr double LATERAL_STALL_ERROR_MAX_METERS = 0.4;
     static constexpr double LATERAL_STALL_ERROR_MAX_METERS = .4;
     //static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 40;
-    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 20;
+    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 13;
 
     static constexpr double LATERAL_PURE_PID_THRESHOLD_METERS = 0.5;
     // static constexpr double LATERAL_PURE_PID_THRESHOLD_METERS = 40;
