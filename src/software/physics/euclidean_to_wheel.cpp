@@ -8,7 +8,7 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/vector.h"
 
-EuclideanToWheel::EuclideanToWheel(const RobotConstants& robot_constants)
+EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_constants)
     : robot_constants_(robot_constants)
 {
     // Phi, the angle between the hemisphere line of the robot and the front wheel axles

@@ -7,6 +7,8 @@
 #include <string>
 #include <unordered_map>
 
+#define CHECK_VERSION(v) (CURRENT_ROBOT_VERSION == v)
+
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
@@ -68,7 +70,7 @@ static const double BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS = 0.05;
 // The max allowed height of the robots, in metres
 static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
-static const double ROBOT_MAX_RADIUS_METERS = 0.09;
+constexpr double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
 static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.078;
 // The approximate radius of the ball according to the SSL rulebook

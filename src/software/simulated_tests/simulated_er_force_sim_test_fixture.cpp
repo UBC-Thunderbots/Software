@@ -181,7 +181,7 @@ void SimulatedErForceSimTestFixture::runTest(
 
     auto realism_config = ErForceSimulator::createDefaultRealismConfig();
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field_type, create2026RobotConstants(), realism_config, ramping));
+        field_type, robot_constants::createRobotConstants(), realism_config, ramping));
 
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);

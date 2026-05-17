@@ -6,7 +6,7 @@
 #include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/logger/logger.h"
 
-MotorService::MotorService(const RobotConstants& robot_constants)
+MotorService::MotorService(const robot_constants::RobotConstants& robot_constants)
     : motor_controller_(setupMotorController()),
       robot_constants_(robot_constants),
       euclidean_to_four_wheel_(robot_constants),

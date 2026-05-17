@@ -34,7 +34,7 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
 std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectControl(
     unsigned int robot_id,
     std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control,
-    RobotConstants& robot_constants);
+    robot_constants::RobotConstants& robot_constants);
 
 /**
  * Creates a RobotCommand proto

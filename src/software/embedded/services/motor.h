@@ -26,7 +26,7 @@ class MotorService
      *
      * @param robot_constants The robot constants
      */
-    explicit MotorService(const RobotConstants& robot_constants);
+    explicit MotorService(const robot_constants::RobotConstants& robot_constants);
 
     virtual ~MotorService() = default;
 
@@ -75,7 +75,7 @@ class MotorService
 
     std::unique_ptr<MotorController> motor_controller_;
 
-    RobotConstants robot_constants_;
+    robot_constants::RobotConstants robot_constants_;
 
     EuclideanToWheel euclidean_to_four_wheel_;
 

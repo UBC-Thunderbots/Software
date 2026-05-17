@@ -68,7 +68,7 @@ extern "C"
     }
 }
 
-Thunderloop::Thunderloop(const RobotConstants& robot_constants, bool enable_log_merging,
+Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants, bool enable_log_merging,
                          const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       motor_status_(std::nullopt),

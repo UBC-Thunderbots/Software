@@ -41,7 +41,7 @@ class EuclideanToWheel
      *
      * @param robot_constants The constants of the robot we are computing for.
      */
-    explicit EuclideanToWheel(const RobotConstants& robot_constants);
+    explicit EuclideanToWheel(const robot_constants::RobotConstants& robot_constants);
 
     /**
      * Gets the wheel velocity from the Euclidean velocity.
@@ -75,7 +75,7 @@ class EuclideanToWheel
                                    const double& time_to_ramp);
 
    private:
-    const RobotConstants robot_constants_;
+    const robot_constants::RobotConstants robot_constants_;
 
     /**
      * Euclidean velocity to wheel velocity coupling matrix.

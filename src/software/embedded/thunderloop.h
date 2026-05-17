@@ -49,7 +49,7 @@ class Thunderloop
      * @param enable_log_merging Whether to merge repeated log message or not
      * @param loop_hz The rate to run the loop
      */
-    Thunderloop(const RobotConstants& robot_constants, bool enable_log_merging,
+    Thunderloop(const robot_constants::RobotConstants& robot_constants, bool enable_log_merging,
                 const int loop_hz);
 
     ~Thunderloop();
@@ -140,7 +140,7 @@ class Thunderloop
     TbotsProto::Timestamp time_sent_;
 
     // Current State
-    RobotConstants robot_constants_;
+    robot_constants::RobotConstants robot_constants_;
     Angle current_orientation_;
     int robot_id_;
     int channel_id_;

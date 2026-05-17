@@ -21,7 +21,7 @@ class PrimitiveExecutor
      * @param robot_id The id of the robot which uses this primitive executor
      */
     explicit PrimitiveExecutor(const Duration time_step,
-                               const RobotConstants& robot_constants,
+                               const robot_constants::RobotConstants& robot_constants,
                                const TeamColour friendly_team_colour,
                                const RobotId robot_id);
 
@@ -82,7 +82,7 @@ class PrimitiveExecutor
     AngularVelocity angular_velocity_;
     Angle orientation_;
     TeamColour friendly_team_colour_;
-    RobotConstants robot_constants_;
+    robot_constants::RobotConstants robot_constants_;
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 

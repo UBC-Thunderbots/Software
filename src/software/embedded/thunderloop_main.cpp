@@ -112,7 +112,7 @@ int main(int argc, char** argv)
     reserveProcessMemory(pre_allocation_size);
 
     auto thunderloop =
-        Thunderloop(create2026RobotConstants(), args.enable_log_merging, THUNDERLOOP_HZ);
+        Thunderloop(robot_constants::createRobotConstants(), args.enable_log_merging, THUNDERLOOP_HZ);
     thunderloop.runLoop();
 
     return 0;

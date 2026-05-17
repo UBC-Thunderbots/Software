@@ -372,7 +372,7 @@ TEST_F(RobotTest,
     Angle target_angle = Angle::fromDegrees(-45.0);
     Robot robot(0, {1, 1}, Vector(0, 0), Angle::fromDegrees(45.0),
                 AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0), {},
-                create2026RobotConstants());
+                robot_constants::createRobotConstants());
 
     // Figure out a lower bound on the time required, based on us being able to constantly
     // accelerate at the max acceleration
