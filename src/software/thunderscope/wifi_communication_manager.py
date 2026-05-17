@@ -151,7 +151,7 @@ class WifiCommunicationManager:
                         primitive_sender,
                     )
                     logger.info(f"Connected to robot {robot_id} at {ip_address}")
-                except tbots_cpp.TbotsNetworkException:
+                except tbots_cpp.TbotsNetworkException as error:
                     logger.error(f"Error connecting to robot {robot_id}: {error}")
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
@@ -268,9 +268,10 @@ class WifiCommunicationManager:
             """
             try:
                 resource = creator()
-            except tbots_cpp.TbotsNetworkException:
+            except tbots_cpp.TbotsNetworkException as error:
                 logger.error(f"Error setting up robot status interface:\n{error}")
                 is_setup_successfully = False
+                return None
             return resource
 
         # Create unicast listeners for RobotStatus and RobotLog. These are all binded to all interfaces

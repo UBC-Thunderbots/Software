@@ -40,7 +40,7 @@ MovePrimitive::MovePrimitive(
         angular_trajectory.generate(
             robot.orientation(), final_angle, robot.angularVelocity(),
             AngularVelocity::fromRadians(
-                robot.robotConstants().robot_max_ang_speed_rad_per_s),
+                robot.robotConstants().robot_max_ang_speed_trajectory_rad_per_s),
             AngularVelocity::fromRadians(
                 robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2),
             AngularVelocity::fromRadians(

@@ -37,6 +37,7 @@ cc_library(
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
         "//software/time:duration",
+        "//software/util/pid",
         "//software/world:robot_state",
         "//software/world:team_colour",
     ],
@@ -58,11 +59,14 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
+        "//software/embedded:robot_localizer",
+        "//software/embedded/services:imu",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",
         "//software/embedded/toml_config",
         "//software/logger:network_logger",
+        "//software/physics:velocity_conversion_util",
         "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",
         "@tracy",
@@ -98,5 +102,23 @@ cc_test(
     deps = [
         ":thunderloop",
         "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_library(
+    name = "robot_localizer",
+    srcs = ["robot_localizer.cpp"],
+    hdrs = ["robot_localizer.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software:constants",
+        "//software/embedded/services:imu",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
+        "//software/sensor_fusion/filter:kalman_filter",
+        "//software/util/scoped_timespec_timer",
+        "@eigen",
     ],
 )
