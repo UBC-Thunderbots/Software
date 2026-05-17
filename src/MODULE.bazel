@@ -209,6 +209,13 @@ http_archive(
     url = "https://github.com/analogdevicesinc/TMC-API/archive/0cd695fab6d43ceb121af4b8608e5d92b14e1ce9.tar.gz",
 )
 
+http_archive(
+    name = "cppcrc",
+    build_file = "@//extlibs:cppcrc.BUILD",
+    strip_prefix = "cppcrc-6360eee1c8966d32b2552ce156b135ec6a3235f1",
+    url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
+)
+
 ##############################################
 # Register our Toolchains
 ##############################################

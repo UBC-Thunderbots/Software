@@ -1,4 +1,4 @@
-#include "software/embedded/gpio_char_dev.h"
+#include "software/embedded/gpio/gpio_char_dev.h"
 
 #include <linux/gpio.h>
 
