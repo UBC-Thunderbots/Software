@@ -67,8 +67,7 @@ class PrimitiveExecutor
      * @return True if the new trajectory requested is meaningfully different from the
      * current trajectory. That is, if the destinations are new.
      */
-    bool isLateralTrajectoryNew(
-        const std::optional<TrajectoryPath>& new_trajectory) const;
+    bool isLinearTrajectoryNew(const std::optional<TrajectoryPath>& new_trajectory) const;
 
     /**
      *
@@ -111,7 +110,7 @@ class PrimitiveExecutor
 
     controls::PIDController<double> x_pid = {0.8, 0, 0, 0};
     controls::PIDController<double> y_pid = {0.8, 0, 0, 0};
-    controls::PIDController<double> w_pid = {.7, 0.000, 2, 0000};
+    controls::PIDController<double> w_pid = {0.7, 0, 2, 0};
 
     // When close to target position, ignore trajectory velocity and use pure PID control.
     // These PIDs should be used in that case.
@@ -119,15 +118,15 @@ class PrimitiveExecutor
     controls::PIDController<double> y_pid_close = {2, 0, 0, 0};
     controls::PIDController<double> w_pid_close = {2, 0, 4, 0};
 
-    // If distance between current lateral trajectory destination and new one is larger
+    // If distance between current linear trajectory destination and new one is larger
     // than this, we change trajectories.
-    static constexpr double LATERAL_DESTINATION_THRESHOLD_METERS  = 0.03;
+    static constexpr double LINEAR_DESTINATION_THRESHOLD_METERS   = 0.03;
     static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
 
-    static constexpr double LATERAL_STALL_ERROR_MAX_METERS  = .4;
+    static constexpr double LINEAR_STALL_ERROR_MAX_METERS   = .4;
     static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 13;
 
-    static constexpr double LATERAL_PURE_PID_THRESHOLD_METERS  = 0.5;
+    static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS   = 0.5;
     static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 25;
 
     // The distance away from the destination at which we start dampening the velocity

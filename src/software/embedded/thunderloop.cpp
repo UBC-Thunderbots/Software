@@ -242,17 +242,10 @@ void Thunderloop::runLoop()
                     const Point position =
                         createPoint(primitive_.move().xy_traj_params().start_position());
 
-                    const Vector velocity = createVector(
-                        primitive_.move().xy_traj_params().initial_velocity());
-
                     const Angle orientation =
                         createAngle(primitive_.move().w_traj_params().start_angle());
 
-                    const AngularVelocity angular_velocity = createAngularVelocity(
-                        primitive_.move().w_traj_params().initial_velocity());
-
-                    robot_localizer_.updateVision(position, velocity, orientation,
-                                                  angular_velocity, RTT_S / 2);
+                    robot_localizer_.updateVision(position, orientation, RTT_S / 2);
                 }
 
                 // Update primitive executor's primitive set
@@ -271,12 +264,8 @@ void Thunderloop::runLoop()
             }
 
             std::optional<Angle> imu_poll = imu_service_->pollHeadingRate();
-
             if (imu_poll.has_value())
             {
-                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                    {"imu_ang_vel", imu_poll.value().toDegrees()},
-                });
                 robot_localizer_.updateImu(imu_poll.value());
             }
 
@@ -288,19 +277,6 @@ void Thunderloop::runLoop()
                     localToGlobalVelocity(createVector(status.local_velocity()),
                                           robot_localizer_.getOrientation()),
                     createAngularVelocity(status.angular_velocity()));
-
-                // const Vector target_velocity =
-                //     localToGlobalVelocity(createVector(status.target_local_velocity()),
-                //                           robot_localizer_.getOrientation());
-                // const AngularVelocity target_angular_velocity =
-                //     createAngularVelocity(status.target_angular_velocity());
-
-                // const Vector delta_velocity = target_velocity - last_target_velocity_;
-                // const AngularVelocity delta_angular_velocity =
-                //     target_angular_velocity - last_target_angular_velocity_;
-
-                // last_target_velocity_         = target_velocity;
-                // last_target_angular_velocity_ = target_angular_velocity;
 
                 robot_localizer_.step(Vector(), AngularVelocity::zero());
 

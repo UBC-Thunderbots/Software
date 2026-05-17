@@ -16,8 +16,8 @@ MAKE_ENUM(StateIndex, X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCIT
           ANGULAR_VELOCITY);
 
 MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTATION,
-          VISION_X_VELOCITY, VISION_Y_VELOCITY, VISION_ANGULAR_VELOCITY, MOTOR_X_VELOCITY,
-          MOTOR_Y_VELOCITY, MOTOR_ANGULAR_VELOCITY, IMU_ANGULAR_VELOCITY);
+          MOTOR_X_VELOCITY, MOTOR_Y_VELOCITY, MOTOR_ANGULAR_VELOCITY,
+          IMU_ANGULAR_VELOCITY);
 
 MAKE_ENUM(ControlIndex, X_ACCELERATION, Y_ACCELERATION, ANGULAR_ACCELERATION);
 
@@ -57,16 +57,13 @@ class RobotLocalizer
               const AngularVelocity& target_angular_acceleration);
 
     /**
-     * Update the robot's position and velocity from data reported by vision.
+     * Update the robot's position and orientation from data reported by vision.
      *
      * @param position Vision reading of the robot's position in world space
-     * @param velocity Vision reading of the robot's velocity in world space
      * @param orientation Vision reading of the robot's orientation in world space
-     * @param angular_velocity Vision reading of the robot's angular velocity
      * @param age_seconds Age in seconds of the vision snapshot (time since it was taken)
      */
-    void updateVision(const Point& position, const Vector& velocity,
-                      const Angle& orientation, const AngularVelocity& angular_velocity,
+    void updateVision(const Point& position, const Angle& orientation,
                       double age_seconds);
 
     /**
@@ -116,16 +113,12 @@ class RobotLocalizer
 
    private:
     /**
-     * Update the Kalman filter with the robot's position and velocity from vision.
+     * Update the Kalman filter with the robot's position and orientation from vision.
      *
      * @param position Vision reading of the robot's position in world space
-     * @param velocity Vision reading of the robot's velocity in world space
      * @param orientation Vision reading of the robot's orientation in world space
-     * @param angular_velocity Vision reading of the robot's angular velocity
      */
-    void updateFilterWithVision(const Point& position, const Vector& velocity,
-                                const Angle& orientation,
-                                const AngularVelocity& angular_velocity);
+    void updateFilterWithVision(const Point& position, const Angle& orientation);
 
     static constexpr size_t STATE_SIZE       = reflective_enum::size<StateIndex>();
     static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
