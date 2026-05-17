@@ -11,6 +11,7 @@ from typing import override
 
 
 logger = create_logger(__name__)
+DEFAULT_ORIENTATION = -math.pi / 2
 
 
 class GLMovementFieldTestLayer(GLLayer):
@@ -34,7 +35,7 @@ class GLMovementFieldTestLayer(GLLayer):
         # State for drag-to-orient movement
         self.is_dragging_to_orient = False
         self.target_point = None
-        self.current_orientation = -math.pi / 2
+        self.current_orientation = DEFAULT_ORIENTATION
 
     def select_closest_robot(self, point):
         """Find the closest robot to a point
@@ -82,7 +83,7 @@ class GLMovementFieldTestLayer(GLLayer):
                 return
 
             self.target_point = point
-            self.current_orientation = -math.pi / 2
+            self.current_orientation = DEFAULT_ORIENTATION
             self.is_dragging_to_orient = True
 
     def move_to_point(self, point, orientation: float = None):
@@ -99,7 +100,7 @@ class GLMovementFieldTestLayer(GLLayer):
         robot_id = self.selected_robot_id
 
         if orientation is None:
-            orientation = -math.pi / 2
+            orientation = DEFAULT_ORIENTATION
 
         point = Point(x_meters=point.x(), y_meters=point.y())
         move_tactic = MoveTactic(
