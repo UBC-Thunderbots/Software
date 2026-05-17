@@ -10,8 +10,7 @@ class PrimitiveFactoryTest : public testing::Test
 {
    protected:
     robot_constants::RobotConstants robot_constants =
-        robot_constants::createRobotConstants();
-};
+        robot_constants::createRobotConstants();};
 
 TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
 {

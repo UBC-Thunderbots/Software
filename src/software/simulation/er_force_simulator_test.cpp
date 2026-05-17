@@ -308,7 +308,7 @@ TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 {
     robot_constants::RobotConstants robot_constants =
         robot_constants::createRobotConstants();
-    auto realism_config = ErForceSimulator::createDefaultRealismConfig();
+    auto realism_config            = ErForceSimulator::createDefaultRealismConfig();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
         TbotsProto::FieldType::DIV_A, robot_constants, realism_config);
     simulator->resetCurrentTime();
@@ -321,7 +321,7 @@ TEST(ErForceSimulatorFieldTest, check_field_B_configuration)
 {
     robot_constants::RobotConstants robot_constants =
         robot_constants::createRobotConstants();
-    auto realism_config = ErForceSimulator::createDefaultRealismConfig();
+    auto realism_config            = ErForceSimulator::createDefaultRealismConfig();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
         TbotsProto::FieldType::DIV_B, robot_constants, realism_config);
     simulator->resetCurrentTime();
