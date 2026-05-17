@@ -159,7 +159,7 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, True)
-    gl_widget.add_layer(field_movement_layer, True)
+    gl_widget.add_layer(field_movement_layer, False)
     gl_widget.add_layer(max_dribble_layer, True)
     gl_widget.add_layer(referee_layer)
 
