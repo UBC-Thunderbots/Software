@@ -58,8 +58,8 @@ ImuService::ImuService() : initialized_(false)
     }
     if (i2c_smbus_read_byte_data(file_descriptor_, WHOAMI_REG) != 106)
     {
-        LOG(WARNING) << "Failed to initialize the IMU: WHOAMI register " << static_cast<int>(WHOAMI_REG)
-                     << " read incorrectly.";
+        LOG(WARNING) << "Failed to initialize the IMU: WHOAMI register "
+                     << static_cast<int>(WHOAMI_REG) << " read incorrectly.";
         return;
     }
     // Attempt to enable gyro and accelerometer, checking that writes are successful
@@ -77,8 +77,9 @@ ImuService::ImuService() : initialized_(false)
     i2c_smbus_write_byte_data(file_descriptor_, GYRO_CONTROL_REG, 0b01011000);
     if (i2c_smbus_read_byte_data(file_descriptor_, GYRO_CONTROL_REG) != 0b01011000)
     {  // write unsuccessful
-        LOG(WARNING) << "Failed to initialize the IMU: writing to gyroscope config register "
-                     << "unsuccessful";
+        LOG(WARNING)
+            << "Failed to initialize the IMU: writing to gyroscope config register "
+            << "unsuccessful";
         return;
     }
 

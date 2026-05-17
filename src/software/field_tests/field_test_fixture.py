@@ -104,7 +104,9 @@ class FieldTestRunner(TbotsTestRunner):
 
                 QtWidgets.QApplication.processEvents()
             time.sleep(0.1)
-        logger.info("\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m")
+        logger.info(
+            "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
+        )
 
     @override
     def send_gamecontroller_command(
@@ -231,7 +233,7 @@ class FieldTestRunner(TbotsTestRunner):
             # which can only happen if we are running this run_test in a background thread.
             if not self.thunderscope.is_open():
                 self.thunderscope.show()
-            
+
             run_test_thread.join()
 
             if self.last_exception:

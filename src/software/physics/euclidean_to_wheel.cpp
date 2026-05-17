@@ -23,12 +23,12 @@ EuclideanToWheel::EuclideanToWheel(const RobotConstants& robot_constants)
 
     // 1. Physical wheel coordinates in meters
     // Mapped to the robot frame: +X = Right, +Y = Forward
-    double fr_x = 0.06632, fr_y =  0.03485;
+    double fr_x = 0.06632, fr_y = 0.03485;
     double br_x = 0.05592, br_y = -0.04985;
 
     // 2. Unit drive vectors (extracted directly from the matrix's linear columns)
     double fr_dx = -sin_p, fr_dy = cos_p;
-    double br_dx =  sin_t, br_dy = cos_t;
+    double br_dx = sin_t, br_dy = cos_t;
 
     // 3. Dynamically calculate the rotational lever arms using the 2D cross product
     // Lever Arm = | X * Dy - Y * Dx |
@@ -45,7 +45,9 @@ EuclideanToWheel::EuclideanToWheel(const RobotConstants& robot_constants)
 
     // Calculate Pseudo-inverse dynamically
     wheel_to_euclidean_velocity_D_inverse_ =
-        (euclidean_to_wheel_velocity_D_.transpose() * euclidean_to_wheel_velocity_D_).inverse() * euclidean_to_wheel_velocity_D_.transpose();
+        (euclidean_to_wheel_velocity_D_.transpose() * euclidean_to_wheel_velocity_D_)
+            .inverse() *
+        euclidean_to_wheel_velocity_D_.transpose();
 }
 
 #else

@@ -1,4 +1,5 @@
 #include "robot_localizer.h"
+
 #include <chrono>
 
 RobotLocalizer::RobotLocalizer(const double process_noise_variance,

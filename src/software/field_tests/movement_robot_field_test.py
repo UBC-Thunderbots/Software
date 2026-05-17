@@ -8,6 +8,7 @@ logger = create_logger(__name__)
 import math
 import threading
 
+
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
     test_angles = [0, 45, 90, 180, 270, 0]
@@ -46,7 +47,9 @@ def test_basic_rotation(field_test_runner):
             move_tactic = MoveTactic()
             move_tactic.destination.CopyFrom(rob_pos_p)
             move_tactic.dribbler_mode = DribblerMode.OFF
-            move_tactic.final_orientation.CopyFrom(Angle(radians=angle * math.pi / 180.0))
+            move_tactic.final_orientation.CopyFrom(
+                Angle(radians=angle * math.pi / 180.0)
+            )
             move_tactic.ball_collision_type = BallCollisionType.AVOID
             move_tactic.auto_chip_or_kick.CopyFrom(
                 AutoChipOrKick(autokick_speed_m_per_s=0.0)
@@ -69,7 +72,9 @@ def test_basic_rotation(field_test_runner):
             time.sleep(2)
 
         # Send a halt tactic after the test finishes
-        field_test_runner.set_tactics(blue_tactics={id: HaltTactic()}, yellow_tactics=None)
+        field_test_runner.set_tactics(
+            blue_tactics={id: HaltTactic()}, yellow_tactics=None
+        )
 
     test_thread = threading.Thread(target=execute_test, daemon=True)
     test_thread.start()
@@ -77,7 +82,7 @@ def test_basic_rotation(field_test_runner):
     # If thunderscope is enabled, show it in the main thread (blocking)
     if field_test_runner.thunderscope:
         field_test_runner.thunderscope.show()
-    
+
     test_thread.join()
 
 
@@ -168,7 +173,9 @@ def test_one_robots_square(field_test_runner):
             )
 
         # Send a halt tactic after the test finishes
-        field_test_runner.set_tactics(blue_tactics={id: HaltTactic()}, yellow_tactics=None)
+        field_test_runner.set_tactics(
+            blue_tactics={id: HaltTactic()}, yellow_tactics=None
+        )
 
     test_thread = threading.Thread(target=execute_test, daemon=True)
     test_thread.start()
@@ -176,7 +183,7 @@ def test_one_robots_square(field_test_runner):
     # If thunderscope is enabled, show it in the main thread (blocking)
     if field_test_runner.thunderscope:
         field_test_runner.thunderscope.show()
-    
+
     test_thread.join()
 
 

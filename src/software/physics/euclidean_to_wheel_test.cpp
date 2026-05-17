@@ -118,10 +118,14 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w)
     // Based on the physical offsets, the lever arm evaluates to 0.0746 meters.
     double expected_lever_arm = 0.0746;
 
-    EXPECT_NEAR(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], expected_lever_arm, 0.001);
-    EXPECT_NEAR(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], expected_lever_arm, 0.001);
-    EXPECT_NEAR(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], expected_lever_arm, 0.001);
-    EXPECT_NEAR(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], expected_lever_arm, 0.001);
+    EXPECT_NEAR(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
+                expected_lever_arm, 0.001);
+    EXPECT_NEAR(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], expected_lever_arm,
+                0.001);
+    EXPECT_NEAR(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], expected_lever_arm,
+                0.001);
+    EXPECT_NEAR(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], expected_lever_arm,
+                0.001);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w)
@@ -135,10 +139,14 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w)
     // exact physical lever arm (in meters) multiplied by the negative velocity.
     double expected_lever_arm = -0.0746;
 
-    EXPECT_NEAR(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], expected_lever_arm, 0.001);
-    EXPECT_NEAR(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], expected_lever_arm, 0.001);
-    EXPECT_NEAR(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], expected_lever_arm, 0.001);
-    EXPECT_NEAR(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], expected_lever_arm, 0.001);
+    EXPECT_NEAR(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
+                expected_lever_arm, 0.001);
+    EXPECT_NEAR(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], expected_lever_arm,
+                0.001);
+    EXPECT_NEAR(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], expected_lever_arm,
+                0.001);
+    EXPECT_NEAR(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], expected_lever_arm,
+                0.001);
 }
 #else
 

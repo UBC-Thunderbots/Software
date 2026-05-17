@@ -29,7 +29,9 @@ class ImuService
     // Variance from datasheet (in rad^2/s^2)
     static constexpr double IMU_VARIANCE =
         (4.0 * 14.4222 / 1000.0 * M_PI / 180.0) *
-        (4.0 * 14.4222 / 1000.0 * M_PI / 180.0);  // stdev = 4mdeg/Hz noise density * sqrt(208) Hz * 1/1000 deg/mdeg * pi/180 rad/deg
+        (4.0 * 14.4222 / 1000.0 * M_PI /
+         180.0);  // stdev = 4mdeg/Hz noise density * sqrt(208) Hz * 1/1000 deg/mdeg *
+                  // pi/180 rad/deg
    private:
     bool initialized_    = false;
     int file_descriptor_ = 0;
