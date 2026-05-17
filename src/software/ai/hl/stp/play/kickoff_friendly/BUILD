@@ -40,3 +40,14 @@ cc_test(
         "//software/world",
     ],
 )
+
+py_test(
+    name = "kickoff_friendly_play_test",
+    srcs = ["kickoff_friendly_play_test.py"],
+    tags = ["exclusive"],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)
