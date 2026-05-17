@@ -9,7 +9,7 @@
 class StSpinMotorController : public MotorController
 {
    public:
-    explicit StSpinMotorController();
+    explicit StSpinMotorController(const RobotConstants& robot_constants);
 
     void setup() override;
 
@@ -19,13 +19,16 @@ class StSpinMotorController : public MotorController
 
     int readThenWriteVelocity(MotorIndex motor, int target_velocity) override;
 
+    void updateEuclideanVelocity(EuclideanSpace_t target_euclidean_velocity) override;
+
     void immediatelyDisable() override;
 
    private:
     using OutgoingFrame =
         std::variant<NoOpFrame, SetResponseTypeFrame, SetTargetSpeedFrame,
                      SetTargetTorqueFrame, SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame,
-                     SetPidSpeedKpKiFrame, SetSpeedFeedForwardKaKvFrame>;
+                     SetPidSpeedKpKiFrame, SetSpeedFeedForwardKaKvFrame,
+                     SetSpeedFeedForwardKsFrame>;
 
     // Length of frame (in number of bytes)
     static constexpr unsigned int FRAME_LEN = 6;
@@ -45,6 +48,10 @@ class StSpinMotorController : public MotorController
     static constexpr uint32_t SPI_MODE         = 0;
 
     static constexpr int RESET_GPIO_PIN = 12;
+
+    static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
+
+    RobotConstants robot_constants_;
 
     // SPI file descriptors
     std::unordered_map<MotorIndex, int> spi_fds_;

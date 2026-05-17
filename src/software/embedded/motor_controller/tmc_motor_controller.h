@@ -20,6 +20,8 @@ class TmcMotorController : public MotorController
 
     int readThenWriteVelocity(MotorIndex motor, int target_velocity) override;
 
+    void updateEuclideanVelocity(EuclideanSpace_t target_euclidean_velocity) override;
+
     /**
      * Trinamic API binding, sets spi_demux_select_0|1 pins appropriately and
      * calls readWriteByte.
@@ -266,15 +268,21 @@ class TmcMotorController : public MotorController
     static constexpr int DRIVE_MOTOR_NUM_POLE_PAIRS    = 8;
     static constexpr int DRIBBLER_MOTOR_NUM_POLE_PAIRS = 1;
 
+    static constexpr double WHEEL_ROTATIONS_PER_MOTOR_ROTATION = 17.0 / 60.0;
+
     // All Trinamic RPMs are Electrical RPMs (eRPM), which represents the speed at which
     // the rotating magnetic field inside the motor moves (as opposed to mechanical RPM
     // which indicates how fast the motor shaft is rotating).
     //
     // RPM = eRPM / # of pole pairs
     static constexpr double DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM =
-        1.0 / DRIVE_MOTOR_NUM_POLE_PAIRS;
+        1.0 / DRIVE_MOTOR_NUM_POLE_PAIRS * WHEEL_ROTATIONS_PER_MOTOR_ROTATION;
     static constexpr double DRIBBLER_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM =
         1.0 / DRIBBLER_MOTOR_NUM_POLE_PAIRS;
+    static constexpr double DRIVE_MOTOR_ELECTRICAL_RPM_PER_MECHANICAL_RPM =
+        1.0 / DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
+    static constexpr double DRIBBLER_MOTOR_ELECTRICAL_RPM_PER_MECHANICAL_RPM =
+        1.0 / DRIBBLER_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
 
     static constexpr int SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = 16;
     static constexpr int SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = 19;

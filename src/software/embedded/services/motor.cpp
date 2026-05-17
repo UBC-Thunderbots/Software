@@ -7,8 +7,8 @@
 #include "software/logger/logger.h"
 
 MotorService::MotorService(const robot_constants::RobotConstants& robot_constants)
-    : motor_controller_(setupMotorController()),
-      robot_constants_(robot_constants),
+    : robot_constants_(robot_constants),
+      motor_controller_(setupMotorController()),
       euclidean_to_four_wheel_(robot_constants),
       drive_motor_mps_per_rpm_(2 * M_PI * robot_constants.wheel_radius_meters / 60)
 {
@@ -36,7 +36,7 @@ std::unique_ptr<MotorController> MotorService::setupMotorController()
     }
     else
     {
-        return std::make_unique<StSpinMotorController>();
+        return std::make_unique<StSpinMotorController>(robot_constants_);
     }
 }
 
@@ -196,6 +196,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
             -direct_velocity.velocity().y_component_meters(),
             direct_velocity.velocity().x_component_meters(),
             direct_velocity.angular_velocity().radians_per_second()};
+
+        motor_controller_->updateEuclideanVelocity(target_euclidean_velocity);
 
         target_wheel_velocities_ =
             euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);

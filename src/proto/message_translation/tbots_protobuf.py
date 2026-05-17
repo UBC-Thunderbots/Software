@@ -11,7 +11,8 @@ def create_world_state(
     blue_robot_locations: list[tbots_cpp.Point],
     ball_location: tbots_cpp.Point,
     ball_velocity: tbots_cpp.Vector,
-    blue_robot_orientations: list[float] = [],
+    blue_robot_orientations: list[tbots_cpp.Angle] = [],
+    blue_robot_velocities: list[tbots_cpp.Vector] = [],
 ) -> WorldState:
     """Initializes the world from a list of robot locations and ball location/velocity.
 
@@ -22,6 +23,7 @@ def create_world_state(
     :param ball_location: Location of the ball
     :param ball_velocity: Velocity of the ball
     :param blue_robot_orientations: A list of blue robots orientations
+    :param blue_robot_velocities: A list of blue robots velocities
     """
     world_state = WorldState()
 
@@ -36,17 +38,26 @@ def create_world_state(
         )
 
     for robot_id, robot_location in enumerate(blue_robot_locations):
-        orientation = 0
+        orientation = tbots_cpp.Angle.zero()
+        velocity = tbots_cpp.Vector(0, 0)
+
         try:
             orientation = blue_robot_orientations[robot_id]
         except IndexError:
             pass
+
+        try:
+            velocity = blue_robot_velocities[robot_id]
+        except IndexError:
+            pass
+
         world_state.blue_robots[robot_id].CopyFrom(
             RobotState(
                 global_position=Point(
                     x_meters=robot_location.x(), y_meters=robot_location.y()
                 ),
-                global_orientation=Angle(radians=orientation),
+                global_orientation=tbots_cpp.createAngleProto(orientation),
+                global_velocity=tbots_cpp.createVectorProto(velocity),
             )
         )
 

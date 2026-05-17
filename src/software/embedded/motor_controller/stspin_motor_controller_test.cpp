@@ -46,7 +46,8 @@ class StSpinMotorControllerTest
         }
         LOG(INFO) << "Enabled motors: " << ss.str();
 
-        const auto motor_controller = std::make_unique<StSpinMotorController>();
+        const auto motor_controller =
+            std::make_unique<StSpinMotorController>(create2026RobotConstants());
         motor_controller->setup();
 
         LOG(INFO) << "Motor controller setup complete";
