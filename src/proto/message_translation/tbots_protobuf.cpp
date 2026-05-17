@@ -430,6 +430,7 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
 {
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         params.max_speed_mode(), robot_constants);
+
     if (max_speed == 0)
     {
         return std::nullopt;
@@ -482,7 +483,8 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
             robot_constants.robot_max_ang_speed_trajectory_rad_per_s),
         AngularVelocity::fromRadians(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2),
-        AngularVelocity::fromRadians(3));
+        AngularVelocity::fromRadians(
+            robot_constants.robot_max_ang_acceleration_rad_per_s_2));
 }
 
 int convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
