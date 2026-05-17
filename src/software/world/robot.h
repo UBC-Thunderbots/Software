@@ -30,12 +30,13 @@ class Robot
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      * @param robot_constants The robot constants for this robot
      */
-    explicit Robot(RobotId id, const Point& position, const Vector& velocity,
-                   const Angle& orientation, const AngularVelocity& angular_velocity,
-                   const Timestamp& timestamp, bool breakbeam_tripped = false,
-                   const std::set<RobotCapability>& unavailable_capabilities =
-                       std::set<RobotCapability>(),
-                   const robot_constants::RobotConstants& robot_constants = DEFAULT_ROBOT_CONSTANTS);
+    explicit Robot(
+        RobotId id, const Point& position, const Vector& velocity,
+        const Angle& orientation, const AngularVelocity& angular_velocity,
+        const Timestamp& timestamp, bool breakbeam_tripped = false,
+        const std::set<RobotCapability>& unavailable_capabilities =
+            std::set<RobotCapability>(),
+        const robot_constants::RobotConstants& robot_constants = DEFAULT_ROBOT_CONSTANTS);
 
     /**
      * Creates a new robot given robot data
@@ -68,11 +69,11 @@ class Robot
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      * @param robot_constants The robot constants for this robot
      */
-    explicit Robot(RobotId id, const RobotState& initial_state,
-                   const Timestamp& timestamp,
-                   const std::set<RobotCapability>& unavailable_capabilities =
-                       std::set<RobotCapability>(),
-                   const robot_constants::RobotConstants& robot_constants = DEFAULT_ROBOT_CONSTANTS);
+    explicit Robot(
+        RobotId id, const RobotState& initial_state, const Timestamp& timestamp,
+        const std::set<RobotCapability>& unavailable_capabilities =
+            std::set<RobotCapability>(),
+        const robot_constants::RobotConstants& robot_constants = DEFAULT_ROBOT_CONSTANTS);
 
 
     /**

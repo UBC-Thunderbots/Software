@@ -282,18 +282,23 @@ PYBIND11_MODULE(python_bindings, m)
         .def_readwrite("max_force_dribbler_speed_rpm",
                        &robot_constants::RobotConstants::max_force_dribbler_speed_rpm)
         .def_readwrite("robot_radius_m", &robot_constants::RobotConstants::robot_radius_m)
-        .def_readwrite("front_wheel_angle_deg", &robot_constants::RobotConstants::front_wheel_angle_deg)
-        .def_readwrite("back_wheel_angle_deg", &robot_constants::RobotConstants::back_wheel_angle_deg)
+        .def_readwrite("front_wheel_angle_deg",
+                       &robot_constants::RobotConstants::front_wheel_angle_deg)
+        .def_readwrite("back_wheel_angle_deg",
+                       &robot_constants::RobotConstants::back_wheel_angle_deg)
         .def_readwrite("front_of_robot_width_meters",
                        &robot_constants::RobotConstants::front_of_robot_width_meters)
-        .def_readwrite("dribbler_width_meters", &robot_constants::RobotConstants::dribbler_width_meters)
+        .def_readwrite("dribbler_width_meters",
+                       &robot_constants::RobotConstants::dribbler_width_meters)
         .def_readwrite("robot_max_acceleration_m_per_s_2",
                        &robot_constants::RobotConstants::robot_max_acceleration_m_per_s_2)
-        .def_readwrite("robot_max_ang_acceleration_rad_per_s_2",
-                       &robot_constants::RobotConstants::robot_max_ang_acceleration_rad_per_s_2)
+        .def_readwrite(
+            "robot_max_ang_acceleration_rad_per_s_2",
+            &robot_constants::RobotConstants::robot_max_ang_acceleration_rad_per_s_2)
         .def_readwrite("indefinite_dribbler_speed_rpm",
                        &robot_constants::RobotConstants::indefinite_dribbler_speed_rpm)
-        .def_readwrite("wheel_radius_meters", &robot_constants::RobotConstants::wheel_radius_meters)
+        .def_readwrite("wheel_radius_meters",
+                       &robot_constants::RobotConstants::wheel_radius_meters)
         .def_readwrite("robot_max_speed_m_per_s",
                        &robot_constants::RobotConstants::robot_max_speed_m_per_s)
         .def_readwrite("robot_max_ang_speed_rad_per_s",

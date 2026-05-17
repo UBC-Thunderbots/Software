@@ -7,7 +7,8 @@
 class SSLSimulationProtoTest : public ::testing::Test
 {
    protected:
-    robot_constants::RobotConstants robot_constants = robot_constants::createRobotConstants();
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
 };
 
 TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_forward_from_primitive)

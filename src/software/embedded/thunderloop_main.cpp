@@ -111,8 +111,8 @@ int main(int argc, char** argv)
     const int pre_allocation_size = 20 * 1024 * 1024;
     reserveProcessMemory(pre_allocation_size);
 
-    auto thunderloop =
-        Thunderloop(robot_constants::createRobotConstants(), args.enable_log_merging, THUNDERLOOP_HZ);
+    auto thunderloop = Thunderloop(robot_constants::createRobotConstants(),
+                                   args.enable_log_merging, THUNDERLOOP_HZ);
     thunderloop.runLoop();
 
     return 0;

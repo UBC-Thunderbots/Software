@@ -257,7 +257,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
  */
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const TbotsProto::TrajectoryParamsAngular1D& params,
-    const AngularVelocity& initial_velocity, const robot_constants::RobotConstants& robot_constants);
+    const AngularVelocity& initial_velocity,
+    const robot_constants::RobotConstants& robot_constants);
 
 /**
  * Convert dribbler mode to dribbler speed

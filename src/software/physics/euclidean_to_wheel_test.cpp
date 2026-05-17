@@ -12,8 +12,9 @@ class EuclideanToWheelTest : public ::testing::Test
     EuclideanSpace_t target_euclidean_velocity{};
     WheelSpace_t expected_wheel_speeds{};
     WheelSpace_t calculated_wheel_speeds{};
-    robot_constants::RobotConstants robot_constants = robot_constants::createRobotConstants();
-    double robot_radius            = robot_constants::createRobotConstants().robot_radius_m;
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
+    double robot_radius = robot_constants::createRobotConstants().robot_radius_m;
 
     WheelSpace_t target_wheel_velocity{};
     WheelSpace_t current_wheel_velocity{};

@@ -476,7 +476,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
 
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const TbotsProto::TrajectoryParamsAngular1D& params,
-    const AngularVelocity& initial_velocity, const robot_constants::RobotConstants& robot_constants)
+    const AngularVelocity& initial_velocity,
+    const robot_constants::RobotConstants& robot_constants)
 {
     return BangBangTrajectory1DAngular(
         createAngle(params.start_angle()), createAngle(params.final_angle()),

@@ -10,10 +10,9 @@
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 
-PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
-                                     const robot_constants::RobotConstants& robot_constants,
-                                     const TeamColour friendly_team_colour,
-                                     const RobotId robot_id)
+PrimitiveExecutor::PrimitiveExecutor(
+    const Duration time_step, const robot_constants::RobotConstants& robot_constants,
+    const TeamColour friendly_team_colour, const RobotId robot_id)
     : current_primitive_(),
       friendly_team_colour_(friendly_team_colour),
       robot_constants_(robot_constants),

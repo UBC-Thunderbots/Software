@@ -16,9 +16,10 @@ class PrimitiveTest : public testing::Test
     }
 
    protected:
-    robot_constants::RobotConstants robot_constants = robot_constants::createRobotConstants();
-    Robot robot                    = TestUtil::createRobotAtPos(Point(0, 0));
-    std::shared_ptr<World> world   = TestUtil::createBlankTestingWorld();
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
+    Robot robot                  = TestUtil::createRobotAtPos(Point(0, 0));
+    std::shared_ptr<World> world = TestUtil::createBlankTestingWorld();
     RobotNavigationObstacleFactory obstacle_factory =
         RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig());
 };
