@@ -14,7 +14,6 @@ RobotLocalizer::RobotLocalizer(const double process_noise_variance,
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
             vision_noise_variance, vision_noise_variance, vision_noise_variance,
-            vision_noise_variance, vision_noise_variance, vision_noise_variance,
             motor_sensor_noise_variance, motor_sensor_noise_variance,
             motor_sensor_noise_variance, ImuService::IMU_VARIANCE)
             .asDiagonal();
@@ -137,14 +136,12 @@ void RobotLocalizer::step(const Vector& target_linear_acceleration,
     filter_.predict(step.prediction->control_input);
 }
 
-void RobotLocalizer::updateVision(const Point& position, const Vector& velocity,
-                                  const Angle& orientation,
-                                  const AngularVelocity& angular_velocity,
+void RobotLocalizer::updateVision(const Point& position, const Angle& orientation,
                                   const double age_seconds)
 {
     if (history.empty())
     {
-        updateFilterWithVision(position, velocity, orientation, angular_velocity);
+        updateFilterWithVision(position, orientation);
         return;
     }
 
@@ -158,7 +155,7 @@ void RobotLocalizer::updateVision(const Point& position, const Vector& velocity,
     if (rollback_point == history.begin())
     {
         // All history predates the sample, no need to rollback
-        updateFilterWithVision(position, velocity, orientation, angular_velocity);
+        updateFilterWithVision(position, orientation);
         return;
     }
 
@@ -170,7 +167,7 @@ void RobotLocalizer::updateVision(const Point& position, const Vector& velocity,
     filter_.state_estimate   = replay_iter->state_estimate;
     filter_.state_covariance = replay_iter->state_covariance;
 
-    updateFilterWithVision(position, velocity, orientation, angular_velocity);
+    updateFilterWithVision(position, orientation);
 
     // Replay from the rollback point back to the current estimate
     for (; replay_iter != history.rbegin(); --replay_iter)
@@ -193,9 +190,8 @@ void RobotLocalizer::updateVision(const Point& position, const Vector& velocity,
     }
 }
 
-void RobotLocalizer::updateFilterWithVision(const Point& position, const Vector& velocity,
-                                            const Angle& orientation,
-                                            const AngularVelocity& angular_velocity)
+void RobotLocalizer::updateFilterWithVision(const Point& position,
+                                            const Angle& orientation)
 {
     const double orientation_estimate =
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION));
@@ -207,18 +203,11 @@ void RobotLocalizer::updateFilterWithVision(const Point& position, const Vector&
         position.x();
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION)) =
         position.y();
-    measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_X_VELOCITY)) =
-        velocity.x();
-    measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_VELOCITY)) =
-        velocity.y();
 
     // Coterminal angle that is closest to current estimate
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION)) =
         orientation_estimate +
         (orientation - Angle::fromRadians(orientation_estimate)).clamp().toRadians();
-
-    measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_ANGULAR_VELOCITY)) =
-        angular_velocity.toRadians();
 
     filter_.measurement_model.setZero();
     filter_.measurement_model(
@@ -227,18 +216,9 @@ void RobotLocalizer::updateFilterWithVision(const Point& position, const Vector&
     filter_.measurement_model(
         static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION),
         static_cast<Eigen::Index>(StateIndex::Y_POSITION)) = 1;
-    // filter_.measurement_model(
-    //     static_cast<Eigen::Index>(MeasurementIndex::VISION_X_VELOCITY),
-    //     static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) = 1;
-    // filter_.measurement_model(
-    //     static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_VELOCITY),
-    //     static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) = 1;
     filter_.measurement_model(
         static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
         static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
-    // filter_.measurement_model(
-    //     static_cast<Eigen::Index>(MeasurementIndex::VISION_ANGULAR_VELOCITY),
-    //     static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
 
     filter_.update(measurement);
 }

@@ -21,7 +21,7 @@ PrimitiveExecutor::PrimitiveExecutor(
 {
 }
 
-bool PrimitiveExecutor::isLateralTrajectoryNew(
+bool PrimitiveExecutor::isLinearTrajectoryNew(
     const std::optional<TrajectoryPath>& new_trajectory) const
 {
     if (new_trajectory.has_value() != trajectory_path_.has_value())
@@ -38,7 +38,7 @@ bool PrimitiveExecutor::isLateralTrajectoryNew(
 
     return distance(new_trajectory->getDestination(),
                     trajectory_path_->getDestination()) >
-           LATERAL_DESTINATION_THRESHOLD_METERS;
+           LINEAR_DESTINATION_THRESHOLD_METERS;
 }
 
 bool PrimitiveExecutor::isAngularTrajectoryNew(
@@ -63,15 +63,16 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         const std::optional new_trajectory_path =
             createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
                                            position_, velocity_, robot_constants_);
+
         // Check if this new trajectory is "new". That is, if its destination differs
         // meaningfully from our current trajectory.
-        if (isLateralTrajectoryNew(new_trajectory_path))
+        if (isLinearTrajectoryNew(new_trajectory_path))
         {
             trajectory_path_                       = new_trajectory_path;
             time_since_linear_trajectory_creation_ = Duration::fromSeconds(RTT_S);
             x_pid.reset();
             y_pid.reset();
-            LOG(INFO) << "new lateral trajectory accepted";
+            LOG(INFO) << "new linear trajectory accepted";
         }
 
         const BangBangTrajectory1DAngular new_angular_trajectory =
@@ -103,19 +104,21 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
     // TODO: Add a timeout to following error
     if (trajectory_path_.has_value())
     {
-        const double lateral_following_error =
+        const double linear_following_error =
             (position_ - trajectory_path_->getPosition(
                              time_since_linear_trajectory_creation_.toSeconds()))
                 .length();
-        if (lateral_following_error > LATERAL_STALL_ERROR_MAX_METERS)
+
+        if (linear_following_error > LINEAR_STALL_ERROR_MAX_METERS)
         {
-            // regenerate lateral trajectory
+            // regenerate linear trajectory
             trajectory_path_ =
                 createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
                                                position_, velocity_, robot_constants_);
             time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
         }
     }
+
     if (angular_trajectory_.has_value())
     {
         const double angular_following_error =
@@ -123,29 +126,15 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
                 ->getPosition(time_since_angular_trajectory_creation_.toSeconds())
                 .minDiff(orientation_)
                 .toDegrees();
-        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-            {"following_error_deg", angular_following_error},
-        });
+
         if (angular_following_error > ANGULAR_STALL_ERROR_MAX_DEGREES)
         {
             // regenerate angular trajectory
             angular_trajectory_ = createAngularTrajectoryFromParams(
                 current_primitive_.move().w_traj_params(), orientation_,
-                AngularVelocity::fromRadians(angular_velocity_.toRadians()),
-                robot_constants_);
+                angular_velocity_, robot_constants_);
             time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
         }
-        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-            {"following_error_after_deg",
-             angular_trajectory_
-                 ->getPosition(time_since_angular_trajectory_creation_.toSeconds())
-                 .minDiff(orientation_)
-                 .toDegrees()},
-            {"angular_pos_after_deg",
-             angular_trajectory_
-                 ->getPosition(time_since_angular_trajectory_creation_.toSeconds())
-                 .toDegrees()},
-        });
     }
 }
 
@@ -227,17 +216,18 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
 
             const Point target_position    = trajectory_path_->getDestination();
             const Angle target_orientation = angular_trajectory_->getDestination();
-            Vector error_lateral           = target_position - position_;
+            Vector error_linear            = target_position - position_;
             Angle error_angular            = (target_orientation - orientation_).clamp();
 
             Vector target_linear_velocity;
             AngularVelocity target_angular_velocity;
+
             // if close enough, use special PID to destination
-            if (error_lateral.lengthSquared() < LATERAL_PURE_PID_THRESHOLD_METERS)
+            if (error_linear.lengthSquared() < LINEAR_PURE_PID_THRESHOLD_METERS)
             {
                 target_linear_velocity =
-                    globalToLocalVelocity({x_pid_close.step(error_lateral.x()),
-                                           y_pid_close.step(error_lateral.y())},
+                    globalToLocalVelocity({x_pid_close.step(error_linear.x()),
+                                           y_pid_close.step(error_linear.y())},
                                           orientation_);
                 LOG(INFO) << "Y: close to target, doing pure PID with effort "
                           << target_linear_velocity.y();
@@ -248,19 +238,19 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             {
                 // FEEDFORWARD velocities from the trajectory
                 const Vector trajectory_linear_velocity = getTargetLinearVelocity();
-                error_lateral                           = trajectory_path_->getPosition(
+                error_linear                            = trajectory_path_->getPosition(
                                                               time_since_linear_trajectory_creation_.toSeconds()) -
-                                position_;
-                const Vector pid_effort_lateral(x_pid.step(error_lateral.x()),
-                                                y_pid.step(error_lateral.y()));
+                               position_;
+                const Vector pid_effort_linear(x_pid.step(error_linear.x()),
+                                               y_pid.step(error_linear.y()));
                 LOG(INFO) << "Y: far from target, PID control effort: "
-                          << pid_effort_lateral.y()
+                          << pid_effort_linear.y()
                           << " FF: " << trajectory_linear_velocity.y();
                 LOG(INFO) << "X: far from target, PID control effort: "
-                          << pid_effort_lateral.x()
+                          << pid_effort_linear.x()
                           << " FF: " << trajectory_linear_velocity.x();
                 target_linear_velocity = globalToLocalVelocity(
-                    trajectory_linear_velocity + pid_effort_lateral, orientation_);
+                    trajectory_linear_velocity + pid_effort_linear, orientation_);
             }
             if (error_angular.abs().toDegrees() < ANGULAR_PURE_PID_THRESHOLD_DEGREES)
             {
@@ -286,20 +276,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 LOG(INFO) << "AND: far from target, PID control effort: "
                           << pid_effort_angular.toDegrees()
                           << " FF: " << trajectory_angular_velocity.toDegrees();
-                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                    {"following_error_prim_deg",
-                     angular_trajectory_
-                         ->getPosition(
-                             time_since_angular_trajectory_creation_.toSeconds())
-                         .minDiff(orientation_)
-                         .toDegrees()},
-                    {"angular_pos_prim_deg",
-                     angular_trajectory_
-                         ->getPosition(
-                             time_since_angular_trajectory_creation_.toSeconds())
-                         .toDegrees()},
-                    {"angular_error_prim_deg", error_angular.toDegrees()},
-                });
             }
 
             LOG(INFO) << "Local velocity x " << target_linear_velocity.x() << " y "
