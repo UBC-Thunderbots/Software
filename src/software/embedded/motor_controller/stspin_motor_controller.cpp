@@ -21,7 +21,8 @@
 // (https://reveng.sourceforge.io/crc-catalogue/all.htm#crc.cat.crc-8-autosar)
 using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
-StSpinMotorController::StSpinMotorController(const RobotConstants& robot_constants)
+StSpinMotorController::StSpinMotorController(
+    const robot_constants::RobotConstants& robot_constants)
     : robot_constants_(robot_constants),
       reset_gpio_(std::make_unique<GpioCharDev>(RESET_GPIO_PIN, GpioDirection::OUTPUT,
                                                 GpioState::HIGH))
@@ -44,10 +45,8 @@ void StSpinMotorController::setup()
 
     for (const MotorIndex motor : driveMotors())
     {
-        // sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 500, .ki = 60});
-
-        sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = 806, .ki = 154});
-        sendAndReceiveFrame(motor, SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = 0});
+        sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = SPEED_PID_PROPORTIONAL_GAIN,
+                                                        .ki = SPEED_PID_INTEGRAL_GAIN});
     }
 }
 
@@ -183,8 +182,6 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 
     sendAndReceiveFrame(motor, outgoing_frame);
 
-    sendMotorStatusToPlotJuggler(motor);
-
     return motor_status_.at(motor).speed;
 }
 
@@ -196,13 +193,18 @@ void StSpinMotorController::updateEuclideanVelocity(
 
     if (local_velocity.length() <= 0.01)
     {
-        sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
-                            SetSpeedFeedForwardKsFrame{.ks = 270});
-        sendAndReceiveFrame(MotorIndex::FRONT_RIGHT,
-                            SetSpeedFeedForwardKsFrame{.ks = 270});
-        sendAndReceiveFrame(MotorIndex::BACK_RIGHT,
-                            SetSpeedFeedForwardKsFrame{.ks = 270});
-        sendAndReceiveFrame(MotorIndex::BACK_LEFT, SetSpeedFeedForwardKsFrame{.ks = 270});
+        sendAndReceiveFrame(
+            MotorIndex::FRONT_LEFT,
+            SetSpeedFeedForwardKsFrame{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
+        sendAndReceiveFrame(
+            MotorIndex::FRONT_RIGHT,
+            SetSpeedFeedForwardKsFrame{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
+        sendAndReceiveFrame(
+            MotorIndex::BACK_RIGHT,
+            SetSpeedFeedForwardKsFrame{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
+        sendAndReceiveFrame(
+            MotorIndex::BACK_LEFT,
+            SetSpeedFeedForwardKsFrame{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
         return;
     }
 

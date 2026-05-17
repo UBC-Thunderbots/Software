@@ -9,7 +9,8 @@
 class StSpinMotorController : public MotorController
 {
    public:
-    explicit StSpinMotorController(const RobotConstants& robot_constants);
+    explicit StSpinMotorController(
+        const robot_constants::RobotConstants& robot_constants);
 
     void setup() override;
 
@@ -49,9 +50,13 @@ class StSpinMotorController : public MotorController
 
     static constexpr int RESET_GPIO_PIN = 12;
 
-    static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
+    static constexpr int SPEED_PID_PROPORTIONAL_GAIN = 700;
+    static constexpr int SPEED_PID_INTEGRAL_GAIN     = 30;
 
-    RobotConstants robot_constants_;
+    static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
+    static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 300;
+
+    robot_constants::RobotConstants robot_constants_;
 
     // SPI file descriptors
     std::unordered_map<MotorIndex, int> spi_fds_;
