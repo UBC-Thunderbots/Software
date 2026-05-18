@@ -88,7 +88,9 @@ class BallMovesForwardInRegions(BallMovesForward):
     def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         for region in self.regions:
             if tbots.contains(region, get_ball_pos(world, simulator_state)):
-                return super().get_validation_status(world, simulator_state=simulator_state)
+                return super().get_validation_status(
+                    world, simulator_state=simulator_state
+                )
 
         return ValidationStatus.PASSING
 

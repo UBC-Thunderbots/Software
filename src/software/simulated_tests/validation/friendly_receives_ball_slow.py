@@ -1,4 +1,3 @@
-import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation.validation import (
@@ -34,7 +33,10 @@ class FriendlyReceivesBallSlow(FriendlyHasBallPossession):
                  PASSING if the ball is not near the dribbler, or if it is near
                          the dribbler at a speed slower than the max
         """
-        if super().get_validation_status(world, simulator_state=simulator_state) == ValidationStatus.PASSING:
+        if (
+            super().get_validation_status(world, simulator_state=simulator_state)
+            == ValidationStatus.PASSING
+        ):
             ball_velocity = get_ball_vel(world, simulator_state)
             if ball_velocity.length() - self.max_receive_speed > 0.2:
                 return ValidationStatus.FAILING

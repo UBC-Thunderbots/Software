@@ -26,9 +26,10 @@ class BallStopsInRegion(Validation):
                  PASSING when a ball stops in a region
         """
         for region in self.regions:
-            if tbots_cpp.contains(
-                region, get_ball_pos(world, simulator_state)
-            ) and get_ball_vel(world, simulator_state).length() <= 0.01:
+            if (
+                tbots_cpp.contains(region, get_ball_pos(world, simulator_state))
+                and get_ball_vel(world, simulator_state).length() <= 0.01
+            ):
                 return ValidationStatus.PASSING
 
         return ValidationStatus.FAILING
