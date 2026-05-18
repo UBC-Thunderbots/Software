@@ -208,6 +208,16 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     target_wheel_velocities_ = euclidean_to_four_wheel_.rampWheelVelocity(
         prev_wheel_velocities_, target_wheel_velocities_, time_elapsed_since_last_poll_s);
 
+    const EuclideanSpace_t target_euclidean_velocity =
+        euclidean_to_four_wheel_.getEuclideanVelocity(target_wheel_velocities_);
+
+    motor_status.mutable_target_local_velocity()->set_x_component_meters(
+        target_euclidean_velocity[1]);
+    motor_status.mutable_target_local_velocity()->set_y_component_meters(
+        -target_euclidean_velocity[0]);
+    motor_status.mutable_target_angular_velocity()->set_radians_per_second(
+        target_euclidean_velocity[2]);
+
     prev_wheel_velocities_ = target_wheel_velocities_;
 
     // Get target dribbler rpm from the primitive
@@ -243,7 +253,7 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
 
 void MotorService::trackMotorReset()
 {
-    const auto now = std::chrono::system_clock::now();
+    const auto now = std::chrono::steady_clock::now();
 
     if (num_tracked_motor_resets_ == 0)
     {
