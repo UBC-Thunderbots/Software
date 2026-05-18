@@ -199,7 +199,6 @@ class SimulatedTestRunner(TbotsTestRunner):
             if self.thunderscope and tick_duration_s > processing_time:
                 time.sleep(tick_duration_s - processing_time)
 
-            # Fetch the latest true simulator state (non-blocking; None if not yet available)
             simulator_state = self.simulator_state_buffer.get(
                 block=False, return_cached=True
             )

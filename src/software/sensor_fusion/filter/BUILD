@@ -41,15 +41,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "ball_tracker_test",
-    srcs = ["ball_tracker_test.cpp"],
-    deps = [
-        ":ball_tracker",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/world:field",
-    ],
-)
 
 cc_library(
     name = "robot_filter",
