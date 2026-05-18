@@ -4,6 +4,20 @@ from proto.validation_pb2 import *
 from abc import abstractmethod
 
 
+def get_ball_pos(world, simulator_state=None):
+    """Return true ball position from simulator if available, else from world."""
+    if simulator_state is not None and simulator_state.HasField("ball"):
+        return tbots_cpp.Point(simulator_state.ball.p_x, simulator_state.ball.p_y)
+    return tbots_cpp.createPoint(world.ball.current_state.global_position)
+
+
+def get_ball_vel(world, simulator_state=None):
+    """Return true ball velocity from simulator if available, else from world."""
+    if simulator_state is not None and simulator_state.HasField("ball"):
+        return tbots_cpp.Vector(simulator_state.ball.v_x, simulator_state.ball.v_y)
+    return tbots_cpp.createVector(world.ball.current_state.global_velocity)
+
+
 class Validation:
     """A validation function"""
 
