@@ -4,6 +4,20 @@ from proto.validation_pb2 import *
 from abc import abstractmethod
 
 
+def get_ball_pos(world, simulator_state=None):
+    """Return true ball position from simulator if available, else from world."""
+    if simulator_state is not None and simulator_state.HasField("ball"):
+        return tbots_cpp.Point(simulator_state.ball.p_x, simulator_state.ball.p_y)
+    return tbots_cpp.createPoint(world.ball.current_state.global_position)
+
+
+def get_ball_vel(world, simulator_state=None):
+    """Return true ball velocity from simulator if available, else from world."""
+    if simulator_state is not None and simulator_state.HasField("ball"):
+        return tbots_cpp.Vector(simulator_state.ball.v_x, simulator_state.ball.v_y)
+    return tbots_cpp.createVector(world.ball.current_state.global_velocity)
+
+
 class Validation:
     """A validation function"""
 
@@ -188,7 +202,9 @@ def run_validation_sequence_sets(
         validation_proto = ValidationProto()
 
         # Get status
-        status = validation.get_validation_status(world, simulator_state=simulator_state)
+        status = validation.get_validation_status(
+            world, simulator_state=simulator_state
+        )
 
         # Create validation proto
         validation_proto.status = status
@@ -237,22 +253,6 @@ def check_validation(validation_proto_set):
     for validation_proto in validation_proto_set.validations:
         if validation_proto.status == ValidationStatus.FAILING:
             raise AssertionError(validation_proto.failure_msg)
-
-
-def get_ball_vel(world, simulator_state):
-    """Returns (vx, vy) using true simulator velocity if available."""
-    if simulator_state is not None and simulator_state.HasField("ball"):
-        return simulator_state.ball.v_x, simulator_state.ball.v_y
-    v = world.ball.current_state.global_velocity
-    return v.x_component_meters, v.y_component_meters
-
-
-def get_ball_pos(world, simulator_state):
-    """Returns (x_m, y_m) using true simulator position if available."""
-    if simulator_state is not None and simulator_state.HasField("ball"):
-        return simulator_state.ball.p_x, simulator_state.ball.p_y
-    p = world.ball.current_state.global_position
-    return p.x_meters, p.y_meters
 
 
 def create_validation_geometry(geometry=[]) -> ValidationGeometry:

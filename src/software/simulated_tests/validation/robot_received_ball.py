@@ -5,6 +5,7 @@ from software.simulated_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
+    get_ball_pos,
 )
 from typing import override
 
@@ -29,7 +30,7 @@ class RobotReceivedBall(Validation):
         :return: FAILING when the robot does not have the ball
                  PASSING when the robot has the ball
         """
-        ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
+        ball_position = get_ball_pos(world, simulator_state)
         for robot in world.friendly_team.team_robots:
             if robot.id == self.robot_id:
                 if tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.tolerance):

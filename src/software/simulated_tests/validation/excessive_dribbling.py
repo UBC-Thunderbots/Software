@@ -28,8 +28,7 @@ class ExcessivelyDribbling(Validation):
         :return: FAILING when the robot is excessively dribbling
                  PASSING when the robot is not excessively dribbling
         """
-        bx, by = get_ball_pos(world, simulator_state)
-        ball_position = tbots_cpp.Point(bx, by)
+        ball_position = get_ball_pos(world, simulator_state)
         for robot in world.friendly_team.team_robots:
             if tbots_cpp.Robot(robot).isNearDribbler(
                 ball_position, self.dribbler_tolerance

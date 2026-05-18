@@ -30,8 +30,7 @@ class BallSpeedThreshold(Validation):
         :return: FAILING if the ball speed is below some threshold
                  PASSING if the ball speed is at or above some threshold
         """
-        vx, vy = get_ball_vel(world, simulator_state)
-        if (vx**2 + vy**2) ** 0.5 >= self.speed_threshold:
+        if get_ball_vel(world, simulator_state).length() >= self.speed_threshold:
             return ValidationStatus.PASSING
 
         return ValidationStatus.FAILING

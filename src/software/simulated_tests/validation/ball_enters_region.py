@@ -5,6 +5,7 @@ from software.simulated_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
+    get_ball_pos,
 )
 from typing import override
 
@@ -24,11 +25,9 @@ class BallEntersRegion(Validation):
         :return: FAILING until a ball enters any of the regions
                  PASSING when a ball enters
         """
-        self.ball_position = world.ball.current_state.global_position
+        self.ball_position = get_ball_pos(world, simulator_state)
         for region in self.regions:
-            if tbots_cpp.contains(
-                region, tbots_cpp.createPoint(world.ball.current_state.global_position)
-            ):
+            if tbots_cpp.contains(region, self.ball_position):
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 
