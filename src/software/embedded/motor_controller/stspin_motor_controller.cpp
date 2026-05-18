@@ -70,7 +70,7 @@ void StSpinMotorController::updateFaults(const MotorIndex motor,
 
     if (motor_status.fault_flags == fault_flags)
     {
-        // No change in faults; early return
+        // No change in faults
         return;
     }
 
@@ -81,7 +81,7 @@ void StSpinMotorController::updateFaults(const MotorIndex motor,
 
     if (fault_flags == 0)
     {
-        // No faults; early return
+        // No faults
         return;
     }
 
@@ -287,9 +287,9 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex motor,
         oss << std::hex << std::uppercase << std::setfill('0') << "Expected CRC 0x"
             << std::setw(2) << static_cast<int>(rx[5]) << " but got 0x" << std::setw(2)
             << static_cast<int>(rx_crc) << ". RX: ";
-        for (size_t i = 0; i < FRAME_LEN; ++i)
+        for (const uint8_t byte : rx)
         {
-            oss << "0x" << std::setw(2) << static_cast<int>(rx[i]) << " ";
+            oss << "0x" << std::setw(2) << static_cast<int>(byte) << " ";
         }
 
         LOG(WARNING) << "Frame #" << motor_status_[motor].frame_count

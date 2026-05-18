@@ -22,22 +22,18 @@ class MotorService
    public:
     /**
      * Service that interacts with the motors.
-     * Opens all the required ports and maintains them until destroyed.
      *
      * @param robot_constants The robot constants
      */
     explicit MotorService(const robot_constants::RobotConstants& robot_constants);
 
-    virtual ~MotorService() = default;
-
     /**
-     * When the motor service is polled with a DirectControlPrimitive msg,
-     * call the appropriate trinamic api function to spin the appropriate motor.
+     * Polls the motor service to execute the given motor control command and
+     * return the current motor status.
      *
-     * @param motor_control The motor msg to unpack and execute on the motors
-     * @param time_elapsed_since_last_poll_s The time since last poll was called in
-     * seconds
-     * @return The status of all the drive units
+     * @param motor_control The motor control message to unpack and execute
+     * @param time_elapsed_since_last_poll_s The time since the last poll in seconds
+     * @return The status of all the motors
      */
     TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
                                  double time_elapsed_since_last_poll_s);
@@ -48,17 +44,21 @@ class MotorService
     void setup();
 
     /**
-     * Reset the motor board by toggling the reset GPIO appropriately. Effectively stops
-     * the motors from moving.
+     * Resets the motors, effectively stopping them from moving.
      */
     void reset();
 
    private:
+    /**
+     * Creates a motor controller based on the motor board type specified at compile time.
+     *
+     * @return the instantiated motor controller implementation corresponding to the
+     * motor board type specified at compile time
+     */
     std::unique_ptr<MotorController> setupMotorController();
 
     /**
-     * Return a MotorStatus proto filled with motor faults. Some values of the proto are
-     * previously cached velocities due to SPI transaction costs.
+     * Return a MotorStatus proto filled with motor velocities and faults.
      *
      * @param current_wheel_velocities  the current wheel velocities in m/s
      * @param dribbler_rpm             the dribbler motor's rotations per minute
@@ -69,8 +69,19 @@ class MotorService
     TbotsProto::MotorStatus createMotorStatus(
         const WheelSpace_t& current_wheel_velocities, double dribbler_rpm) const;
 
+    /**
+     * Tracks that a motor reset occurred just now.
+     * We count the number of resets within a certain time threshold, and if
+     * this count exceeds a certain level, we crash Thunderloop for safety.
+     */
     void trackMotorReset();
 
+    /**
+     * Checks if any motor requires a reset due to being disabled or having a
+     * reset fault.
+     *
+     * @return true if any motor requires a reset, false otherwise
+     */
     bool anyMotorRequiresReset() const;
 
     robot_constants::RobotConstants robot_constants_;
@@ -82,7 +93,7 @@ class MotorService
     WheelSpace_t prev_wheel_velocities_;
     WheelSpace_t target_wheel_velocities_;
 
-    int dribbler_target_rpm_ = 0;
+    int dribbler_target_rpm_;
 
     double drive_motor_mps_per_rpm_;
 

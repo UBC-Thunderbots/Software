@@ -6,6 +6,13 @@
 #include "software/embedded/motor_controller/motor_index.h"
 #include "software/embedded/motor_controller/stspin_types.h"
 
+/**
+ * Motor controller for controlling our 6th generation STSPIN motor drivers.
+ *
+ * We communicate with our MDv6 boards over SPI in full-duplex mode using a custom
+ * frame-based protocol. This protocol is documented in the MDv6 firmware repo, which
+ * can be found at https://github.com/UBC-Thunderbots/MDv6_Firmware
+ */
 class StSpinMotorController : public MotorController
 {
    public:
@@ -84,7 +91,7 @@ class StSpinMotorController : public MotorController
     std::unordered_map<MotorIndex, MotorStatus> motor_status_;
 
     /**
-     * Opens a SPI file descriptor for the given motor
+     * Opens a SPI file descriptor for the given motor.
      *
      * @param motor the motor to open a SPI file descriptor for
      */
@@ -98,13 +105,38 @@ class StSpinMotorController : public MotorController
      */
     void sendAndReceiveFrame(MotorIndex motor, const OutgoingFrame& outgoing_frame);
 
+    /**
+     * Populates the transmit buffer with the data from an outgoing frame.
+     *
+     * @param outgoing_frame the outgoing frame to populate the transmit buffer with
+     * @param tx the transmit buffer to populate with the outgoing frame's data
+     */
     void populateTx(const OutgoingFrame& outgoing_frame,
                     std::array<uint8_t, FRAME_LEN>& tx);
 
+    /**
+     * Processes a frame received from the given motor, caching any motor status
+     * the frame provides.
+     *
+     * @param motor the motor that the received frame corresponds to
+     * @param rx the receive buffer with the received frame to process
+     */
     void processRx(MotorIndex motor, const std::array<uint8_t, FRAME_LEN>& rx);
 
+    /**
+     * Records that the given faults were raised for a given motor.
+     *
+     * @param motor the motor to update the faults of
+     * @param fault_flags the faults for the motor
+     */
     void updateFaults(MotorIndex motor, uint16_t fault_flags);
 
+    /**
+     * Sends the target and measured speed and current (Iq and Id) for the
+     * specified motor to PlotJuggler.
+     *
+     * @param motor the motor to plot the status of
+     */
     void sendMotorStatusToPlotJuggler(MotorIndex motor);
 
     friend class StSpinMotorControllerTest;

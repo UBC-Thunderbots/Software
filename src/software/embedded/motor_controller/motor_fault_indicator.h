@@ -28,5 +28,11 @@ struct MotorFaultIndicator
     MotorFaultIndicator(bool drive_enabled,
                         const std::unordered_set<TbotsProto::MotorFault>& motor_faults);
 
+    /**
+     * Checks if the motor requires a reset due to being disabled or
+     * having a reset fault.
+     *
+     * @return true if the motor requires a reset, false otherwise
+     */
     bool requiresReset() const;
 };

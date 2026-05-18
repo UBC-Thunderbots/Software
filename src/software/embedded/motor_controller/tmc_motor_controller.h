@@ -5,6 +5,13 @@
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
 #include "software/embedded/motor_controller/motor_index.h"
 
+/**
+ * Motor controller for interfacing with our 5th generation Trinamic motor
+ * controllers and drivers.
+ *
+ * TMC4671 is the controller and TMC6100 is the driver. We use the TMC4671's SPI
+ * interface to configure the controller and driver, read/set motor velocities, etc.
+ */
 class TmcMotorController : public MotorController
 {
    public:
