@@ -202,7 +202,7 @@ class SimulatedTestRunner(TbotsTestRunner):
 
             # Fetch the latest true simulator state (non-blocking; None if not yet available)
             simulator_state = self.simulator_state_buffer.get(
-                block=False, return_cached=False
+                block=False, return_cached=True
             )
 
             # Validate
