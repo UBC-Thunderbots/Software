@@ -203,6 +203,26 @@ class SimulatedTestRunner(TbotsTestRunner):
                 block=False, return_cached=True
             )
 
+            sf_pos = world.ball.current_state.global_position
+            sf_vel = world.ball.current_state.global_velocity
+            has_sim = simulator_state is not None and simulator_state.HasField("ball")
+            if has_sim:
+                sim_b = simulator_state.ball
+                print(
+                    f"[BallState] t={time_elapsed_s:.3f}  "
+                    f"sf_pos=({sf_pos.x_meters:.3f},{sf_pos.y_meters:.3f})  "
+                    f"sf_vel=({sf_vel.x_component_meters:.3f},{sf_vel.y_component_meters:.3f})  "
+                    f"sim_pos=({sim_b.p_x:.3f},{sim_b.p_y:.3f})  "
+                    f"sim_vel=({sim_b.v_x:.3f},{sim_b.v_y:.3f})  using=sim"
+                )
+            else:
+                print(
+                    f"[BallState] t={time_elapsed_s:.3f}  "
+                    f"sf_pos=({sf_pos.x_meters:.3f},{sf_pos.y_meters:.3f})  "
+                    f"sf_vel=({sf_vel.x_component_meters:.3f},{sf_vel.y_component_meters:.3f})  "
+                    f"using=sf"
+                )
+
             # Validate
             (
                 eventually_validation_proto_set,
