@@ -14,7 +14,11 @@
 namespace {
     const Eigen::Vector<double, 4> INITIAL_STATE = Eigen::Vector<double, 4>::Zero();
 
-    const Eigen::Matrix<double,4,4> INITIAL_COV = Eigen::Matrix<double,4,4>::Identity() * 1000.0;
+    const Eigen::Matrix<double,4,4> INITIAL_COV =  (Eigen::Matrix<double,4,4>() <<
+	    1000, 0,        0, 0,
+	    0,   1000, 0,0,
+	    0, 0,        10, 0,
+	    0,        0, 0,        10).finished();
 
 	const Eigen::Matrix<double,4,4> Q = (Eigen::Matrix<double,4,4>() <<
 	    2.222e-8, 0,        2.000e-6, 0,
