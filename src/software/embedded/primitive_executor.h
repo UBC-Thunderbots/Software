@@ -55,13 +55,9 @@ class PrimitiveExecutor
         TbotsProto::PrimitiveExecutorStatus& status);
 
    private:
-    /*
-     * Compute the next target linear _local_ velocity the robot should be at.
-     * @returns Vector The target linear _local_ velocity
-     */
-    Vector getTargetLinearVelocity();
-
     /**
+     * Check if the given trajectory is "new". That is, if its destination differs
+     * meaningfully from our current trajectory.
      *
      * @param new_trajectory The new trajectory requested by the AI.
      * @return True if the new trajectory requested is meaningfully different from the
@@ -70,6 +66,8 @@ class PrimitiveExecutor
     bool isLinearTrajectoryNew(const std::optional<TrajectoryPath>& new_trajectory) const;
 
     /**
+     * Check if the given trajectory is "new". That is, if its destination differs
+     * meaningfully from our current trajectory.
      *
      * @param new_trajectory The new trajectory requested by the AI.
      * @return True if the new trajectory requested is meaningfully different from the
@@ -77,12 +75,19 @@ class PrimitiveExecutor
      */
     bool isAngularTrajectoryNew(const BangBangTrajectory1DAngular& new_trajectory) const;
 
+    /**
+     * Compute the next target linear _local_ velocity the robot should be at.
+     *
+     * @returns Vector The target linear _local_ velocity
+     */
+    Vector getTargetLinearVelocity() const;
+
     /*
-     * Returns the next target angular velocity the robot
+     * Returns the next target angular velocity the robot should be at.
      *
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity getTargetAngularVelocity();
+    AngularVelocity getTargetAngularVelocity() const;
 
     TbotsProto::Primitive current_primitive_;
 

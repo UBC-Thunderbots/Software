@@ -13,8 +13,7 @@
 PrimitiveExecutor::PrimitiveExecutor(
     const Duration time_step, const robot_constants::RobotConstants& robot_constants,
     const TeamColour friendly_team_colour, const RobotId robot_id)
-    : current_primitive_(),
-      friendly_team_colour_(friendly_team_colour),
+    : friendly_team_colour_(friendly_team_colour),
       robot_constants_(robot_constants),
       time_step_(time_step),
       robot_id_(robot_id)
@@ -64,28 +63,24 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
             createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
                                            position_, velocity_, robot_constants_);
 
-        // Check if this new trajectory is "new". That is, if its destination differs
-        // meaningfully from our current trajectory.
         if (isLinearTrajectoryNew(new_trajectory_path))
         {
             trajectory_path_                       = new_trajectory_path;
             time_since_linear_trajectory_creation_ = Duration::fromSeconds(RTT_S);
             x_pid.reset();
             y_pid.reset();
-            LOG(INFO) << "new linear trajectory accepted";
         }
 
         const BangBangTrajectory1DAngular new_angular_trajectory =
             createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
                                               orientation_, angular_velocity_,
                                               robot_constants_);
-        LOG(INFO) << "angular has val " << angular_trajectory_.has_value();
+
         if (isAngularTrajectoryNew(new_angular_trajectory))
         {
             angular_trajectory_                     = new_angular_trajectory;
             time_since_angular_trajectory_creation_ = Duration::fromSeconds(RTT_S);
             w_pid.reset();
-            LOG(INFO) << "new angular trajectory accepted";
         }
     }
 }
@@ -138,7 +133,7 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
     }
 }
 
-Vector PrimitiveExecutor::getTargetLinearVelocity()
+Vector PrimitiveExecutor::getTargetLinearVelocity() const
 {
     Vector target_velocity =
         trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds());
@@ -158,7 +153,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity()
     return target_velocity;
 }
 
-AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
+AngularVelocity PrimitiveExecutor::getTargetAngularVelocity() const
 {
     AngularVelocity angular_velocity = angular_trajectory_->getVelocity(
         time_since_angular_trajectory_creation_.toSeconds());
@@ -229,10 +224,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     globalToLocalVelocity({x_pid_close.step(error_linear.x()),
                                            y_pid_close.step(error_linear.y())},
                                           orientation_);
-                LOG(INFO) << "Y: close to target, doing pure PID with effort "
-                          << target_linear_velocity.y();
-                LOG(INFO) << "X: close to target, doing pure PID with effort "
-                          << target_linear_velocity.x();
             }
             else
             {
@@ -243,21 +234,14 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                                position_;
                 const Vector pid_effort_linear(x_pid.step(error_linear.x()),
                                                y_pid.step(error_linear.y()));
-                LOG(INFO) << "Y: far from target, PID control effort: "
-                          << pid_effort_linear.y()
-                          << " FF: " << trajectory_linear_velocity.y();
-                LOG(INFO) << "X: far from target, PID control effort: "
-                          << pid_effort_linear.x()
-                          << " FF: " << trajectory_linear_velocity.x();
                 target_linear_velocity = globalToLocalVelocity(
                     trajectory_linear_velocity + pid_effort_linear, orientation_);
             }
+
             if (error_angular.abs().toDegrees() < ANGULAR_PURE_PID_THRESHOLD_DEGREES)
             {
                 target_angular_velocity = AngularVelocity::fromRadians(
                     w_pid_close.step(error_angular.toRadians()));
-                LOG(INFO) << "AND: close to target, doing pure PID with effort: "
-                          << target_angular_velocity.toDegrees();
             }
             else
             {
@@ -273,13 +257,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     AngularVelocity::fromRadians(w_pid.step(error_angular.toRadians()));
                 target_angular_velocity =
                     (trajectory_angular_velocity + pid_effort_angular);
-                LOG(INFO) << "AND: far from target, PID control effort: "
-                          << pid_effort_angular.toDegrees()
-                          << " FF: " << trajectory_angular_velocity.toDegrees();
             }
-
-            LOG(INFO) << "Local velocity x " << target_linear_velocity.x() << " y "
-                      << target_linear_velocity.y();
 
             // Make sure target linear velocity is clamped
             target_linear_velocity = target_linear_velocity.normalize(
@@ -291,7 +269,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 convertDribblerModeToDribblerSpeed(
                     current_primitive_.move().dribbler_mode(), robot_constants_),
                 current_primitive_.move().auto_chip_or_kick());
-            LOG(INFO) << "handle kmove end";
 
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
