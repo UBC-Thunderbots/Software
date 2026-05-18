@@ -152,7 +152,8 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
     // Generate a trajectory, and then generate a TbotsProto::TrajectoryPathParams2D
     // with the same parameters as the trajectory, finally, generate a second trajectory
     // from the parameters and make sure the two trajectories are equal.
-    RobotConstants robot_constants = create2021RobotConstants();
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
     Point start_position(0.0, 0.0);
     Point destination(0.0, 0.0);
 
