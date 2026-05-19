@@ -11,7 +11,7 @@
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
-#include "shared/2021_robot_constants.h"
+#include "shared/robot_constants.h"
 #include "shared/test_util/test_util.h"
 #include "software/logger/logger.h"
 #include "software/simulation/er_force_simulator.h"
@@ -181,7 +181,7 @@ void SimulatedErForceSimTestFixture::runTest(
 
     auto realism_config = ErForceSimulator::createDefaultRealismConfig();
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field_type, create2021RobotConstants(), realism_config, ramping));
+        field_type, robot_constants::createRobotConstants(), realism_config, ramping));
 
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);
