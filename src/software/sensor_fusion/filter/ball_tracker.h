@@ -63,4 +63,5 @@ class BallTracker
 	int consecutive_outliers;
 	KalmanFilter<4, 2, 1> kalman_filter;
 	std::optional<Timestamp> prev_detection_timestamp;
+	std::optional<Timestamp> last_measurement_timestamp;
 };

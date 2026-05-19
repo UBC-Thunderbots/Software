@@ -38,8 +38,14 @@ namespace {
         1, 0, 0, 0,
         0, 1, 0, 0).finished();
 
-    // Empirically measured
-	const double DAMPING = 1;
+    // Empirically measured per-second velocity retention during normal tracking
+	const double DAMPING = 0.994;
+    // Per-second retention when fully occluded long enough (velocity decays much faster)
+    const double DAMPING_OCCLUDED = 0.3;
+    // Occlusion time (seconds) before damping starts to increase
+    const double OCCLUSION_GRACE_SECONDS = 1.0;
+    // Occlusion time (seconds) past the grace period at which damping fully transitions to DAMPING_OCCLUDED
+    const double MAX_OCCLUSION_SECONDS = 1.0;
 
 	const double MAHANALOGIS_THRESHOLD = 1;
 	const int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
@@ -78,11 +84,17 @@ std::optional<Ball> BallTracker::estimateBallState(
 		dt = (current_time - *prev_detection_timestamp).toSeconds();
 		prev_detection_timestamp = current_time;
 
+		const double occlusion_seconds = last_measurement_timestamp.has_value()
+		    ? (current_time - *last_measurement_timestamp).toSeconds()
+		    : 0.0;
+		const double alpha = std::min(std::max(occlusion_seconds - OCCLUSION_GRACE_SECONDS, 0.0) / MAX_OCCLUSION_SECONDS, 1.0);
+		const double effective_damping = DAMPING * (1.0 - alpha) + DAMPING_OCCLUDED * alpha;
+
 		Eigen::Matrix<double,4,4> A;
 		A << 1, 0, dt, 0,
 		     0, 1, 0,  dt,
-		     0, 0, DAMPING, 0,
-		     0, 0, 0,       DAMPING;
+		     0, 0, effective_damping, 0,
+		     0, 0, 0,                 effective_damping;
 		kalman_filter.process_model = A;
 		kalman_filter.predict(Eigen::Vector<double,1>::Zero());
 	}
@@ -109,8 +121,9 @@ std::optional<Ball> BallTracker::estimateBallState(
             kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
             kalman_filter.state_covariance = INITIAL_COV;
         }
-        prev_detection_timestamp = current_time;
-        consecutive_outliers     = 0;
+        prev_detection_timestamp    = current_time;
+        last_measurement_timestamp  = current_time;
+        consecutive_outliers        = 0;
     }
 	else if (best_ball_detection){
 		Eigen::Vector<double, 2> measurement;
@@ -132,6 +145,7 @@ std::optional<Ball> BallTracker::estimateBallState(
 
 		if (mahalanobis < MAHANALOGIS_THRESHOLD){
 			kalman_filter.update(measurement);
+			last_measurement_timestamp = current_time;
 		}
 		else{
 			consecutive_outliers++;
@@ -140,6 +154,7 @@ std::optional<Ball> BallTracker::estimateBallState(
 		if (consecutive_outliers > CONSECUTIVE_OUTLIERS_THRESHOLD){
 			kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
 			kalman_filter.state_covariance = INITIAL_COV;
+			last_measurement_timestamp = current_time;
 			consecutive_outliers = 0;
 		}
 		prev_detection_timestamp = current_time;
