@@ -39,7 +39,7 @@ class GLMovementFieldTestLayer(GLLayer):
         self.world_buffer: ThreadSafeBuffer = ThreadSafeBuffer(buffer_size, World)
         self.fullsystem_io: ProtoUnixIO = fullsystem_io
         self.selected_robot_id = 0
-        self.cached_team: tbots_cpp.Team = None
+        self.cached_world = None
         self.is_selected = False
 
         # State for drag-to-orient movement
@@ -47,6 +47,7 @@ class GLMovementFieldTestLayer(GLLayer):
         self.target_point = None
         self.current_orientation = DEFAULT_ORIENTATION
 
+        self.selected_robot_graphics = ObservableList(self._graphics_changed)
         self.preview_robot_graphics = ObservableList(self._graphics_changed)
         self.preview_orientation_graphics = ObservableList(self._graphics_changed)
 
@@ -61,11 +62,13 @@ class GLMovementFieldTestLayer(GLLayer):
 
         :param point: the reference point to find the closest robot
         """
-        if not self.cached_team:
+        team = tbots_cpp.Team(self.cached_world.friendly_team)
+
+        if not team:
             logger.warning("No vision data received")
             return
 
-        closest_robot = self.cached_team.getNearestRobot(
+        closest_robot = team.getNearestRobot(
             tbots_cpp.Point(point.x(), point.y())
         )
         if closest_robot is None:
@@ -195,6 +198,32 @@ class GLMovementFieldTestLayer(GLLayer):
         else:
             self.target_point = None
 
+    def _draw_selection(self):
+        if not self.is_selected or self.cached_world is None:
+            self.selected_robot_graphics.resize(0, None)
+            return
+
+        # Get selected robot
+        robot = next(
+            (r for r in self.cached_world.friendly_team.team_robots if r.id == self.selected_robot_id),
+            None,
+        )
+        if robot is None:
+            self.selected_robot_graphics.resize(0, None)
+            self.is_selected = False
+            return
+
+        self.selected_robot_graphics.resize(
+            1, lambda: GLRobotOutline(outline_color=Colors.SELECTED_ROBOT_OUTLINE)
+        )
+        self.selected_robot_graphics[0].set_position(
+            robot.current_state.global_position.x_meters,
+            robot.current_state.global_position.y_meters,
+        )
+        self.selected_robot_graphics[0].set_orientation(
+            math.degrees(robot.current_state.global_orientation.radians)
+        )
+
     def draw_preview(self):
         if self.target_point is None:
             self.preview_robot_graphics.resize(0, None)
@@ -226,6 +255,7 @@ class GLMovementFieldTestLayer(GLLayer):
         world = self.world_buffer.get(block=False, return_cached=False)
 
         if world is not None:
-            self.cached_team = tbots_cpp.Team(world.friendly_team)
+            self.cached_world = world
 
+        self._draw_selection()
         self.draw_preview()
