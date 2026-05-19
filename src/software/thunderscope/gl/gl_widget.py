@@ -132,6 +132,13 @@ class GLWidget(QWidget):
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
         self.proto_unix_io = proto_unix_io
 
+    def set_scene_mouse_tracking(self, enabled: bool) -> None:
+        """Enable or disable scene-space mouse movement tracking.
+
+        :param enabled: Whether to emit mouse_in_scene_moved_signal on mouse moves
+        """
+        self.gl_view_widget.detect_mouse_movement_in_scene = enabled
+
     def get_sim_control_toolbar(self):
         """Returns the simulation control toolbar"""
         return self.simulation_control_toolbar
@@ -307,14 +314,6 @@ class GLWidget(QWidget):
     def toggle_measure_mode(self) -> None:
         """Toggles measure mode in the 3D visualizer"""
         self.measure_mode_enabled = not self.measure_mode_enabled
-
-        # Enable/disable detect_mouse_movement_in_scene in ExtendedGLViewWidget
-        # so that the mouse_in_scene_moved_signal is emitted if measure mode is on.
-        #
-        # Normally we want to disable detect_mouse_movement_in_scene so that we
-        # don't do unnecessary calculations every tick to find the point in the scene
-        # that the mouse is pointing at.
-        self.gl_view_widget.detect_mouse_movement_in_scene = self.measure_mode_enabled
 
         if self.measure_mode_enabled:
             self.measure_layer = GLMeasureLayer("Measure")

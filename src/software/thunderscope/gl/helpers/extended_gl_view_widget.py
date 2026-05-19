@@ -61,7 +61,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         self.point_picked = False
 
         # This must be enabled for the mouse_moved_in_scene_signal to be emitted
-        self.detect_mouse_movement_in_scene = False
+        self.detect_mouse_movement_in_scene = True
 
     @override
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:

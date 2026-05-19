@@ -5,6 +5,10 @@ from proto.import_all_protos import *
 from software.thunderscope.gl.layers.gl_world_layer import tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.logger.logger import create_logger
+from software.thunderscope.constants import Colors
+from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
+from software.thunderscope.gl.graphics.gl_line_strip import GLLineStrip
+from software.thunderscope.gl.helpers.observable_list import ObservableList
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from typing import override
@@ -16,15 +20,21 @@ DEFAULT_ORIENTATION = -math.pi / 2
 
 class GLMovementFieldTestLayer(GLLayer):
     def __init__(
-        self, name: str, fullsystem_io: ProtoUnixIO, buffer_size: int = 5
+        self,
+        name: str,
+        fullsystem_io: ProtoUnixIO,
+        buffer_size: int = 5,
+        on_visibility_changed=None,
     ) -> None:
         """Initialize the GLMovementFieldTestLayer
 
         :param name:            The displayed name of the layer
         :param buffer_size:     The buffer size we have
         :param fullsystem_io:   The fullsystem protounix io
+        :param on_visibility_changed: Optional callback invoked with the new visibility state
         """
         super().__init__(name)
+        self._on_visibility_changed = on_visibility_changed
 
         self.world_buffer: ThreadSafeBuffer = ThreadSafeBuffer(buffer_size, World)
         self.fullsystem_io: ProtoUnixIO = fullsystem_io
@@ -36,6 +46,15 @@ class GLMovementFieldTestLayer(GLLayer):
         self.is_dragging_to_orient = False
         self.target_point = None
         self.current_orientation = DEFAULT_ORIENTATION
+
+        self.preview_robot_graphics = ObservableList(self._graphics_changed)
+        self.preview_orientation_graphics = ObservableList(self._graphics_changed)
+
+    @override
+    def setVisible(self, visible: bool) -> None:
+        super().setVisible(visible)
+        if self._on_visibility_changed:
+            self._on_visibility_changed(visible)
 
     def select_closest_robot(self, point):
         """Find the closest robot to a point
@@ -83,7 +102,6 @@ class GLMovementFieldTestLayer(GLLayer):
                 return
 
             self.target_point = point
-            self.current_orientation = DEFAULT_ORIENTATION
             self.is_dragging_to_orient = True
 
     def move_to_point(self, point, orientation: float = None):
@@ -155,14 +173,59 @@ class GLMovementFieldTestLayer(GLLayer):
         # Reset drag-to-orient state
         self.is_dragging_to_orient = False
         self.target_point = None
-        self.current_orientation = -math.pi / 2
+
+    @override
+    def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
+        """Handle mouse moved events to update preview.
+
+        :param event: The event
+        """
+        if not self.visible() or not self.is_selected:
+            self.target_point = None
+            return
+
+        if self.is_dragging_to_orient:
+            return
+
+        if (
+            event.mouse_event.modifiers() & Qt.KeyboardModifier.AltModifier
+            and not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier
+        ):
+            self.target_point = event.point_in_scene
+        else:
+            self.target_point = None
+
+    def draw_preview(self):
+        if self.target_point is None:
+            self.preview_robot_graphics.resize(0, None)
+            self.preview_orientation_graphics.resize(0, None)
+            return
+
+        x = self.target_point.x()
+        y = self.target_point.y()
+        angle = self.current_orientation
+
+        self.preview_robot_graphics.resize(
+            1, lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE)
+        )
+        self.preview_robot_graphics[0].set_position(x, y)
+        self.preview_robot_graphics[0].set_orientation(math.degrees(angle))
+
+        line_length = 0.3
+        end_x = x + math.cos(angle) * line_length
+        end_y = y + math.sin(angle) * line_length
+
+        self.preview_orientation_graphics.resize(
+            1, lambda: GLLineStrip(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE)
+        )
+        self.preview_orientation_graphics[0].set_points([[x, y], [end_x, end_y]])
 
     @override
     def refresh_graphics(self):
         """Updating the world cache"""
         world = self.world_buffer.get(block=False, return_cached=False)
 
-        if world is None:
-            return
+        if world is not None:
+            self.cached_team = tbots_cpp.Team(world.friendly_team)
 
-        self.cached_team = tbots_cpp.Team(world.friendly_team)
+        self.draw_preview()
