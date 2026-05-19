@@ -65,7 +65,7 @@ extern "C"
     }
 }
 
-MotorService::MotorService(const RobotConstants_t& robot_constants,
+MotorService::MotorService(const robot_constants::RobotConstants& robot_constants,
                            int control_loop_frequency_hz)
     : spi_demux_select_0_(setupGpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO,
                                     GpioDirection::OUTPUT, GpioState::LOW)),
@@ -85,8 +85,8 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     motorServiceInit(robot_constants, control_loop_frequency_hz);
 }
 
-void MotorService::motorServiceInit(const RobotConstants_t& robot_constants,
-                                    int control_loop_frequency_hz)
+void MotorService::motorServiceInit(
+    const robot_constants::RobotConstants& robot_constants, int control_loop_frequency_hz)
 {
     int ret = 0;
 

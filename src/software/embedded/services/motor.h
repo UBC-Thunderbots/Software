@@ -36,10 +36,11 @@ class MotorService
      * Service that interacts with the motor board.
      * Opens all the required ports and maintains them until destroyed.
      *
-     * @param RobotConstants_t The robot constants
+     * @param robot_constants The robot constants
      * @param control_loop_frequency_hz The frequency the main loop will call poll at
      */
-    MotorService(const RobotConstants_t& robot_constants, int control_loop_frequency_hz);
+    MotorService(const robot_constants::RobotConstants& robot_constants,
+                 int control_loop_frequency_hz);
 
     virtual ~MotorService();
 
@@ -185,7 +186,7 @@ class MotorService
      * @param robot_constants robot constants for motor service
      * @param control_loop_frequency_hz control loop frequency in Hertz
      */
-    void motorServiceInit(const RobotConstants_t& robot_constants,
+    void motorServiceInit(const robot_constants::RobotConstants& robot_constants,
                           int control_loop_frequency_hz);
 
     /**
@@ -387,7 +388,7 @@ class MotorService
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors_;
 
-    RobotConstants_t robot_constants_;
+    robot_constants::RobotConstants robot_constants_;
 
     // Drive Motors
     EuclideanToWheel euclidean_to_four_wheel_;

@@ -7,7 +7,6 @@
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/motor.h"
@@ -68,8 +67,8 @@ extern "C"
     }
 }
 
-Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
-                         const int loop_hz)
+Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
+                         bool enable_log_merging, const int loop_hz)
     // TODO (#2495): Set the friendly team colour
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       motor_status_(std::nullopt),
