@@ -78,6 +78,10 @@ class WifiCommunicationManager:
             referee_interface=DISCONNECTED,
             vision_interface=DISCONNECTED,
         )
+        ## Thread Management ##
+        self.running = True
+        self.broadcast_ip: Thread | None = None
+
         if interface:
             self.accept_next_network_config = False
             self.__setup_robot_communication(interface)
@@ -88,10 +92,6 @@ class WifiCommunicationManager:
             self.__setup_full_system(
                 referee_interface=interface, vision_interface=interface
             )
-
-        ## Thread Management ##
-        self.running = True
-        self.broadcast_ip: Thread | None = None
 
         logger.debug("[WifiCommunicationManager] Initialized")
         self.__print_current_network_config()

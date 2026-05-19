@@ -39,7 +39,7 @@ namespace {
         0, 1, 0, 0).finished();
 
     // Empirically measured
-	const double DAMPING = 0.9889;
+	const double DAMPING = 1;
 
 	const double MAHANALOGIS_THRESHOLD = 1;
 	const int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;

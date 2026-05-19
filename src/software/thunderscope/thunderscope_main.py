@@ -337,7 +337,7 @@ if __name__ == "__main__":
                     else args.yellow_full_system_runtime_dir
                 )
                 with FullSystem(
-                    path_to_binary=full_system_runtime_dir,
+                    path_to_binary="software/unix_full_system",
                     full_system_runtime_dir=runtime_dir,
                     debug_full_system=debug,
                     friendly_colour_yellow=friendly_colour_yellow,
