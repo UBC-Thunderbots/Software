@@ -198,7 +198,8 @@ class GLMovementFieldTestLayer(GLLayer):
         else:
             self.target_point = None
 
-    def _draw_selection(self):
+    def draw_selection(self):
+        """Renders an outline around the currently selected robot."""
         if not self.is_selected or self.cached_world is None:
             self.selected_robot_graphics.resize(0, None)
             return
@@ -225,6 +226,7 @@ class GLMovementFieldTestLayer(GLLayer):
         )
 
     def draw_preview(self):
+        """Renders a robot outline at the target position and a line indicating orientation."""
         if self.target_point is None:
             self.preview_robot_graphics.resize(0, None)
             self.preview_orientation_graphics.resize(0, None)
@@ -257,5 +259,5 @@ class GLMovementFieldTestLayer(GLLayer):
         if world is not None:
             self.cached_world = world
 
-        self._draw_selection()
+        self.draw_selection()
         self.draw_preview()
