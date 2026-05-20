@@ -55,6 +55,7 @@ namespace {
 
 BallTracker::BallTracker() :
 	consecutive_outliers(0),
+	velocity_initialized(false),
 	kalman_filter(INITIAL_STATE, INITIAL_COV,
 	              Eigen::Matrix<double,4,4>::Identity(),
 	              Q,
@@ -83,6 +84,23 @@ std::optional<Ball> BallTracker::estimateBallState(
 	if (prev_detection_timestamp){
 		dt = (current_time - *prev_detection_timestamp).toSeconds();
 		prev_detection_timestamp = current_time;
+
+		// Hard-initialize velocity from finite difference on the first step so
+		// hasBallBeenKicked() fires immediately. Set P_vel = 2R/dt^2 (the exact
+		// variance of a finite-diff estimate) so the filter knows the estimate is
+		// noisy and can correct it aggressively over the next few frames.
+		if (!velocity_initialized && dt > 0 && best_ball_detection)
+		{
+		    kalman_filter.state_estimate(2) =
+		        (best_ball_detection->position.x() - kalman_filter.state_estimate(0)) / dt;
+		    kalman_filter.state_estimate(3) =
+		        (best_ball_detection->position.y() - kalman_filter.state_estimate(1)) / dt;
+		    kalman_filter.state_covariance(2, 2) =
+		        std::min(2.0 * R(0, 0) / (dt * dt), 1000.0);
+		    kalman_filter.state_covariance(3, 3) =
+		        std::min(2.0 * R(1, 1) / (dt * dt), 1000.0);
+		    velocity_initialized = true;
+		}
 
 		const double occlusion_seconds = last_measurement_timestamp.has_value()
 		    ? (current_time - *last_measurement_timestamp).toSeconds()
@@ -120,6 +138,7 @@ std::optional<Ball> BallTracker::estimateBallState(
             measurement << dribbler_pos.x(), dribbler_pos.y();
             kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
             kalman_filter.state_covariance = INITIAL_COV;
+            velocity_initialized = false;
         }
         prev_detection_timestamp    = current_time;
         last_measurement_timestamp  = current_time;
@@ -134,6 +153,7 @@ std::optional<Ball> BallTracker::estimateBallState(
 			kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
 			kalman_filter.state_covariance = INITIAL_COV;
 			consecutive_outliers = 0;
+			velocity_initialized = false;
 		}
 
 		const Eigen::Vector<double, 2> innovation =
@@ -156,6 +176,7 @@ std::optional<Ball> BallTracker::estimateBallState(
 			kalman_filter.state_covariance = INITIAL_COV;
 			last_measurement_timestamp = current_time;
 			consecutive_outliers = 0;
+			velocity_initialized = false;
 		}
 		prev_detection_timestamp = current_time;
 	}
