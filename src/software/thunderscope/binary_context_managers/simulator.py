@@ -134,6 +134,10 @@ gdb --args bazel-bin/{simulator_command}
             WorldStateReceivedTrigger,
         )
 
+        simulator_proto_unix_io.attach_unix_receiver(
+            self.simulator_runtime_dir, "/log", RobotLog
+        )
+
         # setup blue full system unix io
         for arg in [
             (BLUE_WORLD_PATH, World),

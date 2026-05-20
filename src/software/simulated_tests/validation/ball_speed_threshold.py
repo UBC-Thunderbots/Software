@@ -7,6 +7,7 @@ from software.simulated_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
+    get_ball_vel,
 )
 from typing import override
 
@@ -22,17 +23,14 @@ class BallSpeedThreshold(Validation):
         self.speed_threshold = speed_threshold
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if the ball speed is at or above some threshold
 
         :param world: The world msg to validate
         :return: FAILING if the ball speed is below some threshold
                  PASSING if the ball speed is at or above some threshold
         """
-        if (
-            tbots_cpp.createVector(world.ball.current_state.global_velocity).length()
-            >= self.speed_threshold
-        ):
+        if get_ball_vel(world, simulator_state).length() >= self.speed_threshold:
             return ValidationStatus.PASSING
 
         return ValidationStatus.FAILING

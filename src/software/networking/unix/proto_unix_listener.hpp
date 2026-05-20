@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sys/stat.h>
+
 #include <boost/asio.hpp>
 #include <string>
 
@@ -73,6 +75,7 @@ ProtoUnixListener<ReceiveProtoT>::ProtoUnixListener(
 
     socket_.open();
     socket_.bind(listen_endpoint_);
+    ::chmod(unix_path.c_str(), 0777);
 
     boost::asio::local::datagram_protocol::socket::receive_buffer_size option(
         UNIX_BUFFER_SIZE);

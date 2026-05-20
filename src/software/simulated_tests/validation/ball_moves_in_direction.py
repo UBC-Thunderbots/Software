@@ -5,6 +5,7 @@ from software.simulated_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
+    get_ball_pos,
 )
 from typing import override
 
@@ -24,14 +25,14 @@ class BallMovesForward(Validation):
         self.tolerance = tolerance
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if ball is moving forward
 
         :param world: The world msg to validate
         :return: FAILING if ball doesn't move in the direction
                  PASSING if ball moves in the direction
         """
-        current_ball_position = world.ball.current_state.global_position.x_meters
+        current_ball_position = get_ball_pos(world, simulator_state).x()
 
         # if max displacement is not set or current ball is moving in the right direction
         # set it and return PASSING
@@ -84,12 +85,10 @@ class BallMovesForwardInRegions(BallMovesForward):
         self.regions = regions
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         for region in self.regions:
-            if tbots.contains(
-                region, tbots.createPoint(world.ball.current_state.global_position)
-            ):
-                return super().get_validation_status(world)
+            if tbots.contains(region, get_ball_pos(world, simulator_state)):
+                return super().get_validation_status(world, simulator_state=simulator_state)
 
         return ValidationStatus.PASSING
 

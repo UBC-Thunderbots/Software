@@ -122,7 +122,7 @@ std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismCo
     realism_config->set_vision_delay(35000000);
     realism_config->set_vision_processing_time(10000000);
     realism_config->set_missing_ball_detections(0.02f);
-    realism_config->set_simulate_dribbling(false);
+    realism_config->set_simulate_dribbling(true);
     return realism_config;
 }
 
@@ -472,11 +472,13 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     blue_robot_with_ball.reset();
     yellow_robot_with_ball.reset();
 
+	ball_is_visible_ = true;
     for (const auto& response : yellow_radio_responses)
     {
         if (response.has_ball_detected() && response.ball_detected())
         {
             yellow_robot_with_ball = response.id();
+			ball_is_visible_ = false;
         }
     }
 
@@ -485,6 +487,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         if (response.has_ball_detected() && response.ball_detected())
         {
             blue_robot_with_ball = response.id();
+			ball_is_visible_ = false;
         }
     }
 
@@ -546,7 +549,8 @@ std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets(
 
 world::SimulatorState ErForceSimulator::getSimulatorState() const
 {
-    return er_force_sim->getSimulatorState();
+    auto state = er_force_sim->getSimulatorState();
+    return state;
 }
 
 Field ErForceSimulator::getField() const
@@ -562,6 +566,11 @@ Timestamp ErForceSimulator::getTimestamp() const
 void ErForceSimulator::resetCurrentTime()
 {
     current_time = Timestamp::fromSeconds(0);
+}
+
+bool ErForceSimulator::isBallVisible() const
+{
+    return ball_is_visible_;
 }
 
 std::map<RobotId, std::pair<Vector, AngularVelocity>>

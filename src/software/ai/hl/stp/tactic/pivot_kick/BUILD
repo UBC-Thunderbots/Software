@@ -32,7 +32,6 @@ cc_test(
         "//software/test_util",
     ],
 )
-
 py_test(
     name = "pivot_kick_tactic_test",
     srcs = ["pivot_kick_tactic_test.py"],

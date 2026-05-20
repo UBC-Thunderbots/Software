@@ -24,7 +24,6 @@ cc_library(
     ],
     alwayslink = True,
 )
-
 py_test(
     name = "kickoff_friendly_play_test",
     srcs = ["kickoff_friendly_play_test.py"],

@@ -26,7 +26,7 @@ class RobotAtOrientation(Validation):
         self.threshold = threshold
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if the robot is at the expected orientation
 
         :param world: The world msg to validate

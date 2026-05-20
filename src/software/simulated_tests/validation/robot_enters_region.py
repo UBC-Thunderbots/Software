@@ -24,7 +24,7 @@ class MinNumberOfRobotsEntersRegion(Validation):
         self.robot_in_zone = {}
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if a specific number of robots enter the provided set of regions
 
         :param world: The world msg to validate

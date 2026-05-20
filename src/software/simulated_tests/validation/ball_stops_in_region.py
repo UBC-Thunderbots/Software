@@ -5,6 +5,8 @@ from software.simulated_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
+    get_ball_pos,
+    get_ball_vel,
 )
 from typing import override
 
@@ -16,7 +18,7 @@ class BallStopsInRegion(Validation):
         self.regions = regions if regions else []
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if the ball stops in the provided regions
 
         :param world: The world msg to validate
@@ -25,13 +27,8 @@ class BallStopsInRegion(Validation):
         """
         for region in self.regions:
             if tbots_cpp.contains(
-                region, tbots_cpp.createPoint(world.ball.current_state.global_position)
-            ) and (
-                tbots_cpp.createVector(
-                    world.ball.current_state.global_velocity
-                ).length()
-                <= 0.01
-            ):
+                region, get_ball_pos(world, simulator_state)
+            ) and get_ball_vel(world, simulator_state).length() <= 0.01:
                 return ValidationStatus.PASSING
 
         return ValidationStatus.FAILING

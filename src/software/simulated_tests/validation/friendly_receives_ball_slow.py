@@ -3,6 +3,7 @@ from proto.import_all_protos import *
 
 from software.simulated_tests.validation.validation import (
     create_validation_types,
+    get_ball_vel,
 )
 from software.simulated_tests.validation.friendly_has_ball_possession import (
     FriendlyHasBallPossession,
@@ -24,7 +25,7 @@ class FriendlyReceivesBallSlow(FriendlyHasBallPossession):
         self.max_receive_speed = max_receive_speed
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if the specified robot receives the ball too fast
 
         :param world: The world msg to validate
@@ -33,10 +34,8 @@ class FriendlyReceivesBallSlow(FriendlyHasBallPossession):
                  PASSING if the ball is not near the dribbler, or if it is near
                          the dribbler at a speed slower than the max
         """
-        if super().get_validation_status(world) == ValidationStatus.PASSING:
-            ball_velocity = tbots_cpp.createVector(
-                world.ball.current_state.global_velocity
-            )
+        if super().get_validation_status(world, simulator_state=simulator_state) == ValidationStatus.PASSING:
+            ball_velocity = get_ball_vel(world, simulator_state)
             if ball_velocity.length() - self.max_receive_speed > 0.2:
                 return ValidationStatus.FAILING
         return ValidationStatus.PASSING

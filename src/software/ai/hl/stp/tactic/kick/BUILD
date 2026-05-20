@@ -30,7 +30,6 @@ cc_test(
         "//software/test_util",
     ],
 )
-
 py_test(
     name = "kick_tactic_test",
     srcs = ["kick_tactic_test.py"],

@@ -33,6 +33,7 @@ py_library(
         "//software:python_bindings.so",
     ],
     deps = [
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
         "//software/logger:py_logger",

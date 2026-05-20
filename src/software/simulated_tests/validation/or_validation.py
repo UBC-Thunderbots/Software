@@ -17,9 +17,12 @@ class OrValidation(Validation):
         self.validations = validations
 
     @override
-    def get_validation_status(self, world):
+    def get_validation_status(self, world, simulator_state=None):
         for validation in self.validations:
-            if validation.get_validation_status(world) == ValidationStatus.PASSING:
+            if (
+                validation.get_validation_status(world, simulator_state=simulator_state)
+                == ValidationStatus.PASSING
+            ):
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 

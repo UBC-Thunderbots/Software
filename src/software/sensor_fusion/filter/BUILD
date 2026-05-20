@@ -16,29 +16,31 @@ cc_library(
 )
 
 cc_library(
-    name = "ball_filter",
-    srcs = ["ball_filter.cpp"],
-    hdrs = ["ball_filter.h"],
+    name = "kalman_filter",
+    srcs = ["kalman_filter.cpp"],
+    hdrs = ["kalman_filter.h"],
+    deps = [
+        "@eigen",
+    ],
+)
+cc_library(
+    name = "ball_tracker",
+    srcs = ["ball_tracker.cpp"],
+    hdrs = ["ball_tracker.h"],
     deps = [
         ":vision_detection",
+		":kalman_filter",
         "//software/geom/algorithms",
         "//software/math:math_functions",
         "//software/world:ball",
         "//software/world:field",
+        "//software/world:robot",
+        "//software:constants",
         "@boost//:circular_buffer",
         "@eigen",
     ],
 )
 
-cc_test(
-    name = "ball_filter_test",
-    srcs = ["ball_filter_test.cpp"],
-    deps = [
-        ":ball_filter",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/world:field",
-    ],
-)
 
 cc_library(
     name = "robot_filter",
@@ -83,18 +85,7 @@ cc_test(
 cc_library(
     name = "sensor_fusion_filters",
     deps = [
-        ":ball_filter",
+        ":ball_tracker",
         ":robot_team_filter",
-    ],
-)
-
-py_test(
-    name = "ball_occlusion_test",
-    srcs = ["ball_occlusion_test.py"],
-    tags = ["exclusive"],
-    deps = [
-        "//software:conftest",
-        "//software/simulated_tests/validation:validations",
-        requirement("pytest"),
     ],
 )

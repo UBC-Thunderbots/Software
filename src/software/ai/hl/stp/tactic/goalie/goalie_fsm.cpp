@@ -4,6 +4,7 @@
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/math/math_functions.h"
+#include "software/logger/logger.h"
 
 GoalieFSM::GoalieFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
                      TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
@@ -167,9 +168,13 @@ bool GoalieFSM::shouldPanic(const Update& event)
 bool GoalieFSM::shouldPivotChip(const Update& event)
 {
     double ball_speed_panic = ai_config_ptr->goalie_tactic_config().ball_speed_panic();
-    return event.common.world_ptr->ball().velocity().length() <= ball_speed_panic &&
+	bool chip = event.common.world_ptr->ball().velocity().length() <= ball_speed_panic &&
            event.common.world_ptr->field().pointInFriendlyDefenseArea(
                event.common.world_ptr->ball().position());
+	if (chip){LOG(INFO)<<"CHIPPED" <<std::endl;}
+	
+
+    return chip;
 }
 
 bool GoalieFSM::panicDone(const Update& event)

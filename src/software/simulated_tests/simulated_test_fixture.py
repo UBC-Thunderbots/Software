@@ -1,26 +1,25 @@
-import threading
-import queue
 import argparse
-import time
-import sys
 import os
+import queue
+import sys
+import threading
+import time
+from typing import override
 
 import pytest
-from proto.import_all_protos import *
-
-from software.simulated_tests.validation import validation
-from software.simulated_tests.tbots_test_runner import TbotsTestRunner
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
-from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.thunderscope_config import configure_simulated_test_view
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+from proto.import_all_protos import *
 from software.logger.logger import create_logger
-from typing import override
+from software.simulated_tests.tbots_test_runner import TbotsTestRunner
+from software.simulated_tests.validation import validation
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.thunderscope_config import configure_simulated_test_view
 
 logger = create_logger(__name__)
 
@@ -200,6 +199,28 @@ class SimulatedTestRunner(TbotsTestRunner):
             if self.thunderscope and tick_duration_s > processing_time:
                 time.sleep(tick_duration_s - processing_time)
 
+            simulator_state = self.simulator_state_buffer.get(
+                block=False, return_cached=True
+            )
+
+            sf_pos = world.ball.current_state.global_position
+            sf_vel = world.ball.current_state.global_velocity
+            if simulator_state is not None:
+                sim_b = simulator_state.ball
+                print(
+                    f"[BallState] t={time_elapsed_s:.3f}  "
+                    f"sf_pos=({sf_pos.x_meters:.3f},{sf_pos.y_meters:.3f})  "
+                    f"sf_vel=({sf_vel.x_component_meters:.3f},{sf_vel.y_component_meters:.3f})  "
+                    f"sim_pos=({sim_b.p_x:.3f},{sim_b.p_y:.3f})  "
+                    f"sim_vel=({sim_b.v_x:.3f},{sim_b.v_y:.3f})"
+                )
+            else:
+                print(
+                    f"[BallState] t={time_elapsed_s:.3f}  "
+                    f"sf_pos=({sf_pos.x_meters:.3f},{sf_pos.y_meters:.3f})  "
+                    f"sf_vel=({sf_vel.x_component_meters:.3f},{sf_vel.y_component_meters:.3f})"
+                )
+
             # Validate
             (
                 eventually_validation_proto_set,
@@ -208,6 +229,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 world,
                 eventually_validation_sequence_set,
                 always_validation_sequence_set,
+                simulator_state=simulator_state,
             )
 
             # Set the test name
@@ -532,25 +554,29 @@ def simulated_test_runner():
     test_name = current_test.split("-")[0]
 
     # Launch all binaries
-    with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}",
-        args.debug_simulator,
-        args.enable_realism,
-    ) as simulator, FullSystem(
-        "software/unix_full_system",
-        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
-        args.debug_blue_full_system,
-        False,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope,
-    ) as blue_fs, FullSystem(
-        "software/unix_full_system",
-        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
-        args.debug_yellow_full_system,
-        True,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope,
-    ) as yellow_fs:
+    with (
+        Simulator(
+            f"{args.simulator_runtime_dir}/test/{test_name}",
+            args.debug_simulator,
+            args.enable_realism,
+        ) as simulator,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+            args.debug_blue_full_system,
+            False,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope,
+        ) as blue_fs,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+            args.debug_yellow_full_system,
+            True,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope,
+        ) as yellow_fs,
+    ):
         with Gamecontroller(
             suppress_logs=(not args.show_gamecontroller_logs)
         ) as gamecontroller:

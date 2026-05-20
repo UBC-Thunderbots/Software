@@ -5,6 +5,7 @@ from software.simulated_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
+    get_ball_pos,
 )
 from typing import override
 
@@ -17,18 +18,16 @@ class BallEntersRegion(Validation):
         self.ball_position = None
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if the ball enters the provided regions
 
         :param world: The world msg to validate
         :return: FAILING until a ball enters any of the regions
                  PASSING when a ball enters
         """
-        self.ball_position = world.ball.current_state.global_position
+        self.ball_position = get_ball_pos(world, simulator_state)
         for region in self.regions:
-            if tbots_cpp.contains(
-                region, tbots_cpp.createPoint(world.ball.current_state.global_position)
-            ):
+            if tbots_cpp.contains(region, self.ball_position):
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 

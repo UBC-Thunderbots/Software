@@ -5,6 +5,7 @@ from software.simulated_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
+    get_ball_pos,
 )
 from typing import override
 
@@ -22,14 +23,14 @@ class FriendlyHasBallPossession(Validation):
         self.tolerance = tolerance
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world, simulator_state=None) -> ValidationStatus:
         """Checks if friendly robot has possession of the ball
 
         :param world: The world msg to validate
         :return: FAILING when friendly robot does not have possession of the ball
                  PASSING when friendly robot has possession of the ball
         """
-        ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
+        ball_position = get_ball_pos(world, simulator_state)
         for robot in world.friendly_team.team_robots:
             if self.robot_id is not None and robot.id != self.robot_id:
                 continue

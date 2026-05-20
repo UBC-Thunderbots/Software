@@ -29,7 +29,8 @@ from software.thunderscope.time_provider import time_provider_instance
 class Gamecontroller:
     """Gamecontroller Context Manager"""
 
-    CI_MODE_LAUNCH_DELAY_S = 0.3
+    CI_MODE_LAUNCH_DELAY_S = 0.1
+    CI_MODE_CONNECT_TIMEOUT_S = 5.0
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
     REFEREE_IP = "224.5.23.1"
     RESET_MATCH_DELAY_S = 1
@@ -99,17 +100,45 @@ class Gamecontroller:
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
+        # Run in a temp dir so the gamecontroller always starts with a clean
+        # state store — the state-store.json.stream can get corrupted when the
+        # process is killed mid-write, causing a panic on the next startup.
+        import tempfile
+        self._gc_workdir = tempfile.mkdtemp(prefix="gamecontroller_")
+
         if self.suppress_logs:
-            with open(os.devnull, "w") as fp:
-                self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
-
+            self._gc_log = open(
+                os.path.join(self._gc_workdir, "gamecontroller.log"), "w"
+            )
+            self.gamecontroller_proc = Popen(
+                command, stdout=self._gc_log, stderr=self._gc_log,
+                cwd=self._gc_workdir,
+            )
         else:
-            self.gamecontroller_proc = Popen(command)
+            self._gc_log = None
+            self.gamecontroller_proc = Popen(command, cwd=self._gc_workdir)
 
-        # We can't connect to the ci port right away, it takes
-        # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
-        time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
-        self.ci_socket = SslSocket(self.ci_port)
+        # Poll until the gamecontroller CI port is ready, up to CI_MODE_CONNECT_TIMEOUT_S
+        deadline = time.time() + Gamecontroller.CI_MODE_CONNECT_TIMEOUT_S
+        while True:
+            if self.gamecontroller_proc.poll() is not None:
+                log_contents = ""
+                log_path = os.path.join(self._gc_workdir, "gamecontroller.log")
+                if os.path.exists(log_path):
+                    with open(log_path) as f:
+                        log_contents = f.read()
+                raise RuntimeError(
+                    f"Gamecontroller process exited with code {self.gamecontroller_proc.returncode} "
+                    f"before CI port {self.ci_port} became available"
+                    + (f"\nGamecontroller output:\n{log_contents}" if log_contents else "")
+                )
+            try:
+                self.ci_socket = SslSocket(self.ci_port)
+                break
+            except ConnectionRefusedError:
+                if time.time() >= deadline:
+                    raise
+                time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
 
         return self
 
@@ -123,6 +152,10 @@ class Gamecontroller:
         self.gamecontroller_proc.terminate()
         self.gamecontroller_proc.wait()
         self.ci_socket.close()
+        if self._gc_log is not None:
+            self._gc_log.close()
+        import shutil
+        shutil.rmtree(self._gc_workdir, ignore_errors=True)
 
     def refresh(self):
         """Gets any manual gamecontroller commands from the buffer and executes them"""
@@ -301,6 +334,8 @@ class Gamecontroller:
                     "error receiving CiOutput proto from the gamecontroller: "
                     + parse_err.args
                 )
+            except OSError:
+                break
 
         return ci_output_list
 

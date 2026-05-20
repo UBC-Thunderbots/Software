@@ -34,7 +34,6 @@ cc_test(
         "@googletest//:gtest_main",
     ],
 )
-
 py_test(
     name = "receiver_tactic_test",
     srcs = ["receiver_tactic_test.py"],
