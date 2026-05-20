@@ -126,8 +126,6 @@ std::optional<Ball> BallTracker::estimateBallState(
             (best_ball_detection->position - dribbler_pos).length() <=
                 DRIBBLING_MEASUREMENT_MAX_DISTANCE_METERS;
 
-        // Use ball detection if available and near dribbler, otherwise fall back to
-        // dribbler position (ball likely occluded by robot body)
         Eigen::Vector<double, 2> measurement;
         if (near_dribbler)
         {
@@ -143,8 +141,6 @@ std::optional<Ball> BallTracker::estimateBallState(
         kalman_filter.measurement_covariance = R_DRIBBLING;
         kalman_filter.update(measurement);
         kalman_filter.measurement_covariance = R;
-        kalman_filter.state_estimate(2) = 0;
-        kalman_filter.state_estimate(3) = 0;
         prev_detection_timestamp    = current_time;
         last_measurement_timestamp  = current_time;
         consecutive_outliers        = 0;
