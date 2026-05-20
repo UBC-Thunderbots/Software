@@ -1,18 +1,18 @@
 import pytest
-
 import software.python_bindings as tbots_cpp
+
 from proto.import_all_protos import *
-from software.simulated_tests.validation.robot_enters_region import *
-from software.simulated_tests.validation.ball_enters_region import *
-from software.simulated_tests.validation.ball_moves_in_direction import *
-from software.simulated_tests.validation.friendly_has_ball_possession import *
-from software.simulated_tests.validation.ball_speed_threshold import *
-from software.simulated_tests.validation.robot_speed_threshold import *
-from software.simulated_tests.validation.excessive_dribbling import *
+from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
+from software.simulated_tests.validation.ball_enters_region import *
+from software.simulated_tests.validation.ball_moves_in_direction import *
+from software.simulated_tests.validation.ball_speed_threshold import *
+from software.simulated_tests.validation.excessive_dribbling import *
+from software.simulated_tests.validation.friendly_has_ball_possession import *
+from software.simulated_tests.validation.robot_enters_region import *
+from software.simulated_tests.validation.robot_speed_threshold import *
 
 
 @pytest.mark.parametrize(
@@ -28,7 +28,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
             + tbots_cpp.Vector(0, -0.5),
         ),
         # test ball very fast misses net
-        (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 1), tbots_cpp.Point(-4.5, 0)),
+        (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 1), tbots_cpp.Point(-4.3, 0)),
         # test ball very fast get saved
         # TODO (#3377): This test is flaky due to inconsistent goalie reach. The linked ticket may provide a permanent fix.
         (
@@ -74,7 +74,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
         # ball moving out from inside defense area
         (
             tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0.5, 0),
+            + tbots_cpp.Vector(0.4, 0),
             tbots_cpp.Vector(0.5, 0),
             tbots_cpp.Point(-3.5, 0),
         ),

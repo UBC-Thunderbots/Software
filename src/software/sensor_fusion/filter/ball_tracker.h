@@ -1,7 +1,8 @@
 #pragma once
 
-#include <boost/circular_buffer.hpp>
 #include <optional>
+#include <utility>
+#include <vector>
 
 #include "software/geom/line.h"
 #include "software/geom/point.h"
@@ -60,9 +61,23 @@ class BallTracker
      *         list is empty
      */
 	std::optional<BallDetection> getBestBallDetection(const std::vector<BallDetection> &new_ball_detections);
+
+    /**
+     * Appends the detection to the velocity init buffer and, once
+     * VELOCITY_INIT_BUFFER_SIZE samples have accumulated, fits a least-squares
+     * line through them to initialize the filter's velocity state and covariance.
+     *
+     * @param position    The ball position for this sample
+     * @param current_time The timestamp of this sample
+     * @return true if velocity was initialized this call (buffer just became full)
+     */
+    bool tryInitVelocityFromBuffer(const Point& position, const Timestamp& current_time);
+
 	int consecutive_outliers;
 	bool velocity_initialized;
 	KalmanFilter<4, 2, 1> kalman_filter;
 	std::optional<Timestamp> prev_detection_timestamp;
 	std::optional<Timestamp> last_measurement_timestamp;
+    static constexpr int VELOCITY_INIT_BUFFER_SIZE = 4;
+    std::vector<std::pair<Point, double>> velocity_init_buffer;
 };

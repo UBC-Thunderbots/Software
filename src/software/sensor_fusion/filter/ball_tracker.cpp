@@ -17,8 +17,8 @@ namespace {
     const Eigen::Matrix<double,4,4> INITIAL_COV = (Eigen::Matrix<double,4,4>() <<
         1000, 0,    0,  0,
         0,    1000, 0,  0,
-        0,    0,    10, 0,
-        0,    0,    0,  10).finished();
+        0,    0,    1, 0,
+        0,    0,    0,  1).finished();
 
 	const Eigen::Matrix<double,4,4> Q = (Eigen::Matrix<double,4,4>() <<
 	    2.222e-8, 0,        2.000e-6, 0,
@@ -51,6 +51,11 @@ namespace {
 	const int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
 
     const double DRIBBLING_MEASUREMENT_MAX_DISTANCE_METERS = 0.08;
+
+    // Speed gate for the init buffer: reject detections that imply a ball jump
+    // beyond this threshold from the last known position.
+    // BALL_MAX_SPEED_METERS_PER_SECOND (6.5) + 2.5 buffer for measurement error.
+    const double INIT_BUFFER_MAX_SPEED_M_PER_S = BALL_MAX_SPEED_METERS_PER_SECOND + 2.5;
 }
 
 BallTracker::BallTracker() :
@@ -80,27 +85,23 @@ std::optional<Ball> BallTracker::estimateBallState(
 
 	std::optional<BallDetection> best_ball_detection = getBestBallDetection(new_ball_detections);
 
+    if (!velocity_initialized)
+    {
+        if (best_ball_detection)
+            velocity_initialized = tryInitVelocityFromBuffer(
+                best_ball_detection->position, current_time);
+
+        const Point pos = best_ball_detection
+            ? best_ball_detection->position
+            : Point(kalman_filter.state_estimate(0), kalman_filter.state_estimate(1));
+        const double z = best_ball_detection ? best_ball_detection->distance_from_ground : 0.0;
+        return Ball(BallState(pos, Vector(0, 0), z), current_time);
+    }
+
     double dt = 0.0;
 	if (prev_detection_timestamp){
 		dt = (current_time - *prev_detection_timestamp).toSeconds();
 		prev_detection_timestamp = current_time;
-
-		// Hard-initialize velocity from finite difference on the first step so
-		// hasBallBeenKicked() fires immediately. Set P_vel = 2R/dt^2 (the exact
-		// variance of a finite-diff estimate) so the filter knows the estimate is
-		// noisy and can correct it aggressively over the next few frames.
-		if (!velocity_initialized && dt > 0 && best_ball_detection)
-		{
-		    kalman_filter.state_estimate(2) =
-		        (best_ball_detection->position.x() - kalman_filter.state_estimate(0)) / dt;
-		    kalman_filter.state_estimate(3) =
-		        (best_ball_detection->position.y() - kalman_filter.state_estimate(1)) / dt;
-		    kalman_filter.state_covariance(2, 2) =
-		        std::min(2.0 * R(0, 0) / (dt * dt), 1000.0);
-		    kalman_filter.state_covariance(3, 3) =
-		        std::min(2.0 * R(1, 1) / (dt * dt), 1000.0);
-		    velocity_initialized = true;
-		}
 
 		const double occlusion_seconds = last_measurement_timestamp.has_value()
 		    ? (current_time - *last_measurement_timestamp).toSeconds()
@@ -139,6 +140,7 @@ std::optional<Ball> BallTracker::estimateBallState(
             kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
             kalman_filter.state_covariance = INITIAL_COV;
             velocity_initialized = false;
+            velocity_init_buffer.clear();
         }
         prev_detection_timestamp    = current_time;
         last_measurement_timestamp  = current_time;
@@ -154,6 +156,7 @@ std::optional<Ball> BallTracker::estimateBallState(
 			kalman_filter.state_covariance = INITIAL_COV;
 			consecutive_outliers = 0;
 			velocity_initialized = false;
+			velocity_init_buffer.clear();
 		}
 
 		const Eigen::Vector<double, 2> innovation =
@@ -177,6 +180,7 @@ std::optional<Ball> BallTracker::estimateBallState(
 			last_measurement_timestamp = current_time;
 			consecutive_outliers = 0;
 			velocity_initialized = false;
+			velocity_init_buffer.clear();
 		}
 		prev_detection_timestamp = current_time;
 	}
@@ -187,6 +191,63 @@ std::optional<Ball> BallTracker::estimateBallState(
 
     BallState ball_state(ball_position, ball_velocity, z_height);
     return Ball(ball_state, current_time);
+}
+
+bool BallTracker::tryInitVelocityFromBuffer(const Point& position,
+                                             const Timestamp& current_time)
+{
+    // Gate: reject detections that imply the ball teleported from the last
+    // known position. Clear the buffer and reanchor rather than poisoning the
+    // regression with a noise spike.
+    if (!velocity_init_buffer.empty())
+    {
+        const Point last_pos(kalman_filter.state_estimate(0),
+                             kalman_filter.state_estimate(1));
+        const double dt_s = current_time.toSeconds() - velocity_init_buffer.back().second;
+        if (dt_s > 0 &&
+            (position - last_pos).length() / dt_s > INIT_BUFFER_MAX_SPEED_M_PER_S)
+        {
+            velocity_init_buffer.clear();
+            kalman_filter.state_estimate(0) = position.x();
+            kalman_filter.state_estimate(1) = position.y();
+            prev_detection_timestamp        = current_time;
+            return false;
+        }
+    }
+
+    velocity_init_buffer.emplace_back(position, current_time.toSeconds());
+    kalman_filter.state_estimate(0) = position.x();
+    kalman_filter.state_estimate(1) = position.y();
+    prev_detection_timestamp        = current_time;
+
+    if (static_cast<int>(velocity_init_buffer.size()) < VELOCITY_INIT_BUFFER_SIZE)
+        return false;
+
+    const int N = static_cast<int>(velocity_init_buffer.size());
+    double t_mean = 0.0, x_mean = 0.0, y_mean = 0.0;
+    for (const auto& [pos, t] : velocity_init_buffer) {
+        t_mean += t; x_mean += pos.x(); y_mean += pos.y();
+    }
+    t_mean /= N; x_mean /= N; y_mean /= N;
+
+    double Sxx = 0.0, Stx = 0.0, Sty = 0.0;
+    for (const auto& [pos, t] : velocity_init_buffer) {
+        const double dt_i = t - t_mean;
+        Sxx  += dt_i * dt_i;
+        Stx  += dt_i * (pos.x() - x_mean);
+        Sty  += dt_i * (pos.y() - y_mean);
+    }
+    if (Sxx > 1e-10)
+    {
+        kalman_filter.state_estimate(2)      = Stx / Sxx;
+        kalman_filter.state_estimate(3)      = Sty / Sxx;
+        kalman_filter.state_covariance(2, 2) = R(0, 0) / Sxx;
+        kalman_filter.state_covariance(3, 3) = R(1, 1) / Sxx;
+    }
+    last_measurement_timestamp = current_time;
+    consecutive_outliers       = 0;
+    velocity_init_buffer.clear();
+    return true;
 }
 
 std::optional<BallDetection> BallTracker::getBestBallDetection(const std::vector<BallDetection> &new_ball_detections){
