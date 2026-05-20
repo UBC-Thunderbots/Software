@@ -17,7 +17,7 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
-                                   const RobotConstants_t& robot_constants,
+                                   const robot_constants::RobotConstants& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
                                    const bool ramping,
                                    double primitive_executor_time_step)

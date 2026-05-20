@@ -34,3 +34,13 @@ cc_test(
         "//software/test_util",
     ],
 )
+py_test(
+    name = "attacker_tactic_test",
+    srcs = ["attacker_tactic_test.py"],
+    tags = ["exclusive"],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)

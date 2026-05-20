@@ -278,6 +278,9 @@ if __name__ == "__main__":
             layout_path=args.layout,
         )
 
+        # Fetch the AI runtime/backends
+        runtime_config = runtime_manager_instance.fetch_runtime_config()
+
         if args.run_blue:
             runtime_dir = args.blue_full_system_runtime_dir
             friendly_colour_yellow = False
@@ -331,11 +334,6 @@ if __name__ == "__main__":
             )
 
             if args.run_blue or args.run_yellow:
-                full_system_runtime_dir = (
-                    args.blue_full_system_runtime_dir
-                    if args.run_blue
-                    else args.yellow_full_system_runtime_dir
-                )
                 with FullSystem(
                     path_to_binary="software/unix_full_system",
                     full_system_runtime_dir=runtime_dir,
