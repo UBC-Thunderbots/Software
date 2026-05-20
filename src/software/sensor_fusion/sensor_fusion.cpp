@@ -1,7 +1,10 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "software/constants.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
+
+static constexpr double PROXIMITY_DRIBBLING_THRESHOLD_METERS = 0.12;
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
     : sensor_fusion_config(sensor_fusion_config),
@@ -296,7 +299,26 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
     }
     else
     {
-        std::optional<Ball> new_ball = createBall(ball_detections, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
+        std::optional<Robot> proximity_dribbling_robot;
+        if (ball)
+        {
+            std::optional<Robot> nearest_friendly = friendly_team.getNearestRobot(ball->position());
+            if (nearest_friendly.has_value())
+            {
+                Point dribbler_pos =
+                    nearest_friendly->position() +
+                    Vector::createFromAngle(nearest_friendly->orientation())
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING);
+                if (distance(dribbler_pos, ball->position()) <=
+                    PROXIMITY_DRIBBLING_THRESHOLD_METERS)
+                {
+                    proximity_dribbling_robot = nearest_friendly;
+                }
+            }
+        }
+
+        std::optional<Ball> new_ball = createBall(ball_detections, Timestamp::fromSeconds(ssl_detection_frame.t_capture()), proximity_dribbling_robot);
         if (new_ball)
         {
             // If vision detected a new ball, then use that one

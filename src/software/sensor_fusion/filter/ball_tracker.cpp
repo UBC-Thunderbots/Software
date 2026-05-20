@@ -1,6 +1,7 @@
 #include "software/sensor_fusion/filter/ball_tracker.h"
 
 #include <Eigen/Dense>
+#include "software/logger/logger.h"
 #include <algorithm>
 #include <vector>
 
@@ -125,23 +126,25 @@ std::optional<Ball> BallTracker::estimateBallState(
             (best_ball_detection->position - dribbler_pos).length() <=
                 DRIBBLING_MEASUREMENT_MAX_DISTANCE_METERS;
 
+        // Use ball detection if available and near dribbler, otherwise fall back to
+        // dribbler position (ball likely occluded by robot body)
         Eigen::Vector<double, 2> measurement;
         if (near_dribbler)
         {
             measurement << best_ball_detection->position.x(),
                 best_ball_detection->position.y();
-            kalman_filter.measurement_covariance = R_DRIBBLING;
-            kalman_filter.update(measurement);
-            kalman_filter.measurement_covariance = R;
         }
         else
         {
             measurement << dribbler_pos.x(), dribbler_pos.y();
-            kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
-            kalman_filter.state_covariance = INITIAL_COV;
-            velocity_initialized = false;
-            velocity_init_buffer.clear();
         }
+        LOG(INFO) << "[BallTracker] dribbling: tight update at ("
+                  << measurement(0) << "," << measurement(1) << ")";
+        kalman_filter.measurement_covariance = R_DRIBBLING;
+        kalman_filter.update(measurement);
+        kalman_filter.measurement_covariance = R;
+        kalman_filter.state_estimate(2) = 0;
+        kalman_filter.state_estimate(3) = 0;
         prev_detection_timestamp    = current_time;
         last_measurement_timestamp  = current_time;
         consecutive_outliers        = 0;
@@ -152,6 +155,7 @@ std::optional<Ball> BallTracker::estimateBallState(
 
 		Point predicted_pos(kalman_filter.state_estimate(0), kalman_filter.state_estimate(1));
 		if (!contains(filter_area, predicted_pos)){
+			LOG(INFO) << "[BallTracker] predicted pos out of bounds, reset to measurement";
 			kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
 			kalman_filter.state_covariance = INITIAL_COV;
 			consecutive_outliers = 0;
@@ -171,10 +175,12 @@ std::optional<Ball> BallTracker::estimateBallState(
 			last_measurement_timestamp = current_time;
 		}
 		else{
+			LOG(INFO) << "[BallTracker] outlier rejected (mahalanobis=" << mahalanobis << ", consecutive=" << consecutive_outliers + 1 << ")";
 			consecutive_outliers++;
 		}
 
 		if (consecutive_outliers > CONSECUTIVE_OUTLIERS_THRESHOLD){
+			LOG(INFO) << "[BallTracker] too many consecutive outliers, hard reset to measurement";
 			kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
 			kalman_filter.state_covariance = INITIAL_COV;
 			last_measurement_timestamp = current_time;
@@ -207,6 +213,7 @@ bool BallTracker::tryInitVelocityFromBuffer(const Point& position,
         if (dt_s > 0 &&
             (position - last_pos).length() / dt_s > INIT_BUFFER_MAX_SPEED_M_PER_S)
         {
+            LOG(INFO) << "[BallTracker] init buffer: noisy detection rejected, reanchor";
             velocity_init_buffer.clear();
             kalman_filter.state_estimate(0) = position.x();
             kalman_filter.state_estimate(1) = position.y();
@@ -244,6 +251,7 @@ bool BallTracker::tryInitVelocityFromBuffer(const Point& position,
         kalman_filter.state_covariance(2, 2) = R(0, 0) / Sxx;
         kalman_filter.state_covariance(3, 3) = R(1, 1) / Sxx;
     }
+    LOG(INFO) << "[BallTracker] velocity initialized from buffer: vx=" << kalman_filter.state_estimate(2) << " vy=" << kalman_filter.state_estimate(3);
     last_measurement_timestamp = current_time;
     consecutive_outliers       = 0;
     velocity_init_buffer.clear();
