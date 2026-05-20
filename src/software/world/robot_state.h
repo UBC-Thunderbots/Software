@@ -1,7 +1,6 @@
 #pragma once
 
 #include "proto/vision.pb.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/geom/angle.h"
@@ -28,8 +27,8 @@ class RobotState
      * @param angular_velocity The angular velocity of the robot
      * @param breakbeam_tripped The breakbeam status of the robot
      */
-    explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation, const AngularVelocity &angular_velocity,
+    explicit RobotState(const Point& position, const Vector& velocity,
+                        const Angle& orientation, const AngularVelocity& angular_velocity,
                         const bool breakbeam_tripped = false);
 
     /**
@@ -39,7 +38,7 @@ class RobotState
      * @param robot_state_proto The TbotsProto::RobotState protobuf which this robot state
      * should be based on
      */
-    explicit RobotState(const TbotsProto::RobotState &robot_state_proto);
+    explicit RobotState(const TbotsProto::RobotState& robot_state_proto);
 
     /**
      * Returns the position of the robot represented by this state
@@ -85,7 +84,7 @@ class RobotState
      * @return True if the other robot state is equal to this robot state, and false
      * otherwise
      */
-    bool operator==(const RobotState &other) const;
+    bool operator==(const RobotState& other) const;
 
     /**
      * Defines the inequality operator for a RobotState.
@@ -95,7 +94,7 @@ class RobotState
      * @return True if the other robot state is not equal to this robot state, and false
      * otherwise
      */
-    bool operator!=(const RobotState &other) const;
+    bool operator!=(const RobotState& other) const;
 
    private:
     Point position_;
@@ -113,7 +112,7 @@ struct RobotStateWithId
     unsigned int id;
     RobotState robot_state;
 
-    bool operator==(const RobotStateWithId &other) const
+    bool operator==(const RobotStateWithId& other) const
     {
         return id == other.id && robot_state == other.robot_state;
     }

@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//software/sensor_fusion:__subpackages__"])
 
 cc_library(
@@ -86,17 +88,13 @@ cc_library(
     ],
 )
 
-cc_test(
+py_test(
     name = "ball_occlusion_test",
-    srcs = ["ball_occlusion_test.cpp"],
+    srcs = ["ball_occlusion_test.py"],
+    tags = ["exclusive"],
     deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play/halt_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
+        "//software:conftest",
+        "//software/simulated_tests/validation:validations",
+        requirement("pytest"),
     ],
 )

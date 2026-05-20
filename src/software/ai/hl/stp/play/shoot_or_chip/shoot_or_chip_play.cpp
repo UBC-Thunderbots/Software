@@ -12,7 +12,7 @@ ShootOrChipPlay::ShootOrChipPlay(
 {
 }
 
-void ShootOrChipPlay::updateTactics(const PlayUpdate &play_update)
+void ShootOrChipPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(ShootOrChipPlayFSM::Update(control_params, play_update));
 }

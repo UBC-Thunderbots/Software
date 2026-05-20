@@ -20,60 +20,60 @@ const Duration Duration::fromMilliseconds(double milliseconds)
     return Duration(milliseconds * SECONDS_PER_MILLISECOND);
 }
 
-bool Duration::operator==(const Duration &other) const
+bool Duration::operator==(const Duration& other) const
 {
     return std::fabs(other.toSeconds() - toSeconds()) < EPSILON;
 }
 
-bool Duration::operator!=(const Duration &other) const
+bool Duration::operator!=(const Duration& other) const
 {
     return !(*this == other);
 }
 
-bool Duration::operator<(const Duration &other) const
+bool Duration::operator<(const Duration& other) const
 {
     return (*this != other) && (toSeconds() < other.toSeconds());
 }
 
-bool Duration::operator>=(const Duration &other) const
+bool Duration::operator>=(const Duration& other) const
 {
     return !(*this < other);
 }
 
-bool Duration::operator>(const Duration &other) const
+bool Duration::operator>(const Duration& other) const
 {
     return (*this != other) && (toSeconds() > other.toSeconds());
 }
 
-bool Duration::operator<=(const Duration &other) const
+bool Duration::operator<=(const Duration& other) const
 {
     return !(*this > other);
 }
 
-Duration Duration::operator+(const Duration &duration) const
+Duration Duration::operator+(const Duration& duration) const
 {
     return Duration::fromSeconds(toSeconds() + duration.toSeconds());
 }
 
-Duration Duration::operator-(const Duration &duration) const
+Duration Duration::operator-(const Duration& duration) const
 {
     return Duration::fromSeconds(toSeconds() - duration.toSeconds());
 }
 
-std::ostream &operator<<(std::ostream &output_stream, const Duration &duration)
+std::ostream& operator<<(std::ostream& output_stream, const Duration& duration)
 {
     output_stream << std::setprecision(2) << std::fixed << duration.toSeconds() << "s";
 
     return output_stream;
 }
 
-Duration &Duration::operator+=(const Duration &duration)
+Duration& Duration::operator+=(const Duration& duration)
 {
     time_in_seconds = time_in_seconds + duration.toSeconds();
     return *this;
 }
 
-Duration &Duration::operator-=(const Duration &duration)
+Duration& Duration::operator-=(const Duration& duration)
 {
     time_in_seconds = time_in_seconds - duration.toSeconds();
     return *this;

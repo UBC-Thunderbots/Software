@@ -29,10 +29,10 @@ class TrajectoryPlanner
      * @return TrajectoryPath which attempts to avoid the obstacles
      */
     std::optional<TrajectoryPath> findTrajectory(
-        const Point &start, const Point &destination, const Vector &initial_velocity,
-        const KinematicConstraints &constraints,
-        const std::vector<ObstaclePtr> &obstacles, const Rectangle &navigable_area,
-        const std::optional<Point> &prev_sub_destination = std::nullopt);
+        const Point& start, const Point& destination, const Vector& initial_velocity,
+        const KinematicConstraints& constraints,
+        const std::vector<ObstaclePtr>& obstacles, const Rectangle& navigable_area,
+        const std::optional<Point>& prev_sub_destination = std::nullopt);
 
    private:
     /**
@@ -47,9 +47,9 @@ class TrajectoryPlanner
      * @return A trajectory path with only a single trajectory + its cost
      */
     TrajectoryPathWithCost getDirectTrajectoryWithCost(
-        const Point &start, const Point &destination, const Vector &initial_velocity,
-        const KinematicConstraints &constraints,
-        const std::vector<ObstaclePtr> &obstacles);
+        const Point& start, const Point& destination, const Vector& initial_velocity,
+        const KinematicConstraints& constraints,
+        const std::vector<ObstaclePtr>& obstacles);
 
     /**
      * Given a trajectory path, calculate its cost
@@ -63,8 +63,8 @@ class TrajectoryPlanner
      * @return The trajectory path with its cost
      */
     TrajectoryPathWithCost getTrajectoryWithCost(
-        const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
-        const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
+        const TrajectoryPath& trajectory, const std::vector<ObstaclePtr>& obstacles,
+        const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
         const std::optional<double> sub_traj_duration_s, double max_cost);
 
 
@@ -79,8 +79,8 @@ class TrajectoryPlanner
      * @param navigable_area The navigable area of the field
      * @return A list of sub destinations for trajectory paths be sampled through
      */
-    std::vector<Point> getSubDestinations(const Point &start, const Point &destination,
-                                          const Rectangle &navigable_area) const;
+    std::vector<Point> getSubDestinations(const Point& start, const Point& destination,
+                                          const Rectangle& navigable_area) const;
 
     /**
      * Helper function for generating the relative sub destinations

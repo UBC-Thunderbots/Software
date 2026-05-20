@@ -11,7 +11,7 @@
  *
  * @return true if the given points are collinear, false otherwise
  */
-bool collinear(const Point &a, const Point &b, const Point &c);
+bool collinear(const Point& a, const Point& b, const Point& c);
 
 /**
  * Checks if 2 Segments are collinear.
@@ -25,4 +25,4 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  * @return false : If Segment1 and Segment2 are NOT collinear within FIXED_EPSILON
  * distance
  */
-bool collinear(const Segment &segment1, const Segment &segment2);
+bool collinear(const Segment& segment1, const Segment& segment2);

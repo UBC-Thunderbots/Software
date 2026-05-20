@@ -27,12 +27,12 @@ class MovePrimitive : public Primitive
      * @param cost_override optionally override the cost of the move primitive, defaults
      * to the total duration of reaching the destination (ignoring obstacles)
      */
-    MovePrimitive(const Robot &robot, const Point &destination, const Angle &final_angle,
-                  const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
-                  const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
-                  const TbotsProto::DribblerMode &dribbler_mode,
-                  const TbotsProto::BallCollisionType &ball_collision_type,
-                  const AutoChipOrKick &auto_chip_or_kick,
+    MovePrimitive(const Robot& robot, const Point& destination, const Angle& final_angle,
+                  const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
+                  const TbotsProto::ObstacleAvoidanceMode& obstacle_avoidance_mode,
+                  const TbotsProto::DribblerMode& dribbler_mode,
+                  const TbotsProto::BallCollisionType& ball_collision_type,
+                  const AutoChipOrKick& auto_chip_or_kick,
                   std::optional<double> cost_override = std::nullopt);
 
     ~MovePrimitive() override = default;
@@ -48,10 +48,10 @@ class MovePrimitive : public Primitive
      */
     std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
     generatePrimitiveProtoMessage(
-        const World &world,
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const std::map<RobotId, TrajectoryPath> &robot_trajectories,
-        const RobotNavigationObstacleFactory &obstacle_factory) override;
+        const World& world,
+        const std::set<TbotsProto::MotionConstraint>& motion_constraints,
+        const std::map<RobotId, TrajectoryPath>& robot_trajectories,
+        const RobotNavigationObstacleFactory& obstacle_factory) override;
 
     /**
      * Fill the obstacle list and path visualization with the obstacles and path
@@ -61,8 +61,8 @@ class MovePrimitive : public Primitive
      * @param path_visualization_out Reference to the PathVisualization proto to add path
      */
     void getVisualizationProtos(
-        TbotsProto::ObstacleList &obstacle_list_out,
-        TbotsProto::PathVisualization &path_visualization_out) const override;
+        TbotsProto::ObstacleList& obstacle_list_out,
+        TbotsProto::PathVisualization& path_visualization_out) const override;
 
    private:
     /**
@@ -74,10 +74,10 @@ class MovePrimitive : public Primitive
      * @param robot_trajectories A map of the friendly robots' known trajectories
      * @param obstacle_factory Obstacle factory to use
      */
-    void updateObstacles(const World &world,
-                         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-                         const std::map<RobotId, TrajectoryPath> &robot_trajectories,
-                         const RobotNavigationObstacleFactory &obstacle_factory);
+    void updateObstacles(const World& world,
+                         const std::set<TbotsProto::MotionConstraint>& motion_constraints,
+                         const std::map<RobotId, TrajectoryPath>& robot_trajectories,
+                         const RobotNavigationObstacleFactory& obstacle_factory);
 
     Robot robot;
     Point destination;

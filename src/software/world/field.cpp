@@ -67,7 +67,7 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
     }
 }
 
-Field::Field(const TbotsProto::Field &field_proto)
+Field::Field(const TbotsProto::Field& field_proto)
     : Field(field_proto.field_x_length(), field_proto.field_y_length(),
             field_proto.defense_x_length(), field_proto.defense_y_length(),
             field_proto.goal_x_length(), field_proto.goal_y_length(),
@@ -115,12 +115,12 @@ double Field::defenseAreaXLength() const
     return defense_x_length_;
 }
 
-const Rectangle &Field::friendlyDefenseArea() const
+const Rectangle& Field::friendlyDefenseArea() const
 {
     return friendly_defense_area_;
 }
 
-const Rectangle &Field::enemyDefenseArea() const
+const Rectangle& Field::enemyDefenseArea() const
 {
     return enemy_defense_area_;
 }
@@ -155,7 +155,7 @@ Rectangle Field::enemyNegativeYQuadrant() const
     return Rectangle(centerPoint(), enemyCornerNeg());
 }
 
-const Rectangle &Field::fieldLines() const
+const Rectangle& Field::fieldLines() const
 {
     return field_lines_;
 }
@@ -197,12 +197,12 @@ Point Field::enemyGoalCenter() const
     return Point(xLength() / 2.0, 0.0);
 }
 
-const Rectangle &Field::friendlyGoal() const
+const Rectangle& Field::friendlyGoal() const
 {
     return friendly_goal_;
 }
 
-const Rectangle &Field::enemyGoal() const
+const Rectangle& Field::enemyGoal() const
 {
     return enemy_goal_;
 }
@@ -264,41 +264,41 @@ double Field::boundaryMargin() const
     return boundary_buffer_size_;
 }
 
-bool Field::pointInFriendlyDefenseArea(const Point &p) const
+bool Field::pointInFriendlyDefenseArea(const Point& p) const
 {
     return contains(friendlyDefenseArea(), p);
 }
 
-bool Field::pointInEnemyDefenseArea(const Point &p) const
+bool Field::pointInEnemyDefenseArea(const Point& p) const
 {
     return contains(enemyDefenseArea(), p);
 }
 
-bool Field::pointInFriendlyHalf(const Point &p) const
+bool Field::pointInFriendlyHalf(const Point& p) const
 {
     return p.x() < centerPoint().x();
 }
 
-bool Field::pointInEnemyHalf(const Point &p) const
+bool Field::pointInEnemyHalf(const Point& p) const
 {
     return p.x() >= centerPoint().x();
 }
 
-bool Field::pointInFriendlyCorner(const Point &p, double radius) const
+bool Field::pointInFriendlyCorner(const Point& p, double radius) const
 {
     return ((distance(p, friendlyCornerPos()) < radius) ||
             (distance(p, friendlyCornerNeg()) < radius)) &&
            contains(fieldLines(), p);
 }
 
-bool Field::pointInEnemyCorner(const Point &p, double radius) const
+bool Field::pointInEnemyCorner(const Point& p, double radius) const
 {
     return ((distance(p, enemyCornerPos()) < radius) ||
             (distance(p, enemyCornerNeg()) < radius)) &&
            contains(fieldLines(), p);
 }
 
-bool Field::operator==(const Field &other) const
+bool Field::operator==(const Field& other) const
 {
     return this->field_y_length_ == other.field_y_length_ &&
            this->field_x_length_ == other.field_x_length_ &&
@@ -310,7 +310,7 @@ bool Field::operator==(const Field &other) const
            this->center_circle_radius_ == other.center_circle_radius_;
 }
 
-bool Field::operator!=(const Field &other) const
+bool Field::operator!=(const Field& other) const
 {
     return !(*this == other);
 }

@@ -57,7 +57,7 @@ class camun::simulator::Simulator
      *
      * @param setup the simulator set up
      */
-    explicit Simulator(const amun::SimulatorSetup &setup);
+    explicit Simulator(const amun::SimulatorSetup& setup);
 
    public:
     /**
@@ -68,9 +68,9 @@ class camun::simulator::Simulator
      * @return the radio response feedback from the simulator
      */
     std::vector<robot::RadioResponse> acceptBlueRobotControlCommand(
-        const SSLSimulationProto::RobotControl &control);
+        const SSLSimulationProto::RobotControl& control);
     std::vector<robot::RadioResponse> acceptYellowRobotControlCommand(
-        const SSLSimulationProto::RobotControl &control);
+        const SSLSimulationProto::RobotControl& control);
 
     /**
      * Steps the simulation a given amount of time
@@ -106,7 +106,7 @@ class camun::simulator::Simulator
      *
      * @param command the simulator set up command
      */
-    void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command);
+    void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>& command);
 
    private:
     /**
@@ -118,14 +118,14 @@ class camun::simulator::Simulator
      * @return the radio response feedback from the simulator
      */
     std::vector<robot::RadioResponse> acceptRobotControlCommand(
-        const SSLSimulationProto::RobotControl &control, bool isBlue);
+        const SSLSimulationProto::RobotControl& control, bool isBlue);
 
-    void resetFlipped(RobotMap &robots, float side);
-    void setTeam(RobotMap &list, float side, const robot::Team &team,
-                 std::map<uint32_t, robot::Specs> &specs);
-    void moveBall(const sslsim::TeleportBall &ball);
-    void moveRobot(const sslsim::TeleportRobot &robot);
-    void initializeDetection(SSLProto::SSL_DetectionFrame &detection, size_t cameraId);
+    void resetFlipped(RobotMap& robots, float side);
+    void setTeam(RobotMap& list, float side, const robot::Team& team,
+                 std::map<uint32_t, robot::Specs>& specs);
+    void moveBall(const sslsim::TeleportBall& ball);
+    void moveRobot(const sslsim::TeleportRobot& robot);
+    void initializeDetection(SSLProto::SSL_DetectionFrame& detection, size_t cameraId);
 
    private:
     std::unique_ptr<SimulatorData> m_data;

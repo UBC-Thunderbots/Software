@@ -8,7 +8,7 @@ ExamplePlayFSM::ExamplePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_co
                   { return std::make_shared<MoveTactic>(ai_config_ptr); });
 }
 
-void ExamplePlayFSM::moveToPosition(const Update &event)
+void ExamplePlayFSM::moveToPosition(const Update& event)
 {
     // The angle between each robot spaced out in a circle around the ball
     Angle angle_between_robots = Angle::full() / static_cast<double>(move_tactics.size());
