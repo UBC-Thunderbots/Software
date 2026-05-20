@@ -74,7 +74,7 @@ from software.simulated_tests.validation.robot_speed_threshold import *
         # ball moving out from inside defense area
         (
             tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots_cpp.Vector(0.4, 0),
+            + tbots_cpp.Vector(0.5, 0),
             tbots_cpp.Vector(0.5, 0),
             tbots_cpp.Point(-3.5, 0),
         ),
