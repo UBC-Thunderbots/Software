@@ -20,22 +20,15 @@ DEFAULT_ORIENTATION = -math.pi / 2
 
 class GLMovementFieldTestLayer(GLLayer):
     def __init__(
-        self,
-        name: str,
-        fullsystem_io: ProtoUnixIO,
-        buffer_size: int = 5,
-        on_visibility_changed=None,
+        self, name: str, fullsystem_io: ProtoUnixIO, buffer_size: int = 5,
     ) -> None:
         """Initialize the GLMovementFieldTestLayer
 
         :param name:            The displayed name of the layer
         :param buffer_size:     The buffer size we have
         :param fullsystem_io:   The fullsystem protounix io
-        :param on_visibility_changed: Optional callback invoked with the new visibility state
         """
         super().__init__(name)
-        self._on_visibility_changed = on_visibility_changed
-
         self.world_buffer: ThreadSafeBuffer = ThreadSafeBuffer(buffer_size, World)
         self.fullsystem_io: ProtoUnixIO = fullsystem_io
         self.selected_robot_id = 0
@@ -52,7 +45,7 @@ class GLMovementFieldTestLayer(GLLayer):
         self.preview_orientation_graphics = ObservableList(self._graphics_changed)
 
     def _get_selected_robot(self):
-        """Return the proto robot matching selected_robot_id, or None."""
+        """Return the proto robot matching the selected robot ID, or None."""
         if self.cached_world is None:
             return None
         return next(
@@ -60,19 +53,12 @@ class GLMovementFieldTestLayer(GLLayer):
             None,
         )
 
-    @override
-    def setVisible(self, visible: bool) -> None:
-        super().setVisible(visible)
-        if self._on_visibility_changed:
-            self._on_visibility_changed(visible)
-
     def select_closest_robot(self, point):
         """Find the closest robot to a point
 
         :param point: the reference point to find the closest robot
         """
         team = tbots_cpp.Team(self.cached_world.friendly_team)
-
         if not team:
             logger.warning("No vision data received")
             return
@@ -89,6 +75,7 @@ class GLMovementFieldTestLayer(GLLayer):
         self.selected_robot_id = closest_robot.id()
         self.is_selected = True
 
+        # Set the selected robot's orientation as current orientation
         robot = self._get_selected_robot()
         if robot is not None:
             self.current_orientation = robot.current_state.global_orientation.radians
@@ -132,9 +119,6 @@ class GLMovementFieldTestLayer(GLLayer):
             return
 
         robot_id = self.selected_robot_id
-
-        if orientation is None:
-            orientation = DEFAULT_ORIENTATION
 
         point = Point(x_meters=point.x(), y_meters=point.y())
         move_tactic = MoveTactic(
@@ -189,10 +173,11 @@ class GLMovementFieldTestLayer(GLLayer):
         # Reset drag-to-orient state
         self.is_dragging_to_orient = False
         self.target_point = None
+        self.current_orientation = DEFAULT_ORIENTATION
 
     @override
     def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
-        """Handle mouse moved events to update preview.
+        """Handle mouse moved events to update robot position preview.
 
         :param event: The event
         """
@@ -207,6 +192,7 @@ class GLMovementFieldTestLayer(GLLayer):
             event.mouse_event.modifiers() & Qt.KeyboardModifier.AltModifier
             and not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier
         ):
+            # Shift+Alt is pressed - mouse point is the current target position
             self.target_point = event.point_in_scene
         else:
             self.target_point = None
