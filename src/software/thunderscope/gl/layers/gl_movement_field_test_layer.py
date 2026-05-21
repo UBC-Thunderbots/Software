@@ -206,7 +206,6 @@ class GLMovementFieldTestLayer(GLLayer):
         robot = self._get_selected_robot()
         if robot is None:
             self.selected_robot_graphics.resize(0, None)
-            self.is_selected = False
             return
 
         self.selected_robot_graphics.resize(
