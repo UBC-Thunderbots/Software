@@ -50,7 +50,11 @@ class GLMovementFieldTestLayer(GLLayer):
         if self.cached_world is None:
             return None
         return next(
-            (r for r in self.cached_world.friendly_team.team_robots if r.id == self.selected_robot_id),
+            (
+                r
+                for r in self.cached_world.friendly_team.team_robots
+                if r.id == self.selected_robot_id
+            ),
             None,
         )
 
@@ -64,9 +68,7 @@ class GLMovementFieldTestLayer(GLLayer):
             logger.warning("No vision data received")
             return
 
-        closest_robot = team.getNearestRobot(
-            tbots_cpp.Point(point.x(), point.y())
-        )
+        closest_robot = team.getNearestRobot(tbots_cpp.Point(point.x(), point.y()))
         if closest_robot is None:
             logger.warning(
                 "No robots found. Are you sure there is friendly robot on field?"
@@ -232,7 +234,8 @@ class GLMovementFieldTestLayer(GLLayer):
         angle = self.current_orientation
 
         self.preview_robot_graphics.resize(
-            1, lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE)
+            1,
+            lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
         self.preview_robot_graphics[0].set_position(x, y)
         self.preview_robot_graphics[0].set_orientation(math.degrees(angle))
