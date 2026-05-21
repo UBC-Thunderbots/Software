@@ -20,7 +20,7 @@ DEFAULT_ORIENTATION = -math.pi / 2
 
 class GLMovementFieldTestLayer(GLLayer):
     def __init__(
-        self, name: str, fullsystem_io: ProtoUnixIO, buffer_size: int = 5,
+        self, name: str, fullsystem_io: ProtoUnixIO, buffer_size: int = 5
     ) -> None:
         """Initialize the GLMovementFieldTestLayer
 
@@ -29,6 +29,7 @@ class GLMovementFieldTestLayer(GLLayer):
         :param fullsystem_io:   The fullsystem protounix io
         """
         super().__init__(name)
+
         self.world_buffer: ThreadSafeBuffer = ThreadSafeBuffer(buffer_size, World)
         self.fullsystem_io: ProtoUnixIO = fullsystem_io
         self.selected_robot_id = 0
@@ -111,7 +112,7 @@ class GLMovementFieldTestLayer(GLLayer):
         """Move to a point with an optional orientation
 
         :param point: the point we are commanding the robot to move to
-        :param orientation: the final orientation in radians (defaults to -π/2)
+        :param orientation: the final orientation in radians
         """
         # whether the selected_robot_index would cause index out of range issues
         if not self.is_selected:
