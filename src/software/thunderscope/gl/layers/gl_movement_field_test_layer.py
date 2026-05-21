@@ -51,6 +51,15 @@ class GLMovementFieldTestLayer(GLLayer):
         self.preview_robot_graphics = ObservableList(self._graphics_changed)
         self.preview_orientation_graphics = ObservableList(self._graphics_changed)
 
+    def _get_selected_robot(self):
+        """Return the proto robot matching selected_robot_id, or None."""
+        if self.cached_world is None:
+            return None
+        return next(
+            (r for r in self.cached_world.friendly_team.team_robots if r.id == self.selected_robot_id),
+            None,
+        )
+
     @override
     def setVisible(self, visible: bool) -> None:
         super().setVisible(visible)
@@ -79,6 +88,10 @@ class GLMovementFieldTestLayer(GLLayer):
 
         self.selected_robot_id = closest_robot.id()
         self.is_selected = True
+
+        robot = self._get_selected_robot()
+        if robot is not None:
+            self.current_orientation = robot.current_state.global_orientation.radians
 
     @override
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
@@ -198,17 +211,13 @@ class GLMovementFieldTestLayer(GLLayer):
         else:
             self.target_point = None
 
-    def draw_selection(self):
+    def _draw_selection(self):
         """Renders an outline around the currently selected robot."""
-        if not self.is_selected or self.cached_world is None:
+        if not self.is_selected:
             self.selected_robot_graphics.resize(0, None)
             return
 
-        # Get selected robot
-        robot = next(
-            (r for r in self.cached_world.friendly_team.team_robots if r.id == self.selected_robot_id),
-            None,
-        )
+        robot = self._get_selected_robot()
         if robot is None:
             self.selected_robot_graphics.resize(0, None)
             self.is_selected = False
@@ -225,7 +234,7 @@ class GLMovementFieldTestLayer(GLLayer):
             math.degrees(robot.current_state.global_orientation.radians)
         )
 
-    def draw_preview(self):
+    def _draw_preview(self):
         """Renders a robot outline at the target position and a line indicating orientation."""
         if self.target_point is None:
             self.preview_robot_graphics.resize(0, None)
@@ -259,5 +268,5 @@ class GLMovementFieldTestLayer(GLLayer):
         if world is not None:
             self.cached_world = world
 
-        self.draw_selection()
-        self.draw_preview()
+        self._draw_selection()
+        self._draw_preview()
