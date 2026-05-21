@@ -174,7 +174,6 @@ class GLMovementFieldTestLayer(GLLayer):
         # Reset drag-to-orient state
         self.is_dragging_to_orient = False
         self.target_point = None
-        self.current_orientation = DEFAULT_ORIENTATION
 
     @override
     def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
