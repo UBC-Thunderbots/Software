@@ -137,6 +137,7 @@ use_repo(
     "boost",
 )
 
+# Temporary workaround while https://github.com/hedronvision/bazel-compile-commands-extractor/pull/219 is not merged
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 archive_override(
     module_name = "hedron_compile_commands",
