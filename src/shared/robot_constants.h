@@ -105,8 +105,8 @@ constexpr RobotConstants createRobotConstants()
 
         .front_wheel_x_mag = 0.03485f,
         .front_wheel_y_mag = 0.06632f,
-        .back_wheel_x_mag = 0.04985f,
-        .back_wheel_y_mag = 0.05592f,
+        .back_wheel_x_mag  = 0.04985f,
+        .back_wheel_y_mag  = 0.05592f,
 
         .front_of_robot_width_meters = 0.11f,
         .dribbler_width_meters       = 0.07825f,
@@ -128,9 +128,8 @@ constexpr RobotConstants createRobotConstants()
         .robot_max_ang_acceleration_rad_per_s_2 = 30.0f,
 
         .wheel_radius_meters = 0.03f,
-    
-        .expected_lever_arm = 0.0749f
-    };
+
+        .expected_lever_arm = 0.0749f};
 }
 #elif CHECK_VERSION(2021)
 constexpr RobotConstants createRobotConstants()

@@ -1,6 +1,7 @@
 #include "software/physics/euclidean_to_wheel.h"
 
 #include <gtest/gtest.h>
+
 #include "proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
 
@@ -14,7 +15,8 @@ class EuclideanToWheelTest : public ::testing::Test
     robot_constants::RobotConstants robot_constants =
         robot_constants::createRobotConstants();
     double robot_radius = robot_constants::createRobotConstants().robot_radius_m;
-    double expected_lever_arm = robot_constants::createRobotConstants().expected_lever_arm;
+    double expected_lever_arm =
+        robot_constants::createRobotConstants().expected_lever_arm;
     const float EQUALITY_COMPARISON = 0.001f;
 
     WheelSpace_t target_wheel_velocity{};
