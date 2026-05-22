@@ -3,30 +3,31 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "position_controller",
     srcs = [
-        "position_controller.cpp"
+        "position_controller.cpp",
     ],
     hdrs = [
-        "position_controller.h"
+        "position_controller.h",
     ],
     deps = [
-        ":pid_controller"
+        ":pid_controller",
+        "//software/geom:vector",
     ]
 )
 
 cc_library(
     name = "pid_controller",
     srcs = [
-        "pid_controller.cpp"
+        "pid_controller.cpp",
     ],
     hdrs = [
-        "pid_controller.h"
+        "pid_controller.h",
     ],
 )
 
 cc_test(
     name = "position_controller_test",
     srcs = [
-        "position_controller_test.cpp"
+        "position_controller_test.cpp",
     ],
     deps = [
         ":position_controller",
@@ -37,7 +38,7 @@ cc_test(
 cc_test(
     name = "pid_controller_test",
     srcs = [
-        "pid_controller_test.cpp"
+        "pid_controller_test.cpp",
     ],
     deps = [
         ":pid_controller",
