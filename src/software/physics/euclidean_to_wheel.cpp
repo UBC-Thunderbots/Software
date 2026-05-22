@@ -8,9 +8,9 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/vector.h"
 
-// get rid of this stupid ifdef, and then look at the issue 
+// get rid of this stupid ifdef, and then look at the issue
 
-// Turn this to 
+// Turn this to
 #if CHECK_VERSION(2026)
 EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_constants)
     : robot_constants_(robot_constants)
@@ -27,14 +27,15 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
     double b_br = (M_PI - t);
 
     // Mapped to the robot frame: +X = Forward, +Y = Left
-    double fr_x =  0.03485, fr_y = -0.06632;
-    double fl_x =  0.03485, fl_y =  0.06632;
-    double bl_x = -0.04985, bl_y =  0.05592;
+    double fr_x = 0.03485, fr_y = -0.06632;
+    double fl_x = 0.03485, fl_y = 0.06632;
+    double bl_x = -0.04985, bl_y = 0.05592;
     double br_x = -0.04985, br_y = -0.05592;
 
 
     // Assuming that CCW when looking end of shaft into motor is the positive direction.
-    // Formula is u_1 = v_x * cos(B_1) + v_y * sin(B_1) + W * (x_1 * sin(B_1) - y_1 * cos(B_1))
+    // Formula is u_1 = v_x * cos(B_1) + v_y * sin(B_1) + W * (x_1 * sin(B_1) - y_1 *
+    // cos(B_1))
 
     // clang-format off
     euclidean_to_wheel_velocity_D_ <<
