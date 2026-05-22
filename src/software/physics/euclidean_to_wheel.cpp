@@ -8,10 +8,7 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/vector.h"
 
-// get rid of this stupid ifdef, and then look at the issue 
-
-// Turn this to 
-#if CHECK_VERSION(2026)
+#ifdef DEBUG_WHEEL
 EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_constants)
     : robot_constants_(robot_constants)
 {
@@ -19,29 +16,31 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
     auto p = robot_constants_.front_wheel_angle_deg * M_PI / 180.;
     auto t = robot_constants_.back_wheel_angle_deg * M_PI / 180.;
 
-    // Beta is angle of wheel rolling direction relative to X-axis
-    // LOOK AT (software)/src/shared/robot_constants.h to see X-axis
-    double b_fr = -(M_PI - p);
-    double b_fl = -p;
-    double b_bl = t;
-    double b_br = (M_PI - t);
+    auto cos_p = std::cos(p);
+    auto sin_p = std::sin(p);
+    auto cos_t = std::cos(t);
+    auto sin_t = std::sin(t);
 
-    // Mapped to the robot frame: +X = Forward, +Y = Left
-    double fr_x =  0.03485, fr_y = -0.06632;
-    double fl_x =  0.03485, fl_y =  0.06632;
-    double bl_x = -0.04985, bl_y =  0.05592;
-    double br_x = -0.04985, br_y = -0.05592;
+    // 1. Physical wheel coordinates in meters
+    // Mapped to the robot frame: +X = Right, +Y = Forward
+    double fr_x = 0.06632, fr_y = 0.03485;
+    double br_x = 0.05592, br_y = -0.04985;
 
+    // 2. Unit drive vectors (extracted directly from the matrix's linear columns)
+    double fr_dx = -sin_p, fr_dy = cos_p;
+    double br_dx = sin_t, br_dy = cos_t;
 
-    // Assuming that CCW when looking end of shaft into motor is the positive direction.
-    // Formula is u_1 = v_x * cos(B_1) + v_y * sin(B_1) + W * (x_1 * sin(B_1) - y_1 * cos(B_1))
+    // 3. Dynamically calculate the rotational lever arms using the 2D cross product
+    // Lever Arm = | X * Dy - Y * Dx |
+    double rot_f = std::abs((fr_x * fr_dy) - (fr_y * fr_dx));
+    double rot_b = std::abs((br_x * br_dy) - (br_y * br_dx));
 
     // clang-format off
     euclidean_to_wheel_velocity_D_ <<
-         std::cos(b_fr), std::sin(b_fr), (fr_x * std::sin(b_fr) - fr_y * std::cos(b_fr)),
-         std::cos(b_fl), std::sin(b_fl), (fl_x * std::sin(b_fl) - fl_y * std::cos(b_fl)),
-         std::cos(b_bl), std::sin(b_bl), (bl_x * std::sin(b_bl) - bl_y * std::cos(b_bl)),
-         std::cos(b_br), std::sin(b_br), (br_x * std::sin(b_br) - br_y * std::cos(b_br));
+        -sin_p,  cos_p, rot_f,
+        -sin_p, -cos_p, rot_f,
+         sin_t, -cos_t, rot_b,
+         sin_t,  cos_t, rot_b;
     // clang-format on
 
     // Calculate Pseudo-inverse dynamically
@@ -103,8 +102,7 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
 
 #endif
 
-// Why was this DEBUG_WHEEL
-#if CHECK_VERSION(2026)
+#ifdef DEBUG_WHEEL
 WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_velocity) const
 {
     // The generalized D matrix natively handles the w -> tangential velocity
