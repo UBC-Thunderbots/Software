@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <utility>
 #include <numbers>
+#include <climits>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/angular_velocity.h"
