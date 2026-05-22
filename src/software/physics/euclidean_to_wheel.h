@@ -7,8 +7,6 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/vector.h"
 
-#define DEBUG_WHEEL
-
 /**
  * Vector representation of 2D Euclidean space.
  *
