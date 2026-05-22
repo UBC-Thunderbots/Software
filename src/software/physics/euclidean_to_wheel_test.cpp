@@ -36,7 +36,8 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_zero)
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity), 0.001));
 }
 
-// Note: The tests below assume that counter-clockwise motor rotation is positive velocity, and vise-versa.
+// Note: The tests below assume that counter-clockwise motor rotation is positive
+// velocity, and vise-versa.
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_x)
 {
     // Test +x/forward
