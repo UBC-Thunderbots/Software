@@ -21,7 +21,7 @@ class PositionController
      * in both x and y coordinate.
      * @param delta_time The time passed since last time step.
      */
-    Vector step(Vector error, double delta_time = 1.0);
+    Vector step(const Vector& error, double delta_time = 1.0);
 
     /**
      * Resets the state of this position controller.
