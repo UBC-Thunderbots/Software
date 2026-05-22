@@ -150,7 +150,7 @@ std::optional<AngularVelocity> ImuService::pollHeadingVelocity()
         return std::nullopt;
     }
 
-    std::optional<int16_t> opt_full_word = combineBits(YAW_LEAST_SIG_REG, YAW_MOST_SIG_REG);
+    std::optional<int16_t> opt_full_word = combineBits(HEADING_LEAST_SIG_REG, HEADING_MOST_SIG_REG);
     
     if (!opt_full_word.has_value())
     {
