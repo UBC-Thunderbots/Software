@@ -1,7 +1,6 @@
 #include "software/physics/euclidean_to_wheel.h"
 
 #include <gtest/gtest.h>
-
 #include "proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
 
@@ -15,6 +14,7 @@ class EuclideanToWheelTest : public ::testing::Test
     robot_constants::RobotConstants robot_constants =
         robot_constants::createRobotConstants();
     double robot_radius = robot_constants::createRobotConstants().robot_radius_m;
+    double expected_lever_arm = robot_constants::createRobotConstants().expected_lever_arm;
 
     WheelSpace_t target_wheel_velocity{};
     WheelSpace_t current_wheel_velocity{};
@@ -135,7 +135,6 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_sign)
     EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 }
 
-#if CHECK_VERSION(2026)
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)
 {
     // Test +w/counter-clockwise
@@ -147,7 +146,6 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)
     // exact physical lever arm (in meters), NOT the nominal robot_radius.
 
     // Based on the physical offsets, the lever arm evaluates to 0.0749 meters.
-    double expected_lever_arm = 0.0749;
 
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
                 expected_lever_arm, 0.001);
@@ -168,7 +166,6 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_magnitude)
 
     // Because the wheels are offset, their speed at -1 rad/s equals their
     // exact physical lever arm (in meters) multiplied by the negative velocity.
-    double expected_lever_arm = 0.0749;
 
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
                 expected_lever_arm, 0.001);
@@ -180,47 +177,6 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_magnitude)
                 expected_lever_arm, 0.001);
 }
 
-#else
-
-TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)
-{
-    // Test +w/counter-clockwise
-    target_euclidean_velocity = {0, 0, 1};
-    calculated_wheel_speeds =
-        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
-
-    // Formula for the length of a segment: length = radius * angle
-    // Since angle = 1rad, the length of the segment is equal to the radius.
-    // Therefore, all wheel speeds must be equal to the robot radius.
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
-                     robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], robot_radius);
-}
-
-
-TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_magnitude)
-{
-    // Test -w/clockwise
-    target_euclidean_velocity = {0, 0, -1};
-    calculated_wheel_speeds =
-        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
-
-    // Formula for the length of a segment: length = radius * angle
-    // Since angle = -1rad, the length of the segment is equal to the -radius.
-    // Therefore, all wheel speeds (=length of segment/sec) must be equal to the robot
-    // radius.
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
-                     -robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX],
-                     -robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], -robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX],
-                     -robot_radius);
-}
-
-#endif
 
 TEST_F(EuclideanToWheelTest, test_conversion_is_linear)
 {

@@ -41,6 +41,18 @@ struct RobotConstants
     // The angle between y-axis of the robot and the rear wheel axles [degrees]
     float back_wheel_angle_deg;
 
+    // X position of centre of front wheel
+    float front_wheel_x_mag;
+
+    // Y position of centre of front wheel
+    float front_wheel_y_mag;
+
+    // X position of centre of rear wheel
+    float back_wheel_x_mag;
+
+    // Y position of centre of rear wheel
+    float back_wheel_y_mag;
+
     // The total width of the entire flat face on the front of the robot [meters]
     float front_of_robot_width_meters;
 
@@ -74,6 +86,8 @@ struct RobotConstants
 
     // The radius of the wheel, in meters
     float wheel_radius_meters;
+
+    float expected_lever_arm;
 };
 
 /**
@@ -88,6 +102,11 @@ constexpr RobotConstants createRobotConstants()
         .robot_radius_m        = static_cast<float>(ROBOT_MAX_RADIUS_METERS),
         .front_wheel_angle_deg = 32.0f,
         .back_wheel_angle_deg  = 44.0f,
+
+        .front_wheel_x_mag = 0.03485f,
+        .front_wheel_y_mag = 0.06632f,
+        .back_wheel_x_mag = 0.04985f,
+        .back_wheel_y_mag = 0.05592f,
 
         .front_of_robot_width_meters = 0.11f,
         .dribbler_width_meters       = 0.07825f,
@@ -108,7 +127,10 @@ constexpr RobotConstants createRobotConstants()
         .robot_max_ang_speed_rad_per_s          = 10.0f,
         .robot_max_ang_acceleration_rad_per_s_2 = 30.0f,
 
-        .wheel_radius_meters = 0.03f};
+        .wheel_radius_meters = 0.03f,
+    
+        .expected_lever_arm = 0.0749f
+    };
 }
 #elif CHECK_VERSION(2021)
 constexpr RobotConstants createRobotConstants()
