@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 # We force linking for all plays so that the static variables required for the
@@ -46,7 +48,7 @@ cc_test(
 )
 
 cc_test(
-    name = "shoot_or_pass_play_test",
+    name = "shoot_or_pass_play_test_cpp",
     srcs = ["shoot_or_pass_play_test.cpp"],
     deps = [
         ":shoot_or_pass_play",
@@ -57,5 +59,21 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "shoot_or_pass_play_test",
+    srcs = [
+        "shoot_or_pass_play_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
