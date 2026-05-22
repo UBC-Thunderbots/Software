@@ -12,8 +12,8 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
     : robot_constants_(robot_constants)
 {
     // Angles [rads]
-    auto p = robot_constants_.front_wheel_angle_deg * M_PI / 180.;
-    auto t = robot_constants_.back_wheel_angle_deg * M_PI / 180.;
+    double p = robot_constants_.front_wheel_angle_deg * M_PI / 180.;
+    double t = robot_constants_.back_wheel_angle_deg * M_PI / 180.;
 
     // Beta is angle of wheel rolling direction relative to X-axis
     // LOOK AT (software)/src/shared/robot_constants.h to see X-axis
