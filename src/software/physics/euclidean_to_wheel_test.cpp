@@ -15,6 +15,7 @@ class EuclideanToWheelTest : public ::testing::Test
         robot_constants::createRobotConstants();
     double robot_radius = robot_constants::createRobotConstants().robot_radius_m;
     double expected_lever_arm = robot_constants::createRobotConstants().expected_lever_arm;
+    const float EQUALITY_COMPARISON = 0.001f;
 
     WheelSpace_t target_wheel_velocity{};
     WheelSpace_t current_wheel_velocity{};
@@ -148,13 +149,13 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)
     // Based on the physical offsets, the lever arm evaluates to 0.0749 meters.
 
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
-                expected_lever_arm, 0.001);
+                expected_lever_arm, EQUALITY_COMPARISON);
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX]),
-                expected_lever_arm, 0.001);
+                expected_lever_arm, EQUALITY_COMPARISON);
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX]),
-                expected_lever_arm, 0.001);
+                expected_lever_arm, EQUALITY_COMPARISON);
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX]),
-                expected_lever_arm, 0.001);
+                expected_lever_arm, EQUALITY_COMPARISON);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_magnitude)
@@ -168,13 +169,13 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_magnitude)
     // exact physical lever arm (in meters) multiplied by the negative velocity.
 
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
-                expected_lever_arm, 0.001);
+                expected_lever_arm, EQUALITY_COMPARISON);
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX]),
-                expected_lever_arm, 0.001);
+                expected_lever_arm, EQUALITY_COMPARISON);
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX]),
-                expected_lever_arm, 0.001);
+                expected_lever_arm, EQUALITY_COMPARISON);
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX]),
-                expected_lever_arm, 0.001);
+                expected_lever_arm, EQUALITY_COMPARISON);
 }
 
 
