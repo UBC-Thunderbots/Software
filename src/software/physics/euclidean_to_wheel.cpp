@@ -8,9 +8,6 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/vector.h"
 
-// get rid of this stupid ifdef, and then look at the issue 
-
-// Turn this to 
 #if CHECK_VERSION(2026)
 EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_constants)
     : robot_constants_(robot_constants)
@@ -103,7 +100,6 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
 
 #endif
 
-// Why was this DEBUG_WHEEL
 #if CHECK_VERSION(2026)
 WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_velocity) const
 {

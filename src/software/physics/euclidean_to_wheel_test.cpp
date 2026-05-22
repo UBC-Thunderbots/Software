@@ -36,8 +36,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_zero)
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity), 0.001));
 }
 
-// Note: The tests below assume that counter-clockwise motor rotation is positive
-// velocity, and vise-versa.
+// Note: The tests below assume that counter-clockwise motor rotation is positive velocity, and vise-versa.
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_x)
 {
     // Test +x/forward
@@ -109,7 +108,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_y)
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_sign)
 {
-    // Test w / counter-clockwise
+    // Test +w / counter-clockwise
     target_euclidean_velocity = {0, 0, 1};
     calculated_wheel_speeds =
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
@@ -123,7 +122,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_sign)
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_sign)
 {
-    // Test w / clockwise
+    // Test -w / clockwise
     target_euclidean_velocity = {0, 0, -1};
     calculated_wheel_speeds =
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
@@ -135,7 +134,6 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_sign)
     EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 }
 
-// #ifdef DEBUG_WHEEL
 #if CHECK_VERSION(2026)
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)
 {
@@ -146,8 +144,6 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)
 
     // Because the wheels are offset, their speed at 1 rad/s equals their
     // exact physical lever arm (in meters), NOT the nominal robot_radius.
-
-    // i have no idea what it's yapping about above but i ignored it lol
 
     // Based on the physical offsets, the lever arm evaluates to 0.0749 meters.
     double expected_lever_arm = 0.0749;
@@ -182,6 +178,7 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_magnitude)
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX]), expected_lever_arm,
                 0.001);
 }
+
 #else
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)
