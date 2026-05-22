@@ -150,12 +150,12 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)
 
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
                 expected_lever_arm, 0.001);
-    EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX]), expected_lever_arm,
-                0.001);
-    EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX]), expected_lever_arm,
-                0.001);
-    EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX]), expected_lever_arm,
-                0.001);
+    EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX]),
+                expected_lever_arm, 0.001);
+    EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX]),
+                expected_lever_arm, 0.001);
+    EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX]),
+                expected_lever_arm, 0.001);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_magnitude)
@@ -171,12 +171,12 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_magnitude)
 
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
                 expected_lever_arm, 0.001);
-    EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX]), expected_lever_arm,
-                0.001);
-    EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX]), expected_lever_arm,
-                0.001);
-    EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX]), expected_lever_arm,
-                0.001);
+    EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX]),
+                expected_lever_arm, 0.001);
+    EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX]),
+                expected_lever_arm, 0.001);
+    EXPECT_NEAR(std::abs(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX]),
+                expected_lever_arm, 0.001);
 }
 
 #else
