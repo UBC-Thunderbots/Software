@@ -32,6 +32,7 @@ class ImuService
 			(4.0 * 14.4222 / 1000.0 * std::numbers::pi / 180.0);
 
 	private:
+		std::optional<int16_t> combineBits();
 		bool initialized_=true;
 		int file_descriptor_=0;
 		doubel degrees_error_;
@@ -47,8 +48,10 @@ class ImuService
     	static const uint8_t CTRL4_C           = 0x13;
     	static const uint8_t CTRL6_C           = 0x15;
     	static const uint8_t CTRL8_XL          = 0x17;
-	 // Device path for the IMU
+
+		// Device path for the IMU
 	    inline static const std::string IMU_DEVICE = "/dev/i2c-1";
+
 		// Gyroscope Z-axis (Yaw) Output Data Registers
 	    static constexpr uint8_t YAW_LEAST_SIG_REG = 0x26; // OUTZ_L_G
 	    static constexpr uint8_t YAW_MOST_SIG_REG  = 0x27; // OUTZ_H_G
