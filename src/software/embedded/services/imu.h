@@ -47,6 +47,17 @@ class ImuService
     	static const uint8_t CTRL4_C           = 0x13;
     	static const uint8_t CTRL6_C           = 0x15;
     	static const uint8_t CTRL8_XL          = 0x17;
-    	static const uint8_t YAW_LEAST_SIG_REG = 0x26;
-    	static const uint8_t YAW_MOST_SIG_REG  = 0x27;
+	 // Device path for the IMU
+	    inline static const std::string IMU_DEVICE = "/dev/i2c-1";
+		// Gyroscope Z-axis (Yaw) Output Data Registers
+	    static constexpr uint8_t YAW_LEAST_SIG_REG = 0x26; // OUTZ_L_G
+	    static constexpr uint8_t YAW_MOST_SIG_REG  = 0x27; // OUTZ_H_G
+	
+	    // Accelerometer X-axis Output Data Registers
+	    static constexpr uint8_t ACCEL_X_LEAST_SIG_REG = 0x28; // OUTX_L_XL
+	    static constexpr uint8_t ACCEL_X_MOST_SIG_REG  = 0x29; // OUTX_H_XL
+	
+	    // Accelerometer Y-axis Output Data Registers
+	    static constexpr uint8_t ACCEL_Y_LEAST_SIG_REG = 0x2A; // OUTY_L_XL
+	    static constexpr uint8_t ACCEL_Y_MOST_SIG_REG  = 0x2B; // OUTY_H_XL
 }
