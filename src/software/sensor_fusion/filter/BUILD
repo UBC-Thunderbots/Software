@@ -98,3 +98,24 @@ py_test(
         requirement("pytest"),
     ],
 )
+
+cc_library(
+    name = "kalman_filter",
+    srcs = [],
+    hdrs = ["kalman_filter.hpp"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "kalman_filter_test",
+    srcs = ["kalman_filter_test.cpp"],
+    deps = [
+        ":kalman_filter",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
