@@ -11,14 +11,14 @@ struct RobotConstants
     // The radius of the robot [m]
     float robot_radius_m;
 
+    // clang-format off
+
     // The front_wheel_angle_deg and back_wheel_angle_deg are measured as absolute
     // angles from the robot's y-axis to each wheel axle.
     //
     // In the ASCII diagram below:
     //  - front_wheel_angle_deg = A
     //  - back_wheel_angle_deg  = B
-
-    // clang-format off
     // The angles are assumed to be symmetric for the left and right sides of the robot.
     //
     //                 FRONT OF ROBOT
@@ -37,6 +37,7 @@ struct RobotConstants
     //         |B \ '.                 .' / ◄─── Back wheel        
     //         |   \  '-.          _.-'  /          
     //         |         ''------''
+    
     // clang-format on
 
     // The angle between y-axis of the robot and the front wheel axles [degrees]
