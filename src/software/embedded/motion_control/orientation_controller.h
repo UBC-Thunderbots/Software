@@ -1,8 +1,10 @@
 #pragma once
 
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/embedded/motion_control/pid_controller.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
+#include "software/time/duration.h"
 
 class OrientationController
 {
@@ -21,7 +23,9 @@ class OrientationController
      * @param target_orientation The target trajectory path.
      * @param delta_time The time passed since last time step.
      */
-    AngularVelocity step(Angle orientation, Angle target_orientation,
+    AngularVelocity step(Angle orientation,
+                         const BangBangTrajectory1DAngular& angular_trajectory,
+                         Duration time_since_trajectory_creation,
                          double delta_time = 1.0);
 
    private:
