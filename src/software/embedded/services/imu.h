@@ -81,4 +81,4 @@ class ImuService
 	    // Accelerometer Y-axis Output Data Registers
 	    static constexpr uint8_t ACCEL_Y_LEAST_SIG_REG = 0x2A; // OUTY_L_XL
 	    static constexpr uint8_t ACCEL_Y_MOST_SIG_REG  = 0x2B; // OUTY_H_XL
-}
+};
