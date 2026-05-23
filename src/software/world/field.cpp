@@ -8,7 +8,7 @@ Field Field::createSSLDivisionBField()
 {
     // Using the dimensions of a standard Division B SSL field
     // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_field_setup
-    Field field = Field(27.0, 12.0, 1.0, 2.0, 0.18, 1.0, 0.3, 0.5);
+    Field field = Field(9.0, 6.0, 1.0, 2.0, 0.18, 1.0, 0.3, 0.5);
     return field;
 }
 
@@ -20,15 +20,28 @@ Field Field::createSSLDivisionAField()
     return field;
 }
 
+Field Field::createPracticeField()
+{
+    // 2/5 of Division B in field length, width, defense area, and center circle;
+    // 3/5 of Division B goal width. Goal depth (0.18) and boundary buffer (0.3)
+    // are kept at Division B values — they are tied to physical goal hardware
+    // and surrounding carpet, not field size.
+    Field field = Field(3.6, 2.4, 0.4, 0.8, 0.18, 0.6, 0.3, 0.2);
+    return field;
+}
+
 Field Field::createField(TbotsProto::FieldType field_type)
 {
-    if (field_type == TbotsProto::FieldType::DIV_A)
+    switch (field_type)
     {
-        return createSSLDivisionAField();
-    }
-    else
-    {
-        return createSSLDivisionBField();
+        case TbotsProto::FieldType::DIV_A:
+            return createSSLDivisionAField();
+        case TbotsProto::FieldType::DIV_B:
+            return createSSLDivisionBField();
+        case TbotsProto::FieldType::PRACTICE:
+            return createPracticeField();
+        default:
+            throw std::invalid_argument("Unknown FieldType passed to createField");
     }
 }
 

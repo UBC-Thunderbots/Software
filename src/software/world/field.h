@@ -50,10 +50,21 @@ class Field
     static Field createSSLDivisionAField();
 
     /**
-     * Creates a field with the standard SSL Division A or B dimensions
+     * Creates a smaller practice field that fits in a constrained space.
+     * Field length and width are 2/5 of Division B; goal width is 3/5 of Division B.
+     * Goal depth and boundary buffer are kept at Division B values because they
+     * are tied to physical goal hardware and carpet margin, not field size.
+     *
+     * @return a field sized for indoor practice use
+     */
+    static Field createPracticeField();
+
+    /**
+     * Creates a field with the standard SSL Division A or B dimensions,
+     * or the practice field dimensions.
      *
      * @param field_type The field type
-     * @return a field with the standard SSL Division A or B dimensions
+     * @return a field matching the given type
      */
     static Field createField(TbotsProto::FieldType field_type);
 

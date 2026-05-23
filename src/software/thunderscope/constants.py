@@ -63,8 +63,8 @@ SPEED_SEGMENT_SCALE = 0.2
 
 DEFAULT_EMPTY_FIELD_WORLD = World(
     field=Field(
-        field_x_length=27.0,
-        field_y_length=12.0,
+        field_x_length=9.0,
+        field_y_length=6.0,
         defense_x_length=1.0,
         defense_y_length=2.0,
         goal_x_length=0.18,

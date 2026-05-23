@@ -181,6 +181,14 @@ if __name__ == "__main__":
         help="set realism flag to use realistic config",
     )
     parser.add_argument(
+        "--division",
+        action="store",
+        type=str,
+        default="div_b",
+        choices=["div_a", "div_b", "practice"],
+        help="Which field the simulator runs on: div_a, div_b, or practice",
+    )
+    parser.add_argument(
         "--estop_baudrate",
         action="store",
         type=int,
@@ -463,7 +471,10 @@ if __name__ == "__main__":
 
         # Launch all binaries
         with Simulator(
-            args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
+            args.simulator_runtime_dir,
+            args.debug_simulator,
+            args.enable_realism,
+            args.division,
         ) as simulator, FullSystem(
             path_to_binary=runtime_config.get_blue_runtime_path(),
             full_system_runtime_dir=args.blue_full_system_runtime_dir,

@@ -34,14 +34,19 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
 {
     std::string full_filename = CONFIG_DIRECTORY;
 
-    if (field_type == TbotsProto::FieldType::DIV_A)
+    switch (field_type)
     {
-        full_filename = full_filename + CONFIG_FILE + ".txt";
-    }
-    else
-    {
-        // loading division B configuration
-        full_filename = full_filename + CONFIG_FILE + "B.txt";
+        case TbotsProto::FieldType::DIV_A:
+            full_filename = full_filename + CONFIG_FILE + ".txt";
+            break;
+        case TbotsProto::FieldType::DIV_B:
+            full_filename = full_filename + CONFIG_FILE + "B.txt";
+            break;
+        case TbotsProto::FieldType::PRACTICE:
+            full_filename = full_filename + "simulator/practice.txt";
+            break;
+        default:
+            LOG(FATAL) << "Unknown FieldType passed to ErForceSimulator";
     }
 
     std::ifstream config_file(full_filename);

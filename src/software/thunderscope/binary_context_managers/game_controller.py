@@ -504,7 +504,12 @@ class Gamecontroller:
     def __reset_world_state(self) -> None:
         """Resets the robot and ball positions"""
         self.simulator_proto_unix_io.send_proto(
-            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+            WorldState,
+            create_default_world_state(
+                num_robots=DIV_B_NUM_ROBOTS,
+                field_x_length=self.latest_world.field.field_x_length,
+                field_y_length=self.latest_world.field.field_y_length,
+            ),
         )
         self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
 

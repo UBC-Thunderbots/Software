@@ -31,7 +31,7 @@ int main(int argc, char** argv)
                        "The directory to output logs and setup unix sockets.");
     desc.add_options()("division",
                        boost::program_options::value<std::string>(&args.division),
-                       "div_a or div_b");
+                       "div_a, div_b, or practice");
     desc.add_options()("enable_realism",
                        boost::program_options::bool_switch(&args.enable_realism),
                        "realism simulator");  // install terminal flag
@@ -85,16 +85,21 @@ int main(int argc, char** argv)
             realism_config = ErForceSimulator::createDefaultRealismConfig();
         }
 
+        TbotsProto::FieldType field_type;
         if (args.division == "div_a")
         {
-            er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_A, create2021RobotConstants(), realism_config);
+            field_type = TbotsProto::FieldType::DIV_A;
+        }
+        else if (args.division == "practice")
+        {
+            field_type = TbotsProto::FieldType::PRACTICE;
         }
         else
         {
-            er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_B, create2021RobotConstants(), realism_config);
+            field_type = TbotsProto::FieldType::DIV_B;
         }
+        er_force_sim = std::make_shared<ErForceSimulator>(
+            field_type, create2021RobotConstants(), realism_config);
 
         std::mutex simulator_mutex;
 
