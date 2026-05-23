@@ -1,6 +1,5 @@
 #include "software/embedded/motor_controller/tmc_motor_controller.h"
 
-
 #include "shared/constants.h"
 #include "software/embedded/gpio/gpio_char_dev.h"
 #include "software/embedded/spi_utils.h"

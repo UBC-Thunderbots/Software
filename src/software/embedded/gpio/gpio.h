@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+
 #include "software/util/make_enum/make_enum.hpp"
 
 MAKE_ENUM(GpioState, LOW, HIGH);

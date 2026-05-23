@@ -62,7 +62,7 @@ class StSpinMotorController : public MotorController
 
     static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
     static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 300;
-     robot_constants::RobotConstants robot_constants_;
+    robot_constants::RobotConstants robot_constants_;
 
     // SPI file descriptors
     std::unordered_map<MotorIndex, int> spi_fds_;

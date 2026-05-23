@@ -1,4 +1,5 @@
 package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "motor_index",
     hdrs = ["motor_index.h"],
@@ -6,6 +7,7 @@ cc_library(
         "//software/util/make_enum",
     ],
 )
+
 cc_library(
     name = "motor_board",
     hdrs = ["motor_board.h"],
@@ -13,6 +15,7 @@ cc_library(
         "//software/util/make_enum",
     ],
 )
+
 cc_library(
     name = "motor_controller",
     srcs = [
@@ -38,6 +41,7 @@ cc_library(
         "@trinamic",
     ],
 )
+
 cc_library(
     name = "motor_fault_indicator",
     srcs = ["motor_fault_indicator.cpp"],
@@ -47,10 +51,12 @@ cc_library(
         "//proto:tbots_cc_proto",
     ],
 )
+
 cc_library(
     name = "stspin_types",
     hdrs = ["stspin_types.h"],
 )
+
 cc_binary(
     name = "stspin_motor_controller_test",
     srcs = ["stspin_motor_controller_test.cpp"],
