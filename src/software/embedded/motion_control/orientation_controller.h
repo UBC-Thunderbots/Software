@@ -1,0 +1,33 @@
+#pragma once
+
+#include "software/embedded/motion_control/pid_controller.h"
+#include "software/geom/angle.h"
+#include "software/geom/angular_velocity.h"
+
+class OrientationController
+{
+   public:
+    /**
+     * Constructs an orientation controller that uses measurements over multiple
+     * time intervals to calculate the target angular velocity to minimize error.
+     */
+    OrientationController() = default;
+
+    /**
+     * Given an orientation and target orientation, returns a target angular
+     * velocity to minimize the error between the two.
+     *
+     * @param orientation The actual orientation.
+     * @param target_orientation The target trajectory path.
+     * @param delta_time The time passed since last time step.
+     */
+    AngularVelocity step(Angle orientation, Angle target_orientation,
+                         double delta_time = 1.0);
+
+   private:
+    // TODO: tune constants
+    PidController w_pid_{0.7, 0.0, 2.0, 0.0};
+    PidController w_pid_close_{2.0, 0.0, 4.0, 0.0};
+
+    static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 25.0;
+};
