@@ -9,8 +9,8 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "software/embedded/primitive_executor.h"
-#include "software/embedded/services/motor.h"
 #include "software/embedded/services/imu.h"
+#include "software/embedded/services/motor.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
@@ -120,8 +120,8 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
     motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
-	g_motor_service = motor_service_.get();
-	motor_service_->setup();
+    g_motor_service = motor_service_.get();
+    motor_service_->setup();
 
     LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
 
@@ -182,14 +182,14 @@ void Thunderloop::runLoop()
     robot_status_.set_thunderloop_version(thunderloop_hash);
     robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
 
-	
-	std::optional<AngularVelocity> imu_poll = imu_service_->pollHeadingVelocity();
-	
-	//TODO: Replace with actual IMU data usage
-	if (imu_poll.has_value()){
 
-		LOG(INFO) << "IMU Heading Velocity" << imu_poll.value() ;
-	}
+    std::optional<AngularVelocity> imu_poll = imu_service_->pollHeadingVelocity();
+
+    // TODO: Replace with actual IMU data usage
+    if (imu_poll.has_value())
+    {
+        LOG(INFO) << "IMU Heading Velocity" << imu_poll.value();
+    }
 
     for (;;)
     {

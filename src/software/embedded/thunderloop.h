@@ -10,10 +10,10 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
+#include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
-#include "software/embedded/services/imu.h"
 #include "software/embedded/toml_config/toml_config_client.h"
 #include "software/logger/logger.h"
 
