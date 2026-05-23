@@ -7,7 +7,6 @@
 #include "imu.h"
 #include "shared/constants.h"
 #include "software/logger/logger.h"
-#include "software/geom/angular_acceleration.h"
 
 // these functions taken from
 // https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/lib/smbus.c
@@ -128,7 +127,7 @@ ImuService::ImuService() : initialized_(false)
     }
 }
 
-std::optional<int16_t> ImuService::combineBits(uint8_t ls_reg, uint8_t ms_reg)
+std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg)
 {
     int least_significant = i2c_smbus_read_byte_data(file_descriptor_, ls_reg);
     int most_significant  = i2c_smbus_read_byte_data(file_descriptor_, ms_reg);
@@ -151,7 +150,7 @@ std::optional<AngularVelocity> ImuService::pollHeadingVelocity()
         return std::nullopt;
     }
 
-    std::optional<int16_t> opt_full_word = combineBits(HEADING_LEAST_SIG_REG, HEADING_MOST_SIG_REG);
+    std::optional<int16_t> opt_full_word = readAndCombineByteData(HEADING_LEAST_SIG_REG, HEADING_MOST_SIG_REG);
     
     if (!opt_full_word.has_value())
     {
@@ -165,14 +164,9 @@ std::optional<AngularVelocity> ImuService::pollHeadingVelocity()
     return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
 }
 
-std::optional<Eigen::Vector2d> ImuService::pollHeadingAcceleration(std::optional<AngularVelocity> prev_angular_velocity, double prev_time){
-	if (!prev_angular_velocity.has_value()){
-		return std::nullopt;
-	}
-	
 	 
 	
-}
+
 std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
 {
     if (!initialized_)
@@ -180,8 +174,8 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
         return std::nullopt;
     }
 
-    std::optional<int16_t> opt_x = combineBits(ACCEL_X_LEAST_SIG_REG, ACCEL_X_MOST_SIG_REG);
-    std::optional<int16_t> opt_y = combineBits(ACCEL_Y_LEAST_SIG_REG, ACCEL_Y_MOST_SIG_REG);
+    std::optional<int16_t> opt_x = readAndCombineByteData(ACCEL_X_LEAST_SIG_REG, ACCEL_X_MOST_SIG_REG);
+    std::optional<int16_t> opt_y = readAndCombineByteData(ACCEL_Y_LEAST_SIG_REG, ACCEL_Y_MOST_SIG_REG);
 
     if (!opt_x.has_value() || !opt_y.has_value())
     {

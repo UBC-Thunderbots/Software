@@ -14,17 +14,17 @@
 class ImuService
 {
     public:
+		/**
+     	* Constructs and initializes a new IMU service object.
+     	*
+     	* If successfully initialized, will try to do a simple calibration of the IMU.
+     	*/
 		ImuService();
 		/*
 		 * Polls the latest IMU reading of the angular velocity of the robot on the z axis
 		 * @return the current angular velocty of the robot on the z axis
 		 */
 		std::optional<AngularVelocity> pollHeadingVelocity();
-		/*
-		 * Polls the latest IMU reading of the linear acceleration of the robot on the z plane 
-		 * @return the current linear acceleration of the robot on the z plane		 
-		 */
-		std::optional<Eigen::Vector2d> pollHeadingAcceleration();
 		/*
 		 * Polls the latest IMU reading of the linear acceleration of the robot on the z plane 
 		 * @return the current linear acceleration of the robot on the z plane		 
@@ -38,10 +38,21 @@ class ImuService
 			(4.0 * 14.4222 / 1000.0 * std::numbers::pi / 180.0);
 
 	private:
-		std::optional<int16_t> combineBits();
-		bool initialized_=true;
+
+		/*
+		 * reads byte data from two registers, and combine them into a single value 
+		 * @parama ls_reg register of the least significant register
+		 * @parama ms_reg register of the most significant register	
+		 * @return the combined integer value of the two registers		 
+		 */
+
+		std::optional<int16_t> readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg);
+
+		bool initialized_=false;
+
 		int file_descriptor_=0;
-		doubel degrees_error_;
+
+		double degrees_error_;
 
 		// Maps the maximum raw reading from 16-bit integer to be 2 times gravity	
 		static constexpr double ACCELEROMETER_FULL_SCALE_G = 2.0;
@@ -55,11 +66,6 @@ class ImuService
     	static const uint8_t CTRL4_C           = 0x13;
     	static const uint8_t CTRL6_C           = 0x15;
     	static const uint8_t CTRL8_XL          = 0x17;
-
-		// Deviation from center of mass
-		double x_deviation;
-		double y_deviation;
-		
 
 		// Device path for the IMU
 	    inline static const std::string IMU_DEVICE = "/dev/i2c-1";
