@@ -31,20 +31,6 @@ cc_library(
     alwayslink = True,
 )
 
-cc_test(
-    name = "shoot_or_chip_play_cpp_test",
-    srcs = ["shoot_or_chip_play_test.cpp"],
-    deps = [
-        ":shoot_or_chip_play",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
 py_test(
     name = "shoot_or_chip_play_test",
     srcs = [

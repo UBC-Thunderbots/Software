@@ -1,7 +1,7 @@
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/primitive/primitive_msg_factory.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
+#include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/power.h"
@@ -17,7 +17,7 @@ extern "C"
 
 std::unique_ptr<MotorService> motor_service_;
 std::unique_ptr<PowerService> power_service_;
-RobotConstants_t robot_constants_;
+robot_constants::RobotConstants robot_constants_;
 int read_value;
 
 // SPI Chip Selects
@@ -38,8 +38,8 @@ int main(int argc, char** argv)
 
     LOG(INFO) << "Running on the Raspberry Pi!";
 
-    motor_service_ =
-        std::make_unique<MotorService>(create2021RobotConstants(), THUNDERLOOP_HZ);
+    motor_service_ = std::make_unique<MotorService>(
+        robot_constants::createRobotConstants(), THUNDERLOOP_HZ);
 
     // Testing Motor board SPI transfer
     for (uint8_t chip_select : CHIP_SELECT)
