@@ -55,21 +55,18 @@ TEST_F(KickoffFriendlyPlayTest, DISABLED_test_kickoff_friendly_play)
             const Field test_field = world_ptr->field();
             // Two friendly robots near the half line setting up for offense
             Rectangle robotsOffensiveRect(
-                Point(-test_field.xLength() / 18.0,
-                      5.0 * test_field.yLength() / 12.0),
-                Point(-test_field.xLength() / 6.0,
-                      -5.0 * test_field.yLength() / 12.0));
+                Point(-test_field.xLength() / 18.0, 5.0 * test_field.yLength() / 12.0),
+                Point(-test_field.xLength() / 6.0, -5.0 * test_field.yLength() / 12.0));
             robotInPolygon(robotsOffensiveRect, 2, world_ptr, yield);
 
 
             // Two Friendly robots defending the exterior of defense box and one goalie
-            Rectangle robotsDefensiveRect(
-                Point(test_field.friendlyDefenseArea().xMax() +
-                          0.3 * test_field.xLength() / 9.0,
-                      1.1 * test_field.yLength() / 6.0),
-                Point(test_field.friendlyDefenseArea().xMax() -
-                          0.01 * test_field.xLength() / 9.0,
-                      -1.1 * test_field.yLength() / 6.0));
+            Rectangle robotsDefensiveRect(Point(test_field.friendlyDefenseArea().xMax() +
+                                                    0.3 * test_field.xLength() / 9.0,
+                                                1.1 * test_field.yLength() / 6.0),
+                                          Point(test_field.friendlyDefenseArea().xMax() -
+                                                    0.01 * test_field.xLength() / 9.0,
+                                                -1.1 * test_field.yLength() / 6.0));
             robotInPolygon(robotsDefensiveRect, 3, world_ptr, yield);
         }};
 

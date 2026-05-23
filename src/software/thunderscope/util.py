@@ -131,20 +131,30 @@ def realtime_sim_ticker(
 
 
 def sync_simulation(
-    tscope: "Thunderscope", num_robots: int, timeout_s: float = 0.1
+    tscope: "Thunderscope",
+    num_robots: int,
+    timeout_s: float = 0.1,
+    field_x_length: float = 9.0,
+    field_y_length: float = 6.0,
 ) -> None:
     """Ensure that simulator has synchronized with the default world state.
 
     :param tscope:              Thunderscope instance that is tied to this instance of the simulation
     :param num_robots:          Number of robots to initialize the simulator with
     :param timeout_s:           How long to wait before we retry our attempt to synchronize with the simulator
+    :param field_x_length:      Field length along the x-axis in meters; defaults to SSL Division B
+    :param field_y_length:      Field width along the y-axis in meters; defaults to SSL Division B
     """
     sim_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM]
     world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
     sim_proto_unix_io.register_observer(
         WorldStateReceivedTrigger, world_state_received_buffer
     )
-    world_state = tbots_protobuf.create_default_world_state(num_robots)
+    world_state = tbots_protobuf.create_default_world_state(
+        num_robots,
+        field_x_length=field_x_length,
+        field_y_length=field_y_length,
+    )
 
     while True:
         sim_proto_unix_io.send_proto(WorldState, world_state)

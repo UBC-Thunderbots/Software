@@ -60,8 +60,10 @@ class Simulator:
         except:
             pass
 
-        simulator_command = "software/er_force_simulator_main --runtime_dir={} --division={}".format(
-            self.simulator_runtime_dir, self.division
+        simulator_command = (
+            "software/er_force_simulator_main --runtime_dir={} --division={}".format(
+                self.simulator_runtime_dir, self.division
+            )
         )
 
         if self.enable_realism:

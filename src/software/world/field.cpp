@@ -76,7 +76,7 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
         boundary_buffer_size_ < 0 || center_circle_radius_ <= 0)
     {
         throw std::invalid_argument(
-            "At least one field dimension is non-positive - Field is invalid");
+            "At least one field dimension is non-positive, Field is invalid");
     }
 }
 

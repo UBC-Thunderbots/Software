@@ -448,9 +448,18 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
+            # Mirrors the dimensions in software/world/field.cpp createField factories
+            division_field_dims = {
+                "div_a": (12.0, 9.0),
+                "div_b": (9.0, 6.0),
+                "practice": (3.6, 2.4),
+            }
+            field_x_length, field_y_length = division_field_dims[args.division]
             sync_simulation(
                 tscope,
                 0 if args.empty else DIV_B_NUM_ROBOTS,
+                field_x_length=field_x_length,
+                field_y_length=field_y_length,
             )
 
             if args.ci_mode:
