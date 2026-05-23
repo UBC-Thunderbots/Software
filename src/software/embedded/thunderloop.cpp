@@ -120,7 +120,9 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
     motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
-    g_motor_service = motor_service_.get();
+	g_motor_service = motor_service_.get();
+	motor_service_->setup();
+
     mLOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
 
     imu_service_ = std::make_unique<ImuService>();
