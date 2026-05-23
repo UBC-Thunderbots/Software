@@ -105,7 +105,7 @@ ImuService::ImuService() : initialized_(false)
     for (int i = 0; i < 100; i++)
     {
         // Fixed: Call the actual implemented function name
-        auto poll = pollHeadingVelocity();
+        auto poll = pollAngularVelocity();
         if (poll.has_value())
         {
             sum += poll->toDegrees();
@@ -121,12 +121,25 @@ ImuService::ImuService() : initialized_(false)
     }
     else
     {
-        LOG(WARNING) << "IMU Calibration failed: no valid samples received. Heading "
+        LOG(WARNING) << "IMU Calibration failed: no valid samples received. Angular "
                         "stability will be poor.";
         initialized_ = false;
     }
 }
 
+std::optional<ImuData> ImuService::poll(){
+	
+	std::optional<AngularVelocity> AngularVelocity = pollAngularVelocity();
+	std::optional<AngularAcceleration> AngularAceleration = pollAngularAcceleration();
+	std::optional<Eigen::Vector2d> LinearAcceleration = pollLinearAcceleration();
+
+	if (!AngularVelocity.has_value() || !AngularAcceleration.has_value() || !LinearAcceleration.has_value()){
+		return std::nullopt;
+	}
+
+	return {AngularVelocity.value(), AngularAcceleration.value(), LinearAcceleration.value()};
+
+}
 std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg)
 {
     int least_significant = i2c_smbus_read_byte_data(file_descriptor_, ls_reg);
@@ -143,14 +156,14 @@ std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_
     return static_cast<int16_t>(combined);
 }
 
-std::optional<AngularVelocity> ImuService::pollHeadingVelocity()
+std::optional<AngularVelocity> ImuService::pollAngularVelocity()
 {
     if (!initialized_)
     {
         return std::nullopt;
     }
 
-    std::optional<int16_t> opt_full_word = readAndCombineByteData(HEADING_LEAST_SIG_REG, HEADING_MOST_SIG_REG);
+    std::optional<int16_t> opt_full_word = readAndCombineByteData(GYRO_LEAST_SIG_REG, GYRO_MOST_SIG_REG);
     
     if (!opt_full_word.has_value())
     {
@@ -166,7 +179,7 @@ std::optional<AngularVelocity> ImuService::pollHeadingVelocity()
 }
 
 
-std::optional<AngularAcceleration> ImuService::pollHeadingAcceleration()
+std::optional<AngularAcceleration> ImuService::pollAngularAcceleration()
 {
     if (!initialized_)
     {
@@ -174,12 +187,13 @@ std::optional<AngularAcceleration> ImuService::pollHeadingAcceleration()
     }
 	
 	if(!prev_angular_velocity_.has_value()){
-		prev_angular_velocity_ = pollHeadingVelocity();
+		prev_angular_velocity_ = pollAngularVelocity();
+		prev_time_ = std::chrono::steady_clock::now();;
 		return std::nullopt;
 	}
 
     auto curr_time =  std::chrono::steady_clock::now();
-	auto curr_angular_velocity = pollHeadingVelocity(); 
+	auto curr_angular_velocity = pollAngularVelocity(); 
 
 	double dt = std::chrono::duration<double>(curr_time - prev_time_).count();
 	if (dt <= 0 || !curr_angular_velocity.has_value()) return std::nullopt;
@@ -187,7 +201,6 @@ std::optional<AngularAcceleration> ImuService::pollHeadingAcceleration()
 	double alpha = (curr_angular_velocity->toRadians() - 
                 prev_angular_velocity_->toRadians()) / dt;
 
-	// store current time and angular velocity as previous
 	prev_angular_velocity_ = curr_angular_velocity;
 	prev_time_ = curr_time;
 

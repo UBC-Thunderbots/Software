@@ -12,6 +12,13 @@
 /**
  * Handles low level IMU I2C communication, and some minor offset filtering.
  */
+struct ImuData{
+
+		AngularVelocity AngularVelocity;
+		AngularAcceleration AngularAceleration;
+		Eigen::Vector2d LinearAcceleration;
+
+};
 class ImuService
 {
     public:
@@ -21,22 +28,8 @@ class ImuService
      	* If successfully initialized, will try to do a simple calibration of the IMU.
      	*/
 		ImuService();
-		/*
-		 * Polls the latest IMU reading of the angular velocity of the robot on the z axis
-		 * @return the current angular velocty of the robot on the z axis
-		 */
-		std::optional<AngularVelocity> pollHeadingVelocity();
-		/*
-		 * Computes angular acceleration from successive angular velocity readings
-		 * @return the current angular acceleration of the robot on the z axis
-		 */
-		std::optional<AngularAcceleration> pollHeadingAcceleration();
-		/*
-		 * Polls the latest IMU reading of the linear acceleration of the robot on the z plane 
-		 * @return the current linear acceleration of the robot on the z plane		 
-		 */
-		std::optional<Eigen::Vector2d> pollLinearAcceleration();
 
+		std::optional<ImuData> poll();
 
 		// Variance from datasheet (in rad^2/s^2)
 		static constexpr double IMU_VARIANCE = 
@@ -45,6 +38,21 @@ class ImuService
 
 	private:
 
+		/*
+		 * Polls the latest IMU reading of the angular velocity of the robot on the z axis
+		 * @return the current angular velocty of the robot on the z axis
+		 */
+		std::optional<AngularVelocity> pollAngularVelocity();
+		/*
+		 * Computes angular acceleration from successive angular velocity readings
+		 * @return the current angular acceleration of the robot on the z axis
+		 */
+		std::optional<AngularAcceleration> pollAngularAcceleration();
+		/*
+		 * Polls the latest IMU reading of the linear acceleration of the robot on the z plane 
+		 * @return the current linear acceleration of the robot on the z plane		 
+		 */
+		std::optional<Eigen::Vector2d> pollLinearAcceleration();
 		/*
 		 * Reads byte data from two registers, and combine them into a single value 
 		 * @parama ls_reg register of the least significant register
@@ -77,8 +85,8 @@ class ImuService
 	    inline static const std::string IMU_DEVICE = "/dev/i2c-1";
 
 		// Gyroscope Z-axis (Yaw) Output Data Registers
-	    static constexpr uint8_t HEADING_LEAST_SIG_REG = 0x26; // OUTZ_L_G
-	    static constexpr uint8_t HEADING_MOST_SIG_REG  = 0x27; // OUTZ_H_G
+	    static constexpr uint8_t GYRO_LEAST_SIG_REG = 0x26; // OUTZ_L_G
+	    static constexpr uint8_t GYRO_MOST_SIG_REG  = 0x27; // OUTZ_H_G
 	
 	    // Accelerometer X-axis Output Data Registers
 	    static constexpr uint8_t ACCEL_X_LEAST_SIG_REG = 0x28; // OUTX_L_XL
@@ -87,7 +95,11 @@ class ImuService
 	    // Accelerometer Y-axis Output Data Registers
 	    static constexpr uint8_t ACCEL_Y_LEAST_SIG_REG = 0x2A; // OUTY_L_XL
 	    static constexpr uint8_t ACCEL_Y_MOST_SIG_REG  = 0x2B; // OUTY_H_XL
-															
+		
+		// IMU offset for acceleration calculation
+		static constexpr double IMU_OFFSET_X = 0.0;  
+		static constexpr double IMU_OFFSET_Y = 0.0; 														
+
 		// prev time and angular accleration 
 		std::optional<AngularVelocity> prev_angular_velocity_;
 		std::chrono::steady_clock::time_point prev_time_;
