@@ -123,10 +123,10 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
 	g_motor_service = motor_service_.get();
 	motor_service_->setup();
 
-    mLOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
 
     imu_service_ = std::make_unique<ImuService>();
-    LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";otor_service_->setup();
+    LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -183,7 +183,7 @@ void Thunderloop::runLoop()
     robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
 
 	
-	std::optional<Angle> imu_poll = imu_service_->pollHeadingVelocity();
+	std::optional<AngularVelocity> imu_poll = imu_service_->pollHeadingVelocity();
 	
 	//TODO: Replace with actual IMU data usage
 	if (imu_poll.has_value()){

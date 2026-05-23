@@ -29,7 +29,7 @@ cc_library(
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",
-        "//software/embedded/services/imu",
+        "//software/embedded/services:imu",
         "//software/embedded/toml_config",
         "//software/logger:network_logger",
         "//software/tracy:tracy_constants",
