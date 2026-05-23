@@ -22,7 +22,7 @@ class Shot
      *
      * @return a point, representing the target to shoot at.
      */
-    const Point &getPointToShootAt() const;
+    const Point& getPointToShootAt() const;
 
     /**
      * Returns the angle formed by the shot origin, and the edges of the two obstacles
@@ -31,7 +31,7 @@ class Shot
      * @return the angle formed by the shot origin, and the edges of the two obstacles
      * closest to the shot path
      */
-    const Angle &getOpenAngle() const;
+    const Angle& getOpenAngle() const;
 
    private:
     /**

@@ -35,7 +35,7 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
      * @param ai_config_ptr the play config pointer for this play FSM
      */
     explicit KickoffEnemyPlayFSM(
-        const std::shared_ptr<const TbotsProto::AiConfig> &ai_config_ptr);
+        const std::shared_ptr<const TbotsProto::AiConfig>& ai_config_ptr);
 
 
     /**
@@ -43,7 +43,7 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
      *
      * @param world_ptr the world pointer
      */
-    void createKickoffSetupPositions(const WorldPtr &world_ptr);
+    void createKickoffSetupPositions(const WorldPtr& world_ptr);
 
     /**
      * add shadowing robots to tactics to run.
@@ -52,9 +52,9 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
      * @param tactics_to_run vector of tactics to run.
      * @param defense_position_index index of robot for priority.
      */
-    void assignShadowing(const std::vector<EnemyThreat> &enemy_threats,
-                         PriorityTacticVector &tactics_to_run,
-                         size_t &defense_position_index);
+    void assignShadowing(const std::vector<EnemyThreat>& enemy_threats,
+                         PriorityTacticVector& tactics_to_run,
+                         size_t& defense_position_index);
 
     /**
      * add defenders to tactics to run.
@@ -64,8 +64,8 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
      * @param shadower_count number of shadowing robots so some space is allowed for
      * shadowers
      */
-    void assignDefenders(PriorityTacticVector &tactics_to_run,
-                         size_t &defense_position_index, size_t &shadower_count);
+    void assignDefenders(PriorityTacticVector& tactics_to_run,
+                         size_t& defense_position_index, size_t& shadower_count);
 
     /**
      * add a goal blocker to tactics to run.
@@ -74,16 +74,16 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
      * @param tactics_to_run vector of tactics to run.
      * @param defense_position_index index of robot for priority.
      */
-    void assignGoalBlocker(const WorldPtr &world_ptr,
-                           PriorityTacticVector &tactics_to_run,
-                           size_t &defense_position_index);
+    void assignGoalBlocker(const WorldPtr& world_ptr,
+                           PriorityTacticVector& tactics_to_run,
+                           size_t& defense_position_index);
 
     /**
      * Action to organize the bots to be ready for enemy kickoff.
      *
      * @param event the FreeKickPlayFSM Update event
      */
-    void kickoff(const Update &event);
+    void kickoff(const Update& event);
 
 
     auto operator()()

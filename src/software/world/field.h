@@ -91,7 +91,7 @@ class Field
      *
      * @param field_proto
      */
-    explicit Field(const TbotsProto::Field &field_proto);
+    explicit Field(const TbotsProto::Field& field_proto);
 
     /**
      * Gets the x-axis length of the field from goal-line to goal-line in metres.
@@ -189,14 +189,14 @@ class Field
      *
      * @return defense area of the friendly team
      */
-    const Rectangle &friendlyDefenseArea() const;
+    const Rectangle& friendlyDefenseArea() const;
 
     /**
      * Gets the enemy defense area as a Rectangle.
      *
      * @return defense area of the enemy team
      */
-    const Rectangle &enemyDefenseArea() const;
+    const Rectangle& enemyDefenseArea() const;
 
     /**
      * Gets the friendly half of the field within field lines
@@ -246,7 +246,7 @@ class Field
      *
      * @return The area within the field lines as a rectangle
      */
-    const Rectangle &fieldLines() const;
+    const Rectangle& fieldLines() const;
 
     /**
      * Gets the area within the field boundary (the physical walls surrounding the Field).
@@ -276,14 +276,14 @@ class Field
      *
      * @return the area within the friendly goal.
      */
-    const Rectangle &friendlyGoal() const;
+    const Rectangle& friendlyGoal() const;
 
     /**
      * Gets the area within the enemy goal.
      *
      * @return the area within the enemy goal.
      */
-    const Rectangle &enemyGoal() const;
+    const Rectangle& enemyGoal() const;
 
     /**
      * Gets the position of the friendly team's penalty mark.
@@ -368,14 +368,14 @@ class Field
      *
      * @returns true if point p is in friendly defense area
      */
-    bool pointInFriendlyDefenseArea(const Point &p) const;
+    bool pointInFriendlyDefenseArea(const Point& p) const;
 
     /**
      * Returns whether p is in the enemy defense area
      *
      * @returns true if point p is in enemy defense area
      */
-    bool pointInEnemyDefenseArea(const Point &p) const;
+    bool pointInEnemyDefenseArea(const Point& p) const;
 
     /**
      * Returns true if the point is in the friendly half of the field, and false otherwise
@@ -383,7 +383,7 @@ class Field
      * @param point
      * @return true if the point is in the friendly half of the field, and false otherwise
      */
-    bool pointInFriendlyHalf(const Point &p) const;
+    bool pointInFriendlyHalf(const Point& p) const;
 
     /**
      * Returns true if the point is in the enemy half of the field, and false otherwise
@@ -391,7 +391,7 @@ class Field
      * @param point
      * @return true if the point is in the enemy's half of the field, and false otherwise
      */
-    bool pointInEnemyHalf(const Point &p) const;
+    bool pointInEnemyHalf(const Point& p) const;
 
     /**
      * Returns true if the point is in within the provided radius in one of the friendly
@@ -403,7 +403,7 @@ class Field
      * @return true if the point is in within the provided radius in one of the friendly
      * corner.
      */
-    bool pointInFriendlyCorner(const Point &p, double radius) const;
+    bool pointInFriendlyCorner(const Point& p, double radius) const;
 
     /**
      * Returns true if the point is in within the provided radius in one of the enemy
@@ -415,7 +415,7 @@ class Field
      * @return true if the point is in within the provided radius in one of the enemy
      * corner.
      */
-    bool pointInEnemyCorner(const Point &p, double radius) const;
+    bool pointInEnemyCorner(const Point& p, double radius) const;
 
     /**
      * Compares two fields for equality
@@ -423,7 +423,7 @@ class Field
      * @param other the field to compare to
      * @return true if the fields have the same dimensions, and false otherwise
      */
-    bool operator==(const Field &other) const;
+    bool operator==(const Field& other) const;
 
     /**
      * Compares two fields for inequality
@@ -431,7 +431,7 @@ class Field
      * @param other the field the compare to
      * @return true if the fields do not have the same dimensions, and false otherwise
      */
-    bool operator!=(const Field &other) const;
+    bool operator!=(const Field& other) const;
 
    private:
     // The length of the playable field (between the goal lines) in metres
@@ -470,7 +470,7 @@ namespace std
 template <>
 struct less<Field>
 {
-    bool operator()(const Field &lhs, const Field &rhs) const
+    bool operator()(const Field& lhs, const Field& rhs) const
     {
         return lhs.friendlyDefenseArea().halfPerimeter() +
                    lhs.enemyDefenseArea().halfPerimeter() +

@@ -19,9 +19,9 @@ class ProtoUnixListener
      * @param unix_path The unix path to connect to
      * @param receive_callback The callback to trigger on a new packet
      */
-    ProtoUnixListener(boost::asio::io_service &io_service, const std::string &unix_path,
-                      std::function<void(ReceiveProtoT &)> receive_callback,
-                      const std::shared_ptr<ProtoLogger> &proto_logger = nullptr);
+    ProtoUnixListener(boost::asio::io_service& io_service, const std::string& unix_path,
+                      std::function<void(ReceiveProtoT&)> receive_callback,
+                      const std::shared_ptr<ProtoLogger>& proto_logger = nullptr);
 
     virtual ~ProtoUnixListener();
 
@@ -32,7 +32,7 @@ class ProtoUnixListener
      * @param error The error code obtained when receiving the incoming data
      * @param num_bytes_received How many bytes of data were received
      */
-    void handleDataReception(const boost::system::error_code &error,
+    void handleDataReception(const boost::system::error_code& error,
                              size_t num_bytes_received);
 
     /**
@@ -50,7 +50,7 @@ class ProtoUnixListener
     std::array<char, UNIX_BUFFER_SIZE> raw_received_data_;
 
     // The function to call on every received packet of ReceiveProtoT data
-    std::function<void(ReceiveProtoT &)> receive_callback;
+    std::function<void(ReceiveProtoT&)> receive_callback;
 
     std::shared_ptr<ProtoLogger> proto_logger;
 
@@ -60,9 +60,9 @@ class ProtoUnixListener
 
 template <class ReceiveProtoT>
 ProtoUnixListener<ReceiveProtoT>::ProtoUnixListener(
-    boost::asio::io_service &io_service, const std::string &unix_path,
-    std::function<void(ReceiveProtoT &)> receive_callback,
-    const std::shared_ptr<ProtoLogger> &proto_logger)
+    boost::asio::io_service& io_service, const std::string& unix_path,
+    std::function<void(ReceiveProtoT&)> receive_callback,
+    const std::shared_ptr<ProtoLogger>& proto_logger)
     : socket_(io_service), receive_callback(receive_callback), proto_logger(proto_logger)
 {
     ::unlink(unix_path.c_str());
@@ -96,7 +96,7 @@ void ProtoUnixListener<ReceiveProtoT>::startListen()
 
 template <class ReceiveProtoT>
 void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
-    const boost::system::error_code &error, size_t num_bytes_received)
+    const boost::system::error_code& error, size_t num_bytes_received)
 {
     if (!running_)
     {

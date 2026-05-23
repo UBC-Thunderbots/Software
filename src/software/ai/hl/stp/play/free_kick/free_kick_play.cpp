@@ -8,7 +8,7 @@ FreeKickPlay::FreeKickPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config
 {
 }
 
-void FreeKickPlay::updateTactics(const PlayUpdate &play_update)
+void FreeKickPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(FreeKickPlayFSM::Update(control_params, play_update));
 }

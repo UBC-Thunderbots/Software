@@ -8,7 +8,6 @@ from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
 from software.py_constants import (
     SECONDS_PER_MILLISECOND,
-    SECONDS_PER_NANOSECOND,
     NANOSECONDS_PER_MILLISECOND,
 )
 from software.thunderscope.constants import ProtoUnixIOTypes
@@ -36,10 +35,8 @@ def exit_poller(
     :param on_exit:         callback once the exit_duration time has elapsed
     :param poll_duration_s: interval between polling the time_provider for the current timestamp
     """
-    while (
-        time_provider_instance.elapsed_time_ns() * SECONDS_PER_NANOSECOND
-        <= exit_duration_s
-    ):
+    start_time_s = time.time()
+    while time.time() <= start_time_s + exit_duration_s:
         time.sleep(poll_duration_s)
 
     on_exit()

@@ -121,7 +121,7 @@ const Point PenaltyKickFSM::evaluateNextShotPosition(std::optional<Robot> enemy_
     }
 }
 
-void PenaltyKickFSM::shoot(const Update &event,
+void PenaltyKickFSM::shoot(const Update& event,
                            boost::sml::back::process<KickFSM::Update> processEvent)
 {
     KickFSM::ControlParams control_params{
@@ -132,7 +132,7 @@ void PenaltyKickFSM::shoot(const Update &event,
 }
 
 void PenaltyKickFSM::updateApproachKeeper(
-    const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
     Field field                       = event.common.world_ptr->field();
     std::optional<Robot> enemy_goalie = event.common.world_ptr->enemyTeam().goalie();
@@ -150,7 +150,7 @@ void PenaltyKickFSM::updateApproachKeeper(
 }
 
 void PenaltyKickFSM::adjustOrientationForShot(
-    const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
     std::optional<Robot> enemy_goalie = event.common.world_ptr->enemyTeam().goalie();
     const Point next_shot_position =
@@ -164,7 +164,7 @@ void PenaltyKickFSM::adjustOrientationForShot(
     processEvent(DribbleFSM::Update(control_params, event.common));
 }
 
-bool PenaltyKickFSM::takePenaltyShot(const Update &event)
+bool PenaltyKickFSM::takePenaltyShot(const Update& event)
 {
     Field field = event.common.world_ptr->field();
 
@@ -189,7 +189,7 @@ bool PenaltyKickFSM::takePenaltyShot(const Update &event)
     return should_shoot;
 }
 
-bool PenaltyKickFSM::timeOutApproach(const Update &event)
+bool PenaltyKickFSM::timeOutApproach(const Update& event)
 {
     return event.common.world_ptr->getMostRecentTimestamp() > complete_approach;
 }

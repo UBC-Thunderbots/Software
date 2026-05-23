@@ -21,7 +21,6 @@
 #include "proto/team.pb.h"
 #include "proto/world.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/robot_constants.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
@@ -203,7 +202,12 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::self > Angle())
         .def_static("fromRadians", &Angle::fromRadians)
         .def_static("fromDegrees", &Angle::fromDegrees)
+        .def_static("zero", &Angle::zero)
+        .def_static("quarter", &Angle::quarter)
+        .def_static("half", &Angle::half)
+        .def_static("threeQuarter", &Angle::threeQuarter)
         .def("toRadians", &Angle::toRadians)
+        .def("minDiff", &Angle::minDiff)
         // Overloaded
         .def("__repr__",
              [](const Angle& a)
@@ -274,33 +278,32 @@ PYBIND11_MODULE(python_bindings, m)
                  return stream.str();
              });
 
-    py::class_<RobotConstants>(m, "RobotConstants")
+    py::class_<robot_constants::RobotConstants>(m, "RobotConstants")
         .def_readwrite("max_force_dribbler_speed_rpm",
-                       &RobotConstants::max_force_dribbler_speed_rpm)
-        .def_readwrite("robot_radius_m", &RobotConstants::robot_radius_m)
-        .def_readwrite("mass_kg", &RobotConstants::mass_kg)
-        .def_readwrite("inertial_factor", &RobotConstants::inertial_factor)
-        .def_readwrite("jerk_limit_kg_m_per_s_3",
-                       &RobotConstants::jerk_limit_kg_m_per_s_3)
-        .def_readwrite("front_wheel_angle_deg", &RobotConstants::front_wheel_angle_deg)
-        .def_readwrite("back_wheel_angle_deg", &RobotConstants::back_wheel_angle_deg)
+                       &robot_constants::RobotConstants::max_force_dribbler_speed_rpm)
+        .def_readwrite("robot_radius_m", &robot_constants::RobotConstants::robot_radius_m)
+        .def_readwrite("front_wheel_angle_deg",
+                       &robot_constants::RobotConstants::front_wheel_angle_deg)
+        .def_readwrite("back_wheel_angle_deg",
+                       &robot_constants::RobotConstants::back_wheel_angle_deg)
         .def_readwrite("front_of_robot_width_meters",
-                       &RobotConstants::front_of_robot_width_meters)
-        .def_readwrite("dribbler_width_meters", &RobotConstants::dribbler_width_meters)
+                       &robot_constants::RobotConstants::front_of_robot_width_meters)
+        .def_readwrite("dribbler_width_meters",
+                       &robot_constants::RobotConstants::dribbler_width_meters)
         .def_readwrite("robot_max_acceleration_m_per_s_2",
-                       &RobotConstants::robot_max_acceleration_m_per_s_2)
-        .def_readwrite("robot_max_ang_acceleration_rad_per_s_2",
-                       &RobotConstants::robot_max_ang_acceleration_rad_per_s_2)
+                       &robot_constants::RobotConstants::robot_max_acceleration_m_per_s_2)
+        .def_readwrite(
+            "robot_max_ang_acceleration_rad_per_s_2",
+            &robot_constants::RobotConstants::robot_max_ang_acceleration_rad_per_s_2)
         .def_readwrite("indefinite_dribbler_speed_rpm",
-                       &RobotConstants::indefinite_dribbler_speed_rpm)
-        .def_readwrite("wheel_radius_meters", &RobotConstants::wheel_radius_meters)
-        .def_readwrite("wheel_rotations_per_motor_rotation",
-                       &RobotConstants::wheel_rotations_per_motor_rotation)
+                       &robot_constants::RobotConstants::indefinite_dribbler_speed_rpm)
+        .def_readwrite("wheel_radius_meters",
+                       &robot_constants::RobotConstants::wheel_radius_meters)
         .def_readwrite("robot_max_speed_m_per_s",
-                       &RobotConstants::robot_max_speed_m_per_s)
+                       &robot_constants::RobotConstants::robot_max_speed_m_per_s)
         .def_readwrite("robot_max_ang_speed_rad_per_s",
-                       &RobotConstants::robot_max_ang_speed_rad_per_s);
-    m.def("create2021RobotConstants", &create2021RobotConstants);
+                       &robot_constants::RobotConstants::robot_max_ang_speed_rad_per_s);
+    m.def("createRobotConstants", &robot_constants::createRobotConstants);
 
     m.def("createPoint", &createPoint);
     m.def("createPolygon", &createPolygon);
@@ -351,7 +354,9 @@ PYBIND11_MODULE(python_bindings, m)
         .def("getNearestRobot",
              py::overload_cast<const Point&>(&Team::getNearestRobot, py::const_));
 
-    py::class_<Timestamp>(m, "Timestamp").def(py::init<>());
+    py::class_<Timestamp>(m, "Timestamp")
+        .def(py::init<>())
+        .def("toSeconds", &Timestamp::toSeconds);
 
     py::class_<Ball>(m, "Ball")
         .def(py::init<Point, Vector, Timestamp>())

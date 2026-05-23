@@ -18,7 +18,6 @@ cc_library(
     name = "tbots_gtest_main",
     testonly = True,
     srcs = ["tbots_gtest_main.cpp"],
-    hdrs = ["tbots_gtest_main.h"],
     deps = [
         "//software/logger",
         "@boost//:program_options",

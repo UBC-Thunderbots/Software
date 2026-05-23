@@ -18,7 +18,7 @@ void DribbleTactic::updateControlParams(std::optional<Point> dribble_destination
     control_params.allow_excessive_dribbling = allow_excessive_dribbling;
 }
 
-void DribbleTactic::accept(TacticVisitor &visitor) const
+void DribbleTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
