@@ -81,7 +81,6 @@ bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:ro
 ```
 
 * <motor_board> is the type of motor driver board on the robot (either `STSPIN` or `TRINAMIC`)
-
 * <robot_ip> is the IP address of the robot
 * <robot_password> is the password of the `robot` user account
 

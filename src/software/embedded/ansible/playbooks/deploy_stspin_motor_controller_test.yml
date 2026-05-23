@@ -1,0 +1,42 @@
+---
+- name: Deploy stspin_motor_controller_test binary to robot
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+    - name: Log Robot ID
+      ansible.builtin.debug:
+        msg: "[Robot ID = {{ inventory_hostname }}]"
+      tags: always
+
+    - name: Deploy stspin_motor_controller_test binary
+      block:
+        - name: Stop Services
+          become: true
+          become_method: ansible.builtin.sudo
+          ansible.builtin.systemd:
+            name: "thunderloop.service"
+            masked: false
+            daemon_reload: true
+            state: stopped
+          tags: always
+
+        - name: Delete stspin_motor_controller_test binary under ~/thunderbots_binaries
+          ansible.builtin.file:
+            state: absent
+            path: ~/thunderbots_binaries/stspin_motor_controller_test
+          become_method: ansible.builtin.sudo
+          become: true
+          register: result
+
+        - name: Log where Ansible is searching
+          ansible.builtin.debug:
+            msg: "{{ ansible_search_path }}"
+          tags: always
+
+        - name: Sync Binary
+          ansible.posix.synchronize:
+            src: ../../motor_controller/stspin_motor_controller_test
+            dest: ~/thunderbots_binaries/
+            recursive: true
+            copy_links: true
+          tags: always
