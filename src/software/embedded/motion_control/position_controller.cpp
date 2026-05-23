@@ -1,4 +1,4 @@
-#include "software/embedded/position_controller/position_controller.h"
+#include "software/embedded/motion_control/position_controller.h"
 
 Vector PositionController::step(const Point& position, const TrajectoryPath& target_path,
                                 Duration time_since_trajectory_creation,

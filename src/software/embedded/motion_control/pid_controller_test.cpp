@@ -1,4 +1,4 @@
-#include "software/embedded/position_controller/pid_controller.h"
+#include "software/embedded/motion_control/pid_controller.h"
 
 #include <gtest/gtest.h>
 
