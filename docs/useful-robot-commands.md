@@ -4,7 +4,6 @@
 
 <!--TOC-->
 
-- [Useful Robot Commands](#useful-robot-commands)
 - [Table of Contents](#table-of-contents)
   - [Flashing the robot's compute module](#flashing-the-robots-compute-module)
   - [Flashing the powerboard](#flashing-the-powerboard)
