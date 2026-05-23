@@ -40,7 +40,7 @@ class ImuService
 	private:
 
 		/*
-		 * reads byte data from two registers, and combine them into a single value 
+		 * Reads byte data from two registers, and combine them into a single value 
 		 * @parama ls_reg register of the least significant register
 		 * @parama ms_reg register of the most significant register	
 		 * @return the combined integer value of the two registers		 
