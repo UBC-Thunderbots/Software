@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <chrono>
 #include <utility>
 #include <numbers>
 #include <climits>
@@ -13,11 +14,9 @@
  * Handles low level IMU I2C communication, and some minor offset filtering.
  */
 struct ImuData{
-
-		AngularVelocity AngularVelocity;
-		AngularAcceleration AngularAceleration;
-		Eigen::Vector2d LinearAcceleration;
-
+		AngularVelocity angular_velocity;
+		AngularAcceleration angular_acceleration;
+		Eigen::Vector2d linear_acceleration;
 };
 class ImuService
 {
@@ -33,8 +32,8 @@ class ImuService
 
 		// Variance from datasheet (in rad^2/s^2)
 		static constexpr double IMU_VARIANCE = 
-			(4.0 * 14.4222 / 1000.0 * std::numbers::pi / 180.0) *
-			(4.0 * 14.4222 / 1000.0 * std::numbers::pi / 180.0);
+			(4.0 * 14.4222 / 1000.0 * 3.1415 / 180.0) *
+			(4.0 * 14.4222 / 1000.0 * 3.1415 / 180.0);
 
 	private:
 
@@ -59,8 +58,14 @@ class ImuService
 		 * @parama ms_reg register of the most significant register	
 		 * @return the combined integer value of the two registers		 
 		 */
-
 		std::optional<int16_t> readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg);
+		/*
+		 * Reads byte data from two registers, and combine them into a single value 
+		 * @parama ls_reg register of the least significant register
+		 * @parama ms_reg register of the most significant register	
+		 * @return the combined integer value of the two registers		 
+		 */
+		std::optional<Eigen::Vector2d> transformLinearAcceleration(AngularVelocity omega, AngularAceleration alpha, LinearAcceleration a);
 
 		bool initialized_=false;
 

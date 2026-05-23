@@ -128,16 +128,16 @@ ImuService::ImuService() : initialized_(false)
 }
 
 std::optional<ImuData> ImuService::poll(){
-	
-	std::optional<AngularVelocity> AngularVelocity = pollAngularVelocity();
-	std::optional<AngularAcceleration> AngularAceleration = pollAngularAcceleration();
-	std::optional<Eigen::Vector2d> LinearAcceleration = pollLinearAcceleration();
 
-	if (!AngularVelocity.has_value() || !AngularAcceleration.has_value() || !LinearAcceleration.has_value()){
+	std::optional<AngularVelocity> angular_velocity = pollAngularVelocity();
+	std::optional<AngularAcceleration> angular_acceleration = pollAngularAcceleration();
+	std::optional<Eigen::Vector2d> linear_acceleration = pollLinearAcceleration();
+
+	if (!angular_velocity.has_value() || !angular_acceleration.has_value() || !linear_acceleration.has_value()){
 		return std::nullopt;
 	}
 
-	return {AngularVelocity.value(), AngularAcceleration.value(), LinearAcceleration.value()};
+	return ImuData{angular_velocity.value(), angular_acceleration.value(), linear_acceleration.value()};
 
 }
 std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg)
@@ -175,7 +175,7 @@ std::optional<AngularVelocity> ImuService::pollAngularVelocity()
     double degrees_per_sec = static_cast<double>(full_word) /
                              static_cast<double>(SHRT_MAX) * IMU_FULL_SCALE_DPS;
 	
-    return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
+    return AngularVelocity::fromRadians((degrees_per_sec - degrees_error_)*3.1415/180);
 }
 
 
@@ -234,6 +234,25 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
     double a_y = (static_cast<double>(raw_y) / SHRT_MAX) 
                  * ACCELEROMETER_FULL_SCALE_G 
                  * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+	
+	// Transform using equations
                  
     return Eigen::Vector2d(a_x, a_y);
+}
+
+std::optional<Eigen::Vector2d> ImuService::transformLinearAcceleration(
+    AngularVelocity omega, AngularAcceleration alpha, Eigen::Vector2d a_imu)
+{
+    Eigen::Vector2d r(IMU_OFFSET_X, IMU_OFFSET_Y);
+
+    double w = omega.toRadians();
+    double a = alpha.toRadians();
+
+    // tangential: alpha x r → (-alpha*ry, alpha*rx)
+    Eigen::Vector2d tangential(-a * r.y(), a * r.x());
+
+    // centripetal: omega^2 * r
+    Eigen::Vector2d centripetal = (w * w) * r;
+
+    return a_imu + tangential - centripetal;
 }

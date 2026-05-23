@@ -39,6 +39,7 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/geom:angular_velocity",
+        "//software/geom:angular_acceleration",
         "//software/logger",
         "@eigen",
     ],

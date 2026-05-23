@@ -183,12 +183,11 @@ void Thunderloop::runLoop()
     robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
 
 	
-	std::optional<AngularVelocity> imu_poll = imu_service_->pollHeadingVelocity();
-	
+	std::optional<ImuData> imu_poll = imu_service_->poll();
+
 	//TODO: Replace with actual IMU data usage
 	if (imu_poll.has_value()){
-
-		LOG(INFO) << "IMU Heading Velocity" << imu_poll.value() ;
+		LOG(INFO) << "IMU Angular Velocity: " << imu_poll->angular_velocity.toRadians();
 	}
 
     for (;;)
