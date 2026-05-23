@@ -2,11 +2,11 @@
 
 
 AngularVelocity OrientationController::step(
-    Angle orientation, const BangBangTrajectory1DAngular& angular_trajectory,
-    Duration time_since_trajectory_creation, double delta_time)
+    Angle orientation, const BangBangTrajectory1DAngular& target_trajectory,
+    Duration elapsed_time, double delta_time)
 {
     const Angle difference_from_target =
-        (angular_trajectory.getDestination() - orientation).clamp();
+        (target_trajectory.getDestination() - orientation).clamp();
 
     if (difference_from_target.abs().toDegrees() < ANGULAR_PURE_PID_THRESHOLD_DEGREES)
     {
@@ -18,13 +18,11 @@ AngularVelocity OrientationController::step(
     {
         // feedforward trajectory angular velocity with small pid control effort
         const Angle error_angular =
-            (angular_trajectory.getPosition(time_since_trajectory_creation.toSeconds()) -
-             orientation)
+            (target_trajectory.getPosition(elapsed_time.toSeconds()) - orientation)
                 .clamp();
         const AngularVelocity pid_effort_angular = AngularVelocity::fromRadians(
             w_pid_.step(error_angular.toRadians(), delta_time));
-        return angular_trajectory.getVelocity(
-                   time_since_trajectory_creation.toSeconds()) +
+        return target_trajectory.getVelocity(elapsed_time.toSeconds()) +
                pid_effort_angular;
     }
 }

@@ -6,26 +6,26 @@
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
 
-// TODO: create angular velocity contorller as well
-
 class PositionController
 {
    public:
     /**
-     * Constructs a position controller that uses error over multiple time
-     * increments to calculate control effort to minimize it.
+     * Constructs a position controller that uses measurements over multiple time
+     * intervals to calculate the target velocity to minimize error.
      */
     PositionController() = default;
 
     /**
-     * Given an error, returns a target global velocity to minimize it.
+     * Given a position and target trajectory, returns a target global velocity to
+     * minimize error between the two.
      *
-     * @param position The actual position
-     * @param target_path The target trajectory path
+     * @param position The actual position.
+     * @param target_trajectory The target 2D trajectory path.
+     * @param elapsed_time The elapsed time since the trajectory was created.
      * @param delta_time The time passed since last time step.
      */
-    Vector step(const Point& position, const TrajectoryPath& target_path,
-                Duration time_since_trajectory_creation, double delta_time = 1.0);
+    Vector step(const Point& position, const TrajectoryPath& target_trajectory,
+                Duration elapsed_time, double delta_time = 1.0);
 
     /**
      * Resets the state of this position controller.

@@ -20,13 +20,14 @@ class OrientationController
      * velocity to minimize the error between the two.
      *
      * @param orientation The actual orientation.
-     * @param target_orientation The target trajectory path.
+     * @param target_trajectory The target angular trajectory.
+     * @param elapsed_time The elapsed time since the trajectory was created.
      * @param delta_time The time passed since last time step.
      */
     AngularVelocity step(Angle orientation,
-                         const BangBangTrajectory1DAngular& angular_trajectory,
-                         Duration time_since_trajectory_creation,
-                         double delta_time = 1.0);
+                         const BangBangTrajectory1DAngular& target_trajectory,
+                         Duration elapsed_time, double delta_time = 1.0);
+
     /**
      * Resets the state of this orientation controller.
      */
