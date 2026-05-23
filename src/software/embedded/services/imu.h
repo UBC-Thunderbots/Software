@@ -32,8 +32,8 @@ class ImuService
 
 		// Variance from datasheet (in rad^2/s^2)
 		static constexpr double IMU_VARIANCE = 
-			(4.0 * 14.4222 / 1000.0 * 3.1415 / 180.0) *
-			(4.0 * 14.4222 / 1000.0 * 3.1415 / 180.0);
+			(4.0 * 14.4222 / 1000.0 * M_PI / 180.0) *
+			(4.0 * 14.4222 / 1000.0 * M_PI / 180.0);
 
 	private:
 
@@ -46,7 +46,7 @@ class ImuService
 		 * Computes angular acceleration from successive angular velocity readings
 		 * @return the current angular acceleration of the robot on the z axis
 		 */
-		std::optional<AngularAcceleration> pollAngularAcceleration();
+		std::optional<AngularAcceleration> pollAngularAcceleration(std::optional<AngularVelocity> curr_angular_velocity);
 		/*
 		 * Polls the latest IMU reading of the linear acceleration of the robot on the z plane 
 		 * @return the current linear acceleration of the robot on the z plane		 
@@ -65,7 +65,7 @@ class ImuService
 		 * @parama ms_reg register of the most significant register	
 		 * @return the combined integer value of the two registers		 
 		 */
-		std::optional<Eigen::Vector2d> transformLinearAcceleration(AngularVelocity omega, AngularAceleration alpha, LinearAcceleration a);
+		Eigen::Vector2d transformLinearAcceleration(AngularVelocity omega, AngularAcceleration alpha, Eigen::Vector2d a);
 
 		bool initialized_=false;
 

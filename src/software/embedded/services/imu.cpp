@@ -130,14 +130,16 @@ ImuService::ImuService() : initialized_(false)
 std::optional<ImuData> ImuService::poll(){
 
 	std::optional<AngularVelocity> angular_velocity = pollAngularVelocity();
-	std::optional<AngularAcceleration> angular_acceleration = pollAngularAcceleration();
-	std::optional<Eigen::Vector2d> linear_acceleration = pollLinearAcceleration();
+	std::optional<AngularAcceleration> angular_acceleration = pollAngularAcceleration(angular_velocity);
+	std::optional<Eigen::Vector2d> imu_linear_acceleration = pollLinearAcceleration();
 
-	if (!angular_velocity.has_value() || !angular_acceleration.has_value() || !linear_acceleration.has_value()){
+	if (!angular_velocity.has_value() || !angular_acceleration.has_value() || !imu_linear_acceleration.has_value()){
 		return std::nullopt;
 	}
 
-	return ImuData{angular_velocity.value(), angular_acceleration.value(), linear_acceleration.value()};
+	Eigen::Vector2d linear_acceleration = transformLinearAcceleration(angular_velocity.value(), angular_acceleration.value(), imu_linear_acceleration.value();
+
+	return ImuData{angular_velocity.value(), angular_acceleration.value(), linear_acceleration};
 
 }
 std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg)
@@ -175,11 +177,11 @@ std::optional<AngularVelocity> ImuService::pollAngularVelocity()
     double degrees_per_sec = static_cast<double>(full_word) /
                              static_cast<double>(SHRT_MAX) * IMU_FULL_SCALE_DPS;
 	
-    return AngularVelocity::fromRadians((degrees_per_sec - degrees_error_)*3.1415/180);
+    return AngularVelocity::fromRadians((degrees_per_sec - degrees_error_)*M_PI/180);
 }
 
 
-std::optional<AngularAcceleration> ImuService::pollAngularAcceleration()
+std::optional<AngularAcceleration> ImuService::pollAngularAcceleration(std::optional<AngularVelocity> curr_angular_velocity)
 {
     if (!initialized_)
     {
@@ -193,7 +195,6 @@ std::optional<AngularAcceleration> ImuService::pollAngularAcceleration()
 	}
 
     auto curr_time =  std::chrono::steady_clock::now();
-	auto curr_angular_velocity = pollAngularVelocity(); 
 
 	double dt = std::chrono::duration<double>(curr_time - prev_time_).count();
 	if (dt <= 0 || !curr_angular_velocity.has_value()) return std::nullopt;
@@ -240,7 +241,7 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
     return Eigen::Vector2d(a_x, a_y);
 }
 
-std::optional<Eigen::Vector2d> ImuService::transformLinearAcceleration(
+Eigen::Vector2d ImuService::transformLinearAcceleration(
     AngularVelocity omega, AngularAcceleration alpha, Eigen::Vector2d a_imu)
 {
     Eigen::Vector2d r(IMU_OFFSET_X, IMU_OFFSET_Y);
