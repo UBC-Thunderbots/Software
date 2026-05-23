@@ -3,7 +3,6 @@
 #include <Eigen/Dense>
 #include <chrono>
 #include <utility>
-#include <numbers>
 #include <climits>
 
 #include "proto/tbots_software_msgs.pb.h"
@@ -14,9 +13,9 @@
  * Handles low level IMU I2C communication, and some minor offset filtering.
  */
 struct ImuData{
-		AngularVelocity angular_velocity;
-		AngularAcceleration angular_acceleration;
-		Eigen::Vector2d linear_acceleration;
+		std::optional<AngularVelocity> angular_velocity;
+		std::optional<AngularAcceleration> angular_acceleration;
+		std::optional<Eigen::Vector2d> linear_acceleration;
 };
 class ImuService
 {

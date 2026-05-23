@@ -10,7 +10,7 @@
 
 // these functions taken from
 // https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/lib/smbus.c
-__s32 i2c_smbus_access(int file, char read_write, __u8 command, int size,
+static __s32 i2c_smbus_access(int file, char read_write, __u8 command, int size,
                        union i2c_smbus_data* data)
 {
     struct i2c_smbus_ioctl_data args;
@@ -27,7 +27,7 @@ __s32 i2c_smbus_access(int file, char read_write, __u8 command, int size,
     return err;
 }
 
-__s32 i2c_smbus_read_byte_data(int file, __u8 command)
+static __s32 i2c_smbus_read_byte_data(int file, __u8 command)
 {
     union i2c_smbus_data data;
     int err;
@@ -39,7 +39,7 @@ __s32 i2c_smbus_read_byte_data(int file, __u8 command)
     return 0x0FF & data.byte;
 }
 
-__s32 i2c_smbus_write_byte_data(int file, __u8 command, __u8 value)
+static __s32 i2c_smbus_write_byte_data(int file, __u8 command, __u8 value)
 {
     union i2c_smbus_data data;
     data.byte = value;
@@ -114,6 +114,7 @@ ImuService::ImuService() : initialized_(false)
         usleep(50000);
     }
 
+    // TODO: More robust calibration
     if (valid_samples > 0)
     {
         degrees_error_ = sum / valid_samples;
@@ -133,13 +134,15 @@ std::optional<ImuData> ImuService::poll(){
 	std::optional<AngularAcceleration> angular_acceleration = pollAngularAcceleration(angular_velocity);
 	std::optional<Eigen::Vector2d> imu_linear_acceleration = pollLinearAcceleration();
 
-	if (!angular_velocity.has_value() || !angular_acceleration.has_value() || !imu_linear_acceleration.has_value()){
-		return std::nullopt;
+	if (angular_velocity.has_value() ||  angular_acceleration.has_value() || imu_linear_acceleration.has_value()){
+		std::optional<Eigen::Vector2d> linear_acceleration = transformLinearAcceleration(angular_velocity.value(), angular_acceleration.value(), imu_linear_acceleration.value());
+	}
+	else{
+		std::optional<Eigen::Vector2d> linear_acceleration = std::nullopt; 
 	}
 
-	Eigen::Vector2d linear_acceleration = transformLinearAcceleration(angular_velocity.value(), angular_acceleration.value(), imu_linear_acceleration.value();
 
-	return ImuData{angular_velocity.value(), angular_acceleration.value(), linear_acceleration};
+	return ImuData{angular_velocity, angular_acceleration, linear_acceleration};
 
 }
 std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg)
@@ -190,7 +193,7 @@ std::optional<AngularAcceleration> ImuService::pollAngularAcceleration(std::opti
 	
 	if(!prev_angular_velocity_.has_value()){
 		prev_angular_velocity_ = pollAngularVelocity();
-		prev_time_ = std::chrono::steady_clock::now();;
+		prev_time_ = std::chrono::steady_clock::now();
 		return std::nullopt;
 	}
 
@@ -236,8 +239,6 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
                  * ACCELEROMETER_FULL_SCALE_G 
                  * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
 	
-	// Transform using equations
-                 
     return Eigen::Vector2d(a_x, a_y);
 }
 
