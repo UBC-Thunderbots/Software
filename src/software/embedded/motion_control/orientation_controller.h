@@ -27,6 +27,10 @@ class OrientationController
                          const BangBangTrajectory1DAngular& angular_trajectory,
                          Duration time_since_trajectory_creation,
                          double delta_time = 1.0);
+    /**
+     * Resets the state of this orientation controller.
+     */
+    void reset();
 
    private:
     // TODO: tune constants

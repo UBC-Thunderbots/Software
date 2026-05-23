@@ -28,3 +28,9 @@ AngularVelocity OrientationController::step(
                pid_effort_angular;
     }
 }
+
+void OrientationController::reset()
+{
+    w_pid_.reset();
+    w_pid_close_.reset();
+}
