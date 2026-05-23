@@ -1,5 +1,5 @@
 #pragma once
-#include <math.d>
+#include <math.h>
 
 // Some platformio targets don't support STL, so we can't
 // use unordered_map, string, .... We guard all networking stuff with
