@@ -1,17 +1,27 @@
 #include "software/embedded/position_controller/position_controller.h"
 
-Vector PositionController::step(const Vector& error, double delta_time)
+Vector PositionController::step(const Point& position, const TrajectoryPath& target_path,
+                                Duration time_since_trajectory_creation,
+                                double delta_time)
 {
-    // if close enough, use special PID to destination
-    if (error.lengthSquared() < LINEAR_PURE_PID_THRESHOLD_METERS)
+    const Vector distance_from_destination = target_path.getDestination() - position;
+
+    if (distance_from_destination.lengthSquared() < LINEAR_PURE_PID_THRESHOLD_METERS)
     {
-        return Vector{x_pid_close_.step(error.x(), delta_time),
-                      y_pid_close_.step(error.y(), delta_time)};
+        // if target destination is close enough, use pure PID for velocity
+        return Vector{x_pid_close_.step(distance_from_destination.x(), delta_time),
+                      y_pid_close_.step(distance_from_destination.y(), delta_time)};
     }
     else
     {
-        return Vector{x_pid_.step(error.x(), delta_time),
-                      y_pid_.step(error.y(), delta_time)};
+        // feedforward trajectory velocity with small pid control effort
+        const Vector error =
+            target_path.getPosition(time_since_trajectory_creation.toSeconds()) -
+            position;
+        const Vector control_effort{x_pid_.step(error.x(), delta_time),
+                                    y_pid_.step(error.y(), delta_time)};
+        return target_path.getVelocity(time_since_trajectory_creation.toSeconds()) +
+               control_effort;
     }
 }
 

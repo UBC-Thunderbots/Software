@@ -10,7 +10,7 @@ cc_library(
     ],
     deps = [
         ":pid_controller",
-        "//software/geom:vector",
+        "//software/ai/navigator/trajectory:trajectory_path",
     ]
 )
 

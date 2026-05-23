@@ -1,7 +1,10 @@
 #pragma once
 
+#include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/embedded/position_controller/pid_controller.h"
+#include "software/geom/point.h"
 #include "software/geom/vector.h"
+#include "software/time/duration.h"
 
 // TODO: create angular velocity contorller as well
 
@@ -15,13 +18,14 @@ class PositionController
     PositionController() = default;
 
     /**
-     * Given an error, returns the control effort to minimize it.
+     * Given an error, returns a target global velocity to minimize it.
      *
-     * @param error The amount of error between desired and actual output
-     * in both x and y coordinate.
+     * @param position The actual position
+     * @param target_path The target trajectory path
      * @param delta_time The time passed since last time step.
      */
-    Vector step(const Vector& error, double delta_time = 1.0);
+    Vector step(const Point& position, const TrajectoryPath& target_path,
+                Duration time_since_trajectory_creation, double delta_time = 1.0);
 
     /**
      * Resets the state of this position controller.
