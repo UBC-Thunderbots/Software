@@ -7,6 +7,7 @@
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/angular_velocity.h"
+#include "software/geom/angular_acceleration.h"
 
 /**
  * Handles low level IMU I2C communication, and some minor offset filtering.
@@ -25,6 +26,11 @@ class ImuService
 		 * @return the current angular velocty of the robot on the z axis
 		 */
 		std::optional<AngularVelocity> pollHeadingVelocity();
+		/*
+		 * Computes angular acceleration from successive angular velocity readings
+		 * @return the current angular acceleration of the robot on the z axis
+		 */
+		std::optional<AngularAcceleration> pollHeadingAcceleration();
 		/*
 		 * Polls the latest IMU reading of the linear acceleration of the robot on the z plane 
 		 * @return the current linear acceleration of the robot on the z plane		 
@@ -81,4 +87,9 @@ class ImuService
 	    // Accelerometer Y-axis Output Data Registers
 	    static constexpr uint8_t ACCEL_Y_LEAST_SIG_REG = 0x2A; // OUTY_L_XL
 	    static constexpr uint8_t ACCEL_Y_MOST_SIG_REG  = 0x2B; // OUTY_H_XL
-}
+															
+		// prev time and angular accleration 
+		std::optional<AngularVelocity> prev_angular_velocity_;
+		std::chrono::steady_clock::time_point prev_time_;
+
+};

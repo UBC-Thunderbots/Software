@@ -161,9 +161,38 @@ std::optional<AngularVelocity> ImuService::pollHeadingVelocity()
     
     double degrees_per_sec = static_cast<double>(full_word) /
                              static_cast<double>(SHRT_MAX) * IMU_FULL_SCALE_DPS;
+	
     return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
 }
 
+
+std::optional<AngularAcceleration> ImuService::pollHeadingAcceleration()
+{
+    if (!initialized_)
+    {
+        return std::nullopt;
+    }
+	
+	if(!prev_angular_velocity_.has_value()){
+		prev_angular_velocity_ = pollHeadingVelocity();
+		return std::nullopt;
+	}
+
+    auto curr_time =  std::chrono::steady_clock::now();
+	auto curr_angular_velocity = pollHeadingVelocity(); 
+
+	double dt = std::chrono::duration<double>(curr_time - prev_time_).count();
+	if (dt <= 0 || !curr_angular_velocity.has_value()) return std::nullopt;
+
+	double alpha = (curr_angular_velocity->toRadians() - 
+                prev_angular_velocity_->toRadians()) / dt;
+
+	// store current time and angular velocity as previous
+	prev_angular_velocity_ = curr_angular_velocity;
+	prev_time_ = curr_time;
+
+    return AngularAcceleration::fromRadians(alpha);
+}
 	 
 	
 
