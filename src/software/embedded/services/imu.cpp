@@ -7,6 +7,7 @@
 #include "imu.h"
 #include "shared/constants.h"
 #include "software/logger/logger.h"
+#include "software/geom/angular_acceleration.h"
 
 // these functions taken from
 // https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/lib/smbus.c
@@ -164,6 +165,14 @@ std::optional<AngularVelocity> ImuService::pollHeadingVelocity()
     return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
 }
 
+std::optional<Eigen::Vector2d> ImuService::pollHeadingAcceleration(std::optional<AngularVelocity> prev_angular_velocity, double prev_time){
+	if (!prev_angular_velocity.has_value()){
+		return std::nullopt;
+	}
+	
+	 
+	
+}
 std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
 {
     if (!initialized_)

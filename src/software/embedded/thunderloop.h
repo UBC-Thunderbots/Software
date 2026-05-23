@@ -16,6 +16,7 @@
 #include "software/embedded/services/imu.h"
 #include "software/embedded/toml_config/toml_config_client.h"
 #include "software/logger/logger.h"
+#include "software/geom/angular_velocity.h"
 
 class Thunderloop
 {
@@ -119,6 +120,7 @@ class Thunderloop
      */
     TbotsProto::PowerStatus pollPowerService(struct timespec& poll_time);
 
+
     /**
      * Wait for networking communication to be established. This function is blocking.
      */
@@ -153,6 +155,10 @@ class Thunderloop
     int kick_constant_;
     int chip_pulse_width_;
 
+	// Store previous angular velocity for angular accleration calculations
+	std::optional<AngularVelocity> prev_angular_velocity;
+	double prev_angular_velocity_time;
+	
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
 
