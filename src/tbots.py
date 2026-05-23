@@ -19,7 +19,6 @@ from cli.cli_params import (
     InteractiveModeOption,
     TracyOption,
     EnableThunderscopeOption,
-    EnableVisualizerOption,
     StopAIOnStartOption,
     SearchQueryArgument,
     TestSuiteOption,
@@ -109,7 +108,6 @@ def main(
     interactive_search: InteractiveModeOption = False,
     tracy: TracyOption = False,
     enable_thunderscope: EnableThunderscopeOption = False,
-    enable_visualizer: EnableVisualizerOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
     test_suite: TestSuiteOption = False,
     jobs_option: JobsOption = "",
@@ -182,8 +180,6 @@ def main(
     bazel_arguments = unknown_args
     if stop_ai_on_start:
         bazel_arguments += ["--stop_ai_on_start"]
-    if enable_visualizer:
-        bazel_arguments += ["--enable_visualizer"]
     if enable_thunderscope:
         bazel_arguments += ["--enable_thunderscope"]
     if flash_robots:
