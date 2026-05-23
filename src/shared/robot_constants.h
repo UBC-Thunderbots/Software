@@ -19,21 +19,22 @@ struct RobotConstants
     //
     // The angles are assumed to be symmetric for the left and right sides of the robot.
     //
-    //                        y
-    //                        ▲
-    //                        |
-    //    Back wheel          │         Front wheel
-    //        └────────►  , - │ - ,  ◄───────┘
-    //                , '\    │    /' ,
-    //              ,     \ B │ A /    │
-    //             ,       \  │  /     │
-    //            ,         \ │ /      │
-    //            ,           └────────┼───────► x   Front of robot
-    //            ,                    │
-    //             ,                   │
-    //              ,                  │
-    //                ,              .'
-    //                  ' - , _  , '
+    //                 FRONT OF ROBOT
+    //         |             ▲ X-Axis
+    //         |   /  -------+---------  \                     eric
+    //         |A / .'       │         '. \  ◄─── Front wheel       
+    //         | /.'         │          .'.\                   grayson      
+    //         |//           │       .     \\                  samuel
+    //         ;             │    . Lever    ;     
+    //        |              │ .    Arm      |      
+    //  ◄─────┼──────────────┼               |      
+    //  Y-Axis|                              |      
+    //         ;                             ;      
+    //         |\\                         //       
+    //         | \'.                     .'/        
+    //         |B \ '.                 .' / ◄─── Back wheel        
+    //         |   \  '-.          _.-'  /          
+    //         |         ''------''
 
     // The angle between y-axis of the robot and the front wheel axles [degrees]
     float front_wheel_angle_deg;
@@ -42,16 +43,16 @@ struct RobotConstants
     float back_wheel_angle_deg;
 
     // X position of centre of front wheel
-    float front_wheel_x_mag;
+    float front_wheel_x_magnitude_meters;
 
     // Y position of centre of front wheel
-    float front_wheel_y_mag;
+    float front_wheel_y_magnitude_meters;
 
     // X position of centre of rear wheel
-    float back_wheel_x_mag;
+    float back_wheel_x_magnitude_meters;
 
     // Y position of centre of rear wheel
-    float back_wheel_y_mag;
+    float back_wheel_y_magnitude_meters;
 
     // The total width of the entire flat face on the front of the robot [meters]
     float front_of_robot_width_meters;
@@ -87,6 +88,7 @@ struct RobotConstants
     // The radius of the wheel, in meters
     float wheel_radius_meters;
 
+    // Computed by finding sqrt(x^2 + y^2) of front and rear wheels. Both equal
     float expected_lever_arm;
 };
 
@@ -103,10 +105,10 @@ constexpr RobotConstants createRobotConstants()
         .front_wheel_angle_deg = 32.0f,
         .back_wheel_angle_deg  = 44.0f,
 
-        .front_wheel_x_mag = 0.03485f,
-        .front_wheel_y_mag = 0.06632f,
-        .back_wheel_x_mag  = 0.04985f,
-        .back_wheel_y_mag  = 0.05592f,
+        .front_wheel_x_magnitude_meters = 0.03485f,
+        .front_wheel_y_magnitude_meters = 0.06632f,
+        .back_wheel_x_magnitude_meters  = 0.04985f,
+        .back_wheel_y_magnitude_meters  = 0.05592f,
 
         .front_of_robot_width_meters = 0.11f,
         .dribbler_width_meters       = 0.07825f,
