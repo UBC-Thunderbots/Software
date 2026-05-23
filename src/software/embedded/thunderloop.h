@@ -62,6 +62,7 @@ class Thunderloop
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
     std::unique_ptr<PowerService> power_service_;
+    std::unique_ptr<ImuService> imu_service_;
 
     // TOML config client
     std::unique_ptr<TomlConfigClient> toml_config_client_;

@@ -182,10 +182,13 @@ void Thunderloop::runLoop()
 
 	
 	std::optional<Angle> imu_poll = imu_service_->pollHeadingVelocity();
+	
+	//TODO: Replace with actual IMU data usage
 	if (imu_poll.has_value()){
 
 		LOG(INFO) << "IMU Heading Velocity" << imu_poll.value() ;
 	}
+
     for (;;)
     {
         struct timespec time_since_prev_iter;
