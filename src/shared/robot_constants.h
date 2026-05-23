@@ -7,7 +7,6 @@ namespace robot_constants
 
 struct RobotConstants
 {
-    
     // The radius of the robot [m]
     float robot_radius_m;
 
@@ -37,7 +36,7 @@ struct RobotConstants
     //         |B \ '.                 .' / ◄─── Back wheel        
     //         |   \  '-.          _.-'  /          
     //         |         ''------''
-    
+
     // clang-format on
 
     // The angle between y-axis of the robot and the front wheel axles [degrees]
