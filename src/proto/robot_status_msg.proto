@@ -101,7 +101,7 @@ enum MotorFault
     PHASE_W_SHORT_TO_GND_DETECTED  = 13;
     PHASE_W_SHORT_TO_VS_DETECTED   = 14;
 
-     /*********** STSPIN Faults ************/
+    /*********** STSPIN Faults ************/
     NO_FAULT     = 15;
     DURATION     = 16;
     OVER_VOLT    = 17;

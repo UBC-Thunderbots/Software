@@ -164,8 +164,12 @@ void StSpinMotorController::updateFaults(const MotorIndex motor,
         motor_faults.drive_enabled = false;
     }
 
-    LOG(WARNING) << oss.str(); //Consider moving this to a helper and also making the stream object persistent so we do not need to continuously recreate it (it is notoriously expensive). We could also consider another approach to formating this string as using streams in general is less than ideal. Or We can probably just use string::append
-
+    LOG(WARNING)
+        << oss.str();  // Consider moving this to a helper and also making the stream
+                       // object persistent so we do not need to continuously recreate it
+                       // (it is notoriously expensive). We could also consider another
+                       // approach to formatting this string as using streams in general
+                       // is less than ideal. Or We can probably just use string::append
 }
 
 int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
@@ -192,7 +196,7 @@ void StSpinMotorController::updateEuclideanVelocity(
     const Vector local_velocity(target_euclidean_velocity[1],
                                 -target_euclidean_velocity[0]);
 
-    if (local_velocity.length() <= 0.01) //Magic number
+    if (local_velocity.length() <= 0.01)  // Magic number
     {
         sendAndReceiveFrame(
             MotorIndex::FRONT_LEFT,
