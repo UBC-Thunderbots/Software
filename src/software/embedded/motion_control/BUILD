@@ -11,7 +11,7 @@ cc_library(
     deps = [
         ":pid_controller",
         "//software/ai/navigator/trajectory:trajectory_path",
-    ]
+    ],
 )
 
 cc_library(
@@ -27,7 +27,7 @@ cc_library(
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
-    ]
+    ],
 )
 
 cc_library(

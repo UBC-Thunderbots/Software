@@ -1,6 +1,5 @@
 #include "software/embedded/motion_control/orientation_controller.h"
 
-
 AngularVelocity OrientationController::step(
     Angle orientation, const BangBangTrajectory1DAngular& target_trajectory,
     Duration elapsed_time, double delta_time)
