@@ -147,6 +147,11 @@ class RobotDiagnosticsCLI:
             self.embedded_data.get_network_interface(),
         )
         table.add_row(
+            "PlotJuggler Interface",
+            f"{ROBOT_PLOT_JUGGLER_INTERFACE_CONFIG_KEY}",
+            self.embedded_data.get_plot_juggler_interface(),
+        )
+        table.add_row(
             "Kick Constant",
             f"{ROBOT_KICK_CONSTANT_CONFIG_KEY}",
             self.embedded_data.get_kick_constant(),

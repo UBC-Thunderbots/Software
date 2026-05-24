@@ -8,6 +8,7 @@
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
+#include "software/constants.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/motor.h"
 #include "software/logger/logger.h"
@@ -88,7 +89,14 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     waitForNetworkUp();
 
     g3::overrideSetupSignals({});
-    NetworkLoggerSingleton::initializeLogger(robot_id_, enable_log_merging);
+    std::string plot_juggler_interface =
+        toml_config_client_->get(ROBOT_PLOT_JUGGLER_INTERFACE_CONFIG_KEY);
+    if (plot_juggler_interface.empty())
+    {
+        plot_juggler_interface = "tbotswifi5";
+    }
+    NetworkLoggerSingleton::initializeLogger(robot_id_, enable_log_merging,
+                                             plot_juggler_interface);
 
     // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);

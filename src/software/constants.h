@@ -48,6 +48,7 @@ static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
 const std::string ROBOT_ID_CONFIG_KEY                = "robot_id";
 const std::string ROBOT_MULTICAST_CHANNEL_CONFIG_KEY = "channel_id";
 const std::string ROBOT_NETWORK_INTERFACE_CONFIG_KEY = "network_interface";
+const std::string ROBOT_PLOT_JUGGLER_INTERFACE_CONFIG_KEY = "plot_juggler_interface";
 const std::string ROBOT_KICK_CONSTANT_CONFIG_KEY     = "kick_constant";
 const std::string ROBOT_KICK_EXP_COEFF_CONFIG_KEY    = "kick_coeff";
 const std::string ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY  = "chip_pulse_width";
