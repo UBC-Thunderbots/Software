@@ -128,8 +128,8 @@ ImuService::ImuService() : initialized_(false)
                         "stability will be poor.";
         initialized_ = false;
     }
-	Eigen::Vector2d deviation = calibrate_imu();
-	LOG(INFO) << "error: " << deviation.x() << deviation.y()  << ".";
+    Eigen::Vector2d deviation = calibrate_imu();
+    LOG(INFO) << "error: " << deviation.x() << deviation.y() << ".";
 }
 
 std::optional<ImuData> ImuService::poll()
@@ -270,7 +270,7 @@ Eigen::Vector2d ImuService::transformLinearAcceleration(AngularVelocity omega,
 
 Eigen::Vector2d ImuService::calibrate_imu()
 {
-	LOG(INFO) << "Start IMU x,y calibration" << std::endl;
+    LOG(INFO) << "Start IMU x,y calibration" << std::endl;
     Eigen::MatrixXd A(2 * 100, 2);
     Eigen::VectorXd b(2 * 100);
     int valid = 0;
@@ -279,9 +279,10 @@ Eigen::Vector2d ImuService::calibrate_imu()
     {
         // Fixed: Call the actual implemented function name
         auto omega_opt = pollAngularVelocity();
-		if (!omega_opt.has_value()){
-			continue;	
-		}
+        if (!omega_opt.has_value())
+        {
+            continue;
+        }
         auto alpha_opt = pollAngularAcceleration(omega_opt);
         auto acc       = pollLinearAcceleration();
         if (omega_opt.has_value() && alpha_opt.has_value() && acc.has_value())
