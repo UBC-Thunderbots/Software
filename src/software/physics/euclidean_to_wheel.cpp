@@ -12,25 +12,25 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
     : robot_constants_(robot_constants)
 {
     // Angles [rads]
-    double p = robot_constants_.front_wheel_angle_deg * M_PI / 180.;
-    double t = robot_constants_.back_wheel_angle_deg * M_PI / 180.;
+    const double p = robot_constants_.front_wheel_angle_deg * M_PI / 180.;
+    const double t = robot_constants_.back_wheel_angle_deg * M_PI / 180.;
 
     // Beta is angle of wheel rolling direction relative to X-axis
     // LOOK AT (software)/src/shared/robot_constants.h to see X-axis
-    double b_fr = -(M_PI - p);
-    double b_fl = -p;
-    double b_bl = t;
-    double b_br = (M_PI - t);
+    const double b_fr = -(M_PI - p);
+    const double b_fl = -p;
+    const double b_bl = t;
+    const double b_br = (M_PI - t);
 
     // Mapped to the robot frame: +X = Forward, +Y = Left
-    double fr_x = robot_constants_.front_wheel_x_magnitude_meters;
-    double fr_y = robot_constants_.front_wheel_y_magnitude_meters * -1.0;
-    double fl_x = robot_constants_.front_wheel_x_magnitude_meters;
-    double fl_y = robot_constants_.front_wheel_y_magnitude_meters;
-    double bl_x = robot_constants_.back_wheel_x_magnitude_meters * -1.0;
-    double bl_y = robot_constants_.back_wheel_y_magnitude_meters;
-    double br_x = robot_constants_.back_wheel_x_magnitude_meters * -1.0;
-    double br_y = robot_constants_.back_wheel_y_magnitude_meters * -1.0;
+    const double fr_x = robot_constants_.front_wheel_x_magnitude_meters;
+    const double fr_y = robot_constants_.front_wheel_y_magnitude_meters * -1.0;
+    const double fl_x = robot_constants_.front_wheel_x_magnitude_meters;
+    const double fl_y = robot_constants_.front_wheel_y_magnitude_meters;
+    const double bl_x = robot_constants_.back_wheel_x_magnitude_meters * -1.0;
+    const double bl_y = robot_constants_.back_wheel_y_magnitude_meters;
+    const double br_x = robot_constants_.back_wheel_x_magnitude_meters * -1.0;
+    const double br_y = robot_constants_.back_wheel_y_magnitude_meters * -1.0;
 
 
     // Assuming that CCW when looking end of shaft into motor is the positive direction.
@@ -52,10 +52,8 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
     // was calculated using Wolfram Alpha: https://bit.ly/3A08BJX
 
     // Calculate Pseudo-inverse dynamically
-    wheel_to_euclidean_velocity_D_inverse_ =
-        (euclidean_to_wheel_velocity_D_.transpose() * euclidean_to_wheel_velocity_D_)
-            .inverse() *
-        euclidean_to_wheel_velocity_D_.transpose();
+
+    wheel_to_euclidean_velocity_D_inverse_ = euclidean_to_wheel_velocity_D_.completeOrthogonalDecomposition().pseudoInverse();
 }
 
 WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_velocity) const
