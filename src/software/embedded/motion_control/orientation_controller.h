@@ -26,7 +26,7 @@ class OrientationController
      */
     AngularVelocity step(Angle orientation,
                          const BangBangTrajectory1DAngular& target_trajectory,
-                         Duration elapsed_time, double delta_time = 1.0);
+                         Duration elapsed_time, double delta_time);
 
     /**
      * Resets the state of this orientation controller.

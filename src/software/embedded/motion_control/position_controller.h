@@ -25,7 +25,7 @@ class PositionController
      * @param delta_time The time passed since last time step.
      */
     Vector step(const Point& position, const TrajectoryPath& target_trajectory,
-                Duration elapsed_time, double delta_time = 1.0);
+                Duration elapsed_time, double delta_time);
 
     /**
      * Resets the state of this position controller.

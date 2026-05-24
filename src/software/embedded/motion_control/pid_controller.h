@@ -25,12 +25,10 @@ class PidController
      * Given an error, returns the control effort to minimize it.
      *
      * @param error The amount of error between desired and actual output
-     * @param delta_time The time passed since last step, for calculating
-     * integrator and derivative. If this function is calling in invariant intervals,
-     * delta_time is by default set to 1 and any effects it would have can be handled
-     * by tuning k_i and k_d.
+     * @param delta_time The time passed since last step, for calculating the integrator
+     * and derivative.
      **/
-    double step(double error, double delta_time = 1.0);
+    double step(double error, double delta_time);
 
     /**
      * Resets the integrator and clears the last error used for derivative calculation.
