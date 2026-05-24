@@ -134,11 +134,10 @@ std::optional<ImuData> ImuService::poll(){
 	std::optional<AngularAcceleration> angular_acceleration = pollAngularAcceleration(angular_velocity);
 	std::optional<Eigen::Vector2d> imu_linear_acceleration = pollLinearAcceleration();
 
-	if (angular_velocity.has_value() ||  angular_acceleration.has_value() || imu_linear_acceleration.has_value()){
-		std::optional<Eigen::Vector2d> linear_acceleration = transformLinearAcceleration(angular_velocity.value(), angular_acceleration.value(), imu_linear_acceleration.value());
-	}
-	else{
-		std::optional<Eigen::Vector2d> linear_acceleration = std::nullopt; 
+	std::optional<Eigen::Vector2d> linear_acceleration;
+	if (angular_velocity && angular_acceleration && imu_linear_acceleration) {
+	    linear_acceleration = transformLinearAcceleration(
+	        *angular_velocity, *angular_acceleration, *imu_linear_acceleration);
 	}
 
 
