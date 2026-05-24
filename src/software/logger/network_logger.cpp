@@ -34,8 +34,9 @@ void NetworkLoggerSingleton::initializeLogger(RobotId robot_id, bool enable_log_
 {
     if (!instance)
     {
-        NetworkLoggerSingleton::instance = std::shared_ptr<NetworkLoggerSingleton>(
-            new NetworkLoggerSingleton(robot_id, enable_log_merging, plot_juggler_interface));
+        NetworkLoggerSingleton::instance =
+            std::shared_ptr<NetworkLoggerSingleton>(new NetworkLoggerSingleton(
+                robot_id, enable_log_merging, plot_juggler_interface));
     }
 }
 
