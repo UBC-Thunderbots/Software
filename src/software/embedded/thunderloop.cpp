@@ -84,8 +84,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
       kick_constant_(std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY))),
       chip_pulse_width_(
           std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
-      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
-                          TeamColour::YELLOW, robot_id_),
+      primitive_executor_(robot_constants),
       robot_localizer_(robot_constants.kalman_process_noise_variance_rad_per_s_4,
                        robot_constants.kalman_vision_noise_variance_rad_2,
                        robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2)

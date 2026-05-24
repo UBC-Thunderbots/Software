@@ -124,7 +124,7 @@ constexpr RobotConstants createRobotConstants()
         // Robot's angular movement constants
         .robot_max_ang_speed_rad_per_s            = 6.0f,
         .robot_max_ang_speed_trajectory_rad_per_s = 5.0f,
-        .robot_max_ang_acceleration_rad_per_s_2   = 4.0f,
+        .robot_max_ang_acceleration_rad_per_s_2   = 10.0f,
 
         .wheel_radius_meters = 0.03f,
 

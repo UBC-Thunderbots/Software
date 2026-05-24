@@ -1,4 +1,5 @@
 #pragma once
+
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -15,19 +16,14 @@ class PrimitiveExecutor
    public:
     /**
      * Constructor
-     * @param time_step Time step which this primitive executor operates in
-     * @param robot_constants The robot constants for the robot which uses this primitive
-     * executor
-     * @param friendly_team_colour The colour of the friendly team
-     * @param robot_id The id of the robot which uses this primitive executor
+     *
+     * @param robot_constants The robot constants for the robot
      */
-    explicit PrimitiveExecutor(const Duration time_step,
-                               const robot_constants::RobotConstants& robot_constants,
-                               const TeamColour friendly_team_colour,
-                               const RobotId robot_id);
+    explicit PrimitiveExecutor(const robot_constants::RobotConstants& robot_constants);
 
     /**
      * Update primitive executor with a new Primitive
+     *
      * @param primitive_msg The primitive to start
      */
     void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
@@ -94,8 +90,9 @@ class PrimitiveExecutor
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
-    Duration time_since_angular_trajectory_creation_;
-    Duration time_since_linear_trajectory_creation_;
+    std::chrono::time_point<std::chrono::steady_clock> last_step_time_;
+    std::chrono::duration<double> time_since_linear_trajectory_creation_;
+    std::chrono::duration<double> time_since_angular_trajectory_creation_;
 
     Point position_;
     Vector velocity_;
@@ -105,13 +102,7 @@ class PrimitiveExecutor
     Point last_position_;
     Angle last_orientation_;
 
-    TeamColour friendly_team_colour_;
     robot_constants::RobotConstants robot_constants_;
-
-    // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
-    // time step to be used, in Seconds
-    Duration time_step_;
-    RobotId robot_id_;
 
     controls::PIDController<double> x_pid = {0.8, 0, 0, 0};
     controls::PIDController<double> y_pid = {0.8, 0, 0, 0};
@@ -121,7 +112,7 @@ class PrimitiveExecutor
     // These PIDs should be used in that case.
     controls::PIDController<double> x_pid_close = {2, 0, 0, 0};
     controls::PIDController<double> y_pid_close = {2, 0, 0, 0};
-    controls::PIDController<double> w_pid_close = {2, 0, 4, 0};
+    controls::PIDController<double> w_pid_close = {2, 0, 0, 0};
 
     // If distance between current linear trajectory destination and new one is larger
     // than this, we change trajectories.
@@ -129,10 +120,10 @@ class PrimitiveExecutor
     static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
 
     static constexpr double LINEAR_STALL_ERROR_MAX_METERS   = .4;
-    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 13;
+    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 25;
 
     static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS   = 0.5;
-    static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 25;
+    static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 45;
 
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.
