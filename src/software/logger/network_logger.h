@@ -21,9 +21,8 @@ class NetworkLoggerSingleton
      * Initializes a g3log logger for the calling program. This should only be
      * called once at the start of a program.
      */
-    static void initializeLogger(
-        RobotId robot_id, bool enable_log_merging,
-        const std::string& network_interface = "tbotswifi5");
+    static void initializeLogger(RobotId robot_id, bool enable_log_merging,
+                                 const std::string& network_interface = "tbotswifi5");
 
     /**
      * Updates the underlying UDP sender associated with this network sink. Useful when a
