@@ -1,17 +1,19 @@
+#include "imu.h"
+
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
 #include <sys/ioctl.h>
-#include <climits> // For SHRT_MAX
 
-#include "imu.h"
+#include <climits>  // For SHRT_MAX
+
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
 // these functions taken from
 // https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/lib/smbus.c
 static __s32 i2c_smbus_access(int file, char read_write, __u8 command, int size,
-                       union i2c_smbus_data* data)
+                              union i2c_smbus_data* data)
 {
     struct i2c_smbus_ioctl_data args;
     __s32 err;
@@ -128,21 +130,22 @@ ImuService::ImuService() : initialized_(false)
     }
 }
 
-std::optional<ImuData> ImuService::poll(){
+std::optional<ImuData> ImuService::poll()
+{
+    std::optional<AngularVelocity> angular_velocity = pollAngularVelocity();
+    std::optional<AngularAcceleration> angular_acceleration =
+        pollAngularAcceleration(angular_velocity);
+    std::optional<Eigen::Vector2d> imu_linear_acceleration = pollLinearAcceleration();
 
-	std::optional<AngularVelocity> angular_velocity = pollAngularVelocity();
-	std::optional<AngularAcceleration> angular_acceleration = pollAngularAcceleration(angular_velocity);
-	std::optional<Eigen::Vector2d> imu_linear_acceleration = pollLinearAcceleration();
-
-	std::optional<Eigen::Vector2d> linear_acceleration;
-	if (angular_velocity && angular_acceleration && imu_linear_acceleration) {
-	    linear_acceleration = transformLinearAcceleration(
-	        *angular_velocity, *angular_acceleration, *imu_linear_acceleration);
-	}
+    std::optional<Eigen::Vector2d> linear_acceleration;
+    if (angular_velocity && angular_acceleration && imu_linear_acceleration)
+    {
+        linear_acceleration = transformLinearAcceleration(
+            *angular_velocity, *angular_acceleration, *imu_linear_acceleration);
+    }
 
 
-	return ImuData{angular_velocity, angular_acceleration, linear_acceleration};
-
+    return ImuData{angular_velocity, angular_acceleration, linear_acceleration};
 }
 std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg)
 {
@@ -156,7 +159,7 @@ std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_
 
     uint16_t combined = (static_cast<uint8_t>(most_significant) << 8) |
                         static_cast<uint8_t>(least_significant);
-                        
+
     return static_cast<int16_t>(combined);
 }
 
@@ -167,50 +170,54 @@ std::optional<AngularVelocity> ImuService::pollAngularVelocity()
         return std::nullopt;
     }
 
-    std::optional<int16_t> opt_full_word = readAndCombineByteData(GYRO_LEAST_SIG_REG, GYRO_MOST_SIG_REG);
-    
+    std::optional<int16_t> opt_full_word =
+        readAndCombineByteData(GYRO_LEAST_SIG_REG, GYRO_MOST_SIG_REG);
+
     if (!opt_full_word.has_value())
     {
         return std::nullopt;
     }
 
     int16_t full_word = opt_full_word.value();
-    
+
     double degrees_per_sec = static_cast<double>(full_word) /
                              static_cast<double>(SHRT_MAX) * IMU_FULL_SCALE_DPS;
-	
-    return AngularVelocity::fromRadians((degrees_per_sec - degrees_error_)*M_PI/180);
+
+    return AngularVelocity::fromRadians((degrees_per_sec - degrees_error_) * M_PI / 180);
 }
 
 
-std::optional<AngularAcceleration> ImuService::pollAngularAcceleration(std::optional<AngularVelocity> curr_angular_velocity)
+std::optional<AngularAcceleration> ImuService::pollAngularAcceleration(
+    std::optional<AngularVelocity> curr_angular_velocity)
 {
     if (!initialized_)
     {
         return std::nullopt;
     }
-	
-	if(!prev_angular_velocity_.has_value()){
-		prev_angular_velocity_ = pollAngularVelocity();
-		prev_time_ = std::chrono::steady_clock::now();
-		return std::nullopt;
-	}
 
-    auto curr_time =  std::chrono::steady_clock::now();
+    if (!prev_angular_velocity_.has_value())
+    {
+        prev_angular_velocity_ = pollAngularVelocity();
+        prev_time_             = std::chrono::steady_clock::now();
+        return std::nullopt;
+    }
 
-	double dt = std::chrono::duration<double>(curr_time - prev_time_).count();
-	if (dt <= 0 || !curr_angular_velocity.has_value()) return std::nullopt;
+    auto curr_time = std::chrono::steady_clock::now();
 
-	double alpha = (curr_angular_velocity->toRadians() - 
-                prev_angular_velocity_->toRadians()) / dt;
+    double dt = std::chrono::duration<double>(curr_time - prev_time_).count();
+    if (dt <= 0 || !curr_angular_velocity.has_value())
+        return std::nullopt;
 
-	prev_angular_velocity_ = curr_angular_velocity;
-	prev_time_ = curr_time;
+    double alpha =
+        (curr_angular_velocity->toRadians() - prev_angular_velocity_->toRadians()) / dt;
+
+    prev_angular_velocity_ = curr_angular_velocity;
+    prev_time_             = curr_time;
 
     return AngularAcceleration::fromRadians(alpha);
 }
-	 
-	
+
+
 
 std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
 {
@@ -219,8 +226,10 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
         return std::nullopt;
     }
 
-    std::optional<int16_t> opt_x = readAndCombineByteData(ACCEL_X_LEAST_SIG_REG, ACCEL_X_MOST_SIG_REG);
-    std::optional<int16_t> opt_y = readAndCombineByteData(ACCEL_Y_LEAST_SIG_REG, ACCEL_Y_MOST_SIG_REG);
+    std::optional<int16_t> opt_x =
+        readAndCombineByteData(ACCEL_X_LEAST_SIG_REG, ACCEL_X_MOST_SIG_REG);
+    std::optional<int16_t> opt_y =
+        readAndCombineByteData(ACCEL_Y_LEAST_SIG_REG, ACCEL_Y_MOST_SIG_REG);
 
     if (!opt_x.has_value() || !opt_y.has_value())
     {
@@ -230,19 +239,18 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
     int16_t raw_x = opt_x.value();
     int16_t raw_y = opt_y.value();
 
-    double a_x = (static_cast<double>(raw_x) / SHRT_MAX) 
-                 * ACCELEROMETER_FULL_SCALE_G 
-                 * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
-                 
-    double a_y = (static_cast<double>(raw_y) / SHRT_MAX) 
-                 * ACCELEROMETER_FULL_SCALE_G 
-                 * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
-	
+    double a_x = (static_cast<double>(raw_x) / SHRT_MAX) * ACCELEROMETER_FULL_SCALE_G *
+                 ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+
+    double a_y = (static_cast<double>(raw_y) / SHRT_MAX) * ACCELEROMETER_FULL_SCALE_G *
+                 ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+
     return Eigen::Vector2d(a_x, a_y);
 }
 
-Eigen::Vector2d ImuService::transformLinearAcceleration(
-    AngularVelocity omega, AngularAcceleration alpha, Eigen::Vector2d a_imu)
+Eigen::Vector2d ImuService::transformLinearAcceleration(AngularVelocity omega,
+                                                        AngularAcceleration alpha,
+                                                        Eigen::Vector2d a_imu)
 {
     Eigen::Vector2d r(IMU_OFFSET_X, IMU_OFFSET_Y);
 
