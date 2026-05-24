@@ -14,12 +14,6 @@ PidController::PidController(double k_p, double k_i, double k_d, double max_inte
 
 double PidController::step(double error, double delta_time)
 {
-    // if sign of error swaps, reset integrator
-    if (last_error_.value_or(0.0) * error <= 0.0)
-    {
-        integral_ = 0.0;
-    }
-
     integral_ = std::clamp(integral_ + error * delta_time, -max_integral, max_integral);
 
     const double derivative = (error - last_error_.value_or(error)) / delta_time;

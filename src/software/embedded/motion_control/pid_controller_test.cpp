@@ -33,13 +33,12 @@ TEST(PidControllerTest, OnlyIntegralTermNonZero)
     EXPECT_DOUBLE_EQ(pid.step(1.0, 1.0), k_i * 3.0);
     EXPECT_DOUBLE_EQ(pid.step(0.5, 1.0), k_i * 3.5);
 
-    // switch error direction, integral term should reset
-    EXPECT_DOUBLE_EQ(pid.step(-0.2, 1.0), k_i * -0.2);
-    EXPECT_DOUBLE_EQ(pid.step(-1.0, 1.0), k_i * -1.2);
-    EXPECT_DOUBLE_EQ(pid.step(0.0, 1.0), k_i * 0.0);
+    EXPECT_DOUBLE_EQ(pid.step(-0.2, 1.0), k_i * 3.3);
+    EXPECT_DOUBLE_EQ(pid.step(-1.0, 1.0), k_i * 2.3);
+    EXPECT_DOUBLE_EQ(pid.step(0.0, 1.0), k_i * 2.3);
 
     // should not accumulate integral term above max_integral
-    EXPECT_DOUBLE_EQ(pid.step(9.0, 1.0), k_i * 9.0);
+    EXPECT_DOUBLE_EQ(pid.step(6.7, 1.0), k_i * 9.0);
     EXPECT_DOUBLE_EQ(pid.step(5.0, 1.0), k_i * 10.0);
     EXPECT_DOUBLE_EQ(pid.step(1.0, 1.0), k_i * 10.0);
 }
@@ -70,9 +69,9 @@ TEST(PidControllerTest, GeneralApplication)
     EXPECT_DOUBLE_EQ(pid.step(12.0, 0.75), k_p * 12.0 + k_i * 9.0 + k_d * 0.0);
     EXPECT_DOUBLE_EQ(pid.step(24.0, 0.75), k_p * 24.0 + k_i * 10.0 + k_d * 12.0 / 0.75);
     EXPECT_DOUBLE_EQ(pid.step(4.0, 1.0), k_p * 4.0 + k_i * 10.0 + k_d * -20.0);
-    EXPECT_DOUBLE_EQ(pid.step(0.0, 1.0), k_p * 0.0 + k_i * 0.0 + k_d * -4.0);
-    EXPECT_DOUBLE_EQ(pid.step(2.0, 1.0), k_p * 2.0 + k_i * 2.0 + k_d * 2.0);
-    EXPECT_DOUBLE_EQ(pid.step(-2.0, 1.0), k_p * -2.0 + k_i * -2.0 + k_d * -4.0);
+    EXPECT_DOUBLE_EQ(pid.step(0.0, 1.0), k_p * 0.0 + k_i * 10.0 + k_d * -4.0);
+    EXPECT_DOUBLE_EQ(pid.step(2.0, 1.0), k_p * 2.0 + k_i * 10.0 + k_d * 2.0);
+    EXPECT_DOUBLE_EQ(pid.step(-2.0, 1.0), k_p * -2.0 + k_i * 8.0 + k_d * -4.0);
 }
 
 TEST(PidControllerTest, InvalidArgumentsToConstructor)
