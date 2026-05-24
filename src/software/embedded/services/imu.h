@@ -70,7 +70,7 @@ class ImuService
     Eigen::Vector2d calibrate_imu();
 
 
-	bool initialized_ = false;
+    bool initialized_ = false;
 
     int file_descriptor_ = 0;
 

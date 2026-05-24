@@ -266,41 +266,42 @@ Eigen::Vector2d ImuService::transformLinearAcceleration(AngularVelocity omega,
     return a_imu + tangential - centripetal;
 }
 
-Eigen::Vector2d ImuService::calibrate_imu(){
-	Eigen::MatrixXd A(2*100, 2);
-	Eigen::VectorXd b(2*100);
-	int valid = 0;
+Eigen::Vector2d ImuService::calibrate_imu()
+{
+    Eigen::MatrixXd A(2 * 100, 2);
+    Eigen::VectorXd b(2 * 100);
+    int valid = 0;
 
     for (int i = 0; i < 100; i++)
     {
         // Fixed: Call the actual implemented function name
         auto omega_opt = pollAngularVelocity();
         auto alpha_opt = pollAngularAcceleration();
-		auto acc = pollLinearAcceleration();
-		if (omega_opt.has_value() && alpha_opt.has_value() && acc.has_value())
-		{
-		    double omega = omega_opt->toRadians();
-		    double alpha = alpha_opt->toRadians();
-		
-		    A(2*valid,   0) = -omega * omega;
-		    A(2*valid,   1) = -alpha;
-		    A(2*valid+1, 0) =  alpha;
-		    A(2*valid+1, 1) = -omega * omega;
-		
-		    b(2*valid)   = acc->x();
-		    b(2*valid+1) = acc->y();
-		    valid++;
-		}
-		    usleep(100000);
-		}
-		if (valid < 10)
-		{
-		    LOG(WARNING) << "Calibration failed: insufficient valid samples";
-		    return Eigen::Vector2d(0.0, 0.0);
-		}
-		Eigen::MatrixXd A_valid = A.topRows(2 * valid);
-		Eigen::VectorXd b_valid = b.topRows(2 * valid);
-		Eigen::Vector2d X = A_valid.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_valid);
-		return X;
+        auto acc       = pollLinearAcceleration();
+        if (omega_opt.has_value() && alpha_opt.has_value() && acc.has_value())
+        {
+            double omega = omega_opt->toRadians();
+            double alpha = alpha_opt->toRadians();
 
+            A(2 * valid, 0)     = -omega * omega;
+            A(2 * valid, 1)     = -alpha;
+            A(2 * valid + 1, 0) = alpha;
+            A(2 * valid + 1, 1) = -omega * omega;
+
+            b(2 * valid)     = acc->x();
+            b(2 * valid + 1) = acc->y();
+            valid++;
+        }
+        usleep(100000);
+    }
+    if (valid < 10)
+    {
+        LOG(WARNING) << "Calibration failed: insufficient valid samples";
+        return Eigen::Vector2d(0.0, 0.0);
+    }
+    Eigen::MatrixXd A_valid = A.topRows(2 * valid);
+    Eigen::VectorXd b_valid = b.topRows(2 * valid);
+    Eigen::Vector2d X =
+        A_valid.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_valid);
+    return X;
 }
