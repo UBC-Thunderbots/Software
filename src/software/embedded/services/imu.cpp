@@ -279,7 +279,10 @@ Eigen::Vector2d ImuService::calibrate_imu()
     {
         // Fixed: Call the actual implemented function name
         auto omega_opt = pollAngularVelocity();
-        auto alpha_opt = pollAngularAcceleration();
+		if (!omega_opt.has_value()){
+			continue;	
+		}
+        auto alpha_opt = pollAngularAcceleration(omega_opt);
         auto acc       = pollLinearAcceleration();
         if (omega_opt.has_value() && alpha_opt.has_value() && acc.has_value())
         {
