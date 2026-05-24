@@ -24,18 +24,6 @@ cc_library(
 )
 
 cc_library(
-    name = "imu",
-    srcs = ["imu.cpp"],
-    hdrs = ["imu.h"],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//software/geom:angular_velocity",
-        "//software/logger",
-        "@eigen",
-    ],
-)
-
-cc_library(
     name = "power",
     srcs = ["power.cpp"],
     hdrs = ["power.h"],
@@ -46,5 +34,38 @@ cc_library(
         "//software/uart:boost_uart_communication",
         "@boost//:asio",
         "@boost//:filesystem",
+    ],
+)
+
+cc_library(
+    name = "imu",
+    srcs = ["imu.cpp"],
+    hdrs = ["imu.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//software/geom:angular_acceleration",
+        "//software/geom:angular_velocity",
+        "//software/logger",
+        "@eigen",
+    ],
+)
+
+cc_binary(
+    name = "robot_auto_test",
+    srcs = ["robot_auto_test.cpp"],
+    linkopts = [
+        "-lpthread",
+        "-lrt",
+    ],
+    deps = [
+        ":motor",
+        ":power",
+        "//proto/message_translation:tbots_geometry",
+        "//proto/primitive:primitive_msg_factory",
+        "//shared:robot_constants",
+        "//software/embedded:primitive_executor",
+        "//software/logger",
+        "@trinamic",
     ],
 )

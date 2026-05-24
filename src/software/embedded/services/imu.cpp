@@ -5,12 +5,15 @@
 #include <linux/i2c.h>
 #include <sys/ioctl.h>
 
+#include <climits>  // For SHRT_MAX
+
+#include "shared/constants.h"
 #include "software/logger/logger.h"
 
 // these functions taken from
 // https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/lib/smbus.c
-__s32 i2c_smbus_access(int file, char read_write, __u8 command, int size,
-                       union i2c_smbus_data* data)
+static __s32 i2c_smbus_access(int file, char read_write, __u8 command, int size,
+                              union i2c_smbus_data* data)
 {
     struct i2c_smbus_ioctl_data args;
     __s32 err;
@@ -26,7 +29,7 @@ __s32 i2c_smbus_access(int file, char read_write, __u8 command, int size,
     return err;
 }
 
-__s32 i2c_smbus_read_byte_data(int file, __u8 command)
+static __s32 i2c_smbus_read_byte_data(int file, __u8 command)
 {
     union i2c_smbus_data data;
     int err;
@@ -38,12 +41,13 @@ __s32 i2c_smbus_read_byte_data(int file, __u8 command)
     return 0x0FF & data.byte;
 }
 
-__s32 i2c_smbus_write_byte_data(int file, __u8 command, __u8 value)
+static __s32 i2c_smbus_write_byte_data(int file, __u8 command, __u8 value)
 {
     union i2c_smbus_data data;
     data.byte = value;
     return i2c_smbus_access(file, I2C_SMBUS_WRITE, command, I2C_SMBUS_BYTE_DATA, &data);
 }
+
 
 ImuService::ImuService() : initialized_(false)
 {
@@ -102,7 +106,8 @@ ImuService::ImuService() : initialized_(false)
     int valid_samples = 0;
     for (int i = 0; i < 100; i++)
     {
-        auto poll = pollHeadingRate();
+        // Fixed: Call the actual implemented function name
+        auto poll = pollAngularVelocity();
         if (poll.has_value())
         {
             sum += poll->toDegrees();
@@ -111,6 +116,7 @@ ImuService::ImuService() : initialized_(false)
         usleep(50000);
     }
 
+    // TODO: More robust calibration
     if (valid_samples > 0)
     {
         degrees_error_ = sum / valid_samples;
@@ -118,32 +124,143 @@ ImuService::ImuService() : initialized_(false)
     }
     else
     {
-        LOG(WARNING) << "IMU Calibration failed: no valid samples received. Heading "
+        LOG(WARNING) << "IMU Calibration failed: no valid samples received. Angular "
                         "stability will be poor.";
         initialized_ = false;
     }
 }
 
-std::optional<AngularVelocity> ImuService::pollHeadingRate()
+ImuData ImuService::poll()
 {
-    if (!initialized_)
+    std::optional<AngularVelocity> angular_velocity = pollAngularVelocity();
+    std::optional<AngularAcceleration> angular_acceleration =
+        pollAngularAcceleration(angular_velocity);
+    std::optional<Eigen::Vector2d> imu_linear_acceleration = pollLinearAcceleration();
+
+    std::optional<Eigen::Vector2d> linear_acceleration;
+    if (angular_velocity && angular_acceleration && imu_linear_acceleration)
     {
-        return std::nullopt;
+        linear_acceleration = transformLinearAcceleration(
+            *angular_velocity, *angular_acceleration, *imu_linear_acceleration);
     }
 
-    // Two separate registers for the Gyro output data.
-    int least_significant = i2c_smbus_read_byte_data(file_descriptor_, YAW_LEAST_SIG_REG);
-    int most_significant  = i2c_smbus_read_byte_data(file_descriptor_, YAW_MOST_SIG_REG);
+    return ImuData{angular_velocity, angular_acceleration, linear_acceleration};
+}
+std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg)
+{
+    int least_significant = i2c_smbus_read_byte_data(file_descriptor_, ls_reg);
+    int most_significant  = i2c_smbus_read_byte_data(file_descriptor_, ms_reg);
 
     if (least_significant < 0 || most_significant < 0)
     {
         return std::nullopt;
     }
 
-    int16_t full_word = (static_cast<uint8_t>(most_significant) << 8) |
+    uint16_t combined = (static_cast<uint8_t>(most_significant) << 8) |
                         static_cast<uint8_t>(least_significant);
+
+    return static_cast<int16_t>(combined);
+}
+
+std::optional<AngularVelocity> ImuService::pollAngularVelocity()
+{
+    if (!initialized_)
+    {
+        return std::nullopt;
+    }
+
+    std::optional<int16_t> opt_full_word =
+        readAndCombineByteData(GYRO_LEAST_SIG_REG, GYRO_MOST_SIG_REG);
+
+    if (!opt_full_word.has_value())
+    {
+        return std::nullopt;
+    }
+
+    int16_t full_word = opt_full_word.value();
 
     double degrees_per_sec = static_cast<double>(full_word) /
                              static_cast<double>(SHRT_MAX) * IMU_FULL_SCALE_DPS;
-    return AngularVelocity::fromDegrees(degrees_per_sec - degrees_error_);
+
+    return AngularVelocity::fromRadians((degrees_per_sec - degrees_error_) * M_PI / 180);
+}
+
+
+std::optional<AngularAcceleration> ImuService::pollAngularAcceleration(
+    std::optional<AngularVelocity> curr_angular_velocity)
+{
+    if (!initialized_)
+    {
+        return std::nullopt;
+    }
+
+    if (!prev_angular_velocity_.has_value())
+    {
+        prev_angular_velocity_ = pollAngularVelocity();
+        prev_time_             = std::chrono::steady_clock::now();
+        return std::nullopt;
+    }
+
+    auto curr_time = std::chrono::steady_clock::now();
+
+    double dt = std::chrono::duration<double>(curr_time - prev_time_).count();
+    if (dt <= 0 || !curr_angular_velocity.has_value())
+        return std::nullopt;
+
+    double alpha =
+        (curr_angular_velocity->toRadians() - prev_angular_velocity_->toRadians()) / dt;
+
+    prev_angular_velocity_ = curr_angular_velocity;
+    prev_time_             = curr_time;
+
+    return AngularAcceleration::fromRadians(alpha);
+}
+
+
+
+std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
+{
+    if (!initialized_)
+    {
+        return std::nullopt;
+    }
+
+    std::optional<int16_t> opt_x =
+        readAndCombineByteData(ACCEL_X_LEAST_SIG_REG, ACCEL_X_MOST_SIG_REG);
+    std::optional<int16_t> opt_y =
+        readAndCombineByteData(ACCEL_Y_LEAST_SIG_REG, ACCEL_Y_MOST_SIG_REG);
+
+    if (!opt_x.has_value() || !opt_y.has_value())
+    {
+        return std::nullopt;
+    }
+
+    int16_t raw_x = opt_x.value();
+    int16_t raw_y = opt_y.value();
+
+    double a_x = (static_cast<double>(raw_x) / SHRT_MAX) * ACCELEROMETER_FULL_SCALE_G *
+                 ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+
+    double a_y = (static_cast<double>(raw_y) / SHRT_MAX) * ACCELEROMETER_FULL_SCALE_G *
+                 ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+
+    return Eigen::Vector2d(a_x, a_y);
+}
+
+Eigen::Vector2d ImuService::transformLinearAcceleration(AngularVelocity omega,
+                                                        AngularAcceleration alpha,
+                                                        Eigen::Vector2d a_imu)
+{
+    Eigen::Vector2d r(IMU_OFFSET_X, IMU_OFFSET_Y);
+
+    double w = omega.toRadians();
+    double a = alpha.toRadians();
+
+    // tangential: alpha x r → (-alpha*ry, alpha*rx)
+    Eigen::Vector2d tangential(-a * r.y(), a * r.x());
+
+    // centripetal: omega^2 * r
+    Eigen::Vector2d centripetal = (w * w) * r;
+
+    return a_imu + tangential - centripetal;
 }
