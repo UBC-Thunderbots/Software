@@ -29,7 +29,6 @@ TEST_F(TomlConfigClientTest, create_with_nonexistent_file_creates_default_config
     EXPECT_EQ(client.get("robot_id"), "1");
     EXPECT_EQ(client.get("channel_id"), "0");
     EXPECT_EQ(client.get("network_interface"), "tbotswifi5");
-    EXPECT_EQ(client.get("plot_juggler_interface"), "tbotswifi5");
 }
 
 TEST_F(TomlConfigClientTest, get_nonexistent_key_returns_empty_string)

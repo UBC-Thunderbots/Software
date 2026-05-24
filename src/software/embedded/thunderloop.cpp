@@ -89,14 +89,8 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     waitForNetworkUp();
 
     g3::overrideSetupSignals({});
-    std::string plot_juggler_interface =
-        toml_config_client_->get(ROBOT_PLOT_JUGGLER_INTERFACE_CONFIG_KEY);
-    if (plot_juggler_interface.empty())
-    {
-        plot_juggler_interface = "tbotswifi5";
-    }
     NetworkLoggerSingleton::initializeLogger(robot_id_, enable_log_merging,
-                                             plot_juggler_interface);
+                                             network_interface_);
 
     // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);

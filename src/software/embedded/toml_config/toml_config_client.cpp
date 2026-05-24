@@ -41,7 +41,6 @@ void TomlConfigClient::loadConfig()
             {"robot_id", "1"},
             {"channel_id", "0"},
             {"network_interface", "tbotswifi5"},
-            {"plot_juggler_interface", "tbotswifi5"},
             {"kick_constant", "0"},
             {"kick_coeff", "0.0"},
             {"chip_pulse_width", "0"},

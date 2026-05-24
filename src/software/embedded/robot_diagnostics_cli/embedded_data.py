@@ -52,9 +52,6 @@ class EmbeddedData:
     def get_network_interface(self) -> str:
         return self._get_value(ROBOT_NETWORK_INTERFACE_CONFIG_KEY)
 
-    def get_plot_juggler_interface(self) -> str:
-        return self._get_value(ROBOT_PLOT_JUGGLER_INTERFACE_CONFIG_KEY)
-
     def get_channel_id(self) -> str:
         return self._get_value(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY)
 
