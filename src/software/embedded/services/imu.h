@@ -67,8 +67,10 @@ class ImuService
     Eigen::Vector2d transformLinearAcceleration(AngularVelocity omega,
                                                 AngularAcceleration alpha,
                                                 Eigen::Vector2d a);
+    Eigen::Vector2d calibrate_imu();
 
-    bool initialized_ = false;
+
+	bool initialized_ = false;
 
     int file_descriptor_ = 0;
 
