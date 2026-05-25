@@ -70,6 +70,27 @@ nanopb_proto_library(
 
 py_proto_library(
     name = "tbots_py_proto",
+    srcs = [
+        "ball.proto",
+        "estop_state.proto",
+        "game_state.proto",
+        "geometry.proto",
+        "ip_notification.proto",
+        "parameters.proto",
+        "play.proto",
+        "primitive.proto",
+        "replay_bookmark.proto",
+        "robot_statistic.proto",
+        "robot_status_msg.proto",
+        "tactic.proto",
+        "tbots_software_msgs.proto",
+        "tbots_timestamp_msg.proto",
+        "team.proto",
+        "validation.proto",
+        "vision.proto",
+        "visualization.proto",
+        "world.proto",
+    ],
     deps = [
         ":tbots_proto",
     ],

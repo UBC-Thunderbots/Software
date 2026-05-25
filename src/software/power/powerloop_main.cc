@@ -1,9 +1,7 @@
 #ifdef PLATFORMIO_BUILD
-#include "charger.h"
 #include "chicker.h"
 #include "constants_platformio.h"
 #include "control_executor.h"
-#include "geneva.h"
 #include "power_frame_msg_platformio.h"
 #include "power_monitor.h"
 #include "proto/power_frame_msg.nanopb.h"
@@ -14,10 +12,8 @@
 #include "proto/robot_status_msg.nanopb.h"
 #include "shared/constants.h"
 #include "shared/uart_framing/uart_framing.hpp"
-#include "software/power/charger.h"
 #include "software/power/chicker.h"
 #include "software/power/control_executor.h"
-#include "software/power/geneva.h"
 #include "software/power/power_monitor.h"
 #endif
 
@@ -29,10 +25,8 @@ bool receiving;
 
 uint32_t sequence_num;
 
-std::shared_ptr<Charger> charger;
 std::shared_ptr<Chicker> chicker;
 std::shared_ptr<PowerMonitor> monitor;
-std::shared_ptr<Geneva> geneva;
 std::shared_ptr<ControlExecutor> executor;
 
 void setup()
@@ -40,12 +34,9 @@ void setup()
     Serial.begin(460800, SERIAL_8N1);
     receiving    = false;
     sequence_num = 0;
-    charger      = std::make_shared<Charger>();
     chicker      = std::make_shared<Chicker>();
     monitor      = std::make_shared<PowerMonitor>();
-    geneva       = std::make_shared<Geneva>();
-    executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
-    charger->chargeCapacitors();
+    executor     = std::make_shared<ControlExecutor>(chicker);
 }
 
 void loop()
