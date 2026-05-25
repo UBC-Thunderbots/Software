@@ -38,6 +38,11 @@ class PowerService
      */
     void tick();
 
+    /**
+     * Set dribbler RPM
+     */
+    void dribble(int rpm);
+
    private:
     /**
      * Initiates timer for serial reading
@@ -58,3 +63,22 @@ class PowerService
     // Required flag to exit power service cleanly
     bool is_running = true;
 };
+
+/**
+ * A separate power service that also controls the dribbler.
+ */
+class PowerServiceWithDribble : public PowerService {
+   public:
+    /**
+     * Handler method called every time the timer expires a new read is requested
+     */
+    override void tick();
+
+    /**
+     * Set dribbler RPM
+     */
+    void dribble(int rpm);
+   private:
+    bool _new_dribble_command = false;
+    std::atomic<TbotsProto_DribblerControl> dribble_command;
+}

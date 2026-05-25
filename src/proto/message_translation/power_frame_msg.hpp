@@ -316,4 +316,10 @@ std::unique_ptr<TbotsProto::PowerStatus> inline createTbotsPowerStatus(
     proto_status->ParseFromString(std::string(buffer.begin(), buffer.end()));
     return proto_status;
 }
+
+TbotsProto_DribblerControl inline createNanoPbDribblerControl(int rpm) {
+    TbotsProto_DribblerControl control = TbotsProto_DribblerControl_init_default;
+    control.dribbler_speed = rpm;
+    return control;
+}
 #endif

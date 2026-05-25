@@ -14,7 +14,6 @@ cc_library(
         "//shared:robot_constants",
         "//software/embedded/gpio",
         "//software/embedded/motor_controller",
-        "//software/embedded/motor_controller:motor_board",
         "//software/embedded/motor_controller:motor_fault_indicator",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",

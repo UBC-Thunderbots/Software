@@ -34,7 +34,7 @@ message PowerPulseControl
 
 message DribblerControl
 {
-    uint8 dribbler_speed = 1;
+    uint32 dribbler_speed = 1; // Changed from uint8 to have better rpm control
 }
 
 message PowerFrame

@@ -22,8 +22,9 @@
 using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
 StSpinMotorController::StSpinMotorController(
-    const robot_constants::RobotConstants& robot_constants)
+    const robot_constants::RobotConstants& robot_constants, PowerServiceWithDribble& power_service)
     : robot_constants_(robot_constants),
+        power_service_(power_service),
       reset_gpio_(std::make_unique<GpioCharDev>(RESET_GPIO_PIN, GpioDirection::OUTPUT,
                                                 GpioState::HIGH))
 {
@@ -177,7 +178,8 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 {
     if (motor == MotorIndex::DRIBBLER)
     {
-        return 0;
+        // Here target_velocity is treated as angular velocity with unit RPM
+        power_service_.dribble(target_velocity);
     }
 
     const auto outgoing_frame = SetTargetSpeedFrame{

@@ -5,6 +5,7 @@
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
 #include "software/embedded/motor_controller/motor_index.h"
 #include "software/embedded/motor_controller/stspin_types.h"
+#include "software/embedded/services/power.h"
 
 /**
  * Motor controller for controlling our 6th generation STSPIN motor drivers.
@@ -17,7 +18,7 @@ class StSpinMotorController : public MotorController
 {
    public:
     explicit StSpinMotorController(
-        const robot_constants::RobotConstants& robot_constants);
+        const robot_constants::RobotConstants& robot_constants, PowerServiceWithDribble& power_service);
 
     void setup() override;
 
@@ -88,6 +89,8 @@ class StSpinMotorController : public MotorController
     };
 
     std::unordered_map<MotorIndex, MotorStatus> motor_status_;
+
+    PowerServiceWithDribble& power_service_;
 
     /**
      * Opens a SPI file descriptor for the given motor.

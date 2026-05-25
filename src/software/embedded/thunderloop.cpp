@@ -15,6 +15,7 @@
 #include "software/networking/tbots_network_exception.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
+#include "software/embedded/motor_controller/motor_board.h"
 
 /**
  * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -114,11 +115,22 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    power_service_ = std::make_unique<PowerService>();
-    LOG(INFO)
-        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
+    
 
-    motor_service_  = std::make_unique<MotorService>(robot_constants);
+    if constexpr (MOTOR_BOARD == MotorBoard::TRINAMIC)
+    {
+        power_service_ = std::make_unique<PowerService>();
+        LOG(INFO)
+            << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
+        motor_service_  = std::make_unique<MotorService>(robot_constants,std::make_unique<TmcMotorController>());
+    }
+    else
+    {
+        power_service_ = std::make_unique<PowerServiceWithDribble>();
+        LOG(INFO)
+            << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
+        motor_service_  = std::make_unique<MotorService>(robot_constants, std::make_unique<StSpinMotorController>(robot_constants, power_service_));
+    }
     g_motor_service = motor_service_.get();
     motor_service_->setup();
     LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";

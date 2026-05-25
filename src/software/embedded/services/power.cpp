@@ -83,3 +83,54 @@ TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& comma
         createNanoPbPowerPulseControl(command, kick_coeff, kick_constant, chip_constant);
     return *createTbotsPowerStatus(status);
 }
+
+void PowerServiceWithDribble::dribble(int rpm) {
+    dribble_command = createNanoPbDribblerControl(rpm);
+    _new_dribble_command = true;
+}
+
+void PowerServiceWithDribble::tick()
+{
+    std::vector<uint8_t> power_status;
+    try
+    {
+        uart->flushSerialPort(uart->flush_receive);
+        power_status = uart->serialRead(READ_BUFFER_SIZE);
+    }
+    catch (std::exception& e)
+    {
+        LOG(FATAL) << "Read thread has crashed" << e.what();
+    }
+
+    TbotsProto_PowerFrame status_frame = TbotsProto_PowerFrame_init_default;
+    if (!unmarshalUartPacket(power_status, status_frame))
+    {
+        LOG(WARNING) << "Unmarshal failed";
+    }
+    else
+    {
+        status = status_frame.power_msg.power_status;
+    }
+    if (_new_dribble_command) {
+        auto command = dribble_command.load(std::memory_order_relaxed);  // get value atomically
+    } else {
+        auto command =
+            nanopb_command.load(std::memory_order_relaxed);  // get value atomically
+    }
+    auto frame                = createUartFrame(command);
+    auto power_command_buffer = marshallUartPacket(frame);
+
+    try
+    {
+        // Write power command
+        uart->flushSerialPort(uart->flush_send);
+        if (!uart->serialWrite(power_command_buffer))
+        {
+            LOG(WARNING) << "Writing power command failed.";
+        }
+    }
+    catch (std::exception& e)
+    {
+        LOG(FATAL) << "ESP32 has disconnected. Power service has crashed" << e.what();
+    }
+}
