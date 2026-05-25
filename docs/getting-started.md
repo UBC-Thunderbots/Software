@@ -31,7 +31,6 @@
     - [Tracy](#tracy)
   - [Building for the robot](#building-for-the-robot)
   - [Deploying Robot Software to the robot](#deploying-robot-software-to-the-robot)
-  - [Testing Robot Software locally](#testing-robot-software-locally)
   - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
     - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
 - [Workflow](#workflow)
@@ -281,24 +280,12 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - Xbox control allows us to use a connected Xbox controller to control the robots
 4. Run our SimulatedPlayTests in Thunderscope
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
-    1. For legacy C++ tests (#2581) with the visualizer:
-        1. First run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main --visualize_cpp_test`
-        2. Then run `./tbots.py test [some_target_here] --run_sim_in_realtime`
-    2. For PyTests:
-        - With the visualizer: `./tbots.py test [some_target_here] -t`
-        - Without the visualizer: `./tbots.py test [some_target_here]`
-    3. For legacy C++ tests (#2581) without the visualizer:
-        - `./tbots.py test [some_target_here]`
+    - With the visualizer: `./tbots.py test [some_target_here] -t`
+    - Without the visualizer: `./tbots.py test [some_target_here]`
 5. Run our SimulatedTacticTests in Thunderscope:
     - This will launch the visualizer and simulate an AI Tactic on a single robot
-    1. For legacy C++ tests (#2581) with the visualizer:
-        - First, run Thunderscope configured for receiving protobufs over unix sockets correctly: `./tbots.py run thunderscope_main --visualize_cpp_test`
-        - Then run `./tbots.py test [some_target_here] --run_sim_in_realtime`
-    2. For PyTests:
-        - With the visualizer: `./tbots.py test [some_target_here] -t`
-        - Without the visualizer: `./tbots.py test [some_target_here]`
-    3. For legacy C++ tests (#2581) without the visualizer:
-        - `./tbots.py test [some_target_here]`
+    - With the visualizer: `./tbots.py test [some_target_here] -t`
+    - Without the visualizer: `./tbots.py test [some_target_here]`
 
 ## Debugging
 
@@ -366,38 +353,10 @@ We use Ansible to automatically update software running on the robot. [More info
 To update binaries on a working robot, you can run:
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
-Where `<platform>` is the robot platform you are deploying to (`PI` or `NANO`), and `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
-
-## Testing Robot Software locally
-
-It is possible to run Thunderloop without having a fully-working robot. Using this mode is useful when testing features that don't require the power board or motors.
-
-1. To run Thunderloop locally on your computer
-    1. First, you must ensure that `redis` is installed. Installation instructions can be found [here](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-linux/). The result of these installation directions will likely enable `redis-server` as a service that starts on boot. You may want to run `sudo systemctl disable redis-server` to prevent this.
-    2. Next, run the command `redis-server` in a terminal.
-    3. Set up the following required REDIS constants by running the following commands in the terminal:
-        - `redis-cli set /robot_id "{robot_id}"` where `{robot_id}` is the robot's ID (e.g. `1`, `2`, etc.)
-        - `redis-cli set /network_interface "{network_interface}"` where `{network_interface}` is one of the interfaces listed by `ip a`.
-        - `redis-cli set /channel_id "{channel_id}"` where `{channel_id}` is the channel id of the robot (e.g. `1`, `2`, etc.)
-        - `redis-cli set /kick_coeff "{kick_coeff}"` where `{kick_coeff}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-        - `redis-cli set /kick_constant "{kick_constant}"` where `{kick_constant}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-        - `redis-cli set /chip_pulse_width "{chip_pulse_width}"` where `{chip_pulse_width}` is a calibrated kicking parameter. When running locally, this parameter doesn't matter so `0` is fine.
-    4. Now, run Thunderloop with the following command:
-        - `bazel run //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED`
-
-2. If you have a robot PC that doesn't have proper communication with the power or motor board, you can still run Thunderloop in a limited capacity to test software features (eg. networking).
-    1. First, build the Thunderloop binary:
-        - `bazel build //software/embedded:thunderloop_main --//software/embedded:host_platform=LIMITED --platforms=//toolchains/cc:robot`
-    2. Find the `<robot_ip>` of the robot you want to run Thunderloop on. This guide may help you find the IP address of the robot: [Useful Robot Commands](useful-robot-commands.md#Wifi-Disclaimer).
-    3. Copy the binary to the robot:
-        - `scp bazel-bin/software/embedded/thunderloop_main robot@<robot_ip>:/home/robot/thunderloop_main`
-    4. SSH into the robot using the following command:
-        - `ssh robot@<robot_ip>`
-    5. Run the Thunderloop binary on the robot:
-        - `sudo ./thunderloop_main`
+Where `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
 
 ## Setting up Virtual Robocup 2021
 

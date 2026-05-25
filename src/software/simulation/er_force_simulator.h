@@ -28,7 +28,7 @@ class ErForceSimulator
      * @param realism_config realism configuration
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const RobotConstants_t& robot_constants,
+                              const robot_constants::RobotConstants& robot_constants,
                               std::unique_ptr<RealismConfigErForce>& realism_config,
                               const bool ramping = false,
                               double primitive_executor_time_step_s =
@@ -222,7 +222,7 @@ class ErForceSimulator
     std::unique_ptr<camun::simulator::Simulator> er_force_sim;
     EuclideanToWheel euclidean_to_four_wheel;
 
-    RobotConstants_t robot_constants;
+    robot_constants::RobotConstants robot_constants;
     Field field;
 
     std::optional<RobotId> blue_robot_with_ball;

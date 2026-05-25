@@ -9,7 +9,7 @@
 - [Tools](#tools)
   - [Ansible](#ansible)
   - [Systemd](#systemd)
-  - [Redis](#redis)
+  - [TOML Configuration](#toml-configuration)
 - [Thunderloop](#thunderloop)
 
 <!--TOC-->
@@ -26,8 +26,7 @@
 
 For a more detailed look at how Ansible works, [see the RFC](https://docs.google.com/document/d/1hN3Us2Vjr8z6ihqUVp_3L7rrjKc-EZ-l2hZJc31gNOc/edit)
 
-Example command: `bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot --//software/embedded:host_platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
-* <platform>: `PI` or `NANO` depending on the computer on the robot
+Example command: `bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 * <robot_ip>: IP address of the robot
 * <robot_password>: Password of the robot
 
@@ -37,9 +36,9 @@ More commands available [here](useful-robot-commands.md#off-robot-commands)
 
 [Systemd](https://www.freedesktop.org/wiki/Software/systemd/) allows us to have services which start as soon as we boot the robot, will automatically restart and are individually controllable. All services have the file {service}.service, which controls the configuration of that service. Our core service brought up by systemd is thunderloop. The thunderloop.service file can be seen [here](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/embedded/linux_configs/systemd/thunderloop.service).
 
-## Redis
+## TOML Configuration
 
-[Redis](https://redis.io/docs/about/) is an in-memory key-value store. This allows us to share state between processes as well as modify values dynamically through the provided [cli](useful-robot-commands#redis). Values also persists between boots.
+Robot configuration is stored in a TOML file in home directory. This file contains both static configuration values and dynamic runtime values. 
 
 # Thunderloop
 

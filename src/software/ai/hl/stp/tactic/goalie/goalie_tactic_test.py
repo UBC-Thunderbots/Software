@@ -1,18 +1,18 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.robot_enters_region import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_moves_in_direction import *
-from software.simulated_tests.friendly_has_ball_possession import *
-from software.simulated_tests.ball_speed_threshold import *
-from software.simulated_tests.robot_speed_threshold import *
-from software.simulated_tests.excessive_dribbling import *
+from proto.import_all_protos import *
+from software.simulated_tests.validation.robot_enters_region import *
+from software.simulated_tests.validation.ball_enters_region import *
+from software.simulated_tests.validation.ball_moves_in_direction import *
+from software.simulated_tests.validation.friendly_has_ball_possession import *
+from software.simulated_tests.validation.ball_speed_threshold import *
+from software.simulated_tests.validation.robot_speed_threshold import *
+from software.simulated_tests.validation.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
 
 
 @pytest.mark.parametrize(
@@ -114,45 +114,24 @@ def test_goalie_blocks_shot(
     robot_initial_position,
     simulated_test_runner,
 ):
-    # Setup Robot
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
-        create_world_state(
-            [],
-            blue_robot_locations=[robot_initial_position],
-            ball_location=ball_initial_position,
-            ball_velocity=ball_initial_velocity,
-        ),
-    )
+    def setup(*args):
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                [],
+                blue_robot_locations=[robot_initial_position],
+                ball_location=ball_initial_position,
+                ball_velocity=ball_initial_velocity,
+            )
+        )
 
-    # These aren't necessary for this test, but this is just an example
-    # of how to send commands to the simulator.
-    #
-    # NOTE: The gamecontroller responses are automatically handled by
-    # the gamecontroller context manager class
-    simulated_test_runner.gamecontroller.send_gc_command(
-        gc_command=Command.Type.STOP, team=Team.UNKNOWN
-    )
-    simulated_test_runner.gamecontroller.send_gc_command(
-        gc_command=Command.Type.FORCE_START, team=Team.BLUE
-    )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: GoalieTactic(
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                )
+            }
+        )
 
-    # Setup Tactic
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].goalie.CopyFrom(
-        GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
-    )
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
-
-    # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
-
-    # Always Validation
     always_validation_sequence_set = [
         [
             RobotNeverEntersRegion(
@@ -165,7 +144,6 @@ def test_goalie_blocks_shot(
         ]
     ]
 
-    # Eventually Validation
     eventually_validation_sequence_set = [
         [
             # Goalie should be in the defense area
@@ -178,6 +156,7 @@ def test_goalie_blocks_shot(
     ]
 
     simulated_test_runner.run_test(
+        setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -212,35 +191,28 @@ def test_goalie_clears_from_dead_zone(
     should_clear,
     simulated_test_runner,
 ):
-    # Setup Robot
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
-        create_world_state(
-            [],
-            blue_robot_locations=[
-                tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().centre()
-            ],
-            ball_location=ball_position,
-            ball_velocity=tbots_cpp.Vector(0, 0),
-        ),
-    )
+    def setup(*args):
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                [],
+                blue_robot_locations=[
+                    tbots_cpp.Field.createSSLDivisionBField()
+                    .friendlyDefenseArea()
+                    .centre()
+                ],
+                ball_location=ball_position,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            )
+        )
 
-    # Setup Tactic
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].goalie.CopyFrom(
-        GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
-    )
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: GoalieTactic(
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                )
+            }
+        )
 
-    # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
-    )
-
-    # Always Validation
     always_validation_sequence_set = [
         [
             BallNeverEntersRegion(
@@ -253,7 +225,6 @@ def test_goalie_clears_from_dead_zone(
     if should_clear:
         always_validation_sequence_set = [[]]
 
-    # Eventually Validation
     eventually_validation_sequence_set = [[]]
     if should_clear:
         eventually_validation_sequence_set = [
@@ -268,6 +239,7 @@ def test_goalie_clears_from_dead_zone(
         ]
 
     simulated_test_runner.run_test(
+        setup=setup,
         test_timeout_s=8,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,

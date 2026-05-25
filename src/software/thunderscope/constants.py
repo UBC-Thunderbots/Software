@@ -331,7 +331,9 @@ class DiagnosticsConstants:
     SUPPORTED_CONTROLLERS = {
         "Microsoft Xbox One X pad",
         "Microsoft X-Box One S pad",
+        "Microsoft X-Box 360 pad",
         "Microsoft Xbox 360 pad",
+        "Generic X-Box pad",
     }
 
     BUTTON_PRESSED_THRESHOLD = 0.5
@@ -348,6 +350,10 @@ class DiagnosticsConstants:
     CHIP_DISTANCE_STEPPER = 0.5
     MIN_CHIP_POWER = 0.5
     MAX_CHIP_POWER = 5.0
+
+    PULSE_WIDTH_STEPPER = 1
+    MIN_PULSE_WIDTH = 1
+    MAX_PULSE_WIDTH = 20000
 
 
 class ProtoConfigurationConstant:
@@ -397,6 +403,19 @@ class RuntimeManagerConstants:
     DEFAULT_BINARY_NAME = "Current Fullsystem"
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
+
+    RUNTIME_STATS_DIRECTORY_PATH = "/tmp/tbots/stats"
+    RUNTIME_FRIENDLY_STATS_FILE = "blue.toml"
+    RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE = "yellow_from_blue.toml"
+    RUNTIME_ENEMY_STATS_FILE = "yellow.toml"
+    RUNTIME_FRIENDLY_FROM_ENEMY_STATS_FILE = "blue_from_yellow.toml"
+
+    RUNTIME_STATS_SCORE_KEY = "goals"
+    RUNTIME_STATS_RED_CARDS_KEY = "red_cards"
+    RUNTIME_STATS_YELLOW_CARDS_KEY = "yellow_cards"
+    RUNTIME_STATS_SHOTS_ON_NET = "shots_on_net"
+    RUNTIME_STATS_SHOTS_BLOCKED = "shots_blocked"
+
     RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
     DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
     MAX_RELEASES_FETCHED = 5

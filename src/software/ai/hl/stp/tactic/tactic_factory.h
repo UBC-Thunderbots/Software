@@ -12,52 +12,52 @@
  * @return a pointer to the tactic
  */
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::Tactic &tactic_proto,
+    const TbotsProto::Tactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::AttackerTactic &tactic_proto,
+    const TbotsProto::AttackerTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::ChipTactic &tactic_proto,
+    const TbotsProto::ChipTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::CreaseDefenderTactic &tactic_proto,
+    const TbotsProto::CreaseDefenderTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::DribbleTactic &tactic_proto,
+    const TbotsProto::DribbleTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::GetBehindBallTactic &tactic_proto,
+    const TbotsProto::GetBehindBallTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::GoalieTactic &tactic_proto,
+    const TbotsProto::GoalieTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::KickTactic &tactic_proto,
+    const TbotsProto::KickTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::MoveGoalieToGoalLineTactic &tactic_proto,
+    const TbotsProto::MoveGoalieToGoalLineTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::MoveTactic &tactic_proto,
+    const TbotsProto::MoveTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::PassDefenderTactic &tactic_proto,
+    const TbotsProto::PassDefenderTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::PenaltyKickTactic &tactic_proto,
+    const TbotsProto::PenaltyKickTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::PivotKickTactic &tactic_proto,
+    const TbotsProto::PivotKickTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::ReceiverTactic &tactic_proto,
+    const TbotsProto::ReceiverTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::ShadowEnemyTactic &tactic_proto,
+    const TbotsProto::ShadowEnemyTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::HaltTactic &tactic_proto,
+    const TbotsProto::HaltTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
 /**
@@ -68,6 +68,6 @@ std::shared_ptr<Tactic> createTactic(
  * @return the C++ struct/class
  */
 AutoChipOrKick createAutoChipOrKick(
-    const TbotsProto::AutoChipOrKick &auto_chip_or_kick_proto);
-Pass createPass(const TbotsProto::Pass &pass_proto);
-EnemyThreat createEnemyThreat(const TbotsProto::EnemyThreat &enemy_threat_proto);
+    const TbotsProto::AutoChipOrKick& auto_chip_or_kick_proto);
+Pass createPass(const TbotsProto::Pass& pass_proto);
+EnemyThreat createEnemyThreat(const TbotsProto::EnemyThreat& enemy_threat_proto);

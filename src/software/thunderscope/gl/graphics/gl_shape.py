@@ -3,12 +3,12 @@ from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors, LINE_WIDTH
-
+from software.thunderscope.gl.graphics.gl_graphic import GLGraphic
 from typing import Optional
 
 
-class GLShape(GLLinePlotItem):
-    """Base class for a graphic that displays a shape on the
+class GLShape(GLGraphic):
+    """Base class for a graphic that displays a 2D geometric shape on the
     cartesian plane (i.e. x-y plane)
     """
 
@@ -22,53 +22,18 @@ class GLShape(GLLinePlotItem):
         """Base constructor for the GLShape
 
         :param parent_item: The parent item of the graphic
-        :param outline_color: The color of the polygon's outline
-        :param fill_color: The color used to fill the polygon, or None if no fill
-        :param line_width: The line width of the polygon's outline
-        """
-        super().__init__(parentItem=parent_item, width=line_width)
-
-        self.x = 0
-        self.y = 0
-        self.orientation = 0
-
-        self.points = []
-        self.fill_graphic = None
-
-        self.set_outline_color(outline_color)
-        self.set_fill_color(fill_color)
-
-    def set_position(self, x: float, y: float) -> None:
-        """Set the position of the graphic in the scene
-
-        :param x: The x coordinate to position the graphic at
-        :param y: The y coordinate to position the graphic at
-        """
-        if self.x == x and self.y == y:
-            return
-
-        self.translate(x - self.x, y - self.y, 0)
-        self.x = x
-        self.y = y
-
-    def set_orientation(self, degrees: float) -> None:
-        """Set the orientation of the graphic in the scene
-
-        :param degrees: The orientation of the graphic in degrees
-        """
-        if self.orientation == degrees:
-            return
-
-        # Rotate locally about the z axis (0, 0, 1)
-        self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
-        self.orientation = degrees
-
-    def set_outline_color(self, outline_color: QtGui.QColor) -> None:
-        """Set the color of the shape's outline
-
         :param outline_color: The color of the shape's outline
+        :param fill_color: The color used to fill the shape, or None if no fill
+        :param line_width: The line width of the shape's outline
         """
-        self.setData(color=outline_color)
+        super().__init__(
+            parent_item=parent_item,
+            outline_color=outline_color,
+            line_width=line_width,
+        )
+
+        self.fill_graphic = None
+        self.set_fill_color(fill_color)
 
     def set_fill_color(self, fill_color: Optional[QtGui.QColor]) -> None:
         """Set the color used to fill the shape
@@ -84,11 +49,3 @@ class GLShape(GLLinePlotItem):
             if self.fill_graphic:
                 self.fill_graphic.setParentItem(None)
                 self.fill_graphic = None
-
-    def _update_shape_data(self) -> None:
-        """Update the underlying GLLinePlotItem and GLMeshItem representing
-        the outline and fill of this shape
-        """
-        raise NotImplementedError(
-            "Derived class of GLShape must implement _update_shape_data"
-        )

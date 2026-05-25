@@ -21,11 +21,11 @@ class voronoi_diagram;
 class VoronoiDiagram
 {
    public:
-    explicit VoronoiDiagram(const std::vector<Point> &points);
+    explicit VoronoiDiagram(const std::vector<Point>& points);
 
     VoronoiDiagram() = delete;
 
-    const std::vector<Point> &getPointsUsedForGeneration() const
+    const std::vector<Point>& getPointsUsedForGeneration() const
     {
         return points;
     }
@@ -38,7 +38,7 @@ class VoronoiDiagram
      * @param bounding_box The bounding rectangle
      * @return
      */
-    std::vector<Point> findVoronoiEdgeRecIntersects(const Rectangle &bounding_box);
+    std::vector<Point> findVoronoiEdgeRecIntersects(const Rectangle& bounding_box);
 
     /**
      * Find the set of open circles whose origin lies within the given rectangle, and that
@@ -49,7 +49,7 @@ class VoronoiDiagram
      * @param bounding_box The bounding rectangle of the Voronoi diagram.
      * @return A vector of open circles.
      */
-    std::vector<Circle> voronoiVerticesToOpenCircles(const Rectangle &bounding_box);
+    std::vector<Circle> voronoiVerticesToOpenCircles(const Rectangle& bounding_box);
 
    private:
     std::shared_ptr<boost::polygon::voronoi_diagram<

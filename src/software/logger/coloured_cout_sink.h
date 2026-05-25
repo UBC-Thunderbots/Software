@@ -41,7 +41,7 @@ class ColouredCoutSink
      *
      * @params log the LogMessage to output
      */
-    void displaySingleLog(g3::LogMessage &log);
+    void displaySingleLog(g3::LogMessage& log);
 
    private:
     /**

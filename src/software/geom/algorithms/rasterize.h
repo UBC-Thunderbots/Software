@@ -19,7 +19,7 @@
  * @param resolution_size how far should the points be apart from each other in meters
  * @return a set of points covered by circle
  */
-std::vector<Point> rasterize(const Circle &circle, double resolution_size);
+std::vector<Point> rasterize(const Circle& circle, double resolution_size);
 
 /**
  * Returns a set of points covered by a rectangle with a set resolution size
@@ -30,7 +30,7 @@ std::vector<Point> rasterize(const Circle &circle, double resolution_size);
  * @param resolution_size how far should the points be apart from each other in meters
  * @return a set of points covered by rectangle
  */
-std::vector<Point> rasterize(const Rectangle &rectangle, double resolution_size);
+std::vector<Point> rasterize(const Rectangle& rectangle, double resolution_size);
 
 /**
  * Returns a set of points covered by a polygon with a set resolution size
@@ -39,7 +39,7 @@ std::vector<Point> rasterize(const Rectangle &rectangle, double resolution_size)
  * @param resolution_size how far should the points be apart from each other in meters
  * @return a set of points covered by polygon
  */
-std::vector<Point> rasterize(const Polygon &polygon, double resolution_size);
+std::vector<Point> rasterize(const Polygon& polygon, double resolution_size);
 
 /**
  * Returns a set of points covered by a stadium with a set resolution size
@@ -48,4 +48,4 @@ std::vector<Point> rasterize(const Polygon &polygon, double resolution_size);
  * @param resolution_size how far should the points be apart from each other in meters
  * @return a set of points covered by stadium
  */
-std::vector<Point> rasterize(const Stadium &stadium, double resolution_size);
+std::vector<Point> rasterize(const Stadium& stadium, double resolution_size);

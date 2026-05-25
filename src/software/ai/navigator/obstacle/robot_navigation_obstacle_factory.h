@@ -34,8 +34,8 @@ class RobotNavigationObstacleFactory
      * @return Obstacles representing the given motion constraints
      */
     std::vector<ObstaclePtr> createObstaclesFromMotionConstraints(
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const World &world) const;
+        const std::set<TbotsProto::MotionConstraint>& motion_constraints,
+        const World& world) const;
 
     /**
      * Create static obstacles for the given motion constraint
@@ -46,7 +46,7 @@ class RobotNavigationObstacleFactory
      * @return Obstacles representing the given motion constraint
      */
     std::vector<ObstaclePtr> createObstaclesFromMotionConstraint(
-        const TbotsProto::MotionConstraint &motion_constraint, const World &world) const;
+        const TbotsProto::MotionConstraint& motion_constraint, const World& world) const;
 
     /**
      * Create circle obstacle around robot with additional radius scaling
@@ -55,7 +55,7 @@ class RobotNavigationObstacleFactory
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createStaticObstacleFromRobotPosition(const Point &robot_position) const;
+    ObstaclePtr createStaticObstacleFromRobotPosition(const Point& robot_position) const;
 
     /**
      * Create a stadium shaped obstacle for enemy robot with additional radius scaling
@@ -64,7 +64,7 @@ class RobotNavigationObstacleFactory
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createStadiumEnemyRobotObstacle(const Robot &enemy_robot) const;
+    ObstaclePtr createStadiumEnemyRobotObstacle(const Robot& enemy_robot) const;
 
     /**
      * Create dynamic circle obstacle for enemy robot with additional radius scaling
@@ -73,7 +73,7 @@ class RobotNavigationObstacleFactory
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createConstVelocityEnemyRobotObstacle(const Robot &enemy_robot) const;
+    ObstaclePtr createConstVelocityEnemyRobotObstacle(const Robot& enemy_robot) const;
 
     /**
      * Create dynamic circle obstacle around robot with additional radius scaling
@@ -83,8 +83,8 @@ class RobotNavigationObstacleFactory
      *
      * @return moving obstacle around the robot
      */
-    ObstaclePtr createFromMovingRobot(const Robot &robot,
-                                      const TrajectoryPath &traj) const;
+    ObstaclePtr createFromMovingRobot(const Robot& robot,
+                                      const TrajectoryPath& traj) const;
 
     /**
      * Create circle obstacle around ball
@@ -93,7 +93,7 @@ class RobotNavigationObstacleFactory
      *
      * @return obstacle around the ball
      */
-    ObstaclePtr createFromBallPosition(const Point &ball_position) const;
+    ObstaclePtr createFromBallPosition(const Point& ball_position) const;
 
     /**
      * Returns an obstacle for the shape
@@ -104,10 +104,10 @@ class RobotNavigationObstacleFactory
      *
      * @return ObstaclePtr
      */
-    ObstaclePtr createFromShape(const Circle &circle) const;
-    ObstaclePtr createFromShape(const Polygon &polygon) const;
-    ObstaclePtr createFromShape(const Rectangle &rectangle) const;
-    ObstaclePtr createFromShape(const Stadium &stadium) const;
+    ObstaclePtr createFromShape(const Circle& circle) const;
+    ObstaclePtr createFromShape(const Polygon& polygon) const;
+    ObstaclePtr createFromShape(const Rectangle& rectangle) const;
+    ObstaclePtr createFromShape(const Stadium& stadium) const;
 
     /**
      * Generate a trajectory based circular obstacle with additional radius scaling
@@ -116,8 +116,8 @@ class RobotNavigationObstacleFactory
      * @param traj Trajectory which the obstacle is following
      * @return ObstaclePtr to the trajectory based obstacle
      */
-    ObstaclePtr createCircleWithTrajectory(const Circle &circle,
-                                           const TrajectoryPath &traj) const;
+    ObstaclePtr createCircleWithTrajectory(const Circle& circle,
+                                           const TrajectoryPath& traj) const;
 
     /**
      * Generate a const velocity based circular obstacle with additional radius scaling
@@ -126,8 +126,8 @@ class RobotNavigationObstacleFactory
      * @param velocity The velocity of the obstacle
      * @return ObstaclePtr to the constant velocity obstacle
      */
-    ObstaclePtr createCircleWithConstVelocity(const Circle &circle,
-                                              const Vector &velocity) const;
+    ObstaclePtr createCircleWithConstVelocity(const Circle& circle,
+                                              const Vector& velocity) const;
 
     /**
      * Returns an obstacle with the shape of the BallPlacementZone if the state is in
@@ -138,8 +138,8 @@ class RobotNavigationObstacleFactory
      *
      * @return ObstaclePtr
      */
-    ObstaclePtr createFromBallPlacement(const Point &placement_point,
-                                        const Point &ball_point) const;
+    ObstaclePtr createFromBallPlacement(const Point& placement_point,
+                                        const Point& ball_point) const;
 
    private:
     TbotsProto::RobotNavigationObstacleConfig config;
@@ -158,9 +158,9 @@ class RobotNavigationObstacleFactory
      *
      * @return ObstaclePtr
      */
-    ObstaclePtr createFromFieldRectangle(const Rectangle &field_rectangle,
-                                         const Rectangle &field_lines,
-                                         const Rectangle &field_boundary,
+    ObstaclePtr createFromFieldRectangle(const Rectangle& field_rectangle,
+                                         const Rectangle& field_lines,
+                                         const Rectangle& field_boundary,
                                          double additional_expansion_amount = 0.0) const;
 
     /**
@@ -182,6 +182,6 @@ class RobotNavigationObstacleFactory
      * obstacles around the goal.
      */
 
-    std::vector<ObstaclePtr> createGoalObstacles(const Rectangle &goal,
+    std::vector<ObstaclePtr> createGoalObstacles(const Rectangle& goal,
                                                  bool isFriendly) const;
 };

@@ -47,7 +47,7 @@ struct MoveFSM : TacticFSM<MoveFSM>
      *
      * @param event MoveFSM::Update event
      */
-    void updateMove(const Update &event);
+    void updateMove(const Update& event);
 
     /**
      * This guard is used to check if the robot is done moving
@@ -56,7 +56,7 @@ struct MoveFSM : TacticFSM<MoveFSM>
      *
      * @return if robot has reached the destination
      */
-    bool moveDone(const Update &event);
+    bool moveDone(const Update& event);
 
     auto operator()()
     {

@@ -15,16 +15,6 @@ AssignedTacticsPlay::AssignedTacticsPlay(
 {
 }
 
-void AssignedTacticsPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                         const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing
-    while (true)
-    {
-        yield({{}});
-    }
-}
-
 void AssignedTacticsPlay::updateControlParams(
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics,
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>> motion_constraints)
@@ -34,14 +24,14 @@ void AssignedTacticsPlay::updateControlParams(
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
-    const WorldPtr &world_ptr, const InterPlayCommunication &,
-    const SetInterPlayCommunicationCallback &)
+    const WorldPtr& world_ptr, const InterPlayCommunication&,
+    const SetInterPlayCommunicationCallback&)
 {
     obstacle_list.Clear();
     path_visualization.Clear();
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
-    for (const auto &robot : world_ptr->friendlyTeam().getAllRobots())
+    for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
     {
         if (assigned_tactics.contains(robot.id()))
         {
@@ -87,7 +77,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
     return primitives_to_run;
 }
 
-void AssignedTacticsPlay::updateTactics(const PlayUpdate &play_update) {}
+void AssignedTacticsPlay::updateTactics(const PlayUpdate& play_update) {}
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, AssignedTacticsPlay,

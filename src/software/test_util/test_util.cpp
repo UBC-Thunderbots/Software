@@ -24,12 +24,12 @@ std::shared_ptr<World> createBlankTestingWorld(TbotsProto::FieldType field_type)
     return createBlankTestingWorld(createField(Field::createField(field_type)));
 }
 
-Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,
-                             const Timestamp &timestamp)
+Team setRobotPositionsHelper(Team team, const std::vector<Point>& robot_positions,
+                             const Timestamp& timestamp)
 {
     std::vector<Robot> robots;
     unsigned int robot_id_index = 0;
-    for (const Point &robot_position : robot_positions)
+    for (const Point& robot_position : robot_positions)
     {
         Robot robot = Robot(robot_id_index, robot_position, Vector(), Angle::zero(),
                             AngularVelocity::zero(), timestamp);
@@ -44,39 +44,39 @@ Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_position
     return team;
 }
 
-void setFriendlyRobotPositions(const std::shared_ptr<World> &world,
+void setFriendlyRobotPositions(const std::shared_ptr<World>& world,
                                std::vector<Point> robot_positions,
-                               const Timestamp &timestamp)
+                               const Timestamp& timestamp)
 {
     Team new_friendly_team =
         setRobotPositionsHelper(world->friendlyTeam(), robot_positions, timestamp);
     world->updateFriendlyTeamState(new_friendly_team);
 }
 
-void setEnemyRobotPositions(const std::shared_ptr<World> &world,
+void setEnemyRobotPositions(const std::shared_ptr<World>& world,
                             std::vector<Point> robot_positions,
-                            const Timestamp &timestamp)
+                            const Timestamp& timestamp)
 {
     Team new_enemy_team =
         setRobotPositionsHelper(world->enemyTeam(), robot_positions, timestamp);
     world->updateEnemyTeamState(new_enemy_team);
 }
 
-void setBallPosition(const std::shared_ptr<World> &world, Point ball_position,
+void setBallPosition(const std::shared_ptr<World>& world, Point ball_position,
                      Timestamp timestamp)
 {
     BallState ball_state(ball_position, world->ball().velocity());
     world->updateBall(Ball(ball_state, timestamp));
 }
 
-void setBallVelocity(const std::shared_ptr<World> &world, Vector ball_velocity,
+void setBallVelocity(const std::shared_ptr<World>& world, Vector ball_velocity,
                      Timestamp timestamp)
 {
     BallState ball_state(world->ball().position(), ball_velocity);
     world->updateBall(Ball(ball_state, timestamp));
 }
 
-Robot createRobotAtPos(const Point &pt)
+Robot createRobotAtPos(const Point& pt)
 {
     static RobotId robot_id_counter = 0;
     return Robot(robot_id_counter++, pt, Vector(), Angle(), AngularVelocity(),
@@ -98,7 +98,7 @@ double millisecondsSince(std::chrono::time_point<std::chrono::system_clock> star
 }
 
 std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
-    const std::vector<Point> &positions)
+    const std::vector<Point>& positions)
 {
     std::vector<RobotStateWithId> states;
     for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
@@ -112,7 +112,7 @@ std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
 }
 
 std::vector<RobotStateWithId> createMovingRobotStatesWithId(
-    const std::vector<Point> &positions, const std::vector<Vector> &velocity)
+    const std::vector<Point>& positions, const std::vector<Vector>& velocity)
 {
     std::vector<RobotStateWithId> states;
     for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
@@ -125,8 +125,8 @@ std::vector<RobotStateWithId> createMovingRobotStatesWithId(
     return states;
 }
 
-GameState createGameState(const RefereeCommand &current_referee_command,
-                          const RefereeCommand &previous_referee_command)
+GameState createGameState(const RefereeCommand& current_referee_command,
+                          const RefereeCommand& previous_referee_command)
 {
     GameState game_state;
     game_state.updateRefereeCommand(previous_referee_command);

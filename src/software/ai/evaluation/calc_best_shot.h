@@ -29,8 +29,8 @@
  * shot (this is the total angle between the obstacles on either side of the shot
  * vector). If no shot is possible, returns `std::nullopt`
  */
-std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &shot_origin,
-                                       const std::vector<Robot> &robot_obstacles,
+std::optional<Shot> calcBestShotOnGoal(const Segment& goal_post, const Point& shot_origin,
+                                       const std::vector<Robot>& robot_obstacles,
                                        TeamType goal,
                                        double radius = ROBOT_MAX_RADIUS_METERS);
 /**
@@ -53,8 +53,8 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
  * shot (this is the total angle between the obstacles on either side of the shot
  * vector). If no shot can be found, returns std::nullopt
  */
-std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
-                                       const Team &enemy_team, const Point &shot_origin,
+std::optional<Shot> calcBestShotOnGoal(const Field& field, const Team& friendly_team,
+                                       const Team& enemy_team, const Point& shot_origin,
                                        TeamType goal,
-                                       const std::vector<Robot> &robots_to_ignore = {},
+                                       const std::vector<Robot>& robots_to_ignore = {},
                                        double radius = ROBOT_MAX_RADIUS_METERS);

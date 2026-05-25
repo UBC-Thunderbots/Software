@@ -29,7 +29,11 @@ install_bazel() {
 }
 
 install_clang_format() {
-    ln -s /usr/bin/clang-format-14 /opt/tbotspython/bin/clang-format
+    if is_darwin $1; then
+        ln -s /opt/homebrew/bin/clang-format /opt/tbotspython/bin/clang-format
+    else
+        ln -s /usr/bin/clang-format-14 /opt/tbotspython/bin/clang-format
+    fi
 }
 
 install_cross_compiler() {
