@@ -116,7 +116,7 @@ ImuService::ImuService() : initialized_(false)
         usleep(50000);
     }
 
-    // TODO: More robust calibration
+    // TODO (3421): More robust calibration
     if (valid_samples > 0)
     {
         degrees_error_ = sum / valid_samples;
@@ -128,8 +128,10 @@ ImuService::ImuService() : initialized_(false)
                         "stability will be poor.";
         initialized_ = false;
     }
-	Eigen::Vector2d deviation = calibrate_imu();
-	LOG(INFO) << "error: " << deviation.x() << deviation.y()  << ".";
+
+	// Temparary: enable when need to calibrate
+	// Eigen::Vector2d deviation = calibrate_imu();
+	// LOG(INFO) << "error: " << deviation.x() << deviation.y()  << ".";
 }
 
 std::optional<ImuData> ImuService::poll()
@@ -252,7 +254,7 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
 
 Eigen::Vector2d ImuService::transformLinearAcceleration(AngularVelocity omega,
                                                         AngularAcceleration alpha,
-                                                        Eigen::Vector2d a_imu)
+                                                        Eigen::Vector2d imu_acceleration)
 {
     Eigen::Vector2d r(IMU_OFFSET_X, IMU_OFFSET_Y);
 
@@ -265,7 +267,7 @@ Eigen::Vector2d ImuService::transformLinearAcceleration(AngularVelocity omega,
     // centripetal: omega^2 * r
     Eigen::Vector2d centripetal = (w * w) * r;
 
-    return a_imu + tangential - centripetal;
+    return imu_acceleration + tangential - centripetal;
 }
 
 Eigen::Vector2d ImuService::calibrate_imu()
