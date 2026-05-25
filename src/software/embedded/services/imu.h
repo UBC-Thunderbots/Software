@@ -60,20 +60,20 @@ class ImuService
     std::optional<int16_t> readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg);
     /**
      * Transform linear acceleration to robot center of mass
-	 * @parama omega angular veocity of the robot
-	 * @param alpha angular acceleration of the robot
-	 * @parama imu_acceleration lianer acceleration of imu
-	 * @return the linear acceleration of the robot center of mass
-	 */
+     * @parama omega angular veocity of the robot
+     * @param alpha angular acceleration of the robot
+     * @parama imu_acceleration lianer acceleration of imu
+     * @return the linear acceleration of the robot center of mass
+     */
     Eigen::Vector2d transformLinearAcceleration(AngularVelocity omega,
                                                 AngularAcceleration alpha,
                                                 Eigen::Vector2d imu_acceleration);
     /**
-     * Finds the deviation of the imu from the robot center of mass by taking 100 data points, 
-	 * applying a least square regression on the relative acceleration formula, 
-	 * and solving for the distance
-	 * @return the deviation of the imu from the robot center of mass
-	 */
+     * Finds the deviation of the imu from the robot center of mass by taking 100 data
+     * points, applying a least square regression on the relative acceleration formula,
+     * and solving for the distance
+     * @return the deviation of the imu from the robot center of mass
+     */
     Eigen::Vector2d calibrate_imu();
 
 

@@ -129,9 +129,9 @@ ImuService::ImuService() : initialized_(false)
         initialized_ = false;
     }
 
-	// Temparary: enable when need to calibrate
-	// Eigen::Vector2d deviation = calibrate_imu();
-	// LOG(INFO) << "error: " << deviation.x() << deviation.y()  << ".";
+    // Temporary: enable when need to calibrate
+    // Eigen::Vector2d deviation = calibrate_imu();
+    // LOG(INFO) << "error: " << deviation.x() << deviation.y()  << ".";
 }
 
 std::optional<ImuData> ImuService::poll()
