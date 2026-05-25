@@ -41,11 +41,11 @@ struct KalmanParamsBehaviour
     // Filter Params
     vec<DimX> state_estimate;
     matrix<DimX, DimX> state_covariance;
-    matrix<DimX, DimX>  process_model;
-    matrix<DimX, DimX>  process_covariance;
-    matrix<DimX, DimU>  control_model;
-    matrix<DimY, DimX>  measurement_model;
-    matrix<DimY, DimY>  measurement_covariance;
+    matrix<DimX, DimX> process_model;
+    matrix<DimX, DimX> process_covariance;
+    matrix<DimX, DimU> control_model;
+    matrix<DimY, DimX> measurement_model;
+    matrix<DimY, DimY> measurement_covariance;
 
     // Input
     matrix<DimU, 1> control_input;
@@ -54,7 +54,6 @@ struct KalmanParamsBehaviour
     // Expected Values
     vec<DimX> expected_state_estimate;
     matrix<DimX, DimX> expected_state_covariance;
-
 };
 
 class MathTests1D :  // Params: Kalman Params in 1D
@@ -93,10 +92,9 @@ class MathTests1D :  // Params: Kalman Params in 1D
 template <int DimX, int DimY, int DimU>
 class BehaviourTests
     :  // Params: Kalman Params as Matrix, expected state, expected covariance
-                    public testing::TestWithParam<KalmanParamsBehaviour<DimX, DimY, DimU>>
+       public testing::TestWithParam<KalmanParamsBehaviour<DimX, DimY, DimU>>
 {
    protected:
-
     KalmanFilter<DimX, DimY, DimU> filter{};
 
     vec<DimX> expected_state_estimate;
@@ -111,20 +109,20 @@ class BehaviourTests
     {
         p = this->GetParam();
 
-        filter.state_estimate = p.state_estimate;
-        filter.state_covariance = p.state_covariance;
-        filter.process_model = p.process_model;
-        filter.process_covariance = p.process_covariance;
-        filter.control_model = p.control_model;
-        filter.measurement_model = p.measurement_model;
+        filter.state_estimate         = p.state_estimate;
+        filter.state_covariance       = p.state_covariance;
+        filter.process_model          = p.process_model;
+        filter.process_covariance     = p.process_covariance;
+        filter.control_model          = p.control_model;
+        filter.measurement_model      = p.measurement_model;
         filter.measurement_covariance = p.measurement_covariance;
 
         // Input
-        control_input = p.control_input;
+        control_input     = p.control_input;
         measurement_input = p.measurement_input;
 
         // Expected Values
-        expected_state_estimate =  p.expected_state_estimate;
+        expected_state_estimate   = p.expected_state_estimate;
         expected_state_covariance = p.expected_state_covariance;
     }
 };
@@ -168,6 +166,8 @@ INSTANTIATE_TEST_SUITE_P(
         // Negative Numbers, No Uncertainty
         KalmanParamsMath{-3.5, -0.1, -1.0, 0.0, -1.0, -1.0, 0.0, 3.4, -2.3}));
 
+// #TODO See how KF behaves with divide by 0
+
 // Behavioural Tests
 
 using BehaviourTests1D = BehaviourTests<1, 1, 1>;
@@ -176,22 +176,35 @@ TEST_P(BehaviourTests1D, Behaviour1D)
     filter.predict(control_input);
     filter.update(measurement_input);
 
-    EXPECT_TRUE(filter.state_estimate.isApprox(expected_state_estimate, std::numeric_limits<double>::epsilon()));
-    EXPECT_TRUE(filter.state_covariance.isApprox(expected_state_covariance, std::numeric_limits<double>::epsilon()));
-
+    EXPECT_TRUE(filter.state_estimate.isApprox(expected_state_estimate,
+                                               std::numeric_limits<double>::epsilon()));
+    EXPECT_TRUE(filter.state_covariance.isApprox(expected_state_covariance,
+                                                 std::numeric_limits<double>::epsilon()));
 }
 
 INSTANTIATE_TEST_SUITE_P(
     Behaviour1D, BehaviourTests1D,
     ::testing::Values(
         // High measurement noise and no control input, estimate should trust prediction
-        KalmanParamsBehaviour<1,1,1>{vec<1>{5.0}, matrix<1, 1>{7.0}, matrix<1, 1>{1.0}, matrix<1, 1>{0.0}, matrix<1, 1>{0.0}, matrix<1, 1>{1.0}, matrix<1, 1>{1e20}, matrix<1, 1>{0}, matrix<1, 1>{4.0}, matrix<1, 1>{5.0}, matrix<1, 1>{7.0}},
+        KalmanParamsBehaviour<1, 1, 1>{
+            vec<1>{5.0}, matrix<1, 1>{7.0}, matrix<1, 1>{1.0}, matrix<1, 1>{0.0},
+            matrix<1, 1>{0.0}, matrix<1, 1>{1.0}, matrix<1, 1>{1e20}, matrix<1, 1>{0},
+            matrix<1, 1>{4.0}, matrix<1, 1>{5.0}, matrix<1, 1>{7.0}},
 
         // High process noise, estimate should trust measurements no matter control
-        KalmanParamsBehaviour<1,1,1>{vec<1>{2.0}, matrix<1, 1>{6.0}, matrix<1, 1>{1.0}, matrix<1, 1>{1e20}, matrix<1, 1>{1.0}, matrix<1, 1>{1.0}, matrix<1, 1>{2.0}, matrix<1, 1>{0.0}, matrix<1, 1>{4.0}, matrix<1, 1>{4.0}, matrix<1, 1>{2.0}},
-        KalmanParamsBehaviour<1,1,1>{vec<1>{2.0}, matrix<1, 1>{6.0}, matrix<1, 1>{1.0}, matrix<1, 1>{1e20}, matrix<1, 1>{1.0}, matrix<1, 1>{1.0}, matrix<1, 1>{2.0}, matrix<1, 1>{90.0}, matrix<1, 1>{4.0}, matrix<1, 1>{4.0}, matrix<1, 1>{2.0}},
+        KalmanParamsBehaviour<1, 1, 1>{
+            vec<1>{2.0}, matrix<1, 1>{6.0}, matrix<1, 1>{1.0}, matrix<1, 1>{1e20},
+            matrix<1, 1>{1.0}, matrix<1, 1>{1.0}, matrix<1, 1>{2.0}, matrix<1, 1>{0.0},
+            matrix<1, 1>{4.0}, matrix<1, 1>{4.0}, matrix<1, 1>{2.0}},
+        KalmanParamsBehaviour<1, 1, 1>{
+            vec<1>{2.0}, matrix<1, 1>{6.0}, matrix<1, 1>{1.0}, matrix<1, 1>{1e20},
+            matrix<1, 1>{1.0}, matrix<1, 1>{1.0}, matrix<1, 1>{2.0}, matrix<1, 1>{90.0},
+            matrix<1, 1>{4.0}, matrix<1, 1>{4.0}, matrix<1, 1>{2.0}},
 
         // Equal measurement and process noise, estimate should weigh each equally
-        KalmanParamsBehaviour<1,1,1>{vec<1>{-3.4}, matrix<1,1>{1.0}, matrix<1,1>{1.0}, matrix<1,1>{0.0}, matrix<1, 1>{0.0}, matrix<1,1>{1.0}, matrix<1,1>{1.0}, matrix<1,1>{0.0}, matrix<1,1>{-2.6}, matrix<1,1>{-3.0}, matrix<1,1>{0.5}}
+        KalmanParamsBehaviour<1, 1, 1>{
+            vec<1>{-3.4}, matrix<1, 1>{1.0}, matrix<1, 1>{1.0}, matrix<1, 1>{0.0},
+            matrix<1, 1>{0.0}, matrix<1, 1>{1.0}, matrix<1, 1>{1.0}, matrix<1, 1>{0.0},
+            matrix<1, 1>{-2.6}, matrix<1, 1>{-3.0}, matrix<1, 1>{0.5}}
 
-    ));
+        ));
