@@ -127,5 +127,6 @@ py_library(
     deps = [
         "//software/field_tests:field_test_fixture",
         "//software/simulated_tests:simulated_test_fixture",
+        "//software/gameplay_tests:fixture",
     ],
 )
