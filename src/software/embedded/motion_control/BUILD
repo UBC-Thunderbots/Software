@@ -1,6 +1,16 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "controller",
+    hdrs = [
+        "controller.h",
+    ],
+    deps = [
+        "//software/time:duration",
+    ],
+)
+
+cc_library(
     name = "position_controller",
     srcs = [
         "position_controller.cpp",
@@ -9,6 +19,7 @@ cc_library(
         "position_controller.h",
     ],
     deps = [
+        ":controller",
         ":pid_controller",
         "//software/ai/navigator/trajectory:trajectory_path",
     ],
@@ -23,6 +34,7 @@ cc_library(
         "orientation_controller.h",
     ],
     deps = [
+        ":controller",
         ":pid_controller",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/geom:angle",

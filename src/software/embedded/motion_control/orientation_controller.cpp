@@ -1,8 +1,8 @@
 #include "software/embedded/motion_control/orientation_controller.h"
 
 AngularVelocity OrientationController::step(
-    Angle orientation, const BangBangTrajectory1DAngular& target_trajectory,
-    Duration elapsed_time, double delta_time)
+    const Angle& orientation, const BangBangTrajectory1DAngular& target_trajectory,
+    Duration elapsed_time, Duration delta_time)
 {
     const Angle difference_from_target =
         (target_trajectory.getDestination() - orientation).clamp();
@@ -10,8 +10,8 @@ AngularVelocity OrientationController::step(
     if (difference_from_target.abs().toDegrees() < ANGULAR_PURE_PID_THRESHOLD_DEGREES)
     {
         // if target orientation is close enough, use pure PID for angular velocity
-        return AngularVelocity::fromRadians(
-            w_pid_close_.step(difference_from_target.toRadians(), delta_time));
+        return AngularVelocity::fromRadians(w_pid_close_.step(
+            difference_from_target.toRadians(), delta_time.toSeconds()));
     }
     else
     {
@@ -20,7 +20,7 @@ AngularVelocity OrientationController::step(
             (target_trajectory.getPosition(elapsed_time.toSeconds()) - orientation)
                 .clamp();
         const AngularVelocity pid_effort_angular = AngularVelocity::fromRadians(
-            w_pid_.step(error_angular.toRadians(), delta_time));
+            w_pid_.step(error_angular.toRadians(), delta_time.toSeconds()));
         return target_trajectory.getVelocity(elapsed_time.toSeconds()) +
                pid_effort_angular;
     }

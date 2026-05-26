@@ -1,12 +1,13 @@
 #pragma once
 
 #include "software/ai/navigator/trajectory/trajectory_path.h"
+#include "software/embedded/motion_control/orientation_controller.h"
 #include "software/embedded/motion_control/pid_controller.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
 
-class PositionController
+class PositionController : public MotionController<Point, TrajectoryPath, Vector>
 {
    public:
     /**
@@ -25,12 +26,12 @@ class PositionController
      * @param delta_time The time passed since last time step.
      */
     Vector step(const Point& position, const TrajectoryPath& target_trajectory,
-                Duration elapsed_time, double delta_time);
+                Duration elapsed_time, Duration delta_time) override;
 
     /**
      * Resets the state of this position controller.
      */
-    void reset();
+    void reset() override;
 
    private:
     // TODO(#3737): tune constants
