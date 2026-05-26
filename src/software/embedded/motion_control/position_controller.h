@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/navigator/trajectory/trajectory_path.h"
-#include "software/embedded/motion_control/orientation_controller.h"
+#include "software/embedded/motion_control/controller.h"
 #include "software/embedded/motion_control/pid_controller.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
