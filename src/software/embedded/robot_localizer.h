@@ -19,7 +19,7 @@ MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTA
           MOTOR_X_VELOCITY, MOTOR_Y_VELOCITY, MOTOR_ANGULAR_VELOCITY,
           IMU_ANGULAR_VELOCITY);
 
-MAKE_ENUM(ControlIndex, X_ACCELERATION, Y_ACCELERATION, ANGULAR_ACCELERATION);
+MAKE_ENUM(ControlIndex, X_ACCELERATION, Y_ACCELERATION);
 
 /**
  * Estimates robot orientation, angular velocity, and angular acceleration
@@ -48,13 +48,9 @@ class RobotLocalizer
     /**
      * Runs one prediction step using elapsed time since the previous call.
      *
-     * @param target_linear_acceleration The current target linear acceleration of the
-     * robot
-     * @param target_angular_acceleration The current target angular acceleration of the
-     * robot
+     * @param linear_acceleration The current linear acceleration of the robot
      */
-    void step(const Vector& target_linear_acceleration,
-              const AngularVelocity& target_angular_acceleration);
+    void step(const Vector& linear_acceleration);
 
     /**
      * Update the robot's position and orientation from data reported by vision.

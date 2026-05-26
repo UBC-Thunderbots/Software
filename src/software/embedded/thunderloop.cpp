@@ -185,15 +185,6 @@ void Thunderloop::runLoop()
     robot_status_.set_thunderloop_version(thunderloop_hash);
     robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
 
-
-    std::optional<ImuData> imu_poll = imu_service_->poll();
-
-    // TODO: Replace with actual IMU data usage
-    if (imu_poll.has_value() && imu_poll->angular_velocity.has_value())
-    {
-        LOG(INFO) << "IMU Angular Velocity: " << imu_poll->angular_velocity->toRadians();
-    }
-
     for (;;)
     {
         struct timespec time_since_prev_iter;
@@ -273,7 +264,7 @@ void Thunderloop::runLoop()
             }
 
             const ImuData imu_poll = imu_service_->poll();
-            
+
             if (imu_poll.angular_velocity.has_value())
             {
                 robot_localizer_.updateImu(imu_poll.angular_velocity.value());
@@ -288,17 +279,18 @@ void Thunderloop::runLoop()
                                           robot_localizer_.getOrientation()),
                     createAngularVelocity(status.angular_velocity()));
 
-                Vector linear_acceleration = Vector();
-                if (imu_poll.linear_acceleration.has_value()) {
-                    const auto a = imu_poll.linear_acceleration.value();
-                    linear_acceleration = Vector(a[1], a[0]);
+                Vector linear_acceleration;
+                if (imu_poll.linear_acceleration.has_value())
+                {
+                    const auto accel    = imu_poll.linear_acceleration.value();
+                    linear_acceleration = Vector(accel[1], accel[0]);
                     LOG(PLOTJUGGLER) << *createPlotJugglerValue({
                         {"linear_acceleration_x", linear_acceleration.x()},
                         {"linear_acceleration_y", linear_acceleration.y()},
                     });
                 }
 
-                robot_localizer_.step(linear_acceleration, AngularVelocity::zero());
+                robot_localizer_.step(linear_acceleration);
 
                 primitive_executor_.updateState(robot_localizer_.getPosition(),
                                                 robot_localizer_.getVelocity(),

@@ -21,8 +21,7 @@ RobotLocalizer::RobotLocalizer(const double process_noise_variance,
     last_step_time_ = std::chrono::steady_clock::now();
 }
 
-void RobotLocalizer::step(const Vector& target_linear_acceleration,
-                          const AngularVelocity& target_angular_acceleration)
+void RobotLocalizer::step(const Vector& linear_acceleration)
 {
     FilterStep step{
         .prediction       = FilterStep::Predict{},
@@ -106,27 +105,21 @@ void RobotLocalizer::step(const Vector& target_linear_acceleration,
 
     control_model(static_cast<Eigen::Index>(StateIndex::X_POSITION),
                   static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) =
-        delta_time_seconds / 2;
+        delta_time_squared / 2;
 
     control_model(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
                   static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
-        delta_time_seconds / 2;
-
-    control_model(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
-                  static_cast<Eigen::Index>(ControlIndex::ANGULAR_ACCELERATION)) =
-        delta_time_seconds / 2;
+        delta_time_squared / 2;
 
     control_model(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) = 1;
+                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) =
+        delta_time_seconds;
 
     control_model(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) = 1;
+                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
+        delta_time_seconds;
 
-    control_model(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::ANGULAR_ACCELERATION)) = 1;
-
-    step.prediction->control_input << target_linear_acceleration.x(),
-        target_linear_acceleration.y(), target_angular_acceleration.toRadians();
+    step.prediction->control_input << linear_acceleration.x(), linear_acceleration.y();
 
     filter_.process_model      = step.prediction->process_model;
     filter_.process_covariance = step.prediction->process_covariance;

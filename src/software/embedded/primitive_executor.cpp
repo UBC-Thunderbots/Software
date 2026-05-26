@@ -61,7 +61,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
         if (isLinearTrajectoryNew(new_trajectory_path))
         {
-            trajectory_path_                 = new_trajectory_path;
+            trajectory_path_ = new_trajectory_path;
             time_since_linear_trajectory_creation_ =
                 std::chrono::duration<double>::zero();
             x_pid.reset();
@@ -75,7 +75,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
         if (isAngularTrajectoryNew(new_angular_trajectory))
         {
-            angular_trajectory_               = new_angular_trajectory;
+            angular_trajectory_ = new_angular_trajectory;
             time_since_angular_trajectory_creation_ =
                 std::chrono::duration<double>::zero();
             w_pid.reset();
