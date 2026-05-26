@@ -365,6 +365,7 @@ def test_attacker_shoot_goal(
         simulated_test_runner.set_tactics(
             blue_tactics={
                 0: AttackerTactic(
+                    pass_committed=False,
                     chip_target=tbots_cpp.createPointProto(
                         tbots_cpp.Point(0, field.fieldLines().yMin())
                     ),

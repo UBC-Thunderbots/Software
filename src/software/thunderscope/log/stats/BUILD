@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 py_library(
@@ -14,5 +16,6 @@ py_library(
     deps = [
         ":fullsystem_stats",
         "//software/thunderscope:thread_safe_buffer",
+        requirement("rich"),
     ],
 )
