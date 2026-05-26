@@ -23,14 +23,14 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
     const double b_br = (M_PI - t);
 
     // Mapped to the robot frame: +X = Forward, +Y = Left
-    const double fr_x = robot_constants_.front_wheel_x_magnitude_meters;
-    const double fr_y = robot_constants_.front_wheel_y_magnitude_meters * -1.0;
-    const double fl_x = robot_constants_.front_wheel_x_magnitude_meters;
-    const double fl_y = robot_constants_.front_wheel_y_magnitude_meters;
-    const double bl_x = robot_constants_.back_wheel_x_magnitude_meters * -1.0;
-    const double bl_y = robot_constants_.back_wheel_y_magnitude_meters;
-    const double br_x = robot_constants_.back_wheel_x_magnitude_meters * -1.0;
-    const double br_y = robot_constants_.back_wheel_y_magnitude_meters * -1.0;
+    const double fr_x = robot_constants_.fr_x_pos_meters;
+    const double fr_y = robot_constants_.fr_y_pos_meters;
+    const double fl_x = robot_constants_.fl_x_pos_meters;
+    const double fl_y = robot_constants_.fl_y_pos_meters;
+    const double bl_x = robot_constants_.bl_x_pos_meters;
+    const double bl_y = robot_constants_.bl_y_pos_meters;
+    const double br_x = robot_constants_.br_x_pos_meters;
+    const double br_y = robot_constants_.br_y_pos_meters;
 
 
     // Assuming that CCW when looking end of shaft into motor is the positive direction.

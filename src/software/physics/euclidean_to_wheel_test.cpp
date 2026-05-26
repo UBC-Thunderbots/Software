@@ -148,8 +148,6 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)
     // Because the wheels are offset, their speed at 1 rad/s equals their
     // exact physical lever arm (in meters), NOT the nominal robot_radius.
 
-    // Based on the physical offsets, the lever arm evaluates to 0.0749 meters.
-
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
                 expected_lever_arm, EQUALITY_COMPARISON);
     EXPECT_NEAR(std::abs(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX]),

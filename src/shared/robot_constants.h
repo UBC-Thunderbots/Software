@@ -45,22 +45,34 @@ struct RobotConstants
     // The angle between y-axis of the robot and the rear wheel axles [degrees]
     float back_wheel_angle_deg;
 
-    // X position of centre of front wheel
-    float front_wheel_x_magnitude_meters;
+    // X position of centre of front right wheel
+    float fr_x_pos_meters;
 
-    // Y position of centre of front wheel
-    float front_wheel_y_magnitude_meters;
+    // Y position of centre of front right wheel
+    float fr_y_pos_meters;
 
-    // X position of centre of rear wheel
-    float back_wheel_x_magnitude_meters;
+    // X position of centre of front left wheel
+    float fl_x_pos_meters;
 
-    // Y position of centre of rear wheel
-    float back_wheel_y_magnitude_meters;
+    // Y position of centre of front left wheel
+    float fl_y_pos_meters;
 
-    // The total width of the entire flat face on the front of the robot [meters]
+    // X position of centre of back left wheel
+    float bl_x_pos_meters;
+
+    // Y position of centre of back left wheel
+    float bl_y_pos_meters;
+
+    // X position of centre of back right wheel
+    float br_x_pos_meters;
+
+    // Y position of centre of back right wheel
+    float br_y_pos_meters;
+
+    // The total width of the entire flat face on the front of the robot [metres]
     float front_of_robot_width_meters;
 
-    // The distance from one end of the dribbler to the other [meters]
+    // The distance from one end of the dribbler to the other [metres]
     float dribbler_width_meters;
 
     // Indefinite dribbler mode sets a speed that can be maintained indefinitely [rpm]
@@ -88,10 +100,12 @@ struct RobotConstants
     // The maximum angular acceleration achievable by our robots [rad/s^2]
     float robot_max_ang_acceleration_rad_per_s_2;
 
-    // The radius of the wheel, in meters
+    // The radius of the wheel, in metres
     float wheel_radius_meters;
 
-    // Computed by finding sqrt(x^2 + y^2) of front and rear wheels. Both equal
+    // Distance [metres] from centre of robot to centre of wheel. 
+    // Found by sqrt(x^2 + y^2) of a wheel.
+    // Front wheel arm = Rear wheel arm. See ASCII image above.
     float expected_lever_arm;
 };
 
@@ -108,10 +122,14 @@ constexpr RobotConstants createRobotConstants()
         .front_wheel_angle_deg = 32.0f,
         .back_wheel_angle_deg  = 44.0f,
 
-        .front_wheel_x_magnitude_meters = 0.03485f,
-        .front_wheel_y_magnitude_meters = 0.06632f,
-        .back_wheel_x_magnitude_meters  = 0.04985f,
-        .back_wheel_y_magnitude_meters  = 0.05592f,
+        .fr_x_pos_meters = 0.03485f,
+        .fr_y_pos_meters = -0.06632f,
+        .fl_x_pos_meters = 0.03485f,
+        .fl_y_pos_meters = 0.06632f,
+        .bl_x_pos_meters = -0.04985f,
+        .bl_y_pos_meters = 0.05592f,
+        .br_x_pos_meters = -0.04985f,
+        .br_y_pos_meters = -0.05592f,
 
         .front_of_robot_width_meters = 0.11f,
         .dribbler_width_meters       = 0.07825f,
