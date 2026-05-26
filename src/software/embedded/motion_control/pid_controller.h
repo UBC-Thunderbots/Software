@@ -18,6 +18,12 @@ class PidController
      *
      * @pre max_integral must be >= 0.0
      * @throws std::invalid_argument if max_integral < 0.0
+     *
+     * @param k_p The proportional gain.
+     * @param k_i The integral gain.
+     * @param k_d The derivative gain.
+     * @param max_integral The maximum absolute value that the integrator term can
+     * accumulate to.
      **/
     PidController(double k_p, double k_i, double k_d, double max_integral);
 
