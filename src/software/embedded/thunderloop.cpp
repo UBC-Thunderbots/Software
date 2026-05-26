@@ -185,7 +185,7 @@ void Thunderloop::runLoop()
 
     std::optional<ImuData> imu_poll = imu_service_->poll();
 
-    // TODO: Replace with actual IMU data usage
+    // TODO (3725): Replace with actual IMU data usage
     if (imu_poll.has_value() && imu_poll->angular_velocity.has_value())
     {
         LOG(INFO) << "IMU Angular Velocity: " << imu_poll->angular_velocity->toRadians();
