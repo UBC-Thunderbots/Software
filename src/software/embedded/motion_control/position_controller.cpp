@@ -7,7 +7,7 @@ Vector PositionController::step(const Point& position,
     const Vector distance_from_destination =
         target_trajectory.getDestination() - position;
 
-    if (distance_from_destination.lengthSquared() < LINEAR_PURE_PID_THRESHOLD_METERS)
+    if (distance_from_destination.length() < LINEAR_PURE_PID_THRESHOLD_METERS)
     {
         // if target destination is close enough, use pure PID for velocity
         return Vector{x_pid_close_.step(distance_from_destination.x(), delta_time),
