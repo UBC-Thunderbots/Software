@@ -103,7 +103,7 @@ struct RobotConstants
     // The radius of the wheel, in metres
     float wheel_radius_meters;
 
-    // Distance [metres] from centre of robot to centre of wheel. 
+    // Distance [metres] from centre of robot to centre of wheel.
     // Found by sqrt(x^2 + y^2) of a wheel.
     // Front wheel arm = Rear wheel arm. See ASCII image above.
     float expected_lever_arm;
