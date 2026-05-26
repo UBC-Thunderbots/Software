@@ -120,7 +120,6 @@ class Thunderloop
      */
     TbotsProto::PowerStatus pollPowerService(struct timespec& poll_time);
 
-
     /**
      * Wait for networking communication to be established. This function is blocking.
      */
