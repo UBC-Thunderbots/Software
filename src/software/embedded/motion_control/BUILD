@@ -62,3 +62,25 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
     ],
 )
+
+cc_test(
+    name = "position_controller_test",
+    srcs = [
+        "position_controller_test.cpp",
+    ],
+    deps = [
+        ":position_controller",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
+    name = "orientation_controller_test",
+    srcs = [
+        "orientation_controller_test.cpp",
+    ],
+    deps = [
+        ":orientation_controller",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
