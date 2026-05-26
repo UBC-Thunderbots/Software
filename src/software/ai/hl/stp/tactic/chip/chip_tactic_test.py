@@ -3,10 +3,10 @@ import pytest
 import software.python_bindings as tbots_cpp
 
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
-from software.simulated_tests.validation.ball_is_off_ground import (
+from software.gameplay_tests.validation.ball_is_off_ground import (
     BallIsEventuallyOffGround,
 )
-from software.simulated_tests.validation.ball_kicked_in_direction import (
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
 from software.simulated_tests.simulated_test_fixture import (

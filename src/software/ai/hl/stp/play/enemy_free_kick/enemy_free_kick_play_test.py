@@ -3,11 +3,11 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
 
-from software.simulated_tests.validation.or_validation import OrValidation
+from software.gameplay_tests.validation.or_validation import OrValidation
 
-from software.simulated_tests.validation.friendly_team_scored import *
-from software.simulated_tests.validation.ball_enters_region import *
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.friendly_team_scored import *
+from software.gameplay_tests.validation.ball_enters_region import *
+from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )

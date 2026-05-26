@@ -9,7 +9,7 @@ from software.py_constants import MILLISECONDS_PER_SECOND
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
-from software.simulated_tests.validation import validation
+from software.gameplay_tests.validation import validation
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 logger = create_logger(__name__)

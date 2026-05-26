@@ -1,22 +1,22 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.validation.robot_at_position import (
+from software.gameplay_tests.validation.robot_at_position import (
     RobotEventuallyAtPosition,
 )
-from software.simulated_tests.validation.ball_kicked_in_direction import (
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.simulated_tests.validation.robot_at_orientation import (
+from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
-from software.simulated_tests.validation.ball_is_off_ground import (
+from software.gameplay_tests.validation.ball_is_off_ground import (
     BallIsEventuallyOffGround,
 )
-from software.simulated_tests.validation.robot_at_angular_velocity import (
+from software.gameplay_tests.validation.robot_at_angular_velocity import (
     RobotEventuallyAtAngularVelocity,
 )
-from software.simulated_tests.validation.duration_validation import DurationValidation
+from software.gameplay_tests.validation.duration_validation import DurationValidation
 
 # from software.simulated_tests.simulated_test_fixture import (
 #     pytest_main,

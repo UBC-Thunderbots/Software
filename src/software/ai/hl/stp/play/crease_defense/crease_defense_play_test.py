@@ -6,13 +6,13 @@ from proto.ssl_gc_common_pb2 import Team
 from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
-from software.simulated_tests.validation.robot_speed_threshold import (
+from software.gameplay_tests.validation.robot_speed_threshold import (
     RobotSpeedEventuallyBelowThreshold,
 )
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyEntersRegion,
 )
-from software.simulated_tests.validation.delay_validation import DelayValidation
+from software.gameplay_tests.validation.delay_validation import DelayValidation
 
 
 def test_crease_defense_play(simulated_test_runner):

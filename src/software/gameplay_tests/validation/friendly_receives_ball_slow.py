@@ -1,10 +1,10 @@
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
-from software.simulated_tests.validation.validation import (
+from software.gameplay_tests.validation.validation import (
     create_validation_types,
 )
-from software.simulated_tests.validation.friendly_has_ball_possession import (
+from software.gameplay_tests.validation.friendly_has_ball_possession import (
     FriendlyHasBallPossession,
 )
 from typing import override

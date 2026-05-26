@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyExitsRegion,
     NumberOfRobotsEventuallyEntersRegion,
 )

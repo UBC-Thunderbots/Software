@@ -5,16 +5,16 @@ from software.simulated_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.friendly_receives_ball_slow import (
+from software.gameplay_tests.validation.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
-from software.simulated_tests.validation.friendly_has_ball_possession import (
+from software.gameplay_tests.validation.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
-from software.simulated_tests.validation.ball_moves_in_direction import (
+from software.gameplay_tests.validation.ball_moves_in_direction import (
     BallMovesForwardInRegions,
 )
-from software.simulated_tests.validation.ball_enters_region import (
+from software.gameplay_tests.validation.ball_enters_region import (
     BallEventuallyExitsRegion,
     BallEventuallyEntersRegion,
 )

@@ -2,11 +2,11 @@ import math
 from software.py_constants import *
 from proto.import_all_protos import *
 
-from software.simulated_tests.validation.validation import (
+from software.gameplay_tests.validation.validation import (
     create_validation_types,
     create_validation_geometry,
 )
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     RobotEntersRegion,
 )
 from typing import override
