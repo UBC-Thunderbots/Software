@@ -53,7 +53,8 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
 
     // Calculate Pseudo-inverse dynamically
 
-    wheel_to_euclidean_velocity_D_inverse_ = euclidean_to_wheel_velocity_D_.completeOrthogonalDecomposition().pseudoInverse();
+    wheel_to_euclidean_velocity_D_inverse_ =
+        euclidean_to_wheel_velocity_D_.completeOrthogonalDecomposition().pseudoInverse();
 }
 
 WheelSpace_t EuclideanToWheel::getWheelVelocity(EuclideanSpace_t euclidean_velocity) const
