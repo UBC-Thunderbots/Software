@@ -124,7 +124,9 @@ def main(
 def validate(config: BuildConfig):
     if bool(config.flash_robots) or bool(config.ansible_playbook):
         if not config.ssh_password:
-            print("Error: SSH password is required for flashing or ansible playbooks.")
+            print(
+                "Error: SSH password is required for flashing or ansible playbooks. Please include the --pwd flag"
+            )
             sys.exit(1)
     if config.search_query is None and (
         not config.test_suite or config.action != ActionArgument.test
