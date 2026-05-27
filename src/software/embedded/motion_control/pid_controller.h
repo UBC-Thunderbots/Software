@@ -40,12 +40,12 @@ class PidController
      **/
     void reset();
 
-    double k_p;
-    double k_i;
-    double k_d;
-    double max_integral;
-
    private:
+    double k_p_;
+    double k_i_;
+    double k_d_;
+    double max_integral_;
+
     double integral_                  = 0.0;
     std::optional<double> last_error_ = std::nullopt;
 };
