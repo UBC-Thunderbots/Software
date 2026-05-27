@@ -12,7 +12,6 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
 
     :param allow_unrecognized: if true, does not raise an error for unrecognized arguments
     """
-
     # TODO: add field test specific flags
 
     parser = argparse.ArgumentParser(description="Run simulated pytests")

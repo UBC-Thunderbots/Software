@@ -51,9 +51,7 @@ from software.gameplay_tests.util import (
 @pytest.mark.skip(
     "Disabling this test because of poor dribbling controls, does not consistently score goal. TODO (#2232)"
 )
-def test_penalty_kick(
-    enemy_robot_location, enemy_robot_velocity, gameplay_test_runner
-):
+def test_penalty_kick(enemy_robot_location, enemy_robot_velocity, gameplay_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
     ball_initial_pos = field.friendlyPenaltyMark()
 
