@@ -1,15 +1,12 @@
 #include "software/embedded/motion_control/pid_controller.h"
 
 #include <algorithm>
-#include <stdexcept>
+#include <cassert>
 
 PidController::PidController(double k_p, double k_i, double k_d, double max_integral)
     : k_p(k_p), k_i(k_i), k_d(k_d), max_integral(max_integral)
 {
-    if (max_integral < 0.0)
-    {
-        throw std::invalid_argument("PidController max_integral must be >= 0.0");
-    }
+    assert(max_integral >= 0.0);
 };
 
 double PidController::step(double error, double delta_time)

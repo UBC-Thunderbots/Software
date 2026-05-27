@@ -17,7 +17,6 @@ class PidController
      * - http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-reset-windup/
      *
      * @pre max_integral must be >= 0.0
-     * @throws std::invalid_argument if max_integral < 0.0
      *
      * @param k_p The proportional gain.
      * @param k_i The integral gain.
