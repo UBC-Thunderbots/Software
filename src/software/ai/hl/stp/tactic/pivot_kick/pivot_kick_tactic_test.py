@@ -7,7 +7,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 
@@ -36,12 +36,12 @@ from software.simulated_tests.simulated_test_fixture import (
 @pytest.mark.skip(
     "Disabling this flaky test. TODO (#2859): the robot does not dribble far enough into the ball"
 )
-def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
+def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, gameplay_test_runner):
     robot_position = tbots_cpp.Point(0, 0)
     ball_position = robot_position + ball_offset_from_robot
 
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -53,7 +53,7 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_run
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 1: PivotKickTactic(
                     kick_origin=tbots_cpp.createPointProto(ball_position),
@@ -69,7 +69,7 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_run
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=[[]],

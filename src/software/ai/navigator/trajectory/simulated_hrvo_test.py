@@ -1,5 +1,5 @@
 import pytest
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 from software.gameplay_tests.validation.avoid_collisions import *
@@ -9,7 +9,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 import math
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import SimulatedTestRunner
+from software.gameplay_tests.util import SimulatedTestRunner
 from software.gameplay_tests.validation.validation import (
     create_validation_types,
     create_validation_geometry,
@@ -168,7 +168,7 @@ def hrvo_setup(
     friendly_robots_final_orientations: list[tbots.Angle],
     enemy_robots_positions: list[tbots.Point],
     enemy_robots_destinations: list[tbots.Point],
-    simulated_test_runner: SimulatedTestRunner,
+    gameplay_test_runner: SimulatedTestRunner,
 ):
     """Setup for the hrvo tests
 
@@ -177,7 +177,7 @@ def hrvo_setup(
     :param friendly_robots_final_orientations: final orientations of friendly robots
     :param enemy_robots_positions: starting positions of enemy robots
     :param enemy_robots_destinations: destinations of enemy robots
-    :param simulated_test_runner: the current test runner being used
+    :param gameplay_test_runner: the current test runner being used
     """
     desired_orientation = tbots.Angle.fromRadians(0)
 
@@ -185,7 +185,7 @@ def hrvo_setup(
 
     ball_initial_vel = tbots.Point(0, 0)
 
-    simulated_test_runner.set_world_state(
+    gameplay_test_runner.set_world_state(
         create_world_state(
             yellow_robot_locations=enemy_robots_positions,
             blue_robot_locations=friendly_robots_positions,
@@ -194,13 +194,13 @@ def hrvo_setup(
         )
     )
 
-    simulated_test_runner.send_gamecontroller_command(
+    gameplay_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.STOP, team=Team.BLUE
     )
-    simulated_test_runner.send_gamecontroller_command(
+    gameplay_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.STOP, team=Team.YELLOW
     )
-    simulated_test_runner.send_gamecontroller_command(
+    gameplay_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
 
@@ -226,7 +226,7 @@ def hrvo_setup(
             tbots.Angle.fromRadians(0),
         )
 
-    simulated_test_runner.set_tactics(
+    gameplay_test_runner.set_tactics(
         blue_tactics=blue_tactics, yellow_tactics=yellow_tactics
     )
 
@@ -472,7 +472,7 @@ def hrvo_setup(
     ],
 )
 def test_robot_movement(
-    simulated_test_runner: SimulatedTestRunner,
+    gameplay_test_runner: SimulatedTestRunner,
     friendly_robot_positions: list[tbots.Point],
     friendly_robot_destinations: list[tbots.Point],
     friendly_robots_final_orientations: list[tbots.Angle],
@@ -491,14 +491,14 @@ def test_robot_movement(
         else get_reached_destination_validation(friendly_robot_destinations)
     )
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=lambda param: hrvo_setup(
             friendly_robot_positions,
             friendly_robot_destinations,
             friendly_robots_final_orientations,
             enemy_robots_positions,
             enemy_robots_destinations,
-            simulated_test_runner,
+            gameplay_test_runner,
         ),
         params=[0],
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,

@@ -4,7 +4,7 @@ from software.field_tests.field_test_fixture import *
 from software.gameplay_tests.validation.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 

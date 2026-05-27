@@ -1,4 +1,4 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -15,7 +15,7 @@ py_library(
         "//software/logger:py_logger",
         "//software/networking/unix:threaded_unix_listener_py",
         "//software/networking/unix:threaded_unix_sender_py",
-        "//software/simulated_tests:tbots_test_runner",
+        "//software/gameplay_tests:tbots_test_runner",
         "//software/gameplay_tests/validation:validations",
         "//software/thunderscope",
         "//software/thunderscope:constants",
@@ -38,7 +38,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:tbots_test_runner",
+        "//software/gameplay_tests:tbots_test_runner",
         "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
@@ -55,7 +55,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:tbots_test_runner",
+        "//software/gameplay_tests:tbots_test_runner",
         "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],

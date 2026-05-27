@@ -1,8 +1,8 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = [
     "//software/ai:__subpackages__",
-    "//software/simulated_tests:__subpackages__",
+    "//software/gameplay_tests:__subpackages__",
 ])
 
 cc_library(

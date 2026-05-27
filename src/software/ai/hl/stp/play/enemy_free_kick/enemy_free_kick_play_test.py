@@ -13,7 +13,7 @@ from software.gameplay_tests.validation.robot_enters_region import (
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 
@@ -97,10 +97,10 @@ from software.simulated_tests.simulated_test_fixture import (
     "Disabling this test because OrValidation is passed both an always validation and eventually validation"
 )
 def test_enemy_free_kick_play(
-    simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
+    gameplay_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -109,14 +109,14 @@ def test_enemy_free_kick_play(
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.DIRECT, team=Team.YELLOW
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.EnemyFreeKickPlay, yellow_play=PlayName.FreeKickPlay
         )
 
@@ -141,7 +141,7 @@ def test_enemy_free_kick_play(
         [RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 1)])]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         params=[0, 1, 2],
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,

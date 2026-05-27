@@ -23,16 +23,16 @@ from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 
 
-def test_not_bumping_ball_towards_net(simulated_test_runner):
+def test_not_bumping_ball_towards_net(gameplay_test_runner):
     enemy_threat_point = tbots_cpp.Point(3, 0)
 
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[tbots_cpp.Point(0, 0)],
                 yellow_robot_locations=[tbots_cpp.Point(4, 0)],
@@ -41,7 +41,7 @@ def test_not_bumping_ball_towards_net(simulated_test_runner):
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(enemy_threat_point),
@@ -52,7 +52,7 @@ def test_not_bumping_ball_towards_net(simulated_test_runner):
 
     always_validations = [[BallSpeedAlwaysBelowThreshold(0.001)]]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         inv_always_validation_sequence_set=always_validations,
         ag_always_validation_sequence_set=always_validations,
@@ -79,12 +79,12 @@ def test_not_bumping_ball_towards_net(simulated_test_runner):
     ],
 )
 def test_crease_region_positioning(
-    enemy_threat_point, crease_alignment, region_index, simulated_test_runner
+    enemy_threat_point, crease_alignment, region_index, gameplay_test_runner
 ):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[tbots_cpp.Point(-3, 1.5)],
                 yellow_robot_locations=[
@@ -100,7 +100,7 @@ def test_crease_region_positioning(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(enemy_threat_point),
@@ -174,7 +174,7 @@ def test_crease_region_positioning(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validations,
         ag_eventually_validation_sequence_set=eventually_validations,
@@ -211,10 +211,10 @@ def test_crease_positioning(
     yellow_bots,
     ball_initial_pos,
     ball_initial_velocity,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_bots],
                 yellow_robot_locations=[yellow_bots],
@@ -223,7 +223,7 @@ def test_crease_positioning(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
@@ -259,7 +259,7 @@ def test_crease_positioning(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
@@ -321,10 +321,10 @@ def test_crease_autochip(
     ball_initial_pos,
     ball_initial_velocity,
     should_chip,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_bots],
                 yellow_robot_locations=[yellow_bots],
@@ -333,7 +333,7 @@ def test_crease_autochip(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
@@ -356,7 +356,7 @@ def test_crease_autochip(
         always_validation_sequence_set = [[]]
         eventually_validation_sequence_set = [[BallIsEventuallyOffGround()]]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
@@ -393,10 +393,10 @@ def test_crease_get_ball(
     ball_initial_pos,
     ball_initial_velocity,
     should_dribble,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_bots],
                 yellow_robot_locations=[yellow_bots],
@@ -405,7 +405,7 @@ def test_crease_get_ball(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
@@ -437,7 +437,7 @@ def test_crease_get_ball(
             RobotNeverEntersRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.2)])
         )
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,

@@ -9,7 +9,7 @@ from software.gameplay_tests.validation.friendly_has_ball_possession import *
 from software.gameplay_tests.validation.ball_speed_threshold import *
 from software.gameplay_tests.validation.robot_speed_threshold import *
 from software.gameplay_tests.validation.excessive_dribbling import *
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -112,10 +112,10 @@ def test_goalie_blocks_shot(
     ball_initial_position,
     ball_initial_velocity,
     robot_initial_position,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 [],
                 blue_robot_locations=[robot_initial_position],
@@ -124,7 +124,7 @@ def test_goalie_blocks_shot(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: GoalieTactic(
                     max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
@@ -155,7 +155,7 @@ def test_goalie_blocks_shot(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
@@ -189,10 +189,10 @@ def test_goalie_blocks_shot(
 def test_goalie_clears_from_dead_zone(
     ball_position,
     should_clear,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 [],
                 blue_robot_locations=[
@@ -205,7 +205,7 @@ def test_goalie_clears_from_dead_zone(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: GoalieTactic(
                     max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
@@ -238,7 +238,7 @@ def test_goalie_clears_from_dead_zone(
             ]
         ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         test_timeout_s=8,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,

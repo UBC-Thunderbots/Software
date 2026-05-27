@@ -1,7 +1,7 @@
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
 
-from software.simulated_tests.simulated_test_fixture import *
+from software.gameplay_tests.util import *
 from software.logger.logger import create_logger
 import math
 
@@ -14,7 +14,7 @@ logger = create_logger(__name__)
 #     "robot_x_destination, robot_y_destination",
 #     [(-2.0, -1), (-2.0, 1.0), (0.0, 1.0), (0.0, -1.0)],
 # )
-# def test_basic_movement(simulated_test_runner):
+# def test_basic_movement(gameplay_test_runner):
 #
 #     robot_starting_x = 0
 #     robot_starting_y = 0
@@ -40,7 +40,7 @@ logger = create_logger(__name__)
 #         ball_location=tbots_cpp.Point(1, 1),
 #         ball_velocity=tbots_cpp.Point(0, 0),
 #     )
-#     simulated_test_runner.set_world_state(initial_worldstate)
+#     gameplay_test_runner.set_world_state(initial_worldstate)
 #
 #     # Setup Tactic
 #     params = AssignedTacticPlayControlParams()
@@ -59,9 +59,9 @@ logger = create_logger(__name__)
 #             ),
 #         ]
 #     ]
-#     simulated_test_runner.set_tactics(params, True)
+#     gameplay_test_runner.set_tactics(params, True)
 #
-#     simulated_test_runner.run_test(
+#     gameplay_test_runner.run_test(
 #         eventually_validation_sequence_set=eventually_validation_sequence_set,
 #         test_timeout_s=5,
 #     )

@@ -7,7 +7,7 @@ from proto.play_pb2 import PlayName
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.import_all_protos import Command
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 
@@ -171,10 +171,10 @@ def test_ball_occlusion(
     ball_velocity,
     blue_robot_positions,
     yellow_robot_positions,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     def setup(*args):
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=blue_robot_positions,
                 yellow_robot_locations=yellow_robot_positions,
@@ -183,18 +183,18 @@ def test_ball_occlusion(
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.HALT, team=Team.UNKNOWN
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.HaltPlay, yellow_play=PlayName.HaltPlay
         )
 
     # This test validates that the ball tracking/filter handles occlusion correctly.
     # The validation simply waits for the simulation to run long enough (10s).
     # If the system crashes or has tracking issues, the test will fail.
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         test_timeout_s=10,
     )
