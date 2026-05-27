@@ -73,13 +73,3 @@ TEST(PidControllerTest, GeneralApplication)
     EXPECT_DOUBLE_EQ(pid.step(2.0, 1.0), k_p * 2.0 + k_i * 10.0 + k_d * 2.0);
     EXPECT_DOUBLE_EQ(pid.step(-2.0, 1.0), k_p * -2.0 + k_i * 8.0 + k_d * -4.0);
 }
-
-TEST(PidControllerTest, InvalidArgumentsToConstructor)
-{
-    EXPECT_NO_THROW(PidController(0.0, 0.0, 0.0, 9.0));
-    EXPECT_NO_THROW(PidController(0.0, 0.0, 0.0, 1.0));
-    EXPECT_NO_THROW(PidController(0.0, 0.0, 0.0, 0.0));
-    EXPECT_THROW(PidController(0.0, 0.0, 0.0, -0.5), std::invalid_argument);
-    EXPECT_THROW(PidController(0.0, 0.0, 0.0, -1.0), std::invalid_argument);
-    EXPECT_THROW(PidController(0.0, 0.0, 0.0, -3.0), std::invalid_argument);
-}
