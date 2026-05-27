@@ -116,7 +116,7 @@ ImuService::ImuService() : initialized_(false)
         usleep(50000);
     }
 
-    // TODO: More robust calibration
+    // TODO (3421): More robust calibration
     if (valid_samples > 0)
     {
         degrees_error_ = sum / valid_samples;
@@ -128,6 +128,10 @@ ImuService::ImuService() : initialized_(false)
                         "stability will be poor.";
         initialized_ = false;
     }
+
+    // Temporary: enable when need to calibrate
+    // Eigen::Vector2d deviation = calibrate_imu();
+    // LOG(INFO) << "error: " << deviation.x() << deviation.y()  << ".";
 }
 
 ImuData ImuService::poll()
@@ -143,6 +147,7 @@ ImuData ImuService::poll()
         linear_acceleration = transformLinearAcceleration(
             *angular_velocity, *angular_acceleration, *imu_linear_acceleration);
     }
+
 
     return ImuData{angular_velocity, angular_acceleration, linear_acceleration};
 }
@@ -249,7 +254,7 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
 
 Eigen::Vector2d ImuService::transformLinearAcceleration(AngularVelocity omega,
                                                         AngularAcceleration alpha,
-                                                        Eigen::Vector2d a_imu)
+                                                        Eigen::Vector2d imu_acceleration)
 {
     Eigen::Vector2d r(IMU_OFFSET_X, IMU_OFFSET_Y);
 
@@ -262,5 +267,50 @@ Eigen::Vector2d ImuService::transformLinearAcceleration(AngularVelocity omega,
     // centripetal: omega^2 * r
     Eigen::Vector2d centripetal = (w * w) * r;
 
-    return a_imu + tangential - centripetal;
+    return imu_acceleration + tangential - centripetal;
+}
+
+Eigen::Vector2d ImuService::calibrate_imu()
+{
+    LOG(INFO) << "Start IMU x,y calibration" << std::endl;
+    Eigen::MatrixXd A(2 * 100, 2);
+    Eigen::VectorXd b(2 * 100);
+    int valid = 0;
+
+    for (int i = 0; i < 100; i++)
+    {
+        // Fixed: Call the actual implemented function name
+        auto omega_opt = pollAngularVelocity();
+        if (!omega_opt.has_value())
+        {
+            continue;
+        }
+        auto alpha_opt = pollAngularAcceleration(omega_opt);
+        auto acc       = pollLinearAcceleration();
+        if (omega_opt.has_value() && alpha_opt.has_value() && acc.has_value())
+        {
+            double omega = omega_opt->toRadians();
+            double alpha = alpha_opt->toRadians();
+
+            A(2 * valid, 0)     = -omega * omega;
+            A(2 * valid, 1)     = -alpha;
+            A(2 * valid + 1, 0) = alpha;
+            A(2 * valid + 1, 1) = -omega * omega;
+
+            b(2 * valid)     = acc->x();
+            b(2 * valid + 1) = acc->y();
+            valid++;
+        }
+        usleep(100000);
+    }
+    if (valid < 10)
+    {
+        LOG(WARNING) << "Calibration failed: insufficient valid samples";
+        return Eigen::Vector2d(0.0, 0.0);
+    }
+    Eigen::MatrixXd A_valid = A.topRows(2 * valid);
+    Eigen::VectorXd b_valid = b.topRows(2 * valid);
+    Eigen::Vector2d X =
+        A_valid.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_valid);
+    return X;
 }

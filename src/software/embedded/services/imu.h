@@ -36,38 +36,47 @@ class ImuService
         (4.0 * 14.4222 / 1000.0 * M_PI / 180.0) * (4.0 * 14.4222 / 1000.0 * M_PI / 180.0);
 
    private:
-    /*
+    /**
      * Polls the latest IMU reading of the angular velocity of the robot on the z axis
      * @return the current angular velocty of the robot on the z axis
      */
     std::optional<AngularVelocity> pollAngularVelocity();
-    /*
+    /**
      * Computes angular acceleration from successive angular velocity readings
      * @return the current angular acceleration of the robot on the z axis
      */
     std::optional<AngularAcceleration> pollAngularAcceleration(
         std::optional<AngularVelocity> curr_angular_velocity);
-    /*
+    /**
      * Polls the latest IMU reading of the linear acceleration of the robot on the z plane
      * @return the current linear acceleration of the robot on the z plane
      */
     std::optional<Eigen::Vector2d> pollLinearAcceleration();
-    /*
+    /**
      * Reads byte data from two registers, and combine them into a single value
      * @parama ls_reg register of the least significant register
      * @parama ms_reg register of the most significant register
      * @return the combined integer value of the two registers
      */
     std::optional<int16_t> readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg);
-    /*
-     * Reads byte data from two registers, and combine them into a single value
-     * @parama ls_reg register of the least significant register
-     * @parama ms_reg register of the most significant register
-     * @return the combined integer value of the two registers
+    /**
+     * Transform linear acceleration to robot center of mass
+     * @parama omega angular veocity of the robot
+     * @param alpha angular acceleration of the robot
+     * @parama imu_acceleration lianer acceleration of imu
+     * @return the linear acceleration of the robot center of mass
      */
     Eigen::Vector2d transformLinearAcceleration(AngularVelocity omega,
                                                 AngularAcceleration alpha,
-                                                Eigen::Vector2d a);
+                                                Eigen::Vector2d imu_acceleration);
+    /**
+     * Finds the deviation of the imu from the robot center of mass by taking 100 data
+     * points, applying a least square regression on the relative acceleration formula,
+     * and solving for the distance
+     * @return the deviation of the imu from the robot center of mass
+     */
+    Eigen::Vector2d calibrate_imu();
+
 
     bool initialized_ = false;
 
