@@ -31,6 +31,20 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "imu",
+    srcs = ["imu.cpp"],
+    hdrs = ["imu.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//software/geom:angular_acceleration",
+        "//software/geom:angular_velocity",
+        "//software/logger",
+        "@eigen",
+    ],
+)
+
 cc_binary(
     name = "robot_auto_test",
     srcs = ["robot_auto_test.cpp"],
