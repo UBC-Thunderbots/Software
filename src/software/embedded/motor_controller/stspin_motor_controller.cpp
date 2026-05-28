@@ -85,7 +85,8 @@ void StSpinMotorController::updateFaults(const MotorIndex motor,
         // No faults
         return;
     }
-
+    
+    // TODO #3748 Use a helper, stop regenerating the stream object.
     std::ostringstream oss;
     oss << "======= Faults For Motor " << motor << "=======\n";
 
@@ -198,7 +199,7 @@ void StSpinMotorController::updateEuclideanVelocity(
     const Vector local_velocity(target_euclidean_velocity[1],
                                 -target_euclidean_velocity[0]);
 
-    if (local_velocity.length() <= 0.01)  // Magic number
+    if (local_velocity.length() <= MINIMUM_SPEED_FOR_FEED_FORWARD)
     {
         sendAndReceiveFrame(
             MotorIndex::FRONT_LEFT,

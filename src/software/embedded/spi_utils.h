@@ -4,7 +4,8 @@
 
 #include <cstdint>
 
-// Wrap in spi_utils namespace
+// TODO: #3747 Wrap in spi_utils namespace
+// TODO: #3751 Use std::array instead of raw pointers for tx and rx buffers.
 /**
  * Trigger an SPI transfer over an open SPI connection
  *
