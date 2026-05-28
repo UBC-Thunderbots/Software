@@ -37,8 +37,6 @@ cc_library(
         "@boost//:filesystem",
     ],
 )
-<<<<<<< HEAD
-=======
 
 cc_library(
     name = "imu",
@@ -53,23 +51,3 @@ cc_library(
         "@eigen",
     ],
 )
-
-cc_binary(
-    name = "robot_auto_test",
-    srcs = ["robot_auto_test.cpp"],
-    linkopts = [
-        "-lpthread",
-        "-lrt",
-    ],
-    deps = [
-        ":motor",
-        ":power",
-        "//proto/message_translation:tbots_geometry",
-        "//proto/primitive:primitive_msg_factory",
-        "//shared:robot_constants",
-        "//software/embedded:primitive_executor",
-        "//software/logger",
-        "@trinamic",
-    ],
-)
->>>>>>> 2a39569e785bb4f0f81ad646828e00942be3cfc2
