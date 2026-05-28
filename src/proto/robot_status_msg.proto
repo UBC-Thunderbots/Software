@@ -101,6 +101,7 @@ enum MotorFault
     PHASE_W_SHORT_TO_GND_DETECTED  = 13;
     PHASE_W_SHORT_TO_VS_DETECTED   = 14;
 
+    // TODO: #3749 Move this to its own proto.
     /*********** STSPIN Faults ************/
     NO_FAULT     = 15;
     DURATION     = 16;
