@@ -18,6 +18,8 @@
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/embedded/motor_controller/motor_board.h"
+#include "software/embedded/motor_controller/stspin_motor_controller.h"
+#include "software/embedded/motor_controller/tmc_motor_controller.h"
 
 /**
  * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example

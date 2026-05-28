@@ -85,6 +85,13 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame,
     frame.power_msg.power_status = status;
 }
 
+void inline setPowerMsg(TbotsProto_PowerFrame& frame,
+                        const TbotsProto_DribblerControl& dribble_control)
+{
+    frame.which_power_msg        = TbotsProto_PowerFrame_dribbler_control_tag;
+    frame.power_msg.dribbler_control = dribble_control;
+}
+
 /**
  * Creates a nanopb power status msg with provided fields
  *

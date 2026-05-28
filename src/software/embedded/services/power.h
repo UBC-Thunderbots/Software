@@ -36,7 +36,7 @@ class PowerService
     /**
      * Handler method called every time the timer expires a new read is requested
      */
-    void tick();
+    virtual void tick();
 
     /**
      * Set dribbler RPM
@@ -72,7 +72,7 @@ class PowerServiceWithDribble : public PowerService {
     /**
      * Handler method called every time the timer expires a new read is requested
      */
-    override void tick();
+    void tick() override;
 
     /**
      * Set dribbler RPM
@@ -81,4 +81,4 @@ class PowerServiceWithDribble : public PowerService {
    private:
     bool _new_dribble_command = false;
     std::atomic<TbotsProto_DribblerControl> dribble_command;
-}
+};

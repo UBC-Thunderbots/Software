@@ -10,7 +10,7 @@ PowerService::PowerService()
     nanopb_command = createNanoPbPowerPulseControl(TbotsProto::PowerControl(), 0.0, 0, 0);
 
     if (!boost::filesystem::exists(DEVICE_SERIAL_PORT))
-    {
+    {   
         throw std::runtime_error("USB not plugged into the Raspberry Pi");
     }
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
@@ -111,15 +111,16 @@ void PowerServiceWithDribble::tick()
     {
         status = status_frame.power_msg.power_status;
     }
+    std::vector<uint8_t> power_command_buffer;
     if (_new_dribble_command) {
         auto command = dribble_command.load(std::memory_order_relaxed);  // get value atomically
         _new_dribble_command = false;
+        power_command_buffer = marshallUartPacket(createUartFrame(command));
     } else {
         auto command =
             nanopb_command.load(std::memory_order_relaxed);  // get value atomically
+        power_command_buffer = marshallUartPacket(createUartFrame(command));
     }
-    auto frame                = createUartFrame(command);
-    auto power_command_buffer = marshallUartPacket(frame);
 
     try
     {

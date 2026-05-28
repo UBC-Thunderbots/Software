@@ -32,6 +32,7 @@ cc_library(
         ":motor_fault_indicator",
         ":motor_index",
         ":stspin_types",
+        "//software/embedded/services:power",
         "//proto/message_translation:tbots_protobuf",
         "//software/embedded:spi_utils",
         "//software/embedded/gpio",
