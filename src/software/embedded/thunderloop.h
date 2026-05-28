@@ -10,6 +10,7 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
+#include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
@@ -60,6 +61,7 @@ class Thunderloop
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
     std::unique_ptr<PowerService> power_service_;
+    std::unique_ptr<ImuService> imu_service_;
 
     // TOML config client
     std::unique_ptr<TomlConfigClient> toml_config_client_;
