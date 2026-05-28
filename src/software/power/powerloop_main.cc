@@ -103,11 +103,11 @@ void loop()
         monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
         chicker->getBreakBeamTripped());
 
-    if (dribble_target < dribble_speed) {
+    if (dribble_target <= dribble_speed) {
         dribble_speed = dribble_target;
     } else {
         // Ramp to speed
-        dribble_speed = dribble_speed + (dribble_target-dribble_speed)/RAMP_FACTOR;     
+        dribble_speed = dribble_speed + (dribble_target-dribble_speed)/RAMP_FACTOR + 1;     
     }
     dribbler->dribble(dribble_speed/DRIBBLER_MAX_SPEED*255);
 
