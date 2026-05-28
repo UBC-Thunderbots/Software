@@ -8,6 +8,7 @@ cc_library(
         select({
             "//software/embedded:build_trinamic": ["TRINAMIC_MOTOR_BOARD"],
             "//software/embedded:build_stspin": ["STSPIN_MOTOR_BOARD"],
+            "//conditions:default": ["STSPIN_MOTOR_BOARD"],
         }),
     deps = [
         "//proto:tbots_cc_proto",
