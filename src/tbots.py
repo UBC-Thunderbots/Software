@@ -49,7 +49,6 @@ class BuildConfig:
     tracy: bool = False
     test_suite: bool = False
     enable_thunderscope: bool = False
-    enable_visualizer: bool = False
     stop_ai_on_start: bool = False
     jobs_option: str | None = None
     runs: int | None = None
@@ -108,7 +107,6 @@ def main(
         tracy=tracy,
         test_suite=test_suite,
         enable_thunderscope=enable_thunderscope,
-        enable_visualizer=enable_visualizer,
         stop_ai_on_start=stop_ai_on_start,
         jobs_option=jobs_option,
         runs=runs,
@@ -188,8 +186,6 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
     # Append runtime arguments
     if config.stop_ai_on_start:
         runtime_args.append("--stop_ai_on_start")
-    if config.enable_visualizer:
-        runtime_args.append("--enable_visualizer")
     if config.enable_thunderscope:
         runtime_args.append("--enable_thunderscope")
 
