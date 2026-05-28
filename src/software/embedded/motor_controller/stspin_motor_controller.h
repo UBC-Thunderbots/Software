@@ -32,7 +32,7 @@ class StSpinMotorController : public MotorController
     void immediatelyDisable() override;
 
    private:
-   // TODO: #3750 Use a template function instead of std::variant.
+    // TODO: #3750 Use a template function instead of std::variant.
     using OutgoingFrame =
         std::variant<NoOpFrame, SetResponseTypeFrame, SetTargetSpeedFrame,
                      SetTargetTorqueFrame, SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame,
@@ -63,7 +63,7 @@ class StSpinMotorController : public MotorController
 
     static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
     static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 300;
-    static constexpr double MINIMUM_SPEED_FOR_FEED_FORWARD = 0.01;
+    static constexpr double MINIMUM_SPEED_FOR_FEED_FORWARD  = 0.01;
 
     robot_constants::RobotConstants robot_constants_;
 
