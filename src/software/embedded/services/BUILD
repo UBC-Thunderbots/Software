@@ -35,3 +35,18 @@ cc_library(
         "@boost//:filesystem",
     ],
 )
+
+cc_library(
+    name = "imu",
+    srcs = ["imu.cpp"],
+    hdrs = ["imu.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//software/geom:angular_acceleration",
+        "//software/geom:angular_velocity",
+        "//software/logger",
+        "@eigen",
+    ],
+)
+
