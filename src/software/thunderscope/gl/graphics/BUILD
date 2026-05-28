@@ -56,6 +56,23 @@ py_library(
 )
 
 py_library(
+    name = "gl_graphic",
+    srcs = ["gl_graphic.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_line_strip",
+    srcs = ["gl_line_strip.py"],
+    deps = [
+        ":gl_graphic",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "gl_polygon",
     srcs = ["gl_polygon.py"],
     deps = [
@@ -69,6 +86,7 @@ py_library(
     name = "gl_shape",
     srcs = ["gl_shape.py"],
     deps = [
+        ":gl_graphic",
         requirement("pyqtgraph"),
     ],
 )

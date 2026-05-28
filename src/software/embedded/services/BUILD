@@ -4,12 +4,6 @@ cc_library(
     name = "motor",
     srcs = ["motor.cpp"],
     hdrs = ["motor.h"],
-    defines =
-        select({
-            "//software/embedded:build_nano": ["NANO"],
-            "//software/embedded:build_pi": ["PI"],
-            "//software/embedded:build_limited": ["LIMITED"],
-        }),
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
@@ -34,6 +28,20 @@ cc_library(
         "//software/uart:boost_uart_communication",
         "@boost//:asio",
         "@boost//:filesystem",
+    ],
+)
+
+cc_library(
+    name = "imu",
+    srcs = ["imu.cpp"],
+    hdrs = ["imu.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//software/geom:angular_acceleration",
+        "//software/geom:angular_velocity",
+        "//software/logger",
+        "@eigen",
     ],
 )
 

@@ -50,35 +50,35 @@ class ErForceVector
     }
 
    public:
-    float &operator[](unsigned int index);
+    float& operator[](unsigned int index);
     float operator[](unsigned int index) const;
-    ErForceVector operator+(const ErForceVector &rho) const;
-    ErForceVector operator-(const ErForceVector &rho) const;
+    ErForceVector operator+(const ErForceVector& rho) const;
+    ErForceVector operator-(const ErForceVector& rho) const;
     ErForceVector operator*(float scalar) const;
     ErForceVector operator/(float scalar) const;
-    ErForceVector &operator*=(float scalar);
-    ErForceVector &operator+=(const ErForceVector &other);
-    float operator*(const ErForceVector &rho) const;
-    bool operator==(const ErForceVector &rho) const;
-    bool operator!=(const ErForceVector &rho) const;
+    ErForceVector& operator*=(float scalar);
+    ErForceVector& operator+=(const ErForceVector& other);
+    float operator*(const ErForceVector& rho) const;
+    bool operator==(const ErForceVector& rho) const;
+    bool operator!=(const ErForceVector& rho) const;
 
     ErForceVector perpendicular() const;
     ErForceVector normalized() const;
     float length() const;
     float lengthSquared() const;
-    float distance(const ErForceVector &rho) const;
-    float distanceSq(const ErForceVector &rho) const
+    float distance(const ErForceVector& rho) const;
+    float distanceSq(const ErForceVector& rho) const
     {
         return (*this - rho).lengthSquared();
     }
 
-    float dot(const ErForceVector &other) const
+    float dot(const ErForceVector& other) const
     {
         return x * other.x + y * other.y;
     }
 
-    static float det(const ErForceVector &a, const ErForceVector &b,
-                     const ErForceVector &c)
+    static float det(const ErForceVector& a, const ErForceVector& b,
+                     const ErForceVector& c)
     {
         return a.x * b.y + b.x * c.y + c.x * a.y - a.x * c.y - b.x * a.y - c.x * b.y;
     }
@@ -89,7 +89,7 @@ class ErForceVector
         return std::atan2(x, y) + float(2 * M_PI);
     }
 
-    friend std::ostream &operator<<(std::ostream &stream, const ErForceVector v);
+    friend std::ostream& operator<<(std::ostream& stream, const ErForceVector v);
 
    public:
     union
@@ -103,7 +103,7 @@ class ErForceVector
     };
 };
 
-inline float &ErForceVector::operator[](unsigned int index)
+inline float& ErForceVector::operator[](unsigned int index)
 {
     return d[index];
 }
@@ -113,12 +113,12 @@ inline float ErForceVector::operator[](unsigned int index) const
     return d[index];
 }
 
-inline ErForceVector ErForceVector::operator+(const ErForceVector &rho) const
+inline ErForceVector ErForceVector::operator+(const ErForceVector& rho) const
 {
     return ErForceVector(x + rho.x, y + rho.y);
 }
 
-inline ErForceVector ErForceVector::operator-(const ErForceVector &rho) const
+inline ErForceVector ErForceVector::operator-(const ErForceVector& rho) const
 {
     return ErForceVector(x - rho.x, y - rho.y);
 }
@@ -133,29 +133,29 @@ inline ErForceVector ErForceVector::operator/(float scalar) const
     return ErForceVector(x / scalar, y / scalar);
 }
 
-inline float ErForceVector::operator*(const ErForceVector &rho) const
+inline float ErForceVector::operator*(const ErForceVector& rho) const
 {
     return x * rho.x + y * rho.y;
 }
 
-inline bool ErForceVector::operator==(const ErForceVector &rho) const
+inline bool ErForceVector::operator==(const ErForceVector& rho) const
 {
     return x == rho.x && y == rho.y;
 }
 
-inline bool ErForceVector::operator!=(const ErForceVector &rho) const
+inline bool ErForceVector::operator!=(const ErForceVector& rho) const
 {
     return x != rho.x || y != rho.y;
 }
 
-inline ErForceVector &ErForceVector::operator+=(const ErForceVector &other)
+inline ErForceVector& ErForceVector::operator+=(const ErForceVector& other)
 {
     x += other.x;
     y += other.y;
     return *this;
 }
 
-inline ErForceVector &ErForceVector::operator*=(float scalar)
+inline ErForceVector& ErForceVector::operator*=(float scalar)
 {
     x *= scalar;
     y *= scalar;
@@ -211,12 +211,12 @@ inline float ErForceVector::lengthSquared() const
  * \param rho Another vector
  * \return The distance to the other vector
  */
-inline float ErForceVector::distance(const ErForceVector &rho) const
+inline float ErForceVector::distance(const ErForceVector& rho) const
 {
     return (*this - rho).length();
 }
 
-inline std::ostream &operator<<(std::ostream &stream, const ErForceVector v)
+inline std::ostream& operator<<(std::ostream& stream, const ErForceVector v)
 {
     stream << "ErForceVector(" << v.x << ", " << v.y << ")";
     return stream;

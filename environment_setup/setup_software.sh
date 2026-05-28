@@ -143,6 +143,10 @@ sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoRefe
 
 print_status_msg "Finished setting up AutoRef"
 
+# setup external_runtimes 
+sudo mkdir /opt/tbotspython/external_runtimes
+sudo chown -R $USER:$USER /opt/tbotspython/external_runtimes/
+
 # Install Bazel
 print_status_msg "Installing Bazel"
 
@@ -160,6 +164,7 @@ print_status_msg "Done setting up cross compiler for robot software"
 
 print_status_msg "Setting Up Python Development Headers"
 install_python_dev_cross_compile_headers $g_arch
+install_python_toolchain_headers
 print_status_msg "Done Setting Up Python Development Headers"
 
 print_status_msg "Setting Up PlatformIO"

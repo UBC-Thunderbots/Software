@@ -36,14 +36,14 @@ class Tactic
      *
      * @return the robot capability requirements
      */
-    virtual const std::set<RobotCapability> &robotCapabilityRequirements() const = 0;
+    virtual const std::set<RobotCapability>& robotCapabilityRequirements() const = 0;
 
     /**
      * Mutable robot hardware capability requirements of the tactic.
      *
      * @return the Mutable robot hardware capability requirements of the tactic
      */
-    virtual std::set<RobotCapability> &mutableRobotCapabilityRequirements() = 0;
+    virtual std::set<RobotCapability>& mutableRobotCapabilityRequirements() = 0;
 
     /**
      * Updates the last execution robot
@@ -61,14 +61,14 @@ class Tactic
      * @return the next primitive
      */
     virtual std::map<RobotId, std::shared_ptr<Primitive>> get(
-        const WorldPtr &world_ptr) = 0;
+        const WorldPtr& world_ptr) = 0;
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself
      *
      * @param visitor A Tactic Visitor
      */
-    virtual void accept(TacticVisitor &visitor) const = 0;
+    virtual void accept(TacticVisitor& visitor) const = 0;
 
     virtual ~Tactic() = default;
 };

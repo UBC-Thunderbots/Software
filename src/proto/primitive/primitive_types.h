@@ -14,7 +14,7 @@ struct AutoChipOrKick
         double autochip_distance_m;
     };
 
-    bool operator==(const AutoChipOrKick &other) const
+    bool operator==(const AutoChipOrKick& other) const
     {
         if (auto_chip_kick_mode == other.auto_chip_kick_mode)
         {
@@ -30,7 +30,7 @@ struct AutoChipOrKick
         return false;
     }
 
-    bool operator!=(const AutoChipOrKick &other) const
+    bool operator!=(const AutoChipOrKick& other) const
     {
         return !((*this) == other);
     }

@@ -19,9 +19,7 @@ class EnemyFreeKickPlay : public PlayBase<EnemyFreeKickPlayFSM>
      */
     EnemyFreeKickPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
-    void getNextTactics(TacticCoroutine::push_type &yield,
-                        const WorldPtr &world_ptr) override;
-    void updateTactics(const PlayUpdate &play_update) override;
+    void updateTactics(const PlayUpdate& play_update) override;
 
     /**
      * Update control params for this play

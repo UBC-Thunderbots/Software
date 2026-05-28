@@ -1,6 +1,6 @@
 #include "software/geom/line.h"
 
-Line::Line(const Point &first, const Point &second)
+Line::Line(const Point& first, const Point& second)
 {
     if (first == second)
     {
@@ -11,7 +11,7 @@ Line::Line(const Point &first, const Point &second)
     coeffs.c = first.x() * second.y() - second.x() * first.y();
 }
 
-const Line::Coeffs &Line::getCoeffs() const
+const Line::Coeffs& Line::getCoeffs() const
 {
     return coeffs;
 }

@@ -1,3 +1,5 @@
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -33,17 +35,15 @@ cc_test(
     ],
 )
 
-cc_test(
+py_test(
     name = "receiver_tactic_test",
-    srcs = ["receiver_tactic_test.cpp"],
+    srcs = ["receiver_tactic_test.py"],
+    tags = [
+        "exclusive",
+    ],
     deps = [
-        ":receiver_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
+        "//software:conftest",
+        "//software/simulated_tests/validation:validations",
+        requirement("pytest"),
     ],
 )

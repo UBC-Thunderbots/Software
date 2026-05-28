@@ -11,7 +11,7 @@ PowerService::PowerService()
 
     if (!boost::filesystem::exists(DEVICE_SERIAL_PORT))
     {
-        throw std::runtime_error("USB not plugged into the Jetson Nano");
+        throw std::runtime_error("USB not plugged into the Raspberry Pi");
     }
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
     this->read_thread = std::thread(std::bind(&PowerService::continuousRead, this));

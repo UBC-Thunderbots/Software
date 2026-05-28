@@ -118,7 +118,7 @@ inline const static std::unordered_map<SSLProto::Referee::Stage, RefereeStage>
  *
  * @return RefereeCommand from command
  */
-RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
+RefereeCommand createRefereeCommand(const SSLProto::Referee& packet,
                                     TeamColour team_colour);
 
 /**
@@ -129,7 +129,7 @@ RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
  *
  * @return RefereeStage from stage
  */
-RefereeStage createRefereeStage(const SSLProto::Referee &packet);
+RefereeStage createRefereeStage(const SSLProto::Referee& packet);
 
 /**
  * Extracts the ball placement point from SSLProto::Referee packet
@@ -138,5 +138,5 @@ RefereeStage createRefereeStage(const SSLProto::Referee &packet);
  *
  * @return ball placement point if found
  */
-std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet);
+std::optional<Point> getBallPlacementPoint(const SSLProto::Referee& packet);
 }  // namespace ssl_referee

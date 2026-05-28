@@ -4,6 +4,7 @@
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/contains.h"
 
 PassDefenderFSM::PassDefenderFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
@@ -17,6 +18,12 @@ bool PassDefenderFSM::passStarted(const Update& event)
     Vector ball_receiver_point_vector(
         event.control_params.position_to_block_from.x() - ball_position.x(),
         event.control_params.position_to_block_from.y() - ball_position.y());
+
+    // Make sure ball is within playing area
+    if (!contains(event.common.world_ptr->field().fieldLines(), ball_position))
+    {
+        return false;
+    }
 
     bool pass_started = event.common.world_ptr->ball().hasBallBeenKicked(
         ball_receiver_point_vector.orientation(), MIN_PASS_SPEED,

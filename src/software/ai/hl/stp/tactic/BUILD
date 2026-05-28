@@ -113,6 +113,7 @@ cc_library(
     ],
     deps = [
         ":primitive",
+        ":vis_proto_deduper",
         "//proto/message_translation:tbots_protobuf",
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:trajectory_planner",
@@ -138,6 +139,31 @@ cc_test(
     deps = [
         ":move_primitive",
         ":stop_primitive",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_library(
+    name = "vis_proto_deduper",
+    srcs = ["vis_proto_deduper.cpp"],
+    hdrs = [
+        "vis_proto_deduper.h",
+    ],
+    deps = [
+        ":primitive",
+        "//proto/message_translation:tbots_protobuf",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/util/hash:hash_combine",
+    ],
+)
+
+cc_test(
+    name = "vis_proto_deduper_test",
+    srcs = ["vis_proto_deduper_test.cpp"],
+    deps = [
+        ":primitive",
+        ":vis_proto_deduper",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],

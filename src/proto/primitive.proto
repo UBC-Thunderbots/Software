@@ -78,6 +78,8 @@ message AutoChipOrKick
     {
         float autokick_speed_m_per_s   = 1;
         float autochip_distance_meters = 2;
+        float autokick_pulse_width     = 3;
+        float autochip_pulse_width     = 4;
     };
 }
 
@@ -92,6 +94,8 @@ message PowerControl
             float kick_speed_m_per_s         = 1;
             float chip_distance_meters       = 2;
             AutoChipOrKick auto_chip_or_kick = 3;
+            float kick_pulse_width           = 4;
+            float chip_pulse_width           = 5;
         };
     }
 

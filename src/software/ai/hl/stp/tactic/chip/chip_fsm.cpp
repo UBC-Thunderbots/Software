@@ -8,7 +8,7 @@ ChipFSM::ChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 }
 
 void ChipFSM::updateGetBehindBall(
-    const Update &event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
 {
     GetBehindBallFSM::ControlParams control_params{
         .ball_location   = event.control_params.chip_origin,
@@ -18,7 +18,7 @@ void ChipFSM::updateGetBehindBall(
     processEvent(GetBehindBallFSM::Update(control_params, event.common));
 }
 
-void ChipFSM::updateChip(const Update &event)
+void ChipFSM::updateChip(const Update& event)
 {
     Vector direction_to_chip =
         Vector::createFromAngle(event.control_params.chip_direction);
@@ -34,15 +34,15 @@ void ChipFSM::updateChip(const Update &event)
                        event.control_params.chip_distance_meters}));
 }
 
-bool ChipFSM::ballChicked(const Update &event)
+bool ChipFSM::ballChicked(const Update& event)
 {
     return event.common.world_ptr->ball().hasBallBeenKicked(
         event.control_params.chip_direction);
 }
 
-bool ChipFSM::shouldRealignWithBall(const Update &event)
+bool ChipFSM::shouldRealignWithBall(const Update& event)
 {
-    const Robot &robot = event.common.robot;
+    const Robot& robot = event.common.robot;
 
     // First check to see if it's too late to realign with the ball
     if (robot.isNearDribbler(event.control_params.chip_origin, 0.05))

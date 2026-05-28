@@ -21,14 +21,14 @@ class Circle final : public ConvexShape
      * @param radius the radius of the Circle
      * @throws std::invalid_argument if passed a negative radius.
      */
-    explicit Circle(const Point &origin, double radius);
+    explicit Circle(const Point& origin, double radius);
 
     /**
      * Returns the origin of this Circle.
      *
      * @return the origin of this Circle.
      */
-    const Point &origin() const;
+    const Point& origin() const;
 
     /**
      * Returns the radius of this Circle.
@@ -57,7 +57,7 @@ class Circle final : public ConvexShape
  *
  * @return true if the two circles represent the same circle, and false otherwise
  */
-bool operator==(const Circle &c, const Circle &d);
+bool operator==(const Circle& c, const Circle& d);
 
 /**
  * Compares two Circles for inequality
@@ -67,7 +67,7 @@ bool operator==(const Circle &c, const Circle &d);
  *
  * @return true if the two circles represent the different circles, and false otherwise
  */
-bool operator!=(const Circle &c, const Circle &d);
+bool operator!=(const Circle& c, const Circle& d);
 
 /**
  * Implements the << operator for printing
@@ -77,12 +77,12 @@ bool operator!=(const Circle &c, const Circle &d);
  *
  * @return The output stream with the string representation of the class appended
  */
-std::ostream &operator<<(std::ostream &os, const Circle &circle);
+std::ostream& operator<<(std::ostream& os, const Circle& circle);
 
 template <>
 struct std::hash<Circle>
 {
-    size_t operator()(const Circle &circle) const
+    size_t operator()(const Circle& circle) const
     {
         return std::hash<Point>()(circle.origin()) ^ std::hash<double>()(circle.radius());
     }

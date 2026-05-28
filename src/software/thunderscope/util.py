@@ -1,3 +1,4 @@
+import platform
 from typing import Callable, NoReturn, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -5,12 +6,15 @@ if TYPE_CHECKING:
 
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
-from software.py_constants import SECONDS_PER_MILLISECOND
+from software.py_constants import (
+    SECONDS_PER_MILLISECOND,
+    NANOSECONDS_PER_MILLISECOND,
+)
 from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
-from software.thunderscope.time_provider import TimeProvider
+from software.thunderscope.time_provider import time_provider_instance
 
 import queue
 import time
@@ -20,7 +24,6 @@ import software.python_bindings as tbots_cpp
 
 
 def exit_poller(
-    time_provider: TimeProvider,
     exit_duration_s: float,
     on_exit: Callable[[], None],
     poll_duration_s: float = 0.5,
@@ -28,13 +31,12 @@ def exit_poller(
     """Calls the on_exit callback once the elapsed exit_duration has passed from the start of this function call,
     polling every poll_duration using system time
 
-    :param time_provider:   used to compare all timestamps
     :param exit_duration_s: how long to poll from the start of this program before exiting
     :param on_exit:         callback once the exit_duration time has elapsed
     :param poll_duration_s: interval between polling the time_provider for the current timestamp
     """
-    time_now_s = time_provider.time_provider()
-    while time_provider.time_provider() <= (time_now_s + exit_duration_s):
+    start_time_s = time.time()
+    while time.time() <= start_time_s + exit_duration_s:
         time.sleep(poll_duration_s)
 
     on_exit()
@@ -80,6 +82,7 @@ def async_sim_ticker(
         # Tick simulation
         tick = SimulatorTick(milliseconds=tick_rate_ms)
         sim_proto_unix_io.send_proto(SimulatorTick, tick)
+        time_provider_instance.tick_ns(tick_rate_ms * NANOSECONDS_PER_MILLISECOND)
 
         while True:
             try:
@@ -87,6 +90,9 @@ def async_sim_ticker(
                 break
             except queue.Empty:
                 sim_proto_unix_io.send_proto(SimulatorTick, tick)
+                time_provider_instance.tick_ns(
+                    tick_rate_ms * NANOSECONDS_PER_MILLISECOND
+                )
 
         while True:
             try:
@@ -94,6 +100,9 @@ def async_sim_ticker(
                 break
             except queue.Empty:
                 sim_proto_unix_io.send_proto(SimulatorTick, tick)
+                time_provider_instance.tick_ns(
+                    tick_rate_ms * NANOSECONDS_PER_MILLISECOND
+                )
 
 
 def realtime_sim_ticker(
@@ -116,6 +125,7 @@ def realtime_sim_ticker(
         if simulation_state_message.is_playing:
             tick = SimulatorTick(milliseconds=tick_rate_ms)
             sim_proto_unix_io.send_proto(SimulatorTick, tick)
+            time_provider_instance.tick_ns(tick_rate_ms * NANOSECONDS_PER_MILLISECOND)
 
         time.sleep(per_tick_delay_s / simulation_state_message.simulation_speed)
 
@@ -195,3 +205,10 @@ def color_from_gradient(
                         int(b_range[i] + (b_range[i + 1] - b_range[i]) * sig_val),
                         int(a_range[i] + (a_range[i + 1] - a_range[i]) * sig_val),
                     )
+
+
+def is_current_platform_macos() -> bool:
+    """Return True if the current process is running on macOS.
+    Uses platform.system(), which should reliably return 'Darwin' on macOS.
+    """
+    return platform.system().lower() == "darwin"

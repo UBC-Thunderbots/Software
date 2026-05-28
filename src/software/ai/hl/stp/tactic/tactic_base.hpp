@@ -20,7 +20,7 @@
     {                                                                                    \
         using parent_class::parent_class;                                                \
                                                                                          \
-        inline void accept(TacticVisitor &visitor) const                                 \
+        inline void accept(TacticVisitor& visitor) const                                 \
         {                                                                                \
             visitor.visit(*this);                                                        \
         }                                                                                \
@@ -45,7 +45,7 @@ class TacticBase : public Tactic
      * @param capability_reqs_ The capability requirements for running this tactic
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit TacticBase(const std::set<RobotCapability> &capability_reqs,
+    explicit TacticBase(const std::set<RobotCapability>& capability_reqs,
                         std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     TacticBase() = delete;
@@ -69,14 +69,14 @@ class TacticBase : public Tactic
      *
      * @return the robot capability requirements
      */
-    const std::set<RobotCapability> &robotCapabilityRequirements() const;
+    const std::set<RobotCapability>& robotCapabilityRequirements() const;
 
     /**
      * Mutable robot hardware capability requirements of the tactic.
      *
      * @return the Mutable robot hardware capability requirements of the tactic
      */
-    std::set<RobotCapability> &mutableRobotCapabilityRequirements();
+    std::set<RobotCapability>& mutableRobotCapabilityRequirements();
 
     /**
      * Updates the last execution robot
@@ -93,14 +93,14 @@ class TacticBase : public Tactic
      *
      * @return the next primitive
      */
-    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr);
+    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr& world_ptr);
 
     /**
      * Accepts a TacticBase Visitor and calls the visit function on itself
      *
      * @param visitor A TacticBase Visitor
      */
-    virtual void accept(TacticVisitor &visitor) const = 0;
+    virtual void accept(TacticVisitor& visitor) const = 0;
 
     virtual ~TacticBase() = default;
 
@@ -133,7 +133,7 @@ class TacticBase : public Tactic
      * @param tactic_update The tactic_update struct that contains all the information for
      * updating the primitive
      */
-    virtual void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm);
+    virtual void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm);
 
 
     // robot capability requirements
@@ -142,7 +142,7 @@ class TacticBase : public Tactic
 
 template <class TacticFsm, class... TacticSubFsms>
 TacticBase<TacticFsm, TacticSubFsms...>::TacticBase(
-    const std::set<RobotCapability> &capability_reqs_,
+    const std::set<RobotCapability>& capability_reqs_,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : last_execution_robot(std::nullopt),
       ai_config_ptr(ai_config_ptr),
@@ -180,7 +180,7 @@ std::string TacticBase<TacticFsm, TacticSubFsms...>::getFSMState() const
 
 template <class TacticFsm, class... TacticSubFsms>
 std::map<RobotId, std::shared_ptr<Primitive>>
-TacticBase<TacticFsm, TacticSubFsms...>::get(const WorldPtr &world_ptr)
+TacticBase<TacticFsm, TacticSubFsms...>::get(const WorldPtr& world_ptr)
 {
     TbotsProto::RobotNavigationObstacleConfig obstacle_config;
     std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
@@ -189,7 +189,7 @@ TacticBase<TacticFsm, TacticSubFsms...>::get(const WorldPtr &world_ptr)
         ZoneNamedN(_tracy_tactic_set_primitive, "Tactic: Get primitives for each robot",
                    true);
 
-        for (const auto &robot : world_ptr->friendlyTeam().getAllRobots())
+        for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
         {
             updatePrimitive(TacticUpdate(robot, world_ptr,
                                          [this](std::shared_ptr<Primitive> new_primitive)
@@ -209,7 +209,7 @@ TacticBase<TacticFsm, TacticSubFsms...>::get(const WorldPtr &world_ptr)
 
 template <class TacticFsm, class... TacticSubFsms>
 void TacticBase<TacticFsm, TacticSubFsms...>::updatePrimitive(
-    const TacticUpdate &tactic_update, bool reset_fsm)
+    const TacticUpdate& tactic_update, bool reset_fsm)
 {
     if (reset_fsm)
     {
@@ -234,15 +234,15 @@ void TacticBase<TacticFsm, TacticSubFsms...>::setLastExecutionRobot(
 }
 
 template <class TacticFsm, class... TacticSubFsms>
-std::set<RobotCapability>
-    &TacticBase<TacticFsm, TacticSubFsms...>::mutableRobotCapabilityRequirements()
+std::set<RobotCapability>&
+TacticBase<TacticFsm, TacticSubFsms...>::mutableRobotCapabilityRequirements()
 {
     return capability_reqs;
 }
 
 template <class TacticFsm, class... TacticSubFsms>
-const std::set<RobotCapability>
-    &TacticBase<TacticFsm, TacticSubFsms...>::robotCapabilityRequirements() const
+const std::set<RobotCapability>&
+TacticBase<TacticFsm, TacticSubFsms...>::robotCapabilityRequirements() const
 {
     return capability_reqs;
 }

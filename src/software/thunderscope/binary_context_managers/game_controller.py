@@ -1,15 +1,16 @@
 from __future__ import annotations
+import itertools
 
 import queue
 import random
 import logging
 import os
-import socket
 import time
 from subprocess import Popen
 from typing import Any
 
 from proto.import_all_protos import *
+from proto.message_translation.tbots_protobuf import create_default_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import *
 import software.python_bindings as tbots_cpp
@@ -21,29 +22,33 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
-
-logger = logging.getLogger(__name__)
-import itertools
+from software.thunderscope.util import is_current_platform_macos
+from software.thunderscope.time_provider import time_provider_instance
 
 
 class Gamecontroller:
     """Gamecontroller Context Manager"""
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
-    REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
+    REFEREE_IP = "224.5.23.1"
+    RESET_MATCH_DELAY_S = 1
+    NO_GAME_PROGRESS_DURATION_S = 120
 
     def __init__(
         self,
         suppress_logs: bool = False,
         use_conventional_port: bool = False,
+        automate_referee: bool = False,
     ) -> None:
         """Run Gamecontroller
 
         :param suppress_logs: Whether to suppress the logs
         :param use_conventional_port: whether or not to use the conventional port!
+        :param automate_referee: whether or not referee commands should be automated
         """
         self.suppress_logs = suppress_logs
+        self.automate_referee = automate_referee
 
         # We default to using a non-conventional port to avoid emitting
         # on the same port as what other teams may be listening on.
@@ -68,6 +73,9 @@ class Gamecontroller:
         self.latest_world = None
         self.blue_removed_robot_ids = queue.Queue()
         self.yellow_removed_robot_ids = queue.Queue()
+        self.processed_event_ids = set()
+        self.last_stage_time_left = None
+        self.pause_start_timestamp = None
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -83,6 +91,10 @@ class Gamecontroller:
         :return: gamecontroller context managed instance
         """
         command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+
+        # Kill any gamecontroller, even those with different IP/port, because
+        # of the port assignment logic when use_conventional_port=False
+        kill_cmd_if_running(command)
 
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
@@ -132,104 +144,6 @@ class Gamecontroller:
                 ),
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
-
-    @staticmethod
-    def __update_robot_count(
-        robot_states,
-        team: Team,
-        max_robots: int,
-        removed_robot_ids: queue.Queue[int],
-        field_edge_y_meters: float,
-    ) -> None:
-        """Static method for updating the number of robots in the world state (i.e. robot_states) for a given Team.
-        This method is team & side agnostic.
-
-        :param robot_states: WorldState <Robot ID, RobotState> map protobuf to be updated.
-        :param team: the Team of robots currently in play
-        :param max_robots: The number of robots we should have on the field. Must be >= 0
-        :param removed_robot_ids: The robots (IDs) which have been removed already and can safely be re-added
-        :param field_edge_y_meters: Places new robots at this y position along the centerline
-        :return:
-        """
-        # build the robot state for placing robots at the edge of field
-        place_state = RobotState(
-            global_position=Point(x_meters=0, y_meters=field_edge_y_meters)
-        )
-        # Remove robots, as we have too many. Set robot velocities to zero to avoid any drift
-        for count, robot in enumerate(team.team_robots, start=1):
-            if count <= max_robots:
-                robot_states[robot.id].CopyFrom(robot.current_state)
-                velocity = robot_states[robot.id].global_velocity
-                velocity.x_component_meters = 0
-                velocity.y_component_meters = 0
-            else:
-                removed_robot_ids.put(robot.id)
-        # Add robots, since we are missing some
-        robots_diff: int = max_robots - len(team.team_robots)
-        if robots_diff <= 0:
-            return
-        for _ in range(robots_diff):
-            try:
-                robot_states[removed_robot_ids.get_nowait()].CopyFrom(place_state)
-            except queue.Empty:
-                return
-
-    def handle_referee(self, referee: Referee) -> None:
-        """Updates the world state based on the referee message
-        :param referee: the referee protobuf message
-        """
-        # Check that we are running with the simulator and have access to its
-        # proto unix io
-        if self.simulator_proto_unix_io is None:
-            return
-
-        # Convert the latest blue world into a WorldState we can send to the simulator and update the robots
-        self.latest_world = self.blue_team_world_buffer.get(
-            block=False, return_cached=True
-        )
-
-        max_allowed_bots_yellow: int = referee.yellow.max_allowed_bots
-        max_allowed_bots_blue: int = referee.blue.max_allowed_bots
-        # Ignore if nothing needs to be updated
-        if (
-            len(self.latest_world.friendly_team.team_robots) == max_allowed_bots_blue
-            and len(self.latest_world.enemy_team.team_robots) == max_allowed_bots_yellow
-        ):
-            return
-
-        # Populate a blank WorldState with new updated robot information
-        world_state = WorldState()
-        field_edge_y_meters: Final[int] = (
-            self.latest_world.field.field_y_length
-            - self.latest_world.field.boundary_buffer_size
-        )
-
-        self.__update_robot_count(
-            world_state.blue_robots,
-            self.latest_world.friendly_team,
-            max_allowed_bots_blue,
-            self.blue_removed_robot_ids,
-            field_edge_y_meters,
-        )
-        self.__update_robot_count(
-            world_state.yellow_robots,
-            self.latest_world.enemy_team,
-            max_allowed_bots_yellow,
-            self.yellow_removed_robot_ids,
-            -field_edge_y_meters,
-        )
-
-        # Check if we need to invert the world state
-        if referee.blue_team_on_positive_half:
-            for robot in itertools.chain(
-                world_state.blue_robots, world_state.yellow_robots
-            ):
-                robot.current_state.global_position.x_meters *= -1
-                robot.current_state.global_position.y_meters *= -1
-                robot.current_state.global_orientation.radians += math.pi
-
-        # Send out updated world state
-        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
 
     def is_valid_port(self, port):
         """Determine whether or not a given port is valid
@@ -282,16 +196,21 @@ class Gamecontroller:
 
             :param data: The referee command to send
             """
-            self.handle_referee(data)
+            self.__handle_referee(data)
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
             if autoref_proto_unix_io is not None:
                 autoref_proto_unix_io.send_proto(Referee, data)
 
+        if is_current_platform_macos():
+            loopback_iface = "en0"
+        else:
+            loopback_iface = "lo"
+
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP,
             self.referee_port,
-            "lo",
+            loopback_iface,
             __send_referee_command,
             True,
         )
@@ -385,71 +304,24 @@ class Gamecontroller:
 
         return ci_output_list
 
-    def reset_team(self, name: str, team: str) -> Change.UpdateTeamState:
-        """Returns an UpdateTeamState proto for the gamecontroller to reset team info.
-
-        :param name name of the new team
-        :param team yellow or blue team to update
-
-        :return: corresponding UpdateTeamState proto
-        """
-        update_team_state = Change.UpdateTeamState()
-        update_team_state.for_team = team
-        update_team_state.team_name.value = name
-        update_team_state.goals.value = 0
-        update_team_state.timeouts_left.value = 4
-        update_team_state.timeout_time_left.value = "05:00"
-        update_team_state.can_place_ball.value = True
-
-        return update_team_state
-
-    def reset_game(
-        self, division: proto.ssl_gc_common_pb2.Division
-    ) -> Change.UpdateConfig:
-        """Returns an UpdateConfig proto for the Gamecontroller to reset game info.
-
-        :param division the Division proto corresponding to the game division to set up the Gamecontroller for
-
-        :return: corresponding UpdateConfig proto
-        """
-        game_update = Change.UpdateConfig()
-        game_update.division = division
-        game_update.first_kickoff_team = SslTeam.BLUE
-        game_update.match_type = MatchType.FRIENDLY
-
-        return game_update
-
-    def reset_team_info(
-        self, division: proto.ssl_gc_common_pb2.Division
-    ) -> list[CiOutput]:
-        """Sends a message to the Gamecontroller to reset Team information.
-
-        :param division: the Division proto corresponding to the game division to set up the Gamecontroller for
+    def reset_match(self) -> list[CiOutput]:
+        """Sends a message to the Gamecontroller to reset match information to our defaults.
 
         :return: a list of CiOutput protos from the Gamecontroller
         """
         ci_input = CiInput(timestamp=int(time.time_ns()))
-        input_blue_update = Input()
-        input_blue_update.reset_match = True
-        input_blue_update.change.update_team_state_change.CopyFrom(
-            self.reset_team("BLUE", SslTeam.BLUE)
+
+        input_reset_match = Input()
+        input_reset_match.reset_match = True
+
+        input_set_match_config = Input()
+        input_set_match_config.change.update_config_change.division = Division.DIV_B
+        input_set_match_config.change.update_config_change.match_type = (
+            MatchType.FRIENDLY
         )
 
-        input_yellow_update = Input()
-        input_yellow_update.reset_match = True
-        input_yellow_update.change.update_team_state_change.CopyFrom(
-            self.reset_team("YELLOW", SslTeam.YELLOW)
-        )
-
-        input_game_update = Input()
-        input_game_update.reset_match = True
-        input_game_update.change.update_config_change.CopyFrom(
-            self.reset_game(division)
-        )
-
-        ci_input.api_inputs.append(input_blue_update)
-        ci_input.api_inputs.append(input_yellow_update)
-        ci_input.api_inputs.append(input_game_update)
+        ci_input.api_inputs.append(input_reset_match)
+        ci_input.api_inputs.append(input_set_match_config)
 
         return self.send_ci_input(ci_input)
 
@@ -470,3 +342,248 @@ class Gamecontroller:
         ci_input.api_inputs.append(game_config_input)
 
         return self.send_ci_input(ci_input)
+
+    def __handle_referee(self, referee: Referee) -> None:
+        """Updates the world state based on the referee message
+        :param referee: the referee protobuf message
+        """
+        # Check that we are running with the simulator and have access to its
+        # proto unix io
+        if self.simulator_proto_unix_io is None:
+            return
+
+        # Convert the latest blue world into a WorldState we can send to the simulator and update the robots
+        self.latest_world = self.blue_team_world_buffer.get(
+            block=False, return_cached=True
+        )
+
+        if self.automate_referee:
+            self.__automate_referee(referee)
+
+        if (
+            len(self.latest_world.friendly_team.team_robots)
+            != referee.blue.max_allowed_bots
+            or len(self.latest_world.enemy_team.team_robots)
+            != referee.yellow.max_allowed_bots
+        ):
+            self.__update_max_allowed_robots(referee)
+
+    def __automate_referee(self, referee: Referee) -> None:
+        """Automate referee events by handling possible goals, ball placement failures,
+        game stage changes, starting new game, and resetting when there is no game progress.
+
+        :param referee: the referee protobuf message
+        """
+        self.__handle_game_no_progress(referee)
+
+        if referee.stage_time_left < 0:
+            self.__handle_game_stage_change(referee.stage)
+
+        possible_goal_events = self.__find_unprocessed_events(
+            referee, GameEvent.Type.POSSIBLE_GOAL
+        )
+        placement_failed_events = self.__find_unprocessed_events(
+            referee, GameEvent.Type.PLACEMENT_FAILED
+        )
+
+        if len(possible_goal_events) >= 1:
+            self.__handle_possible_goal(possible_goal_events[0].possible_goal.by_team)
+            self.processed_event_ids.add(possible_goal_events[0].id)
+
+        if len(placement_failed_events) >= 2:
+            self.__handle_placement_failed()
+            self.processed_event_ids.add(placement_failed_events[0].id)
+            self.processed_event_ids.add(placement_failed_events[1].id)
+
+    def __handle_game_no_progress(self, referee: Referee) -> None:
+        """Handle game stalling by ending early if there is no progress in game stage time for too long.
+
+        :param referee: the referee protobuf message
+        """
+        is_game_progressing = referee.stage_time_left != self.last_stage_time_left
+        self.last_stage_time_left = referee.stage_time_left
+
+        if is_game_progressing:
+            self.pause_start_timestamp = None
+            return
+
+        # First referee message after being paused
+        if self.pause_start_timestamp is None:
+            self.pause_start_timestamp = time_provider_instance.elapsed_time_ns()
+
+        pause_duration_s = (
+            time_provider_instance.elapsed_time_ns() - self.pause_start_timestamp
+        ) * SECONDS_PER_NANOSECOND
+
+        if pause_duration_s >= self.NO_GAME_PROGRESS_DURATION_S:
+            logging.warning(
+                f"Gamecontroller: Ending game early due unknown issue halting "
+                f"game progress for {self.NO_GAME_PROGRESS_DURATION_S} seconds"
+            )
+            self.__handle_game_stage_change(Referee.Stage.NORMAL_SECOND_HALF)
+            self.pause_start_timestamp = None
+
+    def __handle_game_stage_change(self, game_stage: Referee.Stage) -> None:
+        """Handle game stage change by advancing to the next half once first half is over
+        and starting a new game once the second half is over.
+
+        :param game_stage: The current game stage from the referee message
+        """
+        if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
+            # skip to pre second half
+            self.__set_game_stage(Referee.Stage.NORMAL_SECOND_HALF_PRE)
+        else:
+            # end game
+            self.__set_game_stage(Referee.Stage.POST_GAME)
+
+            # Race condition where events don't get resolved before setting new match settings
+            time.sleep(self.RESET_MATCH_DELAY_S)
+
+            # start new game
+            self.reset_match()
+
+        self.__reset_world_state()
+
+    def __set_game_stage(self, new_stage: Referee.Stage) -> None:
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        api_input = Input()
+        change = Change()
+        change.change_stage_change.new_stage = new_stage
+        api_input.change.CopyFrom(change)
+        ci_input.api_inputs.append(api_input)
+        self.send_ci_input(ci_input)
+
+    def __find_unprocessed_events(
+        self, referee: Referee, event_type: GameEvent.Type
+    ) -> list[GameEvent]:
+        """Find unprocessed game events of the specified type.
+
+        :param referee: the referee protobuf message
+        :param event_type: the type of game event to search for
+        :return: list of unprocessed events of the given type
+        """
+        return [
+            event
+            for event in referee.game_events
+            if event.type == event_type and event.id not in self.processed_event_ids
+        ]
+
+    def __handle_possible_goal(self, scoring_team: SslTeam) -> None:
+        """Handle a possible goal event by approving the goal and resetting world state.
+
+        :param scoring_team: the team that scored the goal
+        """
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        api_input = Input()
+        change = Change()
+
+        # Send goal game event to resolve the possible goal
+        game_event = GameEvent(
+            type=GameEvent.Type.GOAL,
+            origin=[
+                "Majority"
+            ],  # Required or else ssl-gamecontroller will convert game event to proposal
+            goal=GameEvent.Goal(by_team=scoring_team),
+        )
+
+        change.add_game_event_change.game_event.CopyFrom(game_event)
+        api_input.change.CopyFrom(change)
+        ci_input.api_inputs.append(api_input)
+        self.send_ci_input(ci_input)
+
+        self.__reset_world_state()
+
+    def __handle_placement_failed(self) -> None:
+        """Handle a placement failed event by moving the ball to the placement point."""
+        world_state = WorldState()
+        world_state.ball_state.global_position.CopyFrom(
+            self.latest_world.game_state.ball_placement_point
+        )
+        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+    def __reset_world_state(self) -> None:
+        """Resets the robot and ball positions"""
+        self.simulator_proto_unix_io.send_proto(
+            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+        )
+        self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
+
+    def __update_max_allowed_robots(self, referee: Referee) -> None:
+        """Update the world state by adding or removing robots for each team to match
+        their maximum allowed number of robots.
+
+        :param referee: the referee protobuf message
+        """
+        world_state = WorldState()
+        field_edge_y_meters: Final[int] = (
+            self.latest_world.field.field_y_length
+            - self.latest_world.field.boundary_buffer_size
+        )
+
+        self.__update_robot_count(
+            world_state.blue_robots,
+            self.latest_world.friendly_team,
+            referee.blue.max_allowed_bots,
+            self.blue_removed_robot_ids,
+            field_edge_y_meters,
+        )
+        self.__update_robot_count(
+            world_state.yellow_robots,
+            self.latest_world.enemy_team,
+            referee.yellow.max_allowed_bots,
+            self.yellow_removed_robot_ids,
+            -field_edge_y_meters,
+        )
+
+        # Check if we need to invert the world state
+        if referee.blue_team_on_positive_half:
+            for robot in itertools.chain(
+                world_state.blue_robots, world_state.yellow_robots
+            ):
+                robot.current_state.global_position.x_meters *= -1
+                robot.current_state.global_position.y_meters *= -1
+                robot.current_state.global_orientation.radians += math.pi
+
+        # Send out updated world state
+        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+    @staticmethod
+    def __update_robot_count(
+        robot_states,
+        team: Team,
+        max_robots: int,
+        removed_robot_ids: queue.Queue[int],
+        field_edge_y_meters: float,
+    ) -> None:
+        """Static method for updating the number of robots in the world state (i.e. robot_states) for a given Team.
+        This method is team & side agnostic.
+
+        :param robot_states: WorldState <Robot ID, RobotState> map protobuf to be updated.
+        :param team: the Team of robots currently in play
+        :param max_robots: The number of robots we should have on the field. Must be >= 0
+        :param removed_robot_ids: The robots (IDs) which have been removed already and can safely be re-added
+        :param field_edge_y_meters: Places new robots at this y position along the centerline
+        :return:
+        """
+        # build the robot state for placing robots at the edge of field
+        place_state = RobotState(
+            global_position=Point(x_meters=0, y_meters=field_edge_y_meters)
+        )
+        # Remove robots, as we have too many. Set robot velocities to zero to avoid any drift
+        for count, robot in enumerate(team.team_robots, start=1):
+            if count <= max_robots:
+                robot_states[robot.id].CopyFrom(robot.current_state)
+                velocity = robot_states[robot.id].global_velocity
+                velocity.x_component_meters = 0
+                velocity.y_component_meters = 0
+            else:
+                removed_robot_ids.put(robot.id)
+        # Add robots, since we are missing some
+        robots_diff: int = max_robots - len(team.team_robots)
+        if robots_diff <= 0:
+            return
+        for _ in range(robots_diff):
+            try:
+                robot_states[removed_robot_ids.get_nowait()].CopyFrom(place_state)
+            except queue.Empty:
+                return
