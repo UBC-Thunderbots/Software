@@ -113,6 +113,7 @@ void PowerServiceWithDribble::tick()
     }
     if (_new_dribble_command) {
         auto command = dribble_command.load(std::memory_order_relaxed);  // get value atomically
+        _new_dribble_command = false;
     } else {
         auto command =
             nanopb_command.load(std::memory_order_relaxed);  // get value atomically

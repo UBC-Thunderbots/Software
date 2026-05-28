@@ -37,6 +37,11 @@ std::shared_ptr<Geneva> geneva;
 std::shared_ptr<ControlExecutor> executor;
 std::shared_ptr<Dribbler> dribbler;
 
+#define RAMP_FACTOR 4
+#define DRIBBLER_MAX_SPEED 11040 // Max RPM from spec
+int dribble_target;
+int dribble_speed;
+
 void setup()
 {
     Serial.begin(460800, SERIAL_8N1);
@@ -49,6 +54,8 @@ void setup()
     executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
     dribbler     = std::make_shared<Dribbler>();
     charger->chargeCapacitors();
+    dribble_speed = 0;
+    dribble_target = 0;
 }
 
 void loop()
@@ -72,7 +79,7 @@ void loop()
                     } 
                     else  if (frame.which_power_msg == TbotsProto_PowerFrame_dribbler_control_tag) 
                     {
-                        dribbler->dribble(frame.power_msg.dribble_control.dribble_speed);
+                        dribble_target = frame.power_msg.dribbler_control.dribble_speed;
                     }
                 }
 
@@ -95,6 +102,14 @@ void loop()
         monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
         monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
         chicker->getBreakBeamTripped());
+
+    if (dribble_target < dribble_speed) {
+        dribble_speed = dribble_target;
+    } else {
+        // Ramp to speed
+        dribble_speed = dribble_speed + (dribble_target-dribble_speed)/RAMP_FACTOR;     
+    }
+    dribbler->dribble(dribble_speed/DRIBBLER_MAX_SPEED*255);
 
     // Write sensor values out to Serial
     TbotsProto_PowerFrame status_frame = createUartFrame(status);
