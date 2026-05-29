@@ -43,7 +43,7 @@ extern "C"
     {
         if (g_motor_service)
         {
-            g_motor_service->resetMotorBoard();
+            g_motor_service->reset();
         }
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
@@ -121,7 +121,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
-    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    motor_service_  = std::make_unique<MotorService>(robot_constants);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
 
