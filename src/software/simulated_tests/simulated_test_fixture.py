@@ -1,4 +1,3 @@
-import threading
 import queue
 import argparse
 import time
@@ -189,7 +188,9 @@ class SimulatedTestRunner(TbotsTestRunner):
                         )
 
             if retry_count == MAX_RETRIES:
-                raise TimeoutError("Timed out waiting for world/primitive updates from AI/Simulator")
+                raise TimeoutError(
+                    "Timed out waiting for world/primitive updates from AI/Simulator"
+                )
 
             processing_time = time.time() - start_time
             if self.thunderscope and tick_duration_s > processing_time:

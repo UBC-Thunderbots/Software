@@ -36,7 +36,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
         if (is_linear_traj_new)
         {
-            trajectory_path_ = new_trajectory_path;
+            trajectory_path_                       = new_trajectory_path;
             time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
             position_controller_.reset();
         }
@@ -53,7 +53,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
         if (is_angular_traj_new)
         {
-            angular_trajectory_ = new_angular_trajectory;
+            angular_trajectory_                     = new_angular_trajectory;
             time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
             orientation_controller_.reset();
         }
@@ -112,8 +112,10 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
     TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time)
 {
-    time_since_linear_trajectory_creation_  = time_since_linear_trajectory_creation_ + delta_time;
-    time_since_angular_trajectory_creation_ = time_since_angular_trajectory_creation_ + delta_time;
+    time_since_linear_trajectory_creation_ =
+        time_since_linear_trajectory_creation_ + delta_time;
+    time_since_angular_trajectory_creation_ =
+        time_since_angular_trajectory_creation_ + delta_time;
 
     status.set_running_primitive(true);
 
@@ -149,10 +151,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 position_, *trajectory_path_, time_since_linear_trajectory_creation_,
                 delta_time);
 
-            const AngularVelocity target_angular_velocity =
-                orientation_controller_.step(orientation_, *angular_trajectory_,
-                                             time_since_angular_trajectory_creation_,
-                                             delta_time);
+            const AngularVelocity target_angular_velocity = orientation_controller_.step(
+                orientation_, *angular_trajectory_,
+                time_since_angular_trajectory_creation_, delta_time);
 
             Vector target_linear_velocity_local =
                 globalToLocalVelocity(target_linear_velocity_global, orientation_);

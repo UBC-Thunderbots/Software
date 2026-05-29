@@ -200,7 +200,7 @@ void Thunderloop::runLoop()
             processLocalizationUpdates();
 
             processPrimitiveExecution(poll_time, last_primitive_received_time,
-                                       delta_time);
+                                      delta_time);
 
             updateChickerStatus(last_chipper_fired, last_kicker_fired);
 
