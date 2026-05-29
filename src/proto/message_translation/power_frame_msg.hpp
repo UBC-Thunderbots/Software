@@ -88,7 +88,7 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame,
 void inline setPowerMsg(TbotsProto_PowerFrame& frame,
                         const TbotsProto_DribblerControl& dribble_control)
 {
-    frame.which_power_msg        = TbotsProto_PowerFrame_dribbler_control_tag;
+    frame.which_power_msg            = TbotsProto_PowerFrame_dribbler_control_tag;
     frame.power_msg.dribbler_control = dribble_control;
 }
 
@@ -324,9 +324,10 @@ std::unique_ptr<TbotsProto::PowerStatus> inline createTbotsPowerStatus(
     return proto_status;
 }
 
-TbotsProto_DribblerControl inline createNanoPbDribblerControl(int rpm) {
+TbotsProto_DribblerControl inline createNanoPbDribblerControl(int rpm)
+{
     TbotsProto_DribblerControl control = TbotsProto_DribblerControl_init_default;
-    control.dribbler_speed = rpm;
+    control.dribbler_speed             = rpm;
     return control;
 }
 #endif

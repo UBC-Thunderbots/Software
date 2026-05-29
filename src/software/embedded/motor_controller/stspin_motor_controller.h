@@ -17,8 +17,8 @@
 class StSpinMotorController : public MotorController
 {
    public:
-    explicit StSpinMotorController(
-        const robot_constants::RobotConstants& robot_constants, PowerServiceWithDribble& power_service);
+    explicit StSpinMotorController(const robot_constants::RobotConstants& robot_constants,
+                                   PowerServiceWithDribble& power_service);
 
     void setup() override;
 
