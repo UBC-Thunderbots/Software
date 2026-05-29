@@ -39,7 +39,6 @@ cc_library(
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
         "//software/time:duration",
-        "//software/util/pid",
         "//software/world:robot_state",
         "//software/world:team_colour",
     ],

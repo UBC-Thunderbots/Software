@@ -254,7 +254,8 @@ inline void Thunderloop::processNetworkPolling(
             const Point position =
                 createPoint(primitive_.move().xy_traj_params().start_position());
             const Angle orientation =
-                createAngle(primitive_.move().w_traj_params().start_angle());
+                createAngle(primitive_.move().w_traj_params().start_angle()) +
+                Angle::half();
 
             robot_localizer_.update(
                 RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
@@ -295,7 +296,7 @@ inline void Thunderloop::processLocalizationUpdates()
         if (imu_poll.has_value() && imu_poll->linear_acceleration.has_value())
         {
             const auto accel    = imu_poll->linear_acceleration.value();
-            linear_acceleration = Vector(accel[1], accel[0]);
+            linear_acceleration = Vector(accel[0], accel[1]);
         }
 
         robot_localizer_.step(linear_acceleration);
