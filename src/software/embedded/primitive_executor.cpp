@@ -12,8 +12,7 @@
 
 PrimitiveExecutor::PrimitiveExecutor(
     const robot_constants::RobotConstants& robot_constants)
-    : last_step_time_(std::chrono::steady_clock::now()),
-      robot_constants_(robot_constants)
+    : last_step_time_(std::chrono::steady_clock::now()), robot_constants_(robot_constants)
 {
 }
 
@@ -49,7 +48,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         const bool is_angular_traj_new =
             !angular_trajectory_.has_value() ||
             angular_trajectory_->isNew(new_angular_trajectory,
-                                        ANGULAR_DESTINATION_THRESHOLD_DEGREES);
+                                       ANGULAR_DESTINATION_THRESHOLD_DEGREES);
 
         if (is_angular_traj_new)
         {
@@ -115,10 +114,10 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
     TbotsProto::PrimitiveExecutorStatus& status)
 {
-    const auto current_time = std::chrono::steady_clock::now();
+    const auto current_time      = std::chrono::steady_clock::now();
     const auto delta_time_chrono = current_time - last_step_time_;
-    const Duration delta_time = Duration::fromSeconds(
-        std::chrono::duration<double>(delta_time_chrono).count());
+    const Duration delta_time =
+        Duration::fromSeconds(std::chrono::duration<double>(delta_time_chrono).count());
 
     time_since_linear_trajectory_creation_ += delta_time_chrono;
     time_since_angular_trajectory_creation_ += delta_time_chrono;
@@ -154,10 +153,10 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     prim->direct_control());
             }
 
-            const Duration elapsed_linear = Duration::fromSeconds(
-                time_since_linear_trajectory_creation_.count());
-            const Duration elapsed_angular = Duration::fromSeconds(
-                time_since_angular_trajectory_creation_.count());
+            const Duration elapsed_linear =
+                Duration::fromSeconds(time_since_linear_trajectory_creation_.count());
+            const Duration elapsed_angular =
+                Duration::fromSeconds(time_since_angular_trajectory_creation_.count());
 
             const Vector target_linear_velocity_global = position_controller_.step(
                 position_, *trajectory_path_, elapsed_linear, delta_time);

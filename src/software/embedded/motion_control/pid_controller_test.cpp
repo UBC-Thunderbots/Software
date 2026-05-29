@@ -43,7 +43,8 @@ TEST(PidControllerTest, OnlyIntegralTermNonZero)
 
     // should not accumulate integral term above max_integral
     EXPECT_DOUBLE_EQ(pid.step(6.7, 1.0), k_i * 5.5);  // Sign not swapped from 0.0 to 6.7
-    EXPECT_DOUBLE_EQ(pid.step(5.0, 1.0), k_i * 10.0); // Clamped (5.5 + 5.0 = 10.5 -> 10.0)
+    EXPECT_DOUBLE_EQ(pid.step(5.0, 1.0),
+                     k_i * 10.0);  // Clamped (5.5 + 5.0 = 10.5 -> 10.0)
     EXPECT_DOUBLE_EQ(pid.step(1.0, 1.0), k_i * 10.0);
 }
 

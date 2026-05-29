@@ -145,7 +145,7 @@ class Thunderloop
      * @param last_primitive_received_time Input for checking timeouts
      */
     inline void processPrimitiveExecution(struct timespec& poll_time,
-                                           struct timespec& last_primitive_received_time);
+                                          struct timespec& last_primitive_received_time);
 
     /**
      * Updates internal tracking for chipper/kicker firing events.

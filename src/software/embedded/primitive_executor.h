@@ -4,10 +4,10 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
-#include "software/geom/vector.h"
-#include "software/world/robot_state.h"
 #include "software/embedded/motion_control/orientation_controller.h"
 #include "software/embedded/motion_control/position_controller.h"
+#include "software/geom/vector.h"
+#include "software/world/robot_state.h"
 
 class PrimitiveExecutor
 {
@@ -77,8 +77,8 @@ class PrimitiveExecutor
 
     // These constants were lost during a refactor/revert and are currently set to
     // estimated defaults.
-    static constexpr double LINEAR_STALL_ERROR_MAX_METERS                   = 0.1;
-    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES                 = 20.0;
-    static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS                = 0.5;
-    static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES              = 25.0;
+    static constexpr double LINEAR_STALL_ERROR_MAX_METERS      = 0.1;
+    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES    = 20.0;
+    static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS   = 0.5;
+    static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 25.0;
 };

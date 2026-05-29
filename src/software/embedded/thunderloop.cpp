@@ -219,8 +219,8 @@ void Thunderloop::runLoop()
     }
 }
 
-inline void Thunderloop::processNetworkPolling(struct timespec& poll_time,
-                                               struct timespec& last_primitive_received_time)
+inline void Thunderloop::processNetworkPolling(
+    struct timespec& poll_time, struct timespec& last_primitive_received_time)
 {
     struct timespec current_time;
     TbotsProto::Primitive new_primitive;
@@ -296,10 +296,9 @@ inline void Thunderloop::processLocalizationUpdates()
 
         robot_localizer_.step(linear_acceleration);
 
-        primitive_executor_.updateState(robot_localizer_.getPosition(),
-                                        robot_localizer_.getVelocity(),
-                                        robot_localizer_.getOrientation(),
-                                        robot_localizer_.getAngularVelocity());
+        primitive_executor_.updateState(
+            robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
+            robot_localizer_.getOrientation(), robot_localizer_.getAngularVelocity());
     }
 }
 
@@ -371,12 +370,13 @@ inline void Thunderloop::updateAndSendRobotStatus(uint64_t last_handled_primitiv
 
     robot_status_.set_robot_id(robot_id_);
     robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
-    *(robot_status_.mutable_time_sent())             = time_sent_;
-    *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
-    *(robot_status_.mutable_motor_status())          = motor_status_.value_or(TbotsProto::MotorStatus());
-    *(robot_status_.mutable_power_status())          = power_status_;
-    *(robot_status_.mutable_network_status())        = network_status_;
-    *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
+    *(robot_status_.mutable_time_sent())          = time_sent_;
+    *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
+    *(robot_status_.mutable_motor_status()) =
+        motor_status_.value_or(TbotsProto::MotorStatus());
+    *(robot_status_.mutable_power_status())              = power_status_;
+    *(robot_status_.mutable_network_status())            = network_status_;
+    *(robot_status_.mutable_chipper_kicker_status())     = chipper_kicker_status_;
     *(robot_status_.mutable_primitive_executor_status()) = primitive_executor_status_;
 
     updateErrorCodes();

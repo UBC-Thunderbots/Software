@@ -67,6 +67,5 @@ class Trajectory
      * different
      * @return True if the trajectories are different, false otherwise
      */
-    virtual bool isNew(const Trajectory<P, V, A>& other,
-                       double threshold) const = 0;
+    virtual bool isNew(const Trajectory<P, V, A>& other, double threshold) const = 0;
 };
