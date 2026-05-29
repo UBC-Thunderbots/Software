@@ -77,6 +77,6 @@ class PrimitiveExecutor
 
     // These constants were lost during a refactor/revert and are currently set to
     // estimated defaults.
-    static constexpr double LINEAR_STALL_ERROR_MAX_METERS      = 0.4;
-    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES    = 13.0;
+    static constexpr double LINEAR_STALL_ERROR_MAX_METERS   = 0.4;
+    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 13.0;
 };
