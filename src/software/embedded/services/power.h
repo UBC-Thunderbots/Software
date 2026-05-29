@@ -67,7 +67,8 @@ class PowerService
 /**
  * A separate power service that also controls the dribbler.
  */
-class PowerServiceWithDribble : public PowerService {
+class PowerServiceWithDribble : public PowerService
+{
    public:
     /**
      * Handler method called every time the timer expires a new read is requested
@@ -78,6 +79,7 @@ class PowerServiceWithDribble : public PowerService {
      * Set dribbler RPM
      */
     void dribble(int rpm);
+
    private:
     bool _new_dribble_command = false;
     std::atomic<TbotsProto_DribblerControl> dribble_command;

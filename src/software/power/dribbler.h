@@ -5,9 +5,9 @@
 /**
  * Represents the dribbler on the power board
  */
-class Dribbler 
+class Dribbler
 {
-    public:
+   public:
     /**
      * Creates a dribbler, setting up pins.
      */

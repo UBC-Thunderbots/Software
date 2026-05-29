@@ -58,6 +58,7 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
+        "//software/embedded/motor_controller",
         "//software/embedded/motor_controller:motor_board",
         "//software/embedded/services:imu",
         "//software/embedded/services:motor",
@@ -67,7 +68,6 @@ cc_library(
         "//software/logger:network_logger",
         "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",
-        "//software/embedded/motor_controller:motor_controller",
         "@tracy",
     ],
 )

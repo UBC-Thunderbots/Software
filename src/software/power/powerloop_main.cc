@@ -38,7 +38,7 @@ std::shared_ptr<ControlExecutor> executor;
 std::shared_ptr<Dribbler> dribbler;
 
 #define RAMP_FACTOR 4
-#define DRIBBLER_MAX_SPEED 11040 // Max RPM from spec
+#define DRIBBLER_MAX_SPEED 11040  // Max RPM from spec
 int dribble_target;
 int dribbler_speed;
 
@@ -73,11 +73,12 @@ void loop()
                 if (unmarshalUartPacket(buffer, frame))
                 {
                     // On successful decoding execute the given command
-                    if (frame.which_power_msg == TbotsProto_PowerFrame_power_control_tag) 
+                    if (frame.which_power_msg == TbotsProto_PowerFrame_power_control_tag)
                     {
                         executor->execute(frame.power_msg.power_control);
-                    } 
-                    else  if (frame.which_power_msg == TbotsProto_PowerFrame_dribbler_control_tag) 
+                    }
+                    else if (frame.which_power_msg ==
+                             TbotsProto_PowerFrame_dribbler_control_tag)
                     {
                         dribble_target = frame.power_msg.dribbler_control.dribbler_speed;
                     }
