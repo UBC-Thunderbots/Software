@@ -1,6 +1,7 @@
 #include "software/embedded/services/motor.h"
 
 #include "proto/tbots_software_msgs.pb.h"
+#include "software/embedded/motor_controller/motor_board.h"
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
 #include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/logger/logger.h"

@@ -85,7 +85,6 @@ void StSpinMotorController::updateFaults(const MotorIndex motor,
         // No faults
         return;
     }
-    
     // TODO #3748 Use a helper, stop regenerating the stream object.
     std::ostringstream oss;
     oss << "======= Faults For Motor " << motor << "=======\n";
