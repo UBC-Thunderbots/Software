@@ -192,11 +192,15 @@ void Thunderloop::runLoop()
             FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
             ScopedTimespecTimer iteration_timer(&iteration_time);
 
+            const Duration delta_time = Duration::fromSeconds(
+                getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND);
+
             processNetworkPolling(poll_time, last_primitive_received_time);
 
             processLocalizationUpdates();
 
-            processPrimitiveExecution(poll_time, last_primitive_received_time);
+            processPrimitiveExecution(poll_time, last_primitive_received_time,
+                                       delta_time);
 
             updateChickerStatus(last_chipper_fired, last_kicker_fired);
 
@@ -303,7 +307,8 @@ inline void Thunderloop::processLocalizationUpdates()
 }
 
 inline void Thunderloop::processPrimitiveExecution(
-    struct timespec& poll_time, struct timespec& last_primitive_received_time)
+    struct timespec& poll_time, struct timespec& last_primitive_received_time,
+    const Duration& delta_time)
 {
     struct timespec current_time;
     struct timespec time_since_last_primitive_received;
@@ -324,7 +329,8 @@ inline void Thunderloop::processPrimitiveExecution(
             primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
         }
 
-        direct_control_ = *primitive_executor_.stepPrimitive(primitive_executor_status_);
+        direct_control_ =
+            *primitive_executor_.stepPrimitive(primitive_executor_status_, delta_time);
     }
 
     thunderloop_status_.set_primitive_executor_step_time_ms(getMilliseconds(poll_time));

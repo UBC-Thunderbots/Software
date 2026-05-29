@@ -42,10 +42,11 @@ class PrimitiveExecutor
      * target wheel velocities
      * @param status The status of the primitive executor, set to false if current
      * primitive is a Stop primitive
+     * @param delta_time The time passed since the last step
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus& status);
+        TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
 
    private:
     TbotsProto::Primitive current_primitive_;
@@ -53,9 +54,8 @@ class PrimitiveExecutor
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
-    std::chrono::time_point<std::chrono::steady_clock> last_step_time_;
-    std::chrono::duration<double> time_since_linear_trajectory_creation_;
-    std::chrono::duration<double> time_since_angular_trajectory_creation_;
+    Duration time_since_linear_trajectory_creation_;
+    Duration time_since_angular_trajectory_creation_;
 
     Point position_;
     Vector velocity_;
@@ -77,8 +77,8 @@ class PrimitiveExecutor
 
     // These constants were lost during a refactor/revert and are currently set to
     // estimated defaults.
-    static constexpr double LINEAR_STALL_ERROR_MAX_METERS      = 0.1;
+    static constexpr double LINEAR_STALL_ERROR_MAX_METERS      = 0.2;
     static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES    = 20.0;
-    static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS   = 0.5;
-    static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 25.0;
+    static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS   = 0.05;
+    static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 5.0;
 };

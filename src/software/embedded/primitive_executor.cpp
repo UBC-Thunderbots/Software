@@ -12,7 +12,9 @@
 
 PrimitiveExecutor::PrimitiveExecutor(
     const robot_constants::RobotConstants& robot_constants)
-    : last_step_time_(std::chrono::steady_clock::now()), robot_constants_(robot_constants)
+    : time_since_linear_trajectory_creation_(Duration::fromSeconds(0)),
+      time_since_angular_trajectory_creation_(Duration::fromSeconds(0)),
+      robot_constants_(robot_constants)
 {
 }
 
@@ -35,8 +37,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         if (is_linear_traj_new)
         {
             trajectory_path_ = new_trajectory_path;
-            time_since_linear_trajectory_creation_ =
-                std::chrono::duration<double>::zero();
+            time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
             position_controller_.reset();
         }
 
@@ -53,8 +54,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         if (is_angular_traj_new)
         {
             angular_trajectory_ = new_angular_trajectory;
-            time_since_angular_trajectory_creation_ =
-                std::chrono::duration<double>::zero();
+            time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
             orientation_controller_.reset();
         }
     }
@@ -75,7 +75,7 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
     {
         const double linear_following_error =
             (position_ - trajectory_path_->getPosition(
-                             time_since_linear_trajectory_creation_.count()))
+                             time_since_linear_trajectory_creation_.toSeconds()))
                 .length();
 
         if (linear_following_error > LINEAR_STALL_ERROR_MAX_METERS)
@@ -85,8 +85,7 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
                 createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
                                                position_, velocity_, robot_constants_);
 
-            time_since_linear_trajectory_creation_ =
-                std::chrono::duration<double>::zero();
+            time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
         }
     }
 
@@ -94,7 +93,7 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
     {
         const double angular_following_error =
             angular_trajectory_
-                ->getPosition(time_since_angular_trajectory_creation_.count())
+                ->getPosition(time_since_angular_trajectory_creation_.toSeconds())
                 .minDiff(orientation_)
                 .toDegrees();
 
@@ -105,23 +104,16 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
                 current_primitive_.move().w_traj_params(), orientation_,
                 angular_velocity_, robot_constants_);
 
-            time_since_angular_trajectory_creation_ =
-                std::chrono::duration<double>::zero();
+            time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
         }
     }
 }
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    TbotsProto::PrimitiveExecutorStatus& status)
+    TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time)
 {
-    const auto current_time      = std::chrono::steady_clock::now();
-    const auto delta_time_chrono = current_time - last_step_time_;
-    const Duration delta_time =
-        Duration::fromSeconds(std::chrono::duration<double>(delta_time_chrono).count());
-
-    time_since_linear_trajectory_creation_ += delta_time_chrono;
-    time_since_angular_trajectory_creation_ += delta_time_chrono;
-    last_step_time_ = current_time;
+    time_since_linear_trajectory_creation_  = time_since_linear_trajectory_creation_ + delta_time;
+    time_since_angular_trajectory_creation_ = time_since_angular_trajectory_creation_ + delta_time;
 
     status.set_running_primitive(true);
 
@@ -153,16 +145,14 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     prim->direct_control());
             }
 
-            const Duration elapsed_linear =
-                Duration::fromSeconds(time_since_linear_trajectory_creation_.count());
-            const Duration elapsed_angular =
-                Duration::fromSeconds(time_since_angular_trajectory_creation_.count());
-
             const Vector target_linear_velocity_global = position_controller_.step(
-                position_, *trajectory_path_, elapsed_linear, delta_time);
+                position_, *trajectory_path_, time_since_linear_trajectory_creation_,
+                delta_time);
 
-            const AngularVelocity target_angular_velocity = orientation_controller_.step(
-                orientation_, *angular_trajectory_, elapsed_angular, delta_time);
+            const AngularVelocity target_angular_velocity =
+                orientation_controller_.step(orientation_, *angular_trajectory_,
+                                             time_since_angular_trajectory_creation_,
+                                             delta_time);
 
             Vector target_linear_velocity_local =
                 globalToLocalVelocity(target_linear_velocity_global, orientation_);

@@ -24,10 +24,11 @@ from typing import override
 
 logger = create_logger(__name__)
 
-LAUNCH_DELAY_S = 0.1
-WORLD_BUFFER_TIMEOUT = 0.5
-PROCESS_BUFFER_DELAY_S = 0.01
-PAUSE_AFTER_FAIL_DELAY_S = 3
+LAUNCH_DELAY_S = 2
+WORLD_BUFFER_TIMEOUT = 10
+PROCESS_BUFFER_DELAY_S = 0.1
+PAUSE_AFTER_FAIL_DELAY_S = 5
+SECONDS_PER_MILLISECOND = 0.001
 
 
 class SimulatedTestRunner(TbotsTestRunner):
@@ -101,57 +102,50 @@ class SimulatedTestRunner(TbotsTestRunner):
             WorldStateReceivedTrigger, world_state_received_buffer
         )
 
-        while True:
+        retries = 0
+        MAX_RETRIES = 100  # 10 seconds total at 0.1s sleep
+        while retries < MAX_RETRIES:
             setup(param)
 
             try:
                 world_state_received_buffer.get(
-                    block=True, timeout=WORLD_BUFFER_TIMEOUT
+                    block=True, timeout=0.1, return_cached=False
                 )
+                return
             except queue.Empty:
-                # Did not receive a response within timeout period
-                continue
-            else:
-                # Received a response from the simulator
-                break
+                retries += 1
+
+        raise TimeoutError("Timed out waiting for Simulator to receive world state")
 
     def runner(
         self,
         always_validation_sequence_set,
         eventually_validation_sequence_set,
-        test_timeout_s,
-        tick_duration_s,
-        ci_cmd_with_delay,
-        run_till_end,
+        test_timeout_s=3,
+        tick_duration_s=1.0 / 60.0,
+        ci_cmd_with_delay=[],
+        run_till_end=False,
+        **kwargs,
     ):
-        """Run a test
+        """Ticks the simulation forward while running the validations
 
-        :param always_validation_sequence_set: Validation functions that should
-                                hold on every tick
-        :param eventually_validation_sequence_set: Validation that should
-                                eventually be true, before the test ends
-        :param test_timeout_s: The timeout for the test, if any eventually_validations
-                                remain after the timeout, the test fails.
-        :param tick_duration_s: The simulation step duration
+        :param eventually_validation_sequence_set: validation set that must eventually be true
+        :param always_validation_sequence_set: validation set that must always be true
+        :param test_timeout_s: how long the test will run
+        :param tick_duration_s: how long each simulation step will be
+        :param run_till_end: if the test should run till the test timeout even if a pass condition is reached
         :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
-                                  [
-                                      (time, command, team),
-                                      (time, command, team),
-                                      ...
-                                  ]
-        :param run_till_end: If true, test runs till the end even if eventually validation passes
-                             If false, test stops once eventually validation passes and fails if time out
+                                  [(1.0, Command.Type.NORMAL_START, Team.BLUE)]
         """
         time_elapsed_s = 0
-
         eventually_validation_failure_msg = "Test Timed Out"
+        eventually_validation_proto_set = None
 
         while time_elapsed_s < test_timeout_s:
-            # get time before we execute the loop
-            processing_start_time = time.time()
+            start_time = time.time()
 
             # Check for new CI commands at this time step
-            for delay, cmd, team in ci_cmd_with_delay:
+            for delay, cmd, team in ci_cmd_with_delay[:]:
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
@@ -163,7 +157,9 @@ class SimulatedTestRunner(TbotsTestRunner):
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
 
-            while True:
+            retry_count = 0
+            MAX_RETRIES = 5
+            while retry_count < MAX_RETRIES:
                 try:
                     world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
@@ -179,24 +175,23 @@ class SimulatedTestRunner(TbotsTestRunner):
 
                     break
                 except queue.Empty:
-                    # If we timeout, that means full_system missed the last
-                    # wrapper and robot status, lets resend it.
-                    logger.warning("Fullsystem missed last wrapper, resending ...")
-
-                    ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                    robot_status = self.robot_status_buffer.get(block=False)
-
-                    self.blue_full_system_proto_unix_io.send_proto(
-                        SSL_WrapperPacket, ssl_wrapper
+                    retry_count += 1
+                    logger.warning(
+                        f"Timeout waiting for world/primitives (retry {retry_count}/{MAX_RETRIES}). Resending SSL Wrapper."
                     )
-                    self.blue_full_system_proto_unix_io.send_proto(
-                        RobotStatus, robot_status
-                    )
+                    # No world or primitives was found within the given timeout. Re-send the SSL wrapper packet and try again.
+                    for packet in self.ssl_wrapper_buffer.get_all():
+                        self.blue_full_system_proto_unix_io.send_proto(
+                            SSL_WrapperPacket, packet
+                        )
+                        self.yellow_full_system_proto_unix_io.send_proto(
+                            SSL_WrapperPacket, packet
+                        )
 
-            # get the time difference after we get the primitive (after any blocking that happened)
-            processing_time = time.time() - processing_start_time
+            if retry_count == MAX_RETRIES:
+                raise TimeoutError("Timed out waiting for world/primitive updates from AI/Simulator")
 
-            # if the time we have blocked is less than a tick, sleep for the remaining time (for Thunderscope only)
+            processing_time = time.time() - start_time
             if self.thunderscope and tick_duration_s > processing_time:
                 time.sleep(tick_duration_s - processing_time)
 
@@ -248,121 +243,51 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
-
         self.__stopper()
 
     @override
     def run_test(
         self,
-        always_validation_sequence_set,
-        eventually_validation_sequence_set,
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
+        setup=None,
         test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
-        index=0,
+        tick_duration_s=1.0 / 60.0,
         ci_cmd_with_delay=[],
-        run_till_end=True,
+        run_till_end=False,
         **kwargs,
     ):
-        """Helper function to run a test, with thunderscope if enabled
+        """Begins validating a test based on incoming world protos
 
-        :param always_validation_sequence_set: validation that should always be true
-        :param eventually_validation_sequence_set: validation that should eventually be true
-        :param test_timeout_s: how long the test should run before timing out
-        :param tick_duration_s: length of a tick
-        :param index: index of the current test. default is 0 (invariant test)
-                      values can be passed in during aggregate testing for different timeout durations
-        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
-                                  [
-                                      (time, command, team),
-                                      (time, command, team),
-                                      ...
-                                  ]
-        :param run_till_end: If true, test runs till the end even if eventually validation passes
-                             If false, test stops once eventually validation passes and fails if time out
+        :param eventually_validation_sequence_set: validation set that must eventually be true
+        :param always_validation_sequence_set: validation set that must always be true
+        :param setup: initialization function for this test
+        :param test_timeout_s: how long the test will run
         """
-        test_timeout_duration = (
-            test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
-        )
+        # Set the hook for exception handling so that we can close the thunderscope
+        # instance should one exist
+        sys.excepthook = self.excepthook
 
-        # If thunderscope is enabled, run the test in a thread and show
-        # thunderscope on this thread. The excepthook is setup to catch
-        # any test failures and propagate them to the main thread
-        if self.thunderscope:
-            run_sim_thread = threading.Thread(
-                target=self.runner,
-                daemon=True,
-                args=[
-                    always_validation_sequence_set,
-                    eventually_validation_sequence_set,
-                    test_timeout_duration,
-                    tick_duration_s,
-                    ci_cmd_with_delay,
-                    run_till_end,
-                ],
-            )
-            run_sim_thread.start()
-            self.thunderscope.show()
-            run_sim_thread.join()
+        # Only run setup if provided and if we are not being called from AggregateTestRunner
+        # (which handles its own setup loop)
+        if setup and "params" not in kwargs:
+            self.sync_setup(setup, self)
 
-            if self.last_exception:
-                pytest.fail(str(self.last_exception))
-
-        # If thunderscope is disabled, just run the test
-        else:
-            self.runner(
-                always_validation_sequence_set,
-                eventually_validation_sequence_set,
-                test_timeout_duration,
-                tick_duration_s,
-                ci_cmd_with_delay=ci_cmd_with_delay,
-                run_till_end=run_till_end,
-            )
-
-
-class InvariantTestRunner(SimulatedTestRunner):
-    """Runs a simulated test only once with a given parameter
-
-    Test passes or fails based on the outcome of this test
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    @override
-    def run_test(
-        self,
-        setup=(lambda x: None),
-        params=[0],
-        inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[[]],
-        **kwargs,
-    ):
-        """Run an invariant test
-
-        :param setup: Function that sets up the World state and the gamecontroller before running the test
-        :param params: List of parameters for each iteration of the test
-                        (this method only uses the first element)
-        :param inv_always_validation_sequence_set: Validation functions for invariant testing
-                                that should hold on every tick
-        :param inv_eventually_validation_sequence_set: Validation functions for invariant testing
-                                that should eventually be true, before the test ends
-        """
-        threading.excepthook = self.excepthook
-
-        super().sync_setup(setup, params[0])
-
-        super().run_test(
-            inv_always_validation_sequence_set,
-            inv_eventually_validation_sequence_set,
+        self.runner(
+            always_validation_sequence_set=always_validation_sequence_set,
+            eventually_validation_sequence_set=eventually_validation_sequence_set,
+            test_timeout_s=test_timeout_s,
+            tick_duration_s=tick_duration_s,
+            ci_cmd_with_delay=ci_cmd_with_delay,
+            run_till_end=run_till_end,
             **kwargs,
         )
 
 
 class AggregateTestRunner(SimulatedTestRunner):
-    """Runs a simulated test multiple times with different given parameters
-
-    Result of the test is determined by comparing the number of
-    passing iterations to a predetermined acceptable threshold
+    """A test runner for aggregate tests.
+    These tests are a collection of invariant tests. If any of the invariant tests fail,
+    the aggregate test fails.
     """
 
     def __init__(self, *args, **kwargs):
@@ -377,30 +302,29 @@ class AggregateTestRunner(SimulatedTestRunner):
         ag_eventually_validation_sequence_set=[[]],
         **kwargs,
     ):
-        """Run an aggregate test
+        """Begins validating a test based on incoming world protos. Runs the
+        invariant test first, then the aggregate test.
 
-        :param setup: Function that sets up the World state and the gamecontroller before running the test
+        :param setup: initialization function for this test
         :param params: List of parameters for each iteration of the test
-        :param ag_always_validation_sequence_set: Validation functions for aggregate testing
-                                that should hold on every tick
-        :param ag_eventually_validation_sequence_set: Validation functions for aggregate testing
-                                that should eventually be true, before the test end
+        :param ag_eventually_validation_sequence_set: validation set for aggregate test that must eventually be true
+        :param ag_always_validation_sequence_set: validation set for aggregate test that must always be true
         """
-        threading.excepthook = self.excepthook
+        sys.excepthook = self.excepthook
 
         failed_tests = 0
 
-        # Runs the test once for each given parameter
-        # Catches Assertion Error thrown by failing test and increments counter
-        # Calculates overall results and prints them
+        # Create a copy of kwargs without 'params' to avoid double-setup in SimulatedTestRunner
+        clean_kwargs = {k: v for k, v in kwargs.items() if k != "params"}
+
         for x in range(len(params)):
             super().sync_setup(setup, params[x])
 
             try:
                 super().run_test(
-                    ag_always_validation_sequence_set,
-                    ag_eventually_validation_sequence_set,
-                    **kwargs,
+                    always_validation_sequence_set=ag_always_validation_sequence_set,
+                    eventually_validation_sequence_set=ag_eventually_validation_sequence_set,
+                    **clean_kwargs,
                 )
             except AssertionError:
                 failed_tests += 1
@@ -494,6 +418,12 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         default=False,
         help="Use realism in the simulator",
     )
+    parser.add_argument(
+        "--ci_mode",
+        action="store_true",
+        default=False,
+        help="Run in CI mode (faster execution)",
+    )
     return parser.parse_known_args()[0] if allow_unrecognized else parser.parse_args()
 
 
@@ -542,14 +472,14 @@ def simulated_test_runner():
         args.debug_blue_full_system,
         False,
         should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope,
+        running_in_realtime=not args.ci_mode,
     ) as blue_fs, FullSystem(
         "software/unix_full_system",
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         args.debug_yellow_full_system,
         True,
         should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope,
+        running_in_realtime=not args.ci_mode,
     ) as yellow_fs:
         with Gamecontroller(
             suppress_logs=(not args.show_gamecontroller_logs)
@@ -580,7 +510,9 @@ def simulated_test_runner():
                     layout_path=args.layout,
                 )
 
-            time.sleep(LAUNCH_DELAY_S)
+            # Even in CI mode, give a small delay for processes to start up
+            actual_launch_delay = 0.5 if args.ci_mode else LAUNCH_DELAY_S
+            time.sleep(actual_launch_delay)
 
             runner = None
 
@@ -595,7 +527,7 @@ def simulated_test_runner():
                     gamecontroller,
                 )
             else:
-                runner = InvariantTestRunner(
+                runner = SimulatedTestRunner(
                     current_test,
                     tscope,
                     simulator_proto_unix_io,

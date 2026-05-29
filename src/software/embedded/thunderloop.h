@@ -143,9 +143,11 @@ class Thunderloop
      *
      * @param poll_time Output for execution duration
      * @param last_primitive_received_time Input for checking timeouts
+     * @param delta_time The time passed since the last step
      */
-    inline void processPrimitiveExecution(struct timespec& poll_time,
-                                          struct timespec& last_primitive_received_time);
+    inline void processPrimitiveExecution(
+        struct timespec& poll_time, struct timespec& last_primitive_received_time,
+        const Duration& delta_time);
 
     /**
      * Updates internal tracking for chipper/kicker firing events.
