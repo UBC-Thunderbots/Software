@@ -17,4 +17,4 @@ class Dribbler
      * Sets the dribbler to the given duty cycle from 0 (always off) to 255 (always on)
      */
     static void dribble(uint32_t speed);
-}
+};

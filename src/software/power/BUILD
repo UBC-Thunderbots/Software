@@ -17,6 +17,13 @@ platformio_library(
 )
 
 platformio_library(
+    name = "dribbler",
+    src = "dribbler.cpp",
+    hdr = "dribbler.h",
+    deps = [":pins"],
+)
+
+platformio_library(
     name = "geneva",
     src = "geneva.cpp",
     hdr = "geneva.h",
@@ -73,6 +80,7 @@ platformio_project(
         ":charger",
         ":chicker",
         ":control_executor",
+        ":dribbler",
         ":geneva",
         ":pins",
         ":power_monitor",
