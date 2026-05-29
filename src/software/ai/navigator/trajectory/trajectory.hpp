@@ -59,4 +59,14 @@ class Trajectory
     {
         return getPosition(getTotalTime());
     }
+
+    /**
+     * Check if this trajectory is meaningfully different from another trajectory.
+     * @param other The other trajectory to compare to
+     * @param threshold The threshold above which the trajectories are considered
+     * different
+     * @return True if the trajectories are different, false otherwise
+     */
+    virtual bool isNew(const Trajectory<P, V, A>& other,
+                       double threshold) const = 0;
 };

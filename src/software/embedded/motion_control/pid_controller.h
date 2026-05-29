@@ -1,20 +1,24 @@
 #pragma once
 
+#include <algorithm>
+#include <cassert>
 #include <optional>
 
+/**
+ * A PID controller is used to calculate corrections based on error values over
+ * time as the difference between a desired value and the actual measured value.
+ * This PID controller also limits integral windup using a max_integral value.
+ *
+ * Resources:
+ * - https://raw.org/book/control-theory/introduction-to-pid-controllers/
+ * - http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-reset-windup/
+ */
+template <typename T>
 class PidController
 {
    public:
     /**
      * Constructs a new PID controller.
-     *
-     * A PID controller is used to calculate corrections based on error values over
-     * time as the difference between a desired value and the actual measured value.
-     * This PID controller also limits integral windup using a max_integral value.
-     *
-     * Resources:
-     * - https://raw.org/book/control-theory/introduction-to-pid-controllers/
-     * - http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-reset-windup/
      *
      * @pre max_integral must be >= 0.0
      *
@@ -24,7 +28,11 @@ class PidController
      * @param max_integral The maximum absolute value that the integrator term can
      * accumulate to.
      **/
-    PidController(double k_p, double k_i, double k_d, double max_integral);
+    PidController(T k_p, T k_i, T k_d, T max_integral)
+        : k_p_(k_p), k_i_(k_i), k_d_(k_d), max_integral_(max_integral)
+    {
+        assert(max_integral >= T(0.0));
+    }
 
     /**
      * Given an error, returns the control effort to minimize it.
@@ -33,19 +41,39 @@ class PidController
      * @param delta_time The time passed since last step, for calculating the integrator
      * and derivative.
      **/
-    double step(double error, double delta_time);
+    T step(T error, T delta_time = T(1.0))
+    {
+        // If sign of error swaps, reset integrator
+        if (last_error_.has_value() && (last_error_.value() * error < T(0.0)))
+        {
+            integral_ = T(0.0);
+        }
+
+        integral_ =
+            std::clamp(integral_ + error * delta_time, -max_integral_, max_integral_);
+
+        const T derivative = (error - last_error_.value_or(error)) / delta_time;
+
+        last_error_ = error;
+
+        return error * k_p_ + integral_ * k_i_ + derivative * k_d_;
+    }
 
     /**
      * Resets the integrator and clears the last error used for derivative calculation.
      **/
-    void reset();
+    void reset()
+    {
+        integral_   = T(0.0);
+        last_error_ = std::nullopt;
+    }
 
    private:
-    double k_p_;
-    double k_i_;
-    double k_d_;
-    double max_integral_;
+    T k_p_;
+    T k_i_;
+    T k_d_;
+    T max_integral_;
 
-    double integral_                  = 0.0;
-    std::optional<double> last_error_ = std::nullopt;
+    T integral_                  = T(0.0);
+    std::optional<T> last_error_ = std::nullopt;
 };

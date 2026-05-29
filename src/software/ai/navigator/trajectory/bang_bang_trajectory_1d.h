@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstddef>
 
 #include "software/ai/navigator/trajectory/trajectory.hpp"
@@ -102,6 +103,19 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * @return The number of trajectory parts
      */
     size_t getNumTrajectoryParts() const;
+
+    /**
+     * Check if this trajectory is meaningfully different from another trajectory.
+     * @param other The other trajectory to compare to
+     * @param threshold The threshold above which the trajectories are considered
+     * different
+     * @return True if the trajectories are different, false otherwise
+     */
+    bool isNew(const Trajectory<double, double, double>& other,
+               double threshold) const override
+    {
+        return std::abs(getDestination() - other.getDestination()) > threshold;
+    }
 
    private:
     /**

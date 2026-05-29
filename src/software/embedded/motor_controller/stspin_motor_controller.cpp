@@ -165,12 +165,7 @@ void StSpinMotorController::updateFaults(const MotorIndex motor,
         motor_faults.drive_enabled = false;
     }
 
-    LOG(WARNING)
-        << oss.str();  // Consider moving this to a helper and also making the stream
-                       // object persistent so we do not need to continuously recreate it
-                       // (it is notoriously expensive). We could also consider another
-                       // approach to formatting this string as using streams in general
-                       // is less than ideal. Or We can probably just use string::append
+    LOG(WARNING) << oss.str();
 }
 
 int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
