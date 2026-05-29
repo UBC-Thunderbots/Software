@@ -51,5 +51,3 @@ cc_library(
         "@eigen",
     ],
 )
-
-
