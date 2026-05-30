@@ -75,8 +75,7 @@ def test_move_across_field(gameplay_test_runner):
 
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=5,
     )
 
@@ -137,8 +136,7 @@ def test_autochip_move(gameplay_test_runner):
 
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=10,
     )
 
@@ -196,8 +194,7 @@ def test_autokick_move(gameplay_test_runner):
 
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=5,
     )
 
@@ -252,7 +249,7 @@ def test_autokick_move(gameplay_test_runner):
 def test_spinning_move(
     orientation, initial_position, destination, angular_velocity, gameplay_test_runner
 ):
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[initial_position],
@@ -296,8 +293,7 @@ def test_spinning_move(
 
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=5,
     )
 

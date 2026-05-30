@@ -185,31 +185,21 @@ def run_ball_placement_scenario(
 
     gameplay_test_runner.run_test(
         setup=lambda test_setup_arg: ball_placement_play_setup(
-            test_setup_arg["ball_start_point"],
-            test_setup_arg["ball_placement_point"],
+            ball_start_point,
+            ball_placement_point,
             gameplay_test_runner,
             blue_only,
         ),
-        params=[
-            {
-                "ball_start_point": ball_start_point,
-                "ball_placement_point": ball_placement_point,
-            }
-        ],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
-        test_timeout_s=[15],
+        test_timeout_s=15,
     )
 
     gameplay_test_runner.run_test(
         # setup argument isn't passed to preserve world state from previous test run
         inv_always_validation_sequence_set=drop_ball_always_validation_sequence_set,
         inv_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=drop_ball_always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
-        test_timeout_s=[5],
+        test_timeout_s=5,
     )
 
 

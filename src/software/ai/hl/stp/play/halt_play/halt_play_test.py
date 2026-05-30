@@ -54,13 +54,8 @@ def test_halt_play(gameplay_test_runner):
     # params just have to be a list of length 1 to ensure the test runs at least once
     gameplay_test_runner.run_test(
         setup=setup,
-        params=[0],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1e-3)]
-        ],
-        ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[
             [RobotSpeedEventuallyBelowThreshold(1e-3)]
         ],
         ci_cmd_with_delay=[

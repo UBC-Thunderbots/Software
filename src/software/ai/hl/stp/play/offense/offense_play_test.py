@@ -12,8 +12,8 @@ from software.gameplay_tests.util import (
 
 
 def test_offense_play(gameplay_test_runner):
-    def setup(start_point):
-        ball_initial_pos = start_point
+    def setup(*args):
+        ball_initial_pos = tbots_cpp.Point(-4.4, 2.9)
 
         blue_bots = [
             tbots_cpp.Point(-4.5, 3.0),
@@ -65,19 +65,13 @@ def test_offense_play(gameplay_test_runner):
         [NeverExcessivelyDribbles()],
     ]
 
-    ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
-
     # Eventually Validation
     inv_eventually_validation_sequence_set = [[]]
-    ag_eventually_validation_sequence_set = [[FriendlyTeamEventuallyScored()]]
 
     gameplay_test_runner.run_test(
-        params=[tbots_cpp.Point(-4.4, 2.9)],
         setup=setup,
         inv_eventually_validation_sequence_set=inv_eventually_validation_sequence_set,
         inv_always_validation_sequence_set=inv_always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=ag_eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=ag_always_validation_sequence_set,
         test_timeout_s=15,
         run_till_end=True,
     )

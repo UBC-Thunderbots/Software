@@ -256,9 +256,8 @@ def test_passing_receive_speed(
             gameplay_test_runner=gameplay_test_runner,
             receive_pass=True,
         ),
-        params=[0],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
         run_till_end=False,
     )
