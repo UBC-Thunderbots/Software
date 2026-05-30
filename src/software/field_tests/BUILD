@@ -38,7 +38,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/gameplay_tests:tbots_test_runner",
+        "//software/gameplay_tests:util",
         "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
