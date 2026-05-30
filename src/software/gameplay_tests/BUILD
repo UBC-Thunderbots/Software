@@ -54,7 +54,9 @@ py_library(
     srcs = [
         "field_test_runner.py",
     ],
-    deps = [],
+    deps = [
+        ":tbots_test_runner"
+    ],
 )
 
 py_library(
@@ -62,7 +64,9 @@ py_library(
     srcs = [
         "simulated_test_runner.py",
     ],
-    deps = [],
+    deps = [
+        ":tbots_test_runner"
+    ],
 )
 
 py_library(
