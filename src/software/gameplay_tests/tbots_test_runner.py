@@ -145,6 +145,7 @@ class TbotsTestRunner:
     @abstractmethod
     def run_test(
         self,
+        setup=lambda: None,
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
