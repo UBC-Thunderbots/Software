@@ -216,7 +216,11 @@ class GLMovementFieldTestLayer(GLLayer):
 
     def _draw_selection(self):
         """Renders an outline around the currently selected robot."""
-        robot = self._get_selected_robot(self.cached_world, self.selected_robot_id) if self.is_selected else None
+        robot = (
+            self._get_selected_robot(self.cached_world, self.selected_robot_id)
+            if self.is_selected
+            else None
+        )
         if robot is None:
             self.selected_robot_graphic.hide()
             return
