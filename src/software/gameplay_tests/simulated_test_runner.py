@@ -51,12 +51,76 @@ class SimulatedTestRunner(TbotsTestRunner):
         self.simulator_proto_unix_io = simulator_proto_unix_io
 
     @override
-    def set_world_state(self, worldstate: WorldState):
-        """Sets the simulation worldstate
+    def set_world_state(self, world_state: WorldState):
+        """Sets the world state of the simulator.
 
-        :param worldstate: proto containing the desired worldstate
+        :param world_state: The WorldState proto to use
         """
-        self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
+        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+    @override
+    def run_test(
+        self,
+        setup=(lambda: None),
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+        tick_duration_s=0.0166,  # Default to 60hz
+        ci_cmd_with_delay=[],
+        run_till_end=True,
+    ):
+        """Helper function to run a test, with thunderscope if enabled
+
+        :param always_validation_sequence_set: validation that should always be true
+        :param eventually_validation_sequence_set: validation that should eventually be true
+        :param test_timeout_s: how long the test should run before timing out
+        :param tick_duration_s: length of a tick
+        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+                                  [
+                                      (time, command, team),
+                                      (time, command, team),
+                                      ...
+                                  ]
+        :param run_till_end: If true, test runs till the end even if eventually validation passes
+                             If false, test stops once eventually validation passes and fails if time out
+        """
+
+        threading.excepthook = self.excepthook
+        self.sync_setup(setup)
+
+        # If thunderscope is enabled, run the test in a thread and show
+        # thunderscope on this thread. The excepthook is setup to catch
+        # any test failures and propagate them to the main thread
+        if self.thunderscope:
+            run_sim_thread = threading.Thread(
+                target=self.runner,
+                daemon=True,
+                args=[
+                    always_validation_sequence_set,
+                    eventually_validation_sequence_set,
+                    test_timeout_s,
+                    tick_duration_s,
+                    ci_cmd_with_delay,
+                    run_till_end,
+                ],
+            )
+            run_sim_thread.start()
+            self.thunderscope.show()
+            run_sim_thread.join()
+
+            if self.last_exception:
+                pytest.fail(str(self.last_exception))
+
+        # If thunderscope is disabled, just run the test
+        else:
+            self.runner(
+                always_validation_sequence_set,
+                eventually_validation_sequence_set,
+                test_timeout_s,
+                tick_duration_s,
+                ci_cmd_with_delay=ci_cmd_with_delay,
+                run_till_end=run_till_end,
+            )
 
     def excepthook(self, args):
         """This function is _critical_ for show_thunderscope to work.
@@ -80,7 +144,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         if self.thunderscope:
             self.thunderscope.close()
 
-    def sync_setup(self, setup, param):
+    def sync_setup(self, setup):
         """Run setup until simulator has received game state
 
         :param setup: Function that sets up the world state
@@ -92,7 +156,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         )
 
         while True:
-            setup(param)
+            setup()
 
             try:
                 world_state_received_buffer.get(
@@ -240,163 +304,3 @@ class SimulatedTestRunner(TbotsTestRunner):
         validation.check_validation(eventually_validation_proto_set)
 
         self.__stopper()
-
-    @override
-    def run_test(
-        self,
-        always_validation_sequence_set,
-        eventually_validation_sequence_set,
-        test_timeout_s=3,
-        tick_duration_s=0.0166,  # Default to 60hz
-        index=0,
-        ci_cmd_with_delay=[],
-        run_till_end=True,
-        **kwargs,
-    ):
-        """Helper function to run a test, with thunderscope if enabled
-
-        :param always_validation_sequence_set: validation that should always be true
-        :param eventually_validation_sequence_set: validation that should eventually be true
-        :param test_timeout_s: how long the test should run before timing out
-        :param tick_duration_s: length of a tick
-        :param index: index of the current test. default is 0 (invariant test)
-                      values can be passed in during aggregate testing for different timeout durations
-        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
-                                  [
-                                      (time, command, team),
-                                      (time, command, team),
-                                      ...
-                                  ]
-        :param run_till_end: If true, test runs till the end even if eventually validation passes
-                             If false, test stops once eventually validation passes and fails if time out
-        """
-        test_timeout_duration = (
-            test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
-        )
-
-        # If thunderscope is enabled, run the test in a thread and show
-        # thunderscope on this thread. The excepthook is setup to catch
-        # any test failures and propagate them to the main thread
-        if self.thunderscope:
-            run_sim_thread = threading.Thread(
-                target=self.runner,
-                daemon=True,
-                args=[
-                    always_validation_sequence_set,
-                    eventually_validation_sequence_set,
-                    test_timeout_duration,
-                    tick_duration_s,
-                    ci_cmd_with_delay,
-                    run_till_end,
-                ],
-            )
-            run_sim_thread.start()
-            self.thunderscope.show()
-            run_sim_thread.join()
-
-            if self.last_exception:
-                pytest.fail(str(self.last_exception))
-
-        # If thunderscope is disabled, just run the test
-        else:
-            self.runner(
-                always_validation_sequence_set,
-                eventually_validation_sequence_set,
-                test_timeout_duration,
-                tick_duration_s,
-                ci_cmd_with_delay=ci_cmd_with_delay,
-                run_till_end=run_till_end,
-            )
-
-
-class InvariantTestRunner(SimulatedTestRunner):
-    """Runs a simulated test only once with a given parameter
-
-    Test passes or fails based on the outcome of this test
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    @override
-    def run_test(
-        self,
-        setup=(lambda x: None),
-        params=[0],
-        inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[[]],
-        **kwargs,
-    ):
-        """Run an invariant test
-
-        :param setup: Function that sets up the World state and the gamecontroller before running the test
-        :param params: List of parameters for each iteration of the test
-                        (this method only uses the first element)
-        :param inv_always_validation_sequence_set: Validation functions for invariant testing
-                                that should hold on every tick
-        :param inv_eventually_validation_sequence_set: Validation functions for invariant testing
-                                that should eventually be true, before the test ends
-        """
-        threading.excepthook = self.excepthook
-
-        super().sync_setup(setup, params[0])
-
-        super().run_test(
-            inv_always_validation_sequence_set,
-            inv_eventually_validation_sequence_set,
-            **kwargs,
-        )
-
-
-class AggregateTestRunner(SimulatedTestRunner):
-    """Runs a simulated test multiple times with different given parameters
-
-    Result of the test is determined by comparing the number of
-    passing iterations to a predetermined acceptable threshold
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    @override
-    def run_test(
-        self,
-        setup=(lambda arg: None),
-        params=[],
-        ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[[]],
-        **kwargs,
-    ):
-        """Run an aggregate test
-
-        :param setup: Function that sets up the World state and the gamecontroller before running the test
-        :param params: List of parameters for each iteration of the test
-        :param ag_always_validation_sequence_set: Validation functions for aggregate testing
-                                that should hold on every tick
-        :param ag_eventually_validation_sequence_set: Validation functions for aggregate testing
-                                that should eventually be true, before the test end
-        """
-        threading.excepthook = self.excepthook
-
-        failed_tests = 0
-
-        # Runs the test once for each given parameter
-        # Catches Assertion Error thrown by failing test and increments counter
-        # Calculates overall results and prints them
-        for x in range(len(params)):
-            super().sync_setup(setup, params[x])
-
-            try:
-                super().run_test(
-                    ag_always_validation_sequence_set,
-                    ag_eventually_validation_sequence_set,
-                    **kwargs,
-                )
-            except AssertionError:
-                failed_tests += 1
-
-        # TODO (#2856) Fix validation and results output
-
-        logger.info(f"{failed_tests} test failed")
-
-        assert failed_tests == 0

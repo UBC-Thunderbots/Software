@@ -135,10 +135,10 @@ class TbotsTestRunner:
         return params
 
     @abstractmethod
-    def set_world_state(self, worldstate: WorldState):
-        """Sets the worldstate for the given team
+    def set_world_state(self, world_state: WorldState):
+        """Sets the initial world state of the test.
 
-        :param worldstate: the worldstate proto to use
+        :param world_state: The WorldState proto to use
         """
         raise NotImplementedError("abstract class method called set_world_state")
 

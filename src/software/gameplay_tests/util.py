@@ -72,9 +72,6 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
 
     simulated_group = parser.add_argument_group("Simulated test arguments")
     simulated_group.add_argument(
-        "--aggregate", action="store_true", default=False, help="Run aggregate test"
-    )
-    simulated_group.add_argument(
         "--simulator_runtime_dir",
         type=str,
         help="simulator runtime directory",

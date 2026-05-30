@@ -76,23 +76,12 @@ class FieldTestRunner(TbotsTestRunner):
             )
 
     @override
-    def send_gamecontroller_command(
-        self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
-        team: proto.ssl_gc_common_pb2.Team,
-        final_ball_placement_point=None,
-    ):
-        """Send a command to the gamecontroller
+    def set_world_state(self, world_state: WorldState):
+        """Does nothing... TODO
 
-        :param gc_command: The command to send
-        :param team: The team which the command as attributed to
-        :param final_ball_placement_point: The ball placement point
+        :param world_state: The WorldState proto to use
         """
-        self.gamecontroller.send_ci_input(
-            gc_command=gc_command,
-            team=team,
-            final_ball_placement_point=final_ball_placement_point,
-        )
+        pass
 
     @override
     def run_test(

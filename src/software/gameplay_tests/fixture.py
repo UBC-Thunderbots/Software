@@ -9,10 +9,7 @@ from software.py_constants import (
 
 from proto.import_all_protos import World
 from software.gameplay_tests.field_test_runner import FieldTestRunner
-from software.gameplay_tests.simulated_test_runner import (
-    AggregateTestRunner,
-    InvariantTestRunner,
-)
+from software.gameplay_tests.simulated_test_runner import SimulatedTestRunner
 from software.gameplay_tests.util import get_current_pytest, load_command_line_arguments
 from software.logger.logger import create_logger
 from software.thunderscope.binary_context_managers.full_system import FullSystem
@@ -212,26 +209,13 @@ def create_simulated_test_runner(args):
 
             time.sleep(LAUNCH_DELAY_S)
 
-            runner = None
-
-            # Initialise the right runner based on which testing mode is selected
-            if args.aggregate:
-                runner = AggregateTestRunner(
-                    current_test,
-                    tscope,
-                    simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io,
-                    gamecontroller,
-                )
-            else:
-                runner = InvariantTestRunner(
-                    current_test,
-                    tscope,
-                    simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io,
-                    gamecontroller,
-                )
+            runner = SimulatedTestRunner(
+                current_test,
+                tscope,
+                simulator_proto_unix_io,
+                blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io,
+                gamecontroller,
+            )
 
             yield runner
