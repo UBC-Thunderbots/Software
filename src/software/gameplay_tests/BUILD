@@ -16,7 +16,10 @@ py_library(
     ],
     deps = [
         ":util",
+        ":field_test_runner",
         ":simulated_test_runner",
+        "//software/thunderscope:estop_helpers",
+        "//software/logger:py_logger",
         "//software/thunderscope:thunderscope",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
@@ -44,6 +47,14 @@ py_library(
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
     ],
+)
+
+py_library(
+    name = "field_test_runner",
+    srcs = [
+        "field_test_runner.py",
+    ],
+    deps = [],
 )
 
 py_library(
