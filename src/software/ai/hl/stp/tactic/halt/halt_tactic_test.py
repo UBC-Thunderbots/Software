@@ -63,8 +63,7 @@ def test_robot_halt(blue_robot_locations, blue_robot_velocities, gameplay_test_r
 
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
     )
 
 

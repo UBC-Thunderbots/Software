@@ -71,10 +71,7 @@ def test_pivot_kick(ball_offset_from_robot, angle_to_kick_at, gameplay_test_runn
 
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=5,
     )
 

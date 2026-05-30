@@ -491,7 +491,7 @@ def test_robot_movement(
     )
 
     gameplay_test_runner.run_test(
-        setup=lambda param: hrvo_setup(
+        setup=lambda: hrvo_setup(
             friendly_robot_positions,
             friendly_robot_destinations,
             friendly_robots_final_orientations,

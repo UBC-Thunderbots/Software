@@ -51,13 +51,9 @@ def test_halt_play(gameplay_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
-    # params just have to be a list of length 1 to ensure the test runs at least once
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1e-3)]
-        ],
+        eventually_validation_sequence_set=[[RobotSpeedEventuallyBelowThreshold(1e-3)]],
         ci_cmd_with_delay=[
             (3, Command.Type.HALT, Team.BLUE),
             (3, Command.Type.HALT, Team.YELLOW),

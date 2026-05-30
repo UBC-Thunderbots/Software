@@ -60,18 +60,14 @@ def test_offense_play(gameplay_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     # Always Validation
-    inv_always_validation_sequence_set = [
+    always_validation_sequence_set = [
         [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])],
         [NeverExcessivelyDribbles()],
     ]
 
-    # Eventually Validation
-    inv_eventually_validation_sequence_set = [[]]
-
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=inv_eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=inv_always_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
         run_till_end=True,
     )

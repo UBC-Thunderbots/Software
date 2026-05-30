@@ -64,8 +64,6 @@ def test_shoot_or_chip_play(gameplay_test_runner):
     # TODO (#3651): add validations
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
 

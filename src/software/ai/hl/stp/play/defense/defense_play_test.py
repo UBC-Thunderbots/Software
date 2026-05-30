@@ -61,14 +61,14 @@ def test_defense_play_ball_steal(gameplay_test_runner, blue_bots, yellow_bots):
 
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_always_validation_sequence_set=[
+        always_validation_sequence_set=[
             [
                 BallNeverEntersRegion(
                     regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
                 )
             ]
         ],
-        inv_eventually_validation_sequence_set=[
+        eventually_validation_sequence_set=[
             [FriendlyEventuallyHasBallPossession(tolerance=0.2)]
         ],
         test_timeout_s=20,
@@ -123,14 +123,14 @@ def test_defense_play(gameplay_test_runner, blue_bots, yellow_bots):
 
     gameplay_test_runner.run_test(
         setup=setup,
-        inv_always_validation_sequence_set=[
+        always_validation_sequence_set=[
             [
                 BallNeverEntersRegion(
                     regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
                 )
             ]
         ],
-        inv_eventually_validation_sequence_set=[
+        eventually_validation_sequence_set=[
             [FriendlyEventuallyHasBallPossession(tolerance=0.1)]
         ],
         test_timeout_s=30,
