@@ -280,7 +280,7 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex motor,
 
     populateTx(outgoing_frame, tx);
 
-    spiTransfer(spi_fds_[motor], tx.data(), rx.data(), FRAME_LEN, SPI_SPEED_HZ);
+    spiTransfer<FRAME_LEN>(spi_fds_[motor], tx, rx, SPI_SPEED_HZ);
 
     motor_status_[motor].frame_count++;
 

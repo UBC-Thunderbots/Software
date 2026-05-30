@@ -202,13 +202,13 @@ class TmcMotorController : public MotorController
     std::unique_ptr<Gpio> reset_gpio_;
 
     // Transfer Buffers for spiTransfer
-    uint8_t tx_[5] = {};
-    uint8_t rx_[5] = {};
+    std::array<uint8_t, 5> tx_ = {};
+    std::array<uint8_t, 5> rx_  = {};
 
     // Transfer Buffers for readThenWriteSpiTransfer
-    uint8_t write_tx_[5] = {};
-    uint8_t read_tx_[5]  = {};
-    uint8_t read_rx_[5]  = {};
+    std::array<uint8_t, 5> write_tx_ = {};
+    std::array<uint8_t, 5> read_tx_  = {};
+    std::array<uint8_t, 5> read_rx_  = {};
 
     // Transfer State
     bool transfer_started_  = false;

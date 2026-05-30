@@ -582,7 +582,7 @@ uint8_t TmcMotorController::readWriteByte(const uint8_t motor, const uint8_t dat
             // The first byte should contain the address on a read operation.
             // Trigger a transfer (1 byte) and buffer the response (4 bytes)
             tx_[position_] = data;
-            spiTransfer(file_descriptors_[motor], tx_, rx_, 5, spi_speed);
+            spiTransfer<5>(file_descriptors_[motor], tx_, rx_, spi_speed);
 
             currently_reading_ = true;
             currently_writing_ = false;
@@ -608,7 +608,7 @@ uint8_t TmcMotorController::readWriteByte(const uint8_t motor, const uint8_t dat
     {
         // we have all the bytes for this transfer, lets trigger the transfer and
         // reset state
-        spiTransfer(file_descriptors_[motor], tx_, rx_, 5, spi_speed);
+        spiTransfer<5>(file_descriptors_[motor], tx_, rx_, spi_speed);
         transfer_started_ = false;
     }
 
