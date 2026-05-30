@@ -2,31 +2,6 @@ load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
-py_library(
-    name = "field_test_fixture",
-    srcs = [
-        "field_test_fixture.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-    ],
-    deps = [
-        "//proto:import_all_protos",
-        "//software/gameplay_tests:tbots_test_runner",
-        "//software/gameplay_tests/validation:validations",
-        "//software/logger:py_logger",
-        "//software/networking/unix:threaded_unix_listener_py",
-        "//software/networking/unix:threaded_unix_sender_py",
-        "//software/thunderscope",
-        "//software/thunderscope:constants",
-        "//software/thunderscope:estop_helpers",
-        "//software/thunderscope:robot_communication",
-        "//software/thunderscope/binary_context_managers:full_system",
-        "//software/thunderscope/binary_context_managers:game_controller",
-        "//software/thunderscope/binary_context_managers:simulator",
-    ],
-)
-
 py_test(
     name = "movement_robot_field_test",
     srcs = [
@@ -55,7 +30,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/gameplay_tests:tbots_test_runner",
+        "//software/gameplay_tests:util",
         "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
@@ -68,6 +43,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
+        "//software/gameplay_tests:util",
         "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
