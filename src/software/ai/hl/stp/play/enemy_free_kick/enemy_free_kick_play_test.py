@@ -99,7 +99,7 @@ from software.gameplay_tests.util import (
 def test_enemy_free_kick_play(
     gameplay_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,

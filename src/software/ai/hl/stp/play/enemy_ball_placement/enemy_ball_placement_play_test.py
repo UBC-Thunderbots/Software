@@ -22,7 +22,7 @@ from proto.ssl_gc_common_pb2 import Team
 def test_two_ai_ball_placement(
     gameplay_test_runner, ball_start_point, ball_placement_point
 ):
-    def setup(*args):
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-4.5, 0),
             tbots_cpp.Point(-4, 0.5),

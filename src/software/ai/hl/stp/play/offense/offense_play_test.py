@@ -12,7 +12,7 @@ from software.gameplay_tests.util import (
 
 
 def test_offense_play(gameplay_test_runner):
-    def setup(*args):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(-4.4, 2.9)
 
         blue_bots = [

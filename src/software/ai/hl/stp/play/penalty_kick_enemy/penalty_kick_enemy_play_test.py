@@ -103,7 +103,7 @@ def test_penalty_kick_enemy_play_setup(
     ball_initial_pos = field.enemyPenaltyMark()
     enemy_penalty_x = ball_initial_pos.x()
 
-    def setup(*args):
+    def setup():
         # Enemy robots behind the penalty mark
         yellow_bots = [
             tbots_cpp.Point(enemy_penalty_x + 0.3, 0),  # kicker robot

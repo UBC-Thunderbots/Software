@@ -36,7 +36,7 @@ def test_ball_chipped_on_intercept(
     position_to_block_from,
     gameplay_test_runner,
 ):
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 [],
@@ -109,7 +109,7 @@ def test_avoid_intercept_scenario(
     position_to_block_from,
     gameplay_test_runner,
 ):
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 [],
@@ -242,7 +242,7 @@ def test_steal_ball(
     should_steal,
     gameplay_test_runner,
 ):
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[position_to_block_from],

@@ -13,7 +13,7 @@ from proto.geometry_pb2 import Point, Vector, Angle, AngularVelocity
 
 
 def test_shoot_or_chip_play(gameplay_test_runner):
-    def setup(*args):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(-1.4, 2)
         ball_initial_vel = tbots_cpp.Vector(0, 0)
 

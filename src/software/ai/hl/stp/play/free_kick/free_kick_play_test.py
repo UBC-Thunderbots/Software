@@ -32,7 +32,7 @@ from software.gameplay_tests.util import (
     ],
 )
 def test_free_kick_play_friendly(ball_initial_pos, must_score, gameplay_test_runner):
-    def setup(*args):
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-4.5, 0),
             tbots_cpp.Point(-3, 1.5),

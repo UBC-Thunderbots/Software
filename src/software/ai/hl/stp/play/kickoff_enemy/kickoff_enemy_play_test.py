@@ -22,7 +22,7 @@ def test_kickoff_enemy_play(gameplay_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
             tbots_cpp.Point(-2.8, 2.5),

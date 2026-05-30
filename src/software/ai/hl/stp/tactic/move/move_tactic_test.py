@@ -33,7 +33,7 @@ def test_move_across_field(gameplay_test_runner):
     destination = tbots_cpp.Point(2.5, -1.1)
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
@@ -85,7 +85,7 @@ def test_autochip_move(gameplay_test_runner):
     destination = tbots_cpp.Point(0, 1.5)
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
@@ -146,7 +146,7 @@ def test_autokick_move(gameplay_test_runner):
     destination = tbots_cpp.Point(-1, -1)
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[initial_position],

@@ -10,7 +10,7 @@ from software.gameplay_tests.util import (
 # TODO issue  #2599 - Remove Duration parameter from test
 # @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_halt_play(gameplay_test_runner):
-    def setup(*args):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(0, 0)
 
         blue_bots = [

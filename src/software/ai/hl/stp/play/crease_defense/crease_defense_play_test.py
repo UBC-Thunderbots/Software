@@ -19,7 +19,7 @@ def test_crease_defense_play(gameplay_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
     goalie_position = tbots_cpp.Point(-4.5, 0)
 
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[

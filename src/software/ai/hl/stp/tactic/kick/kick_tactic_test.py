@@ -42,7 +42,7 @@ def test_kick(ball_offset_from_robot, angle_to_kick_at, gameplay_test_runner):
     robot_position = tbots_cpp.Point(0, 0)
     ball_position = robot_position + ball_offset_from_robot
 
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[

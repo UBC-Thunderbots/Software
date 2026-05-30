@@ -121,7 +121,7 @@ def test_attacker_passing(
     ball_velocity,
     gameplay_test_runner,
 ):
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
@@ -231,7 +231,7 @@ def test_attacker_keep_away(
     field_top_left = field.fieldLines().negXPosYCorner()
 
     # Keep away near field corner (second test case from C++)
-    def setup(*args):
+    def setup():
         robot_pos = field_top_left
         ball_pos = tbots_cpp.Point(field_top_left.x() + 0.05, field_top_left.y() - 0.2)
         enemy_positions = [
@@ -352,7 +352,7 @@ def test_attacker_shoot_goal(
 ):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
+    def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[robot_pos],

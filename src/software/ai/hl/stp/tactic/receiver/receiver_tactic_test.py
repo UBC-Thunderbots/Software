@@ -189,7 +189,7 @@ def test_receiver(
     one_touch,
     gameplay_test_runner,
 ):
-    def setup(*args):
+    def setup():
         ball_velocity = calculate_ball_velocity(
             passer_point, receiver_point, pass_speed
         )
