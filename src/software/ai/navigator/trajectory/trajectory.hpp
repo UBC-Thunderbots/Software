@@ -61,11 +61,12 @@ class Trajectory
     }
 
     /**
-     * Check if this trajectory is meaningfully different from another trajectory.
+     * Check if this trajectory is meaningfully equal to another trajectory.
      * @param other The other trajectory to compare to
-     * @param threshold The threshold above which the trajectories are considered
-     * different
-     * @return True if the trajectories are different, false otherwise
+     * @param threshold The threshold below which the trajectories are considered
+     * equal
+     * @return True if the trajectories are equal, false otherwise
      */
-    virtual bool isNew(const Trajectory<P, V, A>& other, double threshold) const = 0;
+    virtual bool equals(const Trajectory<P, V, A>& other,
+                        double threshold) const = 0;
 };

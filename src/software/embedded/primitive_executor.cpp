@@ -31,12 +31,12 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         const bool is_linear_traj_new =
             (new_trajectory_path.has_value() != trajectory_path_.has_value()) ||
             (new_trajectory_path.has_value() &&
-             trajectory_path_->isNew(*new_trajectory_path,
-                                     LINEAR_DESTINATION_THRESHOLD_METERS));
+             !trajectory_path_->equals(*new_trajectory_path,
+                                       LINEAR_DESTINATION_THRESHOLD_METERS));
 
         if (is_linear_traj_new)
         {
-            trajectory_path_                       = new_trajectory_path;
+            trajectory_path_ = new_trajectory_path;
             time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
             position_controller_.reset();
         }
@@ -48,8 +48,8 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
         const bool is_angular_traj_new =
             !angular_trajectory_.has_value() ||
-            angular_trajectory_->isNew(new_angular_trajectory,
-                                       ANGULAR_DESTINATION_THRESHOLD_DEGREES);
+            !angular_trajectory_->equals(new_angular_trajectory,
+                                         ANGULAR_DESTINATION_THRESHOLD_DEGREES);
 
         if (is_angular_traj_new)
         {

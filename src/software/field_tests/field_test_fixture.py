@@ -363,13 +363,6 @@ def load_command_line_arguments():
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
 
-    parser.add_argument(
-        "--no_visualization",
-        action="store_true",
-        default=False,
-        help="Disables the Thunderscope GUI",
-    )
-
     return parser.parse_args()
 
 
@@ -436,17 +429,15 @@ def field_test_runner():
             simulator_proto_unix_io=simulator_proto_unix_io,
         )
         # Inject the proto unix ios into thunderscope and start the test
-        tscope = None
-        if not args.no_visualization:
-            tscope = Thunderscope(
-                configure_field_test_view(
-                    simulator_proto_unix_io=simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                    yellow_is_friendly=args.run_yellow,
-                ),
-                layout_path=None,
-            )
+        tscope = Thunderscope(
+            configure_field_test_view(
+                simulator_proto_unix_io=simulator_proto_unix_io,
+                blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                yellow_is_friendly=args.run_yellow,
+            ),
+            layout_path=None,
+        )
 
         # Set control mode for all robots to AI so that packets are sent to the robots
         for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
@@ -457,8 +448,7 @@ def field_test_runner():
 
         # connect the keyboard estop toggle to the key event if needed
         if estop_mode == EstopMode.KEYBOARD_ESTOP:
-            if tscope:
-                tscope.keyboard_estop_shortcut.activated.connect(
+            tscope.keyboard_estop_shortcut.activated.connect(
                     rc_friendly.toggle_keyboard_estop
                 )
             # we call this method to enable estop automatically when a field test starts

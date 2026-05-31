@@ -139,45 +139,58 @@ void RobotLocalizer::update(const VisionData& data)
     const auto current_time = std::chrono::steady_clock::now();
     const auto sample_age   = std::chrono::duration<double>(data.age_seconds);
 
-    const auto rollback_point = std::find_if(
+    auto rollback_point = std::find_if(
         history.begin(), history.end(),
-        [&](const FilterStep& step) { return step.time - current_time >= sample_age; });
+        [&](const FilterStep& step) { return (current_time - step.time) >= sample_age; });
 
     if (rollback_point == history.begin())
     {
-        // All history predates the sample, no need to rollback
+        // All history predates the sample, or is exactly at the same time.
+        // No need to rollback, just apply to the current state.
         updateFilterWithVision(data.position, data.orientation);
+        history.clear(); // Safe to clear, since all history is older than current state
         return;
     }
 
-    auto replay_iter = std::make_reverse_iterator(rollback_point);
+    if (rollback_point == history.end())
+    {
+        // The vision sample is older than our entire history.
+        // Roll back as far as we can (to the oldest step).
+        rollback_point = std::prev(history.end());
+    }
 
-    // Truncate history after the rollback point
+    // 1. Save the state from the rollback point
+    filter_.state_estimate   = rollback_point->state_estimate;
+    filter_.state_covariance = rollback_point->state_covariance;
+
+    // 2. Truncate history (erase rollback_point and everything older)
     history.erase(rollback_point, history.end());
 
-    filter_.state_estimate   = replay_iter->state_estimate;
-    filter_.state_covariance = replay_iter->state_covariance;
-
+    // 3. Apply the delayed vision measurement
     updateFilterWithVision(data.position, data.orientation);
 
-    // Replay from the rollback point back to the current estimate
-    for (; replay_iter != history.rbegin(); --replay_iter)
+    // 4. Replay the remaining history (from oldest to newest)
+    for (auto it = history.rbegin(); it != history.rend(); ++it)
     {
-        if (replay_iter->prediction.has_value())
+        if (it->prediction.has_value())
         {
-            const auto& prediction     = replay_iter->prediction.value();
+            const auto& prediction     = it->prediction.value();
             filter_.process_model      = prediction.process_model;
             filter_.process_covariance = prediction.process_covariance;
             filter_.control_model      = prediction.control_model;
             filter_.predict(prediction.control_input);
         }
 
-        if (replay_iter->update.has_value())
+        if (it->update.has_value())
         {
-            const auto& update        = replay_iter->update.value();
+            const auto& update        = it->update.value();
             filter_.measurement_model = update.measurement_model;
             filter_.update(update.measurement);
         }
+
+        // IMPORTANT: Update the history with the recomputed state so future rollbacks are correct
+        it->state_estimate   = filter_.state_estimate;
+        it->state_covariance = filter_.state_covariance;
     }
 }
 
