@@ -203,7 +203,7 @@ class TmcMotorController : public MotorController
 
     // Transfer Buffers for spiTransfer
     std::array<uint8_t, 5> tx_ = {};
-    std::array<uint8_t, 5> rx_  = {};
+    std::array<uint8_t, 5> rx_ = {};
 
     // Transfer Buffers for readThenWriteSpiTransfer
     std::array<uint8_t, 5> write_tx_ = {};

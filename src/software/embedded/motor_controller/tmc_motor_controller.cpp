@@ -423,11 +423,6 @@ int TmcMotorController::readThenWriteValue(const MotorIndex motor,
     spi_demux_select_0_->setValue(GpioState::HIGH);
     spi_demux_select_1_->setValue(GpioState::LOW);
 
-    // ensure tx_ and rx_ are cleared
-    memset(read_tx_, 0, 5);
-    memset(write_tx_, 0, 5);
-    memset(read_rx_, 0, 5);
-
     //  Trinamic transactions looks like this:
     //  + - - - + - - - + - - - + - - - + - - - +
     //  |  ADDR |             DATA              |
@@ -446,9 +441,9 @@ int TmcMotorController::readThenWriteValue(const MotorIndex motor,
         write_tx_[4 - i]     = byte_to_copy;
     }
 
-    readThenWriteSpiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], read_tx_,
-                             write_tx_, read_rx_, TMC_CMD_MSG_SIZE, TMC_CMD_MSG_SIZE,
-                             TMC4671_SPI_SPEED);
+    readThenWriteSpiTransfer<TMC_CMD_MSG_SIZE, TMC_CMD_MSG_SIZE>(
+        file_descriptors_[CHIP_SELECTS.at(motor)], read_tx_, write_tx_, read_rx_,
+        TMC4671_SPI_SPEED);
 
     int32_t value = read_rx_[0];
     for (int i = 1; i < 5; i++)
@@ -566,8 +561,6 @@ uint8_t TmcMotorController::readWriteByte(const uint8_t motor, const uint8_t dat
 
     if (!transfer_started_)
     {
-        memset(tx_, 0, sizeof(tx_));
-        memset(rx_, 0, sizeof(rx_));
         position_ = 0;
 
         if (data & TMC_WRITE_BIT)
