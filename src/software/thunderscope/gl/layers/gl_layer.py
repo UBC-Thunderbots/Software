@@ -17,7 +17,7 @@ class GLLayer(GLGraphicsItem):
     enabling us to group together related layers.
     """
 
-    NEEDS_MOUSE_MOVEMENT_TRACKING: bool = False
+    needs_mouse_movement_tracking: bool = False
 
     def __init__(self, name: str, parent_item: GLGraphicsItem | None = None) -> None:
         """Initialize the GLLayer

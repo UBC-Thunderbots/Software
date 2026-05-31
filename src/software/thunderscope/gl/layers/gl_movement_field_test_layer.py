@@ -17,9 +17,10 @@ logger = create_logger(__name__)
 
 
 class GLMovementFieldTestLayer(GLLayer):
+    needs_mouse_movement_tracking = True
+
     DEFAULT_ORIENTATION = -math.pi / 2
     LINE_LENGTH = 0.3
-    NEEDS_MOUSE_MOVEMENT_TRACKING = True
 
     def __init__(
         self, name: str, fullsystem_io: ProtoUnixIO, buffer_size: int = 5
