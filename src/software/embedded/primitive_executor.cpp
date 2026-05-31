@@ -247,10 +247,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             {
                 target_angular_velocity = AngularVelocity::fromRadians(
                     w_pid_close.step(error_angular.toRadians()));
-
-                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                    {"is_pure_pid", 100},
-                });
             }
             else
             {
@@ -265,26 +261,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     AngularVelocity::fromRadians(w_pid.step(error_angular.toRadians()));
                 target_angular_velocity =
                     trajectory_angular_velocity + pid_effort_angular;
-
-                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                    {"is_pure_pid", 0},
-                });
             }
-
-            LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                {"target_angular_velocity", target_angular_velocity.toDegrees()},
-                {"angular_velocity", angular_velocity_.toDegrees()},
-                {"orientation", orientation_.toDegrees()},
-                {"expected_orientation",
-                 angular_trajectory_
-                     ->getPosition(time_since_angular_trajectory_creation_.count())
-                     .toDegrees()},
-            });
-
-            // Make sure target linear velocity is clamped
-            target_linear_velocity = target_linear_velocity.normalize(
-                std::min(target_linear_velocity.length(),
-                         static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
 
             const auto prim = createDirectControlPrimitive(
                 target_linear_velocity, target_angular_velocity,

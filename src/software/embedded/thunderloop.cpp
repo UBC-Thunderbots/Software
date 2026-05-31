@@ -187,15 +187,6 @@ void Thunderloop::runLoop()
     robot_status_.set_thunderloop_version(thunderloop_hash);
     robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
 
-
-    std::optional<ImuData> imu_poll = imu_service_->poll();
-
-    // TODO (3725): Replace with actual IMU data usage
-    if (imu_poll.has_value() && imu_poll->angular_velocity.has_value())
-    {
-        LOG(INFO) << "IMU Angular Velocity: " << imu_poll->angular_velocity->toRadians();
-    }
-
     for (;;)
     {
         struct timespec time_since_prev_iter;

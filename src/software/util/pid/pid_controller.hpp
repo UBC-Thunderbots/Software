@@ -53,7 +53,7 @@ T controls::PIDController<T>::step(T error, T delta_time)
 
     integral += std::max(std::min(error * delta_time, max_integral), -max_integral);
     // set derivative, if no last_error, just set to 0
-    const T derivative = (last_error.value_or(error) - error) / delta_time;
+    const T derivative = (error - last_error.value_or(error)) / delta_time;
     last_error         = error;
     return error * k_p + integral * k_i + derivative * k_d;
 }
