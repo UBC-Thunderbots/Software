@@ -6,6 +6,10 @@ import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.util import pytest_main
+from software.gameplay_tests.validation.robot_enters_region import (
+    RobotEventuallyEntersRegion,
+)
+from software.gameplay_tests.validation.delay_validation import DelayValidation
 from software.logger.logger import create_logger
 
 logger = create_logger(__name__)
@@ -148,56 +152,50 @@ logger = create_logger(__name__)
     ],
 )
 def test_one_robots_square(start_position, end_position, gameplay_test_runner):
-    gameplay_test_runner.set_world_state(
-        create_world_state(
-            blue_robot_locations=[
-                start_position,
-            ],
-            yellow_robot_locations=[],
-            ball_location=tbots_cpp.Point(0, 0),
-            ball_velocity=tbots_cpp.Vector(0, 0),
-        ),
-    )
-    world = gameplay_test_runner.world_buffer.get(block=True, timeout=5.0)
-    while len(world.friendly_team.team_robots) == 0:
-        tick = SimulatorTick(milliseconds=1000 / 60)
-        gameplay_test_runner.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+    def setup():
+        gameplay_test_runner.set_world_state(
+            create_world_state(
+                blue_robot_locations=[
+                    start_position,
+                ],
+                yellow_robot_locations=[],
+                ball_location=tbots_cpp.Point(0, 0),
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
 
-        world = gameplay_test_runner.world_buffer.get(block=True, timeout=5.0)
-        print("The first world received had no robots in it!")
-        # raise Exception("The first world received had no robots in it!")
+        tactic = MoveTactic(
+            destination=tbots_cpp.createPointProto(end_position),
+            dribbler_mode=DribblerMode.OFF,
+            final_orientation=Angle(radians=-math.pi / 2),
+            ball_collision_type=BallCollisionType.AVOID,
+            auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
+            max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+            obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        )
 
-    print("Here are the robots:")
-    print(
-        [
-            robot.current_state.global_position
-            for robot in world.friendly_team.team_robots
-        ]
-    )
-
-    id = world.friendly_team.team_robots[0].id
-    print(f"Running test on robot {id}")
-
-    tactic = MoveTactic(
-        destination=tbots_cpp.createPointProto(end_position),
-        dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi / 2),
-        ball_collision_type=BallCollisionType.AVOID,
-        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
-    )
-
-    print(f"Going to {tactic.destination}")
-
-    gameplay_test_runner.set_tactics(
-        blue_tactics={
-            id: tactic,
-        },
-    )
+        gameplay_test_runner.set_tactics(
+            blue_tactics={
+                0: tactic,
+            },
+        )
 
     gameplay_test_runner.run_test(
+        setup=setup,
         test_timeout_s=4,
+        eventually_validation_sequence_set=[
+            [
+                RobotEventuallyEntersRegion(
+                    regions=[tbots_cpp.Circle(end_position, 0.05)]
+                ),
+                DelayValidation(
+                    delay_s=1,
+                    validation=RobotEventuallyEntersRegion(
+                        regions=[tbots_cpp.Circle(end_position, 0.05)]
+                    ),
+                ),
+            ]
+        ],
     )
 
 
