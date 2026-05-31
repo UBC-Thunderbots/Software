@@ -20,7 +20,7 @@ class GLMovementFieldTestLayer(GLLayer):
     needs_mouse_movement_tracking = True
 
     DEFAULT_ORIENTATION = -math.pi / 2
-    LINE_LENGTH = 0.3
+    ORIENTATION_LINE_LENGTH = 0.3
 
     def __init__(
         self, name: str, fullsystem_io: ProtoUnixIO, buffer_size: int = 5
@@ -250,8 +250,8 @@ class GLMovementFieldTestLayer(GLLayer):
         self.preview_robot_graphic.set_orientation(math.degrees(angle))
         self.preview_robot_graphic.show()
 
-        end_x = x + math.cos(angle) * self.LINE_LENGTH
-        end_y = y + math.sin(angle) * self.LINE_LENGTH
+        end_x = x + math.cos(angle) * self.ORIENTATION_LINE_LENGTH
+        end_y = y + math.sin(angle) * self.ORIENTATION_LINE_LENGTH
 
         self.preview_orientation_graphic.set_points([[x, y], [end_x, end_y]])
         self.preview_orientation_graphic.show()
