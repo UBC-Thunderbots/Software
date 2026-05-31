@@ -31,8 +31,7 @@ void spiTransfer(int fd, const std::array<uint8_t, len>& tx, std::array<uint8_t,
 template <uint32_t read_len, uint32_t write_len>
 void readThenWriteSpiTransfer(int fd, const std::array<uint8_t, read_len>& read_tx,
                               const std::array<uint8_t, write_len>& write_tx,
-                              std::array<uint8_t, read_len>& read_rx,
-                              uint32_t spi_speed)
+                              std::array<uint8_t, read_len>& read_rx, uint32_t spi_speed)
 {
     uint8_t write_rx[5] = {};
 
