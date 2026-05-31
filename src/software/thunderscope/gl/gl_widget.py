@@ -308,7 +308,8 @@ class GLWidget(QWidget):
 
     def _update_mouse_tracking(self) -> None:
         """Enable detect_mouse_movement_in_scene if measure mode or any layer that
-        requires mouse movement tracking is active; disable it when both are off."""
+        requires mouse movement tracking is active; disable it when both are off.
+        """
         movement_layer_active = any(
             layer.needs_mouse_movement_tracking and layer.visible()
             for layer in self.layers
