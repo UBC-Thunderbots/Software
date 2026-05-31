@@ -102,6 +102,5 @@ class MotorService
 
     static constexpr int MOTOR_RESET_TIME_THRESHOLD_S                = 60;
     static constexpr int MOTOR_RESET_THRESHOLD_COUNT                 = 3;
-    static constexpr double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
     static constexpr int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
 };
