@@ -1,10 +1,12 @@
 #pragma once
 
-#include <array>
-#include <cstdint>
-#include "software/embedded/spi_utils.h"
 #include <errno.h>
 #include <linux/spi/spidev.h>
+
+#include <array>
+#include <cstdint>
+
+#include "software/embedded/spi_utils.h"
 #include "software/logger/logger.h"
 
 // TODO: #3747 Wrap in spi_utils namespace
@@ -12,6 +14,8 @@
  * Trigger an SPI transfer over an open SPI connection
  *
  * NOTE: tx is expected to be in BIG ENDIAN
+ *
+ * @tparam len the length of the tx and rx buffer
  *
  * @param fd the SPI file descriptor to transfer data over
  * @param tx the tx buffer, data to send out
@@ -44,6 +48,9 @@ void spiTransfer(int fd, const std::array<uint8_t, len>& tx, std::array<uint8_t,
  * Performs two back to back SPI transactions, first a read and then a write.
  *
  * NOTE: read_tx and write_tx are both expected to be in BIG ENDIAN
+ *
+ * @tparam read_len the length of the read_tx and read_rx buffers
+ * @tparam write_len the length of the write_tx buffer
  *
  * @param fd the SPI file descriptor to transfer data over
  * @param read_tx pointer to the buffer containing the address for reading
