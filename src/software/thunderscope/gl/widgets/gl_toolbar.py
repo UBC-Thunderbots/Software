@@ -1,6 +1,7 @@
 import textwrap
-from pyqtgraph.Qt import QtCore
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
+from typing import Callable
 
 
 class GLToolbar(QWidget):
@@ -54,3 +55,37 @@ class GLToolbar(QWidget):
             }}
             """
         )
+
+    def setup_icon_button(
+        self,
+        icon: QtGui.QPixmap,
+        tooltip: str,
+        callback: Callable[[], None],
+        display_text: str = None,
+    ) -> QPushButton:
+        """Sets up a button with the given name and callback
+
+        :param icon: the icon displayed on the button
+        :param tooltip: the tooltip displayed when hovering over the button
+        :param callback: the callback for the button click
+        :param display_text: optional param if button needs both text and an icon
+        :return: the button
+        """
+        button = QPushButton()
+        button.setIcon(icon)
+        button.setToolTip(tooltip)
+        button.setStyleSheet(self.get_button_style())
+        button.clicked.connect(callback)
+
+        if display_text:
+            button.setText(display_text)
+        return button
+
+    def add_separator(self, layout: QBoxLayout) -> None:
+        """Adds a separator line with enough spacing to the given layout
+
+        :param layout: the layout to add the separator to
+        """
+        layout.addSpacing(10)
+        layout.addWidget(QLabel("<b>|</b>"))
+        layout.addSpacing(10)

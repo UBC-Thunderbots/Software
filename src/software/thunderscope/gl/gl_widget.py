@@ -21,6 +21,9 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
+from software.thunderscope.gl.widgets.gl_simulated_test_toolbar import (
+    GLSimulatedTestToolbar,
+)
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from proto.world_pb2 import SimulationState
 from proto.replay_bookmark_pb2 import ReplayBookmark
@@ -113,7 +116,12 @@ class GLWidget(QWidget):
             friendly_color_yellow=friendly_color_yellow,
         )
 
-        self.__add_toolbar_toggle(self.gamecontroller_toolbar, "Gamecontroller")
+        self.simulated_test_toolbar = GLSimulatedTestToolbar(parent=self.gl_view_widget)
+
+        self.__add_toolbar_select(self.gamecontroller_toolbar, "Gamecontroller")
+        self.__add_toolbar_select(self.simulated_test_toolbar, "Tests")
+        self.current_toolbar = self.gamecontroller_toolbar
+        self.simulated_test_toolbar.setVisible(False)
 
         # Setup replay controls if player is provided and the log has some size
         self.player = player
@@ -269,6 +277,7 @@ class GLWidget(QWidget):
         if self.simulation_control_toolbar:
             self.simulation_control_toolbar.refresh()
             self.gamecontroller_toolbar.refresh()
+            self.simulated_test_toolbar.refresh()
 
         simulation_state = self.simulation_state_buffer.get(block=False)
         # Don't refresh the layers if the simulation is paused
@@ -322,22 +331,23 @@ class GLWidget(QWidget):
         else:
             self.remove_layer(self.measure_layer)
 
-    def __add_toolbar_toggle(self, toolbar: QWidget, name: str) -> None:
-        """Adds a button to the toolbar menu to toggle the given toolbar
+    def __select_toolbar(self, toolbar: QWidget) -> None:
+        """Sets the currently selected toolbar to be only one visible
 
-        :param toolbar: the toolbar to add the toggle button for
+        :param toolbar: the toolbar to select
+        """
+        self.gamecontroller_toolbar.setVisible(False)
+        self.simulated_test_toolbar.setVisible(False)
+        toolbar.setVisible(True)
+        self.current_toolbar = toolbar
+
+    def __add_toolbar_select(self, toolbar: QWidget, name: str) -> None:
+        """Adds a button to the toolbar menu to select the given toolbar
+
+        :param toolbar: the toolbar to add the select button for
         :param name: the display name of the toolbar
         """
-        # Add a menu item for the Gamecontroller toolbar
-        (toolbar_checkbox, toolbar_action) = self.__setup_menu_checkbox(
-            name, self.toolbars_menu
-        )
-        self.toolbars_menu.addAction(toolbar_action)
-
-        # Connect visibility of the toolbar to the menu item
-        toolbar_checkbox.stateChanged.connect(
-            lambda: toolbar.setVisible(toolbar_checkbox.isChecked())
-        )
+        self.toolbars_menu.addAction(name, lambda: self.__select_toolbar(toolbar))
 
     def __setup_menu_checkbox(
         self, name: str, parent: QWidget, checked: bool = True
