@@ -28,7 +28,7 @@ py_library(
     srcs = ["keyboard_controller.py"],
     deps = [
         ":controller_base",
-    ]
+    ],
 )
 
 py_library(
@@ -36,7 +36,7 @@ py_library(
     srcs = ["handheld_controller.py"],
     deps = [
         ":controller_base",
-    ]
+    ],
 )
 
 py_library(
@@ -48,9 +48,9 @@ py_library(
     name = "handheld_controller_widget",
     srcs = ["handheld_controller_widget.py"],
     deps = [
-        ":handheld_controller",
-        ":controller_base",
         "keyboard_controller",
+        ":controller_base",
+        ":handheld_controller",
         "//software/thunderscope:constants",
         requirement("pyqtgraph"),
     ] + select({

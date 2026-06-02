@@ -57,8 +57,19 @@ class StSpinMotorController : public MotorController
 
     static constexpr int RESET_GPIO_PIN = 12;
 
+    static constexpr int FLUX_PID_PROPORTIONAL_GAIN = 3304;
+    static constexpr int FLUX_PID_INTEGRAL_GAIN     = 1693;
+
+    static constexpr int TORQUE_PID_PROPORTIONAL_GAIN = 3304;
+    static constexpr int TORQUE_PID_INTEGRAL_GAIN     = 1693;
+
     static constexpr int SPEED_PID_PROPORTIONAL_GAIN = 1300;
-    static constexpr int SPEED_PID_INTEGRAL_GAIN     = 40;
+    static constexpr int SPEED_PID_INTEGRAL_GAIN     = 420;
+
+    static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN_FRONT  = 1800;
+    static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN_BACK   = 825;
+    static constexpr int MAX_SPEED_FEED_FORWARD_KINETIC_GAIN_FRONT = 0;
+    static constexpr int MAX_SPEED_FEED_FORWARD_KINETIC_GAIN_BACK  = 0;
 
     static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 800;
     static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 250;

@@ -47,6 +47,11 @@ void StSpinMotorController::setup()
     {
         sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = SPEED_PID_PROPORTIONAL_GAIN,
                                                         .ki = SPEED_PID_INTEGRAL_GAIN});
+        sendAndReceiveFrame(motor,
+                            SetPidTorqueKpKiFrame{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
+                                                  .ki = TORQUE_PID_INTEGRAL_GAIN});
+        sendAndReceiveFrame(motor, SetPidTorqueKpKiFrame{.kp = FLUX_PID_PROPORTIONAL_GAIN,
+                                                         .ki = FLUX_PID_INTEGRAL_GAIN});
     }
 }
 
@@ -182,6 +187,8 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 
     sendAndReceiveFrame(motor, outgoing_frame);
 
+    sendMotorStatusToPlotJuggler(motor);
+
     return motor_status_.at(motor).speed;
 }
 
@@ -205,6 +212,12 @@ void StSpinMotorController::updateEuclideanVelocity(
         sendAndReceiveFrame(
             MotorIndex::BACK_LEFT,
             SetSpeedFeedForwardKsFrame{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
+        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+            {"front_left_ks", 0},
+            {"front_right_ks", 0},
+            {"back_left_ks", 0},
+            {"back_right_ks", 0},
+        });
         return;
     }
 
@@ -215,17 +228,37 @@ void StSpinMotorController::updateEuclideanVelocity(
     const Angle back_wheel_angle =
         Angle::fromDegrees(robot_constants_.back_wheel_angle_deg);
 
-    const int16_t front_left_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
+    const int16_t front_left_ks =
+        static_cast<int16_t>(MAX_SPEED_FEED_FORWARD_STATIC_GAIN_FRONT *
+                             std::abs((direction + front_wheel_angle).sin()));
+    const int16_t front_right_ks =
+        static_cast<int16_t>(MAX_SPEED_FEED_FORWARD_STATIC_GAIN_FRONT *
+                             std::abs((direction - front_wheel_angle).sin()));
+    const int16_t back_right_ks =
+        static_cast<int16_t>(MAX_SPEED_FEED_FORWARD_STATIC_GAIN_BACK *
+                             std::abs((direction + back_wheel_angle).sin()));
+    const int16_t back_left_ks =
+        static_cast<int16_t>(MAX_SPEED_FEED_FORWARD_STATIC_GAIN_BACK *
+                             std::abs((direction - back_wheel_angle).sin()));
+
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+        {"front_left_ks", front_left_ks},
+        {"front_right_ks", front_right_ks},
+        {"back_left_ks", back_left_ks},
+        {"back_right_ks", back_right_ks},
+    });
+
+    const int16_t front_left_kv = static_cast<int16_t>(
+        MAX_SPEED_FEED_FORWARD_KINETIC_GAIN_FRONT *
         std::abs((direction - Angle::quarter() + front_wheel_angle).sin()));
-    const int16_t front_right_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
+    const int16_t front_right_kv = static_cast<int16_t>(
+        MAX_SPEED_FEED_FORWARD_KINETIC_GAIN_FRONT *
         std::abs((direction + Angle::quarter() - front_wheel_angle).sin()));
-    const int16_t back_right_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
+    const int16_t back_right_kv = static_cast<int16_t>(
+        MAX_SPEED_FEED_FORWARD_KINETIC_GAIN_BACK *
         std::abs((direction + Angle::quarter() + back_wheel_angle).sin()));
-    const int16_t back_left_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
+    const int16_t back_left_kv = static_cast<int16_t>(
+        MAX_SPEED_FEED_FORWARD_KINETIC_GAIN_BACK *
         std::abs((direction - Angle::quarter() - back_wheel_angle).sin()));
 
     sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
@@ -236,6 +269,15 @@ void StSpinMotorController::updateEuclideanVelocity(
                         SetSpeedFeedForwardKsFrame{.ks = back_right_ks});
     sendAndReceiveFrame(MotorIndex::BACK_LEFT,
                         SetSpeedFeedForwardKsFrame{.ks = back_left_ks});
+
+    sendAndReceiveFrame(MotorIndex::FRONT_LEFT,
+                        SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = front_left_kv});
+    sendAndReceiveFrame(MotorIndex::FRONT_RIGHT,
+                        SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = front_right_kv});
+    sendAndReceiveFrame(MotorIndex::BACK_RIGHT,
+                        SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = back_right_kv});
+    sendAndReceiveFrame(MotorIndex::BACK_LEFT,
+                        SetSpeedFeedForwardKaKvFrame{.ka = 0, .kv = back_left_kv});
 }
 
 void StSpinMotorController::immediatelyDisable()

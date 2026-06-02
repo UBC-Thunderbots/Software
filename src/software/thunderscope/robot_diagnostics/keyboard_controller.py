@@ -19,23 +19,25 @@ _BTN_B = 305
 # Maps abs_code -> (negative_key, positive_key).
 # A held negative key returns -1.0; a held positive key returns +1.0.
 _ABS_KEY_MAP: dict[int, tuple[Qt.Key | None, Qt.Key | None]] = {
-    _ABS_Y:     (Qt.Key.Key_W,    Qt.Key.Key_S),      # forward / back
-    _ABS_X:     (Qt.Key.Key_A,    Qt.Key.Key_D),      # strafe left / right
-    _ABS_RX:    (Qt.Key.Key_Q,    Qt.Key.Key_E),      # rotate CCW / CW
-    _ABS_Z:     (None,            Qt.Key.Key_Shift),  # slowdown (left trigger)
+    _ABS_Y: (Qt.Key.Key_W, Qt.Key.Key_S),  # forward / back
+    _ABS_X: (Qt.Key.Key_A, Qt.Key.Key_D),  # strafe left / right
+    _ABS_RX: (Qt.Key.Key_Q, Qt.Key.Key_E),  # rotate CCW / CW
+    _ABS_Z: (None, Qt.Key.Key_Shift),  # slowdown (left trigger)
     _ABS_HAT0X: (Qt.Key.Key_Left, Qt.Key.Key_Right),  # step kick power
-    _ABS_HAT0Y: (Qt.Key.Key_Up,   Qt.Key.Key_Down),   # step dribbler RPM
-    _ABS_RZ:    (None,            Qt.Key.Key_R),      # dribbler hold (right trigger)
+    _ABS_HAT0Y: (Qt.Key.Key_Up, Qt.Key.Key_Down),  # step dribbler RPM
+    _ABS_RZ: (None, Qt.Key.Key_R),  # dribbler hold (right trigger)
 }
 
 # Maps key_code (ecodes int) -> Qt key for digital button inputs
 _BTN_KEY_MAP: dict[int, Qt.Key] = {
     _BTN_A: Qt.Key.Key_X,  # kick
-    _BTN_B: Qt.Key.Key_C,      # chip
+    _BTN_B: Qt.Key.Key_C,  # chip
 }
+
 
 class _QABCMeta(type(QObject), ABCMeta):
     pass
+
 
 class KeyboardController(QObject, ControllerBase, metaclass=_QABCMeta):
     """Keyboard input source.

@@ -169,7 +169,7 @@ def test_one_robots_square(field_test_runner):
             field_test_runner.run_test(
                 always_validation_sequence_set=[[]],
                 eventually_validation_sequence_set=[[]],
-                test_timeout_s=8,
+                test_timeout_s=4,
             )
 
         # Send a halt tactic after the test finishes
