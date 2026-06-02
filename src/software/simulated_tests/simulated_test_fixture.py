@@ -23,10 +23,10 @@ from typing import override
 
 logger = create_logger(__name__)
 
-LAUNCH_DELAY_S = 2
-WORLD_BUFFER_TIMEOUT = 10
+LAUNCH_DELAY_S = 0.1
+WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.1
-PAUSE_AFTER_FAIL_DELAY_S = 5
+PAUSE_AFTER_FAIL_DELAY_S = 3
 SECONDS_PER_MILLISECOND = 0.001
 
 
@@ -122,7 +122,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         eventually_validation_sequence_set,
         test_timeout_s=3,
         tick_duration_s=1.0 / 60.0,
-        ci_cmd_with_delay=[],
+        ci_cmd_with_delay=None,
         run_till_end=False,
         **kwargs,
     ):
@@ -136,6 +136,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
                                   [(1.0, Command.Type.NORMAL_START, Team.BLUE)]
         """
+        ci_cmd_with_delay = list(ci_cmd_with_delay) if ci_cmd_with_delay else []
         time_elapsed_s = 0
         eventually_validation_failure_msg = "Test Timed Out"
         eventually_validation_proto_set = None
@@ -249,12 +250,12 @@ class SimulatedTestRunner(TbotsTestRunner):
     @override
     def run_test(
         self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
+        always_validation_sequence_set=None,
+        eventually_validation_sequence_set=None,
         setup=None,
         test_timeout_s=3,
         tick_duration_s=1.0 / 60.0,
-        ci_cmd_with_delay=[],
+        ci_cmd_with_delay=None,
         run_till_end=False,
         **kwargs,
     ):
@@ -265,6 +266,8 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param setup: initialization function for this test
         :param test_timeout_s: how long the test will run
         """
+        always_validation_sequence_set = always_validation_sequence_set or [[]]
+        eventually_validation_sequence_set = eventually_validation_sequence_set or [[]]
         # Set the hook for exception handling so that we can close the thunderscope
         # instance should one exist
         sys.excepthook = self.excepthook
@@ -298,9 +301,9 @@ class AggregateTestRunner(SimulatedTestRunner):
     def run_test(
         self,
         setup=(lambda arg: None),
-        params=[],
-        ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[[]],
+        params=None,
+        ag_always_validation_sequence_set=None,
+        ag_eventually_validation_sequence_set=None,
         **kwargs,
     ):
         """Begins validating a test based on incoming world protos. Runs the
@@ -311,6 +314,9 @@ class AggregateTestRunner(SimulatedTestRunner):
         :param ag_eventually_validation_sequence_set: validation set for aggregate test that must eventually be true
         :param ag_always_validation_sequence_set: validation set for aggregate test that must always be true
         """
+        params = params or []
+        ag_always_validation_sequence_set = ag_always_validation_sequence_set or [[]]
+        ag_eventually_validation_sequence_set = ag_eventually_validation_sequence_set or [[]]
         sys.excepthook = self.excepthook
 
         failed_tests = 0
