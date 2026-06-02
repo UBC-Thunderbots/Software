@@ -69,6 +69,11 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
     orientation_      = orientation;
     angular_velocity_ = angular_velocity;
 
+    if (!current_primitive_.has_move())
+    {
+        return;
+    }
+
     // If we are lagging behind trajectory too much, we have stalled! We need to
     // regenerate trajectory.
     if (trajectory_path_.has_value())

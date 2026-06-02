@@ -291,20 +291,20 @@ inline void Thunderloop::processLocalizationUpdates()
             localToGlobalVelocity(createVector(status.local_velocity()),
                                   robot_localizer_.getOrientation()),
             createAngularVelocity(status.angular_velocity())});
-
-        Vector linear_acceleration;
-        if (imu_poll.has_value() && imu_poll->linear_acceleration.has_value())
-        {
-            const auto accel    = imu_poll->linear_acceleration.value();
-            linear_acceleration = Vector(accel[0], accel[1]);
-        }
-
-        robot_localizer_.step(linear_acceleration);
-
-        primitive_executor_.updateState(
-            robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
-            robot_localizer_.getOrientation(), robot_localizer_.getAngularVelocity());
     }
+
+    Vector linear_acceleration;
+    if (imu_poll.has_value() && imu_poll->linear_acceleration.has_value())
+    {
+        const auto accel    = imu_poll->linear_acceleration.value();
+        linear_acceleration = Vector(accel[0], accel[1]);
+    }
+
+    robot_localizer_.step(linear_acceleration);
+
+    primitive_executor_.updateState(
+        robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
+        robot_localizer_.getOrientation(), robot_localizer_.getAngularVelocity());
 }
 
 inline void Thunderloop::processPrimitiveExecution(
