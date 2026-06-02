@@ -189,8 +189,8 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 void StSpinMotorController::updateEuclideanVelocity(
     EuclideanSpace_t target_euclidean_velocity)
 {
-    const Vector local_velocity(target_euclidean_velocity[0],
-                                target_euclidean_velocity[1]);
+    const Vector local_velocity(target_euclidean_velocity[1],
+                                target_euclidean_velocity[0]);
 
     if (local_velocity.length() <= MINIMUM_SPEED_FOR_FEED_FORWARD)
     {
