@@ -316,7 +316,9 @@ class AggregateTestRunner(SimulatedTestRunner):
         """
         params = params or []
         ag_always_validation_sequence_set = ag_always_validation_sequence_set or [[]]
-        ag_eventually_validation_sequence_set = ag_eventually_validation_sequence_set or [[]]
+        ag_eventually_validation_sequence_set = (
+            ag_eventually_validation_sequence_set or [[]]
+        )
         sys.excepthook = self.excepthook
 
         failed_tests = 0

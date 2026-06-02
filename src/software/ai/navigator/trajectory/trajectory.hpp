@@ -67,6 +67,5 @@ class Trajectory
      * equal
      * @return True if the trajectories are equal, false otherwise
      */
-    virtual bool equals(const Trajectory<P, V, A>& other,
-                        double threshold) const = 0;
+    virtual bool equals(const Trajectory<P, V, A>& other, double threshold) const = 0;
 };

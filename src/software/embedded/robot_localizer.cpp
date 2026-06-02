@@ -148,7 +148,7 @@ void RobotLocalizer::update(const VisionData& data)
         // All history predates the sample, or is exactly at the same time.
         // No need to rollback, just apply to the current state.
         updateFilterWithVision(data.position, data.orientation);
-        history.clear(); // Safe to clear, since all history is older than current state
+        history.clear();  // Safe to clear, since all history is older than current state
         return;
     }
 
@@ -188,7 +188,8 @@ void RobotLocalizer::update(const VisionData& data)
             filter_.update(update.measurement);
         }
 
-        // IMPORTANT: Update the history with the recomputed state so future rollbacks are correct
+        // IMPORTANT: Update the history with the recomputed state so future rollbacks are
+        // correct
         it->state_estimate   = filter_.state_estimate;
         it->state_covariance = filter_.state_covariance;
     }

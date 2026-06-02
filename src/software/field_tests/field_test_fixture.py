@@ -449,8 +449,8 @@ def field_test_runner():
         # connect the keyboard estop toggle to the key event if needed
         if estop_mode == EstopMode.KEYBOARD_ESTOP:
             tscope.keyboard_estop_shortcut.activated.connect(
-                    rc_friendly.toggle_keyboard_estop
-                )
+                rc_friendly.toggle_keyboard_estop
+            )
             # we call this method to enable estop automatically when a field test starts
             rc_friendly.toggle_keyboard_estop()
             logger.warning(

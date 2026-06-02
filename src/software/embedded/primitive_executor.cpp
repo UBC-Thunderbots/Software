@@ -36,7 +36,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
         if (is_linear_traj_new)
         {
-            trajectory_path_ = new_trajectory_path;
+            trajectory_path_                       = new_trajectory_path;
             time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
             position_controller_.reset();
         }
