@@ -61,11 +61,9 @@ class PrimitiveExecutor
      */
     AngularVelocity getTargetAngularVelocity();
 
+    RobotState state_;
     TbotsProto::Primitive current_primitive_;
     Duration time_since_trajectory_creation_;
-    Vector velocity_;
-    AngularVelocity angular_velocity_;
-    Angle orientation_;
     robot_constants::RobotConstants robot_constants_;
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
