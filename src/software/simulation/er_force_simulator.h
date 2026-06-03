@@ -27,12 +27,12 @@ class ErForceSimulator
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
      */
-    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const robot_constants::RobotConstants& robot_constants,
-                              std::unique_ptr<RealismConfigErForce>& realism_config,
-                              const bool ramping = false,
-                              double primitive_executor_time_step_s =
-                                  DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK);
+    explicit ErForceSimulator(
+        const TbotsProto::FieldType& field_type,
+        const robot_constants::RobotConstants& robot_constants,
+        std::unique_ptr<RealismConfigErForce>& realism_config, const bool ramping = false,
+        Duration primitive_executor_time_step_s =
+            Duration::fromSeconds(DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK));
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -202,7 +202,7 @@ class ErForceSimulator
         const Vector current_local_velocity,
         const AngularVelocity current_local_angular_velocity,
         TbotsProto::DirectControlPrimitive& target_velocity_primitive,
-        const double& time_to_ramp);
+        Duration time_to_ramp);
 
     // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
@@ -212,7 +212,7 @@ class ErForceSimulator
     std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
     std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
-    double primitive_executor_time_step_s;
+    Duration primitive_executor_time_step;
     unsigned int frame_number;
 
     // The current time.
