@@ -18,6 +18,7 @@
 #include "software/networking/tbots_network_exception.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
+#include "software/world/robot_state.h"
 
 /**
  * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -262,9 +263,9 @@ void Thunderloop::runLoop()
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
-                primitive_executor_.updateVelocity(
-                    createVector(status.local_velocity()),
-                    createAngularVelocity(status.angular_velocity()));
+                primitive_executor_.updateState(
+                    RobotState(Point(), createVector(status.local_velocity()), Angle(),
+                               createAngularVelocity(status.angular_velocity())));
             }
 
             // Timeout Overrides for Primitives

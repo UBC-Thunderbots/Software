@@ -26,13 +26,11 @@ class PrimitiveExecutor
     void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
 
     /**
-     * Update primitive executor with the current velocity of the robot
+     * Update primitive executor with the state of the robot
      *
-     * @param local_velocity The current _local_ velocity
-     * @param angular_velocity The current angular velocity
+     * @param state The current robot state
      */
-    void updateVelocity(const Vector& local_velocity,
-                        const AngularVelocity& angular_velocity);
+    void updateState(const RobotState& state);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the

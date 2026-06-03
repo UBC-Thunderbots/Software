@@ -350,8 +350,7 @@ void ErForceSimulator::setRobotPrimitive(
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
         primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
-        primitive_executor->updateVelocity(robot_state.localVelocity(),
-                                           robot_state.angularVelocity());
+        primitive_executor->updateState(robot_state);
     }
     else
     {

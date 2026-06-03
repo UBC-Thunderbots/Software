@@ -34,13 +34,12 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
     }
 }
 
-void PrimitiveExecutor::updateVelocity(const Vector& local_velocity,
-                                       const AngularVelocity& angular_velocity)
+void PrimitiveExecutor::updateState(const RobotState& state)
 {
     Vector actual_global_velocity =
-        localToGlobalVelocity(local_velocity, state_.orientation());
+        localToGlobalVelocity(state.localVelocity(), state_.orientation());
     state_.setVelocity(actual_global_velocity);
-    state_.setAngularVelocity(angular_velocity);
+    state_.setAngularVelocity(state.angularVelocity());
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()
