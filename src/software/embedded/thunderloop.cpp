@@ -71,7 +71,6 @@ extern "C"
 
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
                          bool enable_log_merging, const int loop_hz)
-    // TODO (#2495): Set the friendly team colour
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       motor_status_(std::nullopt),
       robot_constants_(robot_constants),
@@ -84,8 +83,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
       kick_constant_(std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY))),
       chip_pulse_width_(
           std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
-      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
-                          TeamColour::YELLOW, robot_id_)
+      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants)
 {
     waitForNetworkUp();
 
