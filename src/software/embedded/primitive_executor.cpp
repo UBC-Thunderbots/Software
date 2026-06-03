@@ -31,7 +31,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
             current_primitive_.move().xy_traj_params(),
             Point(current_primitive_.move().xy_traj_params().start_position().x_meters(),
                   current_primitive_.move().xy_traj_params().start_position().y_meters()),
-            velocity_, robot_constants_);
+            global_velocity_, robot_constants_);
 
         angular_trajectory_ = createAngularTrajectoryFromParams(
             current_primitive_.move().w_traj_params(),
@@ -85,58 +85,58 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 //     }
 // }
 
-void PrimitiveExecutor::updateState(const Point& position, const Vector& velocity,
+void PrimitiveExecutor::updateState(const Point& position, const Vector& global_velocity,
                                     const Angle& orientation,
                                     const AngularVelocity& angular_velocity)
 {
     position_         = position;
-    velocity_         = velocity;
+    global_velocity_  = global_velocity;
     orientation_      = orientation;
     angular_velocity_ = angular_velocity;
 
-    if (!current_primitive_.has_move())
-    {
-        return;
-    }
-
-    // If we are lagging behind trajectory too much, we have stalled! We need to
-    // regenerate trajectory.
-    if (trajectory_path_.has_value())
-    {
-        const double linear_following_error =
-            (position_ - trajectory_path_->getPosition(
-                             time_since_linear_trajectory_creation_.toSeconds()))
-                .length();
-
-        if (linear_following_error > LINEAR_STALL_ERROR_MAX_METERS)
-        {
-            // regenerate linear trajectory
-            trajectory_path_ =
-                createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
-                                               position_, velocity_, robot_constants_);
-
-            time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
-        }
-    }
-
-    if (angular_trajectory_.has_value())
-    {
-        const double angular_following_error =
-            angular_trajectory_
-                ->getPosition(time_since_angular_trajectory_creation_.toSeconds())
-                .minDiff(orientation_)
-                .toDegrees();
-
-        if (angular_following_error > ANGULAR_STALL_ERROR_MAX_DEGREES)
-        {
-            // regenerate angular trajectory
-            angular_trajectory_ = createAngularTrajectoryFromParams(
-                current_primitive_.move().w_traj_params(), orientation_,
-                angular_velocity_, robot_constants_);
-
-            time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
-        }
-    }
+    // if (!current_primitive_.has_move())
+    // {
+    //     return;
+    // }
+    //
+    // // If we are lagging behind trajectory too much, we have stalled! We need to
+    // // regenerate trajectory.
+    // if (trajectory_path_.has_value())
+    // {
+    //     const double linear_following_error =
+    //         (position_ - trajectory_path_->getPosition(
+    //                          time_since_linear_trajectory_creation_.toSeconds()))
+    //             .length();
+    //
+    //     if (linear_following_error > LINEAR_STALL_ERROR_MAX_METERS)
+    //     {
+    //         // regenerate linear trajectory
+    //         trajectory_path_ = createTrajectoryPathFromParams(
+    //             current_primitive_.move().xy_traj_params(), position_,
+    //             global_velocity_, robot_constants_);
+    //
+    //         time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
+    //     }
+    // }
+    //
+    // if (angular_trajectory_.has_value())
+    // {
+    //     const double angular_following_error =
+    //         angular_trajectory_
+    //             ->getPosition(time_since_angular_trajectory_creation_.toSeconds())
+    //             .minDiff(orientation_)
+    //             .toDegrees();
+    //
+    //     if (angular_following_error > ANGULAR_STALL_ERROR_MAX_DEGREES)
+    //     {
+    //         // regenerate angular trajectory
+    //         angular_trajectory_ = createAngularTrajectoryFromParams(
+    //             current_primitive_.move().w_traj_params(), orientation_,
+    //             angular_velocity_, robot_constants_);
+    //
+    //         time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
+    //     }
+    // }
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()

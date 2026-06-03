@@ -72,7 +72,7 @@ class PrimitiveExecutor
     Duration time_since_trajectory_creation_;
 
     Point position_;
-    Vector velocity_;
+    Vector global_velocity_;
     AngularVelocity angular_velocity_;
     Angle orientation_;
 
