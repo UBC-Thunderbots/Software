@@ -18,6 +18,11 @@ class RobotState
 {
    public:
     /**
+     * Creates a robot state with default values
+     */
+    RobotState() = default;
+
+    /**
      * Creates a new robot state with the given position, velocity, orientation, angular
      * velocity, and timestamp
      *

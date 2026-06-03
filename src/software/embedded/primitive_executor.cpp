@@ -12,9 +12,7 @@
 
 PrimitiveExecutor::PrimitiveExecutor(
     const robot_constants::RobotConstants& robot_constants)
-    : state_(Point(), Vector(), Angle(), AngularVelocity()),
-      current_primitive_(),
-      robot_constants_(robot_constants)
+    : current_primitive_(), robot_constants_(robot_constants)
 {
 }
 
