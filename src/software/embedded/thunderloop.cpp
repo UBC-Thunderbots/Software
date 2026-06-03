@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -282,7 +283,7 @@ void Thunderloop::runLoop()
 
                 if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
-                    primitive_executor_.setStopPrimitive();
+                    primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
                 }
 
                 direct_control_ =
