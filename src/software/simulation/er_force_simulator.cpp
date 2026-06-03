@@ -12,6 +12,7 @@
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
+#include "software/geom/vector.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
@@ -308,10 +309,10 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     {
         if (robot_to_state.contains(robot_id))
         {
-            const auto& [position, orientation, velocity, angular_velocity] =
+            const auto& [position, orientation, local_velocity, angular_velocity] =
                 robot_to_state.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                              world_proto, position, orientation, velocity,
+                              world_proto, position, orientation, local_velocity,
                               angular_velocity);
         }
     }
@@ -332,10 +333,10 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     {
         if (robot_to_state.contains(robot_id))
         {
-            const auto& [position, orientation, velocity, angular_velocity] =
+            const auto& [position, orientation, local_velocity, angular_velocity] =
                 robot_to_state.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                              world_proto, position, orientation, velocity,
+                              world_proto, position, orientation, local_velocity,
                               angular_velocity);
         }
     }
@@ -346,7 +347,7 @@ void ErForceSimulator::setRobotPrimitive(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
     const TbotsProto::World& world_msg, const Point& position, const Angle& orientation,
-    const Vector& velocity, const AngularVelocity& angular_velocity)
+    const Vector& local_velocity, const AngularVelocity& angular_velocity)
 {
     // Set to NEG_X because the world msg in this simulator is normalized
     // correctly
@@ -356,11 +357,9 @@ void ErForceSimulator::setRobotPrimitive(
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
 
-        primitive_executor->updateState(position,
-                                        globalToLocalVelocity(velocity, orientation),
-                                        orientation, angular_velocity);
-
         primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
+        primitive_executor->updateState(position, local_velocity, orientation,
+                                        angular_velocity);
     }
     else
     {
@@ -401,8 +400,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             auto direct_control_no_ramp = primitive_executor->stepPrimitive(
                 status, Duration::fromSeconds(primitive_executor_time_step_s));
             direct_control = getRampedVelocityPrimitive(
-                globalToLocalVelocity(std::get<2>(current_state.at(robot_id)),
-                                      std::get<1>(current_state.at(robot_id))),
+                std::get<2>(current_state.at(robot_id)),
                 std::get<3>(current_state.at(robot_id)), *direct_control_no_ramp,
                 primitive_executor_time_step_s);
         }
@@ -581,11 +579,13 @@ ErForceSimulator::getRobotIdToStateMap(
     std::map<RobotId, std::tuple<Point, Angle, Vector, AngularVelocity>> map;
     for (const auto& sim_robot : sim_robots)
     {
-        const Point position              = {sim_robot.p_x(), sim_robot.p_y()};
-        const Angle orientation           = Angle::fromRadians(sim_robot.angle());
-        const Vector velocity             = {sim_robot.v_x(), sim_robot.v_y()};
+        const Point position    = {sim_robot.p_x(), sim_robot.p_y()};
+        const Angle orientation = Angle::fromRadians(sim_robot.angle());
+        const Vector local_vel =
+            globalToLocalVelocity(Vector(sim_robot.v_x(), sim_robot.v_y()),
+                                  Angle::fromRadians(sim_robot.angle()));
         const AngularVelocity angular_vel = Angle::fromRadians(sim_robot.r_z());
-        map[sim_robot.id()] = {position, orientation, velocity, angular_vel};
+        map[sim_robot.id()] = {position, orientation, local_vel, angular_vel};
     }
     return map;
 }

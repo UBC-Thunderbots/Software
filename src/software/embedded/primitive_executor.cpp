@@ -83,12 +83,12 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 //     }
 // }
 
-void PrimitiveExecutor::updateState(const Point& position, const Vector& global_velocity,
+void PrimitiveExecutor::updateState(const Point& position, const Vector& local_velocity,
                                     const Angle& orientation,
                                     const AngularVelocity& angular_velocity)
 {
     position_         = position;
-    global_velocity_  = global_velocity;
+    global_velocity_  = localToGlobalVelocity(local_velocity, orientation);
     orientation_      = orientation;
     angular_velocity_ = angular_velocity;
 
