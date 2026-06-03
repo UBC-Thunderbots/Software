@@ -14,6 +14,7 @@ PrimitiveExecutor::PrimitiveExecutor(
     const robot_constants::RobotConstants& robot_constants)
     : time_since_linear_trajectory_creation_(Duration::fromSeconds(0)),
       time_since_angular_trajectory_creation_(Duration::fromSeconds(0)),
+      time_since_trajectory_creation_(Duration::fromSeconds(0)),
       robot_constants_(robot_constants)
 {
 }
@@ -114,13 +115,47 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
     }
 }
 
+Vector PrimitiveExecutor::getTargetLinearVelocity()
+{
+    Vector local_velocity = globalToLocalVelocity(
+        trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
+        orientation_);
+    Point position =
+        trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
+    double distance_to_destination =
+        distance(position, trajectory_path_->getDestination());
+
+    // Dampen velocity as we get closer to the destination to reduce jittering
+    if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
+    {
+        local_velocity *= distance_to_destination / MAX_DAMPENING_VELOCITY_DISTANCE_M;
+    }
+    return local_velocity;
+}
+
+AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
+{
+    orientation_ =
+        angular_trajectory_->getPosition(time_since_trajectory_creation_.toSeconds());
+
+    AngularVelocity angular_velocity =
+        angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds());
+    Angle orientation_to_destination =
+        orientation_.minDiff(angular_trajectory_->getDestination());
+    if (orientation_to_destination.toDegrees() < 5)
+    {
+        angular_velocity *= orientation_to_destination.toDegrees() / 5;
+    }
+
+    return angular_velocity;
+}
+
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
     TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time)
 {
-    time_since_linear_trajectory_creation_ =
-        time_since_linear_trajectory_creation_ + delta_time;
-    time_since_angular_trajectory_creation_ =
-        time_since_angular_trajectory_creation_ + delta_time;
+    time_since_trajectory_creation_ += delta_time;
+    time_since_linear_trajectory_creation_ += delta_time;
+    time_since_angular_trajectory_creation_ += delta_time;
 
     status.set_running_primitive(true);
 
@@ -128,11 +163,12 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     {
         case TbotsProto::Primitive::kStop:
         {
-            const auto prim = createDirectControlPrimitive(
-                Vector(), AngularVelocity(), 0.0, TbotsProto::AutoChipOrKick());
-            status.set_running_primitive(false);
-            return std::make_unique<TbotsProto::DirectControlPrimitive>(
+            auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
+                                                       TbotsProto::AutoChipOrKick());
+            auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
+            status.set_running_primitive(false);
+            return output;
         }
         case TbotsProto::Primitive::kDirectControl:
         {
@@ -143,42 +179,35 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         {
             if (!trajectory_path_.has_value() || !angular_trajectory_.has_value())
             {
-                const auto prim = createDirectControlPrimitive(
-                    Vector(), AngularVelocity(), 0.0, TbotsProto::AutoChipOrKick());
+                auto prim = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
+                                                         TbotsProto::AutoChipOrKick());
+                auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
+                    prim->direct_control());
                 LOG(INFO) << "Not moving because trajectory_path_ has value "
                           << trajectory_path_.has_value() << " angular has "
                           << angular_trajectory_.has_value();
-                return std::make_unique<TbotsProto::DirectControlPrimitive>(
-                    prim->direct_control());
+                return output;
             }
 
-            const Vector target_linear_velocity_global = position_controller_.step(
-                position_, *trajectory_path_, time_since_linear_trajectory_creation_,
-                delta_time);
+            Vector local_velocity            = getTargetLinearVelocity();
+            AngularVelocity angular_velocity = getTargetAngularVelocity();
 
-            const AngularVelocity target_angular_velocity = orientation_controller_.step(
-                orientation_, *angular_trajectory_,
-                time_since_angular_trajectory_creation_, delta_time);
-
-            Vector target_linear_velocity_local =
-                globalToLocalVelocity(target_linear_velocity_global, orientation_);
-
-            // Make sure target linear velocity is clamped
-            target_linear_velocity_local = target_linear_velocity_local.normalize(
-                std::min(target_linear_velocity_local.length(),
-                         static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
-
-            const auto prim = createDirectControlPrimitive(
-                target_linear_velocity_local, target_angular_velocity,
+            auto output = createDirectControlPrimitive(
+                local_velocity, angular_velocity,
                 convertDribblerModeToDribblerSpeed(
                     current_primitive_.move().dribbler_mode(), robot_constants_),
                 current_primitive_.move().auto_chip_or_kick());
 
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
-                prim->direct_control());
+                output->direct_control());
         }
         case TbotsProto::Primitive::PRIMITIVE_NOT_SET:
         {
+            // TODO (#2283) Once we can add/remove robots, this log should
+            // be re-enabled. Right now it just gets spammed because we command
+            // 6 robots for Div B when there are 11 on the field.
+            //
+            // LOG(DEBUG) << "No primitive set!";
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();

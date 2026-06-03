@@ -48,6 +48,19 @@ class PrimitiveExecutor
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
         TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
 
+    /*
+     * Compute the next target linear _local_ velocity the robot should be at.
+     * @returns Vector The target linear _local_ velocity
+     */
+    Vector getTargetLinearVelocity();
+
+    /*
+     * Returns the next target angular velocity the robot
+     *
+     * @returns AngularVelocity The target angular velocity
+     */
+    AngularVelocity getTargetAngularVelocity();
+
    private:
     TbotsProto::Primitive current_primitive_;
 
@@ -56,6 +69,7 @@ class PrimitiveExecutor
 
     Duration time_since_linear_trajectory_creation_;
     Duration time_since_angular_trajectory_creation_;
+    Duration time_since_trajectory_creation_;
 
     Point position_;
     Vector velocity_;
@@ -79,4 +93,6 @@ class PrimitiveExecutor
     // estimated defaults.
     static constexpr double LINEAR_STALL_ERROR_MAX_METERS   = 0.4;
     static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 13.0;
+
+    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
 };
