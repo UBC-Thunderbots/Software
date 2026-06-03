@@ -76,6 +76,34 @@ class RobotState
     bool breakbeamTripped() const;
 
     /**
+     * Sets the position of the robot, with coordinates in metres
+     *
+     * @param position The new position of the robot
+     */
+    void setPosition(const Point& position);
+
+    /**
+     * Sets the velocity of the robot, in metres per second
+     *
+     * @param velocity The new velocity of the robot
+     */
+    void setVelocity(const Vector& velocity);
+
+    /**
+     * Sets the orientation of the robot
+     *
+     * @param orientation The new orientation of the robot
+     */
+    void setOrientation(const Angle& orientation);
+
+    /**
+     * Sets the angular velocity of the robot
+     *
+     * @param angular_velocity The new angular velocity of the robot
+     */
+    void setAngularVelocity(const AngularVelocity& angular_velocity);
+
+    /**
      * Defines the equality operator for a RobotState. RobotStates are equal if
      * all their members are equal
      *

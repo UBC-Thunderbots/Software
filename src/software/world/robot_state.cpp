@@ -48,6 +48,26 @@ bool RobotState::breakbeamTripped() const
     return breakbeam_tripped_;
 }
 
+void RobotState::setPosition(const Point& position)
+{
+    position_ = position;
+}
+
+void RobotState::setVelocity(const Vector& velocity)
+{
+    velocity_ = velocity;
+}
+
+void RobotState::setOrientation(const Angle& orientation)
+{
+    orientation_ = orientation;
+}
+
+void RobotState::setAngularVelocity(const AngularVelocity& angular_velocity)
+{
+    angular_velocity_ = angular_velocity;
+}
+
 bool RobotState::operator==(const RobotState& other) const
 {
     return this->position() == other.position() && this->velocity() == other.velocity() &&
