@@ -85,9 +85,9 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& local_v
                                     const Angle& orientation,
                                     const AngularVelocity& angular_velocity)
 {
-    position_         = position;
-    global_velocity_  = localToGlobalVelocity(local_velocity, orientation);
-    orientation_      = orientation;
+    // position_         = position;
+    global_velocity_ = localToGlobalVelocity(local_velocity, orientation_);
+    // orientation_      = orientation;
     angular_velocity_ = angular_velocity;
 
     // if (!current_primitive_.has_move())
