@@ -579,8 +579,9 @@ ErForceSimulator::getRobotIdToStateMap(
     std::map<RobotId, std::tuple<Point, Angle, Vector, AngularVelocity>> map;
     for (const auto& sim_robot : sim_robots)
     {
-        const Point position    = {sim_robot.p_x(), sim_robot.p_y()};
-        const Angle orientation = Angle::fromRadians(sim_robot.angle());
+        const Point position = {-sim_robot.p_x(), -sim_robot.p_y()};
+        const Angle orientation =
+            Angle::fromRadians(sim_robot.angle()) + Angle::fromDegrees(180);
         const Vector local_vel =
             globalToLocalVelocity(Vector(sim_robot.v_x(), sim_robot.v_y()),
                                   Angle::fromRadians(sim_robot.angle()));

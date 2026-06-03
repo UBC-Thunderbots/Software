@@ -21,73 +21,92 @@ PrimitiveExecutor::PrimitiveExecutor(
 {
 }
 
-void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_msg)
-{
-    current_primitive_ = primitive_msg;
-
-    if (current_primitive_.has_move())
-    {
-        trajectory_path_ =
-            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
-                                           global_velocity_, robot_constants_);
-
-        angular_trajectory_ =
-            createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
-                                              angular_velocity_, robot_constants_);
-
-        time_since_trajectory_creation_ = Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
-    }
-}
-
 // void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_msg)
 // {
 //     current_primitive_ = primitive_msg;
 //
 //     if (current_primitive_.has_move())
 //     {
-//         const std::optional new_trajectory_path =
-//             createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
-//                                            position_, velocity_, robot_constants_);
+//         trajectory_path_ = createTrajectoryPathFromParams(
+//             current_primitive_.move().xy_traj_params(),
+//             createPoint(current_primitive_.move().xy_traj_params().start_position()),
+//             global_velocity_, robot_constants_);
 //
-//         const bool is_linear_traj_new =
-//             (new_trajectory_path.has_value() != trajectory_path_.has_value()) ||
-//             (new_trajectory_path.has_value() &&
-//              !trajectory_path_->equals(*new_trajectory_path,
-//                                        LINEAR_DESTINATION_THRESHOLD_METERS));
+//         angular_trajectory_ = createAngularTrajectoryFromParams(
+//             current_primitive_.move().w_traj_params(),
+//             createAngle(current_primitive_.move().w_traj_params().start_angle()),
+//             angular_velocity_, robot_constants_);
 //
-//         if (is_linear_traj_new)
-//         {
-//             trajectory_path_                       = new_trajectory_path;
-//             time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
-//             position_controller_.reset();
-//         }
-//
-//         const BangBangTrajectory1DAngular new_angular_trajectory =
-//             createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
-//                                               orientation_, angular_velocity_,
-//                                               robot_constants_);
-//
-//         const bool is_angular_traj_new =
-//             !angular_trajectory_.has_value() ||
-//             !angular_trajectory_->equals(new_angular_trajectory,
-//                                          ANGULAR_DESTINATION_THRESHOLD_DEGREES);
-//
-//         if (is_angular_traj_new)
-//         {
-//             angular_trajectory_                     = new_angular_trajectory;
-//             time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
-//             orientation_controller_.reset();
-//         }
+//         time_since_linear_trajectory_creation_ =
+//             Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+//         time_since_angular_trajectory_creation_ =
+//             Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+//         time_since_trajectory_creation_ =
+//         Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
 //     }
 // }
+
+void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_msg)
+{
+    current_primitive_ = primitive_msg;
+
+    if (current_primitive_.has_move())
+    {
+        const std::optional new_trajectory_path =
+
+            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
+                                           position_, global_velocity_, robot_constants_);
+
+        // createTrajectoryPathFromParams(
+        //     current_primitive_.move().xy_traj_params(),
+        //     createPoint(current_primitive_.move().xy_traj_params().start_position()),
+        //     global_velocity_, robot_constants_);
+
+        const bool is_linear_traj_new =
+            (new_trajectory_path.has_value() != trajectory_path_.has_value()) ||
+            (new_trajectory_path.has_value() &&
+             !trajectory_path_->equals(*new_trajectory_path,
+                                       LINEAR_DESTINATION_THRESHOLD_METERS));
+
+        if (is_linear_traj_new)
+        {
+            trajectory_path_                       = new_trajectory_path;
+            time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
+            position_controller_.reset();
+        }
+
+        // const BangBangTrajectory1DAngular new_angular_trajectory =
+        // createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
+        //                                       orientation_, angular_velocity_,
+        //                                       robot_constants_);
+
+        const BangBangTrajectory1DAngular new_angular_trajectory =
+            createAngularTrajectoryFromParams(
+                current_primitive_.move().w_traj_params(),
+                createAngle(current_primitive_.move().w_traj_params().start_angle()),
+                angular_velocity_, robot_constants_);
+
+        const bool is_angular_traj_new =
+            !angular_trajectory_.has_value() ||
+            !angular_trajectory_->equals(new_angular_trajectory,
+                                         ANGULAR_DESTINATION_THRESHOLD_DEGREES);
+
+        if (is_angular_traj_new)
+        {
+            angular_trajectory_                     = new_angular_trajectory;
+            time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
+            orientation_controller_.reset();
+        }
+    }
+}
 
 void PrimitiveExecutor::updateState(const Point& position, const Vector& local_velocity,
                                     const Angle& orientation,
                                     const AngularVelocity& angular_velocity)
 {
-    // position_         = position;
+    position_         = position;
     global_velocity_ = localToGlobalVelocity(local_velocity, orientation_);
-    // orientation_      = orientation;
+    orientation_      = orientation;
     angular_velocity_ = angular_velocity;
 
     // if (!current_primitive_.has_move())
@@ -138,10 +157,10 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& local_v
 Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
     Vector local_velocity = globalToLocalVelocity(
-        trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
+        trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds()),
         orientation_);
     Point position =
-        trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
+        trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds());
     double distance_to_destination =
         distance(position, trajectory_path_->getDestination());
 
@@ -155,11 +174,11 @@ Vector PrimitiveExecutor::getTargetLinearVelocity()
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 {
-    orientation_ =
-        angular_trajectory_->getPosition(time_since_trajectory_creation_.toSeconds());
+    orientation_ = angular_trajectory_->getPosition(
+        time_since_angular_trajectory_creation_.toSeconds());
 
-    AngularVelocity angular_velocity =
-        angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds());
+    AngularVelocity angular_velocity = angular_trajectory_->getVelocity(
+        time_since_angular_trajectory_creation_.toSeconds());
     Angle orientation_to_destination =
         orientation_.minDiff(angular_trajectory_->getDestination());
     if (orientation_to_destination.toDegrees() < 5)
