@@ -27,15 +27,13 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
     if (current_primitive_.has_move())
     {
-        trajectory_path_ = createTrajectoryPathFromParams(
-            current_primitive_.move().xy_traj_params(),
-            createPoint(current_primitive_.move().xy_traj_params().start_position()),
-            global_velocity_, robot_constants_);
+        trajectory_path_ =
+            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
+                                           global_velocity_, robot_constants_);
 
-        angular_trajectory_ = createAngularTrajectoryFromParams(
-            current_primitive_.move().w_traj_params(),
-            createAngle(current_primitive_.move().w_traj_params().start_angle()),
-            angular_velocity_, robot_constants_);
+        angular_trajectory_ =
+            createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
+                                              angular_velocity_, robot_constants_);
 
         time_since_trajectory_creation_ = Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
     }
