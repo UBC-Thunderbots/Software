@@ -30,7 +30,10 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
             createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
                                               state_.angularVelocity(), robot_constants_);
 
-        time_since_trajectory_creation_ = Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        time_since_linear_trajectory_creation_ =
+            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        time_since_angular_trajectory_creation_ =
+            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
     }
 }
 
@@ -45,10 +48,10 @@ void PrimitiveExecutor::updateState(const RobotState& state)
 Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
     Vector local_velocity = globalToLocalVelocity(
-        trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
+        trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds()),
         state_.orientation());
     Point position =
-        trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
+        trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds());
     double distance_to_destination =
         distance(position, trajectory_path_->getDestination());
 
@@ -62,11 +65,11 @@ Vector PrimitiveExecutor::getTargetLinearVelocity()
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 {
-    state_.setOrientation(
-        angular_trajectory_->getPosition(time_since_trajectory_creation_.toSeconds()));
+    state_.setOrientation(angular_trajectory_->getPosition(
+        time_since_angular_trajectory_creation_.toSeconds()));
 
-    AngularVelocity angular_velocity =
-        angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds());
+    AngularVelocity angular_velocity = angular_trajectory_->getVelocity(
+        time_since_angular_trajectory_creation_.toSeconds());
     Angle orientation_to_destination =
         state_.orientation().minDiff(angular_trajectory_->getDestination());
     if (orientation_to_destination.toDegrees() < 5)
@@ -81,7 +84,8 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
     TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time)
 {
-    time_since_trajectory_creation_ += delta_time;
+    time_since_linear_trajectory_creation_ += delta_time;
+    time_since_angular_trajectory_creation_ += delta_time;
     status.set_running_primitive(true);
 
     switch (current_primitive_.primitive_case())

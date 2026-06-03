@@ -61,10 +61,13 @@ class PrimitiveExecutor
 
     RobotState state_;
     TbotsProto::Primitive current_primitive_;
-    Duration time_since_trajectory_creation_;
     robot_constants::RobotConstants robot_constants_;
+
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
+
+    Duration time_since_linear_trajectory_creation_;
+    Duration time_since_angular_trajectory_creation_;
 
     // Estimated delay between a vision frame to AI processing to robot executing
     static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
