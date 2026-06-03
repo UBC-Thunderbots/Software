@@ -60,6 +60,13 @@ class RobotState
     Vector velocity() const;
 
     /**
+     * Returns the local velocity of the robot represented by this state
+     *
+     * @return the local velocity of the robot represented by this state
+     */
+    Vector localVelocity() const;
+
+    /**
      * Returns the orientation of the robot represented by this state
      *
      * @return the orientation of the robot represented by this state

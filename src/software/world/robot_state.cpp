@@ -1,5 +1,7 @@
 #include "software/world/robot_state.h"
 
+#include "software/physics/velocity_conversion_util.h"
+
 RobotState::RobotState(const Point& position, const Vector& velocity,
                        const Angle& orientation, const AngularVelocity& angular_velocity,
                        const bool breakbeam_tripped)
@@ -31,6 +33,11 @@ Point RobotState::position() const
 Vector RobotState::velocity() const
 {
     return velocity_;
+}
+
+Vector RobotState::localVelocity() const
+{
+    return globalToLocalVelocity(velocity_, orientation_);
 }
 
 Angle RobotState::orientation() const
