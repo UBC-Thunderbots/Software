@@ -559,10 +559,10 @@ std::map<RobotId, RobotState> ErForceSimulator::getRobotIdToRobotStateMap(
     std::map<RobotId, RobotState> robot_map;
     for (const auto& sim_robot : sim_robots)
     {
-        const Point position                   = Point(sim_robot.p_x(), sim_robot.p_y());
-        const Vector velocity                  = Vector(sim_robot.v_x(), sim_robot.v_y());
-        const Angle orientation                = Angle::fromRadians(sim_robot.angle());
-        const AngularVelocity angular_velocity = Angle::fromRadians(sim_robot.r_z());
+        const auto position         = Point(sim_robot.p_x(), sim_robot.p_y());
+        const auto velocity         = Vector(sim_robot.v_x(), sim_robot.v_y());
+        const auto orientation      = Angle::fromRadians(sim_robot.angle());
+        const auto angular_velocity = AngularVelocity::fromRadians(sim_robot.r_z());
         robot_map[sim_robot.id()] =
             RobotState(position, velocity, orientation, angular_velocity);
     }
