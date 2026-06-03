@@ -4,97 +4,79 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
+#include "software/embedded/motion_control/orientation_controller.h"
+#include "software/embedded/motion_control/position_controller.h"
 #include "software/geom/vector.h"
-#include "software/time/duration.h"
 #include "software/world/robot_state.h"
-#include "software/world/team_types.h"
 
 class PrimitiveExecutor
 {
    public:
     /**
      * Constructor
-     * @param time_step Time step which this primitive executor operates in
-     * @param robot_constants The robot constants for the robot which uses this primitive
-     * executor
-     * @param friendly_team_colour The colour of the friendly team
-     * @param robot_id The id of the robot which uses this primitive executor
+     *
+     * @param robot_constants The robot constants for the robot
      */
-    explicit PrimitiveExecutor(const Duration time_step,
-                               const robot_constants::RobotConstants& robot_constants,
-                               const TeamColour friendly_team_colour,
-                               const RobotId robot_id);
+    explicit PrimitiveExecutor(const robot_constants::RobotConstants& robot_constants);
 
     /**
      * Update primitive executor with a new Primitive
+     *
      * @param primitive_msg The primitive to start
      */
     void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
 
     /**
-     * Set the current primitive to the stop primitive
-     */
-    void setStopPrimitive();
-
-    /**
-     * Update primitive executor with the current velocity of the robot
+     * Update primitive executor with the current velocity and orientation of the robot
      *
-     * @param local_velocity The current _local_ velocity
+     * @param position The current position
+     * @param velocity The current velocity
+     * @param orientation The current orientation of the robot
      * @param angular_velocity The current angular velocity
      */
-    void updateVelocity(const Vector& local_velocity,
-                        const AngularVelocity& angular_velocity);
-
-    /**
-     * Set the robot id
-     * @param robot_id The id of the robot which uses this primitive executor
-     */
-    void setRobotId(RobotId robot_id);
+    void updateState(const Point& position, const Vector& velocity,
+                     const Angle& orientation, const AngularVelocity& angular_velocity);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
      * @param status The status of the primitive executor, set to false if current
      * primitive is a Stop primitive
-     *
+     * @param delta_time The time passed since the last step
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus& status);
+        TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
 
    private:
-    /*
-     * Compute the next target linear _local_ velocity the robot should be at.
-     * @returns Vector The target linear _local_ velocity
-     */
-    Vector getTargetLinearVelocity();
-
-    /*
-     * Returns the next target angular velocity the robot
-     *
-     * @returns AngularVelocity The target angular velocity
-     */
-    AngularVelocity getTargetAngularVelocity();
-
     TbotsProto::Primitive current_primitive_;
-    Duration time_since_trajectory_creation_;
-    Vector velocity_;
-    AngularVelocity angular_velocity_;
-    Angle orientation_;
-    TeamColour friendly_team_colour_;
-    robot_constants::RobotConstants robot_constants_;
+
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
-    // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
-    // time step to be used, in Seconds
-    Duration time_step_;
-    RobotId robot_id_;
+    Duration time_since_linear_trajectory_creation_;
+    Duration time_since_angular_trajectory_creation_;
 
-    // Estimated delay between a vision frame to AI processing to robot executing
-    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+    Point position_;
+    Vector velocity_;
+    AngularVelocity angular_velocity_;
+    Angle orientation_;
 
-    // The distance away from the destination at which we start dampening the velocity
-    // to avoid jittering around the destination.
-    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
+    Point last_position_;
+    Angle last_orientation_;
+
+    robot_constants::RobotConstants robot_constants_;
+
+    PositionController position_controller_;
+    OrientationController orientation_controller_;
+
+    // If distance between current linear trajectory destination and new one is larger
+    // than this, we change trajectories.
+    static constexpr double LINEAR_DESTINATION_THRESHOLD_METERS   = 0.03;
+    static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
+
+    // These constants were lost during a refactor/revert and are currently set to
+    // estimated defaults.
+    static constexpr double LINEAR_STALL_ERROR_MAX_METERS   = 0.4;
+    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 13.0;
 };

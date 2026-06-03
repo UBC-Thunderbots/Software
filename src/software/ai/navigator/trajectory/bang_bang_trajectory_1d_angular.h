@@ -83,6 +83,19 @@ class BangBangTrajectory1DAngular
      */
     double getTotalTime() const override;
 
+    /**
+     * Check if this trajectory is meaningfully equal to another trajectory.
+     * @param other The other trajectory to compare to
+     * @param threshold The threshold below which the trajectories are considered
+     * equal in degrees.
+     * @return True if the trajectories are equal, false otherwise
+     */
+    bool equals(const Trajectory<Angle, AngularVelocity, AngularAcceleration>& other,
+                double threshold) const override
+    {
+        return getDestination().minDiff(other.getDestination()).toDegrees() <= threshold;
+    }
+
    private:
     BangBangTrajectory1D trajectory;
 };
