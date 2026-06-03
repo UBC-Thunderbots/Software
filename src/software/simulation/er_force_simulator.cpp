@@ -311,8 +311,8 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
             const auto& [position, orientation, velocity, angular_velocity] =
                 robot_to_state.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                              world_proto, position, orientation, velocity,
-                              angular_velocity);
+                              world_proto, -position, orientation + Angle::half(),
+                              velocity, angular_velocity);
         }
     }
 }
@@ -384,6 +384,12 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     {
         const auto& sim_robots = sim_state.yellow_robots();
         current_state          = getRobotIdToStateMap(sim_robots);
+        for (auto& [robot_id, state] : current_state)
+        {
+            auto& [position, orientation, velocity, angular_velocity] = state;
+            position                                                  = -position;
+            orientation = orientation + Angle::half();
+        }
     }
 
     for (auto& primitive_executor_with_id : robot_primitive_executor_map)
