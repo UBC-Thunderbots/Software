@@ -567,7 +567,6 @@ std::map<RobotId, RobotState> ErForceSimulator::getRobotIdToRobotStateMap(
         auto orientation      = Angle::fromRadians(sim_robot.angle());
         auto angular_velocity = AngularVelocity::fromRadians(sim_robot.r_z());
 
-        // TODO(...): actually fix root issue
         if (side == gameController::Team::YELLOW)
         {
             position = -position;
