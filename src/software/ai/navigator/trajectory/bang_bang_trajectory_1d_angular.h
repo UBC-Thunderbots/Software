@@ -83,6 +83,23 @@ class BangBangTrajectory1DAngular
      */
     double getTotalTime() const override;
 
+    /**
+     * Checks if this angular trajectory terminates at approximately the same destination
+     * orientation as another trajectory.
+     *
+     * @param other The other trajectory to compare against.
+     * @param threshold The maximum allowable distance in radians between the two
+     * destinations.
+     * @return True if the distance between destinations is less than or equal to the
+     * threshold. False otherwise.
+     */
+    bool hasSameDestination(
+        const Trajectory<Angle, AngularVelocity, AngularAcceleration>& other,
+        double threshold) const override
+    {
+        return getDestination().minDiff(other.getDestination()).toDegrees() <= threshold;
+    }
+
    private:
     BangBangTrajectory1D trajectory;
 };
