@@ -30,3 +30,12 @@ runs:
       if: runner.os == 'macOS'
       run: |
         "${GITHUB_WORKSPACE}"/environment_setup/setup_software_mac.sh
+
+    - name: Cache Bazel disk cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/thunderbots_bazel_disk_cache
+        key: bazel-cache-${{ runner.os }}-${{ github.sha }}
+        restore-keys: |
+          bazel-cache-${{ runner.os }}-
+

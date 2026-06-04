@@ -64,10 +64,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
         
       - name: Raspberry Pi Build
         run: |
