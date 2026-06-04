@@ -41,6 +41,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
         gamecontroller,
+        ci_mode=False,
     ):
         """Initialize the SimulatorTestRunner
 
@@ -50,6 +51,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
+        :param ci_mode: Run test as fast as possible and exit early if validation passes
         """
         super(SimulatedTestRunner, self).__init__(
             test_name,
@@ -59,6 +61,7 @@ class SimulatedTestRunner(TbotsTestRunner):
             gamecontroller,
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
+        self.ci_mode = ci_mode
 
     @override
     def set_world_state(self, worldstate: WorldState):
@@ -197,7 +200,7 @@ class SimulatedTestRunner(TbotsTestRunner):
             processing_time = time.time() - processing_start_time
 
             # if the time we have blocked is less than a tick, sleep for the remaining time (for Thunderscope only)
-            if self.thunderscope and tick_duration_s > processing_time:
+            if self.thunderscope and not self.ci_mode and tick_duration_s > processing_time:
                 time.sleep(tick_duration_s - processing_time)
 
             # Validate
@@ -260,7 +263,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         tick_duration_s=0.0166,  # Default to 60hz
         index=0,
         ci_cmd_with_delay=[],
-        run_till_end=True,
+        run_till_end=None,
         **kwargs,
     ):
         """Helper function to run a test, with thunderscope if enabled
@@ -279,7 +282,11 @@ class SimulatedTestRunner(TbotsTestRunner):
                                   ]
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
+                             If None, defaults to not ci_mode
         """
+        if run_till_end is None:
+            run_till_end = not self.ci_mode
+            
         test_timeout_duration = (
             test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
         )
@@ -425,6 +432,12 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         "--enable_thunderscope", action="store_true", help="enable thunderscope"
     )
     parser.add_argument(
+        "--ci_mode",
+        action="store_true",
+        default=False,
+        help="Run simulator at faster speed",
+    )
+    parser.add_argument(
         "--aggregate", action="store_true", default=False, help="Run aggregate test"
     )
     parser.add_argument(
@@ -542,14 +555,14 @@ def simulated_test_runner():
         args.debug_blue_full_system,
         False,
         should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope,
+        running_in_realtime=args.enable_thunderscope and not args.ci_mode,
     ) as blue_fs, FullSystem(
         "software/unix_full_system",
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         args.debug_yellow_full_system,
         True,
         should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope,
+        running_in_realtime=args.enable_thunderscope and not args.ci_mode,
     ) as yellow_fs:
         with Gamecontroller(
             suppress_logs=(not args.show_gamecontroller_logs)
@@ -593,6 +606,7 @@ def simulated_test_runner():
                     blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io,
                     gamecontroller,
+                    args.ci_mode,
                 )
             else:
                 runner = InvariantTestRunner(
@@ -602,6 +616,7 @@ def simulated_test_runner():
                     blue_full_system_proto_unix_io,
                     yellow_full_system_proto_unix_io,
                     gamecontroller,
+                    args.ci_mode,
                 )
 
             yield runner
