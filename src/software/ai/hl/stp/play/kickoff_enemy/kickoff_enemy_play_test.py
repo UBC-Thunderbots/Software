@@ -1,3 +1,5 @@
+import threading
+
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
 
@@ -54,6 +56,14 @@ def test_kickoff_enemy_play(simulated_test_runner):
         simulated_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.KICKOFF, team=Team.YELLOW
         )
+
+        # Let robots get ready before starting kickoff
+        threading.Timer(
+            4.0,
+            lambda: simulated_test_runner.send_gamecontroller_command(
+                gc_command=Command.Type.NORMAL_START, team=Team.YELLOW
+            ),
+        ).start()
 
         simulated_test_runner.set_plays(
             blue_play=PlayName.KickoffEnemyPlay,
@@ -135,9 +145,6 @@ def test_kickoff_enemy_play(simulated_test_runner):
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
-        ci_cmd_with_delay=[
-            (4.0, Command.Type.NORMAL_START, Team.YELLOW),
-        ],
     )
 
 

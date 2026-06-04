@@ -42,7 +42,7 @@ void KickoffFriendlyPlayFSM::createKickoffSetupPositions(const WorldPtr& world_p
         kickoff_setup_positions = {
             // Robot 1
             Point(world_ptr->field().centerPoint() +
-                  Vector(-0.95 * world_ptr->field().centerCircleRadius(), 0)),
+                  Vector(-world_ptr->field().centerCircleRadius(), 0)),
             // Robot 2
             // Goalie positions will be handled by the goalie tactic
             // Robot 3
