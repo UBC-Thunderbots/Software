@@ -22,62 +22,77 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
     if (current_primitive_.has_move())
     {
-        trajectory_path_ =
-            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
-                                           state_.velocity(), robot_constants_);
+        const auto new_trajectory_path = createTrajectoryPathFromParams(
+            current_primitive_.move().xy_traj_params(), state_.position(),
+            state_.velocity(), robot_constants_);
 
-        angular_trajectory_ =
-            createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
-                                              state_.angularVelocity(), robot_constants_);
+        const auto new_angular_trajectory = createAngularTrajectoryFromParams(
+            current_primitive_.move().w_traj_params(), state_.orientation(),
+            state_.angularVelocity(), robot_constants_);
 
-        time_since_linear_trajectory_creation_ =
-            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
-        time_since_angular_trajectory_creation_ =
-            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        const bool is_linear_trajectory_new =
+            new_trajectory_path.has_value() != trajectory_path_.has_value() ||
+            (trajectory_path_.has_value() &&
+             !trajectory_path_->hasSameDestination(*new_trajectory_path,
+                                                   LINEAR_DESTINATION_THRESHOLD_METERS));
+
+        const bool is_angular_trajectory_new =
+            !angular_trajectory_.has_value() ||
+            !angular_trajectory_->hasSameDestination(
+                new_angular_trajectory, ANGULAR_DESTINATION_THRESHOLD_DEGREES);
+
+        if (is_linear_trajectory_new)
+        {
+            trajectory_path_ = new_trajectory_path;
+            position_controller_.reset();
+            time_since_linear_trajectory_creation_ =
+                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        }
+
+        if (is_angular_trajectory_new)
+        {
+            angular_trajectory_ = new_angular_trajectory;
+            orientation_controller_.reset();
+            time_since_angular_trajectory_creation_ =
+                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        }
     }
 }
 
 void PrimitiveExecutor::updateState(const RobotState& state)
 {
-    Vector actual_global_velocity =
-        localToGlobalVelocity(state.localVelocity(), state_.orientation());
-    state_.setVelocity(actual_global_velocity);
-    state_.setAngularVelocity(state.angularVelocity());
+    state_ = state;
 }
 
-Vector PrimitiveExecutor::getTargetLinearVelocity()
+Vector PrimitiveExecutor::stepTargetLinearVelocity(Duration delta_time)
 {
-    Vector local_velocity = globalToLocalVelocity(
-        trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds()),
-        state_.orientation());
-    Point position =
-        trajectory_path_->getPosition(time_since_linear_trajectory_creation_.toSeconds());
-    double distance_to_destination =
-        distance(position, trajectory_path_->getDestination());
+    const auto target_v_global =
+        position_controller_.step(state_.position(), *trajectory_path_,
+                                  time_since_linear_trajectory_creation_, delta_time);
+    const auto target_v_local =
+        globalToLocalVelocity(target_v_global, state_.orientation());
 
-    // Dampen velocity as we get closer to the destination to reduce jittering
-    if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
-    {
-        local_velocity *= distance_to_destination / MAX_DAMPENING_VELOCITY_DISTANCE_M;
-    }
-    return local_velocity;
+    return target_v_local.normalize(
+        std::min(target_v_local.length(),
+                 static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
 }
 
-AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
+AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time)
 {
-    state_.setOrientation(angular_trajectory_->getPosition(
-        time_since_angular_trajectory_creation_.toSeconds()));
-
-    AngularVelocity angular_velocity = angular_trajectory_->getVelocity(
-        time_since_angular_trajectory_creation_.toSeconds());
-    Angle orientation_to_destination =
-        state_.orientation().minDiff(angular_trajectory_->getDestination());
-    if (orientation_to_destination.toDegrees() < 5)
+    const auto target_w =
+        orientation_controller_.step(state_.orientation(), *angular_trajectory_,
+                                     time_since_angular_trajectory_creation_, delta_time);
+    if (target_w.toRadians() < -robot_constants_.robot_max_ang_speed_rad_per_s)
     {
-        angular_velocity *= orientation_to_destination.toDegrees() / 5;
+        return AngularVelocity::fromRadians(
+            -robot_constants_.robot_max_ang_speed_rad_per_s);
     }
-
-    return angular_velocity;
+    if (target_w.toRadians() > robot_constants_.robot_max_ang_speed_rad_per_s)
+    {
+        return AngularVelocity::fromRadians(
+            robot_constants_.robot_max_ang_speed_rad_per_s);
+    }
+    return target_w;
 }
 
 
@@ -117,8 +132,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 return output;
             }
 
-            Vector local_velocity            = getTargetLinearVelocity();
-            AngularVelocity angular_velocity = getTargetAngularVelocity();
+            Vector local_velocity            = stepTargetLinearVelocity(delta_time);
+            AngularVelocity angular_velocity = stepTargetAngularVelocity(delta_time);
 
             auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
