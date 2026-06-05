@@ -69,6 +69,7 @@ cc_binary(
         ":motor_controller",
         "//software/logger",
         "//software/logger:network_logger",
+        "//software/embedded/services:uart_communicator",
         "@boost//:program_options",
     ],
 )

@@ -8,6 +8,7 @@
 
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
+#include "software/embedded/services/uart_communicator.h"
 
 // Flag to indicate when a stop has been requested (e.g. via Ctrl+C)
 static volatile std::sig_atomic_t g_stop_requested = false;
@@ -45,9 +46,9 @@ class StSpinMotorControllerTest
             ss << motor << " ";
         }
         LOG(INFO) << "Enabled motors: " << ss.str();
-
+        const auto uart =std::make_shared<UartCommunicator>();
         const auto motor_controller = std::make_unique<StSpinMotorController>(
-            robot_constants::createRobotConstants());
+            robot_constants::createRobotConstants(), uart);
         motor_controller->setup();
 
         LOG(INFO) << "Motor controller setup complete";
