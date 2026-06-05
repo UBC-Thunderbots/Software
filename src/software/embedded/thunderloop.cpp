@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -17,6 +18,7 @@
 #include "software/networking/tbots_network_exception.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
+#include "software/world/robot_state.h"
 
 /**
  * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -71,7 +73,6 @@ extern "C"
 
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
                          bool enable_log_merging, const int loop_hz)
-    // TODO (#2495): Set the friendly team colour
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       motor_status_(std::nullopt),
       robot_constants_(robot_constants),
@@ -84,8 +85,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
       kick_constant_(std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY))),
       chip_pulse_width_(
           std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
-      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
-                          TeamColour::YELLOW, robot_id_)
+      primitive_executor_(robot_constants)
 {
     waitForNetworkUp();
 
@@ -263,9 +263,9 @@ void Thunderloop::runLoop()
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
-                primitive_executor_.updateVelocity(
-                    createVector(status.local_velocity()),
-                    createAngularVelocity(status.angular_velocity()));
+                primitive_executor_.updateState(
+                    RobotState(Point(), createVector(status.local_velocity()), Angle(),
+                               createAngularVelocity(status.angular_velocity())));
             }
 
             // Timeout Overrides for Primitives
@@ -284,11 +284,11 @@ void Thunderloop::runLoop()
 
                 if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
-                    primitive_executor_.setStopPrimitive();
+                    primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
                 }
 
-                direct_control_ =
-                    *primitive_executor_.stepPrimitive(primitive_executor_status_);
+                direct_control_ = *primitive_executor_.stepPrimitive(
+                    primitive_executor_status_, Duration::fromSeconds(1.0 / loop_hz_));
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
