@@ -7,6 +7,7 @@
 #include "software/embedded/primitive_executor.h"
 #include "software/physics/euclidean_to_wheel.h"
 #include "software/world/field.h"
+#include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
 
@@ -27,12 +28,12 @@ class ErForceSimulator
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
      */
-    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const robot_constants::RobotConstants& robot_constants,
-                              std::unique_ptr<RealismConfigErForce>& realism_config,
-                              const bool ramping = false,
-                              double primitive_executor_time_step_s =
-                                  DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK);
+    explicit ErForceSimulator(
+        const TbotsProto::FieldType& field_type,
+        const robot_constants::RobotConstants& robot_constants,
+        std::unique_ptr<RealismConfigErForce>& realism_config, const bool ramping = false,
+        Duration primitive_executor_time_step_s =
+            Duration::fromSeconds(DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK));
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -158,19 +159,16 @@ class ErForceSimulator
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg, const Point& position,
-        const Angle& orientation, const Vector& velocity,
-        const AngularVelocity& angular_velocity);
+        const TbotsProto::World& world_msg, const RobotState& robot_state);
 
     /**
-     * Gets a map from robot id to position and velocity from repeated sim robots
+     * Gets a map from robot id to local and angular velocity from repeated sim robots
      *
      * @param sim_robots Repeated er force sim robot protos
      *
-     * @return a map from robot id to position and velocity
+     * @return a map from robot id to local velocity and angular velocity
      */
-    static std::map<RobotId, std::tuple<Point, Angle, Vector, AngularVelocity>>
-    getRobotIdToStateMap(
+    static std::map<RobotId, RobotState> getRobotIdToRobotStateMap(
         const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
 
     /**
@@ -203,7 +201,7 @@ class ErForceSimulator
         const Vector current_local_velocity,
         const AngularVelocity current_local_angular_velocity,
         TbotsProto::DirectControlPrimitive& target_velocity_primitive,
-        const double& time_to_ramp);
+        Duration time_to_ramp);
 
     // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
@@ -213,7 +211,7 @@ class ErForceSimulator
     std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
     std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
-    double primitive_executor_time_step_s;
+    Duration primitive_executor_time_step;
     unsigned int frame_number;
 
     // The current time.

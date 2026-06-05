@@ -60,14 +60,12 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
     }
 }
 
-void PrimitiveExecutor::updateState(const Point& position, const Vector& velocity,
-                                    const Angle& orientation,
-                                    const AngularVelocity& angular_velocity)
+void PrimitiveExecutor::updateState(const RobotState& state)
 {
-    position_         = position;
-    velocity_         = velocity;
-    orientation_      = orientation;
-    angular_velocity_ = angular_velocity;
+    position_         = state.position();
+    velocity_         = state.velocity();
+    orientation_      = state.orientation();
+    angular_velocity_ = state.angularVelocity();
 
     if (!current_primitive_.has_move())
     {
@@ -115,7 +113,7 @@ void PrimitiveExecutor::updateState(const Point& position, const Vector& velocit
 }
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time)
+    TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time)
 {
     time_since_linear_trajectory_creation_ =
         time_since_linear_trajectory_creation_ + delta_time;

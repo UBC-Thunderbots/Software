@@ -27,15 +27,11 @@ class PrimitiveExecutor
     void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
 
     /**
-     * Update primitive executor with the current velocity and orientation of the robot
+     * Update primitive executor with the state of the robot
      *
-     * @param position The current position
-     * @param velocity The current velocity
-     * @param orientation The current orientation of the robot
-     * @param angular_velocity The current angular velocity
+     * @param state The current robot state
      */
-    void updateState(const Point& position, const Vector& velocity,
-                     const Angle& orientation, const AngularVelocity& angular_velocity);
+    void updateState(const RobotState& state);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
@@ -46,7 +42,7 @@ class PrimitiveExecutor
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
+        TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time);
 
    private:
     TbotsProto::Primitive current_primitive_;

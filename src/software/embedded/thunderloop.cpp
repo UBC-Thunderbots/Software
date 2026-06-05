@@ -302,9 +302,9 @@ inline void Thunderloop::processLocalizationUpdates()
 
     robot_localizer_.step(linear_acceleration);
 
-    primitive_executor_.updateState(
+    primitive_executor_.updateState(RobotState(
         robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
-        robot_localizer_.getOrientation(), robot_localizer_.getAngularVelocity());
+        robot_localizer_.getOrientation(), robot_localizer_.getAngularVelocity()));
 }
 
 inline void Thunderloop::processPrimitiveExecution(
