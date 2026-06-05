@@ -32,7 +32,7 @@ const uint8_t PM_SDA = 13;
 const uint8_t PM_SCL = 14;
 
 // Dribbler
-const uint8_t DRIBBLER_PIN = 0;  // When elec has a pin for this
+const uint8_t DRIBBLER_PIN = 4;  // When elec has a pin for this
 
 // Timers
 const uint8_t CHICKER_PULSE_TIMER     = 0;

@@ -18,14 +18,11 @@
 #include "software/networking/tbots_network_exception.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
-<<<<<<< HEAD
 #include "software/embedded/motor_controller/motor_board.h"
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
 #include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/embedded/services/uart_communicator.h"
-=======
 #include "software/world/robot_state.h"
->>>>>>> 08b84cf832ecd330f4c775d10982d11be540d474
 
 /**
  * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
