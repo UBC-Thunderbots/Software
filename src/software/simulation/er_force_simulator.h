@@ -7,6 +7,7 @@
 #include "software/embedded/primitive_executor.h"
 #include "software/physics/euclidean_to_wheel.h"
 #include "software/world/field.h"
+#include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
 
@@ -158,8 +159,7 @@ class ErForceSimulator
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg, const Vector& local_velocity,
-        const AngularVelocity angular_velocity);
+        const TbotsProto::World& world_msg, const RobotState& robot_state);
 
     /**
      * Gets a map from robot id to local and angular velocity from repeated sim robots
@@ -168,8 +168,7 @@ class ErForceSimulator
      *
      * @return a map from robot id to local velocity and angular velocity
      */
-    static std::map<RobotId, std::pair<Vector, AngularVelocity>>
-    getRobotIdToLocalVelocityMap(
+    static std::map<RobotId, RobotState> getRobotIdToRobotStateMap(
         const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
 
     /**
