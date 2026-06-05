@@ -104,13 +104,17 @@ void loop()
         monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
         chicker->getBreakBeamTripped());
 
-    if (dribble_target <= dribbler_speed) {
+    if (dribble_target <= dribbler_speed)
+    {
         dribbler_speed = dribble_target;
-    } else {
-        // Ramp to speed
-        dribbler_speed = dribbler_speed + (dribble_target-dribbler_speed)/RAMP_FACTOR + 1;     
     }
-    dribbler->dribble(dribbler_speed/DRIBBLER_MAX_SPEED*255);
+    else
+    {
+        // Ramp to speed
+        dribbler_speed =
+            dribbler_speed + (dribble_target - dribbler_speed) / RAMP_FACTOR + 1;
+    }
+    dribbler->dribble(dribbler_speed / DRIBBLER_MAX_SPEED * 255);
 
     // Write sensor values out to Serial
     TbotsProto_PowerFrame status_frame = createUartFrame(status);
