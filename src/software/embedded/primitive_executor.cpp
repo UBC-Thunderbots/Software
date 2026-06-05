@@ -11,13 +11,8 @@
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(
-    const Duration time_step, const robot_constants::RobotConstants& robot_constants,
-    const TeamColour friendly_team_colour, const RobotId robot_id)
-    : current_primitive_(),
-      friendly_team_colour_(friendly_team_colour),
-      robot_constants_(robot_constants),
-      time_step_(time_step),
-      robot_id_(robot_id)
+    const Duration time_step, const robot_constants::RobotConstants& robot_constants)
+    : current_primitive_(), robot_constants_(robot_constants), time_step_(time_step)
 {
 }
 
@@ -36,11 +31,6 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
         time_since_trajectory_creation_ = Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
     }
-}
-
-void PrimitiveExecutor::setStopPrimitive()
-{
-    current_primitive_ = *createStopPrimitiveProto();
 }
 
 void PrimitiveExecutor::updateVelocity(const Vector& local_velocity,
@@ -144,9 +134,4 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
-}
-
-void PrimitiveExecutor::setRobotId(const RobotId robot_id)
-{
-    robot_id_ = robot_id;
 }
