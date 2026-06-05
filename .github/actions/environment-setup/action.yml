@@ -35,7 +35,8 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/thunderbots_bazel_disk_cache
-        key: bazel-cache-${{ runner.os }}-${{ github.sha }}
+        key: bazel-cache-${{ runner.os }}-${{ github.job }}-${{ github.sha }}
         restore-keys: |
+          bazel-cache-${{ runner.os }}-${{ github.job }}-
           bazel-cache-${{ runner.os }}-
 
