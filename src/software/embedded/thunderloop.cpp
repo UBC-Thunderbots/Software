@@ -287,8 +287,8 @@ void Thunderloop::runLoop()
                     primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
                 }
 
-                direct_control_ =
-                    *primitive_executor_.stepPrimitive(primitive_executor_status_, Duration::fromSeconds(1.0 / loop_hz_));
+                direct_control_ = *primitive_executor_.stepPrimitive(
+                    primitive_executor_status_, Duration::fromSeconds(1.0 / loop_hz_));
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
