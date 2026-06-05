@@ -67,9 +67,9 @@ cc_binary(
     ],
     deps = [
         ":motor_controller",
+        "//software/embedded/services:uart_communicator",
         "//software/logger",
         "//software/logger:network_logger",
-        "//software/embedded/services:uart_communicator",
         "@boost//:program_options",
     ],
 )

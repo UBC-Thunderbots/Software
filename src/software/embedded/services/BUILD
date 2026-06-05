@@ -40,7 +40,7 @@ cc_library(
     hdrs = ["imu.h"],
     deps = [
         "//proto:tbots_cc_proto",
-         "//shared:constants",
+        "//shared:constants",
         "//software/geom:angular_acceleration",
         "//software/geom:angular_velocity",
         "//software/logger",
@@ -58,5 +58,5 @@ cc_library(
         "//software/uart:boost_uart_communication",
         "@boost//:asio",
         "@boost//:filesystem",
-    ]
+    ],
 )
