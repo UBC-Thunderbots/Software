@@ -200,7 +200,11 @@ class SimulatedTestRunner(TbotsTestRunner):
             processing_time = time.time() - processing_start_time
 
             # if the time we have blocked is less than a tick, sleep for the remaining time (for Thunderscope only)
-            if self.thunderscope and not self.ci_mode and tick_duration_s > processing_time:
+            if (
+                self.thunderscope
+                and not self.ci_mode
+                and tick_duration_s > processing_time
+            ):
                 time.sleep(tick_duration_s - processing_time)
 
             # Validate
@@ -286,7 +290,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         """
         if run_till_end is None:
             run_till_end = not self.ci_mode
-            
+
         test_timeout_duration = (
             test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
         )
