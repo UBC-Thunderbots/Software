@@ -23,16 +23,18 @@
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
 #include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/embedded/services/uart_communicator.h"
-=======
+    == == ==
+    =
 #include "software/world/robot_state.h"
->>>>>>> 08b84cf832ecd330f4c775d10982d11be540d474
+        >>>>>>> 08b84cf832ecd330f4c775d10982d11be540d474
 
-/**
- * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
- * using clock_nanosleep of librt
- */
-extern int clock_nanosleep(clockid_t __clock_id, int __flags,
-                           __const struct timespec* __req, struct timespec* __rem);
+        /**
+         * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
+         * using clock_nanosleep of librt
+         */
+        extern int
+        clock_nanosleep(clockid_t __clock_id, int __flags, __const struct timespec* __req,
+                        struct timespec* __rem);
 
 // signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
@@ -125,17 +127,20 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
     std::shared_ptr<UartCommunicator> uart = std::make_shared<UartCommunicator>();
-    power_service_ = std::make_unique<PowerService>(uart);
-        LOG(INFO)
-            << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
+    power_service_                         = std::make_unique<PowerService>(uart);
+    LOG(INFO)
+        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
     if constexpr (MOTOR_BOARD == MotorBoard::TRINAMIC)
     {
-        motor_service_  = std::make_unique<MotorService>(robot_constants,std::make_unique<TmcMotorController>());
+        motor_service_ = std::make_unique<MotorService>(
+            robot_constants, std::make_unique<TmcMotorController>());
     }
     else
     {
-        motor_service_  = std::make_unique<MotorService>(robot_constants, std::make_unique<StSpinMotorController>(robot_constants, uart));
+        motor_service_ = std::make_unique<MotorService>(
+            robot_constants,
+            std::make_unique<StSpinMotorController>(robot_constants, uart));
     }
     g_motor_service = motor_service_.get();
     motor_service_->setup();

@@ -18,7 +18,7 @@ class StSpinMotorController : public MotorController
 {
    public:
     explicit StSpinMotorController(const robot_constants::RobotConstants& robot_constants,
-                                    std::shared_ptr<UartCommunicator> power_service);
+                                   std::shared_ptr<UartCommunicator> power_service);
 
     void setup() override;
 

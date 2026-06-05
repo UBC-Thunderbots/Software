@@ -16,7 +16,7 @@ extern "C"
 /**
  * Communicates to the powerboard over uart.
  */
-class UartCommunicator 
+class UartCommunicator
 {
    public:
     /**
@@ -34,7 +34,8 @@ class UartCommunicator
      * @return the latest power status
      */
     TbotsProto::PowerStatus sendChipKickCommand(const TbotsProto::PowerControl& control,
-                                 double kick_coeff, int kick_constant, int chip_constant);
+                                                double kick_coeff, int kick_constant,
+                                                int chip_constant);
 
     /**
      * Set dribbler RPM

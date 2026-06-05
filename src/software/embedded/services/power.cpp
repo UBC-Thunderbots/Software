@@ -5,10 +5,7 @@
 
 #include "proto/power_frame_msg.pb.h"
 
-PowerService::PowerService(std::shared_ptr<UartCommunicator> uart): uart_(uart)
-{
-    
-}
+PowerService::PowerService(std::shared_ptr<UartCommunicator> uart) : uart_(uart) {}
 
 TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command,
                                            double kick_coeff, int kick_constant,

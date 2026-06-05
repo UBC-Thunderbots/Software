@@ -22,7 +22,8 @@
 using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
 
 StSpinMotorController::StSpinMotorController(
-    const robot_constants::RobotConstants& robot_constants, std::shared_ptr<UartCommunicator> uart)
+    const robot_constants::RobotConstants& robot_constants,
+    std::shared_ptr<UartCommunicator> uart)
     : robot_constants_(robot_constants),
       reset_gpio_(std::make_unique<GpioCharDev>(RESET_GPIO_PIN, GpioDirection::OUTPUT,
                                                 GpioState::HIGH)),
