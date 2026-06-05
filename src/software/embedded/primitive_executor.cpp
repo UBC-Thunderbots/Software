@@ -11,8 +11,8 @@
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(
-    const Duration time_step, const robot_constants::RobotConstants& robot_constants)
-    : current_primitive_(), robot_constants_(robot_constants), time_step_(time_step)
+    const robot_constants::RobotConstants& robot_constants)
+    : current_primitive_(), robot_constants_(robot_constants)
 {
 }
 
@@ -78,9 +78,9 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    TbotsProto::PrimitiveExecutorStatus& status)
+    TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time)
 {
-    time_since_trajectory_creation_ += time_step_;
+    time_since_trajectory_creation_ += delta_time;
     status.set_running_primitive(true);
 
     switch (current_primitive_.primitive_case())

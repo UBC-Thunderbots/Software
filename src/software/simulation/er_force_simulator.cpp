@@ -20,10 +20,10 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
                                    const bool ramping,
-                                   double primitive_executor_time_step)
+                                   Duration primitive_executor_time_step)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
-      primitive_executor_time_step_s(primitive_executor_time_step),
+      primitive_executor_time_step(primitive_executor_time_step),
       frame_number(0),
       euclidean_to_four_wheel(robot_constants),
       robot_constants(robot_constants),
@@ -280,14 +280,14 @@ void ErForceSimulator::setRobots(
     {
         if (side == gameController::Team::BLUE)
         {
-            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                Duration::fromSeconds(primitive_executor_time_step_s), robot_constants);
+            auto robot_primitive_executor =
+                std::make_shared<PrimitiveExecutor>(robot_constants);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
-            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                Duration::fromSeconds(primitive_executor_time_step_s), robot_constants);
+            auto robot_primitive_executor =
+                std::make_shared<PrimitiveExecutor>(robot_constants);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }
@@ -389,15 +389,17 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         TbotsProto::PrimitiveExecutorStatus status;  // Added for compilation
         if (ramping)
         {
-            auto direct_control_no_ramp = primitive_executor->stepPrimitive(status);
-            direct_control              = getRampedVelocityPrimitive(
-                             current_velocity_map.at(robot_id).first,
-                             current_velocity_map.at(robot_id).second, *direct_control_no_ramp,
-                             primitive_executor_time_step_s);
+            auto direct_control_no_ramp =
+                primitive_executor->stepPrimitive(status, primitive_executor_time_step);
+            direct_control = getRampedVelocityPrimitive(
+                current_velocity_map.at(robot_id).first,
+                current_velocity_map.at(robot_id).second, *direct_control_no_ramp,
+                primitive_executor_time_step);
         }
         else
         {
-            direct_control = primitive_executor->stepPrimitive(status);
+            direct_control =
+                primitive_executor->stepPrimitive(status, primitive_executor_time_step);
         }
 
         auto command = *getRobotCommandFromDirectControl(
@@ -411,8 +413,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive>
 ErForceSimulator::getRampedVelocityPrimitive(
     const Vector current_local_velocity,
     const AngularVelocity current_local_angular_velocity,
-    TbotsProto::DirectControlPrimitive& target_velocity_primitive,
-    const double& time_to_ramp)
+    TbotsProto::DirectControlPrimitive& target_velocity_primitive, Duration time_to_ramp)
 {
     TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
         target_velocity_primitive.motor_control().direct_velocity_control();
@@ -435,7 +436,7 @@ ErForceSimulator::getRampedVelocityPrimitive(
         euclidean_to_four_wheel.getWheelVelocity(current_euclidean_velocity);
 
     WheelSpace_t ramped_four_wheel = euclidean_to_four_wheel.rampWheelVelocity(
-        current_wheel_velocity, target_wheel_velocity, time_to_ramp);
+        current_wheel_velocity, target_wheel_velocity, time_to_ramp.toSeconds());
 
     EuclideanSpace_t ramped_euclidean =
         euclidean_to_four_wheel.getEuclideanVelocity(ramped_four_wheel);

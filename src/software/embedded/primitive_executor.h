@@ -14,12 +14,10 @@ class PrimitiveExecutor
    public:
     /**
      * Constructor
-     * @param time_step Time step which this primitive executor operates in
      * @param robot_constants The robot constants for the robot which uses this primitive
      * executor
      */
-    explicit PrimitiveExecutor(const Duration time_step,
-                               const robot_constants::RobotConstants& robot_constants);
+    explicit PrimitiveExecutor(const robot_constants::RobotConstants& robot_constants);
 
     /**
      * Update primitive executor with a new Primitive
@@ -39,13 +37,15 @@ class PrimitiveExecutor
     /**
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
+     *
      * @param status The status of the primitive executor, set to false if current
      * primitive is a Stop primitive
+     * @param delta_time The elapsed time since the last primitive step
      *
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus& status);
+        TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time);
 
    private:
     /*
@@ -69,10 +69,6 @@ class PrimitiveExecutor
     robot_constants::RobotConstants robot_constants_;
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
-
-    // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
-    // time step to be used, in Seconds
-    Duration time_step_;
 
     // Estimated delay between a vision frame to AI processing to robot executing
     static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;

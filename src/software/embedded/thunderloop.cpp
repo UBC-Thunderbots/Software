@@ -84,7 +84,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
       kick_constant_(std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY))),
       chip_pulse_width_(
           std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
-      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants)
+      primitive_executor_(robot_constants)
 {
     waitForNetworkUp();
 
@@ -286,8 +286,8 @@ void Thunderloop::runLoop()
                     primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
                 }
 
-                direct_control_ =
-                    *primitive_executor_.stepPrimitive(primitive_executor_status_);
+                direct_control_ = *primitive_executor_.stepPrimitive(
+                    primitive_executor_status_, Duration::fromSeconds(1.0 / loop_hz_));
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
