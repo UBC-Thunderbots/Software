@@ -383,8 +383,8 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
                 primitive_executor->stepPrimitive(status, primitive_executor_time_step);
             const auto& robot_state = robot_map.at(robot_id);
             direct_control          = getRampedVelocityPrimitive(
-                robot_state.localVelocity(), robot_state.angularVelocity(),
-                *direct_control_no_ramp, primitive_executor_time_step);
+                         robot_state.localVelocity(), robot_state.angularVelocity(),
+                         *direct_control_no_ramp, primitive_executor_time_step);
         }
         else
         {
