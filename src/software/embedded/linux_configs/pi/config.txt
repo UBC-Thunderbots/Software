@@ -48,3 +48,4 @@ otg_mode=1
 [all]
 dtparam=pciex1
 dtoverlay=spi0-5cs
+dtoverlay=uart0-pi5
