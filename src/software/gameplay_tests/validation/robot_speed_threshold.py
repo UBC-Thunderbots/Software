@@ -1,11 +1,11 @@
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.simulated_tests.validation.speed_threshold_helpers import *
+from software.gameplay_tests.validation.speed_threshold_helpers import *
 from typing import override
 
 
-from software.simulated_tests.validation.validation import (
+from software.gameplay_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,

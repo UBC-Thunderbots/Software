@@ -3,29 +3,29 @@ import threading
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
 
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyEntersRegion,
     NumberOfRobotsAlwaysStaysInRegion,
     NumberOfRobotsNeverEntersRegion,
     RobotEventuallyEntersRegion,
 )
-from software.simulated_tests.validation.ball_kicked_in_direction import (
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.simulated_tests.validation.ball_enters_region import BallNeverEntersRegion
-from software.simulated_tests.validation.or_validation import OrValidation
+from software.gameplay_tests.validation.ball_enters_region import BallNeverEntersRegion
+from software.gameplay_tests.validation.or_validation import OrValidation
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import Command
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 
 
-def test_kickoff_friendly_play(simulated_test_runner):
+def test_kickoff_friendly_play(gameplay_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
-    def setup(*args):
+    def setup():
         field = tbots_cpp.Field.createSSLDivisionBField()
 
         blue_bots = [
@@ -46,7 +46,7 @@ def test_kickoff_friendly_play(simulated_test_runner):
             field.enemyDefenseArea().negXPosYCorner(),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=blue_bots,
                 yellow_robot_locations=yellow_bots,
@@ -55,22 +55,22 @@ def test_kickoff_friendly_play(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.KICKOFF, team=Team.BLUE
         )
 
         # Let robots get ready before starting kickoff
         threading.Timer(
             4.0,
-            lambda: simulated_test_runner.send_gamecontroller_command(
+            lambda: gameplay_test_runner.send_gamecontroller_command(
                 gc_command=Command.Type.NORMAL_START, team=Team.BLUE
             ),
         ).start()
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.KickoffFriendlyPlay,
             yellow_play=PlayName.KickoffEnemyPlay,
         )
@@ -138,12 +138,10 @@ def test_kickoff_friendly_play(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
     )
 

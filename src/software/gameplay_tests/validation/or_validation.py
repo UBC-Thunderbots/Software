@@ -1,5 +1,5 @@
 from proto.validation_pb2 import *
-from software.simulated_tests.validation.validation import (
+from software.gameplay_tests.validation.validation import (
     Validation,
 )
 from typing import override

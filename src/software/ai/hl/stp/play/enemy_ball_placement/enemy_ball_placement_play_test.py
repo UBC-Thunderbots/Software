@@ -2,8 +2,8 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
-from software.simulated_tests.validation.robot_enters_placement_region import *
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.validation.robot_enters_placement_region import *
+from software.gameplay_tests.util import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
@@ -20,9 +20,9 @@ from proto.ssl_gc_common_pb2 import Team
     ],
 )
 def test_two_ai_ball_placement(
-    simulated_test_runner, ball_start_point, ball_placement_point
+    gameplay_test_runner, ball_start_point, ball_placement_point
 ):
-    def setup(*args):
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-4.5, 0),
             tbots_cpp.Point(-4, 0.5),
@@ -45,7 +45,7 @@ def test_two_ai_ball_placement(
             .negXPosYCorner(),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -54,16 +54,16 @@ def test_two_ai_ball_placement(
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.BALL_PLACEMENT,
             team=Team.YELLOW,
             final_ball_placement_point=ball_placement_point,
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.EnemyBallPlacementPlay,
             yellow_play=PlayName.BallPlacementPlay,
         )
@@ -72,13 +72,9 @@ def test_two_ai_ball_placement(
         [RobotNeverEntersPlacementRegion(ball_placement_point)]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        params=[0],
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        inv_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
     )
 

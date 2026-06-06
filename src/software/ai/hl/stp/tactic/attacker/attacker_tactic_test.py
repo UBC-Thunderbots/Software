@@ -4,22 +4,22 @@ from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 from proto.import_all_protos import AttackerTactic, Pass
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.ball_kicked_in_direction import (
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.simulated_tests.validation.excessive_dribbling import (
+from software.gameplay_tests.validation.excessive_dribbling import (
     NeverExcessivelyDribbles,
 )
-from software.simulated_tests.validation.friendly_team_scored import (
+from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
 )
-from software.simulated_tests.validation.robot_at_orientation import (
+from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
-from software.simulated_tests.validation.robot_at_position import (
+from software.gameplay_tests.validation.robot_at_position import (
     RobotEventuallyAtPosition,
 )
-from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.util import pytest_main
 
 
 def calculate_ball_velocity(passer_point, receiver_point, speed):
@@ -119,10 +119,10 @@ def test_attacker_passing(
     robot_pos,
     ball_pos,
     ball_velocity,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -140,7 +140,7 @@ def test_attacker_passing(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 1: AttackerTactic(
                     best_pass_so_far=Pass(
@@ -166,10 +166,9 @@ def test_attacker_passing(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         run_till_end=False,
         test_timeout_s=7,
     )
@@ -219,7 +218,7 @@ def test_attacker_keep_away(
     ball_velocity,
     enemy_positions,
     ignore_score_checks,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     # TODO (#3638): Port C++ validation functions that don't exist in Python yet
     # In C++ test:
@@ -231,7 +230,7 @@ def test_attacker_keep_away(
     field_top_left = field.fieldLines().negXPosYCorner()
 
     # Keep away near field corner (second test case from C++)
-    def setup(*args):
+    def setup():
         robot_pos = field_top_left
         ball_pos = tbots_cpp.Point(field_top_left.x() + 0.05, field_top_left.y() - 0.2)
         enemy_positions = [
@@ -241,7 +240,7 @@ def test_attacker_keep_away(
             tbots_cpp.Point(-4, 2.75),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -258,7 +257,7 @@ def test_attacker_keep_away(
         )
         receiver_point = tbots_cpp.Point(0, 0)
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 1: AttackerTactic(
                     best_pass_so_far=Pass(
@@ -277,10 +276,9 @@ def test_attacker_keep_away(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
@@ -348,12 +346,12 @@ def test_attacker_keep_away(
     ],
 )
 def test_attacker_shoot_goal(
-    ball_pos, ball_velocity, robot_pos, enemy_positions, simulated_test_runner
+    ball_pos, ball_velocity, robot_pos, enemy_positions, gameplay_test_runner
 ):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[robot_pos],
                 yellow_robot_locations=enemy_positions,
@@ -362,7 +360,7 @@ def test_attacker_shoot_goal(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: AttackerTactic(
                     chip_target=tbots_cpp.createPointProto(
@@ -378,10 +376,9 @@ def test_attacker_shoot_goal(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         run_till_end=False,
         test_timeout_s=9,
     )

@@ -1,15 +1,16 @@
 import math
 from proto.import_all_protos import *
-from software.field_tests.field_test_fixture import *
+from software.gameplay_tests.util import *
 
-from software.simulated_tests.simulated_test_fixture import *
+from software.gameplay_tests.util import *
 from software.logger.logger import create_logger
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 
 logger = create_logger(__name__)
 
+# TODO(#3744)
 
 def test_pivot_kick(field_test_runner):
     id = 5

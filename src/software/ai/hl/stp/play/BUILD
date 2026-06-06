@@ -1,4 +1,4 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -82,7 +82,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )
@@ -100,7 +100,7 @@ py_test(
     ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )
@@ -156,7 +156,7 @@ py_test(
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )

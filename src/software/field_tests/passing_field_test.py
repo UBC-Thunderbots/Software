@@ -1,13 +1,14 @@
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
-from software.field_tests.field_test_fixture import *
-from software.simulated_tests.validation.friendly_receives_ball_slow import (
+from software.gameplay_tests.util import *
+from software.gameplay_tests.validation.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 
+# TODO(#3744)
 
 def test_passing(field_test_runner):
     passer_robot_id = 3

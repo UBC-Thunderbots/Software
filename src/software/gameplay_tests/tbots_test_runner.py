@@ -1,10 +1,7 @@
 from proto.import_all_protos import *
-from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
 from typing import Any
-
-logger = create_logger(__name__)
 
 
 class TbotsTestRunner:
@@ -138,16 +135,17 @@ class TbotsTestRunner:
         return params
 
     @abstractmethod
-    def set_world_state(self, worldstate: WorldState):
-        """Sets the worldstate for the given team
+    def set_world_state(self, world_state: WorldState):
+        """Sets the initial world state of the test.
 
-        :param worldstate: the worldstate proto to use
+        :param world_state: The WorldState proto to use
         """
         raise NotImplementedError("abstract class method called set_world_state")
 
     @abstractmethod
     def run_test(
         self,
+        setup=lambda: None,
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,

@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyExitsRegion,
     NumberOfRobotsEventuallyEntersRegion,
 )
@@ -7,15 +7,15 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.play_pb2 import PlayName
 from proto.import_all_protos import Command
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 
 
-def test_example_play(simulated_test_runner):
+def test_example_play(gameplay_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
-    def setup(*args):
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
             tbots_cpp.Point(-3, 1.5),
@@ -38,7 +38,7 @@ def test_example_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -47,17 +47,17 @@ def test_example_play(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.NORMAL_START, team=Team.BLUE
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.DIRECT, team=Team.BLUE
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.ExamplePlay, yellow_play=PlayName.HaltPlay
         )
 
@@ -72,10 +72,9 @@ def test_example_play(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=10,
     )
 

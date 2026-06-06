@@ -2,22 +2,22 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
-from software.simulated_tests.validation.robot_enters_region import *
-from software.simulated_tests.validation.ball_enters_region import *
+from software.gameplay_tests.validation.robot_enters_region import *
+from software.gameplay_tests.validation.ball_enters_region import *
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
-from software.simulated_tests.validation.or_validation import OrValidation
+from software.gameplay_tests.validation.or_validation import OrValidation
 
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])
-def test_kickoff_play(simulated_test_runner, is_friendly_test):
+def test_kickoff_play(gameplay_test_runner, is_friendly_test):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
-    def setup(*args):
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
             tbots_cpp.Point(-3, 1.5),
@@ -40,7 +40,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             .negXPosYCorner(),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -49,28 +49,28 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
 
         if is_friendly_test:
-            simulated_test_runner.send_gamecontroller_command(
+            gameplay_test_runner.send_gamecontroller_command(
                 gc_command=Command.Type.KICKOFF, team=Team.BLUE
             )
             blue_play = PlayName.KickoffFriendlyPlay
             yellow_play = PlayName.KickoffEnemyPlay
         else:
-            simulated_test_runner.send_gamecontroller_command(
+            gameplay_test_runner.send_gamecontroller_command(
                 gc_command=Command.Type.KICKOFF, team=Team.YELLOW
             )
             blue_play = PlayName.KickoffEnemyPlay
             yellow_play = PlayName.KickoffFriendlyPlay
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.NORMAL_START, team=Team.BLUE
         )
 
-        simulated_test_runner.set_plays(blue_play=blue_play, yellow_play=yellow_play)
+        gameplay_test_runner.set_plays(blue_play=blue_play, yellow_play=yellow_play)
 
     # TODO (#3650): fix validation logic
 
@@ -136,10 +136,10 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             )
         )
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
     )
 

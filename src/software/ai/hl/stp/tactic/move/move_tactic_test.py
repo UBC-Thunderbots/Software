@@ -1,36 +1,40 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.validation.robot_at_position import (
+from software.gameplay_tests.validation.robot_at_position import (
     RobotEventuallyAtPosition,
 )
-from software.simulated_tests.validation.ball_kicked_in_direction import (
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.simulated_tests.validation.robot_at_orientation import (
+from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
-from software.simulated_tests.validation.ball_is_off_ground import (
+from software.gameplay_tests.validation.ball_is_off_ground import (
     BallIsEventuallyOffGround,
 )
-from software.simulated_tests.validation.robot_at_angular_velocity import (
+from software.gameplay_tests.validation.robot_at_angular_velocity import (
     RobotEventuallyAtAngularVelocity,
 )
-from software.simulated_tests.validation.duration_validation import DurationValidation
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.validation.duration_validation import DurationValidation
+
+# from software.gameplay_tests.util import (
+#     pytest_main,
+# )
+from software.gameplay_tests.util import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.import_all_protos import *
 
 
-def test_move_across_field(simulated_test_runner):
+def test_move_across_field(gameplay_test_runner):
     initial_position = tbots_cpp.Point(-3, 1.5)
     destination = tbots_cpp.Point(2.5, -1.1)
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -49,7 +53,7 @@ def test_move_across_field(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 1: MoveTactic(
                     destination=tbots_cpp.createPointProto(destination),
@@ -69,21 +73,20 @@ def test_move_across_field(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=5,
     )
 
 
-def test_autochip_move(simulated_test_runner):
+def test_autochip_move(gameplay_test_runner):
     initial_position = tbots_cpp.Point(-3, 1.5)
     destination = tbots_cpp.Point(0, 1.5)
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -102,7 +105,7 @@ def test_autochip_move(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 1: MoveTactic(
                     destination=tbots_cpp.createPointProto(destination),
@@ -131,21 +134,20 @@ def test_autochip_move(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=10,
     )
 
 
-def test_autokick_move(simulated_test_runner):
+def test_autokick_move(gameplay_test_runner):
     initial_position = tbots_cpp.Point(-1, -0.5)
     destination = tbots_cpp.Point(-1, -1)
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[initial_position],
                 blue_robot_orientations=[tbots_cpp.Angle.threeQuarter()],
@@ -162,7 +164,7 @@ def test_autokick_move(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: MoveTactic(
                     destination=tbots_cpp.createPointProto(destination),
@@ -190,10 +192,9 @@ def test_autokick_move(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=5,
     )
 
@@ -246,10 +247,10 @@ def test_autokick_move(simulated_test_runner):
     ],
 )
 def test_spinning_move(
-    orientation, initial_position, destination, angular_velocity, simulated_test_runner
+    orientation, initial_position, destination, angular_velocity, gameplay_test_runner
 ):
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[initial_position],
                 yellow_robot_locations=[tbots_cpp.Point(4, 0)],
@@ -258,7 +259,7 @@ def test_spinning_move(
             ),
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: MoveTactic(
                     destination=tbots_cpp.createPointProto(destination),
@@ -290,10 +291,9 @@ def test_spinning_move(
         ],
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=5,
     )
 

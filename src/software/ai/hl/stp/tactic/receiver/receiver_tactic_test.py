@@ -3,16 +3,16 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import Pass, ReceiverTactic
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.friendly_team_scored import (
+from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
 )
-from software.simulated_tests.validation.robot_at_orientation import (
+from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
-from software.simulated_tests.validation.robot_received_ball import (
+from software.gameplay_tests.validation.robot_received_ball import (
     RobotEventuallyReceivedBall,
 )
-from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.util import pytest_main
 
 
 def calculate_ball_velocity(passer_point, receiver_point, speed):
@@ -187,14 +187,14 @@ def test_receiver(
     robot_pos,
     robot_orientation,
     one_touch,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
-    def setup(*args):
+    def setup():
         ball_velocity = calculate_ball_velocity(
             passer_point, receiver_point, pass_speed
         )
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -216,7 +216,7 @@ def test_receiver(
             "disable_one_touch_shot": not one_touch,
         }
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={1: ReceiverTactic(**receiver_args)}
         )
 
@@ -232,10 +232,9 @@ def test_receiver(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         run_till_end=False,
     )
 

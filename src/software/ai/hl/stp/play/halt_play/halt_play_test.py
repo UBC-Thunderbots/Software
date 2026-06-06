@@ -1,16 +1,16 @@
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.validation.robot_speed_threshold import *
+from software.gameplay_tests.validation.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 
 
 # TODO issue  #2599 - Remove Duration parameter from test
 # @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
-def test_halt_play(simulated_test_runner):
-    def setup(*args):
+def test_halt_play(gameplay_test_runner):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(0, 0)
 
         blue_bots = [
@@ -35,7 +35,7 @@ def test_halt_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -44,25 +44,16 @@ def test_halt_play(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
-    # params just have to be a list of length 1 to ensure the test runs at least once
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        params=[0],
-        inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1e-3)]
-        ],
-        ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1e-3)]
-        ],
+        eventually_validation_sequence_set=[[RobotSpeedEventuallyBelowThreshold(1e-3)]],
         ci_cmd_with_delay=[
             (3, Command.Type.HALT, Team.BLUE),
             (3, Command.Type.HALT, Team.YELLOW),
