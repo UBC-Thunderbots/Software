@@ -115,6 +115,12 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     {
         ZoneNamedN(_tracy_tactic_assignment, "Play: Assign tactics to robots", true);
 
+        if (priority_tactics.empty())
+        {
+            LOG(WARNING) << "Play has no tactics set. Defaulting to halt tactics.";
+            priority_tactics.push_back(TacticVector{});
+        }
+
         for (unsigned int i = 0; i < priority_tactics.size(); i++)
         {
             auto tactic_vector = priority_tactics[i];
