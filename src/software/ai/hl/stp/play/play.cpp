@@ -117,7 +117,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         if (priority_tactics.empty())
         {
-            LOG(WARNING) << "Play has no tactics set. Defaulting to halt tactics.";
             priority_tactics.push_back(TacticVector{});
         }
 
