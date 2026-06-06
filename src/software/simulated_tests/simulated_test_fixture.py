@@ -51,7 +51,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
-        :param ci_mode: Run test as fast as possible and exit early if validation passes
+        :param ci_mode: Run test as fast as possible
         """
         super(SimulatedTestRunner, self).__init__(
             test_name,
