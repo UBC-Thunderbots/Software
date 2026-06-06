@@ -267,7 +267,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         tick_duration_s=0.0166,  # Default to 60hz
         index=0,
         ci_cmd_with_delay=[],
-        run_till_end=None,
+        run_till_end=True,
         **kwargs,
     ):
         """Helper function to run a test, with thunderscope if enabled
@@ -286,10 +286,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                                   ]
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
-                             If None, defaults to not ci_mode
         """
-        if run_till_end is None:
-            run_till_end = not self.ci_mode
 
         test_timeout_duration = (
             test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
