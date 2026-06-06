@@ -85,11 +85,12 @@ jobs:
       - name: Simulated Test Run
         run: |
           cd src
-          bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps --test_args="--ci_mode"\
+          bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
             //software:unix_full_system       \
             //software/simulated_tests/...    \
             //software/ai/hl/...              \
-            //software/ai/navigator/...       
+            //software/ai/navigator/...       \
+            --test_args="--ci_mode"
             
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
