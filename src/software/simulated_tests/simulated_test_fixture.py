@@ -287,7 +287,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param run_till_end: If true, test runs till the end even if eventually validation passes
                              If false, test stops once eventually validation passes and fails if time out
         """
-
         test_timeout_duration = (
             test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
         )
