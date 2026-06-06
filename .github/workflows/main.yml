@@ -85,7 +85,7 @@ jobs:
       - name: Simulated Test Run
         run: |
           cd src
-          bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps       \
+          bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps --test_args="--ci_mode"\
             //software:unix_full_system       \
             //software/simulated_tests/...    \
             //software/ai/hl/...              \
