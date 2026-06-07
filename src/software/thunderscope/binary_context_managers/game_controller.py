@@ -94,10 +94,14 @@ class Gamecontroller:
             command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
             command += ["-ciAddress", f"localhost:{self.ci_port}"]
             command += [
-                "-address", "localhost:0",
-                "-autorefAddress", "localhost:0",
-                "-remoteControlAddress", "localhost:0",
-                "-teamAddress", "localhost:0",
+                "-address",
+                "localhost:0",
+                "-autorefAddress",
+                "localhost:0",
+                "-remoteControlAddress",
+                "localhost:0",
+                "-teamAddress",
+                "localhost:0",
                 "-backendOnly",
             ]
 
@@ -110,6 +114,7 @@ class Gamecontroller:
             time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
         else:
             import fcntl
+
             lock_fd = open("/tmp/tbots_gc_port.lock", "w")
             fcntl.flock(lock_fd, fcntl.LOCK_EX)
             try:
@@ -119,10 +124,14 @@ class Gamecontroller:
                 command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
                 command += ["-ciAddress", f"localhost:{self.ci_port}"]
                 command += [
-                    "-address", "localhost:0",
-                    "-autorefAddress", "localhost:0",
-                    "-remoteControlAddress", "localhost:0",
-                    "-teamAddress", "localhost:0",
+                    "-address",
+                    "localhost:0",
+                    "-autorefAddress",
+                    "localhost:0",
+                    "-remoteControlAddress",
+                    "localhost:0",
+                    "-teamAddress",
+                    "localhost:0",
                     "-backendOnly",
                 ]
 

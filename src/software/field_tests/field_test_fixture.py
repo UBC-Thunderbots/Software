@@ -207,6 +207,7 @@ def get_runtime_dir():
     if not test_tmpdir:
         return "/tmp/tbots"
     import uuid
+
     symlink_path = os.path.join("/tmp", f"tbt_{uuid.uuid4().hex[:8]}")
     try:
         os.symlink(test_tmpdir, symlink_path)
@@ -214,7 +215,9 @@ def get_runtime_dir():
         pass
     return symlink_path
 
+
 RUNTIME_DIR = get_runtime_dir()
+
 
 def load_command_line_arguments():
     """Load in command-line arguments using argparse
