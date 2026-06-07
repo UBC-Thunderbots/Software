@@ -4,9 +4,6 @@
 
   vars:
     repo_root: "{{ workspace_dir | default(playbook_dir + '/../../../../') }}"
-    # Bazel output location (convenience symlink)
-    # bazel_raw_out_path: "bazel-bin/external/+_repo_rules2+mdv6_firmware/mdv6_firmware_main"
-    # bazel_out_path: "bazel-bin/external/+_repo_rules2+mdv6_firmware/mdv6_firmware_main.bin"
     firmware_bin_name: "mdv6_firmware_main.bin"
     firmware_archive_name: "mdv6_firmware.tar.gz"
     script_path: "software/embedded/drivers/flash_motor_drivers.py"

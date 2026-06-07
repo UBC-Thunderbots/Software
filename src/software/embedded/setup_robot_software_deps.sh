@@ -38,16 +38,13 @@ cd /tmp/tbots_download_cache/Python-3.12.0
 make -j$(nproc)
 sudo make altinstall
 
-# Why tf do we have a venv? Uh sure here we go
 sudo mkdir -p /opt/tbotspython
-sudo chown $(whoami):$(whoami) /opt/tbotspython
+sudo chown -R $USER:$USER /opt/tbotspython
 
 if ! sudo /usr/local/bin/python3.12 -m venv /opt/tbotspython ; then
     echo "Error: Installing Python 3.12 failed"
     exit 1
 fi
-
-sudo chown -R $USER:$USER /opt/tbotspython
 
 # install PlatformIO to global environment
 curl -fsSL -o /tmp/tbots_download_cache/get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py

@@ -2,8 +2,6 @@ import subprocess
 import time
 import sys
 from gpiozero import LED
-from rich import print
-
 # The reset pin for the motor drivers
 MOTOR_DRIVER_RESET_PIN = 12
 
