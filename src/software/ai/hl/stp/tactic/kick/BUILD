@@ -35,7 +35,6 @@ py_test(
     name = "kick_tactic_test",
     srcs = ["kick_tactic_test.py"],
     tags = [
-        "exclusive",
     ],
     deps = [
         "//software:conftest",

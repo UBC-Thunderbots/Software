@@ -35,7 +35,6 @@ py_test(
     name = "chip_tactic_test",
     srcs = ["chip_tactic_test.py"],
     tags = [
-        "exclusive",
     ],
     deps = [
         "//software:conftest",

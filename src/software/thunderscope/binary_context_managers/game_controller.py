@@ -50,17 +50,9 @@ class Gamecontroller:
         self.suppress_logs = suppress_logs
         self.automate_referee = automate_referee
 
-        # We default to using a non-conventional port to avoid emitting
-        # on the same port as what other teams may be listening on.
-        if use_conventional_port:
-            if not self.is_valid_port(SSL_REFEREE_PORT):
-                raise OSError(f"Cannot use port {SSL_REFEREE_PORT} for Gamecontroller")
-
-            self.referee_port = SSL_REFEREE_PORT
-        else:
-            self.referee_port = self.next_free_port(random.randint(1024, 65535))
-
-        self.ci_port = self.next_free_port()
+        self.use_conventional_port = use_conventional_port
+        self.referee_port = None
+        self.ci_port = None
         # this allows gamecontroller to listen to override commands
         self.command_override_buffer = ThreadSafeBuffer(
             buffer_size=2, protobuf_type=ManualGCCommand
@@ -92,23 +84,59 @@ class Gamecontroller:
         """
         command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
 
-        # Kill any gamecontroller, even those with different IP/port, because
-        # of the port assignment logic when use_conventional_port=False
-        kill_cmd_if_running(command)
+        if self.use_conventional_port:
+            kill_cmd_if_running(command)
+            if not self.is_valid_port(SSL_REFEREE_PORT):
+                raise OSError(f"Cannot use port {SSL_REFEREE_PORT} for Gamecontroller")
+            self.referee_port = SSL_REFEREE_PORT
+            self.ci_port = self.next_free_port()
 
-        command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
-        command += ["-ciAddress", f"localhost:{self.ci_port}"]
+            command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
+            command += ["-ciAddress", f"localhost:{self.ci_port}"]
+            command += [
+                "-address", "localhost:0",
+                "-autorefAddress", "localhost:0",
+                "-remoteControlAddress", "localhost:0",
+                "-teamAddress", "localhost:0",
+                "-backendOnly",
+            ]
 
-        if self.suppress_logs:
-            with open(os.devnull, "w") as fp:
-                self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
+            if self.suppress_logs:
+                with open(os.devnull, "w") as fp:
+                    self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
+            else:
+                self.gamecontroller_proc = Popen(command)
 
+            time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
         else:
-            self.gamecontroller_proc = Popen(command)
+            import fcntl
+            lock_fd = open("/tmp/tbots_gc_port.lock", "w")
+            fcntl.flock(lock_fd, fcntl.LOCK_EX)
+            try:
+                self.referee_port = self.next_free_port(random.randint(1024, 65535))
+                self.ci_port = self.next_free_port(random.randint(1024, 65535))
 
-        # We can't connect to the ci port right away, it takes
-        # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
-        time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+                command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
+                command += ["-ciAddress", f"localhost:{self.ci_port}"]
+                command += [
+                    "-address", "localhost:0",
+                    "-autorefAddress", "localhost:0",
+                    "-remoteControlAddress", "localhost:0",
+                    "-teamAddress", "localhost:0",
+                    "-backendOnly",
+                ]
+
+                if self.suppress_logs:
+                    with open(os.devnull, "w") as fp:
+                        self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
+                else:
+                    self.gamecontroller_proc = Popen(command)
+
+                time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+            finally:
+                fcntl.flock(lock_fd, fcntl.LOCK_UN)
+                lock_fd.close()
+
         self.ci_socket = SslSocket(self.ci_port)
 
         return self

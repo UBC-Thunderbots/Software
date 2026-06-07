@@ -202,6 +202,20 @@ class FieldTestRunner(TbotsTestRunner):
             __runner()
 
 
+def get_runtime_dir():
+    test_tmpdir = os.environ.get("TEST_TMPDIR")
+    if not test_tmpdir:
+        return "/tmp/tbots"
+    import uuid
+    symlink_path = os.path.join("/tmp", f"tbt_{uuid.uuid4().hex[:8]}")
+    try:
+        os.symlink(test_tmpdir, symlink_path)
+    except OSError:
+        pass
+    return symlink_path
+
+RUNTIME_DIR = get_runtime_dir()
+
 def load_command_line_arguments():
     """Load in command-line arguments using argparse
 
@@ -213,19 +227,19 @@ def load_command_line_arguments():
         "--simulator_runtime_dir",
         type=str,
         help="simulator runtime directory",
-        default="/tmp/tbots",
+        default=RUNTIME_DIR,
     )
     parser.add_argument(
         "--blue_full_system_runtime_dir",
         type=str,
         help="blue full_system runtime directory",
-        default="/tmp/tbots/blue",
+        default=os.path.join(RUNTIME_DIR, "blue"),
     )
     parser.add_argument(
         "--yellow_full_system_runtime_dir",
         type=str,
         help="yellow full_system runtime directory",
-        default="/tmp/tbots/yellow",
+        default=os.path.join(RUNTIME_DIR, "yellow"),
     )
     parser.add_argument(
         "--layout",

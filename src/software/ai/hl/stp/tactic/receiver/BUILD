@@ -39,7 +39,6 @@ py_test(
     name = "receiver_tactic_test",
     srcs = ["receiver_tactic_test.py"],
     tags = [
-        "exclusive",
     ],
     deps = [
         "//software:conftest",

@@ -33,7 +33,6 @@ py_test(
     name = "halt_tactic_test",
     srcs = ["halt_tactic_test.py"],
     tags = [
-        "exclusive",
     ],
     deps = [
         "//software:conftest",

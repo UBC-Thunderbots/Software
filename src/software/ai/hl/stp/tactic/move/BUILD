@@ -34,7 +34,6 @@ py_test(
     name = "move_tactic_test",
     srcs = ["move_tactic_test.py"],
     tags = [
-        "exclusive",
     ],
     deps = [
         "//software:conftest",

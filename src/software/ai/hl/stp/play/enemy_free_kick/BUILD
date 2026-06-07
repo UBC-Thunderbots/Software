@@ -41,7 +41,6 @@ py_test(
         "enemy_free_kick_play_test.py",
     ],
     tags = [
-        "exclusive",
     ],
     deps = [
         "//software:conftest",
