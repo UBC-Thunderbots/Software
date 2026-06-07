@@ -104,6 +104,13 @@ Looking from the back of the robot the reset and boot buttons are on right side 
 bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
+## Flashing the Motor Driver Boards from Raspberry Pi
+This will flash from our Firmware repository's master branch onto all 4 motor driver boards. 
+```bash
+./tbots.py run run_ansible -- --playbook deploy_motor_firmware.yml --hosts robot@<robot_ip> --ssh_pass <robot_password>
+```
+
+
 ## Setting up the embedded host
 
 This section refers to setting up the computer on the robot for the first time. We need to setup dependencies, drivers and necessary configurations.
