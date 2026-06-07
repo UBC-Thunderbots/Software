@@ -22,8 +22,8 @@
  * @param second
  * @return true if the segment intersects the polygon, false otherwise
  */
-bool intersects(const Polygon &first, const Segment &second);
-bool intersects(const Segment &first, const Polygon &second);
+bool intersects(const Polygon& first, const Segment& second);
+bool intersects(const Segment& first, const Polygon& second);
 
 /**
  * Returns true if the ray intersects the polygon, false otherwise.
@@ -32,8 +32,8 @@ bool intersects(const Segment &first, const Polygon &second);
  * @param second
  * @return true if the ray intersects the polygon, false otherwise
  */
-bool intersects(const Polygon &first, const Ray &second);
-bool intersects(const Ray &first, const Polygon &second);
+bool intersects(const Polygon& first, const Ray& second);
+bool intersects(const Ray& first, const Polygon& second);
 
 /**
  * Returns true if the polygon intersects the circle, false otherwise.
@@ -42,8 +42,8 @@ bool intersects(const Ray &first, const Polygon &second);
  * @param second
  * @return true if the polygon intersects the circle, false otherwise
  */
-bool intersects(const Polygon &first, const Circle &second);
-bool intersects(const Circle &first, const Polygon &second);
+bool intersects(const Polygon& first, const Circle& second);
+bool intersects(const Circle& first, const Polygon& second);
 
 /**
  * Returns true if the circles intersect each other, false otherwise
@@ -52,7 +52,7 @@ bool intersects(const Circle &first, const Polygon &second);
  * @param second
  * @return true if the circles intersect each other, false otherwise
  */
-bool intersects(const Circle &first, const Circle &second);
+bool intersects(const Circle& first, const Circle& second);
 
 /**
  * Returns whether the segment intersects the circle
@@ -63,8 +63,8 @@ bool intersects(const Circle &first, const Circle &second);
  * @param second
  * @return true if the segment inersects the circle, false otherwise
  */
-bool intersects(const Segment &first, const Circle &second);
-bool intersects(const Circle &first, const Segment &second);
+bool intersects(const Segment& first, const Circle& second);
+bool intersects(const Circle& first, const Segment& second);
 
 /**
  * Returns true if the segments intersect each other, false otherwise
@@ -73,7 +73,7 @@ bool intersects(const Circle &first, const Segment &second);
  * @param second
  * @return true if the segments intersect each other, false otherwise
  */
-bool intersects(const Segment &first, const Segment &second);
+bool intersects(const Segment& first, const Segment& second);
 
 /**
  * Returns true if the ray intersects the segment, false otherwise
@@ -82,8 +82,8 @@ bool intersects(const Segment &first, const Segment &second);
  * @param second
  * @return true if the ray intersects the segment, false otherwise
  */
-bool intersects(const Ray &first, const Segment &second);
-bool intersects(const Segment &first, const Ray &second);
+bool intersects(const Ray& first, const Segment& second);
+bool intersects(const Segment& first, const Ray& second);
 
 /**
  * Returns true if the Stadium intersects the Ray, false otherwise
@@ -92,8 +92,8 @@ bool intersects(const Segment &first, const Ray &second);
  * @param second
  * @return true if the Stadium intersects the Ray, false otherwise
  */
-bool intersects(const Stadium &first, const Ray &second);
-bool intersects(const Ray &first, const Stadium &second);
+bool intersects(const Stadium& first, const Ray& second);
+bool intersects(const Ray& first, const Stadium& second);
 
 /**
  * Returns true if the Stadium intersects the Circle, false otherwise
@@ -104,8 +104,8 @@ bool intersects(const Ray &first, const Stadium &second);
  * @param second
  * @return true if the Stadium intersects the Circle, false otherwise
  */
-bool intersects(const Stadium &first, const Circle &second);
-bool intersects(const Circle &first, const Stadium &second);
+bool intersects(const Stadium& first, const Circle& second);
+bool intersects(const Circle& first, const Stadium& second);
 
 /**
  * Returns true if the Stadium intersects the Segment, false otherwise
@@ -116,8 +116,8 @@ bool intersects(const Circle &first, const Stadium &second);
  * @param second
  * @return true if the Stadium intersects the Segment, false otherwise
  */
-bool intersects(const Stadium &first, const Segment &second);
-bool intersects(const Segment &first, const Stadium &second);
+bool intersects(const Stadium& first, const Segment& second);
+bool intersects(const Segment& first, const Stadium& second);
 
 /**
  * Returns true if the Stadium intersects the Polygon, false otherwise
@@ -128,8 +128,8 @@ bool intersects(const Segment &first, const Stadium &second);
  * @param second
  * @return true if the Stadium intersects the Polygon, false otherwise
  */
-bool intersects(const Stadium &first, const Polygon &second);
-bool intersects(const Polygon &first, const Stadium &second);
+bool intersects(const Stadium& first, const Polygon& second);
+bool intersects(const Polygon& first, const Stadium& second);
 
 /**
  * Returns true if the Stadium intersects the other Stadium, false otherwise
@@ -140,4 +140,4 @@ bool intersects(const Polygon &first, const Stadium &second);
  * @param second
  * @return true if the Stadium intersects the other Stadium, false otherwise
  */
-bool intersects(const Stadium &first, const Stadium &second);
+bool intersects(const Stadium& first, const Stadium& second);

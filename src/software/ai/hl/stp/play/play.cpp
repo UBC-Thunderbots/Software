@@ -25,8 +25,8 @@ Play::Play(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
-    const WorldPtr &world_ptr, const InterPlayCommunication &inter_play_communication,
-    const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
+    const WorldPtr& world_ptr, const InterPlayCommunication& inter_play_communication,
+    const SetInterPlayCommunicationCallback& set_inter_play_communication_fun)
 {
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
@@ -115,10 +115,13 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     {
         ZoneNamedN(_tracy_tactic_assignment, "Play: Assign tactics to robots", true);
 
-        for (unsigned int i = 0; i < priority_tactics.size(); i++)
+        // Assigns halt tactic to robots if there are no more tactics in the play
+        priority_tactics.push_back(halt_tactics);
+
+        for (auto& tactic_vector : priority_tactics)
         {
-            auto tactic_vector = priority_tactics[i];
-            size_t num_tactics = tactic_vector.size();
+            if (robots.empty())
+                break;
 
             if (robots.size() < tactic_vector.size())
             {
@@ -127,15 +130,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 // considered lower priority
                 tactic_vector.resize(robots.size());
             }
-            else if (i == (priority_tactics.size() - 1))
-            {
-                // If assigning the last tactic vector, then assign rest of robots with
-                // HaltTactics
-                for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
-                {
-                    tactic_vector.push_back(halt_tactics[ii]);
-                }
-            }
 
             auto [remaining_robots, new_primitives_to_assign,
                   current_tactic_robot_id_assignment] =
@@ -143,7 +137,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
             tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
-            for (auto &[robot_id, primitive] :
+            for (auto& [robot_id, primitive] :
                  new_primitives_to_assign->robot_primitives())
             {
                 primitives_to_run->mutable_robot_primitives()->insert(
@@ -167,7 +161,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     return primitives_to_run;
 }
 
-const std::map<std::shared_ptr<const Tactic>, RobotId> &Play::getTacticRobotIdAssignment()
+const std::map<std::shared_ptr<const Tactic>, RobotId>& Play::getTacticRobotIdAssignment()
     const
 {
     return tactic_robot_id_assignment;
@@ -175,8 +169,8 @@ const std::map<std::shared_ptr<const Tactic>, RobotId> &Play::getTacticRobotIdAs
 
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
            std::map<std::shared_ptr<const Tactic>, RobotId>>
-Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
-                    const std::vector<Robot> &robots_to_assign)
+Play::assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
+                    const std::vector<Robot>& robots_to_assign)
 {
     std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();
@@ -305,7 +299,7 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                     {robot_id, *primitive_proto});
                 remaining_robots.erase(
                     std::remove_if(remaining_robots.begin(), remaining_robots.end(),
-                                   [robots_to_assign, row](const Robot &robot) {
+                                   [robots_to_assign, row](const Robot& robot) {
                                        return robot.id() == robots_to_assign.at(row).id();
                                    }),
                     remaining_robots.end());

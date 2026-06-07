@@ -31,42 +31,10 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "dribble_tactic_test",
-    srcs = ["dribble_tactic_test.cpp"],
-    deps = [
-        ":dribble_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "dribble_tactic_push_enemy_test",
-    srcs = ["dribble_tactic_push_enemy_test.cpp"],
-    deps = [
-        ":dribble_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
 py_test(
-    name = "excessive_dribble_test",
+    name = "dribble_tactic_test",
     srcs = [
-        "excessive_dribble_test.py",
+        "dribble_tactic_test.py",
     ],
     # TODO (#2619) Remove tag to run in parallel
     tags = [

@@ -21,7 +21,7 @@ void EnemyFreeKickPlay::updateControlParams(
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
 }
 
-void EnemyFreeKickPlay::updateTactics(const PlayUpdate &play_update)
+void EnemyFreeKickPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(EnemyFreeKickPlayFSM::Update(control_params, play_update));
 }

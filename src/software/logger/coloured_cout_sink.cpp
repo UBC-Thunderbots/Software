@@ -70,7 +70,7 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     }
 }
 
-void ColouredCoutSink::displaySingleLog(g3::LogMessage &log)
+void ColouredCoutSink::displaySingleLog(g3::LogMessage& log)
 {
     auto level  = log._level;
     auto colour = colourToString(getColour(level));

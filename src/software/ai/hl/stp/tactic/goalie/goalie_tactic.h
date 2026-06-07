@@ -37,7 +37,7 @@ class GoalieTactic : public TacticBase<GoalieFSM, PivotKickFSM, DribbleFSM>
 
     void updateControlParams(bool should_move_to_goal_line);
 
-    void accept(TacticVisitor &visitor) const override;
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;

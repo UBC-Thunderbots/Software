@@ -23,7 +23,7 @@ class Rectangle : public ConvexPolygon
      *
      * @param point2 The corner diagonally-opposite to point1
      */
-    explicit Rectangle(const Point &point1, const Point &point2);
+    explicit Rectangle(const Point& point1, const Point& point2);
 
     /**
      * Returns the length along the x-axis of the rectangle
@@ -51,28 +51,28 @@ class Rectangle : public ConvexPolygon
      *
      * @return The <+x,+y> corner of the rectangle
      */
-    const Point &posXPosYCorner() const;
+    const Point& posXPosYCorner() const;
 
     /**
      * Returns the <-x,+y> corner of the rectangle
      *
      * @return The <-x,+y> corner of the rectangle
      */
-    const Point &negXPosYCorner() const;
+    const Point& negXPosYCorner() const;
 
     /**
      * Returns the <-x,-y> corner of the rectangle
      *
      * @return The <-x,-y> corner of the rectangle
      */
-    const Point &negXNegYCorner() const;
+    const Point& negXNegYCorner() const;
 
     /**
      * Returns the <+x,-y> corner of the rectangle
      *
      * @return The <+x,-y> corner of the rectangle
      */
-    const Point &posXNegYCorner() const;
+    const Point& posXNegYCorner() const;
 
     /**
      * Gets the maximum x value of the rectangle
@@ -126,13 +126,13 @@ class Rectangle : public ConvexPolygon
      */
     Rectangle expand(double expansion_amount) const;
 
-    bool operator==(const Rectangle &p) const;
+    bool operator==(const Rectangle& p) const;
 };
 
 template <>
 struct std::hash<Rectangle>
 {
-    std::size_t operator()(const Rectangle &rectangle) const
+    std::size_t operator()(const Rectangle& rectangle) const
     {
         std::hash<Point> hasher;
         std::size_t seed = 0;

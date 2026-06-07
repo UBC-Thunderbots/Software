@@ -32,5 +32,5 @@ class ShadowEnemyTactic : public TacticBase<ShadowEnemyFSM, MoveFSM>
     void updateControlParams(std::optional<EnemyThreat> enemy_threat,
                              double shadow_distance);
 
-    void accept(TacticVisitor &visitor) const override;
+    void accept(TacticVisitor& visitor) const override;
 };

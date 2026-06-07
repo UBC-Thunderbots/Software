@@ -20,7 +20,7 @@ TEST(LineTest, two_points_constructor_invalid)
         Line l(Point(1, 1), Point(1, 1));
         FAIL() << "A Line was created with two equal Points";
     }
-    catch (std::runtime_error &e)
+    catch (std::runtime_error& e)
     {
         EXPECT_EQ(e.what(), std::string("Cannot create a Line with two equal Points"));
     }

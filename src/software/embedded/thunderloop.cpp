@@ -4,18 +4,21 @@
 #include <fstream>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
+#include "software/constants.h"
 #include "software/embedded/primitive_executor.h"
+#include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
+#include "software/world/robot_state.h"
 
 /**
  * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -42,7 +45,7 @@ extern "C"
     {
         if (g_motor_service)
         {
-            g_motor_service->resetMotorBoard();
+            g_motor_service->reset();
         }
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
@@ -68,9 +71,8 @@ extern "C"
     }
 }
 
-Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
-                         const int loop_hz)
-    // TODO (#2495): Set the friendly team colour
+Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
+                         bool enable_log_merging, const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       motor_status_(std::nullopt),
       robot_constants_(robot_constants),
@@ -83,13 +85,13 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       kick_constant_(std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY))),
       chip_pulse_width_(
           std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
-      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
-                          TeamColour::YELLOW, robot_id_)
+      primitive_executor_(robot_constants)
 {
     waitForNetworkUp();
 
     g3::overrideSetupSignals({});
-    NetworkLoggerSingleton::initializeLogger(robot_id_, enable_log_merging);
+    NetworkLoggerSingleton::initializeLogger(robot_id_, enable_log_merging,
+                                             network_interface_);
 
     // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);
@@ -119,10 +121,14 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
-    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    motor_service_  = std::make_unique<MotorService>(robot_constants);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
-    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
+
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
+
+    imu_service_ = std::make_unique<ImuService>();
+    LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -177,6 +183,15 @@ void Thunderloop::runLoop()
 
     robot_status_.set_thunderloop_version(thunderloop_hash);
     robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
+
+
+    std::optional<ImuData> imu_poll = imu_service_->poll();
+
+    // TODO (3725): Replace with actual IMU data usage
+    if (imu_poll.has_value() && imu_poll->angular_velocity.has_value())
+    {
+        LOG(INFO) << "IMU Angular Velocity: " << imu_poll->angular_velocity->toRadians();
+    }
 
     for (;;)
     {
@@ -248,9 +263,9 @@ void Thunderloop::runLoop()
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
-                primitive_executor_.updateVelocity(
-                    createVector(status.local_velocity()),
-                    createAngularVelocity(status.angular_velocity()));
+                primitive_executor_.updateState(
+                    RobotState(Point(), createVector(status.local_velocity()), Angle(),
+                               createAngularVelocity(status.angular_velocity())));
             }
 
             // Timeout Overrides for Primitives
@@ -269,11 +284,11 @@ void Thunderloop::runLoop()
 
                 if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
-                    primitive_executor_.setStopPrimitive();
+                    primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
                 }
 
-                direct_control_ =
-                    *primitive_executor_.stepPrimitive(primitive_executor_status_);
+                direct_control_ = *primitive_executor_.stepPrimitive(
+                    primitive_executor_status_, Duration::fromSeconds(1.0 / loop_hz_));
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(

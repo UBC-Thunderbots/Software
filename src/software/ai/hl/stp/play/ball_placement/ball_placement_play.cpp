@@ -10,7 +10,7 @@ BallPlacementPlay::BallPlacementPlay(
 {
 }
 
-void BallPlacementPlay::updateTactics(const PlayUpdate &play_update)
+void BallPlacementPlay::updateTactics(const PlayUpdate& play_update)
 {
     auto event = BallPlacementPlayFSM::Update(control_params, play_update);
     fsm.process_event(event);

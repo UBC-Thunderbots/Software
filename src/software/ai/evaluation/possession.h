@@ -15,6 +15,6 @@
  * @return the robot that either has the ball, or is the closest to having it. If the
  * team has no robots, std::nullopt is returned
  */
-std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
-                                                         const Ball &ball,
-                                                         const Field &field);
+std::optional<Robot> getRobotWithEffectiveBallPossession(const Team& team,
+                                                         const Ball& ball,
+                                                         const Field& field);

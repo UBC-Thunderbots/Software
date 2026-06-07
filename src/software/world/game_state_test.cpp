@@ -14,12 +14,12 @@ TEST(GameStateTest, test_get_name_of_referee_command)
             ss << state;
             ss.str();
         }
-        catch (std::invalid_argument &)
+        catch (std::invalid_argument&)
         {
             ADD_FAILURE() << "Unable to get a name for referee command " << i
                           << std::endl;
         }
-        catch (std::exception &)
+        catch (std::exception&)
         {
             ADD_FAILURE()
                 << "Unexpected exception thrown while trying to get the Refere Command for "

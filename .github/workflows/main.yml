@@ -5,13 +5,64 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  schedule:
+    - cron: '0 8 * * *'  # 12 AM PST / 8 AM UTC
+  workflow_dispatch:
+    inputs:
+      clear_cache:
+        description: 'Clear cache before building'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  actions: write
+  contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  check-and-clear-cache:
+    runs-on: ubuntu-24.04
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v4
+        if: github.event_name == 'schedule'
+        with:
+          fetch-depth: 50
+      - name: Check conditions and optionally clear cache
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHOULD_RUN=true
+          if [ "${{ github.event_name }}" == "schedule" ]; then
+            COMMITS=$(git log --oneline --since="24 hours ago")
+            if [ -z "$COMMITS" ]; then
+              echo "No commits in the last 24 hours. Skipping."
+              SHOULD_RUN=false
+            else
+              echo "Commits found in the last 24 hours. Clearing cache..."
+              gh extension install actions/gh-actions-cache || true
+              gh actions-cache delete --all --confirm || true
+              gh cache delete --all || true
+            fi
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            if [ "${{ github.event.inputs.clear_cache }}" == "true" ]; then
+              echo "Manual trigger with clear_cache. Clearing cache..."
+              gh extension install actions/gh-actions-cache || true
+              gh actions-cache delete --all --confirm || true
+              gh cache delete --all || true
+            fi
+          fi
+          echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
+
   multiplatform-build:
+    needs: check-and-clear-cache
+    if: needs.check-and-clear-cache.outputs.should_run == 'true'
     strategy:
       matrix:
         platform: [ ubuntu-24.04-arm ]
@@ -57,6 +108,8 @@ jobs:
           bazel build @mdv6_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board
 
   software-tests:
+    needs: check-and-clear-cache
+    if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Software Tests
     runs-on: ubuntu-24.04
     steps:
@@ -76,14 +129,13 @@ jobs:
             -//software:unix_full_system_tar_gen
 
   robot-tests:
+    needs: check-and-clear-cache
+    if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Robot Software Tests
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      - uses: ./.github/actions/environment-setup
         
       - name: Raspberry Pi Build
         run: |
@@ -92,6 +144,8 @@ jobs:
 
 
   simulated-gameplay-tests:
+    needs: check-and-clear-cache
+    if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Simulated Gameplay Tests
     runs-on: ubuntu-24.04
     steps:
@@ -101,12 +155,15 @@ jobs:
       - name: Simulated Test Run
         run: |
           cd src
-          bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps       \
-            //software:unix_full_system       \
+          bazel test //software/simulated_tests:requirements_test
+          bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
+            --test_arg="--ci_mode"            \
+            -- //software:unix_full_system       \
             //software/simulated_tests/...    \
+            -//software/simulated_tests:requirements_test \
             //software/ai/hl/...              \
-            //software/ai/navigator/...       
-
+            //software/ai/navigator/...
+            
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
         if: always()
@@ -126,6 +183,8 @@ jobs:
             /tmp/tbots/yellow/test/*/proto_*
 
   autorefd-game:
+    needs: check-and-clear-cache
+    if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: AutoRef'd Game (3 Minutes)
     runs-on: ubuntu-24.04
     steps:

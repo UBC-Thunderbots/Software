@@ -4,16 +4,23 @@ cc_library(
     name = "motor",
     srcs = ["motor.cpp"],
     hdrs = ["motor.h"],
+    defines =
+        select({
+            "//software/embedded:build_trinamic": ["TRINAMIC_MOTOR_BOARD"],
+            "//software/embedded:build_stspin": ["STSPIN_MOTOR_BOARD"],
+            "//conditions:default": ["STSPIN_MOTOR_BOARD"],
+        }),
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
-        "//software/embedded:gpio",
-        "//software/embedded/constants",
+        "//software/embedded/gpio",
+        "//software/embedded/motor_controller",
+        "//software/embedded/motor_controller:motor_board",
+        "//software/embedded/motor_controller:motor_fault_indicator",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
         "//software/util/scoped_timespec_timer",
         "@eigen",
-        "@trinamic",
     ],
 )
 
@@ -31,21 +38,16 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "robot_auto_test",
-    srcs = ["robot_auto_test.cpp"],
-    linkopts = [
-        "-lpthread",
-        "-lrt",
-    ],
+cc_library(
+    name = "imu",
+    srcs = ["imu.cpp"],
+    hdrs = ["imu.h"],
     deps = [
-        ":motor",
-        ":power",
-        "//proto/message_translation:tbots_geometry",
-        "//proto/primitive:primitive_msg_factory",
-        "//shared:robot_constants",
-        "//software/embedded:primitive_executor",
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//software/geom:angular_acceleration",
+        "//software/geom:angular_velocity",
         "//software/logger",
-        "@trinamic",
+        "@eigen",
     ],
 )

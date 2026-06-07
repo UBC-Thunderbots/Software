@@ -18,13 +18,13 @@ PivotKickTactic::PivotKickTactic(
 {
 }
 
-void PivotKickTactic::accept(TacticVisitor &visitor) const
+void PivotKickTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
-void PivotKickTactic::updateControlParams(const Point &kick_origin,
-                                          const Angle &kick_direction,
+void PivotKickTactic::updateControlParams(const Point& kick_origin,
+                                          const Angle& kick_direction,
                                           AutoChipOrKick auto_chip_or_kick)
 {
     control_params.kick_origin       = kick_origin;

@@ -137,12 +137,13 @@ use_repo(
     "boost",
 )
 
-bazel_dep(name = "hedron_compile_commands", version = "1.0.5", dev_dependency = True)
+# Temporary workaround while https://github.com/hedronvision/bazel-compile-commands-extractor/pull/219 is not merged
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 archive_override(
     module_name = "hedron_compile_commands",
-    sha256 = "658122cfb1f25be76ea212b00f5eb047d8e2adc8bcf923b918461f2b1e37cdf2",
-    strip_prefix = "bazel-compile-commands-extractor-4f28899228fb3ad0126897876f147ca15026151e",
-    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/4f28899228fb3ad0126897876f147ca15026151e.tar.gz",
+    sha256 = "ba3feefdf57b6d4c749e3c4abfa86f3673e7db364cb13acfc3496dce6ea801a3",
+    strip_prefix = "bazel-compile-commands-extractor-f5fbd4cee671d8d908f37c83abaf70fba5928fc7",
+    url = "https://github.com/mikael-s-persson/bazel-compile-commands-extractor/archive/f5fbd4cee671d8d908f37c83abaf70fba5928fc7.tar.gz",
 )
 
 bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
@@ -236,6 +237,13 @@ http_archive(
     sha256 = "4c1640a87347afdc4d5954752f0e773f6d9fbb0ea0fb1481dbdb3012ec00ef8b",
     strip_prefix = "TMC-API-0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
     url = "https://github.com/analogdevicesinc/TMC-API/archive/0cd695fab6d43ceb121af4b8608e5d92b14e1ce9.tar.gz",
+)
+
+http_archive(
+    name = "cppcrc",
+    build_file = "@//extlibs:cppcrc.BUILD",
+    strip_prefix = "cppcrc-6360eee1c8966d32b2552ce156b135ec6a3235f1",
+    url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
 )
 
 ##############################################
