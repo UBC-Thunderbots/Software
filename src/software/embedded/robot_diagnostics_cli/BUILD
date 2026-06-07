@@ -30,8 +30,7 @@ py_binary(
         "//software/embedded/robot_diagnostics_cli:embedded_data",
         requirement("typer_shell"),
         requirement("rich"),
-        requirement("protobuf"),
-        requirement("inquirerpy"),
+        "@protobuf//:protobuf_python",
     ],
 )
 
@@ -53,7 +52,7 @@ py_library(
     name = "embedded_communication",
     srcs = [":embedded_communication.py"],
     deps = [
-        requirement("protobuf"),
+        "@protobuf//:protobuf_python",
     ],
 )
 
