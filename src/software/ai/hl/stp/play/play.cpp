@@ -115,10 +115,13 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     {
         ZoneNamedN(_tracy_tactic_assignment, "Play: Assign tactics to robots", true);
 
-        for (unsigned int i = 0; i < priority_tactics.size(); i++)
+        // Assigns halt tactic to robots if there are no more tactics in the play
+        priority_tactics.push_back(halt_tactics);
+
+        for (auto& tactic_vector : priority_tactics)
         {
-            auto tactic_vector = priority_tactics[i];
-            size_t num_tactics = tactic_vector.size();
+            if (robots.empty())
+                break;
 
             if (robots.size() < tactic_vector.size())
             {
@@ -126,15 +129,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 // (aka don't assign) the tactics at the end of the vector since they are
                 // considered lower priority
                 tactic_vector.resize(robots.size());
-            }
-            else if (i == (priority_tactics.size() - 1))
-            {
-                // If assigning the last tactic vector, then assign rest of robots with
-                // HaltTactics
-                for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
-                {
-                    tactic_vector.push_back(halt_tactics[ii]);
-                }
             }
 
             auto [remaining_robots, new_primitives_to_assign,
