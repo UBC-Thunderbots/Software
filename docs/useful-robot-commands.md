@@ -7,6 +7,7 @@
 - [Table of Contents](#table-of-contents)
   - [Flashing the robot's compute module](#flashing-the-robots-compute-module)
   - [Flashing the powerboard](#flashing-the-powerboard)
+  - [Flashing the Motor Driver Boards from Raspberry Pi](#flashing-the-motor-driver-boards-from-raspberry-pi)
   - [Setting up the embedded host](#setting-up-the-embedded-host)
     - [Raspberry Pi](#raspberry-pi)
   - [Robot Diagnostics](#robot-diagnostics)
