@@ -182,6 +182,8 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 
     sendAndReceiveFrame(motor, outgoing_frame);
 
+    sendMotorStatusToPlotJuggler(motor);
+
     return motor_status_.at(motor).speed;
 }
 
