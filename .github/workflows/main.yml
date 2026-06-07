@@ -85,10 +85,12 @@ jobs:
       - name: Simulated Test Run
         run: |
           cd src
+          bazel test //software/simulated_tests:requirements_test
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
             --test_arg="--ci_mode"            \
             //software:unix_full_system       \
             //software/simulated_tests/...    \
+            -//software/simulated_tests:requirements_test \
             //software/ai/hl/...              \
             //software/ai/navigator/...
             
