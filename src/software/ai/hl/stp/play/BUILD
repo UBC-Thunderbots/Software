@@ -76,10 +76,6 @@ py_test(
     srcs = [
         "kickoff_play_test.py",
     ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
@@ -94,10 +90,6 @@ py_test(
     ],
     # The default main would be stop_play_test.py; override to our file.
     main = "stop_play_test.py",
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
@@ -150,7 +142,6 @@ py_test(
     data = [
         "//software:py_constants.so",
     ],
-    tags = ["exclusive"],
     deps = [
         "//proto:import_all_protos",
         "//proto:software_py_proto",

@@ -38,7 +38,6 @@ cc_test(
 py_test(
     name = "penalty_kick_tactic_test",
     srcs = ["penalty_kick_tactic_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",

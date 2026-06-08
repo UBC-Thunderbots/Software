@@ -37,7 +37,6 @@ cc_library(
 py_test(
     name = "free_kick_play_test",
     srcs = ["free_kick_play_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
