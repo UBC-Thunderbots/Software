@@ -33,8 +33,6 @@ cc_test(
 py_test(
     name = "move_tactic_test",
     srcs = ["move_tactic_test.py"],
-    tags = [
-    ],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",

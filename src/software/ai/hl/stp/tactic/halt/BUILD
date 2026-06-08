@@ -32,8 +32,6 @@ cc_test(
 py_test(
     name = "halt_tactic_test",
     srcs = ["halt_tactic_test.py"],
-    tags = [
-    ],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",

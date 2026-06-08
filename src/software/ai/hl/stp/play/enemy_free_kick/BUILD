@@ -40,8 +40,6 @@ py_test(
     srcs = [
         "enemy_free_kick_play_test.py",
     ],
-    tags = [
-    ],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
