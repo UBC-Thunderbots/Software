@@ -98,7 +98,9 @@ class Gamecontroller:
             if self.use_conventional_port:
                 kill_cmd_if_running(command)
                 if not self.is_valid_port(SSL_REFEREE_PORT):
-                    raise OSError(f"Cannot use port {SSL_REFEREE_PORT} for Gamecontroller")
+                    raise OSError(
+                        f"Cannot use port {SSL_REFEREE_PORT} for Gamecontroller"
+                    )
                 self.referee_port = SSL_REFEREE_PORT
                 self.ci_port = self.next_free_port(Gamecontroller.GC_PORT_STATE)
             else:
@@ -182,7 +184,9 @@ class Gamecontroller:
         except OSError:
             return False
 
-    def next_free_port(self, port_counter_path: str, start_port: int = 40000, max_port: int = 65535) -> int:
+    def next_free_port(
+        self, port_counter_path: str, start_port: int = 40000, max_port: int = 65535
+    ) -> int:
         """Find and claims the next free port using a file-backed counter to avoid race conditions.
         Ports are assigned monotonically and tracked in port_counter_path.
         Wraps to start_port, when max_port is reached.
@@ -192,14 +196,13 @@ class Gamecontroller:
         :param max_port: The maximum port to look up to
         :return: The next free port
         """
-        assert(start_port < max_port)
+        assert start_port < max_port
 
         try:
             with open(port_counter_path, "r") as f:
                 last_port = int(f.read().strip())
         except (FileNotFoundError, ValueError):
             last_port = random.randint(start_port, max_port)
-
 
         port = last_port + 1
         if port > max_port:
