@@ -10,27 +10,26 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "software/constants.h"
+#include "software/embedded/motor_controller/motor_board.h"
+#include "software/embedded/motor_controller/stspin_motor_controller.h"
+#include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
+#include "software/embedded/services/uart_communicator.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
 #include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
-#include "software/embedded/motor_controller/motor_board.h"
-#include "software/embedded/motor_controller/stspin_motor_controller.h"
-#include "software/embedded/motor_controller/tmc_motor_controller.h"
-#include "software/embedded/services/uart_communicator.h"
 #include "software/world/robot_state.h"
 
-        /**
-         * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
-         * using clock_nanosleep of librt
-         */
-        extern int
-        clock_nanosleep(clockid_t __clock_id, int __flags, __const struct timespec* __req,
-                        struct timespec* __rem);
+/**
+ * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
+ * using clock_nanosleep of librt
+ */
+extern int clock_nanosleep(clockid_t __clock_id, int __flags,
+                           __const struct timespec* __req, struct timespec* __rem);
 
 // signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
