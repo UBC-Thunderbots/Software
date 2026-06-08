@@ -38,8 +38,8 @@ class OrientationController
    private:
     // TODO(#3737): tune constants
     PidController w_pid_{2.0, 0.0, 0.0, 0.0};
-    PidController w_pid_close_{2.0, 0.0, 4.0, 0.0};
+    PidController w_pid_close_{3.0, 2.0, 0.0, 3.0};
 
-		// DISABLED PURE PID
     static constexpr double ANGULAR_PURE_PID_THRESHOLD_DEGREES = 0.0;
+    static constexpr double PURE_PID_THRESHOLD_TIME = 0.25;
 };
