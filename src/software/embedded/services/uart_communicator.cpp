@@ -11,7 +11,7 @@ UartCommunicator::UartCommunicator()
 
     if (!boost::filesystem::exists(DEVICE_SERIAL_PORT))
     {
-        throw std::runtime_error("USB not plugged into the Raspberry Pi");
+        throw std::runtime_error("Powerboard not found");
     }
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
     this->read_thread = std::thread(std::bind(&UartCommunicator::continuousRead, this));
@@ -26,8 +26,13 @@ UartCommunicator::~UartCommunicator()
 
 void UartCommunicator::sendDribbleTarget(int rpm)
 {
-    dribble_command      = createNanoPbDribblerControl(rpm);
-    _new_dribble_command = true;
+    if (rpm != prev_commanded_dribble_rpm)
+    {
+        dribble_command      = createNanoPbDribblerControl(rpm);
+        _new_dribble_command = true;
+        prev_commanded_dribble_rpm = rpm;
+    }
+
 }
 
 TbotsProto::PowerStatus UartCommunicator::sendChipKickCommand(

@@ -49,6 +49,11 @@ std::vector<uint8_t> serializeToVector(const T& data)
         fields = TbotsProto_PowerStatus_fields;
         size   = TbotsProto_PowerStatus_size;
     }
+    else if (std::is_same<T, TbotsProto_DribblerControl>::value)
+    {
+        fields = TbotsProto_DribblerControl_fields;
+        size   = TbotsProto_DribblerControl_size;
+    }
     else
     {
         throw std::runtime_error("Unexpected type as argument");

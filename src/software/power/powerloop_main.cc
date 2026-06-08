@@ -71,10 +71,11 @@ void loop()
             {
                 TbotsProto_PowerFrame frame = TbotsProto_PowerFrame_init_default;
                 if (unmarshalUartPacket(buffer, frame))
-                {
+                {   
                     // On successful decoding execute the given command
                     if (frame.which_power_msg == TbotsProto_PowerFrame_power_control_tag)
                     {
+
                         executor->execute(frame.power_msg.power_control);
                     }
                     else if (frame.which_power_msg ==
@@ -114,7 +115,7 @@ void loop()
         dribbler_speed =
             dribbler_speed + (dribble_target - dribbler_speed) / RAMP_FACTOR + 1;
     }
-    dribbler->dribble(dribbler_speed / DRIBBLER_MAX_SPEED * 255);
+    dribbler->dribble(dribbler_speed *255/ DRIBBLER_MAX_SPEED);
 
     // Write sensor values out to Serial
     TbotsProto_PowerFrame status_frame = createUartFrame(status);

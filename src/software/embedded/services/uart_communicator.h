@@ -47,7 +47,7 @@ class UartCommunicator
      */
     virtual void tick();
 
-   protected:
+   private:
     /**
      * Initiates timer for serial reading
      */
@@ -61,7 +61,7 @@ class UartCommunicator
     // Constants
     const size_t READ_BUFFER_SIZE =
         getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default);
-    const std::string DEVICE_SERIAL_PORT    = "/dev/ttyUSB0";
+    const std::string DEVICE_SERIAL_PORT    = "/dev/ttyAMA0";
     static constexpr unsigned int BAUD_RATE = 460800;
 
     // Required flag to exit power service cleanly
@@ -69,4 +69,6 @@ class UartCommunicator
 
     bool _new_dribble_command = false;
     std::atomic<TbotsProto_DribblerControl> dribble_command;
+
+    int prev_commanded_dribble_rpm = 0;
 };
