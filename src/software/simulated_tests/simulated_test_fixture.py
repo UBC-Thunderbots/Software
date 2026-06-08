@@ -420,6 +420,15 @@ class AggregateTestRunner(SimulatedTestRunner):
 
 
 def get_runtime_dir():
+    """Gets the base runtime directory for the test execution.
+    TODO: Refactor #3744
+
+    If running under Bazel, it uses TEST_TMPDIR to keep tests isolated. To prevent UNIX
+    socket path length limits from being exceeded by Bazel's long paths, it creates a short
+    symlink in /tmp to the TEST_TMPDIR.
+
+    :return: The path to the runtime directory.
+    """
     test_tmpdir = os.environ.get("TEST_TMPDIR")
     if not test_tmpdir:
         return "/tmp/tbots"
@@ -564,6 +573,7 @@ def simulated_test_runner():
     current_test = current_test.replace("]", "")
     current_test = current_test.replace("[", "-")
 
+    # Truncate the test name to 25 characters for UNIX path length limits
     test_name = current_test.split("-")[0][:25]
 
     # Launch all binaries
