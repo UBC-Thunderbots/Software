@@ -11,7 +11,7 @@ MotorService::MotorService(const robot_constants::RobotConstants& robot_constant
     : robot_constants_(robot_constants),
       motor_controller_(std::move(motor_controller)),
       euclidean_to_four_wheel_(robot_constants),
-      dribbler_target_rpm_(0), 
+      dribbler_target_rpm_(0),
       drive_motor_mps_per_rpm_(2 * M_PI * robot_constants.wheel_radius_meters / 60),
       num_tracked_motor_resets_(0)
 {

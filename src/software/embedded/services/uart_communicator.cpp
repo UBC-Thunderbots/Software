@@ -28,11 +28,10 @@ void UartCommunicator::sendDribbleTarget(int rpm)
 {
     if (rpm != prev_commanded_dribble_rpm)
     {
-        dribble_command      = createNanoPbDribblerControl(rpm);
-        _new_dribble_command = true;
+        dribble_command            = createNanoPbDribblerControl(rpm);
+        _new_dribble_command       = true;
         prev_commanded_dribble_rpm = rpm;
     }
-
 }
 
 TbotsProto::PowerStatus UartCommunicator::sendChipKickCommand(
