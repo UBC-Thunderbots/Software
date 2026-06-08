@@ -1,5 +1,5 @@
 ---
-- name: "Start {{ service_name | default('thunderloop') }} service"
+- name: "Start service {{ service_name | default('thunderloop') }}"
   become: true
   become_method: ansible.builtin.sudo
   ansible.builtin.systemd:
