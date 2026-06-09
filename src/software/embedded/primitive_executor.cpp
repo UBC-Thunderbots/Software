@@ -22,13 +22,13 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
     if (current_primitive_.has_move())
     {
-        const auto new_trajectory_path = createTrajectoryPathFromParams(
-            current_primitive_.move().xy_traj_params(), state_.position(),
-            state_.velocity(), robot_constants_);
+        const auto new_trajectory_path =
+            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
+                                           state_.velocity(), robot_constants_);
 
-        const auto new_angular_trajectory = createAngularTrajectoryFromParams(
-            current_primitive_.move().w_traj_params(), state_.orientation(),
-            state_.angularVelocity(), robot_constants_);
+        const auto new_angular_trajectory =
+            createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
+                                              state_.angularVelocity(), robot_constants_);
 
         const bool is_linear_trajectory_new =
             new_trajectory_path.has_value() != trajectory_path_.has_value() ||
