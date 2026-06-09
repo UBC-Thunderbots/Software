@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pins.h>
+#include <cstdint>
 
 /**
  * Represents the dribbler on the power board
@@ -14,7 +14,19 @@ class Dribbler
     Dribbler();
 
     /**
-     * Sets the dribbler to the given duty cycle from 0 (always off) to 255 (always on)
+     * Updates the desired dribbler speed in RPM.
      */
-    static void dribble(uint32_t speed);
+    void setTargetSpeed(uint32_t speed_rpm);
+
+    /**
+     * Advances the ramp and applies the resulting PWM output.
+     */
+    void update();
+
+   private:
+    static constexpr uint32_t MAX_SPEED_RPM = 11040;
+    static constexpr uint32_t RAMP_FACTOR   = 4;
+
+    uint32_t target_speed_rpm_  = 0;
+    uint32_t current_speed_rpm_ = 0;
 };

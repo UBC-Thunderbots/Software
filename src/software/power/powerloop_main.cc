@@ -18,6 +18,7 @@
 #include "software/power/charger.h"
 #include "software/power/chicker.h"
 #include "software/power/control_executor.h"
+#include "software/power/dribbler.h"
 #include "software/power/geneva.h"
 #include "software/power/power_monitor.h"
 #endif
@@ -37,11 +38,6 @@ std::shared_ptr<Geneva> geneva;
 std::shared_ptr<ControlExecutor> executor;
 std::shared_ptr<Dribbler> dribbler;
 
-#define RAMP_FACTOR 4
-#define DRIBBLER_MAX_SPEED 11040  // Max RPM from spec
-int dribble_target;
-int dribbler_speed;
-
 void setup()
 {
     Serial.begin(460800, SERIAL_8N1);
@@ -54,8 +50,6 @@ void setup()
     executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
     dribbler     = std::make_shared<Dribbler>();
     charger->chargeCapacitors();
-    dribbler_speed = 0;
-    dribble_target = 0;
 }
 
 void loop()
@@ -80,7 +74,8 @@ void loop()
                     else if (frame.which_power_msg ==
                              TbotsProto_PowerFrame_dribbler_control_tag)
                     {
-                        dribble_target = frame.power_msg.dribbler_control.dribbler_speed;
+                        dribbler->setTargetSpeed(
+                            frame.power_msg.dribbler_control.dribbler_speed);
                     }
                 }
 
@@ -98,23 +93,13 @@ void loop()
         }
     }
 
+    dribbler->update();
+
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
         monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
         monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
         chicker->getBreakBeamTripped());
-
-    if (dribble_target <= dribbler_speed)
-    {
-        dribbler_speed = dribble_target;
-    }
-    else
-    {
-        // Ramp to speed
-        dribbler_speed =
-            dribbler_speed + (dribble_target - dribbler_speed) / RAMP_FACTOR + 1;
-    }
-    dribbler->dribble(dribbler_speed * 255 / DRIBBLER_MAX_SPEED);
 
     // Write sensor values out to Serial
     TbotsProto_PowerFrame status_frame = createUartFrame(status);

@@ -335,7 +335,8 @@ std::unique_ptr<TbotsProto::PowerStatus> inline createTbotsPowerStatus(
  * @param dribbler_speed_rpm The target dribbler speed in RPM
  * @return a nanopb dribbler control msg with the provided fields
  */
-TbotsProto_DribblerControl inline createNanoPbDribblerControl(int dribbler_speed_rpm)
+TbotsProto_DribblerControl inline createNanoPbDribblerControl(
+    const uint32_t dribbler_speed_rpm)
 {
     TbotsProto_DribblerControl control = TbotsProto_DribblerControl_init_default;
     control.dribbler_speed             = dribbler_speed_rpm;
