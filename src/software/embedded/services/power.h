@@ -18,16 +18,21 @@ class PowerService
    public:
     /**
      * Service that interacts with the power board.
-     * Opens all the required ports and maintains them until destroyed.
+     *
+     * @param kick_coefficient The coefficient used in kick speed to pulse width
+     * conversion
+     * @param kick_constant The constant used in kick speed to pulse width conversion
+     * @param chip_constant The constant used in chip distance to pulse width conversion
      */
     explicit PowerService(double kick_coefficient, int kick_constant, int chip_constant);
     ~PowerService();
 
     /**
-     * When the power service is polled it sends the given power control msg and
-     * returns the latest power status
+     * Polls the power service to execute the given DirectControlPrimitive and update
+     * the current power status.
      *
-     * @return the latest power status
+     * @param primitive DirectControlPrimitive to execute
+     * @param robot_status RobotStatus message to modify with the current power status
      */
     void poll(const TbotsProto::DirectControlPrimitive& primitive,
               TbotsProto::RobotStatus& robot_status);
@@ -43,8 +48,19 @@ class PowerService
      */
     void continuousRead();
 
+    /**
+     * Reads a power status frame from the power board over UART.
+     *
+     * @return the power status read from the power board, or nullopt if the
+     * read was unsuccessful
+     */
     std::optional<TbotsProto_PowerStatus> readPowerStatus() const;
 
+    /**
+     * Writes a power frame to the power board over UART.
+     *
+     * @param frame the power frame to write to the power board
+     */
     void writePowerFrame(const TbotsProto_PowerFrame& frame) const;
 
     const double kick_coefficient_;

@@ -28,11 +28,12 @@ class MotorService
     explicit MotorService(const robot_constants::RobotConstants& robot_constants);
 
     /**
-     * Polls the motor service to execute the given motor control command and
-     * return the current motor status.
+     * Polls the motor service to execute the given DirectControlPrimitive and
+     * update the current motor status.
      *
+     * @param primitive DirectControlPrimitive to execute
+     * @param robot_status RobotStatus message to modify with the current motor status
      * @param time_elapsed_since_last_poll_s The time since the last poll in seconds
-     * @return The status of all the motors
      */
     void poll(const TbotsProto::DirectControlPrimitive& primitive,
               TbotsProto::RobotStatus& robot_status,
