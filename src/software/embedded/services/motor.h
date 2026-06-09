@@ -31,12 +31,12 @@ class MotorService
      * Polls the motor service to execute the given motor control command and
      * return the current motor status.
      *
-     * @param motor_control The motor control message to unpack and execute
      * @param time_elapsed_since_last_poll_s The time since the last poll in seconds
      * @return The status of all the motors
      */
-    TbotsProto::MotorStatus poll(const TbotsProto::MotorControl& motor_control,
-                                 double time_elapsed_since_last_poll_s);
+    void poll(const TbotsProto::DirectControlPrimitive& primitive,
+              TbotsProto::RobotStatus& robot_status,
+              double time_elapsed_since_last_poll_s);
 
     /**
      * Clears previous faults, configures the motor and checks encoder connections.

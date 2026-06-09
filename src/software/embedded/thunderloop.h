@@ -104,21 +104,17 @@ class Thunderloop
      * Poll the motor service.
      *
      * @param poll_time Populates the time taken to poll the service
-     * @param motor_control Control message for the motors
      * @param time_since_prev_iteration Stores the time difference since the last call
      */
-    TbotsProto::MotorStatus pollMotorService(
-        struct timespec& poll_time, const TbotsProto::MotorControl& motor_control,
-        const struct timespec& time_since_prev_iteration);
+    void pollMotorService(struct timespec& poll_time,
+                          const struct timespec& time_since_prev_iteration);
 
     /**
      * Poll the power service
      *
      * @param poll_time Populates the time taken to poll the service
-     *
-     * @return The polled power status message
      */
-    TbotsProto::PowerStatus pollPowerService(struct timespec& poll_time);
+    void pollPowerService(struct timespec& poll_time);
 
     /**
      * Wait for networking communication to be established. This function is blocking.
@@ -134,8 +130,6 @@ class Thunderloop
     // Output Msg Buffers
     TbotsProto::RobotStatus robot_status_;
     TbotsProto::NetworkStatus network_status_;
-    TbotsProto::PowerStatus power_status_;
-    std::optional<TbotsProto::MotorStatus> motor_status_;
     TbotsProto::ThunderloopStatus thunderloop_status_;
     TbotsProto::ChipperKickerStatus chipper_kicker_status_;
     TbotsProto::PrimitiveExecutorStatus primitive_executor_status_;
@@ -148,11 +142,6 @@ class Thunderloop
     int channel_id_;
     std::string network_interface_;
     int loop_hz_;
-
-    // Calibrated power service constants
-    double kick_coeff_;
-    int kick_constant_;
-    int chip_pulse_width_;
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
