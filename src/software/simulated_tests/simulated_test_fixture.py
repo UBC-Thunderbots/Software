@@ -419,10 +419,41 @@ class AggregateTestRunner(SimulatedTestRunner):
         assert failed_tests == 0
 
 
-def load_command_line_arguments(allow_unrecognized: bool = False):
-    """Load in command-line arguments using argparse
+def get_runtime_dir():
+    """Gets the base runtime directory for the test execution.
+    TODO: Refactor #3744
 
-    NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
+    If running under Bazel, it uses TEST_TMPDIR to keep tests isolated. To prevent UNIX
+    socket path length limits from being exceeded by Bazel's long paths, it creates a short
+    symlink in /tmp to the TEST_TMPDIR.
+
+    :return: The path to the runtime directory.
+    """
+    test_tmpdir = os.environ.get("TEST_TMPDIR")
+    if not test_tmpdir:
+        return "/tmp/tbots"
+    import uuid
+
+    symlink_path = os.path.join("/tmp", f"tbt_{uuid.uuid4().hex[:8]}")
+    try:
+        os.symlink(test_tmpdir, symlink_path)
+    except OSError:
+        pass
+    return symlink_path
+
+
+RUNTIME_DIR = get_runtime_dir()
+
+
+def load_command_line_arguments(allow_unrecognized: bool = False) -> argparse.Namespace:
+    """Load command line arguments.
+
+    We aren't using pytest.ini because it does not allow for dynamic defaults,
+    which we need to use TEST_TMPDIR when it's available.
+
+    We aren't using conftest.py's pytest_addoption because we want to be able to
+    run the gamecontroller script directly from python without pytest.
+    Pytest does have a way to access parsed options (request.config.getoption),
     but it doesn't seem to play nicely with bazel. We just use argparse instead.
 
     :param allow_unrecognized: if true, does not raise an error for unrecognized arguments
@@ -444,19 +475,19 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         "--simulator_runtime_dir",
         type=str,
         help="simulator runtime directory",
-        default="/tmp/tbots",
+        default=RUNTIME_DIR,
     )
     parser.add_argument(
         "--blue_full_system_runtime_dir",
         type=str,
         help="blue full_system runtime directory",
-        default="/tmp/tbots/blue",
+        default=os.path.join(RUNTIME_DIR, "blue"),
     )
     parser.add_argument(
         "--yellow_full_system_runtime_dir",
         type=str,
         help="yellow full_system runtime directory",
-        default="/tmp/tbots/yellow",
+        default=os.path.join(RUNTIME_DIR, "yellow"),
     )
     parser.add_argument(
         "--layout",
@@ -542,7 +573,8 @@ def simulated_test_runner():
     current_test = current_test.replace("]", "")
     current_test = current_test.replace("[", "-")
 
-    test_name = current_test.split("-")[0]
+    # Truncate the test name to 25 characters for UNIX path length limits
+    test_name = current_test.split("-")[0][:25]
 
     # Launch all binaries
     with Simulator(

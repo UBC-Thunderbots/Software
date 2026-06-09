@@ -28,7 +28,6 @@ py_test(
     srcs = [
         "enemy_ball_placement_play_test.py",
     ],
-    tags = ["exclusive"],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
