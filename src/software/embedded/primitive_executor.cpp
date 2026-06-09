@@ -30,34 +30,18 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
             createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
                                               state_.angularVelocity(), robot_constants_);
 
-        const bool is_linear_trajectory_new =
-            new_trajectory_path.has_value() != trajectory_path_.has_value() ||
-            (trajectory_path_.has_value() &&
-             !trajectory_path_->hasSameDestination(*new_trajectory_path,
-                                                   LINEAR_DESTINATION_THRESHOLD_METERS));
+        LOG(PLOTJUGGLER) << *createPlotJugglerValue(
+            {{"trajectory_duration", new_trajectory_path->getTotalTime()}});
 
-        const bool is_angular_trajectory_new =
-            !angular_trajectory_.has_value() ||
-            !angular_trajectory_->hasSameDestination(
-                new_angular_trajectory, ANGULAR_DESTINATION_THRESHOLD_DEGREES);
+        trajectory_path_ = new_trajectory_path;
+        position_controller_.reset();
+        time_since_linear_trajectory_creation_ =
+            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
 
-        LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"new_trajectory", 0}});
-        if (is_linear_trajectory_new || true)
-        {
-            LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"new_trajectory", 1}});
-            trajectory_path_ = new_trajectory_path;
-            position_controller_.reset();
-            time_since_linear_trajectory_creation_ =
-                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
-        }
-
-        if (is_angular_trajectory_new || true)
-        {
-            angular_trajectory_ = new_angular_trajectory;
-            orientation_controller_.reset();
-            time_since_angular_trajectory_creation_ =
-                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
-        }
+        angular_trajectory_ = new_angular_trajectory;
+        orientation_controller_.reset();
+        time_since_angular_trajectory_creation_ =
+            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
     }
 }
 
@@ -115,6 +99,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     time_since_angular_trajectory_creation_ += delta_time;
     status.set_running_primitive(true);
 
+    static auto last_local_velocity = Vector();
+
     switch (current_primitive_.primitive_case())
     {
         case TbotsProto::Primitive::kStop:
@@ -146,6 +132,32 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
 
             Vector local_velocity            = stepTargetLinearVelocity(delta_time);
             AngularVelocity angular_velocity = stepTargetAngularVelocity(delta_time);
+
+            // const Vector local_acceleration = (local_velocity - state_.localVelocity())
+            // / delta_time.toSeconds();
+            const Vector local_acceleration =
+                (last_local_velocity - state_.localVelocity()) / delta_time.toSeconds();
+            last_local_velocity = state_.localVelocity();
+
+            LOG(PLOTJUGGLER) << *createPlotJugglerValue(
+                {{"acceleration_length", local_acceleration.length()}});
+
+            if (local_acceleration.length() >
+                robot_constants_.robot_max_acceleration_m_per_s_2)
+            {
+                LOG(WARNING) << "Robot trying to accelerate at "
+                             << local_acceleration.length() << "m/s^2.";
+            }
+
+            const AngularAcceleration angular_acceleration =
+                angular_velocity - state_.angularVelocity();
+            if (angular_acceleration.toRadians() >
+                robot_constants_.robot_max_ang_acceleration_rad_per_s_2)
+            {
+                LOG(WARNING) << "Robot trying to angular accelerate at "
+                             << angular_acceleration.toRadians() << "rads/s^2.";
+            }
+
 
             auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,

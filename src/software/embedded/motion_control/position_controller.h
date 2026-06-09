@@ -35,12 +35,12 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
 
    private:
     // TODO(#3737): tune constants
-    PidController x_pid_{2.0, 0.0, 0.0, 0.0};
-    PidController y_pid_{2.0, 0.0, 0.0, 0.0};
+    PidController x_pid_{0.0, 0.0, 0.0, 0.0};
+    PidController y_pid_{0.0, 0.0, 0.0, 0.0};
 
     PidController x_pid_close_{2.0, 1.0, 0.0, 5.0};
     PidController y_pid_close_{2.0, 1.0, 0.0, 5.0};
 
-    static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS = 0.3;
-    static constexpr double PURE_PID_THRESHOLD_TIME = 0.25;
+    static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS = 0.0;
+    static constexpr double PURE_PID_THRESHOLD_TIME = 0.0;
 };
