@@ -24,10 +24,8 @@ class MotorService
      * Service that interacts with the motors.
      *
      * @param robot_constants The robot constants
-     * @param motor_controller The motor controller
      */
-    explicit MotorService(const robot_constants::RobotConstants& robot_constants,
-                          std::unique_ptr<MotorController> motor_controller);
+    explicit MotorService(const robot_constants::RobotConstants& robot_constants);
 
     /**
      * Polls the motor service to execute the given motor control command and

@@ -10,13 +10,9 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "software/constants.h"
-#include "software/embedded/motor_controller/motor_board.h"
-#include "software/embedded/motor_controller/stspin_motor_controller.h"
-#include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
-#include "software/embedded/services/uart_communicator.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
@@ -121,22 +117,11 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    std::shared_ptr<UartCommunicator> uart = std::make_shared<UartCommunicator>();
-    power_service_                         = std::make_unique<PowerService>(uart);
+    power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
-    if constexpr (MOTOR_BOARD == MotorBoard::TRINAMIC)
-    {
-        motor_service_ = std::make_unique<MotorService>(
-            robot_constants, std::make_unique<TmcMotorController>());
-    }
-    else
-    {
-        motor_service_ = std::make_unique<MotorService>(
-            robot_constants,
-            std::make_unique<StSpinMotorController>(robot_constants, uart));
-    }
+    motor_service_  = std::make_unique<MotorService>(robot_constants);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
 
