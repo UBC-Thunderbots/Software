@@ -91,7 +91,6 @@ cc_library(
 py_test(
     name = "ball_occlusion_test",
     srcs = ["ball_occlusion_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",
