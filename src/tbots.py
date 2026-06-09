@@ -300,6 +300,7 @@ def start_interactive_cli():
                     "setup_pi.yml",
                     "deploy_robot_software.yml",
                     "deploy_powerboard.yml",
+                    "deploy_motor_firmware.yml",
                 ],
             ).ask()
             config.robot_name = questionary.text("Robot name?").ask()

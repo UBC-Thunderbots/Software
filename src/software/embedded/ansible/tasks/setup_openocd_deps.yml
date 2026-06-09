@@ -1,0 +1,17 @@
+---
+- name: Sync OpenOCD Script
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.posix.synchronize:
+    src: ../../setup_openocd_deps.sh
+    dest: ~/
+    copy_links: true
+
+- name: Running the OpenOCD script, this will take a while
+  become_method: ansible.builtin.sudo
+  become: true
+  ansible.builtin.command: "/home/{{ ansible_user }}/setup_openocd_deps.sh"
+  register: result
+  changed_when: true
+  args:
+    chdir: ~/
