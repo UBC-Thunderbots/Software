@@ -263,6 +263,7 @@ void Thunderloop::runLoop()
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
+                // TODO (#3725): use robot localizer to pass in position and orientation
                 primitive_executor_.updateState(
                     RobotState(Point(), createVector(status.local_velocity()), Angle(),
                                createAngularVelocity(status.angular_velocity())));
