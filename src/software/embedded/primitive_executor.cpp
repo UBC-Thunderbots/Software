@@ -80,7 +80,7 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time
     // make sure robot doesn't rotate faster than max angular speed
     const double max_speed = robot_constants_.robot_max_ang_speed_rad_per_s;
     const double clamped_w = std::clamp(target_w.toRadians(), -max_speed, max_speed);
-    target_w = AngularVelocity::fromRadians(clamped_w);
+    target_w               = AngularVelocity::fromRadians(clamped_w);
 
     const auto angular_acceleration =
         (target_w - state_.angularVelocity()) / delta_time.toSeconds();
