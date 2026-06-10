@@ -6,12 +6,10 @@ AngularVelocity OrientationController::step(
 {
     // feedforward trajectory angular velocity with small pid control effort
     const Angle error_angular =
-        (target_trajectory.getPosition(elapsed_time.toSeconds()) - orientation)
-            .clamp();
+        (target_trajectory.getPosition(elapsed_time.toSeconds()) - orientation).clamp();
     const AngularVelocity pid_effort_angular = AngularVelocity::fromRadians(
         w_pid_.step(error_angular.toRadians(), delta_time.toSeconds()));
-    return target_trajectory.getVelocity(elapsed_time.toSeconds()) +
-           pid_effort_angular;
+    return target_trajectory.getVelocity(elapsed_time.toSeconds()) + pid_effort_angular;
 }
 
 void OrientationController::reset()

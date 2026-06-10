@@ -71,7 +71,8 @@ class PrimitiveExecutor
      * control primitive
      * @param delta_time Used to calculate acceleration.
      */
-    void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity, Duration delta_time);
+    void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
+                                       Duration delta_time);
 
     RobotState state_;
     TbotsProto::Primitive current_primitive_;
