@@ -41,6 +41,5 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
     PidController x_pid_close_{2.0, 1.0, 0.0, 5.0};
     PidController y_pid_close_{2.0, 1.0, 0.0, 5.0};
 
-    static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS = 0.0;
-    static constexpr double PURE_PID_THRESHOLD_TIME = 0.0;
+    static constexpr double LINEAR_PURE_PID_THRESHOLD_METERS = 0.2;
 };

@@ -86,8 +86,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     time_since_angular_trajectory_creation_ += delta_time;
     status.set_running_primitive(true);
 
-    static auto last_local_velocity = Vector();
-
     switch (current_primitive_.primitive_case())
     {
         case TbotsProto::Primitive::kStop:
@@ -120,12 +118,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             Vector local_velocity            = stepTargetLinearVelocity(delta_time);
             AngularVelocity angular_velocity = stepTargetAngularVelocity(delta_time);
 
-            // const Vector local_acceleration = (local_velocity - state_.localVelocity())
-            // / delta_time.toSeconds();
             const Vector local_acceleration =
-                (last_local_velocity - state_.localVelocity()) / delta_time.toSeconds();
-            last_local_velocity = state_.localVelocity();
-
+                (local_velocity - state_.localVelocity()) / delta_time.toSeconds();
             if (local_acceleration.length() >
                 robot_constants_.robot_max_acceleration_m_per_s_2)
             {
@@ -141,7 +135,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 LOG(WARNING) << "Robot trying to angular accelerate at "
                              << angular_acceleration.toRadians() << "rads/s^2.";
             }
-
 
             auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,

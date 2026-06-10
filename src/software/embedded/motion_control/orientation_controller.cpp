@@ -7,9 +7,7 @@ AngularVelocity OrientationController::step(
     const Angle difference_from_target =
         (target_trajectory.getDestination() - orientation).clamp();
 
-    if (difference_from_target.abs().toDegrees() < ANGULAR_PURE_PID_THRESHOLD_DEGREES ||
-        target_trajectory.getTotalTime() - elapsed_time.toSeconds() <
-            PURE_PID_THRESHOLD_TIME)
+    if (difference_from_target.abs().toDegrees() < ANGULAR_PURE_PID_THRESHOLD_DEGREES)
     {
         // if target orientation is close enough, use pure PID for angular velocity
         return AngularVelocity::fromRadians(w_pid_close_.step(
