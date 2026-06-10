@@ -1,5 +1,7 @@
 #include "software/embedded/motion_control/position_controller.h"
 
+#include "software/geom/algorithms/distance.h"
+
 Vector PositionController::step(const Point& position,
                                 const TrajectoryPath& target_trajectory,
                                 Duration elapsed_time, Duration delta_time)

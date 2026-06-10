@@ -22,6 +22,7 @@ cc_library(
         ":controller",
         ":pid_controller",
         "//software/ai/navigator/trajectory:trajectory_path",
+        "//software/geom/algorithms",
     ],
 )
 
