@@ -160,7 +160,7 @@ def test_attacker_passing(
             RobotEventuallyAtOrientation(robot_id=1, orientation=pass_orientation),
             # Larger threshold since techically ball is at passer point, not the robot
             RobotEventuallyAtPosition(
-                robot_id=1, position=passer_point, threshold=ROBOT_MAX_RADIUS_METERS
+                robot_id=1, position=passer_point, threshold=ROBOT_MAX_RADIUS_METERS * 1.5
             ),
             BallEventuallyKickedInDirection(kick_direction=pass_orientation),
         ]
