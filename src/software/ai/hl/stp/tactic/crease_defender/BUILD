@@ -38,9 +38,6 @@ cc_test(
 py_test(
     name = "crease_defender_tactic_test",
     srcs = ["crease_defender_tactic_test.py"],
-    tags = [
-        "exclusive",
-    ],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",

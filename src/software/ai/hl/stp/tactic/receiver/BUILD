@@ -38,9 +38,6 @@ cc_test(
 py_test(
     name = "receiver_tactic_test",
     srcs = ["receiver_tactic_test.py"],
-    tags = [
-        "exclusive",
-    ],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",

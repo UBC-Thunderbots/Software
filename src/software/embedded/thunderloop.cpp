@@ -74,7 +74,6 @@ extern "C"
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
                          bool enable_log_merging, const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
-      motor_status_(std::nullopt),
       robot_constants_(robot_constants),
       robot_id_(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY))),
       channel_id_(
@@ -121,7 +120,10 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    // power_service_ = std::make_unique<PowerService>();
+    power_service_ = std::make_unique<PowerService>(
+        std::stod(toml_config_client_->get(ROBOT_KICK_EXP_COEFF_CONFIG_KEY)),
+        std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY)),
+        std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY)));
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
@@ -178,6 +180,16 @@ void Thunderloop::runLoop()
     dateFile.close();
     robot_status_.set_thunderloop_version(thunderloop_hash);
     robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
+    *(robot_status_.mutable_motor_status()) = TbotsProto::MotorStatus();
+    *(robot_status_.mutable_power_status()) = TbotsProto::PowerStatus();
+
+    std::optional<ImuData> imu_poll = imu_service_->poll();
+
+    // TODO (3725): Replace with actual IMU data usage
+    if (imu_poll.has_value() && imu_poll->angular_velocity.has_value())
+    {
+        LOG(INFO) << "IMU Angular Velocity: " << imu_poll->angular_velocity->toRadians();
+    }
 
     for (;;)
     {
@@ -432,9 +444,8 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
-TbotsProto::MotorStatus Thunderloop::pollMotorService(
-    struct timespec& poll_time, const TbotsProto::MotorControl& motor_control,
-    const struct timespec& time_since_prev_iteration)
+void Thunderloop::pollMotorService(struct timespec& poll_time,
+                                   const struct timespec& time_since_prev_iteration)
 {
     ScopedTimespecTimer timer(&poll_time);
 
@@ -442,17 +453,17 @@ TbotsProto::MotorStatus Thunderloop::pollMotorService(
 
     double time_since_prev_iteration_s =
         getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
-    return motor_service_->poll(motor_control, time_since_prev_iteration_s);
+
+    motor_service_->poll(direct_control_, robot_status_, time_since_prev_iteration_s);
 }
 
-TbotsProto::PowerStatus Thunderloop::pollPowerService(struct timespec& poll_time)
+void Thunderloop::pollPowerService(struct timespec& poll_time)
 {
     ScopedTimespecTimer timer(&poll_time);
 
     ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
 
-    return power_service_->poll(direct_control_.power_control(), kick_coeff_,
-                                kick_constant_, chip_pulse_width_);
+    power_service_->poll(direct_control_, robot_status_);
 }
 
 bool isPowerStable(std::ifstream& log_file)
@@ -489,11 +500,11 @@ void Thunderloop::updateErrorCodes()
     robot_status_.clear_error_code();
 
     // Updates error status
-    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
+    if (robot_status_.power_status().battery_voltage() <= BATTERY_WARNING_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
     }
-    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
+    if (robot_status_.power_status().capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
     }

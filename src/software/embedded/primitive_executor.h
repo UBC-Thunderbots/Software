@@ -45,7 +45,35 @@ class PrimitiveExecutor
         TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time);
 
    private:
+    /*
+     * Compute the next target linear _local_ velocity the robot should have.
+     * @param delta_time The elapsed time since last time step
+     *
+     * @returns Vector The target linear _local_ velocity
+     */
+    Vector stepTargetLinearVelocity(Duration delta_time);
+
+    /*
+     * Compute the next target angular velocity the robot should have.
+     * @param delta_time The elapsed time since last time step
+     *
+     * @returns AngularVelocity The target angular velocity
+     */
+    AngularVelocity stepTargetAngularVelocity(Duration delta_time);
+
+    /**
+     * Sends the position, local velocity, and local acceleration to PlotJuggler.
+     *
+     * @param target_local_velocity The local velocity being sent to the next direct
+     * control primitive
+     * @param delta_time Used to calculate acceleration.
+     */
+    void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
+                                       Duration delta_time);
+
+    RobotState state_;
     TbotsProto::Primitive current_primitive_;
+    robot_constants::RobotConstants robot_constants_;
 
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
@@ -53,26 +81,18 @@ class PrimitiveExecutor
     Duration time_since_linear_trajectory_creation_;
     Duration time_since_angular_trajectory_creation_;
 
-    Point position_;
-    Vector velocity_;
-    AngularVelocity angular_velocity_;
-    Angle orientation_;
-
-    Point last_position_;
-    Angle last_orientation_;
-
-    robot_constants::RobotConstants robot_constants_;
-
     PositionController position_controller_;
     OrientationController orientation_controller_;
+
+    // Estimated delay between a vision frame to AI processing to robot executing
+    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+
+    // The distance away from the destination at which we start dampening the velocity
+    // to avoid jittering around the destination.
+    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
 
     // If distance between current linear trajectory destination and new one is larger
     // than this, we change trajectories.
     static constexpr double LINEAR_DESTINATION_THRESHOLD_METERS   = 0.03;
     static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
-
-    // These constants were lost during a refactor/revert and are currently set to
-    // estimated defaults.
-    static constexpr double LINEAR_STALL_ERROR_MAX_METERS   = 0.4;
-    static constexpr double ANGULAR_STALL_ERROR_MAX_DEGREES = 13.0;
 };

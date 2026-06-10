@@ -5,6 +5,10 @@ set -ex
 host_software_packages=(
     device-tree-compiler
     curl
+    python3
+    python3-venv
+    python3-pip
+    libgpiod-dev
     libssl-dev
     libffi-dev
     zlib1g-dev
@@ -34,12 +38,13 @@ cd /tmp/tbots_download_cache/Python-3.12.0
 make -j$(nproc)
 sudo make altinstall
 
+sudo mkdir -p /opt/tbotspython
+sudo chown -R $USER:$USER /opt/tbotspython
+
 if ! sudo /usr/local/bin/python3.12 -m venv /opt/tbotspython ; then
     echo "Error: Installing Python 3.12 failed"
     exit 1
 fi
-
-sudo chown -R $USER:$USER /opt/tbotspython
 
 # install PlatformIO to global environment
 curl -fsSL -o /tmp/tbots_download_cache/get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py
