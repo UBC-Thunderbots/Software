@@ -38,4 +38,6 @@ class OrientationController
    private:
     // TODO(#3737): tune constants
     PidController w_pid_{0.4, 0.0, 0.0, 0.0};
+
+    static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 5;
 };

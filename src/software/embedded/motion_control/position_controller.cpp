@@ -9,7 +9,18 @@ Vector PositionController::step(const Point& position,
         target_trajectory.getPosition(elapsed_time.toSeconds()) - position;
     const Vector control_effort{x_pid_.step(error.x(), delta_time.toSeconds()),
                                 y_pid_.step(error.y(), delta_time.toSeconds())};
-    return target_trajectory.getVelocity(elapsed_time.toSeconds()) + control_effort;
+    double distance_to_destination =
+        distance(position, target_trajectory.getDestination());
+
+    Vector local_velocity =
+        target_trajectory.getVelocity(elapsed_time.toSeconds()) + control_effort;
+
+    // Dampen velocity as we get closer to the destination to reduce jittering
+    if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
+    {
+        local_velocity *= distance_to_destination / MAX_DAMPENING_VELOCITY_DISTANCE_M;
+    }
+    return local_velocity;
 }
 
 void PositionController::reset()

@@ -9,7 +9,19 @@ AngularVelocity OrientationController::step(
         (target_trajectory.getPosition(elapsed_time.toSeconds()) - orientation).clamp();
     const AngularVelocity pid_effort_angular = AngularVelocity::fromRadians(
         w_pid_.step(error_angular.toRadians(), delta_time.toSeconds()));
-    return target_trajectory.getVelocity(elapsed_time.toSeconds()) + pid_effort_angular;
+
+    AngularVelocity angular_velocity =
+        target_trajectory.getVelocity(elapsed_time.toSeconds()) + pid_effort_angular;
+
+    const Angle orientation_to_destination =
+        orientation.minDiff(target_trajectory.getDestination());
+    // Dampen angular velocity as we get closer to the destination to reduce jittering
+    if (orientation_to_destination.toDegrees() < ANGULAR_DESTINATION_THRESHOLD_DEGREES)
+    {
+        angular_velocity *= orientation_to_destination.toDegrees() /
+                            ANGULAR_DESTINATION_THRESHOLD_DEGREES;
+    }
+    return angular_velocity;
 }
 
 void OrientationController::reset()
