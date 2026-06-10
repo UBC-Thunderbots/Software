@@ -21,7 +21,6 @@ cc_library(
     deps = [
         ":controller",
         ":pid_controller",
-        "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/trajectory:trajectory_path",
     ],
 )

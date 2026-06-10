@@ -1,19 +1,9 @@
 #include "software/embedded/motion_control/position_controller.h"
 
-#include "proto/message_translation/tbots_protobuf.h"
-#include "software/logger/logger.h"
-
 Vector PositionController::step(const Point& position,
                                 const TrajectoryPath& target_trajectory,
                                 Duration elapsed_time, Duration delta_time)
 {
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue(
-        {{"target_position_x",
-          target_trajectory.getPosition(elapsed_time.toSeconds()).x()},
-         {"target_position_y",
-          target_trajectory.getPosition(elapsed_time.toSeconds()).y()},
-         {"actual_position_x", position.x()},
-         {"actual_position_y", position.y()}});
     const Vector distance_from_destination =
         target_trajectory.getDestination() - position;
 

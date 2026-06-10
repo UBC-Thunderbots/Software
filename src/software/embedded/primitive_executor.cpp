@@ -38,10 +38,21 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         time_since_linear_trajectory_creation_ =
             Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
 
-        angular_trajectory_ = new_angular_trajectory;
-        orientation_controller_.reset();
-        time_since_angular_trajectory_creation_ =
-            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        if (is_linear_trajectory_new)
+        {
+            trajectory_path_ = new_trajectory_path;
+            position_controller_.reset();
+            time_since_linear_trajectory_creation_ =
+                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        }
+
+        if (is_angular_trajectory_new)
+        {
+            angular_trajectory_ = new_angular_trajectory;
+            orientation_controller_.reset();
+            time_since_angular_trajectory_creation_ =
+                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        }
     }
 }
 
@@ -52,16 +63,6 @@ void PrimitiveExecutor::updateState(const RobotState& state)
 
 Vector PrimitiveExecutor::stepTargetLinearVelocity(Duration delta_time)
 {
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-        {"target_velocity_x",
-         trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds())
-             .x()},
-        {"target_velocity_y",
-         trajectory_path_->getVelocity(time_since_linear_trajectory_creation_.toSeconds())
-             .y()},
-        {"actual_velocity_x", state_.velocity().x()},
-        {"actual_velocity_y", state_.velocity().y()},
-    });
     const auto target_v_global =
         position_controller_.step(state_.position(), *trajectory_path_,
                                   time_since_linear_trajectory_creation_, delta_time);
