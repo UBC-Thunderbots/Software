@@ -7,21 +7,22 @@
 #include "software/embedded/motion_control/orientation_controller.h"
 #include "software/embedded/motion_control/position_controller.h"
 #include "software/geom/vector.h"
+#include "software/time/duration.h"
 #include "software/world/robot_state.h"
+#include "software/world/team_types.h"
 
 class PrimitiveExecutor
 {
    public:
     /**
      * Constructor
-     *
-     * @param robot_constants The robot constants for the robot
+     * @param robot_constants The robot constants for the robot which uses this primitive
+     * executor
      */
     explicit PrimitiveExecutor(const robot_constants::RobotConstants& robot_constants);
 
     /**
      * Update primitive executor with a new Primitive
-     *
      * @param primitive_msg The primitive to start
      */
     void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
@@ -36,9 +37,11 @@ class PrimitiveExecutor
     /**
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
+     *
      * @param status The status of the primitive executor, set to false if current
      * primitive is a Stop primitive
-     * @param delta_time The time passed since the last step
+     * @param delta_time The elapsed time since the last primitive step
+     *
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(

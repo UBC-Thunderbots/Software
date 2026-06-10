@@ -45,6 +45,9 @@ cc_library(
 
 cc_library(
     name = "pid_controller",
+    srcs = [
+        "pid_controller.cpp",
+    ],
     hdrs = [
         "pid_controller.h",
     ],
