@@ -117,6 +117,16 @@
         executable: /bin/bash
       changed_when: true
 
+    - name: Restore Pinmux for SPI
+      ansible.builtin.shell: >
+        set -o pipefail;
+        echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 17 op dh pu &&
+        echo {{ ansible_sudo_pass }} | sudo -S pinctrl set 18 op dh pu
+      args:
+        executable: /bin/bash
+      failed_when: false
+      changed_when: false
+
     - name: Start thunderloop service
       ansible.builtin.include_tasks: ../tasks/start_service.yml
       vars:
