@@ -52,12 +52,22 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(Duration delta_time)
     const auto target_v_global =
         position_controller_.step(state_.position(), *trajectory_path_,
                                   time_since_linear_trajectory_creation_, delta_time);
-    const auto target_v_local =
-        globalToLocalVelocity(target_v_global, state_.orientation());
+    auto target_v_local = globalToLocalVelocity(target_v_global, state_.orientation());
 
-    return target_v_local.normalize(
+    target_v_local = target_v_local.normalize(
         std::min(target_v_local.length(),
                  static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
+
+    const Vector local_acceleration =
+        (target_v_local - state_.localVelocity()) / delta_time.toSeconds();
+
+    if (local_acceleration.length() > robot_constants_.robot_max_acceleration_m_per_s_2)
+    {
+        LOG(WARNING) << "Robot trying to accelerate at " << local_acceleration.length()
+                     << "m/s^2.";
+    }
+
+    return target_v_local;
 }
 
 AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time)
@@ -65,6 +75,7 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time
     const auto target_w =
         orientation_controller_.step(state_.orientation(), *angular_trajectory_,
                                      time_since_angular_trajectory_creation_, delta_time);
+
     if (target_w.toRadians() < -robot_constants_.robot_max_ang_speed_rad_per_s)
     {
         return AngularVelocity::fromRadians(
@@ -75,6 +86,15 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time
         return AngularVelocity::fromRadians(
             robot_constants_.robot_max_ang_speed_rad_per_s);
     }
+
+    // const AngularAcceleration angular_acceleration =
+    //     angular_velocity - state_.angularVelocity();
+    // if (angular_acceleration.toRadians() >
+    //     robot_constants_.robot_max_ang_acceleration_rad_per_s_2)
+    // {
+    //     LOG(WARNING) << "Robot trying to angular accelerate at "
+    //                  << angular_acceleration.toRadians() << "rads/s^2.";
+    // }
     return target_w;
 }
 
@@ -117,24 +137,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
 
             Vector local_velocity            = stepTargetLinearVelocity(delta_time);
             AngularVelocity angular_velocity = stepTargetAngularVelocity(delta_time);
-
-            const Vector local_acceleration =
-                (local_velocity - state_.localVelocity()) / delta_time.toSeconds();
-            if (local_acceleration.length() >
-                robot_constants_.robot_max_acceleration_m_per_s_2)
-            {
-                LOG(WARNING) << "Robot trying to accelerate at "
-                             << local_acceleration.length() << "m/s^2.";
-            }
-
-            const AngularAcceleration angular_acceleration =
-                angular_velocity - state_.angularVelocity();
-            if (angular_acceleration.toRadians() >
-                robot_constants_.robot_max_ang_acceleration_rad_per_s_2)
-            {
-                LOG(WARNING) << "Robot trying to angular accelerate at "
-                             << angular_acceleration.toRadians() << "rads/s^2.";
-            }
 
             auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
