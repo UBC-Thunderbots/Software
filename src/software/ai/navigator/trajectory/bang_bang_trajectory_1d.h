@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <cmath>
 #include <cstddef>
 
 #include "software/ai/navigator/trajectory/trajectory.hpp"
@@ -103,21 +102,6 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * @return The number of trajectory parts
      */
     size_t getNumTrajectoryParts() const;
-
-    /**
-     * Checks if this 1D trajectory terminates at approximately the same destination
-     * position as another trajectory.
-     *
-     * @param other The other trajectory to compare against.
-     * @param threshold The maximum allowable distance between the two destinations.
-     * @return True if the distance between destinations is less than or equal to the
-     * threshold. False otherwise.
-     */
-    bool hasSameDestination(const Trajectory<double, double, double>& other,
-                            double threshold) const override
-    {
-        return std::abs(getDestination() - other.getDestination()) <= threshold;
-    }
 
    private:
     /**

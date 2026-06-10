@@ -59,16 +59,4 @@ class Trajectory
     {
         return getPosition(getTotalTime());
     }
-
-    /**
-     * Checks if this trajectory terminates at approximately the same destination as
-     * another trajectory.
-     *
-     * @param other The other trajectory to compare against.
-     * @param threshold The maximum allowable distance between the two destinations.
-     * @return True if the distance between destinations is less than or equal to the
-     * threshold. False otherwise.
-     */
-    virtual bool hasSameDestination(const Trajectory<P, V, A>& other,
-                                    double threshold) const = 0;
 };
