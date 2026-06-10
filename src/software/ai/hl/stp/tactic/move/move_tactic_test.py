@@ -298,7 +298,7 @@ def test_spinning_move(
     )
 
 
-def test_move_avah(simulated_test_runner):
+def test_move_across_x_axis(simulated_test_runner):
     initial_position = tbots_cpp.Point(-4.4, 0)
     destination = tbots_cpp.Point(3, 0)
 
