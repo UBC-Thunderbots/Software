@@ -64,6 +64,15 @@ class PrimitiveExecutor
      */
     AngularVelocity stepTargetAngularVelocity(Duration delta_time);
 
+    /**
+     * Sends the position, local velocity, and local acceleration to PlotJuggler.
+     *
+     * @param target_local_velocity The local velocity being sent to the next direct
+     * control primitive
+     * @param delta_time Used to calculate acceleration.
+     */
+    void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity, Duration delta_time);
+
     RobotState state_;
     TbotsProto::Primitive current_primitive_;
     robot_constants::RobotConstants robot_constants_;

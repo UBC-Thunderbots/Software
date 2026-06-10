@@ -138,6 +138,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             Vector local_velocity            = stepTargetLinearVelocity(delta_time);
             AngularVelocity angular_velocity = stepTargetAngularVelocity(delta_time);
 
+            sendLinearMotionToPlotJuggler(local_velocity, delta_time);
+
             auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
                 convertDribblerModeToDribblerSpeed(
@@ -157,4 +159,15 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
+}
+
+void PrimitiveExecutor::sendLinearMotionToPlotJuggler(const Vector& target_local_velocity, Duration delta_time)
+{
+    const Vector& local_acceleration = (target_local_velocity - state_.localVelocity()) / delta_time.toSeconds();
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"x", state_.position().x()},
+                                                 {"y", state_.position().y()},
+                                                 {"v_x", target_local_velocity.x()},
+                                                 {"v_y", target_local_velocity.y()},
+                                                 {"a_x", local_acceleration.x()},
+                                                 {"a_y", local_acceleration.y()}});
 }
